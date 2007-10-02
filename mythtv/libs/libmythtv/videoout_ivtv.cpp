@@ -736,7 +736,7 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     switch (db_pip_location)
     {
-        default:
+        case kPIP_END:
         case kPIPTopLeft:
                 xoff = 50;
                 yoff = 40;

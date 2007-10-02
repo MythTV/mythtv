@@ -217,7 +217,7 @@ VideoOutputXv::~VideoOutputXv()
 }
 
 // this is documented in videooutbase.cpp
-void VideoOutputXv::Zoom(int direction)
+void VideoOutputXv::Zoom(ZoomDirection direction)
 {
     QMutexLocker locker(&global_lock);
     VideoOutput::Zoom(direction);
@@ -1455,7 +1455,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 
-    // This needs to be here because "opengl" needs it in InitVideoBuffers().
+    // This needs to be here because OpenGL needs it in InitVideoBuffers()..
     use_picture_controls =
         gContext->GetNumSetting("UseOutputPictureControls", 0);
 
@@ -3690,20 +3690,18 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 }
 
 // this is documented in videooutbase.cpp
-int VideoOutputXv::SetPictureAttribute(int attribute, int newValue)
+int VideoOutputXv::SetPictureAttribute(
+    PictureAttribute attribute, int newValue)
 {
     if (!use_picture_controls)
         return -1;
 
     if (VideoOutputSubType() == OpenGL)
     {
-        if (kPictureAttribute_Hue == attribute)
-            return -1;
-
-        gl_videochain->SetPictureAttribute(attribute, newValue);
-
-        SetPictureAttributeDBValue(attribute, newValue);
-
+        newValue = min(max(newValue, 0), 100);
+        newValue = gl_videochain->SetPictureAttribute(attribute, newValue);
+        if (newValue >= 0)
+            SetPictureAttributeDBValue(attribute, newValue);
         return newValue;
     }
 

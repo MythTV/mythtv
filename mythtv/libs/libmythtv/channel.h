@@ -53,8 +53,8 @@ class Channel : public DTVChannel
 
     // Picture attributes.
     bool InitPictureAttributes(void);
-    int  GetPictureAttribute(const QString db_col_name) const;
-    int  ChangePictureAttribute(int, const QString db_col_name, bool up);
+    int  GetPictureAttribute(PictureAttribute) const;
+    int  ChangePictureAttribute(PictureAdjustType, PictureAttribute, bool up);
 
     // PID caching
     void SaveCachedPids(const pid_cache_t&) const;

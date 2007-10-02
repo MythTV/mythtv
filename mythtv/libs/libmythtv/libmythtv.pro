@@ -262,6 +262,7 @@ using_frontend {
     HEADERS += videobuffers.h           vsync.h
     HEADERS += jitterometer.h           yuv2rgb.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
+    HEADERS += videoouttypes.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp

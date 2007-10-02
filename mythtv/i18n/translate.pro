@@ -45,6 +45,7 @@ SOURCES += ../libs/libmythtv/tv.cpp
 SOURCES += ../libs/libmythtv/tv_play.cpp
 SOURCES += ../libs/libmythtv/videosource.cpp
 SOURCES += ../libs/libmythtv/videosource.h
+SOURCES += ../libs/libmythtv/videoouttypes.h
 SOURCES += ../libs/libmythtv/viewschdiff.cpp
 SOURCES += ../libs/libmythui/myththemedmenu.cpp
 SOURCES += ../libs/libmyth/uitypes.cpp

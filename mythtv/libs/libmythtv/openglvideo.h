@@ -89,7 +89,7 @@ class OpenGLVideo
     QSize GetVideoSize(void)        const { return videoSize; }
     void SetVideoResize(const QRect &rect);
     void DisableVideoResize(void);
-    void SetPictureAttribute(int attributeType, int newValue);
+    int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 
   private:
     void Teardown(void);
@@ -143,7 +143,7 @@ class OpenGLVideo
     bool             videoResize;
     QRect            videoResizeRect;
 
-    static QMap<int,float> pictureAttribs;
+    float pictureAttribs[kPictureAttribute_MAX];
 };
 
 #else // if !USING_OPENGL_VIDEO
@@ -181,7 +181,7 @@ class OpenGLVideo
     QSize GetVideoSize(void) const { return QSize(0,0); }
     void SetVideoResize(const QRect&) { }
     void DisableVideoResize(void) { }
-    void SetPictureAttribute(int, int) { }
+    int SetPictureAttribute(PictureAttribute, int) { return -1; }
 };
 
 #endif // !USING_OPENGL_VIDEO

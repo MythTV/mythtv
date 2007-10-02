@@ -2,6 +2,7 @@
 #define TV_H
 
 #include <qstring.h>
+#include "videoouttypes.h"
 
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
@@ -61,18 +62,5 @@ typedef enum PictureAdjustType
 } PictureAdjustType;
 QString toTypeString(PictureAdjustType type);
 QString toTitleString(PictureAdjustType type);
-
-typedef enum PictureAttribute
-{
-    kPictureAttribute_None = 0,
-    kPictureAttribute_MIN = 1,
-    kPictureAttribute_Brightness = 1,
-    kPictureAttribute_Contrast,
-    kPictureAttribute_Colour,
-    kPictureAttribute_Hue,
-    kPictureAttribute_Volume,
-    kPictureAttribute_MAX
-} PictureAttribute;
-QString toString(PictureAttribute index);
 
 #endif

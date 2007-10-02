@@ -240,7 +240,7 @@ VideoOutput::VideoOutput() :
     // DB Settings
     db_display_dim(0,0),                db_move(0,0),
     db_scale_horiz(0.0f),               db_scale_vert(0.0f),
-    db_pip_location(0),                 db_pip_size(26),
+    db_pip_location(kPIPTopLeft),       db_pip_size(26),
     db_aspectoverride(kAspect_Off),     db_adjustfill(kAdjustFill_Off),
     db_deint_filtername(QString::null),
     db_vdisp_profile(new VideoDisplayProfile()),
@@ -291,8 +291,10 @@ VideoOutput::VideoOutput() :
     db_move        = QPoint(gContext->GetNumSetting("xScanDisplacement", 0),
                             gContext->GetNumSetting("yScanDisplacement", 0));
 
-    db_pip_location    = gContext->GetNumSetting("PIPLocation",        0);
-    db_pip_size        = gContext->GetNumSetting("PIPSize",           26);
+    db_pip_location = (PIPLocation)
+        gContext->GetNumSetting("PIPLocation", (int) kPIPTopLeft);
+    db_pip_size =
+        gContext->GetNumSetting("PIPSize",            26);
 
     db_pict_attr[kPictureAttribute_Brightness] =
         gContext->GetNumSetting("PlaybackBrightness", 50);
@@ -303,8 +305,10 @@ VideoOutput::VideoOutput() :
     db_pict_attr[kPictureAttribute_Hue] =
         gContext->GetNumSetting("PlaybackHue",         0);
 
-    db_aspectoverride  = gContext->GetNumSetting("AspectOverride",     0);
-    db_adjustfill      = gContext->GetNumSetting("AdjustFill",         0);
+    db_aspectoverride = (AspectOverrideMode)
+        gContext->GetNumSetting("AspectOverride",      0);
+    db_adjustfill = (AdjustFillMode)
+        gContext->GetNumSetting("AdjustFill",          0);
 }
 
 /**
@@ -1035,7 +1039,7 @@ void VideoOutput::PrintMoveResizeDebug(void)
  * then we letterbox settings, and finally we apply manual
  * scale & move properties for "Zoom Mode".
  *
- * \sa Zoom(int), ToggleAdjustFill(int)
+ * \sa Zoom(ZoomDirection), ToggleAdjustFill(int)
  */
 void VideoOutput::MoveResize(void)
 {
@@ -1055,12 +1059,12 @@ void VideoOutput::MoveResize(void)
 }
 
 /**
- * \fn VideoOutput::Zoom(int)
+ * \fn VideoOutput::Zoom(ZoomDirection)
  * \brief Sets up zooming into to different parts of the video, the zoom
  *        is actually applied in MoveResize().
- * \sa ToggleAdjustFill(int)
+ * \sa ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutput::Zoom(int direction)
+void VideoOutput::Zoom(ZoomDirection direction)
 {
     if (kZoomHome == direction)
     {
@@ -1092,50 +1096,44 @@ void VideoOutput::Zoom(int direction)
 }
 
 /**
- * \fn VideoOutput::ToggleAspectOverride(int)
+ * \fn VideoOutput::ToggleAspectOverride(AspectOverrideMode)
  * \brief Enforce different aspect ration than detected,
  *        then calls VideoAspectRatioChanged(float)
  *        to apply them.
- * \sa Zoom(int), ToggleAdjustFill(int)
+ * \sa Zoom(ZoomDirection), ToggleAdjustFill(AdjustFillMode)
  */
-void VideoOutput::ToggleAspectOverride(int aspectMode)
+void VideoOutput::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
     if (aspectMode == kAspect_Toggle)
     {
-        if (++aspectoverride >= kAspect_END)
-            aspectoverride = kAspect_Off;
+        aspectMode = (AspectOverrideMode)
+            ((int)(aspectoverride + 1) % kAspect_END);
     }
-    else
-    {
-        aspectoverride = aspectMode;
-    }
+
+    aspectoverride = aspectMode;
 
     VideoAspectRatioChanged(video_aspect);
 }
 
 /**
- * \fn VideoOutput::ToggleAdjustFill(int)
+ * \fn VideoOutput::ToggleAdjustFill(AdjustFillMode)
  * \brief Sets up letterboxing for various standard video frame and
  *        monitor dimensions, then calls MoveResize()
  *        to apply them.
- * \sa Zoom(int), ToggleAspectOverride(int)
+ * \sa Zoom(ZoomDirection), ToggleAspectOverride(AspectOverrideMode)
  */
-void VideoOutput::ToggleAdjustFill(int adjustfillMode)
+void VideoOutput::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
-    if (adjustfillMode == kAdjustFill_Toggle)
-    {
-        if (++adjustfill >= kAdjustFill_END)
-            adjustfill = kAdjustFill_Off;
-    }
-    else
-    {
-        adjustfill = adjustfillMode;
-    }
+    if (adjustFill == kAdjustFill_Toggle)
+        adjustFill = (AdjustFillMode) ((int)(adjustfill + 1) % kAspect_END);
+
+    adjustfill = adjustFill;
 
     MoveResize();
 }
 
-int VideoOutput::ChangePictureAttribute(int attributeType, bool direction)
+int VideoOutput::ChangePictureAttribute(
+    PictureAttribute attributeType, bool direction)
 {
     int curVal = GetPictureAttribute(attributeType);
     if (curVal < 0)
@@ -1152,22 +1150,22 @@ int VideoOutput::ChangePictureAttribute(int attributeType, bool direction)
 }
 
 /**
- * \fn VideoOutput::SetPictureAttribute(int, int)
+ * \fn VideoOutput::SetPictureAttribute(PictureAttribute, int)
  * \brief Sets a specified picture attribute.
  * \param attribute Picture attribute to set.
  * \param newValue  Value to set attribute to.
  * \return Set value if it succeeds, -1 if it does not.
  */
-int VideoOutput::SetPictureAttribute(int attribute, int newValue)
+int VideoOutput::SetPictureAttribute(PictureAttribute attribute, int newValue)
 {
     (void)attribute;
     (void)newValue;
     return -1;
 }
 
-int VideoOutput::GetPictureAttribute(int attributeType) const
+int VideoOutput::GetPictureAttribute(PictureAttribute attributeType) const
 {
-    QMap<int,int>::const_iterator it = db_pict_attr.find(attributeType);
+    PictureSettingMap::const_iterator it = db_pict_attr.find(attributeType);
     if (it == db_pict_attr.end())
         return -1;
     return *it;
@@ -1175,12 +1173,13 @@ int VideoOutput::GetPictureAttribute(int attributeType) const
 
 void VideoOutput::InitPictureAttributes(void)
 {
-    QMap<int,int>::const_iterator it = db_pict_attr.begin();
+    PictureSettingMap::const_iterator it = db_pict_attr.begin();
     for (; it != db_pict_attr.end(); ++it)
         SetPictureAttribute(it.key(), *it);
 }
 
-void VideoOutput::SetPictureAttributeDBValue(int attributeType, int newValue)
+void VideoOutput::SetPictureAttributeDBValue(
+    PictureAttribute attributeType, int newValue)
 {
     QString dbName = QString::null;
     if (kPictureAttribute_Brightness == attributeType)
@@ -1214,7 +1213,7 @@ QRect VideoOutput::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
     int yoff = (int)(display_visible_rect.height() * 0.06);
     switch (location)
     {
-        default:
+        case kPIP_END:
         case kPIPTopLeft:
             break;
         case kPIPBottomLeft:
@@ -1377,7 +1376,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     int yoff = 0;
     switch (db_pip_location)
     {
-        default:
+        case kPIP_END:
         case kPIPTopLeft:
                 xoff = 30 + letterXadj;
                 yoff = 40 + letterYadj;

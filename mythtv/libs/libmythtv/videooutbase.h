@@ -13,6 +13,7 @@ extern "C" {
 #include <qptrlist.h>
 #include "videobuffers.h"
 #include "mythcodecid.h"
+#include "videoouttypes.h"
 
 using namespace std;
 
@@ -25,93 +26,6 @@ class VideoDisplayProfile;
 
 extern "C" {
 struct ImgReSampleContext;
-}
-
-enum PIPLocations
-{
-    kPIPTopLeft = 0,
-    kPIPBottomLeft,
-    kPIPTopRight,
-    kPIPBottomRight
-};
-
-enum ZoomDirections
-{
-    kZoomHome = 0,
-    kZoomIn,
-    kZoomOut,
-    kZoomUp,
-    kZoomDown,
-    kZoomLeft,
-    kZoomRight
-};
-
-enum AdjustFillModes
-{
-    kAdjustFill_Toggle = -1,
-    kAdjustFill_Off = 0,
-    kAdjustFill_Half,
-    kAdjustFill_Full,
-    kAdjustFill_Stretch,
-    kAdjustFill_END
-};
-
-enum AspectOverrideModes
-{
-    kAspect_Toggle = -1,
-    kAspect_Off = 0,
-    kAspect_4_3,
-    kAspect_16_9,
-    kAspect_END
-};
-
-enum FrameScanType
-{
-    kScan_Ignore      = -1,
-    kScan_Detect      =  0,
-    kScan_Interlaced  =  1, // == XVMC_TOP_PICTURE
-    kScan_Intr2ndField=  2, // == XVMC_BOTTOM_PICTURE
-    kScan_Progressive =  3, // == XVMC_FRAME_PICTURE
-};
-
-static inline bool is_interlaced(FrameScanType scan)
-{
-    return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);
-}
-
-static inline bool is_progressive(FrameScanType scan)
-{
-    return (kScan_Progressive == scan);
-}
-
-static inline QString frame_scan_to_string(FrameScanType scan,
-                                           bool brief = false)
-{
-    QString ret = QObject::tr("Unknown");
-    switch (scan)
-    {
-        case kScan_Ignore:
-            ret = QObject::tr("Ignore"); break;
-        case kScan_Detect:
-            ret = QObject::tr("Detect"); break;
-        case kScan_Interlaced:
-            if (brief)
-                ret = QObject::tr("Interlaced");
-            else
-                ret = QObject::tr("Interlaced (Normal)");
-            break;
-        case kScan_Intr2ndField:
-            if (brief)
-                ret = QObject::tr("Interlaced");
-            else
-                ret = QObject::tr("Interlaced (Reversed)");
-            break;
-        case kScan_Progressive:
-            ret = QObject::tr("Progressive"); break;
-        default:
-            break;
-    }
-    return ret;
 }
 
 class VideoOutput
@@ -153,7 +67,7 @@ class VideoOutput
     virtual void StopEmbedding(void);
 
     virtual void MoveResize(void);
-    virtual void Zoom(int direction);
+    virtual void Zoom(ZoomDirection direction);
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
     virtual void GetOSDBounds(QRect &visible, QRect &total,
@@ -174,14 +88,15 @@ class VideoOutput
     virtual float GetDisplayAspect(void) const { return display_aspect; }
 
     /// \brief Returns current aspect override mode
-    /// \sa ToggleAspectOverride(int)
-    int GetAspectOverride(void) { return aspectoverride; }
-    void ToggleAspectOverride(int aspectOverrideMode = kAspect_Toggle);
+    /// \sa ToggleAspectOverride(AspectOverrideMode)
+    AspectOverrideMode GetAspectOverride(void) { return aspectoverride; }
+    void ToggleAspectOverride(
+        AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
 
     /// \brief Returns current adjust fill mode
-    /// \sa ToggleAdjustFill(int)
-    int GetAdjustFill(void) { return adjustfill; }
-    void ToggleAdjustFill(int adjustFillMode = kAdjustFill_Toggle);
+    /// \sa ToggleAdjustFill(AdjustFillMode)
+    AdjustFillMode GetAdjustFill(void) { return adjustfill; }
+    void ToggleAdjustFill(AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -191,9 +106,9 @@ class VideoOutput
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void) { needrepaint = true; }
 
-    int         ChangePictureAttribute(int attributeType, bool direction);
-    virtual int SetPictureAttribute(int attributeType, int newValue);
-    int         GetPictureAttribute(int attributeType) const;
+    int         ChangePictureAttribute(PictureAttribute, bool direction);
+    virtual int SetPictureAttribute(PictureAttribute, int newValue);
+    int         GetPictureAttribute(PictureAttribute) const;
     void        InitPictureAttributes(void);
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
@@ -300,7 +215,8 @@ class VideoOutput
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
-    virtual void SetPictureAttributeDBValue(int attributeType, int newValue);
+    virtual void SetPictureAttributeDBValue(
+        PictureAttribute attributeType, int newValue);
     virtual QRect GetVisibleOSDBounds(float&, float&) const;
     virtual QRect GetTotalOSDBounds(void) const;
 
@@ -325,11 +241,13 @@ class VideoOutput
     QPoint  db_move;          ///< Percentage move from database
     float   db_scale_horiz;   ///< Horizontal Overscan/Underscan percentage
     float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
-    int     db_pip_location;
+    PIPLocation db_pip_location;
     int     db_pip_size;      ///< percentage of full window to use for PiP
-    QMap<int,int> db_pict_attr; ///< Picture settings
-    int     db_aspectoverride;
-    int     db_adjustfill;
+
+    typedef QMap<PictureAttribute,int> PictureSettingMap;
+    PictureSettingMap  db_pict_attr; ///< Picture settings
+    AspectOverrideMode db_aspectoverride;
+    AdjustFillMode     db_adjustfill;
     QString db_deint_filtername;
 
     VideoDisplayProfile *db_vdisp_profile;
@@ -350,9 +268,9 @@ class VideoOutput
     /// if the user has toggled the aspect override mode.
     float   overriden_video_aspect;
     /// AspectOverrideMode to use to modify overriden_video_aspect
-    int     aspectoverride;
+    AspectOverrideMode aspectoverride;
     /// Zoom mode
-    int     adjustfill;
+    AdjustFillMode adjustfill;
 
     /// Pixel rectangle in video frame to display
     QRect   video_rect;

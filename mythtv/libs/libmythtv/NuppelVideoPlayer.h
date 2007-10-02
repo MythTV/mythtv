@@ -156,7 +156,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
                         float a = 1.33333, FrameScanType scan = kScan_Ignore, 
                         bool video_codec_changed = false);
     void SetFileLength(int total, int frames);
-    void Zoom(int direction);
+    void Zoom(ZoomDirection direction);
     void ClearBookmark(void);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
 
@@ -171,8 +171,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetVideoResize(const QRect &videoRect);
 
     // Toggle Sets
-    void ToggleAspectOverride(int aspectMode = -1);
-    void ToggleAdjustFill(int adjustfillMode = -1);
+    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
+    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
 
     // Gets
     int     GetVideoWidth(void) const         { return video_width; }
@@ -181,8 +181,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
     int     GetSecondsBehind(void) const;
-    int     GetAspectOverride(void) const;
-    int     GetAdjustFill(void) const;
+    AspectOverrideMode GetAspectOverride(void) const;
+    AdjustFillMode     GetAdjustFill(void) const;
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
     float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }

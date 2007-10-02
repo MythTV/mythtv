@@ -1066,8 +1066,12 @@ bool Channel::InitPictureAttributes(void)
             InitPictureAttribute("hue"));
 }
 
-int Channel::GetPictureAttribute(const QString db_col_name) const
+int Channel::GetPictureAttribute(PictureAttribute attr) const
 {
+    QString db_col_name = toDBString(attr);
+    if (db_col_name.isEmpty())
+        return -1;
+
     int cfield = ChannelUtil::GetChannelValueInt(
         db_col_name, GetCurrentSourceID(), curchannelname);
     int sfield = CardUtil::GetValueInt(
@@ -1212,9 +1216,13 @@ static int set_attribute_value(bool usingv4l2, int videofd,
 }
 
 int Channel::ChangePictureAttribute(
-    int type, const QString db_col_name, bool up)
+    PictureAdjustType type, PictureAttribute attr, bool up)
 {
     if (!pParent || is_dtv)
+        return -1;
+
+    QString db_col_name = toDBString(attr);
+    if (db_col_name.isEmpty())
         return -1;
 
     int v4l2_attrib = get_v4l2_attribute(db_col_name);
@@ -1226,7 +1234,7 @@ int Channel::ChangePictureAttribute(
     if (get_attribute_value(usingv4l2, videofd, v4l2_attrib) < 0)
         return -1;
 
-    int old_value = GetPictureAttribute(db_col_name);
+    int old_value = GetPictureAttribute(attr);
     int new_value = old_value + ((up) ? 655 : -655);
 
     // make sure we are within bounds (wrap around for hue)

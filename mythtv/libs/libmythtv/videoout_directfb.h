@@ -27,10 +27,10 @@ class VideoOutputDirectfb: public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private);
-    void Zoom(int direction);
+    void Zoom(ZoomDirection direction);
     void DrawUnusedRects(bool /*sync*/) { }
     void UpdatePauseFrame(void);
-    int  SetPictureAttribute(int attribute, int newValue);
+    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
     int  GetRefreshRate(void);
 

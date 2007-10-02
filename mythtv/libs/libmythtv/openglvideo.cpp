@@ -21,8 +21,6 @@
 #define LOC QString("GLVid: ")
 #define LOC_ERR QString("GLVid, Error: ")
 
-QMap<int,float> OpenGLVideo::pictureAttribs;
-
 class OpenGLFilter
 {
     public:
@@ -1006,11 +1004,9 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                     {
                         gl_context->InitFragmentParams(
                             0,
-                            (pictureAttribs[kPictureAttribute_Brightness] /
-                             50.0f) - 0.5f,
-                            (pictureAttribs[kPictureAttribute_Contrast] /
-                             50.0f),
-                            (pictureAttribs[kPictureAttribute_Colour] / 50.0f),
+                            pictureAttribs[kPictureAttribute_Brightness],
+                            pictureAttribs[kPictureAttribute_Contrast],
+                            pictureAttribs[kPictureAttribute_Colour],
                             0.0f);
                     }
                     break;
@@ -1119,9 +1115,31 @@ void OpenGLVideo::Rotate(vector<GLuint> *target)
 }
 
 // locking ok
-void OpenGLVideo::SetPictureAttribute(int attributeType, int newValue)
+int OpenGLVideo::SetPictureAttribute(
+    PictureAttribute attribute, int newValue)
 {
-    pictureAttribs[attributeType] = (float) newValue;
+    if (!useColourControl)
+        return -1;
+
+    int ret = -1;
+    switch (attribute)
+    {
+        case kPictureAttribute_Brightness:
+            ret = newValue;
+            pictureAttribs[attribute] = (newValue * 0.02f) - 0.5f;
+            break;
+        case kPictureAttribute_Contrast:
+        case kPictureAttribute_Colour:
+            ret = newValue;
+            pictureAttribs[attribute] = (newValue * 0.02f);
+            break;
+        case kPictureAttribute_Hue: // not supported yet...
+            break;
+        default:
+            break;
+    }
+
+    return ret;
 }
 
 // locking ok

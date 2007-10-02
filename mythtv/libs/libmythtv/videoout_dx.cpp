@@ -86,7 +86,8 @@ VideoOutputDX::~VideoOutputDX()
     Exit();
 }
 
-void VideoOutputDX::Zoom(int direction)
+// this is documented in videooutbase.cpp
+void VideoOutputDX::Zoom(ZoomDirection direction)
 {
     VideoOutput::Zoom(direction);
     MoveResize();
@@ -474,7 +475,9 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
     DisplayOSD(frame, osd);
 }
 
-int VideoOutputDX::SetPictureAttribute(int attribute, int newValue)
+// this is documented in videooutbase.cpp
+int VideoOutputDX::SetPictureAttribute(
+    PictureAttribute attribute, int newValue)
 {
     if (ccontrol == NULL)
         return -1;

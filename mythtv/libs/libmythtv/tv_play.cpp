@@ -2697,7 +2697,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             activenvp->NextScanType();
             if (GetOSD())
             {
-                QString msg = frame_scan_to_string(activenvp->GetScanType());
+                QString msg = toString(activenvp->GetScanType());
                 GetOSD()->SetSettingsText(msg, 3);
             }
         }
@@ -3615,11 +3615,12 @@ QString TV::PlayMesg()
         mesg = mesg.arg(normal_speed);
     }
 
-/*
-    FrameScanType scan = activenvp->GetScanType();
-    if (is_progressive(scan) || is_interlaced(scan))
-        mesg += " (" + frame_scan_to_string(scan, true) + ")";
-*/
+    if (0)
+    {
+        FrameScanType scan = activenvp->GetScanType();
+        if (is_progressive(scan) || is_interlaced(scan))
+            mesg += " (" + toString(scan, true) + ")";
+    }
 
     return mesg;
 }
@@ -5529,36 +5530,19 @@ void TV::IdleDialog(void)
     idleTimer->changeInterval(timeuntil * 1000);
 }
 
-void TV::ToggleAspectOverride(int aspectMode)
+void TV::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
     nvp->ToggleAspectOverride(aspectMode);
-    int aspectoverride = nvp->GetAspectOverride();
-    QString text;
-
-    switch (aspectoverride)
-    {
-        case kAspect_4_3:             text = tr("4:3"); break;
-        case kAspect_16_9:            text = tr("16:9"); break;
-        default:                      text = tr("Off"); break;
-    }
+    QString text = toString(nvp->GetAspectOverride());
 
     if (GetOSD() && !browsemode && !GetOSD()->IsRunningTreeMenu())
         GetOSD()->SetSettingsText(text, 3);
 }
 
-void TV::ToggleAdjustFill(int adjustfillMode)
+void TV::ToggleAdjustFill(AdjustFillMode adjustfillMode)
 {
     nvp->ToggleAdjustFill(adjustfillMode);
-    int adjustfill = nvp->GetAdjustFill();
-    QString text;
-
-    switch (adjustfill)
-    {
-        case kAdjustFill_Half:        text = tr("Half Zoom"); break;
-        case kAdjustFill_Full:        text = tr("Full Zoom"); break;
-        case kAdjustFill_Stretch:     text = tr("Zoom & Stretch"); break;
-        default:                      text = tr("Off"); break;
-    }
+    QString text = toString(nvp->GetAdjustFill());
 
     if (GetOSD() && !browsemode && !GetOSD()->IsRunningTreeMenu())
         GetOSD()->SetSettingsText(text, 3);
@@ -6023,16 +6007,15 @@ void TV::HandleOSDClosed(int osdType)
     }
 }
 
-void TV::DoTogglePictureAttribute(int itype)
+void TV::DoTogglePictureAttribute(PictureAdjustType type)
 {
-    PictureAdjustType type = (PictureAdjustType) itype;
-
     if (!db_use_picture_attr && kAdjustingPicture_Playback == type)
         return;
 
     adjustingPicture = type;
 
-    adjustingPictureAttribute += 1;
+    adjustingPictureAttribute = (PictureAttribute)
+        ((int) adjustingPictureAttribute + 1);
     if ((adjustingPictureAttribute >= kPictureAttribute_MAX) ||
         ((type >= kAdjustingPicture_Channel) &&
          (adjustingPictureAttribute > kPictureAttribute_Hue)))
@@ -6040,7 +6023,7 @@ void TV::DoTogglePictureAttribute(int itype)
         adjustingPictureAttribute = kPictureAttribute_MIN;
     }
 
-    PictureAttribute attr = (PictureAttribute) adjustingPictureAttribute;
+    PictureAttribute attr = adjustingPictureAttribute;
     QString title = toTitleString(type);
 
     if (!GetOSD())
@@ -6075,18 +6058,17 @@ void TV::DoTogglePictureAttribute(int itype)
     update_osd_pos = false;
 }
    
-void TV::DoChangePictureAttribute(int itype, int control, bool up)
+void TV::DoChangePictureAttribute(
+    PictureAdjustType type, PictureAttribute attr, bool up)
 {
     if (!GetOSD())
         return;
 
-    PictureAdjustType type = (PictureAdjustType) itype;
-    PictureAttribute  attr = (PictureAttribute)  control;
     int value = 99;
 
     if (nvp && (kAdjustingPicture_Playback == type))
     {
-        if (kPictureAttribute_Volume == control)
+        if (kPictureAttribute_Volume == attr)
         {
             ChangeVolume(up);
             return;
@@ -6592,16 +6574,17 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action.left(17) == "TOGGLEPICCONTROLS")
     {
-        adjustingPictureAttribute = action.right(1).toInt() - 1;
+        adjustingPictureAttribute = (PictureAttribute)
+            (action.right(1).toInt() - 1);
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (action.left(12) == "TOGGLEASPECT")
     {
-        ToggleAspectOverride(action.right(1).toInt());
+        ToggleAspectOverride((AspectOverrideMode) action.right(1).toInt());
     }
     else if (action.left(10) == "TOGGLEFILL")
     {
-        ToggleAdjustFill(action.right(1).toInt());
+        ToggleAdjustFill((AdjustFillMode) action.right(1).toInt());
     }
     else if (action == "GUIDE")
         EditSchedule(kScheduleProgramGuide);

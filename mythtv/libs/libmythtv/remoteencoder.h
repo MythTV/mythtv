@@ -6,6 +6,8 @@
 #include <qmap.h>
 
 #include "mythexp.h"
+#include "videoouttypes.h"
+#include "tv.h"
 
 class ProgramInfo;
 class MythSocket;
@@ -44,8 +46,9 @@ class MPUBLIC RemoteEncoder
     QStringList GetInputs(void);
     QString GetInput(void);
     QString SetInput(QString);
-    int  GetPictureAttribute(int attr);
-    int  ChangePictureAttribute(int type, int attr, bool direction);
+    int  GetPictureAttribute(PictureAttribute attr);
+    int  ChangePictureAttribute(
+        PictureAdjustType type, PictureAttribute attr, bool up);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);

@@ -159,7 +159,7 @@ class VideoOutputQuartzView
     virtual void InputChanged(int width, int height, float aspect,
                               MythCodecID av_codec_id);
     virtual void VideoAspectRatioChanged(float aspect);
-    virtual void Zoom(int direction);
+    virtual void Zoom(ZoomDirection direction);
 
     virtual void EmbedChanged(bool embedded);
 
@@ -604,7 +604,7 @@ void VideoOutputQuartzView::VideoAspectRatioChanged(float aspect)
     Transform();
 }
 
-void VideoOutputQuartzView::Zoom(int direction)
+void VideoOutputQuartzView::Zoom(ZoomDirection direction)
 {
     (void)direction;
 
@@ -1233,7 +1233,8 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
         view->VideoAspectRatioChanged(aspect);
 }
 
-void VideoOutputQuartz::Zoom(int direction)
+// this is documented in videooutbase.cpp
+void VideoOutputQuartz::Zoom(ZoomDirection direction)
 {
     VERBOSE(VB_PLAYBACK,
             QString("VideoOutputQuartz::Zoom(direction=%1)").arg(direction));

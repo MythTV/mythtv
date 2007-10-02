@@ -214,14 +214,12 @@ static HostCheckBox *DecodeExtraAudio()
     return gc;
 }
 
-static HostComboBox *PIPLocation()
+static HostComboBox *PIPLocationComboBox()
 {
     HostComboBox *gc = new HostComboBox("PIPLocation");
     gc->setLabel(QObject::tr("PIP Video Location"));
-    gc->addSelection(QObject::tr("Top Left"), "0");
-    gc->addSelection(QObject::tr("Bottom Left"), "1");
-    gc->addSelection(QObject::tr("Top Right"), "2");
-    gc->addSelection(QObject::tr("Bottom Right"), "3");
+    for (uint loc = 0; loc < kPIP_END; loc++)
+        gc->addSelection(toString((PIPLocation) loc), QString::number(loc));
     gc->setHelpText(QObject::tr("Location of PIP Video window."));
     return gc;
 }
@@ -2105,9 +2103,8 @@ static HostComboBox *AspectOverride()
 {
     HostComboBox *gc = new HostComboBox("AspectOverride");
     gc->setLabel(QObject::tr("Video Aspect Override"));
-    gc->addSelection(QObject::tr("Off"),  "0");
-    gc->addSelection(QObject::tr("4:3"),  "1");
-    gc->addSelection(QObject::tr("16:9"), "2");
+    for (int m = kAspect_Off; m < kAspect_END; m++)
+        gc->addSelection(toString((AspectOverrideMode)m), QString::number(m));
     gc->setHelpText(QObject::tr(
                         "When enabled, these will override the aspect "
                         "ratio specified by any broadcaster for all "
@@ -2119,10 +2116,8 @@ static HostComboBox *AdjustFill()
 {
     HostComboBox *gc = new HostComboBox("AdjustFill");
     gc->setLabel(QObject::tr("Zoom"));
-    gc->addSelection(QObject::tr("Off"),     "0");
-    gc->addSelection(QObject::tr("Half"),    "1");
-    gc->addSelection(QObject::tr("Full"),    "2");
-    gc->addSelection(QObject::tr("Stretch"), "3");
+    for (int m = kAdjustFill_Off; m < kAdjustFill_END; m++)
+        gc->addSelection(toString((AdjustFillMode)m), QString::number(m));
     gc->setHelpText(QObject::tr(
                         "When enabled, these will apply a predefined "
                         "zoom to all video playback in MythTV."));
@@ -2552,7 +2547,7 @@ static HostComboBox *ThemePainter()
 ThemeSelector::ThemeSelector(QString label):
     HostImageSelect(label) {
 
-    ThemeType themetype;
+    ThemeType themetype = THEME_UI;
 
     if (label == "Theme")
     {
@@ -4387,7 +4382,7 @@ PlaybackSettings::PlaybackSettings()
     general2->addChild(oscan);
     general2->addChild(AspectOverride());
     general2->addChild(AdjustFill());
-    general2->addChild(PIPLocation());
+    general2->addChild(PIPLocationComboBox());
     general2->addChild(PlaybackExitPrompt());
     general2->addChild(EndOfRecordingExitPrompt());
     addChild(general2);

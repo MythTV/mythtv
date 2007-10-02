@@ -80,13 +80,13 @@ class VideoOutputXv : public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private);
-    void Zoom(int direction);
+    void Zoom(ZoomDirection direction);
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
-    int  SetPictureAttribute(int attribute, int newValue);
+    int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 
     int  GetRefreshRate(void);
 

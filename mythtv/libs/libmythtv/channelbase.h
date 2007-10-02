@@ -129,8 +129,9 @@ class ChannelBase
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
-    virtual int  GetPictureAttribute(const QString) const { return 0; }
-    virtual int  ChangePictureAttribute(int,const QString,bool) { return 0; }
+    virtual int  GetPictureAttribute(PictureAttribute) const { return -1; }
+    virtual int  ChangePictureAttribute(
+        PictureAdjustType, PictureAttribute, bool up) { return -1; }
 
     bool CheckChannel(const QString &channum, QString& inputName) const;
 

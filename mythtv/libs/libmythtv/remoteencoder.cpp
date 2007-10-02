@@ -453,7 +453,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
 }
 
 
-int RemoteEncoder::GetPictureAttribute(int attr)
+int RemoteEncoder::GetPictureAttribute(PictureAttribute attr)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
 
@@ -481,7 +481,8 @@ int RemoteEncoder::GetPictureAttribute(int attr)
  *
  *  \return contrast if it succeeds, -1 otherwise.
  */
-int RemoteEncoder::ChangePictureAttribute(int type, int attr, bool up)
+int RemoteEncoder::ChangePictureAttribute(
+    PictureAdjustType type, PictureAttribute attr, bool up)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
 

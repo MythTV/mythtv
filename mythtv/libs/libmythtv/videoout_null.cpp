@@ -30,7 +30,8 @@ VideoOutputNull::~VideoOutputNull()
     Exit();
 }
 
-void VideoOutputNull::Zoom(int direction)
+// this is documented in videooutbase.cpp
+void VideoOutputNull::Zoom(ZoomDirection direction)
 {
     VideoOutput::Zoom(direction);
     MoveResize();

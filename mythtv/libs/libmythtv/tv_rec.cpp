@@ -2682,19 +2682,9 @@ int TVRec::GetPictureAttribute(PictureAttribute attr)
     if (!channel)
         return -1;
 
-    int ret = -1;
-    if (kPictureAttribute_Brightness == attr)
-        ret = channel->GetPictureAttribute("brightness");
-    else if (kPictureAttribute_Contrast == attr)
-        ret = channel->GetPictureAttribute("contrast");
-    else if (kPictureAttribute_Colour == attr)
-        ret = channel->GetPictureAttribute("colour");
-    else if (kPictureAttribute_Hue == attr)
-        ret = channel->GetPictureAttribute("hue");
+    int ret = channel->GetPictureAttribute(attr);
 
-    if (ret < 0)
-        return -1;
-    return ret / 655;
+    return (ret < 0) ? -1 : ret / 655;
 }
 
 /** \fn TVRec::ChangePictureAttribute(PictureAdjustType,PictureAttribute,bool)
@@ -2712,19 +2702,9 @@ int TVRec::ChangePictureAttribute(PictureAdjustType type,
     if (!channel)
         return -1;
 
-    int ret = -1;
-    if (kPictureAttribute_Brightness == attr)
-        ret = channel->ChangePictureAttribute(type, "brightness", direction);
-    else if (kPictureAttribute_Contrast == attr)
-        ret = channel->ChangePictureAttribute(type, "contrast", direction);
-    else if (kPictureAttribute_Colour == attr)
-        ret = channel->ChangePictureAttribute(type, "colour", direction);
-    else if (kPictureAttribute_Hue == attr)
-        ret = channel->ChangePictureAttribute(type, "hue", direction);
+    int ret = channel->ChangePictureAttribute(type, attr, direction);
 
-    if (ret < 0)
-        return -1;
-    return ret / 655;
+    return (ret < 0) ? -1 : ret / 655;
 }
 
 /** \fn TVRec::GetConnectedInputs(void) const

@@ -16,6 +16,7 @@
 #include "tv.h"
 #include "util.h"
 #include "programinfo.h"
+#include "videoouttypes.h"
 
 #include <qobject.h>
 
@@ -236,8 +237,8 @@ class MPUBLIC TV : public QObject
     void PauseLiveTV(void);
     void UnpauseLiveTV(void);
 
-    void ToggleAspectOverride(int aspectMode = -1);
-    void ToggleAdjustFill(int adjustfillMode = -1);
+    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
+    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
 
     bool FillMenuTracks(OSDGenericTree*, uint type);
     void ChangeTrack(uint type, int dir);
@@ -354,8 +355,9 @@ class MPUBLIC TV : public QObject
     void ToggleRecord(void);
     void BrowseChannel(const QString &channum);
 
-    void DoTogglePictureAttribute(int type);
-    void DoChangePictureAttribute(int type, int control, bool up);
+    void DoTogglePictureAttribute(PictureAdjustType type);
+    void DoChangePictureAttribute(
+        PictureAdjustType type, PictureAttribute attr, bool up);
 
     void BuildOSDTreeMenu(void);
     void ShowOSDTreeMenu(void);
@@ -440,9 +442,10 @@ class MPUBLIC TV : public QObject
     bool doSmartForward;
     bool queuedTranscode;
     bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
-    int adjustingPicture;
-    ; ///< picture attribute to modify (on arrow left or right)
-    int adjustingPictureAttribute;
+    /// Picture attribute type to modify.
+    PictureAdjustType adjustingPicture;
+    /// Picture attribute to modify (on arrow left or right)
+    PictureAttribute  adjustingPictureAttribute;
 
     bool ignoreKeys;
     bool needToSwapPIP;

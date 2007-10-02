@@ -939,7 +939,8 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
     return true;
 }
 
-void VideoOutputDirectfb::Zoom(int direction)
+// this is documented in videooutbase.cpp
+void VideoOutputDirectfb::Zoom(ZoomDirection direction)
 {
     VideoOutput::Zoom(direction);
     MoveResize();
@@ -983,7 +984,9 @@ void VideoOutputDirectfb::MoveResize(void)
     }
 }
 
-int VideoOutputDirectfb::SetPictureAttribute(int attribute, int newValue)
+// this is documented in videooutbase.cpp
+int VideoOutputDirectfb::SetPictureAttribute(
+    PictureAttribute attribute, int newValue)
 {
     DFBColorAdjustment adj = { DCAF_NONE, 0x8000, 0x8000, 0x8000, 0x8000, };
 

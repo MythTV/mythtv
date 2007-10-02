@@ -22,7 +22,7 @@ class VideoOutputNull : public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private);
-    void Zoom(int direction);
+    void Zoom(ZoomDirection direction);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);

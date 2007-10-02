@@ -50,23 +50,3 @@ QString toTitleString(PictureAdjustType type)
 
     return kPicAdjTitles[(int)type & 0x3];
 }
-
-QString toString(PictureAttribute index)
-{
-    const QString tbl[] =
-    {
-        QObject::tr("None"),
-        QObject::tr("Brightness"),
-        QObject::tr("Contrast"),
-        QObject::tr("Colour"),
-        QObject::tr("Hue"),
-        QObject::tr("Volume"),
-        QObject::tr("MAX"),
-    };
-
-    int i = (int)index;
-    i = max(i, (int) kPictureAttribute_None);
-    i = min(i, (int) kPictureAttribute_MAX);
-
-    return tbl[i];
-}
