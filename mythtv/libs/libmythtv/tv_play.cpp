@@ -6824,41 +6824,31 @@ void TV::BuildOSDTreeMenu(void)
         FillMenuTracks(treeMenu, kTrackTypeTeletextCaptions);
     }
 
-    int aspectoverride = nvp->GetAspectOverride();
+    AspectOverrideMode aspectoverride = nvp->GetAspectOverride();
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
-    subitem = new OSDGenericTree(item, tr("Off"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kAspect_Off),
-                                 ((aspectoverride <= kAspect_Off) ||
-                                  (aspectoverride >= kAspect_END)) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("4:3"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kAspect_4_3),
-                                 (aspectoverride == kAspect_4_3) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
-    subitem = new OSDGenericTree(item, tr("16:9"), "TOGGLEASPECT" +
-                                 QString("%1").arg(kAspect_16_9),
-                                 (aspectoverride == kAspect_16_9) ? 1 : 0,
-                                 NULL, "ASPECTGROUP");
+    for (int j = kAspect_Off; j < kAspect_END; j++)
+    {
+        // swap 14:9 and 16:9
+        int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
+                 ((kAspect_16_9 == j) ? kAspect_14_9 : j));
 
-    int adjustfill = nvp->GetAdjustFill();
+ 	bool sel = (i != kAspect_Off) ? (aspectoverride == i) :
+            (aspectoverride <= kAspect_Off) || (aspectoverride >= kAspect_END);
+        subitem = new OSDGenericTree(item, toString((AspectOverrideMode) i),
+                                     QString("TOGGLEASPECT%1").arg(i),
+                                     (sel) ? 1 : 0, NULL, "ASPECTGROUP");
+    }
+
+    AdjustFillMode adjustfill = nvp->GetAdjustFill();
     item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
-    subitem = new OSDGenericTree(item, tr("Off"), "TOGGLEFILL" +
-                                 QString("%1").arg(kAdjustFill_Off),
-                                 ((adjustfill <= kAdjustFill_Off) ||
-                                  (adjustfill >= kAdjustFill_END)) ? 1 : 0,
-                                 NULL, "ADJUSTFILLGROUP");
-    subitem = new OSDGenericTree(item, tr("Half"), "TOGGLEFILL" +
-                                 QString("%1").arg(kAdjustFill_Half),
-                                 (adjustfill == kAdjustFill_Half) ? 1 : 0,
-                                 NULL, "ADJUSTFILLGROUP");
-    subitem = new OSDGenericTree(item, tr("Full"), "TOGGLEFILL" +
-                                 QString("%1").arg(kAdjustFill_Full),
-                                 (adjustfill == kAdjustFill_Full) ? 1 : 0,
-                                 NULL, "ADJUSTFILLGROUP");
-    subitem = new OSDGenericTree(item, tr("Stretch"), "TOGGLEFILL" +
-                                 QString("%1").arg(kAdjustFill_Stretch),
-                                 (adjustfill == kAdjustFill_Stretch) ? 1 : 0,
-                                 NULL, "ADJUSTFILLGROUP");
+    for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
+    {
+ 	bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :
+            (adjustfill <= kAdjustFill_Off) || (adjustfill >= kAdjustFill_END);
+        subitem = new OSDGenericTree(item, toString((AdjustFillMode) i),
+                                     QString("TOGGLEFILL%1").arg(i),
+                                     (sel) ? 1 : 0, NULL, "ADJUSTFILLGROUP");
+    }
 
     if (db_use_picture_attr)
     {

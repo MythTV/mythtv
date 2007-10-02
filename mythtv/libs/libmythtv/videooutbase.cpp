@@ -514,23 +514,14 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
  * \fn VideoOutput::SetVideoAspectRatio(float aspect)
  * \brief Sets VideoOutput::video_aspect to aspect, and sets 
  *        VideoOutput::overriden_video_aspect if aspectoverride
- *        is set to either 4:3 or 16:9.
+ *        is set to either 4:3, 14:9 or 16:9.
  * 
  * \param aspect video aspect ratio to use
  */
 void VideoOutput::SetVideoAspectRatio(float aspect)
 {
-    overriden_video_aspect = video_aspect = aspect;
-
-    // Override video's aspect if configured to do so
-    if (kAspect_4_3 == aspectoverride)
-    {
-        overriden_video_aspect = 4.0f / 3.0f;
-    }
-    else if (kAspect_16_9 == aspectoverride)
-    {
-        overriden_video_aspect = 16.0f / 9.0f;
-    }
+    video_aspect = aspect;
+    overriden_video_aspect = get_aspect_override(aspectoverride, aspect);
 }
 
 /**
