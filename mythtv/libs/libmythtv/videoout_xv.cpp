@@ -1455,6 +1455,10 @@ bool VideoOutputXv::InitSetupBuffers(void)
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 
+    // This needs to be here because "opengl" needs it in InitVideoBuffers().
+    use_picture_controls =
+        gContext->GetNumSetting("UseOutputPictureControls", 0);
+
     // Create video buffers
     bool use_xv     = (renderer.left(2) == "xv");
     bool use_shm    = (renderer == "xshm");
@@ -1488,9 +1492,6 @@ bool VideoOutputXv::InitSetupBuffers(void)
     // The OpenGL video output method always allows picture controls.
     // The XVideo output methods sometimes allow the picture to
     // be adjusted, if the chroma keying color can be discovered.
-    use_picture_controls =
-        gContext->GetNumSetting("UseOutputPictureControls", 0);
-
     use_picture_controls &= 
         (VideoOutputSubType() >= XVideo && xv_colorkey) ||
         (VideoOutputSubType() == OpenGL);
