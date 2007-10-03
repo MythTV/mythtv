@@ -2596,7 +2596,6 @@ fi
 
 if enabled symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
-        check_cflags -fvisibility-inlines-hidden
         check_cppflags -fvisibility-inlines-hidden
         CCONFIG="$CCONFIG use_hidesyms"
     else
