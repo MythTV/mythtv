@@ -1343,6 +1343,13 @@ for opt do
   esac
 done
 
+
+if enabled cpu_override || test x"$tune" != x"generic" && enabled proc_opt; then
+    echo "Warning! --enable-proc-opt shouldn't be used with --arch, --cpu or --tune"
+    echo "Disabling it now."
+    disable proc_opt
+fi
+
 if is_x86_cpu "$arch" ; then
     arch="x86_32"
 fi
@@ -3225,7 +3232,11 @@ if enabled proc_opt; then
     echo "         output of ./configure along with any bug report."
 fi
 
-if disabled proc_opt && enabled dvb; then
+if enabled cpu_override; then
+    echo
+    echo "WARNING: When using --arch=X or --cpu=X you must include the "
+    echo "         output of ./configure along with any bug report."
+elif disabled proc_opt && enabled dvb; then
     echo
     echo "WARNING: If you plan to watch HDTV recordings you probably"
     echo "         need to run ./configure with --enable-proc-opt   "
