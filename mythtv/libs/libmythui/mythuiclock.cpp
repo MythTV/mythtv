@@ -70,7 +70,7 @@ bool MythUIClock::ParseElement(QDomElement &element)
         format.replace("%SHORTDATE%", m_ShortDateFormat, false);
         m_Format=format;
     }
-    if (element.tagName() == "secondflash")
+    else if (element.tagName() == "secondflash")
     {
         QString flash = getFirstText(element);
         if (flash == "yes")
