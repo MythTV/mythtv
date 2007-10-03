@@ -7,6 +7,7 @@ class MythMainWindow;
 class MythThemedMenuPrivate;
 class MythThemedMenuState;
 
+/// \brief Themed menu class, used for main menus in %MythTV frontend
 class MythThemedMenu : public MythScreenType
 {
     Q_OBJECT

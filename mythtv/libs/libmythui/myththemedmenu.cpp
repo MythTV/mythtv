@@ -88,6 +88,10 @@ struct MenuRow
 
 class MythThemedMenuPrivate;
 
+/** \class MyththemedMenuState
+ *  \brief Private class that controls the settings of buttons, logos,
+ *         backgrounds, texts, and more, for the MythThemedMenu class.
+ */
 class MythThemedMenuState: public XMLParseBase
 {
   public:
@@ -316,7 +320,13 @@ ButtonIcon *MythThemedMenuState::getButtonIcon(const QString &type)
     return NULL;
 }
 
-void MythThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
+/** \brief Parse through the element's tags and set the button's 
+ *         area, spread, center, rows, columns and visible lower limit.
+ *  \param dir     the directory path of background
+ *  \param element QDomElement with information about the background
+ */
+void MythThemedMenuState::parseBackground(
+    const QString &dir, QDomElement &element)
 {
     QString path;
 
@@ -391,6 +401,11 @@ void MythThemedMenuState::parseBackground(const QString &dir, QDomElement& eleme
     }
 }
 
+/** \brief Parse through the element's tags and set the shadow's color,
+ *         offset, and alpha.
+ *  \param attributes text attributes whose font shadow will be set
+ *  \param element    DOM dealing with shadow
+ */
 void MythThemedMenuState::parseShadow(TextAttributes &attributes, 
                                       QDomElement &element)
 {
@@ -455,6 +470,12 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
     attributes.font.SetShadow(true, offset, color, alpha);
 }
 
+/** \brief Parse through the element's tags and set the outline's
+ *         color and size.
+ *
+ *  \param attributes text attributes whose font outline will be set
+ *  \param element    DOM element dealing with outline
+ */
 void MythThemedMenuState::parseOutline(TextAttributes &attributes, 
                                        QDomElement &element)
 {
@@ -508,6 +529,12 @@ void MythThemedMenuState::parseOutline(TextAttributes &attributes,
     attributes.font.SetOutline(true, color, size, alpha);
 }
 
+/** \brief Parse through the element's tags and set the text's area,
+ *          fontsize, fontname, positioning, and decorations.
+ *
+ *  \param attributes text attributes whose font face will be set
+ *  \param element    DOM element dealing with text
+ */
 void MythThemedMenuState::parseText(TextAttributes &attributes, 
                                     QDomElement &element)
 {
@@ -770,6 +797,12 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
     watermarkRect = QRect(watermarkPos, QSize(0, 0));
 }
 
+/** \brief Parse through the element's tags and set the logo's
+ *         image and position.
+ *
+ *  \param dir     directory where logo images may be found
+ *  \param element DOM element whose nodes describe the logo
+ */
 void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
@@ -823,6 +856,12 @@ void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
                      logo->height());
 }
 
+/** \brief Parse through the element's tags and set the title's image
+ *         (and subsequent mode) and position.
+ *
+ *  \param dir     directory where title images may be found
+ *  \param element DOM element dealing with the title
+ */ 
 void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
@@ -899,6 +938,12 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
     }
 }
 
+/** \brief Parse through the element's tags to set the arrows
+ *         image and position.
+ *
+ *  \param dir     directory where arrow images may be found
+ *  \param element DOM element dealing with arrow image and position
+ */
 void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element, 
                                      bool up)
 {
@@ -963,6 +1008,12 @@ void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
     }
 }
 
+/** \brief Parse through the element's tags and set the button's
+ *         definition as normal, active, text, or activetext.
+ *
+ *  \param dir     directory where the button images may be found
+ *  \param element DOM element whose nodes define Buttons
+ */
 void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
 {
     bool hasname = false;
@@ -1095,6 +1146,9 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
         delete tmpimg;
 }
 
+/** \brief Set buttons, logo, title icons and text, arrows and
+ *         watermarks back to the defaults.
+ */
 void MythThemedMenuState::setDefaults(void)
 {
     logo = NULL;
@@ -1112,7 +1166,14 @@ void MythThemedMenuState::setDefaults(void)
     watermarkRect = QRect(0, 0, 0, 0);
 }
 
-bool MythThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
+/** \brief Parse the menu from the given dir for background, button,
+ *         logo, arrow, and font settings.
+ *  \param dir      directory where setting may be found
+ *  \param menuname file name of menu file from which settings are parsed
+ *  \return true iff file exists, opens, and parses correctly
+ */
+bool MythThemedMenuState::parseSettings(
+    const QString &dir, const QString &menuname)
 {
     QString filename = dir + menuname;
 
@@ -1221,6 +1282,12 @@ bool MythThemedMenuState::parseSettings(const QString &dir, const QString &menun
 
 /////////////////////////////////////////////////////////////////////////////
 
+/** \brief Constructor, Init() must be called before class can be used.
+ *
+ *  \param lparent menu that owns this instance
+ *  \param cdir    directory where theme is stored
+ *  \param lstate  corresponding settings of the theme
+ */
 MythThemedMenuPrivate::MythThemedMenuPrivate(MythThemedMenu *lparent, 
                                              const char *cdir,
                                              MythThemedMenuState *lstate)
@@ -1250,6 +1317,11 @@ MythThemedMenuPrivate::~MythThemedMenuPrivate()
         delete m_state;
 }
 
+/** \brief Parses the element's tags and set the ThemeButton's type,
+ *         text, depends, and action, then adds the button.
+ *
+ *  \param element DOM element describing features of the themeButton
+ */
 void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
 {
     QString type = "";
@@ -1346,6 +1418,19 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
+/** \brief Parse the themebuttons to be added based on the name of
+ *         the menu file provided.
+ *
+ *  If the menu to be parsed is the main menu and this fails to find the
+ *  XML file this will simply return false. Otherwise if it fails to
+ *  find the menu it will pop up an error dialog and then return false.
+ *
+ *  The idea behind this is that if we can't parse the main menu we
+ *  have to exit from the fronend entirely. But in all other cases
+ *  we can simply return to the main menu and hope that it is a
+ *  non-essential portion of MythTV which the theme does not support.
+ *
+ */
 bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 {
     QString filename = findMenuFile(menuname);
@@ -1456,6 +1541,7 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     return true;
 }
 
+/// \brief Sets up UI according to the corresponding mythThemedMenuState.
 void MythThemedMenuPrivate::SetupUITypes(void)
 {
     if (m_state->titleIcons.contains(menumode))
@@ -1543,6 +1629,15 @@ void MythThemedMenuPrivate::updateLCD(void)
         lcddev->switchToMenu(&menuItems, titleText);
 }
 
+/** \brief Create a new MythThemedButton based on the MythThemedMenuState
+ *         m_state and the type, text, alt-text and action provided in
+ *         the parameters.
+ *
+ *  \param type    type of button to be created
+ *  \param text    text to appear on the button
+ *  \param alttext alternate text to appear when required
+ *  \param action  actions to be associated with button
+ */
 void MythThemedMenuPrivate::addButton(const QString &type, const QString &text, 
                                       const QString &alttext, 
                                       const QStringList &action)
@@ -1631,6 +1726,9 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
     buttonList.push_back(newbutton);
 }
 
+/** \brief Properly lay out all of the buttons that were added with addButton
+ *  \return true iff there are more than 0 rows or columns
+ */
 bool MythThemedMenuPrivate::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
@@ -1712,6 +1810,11 @@ bool MythThemedMenuPrivate::layoutButtons(void)
     return true; 
 }
 
+/** \brief Place buttons in position and set them visible and active.
+ *
+ *  \param resetpos whether or not to reset the active button to the
+ *                  first one on the buttonlist.
+ */
 void MythThemedMenuPrivate::positionButtons(bool resetpos)
 {
     QRect buttonArea = m_state->buttonArea;
@@ -1825,6 +1928,7 @@ bool MythThemedMenuPrivate::makeRowVisible(int newrow, int oldrow)
     return true;
 }
 
+/// \brief Add or remove scroll arrows as needed.
 void MythThemedMenuPrivate::checkScrollArrows(void)
 {
     bool needup = false;
@@ -1839,6 +1943,11 @@ void MythThemedMenuPrivate::checkScrollArrows(void)
     downarrow->SetVisible(needdown);
 }
 
+/** \brief Reset and reparse everything.
+ *
+ *  Note: this does not use the theme or menu file chosen in Init(), but
+ *  instead uses defaults which should work if MythTV was properly installed.
+ */
 bool MythThemedMenuPrivate::ReloadTheme(void)
 {
     GetGlobalFontMap()->Clear();
@@ -1861,6 +1970,10 @@ bool MythThemedMenuPrivate::ReloadTheme(void)
     return parseMenu("mainmenu.xml");
 }
 
+/** \brief Delegate key event to appropriate action for keyHandler()
+ *
+ *  \return true iff key event was properly handled
+ */
 bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 {
     QStringList actions;
@@ -1869,6 +1982,10 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     return keyHandler(actions, e->state() == exitModifier);
 }
 
+/** \brief Interpret key presses on the menu into the appropriate actions
+ *
+ *  \param actions list of MythTV actions to be handled.
+ */
 bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
                                        bool fullexit)
 {
@@ -2020,6 +2137,12 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
     return true;
 } 
 
+/** \brief Interprets mouse gestures as MythTV action events
+ *
+ *  \param origtype originating element type for the gesture
+ *  \param ge       mouse gesture event
+ *  \return true iff a gesture was handled here.
+ */
 bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
                                          MythGestureEvent *ge)
 {
@@ -2075,6 +2198,11 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
     return false;
 }
 
+/** \brief Locates the appropriate menu file from which to parse the menu
+ *
+ *  \param menuname file name of the menu you want to find
+ *  \return the directory in which the menu file is found
+ */
 QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
     QString testdir = MythContext::GetConfDir() + "/" + menuname;
@@ -2106,6 +2234,11 @@ QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
     return "";
 }
 
+/** \brief Handle a MythTV action for the Menus.
+ *
+ *  \param action single action to be handled
+ *  \return true if the action is not to EXEC another program
+ */
 bool MythThemedMenuPrivate::handleAction(const QString &action)
 {
     if (action.left(5) == "EXEC ")
@@ -2215,6 +2348,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     return true;   
 }
 
+
 bool MythThemedMenuPrivate::findDepends(const QString &fileList)
 {
     QStringList files = QStringList::split(" ", fileList);
@@ -2236,9 +2370,17 @@ bool MythThemedMenuPrivate::findDepends(const QString &fileList)
     return false;
 }
 
+/** \brief Queries the user for a password to enter a part of MythTV
+ *         restricted by a password.
+ *
+ *  \param timestamp_setting time settings to be checked
+ *  \param password_setting  password to be checked
+ *  \param text              the message text to be displayed
+ *  \return true if password checks out or is not needed.
+ */
 bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
-                              const QString &password_setting,
-                              const QString &text)
+                                         const QString &password_setting,
+                                         const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = gContext->GetSetting(timestamp_setting);
@@ -2292,6 +2434,15 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
 
 ////////////////////////////////////////////////////////////////////////////
 
+/** \brief Creates a themed menu.
+ *
+ *  \param cdir         directory where theme is stored
+ *  \param menufile     file name of menu definition file
+ *  \param parent       the screen stack that owns this UI type
+ *  \param name         the name of this UI type
+ *  \param allowreorder will buttons be inserted into new rows or pushed back
+ *  \param state        theme state associated with this menu
+ */
 MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
                                MythScreenStack *parent, const char *name,
                                bool allowreorder, MythThemedMenuState *state)
@@ -2303,6 +2454,17 @@ MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
     Init(cdir, menufile);
 }
 
+/** \brief Loads the main UI theme, and a menu theme.
+ *
+ *  See also foundTheme(void), it will return true when called after
+ *  this method iff this method was successful.
+ *
+ *  See also ReloadTheme(void) which you can use to load a generic theme,
+ *  if foundTheme(void) returns false after calling this.
+ *
+ *  \param cdir directory where theme.xml is stored
+ *  \param menufile name of menu item xml file
+ */
 void MythThemedMenu::Init(const char *cdir, const char *menufile)
 {
     QString dir = QString(cdir) + "/";
@@ -2331,11 +2493,14 @@ MythThemedMenu::~MythThemedMenu(void)
         delete d;
 }
 
+/// \brief Returns true iff a theme has been found by a previous call to
+///        Init(const char*,const char*) or ReloadTheme().
 bool MythThemedMenu::foundTheme(void)
 {
     return d->foundtheme;
 }
 
+/// \brief Set the themed menus callback function and data for that function
 void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
 {
     d->m_state->callback = lcallback;
@@ -2352,6 +2517,9 @@ QString MythThemedMenu::getSelection(void)
     return d->selection;
 }
 
+/** \brief Looks at "AllowQuitShutdown" setting in DB, in order to 
+ *         determine what to show to user on exit from the frontend.
+ */
 void MythThemedMenu::ReloadExitKey(void)
 {
     int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
@@ -2368,12 +2536,22 @@ void MythThemedMenu::ReloadExitKey(void)
         d->exitModifier = -1;
 }
 
+/** \brief Reset and reparse everything, check foundTheme(void) for success.
+ *
+ *  Note: this does not use the theme or menu file chosen in Init(), but
+ *  instead uses defaults which should work if MythTV was properly installed.
+ */
 void MythThemedMenu::ReloadTheme(void)
 {
     if (!d->ReloadTheme())
         d->foundtheme = false;
 }
 
+/** \brief keyboard/LIRC event handler.
+ *
+ *  This translates key presses through the "menu" context into MythTV
+ *  actions and then handles them as appropriate.
+ */
 bool MythThemedMenu::keyPressEvent(QKeyEvent *e)
 {
     if (d->ignorekeys)
@@ -2396,6 +2574,11 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *e)
     return ret;
 }
 
+/** \brief Interprets mouse gestures as MythTV action events
+ *
+ *  \param origtype originating element type from the screen
+ *  \param ge       mouse gesture event
+ */
 void MythThemedMenu::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
 {
     if (d->gestureEvent(origtype, ge))
