@@ -1158,7 +1158,7 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
 
     // Check for keyframes and count frames
     if (info->streamType == StreamID::H264Video)
-        FindH264Keyframes(&tspacket);
+        _buffer_packets = !FindH264Keyframes(&tspacket);
     else if (StreamID::IsVideo(info->streamType))
         _buffer_packets = !FindMPEG2Keyframes(&tspacket);
 

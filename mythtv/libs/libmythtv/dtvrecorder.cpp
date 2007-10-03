@@ -347,8 +347,9 @@ void DTVRecorder::HandleKeyframe(void)
  */
 bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
 {
-    if (!tspacket->HasPayload())
-        return false;
+    bool haveBufferedData = !_payload_buffer.empty();
+    if (!tspacket->HasPayload()) // no payload to scan
+        return !haveBufferedData;
 
     const bool payloadStart = tspacket->PayloadStart();
     if (payloadStart)
