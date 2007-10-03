@@ -480,8 +480,7 @@ void MythThemedMenuState::parseOutline(TextAttributes &attributes,
                                        QDomElement &element)
 {
     QColor color;
-    int size;
-    int alpha = 255;
+    int size = 0, alpha = 255;
 
     bool hascolor = false;
     bool hassize = false;
