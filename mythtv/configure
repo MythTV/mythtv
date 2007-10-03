@@ -655,7 +655,7 @@ is_x86_64_cpu() {
 }
 
 is_x86_mmx() {
-    expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null
+    expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null || is_x86_64_cpu "$1"
 }
 
 CONFIG_LIST='
@@ -960,7 +960,7 @@ fi
 arch=`uname -m`
 arch_raw="$arch"
 cpu="generic"
-cpu_overide="no"
+cpu_override="no"
 processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
@@ -1304,25 +1304,14 @@ for opt do
   --arch=*)
           arch=`echo $opt | cut -d '=' -f 2`
           arch_raw="$arch"
-          processor=""
-          processor_flags=""
-          cpu_overide="yes"
+          enable cpu_override
   ;;
   --tune=*)
           tune=`echo $opt | cut -d '=' -f 2`
-          tune_raw="$tune"
-          processor=""
-          processor_flags=""
   ;;
   --cpu=*)
-          arch=`echo $opt | cut -d '=' -f 2`
-          arch_raw="$arch"
-          cpu="$arch"
-          tune="$arch"
-          tune_raw="$arch"
-          processor=""
-          processor_flags=""
-          cpu_overide="yes"
+          cpu=`echo $opt | cut -d '=' -f 2`
+          enable cpu_override
   ;;
   --disable-encoders) disable $ENCODER_LIST
   ;;
@@ -1366,6 +1355,7 @@ fi
 case "$arch" in
   x86_32)
     arch="x86_32"
+    disabled cpu_override && ARCHFLAGS="-march=pentiumpro"
   ;;
   x86_64|amd64)
     arch="x86_32"
@@ -1373,6 +1363,7 @@ case "$arch" in
     if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
       if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
         arch="x86_64"
+        disabled cpu_override && ARCHFLAGS="-march=k8"
         enable fast_64bit
       fi
     fi
@@ -1398,6 +1389,7 @@ case "$arch" in
   ;;
   sun4u|sparc64)
     arch="sparc64"
+    disabled cpu_override && ARCHFLAGS="-mcpu=ultrasparc -mvis"
     enable fast_64bit
   ;;
   sparc)
@@ -1733,14 +1725,14 @@ if test x"$mmx" = x"default"; then
     mmx="no"
     if test x"$arch" = x"x86_64"; then
         mmx="yes"
+    elif enabled cpu_override; then
+        is_x86_mmx "$cpu" && mmx="yes"
     else
-        is_x86_64_cpu "$arch_raw" && mmx="yes"
         is_x86_mmx "$arch_raw" && mmx="yes"
     fi
 
     # if !arch && !tune && !cpu & processor_flags, then...
-    if test x"$cpu_overide" != x"yes" -a x"$tune_raw" = x"" -a \
-            x"$processor_flags" != x"" ; then
+    if disabled cpu_override && test x"$processor_flags" != x"" ; then
         mmx="no"
         if expr "$processor_flags" : ".*mmx" > /dev/null ; then
             mmx="yes"
@@ -1756,6 +1748,11 @@ if test x"$cmov" = x"default"; then
             enable cmov
         fi
      fi
+fi
+
+# use different default ARCHFLAGS for CPU missing cmov (Via C3 ...)
+if test x"$arch" = x"x86_32" && disabled cmov && disabled cpu_override; then
+    ARCHFLAGS="-march=i586"
 fi
 
 test -z "$need_memalign" && need_memalign="$mmx"
@@ -1828,13 +1825,13 @@ if test $tune != "generic"; then
             add_ldflags "-mfdpic"
         ;;
 	*)
-            ARCHFLAGS="-mcpu=$tune"
+            ARCHFLAGS="$ARCHFLAGS -mcpu=$tune"
 	;;
     esac
 fi
 
-if enabled cpu_overide; then
-    ARCHFLAGS="-mcpu=$arch_raw $ARCHFLAGS"
+if test x"$cpu" != x"generic"; then
+    ARCHFLAGS="-march=$cpu $ARCHFLAGS"
 fi
 
 gnu_make(){
@@ -1947,18 +1944,8 @@ int main(void) {
 EOF
 fi
 
-# if either tune or cpu is c3 or c3-2 optimize for smallness
-if test x"$arch_raw" = x"c3" -o x"$arch_raw" = x"c3-2"; then
-    ARCHFLAGS="-march=$arch_raw"
-    optimize="small"
-fi
-if test x"$tune" = x"c3" -o x"$tune" = x"c3-2"; then
-    ARCHFLAGS="-march=$tune"
-    optimize="small"
-fi
-
 # if no tune setting and we know cpu class look at $processor 
-if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
+if disabled cpu_override && enabled proc_opt; then
 # first try to tune based on processor info
 # EM64T era Intel Xeon
    if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
@@ -1992,7 +1979,6 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # P6, which includes Intel Core
    elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then 
        ARCHFLAGS="-march=pentium4" 
-       #arch_raw="i686" 
 # P3
    elif expr "$processor" : "pentium3" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
@@ -2008,7 +1994,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Celeron(R) M processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
-       #optimize="small"
+       optimize="small"
 # P2
    elif expr "$processor" : "pentium2" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
@@ -2063,20 +2049,16 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*VIA Esther" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
        optimize="small"
-       arch_raw="c3-2"
    elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
        optimize="small"
-       arch_raw="c3-2"
 # c3
    elif expr "$processor" : ".*VIA.*Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
-       arch_raw="c3"
    elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
-       arch_raw="c3"
 # if no known processor info, tune base on arch_raw info
    elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium2"
@@ -2099,12 +2081,6 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    fi
 fi
 
-if test x"$tune" = x"generic" -a x"$arch" = x"x86_64" -a x"$cpu_overide" != x"yes"; then
-   ARCHFLAGS="-march=k8"
-elif test x"$tune" = x"generic" -a x"$arch" = x"sparc64" -a x"$cpu_overide" != x"yes"; then
-   ARCHFLAGS="-mcpu=ultrasparc -mvis"
-fi
-
 if enabled proc_error_msg; then
     UNAME_M_INFO=` uname -m 2> /dev/null`
     UNAME_P_INFO=` uname -p 2> /dev/null`
@@ -2125,17 +2101,12 @@ if enabled proc_error_msg; then
     echo ""
 fi
 
-# if cpu flag is present ignore tune and arch and just use cpu
-if test x"$cpu" != x"generic"; then
-    ARCHFLAGS="-march=$cpu"
-fi
-
 # if architecture specific flags don't work blank them
 echo "int main( void ) { return 0; }" > $TMPC
 TMP_ARCHFLAGS=$ARCHFLAGS
 $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || ARCHFLAGS=""
 if test x"$ARCHFLAGS" = x""; then
-    if test "$cpu_overide" = "yes" -o x"$tune_raw" != x""; then
+    if enabled cpu_override || test x"$tune" != x"generic"; then
         echo "ERROR: CPU specific ./configure options failed compile test"
         echo "       Removing CPU specific compilation options. ($TMP_ARCHFLAGS)"
         echo ""
@@ -2873,7 +2844,9 @@ echo "Install prefix   $PREFIX"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
 #echo "make             $make"
-if test x"$processor" != x"" ; then
+if enabled cpu_override && test x"$cpu" != x"generic"; then
+    echo "CPU              $arch ($cpu)"
+elif test x"$processor" != x"" ; then
     echo "CPU              $arch ($processor)"
 elif test x"$arch_raw" != x"" ; then
     echo "CPU              $arch ($arch_raw)"
