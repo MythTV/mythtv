@@ -282,7 +282,7 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     QFileInfo fInfo( sFileName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
-    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.OR G_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
                                                 .arg( sURIParams ); 
 
