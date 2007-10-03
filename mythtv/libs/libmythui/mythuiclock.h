@@ -10,6 +10,20 @@
 
 class MythFontProperties;
 
+/** \class MythUIClock
+ *
+ * \brief A simple text clock widget.
+ *
+ * Updates once a second and inherits from MythUIText, so it supports all the
+ * text styles and decorations offered by that class.
+ *
+ * Basic manipulation of the clock format is supported using any of the
+ * following in the "format" element of the theme:
+ *  %TIME% - The time, in a format defined in the locale settings
+ *  %DATE% - Long date format, as defined in the locale settings
+ *  %SHORTDATE% - Short date format, as defined in the locale settings
+ *
+ */
 class MythUIClock : public MythUIText
 {
   public:
