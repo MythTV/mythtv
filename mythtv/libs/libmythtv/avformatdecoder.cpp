@@ -1128,7 +1128,7 @@ static int mpeg_version(int codec_id)
         case CODEC_ID_MPEG4:
             return 4;
         case CODEC_ID_H264:
-            return 4;
+            return 5;
     }
     return 0;
 }
