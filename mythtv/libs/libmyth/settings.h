@@ -3,6 +3,8 @@
 
 #include <qobject.h>
 #include <qstring.h>
+#include <qdeepcopy.h>
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -36,13 +38,14 @@ class MPUBLIC DBStorage : public Storage
 {
   public:
     DBStorage(Setting *_setting, QString _table, QString _column) :
-        setting(_setting), table(_table), column(_column) {}
+        setting(_setting), table(QDeepCopy<QString>(_table)),
+        column(QDeepCopy<QString>(_column)) {}
 
     virtual ~DBStorage() {}
 
   protected:
-    QString getColumn(void) const { return column; };
-    QString getTable(void) const { return table; };
+    QString getColumn(void) const { return QDeepCopy<QString>(column); };
+    QString getTable(void) const { return QDeepCopy<QString>(table); };
 
     Setting *setting;
     QString table;
@@ -109,20 +112,20 @@ class MPUBLIC Configurable : public QObject
 
     // A name for looking up the setting
     void setName(QString str) {
-        configName = str;
+        configName = QDeepCopy<QString>(str);
         if (label == QString::null)
             setLabel(str);
     };
-    QString getName(void) const { return configName; };
+    QString getName(void) const { return QDeepCopy<QString>(configName); };
     virtual Setting* byName(const QString &name) = 0;
 
     // A label displayed to the user
-    void setLabel(QString str) { label = str; };
-    QString getLabel(void) const { return label; };
+    void setLabel(QString str) { label = QDeepCopy<QString>(str); }
+    QString getLabel(void) const { return QDeepCopy<QString>(label); }
     void setLabelAboveWidget(bool l = true) { labelAboveWidget = l; }
 
-    void setHelpText(QString str) { helptext = str; };
-    QString getHelpText(void) const { return helptext; }
+    void setHelpText(QString str) { helptext = QDeepCopy<QString>(str); }
+    QString getHelpText(void) const { return QDeepCopy<QString>(helptext); }
 
     void setVisible(bool b) { visible = b; };
     bool isVisible(void) const { return visible; };
@@ -585,7 +588,7 @@ class MPUBLIC ButtonSetting: public Setting
 
   public:
     ButtonSetting(Storage *_storage, QString _name = "button") :
-        Setting(_storage), name(_name), button(NULL) { }
+        Setting(_storage), name(QDeepCopy<QString>(_name)), button(NULL) { }
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                                   const char* widgetName=0);
@@ -735,7 +738,8 @@ class MPUBLIC HostTimeBox : public ComboBoxSetting, public HostDBStorage
             for (minute = 0; minute < 60; minute += interval)
             {
                 timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
-                addSelection(timeStr, timeStr, timeStr == defaultTime);
+                addSelection(timeStr, QDeepCopy<QString>(timeStr),
+                             timeStr == defaultTime);
             }
         }
     }
@@ -819,7 +823,8 @@ class MPUBLIC GlobalTimeBox : public ComboBoxSetting, public GlobalDBStorage
             for (minute = 0; minute < 60; minute += interval)
             {
                 timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
-                addSelection(timeStr, timeStr, timeStr == defaultTime);
+                addSelection(timeStr, QDeepCopy<QString>(timeStr),
+                             timeStr == defaultTime);
             }
         }
     }

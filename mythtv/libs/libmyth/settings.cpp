@@ -83,7 +83,7 @@ void Setting::setValue(const QString &newValue)
 {
     settingValue = QDeepCopy<QString>(newValue);
     SetChanged(true);
-    emit valueChanged(settingValue);
+    emit valueChanged(QDeepCopy<QString>(settingValue));
 }
 
 ConfigurationGroup::~ConfigurationGroup()
@@ -678,7 +678,7 @@ bool SelectSetting::removeSelection(const QString &label, QString value)
         current = min(current, (uint) (labels.size() - 1));
     }
 
-    emit selectionRemoved(label, value);
+    emit selectionRemoved(label, QDeepCopy<QString>(value));
 
     return true;
 }
@@ -710,7 +710,8 @@ void SelectSetting::setValue(const QString &newValue)
     int found = getValueIndex(newValue);
     if (found < 0)
     {
-        addSelection(newValue, newValue, true);
+        addSelection(QDeepCopy<QString>(newValue),
+                     QDeepCopy<QString>(newValue), true);
     }
     else
     {
@@ -740,7 +741,7 @@ QString SelectSetting::getSelectionLabel(void) const
     if (!isSet || (current >= values.size()))
         return QString::null;
 
-    return labels[current];
+    return QDeepCopy<QString>(labels[current]);
 }
 
 /** \fn SelectSetting::getValueIndex(QString)
@@ -1316,7 +1317,7 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString &action = actions[i];
             handled = true;
 
             if (action == "SELECT")
