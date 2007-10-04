@@ -652,7 +652,7 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &hostname)
         if (!tmp.isEmpty())
         {
             gContext->SaveSettingOnHost(
-                "DefaultVideoPlaybackProfile", hostname, tmp);
+                "DefaultVideoPlaybackProfile", tmp, hostname);
         }
     }
 
