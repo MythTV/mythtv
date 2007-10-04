@@ -647,9 +647,10 @@ void SelectSetting::addSelection(const QString &label, QString value,
     int found = findSelection(label, value);
     if (found < 0)
     {
-        labels.push_back(label);
-        values.push_back(value);
-        emit selectionAdded(label, value);
+        labels.push_back(QDeepCopy<QString>(label));
+        values.push_back(QDeepCopy<QString>(value));
+        emit selectionAdded(QDeepCopy<QString>(label),
+                            QDeepCopy<QString>(value));
     }
 
     if (select || !isSet)
@@ -1142,7 +1143,7 @@ void ComboBoxSetting::addSelection(
 {
     if ((findSelection(label, value) < 0) && widget)
     {
-        widget->insertItem(label);
+        widget->insertItem(QDeepCopy<QString>(label));
     }
 
     SelectSetting::addSelection(label, value, select);
