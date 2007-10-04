@@ -1365,6 +1365,9 @@ inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
+static QMutex sepExprLock;
+static const QRegExp sepExpr("(_|-|#|\\.)");
+
 inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 {
     int cmp = 0;
@@ -1378,22 +1381,25 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     int b_minor = b.minor_chan;
 
     // Extract minor and major numbers from channum..
-    const QRegExp sepExpr("(_|-|#|\\.)");
     bool tmp1, tmp2;
-    int idx = a.channum.find(sepExpr);
-    if (idx >= 0)
+    int idxA, idxB;
     {
-        int major = a.channum.left(idx).toUInt(&tmp1);
-        int minor = a.channum.mid(idx+1).toUInt(&tmp2);
+        QMutexLocker locker(&sepExprLock);
+        idxA = a.channum.find(sepExpr);
+        idxB = b.channum.find(sepExpr);
+    }
+    if (idxA >= 0)
+    {
+        int major = a.channum.left(idxA).toUInt(&tmp1);
+        int minor = a.channum.mid(idxA+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
             (a_major = major), (a_minor = minor), (isIntA = false);
     }
 
-    idx = b.channum.find(sepExpr);
-    if (idx >= 0)
+    if (idxB >= 0)
     {
-        int major = b.channum.left(idx).toUInt(&tmp1);
-        int minor = b.channum.mid(idx+1).toUInt(&tmp2);
+        int major = b.channum.left(idxB).toUInt(&tmp1);
+        int minor = b.channum.mid(idxB+1).toUInt(&tmp2);
         if (tmp1 && tmp2)
             (b_major = major), (b_minor = minor), (isIntB = false);
     }
