@@ -69,7 +69,7 @@ FilterManager::FilterManager()
     QDir FiltDir(gContext->GetFiltersDir());
     QString Path;
 
-    FiltDir.setFilter(QDir::Files | QDir::Readable | QDir::Executable);
+    FiltDir.setFilter(QDir::Files | QDir::Readable);
     if (FiltDir.exists())
     {
         QStringList LibList = FiltDir.entryList();
