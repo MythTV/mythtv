@@ -207,6 +207,7 @@ package MythTV::Program;
         my $replacement = (shift or '-');
         my $allow_dirs  = (shift) ? 1 : 0;
         my $underscores = (shift) ? 1 : 0;
+        my $no_replace  = (shift) ? 1 : 0;
     # Escape where necessary
         my $safe_sep = $separator;
            $safe_sep =~ s/([^\w\s])/\\$1/sg;
@@ -387,15 +388,17 @@ package MythTV::Program;
         $name =~ s/(?<!%)(?:%($keys))/$fields{$1}/g;
         $name =~ s/%%/%/g;
     # Some basic cleanup for illegal (windows) filename characters, etc.
-        $name =~ tr/\ \t\r\n/ /s;
-        $name =~ tr/"/'/s;
-        $name =~ s/(?:[\/\\:*?<>|]+\s*)+(?=[^\d\s])/$replacement /sg;
-        $name =~ s/[\/\\:*?<>|]/$replacement/sg;
-        $name =~ s/(?:(?:$safe_sep)+\s*)+(?=[^\d\s])/$separator /sg;
-        $name =~ s/^($safe_sep|$safe_rep|\ )+//s;
-        $name =~ s/($safe_sep|$safe_rep|\ )+$//s;
-        $name =~ s/\0($safe_sep|$safe_rep|\ )+/\0/s;
-        $name =~ s/($safe_sep|$safe_rep|\ )+\0/\0/s;
+        unless ($no_replace) {
+            $name =~ tr/\ \t\r\n/ /s;
+            $name =~ tr/"/'/s;
+            $name =~ s/(?:[\/\\:*?<>|]+\s*)+(?=[^\d\s])/$replacement /sg;
+            $name =~ s/[\/\\:*?<>|]/$replacement/sg;
+            $name =~ s/(?:(?:$safe_sep)+\s*)+(?=[^\d\s])/$separator /sg;
+            $name =~ s/^($safe_sep|$safe_rep|\ )+//s;
+            $name =~ s/($safe_sep|$safe_rep|\ )+$//s;
+            $name =~ s/\0($safe_sep|$safe_rep|\ )+/\0/s;
+            $name =~ s/($safe_sep|$safe_rep|\ )+\0/\0/s;
+        }
     # Underscores?
         if ($underscores) {
             $name =~ tr/ /_/s;
