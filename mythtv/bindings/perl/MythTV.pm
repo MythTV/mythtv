@@ -55,6 +55,28 @@ package MythTV;
     our $searchtype_people  = 4;
     our $searchtype_manual  = 5;
 
+# And the recstatus types
+    our $recstatus_tunerbusy         = '-8';
+    our $recstatus_lowdiskspace      = '-7';
+    our $recstatus_cancelled         = '-6';
+    our $recstatus_deleted           = '-5';
+    our $recstatus_aborted           = '-4';
+    our $recstatus_recorded          = '-3';
+    our $recstatus_recording         = '-2';
+    our $recstatus_willrecord        = '-1';
+    our $recstatus_unknown           =   0 ;
+    our $recstatus_dontrecord        =   1 ;
+    our $recstatus_previousrecording =   2 ;
+    our $recstatus_currentrecording  =   3 ;
+    our $recstatus_earliershowing    =   4 ;
+    our $recstatus_toomanyrecordings =   5 ;
+    our $recstatus_notlisted         =   6 ;
+    our $recstatus_conflict          =   7 ;
+    our $recstatus_latershowing      =   8 ;
+    our $recstatus_repeat            =   9 ;
+    our $recstatus_inactive          =  10 ;
+    our $recstatus_neverrecord       =  11 ;
+
 # The character string used by the backend to separate records
     our $BACKEND_SEP    = '[]:[]';
     our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
@@ -70,27 +92,27 @@ package MythTV;
 
 # Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
     our %RecStatus_Types = (
-                            '-8' => 'TunerBusy',
-                            '-7' => 'LowDiskSpace',
-                            '-6' => 'Cancelled',
-                            '-5' => 'Deleted',
-                            '-4' => 'Aborted',
-                            '-3' => 'Recorded',
-                            '-2' => 'Recording',
-                            '-1' => 'WillRecord',
-                              0  => 'Unknown',
-                              1  => 'DontRecord',
-                              2  => 'PreviousRecording',
-                              3  => 'CurrentRecording',
-                              4  => 'EarlierShowing',
-                              5  => 'TooManyRecordings',
-                              6  => 'NotListed',
-                              7  => 'Conflict',
-                              8  => 'LaterShowing',
-                              9  => 'Repeat',
-                             10  => 'Inactive',
-                             11  => 'NeverRecord'
-                            );
+                            $recstatus_tunerbusy         => 'TunerBusy',
+                            $recstatus_lowdiskspace      => 'LowDiskSpace',
+                            $recstatus_cancelled         => 'Cancelled',
+                            $recstatus_deleted           => 'Deleted',
+                            $recstatus_aborted           => 'Aborted',
+                            $recstatus_recorded          => 'Recorded',
+                            $recstatus_recording         => 'Recording',
+                            $recstatus_willrecord        => 'WillRecord',
+                            $recstatus_unknown           => 'Unknown',
+                            $recstatus_dontrecord        => 'DontRecord',
+                            $recstatus_previousrecording => 'PreviousRecording',
+                            $recstatus_currentrecording  => 'CurrentRecording',
+                            $recstatus_earliershowing    => 'EarlierShowing',
+                            $recstatus_toomanyrecordings => 'TooManyRecordings',
+                            $recstatus_notlisted         => 'NotListed',
+                            $recstatus_conflict          => 'Conflict',
+                            $recstatus_latershowing      => 'LaterShowing',
+                            $recstatus_repeat            => 'Repeat',
+                            $recstatus_inactive          => 'Inactive',
+                            $recstatus_neverrecord       => 'NeverRecord'
+                           );
 
 # The most recent MythTV object created
     our $last;
