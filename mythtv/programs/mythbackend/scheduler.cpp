@@ -2160,7 +2160,7 @@ void Scheduler::AddNewRecords(void)
             epicnt.prepare("SELECT DISTINCT chanid, progstart, progend "
                            "FROM recorded "
                            "WHERE recordid = :RECID AND preserve = 0 "
-                               "AND recgroup <> 'LiveTV';");
+                               "AND recgroup NOT IN ('LiveTV','Deleted');");
             epicnt.bindValue(":RECID", recid);
 
             if (epicnt.exec() && epicnt.isActive())
@@ -2301,7 +2301,7 @@ void Scheduler::AddNewRecords(void)
 "    RECTABLE.dupmethod > 1 AND "
 "    recorded.duplicate <> 0 AND "
 "    program.title = recorded.title AND "
-"    recorded.recgroup <> 'LiveTV' "
+"    recorded.recgroup NOT IN ('LiveTV','Deleted') "
 "     AND "
 "     ( "
 "      (program.programid <> '' AND program.generic = 0 "
