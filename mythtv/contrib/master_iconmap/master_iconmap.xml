@@ -1,16 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iconmappings>
     <callsigntonetwork>
+        <callsign>/geschiedenis</callsign>
+        <network>LyngSat-tv/gg/geschiedenis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>101</callsign>
+        <network>LyngSat-tv/bb/bnn_101</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>105fm</callsign>
+        <network>LyngSat-radio/cc/ckry_country105fm</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>1live</callsign>
+        <network>LyngSat-radio/uz/wdr_einslive_de</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>1plus</callsign>
+        <network>LyngSat-tv/ee/eins_plus</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>1xtra</callsign>
+        <network>LyngSat-radio/ab/bbc_radio_1xtra</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>301</callsign>
+        <network>LyngSat-tv/bb/bbc_i</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>302</callsign>
+        <network>LyngSat-tv/bb/bbc_i</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>303</callsign>
+        <network>LyngSat-tv/bb/bbc_i</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>3abn</callsign>
+        <network>LyngSat-tv/num/3abn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>3sat</callsign>
+        <network>LyngSat-tv/num/3sat</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>3voor12central</callsign>
+        <network>LyngSat-tv/vv/vpro_3voor12_central</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt1</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt2</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt3</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt4</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt5</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt6</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt7</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt8</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>4dt9</callsign>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>5life</callsign>
+        <network>LyngSat-tv/ff/five_life</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>5max</callsign>
         <network>LyngSat-tv/cc/cinemax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>5us</callsign>
+        <network>LyngSat-tv/ff/five_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>680am</callsign>
+        <network>LyngSat-radio/num/680_news_toronto</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>70s</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>80s</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>96fm</callsign>
+        <network>LyngSat-radio/cc/cjkr_power97_winnipeg</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>9live</callsign>
+        <network>LyngSat-tv/num/9live</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>abc</callsign>
         <network>LyngSat-tv/aa/abcaus</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>abc1</callsign>
+        <network>LyngSat-tv/aa/abc1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>abc2</callsign>
         <network>LyngSat-tv/aa/abc2_au</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>abcfm</callsign>
+        <network>LyngSat-tv/aa/abc_family</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>abche</callsign>
+        <network>LyngSat-tv/aa/abc_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>acc</callsign>
@@ -21,8 +145,24 @@
         <network>LyngSat-tv/cc/cjal_access9_edmonton</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>acmax</callsign>
+        <network>LyngSat-tv/aa/actionmax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>acmaxp</callsign>
         <network>LyngSat-tv/cc/cinemax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>actionc</callsign>
+        <network>LyngSat-tv/ss/showcase_action</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>actionnow</callsign>
+        <network>LyngSat-tv/aa/action_now</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>actn</callsign>
+        <network>LyngSat-tv/ss/showcase_ca</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>acton</callsign>
@@ -33,12 +173,44 @@
         <network>LyngSat-tv/ee/encore_action</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>adalt</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>adventure1</callsign>
+        <network>LyngSat-tv/aa/adventure_one</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>aetv</callsign>
         <network>LyngSat-tv/aa/ae_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>aetvhd</callsign>
+        <network>LyngSat-tv/aa/ae_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>aetvp</callsign>
         <network>LyngSat-tv/aa/ae_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>aljazeeraint</callsign>
+        <network>LyngSat-tv/aa/al_jazeera_international</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>aln</callsign>
+        <network>LyngSat-tv/aa/american_life_tv_net</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>alock</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_info</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>alt</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>am640</callsign>
+        <network>LyngSat-radio/cc/cfmj_640am_toronto</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>amc</callsign>
@@ -53,8 +225,16 @@
         <network>LyngSat-tv/aa/amc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>amercan</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>angel1</callsign>
         <network>LyngSat-tv/aa/angel_one</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>anima</callsign>
+        <network>LyngSat-tv/aa/animania_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>animal</callsign>
@@ -65,12 +245,40 @@
         <network>LyngSat-tv/aa/animalplanet</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>animani</callsign>
+        <network>LyngSat-tv/aa/animania_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>animedm</callsign>
+        <network>LyngSat-tv/aa/anime_network_od</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>animl</callsign>
+        <network>LyngSat-tv/aa/animal_planet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>anipl</callsign>
         <network>LyngSat-tv/aa/animalplanet</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>anq</callsign>
+        <network>LyngSat-tv/aa/assemblee_national_quebec</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>aov</callsign>
+        <network>LyngSat-tv/aa/aov_adult_movie_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>apc</callsign>
+        <network>LyngSat-tv/aa/animal_planet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>aptn</callsign>
         <network>LyngSat-tv/aa/aboriginal_peoples_tvnet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ard</callsign>
+        <network>LyngSat-tv/aa/ard_das_erste</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>arena</callsign>
@@ -81,8 +289,24 @@
         <network>LyngSat-tv/aa/arena_tv_au</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>argent</callsign>
+        <network>LyngSat-tv/ll/lcn_ca</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>arnhit</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>art</callsign>
         <network>LyngSat-tv/aa/art_latino</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>arte</callsign>
+        <network>LyngSat-tv/aa/arte</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>artl</callsign>
+        <network>LyngSat-tv/aa/art_global_me</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>arts</callsign>
@@ -97,8 +321,44 @@
         <network>LyngSat-tv/aa/ae_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>artv</callsign>
+        <network>LyngSat-tv/aa/artv_quebec</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ary</callsign>
+        <network>LyngSat-tv/aa/ary_digital</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ary01</callsign>
+        <network>LyngSat-tv/aa/ary_digital</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>arydi</callsign>
+        <network>LyngSat-tv/aa/ary_digital</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>as</callsign>
+        <network>LyngSat-tv/aa/americas_store</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>asn</callsign>
+        <network>LyngSat-tv/aa/asn_halifax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>at5</callsign>
+        <network>LyngSat-tv/aa/at5</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ativi</callsign>
+        <network>LyngSat-tv/aa/a_tivi</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>atmax</callsign>
         <network>LyngSat-tv/cc/cinemax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>atv</callsign>
+        <network>LyngSat-tv/aa/atv_at</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>aurora</callsign>
@@ -117,12 +377,48 @@
         <network>LyngSat-tv/aa/azn_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>babytv</callsign>
+        <network>LyngSat-tv/bb/baby_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>band</callsign>
         <network>LyngSat-tv/rr/rede_bandeirantes</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>bbc1</callsign>
+        <network>LyngSat-tv/bb/bbc1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbc2</callsign>
+        <network>LyngSat-tv/bb/bbc2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbc3</callsign>
+        <network>LyngSat-tv/bb/bbc_three</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbc4</callsign>
+        <network>LyngSat-tv/bb/bbc4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbc7</callsign>
+        <network>LyngSat-radio/ab/bbc_radio7</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>bbca</callsign>
         <network>LyngSat-tv/bb/bbc_america</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbci</callsign>
+        <network>LyngSat-tv/bb/bbc_i</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbcprime</callsign>
+        <network>LyngSat-tv/bb/bbc_prime</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bbcw</callsign>
+        <network>LyngSat-corp/ab/bbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>bbcwo</callsign>
@@ -133,8 +429,16 @@
         <network>LyngSat-tv/bb/bbc_world</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>beeb</callsign>
+        <network>LyngSat-tv/bb/bbc_cbeebies</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>bet</callsign>
         <network>LyngSat-tv/bb/bet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>betj</callsign>
+        <network>LyngSat-tv/bb/bet_jazz</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>betjazz</callsign>
@@ -143,6 +447,14 @@
     <callsigntonetwork>
         <callsign>betp</callsign>
         <network>LyngSat-tv/bb/bet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bibeltv</callsign>
+        <network>LyngSat-tv/bb/bibeltv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bigband</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>bio</callsign>
@@ -169,12 +481,32 @@
         <network>LyngSat-tv/bb/bloomberg</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>bluegr</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>blus</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>bnews</callsign>
         <network>LyngSat-tv/bb/broadcast_news</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>bnn</callsign>
+        <network>LyngSat-tv/bb/bnn_ca</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>boom</callsign>
+        <network>LyngSat-tv/bb/boomerang</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>boome</callsign>
         <network>LyngSat-tv/bb/boomerang</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>boomerang</callsign>
+        <network>LyngSat-tv/bb/boomerang_eur</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>bravo</callsign>
@@ -189,88 +521,20 @@
         <network>LyngSat-tv/bb/bravo_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>btyfash</callsign>
+        <network>LyngSat-tv/bb/beauty_and_fashion</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>bvn</callsign>
+        <network>LyngSat-tv/bb/bvn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>byutv</callsign>
         <network>LyngSat-tv/bb/byu_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>c-span</callsign>
-        <network>LyngSat-tv/cc/cspan</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-02</callsign>
-        <network>LyngSat-tv/tt/the_learning_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-07</callsign>
-        <network>LyngSat-tv/cc/cspan</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-12</callsign>
-        <network>LyngSat-tv/hh/history_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-13</callsign>
-        <network>LyngSat-tv/tt/the_weather_channel_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-17</callsign>
-        <network>LyngSat-tv/tt/the_movie_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-21</callsign>
-        <network>LyngSat-tv/cc/comedy_central_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c3-23</callsign>
-        <network>LyngSat-tv/ee/e_entertainment_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-01</callsign>
-        <network>LyngSat-tv/aa/amc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-03</callsign>
-        <network>LyngSat-tv/nn/nickelodeon</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-07</callsign>
-        <network>LyngSat-tv/bb/bravo_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-09</callsign>
-        <network>LyngSat-tv/qq/qvc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-10</callsign>
-        <network>LyngSat-tv/hh/hsn</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-15</callsign>
-        <network>LyngSat-tv/aa/animalplanet</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-17</callsign>
-        <network>LyngSat-tv/mm/mtv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-19</callsign>
-        <network>LyngSat-tv/cc/cspan2</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-20</callsign>
-        <network>LyngSat-tv/ss/sundance_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-21</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-22</callsign>
-        <network>LyngSat-tv/ff/flix</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>c4-23</callsign>
-        <network>LyngSat-tv/vv/vh1</network>
+        <callsign>canald</callsign>
+        <network>LyngSat-tv/cc/canal_d</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>canbr</callsign>
@@ -289,12 +553,32 @@
         <network>LyngSat-tv/cc/cartoonnet</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cartoonnet</callsign>
+        <network>LyngSat-tv/cc/cartoon_network</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>caz!</callsign>
+        <network>LyngSat-radio/cc/caz</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cbbc</callsign>
+        <network>LyngSat-tv/cc/cbbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cbc</callsign>
         <network>LyngSat-tv/cc/cbc_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cbeebies</callsign>
+        <network>LyngSat-tv/bb/bbc_cbeebies</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cblft</callsign>
         <network>LyngSat-tv/cc/cbc_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cbmt</callsign>
+        <network>LyngSat-tv/cc/cbc_montreal</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>cbnew</callsign>
@@ -309,12 +593,36 @@
         <network>LyngSat-tv/cc/cbc_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cbwt</callsign>
+        <network>LyngSat-tv/cc/cbc_manitoba</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cbxft</callsign>
         <network>LyngSat-tv/cc/cbc_src</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>cbxt</callsign>
         <network>LyngSat-tv/cc/cbc_edmonton</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ccef</callsign>
+        <network>LyngSat-tv/cc/cctv_e_f</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cctv9</callsign>
+        <network>LyngSat-tv/cc/cctv09</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cdusa</callsign>
+        <network>LyngSat-tv/cc/cd_usa</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cfcn</callsign>
+        <network>LyngSat-tv/cc/cfcn_calgary</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cfmt</callsign>
+        <network>LyngSat-tv/cc/cfmt_omni1_toronto</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>cfrn</callsign>
@@ -325,6 +633,14 @@
         <network>LyngSat-tv/cc/cftm_montreal</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ch4</callsign>
+        <network>LyngSat-tv/cc/channel4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>chan</callsign>
+        <network>LyngSat-tv/gg/global_bc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>channel[v]</callsign>
         <network>LyngSat-tv/cc/channel_v_au</network>
     </callsigntonetwork>
@@ -333,8 +649,36 @@
         <network>LyngSat-tv/cc/chca_red_deer</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>chek</callsign>
+        <network>LyngSat-tv/cc/chek_vancouver_island</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>chexosh</callsign>
+        <network>LyngSat-tv/cc/chex_cbc12_peterborough</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>chmi</callsign>
+        <network>LyngSat-tv/cc/chmi_city_tv_winnipeg</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>chot</callsign>
+        <network>LyngSat-tv/cc/chot_tva_hull</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>church</callsign>
+        <network>LyngSat-tv/cc/church_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cica</callsign>
         <network>LyngSat-tv/cc/cica_tv_ontario</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cict</callsign>
+        <network>LyngSat-tv/gg/global_calgary</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cihfnb</callsign>
+        <network>LyngSat-tv/gg/global_maritimes</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ciii</callsign>
@@ -349,16 +693,60 @@
         <network>LyngSat-tv/cc/city_city_tv_toronto</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cityhd</callsign>
+        <network>LyngSat-tv/cc/city_tv_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>civt</callsign>
+        <network>LyngSat-tv/cc/civt_vancouver</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cjoh</callsign>
         <network>LyngSat-tv/cc/cjoh_ottawa</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ckal</callsign>
+        <network>LyngSat-tv/cc/ckal_city_tv_calgary</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ckco</callsign>
+        <network>LyngSat-tv/cc/ckco_kitchener</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ckem</callsign>
         <network>LyngSat-tv/cc/ckem_city_tv_edmonton</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cknd</callsign>
+        <network>LyngSat-tv/gg/global_winnipeg</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ckvu</callsign>
+        <network>LyngSat-tv/cc/ckvu_city_tv_vancouver</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ckws</callsign>
         <network>LyngSat-tv/cc/cbc_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ckxt</callsign>
+        <network>LyngSat-tv/cc/ckxt_sun_tv_toronto</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cky</callsign>
+        <network>LyngSat-tv/cc/cky_tv_winnipeg</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>clasrb</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>clcntry</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>clsrck</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>clt</callsign>
@@ -367,6 +755,10 @@
     <callsigntonetwork>
         <callsign>cmt</callsign>
         <network>LyngSat-tv/cc/cmt</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cmtpure</callsign>
+        <network>LyngSat-tv/cc/cmt_pure_country</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>cmtv</callsign>
@@ -385,6 +777,10 @@
         <network>LyngSat-tv/cc/cnbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cnbcwld</callsign>
+        <network>LyngSat-tv/cc/cnbc_world</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cnn</callsign>
         <network>LyngSat-tv/cc/cnn</network>
     </callsigntonetwork>
@@ -395,6 +791,10 @@
     <callsigntonetwork>
         <callsign>cnnin</callsign>
         <network>LyngSat-tv/cc/cnn_international</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>colours</callsign>
+        <network>LyngSat-tv/cc/colourstv_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>comedc</callsign>
@@ -413,6 +813,14 @@
         <network>LyngSat-tv/cc/comedy_central_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>comm22</callsign>
+        <network>LyngSat-corp/or/rogers_cable</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>community</callsign>
+        <network>LyngSat-tv/cc/communitychannel_uk</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>countrymusic</callsign>
         <network>LyngSat-tv/cc/cmc_country_music</network>
     </callsigntonetwork>
@@ -429,7 +837,23 @@
         <network>LyngSat-tv/cc/cpac</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>cpacf</callsign>
+        <network>LyngSat-tv/cc/cpac</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cshp</callsign>
+        <network>LyngSat-tv/cc/celebrity_shopping_network</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>csnch</callsign>
+        <network>LyngSat-tv/cc/comcast_sportsnet_baltimore</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>csndchd</callsign>
+        <network>LyngSat-tv/cc/comcast_sportsnet_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>csnws</callsign>
         <network>LyngSat-tv/cc/comcast_sportsnet_baltimore</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -441,8 +865,28 @@
         <network>LyngSat-tv/cc/cspan2</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>css</callsign>
+        <network>LyngSat-tv/cc/comcast_sports_southeast</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cstv</callsign>
+        <network>LyngSat-tv/cc/cstv_college_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ctmpch</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>cultu</callsign>
         <network>LyngSat-tv/cc/cultura</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>cultura</callsign>
+        <network>LyngSat-tv/cc/cultura_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>current</callsign>
+        <network>LyngSat-tv/cc/current</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>cwea</callsign>
@@ -450,15 +894,15 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dchome</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discovery_home</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dckids</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discovery_kids</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dcwings</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discoverywings</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>deuwe</callsign>
@@ -466,15 +910,31 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dhc</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discovery_health_ca</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dhd</callsign>
         <network>LyngSat-tv/dd/discovery_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>dhlth</callsign>
+        <network>LyngSat-tv/dd/discovery_health</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>disch</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discovery_health_ca</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>discocivil</callsign>
+        <network>LyngSat-tv/dd/discovery_civilisation</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>discohd</callsign>
+        <network>LyngSat-tv/dd/discovery_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>discoscience</callsign>
+        <network>LyngSat-tv/dd/discovery_science</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>discovery</callsign>
@@ -505,6 +965,14 @@
         <network>LyngSat-tv/dd/diy_net_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>dmax</callsign>
+        <network>LyngSat-tv/dd/dmax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>dnce</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>dsc</callsign>
         <network>LyngSat-tv/dd/discovery</network>
     </callsigntonetwork>
@@ -513,12 +981,32 @@
         <network>LyngSat-tv/dd/discovery</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>dsf</callsign>
+        <network>LyngSat-tv/dd/dsf</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>dtimes</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/dd/discovery_times</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>dtn</callsign>
+        <network>LyngSat-tv/dd/daystar</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>dtvfx</callsign>
         <network>LyngSat-tv/ff/fx_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>e!</callsign>
+        <network>LyngSat-tv/ee/e_entertainment_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>e4</callsign>
+        <network>LyngSat-tv/ee/e4_uk</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>e4+1</callsign>
+        <network>LyngSat-tv/ee/e4_plus1</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ea2</callsign>
@@ -529,8 +1017,32 @@
         <network>LyngSat-tv/ee/encore_action</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>easylis</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>edac016</callsign>
+        <network>LyngSat-tv/ee/educational_tv_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>edra</callsign>
         <network>LyngSat-tv/ee/encore_drama</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>einsextra</callsign>
+        <network>LyngSat-tv/ee/eins_extra</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>einsfestival</callsign>
+        <network>LyngSat-tv/ee/eins_festival</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>einsplus</callsign>
+        <network>LyngSat-tv/ee/eins_plus</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>electrn</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>elove</callsign>
@@ -541,12 +1053,24 @@
         <network>LyngSat-tv/ee/encore_mystery</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>encor</callsign>
+        <network>LyngSat-tv/ee/encore_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>encore</callsign>
         <network>LyngSat-tv/ee/encore_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>encorep</callsign>
         <network>LyngSat-tv/ee/encore_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>esnws</callsign>
+        <network>LyngSat-tv/ee/espnews</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>esp2a</callsign>
+        <network>LyngSat-tv/ee/espn2</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>espbr</callsign>
@@ -565,11 +1089,23 @@
         <network>LyngSat-tv/ee/espn2</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>espn2hd</callsign>
+        <callsign>espn2a</callsign>
         <network>LyngSat-tv/ee/espn2</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>espn2hd</callsign>
+        <network>LyngSat-tv/ee/espn2_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>espna</callsign>
+        <network>LyngSat-tv/ee/espn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>espncl</callsign>
+        <network>LyngSat-tv/ee/espn_classic</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>espnclassic</callsign>
         <network>LyngSat-tv/ee/espn_classic</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -582,7 +1118,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>espnhd</callsign>
-        <network>LyngSat-tv/ee/espn</network>
+        <network>LyngSat-tv/ee/espn_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>espnu</callsign>
+        <network>LyngSat-tv/ee/espn_u</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>etv</callsign>
@@ -593,15 +1133,31 @@
         <network>LyngSat-tv/ee/e_entertainment_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>euronews</callsign>
+        <network>LyngSat-tv/ee/euronews</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>eurosport</callsign>
+        <network>LyngSat-tv/ee/eurosport</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>eurosport2</callsign>
+        <network>LyngSat-tv/ee/eurosport2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ewam</callsign>
         <network>LyngSat-tv/ee/encore_wam</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ewst</callsign>
-        <network>LyngSat-tv/ee/encore_wam</network>
+        <network>LyngSat-tv/ee/encore_westerns</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ewtn</callsign>
+        <network>LyngSat-tv/ee/ewtn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ewtnl</callsign>
         <network>LyngSat-tv/ee/ewtn</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -609,12 +1165,16 @@
         <network>LyngSat-tv/ee/expo_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>f4-01</callsign>
-        <network>LyngSat-tv/aa/amc</network>
+        <callsign>extremesport</callsign>
+        <network>LyngSat-tv/ee/extremesports</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>fam</callsign>
         <network>LyngSat-tv/aa/abc_family</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>family7</callsign>
+        <network>LyngSat-tv/ff/family_7</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>famp</callsign>
@@ -641,8 +1201,24 @@
         <network>LyngSat-tv/ff/fox_sports</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>film1+1</callsign>
+        <network>LyngSat-tv/ff/film1_plus1_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>film4</callsign>
+        <network>LyngSat-tv/ff/film4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>film4+1</callsign>
+        <network>LyngSat-tv/ff/film4_plus1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>fitv</callsign>
         <network>LyngSat-tv/ff/fittv_usa</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>five</callsign>
+        <network>LyngSat-tv/ff/five</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>fliving</callsign>
@@ -701,6 +1277,10 @@
         <network>LyngSat-tv/ff/foxnews</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>foxreal</callsign>
+        <network>LyngSat-tv/ff/fox_reality</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>foxsportsnews</callsign>
         <network>LyngSat-tv/ff/fsn</network>
     </callsigntonetwork>
@@ -715,6 +1295,10 @@
     <callsigntonetwork>
         <callsign>fsba</callsign>
         <network>LyngSat-tv/ff/fox_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>fsc</callsign>
+        <network>LyngSat-tv/ff/fox_soccer</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>fsch</callsign>
@@ -754,6 +1338,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>fsne1</callsign>
+        <network>LyngSat-tv/ff/fox_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>fsno1</callsign>
         <network>LyngSat-tv/ff/fox_sports</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -805,6 +1393,10 @@
         <network>LyngSat-tv/ff/fox_sports</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>fstv</callsign>
+        <network>LyngSat-tv/ff/freespeech_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>fsw</callsign>
         <network>LyngSat-tv/ff/fox_sports</network>
     </callsigntonetwork>
@@ -829,160 +1421,8 @@
         <network>LyngSat-tv/ff/fx_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>g0-04</callsign>
-        <network>LyngSat-tv/ss/starz</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-08</callsign>
-        <network>LyngSat-tv/ss/starz</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-12</callsign>
-        <network>LyngSat-tv/ss/starz</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-15</callsign>
-        <network>LyngSat-tv/ss/showtime</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-16</callsign>
-        <network>LyngSat-tv/tt/tvland_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-18</callsign>
-        <network>LyngSat-tv/tt/the_movie_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g0-19</callsign>
-        <network>LyngSat-tv/mm/mtv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-01</callsign>
-        <network>LyngSat-tv/cc/comedy_central_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-06</callsign>
-        <network>LyngSat-tv/ss/spike_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-07</callsign>
-        <network>LyngSat-tv/dd/disney_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-08</callsign>
-        <network>LyngSat-tv/cc/cartoon_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-10</callsign>
-        <network>LyngSat-tv/mm/msnbc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-19</callsign>
-        <network>LyngSat-tv/cc/cinemax</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-20</callsign>
-        <network>LyngSat-tv/hh/hgtv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g1-21</callsign>
-        <network>LyngSat-tv/uu/usa_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>g4</callsign>
         <network>LyngSat-tv/gg/g4_video_game_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-01</callsign>
-        <network>LyngSat-tv/dd/disney_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-04</callsign>
-        <network>LyngSat-tv/ss/scifi</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-05</callsign>
-        <network>LyngSat-tv/cc/cnn</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-06</callsign>
-        <network>LyngSat-tv/tt/tbs_atlanta</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-07</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-08</callsign>
-        <network>LyngSat-tv/hh/hbo</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-09</callsign>
-        <network>LyngSat-tv/ee/espn</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-11</callsign>
-        <network>LyngSat-tv/aa/abc_family</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-12</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-13</callsign>
-        <network>LyngSat-tv/cc/cnbc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-14</callsign>
-        <network>LyngSat-tv/ee/espn2</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-15</callsign>
-        <network>LyngSat-tv/hh/hbo</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-16</callsign>
-        <network>LyngSat-tv/cc/cinemax</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-17</callsign>
-        <network>LyngSat-tv/tt/tnt</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-18</callsign>
-        <network>LyngSat-tv/ss/spike_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-19</callsign>
-        <network>LyngSat-tv/uu/usa_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-20</callsign>
-        <network>LyngSat-tv/bb/bet</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-21</callsign>
-        <network>LyngSat-tv/ll/lifetime</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-22</callsign>
-        <network>LyngSat-tv/cc/cnn_headline_news</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-23</callsign>
-        <network>LyngSat-tv/aa/ae_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g5-24</callsign>
-        <network>LyngSat-tv/ss/showtime</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g7-06</callsign>
-        <network>LyngSat-tv/gg/gameshownetwork</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>g7-07</callsign>
-        <network>LyngSat-tv/gg/golf_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>gac</callsign>
@@ -991,6 +1431,26 @@
     <callsigntonetwork>
         <callsign>gala</callsign>
         <network>LyngSat-tv/gg/galavision_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>gas</callsign>
+        <network>LyngSat-tv/nn/nick_gamesandsport_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>gemstv</callsign>
+        <network>LyngSat-tv/gg/gems_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>geschiedenis</callsign>
+        <network>LyngSat-tv/gg/geschiedenis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>giga</callsign>
+        <network>LyngSat-tv/gg/gigatv_de</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>glbhe</callsign>
+        <network>LyngSat-tv/gg/global_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>globo</callsign>
@@ -1005,12 +1465,28 @@
         <network>LyngSat-tv/gg/gnt_brasil</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>godtv</callsign>
+        <network>LyngSat-corp/gk/god_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>goldold</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>golf</callsign>
         <network>LyngSat-tv/gg/golf_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>gosp</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>gsn</callsign>
         <network>LyngSat-tv/gg/gameshownetwork</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hallmark</callsign>
+        <network>LyngSat-tv/hh/hallmark_movie_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>halmrk</callsign>
@@ -1022,19 +1498,19 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hb2p</callsign>
-        <network>LyngSat-tv/hh/hbo_plus</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>hb2w</callsign>
-        <network>LyngSat-tv/hh/hbo_plus</network>
+        <network>LyngSat-tv/hh/hbo2</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hbo</callsign>
         <network>LyngSat-tv/hh/hbo</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>hbo2</callsign>
-        <network>LyngSat-tv/hh/hbo_plus</network>
+        <callsign>hbo2e</callsign>
+        <network>LyngSat-tv/hh/hbo2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hbo2w</callsign>
+        <network>LyngSat-tv/hh/hbo2</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hboc</callsign>
@@ -1045,7 +1521,15 @@
         <network>LyngSat-tv/hh/hbo_comedy_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>hbocy</callsign>
+        <network>LyngSat-tv/hh/hbo_comedy_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>hbof</callsign>
+        <network>LyngSat-tv/hh/hbo_family</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hbofm</callsign>
         <network>LyngSat-tv/hh/hbo_family</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -1061,12 +1545,24 @@
         <network>LyngSat-tv/hh/hbo_hdtv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>hbolat</callsign>
+        <network>LyngSat-tv/hh/hbo_latino</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hbolt</callsign>
+        <network>LyngSat-tv/hh/hbo_latino</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>hbop</callsign>
         <network>LyngSat-tv/hh/hbo</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hbopl</callsign>
         <network>LyngSat-tv/hh/hbo_plus</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hbosg</callsign>
+        <network>LyngSat-tv/hh/hbo_signature</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hbosig</callsign>
@@ -1083,6 +1579,30 @@
     <callsigntonetwork>
         <callsign>hbozp</callsign>
         <network>LyngSat-tv/hh/hbo_zone</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hd1nl</callsign>
+        <network>LyngSat-tv/hh/hd1_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hdnet</callsign>
+        <network>LyngSat-tv/hh/hdnet</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hdnetmv</callsign>
+        <network>LyngSat-tv/hh/hdnet_movies</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hdnmv</callsign>
+        <network>LyngSat-tv/hh/hdnet_movies</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>heart</callsign>
+        <network>LyngSat-radio/gk/heart1062fm</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>heat</callsign>
+        <network>LyngSat-radio/gk/heat</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>hgtv</callsign>
@@ -1117,6 +1637,22 @@
         <network>LyngSat-tv/hh/history_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>hitlist</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hlc</callsign>
+        <network>LyngSat-tv/hh/healthy_living_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hollanddoc</callsign>
+        <network>LyngSat-tv/hh/holland_doc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>hrtv</callsign>
+        <network>LyngSat-tv/hh/horseracing_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>hsn</callsign>
         <network>LyngSat-tv/hh/hsn</network>
     </callsigntonetwork>
@@ -1141,8 +1677,40 @@
         <network>LyngSat-tv/ee/encore_indieplex</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>isate</callsign>
+        <network>LyngSat-tv/ii/independent_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>itv1</callsign>
+        <network>LyngSat-tv/ii/itv1_central</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>itv2</callsign>
+        <network>LyngSat-tv/ii/itv2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>itv3</callsign>
+        <network>LyngSat-tv/ii/itv3</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>itv4</callsign>
+        <network>LyngSat-tv/ii/itv4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>jenna</callsign>
+        <network>LyngSat-tv/cc/club_jenna</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>jetix</callsign>
         <network>LyngSat-tv/jj/jetix</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>jwltv</callsign>
+        <network>LyngSat-tv/jj/jewelry_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>jzz</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kaal</callsign>
@@ -1159,6 +1727,10 @@
     <callsigntonetwork>
         <callsign>kabcdt</callsign>
         <network>LyngSat-tv/aa/abc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>kabel1</callsign>
+        <network>LyngSat-tv/kk/kabel_eins</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kacb</callsign>
@@ -1330,7 +1902,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kbtc</callsign>
-        <network>PBS-kbtc</network>
+        <network>LyngSat-tv/kk/kbtc_tacoma</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kbtv</callsign>
@@ -1410,11 +1982,11 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kcpq</callsign>
-        <network>LyngSat-tv/ff/fox</network>
+        <network>LyngSat-tv/kk/kcpq_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kcpqdt</callsign>
-        <network>LyngSat-tv/ff/fox</network>
+        <network>LyngSat-tv/kk/kcpq_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kcpt</callsign>
@@ -1433,32 +2005,36 @@
         <network>PBS-kcsm</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>kcsmmhz</callsign>
+        <network>LyngSat-radio/gk/kcsm_jazz911fm_bayarea</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>kctf</callsign>
         <network>PBS-kctf</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kcts</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctscab</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctsdt</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctsdt2</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctsdt3</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctsdt5</callsign>
-        <network>PBS-kcts</network>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kctv</callsign>
@@ -1597,6 +2173,10 @@
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ketnet/canvas</callsign>
+        <network>LyngSat-tv/kk/ketnet_canvas_be</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>kets</callsign>
         <network>PBS-kets</network>
     </callsigntonetwork>
@@ -1623,10 +2203,6 @@
     <callsigntonetwork>
         <callsign>kfbb</callsign>
         <network>LyngSat-tv/aa/abc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>kfda-dt</callsign>
-        <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kfdf</callsign>
@@ -1797,6 +2373,10 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>khousd2</callsign>
+        <network>LyngSat-tv/kk/khou_cbs11_houston</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>khq</callsign>
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
@@ -1867,6 +2447,10 @@
     <callsigntonetwork>
         <callsign>kirodt</callsign>
         <network>LyngSat-tv/kk/kiro_cbs7_seattle</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>kiss</callsign>
+        <network>LyngSat-radio/gk/kiss100_fm_uk</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kitv</callsign>
@@ -2389,6 +2973,10 @@
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>kpxm</callsign>
+        <network>LyngSat-tv/kk/kpxm_i41_minneapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>kpxn</callsign>
         <network>LyngSat-corp/gk/ion_media_networks</network>
     </callsigntonetwork>
@@ -2585,6 +3173,10 @@
         <network>PBS-ksps</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>kstc</callsign>
+        <network>LyngSat-tv/kk/kstc_45_minneapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>kstp</callsign>
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
@@ -2685,6 +3277,10 @@
         <network>LyngSat-tv/kk/ktla_cw5_los_angeles</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ktmd</callsign>
+        <network>LyngSat-tv/kk/ktmd48_houston</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ktmf</callsign>
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
@@ -2727,6 +3323,10 @@
     <callsigntonetwork>
         <callsign>ktrk</callsign>
         <network>LyngSat-tv/aa/abc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ktrksd2</callsign>
+        <network>LyngSat-tv/kk/ktrk_abc13_houston</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>ktrv</callsign>
@@ -3245,16 +3845,16 @@
         <network>LyngSat-tv/kk/kyw_cbs3_philadelphia</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>kyw-dt</callsign>
-        <network>LyngSat-tv/kk/kyw_cbs3_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>kzou</callsign>
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>kzwb</callsign>
         <network>LyngSat-tv/ww/wbtv_net_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>libertytv</callsign>
+        <network>LyngSat-tv/ll/liberty</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>life</callsign>
@@ -3277,6 +3877,14 @@
         <network>LyngSat-tv/ll/lifestyle</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>linktv</callsign>
+        <network>LyngSat-tv/ll/link_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>liveshop</callsign>
+        <network>LyngSat-tv/ll/live_shop</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>lmn</callsign>
         <network>LyngSat-tv/ll/lifetime_movie</network>
     </callsigntonetwork>
@@ -3297,8 +3905,24 @@
         <network>LyngSat-tv/ee/encore_love</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>lrw</callsign>
+        <network>LyngSat-tv/ll/lifetime_real_woman</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ltclass</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>magic</callsign>
+        <network>LyngSat-radio/ln/magic_fm</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>mainevent</callsign>
         <network>LyngSat-tv/mm/mainevent_ppv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>masterp</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>max</callsign>
@@ -3309,8 +3933,40 @@
         <network>LyngSat-tv/cc/cinemax</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>mc90s</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mcrggae</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mcrock</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>metal</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>metv</callsign>
+        <network>LyngSat-tv/ww/wwme_tv23_chicago</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mexican</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mezzo</callsign>
+        <network>LyngSat-tv/mm/mezzo</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>mili</callsign>
         <network>LyngSat-tv/mm/military_channel_discovery</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mojo</callsign>
+        <network>LyngSat-radio/ln/mojo_radio</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>momaxp</callsign>
@@ -3319,6 +3975,14 @@
     <callsigntonetwork>
         <callsign>momusic</callsign>
         <network>LyngSat-tv/mm/muchmoremusic</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mor</callsign>
+        <network>LyngSat-tv/mm/mens_outdoor_recreation</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>more4</callsign>
+        <network>LyngSat-tv/mm/more4</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>movieextra</callsign>
@@ -3357,8 +4021,24 @@
         <network>LyngSat-tv/mm/mtv2_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>mtvbase</callsign>
+        <network>LyngSat-tv/mm/mtv_base</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mtvbrandnew</callsign>
+        <network>LyngSat-tv/mm/mtv_brand_new_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>mtvcan</callsign>
         <network>LyngSat-tv/mm/mtv_ca</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mtvhit</callsign>
+        <network>LyngSat-tv/mm/mtv_hits</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>mtvhits</callsign>
+        <network>LyngSat-tv/mm/mtv_hits_eur</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>mtvl</callsign>
@@ -3385,6 +4065,10 @@
         <network>LyngSat-tv/mm/musiqueplus</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>musurb</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>mystery</callsign>
         <network>LyngSat-tv/ee/encore_mystery</network>
     </callsigntonetwork>
@@ -3395,6 +4079,10 @@
     <callsigntonetwork>
         <callsign>nasa</callsign>
         <network>LyngSat-tv/nn/nasatv_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nasn</callsign>
+        <network>LyngSat-tv/nn/nasn</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>natge</callsign>
@@ -3409,8 +4097,28 @@
         <network>LyngSat-tv/nn/new_england_cable_news</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>ned1</callsign>
+        <network>LyngSat-tv/nn/nederland1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ned2</callsign>
+        <network>LyngSat-tv/nn/nederland2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ned3</callsign>
+        <network>LyngSat-tv/nn/nederland3</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nederlande</callsign>
+        <network>LyngSat-tv/nn/nederland_e</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>nesn</callsign>
         <network>LyngSat-tv/nn/nesn_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>net5</callsign>
+        <network>LyngSat-tv/nn/net5</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>newseng</callsign>
@@ -3429,12 +4137,104 @@
         <network>LyngSat-tv/nn/nfl</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>nfl1</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl10</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl11</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl12</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl13</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl14</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl16</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl17</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl18b</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl2</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl3</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl4</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl5</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl6</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl7</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl8</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nfl9</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>nflhd</callsign>
         <network>LyngSat-tv/nn/nfl</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>nflmix1</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nflmix2</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nflnet</callsign>
+        <network>LyngSat-tv/nn/nfl_network</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nflrz</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nflsnap</callsign>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ngc</callsign>
         <network>LyngSat-tv/nn/natgeochannel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ngchd</callsign>
+        <network>LyngSat-tv/nn/natgeochannel_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>nicke</callsign>
@@ -3443,6 +4243,10 @@
     <callsigntonetwork>
         <callsign>nickelodeon</callsign>
         <network>LyngSat-tv/nn/nickelodeon</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>nickg</callsign>
+        <network>LyngSat-tv/nn/nick_gamesandsport_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>nik</callsign>
@@ -3481,12 +4285,24 @@
         <network>LyngSat-tv/cc/cinemax</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>opra</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>outdoor</callsign>
+        <network>LyngSat-tv/oo/outdoor_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>oxygen</callsign>
         <network>LyngSat-tv/oo/oxygen</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>oxygenp</callsign>
         <network>LyngSat-tv/oo/oxygen</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>party</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>paxsat</callsign>
@@ -3501,16 +4317,68 @@
         <network>LyngSat-tv/pp/playboy</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>poplat</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ppv</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_info</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>privatespice</callsign>
+        <network>LyngSat-tv/ss/spice_private</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>pro7</callsign>
+        <network>LyngSat-tv/pp/pro7</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>prosieben</callsign>
+        <network>LyngSat-tv/pp/pro7</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>puac077</callsign>
+        <network>LyngSat-tv/ss/seattle_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>qvc</callsign>
         <network>LyngSat-tv/qq/qvc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>raceworld</callsign>
+        <network>LyngSat-tv/rr/race_world</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>rai</callsign>
         <network>LyngSat-tv/rr/rai_int</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>raiuno</callsign>
+        <network>LyngSat-tv/rr/raiuno</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rapp</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rbhip</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rbhit</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rckesp</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>rdi</callsign>
         <network>LyngSat-tv/rr/rdi_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rdisn</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>recor</callsign>
@@ -3529,6 +4397,14 @@
         <network>LyngSat-tv/rr/redevida</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>reelz</callsign>
+        <network>LyngSat-tv/rr/reelz_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>retroa</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>robtv</callsign>
         <network>LyngSat-tv/rr/robtv</network>
     </callsigntonetwork>
@@ -3537,12 +4413,76 @@
         <network>LyngSat-tv/ee/encore_retroplex</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>rse</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_east</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rso</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_ontario</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rsp</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_pacific</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>rsw</callsign>
         <network>LyngSat-tv/rr/rogers_sportsnet_west</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>rtbfsat</callsign>
+        <network>LyngSat-tv/rr/rtbf_sat</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rtbla</callsign>
+        <network>LyngSat-tv/rr/rtbf_la_deux</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rtl4</callsign>
+        <network>LyngSat-tv/rr/rtl4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rtl5</callsign>
+        <network>LyngSat-tv/rr/rtl5</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rtl7</callsign>
+        <network>LyngSat-tv/rr/rtl7</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>rtltele</callsign>
+        <network>LyngSat-tv/rr/rtl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sailing</callsign>
+        <network>LyngSat-tv/ss/sailingchannel_it</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>saskleg</callsign>
+        <network>LyngSat-tv/ss/saskatchewan_legislative</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sat1</callsign>
+        <network>LyngSat-tv/ss/sat1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sawld</callsign>
+        <network>LyngSat-tv/ss/south_asia_world</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sblck</callsign>
+        <network>LyngSat-tv/ss/starz_in_black</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sblk</callsign>
+        <network>LyngSat-tv/ss/starz_in_black</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>sbs</callsign>
         <network>LyngSat-tv/ss/sbs</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sbs6</callsign>
+        <network>LyngSat-tv/ss/sbs6</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>sbsnews</callsign>
@@ -3553,8 +4493,12 @@
         <network>LyngSat-tv/ss/sbt</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>scien</callsign>
+        <network>LyngSat-tv/ss/science_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>science</callsign>
-        <network>LyngSat-tv/dd/discovery</network>
+        <network>LyngSat-tv/ss/science_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>scifi</callsign>
@@ -3565,12 +4509,80 @@
         <network>LyngSat-tv/ss/scifi</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>scin</callsign>
+        <network>LyngSat-tv/ss/starz_cinema</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scine</callsign>
+        <network>LyngSat-tv/ss/starz_cinema</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scn</callsign>
+        <network>LyngSat-tv/ss/scn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scnc</callsign>
+        <network>LyngSat-tv/ss/scn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scome</callsign>
+        <network>LyngSat-tv/ss/starz_comedy</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scomep</callsign>
+        <network>LyngSat-tv/ss/starz_comedy</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>scr</callsign>
         <network>LyngSat-tv/tt/the_score</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>scream</callsign>
+        <network>LyngSat-tv/ss/scream</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>scrm</callsign>
+        <network>LyngSat-tv/ss/scream</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>season</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sedg</callsign>
+        <network>LyngSat-tv/ss/starz_edge</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sedge</callsign>
+        <network>LyngSat-tv/ss/starz_edge</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sedgp</callsign>
+        <network>LyngSat-tv/ss/starz_edge</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sehd</callsign>
+        <network>LyngSat-tv/ss/super_ecran_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>serie</callsign>
+        <network>LyngSat-tv/ss/series_plus</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>seta</callsign>
+        <network>LyngSat-tv/ss/setanta_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>setant</callsign>
+        <network>LyngSat-tv/ss/setanta_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>seven</callsign>
         <network>LyngSat-tv/num/7network_aus</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sftrock</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>shcasec</callsign>
@@ -3587,6 +4599,14 @@
     <callsigntonetwork>
         <callsign>shocsep</callsign>
         <network>LyngSat-tv/ss/showcase</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>shop</callsign>
+        <network>LyngSat-tv/ss/shop_at_home</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>shopnbc</callsign>
+        <network>LyngSat-tv/ss/shopnbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>shotoo</callsign>
@@ -3633,8 +4653,20 @@
         <network>LyngSat-tv/ss/showtimextreme</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>shwcse1</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>shwtun</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>sitv</callsign>
         <network>LyngSat-tv/ss/sitv_los_angeles</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>skf</callsign>
+        <network>LyngSat-tv/ss/starz_kids_family</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>skynews</callsign>
@@ -3645,12 +4677,60 @@
         <network>LyngSat-tv/ss/skyracing</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>sleuth</callsign>
+        <network>LyngSat-corp/ss/sleuth</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>smiletv</callsign>
+        <network>LyngSat-corp/ss/smile_tv_networks</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>smjzz</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>smooth</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>smreng</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sndscp</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>snet2</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_east</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>snet3</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_pacific</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>snet4</callsign>
+        <network>LyngSat-tv/rr/rogers_sportsnet_west</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>soap</callsign>
         <network>LyngSat-tv/ss/soapnet_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>sony</callsign>
         <network>LyngSat-tv/ss/sonytv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>soon4</callsign>
+        <network>LyngSat-tv/dd/dishnetworkod</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>soon5</callsign>
+        <network>LyngSat-tv/dd/dishnetworkod</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>space</callsign>
+        <network>LyngSat-tv/ss/space</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>spacec</callsign>
@@ -3663,6 +4743,10 @@
     <callsigntonetwork>
         <callsign>speed</callsign>
         <network>LyngSat-tv/ss/speed_channel_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>speedauctiontv</callsign>
+        <network>LyngSat-tv/ss/speed_auction_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>spikec</callsign>
@@ -3685,6 +4769,22 @@
         <network>LyngSat-tv/pp/pbs_kids_sprout</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>srche</callsign>
+        <network>LyngSat-tv/cc/cbc_src</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>srcsh</callsign>
+        <network>LyngSat-tv/cc/cbc_src</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>ssc</callsign>
+        <network>LyngSat-tv/ss/silver_screen_classics</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>standrd</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>star</callsign>
         <network>LyngSat-tv/ss/star_tv_ca</network>
     </callsigntonetwork>
@@ -3701,6 +4801,10 @@
         <network>LyngSat-tv/ss/starz</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>starzdm</callsign>
+        <network>LyngSat-tv/ss/starz_od</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>starzf</callsign>
         <network>LyngSat-tv/ss/starz</network>
     </callsigntonetwork>
@@ -3709,8 +4813,16 @@
         <network>LyngSat-tv/ss/starz</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>starzhd</callsign>
+        <network>LyngSat-tv/ss/starz_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>starzp</callsign>
         <network>LyngSat-tv/ss/starz</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>sto</callsign>
+        <network>LyngSat-tv/ss/sports_time_ohio</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>strzth</callsign>
@@ -3725,12 +4837,36 @@
         <network>LyngSat-tv/ss/style_network_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>sunb</callsign>
+        <network>LyngSat-tv/ss/sun_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>sundae</callsign>
         <network>LyngSat-tv/ss/sundance_channel</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>sundaep</callsign>
         <network>LyngSat-tv/ss/sundance_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>swr</callsign>
+        <network>LyngSat-tv/ss/swr_fernsehen</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>talksport</callsign>
+        <network>LyngSat-radio/tt/talksport</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tamil</callsign>
+        <network>LyngSat-tv/tt/tamil_vision_inc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tbn</callsign>
+        <network>LyngSat-tv/tt/tbn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tbn_eur</callsign>
+        <network>LyngSat-tv/tt/tbn_europe</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tbs</callsign>
@@ -3749,12 +4885,80 @@
         <network>LyngSat-tv/tt/tcm</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tcmp</callsign>
+        <network>LyngSat-tv/tt/tcm</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tctwld</callsign>
+        <network>LyngSat-tv/tt/tct_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tdcc</callsign>
         <network>LyngSat-tv/dd/discovery</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tdces</callsign>
+        <network>LyngSat-tv/dd/discovery_espanol</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tdchd</callsign>
+        <network>LyngSat-tv/dd/discovery_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tdcntry</callsign>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team1</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team2</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team3</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team4</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team5</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team6</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team7</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team8</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>team9</callsign>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tech</callsign>
+        <network>LyngSat-tv/gg/g4_tech_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>teez</callsign>
+        <network>LyngSat-tv/ss/shorteez</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>telac</callsign>
         <network>LyngSat-tv/tt/telecine_action</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>telat</callsign>
+        <network>LyngSat-tv/cc/canal_latino_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>telcu</callsign>
@@ -3763,6 +4967,10 @@
     <callsigntonetwork>
         <callsign>telem</callsign>
         <network>LyngSat-tv/tt/telecine_emotion</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>teletext</callsign>
+        <network>LyngSat-tv/tt/teletextholidays</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>telpi</callsign>
@@ -3777,6 +4985,14 @@
         <network>LyngSat-tv/ss/southern_cross_ten</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tennis</callsign>
+        <network>LyngSat-tv/tt/tennis_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tfc</callsign>
+        <network>LyngSat-tv/ff/family</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tfcp</callsign>
         <network>LyngSat-tv/ff/family</network>
     </callsigntonetwork>
@@ -3785,8 +5001,28 @@
         <network>LyngSat-tv/tt/tfo</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tgrt</callsign>
+        <network>LyngSat-tv/tt/tgrt</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>thcap</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_info</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>thebo</callsign>
+        <network>LyngSat-tv/tt/the_box_comedy_nl</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>thetube</callsign>
+        <network>LyngSat-tv/tt/the_tube</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>thmaxp</callsign>
         <network>LyngSat-tv/cc/cinemax</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tien</callsign>
+        <network>LyngSat-tv/tt/tien</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tlc</callsign>
@@ -3795,6 +5031,10 @@
     <callsigntonetwork>
         <callsign>tlcp</callsign>
         <network>LyngSat-tv/tt/the_learning_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tlhit</callsign>
+        <network>LyngSat-tv/tt/telehit</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tln</callsign>
@@ -3815,6 +5055,18 @@
     <callsigntonetwork>
         <callsign>tmcxp</callsign>
         <network>LyngSat-tv/tt/the_movie_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tmf</callsign>
+        <network>LyngSat-tv/tt/tmf</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tmfnl</callsign>
+        <network>LyngSat-tv/tt/tmf_nl_theme</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tmfparty</callsign>
+        <network>LyngSat-tv/tt/tmf_party</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tnt</callsign>
@@ -3842,7 +5094,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>toond</callsign>
-        <network>LyngSat-tv/dd/disney_channel</network>
+        <network>LyngSat-tv/dd/disney_toon_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>toondp</callsign>
@@ -3857,6 +5109,10 @@
         <network>LyngSat-tv/tt/travelchannel_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>travel</callsign>
+        <network>LyngSat-tv/tt/travelchannel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>travp</callsign>
         <network>LyngSat-tv/tt/travelchannel_us</network>
     </callsigntonetwork>
@@ -3867,6 +5123,26 @@
     <callsigntonetwork>
         <callsign>tropp</callsign>
         <network>LyngSat-tv/tt/tv_tropolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>trt1</callsign>
+        <network>LyngSat-tv/tt/trt1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>trt2</callsign>
+        <network>LyngSat-tv/tt/trt2</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>trt3</callsign>
+        <network>LyngSat-tv/tt/trt3</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>trti</callsign>
+        <network>LyngSat-tv/tt/trtint</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>trtint</callsign>
+        <network>LyngSat-tv/tt/trtint</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>true</callsign>
@@ -3885,6 +5161,14 @@
         <network>LyngSat-tv/tt/tsn</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tsnhd</callsign>
+        <network>LyngSat-tv/cc/comcast_sportsnet_baltimore</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tst</callsign>
+        <network>LyngSat-tv/ee/ewtn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tv1</callsign>
         <network>LyngSat-tv/tt/tv1_aus</network>
     </callsigntonetwork>
@@ -3893,16 +5177,56 @@
         <network>LyngSat-tv/tt/tv1_aus</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tv1000</callsign>
+        <network>XMLTV Sweden-tv1000.viasat.se</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tv5</callsign>
         <network>LyngSat-tv/tt/tv5_quebec</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tv5monde</callsign>
+        <network>LyngSat-tv/tt/tv5_monde_europe</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tv_8</callsign>
+        <network>LyngSat-tv/tt/tv8_turkey</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvarl</callsign>
+        <network>LyngSat-tv/cc/cimt_tva_riviere_du_loup</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvarn</callsign>
+        <network>LyngSat-tv/cc/cfem_rouyn</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tvaw</callsign>
         <network>LyngSat-tv/cc/cftm_montreal</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tvdrenthe</callsign>
+        <network>LyngSat-tv/rr/rtv_drenthe</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tveint</callsign>
+        <network>LyngSat-tv/tt/tve_int</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvflevo</callsign>
+        <network>LyngSat-tv/oo/omroep_flevoland</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tvgc</callsign>
         <network>LyngSat-tv/tt/tv_guide_channel</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvgelderland</callsign>
+        <network>LyngSat-tv/rr/rtv_gelderland</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvi</callsign>
+        <network>LyngSat-tv/rr/rtl_tvi</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tvland</callsign>
@@ -3913,8 +5237,32 @@
         <network>LyngSat-tv/tt/tvland_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tvnholland</callsign>
+        <network>LyngSat-tv/rr/rtv_noord_holland</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvni</callsign>
+        <network>LyngSat-tv/cc/cj_tvn</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvnoord</callsign>
+        <network>LyngSat-tv/rr/rtv_noord</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>tvone</callsign>
         <network>LyngSat-tv/tt/tv_one_us</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvoost</callsign>
+        <network>LyngSat-tv/rr/rtv_oost</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvoranje</callsign>
+        <network>LyngSat-tv/tt/tv_oranje</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvrijnmond</callsign>
+        <network>LyngSat-tv/rr/rtv_rijnmond</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>tvsen</callsign>
@@ -3925,12 +5273,32 @@
         <network>LyngSat-tv/tt/tvsn_au</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>tvutrecht</callsign>
+        <network>LyngSat-tv/rr/rtv_utrecht</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tvwest</callsign>
+        <network>LyngSat-tv/rr/rtv_west</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>tw1</callsign>
+        <network>LyngSat-tv/tt/tw1</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>twc</callsign>
         <network>LyngSat-tv/tt/the_weather_channel_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>uctv</callsign>
+        <network>LyngSat-tv/uu/uctv_california</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>uhd</callsign>
         <network>LyngSat-tv/uu/universal_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>uni</callsign>
+        <network>LyngSat-tv/uu/univision</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>unich</callsign>
@@ -3961,6 +5329,14 @@
         <network>LyngSat-tv/uu/uwtv_washington</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>veronica</callsign>
+        <network>LyngSat-tv/vv/veronica</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>veronica/jetix</callsign>
+        <network>LyngSat-tv/vv/veronica</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>versus</callsign>
         <network>LyngSat-tv/vv/versus</network>
     </callsigntonetwork>
@@ -3970,6 +5346,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>vh1cl</callsign>
+        <network>LyngSat-tv/vv/vh1_classic</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vh1classic</callsign>
         <network>LyngSat-tv/vv/vh1_classic</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -3985,12 +5365,44 @@
         <network>LyngSat-tv/vv/vh1</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>vibe</callsign>
+        <network>LyngSat-tv/mm/much_vibe</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vie</callsign>
+        <network>LyngSat-tv/cc/canal_vie</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>viehd</callsign>
+        <network>LyngSat-tv/cc/canal_vie_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>vision</callsign>
         <network>LyngSat-tv/vv/visiontv</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>vod</callsign>
+        <network>LyngSat-tv/dd/dishnetworkod</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>voice</callsign>
         <network>LyngSat-tv/vv/voice_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vox</callsign>
+        <network>LyngSat-tv/vv/vox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vraktv</callsign>
+        <network>LyngSat-tv/vv/vrak_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vt4</callsign>
+        <network>LyngSat-tv/vv/vt4</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>vtm</callsign>
+        <network>LyngSat-tv/vv/vtm</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>w</callsign>
@@ -3999,66 +5411,6 @@
     <callsigntonetwork>
         <callsign>w+2</callsign>
         <network>LyngSat-tv/ww/w_au</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w1-06</callsign>
-        <network>LyngSat-tv/nn/nbc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w1-10</callsign>
-        <network>LyngSat-tv/aa/abc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w1-22</callsign>
-        <network>LyngSat-tv/cc/cbs</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w3-03</callsign>
-        <network>LyngSat-corp/tt/the_cw_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w3-09</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w3-14</callsign>
-        <network>LyngSat-tv/tt/tcm</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w3-15</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w4-10</callsign>
-        <network>LyngSat-tv/hh/hbo_plus</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w4-17</callsign>
-        <network>LyngSat-tv/hh/hbo_plus</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w4-19</callsign>
-        <network>LyngSat-tv/hh/hbo_signature</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w7-02</callsign>
-        <network>LyngSat-tv/aa/abc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w7-05</callsign>
-        <network>LyngSat-tv/ff/fox</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w7-06</callsign>
-        <network>LyngSat-tv/cc/cbs</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w7-14</callsign>
-        <network>LyngSat-tv/nn/nbc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>w7-23</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>waay</callsign>
@@ -4269,6 +5621,10 @@
         <network>PBS-wbgu</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wbgukid</callsign>
+        <network>LyngSat-tv/pp/pbs_kids</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wbha</callsign>
         <network>LyngSat-tv/ww/wbtv_net_us</network>
     </callsigntonetwork>
@@ -4405,20 +5761,16 @@
         <network>LyngSat-tv/cc/cbs</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wbzdt</callsign>
+        <network>LyngSat-tv/cc/cbs_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wbzl</callsign>
         <network>LyngSat-tv/ww/wbtv_net_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wcau</callsign>
         <network>LyngSat-tv/ww/wcau_nbc10_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wcau-dt</callsign>
-        <network>LyngSat-tv/ww/wcau_nbc10_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wcau-wx</callsign>
-        <network>LyngSat-tv/ww/wcau_weather_plus</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wcbb</callsign>
@@ -4437,8 +5789,16 @@
         <network>LyngSat-tv/cc/cbs</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wcbsdt</callsign>
+        <network>LyngSat-tv/cc/cbs_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wccb</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wcco</callsign>
+        <network>LyngSat-tv/ww/wcco_cbs4_minneapolis</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wcet</callsign>
@@ -4519,6 +5879,10 @@
     <callsigntonetwork>
         <callsign>wcti</callsign>
         <network>LyngSat-tv/aa/abc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wctv</callsign>
+        <network>LyngSat-tv/ww/wctv_cbs6_thomasville</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wctx</callsign>
@@ -4605,12 +5969,20 @@
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wdivdt</callsign>
+        <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wdka</callsign>
         <network>LyngSat-tv/ww/wbtv_net_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wdky</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wdr</callsign>
+        <network>LyngSat-tv/ww/wdr_fernsehen</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wdrb</callsign>
@@ -4675,6 +6047,10 @@
     <callsigntonetwork>
         <callsign>week</callsign>
         <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>weerkanaal</callsign>
+        <network>LyngSat-tv/ww/weerkanaal</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>weht</callsign>
@@ -4745,6 +6121,10 @@
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wfaadt</callsign>
+        <network>LyngSat-tv/aa/abc_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wfff</callsign>
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
@@ -4758,6 +6138,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wfla</callsign>
+        <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wfladt</callsign>
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -4793,16 +6177,16 @@
         <network>PBS-wfsu</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wftc</callsign>
-        <network>LyngSat-corp/tt/the_cw_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wfte</callsign>
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wfts</callsign>
         <network>LyngSat-tv/aa/abc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wftsdt</callsign>
+        <network>LyngSat-tv/aa/abc_hd</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wftv</callsign>
@@ -4865,8 +6249,12 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wfyi</callsign>
-        <network>PBS-wfyi</network>
+        <callsign>wfyi+</callsign>
+        <network>LyngSat-tv/ww/wfyi_pbs_indianapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wfyidt</callsign>
+        <network>LyngSat-tv/ww/wfyi_pbs_indianapolis</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wgal</callsign>
@@ -4942,7 +6330,7 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wgnsat</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
+        <network>LyngSat-tv/ww/wgn_cw9_chicago</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wgnt</callsign>
@@ -4971,26 +6359,6 @@
     <callsigntonetwork>
         <callsign>wgtw</callsign>
         <network>LyngSat-tv/ww/wgtw_48_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wgtw-d1</callsign>
-        <network>LyngSat-tv/ww/wgtw_48_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wgtw-d2</callsign>
-        <network>LyngSat-tv/cc/church_channel</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wgtw-d3</callsign>
-        <network>LyngSat-tv/jj/jc_tv</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wgtw-d4</callsign>
-        <network>LyngSat-tv/tt/tbn_enlace_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wgtw-d5</callsign>
-        <network>LyngSat-tv/ss/smile_of_a_child</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wgvu</callsign>
@@ -5037,8 +6405,24 @@
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>whecdt</callsign>
+        <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>whecdt2</callsign>
+        <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>whiz</callsign>
         <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>whmb</callsign>
+        <network>LyngSat-tv/ww/whmb_40_indianapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>whmbsat</callsign>
+        <network>LyngSat-tv/ww/world_harvest_tv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>whns</callsign>
@@ -5061,6 +6445,10 @@
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wht</callsign>
+        <network>LyngSat-tv/ww/world_fishing_network</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>whtj</callsign>
         <network>PBS-whtj</network>
     </callsigntonetwork>
@@ -5078,10 +6466,6 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>whyy</callsign>
-        <network>PBS-whyy</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>whyy-1</callsign>
         <network>PBS-whyy</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -5113,16 +6497,24 @@
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wipb</callsign>
-        <network>PBS-wipb</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wipr</callsign>
         <network>PBS-wipr</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wipx</callsign>
+        <network>LyngSat-tv/ww/wipx_i63_indianapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wis</callsign>
         <network>LyngSat-tv/nn/nbc</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wish</callsign>
+        <network>LyngSat-tv/ww/wish_indianapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wishdt</callsign>
+        <network>LyngSat-tv/ww/wish_indianapolis</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wisn</callsign>
@@ -5167,6 +6559,10 @@
     <callsigntonetwork>
         <callsign>wjbk</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wjbkdt</callsign>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wjcl</callsign>
@@ -5357,6 +6753,10 @@
         <network>PBS-wljt</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wlmb</callsign>
+        <network>LyngSat-tv/ww/wlmb_tv40_toledo</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wlmt</callsign>
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
@@ -5449,10 +6849,6 @@
         <network>LyngSat-tv/ww/wmcn_53_atlantic_city</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wmcn-dt</callsign>
-        <network>LyngSat-tv/ww/wmcn_53_atlantic_city</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wmdn</callsign>
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
@@ -5467,6 +6863,10 @@
     <callsigntonetwork>
         <callsign>wmfe</callsign>
         <network>PBS-wmfe</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wmfp</callsign>
+        <network>LyngSat-tv/ss/shop_at_home</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wmgm</callsign>
@@ -5549,10 +6949,6 @@
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wndy</callsign>
-        <network>LyngSat-corp/tt/the_cw_network</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wned</callsign>
         <network>PBS-wned</network>
     </callsigntonetwork>
@@ -5629,10 +7025,6 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wnuv</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wnwo</callsign>
         <network>LyngSat-tv/nn/nbc</network>
     </callsigntonetwork>
@@ -5659,6 +7051,10 @@
     <callsigntonetwork>
         <callsign>wnyw</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wnywdt</callsign>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>woai</callsign>
@@ -5713,6 +7109,10 @@
         <network>LyngSat-tv/cc/cinemax</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>women</callsign>
+        <network>LyngSat-tv/ss/showtime_women</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>womenp</callsign>
         <network>LyngSat-tv/ss/showtime</network>
     </callsigntonetwork>
@@ -5723,6 +7123,14 @@
     <callsigntonetwork>
         <callsign>wopx</callsign>
         <network>LyngSat-corp/gk/ion_media_networks</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>word</callsign>
+        <network>LyngSat-tv/ww/word_network</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>world</callsign>
+        <network>LyngSat-tv/kk/kqed9_sanfrancisco</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>worldmovies</callsign>
@@ -5793,14 +7201,6 @@
         <network>LyngSat-tv/ww/wphl_my17_philadelphia</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wphl-d1</callsign>
-        <network>LyngSat-tv/ww/wphl_my17_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wphl-d2</callsign>
-        <network>LyngSat-tv/tt/the_tube</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wpix</callsign>
         <network>LyngSat-tv/ww/wpix_cw11_new_york</network>
     </callsigntonetwork>
@@ -5841,10 +7241,6 @@
         <network>LyngSat-tv/ww/wpsg_cw57_philadelphia</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wpsg-dt</callsign>
-        <network>LyngSat-tv/ww/wpsg_cw57_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wpsx</callsign>
         <network>PBS-wpsx</network>
     </callsigntonetwork>
@@ -5870,10 +7266,6 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wpvi</callsign>
-        <network>LyngSat-tv/ww/wpvi_abc6_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wpvi-hd</callsign>
         <network>LyngSat-tv/ww/wpvi_abc6_philadelphia</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -5993,8 +7385,8 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wrtv</callsign>
-        <network>LyngSat-tv/aa/abc</network>
+        <callsign>wrtvdt</callsign>
+        <network>LyngSat-tv/ww/wrtv6</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wrwb</callsign>
@@ -6129,6 +7521,10 @@
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wsyxdt2</callsign>
+        <network>LyngSat-tv/mm/my_network_tv_hd</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wtae</callsign>
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
@@ -6169,8 +7565,8 @@
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wthr</callsign>
-        <network>LyngSat-tv/nn/nbc</network>
+        <callsign>wthrdt</callsign>
+        <network>LyngSat-tv/ww/wthr_indianapolis</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wtic</callsign>
@@ -6241,16 +7637,12 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wttk</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
         <callsign>wtto</callsign>
         <network>LyngSat-tv/ww/wbtv_net_us</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wttv</callsign>
-        <network>LyngSat-tv/ww/wbtv_net_us</network>
+        <callsign>wttvdt</callsign>
+        <network>LyngSat-tv/ww/wttv_cw4_indianapolis</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wttw</callsign>
@@ -6313,6 +7705,10 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wtvtdt</callsign>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wtvw</callsign>
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
@@ -6357,6 +7753,10 @@
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wucw</callsign>
+        <network>LyngSat-tv/ww/wucw_cw23_minneapolis</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wuft</callsign>
         <network>PBS-wuft</network>
     </callsigntonetwork>
@@ -6367,6 +7767,10 @@
     <callsigntonetwork>
         <callsign>wuhf</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>wuhfdt</callsign>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wunc</callsign>
@@ -6417,11 +7821,11 @@
         <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wuvp</callsign>
-        <network>LyngSat-tv/uu/univision</network>
+        <callsign>wutvdt</callsign>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
     </callsigntonetwork>
     <callsigntonetwork>
-        <callsign>wuvp-dt</callsign>
+        <callsign>wuvp</callsign>
         <network>LyngSat-tv/uu/univision</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -6549,6 +7953,10 @@
         <network>LyngSat-corp/tt/the_cw_network</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>wwmeca</callsign>
+        <network>LyngSat-tv/ww/wwme_tv23_chicago</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>wwor</callsign>
         <network>LyngSat-tv/ww/wwor_my9_secaucus</network>
     </callsigntonetwork>
@@ -6579,10 +7987,6 @@
     <callsigntonetwork>
         <callsign>wxii</callsign>
         <network>LyngSat-tv/nn/nbc</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wxin</callsign>
-        <network>LyngSat-tv/ff/fox</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wxix</callsign>
@@ -6630,10 +8034,6 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>wybe</callsign>
-        <network>LyngSat-tv/ww/wybe_philadelphia</network>
-    </callsigntonetwork>
-    <callsigntonetwork>
-        <callsign>wybe-dt</callsign>
         <network>LyngSat-tv/ww/wybe_philadelphia</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -6693,8 +8093,36 @@
         <network>LyngSat-tv/aa/abc</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>xcess</callsign>
+        <network>LyngSat-tv/ss/spice_xcess</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>xetv</callsign>
         <network>LyngSat-tv/ff/fox</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xgam1</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xgam2</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xgam3</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xgam4</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xgam5</callsign>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>xmsfal</callsign>
+        <network>LyngSat-radio/uz/xm_cafe</network>
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>xupn</callsign>
@@ -6708,6 +8136,58 @@
         <callsign>ytvp</callsign>
         <network>LyngSat-tv/yy/youth_tv</network>
     </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zazaro</callsign>
+        <network>LyngSat-tv/zz/zazaro_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zdf</callsign>
+        <network>LyngSat-tv/zz/zdf_de</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zdfdokukanal</callsign>
+        <network>LyngSat-tv/zz/zdf_doku</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zdfinfokanal</callsign>
+        <network>LyngSat-tv/zz/zdf_info</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zdftheaterkanal</callsign>
+        <network>LyngSat-tv/zz/zdf_theaterkanal</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zeeland</callsign>
+        <network>LyngSat-tv/oo/omroep_zeeland</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zeetv</callsign>
+        <network>LyngSat-tv/zz/zee_tv</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zoneclub</callsign>
+        <network>LyngSat-tv/zz/zone_club</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zonereality</callsign>
+        <network>LyngSat-tv/zz/zone_reality</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>zp2it</callsign>
+        <network>LyngSat-corp/uz/zap2_it</network>
+    </callsigntonetwork>
+    <networktourl>
+        <network>LyngSat-corp/ab/bbc</network>
+        <url>[LyngSat]/corp/ab/bbc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-corp/ab/bell_expressvu</network>
+        <url>[LyngSat]/corp/ab/bell_expressvu.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-corp/gk/god_tv</network>
+        <url>[LyngSat]/corp/gk/god_tv.jpg</url>
+    </networktourl>
     <networktourl>
         <network>LyngSat-corp/gk/ion_media_networks</network>
         <url>[LyngSat]/corp/gk/ion_media_networks.jpg</url>
@@ -6717,12 +8197,104 @@
         <url>[LyngSat]/corp/ln/my_network_tv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-corp/or/rogers_cable</network>
+        <url>[LyngSat]/corp/or/rogers_cable.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-corp/ss/sleuth</network>
+        <url>[LyngSat]/corp/ss/sleuth.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-corp/ss/smile_tv_networks</network>
+        <url>[LyngSat]/corp/ss/smile_tv_networks.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-corp/tt/the_cw_network</network>
         <url>[LyngSat]/corp/tt/the_cw_network.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-corp/uz/zap2_it</network>
+        <url>[LyngSat]/corp/uz/zap2_it.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/ab/bbc_radio7</network>
+        <url>[LyngSat]/radio/ab/bbc_radio7.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/ab/bbc_radio_1xtra</network>
+        <url>[LyngSat]/radio/ab/bbc_radio_1xtra.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/cc/caz</network>
+        <url>[LyngSat]/radio/cc/caz.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/cc/cfmj_640am_toronto</network>
+        <url>[LyngSat]/radio/cc/cfmj_640am_toronto.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/cc/cjkr_power97_winnipeg</network>
+        <url>[LyngSat]/radio/cc/cjkr_power97_winnipeg.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/cc/ckry_country105fm</network>
+        <url>[LyngSat]/radio/cc/ckry_country105fm.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/gk/heart1062fm</network>
+        <url>[LyngSat]/radio/gk/heart1062fm.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/gk/heat</network>
+        <url>[LyngSat]/radio/gk/heat.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/gk/kcsm_jazz911fm_bayarea</network>
+        <url>[LyngSat]/radio/gk/kcsm_jazz911fm_bayarea.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/gk/kiss100_fm_uk</network>
+        <url>[LyngSat]/radio/gk/kiss100_fm_uk.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/ln/magic_fm</network>
+        <url>[LyngSat]/radio/ln/magic_fm.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/ln/mojo_radio</network>
+        <url>[LyngSat]/radio/ln/mojo_radio.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/ln/music_choice_us</network>
+        <url>[LyngSat]/radio/ln/music_choice_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/num/680_news_toronto</network>
+        <url>[LyngSat]/radio/num/680_news_toronto.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/tt/talksport</network>
+        <url>[LyngSat]/radio/tt/talksport.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/uz/wdr_einslive_de</network>
+        <url>[LyngSat]/radio/uz/wdr_einslive_de.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-radio/uz/xm_cafe</network>
+        <url>[LyngSat]/radio/uz/xm_cafe.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/a_tivi</network>
+        <url>[LyngSat]/tv/aa/a_tivi.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/abc</network>
         <url>[LyngSat]/tv/aa/abc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/abc1</network>
+        <url>[LyngSat]/tv/aa/abc1.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/aa/abc2_au</network>
@@ -6733,6 +8305,10 @@
         <url>[LyngSat]/tv/aa/abc_family.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/aa/abc_hd</network>
+        <url>[LyngSat]/tv/aa/abc_hd.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/abcaus</network>
         <url>[LyngSat]/tv/aa/abcaus.jpg</url>
     </networktourl>
@@ -6741,28 +8317,108 @@
         <url>[LyngSat]/tv/aa/aboriginal_peoples_tvnet.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/aa/action_now</network>
+        <url>[LyngSat]/tv/aa/action_now.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/actionmax</network>
+        <url>[LyngSat]/tv/aa/actionmax.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/adventure_one</network>
+        <url>[LyngSat]/tv/aa/adventure_one.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/ae_hd</network>
+        <url>[LyngSat]/tv/aa/ae_hd.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/ae_tv</network>
         <url>[LyngSat]/tv/aa/ae_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/al_jazeera_international</network>
+        <url>[LyngSat]/tv/aa/al_jazeera_international.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/aa/amc</network>
         <url>[LyngSat]/tv/aa/amc.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/aa/american_life_tv_net</network>
+        <url>[LyngSat]/tv/aa/american_life_tv_net.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/americas_store</network>
+        <url>[LyngSat]/tv/aa/americas_store.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/angel_one</network>
         <url>[LyngSat]/tv/aa/angel_one.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/animal_planet</network>
+        <url>[LyngSat]/tv/aa/animal_planet.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/aa/animalplanet</network>
         <url>[LyngSat]/tv/aa/animalplanet.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/aa/animania_hd</network>
+        <url>[LyngSat]/tv/aa/animania_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/anime_network_od</network>
+        <url>[LyngSat]/tv/aa/anime_network_od.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/aov_adult_movie_channel</network>
+        <url>[LyngSat]/tv/aa/aov_adult_movie_channel.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/ard_das_erste</network>
+        <url>[LyngSat]/tv/aa/ard_das_erste.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/arena_tv_au</network>
         <url>[LyngSat]/tv/aa/arena_tv_au.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/aa/art_global_me</network>
+        <url>[LyngSat]/tv/aa/art_global_me.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/aa/art_latino</network>
         <url>[LyngSat]/tv/aa/art_latino.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/arte</network>
+        <url>[LyngSat]/tv/aa/arte.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/artv_quebec</network>
+        <url>[LyngSat]/tv/aa/artv_quebec.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/ary_digital</network>
+        <url>[LyngSat]/tv/aa/ary_digital.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/asn_halifax</network>
+        <url>[LyngSat]/tv/aa/asn_halifax.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/assemblee_national_quebec</network>
+        <url>[LyngSat]/tv/aa/assemblee_national_quebec.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/at5</network>
+        <url>[LyngSat]/tv/aa/at5.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/aa/atv_at</network>
+        <url>[LyngSat]/tv/aa/atv_at.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/aa/aurora_community_tv</network>
@@ -6781,16 +8437,60 @@
         <url>[LyngSat]/tv/aa/azn_tv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/bb/baby_tv</network>
+        <url>[LyngSat]/tv/bb/baby_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc1</network>
+        <url>[LyngSat]/tv/bb/bbc1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc2</network>
+        <url>[LyngSat]/tv/bb/bbc2.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc4</network>
+        <url>[LyngSat]/tv/bb/bbc4.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/bb/bbc_america</network>
         <url>[LyngSat]/tv/bb/bbc_america.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc_cbeebies</network>
+        <url>[LyngSat]/tv/bb/bbc_cbeebies.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc_i</network>
+        <url>[LyngSat]/tv/bb/bbc_i.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc_prime</network>
+        <url>[LyngSat]/tv/bb/bbc_prime.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bbc_three</network>
+        <url>[LyngSat]/tv/bb/bbc_three.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/bb/bbc_world</network>
         <url>[LyngSat]/tv/bb/bbc_world.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/bb/beauty_and_fashion</network>
+        <url>[LyngSat]/tv/bb/beauty_and_fashion.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/bb/bet</network>
         <url>[LyngSat]/tv/bb/bet.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bet_jazz</network>
+        <url>[LyngSat]/tv/bb/bet_jazz.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bibeltv</network>
+        <url>[LyngSat]/tv/bb/bibeltv.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/bb/biography</network>
@@ -6805,8 +8505,20 @@
         <url>[LyngSat]/tv/bb/bloomberg.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/bb/bnn_101</network>
+        <url>[LyngSat]/tv/bb/bnn_101.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/bnn_ca</network>
+        <url>[LyngSat]/tv/bb/bnn_ca.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/bb/boomerang</network>
         <url>[LyngSat]/tv/bb/boomerang.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/bb/boomerang_eur</network>
+        <url>[LyngSat]/tv/bb/boomerang_eur.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/bb/bravo_ca</network>
@@ -6821,12 +8533,32 @@
         <url>[LyngSat]/tv/bb/broadcast_news.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/bb/bvn</network>
+        <url>[LyngSat]/tv/bb/bvn.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/bb/byu_tv</network>
         <url>[LyngSat]/tv/bb/byu_tv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/canal_d</network>
+        <url>[LyngSat]/tv/cc/canal_d.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/canal_latino_tv</network>
+        <url>[LyngSat]/tv/cc/canal_latino_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/canal_rural_brasil</network>
         <url>[LyngSat]/tv/cc/canal_rural_brasil.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/canal_vie</network>
+        <url>[LyngSat]/tv/cc/canal_vie.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/canal_vie_hd</network>
+        <url>[LyngSat]/tv/cc/canal_vie_hd.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/canalbrasil</network>
@@ -6845,8 +8577,20 @@
         <url>[LyngSat]/tv/cc/cartoonnet.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/cbbc</network>
+        <url>[LyngSat]/tv/cc/cbbc.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/cbc_edmonton</network>
         <url>[LyngSat]/tv/cc/cbc_edmonton.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cbc_manitoba</network>
+        <url>[LyngSat]/tv/cc/cbc_manitoba.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cbc_montreal</network>
+        <url>[LyngSat]/tv/cc/cbc_montreal.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cbc_newsworld</network>
@@ -6865,12 +8609,48 @@
         <url>[LyngSat]/tv/cc/cbs.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/cbs_hd</network>
+        <url>[LyngSat]/tv/cc/cbs_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cctv09</network>
+        <url>[LyngSat]/tv/cc/cctv09.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cctv_e_f</network>
+        <url>[LyngSat]/tv/cc/cctv_e_f.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cd_usa</network>
+        <url>[LyngSat]/tv/cc/cd_usa.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/celebrity_shopping_network</network>
+        <url>[LyngSat]/tv/cc/celebrity_shopping_network.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cfcn_calgary</network>
+        <url>[LyngSat]/tv/cc/cfcn_calgary.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cfem_rouyn</network>
+        <url>[LyngSat]/tv/cc/cfem_rouyn.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cfmt_omni1_toronto</network>
+        <url>[LyngSat]/tv/cc/cfmt_omni1_toronto.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/cfrn_edmonton</network>
         <url>[LyngSat]/tv/cc/cfrn_edmonton.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cftm_montreal</network>
         <url>[LyngSat]/tv/cc/cftm_montreal.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/channel4</network>
+        <url>[LyngSat]/tv/cc/channel4.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/channel_v_au</network>
@@ -6881,12 +8661,32 @@
         <url>[LyngSat]/tv/cc/chca_red_deer.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/chek_vancouver_island</network>
+        <url>[LyngSat]/tv/cc/chek_vancouver_island.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/chex_cbc12_peterborough</network>
+        <url>[LyngSat]/tv/cc/chex_cbc12_peterborough.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/chmi_city_tv_winnipeg</network>
+        <url>[LyngSat]/tv/cc/chmi_city_tv_winnipeg.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/chot_tva_hull</network>
+        <url>[LyngSat]/tv/cc/chot_tva_hull.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/church_channel</network>
         <url>[LyngSat]/tv/cc/church_channel.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cica_tv_ontario</network>
         <url>[LyngSat]/tv/cc/cica_tv_ontario.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cimt_tva_riviere_du_loup</network>
+        <url>[LyngSat]/tv/cc/cimt_tva_riviere_du_loup.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cinemax</network>
@@ -6897,6 +8697,18 @@
         <url>[LyngSat]/tv/cc/city_city_tv_toronto.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/city_tv_hd</network>
+        <url>[LyngSat]/tv/cc/city_tv_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/civt_vancouver</network>
+        <url>[LyngSat]/tv/cc/civt_vancouver.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cj_tvn</network>
+        <url>[LyngSat]/tv/cc/cj_tvn.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/cjal_access9_edmonton</network>
         <url>[LyngSat]/tv/cc/cjal_access9_edmonton.jpg</url>
     </networktourl>
@@ -6905,12 +8717,36 @@
         <url>[LyngSat]/tv/cc/cjoh_ottawa.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/ckal_city_tv_calgary</network>
+        <url>[LyngSat]/tv/cc/ckal_city_tv_calgary.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/ckco_kitchener</network>
+        <url>[LyngSat]/tv/cc/ckco_kitchener.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/ckem_city_tv_edmonton</network>
         <url>[LyngSat]/tv/cc/ckem_city_tv_edmonton.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/ckvu_city_tv_vancouver</network>
+        <url>[LyngSat]/tv/cc/ckvu_city_tv_vancouver.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/ckxt_sun_tv_toronto</network>
+        <url>[LyngSat]/tv/cc/ckxt_sun_tv_toronto.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cky_tv_winnipeg</network>
+        <url>[LyngSat]/tv/cc/cky_tv_winnipeg.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/clt</network>
         <url>[LyngSat]/tv/cc/clt.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/club_jenna</network>
+        <url>[LyngSat]/tv/cc/club_jenna.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cmc_country_music</network>
@@ -6921,8 +8757,16 @@
         <url>[LyngSat]/tv/cc/cmt.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/cmt_pure_country</network>
+        <url>[LyngSat]/tv/cc/cmt_pure_country.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/cnbc</network>
         <url>[LyngSat]/tv/cc/cnbc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/cnbc_world</network>
+        <url>[LyngSat]/tv/cc/cnbc_world.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/cnn</network>
@@ -6937,8 +8781,20 @@
         <url>[LyngSat]/tv/cc/cnn_international.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/colourstv_us</network>
+        <url>[LyngSat]/tv/cc/colourstv_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/comcast_sports_southeast</network>
+        <url>[LyngSat]/tv/cc/comcast_sports_southeast.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/comcast_sportsnet_baltimore</network>
         <url>[LyngSat]/tv/cc/comcast_sportsnet_baltimore.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/comcast_sportsnet_hd</network>
+        <url>[LyngSat]/tv/cc/comcast_sportsnet_hd.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/comedy_central_us</network>
@@ -6947,6 +8803,10 @@
     <networktourl>
         <network>LyngSat-tv/cc/comedynetwork</network>
         <url>[LyngSat]/tv/cc/comedynetwork.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/communitychannel_uk</network>
+        <url>[LyngSat]/tv/cc/communitychannel_uk.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/cc/court_tv_us</network>
@@ -6965,6 +8825,10 @@
         <url>[LyngSat]/tv/cc/cspan2.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/cstv_college_sports</network>
+        <url>[LyngSat]/tv/cc/cstv_college_sports.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/cc/ctv_newsnet</network>
         <url>[LyngSat]/tv/cc/ctv_newsnet.jpg</url>
     </networktourl>
@@ -6973,12 +8837,44 @@
         <url>[LyngSat]/tv/cc/cultura.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/cc/cultura_nl</network>
+        <url>[LyngSat]/tv/cc/cultura_nl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/cc/current</network>
+        <url>[LyngSat]/tv/cc/current.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/daystar</network>
+        <url>[LyngSat]/tv/dd/daystar.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/dd/discovery</network>
         <url>[LyngSat]/tv/dd/discovery.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/dd/discovery_civilisation</network>
+        <url>[LyngSat]/tv/dd/discovery_civilisation.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discovery_espanol</network>
+        <url>[LyngSat]/tv/dd/discovery_espanol.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/dd/discovery_hd</network>
         <url>[LyngSat]/tv/dd/discovery_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discovery_health</network>
+        <url>[LyngSat]/tv/dd/discovery_health.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discovery_health_ca</network>
+        <url>[LyngSat]/tv/dd/discovery_health_ca.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discovery_home</network>
+        <url>[LyngSat]/tv/dd/discovery_home.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/dd/discovery_home_health</network>
@@ -6989,20 +8885,80 @@
         <url>[LyngSat]/tv/dd/discovery_kids.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/dd/discovery_science</network>
+        <url>[LyngSat]/tv/dd/discovery_science.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discovery_times</network>
+        <url>[LyngSat]/tv/dd/discovery_times.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/discoverywings</network>
+        <url>[LyngSat]/tv/dd/discoverywings.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/dishnetwork_info</network>
+        <url>[LyngSat]/tv/dd/dishnetwork_info.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/dishnetwork_ppv_sports</network>
+        <url>[LyngSat]/tv/dd/dishnetwork_ppv_sports.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/dishnetworkod</network>
+        <url>[LyngSat]/tv/dd/dishnetworkod.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/dd/disney_channel</network>
         <url>[LyngSat]/tv/dd/disney_channel.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/disney_toon_us</network>
+        <url>[LyngSat]/tv/dd/disney_toon_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/dd/diy_net_us</network>
         <url>[LyngSat]/tv/dd/diy_net_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/dd/dmax</network>
+        <url>[LyngSat]/tv/dd/dmax.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/dd/dsf</network>
+        <url>[LyngSat]/tv/dd/dsf.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/dd/dw_tv</network>
         <url>[LyngSat]/tv/dd/dw_tv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ee/e4_plus1</network>
+        <url>[LyngSat]/tv/ee/e4_plus1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/e4_uk</network>
+        <url>[LyngSat]/tv/ee/e4_uk.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ee/e_entertainment_tv</network>
         <url>[LyngSat]/tv/ee/e_entertainment_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/educational_tv_nl</network>
+        <url>[LyngSat]/tv/ee/educational_tv_nl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/eins_extra</network>
+        <url>[LyngSat]/tv/ee/eins_extra.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/eins_festival</network>
+        <url>[LyngSat]/tv/ee/eins_festival.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/eins_plus</network>
+        <url>[LyngSat]/tv/ee/eins_plus.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ee/encore_action</network>
@@ -7053,6 +9009,10 @@
         <url>[LyngSat]/tv/ee/espn2.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ee/espn2_hd</network>
+        <url>[LyngSat]/tv/ee/espn2_hd.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ee/espn_brasil</network>
         <url>[LyngSat]/tv/ee/espn_brasil.jpg</url>
     </networktourl>
@@ -7065,12 +9025,32 @@
         <url>[LyngSat]/tv/ee/espn_deportes.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ee/espn_hd</network>
+        <url>[LyngSat]/tv/ee/espn_hd.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ee/espn_int</network>
         <url>[LyngSat]/tv/ee/espn_int.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ee/espn_u</network>
+        <url>[LyngSat]/tv/ee/espn_u.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ee/espnews</network>
         <url>[LyngSat]/tv/ee/espnews.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/euronews</network>
+        <url>[LyngSat]/tv/ee/euronews.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/eurosport</network>
+        <url>[LyngSat]/tv/ee/eurosport.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ee/eurosport2</network>
+        <url>[LyngSat]/tv/ee/eurosport2.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ee/ewtn</network>
@@ -7081,12 +9061,32 @@
         <url>[LyngSat]/tv/ee/expo_channel.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ee/extremesports</network>
+        <url>[LyngSat]/tv/ee/extremesports.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ff/family</network>
         <url>[LyngSat]/tv/ff/family.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ff/family_7</network>
+        <url>[LyngSat]/tv/ff/family_7.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ff/fashion_tv</network>
         <url>[LyngSat]/tv/ff/fashion_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/film1_plus1_nl</network>
+        <url>[LyngSat]/tv/ff/film1_plus1_nl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/film4</network>
+        <url>[LyngSat]/tv/ff/film4.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/film4_plus1</network>
+        <url>[LyngSat]/tv/ff/film4_plus1.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ff/fineliving</network>
@@ -7095,6 +9095,18 @@
     <networktourl>
         <network>LyngSat-tv/ff/fittv_usa</network>
         <url>[LyngSat]/tv/ff/fittv_usa.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/five</network>
+        <url>[LyngSat]/tv/ff/five.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/five_life</network>
+        <url>[LyngSat]/tv/ff/five_life.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/five_us</network>
+        <url>[LyngSat]/tv/ff/five_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ff/flix</network>
@@ -7121,6 +9133,14 @@
         <url>[LyngSat]/tv/ff/fox_moviechannel.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ff/fox_reality</network>
+        <url>[LyngSat]/tv/ff/fox_reality.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/fox_soccer</network>
+        <url>[LyngSat]/tv/ff/fox_soccer.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ff/fox_sports</network>
         <url>[LyngSat]/tv/ff/fox_sports.jpg</url>
     </networktourl>
@@ -7129,12 +9149,20 @@
         <url>[LyngSat]/tv/ff/fox_sports_espanol.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ff/fox_widescreen_hdtv</network>
+        <url>[LyngSat]/tv/ff/fox_widescreen_hdtv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ff/foxclassics_au</network>
         <url>[LyngSat]/tv/ff/foxclassics_au.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ff/foxnews</network>
         <url>[LyngSat]/tv/ff/foxnews.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ff/freespeech_tv</network>
+        <url>[LyngSat]/tv/ff/freespeech_tv.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ff/fsn</network>
@@ -7149,6 +9177,10 @@
         <url>[LyngSat]/tv/ff/fx_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/gg/g4_tech_tv</network>
+        <url>[LyngSat]/tv/gg/g4_tech_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/gg/g4_video_game_tv</network>
         <url>[LyngSat]/tv/gg/g4_video_game_tv.jpg</url>
     </networktourl>
@@ -7161,12 +9193,44 @@
         <url>[LyngSat]/tv/gg/gameshownetwork.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/gg/gems_tv</network>
+        <url>[LyngSat]/tv/gg/gems_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/geschiedenis</network>
+        <url>[LyngSat]/tv/gg/geschiedenis.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/gigatv_de</network>
+        <url>[LyngSat]/tv/gg/gigatv_de.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/global_bc</network>
+        <url>[LyngSat]/tv/gg/global_bc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/global_calgary</network>
+        <url>[LyngSat]/tv/gg/global_calgary.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/gg/global_edmonton</network>
         <url>[LyngSat]/tv/gg/global_edmonton.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/gg/global_hd</network>
+        <url>[LyngSat]/tv/gg/global_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/global_maritimes</network>
+        <url>[LyngSat]/tv/gg/global_maritimes.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/gg/global_ontario</network>
         <url>[LyngSat]/tv/gg/global_ontario.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/gg/global_winnipeg</network>
+        <url>[LyngSat]/tv/gg/global_winnipeg.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/gg/globonews</network>
@@ -7189,8 +9253,16 @@
         <url>[LyngSat]/tv/hh/hallmark_channel.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/hh/hallmark_movie_channel</network>
+        <url>[LyngSat]/tv/hh/hallmark_movie_channel.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/hh/hbo</network>
         <url>[LyngSat]/tv/hh/hbo.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/hbo2</network>
+        <url>[LyngSat]/tv/hh/hbo2.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/hh/hbo_comedy_us</network>
@@ -7205,6 +9277,10 @@
         <url>[LyngSat]/tv/hh/hbo_hdtv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/hh/hbo_latino</network>
+        <url>[LyngSat]/tv/hh/hbo_latino.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/hh/hbo_plus</network>
         <url>[LyngSat]/tv/hh/hbo_plus.jpg</url>
     </networktourl>
@@ -7215,6 +9291,22 @@
     <networktourl>
         <network>LyngSat-tv/hh/hbo_zone</network>
         <url>[LyngSat]/tv/hh/hbo_zone.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/hd1_nl</network>
+        <url>[LyngSat]/tv/hh/hd1_nl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/hdnet</network>
+        <url>[LyngSat]/tv/hh/hdnet.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/hdnet_movies</network>
+        <url>[LyngSat]/tv/hh/hdnet_movies.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/healthy_living_channel</network>
+        <url>[LyngSat]/tv/hh/healthy_living_channel.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/hh/hgtv</network>
@@ -7233,6 +9325,14 @@
         <url>[LyngSat]/tv/hh/history_int.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/hh/holland_doc</network>
+        <url>[LyngSat]/tv/hh/holland_doc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/hh/horseracing_tv</network>
+        <url>[LyngSat]/tv/hh/horseracing_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/hh/hsn</network>
         <url>[LyngSat]/tv/hh/hsn.jpg</url>
     </networktourl>
@@ -7241,20 +9341,56 @@
         <url>[LyngSat]/tv/ii/ifc_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ii/independent_tv</network>
+        <url>[LyngSat]/tv/ii/independent_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ii/inhd</network>
         <url>[LyngSat]/tv/ii/inhd.jpg</url>
     </networktourl>
     <networktourl>
-        <network>LyngSat-tv/jj/jc_tv</network>
-        <url>[LyngSat]/tv/jj/jc_tv.jpg</url>
+        <network>LyngSat-tv/ii/itv1_central</network>
+        <url>[LyngSat]/tv/ii/itv1_central.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ii/itv2</network>
+        <url>[LyngSat]/tv/ii/itv2.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ii/itv3</network>
+        <url>[LyngSat]/tv/ii/itv3.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ii/itv4</network>
+        <url>[LyngSat]/tv/ii/itv4.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/jj/jetix</network>
         <url>[LyngSat]/tv/jj/jetix.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/jj/jewelry_tv</network>
+        <url>[LyngSat]/tv/jj/jewelry_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/kabel_eins</network>
+        <url>[LyngSat]/tv/kk/kabel_eins.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/kk/kbcb_24_world_tv_seattle</network>
         <url>[LyngSat]/tv/kk/kbcb_24_world_tv_seattle.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/kbtc_tacoma</network>
+        <url>[LyngSat]/tv/kk/kbtc_tacoma.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/kcpq_seattle</network>
+        <url>[LyngSat]/tv/kk/kcpq_seattle.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/kcts_pbs9_seattle</network>
+        <url>[LyngSat]/tv/kk/kcts_pbs9_seattle.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/kk/kctv_tv5_kansas_city</network>
@@ -7265,8 +9401,16 @@
         <url>[LyngSat]/tv/kk/kcwe_cw29_kansas_city.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/kk/ketnet_canvas_be</network>
+        <url>[LyngSat]/tv/kk/ketnet_canvas_be.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/kk/khcv45_seattle</network>
         <url>[LyngSat]/tv/kk/khcv45_seattle.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/khou_cbs11_houston</network>
+        <url>[LyngSat]/tv/kk/khou_cbs11_houston.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/kk/king_seattle</network>
@@ -7297,6 +9441,14 @@
         <url>[LyngSat]/tv/kk/kong6_16_seattle.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/kk/kpxm_i41_minneapolis</network>
+        <url>[LyngSat]/tv/kk/kpxm_i41_minneapolis.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/kqed9_sanfrancisco</network>
+        <url>[LyngSat]/tv/kk/kqed9_sanfrancisco.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/kk/krem_cbs2_spokane</network>
         <url>[LyngSat]/tv/kk/krem_cbs2_spokane.jpg</url>
     </networktourl>
@@ -7313,6 +9465,10 @@
         <url>[LyngSat]/tv/kk/ksnt_nbc27_topeka.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/kk/kstc_45_minneapolis</network>
+        <url>[LyngSat]/tv/kk/kstc_45_minneapolis.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/kk/kstw_cw11_seattle</network>
         <url>[LyngSat]/tv/kk/kstw_cw11_seattle.jpg</url>
     </networktourl>
@@ -7325,8 +9481,16 @@
         <url>[LyngSat]/tv/kk/ktla_cw5_los_angeles.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/kk/ktmd48_houston</network>
+        <url>[LyngSat]/tv/kk/ktmd48_houston.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/kk/ktmj_fox43_topeka</network>
         <url>[LyngSat]/tv/kk/ktmj_fox43_topeka.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/kk/ktrk_abc13_houston</network>
+        <url>[LyngSat]/tv/kk/ktrk_abc13_houston.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/kk/kupx_i16_salt_lake_city</network>
@@ -7349,6 +9513,14 @@
         <url>[LyngSat]/tv/kk/kyw_cbs3_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ll/lcn_ca</network>
+        <url>[LyngSat]/tv/ll/lcn_ca.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ll/liberty</network>
+        <url>[LyngSat]/tv/ll/liberty.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ll/life_network</network>
         <url>[LyngSat]/tv/ll/life_network.jpg</url>
     </networktourl>
@@ -7365,6 +9537,18 @@
         <url>[LyngSat]/tv/ll/lifetime_movie.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ll/lifetime_real_woman</network>
+        <url>[LyngSat]/tv/ll/lifetime_real_woman.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ll/link_tv</network>
+        <url>[LyngSat]/tv/ll/link_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ll/live_shop</network>
+        <url>[LyngSat]/tv/ll/live_shop.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ll/logo_us</network>
         <url>[LyngSat]/tv/ll/logo_us.jpg</url>
     </networktourl>
@@ -7373,8 +9557,20 @@
         <url>[LyngSat]/tv/mm/mainevent_ppv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/mm/mens_outdoor_recreation</network>
+        <url>[LyngSat]/tv/mm/mens_outdoor_recreation.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/mezzo</network>
+        <url>[LyngSat]/tv/mm/mezzo.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/mm/military_channel_discovery</network>
         <url>[LyngSat]/tv/mm/military_channel_discovery.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/more4</network>
+        <url>[LyngSat]/tv/mm/more4.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/mm/movie_extra_aus</network>
@@ -7401,8 +9597,28 @@
         <url>[LyngSat]/tv/mm/mtv2_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/mm/mtv_base</network>
+        <url>[LyngSat]/tv/mm/mtv_base.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/mtv_brand_new_nl</network>
+        <url>[LyngSat]/tv/mm/mtv_brand_new_nl.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/mm/mtv_ca</network>
         <url>[LyngSat]/tv/mm/mtv_ca.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/mtv_hits</network>
+        <url>[LyngSat]/tv/mm/mtv_hits.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/mtv_hits_eur</network>
+        <url>[LyngSat]/tv/mm/mtv_hits_eur.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/mm/much_vibe</network>
+        <url>[LyngSat]/tv/mm/much_vibe.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/mm/muchmoremusic</network>
@@ -7421,20 +9637,56 @@
         <url>[LyngSat]/tv/mm/musiqueplus.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/mm/my_network_tv_hd</network>
+        <url>[LyngSat]/tv/mm/my_network_tv_hd.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/nn/nasatv_us</network>
         <url>[LyngSat]/tv/nn/nasatv_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nasn</network>
+        <url>[LyngSat]/tv/nn/nasn.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/nn/natgeochannel</network>
         <url>[LyngSat]/tv/nn/natgeochannel.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/nn/natgeochannel_hd</network>
+        <url>[LyngSat]/tv/nn/natgeochannel_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nbaleaguepass</network>
+        <url>[LyngSat]/tv/nn/nbaleaguepass.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/nn/nbc</network>
         <url>[LyngSat]/tv/nn/nbc.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/nn/nederland1</network>
+        <url>[LyngSat]/tv/nn/nederland1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nederland2</network>
+        <url>[LyngSat]/tv/nn/nederland2.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nederland3</network>
+        <url>[LyngSat]/tv/nn/nederland3.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nederland_e</network>
+        <url>[LyngSat]/tv/nn/nederland_e.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/nn/nesn_us</network>
         <url>[LyngSat]/tv/nn/nesn_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/net5</network>
+        <url>[LyngSat]/tv/nn/net5.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/nn/new_england_cable_news</network>
@@ -7443,6 +9695,18 @@
     <networktourl>
         <network>LyngSat-tv/nn/nfl</network>
         <url>[LyngSat]/tv/nn/nfl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nfl_network</network>
+        <url>[LyngSat]/tv/nn/nfl_network.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nfl_ticket</network>
+        <url>[LyngSat]/tv/nn/nfl_ticket.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/nn/nick_gamesandsport_us</network>
+        <url>[LyngSat]/tv/nn/nick_gamesandsport_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/nn/nickelodeon</network>
@@ -7461,12 +9725,36 @@
         <url>[LyngSat]/tv/nn/nw_cablenews_can.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/num/3abn</network>
+        <url>[LyngSat]/tv/num/3abn.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/num/3sat</network>
+        <url>[LyngSat]/tv/num/3sat.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/num/7network_aus</network>
         <url>[LyngSat]/tv/num/7network_aus.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/num/9live</network>
+        <url>[LyngSat]/tv/num/9live.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/num/9network</network>
         <url>[LyngSat]/tv/num/9network.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/oo/omroep_flevoland</network>
+        <url>[LyngSat]/tv/oo/omroep_flevoland.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/oo/omroep_zeeland</network>
+        <url>[LyngSat]/tv/oo/omroep_zeeland.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/oo/outdoor_channel</network>
+        <url>[LyngSat]/tv/oo/outdoor_channel.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/oo/outdoor_life_network</network>
@@ -7481,6 +9769,10 @@
         <url>[LyngSat]/tv/pp/pbs.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/pp/pbs_kids</network>
+        <url>[LyngSat]/tv/pp/pbs_kids.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/pp/pbs_kids_sprout</network>
         <url>[LyngSat]/tv/pp/pbs_kids_sprout.jpg</url>
     </networktourl>
@@ -7493,12 +9785,24 @@
         <url>[LyngSat]/tv/pp/playboy.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/pp/pro7</network>
+        <url>[LyngSat]/tv/pp/pro7.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/qq/qvc</network>
         <url>[LyngSat]/tv/qq/qvc.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/rr/race_world</network>
+        <url>[LyngSat]/tv/rr/race_world.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/rr/rai_int</network>
         <url>[LyngSat]/tv/rr/rai_int.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/raiuno</network>
+        <url>[LyngSat]/tv/rr/raiuno.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/rr/rdi_tv</network>
@@ -7529,28 +9833,160 @@
         <url>[LyngSat]/tv/rr/redevida.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/rr/reelz_channel</network>
+        <url>[LyngSat]/tv/rr/reelz_channel.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/rr/robtv</network>
         <url>[LyngSat]/tv/rr/robtv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rogers_sportsnet_east</network>
+        <url>[LyngSat]/tv/rr/rogers_sportsnet_east.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rogers_sportsnet_ontario</network>
+        <url>[LyngSat]/tv/rr/rogers_sportsnet_ontario.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rogers_sportsnet_pacific</network>
+        <url>[LyngSat]/tv/rr/rogers_sportsnet_pacific.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/rr/rogers_sportsnet_west</network>
         <url>[LyngSat]/tv/rr/rogers_sportsnet_west.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/rr/rtbf_la_deux</network>
+        <url>[LyngSat]/tv/rr/rtbf_la_deux.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtbf_sat</network>
+        <url>[LyngSat]/tv/rr/rtbf_sat.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtl</network>
+        <url>[LyngSat]/tv/rr/rtl.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtl4</network>
+        <url>[LyngSat]/tv/rr/rtl4.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtl5</network>
+        <url>[LyngSat]/tv/rr/rtl5.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtl7</network>
+        <url>[LyngSat]/tv/rr/rtl7.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtl_tvi</network>
+        <url>[LyngSat]/tv/rr/rtl_tvi.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_drenthe</network>
+        <url>[LyngSat]/tv/rr/rtv_drenthe.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_gelderland</network>
+        <url>[LyngSat]/tv/rr/rtv_gelderland.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_noord</network>
+        <url>[LyngSat]/tv/rr/rtv_noord.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_noord_holland</network>
+        <url>[LyngSat]/tv/rr/rtv_noord_holland.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_oost</network>
+        <url>[LyngSat]/tv/rr/rtv_oost.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_rijnmond</network>
+        <url>[LyngSat]/tv/rr/rtv_rijnmond.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_utrecht</network>
+        <url>[LyngSat]/tv/rr/rtv_utrecht.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/rr/rtv_west</network>
+        <url>[LyngSat]/tv/rr/rtv_west.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/sailingchannel_it</network>
+        <url>[LyngSat]/tv/ss/sailingchannel_it.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/saskatchewan_legislative</network>
+        <url>[LyngSat]/tv/ss/saskatchewan_legislative.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/sat1</network>
+        <url>[LyngSat]/tv/ss/sat1.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/sbs</network>
         <url>[LyngSat]/tv/ss/sbs.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/sbs6</network>
+        <url>[LyngSat]/tv/ss/sbs6.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/sbt</network>
         <url>[LyngSat]/tv/ss/sbt.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/science_channel</network>
+        <url>[LyngSat]/tv/ss/science_channel.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/scifi</network>
         <url>[LyngSat]/tv/ss/scifi.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/scn</network>
+        <url>[LyngSat]/tv/ss/scn.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/scream</network>
+        <url>[LyngSat]/tv/ss/scream.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/seattle_channel</network>
+        <url>[LyngSat]/tv/ss/seattle_channel.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/series_plus</network>
+        <url>[LyngSat]/tv/ss/series_plus.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/setanta_sports</network>
+        <url>[LyngSat]/tv/ss/setanta_sports.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/shop_at_home</network>
+        <url>[LyngSat]/tv/ss/shop_at_home.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/shopnbc</network>
+        <url>[LyngSat]/tv/ss/shopnbc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/shorteez</network>
+        <url>[LyngSat]/tv/ss/shorteez.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/showcase</network>
         <url>[LyngSat]/tv/ss/showcase.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/showcase_action</network>
+        <url>[LyngSat]/tv/ss/showcase_action.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/showcase_ca</network>
@@ -7577,8 +10013,16 @@
         <url>[LyngSat]/tv/ss/showtime_too.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/showtime_women</network>
+        <url>[LyngSat]/tv/ss/showtime_women.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/showtimextreme</network>
         <url>[LyngSat]/tv/ss/showtimextreme.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/silver_screen_classics</network>
+        <url>[LyngSat]/tv/ss/silver_screen_classics.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/sitv_los_angeles</network>
@@ -7593,10 +10037,6 @@
         <url>[LyngSat]/tv/ss/skyracing.jpg</url>
     </networktourl>
     <networktourl>
-        <network>LyngSat-tv/ss/smile_of_a_child</network>
-        <url>[LyngSat]/tv/ss/smile_of_a_child.jpg</url>
-    </networktourl>
-    <networktourl>
         <network>LyngSat-tv/ss/soapnet_us</network>
         <url>[LyngSat]/tv/ss/soapnet_us.jpg</url>
     </networktourl>
@@ -7605,20 +10045,44 @@
         <url>[LyngSat]/tv/ss/sonytv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/south_asia_world</network>
+        <url>[LyngSat]/tv/ss/south_asia_world.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/southern_cross_ten</network>
         <url>[LyngSat]/tv/ss/southern_cross_ten.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/space</network>
+        <url>[LyngSat]/tv/ss/space.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/space_arg</network>
         <url>[LyngSat]/tv/ss/space_arg.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/speed_auction_tv</network>
+        <url>[LyngSat]/tv/ss/speed_auction_tv.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/speed_channel_us</network>
         <url>[LyngSat]/tv/ss/speed_channel_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/spice_private</network>
+        <url>[LyngSat]/tv/ss/spice_private.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/spice_xcess</network>
+        <url>[LyngSat]/tv/ss/spice_xcess.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/spike_tv</network>
         <url>[LyngSat]/tv/ss/spike_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/sports_time_ohio</network>
+        <url>[LyngSat]/tv/ss/sports_time_ohio.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/sportv</network>
@@ -7633,16 +10097,64 @@
         <url>[LyngSat]/tv/ss/starz.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ss/starz_cinema</network>
+        <url>[LyngSat]/tv/ss/starz_cinema.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_comedy</network>
+        <url>[LyngSat]/tv/ss/starz_comedy.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_edge</network>
+        <url>[LyngSat]/tv/ss/starz_edge.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_hd</network>
+        <url>[LyngSat]/tv/ss/starz_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_in_black</network>
+        <url>[LyngSat]/tv/ss/starz_in_black.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_kids_family</network>
+        <url>[LyngSat]/tv/ss/starz_kids_family.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/starz_od</network>
+        <url>[LyngSat]/tv/ss/starz_od.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ss/style_network_us</network>
         <url>[LyngSat]/tv/ss/style_network_us.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/sun_sports</network>
+        <url>[LyngSat]/tv/ss/sun_sports.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ss/sundance_channel</network>
         <url>[LyngSat]/tv/ss/sundance_channel.jpg</url>
     </networktourl>
     <networktourl>
-        <network>LyngSat-tv/tt/tbn_enlace_us</network>
-        <url>[LyngSat]/tv/tt/tbn_enlace_us.jpg</url>
+        <network>LyngSat-tv/ss/super_ecran_hd</network>
+        <url>[LyngSat]/tv/ss/super_ecran_hd.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ss/swr_fernsehen</network>
+        <url>[LyngSat]/tv/ss/swr_fernsehen.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tamil_vision_inc</network>
+        <url>[LyngSat]/tv/tt/tamil_vision_inc.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tbn</network>
+        <url>[LyngSat]/tv/tt/tbn.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tbn_europe</network>
+        <url>[LyngSat]/tv/tt/tbn_europe.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/tbs_atlanta</network>
@@ -7651,6 +10163,10 @@
     <networktourl>
         <network>LyngSat-tv/tt/tcm</network>
         <url>[LyngSat]/tv/tt/tcm.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tct_us</network>
+        <url>[LyngSat]/tv/tt/tct_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/telecine_action</network>
@@ -7677,12 +10193,32 @@
         <url>[LyngSat]/tv/tt/telefutura.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/telehit</network>
+        <url>[LyngSat]/tv/tt/telehit.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/teletextholidays</network>
+        <url>[LyngSat]/tv/tt/teletextholidays.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/teletoon_ca</network>
         <url>[LyngSat]/tv/tt/teletoon_ca.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tennis_channel</network>
+        <url>[LyngSat]/tv/tt/tennis_channel.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tfo</network>
         <url>[LyngSat]/tv/tt/tfo.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tgrt</network>
+        <url>[LyngSat]/tv/tt/tgrt.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/the_box_comedy_nl</network>
+        <url>[LyngSat]/tv/tt/the_box_comedy_nl.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/the_learning_channel</network>
@@ -7705,12 +10241,32 @@
         <url>[LyngSat]/tv/tt/the_weather_channel_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tien</network>
+        <url>[LyngSat]/tv/tt/tien.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tln_telelatino</network>
         <url>[LyngSat]/tv/tt/tln_telelatino.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tmf</network>
+        <url>[LyngSat]/tv/tt/tmf.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tmf_nl_theme</network>
+        <url>[LyngSat]/tv/tt/tmf_nl_theme.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tmf_party</network>
+        <url>[LyngSat]/tv/tt/tmf_party.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tnt</network>
         <url>[LyngSat]/tv/tt/tnt.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/travelchannel</network>
+        <url>[LyngSat]/tv/tt/travelchannel.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/travelchannel_us</network>
@@ -7719,6 +10275,22 @@
     <networktourl>
         <network>LyngSat-tv/tt/treehouse</network>
         <url>[LyngSat]/tv/tt/treehouse.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/trt1</network>
+        <url>[LyngSat]/tv/tt/trt1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/trt2</network>
+        <url>[LyngSat]/tv/tt/trt2.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/trt3</network>
+        <url>[LyngSat]/tv/tt/trt3.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/trtint</network>
+        <url>[LyngSat]/tv/tt/trtint.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/tsc</network>
@@ -7733,8 +10305,16 @@
         <url>[LyngSat]/tv/tt/tv1_aus.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tv5_monde_europe</network>
+        <url>[LyngSat]/tv/tt/tv5_monde_europe.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tv5_quebec</network>
         <url>[LyngSat]/tv/tt/tv5_quebec.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tv8_turkey</network>
+        <url>[LyngSat]/tv/tt/tv8_turkey.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/tv_guide_channel</network>
@@ -7745,6 +10325,10 @@
         <url>[LyngSat]/tv/tt/tv_one_us.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tv_oranje</network>
+        <url>[LyngSat]/tv/tt/tv_oranje.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tv_senado_br</network>
         <url>[LyngSat]/tv/tt/tv_senado_br.jpg</url>
     </networktourl>
@@ -7753,12 +10337,24 @@
         <url>[LyngSat]/tv/tt/tv_tropolis.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/tt/tve_int</network>
+        <url>[LyngSat]/tv/tt/tve_int.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/tt/tvland_us</network>
         <url>[LyngSat]/tv/tt/tvland_us.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/tt/tvsn_au</network>
         <url>[LyngSat]/tv/tt/tvsn_au.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/tt/tw1</network>
+        <url>[LyngSat]/tv/tt/tw1.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/uu/uctv_california</network>
+        <url>[LyngSat]/tv/uu/uctv_california.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/uu/universal_channel</network>
@@ -7781,6 +10377,10 @@
         <url>[LyngSat]/tv/uu/uwtv_washington.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/vv/veronica</network>
+        <url>[LyngSat]/tv/vv/veronica.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/vv/versus</network>
         <url>[LyngSat]/tv/vv/versus.jpg</url>
     </networktourl>
@@ -7799,6 +10399,26 @@
     <networktourl>
         <network>LyngSat-tv/vv/voice_tv</network>
         <url>[LyngSat]/tv/vv/voice_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/vv/vox</network>
+        <url>[LyngSat]/tv/vv/vox.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/vv/vpro_3voor12_central</network>
+        <url>[LyngSat]/tv/vv/vpro_3voor12_central.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/vv/vrak_tv</network>
+        <url>[LyngSat]/tv/vv/vrak_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/vv/vt4</network>
+        <url>[LyngSat]/tv/vv/vt4.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/vv/vtm</network>
+        <url>[LyngSat]/tv/vv/vtm.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/w_au</network>
@@ -7829,8 +10449,8 @@
         <url>[LyngSat]/tv/ww/wcau_nbc10_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
-        <network>LyngSat-tv/ww/wcau_weather_plus</network>
-        <url>[LyngSat]/tv/ww/wcau_weather_plus.jpg</url>
+        <network>LyngSat-tv/ww/wcco_cbs4_minneapolis</network>
+        <url>[LyngSat]/tv/ww/wcco_cbs4_minneapolis.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/wciu_cbs26_chicago</network>
@@ -7841,8 +10461,16 @@
         <url>[LyngSat]/tv/ww/wcpx_i38_chicago.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/wctv_cbs6_thomasville</network>
+        <url>[LyngSat]/tv/ww/wctv_cbs6_thomasville.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wdaf_kansascity</network>
         <url>[LyngSat]/tv/ww/wdaf_kansascity.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/wdr_fernsehen</network>
+        <url>[LyngSat]/tv/ww/wdr_fernsehen.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/we</network>
@@ -7851,6 +10479,10 @@
     <networktourl>
         <network>LyngSat-tv/ww/weatherchannel_aus</network>
         <url>[LyngSat]/tv/ww/weatherchannel_aus.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/weerkanaal</network>
+        <url>[LyngSat]/tv/ww/weerkanaal.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/wesh_nbc2_daytona_beach</network>
@@ -7865,6 +10497,10 @@
         <url>[LyngSat]/tv/ww/wftv.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/wfyi_pbs_indianapolis</network>
+        <url>[LyngSat]/tv/ww/wfyi_pbs_indianapolis.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wgn_cw9_chicago</network>
         <url>[LyngSat]/tv/ww/wgn_cw9_chicago.jpg</url>
     </networktourl>
@@ -7873,8 +10509,20 @@
         <url>[LyngSat]/tv/ww/wgtw_48_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/whmb_40_indianapolis</network>
+        <url>[LyngSat]/tv/ww/whmb_40_indianapolis.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wibw_cbs13_topeka</network>
         <url>[LyngSat]/tv/ww/wibw_cbs13_topeka.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/wipx_i63_indianapolis</network>
+        <url>[LyngSat]/tv/ww/wipx_i63_indianapolis.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/wish_indianapolis</network>
+        <url>[LyngSat]/tv/ww/wish_indianapolis.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/wjys62_chicago</network>
@@ -7897,6 +10545,10 @@
         <url>[LyngSat]/tv/ww/wlcb_45_leesburg.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/wlmb_tv40_toledo</network>
+        <url>[LyngSat]/tv/ww/wlmb_tv40_toledo.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wls_chicago_ch7</network>
         <url>[LyngSat]/tv/ww/wls_chicago_ch7.jpg</url>
     </networktourl>
@@ -7915,6 +10567,18 @@
     <networktourl>
         <network>LyngSat-tv/ww/wofl_fox35_orlando</network>
         <url>[LyngSat]/tv/ww/wofl_fox35_orlando.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/word_network</network>
+        <url>[LyngSat]/tv/ww/word_network.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/world_fishing_network</network>
+        <url>[LyngSat]/tv/ww/world_fishing_network.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/world_harvest_tv</network>
+        <url>[LyngSat]/tv/ww/world_harvest_tv.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/worldmovies</network>
@@ -7953,6 +10617,10 @@
         <url>[LyngSat]/tv/ww/wrnn_tv48_kingston.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/wrtv6</network>
+        <url>[LyngSat]/tv/ww/wrtv6.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wsbk_tv38_boston</network>
         <url>[LyngSat]/tv/ww/wsbk_tv38_boston.jpg</url>
     </networktourl>
@@ -7969,12 +10637,24 @@
         <url>[LyngSat]/tv/ww/wtgl_52_cocoa.jpg</url>
     </networktourl>
     <networktourl>
+        <network>LyngSat-tv/ww/wthr_indianapolis</network>
+        <url>[LyngSat]/tv/ww/wthr_indianapolis.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/wttv_cw4_indianapolis</network>
+        <url>[LyngSat]/tv/ww/wttv_cw4_indianapolis.jpg</url>
+    </networktourl>
+    <networktourl>
         <network>LyngSat-tv/ww/wtxf_fox29_philadelphia</network>
         <url>[LyngSat]/tv/ww/wtxf_fox29_philadelphia.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/wucw_cw23_minneapolis</network>
         <url>[LyngSat]/tv/ww/wucw_cw23_minneapolis.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/ww/wwme_tv23_chicago</network>
+        <url>[LyngSat]/tv/ww/wwme_tv23_chicago.jpg</url>
     </networktourl>
     <networktourl>
         <network>LyngSat-tv/ww/wwor_my9_secaucus</network>
@@ -7991,6 +10671,38 @@
     <networktourl>
         <network>LyngSat-tv/yy/youth_tv</network>
         <url>[LyngSat]/tv/yy/youth_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zazaro_tv</network>
+        <url>[LyngSat]/tv/zz/zazaro_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zdf_de</network>
+        <url>[LyngSat]/tv/zz/zdf_de.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zdf_doku</network>
+        <url>[LyngSat]/tv/zz/zdf_doku.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zdf_info</network>
+        <url>[LyngSat]/tv/zz/zdf_info.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zdf_theaterkanal</network>
+        <url>[LyngSat]/tv/zz/zdf_theaterkanal.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zee_tv</network>
+        <url>[LyngSat]/tv/zz/zee_tv.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zone_club</network>
+        <url>[LyngSat]/tv/zz/zone_club.jpg</url>
+    </networktourl>
+    <networktourl>
+        <network>LyngSat-tv/zz/zone_reality</network>
+        <url>[LyngSat]/tv/zz/zone_reality.jpg</url>
     </networktourl>
     <networktourl>
         <network>PBS-kaet</network>
@@ -8017,10 +10729,6 @@
         <url>[PBS]/KBDI.gif</url>
     </networktourl>
     <networktourl>
-        <network>PBS-kbtc</network>
-        <url>[PBS]/KBTC.gif</url>
-    </networktourl>
-    <networktourl>
         <network>PBS-kbyu</network>
         <url>[PBS]/KBYU.gif</url>
     </networktourl>
@@ -8043,10 +10751,6 @@
     <networktourl>
         <network>PBS-kctf</network>
         <url>[PBS]/KCTF.gif</url>
-    </networktourl>
-    <networktourl>
-        <network>PBS-kcts</network>
-        <url>[PBS]/KCTS.gif</url>
     </networktourl>
     <networktourl>
         <network>PBS-kcwc</network>
@@ -8393,10 +11097,6 @@
         <url>[PBS]/WFWA.gif</url>
     </networktourl>
     <networktourl>
-        <network>PBS-wfyi</network>
-        <url>[PBS]/WFYI.gif</url>
-    </networktourl>
-    <networktourl>
         <network>PBS-wgbh</network>
         <url>[PBS]/WGBH.gif</url>
     </networktourl>
@@ -8439,10 +11139,6 @@
     <networktourl>
         <network>PBS-will</network>
         <url>[PBS]/WILL.gif</url>
-    </networktourl>
-    <networktourl>
-        <network>PBS-wipb</network>
-        <url>[PBS]/WIPB.gif</url>
     </networktourl>
     <networktourl>
         <network>PBS-wipr</network>
@@ -8724,6 +11420,10 @@
         <network>PBS-wyin</network>
         <url>[PBS]/WYIN.gif</url>
     </networktourl>
+    <networktourl>
+        <network>XMLTV Sweden-tv1000.viasat.se</network>
+        <url>[XMLTV Sweden]/tv1000.viasat.se.png</url>
+    </networktourl>
     <baseurl>
         <stub>LyngSat</stub>
         <url>http://lyngsat-logo.com/logo</url>
@@ -8731,5 +11431,9 @@
     <baseurl>
         <stub>PBS</stub>
         <url>http://www.pbs.org/images/stations/standard</url>
+    </baseurl>
+    <baseurl>
+        <stub>XMLTV Sweden</stub>
+        <url>http://xmltv.tvsajten.com/chanlogos</url>
     </baseurl>
 </iconmappings>
