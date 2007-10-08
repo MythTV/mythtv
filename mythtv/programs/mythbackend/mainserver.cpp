@@ -670,9 +670,10 @@ void MainServer::customEvent(QCustomEvent *e)
                 // allow re-record if auto expired but not expired live buffers
                 if (pinfo->recgroup != "LiveTV" &&
                     (gContext->GetNumSetting("RerecordWatched", 0) ||
-                    (!pinfo->getProgramFlags() & FL_WATCHED)))
+                     !(pinfo->getProgramFlags() & FL_WATCHED)))
+                {
                     pinfo->ForgetHistory();
-
+                }
                 DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
