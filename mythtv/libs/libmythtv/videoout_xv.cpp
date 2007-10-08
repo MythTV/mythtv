@@ -632,7 +632,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2")
                 .arg(j).arg(xvflags2str(neededFlags[j])));
 
-        for (uint i = 0; i < p_num_adaptors && (port == -1); ++i)
+        for (int i = 0; i < (int)p_num_adaptors && (port == -1); ++i)
         {
             lastAdaptorName = ai[i].name;
             VERBOSE(VB_PLAYBACK, LOC +
@@ -652,13 +652,13 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
                 X11S(colorkey = colorkey_supported(disp, firstPort));
                 if (!colorkey)
                 {
-                    if (i == (p_num_adaptors -1))
+                    if (i == ((int)p_num_adaptors - 1))
                     {
                         VERBOSE(VB_PLAYBACK, LOC +
                             "Failed to find XV_COLORKEY support. "
                                     "Disabling XV_COLORKEY check");
                         check_for_colorkey = false;
-                        i = 0;
+                        i = -1;
                     }
                     continue;
                 }
