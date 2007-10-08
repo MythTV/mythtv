@@ -468,7 +468,15 @@ class OpenGLVideoSyncPrivate
   private:
     __GLXextFuncPtr glXGetProcAddress(const char * const procName)
     {
-        __GLXextFuncPtr ret = glXGetProcAddressARB((const GLubyte *) procName);
+        __GLXextFuncPtr ret = NULL;
+
+#if GLX_VERSION_1_4
+        X11S(ret = glXGetProcAddress(procName));
+#elif GLX_ARB_get_proc_address
+        X11S(ret = glXGetProcAddressARB(procName));
+#elif GLX_EXT_get_proc_address
+        X11S(ret = glXGetProcAddressEXT(procName));
+#endif
 
         if (!ret)
         {
