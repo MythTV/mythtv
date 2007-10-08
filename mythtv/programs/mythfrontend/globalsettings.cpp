@@ -3638,7 +3638,7 @@ AppearanceSettings::AppearanceSettings()
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Screen settings"));
-    if (GetNumberOfXineramaScreens())
+    if (GetNumberOfXineramaScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());

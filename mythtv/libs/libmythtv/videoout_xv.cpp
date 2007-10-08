@@ -418,11 +418,7 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
             .arg(w).arg(h).arg(window_w).arg(window_h));
 
     // Determine if we are using Xinerama
-    int event_base, error_base;
-    bool usingXinerama = false;
-    X11S(usingXinerama = 
-         (XineramaQueryExtension(XJ_disp, &event_base, &error_base) &&
-          XineramaIsActive(XJ_disp)));
+    bool usingXinerama = (GetNumberOfXineramaScreens() > 1);
 
     // If the dimensions are invalid, assume square pixels and 17" screen.
     // Only print warning if this isn't Xinerama, we will fix Xinerama later.
