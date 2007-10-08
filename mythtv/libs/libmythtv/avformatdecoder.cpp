@@ -3107,8 +3107,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     ScanStreams(false);
                     QMutexLocker locker(&avcodeclock);
                     allowedquit = true;
-                    if (ringBuffer->DVD()->InStillFrame())
-                        ringBuffer->DVD()->SeekCellStart();
                     dvd_video_codec_changed = false;
                     continue;
                 }
