@@ -190,7 +190,7 @@ static uint32_t arch_accel (uint32_t accel)
 	accel |= MPEG2_ACCEL_SPARC_VIS;
 
 #ifdef ACCEL_DETECT
-    if (accel & (MPEG2_ACCEL_SPARC_VIS2 | MPEG2_ACCEL_DETECT) ==
+    if ((accel & (MPEG2_ACCEL_SPARC_VIS2 | MPEG2_ACCEL_DETECT)) ==
 	MPEG2_ACCEL_DETECT) {
 	static RETSIGTYPE (* oldsig) (int);
 
