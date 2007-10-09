@@ -105,7 +105,14 @@ void DTVRecorder::SetOption(const QString &name, int value)
 void DTVRecorder::FinishRecording(void)
 {
     if (ringBuffer)
+    {
+        if (_payload_buffer.size())
+        {
+            ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
+            _payload_buffer.clear();
+        }
         ringBuffer->WriterFlush();
+    }
 
     if (curRecording)
     {
@@ -152,6 +159,7 @@ void DTVRecorder::Reset(void)
     _h264_kf_seq.Reset();
     positionMap.clear();
     positionMapDelta.clear();
+    _payload_buffer.clear();
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
