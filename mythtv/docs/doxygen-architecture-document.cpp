@@ -134,15 +134,21 @@ The database schema is documented here \ref db_schema.
 
 \section fe_plugins Frontend Plugins
 <dl>
+  <dt>mytharchive <dd>Creates themed Video DVDs from recordings
+                      (and other video files).
   <dt>mythbrowser <dd>Provides a simple web browser.
-  <dt>mythdvd     <dd>Launches DVD players such as Xine and MPlayer.
-  <dt>mythgame    <dd>Launches the xmame classic game system emulator.
-  <dt>mythnews    <dd>Browses RSS news feeds.
-  <dt>mythweather <dd>Presents your local weather report.
+  <dt>mythcontrols<dd>Editor for Myth Key bindings, \e et \e c.
+  <dt>mythflix    <dd>
   <dt>mythgallery <dd>A simple picture viewer for your %TV.
+  <dt>mythgame    <dd>Launches the xmame classic game system emulator.
+  <dt>mythmovies  <dd>
   <dt>mythmusic   <dd>A simple music player for your %TV.
+  <dt>mythnews    <dd>Browses RSS news feeds.
   <dt>mythphone   <dd>SIP based video phone.
-  <dt>mythvideo   <dd>Video Browser for non-%MythTV recordings.
+  <dt>mythvideo   <dd>Launch DVD players, and a Video Browser for other files
+                      (non-%MythTV recordings).
+  <dt>mythweather <dd>Presents your local weather report.
+  <dt>mythzoneminder<dd>
 </dl>
 
 \section be_plugins Backend Plugins
@@ -284,6 +290,32 @@ state changing commands should not be issued.
 
  */
 
+/** \defgroup plugin_arch   Plugin Architecture
+This line is filler that is ignored by Doxygen.
+
+MythPlugins are shared object files (<I>i.e.</I> libraries) which are loaded
+from a specific directory (<I>%e.g.</I> /usr/local/lib/mythtv/plugins).
+Currently, all plugins are written in the C++ language, but there is nothing
+preventing other languages being used (the functions are in the C name space).
+
+int mythplugin_init(const char *libversion); is invoked whenever mythfrontend
+is started. This typically handles upgrading any database records - it will be
+the first method called after a new version of the plugin has been installed.
+
+int mythplugin_run(); is invoked when the action attribute of a menu item
+requests it via the PLUGIN directive. This is when the user chooses to enter
+the plugin from the main menu or the appropriate submenu.
+
+int mythplugin_config(); is invoked when the action attribute of a menu item
+requests it via the CONFIGPLUGIN directive. This should be when the users
+wishes to change the plugin's settings (in the main Setup menu).
+
+Other plugin functions are listed in the file \link mythpluginapi.h \endlink
+(see also the \link MythPlugin \endlink
+ and \link MythPluginManager \endlink classes.)
+
+*/
+
 /** \defgroup mtd                   MTD (the Myth Transcoding Daemon)
 This line is filler that is ignored by Doxygen.
 
@@ -375,9 +407,14 @@ MythHDD or MythCDROM and its subclasses) for each removable device
 configured on the system. A runtime loop then monitors each of these
 via its checkMedia() method.
 
-When any of these devices change status, a MediaEvent object is created
-and sent to the frontmost window, which then dispatches it to the
-relevant plugin's registered media handler. The following tables show
+When any of these devices change status, a MediaEvent object is created.
+If the device has a status which is usable, the window jumps to the main menu
+(to allow the registered jump to work correctly), and the event is dispatched
+to the relevant plugin's registered media handler. If the device status is
+unusable (\e %e.g. ejected), the plugin's media handler is called directly
+(so it can "forget" about this device).
+
+The following tables show
 typical status transitions for CD/DVD and USB flash drive devices:
 
 \verbatim
