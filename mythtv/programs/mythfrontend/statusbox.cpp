@@ -589,7 +589,8 @@ void StatusBox::clicked()
                                        QString("JobQueuePopup"),
                                        QObject::tr("Delete Job?"),
                                        QObject::tr("Yes"),
-                                       QObject::tr("No"), 1);
+                                       QObject::tr("No"), 2);
+                cout << "Popup result = " << retval << endl;
                 if (retval == 0)
                 {
                     JobQueue::DeleteJob(contentData[contentPos].toInt());
