@@ -270,6 +270,7 @@ int main(int argc, char *argv[])
                 long long last = 0;
                 QStringList cutlist;
                 cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                ++argpos;
                 deleteMap[0] = 1;
                 for (QStringList::Iterator it = cutlist.begin(); 
                      it != cutlist.end(); ++it )
