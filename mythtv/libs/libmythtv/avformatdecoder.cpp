@@ -2254,6 +2254,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             start_code_state == SEQ_END_CODE && !indvdstill)
         {
             ringBuffer->DVD()->InStillFrame(true);
+            gContext->RestoreScreensaver();
             indvdstill = true;
             d->ResetMPEG2();
             if (storedPackets.isEmpty())
@@ -3066,6 +3067,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 !indvdstill)
             {
                 ringBuffer->DVD()->InStillFrame(false);
+                gContext->DisableScreensaver();
             }
             
             if (pkt->size == 4)
