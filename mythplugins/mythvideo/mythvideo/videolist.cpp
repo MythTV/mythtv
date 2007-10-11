@@ -932,9 +932,15 @@ void VideoListImp::buildFsysList()
             if (mon->ValidateAndLock(pDev))
             {
                 QString path = pDev->getMountPath();
-                node_paths.push_back(
-                        node_to_path_list::value_type(path_to_node_name(path),
-                                                      path));
+                if (path.length())
+                {
+                    VERBOSE(VB_GENERAL,
+                            QString("MythVideo: Adding MediaMonitor "
+                                    "device: %1").arg(path));
+                    node_paths.push_back(node_to_path_list::
+                                         value_type(path_to_node_name(path),
+                                                    path));
+                }
 
                 mon->Unlock(pDev);
             }
