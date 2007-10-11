@@ -18,7 +18,9 @@
 #ifndef __TEMPLATEFINDER_H__
 #define __TEMPLATEFINDER_H__
 
+extern "C" {
 #include "avcodec.h"    /* AVPicture */
+}
 #include "FrameAnalyzer.h"
 
 class PGMConverter;

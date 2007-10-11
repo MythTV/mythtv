@@ -1,5 +1,4 @@
 #include "NuppelVideoPlayer.h"
-#include "avcodec.h"        /* AVPicture */
 #include "frame.h"          /* VideoFrame */
 
 #include "CommDetector2.h"

@@ -1,5 +1,7 @@
 #include "NuppelVideoPlayer.h"
+extern "C" {
 #include "avcodec.h"        // AVPicture
+}
 #include "frame.h"          // VideoFrame
 
 #include "FrameAnalyzer.h"

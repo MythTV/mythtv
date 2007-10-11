@@ -7,7 +7,9 @@
 #ifndef __CANNYEDGEDETECTOR_H__
 #define __CANNYEDGEDETECTOR_H__
 
+extern "C" {
 #include "avcodec.h"    /* AVPicture */
+}
 #include "EdgeDetector.h"
 
 typedef struct VideoFrame_ VideoFrame;

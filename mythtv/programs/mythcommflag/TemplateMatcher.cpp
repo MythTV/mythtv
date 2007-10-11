@@ -2,7 +2,6 @@
 #include <math.h>
 
 #include "NuppelVideoPlayer.h"
-#include "avcodec.h"        /* AVPicture */
 
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"

@@ -10,7 +10,9 @@
 #include "util-x11.h"
 #include "fourcc.h"
 
+extern "C" {
 #include "../libavcodec/xvmc_render.h"
+}
 
 #ifndef XVMC_VLD
 #define XVMC_VLD 0x0020000

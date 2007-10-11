@@ -5,7 +5,9 @@
 #include "openglcontext.h"
 
 // AVLib header
+extern "C" {
 #include "../libavcodec/avcodec.h"
+}
 
 // OpenGL headers
 #define GL_GLEXT_PROTOTYPES

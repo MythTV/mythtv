@@ -20,7 +20,9 @@ using namespace std;
 #include "mythconfig.h"
 #include "videoout_dvdv.h"
 #undef ABS
+extern "C" {
 #include "avcodec.h"
+}
 #include "dvdv.h"
 #include "videoout_dvdv_private.h"
 #include "yuv2rgb.h"

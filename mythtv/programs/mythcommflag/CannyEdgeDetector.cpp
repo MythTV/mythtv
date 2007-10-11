@@ -1,7 +1,6 @@
 #include <math.h>
 
 #include "NuppelVideoPlayer.h"
-#include "avcodec.h"        // AVPicture
 #include "frame.h"          // VideoFrame
 
 #include "pgm.h"

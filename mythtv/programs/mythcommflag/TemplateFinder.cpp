@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "NuppelVideoPlayer.h"
-#include "avcodec.h"        /* AVPicture */
 #include "mythcontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
 

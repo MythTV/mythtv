@@ -7,7 +7,11 @@
 #include <qwaitcondition.h>
 #include <qmutex.h>
 #include <pthread.h>
+
+extern "C" {
 #include "avcodec.h"
+}
+
 #include "mythexp.h"
 
 class RemoteFile;

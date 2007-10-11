@@ -7,7 +7,9 @@
 #ifndef __PGMCONVERTER_H__
 #define __PGMCONVERTER_H__
 
+extern "C" {
 #include "avcodec.h"    /* AVPicture */
+}
 
 typedef struct VideoFrame_ VideoFrame;
 class NuppelVideoPlayer;

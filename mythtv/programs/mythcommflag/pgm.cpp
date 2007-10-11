@@ -1,4 +1,6 @@
+extern "C" {
 #include "avcodec.h"
+}
 #include "frame.h"
 #include "mythcontext.h"
 #include "pgm.h"

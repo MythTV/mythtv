@@ -1,6 +1,8 @@
 #include <sys/time.h>
 
+extern "C" {
 #include "avcodec.h"        /* AVPicture */
+}
 #include "mythcontext.h"    /* gContext */
 
 #include "CommDetector2.h"
