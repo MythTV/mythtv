@@ -2343,19 +2343,22 @@ static QString remove_chaff(const QString &name)
         short_name = short_name.right(short_name.length() - 15);
     if (short_name.left(4) == "Oren")
         short_name = short_name.right(short_name.length() - 5);
-    if (short_name.right(8) == "Frontend")
+    if (short_name.left(8) == "Nextwave")
+        short_name = short_name.right(short_name.length() - 9);
+    if (short_name.right(8).lower() == "frontend")
         short_name = short_name.left(short_name.length() - 9);
     if (short_name.right(7) == "VSB/QAM")
         short_name = short_name.left(short_name.length() - 8);
     if (short_name.right(3) == "VSB")
         short_name = short_name.left(short_name.length() - 4);
-    if (short_name.right(3) == "DVB-T")
+    if (short_name.right(5) == "DVB-T")
         short_name = short_name.left(short_name.length() - 6);
 
     // It would be infinitely better if DVB allowed us to query
     // the vendor ID. But instead we have to guess based on the
     // demodulator name. This means cards like the Air2PC HD5000
     // and DViCO Fusion HDTV cards are not identified correctly.
+    short_name = short_name.simplifyWhiteSpace();
     if (short_name.left(7).lower() == "or51211")
         short_name = "pcHDTV HD-2000";
     else if (short_name.left(7).lower() == "or51132")
@@ -2363,6 +2366,8 @@ static QString remove_chaff(const QString &name)
     else if (short_name.left(7).lower() == "bcm3510")
         short_name = "Air2PC v1";
     else if (short_name.left(7).lower() == "nxt2002")
+        short_name = "Air2PC v2";
+    else if (short_name.left(7).lower() == "nxt200x")
         short_name = "Air2PC v2";
     else if (short_name.left(8).lower() == "lgdt3302")
         short_name = "DViCO HDTV3";
