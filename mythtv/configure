@@ -1511,6 +1511,7 @@ case $targetos in
   darwin)
     appleremote="yes"
     backend="yes"
+    enable proc_opt
     x11="no"
     dv1394="no"
     need_memalign="no"
