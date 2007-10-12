@@ -4888,7 +4888,7 @@ void PlaybackBox::setGroupFilter(void)
         curGroupPassword = "";
 
     if (groupnameAsAllProg)
-        groupDisplayName = recGroup;
+        groupDisplayName = tr(recGroup);
 
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", recGroup);
