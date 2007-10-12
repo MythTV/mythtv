@@ -773,7 +773,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
         }
         else
         {
-            countInGroup = progLists[titleList[titleIndex]].count();
+            countInGroup = progLists[titleList[titleIndex].lower()].count();
             infoMap["group"] = groupDisplayName;
             infoMap["show"] = titleList[titleIndex];
             infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
@@ -1227,7 +1227,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     ProgramList *plist;
     if (titleList.count() > 1)
-        plist = &progLists[titleList[titleIndex]];
+        plist = &progLists[titleList[titleIndex].lower()];
     else
         plist = &progLists[""];
 
@@ -1517,7 +1517,7 @@ void PlaybackBox::cursorDown(bool page, bool newview)
     }
     else 
     {
-        int progCount = progLists[titleList[titleIndex]].count();
+        int progCount = progLists[titleList[titleIndex].lower()].count();
         if (progIndex < progCount - 1) 
         {
             progIndex += (page ? listsize : 1);
@@ -1587,7 +1587,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     int oldrecpriority = 0;
     int oldrecordid = 0;
 
-    p = progLists[oldtitle].at(progIndex);
+    p = progLists[oldtitle.lower()].at(progIndex);
     if (p)
     {
         oldchanid = p->chanid;
@@ -1693,24 +1693,24 @@ bool PlaybackBox::FillList(bool useCachedData)
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->title;
-                    progLists[sortedList[sTitle]].prepend(p);
-                    progLists[sortedList[sTitle]].setAutoDelete(false);
+                    progLists[sortedList[sTitle].lower()].prepend(p);
+                    progLists[sortedList[sTitle].lower()].setAutoDelete(false);
                 } 
 
                 if ((viewMask & VIEW_RECGROUPS) &&
                     p->recgroup != "") // Show recording groups
                 {
                     sortedList[p->recgroup.lower()] = p->recgroup;
-                    progLists[p->recgroup].prepend(p);
-                    progLists[p->recgroup].setAutoDelete(false);
+                    progLists[p->recgroup.lower()].prepend(p);
+                    progLists[p->recgroup.lower()].setAutoDelete(false);
                 }
 
                 if ((viewMask & VIEW_CATEGORIES) &&
                     p->category != "") // Show categories
                 {
                     sortedList[p->category.lower()] = p->category;
-                    progLists[p->category].prepend(p);
-                    progLists[p->category].setAutoDelete(false);
+                    progLists[p->category.lower()].prepend(p);
+                    progLists[p->category.lower()].setAutoDelete(false);
                 }
 
                 if ((viewMask & VIEW_SEARCHES) &&
@@ -1719,9 +1719,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                 {
                     QString tmpTitle = QString("(%1)")
                                                .arg(searchRule[p->recordid]);
-                    sortedList[tmpTitle] = tmpTitle;
-                    progLists[tmpTitle].prepend(p);
-                    progLists[tmpTitle].setAutoDelete(false);
+                    sortedList[tmpTitle.lower()] = tmpTitle;
+                    progLists[tmpTitle.lower()].prepend(p);
+                    progLists[tmpTitle.lower()].setAutoDelete(false);
                 }
 
                 if ((LiveTVInAllPrograms) &&
@@ -1730,9 +1730,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                     (p->recgroup == "LiveTV"))
                 {
                     QString tmpTitle = QString(" %1").arg(tr("LiveTV"));
-                    sortedList[tmpTitle] = tmpTitle;
-                    progLists[tmpTitle].prepend(p);
-                    progLists[tmpTitle].setAutoDelete(false);
+                    sortedList[tmpTitle.lower()] = tmpTitle;
+                    progLists[tmpTitle.lower()].prepend(p);
+                    progLists[tmpTitle.lower()].setAutoDelete(false);
                 }
 
                 if ((viewMask & VIEW_WATCHLIST) && (p->recgroup != "LiveTV"))
@@ -1756,9 +1756,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                         if (recidEpisodes[p->recordid] == 1 ||
                             p->recordid == 0 )
                         {
-                            sortedList[watchGroup] = watchGroup;
-                            progLists[watchGroup].prepend(p);
-                            progLists[watchGroup].setAutoDelete(false);
+                            sortedList[watchGroup.lower()] = watchGroup;
+                            progLists[watchGroup.lower()].prepend(p);
+                            progLists[watchGroup.lower()].setAutoDelete(false);
                         }
                         else
                         {
@@ -2051,7 +2051,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         progIndex = 0;
     else
     {
-        ProgramList *l = &progLists[oldtitle];
+        ProgramList *l = &progLists[oldtitle.lower()];
         progIndex = l->count() - 1;
 
         for (int i = progIndex; i >= 0; i--)
@@ -3818,7 +3818,7 @@ void PlaybackBox::togglePlayListTitle(void)
     if (!curitem)
         return;
 
-    QString currentTitle = titleList[titleIndex];
+    QString currentTitle = titleList[titleIndex].lower();
     ProgramInfo *p;
 
     for( unsigned int i = 0; i < progLists[currentTitle].count(); i++)
