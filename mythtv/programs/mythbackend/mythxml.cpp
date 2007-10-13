@@ -15,6 +15,8 @@
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
 
+#include "backendutil.h"
+
 #include <qtextstream.h>
 #include <qdir.h>
 #include <qfile.h>
@@ -1000,7 +1002,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     //          would need to decide how to delete
     // ----------------------------------------------------------------------
 
-    QString sFileName     = pInfo->GetPlaybackURL();
+    QString sFileName     = GetPlaybackURL(pInfo);
 
     if (bDefaultPixmap)
         pRequest->m_sFileName = sFileName + ".png";
@@ -1234,7 +1236,7 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
             return;     
         }
 
-        pRequest->m_sFileName = pInfo->GetPlaybackURL();
+        pRequest->m_sFileName = GetPlaybackURL(pInfo);
 
         delete pInfo;
 
