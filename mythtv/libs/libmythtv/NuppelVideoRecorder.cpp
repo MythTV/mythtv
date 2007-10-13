@@ -254,7 +254,12 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "scalebitrate")
         scalebitrate = value;
     else if (opt == "mpeg4maxquality")
-        maxquality = value;
+    {
+        if (value > 0)
+            maxquality = value;
+        else
+            maxquality = 1;
+    }
     else if (opt == "mpeg4minquality")
         minquality = value;
     else if (opt == "mpeg4qualdiff")

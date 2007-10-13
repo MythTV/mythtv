@@ -11,7 +11,7 @@ using namespace std;
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1199";
+const QString currentDatabaseVersion = "1200";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3252,6 +3252,17 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1199", dbver))
+            return false;
+    }
+
+    if (dbver == "1199")
+    {
+        const QString updates[] = {
+"UPDATE codecparams SET value = 1 "
+"WHERE name='mpeg4maxquality' AND value = 0;",
+""
+};
+        if (!performActualUpdate(updates, "1200", dbver))
             return false;
     }
 

@@ -507,7 +507,7 @@ class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
 {
   public:
     MPEG4MaxQuality(const RecordingProfile &parent) :
-        SliderSetting(this, 0, 31, 1),
+        SliderSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4maxquality")
     {
         setLabel(QObject::tr("Maximum quality"));
