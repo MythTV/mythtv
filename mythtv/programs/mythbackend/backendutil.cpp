@@ -9,6 +9,8 @@
 #endif
 
 #include <qdir.h>
+#include <qmutex.h>
+#include <qmap.h>
 
 #include "backendutil.h"
 #include "remoteutil.h"
@@ -285,6 +287,32 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         }
         cout << "--- GetFilesystemInfos directory list end ---" << endl;
     }
+}
+
+QMutex recordingPathLock;
+QMap <QString, QString> recordingPathCache;
+
+QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
+{
+    QString result = "";
+    QMutexLocker locker(&recordingPathLock);
+    QString cacheKey = QString("%1:%2").arg(pginfo->chanid)
+                               .arg(pginfo->recstartts.toString(Qt::ISODate));
+    if ((recordingPathCache.contains(cacheKey)) &&
+        (QFile::exists(recordingPathCache[cacheKey])))
+    {
+        result = recordingPathCache[cacheKey];
+        if (!storePath)
+            recordingPathCache.remove(cacheKey);
+    }
+    else
+    {
+        result = pginfo->GetPlaybackURL(false, true);
+        if (storePath && result.left(1) == "/")
+            recordingPathCache[cacheKey] = result;
+    }
+
+    return result;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

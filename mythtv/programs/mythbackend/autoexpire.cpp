@@ -451,10 +451,9 @@ void AutoExpire::ExpireRecordings(void)
                     if (!foundFile && (p->hostname != myHostName))
                     {
                         // Wasn't found so check locally
-                        StorageGroup sgroup;
-                        QString file = sgroup.FindRecordingFile(p->pathname);
+                        QString file = GetPlaybackURL(p);
                         
-                        if (file != "")
+                        if (file.left(1) == "/")
                         {
                             p->pathname = file;
                             p->hostname = myHostName;

@@ -1266,7 +1266,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                                      + "/" + proginfo->pathname;
                 if (proginfo->filesize == 0)
                 {
-                    QString tmpURL = proginfo->GetPlaybackURL();
+                    QString tmpURL = GetPlaybackURL(proginfo);
                     QFile checkFile(tmpURL);
                     if (tmpURL != "" && checkFile.exists())
                     {
@@ -1283,7 +1283,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
             else if (!slave)
             {
-                proginfo->pathname = proginfo->GetPlaybackURL();
+                proginfo->pathname = GetPlaybackURL(proginfo);
                 if (proginfo->pathname == "")
                 {
                     VERBOSE(VB_IMPORTANT,
@@ -1378,7 +1378,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 2);
 
-    QString lpath = pginfo->GetPlaybackURL();
+    QString lpath = GetPlaybackURL(pginfo);
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
 
@@ -1949,7 +1949,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         return;
     }
 
-    QString filename = pginfo->GetPlaybackURL();
+    QString filename = GetPlaybackURL(pginfo, false);
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
@@ -2248,7 +2248,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         }
     }
 
-    QString pburl = pginfo->GetPlaybackURL();
+    QString pburl = GetPlaybackURL(pginfo);
     QFile checkFile(pburl);
 
     if (checkFile.exists() == true)
@@ -3595,7 +3595,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
-    pginfo->pathname = pginfo->GetPlaybackURL();
+    pginfo->pathname = GetPlaybackURL(pginfo);
 
     if ((ismaster) &&
         (pginfo->hostname != gContext->GetHostName()) &&
@@ -3663,7 +3663,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
-    pginfo->pathname = pginfo->GetPlaybackURL();
+    pginfo->pathname = GetPlaybackURL(pginfo);
 
     QDateTime lastmodified;
     QStringList strlist;
@@ -4058,7 +4058,7 @@ QString MainServer::LocalFilePath(QUrl &url)
         ProgramInfo *pginfo = ProgramInfo::GetProgramFromBasename(fpath);
         if (pginfo)
         {
-            QString pburl = pginfo->GetPlaybackURL();
+            QString pburl = GetPlaybackURL(pginfo);
             if (pburl.left(1) == "/")
             {
                 lpath = pburl.section('/', 0, -2) + "/" + lpath;

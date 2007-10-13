@@ -14,6 +14,7 @@ using namespace std;
 #include "util.h"
 #include "previewgenerator.h"
 #include "storagegroup.h"
+#include "backendutil.h"
 
 /**
  * \class EncoderLink
@@ -235,10 +236,8 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
         return sock->CheckFile(pginfo);
     else
     {
-        StorageGroup sgroup(pginfo->storagegroup, gContext->GetHostName());
-        pginfo->pathname =
-            sgroup.FindRecordingFile(pginfo->GetRecordBasename(true));
-        if (pginfo->pathname != "")
+        pginfo->pathname = GetPlaybackURL(pginfo);
+        if (pginfo->pathname.left(1) == "/")
             return true;
     }
     return false;
