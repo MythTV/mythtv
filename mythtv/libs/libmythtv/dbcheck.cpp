@@ -426,6 +426,14 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
+    switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion))
+    {
+        case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
+        case MYTH_SCHEMA_ERROR:
+        case MYTH_SCHEMA_EXIT:         return false;
+        case MYTH_SCHEMA_UPGRADE:      break;
+    }
+
     MSqlQuery chartype(MSqlQuery::InitCon());
     chartype.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
     chartype.exec();

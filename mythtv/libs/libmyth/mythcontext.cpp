@@ -2877,6 +2877,163 @@ MythMainWindow *MythContext::GetMainWindow(void)
     return d->mainWindow;
 }
 
+/**
+ * \brief   Try to prevent silent, automatic database upgrades
+ * \returns -1 to use the existing schema, 0 to exit, 1 to upgrade.
+ */
+int MythContext::PromptForSchemaUpgrade(const QString &dbver,
+                                        const QString &current)
+{
+    bool    autoUpgrade = false;
+    bool    connections = false;  // Are (other) FE/BEs connected?
+    bool    expertMode  = false;  // Use existing schema? Multiple buttons?
+    QString message;
+    int     returnValue = MYTH_SCHEMA_UPGRADE;
+    bool    upgradable  = (dbver.toUInt() < current.toUInt());
+    QString warnOtherCl = tr("There are also other clients using this"
+                             " database. They should be shut down first.");
+
+
+    // Users and developers can choose to live dangerously,
+    // either to silently and automatically upgrade,
+    // or an expert option to allow use of existing:
+    switch (gContext->GetNumSetting("DBSchemaAutoUpgrade"))
+    {
+        case  1: autoUpgrade = true; break;
+        case -1: expertMode  = true; break;
+        default: break;
+    }
+
+
+    // FIXME: Don't know how to determine this
+    //if (getActiveConnections() > 1)
+    //    connections = true;
+
+
+    // Deal with the trivial case first (No user prompting required)
+    if (autoUpgrade && upgradable && !connections)
+        return MYTH_SCHEMA_UPGRADE;
+
+
+    // Build up strings used both in GUI and command shell contexts:
+    if (upgradable)
+    {
+        if (autoUpgrade && connections)
+        {
+            message = tr("Error: MythTV cannot upgrade the schema of this"
+                         " datatase because other clients are using it.\n\n"
+                         "Please shut them down before upgrading.");
+            returnValue = MYTH_SCHEMA_ERROR;
+        }
+        else
+        {
+            message = tr("Warning: MythTV wants to upgrade"
+                         " your database schema, from %1 to %2.");
+            if (expertMode)
+                message += "\n\n" +
+                           tr("You can try using the old schema,"
+                              " but that may cause problems.");
+        }
+    }
+    else   // This client is too old
+    {
+        if (expertMode)
+            message = tr("Warning: MythTV database has newer"
+                         " schema (%1) than expected (%2).");
+        else
+        {
+            message = tr("Error: MythTV database has newer"
+                         " schema (%1) than expected (%2).");
+            returnValue = MYTH_SCHEMA_ERROR;
+        }
+    }
+
+    if (message.contains("%1"))
+        message = message.arg(dbver).arg(current);
+
+
+    if (d->m_gui)
+    {
+        bool createdTempWindow = false;
+
+        if (!d->mainWindow)
+        {
+            d->TempMainWindow();
+            createdTempWindow = true;
+        }
+
+        if (returnValue == MYTH_SCHEMA_ERROR)
+            MythPopupBox::showExitPopup(d->mainWindow,
+                                        "Database Upgrade Error", message);
+        else
+        {
+            QStringList buttonNames;
+            int         selected;
+
+            buttonNames += QObject::tr("Exit");
+            buttonNames += QObject::tr("Upgrade");
+            if (expertMode)
+                buttonNames += QObject::tr("Use current schema");
+
+            selected = MythPopupBox::showButtonPopup(d->mainWindow,
+                                                     "Database Upgrade",
+                                                     message, buttonNames, -1);
+            // The annoying extra confirmation:
+            if (selected == 1)
+            {
+                message = tr("This cannot be un-done, so having a"
+                             " database backup would be a good idea.");
+                if (connections)
+                    message += "\n\n" + warnOtherCl;
+
+                selected = MythPopupBox::showButtonPopup(d->mainWindow,
+                                                         "Database Upgrade",
+                                                         message,
+                                                         buttonNames, -1);
+            }
+
+            switch (selected)
+            {
+                case 0:  returnValue = MYTH_SCHEMA_EXIT;         break;
+                case 1:  returnValue = MYTH_SCHEMA_UPGRADE;      break;
+                case 2:  returnValue = MYTH_SCHEMA_USE_EXISTING; break;
+                default: returnValue = MYTH_SCHEMA_ERROR;
+            }
+        }
+
+        if (createdTempWindow)
+            d->EndTempWindow();
+
+        return returnValue;
+    }
+
+    QString resp;
+
+    cout << endl << message << endl << endl;
+
+    if (expertMode)
+    {
+        resp = d->getResponse("Would you like to use the existing schema?",
+                              "yes");
+        if (!resp || resp.left(1).lower() == "y")
+            return MYTH_SCHEMA_USE_EXISTING;
+    }
+
+    resp = d->getResponse("\nShall I upgrade this database?", "yes");
+    if (resp && resp.left(1).lower() != "y")
+        return MYTH_SCHEMA_EXIT;
+
+    if (connections)
+        cout << endl << warnOtherCl <<endl;
+
+    resp = d->getResponse("\nA database backup might be a good idea"
+                          "\nAre you sure you want to upgrade?", "no");
+    if (!resp || resp.left(1).lower() == "n")
+        return MYTH_SCHEMA_EXIT;
+
+    return MYTH_SCHEMA_UPGRADE;
+}
+
 bool MythContext::TestPopupVersion(const QString &name, 
                                    const QString &libversion,
                                    const QString &pluginversion)

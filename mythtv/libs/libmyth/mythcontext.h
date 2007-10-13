@@ -382,6 +382,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
 
+    int  PromptForSchemaUpgrade(const QString &dbver, const QString &current);
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 
@@ -452,6 +453,15 @@ extern MPUBLIC MythContext *gContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
 extern MPUBLIC QMutex avcodeclock;
+
+/// Return values for PromptForSchemaUpgrade()
+enum MythSchemaUpgrade
+{
+    MYTH_SCHEMA_EXIT         = 1,
+    MYTH_SCHEMA_ERROR        = 2,
+    MYTH_SCHEMA_UPGRADE      = 3,
+    MYTH_SCHEMA_USE_EXISTING = 4
+};
 
 #endif
 
