@@ -97,7 +97,7 @@ static QStringList get_cardtypes(uint sourceid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardtype "
+        "SELECT cardtype, inputname "
         "FROM capturecard, cardinput "
         "WHERE capturecard.cardid = cardinput.cardid AND "
         "      cardinput.sourceid = :SOURCEID");
@@ -108,7 +108,15 @@ static QStringList get_cardtypes(uint sourceid)
     else
     {
         while (query.next())
-            list += query.value(0).toString().upper();
+        {
+/// BEGIN HACK HACK HACK -- return correct card type for child cards
+            QString cardtype = query.value(0).toString().upper();
+            QString inputname = query.value(1).toString().upper();
+            cardtype = ((cardtype == "DVB") && (inputname.left(3) != "DVB")) ?
+                "V4L" : cardtype;
+/// END  HACK HACK HACK
+            list += cardtype;
+        }
     }
 
     return list;
