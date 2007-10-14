@@ -411,7 +411,7 @@ When any of these devices change status, a MediaEvent object is created.
 If the device has a status which is usable, the window jumps to the main menu
 (to allow the registered jump to work correctly), and the event is dispatched
 to the relevant plugin's registered media handler. If the device status is
-unusable (\e %e.g. ejected), the plugin's media handler is called directly
+unusable (<I>%e.g.</I> ejected), the plugin's media handler is called directly
 (so it can "forget" about this device).
 
 The following tables show
@@ -435,7 +435,37 @@ NOTMOUNTED
  */
 
 /** \defgroup myth_network_protocol Myth Network Protocol
-    \todo No one is working on documenting the myth network protocol
+This line is filler that is ignored by Doxygen.
+
+The MythTV backend process currently opens sockets for three different types
+of commands; a custom protocol (by default at port 6543),
+an HTML status server (by default <A HREF="http://127.0.0.1:6544">
+http://127.0.0.1:6544
+</A>), and a UPnP media server (several ports that I cannot
+remember right now that throw around lots of little bits of XML :-)
+
+The custom protocol is an ASCII encoded length and command string.
+Command sequences can be easily sent to the backend using telnet.
+<I>%e.g.</I> \verbatim telnet 127.0.0.1 5432
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.\endverbatim
+<B>\verbatim21      MYTH_PROTO_VERSION 36   23   ANN Playback hostname 1       4DONE\endverbatim</B>
+\verbatim13      ACCEPT[]:[]362       OKConnection closed by foreign host.\endverbatim
+The command string is prefixed by 8 characters, containing the length
+of the forthcoming command. This can be justified in any way
+(as the above example shows)
+
+The backend responds with a length, and an ASCII encoding of a stringlist.
+
+\section commands Commands
+
+There are three main types of networking interactions in MythTV;
+identification commands (which tell the backend about this client),
+query commands that are sent to the master backend
+(<I>%e.g.</I> listing recordings or viewing guide data), and
+file streaming commands (when a frontend if watching or editing a recording).
+
  */
 
 /** \defgroup qobject_dangers QObject is dangerous for your health
