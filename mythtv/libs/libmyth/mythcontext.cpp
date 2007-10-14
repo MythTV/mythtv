@@ -2880,6 +2880,12 @@ MythMainWindow *MythContext::GetMainWindow(void)
 /**
  * \brief   Try to prevent silent, automatic database upgrades
  * \returns -1 to use the existing schema, 0 to exit, 1 to upgrade.
+ *
+ * The GUI prompts have no defaults, so that nothing dangerous
+ * will happen if the user hits return a few times.
+ * Hopefully this will force users to stop and think?
+ * Similarly, the shell command prompting requires an explicit "yes".
+ * Non-interactive shells default to old behaviour (upgrading)
  */
 int MythContext::PromptForSchemaUpgrade(const QString &dbver,
                                         const QString &current)
@@ -3006,6 +3012,16 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
         return returnValue;
     }
+
+    // We are not in a GUI environment, so try to prompt the user in the shell
+
+    if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
+    {
+        cout << "Console is not interactive, cannot ask user about"
+             << " upgrading database schema." << endl << "Upgrading." << endl;
+        return MYTH_SCHEMA_UPGRADE;
+    }
+
 
     QString resp;
 
