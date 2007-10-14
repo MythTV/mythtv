@@ -40,7 +40,9 @@
 #define DCT3412_MODEL_ID1  0x000034cb
 
 #define DCT3416_VENDOR_ID1 0x000016b5
+#define DCT3416_VENDOR_ID2 0x00001bdd
 #define DCT3416_MODEL_ID1  0x0000346b
+#define DCT3416_MODEL_ID2  0x0000b630
 
 #define DCT5100_VENDOR_ID1 0x000017ee
 #define DCT5100_MODEL_ID1  0x0000620a
@@ -217,6 +219,7 @@ int main (int argc, char *argv[])
       if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
             (dir.vendor_id == DCT3412_VENDOR_ID1) || 
             (dir.vendor_id == DCT3416_VENDOR_ID1) || 
+            (dir.vendor_id == DCT3416_VENDOR_ID2) || 
             (dir.vendor_id == DCT5100_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
@@ -239,6 +242,7 @@ int main (int argc, char *argv[])
            ((dir.model_id == DCH3200_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT3416_MODEL_ID1) ||
+            (dir.model_id == DCT3416_MODEL_ID2) ||
             (dir.model_id == DCT5100_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
