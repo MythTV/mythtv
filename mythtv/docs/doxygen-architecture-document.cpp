@@ -450,13 +450,18 @@ Command sequences can be easily sent to the backend using telnet.
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.\endverbatim
-<B>\verbatim21      MYTH_PROTO_VERSION 36   23   ANN Playback hostname 1       4DONE\endverbatim</B>
-\verbatim13      ACCEPT[]:[]362       OKConnection closed by foreign host.\endverbatim
+<B>\verbatim21      MYTH_PROTO_VERSION 36 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
+\verbatim13      ACCEPT[]:[]362       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
 The command string is prefixed by 8 characters, containing the length
 of the forthcoming command. This can be justified in any way
 (as the above example shows)
 
-The backend responds with a length, and an ASCII encoding of a stringlist.
+The backend responds with a length, and the response to the command.
+This can be numbers (up to 32 bit, represented in ASCII),
+a single string, or an ASCII encoding of a QStringList.
+The 5 byte sequence "[]:[]" seperates items in the stringlist.
+Any 64 bit numbers are represented as a stringlist of two 32bit words
+(MSB first).
 
 \section commands Commands
 
@@ -464,7 +469,15 @@ There are three main types of networking interactions in MythTV;
 identification commands (which tell the backend about this client),
 query commands that are sent to the master backend
 (<I>%e.g.</I> listing recordings or viewing guide data), and
-file streaming commands (when a frontend if watching or editing a recording).
+file streaming commands (when a frontend is watching or editing a recording).
+
+Until a client is identified to the backend (via the ANN commands),
+any of the query or file streaming commands will silently fail.
+
+The following summarises some of these commands.
+For a full understanding of all the commands, either read the source code
+(programs/mythbackend/mainserver.cpp), or look on the Wiki
+(http://www.mythtv.org/wiki/index.php/Myth_Protocol_Command_List).
 
  */
 
