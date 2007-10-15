@@ -202,7 +202,6 @@ class VideoOutputXv : public VideoOutput
     VOSType              video_output_subtype;
     DisplayRes          *display_res;
     QMutex               global_lock;
-    bool		 use_i420_hack_for_broken_driver;
 
     // Basic X11 info
     Window               XJ_root;

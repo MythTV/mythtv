@@ -101,7 +101,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
       display_res(NULL), global_lock(true),
-      use_i420_hack_for_broken_driver(false),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
@@ -133,28 +132,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
-
-
-    // The following is a workaround for the ATI Proprietary driver and 
-    // the Intel IEGD driver for the i830M chipset (as of Oct 1st, 2006).
-    // Please report the problem to the driver developers as well, the more
-    // people report the bug in the driver the more likely it is to be
-    // fixed.
-
-    use_i420_hack_for_broken_driver =
-        gContext->GetNumSetting("BrokenI420Hack", 0);
-
-    if (use_i420_hack_for_broken_driver)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "\n"
-                "\n*********************************************************"
-                "\n Using broken I420 workaround. Please ask your driver    "
-                "\n vendor to fix their drivers! This hack will be removed  "
-                "\n in a future MythTV release.                             "
-                "\n*********************************************************"
-                "\n");
-    }
 
     // If using custom display resolutions, display_res will point
     // to a singleton instance of the DisplayRes class
@@ -1122,7 +1099,7 @@ bool VideoOutputXv::InitXVideo()
     InstallXErrorHandler(XJ_disp);
 
     bool foundimageformat = false;
-    int ids[] = { GUID_I420_PLANAR, GUID_IYUV_PLANAR, GUID_YV12_PLANAR };
+    int ids[] = { GUID_YV12_PLANAR, GUID_I420_PLANAR, GUID_IYUV_PLANAR, };
     int format_cnt = 0;
     XvImageFormatValues *formats;
     X11S(formats = XvListImageFormats(XJ_disp, xv_port, &format_cnt));
@@ -1133,9 +1110,6 @@ bool VideoOutputXv::InitXVideo()
         VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Format #%1 is '%2%3%4%5'")
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
-
-    if (use_i420_hack_for_broken_driver) 
-        swap(ids[0], ids[2]);
 
     for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
     {
