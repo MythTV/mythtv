@@ -875,6 +875,14 @@ void MainServer::customEvent(QCustomEvent *e)
     }
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        MYTH_PROTO_VERSION \e version
+ * Checks that \e version matches the backend's version.
+ * If it matches, the stringlist of "ACCEPT" \e "version" is returned.
+ * If it does not, "REJECT" \e "version" is returned,
+ * and the socket is closed (for this client)
+ */
 void MainServer::HandleVersion(MythSocket *socket, QString version)
 {
     QStringList retlist;
@@ -893,6 +901,17 @@ void MainServer::HandleVersion(MythSocket *socket, QString version)
     socket->writeStringList(retlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        ANN Playback \e host \e wantevents
+ * Register \e host as a client, and prevent shutdown of the socket.
+ * 
+ * \par        ANN Monitor  \e host \e wantevents
+ * Register \e host as a client, and allow shutdown of the socket
+ * \par        ANN SlaveBackend \e IPaddress
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename)
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename) \e useReadahead \e retries
+ */
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
                                 MythSocket *socket)
 {
@@ -1012,6 +1031,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     socket->writeStringList(retlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        DONE
+ * Closes this client's socket.
+ */
 void MainServer::HandleDone(MythSocket *socket)
 {
     socket->close();
@@ -1030,6 +1054,13 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
     }
 }
 
+/**
+ * \addingroup myth_network_protocol
+ * \par        QUERY_RECORDINGS \e type
+ * The \e type parameter can be either "Play", "Recording" or "Delete".
+ * Returns programinfo (title, subtitle, description, category, chanid,
+ * channum, callsign, channel.name, fileURL, \e et \e cetera)
+ */
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
@@ -1338,6 +1369,11 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     SendResponse(pbssock, outputlist);
 }
 
+/**
+ * \addingroup myth_network_protocol
+ * \par        QUERY_RECORDING BASENAME \e basename
+ * \par        QUERY_RECORDING TIMESLOT \e time1 \e time2
+ */
 void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
@@ -2143,6 +2179,15 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_FREE_SPACE
+ * Returns the free space on this backend, as a list of hostname, directory,
+ * 1, -1, total size, used (both in K and 64bit, so two 32bit numbers each).
+ * \par        QUERY_FREE_SPACE_LIST
+ * Returns the free space on \e all hosts. (each host as above,
+ * except that the directory becomes a URL, and a TotalDiskSpace is appended)
+ */
 void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 {    
     QStringList strlist;
@@ -2152,6 +2197,11 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
     SendResponse(pbs->getSocket(), strlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_FREE_SPACE_SUMMARY
+ * Summarises the free space on this backend, as list of total size, used
+ */
 void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
 {    
     QStringList fullStrList;
@@ -2169,6 +2219,12 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
     SendResponse(pbs->getSocket(), strList);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_LOAD
+ * Returns the Unix load on this backend
+ * (three floats - the average over 1, 5 and 15 mins).
+ */
 void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
@@ -2186,6 +2242,11 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_UPTIME
+ * Returns the number of seconds this backend's host has been running
+ */
 void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
@@ -2200,6 +2261,11 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_MEMSTATS
+ * Returns total RAM, free RAM, total VM and free VM (all in MB)
+ */
 void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
@@ -2215,6 +2281,10 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_CHECKFILE \e checkslaves \e programinfo
+ */
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
