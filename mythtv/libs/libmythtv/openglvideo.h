@@ -90,6 +90,7 @@ class OpenGLVideo
     void SetVideoResize(const QRect &rect);
     void DisableVideoResize(void);
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
+    PictureAttributeSupported GetSupportedPictureAttributes(void) const;
 
   private:
     void Teardown(void);
@@ -182,6 +183,8 @@ class OpenGLVideo
     void SetVideoResize(const QRect&) { }
     void DisableVideoResize(void) { }
     int SetPictureAttribute(PictureAttribute, int) { return -1; }
+    PictureAttributeSupported GetSupportedPictureAttributes(void) const
+        { return kPictureAttributeSupported_None; }
 };
 
 #endif // !USING_OPENGL_VIDEO

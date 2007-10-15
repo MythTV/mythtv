@@ -243,6 +243,7 @@ VideoOutput::VideoOutput() :
     db_pip_location(kPIPTopLeft),       db_pip_size(26),
     db_aspectoverride(kAspect_Off),     db_adjustfill(kAdjustFill_Off),
     db_deint_filtername(QString::null),
+    db_use_picture_controls(false),
     db_vdisp_profile(new VideoDisplayProfile()),
 
     // Manual Zoom
@@ -283,7 +284,8 @@ VideoOutput::VideoOutput() :
     // Various state variables
     embedding(false),                   needrepaint(false),
     allowpreviewepg(true),              errored(false),
-    framesPlayed(0), db_scaling_allowed(true)
+    framesPlayed(0), db_scaling_allowed(true),
+    supported_attributes(kPictureAttributeSupported_None)
 {
     db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
                            gContext->GetNumSetting("DisplaySizeHeight", 0));
@@ -309,6 +311,9 @@ VideoOutput::VideoOutput() :
         gContext->GetNumSetting("AspectOverride",      0);
     db_adjustfill = (AdjustFillMode)
         gContext->GetNumSetting("AdjustFill",          0);
+
+    db_use_picture_controls =
+        gContext->GetNumSetting("UseOutputPictureControls", 0);
 }
 
 /**

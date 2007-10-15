@@ -1787,13 +1787,12 @@ static HostCheckBox *AltClearSavedPosition()
 static HostCheckBox *UsePicControls()
 {
     HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
-    gc->setLabel(QObject::tr("Use Xv picture controls"));
+    gc->setLabel(QObject::tr("Enable picture controls"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, Xv picture controls (brightness, "
-                    "contrast, etc.) are used during playback. These are "
-                    "independent of the Video4Linux controls used for "
-                    "recording. The Xv controls may not work properly on "
-                    "some systems."));
+    gc->setHelpText(
+        QObject::tr(
+            "If enabled, MythTV attempts to initialize picture controls "
+            "(brightness, contrast, etc.) that are applied during playback."));
     return gc;
 }
 #endif

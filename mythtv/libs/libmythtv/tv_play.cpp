@@ -594,8 +594,6 @@ bool TV::Init(bool createWindow)
     baseFilters         += gContext->GetSetting("CustomFilters");
     db_time_format       = gContext->GetSetting("TimeFormat", "h:mm AP");
     db_short_date_format = gContext->GetSetting("ShortDateFormat", "M/d");
-    db_use_picture_attr  = gContext->GetNumSetting(
-                            "UseOutputPictureControls", 0);
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
@@ -6007,23 +6005,43 @@ void TV::HandleOSDClosed(int osdType)
     }
 }
 
-void TV::DoTogglePictureAttribute(PictureAdjustType type)
+static PictureAttribute next(
+    PictureAdjustType type, NuppelVideoPlayer *nvp, PictureAttribute attr)
 {
-    if (!db_use_picture_attr && kAdjustingPicture_Playback == type)
-        return;
-
-    adjustingPicture = type;
-
-    adjustingPictureAttribute = (PictureAttribute)
-        ((int) adjustingPictureAttribute + 1);
-    if ((adjustingPictureAttribute >= kPictureAttribute_MAX) ||
-        ((type >= kAdjustingPicture_Channel) &&
-         (adjustingPictureAttribute > kPictureAttribute_Hue)))
+    uint sup = kPictureAttributeSupported_None;
+    if ((kAdjustingPicture_Playback == type) && nvp && nvp->getVideoOutput())
     {
-        adjustingPictureAttribute = kPictureAttribute_MIN;
+        sup = nvp->getVideoOutput()->GetSupportedPictureAttributes();
+        if (nvp->getAudioOutput())
+            sup |= kPictureAttributeSupported_Volume;
+    }
+    else if (kAdjustingPicture_Channel == type)
+    {
+        sup = (kPictureAttributeSupported_Brightness |
+               kPictureAttributeSupported_Contrast |
+               kPictureAttributeSupported_Colour |
+               kPictureAttributeSupported_Hue);
+    }
+    else if (kAdjustingPicture_Recording == type)
+    {
+        sup = (kPictureAttributeSupported_Brightness |
+               kPictureAttributeSupported_Contrast |
+               kPictureAttributeSupported_Colour |
+               kPictureAttributeSupported_Hue);
     }
 
-    PictureAttribute attr = adjustingPictureAttribute;
+    return next((PictureAttributeSupported)sup, attr);
+}
+
+void TV::DoTogglePictureAttribute(PictureAdjustType type)
+{
+    PictureAttribute attr = next(type, nvp, adjustingPictureAttribute);
+    if (kPictureAttribute_None == attr)
+        return;
+
+    adjustingPicture          = type;
+    adjustingPictureAttribute = attr;
+
     QString title = toTitleString(type);
 
     if (!GetOSD())
@@ -6850,25 +6868,20 @@ void TV::BuildOSDTreeMenu(void)
                                      (sel) ? 1 : 0, NULL, "ADJUSTFILLGROUP");
     }
 
-    if (db_use_picture_attr)
+    uint sup = kPictureAttributeSupported_None;
+    if (nvp && nvp->getVideoOutput())
+        sup = nvp->getVideoOutput()->GetSupportedPictureAttributes();
+    item = NULL;
+    for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
     {
-        item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
-        subitem = new OSDGenericTree(item, tr("Brightness"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                     .arg(kPictureAttribute_Brightness));
-        subitem = new OSDGenericTree(item, tr("Contrast"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                     .arg(kPictureAttribute_Contrast));
-        subitem = new OSDGenericTree(item, tr("Colour"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                     .arg(kPictureAttribute_Colour));
-        subitem = new OSDGenericTree(item, tr("Hue"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                     .arg(kPictureAttribute_Hue));
+        if (toMask((PictureAttribute)i) & sup)
+        {
+            if (!item)
+                item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
+            subitem = new OSDGenericTree(
+                item, toString((PictureAttribute) i),
+                QString("TOGGLEPICCONTROLS%1").arg(i));
+        }
     }
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 

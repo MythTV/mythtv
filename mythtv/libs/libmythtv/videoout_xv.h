@@ -87,6 +87,7 @@ class VideoOutputXv : public VideoOutput
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
+    void InitPictureAttributes(void);
 
     int  GetRefreshRate(void);
 
@@ -201,7 +202,6 @@ class VideoOutputXv : public VideoOutput
     VOSType              video_output_subtype;
     DisplayRes          *display_res;
     QMutex               global_lock;
-    bool                 use_picture_controls;
     bool		 use_i420_hack_for_broken_driver;
 
     // Basic X11 info
@@ -256,6 +256,8 @@ class VideoOutputXv : public VideoOutput
     int                  xv_chroma;
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
+    QMap<PictureAttribute,int> xv_attribute_min;
+    QMap<PictureAttribute,int> xv_attribute_max;
 
     // OpenGL drawing info
     QMutex               gl_context_lock;

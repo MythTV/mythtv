@@ -24,6 +24,11 @@ extern void del_open_xv_port(int port);
 extern bool has_open_xv_port(int port);
 extern uint cnt_open_xv_port(void);
 extern QString xvflags2str(int flags);
-extern int colorkey_supported(Display *disp, int port);
+extern bool xv_is_attrib_supported(
+    Display *disp, int port, const char *name,
+    int *current_value = NULL, int *min_val = NULL, int *max_val = NULL);
+extern bool xv_set_attrib(Display *disp, int port, const char *name, int val);
+extern bool xv_get_attrib(Display *disp, int port, const char *name, int &val);
+
 
 #endif // _UTIL_XV_H_

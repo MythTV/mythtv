@@ -81,17 +81,74 @@ QString xvflags2str(int flags)
     return str;
 }
 
-int colorkey_supported(Display *disp, int port)
+bool xv_is_attrib_supported(
+    Display *disp, int port, const char *name,
+    int *current_value, int *min_value, int *max_value)
 {
     Atom xv_atom;
-    int colorkey = 0;
+    XvAttribute *attributes;
+    int attrib_count;
     int ret;
-    xv_atom = XInternAtom(disp, "XV_COLORKEY", true);
-    if (xv_atom != None)
+
+    int dummy;
+    int *xv_val = (current_value) ? current_value : &dummy;
+
+    X11S(attributes = XvQueryPortAttributes(disp, port, &attrib_count));
+    for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
     {
-        ret = XvGetPortAttribute(disp, port, xv_atom, &colorkey);
-        if (ret != Success)
-            colorkey = 0;
+        if (strcmp(attributes[i].name, name))
+            continue;
+
+        if (min_value)
+            *min_value = attributes[i].min_value;
+
+        if (max_value)
+            *max_value = attributes[i].max_value;
+
+        X11S(xv_atom = XInternAtom(disp, name, False));
+        if (None == xv_atom)
+            continue;
+
+        X11S(ret = XvGetPortAttribute(disp, port, xv_atom, xv_val));
+        if (Success == ret)
+        {
+            X11S(XFree(attributes));
+            return true;
+        }
     }
-    return colorkey;
+
+    if (attributes)
+        X11S(XFree(attributes));
+
+    return false;
+}
+
+bool xv_set_attrib(Display *disp, int port, const char *name, int val)
+{
+    Atom xv_atom;
+    X11S(xv_atom = XInternAtom(disp, name, False));
+    if (xv_atom == None)
+        return false;
+
+    int ret;
+    X11S(ret = XvSetPortAttribute(disp, port, xv_atom, val));
+    if (Success != ret)
+        return false;
+
+    return true;
+}
+
+bool xv_get_attrib(Display *disp, int port, const char *name, int &val)
+{
+    Atom xv_atom;
+    X11S(xv_atom = XInternAtom(disp, name, False));
+    if (xv_atom == None)
+        return false;
+
+    int ret;
+    X11S(ret = XvGetPortAttribute(disp, port, xv_atom, &val));
+    if (Success != ret)
+        return false;
+
+    return true;
 }

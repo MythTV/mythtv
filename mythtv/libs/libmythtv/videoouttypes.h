@@ -68,6 +68,16 @@ typedef enum PictureAttribute
     kPictureAttribute_MAX
 } PictureAttribute;
 
+typedef enum PictureAttributeSupported
+{
+    kPictureAttributeSupported_None       = 0x00,
+    kPictureAttributeSupported_Brightness = 0x01,
+    kPictureAttributeSupported_Contrast   = 0x02,
+    kPictureAttributeSupported_Colour     = 0x04,
+    kPictureAttributeSupported_Hue        = 0x08,
+    kPictureAttributeSupported_Volume     = 0x10,
+} PictureAttributeSupported;
+
 inline bool is_interlaced(FrameScanType scan)
 {
     return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);
@@ -210,6 +220,82 @@ inline QString toDBString(PictureAttribute pictureattribute)
         return QString::null;
 
     return QDeepCopy<QString>(ret);
+}
+
+inline QString toXVString(PictureAttribute pictureattribute)
+{
+    QString ret = QString::null;
+    switch (pictureattribute)
+    {
+      case kPictureAttribute_None: break;
+      case kPictureAttribute_Brightness:
+          ret = "XV_BRIGHTNESS"; break;
+      case kPictureAttribute_Contrast:
+          ret = "XV_CONTRAST";   break;
+      case kPictureAttribute_Colour:
+          ret = "XV_SATURATION"; break;
+      case kPictureAttribute_Hue:
+          ret = "XV_HUE";        break;
+      case kPictureAttribute_Volume:
+      case kPictureAttribute_MAX: break;
+    }
+
+    if (ret.isEmpty())
+        return QString::null;
+
+    return QDeepCopy<QString>(ret);
+}
+
+inline QString toString(PictureAttributeSupported supported)
+{
+    QString ret = "";
+
+    if (kPictureAttributeSupported_Brightness & supported)
+        ret += "Brightness, ";
+    if (kPictureAttributeSupported_Contrast & supported)
+        ret += "Contrast, ";
+    if (kPictureAttributeSupported_Colour & supported)
+        ret += "Colour, ";
+    if (kPictureAttributeSupported_Hue & supported)
+        ret += "Hue, ";
+    if (kPictureAttributeSupported_Volume & supported)
+        ret += "Volume, ";
+
+    return (ret.isEmpty()) ? "" : ret.left(ret.length() - 2);
+}
+
+inline PictureAttributeSupported toMask(PictureAttribute pictureattribute)
+{
+    PictureAttributeSupported ret = kPictureAttributeSupported_None;
+    switch (pictureattribute)
+    {
+        case kPictureAttribute_None: break;
+        case kPictureAttribute_Brightness:
+            ret = kPictureAttributeSupported_Brightness; break;
+        case kPictureAttribute_Contrast:
+            ret = kPictureAttributeSupported_Contrast; break;
+        case kPictureAttribute_Colour:
+            ret = kPictureAttributeSupported_Colour; break;
+        case kPictureAttribute_Hue:
+            ret = kPictureAttributeSupported_Hue; break;
+        case kPictureAttribute_Volume:
+            ret = kPictureAttributeSupported_Volume; break;
+        case kPictureAttribute_MAX: break;
+    }
+    return ret;
+}
+
+inline PictureAttribute next(PictureAttributeSupported supported,
+                             PictureAttribute          attribute)
+{
+    int i = ((int) attribute + 1) % (int) kPictureAttribute_MAX;
+    for (int j = 0; j < kPictureAttribute_MAX;
+         (i = (i+1) % kPictureAttribute_MAX), j++)
+    {
+        if (toMask((PictureAttribute) i) & supported)
+            return (PictureAttribute) i;
+    }
+    return kPictureAttribute_None;
 }
 
 #endif // _VIDEOOUT_TYPES_H_

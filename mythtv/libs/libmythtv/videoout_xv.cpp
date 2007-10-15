@@ -101,7 +101,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
       display_res(NULL), global_lock(true),
-      use_picture_controls(false),
       use_i420_hack_for_broken_driver(false),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
@@ -548,6 +547,27 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
             .arg(display_aspect));
 }
 
+class XvAttributes
+{
+  public:
+    XvAttributes() :
+        description(QString::null), xv_flags(0), feature_flags(0) {}
+    XvAttributes(const QString &a, uint b, uint c) :
+        description(QDeepCopy<QString>(a)), xv_flags(b), feature_flags(c) {}
+
+  public:
+    QString description;
+    uint    xv_flags;
+    uint    feature_flags;
+
+    static const uint kFeatureNone      = 0x0000;
+    static const uint kFeatureXvMC      = 0x0001;
+    static const uint kFeatureVLD       = 0x0002;
+    static const uint kFeatureIDCT      = 0x0004;
+    static const uint kFeatureChromakey = 0x0008;
+    static const uint kFeaturePicCtrl   = 0x0010;
+};
+
 /**
  * Internal function used to grab a XVideo port with the desired properties.
  *
@@ -560,28 +580,97 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
                                       XvMCSurfaceInfo* xvmc_surf_info,
                                       QString *adaptor_name)
 {
-    uint neededFlags[] = { XvInputMask,
-                           XvInputMask,
-                           XvInputMask,
-                           XvInputMask | XvImageMask };
-    bool useXVMC[] = { true,  true,  true,  false };
-    bool useVLD[]  = { true,  false, false, false };
-    bool useIDCT[] = { false, true,  false, false };
-
     // avoid compiler warnings
-    (void)width; (void)height; (void)xvmc_chroma; (void)xvmc_surf_info;
-    (void)useVLD[0]; (void)useIDCT[0];
-
-    QString msg[] =
-    {
-        "XvMC surface found with VLD support on port %1",
-        "XvMC surface found with IDCT support on port %1",
-        "XvMC surface found with MC support on port %1",
-        "XVideo surface found on port %1"
-    };
+    (void)xvmc_chroma; (void)xvmc_surf_info;
 
     if (adaptor_name)
         *adaptor_name = QString::null;
+
+    // figure out what basic kind of surface we want..
+    int stream_type = 0;
+    bool need_mc   = false, need_idct = false;
+    bool need_vld  = false, need_xv   = false;
+    switch (mcodecid)
+    {
+        case kCodec_MPEG1_XVMC: stream_type = 1; need_mc   = true; break;
+        case kCodec_MPEG2_XVMC: stream_type = 2; need_mc   = true; break;
+        case kCodec_H263_XVMC:  stream_type = 3; need_mc   = true; break;
+        case kCodec_MPEG4_XVMC: stream_type = 4; need_mc   = true; break;
+
+        case kCodec_MPEG1_IDCT: stream_type = 1; need_idct = true; break;
+        case kCodec_MPEG2_IDCT: stream_type = 2; need_idct = true; break;
+        case kCodec_H263_IDCT:  stream_type = 3; need_idct = true; break;
+        case kCodec_MPEG4_IDCT: stream_type = 4; need_idct = true; break;
+
+        case kCodec_MPEG1_VLD:  stream_type = 1; need_vld  = true; break;
+        case kCodec_MPEG2_VLD:  stream_type = 2; need_vld  = true; break;
+        case kCodec_H263_VLD:   stream_type = 3; need_vld  = true; break;
+        case kCodec_MPEG4_VLD:  stream_type = 4; need_vld  = true; break;
+
+        default:
+            need_xv = true;
+            break;
+    }
+
+    // create list of requirements to check in order..
+    vector<XvAttributes> req;
+    if (need_vld)
+    {
+        req.push_back(XvAttributes(
+                          "XvMC surface found with VLD support on port %1",
+                          XvInputMask, XvAttributes::kFeatureXvMC |
+                          XvAttributes::kFeatureVLD));
+    }
+
+    if (need_idct)
+    {
+        req.push_back(XvAttributes(
+                          "XvMC surface found with IDCT support on port %1",
+                          XvInputMask, XvAttributes::kFeatureXvMC |
+                          XvAttributes::kFeatureIDCT));
+    }
+
+    if (need_mc)
+    {
+        req.push_back(XvAttributes(
+                          "XvMC surface found with MC support on port %1",
+                          XvInputMask, XvAttributes::kFeatureXvMC));
+    }
+ 
+    if (need_xv)
+    {
+        req.push_back(XvAttributes( 
+                          "XVideo surface found on port %1",
+                          XvInputMask | XvImageMask,
+                          XvAttributes::kFeatureNone));
+    }
+
+    // try to get an adapter with picture attributes
+    if (true)
+    {
+        uint end = req.size();
+        for (uint i = 0; i < end; i++)
+        {
+            req.push_back(req[i]);
+            req[i].feature_flags |=  XvAttributes::kFeaturePicCtrl;
+        }
+    }
+
+    // figure out if we want chromakeying..
+    VideoDisplayProfile vdp;
+    vdp.SetInput(QSize(width, height));
+    bool check_for_colorkey = (vdp.GetOSDRenderer() == "chromakey");
+
+    // if we want colorkey capability try to get an adapter with them
+    if (check_for_colorkey)
+    {
+        uint end = req.size();
+        for (uint i = 0; i < end; i++)
+        {
+            req.push_back(req[i]);
+            req[i].feature_flags |= XvAttributes::kFeatureChromakey;
+        }
+    }
 
     // get the list of Xv ports
     XvAdaptorInfo *ai = NULL;
@@ -596,41 +685,15 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         return -1;
     }
 
-    // find an Xv port
-    int port = -1, stream_type = 0;
-    uint begin = 0, end = 4;
-    switch (mcodecid)
-    {
-        case kCodec_MPEG1_XVMC: (stream_type = 1),(begin = 2),(end = 3); break;
-        case kCodec_MPEG2_XVMC: (stream_type = 2),(begin = 2),(end = 3); break;
-        case kCodec_H263_XVMC:  (stream_type = 3),(begin = 2),(end = 3); break;
-        case kCodec_MPEG4_XVMC: (stream_type = 4),(begin = 2),(end = 3); break;
-
-        case kCodec_MPEG1_IDCT: (stream_type = 1),(begin = 1),(end = 2); break;
-        case kCodec_MPEG2_IDCT: (stream_type = 2),(begin = 1),(end = 2); break;
-        case kCodec_H263_IDCT:  (stream_type = 3),(begin = 1),(end = 2); break;
-        case kCodec_MPEG4_IDCT: (stream_type = 4),(begin = 1),(end = 2); break;
-
-        case kCodec_MPEG1_VLD:  (stream_type = 1),(begin = 0),(end = 1); break;
-        case kCodec_MPEG2_VLD:  (stream_type = 2),(begin = 0),(end = 1); break;
-        case kCodec_H263_VLD:   (stream_type = 3),(begin = 0),(end = 1); break;
-        case kCodec_MPEG4_VLD:  (stream_type = 4),(begin = 0),(end = 1); break;
-
-        default:
-            begin = 3; end = 4;
-            break;
-    }
-
     QString lastAdaptorName = QString::null;
+    int port = -1;
 
-    VideoDisplayProfile vdp;
-    vdp.SetInput(QSize(width, height));
-    QString osdtype = vdp.GetOSDRenderer();
-    bool check_for_colorkey = (osdtype == "chromakey");
-    for (uint j = begin; j < end; ++j)
+    // find an Xv port
+    for (uint j = 0; j < req.size(); ++j)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2")
-                .arg(j).arg(xvflags2str(neededFlags[j])));
+        VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2 %3")
+                .arg(j).arg(xvflags2str(req[j].xv_flags))
+                .arg(req[j].feature_flags,0,16));
 
         for (int i = 0; i < (int)p_num_adaptors && (port == -1); ++i)
         {
@@ -639,40 +702,53 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
                     QString("Adaptor#%1: %2 has flag[s]: %3")
                     .arg(i).arg(lastAdaptorName).arg(xvflags2str(ai[i].type)));
 
-            if ((ai[i].type & neededFlags[j]) != neededFlags[j])
+            if ((ai[i].type & req[j].xv_flags) != req[j].xv_flags)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "Missing XVideo flags, rejecting.");
                 continue;
+            }
+            else
+                VERBOSE(VB_PLAYBACK, LOC + "Has XVideo flags...");
 
             const XvPortID firstPort = ai[i].base_id;
             const XvPortID lastPort = ai[i].base_id + ai[i].num_ports - 1;
             XvPortID p = 0;
 
-            if (check_for_colorkey)
+            if ((req[j].feature_flags & XvAttributes::kFeaturePicCtrl) &&
+                (!xv_is_attrib_supported(disp, firstPort, "XV_BRIGHTNESS")))
             {
-                int colorkey = 0;
-                X11S(colorkey = colorkey_supported(disp, firstPort));
-                if (!colorkey)
-                {
-                    if (i == ((int)p_num_adaptors - 1))
-                    {
-                        VERBOSE(VB_PLAYBACK, LOC +
-                            "Failed to find XV_COLORKEY support. "
-                                    "Disabling XV_COLORKEY check");
-                        check_for_colorkey = false;
-                        i = -1;
-                    }
-                    continue;
-                }
+                VERBOSE(VB_PLAYBACK, LOC +
+                        "Missing XV_BRIGHTNESS, rejecting.");
+                continue;
             }
+            else if (req[j].feature_flags & XvAttributes::kFeaturePicCtrl)
+                VERBOSE(VB_PLAYBACK, LOC + "Has XV_BRIGHTNESS...");
 
-            if (useXVMC[j])
+            if ((req[j].feature_flags & XvAttributes::kFeatureChromakey) &&
+                (!xv_is_attrib_supported(disp, firstPort, "XV_COLORKEY")))
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                        "Missing XV_COLORKEY, rejecting.");
+                continue;
+            }
+            else if (req[j].feature_flags & XvAttributes::kFeatureChromakey)
+                VERBOSE(VB_PLAYBACK, LOC + "Has XV_COLORKEY...");
+
+            VERBOSE(VB_PLAYBACK, LOC + "Here...");
+
+            if (req[j].feature_flags & XvAttributes::kFeatureXvMC)
             {
 #ifdef USING_XVMC
                 int surfNum;
-                XvMCSurfaceTypes::find(width, height, xvmc_chroma,
-                                       useVLD[j], useIDCT[j], stream_type,
-                                       0, 0,
-                                       disp, firstPort, lastPort,
-                                       p, surfNum);
+                XvMCSurfaceTypes::find(
+                    width, height, xvmc_chroma,
+                    req[j].feature_flags & XvAttributes::kFeatureVLD,
+                    req[j].feature_flags & XvAttributes::kFeatureIDCT,
+                    stream_type,
+                    0, 0,
+                    disp, firstPort, lastPort,
+                    p, surfNum);
+
                 if (surfNum<0)
                     continue;
 
@@ -718,7 +794,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         }
         if (port != -1)
         {
-            VERBOSE(VB_PLAYBACK, LOC + msg[j].arg(port));
+            VERBOSE(VB_PLAYBACK, LOC + req[j].description.arg(port));
             break;
         }
     }
@@ -866,7 +942,7 @@ bool VideoOutputXv::InitOpenGL(void)
         gl_context->Show();
         gl_context->MakeCurrent(true);
         gl_videochain = new OpenGLVideo();
-        ok = gl_videochain->Init(gl_context, use_picture_controls,
+        ok = gl_videochain->Init(gl_context, db_use_picture_controls,
                                  true, video_dim,
                                  display_visible_rect,
                                  display_video_rect, video_rect, true);
@@ -1455,10 +1531,6 @@ bool VideoOutputXv::InitSetupBuffers(void)
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 
-    // This needs to be here because OpenGL needs it in InitVideoBuffers()..
-    use_picture_controls =
-        gContext->GetNumSetting("UseOutputPictureControls", 0);
-
     // Create video buffers
     bool use_xv     = (renderer.left(2) == "xv");
     bool use_shm    = (renderer == "xshm");
@@ -1489,14 +1561,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
         XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
     }
 
-    // The OpenGL video output method always allows picture controls.
-    // The XVideo output methods sometimes allow the picture to
-    // be adjusted, if the chroma keying color can be discovered.
-    use_picture_controls &= 
-        (VideoOutputSubType() >= XVideo && xv_colorkey) ||
-        (VideoOutputSubType() == OpenGL);
-
-    if (use_picture_controls)
+    // Initialize the picture controls if we need to..
+    if (db_use_picture_controls)
         InitPictureAttributes();
 
     return true;
@@ -1563,48 +1629,66 @@ bool VideoOutputXv::Init(
  */
 void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
-    int ret = Success, xv_val=0;
+    static const char *attr_autopaint = "XV_AUTOPAINT_COLORKEY";
+    int xv_val=0;
+
+    // handle autopaint.. Normally we try to disable it so that bob-deint 
+    // doesn't actually bob up the top and bottom borders up and down...
     xv_draw_colorkey = true;
-    xv_colorkey = 0; // set to invalid value as a sentinel
-
-    Atom xv_atom;
-    XvAttribute *attributes;
-    int attrib_count;
-
-    X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &attrib_count));
-    for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
+    if (xv_is_attrib_supported(XJ_disp, xv_port, attr_autopaint, &xv_val))
     {
-        if (!strcmp(attributes[i].name, "XV_AUTOPAINT_COLORKEY"))
+        if (turnoffautopaint && xv_val)
         {
-            X11S(xv_atom = XInternAtom(XJ_disp, "XV_AUTOPAINT_COLORKEY", False));
-            if (xv_atom == None)
-                continue;
-
-            X11L;
-            if (turnoffautopaint)
-                ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom, 0);
-            else
-                ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom, 1);
-
-            ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, &xv_val);
-            // turn of colorkey drawing if autopaint is on
-            if (Success == ret && xv_val)
+            xv_set_attrib(XJ_disp, xv_port, attr_autopaint, 0);
+            if (!xv_get_attrib(XJ_disp, xv_port, attr_autopaint, xv_val) ||
+                xv_val)
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to disable autopaint");
                 xv_draw_colorkey = false;
-            X11U;
+            }
+        }
+        else if (!turnoffautopaint && !xv_val)
+        {
+            xv_set_attrib(XJ_disp, xv_port, attr_autopaint, 1);
+            if (!xv_get_attrib(XJ_disp, xv_port, attr_autopaint, xv_val) ||
+                !xv_val)
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to enable autopaint");
+            }
+        }
+        else if (!turnoffautopaint && xv_val)
+        {
+            xv_draw_colorkey = false;
         }
     }
-    if (attributes)
-        X11S(XFree(attributes));
 
-    if (!xv_draw_colorkey)
-        return;
-
-    QString msg = LOC + "Chromakeying not possible with this XVideo port.";
-    X11S(xv_colorkey = colorkey_supported(XJ_disp, xv_port));
-    if (!xv_colorkey)
+    // Check that we have a colorkey attribute and make sure it is not
+    // the same color as the MythTV letterboxing (currently Black).
+    // This avoids avoid bob-deint actually bobbing the borders of
+    // the video up and down..
+    int letterbox_color = 0;
+    static const char *attr_chroma = "XV_COLORKEY";
+    if (!xv_is_attrib_supported(XJ_disp, xv_port, attr_chroma, &xv_colorkey))
     {
-        VERBOSE(VB_PLAYBACK, msg);
-        return;
+        // set to MythTV letterbox color as a sentinel
+        xv_colorkey = letterbox_color;
+    }
+    else if (xv_colorkey == letterbox_color)
+    {
+        // if it is a valid attribute and set to the letterbox color, change it
+        xv_set_attrib(XJ_disp, xv_port, attr_chroma, 1);
+
+        if (xv_get_attrib(XJ_disp, xv_port, attr_chroma, xv_val) &&
+            xv_val != letterbox_color)
+        {
+            xv_colorkey = xv_val;
+        }
+    }
+
+    if (xv_colorkey == letterbox_color)
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                "Chromakeying not possible with this XVideo port.");
     }
 }
 
@@ -3020,7 +3104,7 @@ void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
         gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(gl_context, use_picture_controls,
+        bool success = gl_pipchain->Init(gl_context, db_use_picture_controls,
                      true, QSize(pipVideoWidth, pipVideoHeight),
                      position, position,
                      QRect(0, 0, pipVideoWidth, pipVideoHeight), false);
@@ -3040,7 +3124,7 @@ void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         VERBOSE(VB_PLAYBACK, LOC + "Re-initialise PiP.");
 
         bool success = gl_pipchain->ReInit(
-            gl_context, use_picture_controls,
+            gl_context, db_use_picture_controls,
             true, QSize(pipVideoWidth, pipVideoHeight),
             position, position,
             QRect(0, 0, pipVideoWidth, pipVideoHeight), false);
@@ -3693,7 +3777,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 int VideoOutputXv::SetPictureAttribute(
     PictureAttribute attribute, int newValue)
 {
-    if (!use_picture_controls)
+    if (!supported_attributes)
         return -1;
 
     if (VideoOutputSubType() == OpenGL)
@@ -3705,70 +3789,90 @@ int VideoOutputXv::SetPictureAttribute(
         return newValue;
     }
 
-    QString  attrName = QString::null;
-    int      valAdj   = 0;
-
-    if (kPictureAttribute_Brightness == attribute)
-        attrName = "XV_BRIGHTNESS";
-    else if (kPictureAttribute_Contrast == attribute)
-        attrName = "XV_CONTRAST";
-    else if (kPictureAttribute_Colour == attribute)
-        attrName = "XV_SATURATION";
-    else if (kPictureAttribute_Hue == attribute)
-    {
-        attrName = "XV_HUE";
-        valAdj   = xv_hue_base;
-    }
+    QString attrName = toXVString(attribute);
+    int valAdj = (kPictureAttribute_Hue == attribute) ? xv_hue_base : 0;
 
     if (attrName.isEmpty())
-        return -1;
-
-    newValue = min(max(newValue, 0), 100);
-
-    Atom attributeAtom = None;
-    X11S(attributeAtom = XInternAtom(XJ_disp, attrName.ascii(), False));
-    if (attributeAtom == None)
-        return -1;
-
-    XvAttribute *attributes = NULL;
-    int howmany;
-    X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &howmany));
-    if (!attributes)
-        return -1;
-
-    bool value_set = false;
-    for (int i = 0; i < howmany; i++)
     {
-        if (attrName != attributes[i].name)
-            continue;
-
-        int port_min = attributes[i].min_value;
-        int port_max = attributes[i].max_value;
-        int range    = port_max - port_min;
-
-        int tmpval2 = (newValue + valAdj) % 100;
-        int tmpval3 = (int) roundf(range * 0.01f * tmpval2);
-        int value   = min(tmpval3 + port_min, port_max);
-        value_set = true;
-
-        X11L;
-        XvSetPortAttribute(XJ_disp, xv_port, attributeAtom, value);
-#ifdef USING_XVMC
-        // Needed for VIA XvMC to commit change immediately.
-        if (video_output_subtype > XVideo)
-            XvMCSetAttribute(XJ_disp, xvmc_ctx, attributeAtom, value);
-#endif
-        X11U;
-        break;
+        VERBOSE(VB_IMPORTANT, "\n\n\n attrName.isEmpty() \n\n\n");
+        return -1;
     }
 
-    X11S(XFree(attributes));
-
-    if (!value_set)
+    if (0 == (toMask(attribute) & supported_attributes))
+    {
+        VERBOSE(VB_IMPORTANT, "\n\n\n unsupported attribute \n\n\n");
         return -1;
+    }
+
+    newValue = min(max(newValue, 0), 100);
+    if (kPictureAttribute_Hue == attribute)
+    {
+        int oldValue = GetPictureAttribute(attribute);
+        newValue = (0 == newValue && oldValue > 0 && oldValue < 5) ?
+            100 : ((100 == newValue && oldValue > 95 && oldValue < 100) ?
+                   0 : newValue);
+    }
+
+    int port_min = xv_attribute_min[attribute];
+    int port_max = xv_attribute_max[attribute];
+    int range    = port_max - port_min;
+    
+    int tmpval = (int) roundf(range * 0.01f * newValue);
+    int value   = min(tmpval + port_min, port_max);
+
+    xv_set_attrib(XJ_disp, xv_port, attrName.ascii(), value);
+
+#ifdef USING_XVMC
+    // Needed for VIA XvMC to commit change immediately.
+    if (video_output_subtype > XVideo)
+    {
+        Atom xv_atom;
+        X11S(xv_atom = XInternAtom(XJ_disp, attrName.ascii(), False));
+        if (xv_atom != None)
+            X11S(XvMCSetAttribute(XJ_disp, xvmc_ctx, xv_atom, value));
+    }
+#endif
 
     SetPictureAttributeDBValue(attribute, newValue);
     return newValue;
+}
+
+void VideoOutputXv::InitPictureAttributes(void)
+{
+    supported_attributes = kPictureAttributeSupported_None;
+
+    if (VideoOutputSubType() == OpenGL)
+    {
+        supported_attributes = gl_videochain->GetSupportedPictureAttributes();
+    }
+    else if (VideoOutputSubType() >= XVideo)
+    {
+        int val, min_val, max_val;
+        for (uint i = 0; i < kPictureAttribute_MAX; i++)
+        {
+            QString attrName = toXVString((PictureAttribute)i);
+            if (attrName.isEmpty())
+                continue;
+
+            if (xv_is_attrib_supported(XJ_disp, xv_port, attrName.ascii(),
+                                       &val, &min_val, &max_val))
+            {
+                supported_attributes = (PictureAttributeSupported)
+                    (supported_attributes | toMask((PictureAttribute)i));
+                xv_attribute_min[(PictureAttribute)i] = min_val;
+                xv_attribute_max[(PictureAttribute)i] = max_val;
+            }
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
+            .arg(toString(supported_attributes)));
+
+    VideoOutput::InitPictureAttributes();
 }
 
 void VideoOutputXv::CheckFrameStates(void)

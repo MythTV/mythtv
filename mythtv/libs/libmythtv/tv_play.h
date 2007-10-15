@@ -399,7 +399,6 @@ class MPUBLIC TV : public QObject
     int     fftime;
     int     rewtime;
     int     jumptime;
-    bool    db_use_picture_attr;
     bool    smartChannelChange;
     bool    MuteIndividualChannels;
     bool    arrowAccel;

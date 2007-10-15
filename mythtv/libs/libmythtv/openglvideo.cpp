@@ -1144,6 +1144,17 @@ int OpenGLVideo::SetPictureAttribute(
     return ret;
 }
 
+PictureAttributeSupported 
+OpenGLVideo::GetSupportedPictureAttributes(void) const
+{
+    return (!useColourControl) ?
+        kPictureAttributeSupported_None :
+        (PictureAttributeSupported) 
+        (kPictureAttributeSupported_Brightness |
+         kPictureAttributeSupported_Contrast |
+         kPictureAttributeSupported_Colour);
+}
+
 // locking ok
 void OpenGLVideo::SetTextureFilters(vector<GLuint> *textures, int filt)
 {

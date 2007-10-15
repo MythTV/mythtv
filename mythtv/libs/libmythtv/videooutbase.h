@@ -106,10 +106,12 @@ class VideoOutput
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void) { needrepaint = true; }
 
+    PictureAttributeSupported GetSupportedPictureAttributes(void) const
+        { return supported_attributes; }
     int         ChangePictureAttribute(PictureAttribute, bool direction);
     virtual int SetPictureAttribute(PictureAttribute, int newValue);
     int         GetPictureAttribute(PictureAttribute) const;
-    void        InitPictureAttributes(void);
+    virtual void InitPictureAttributes(void);
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
@@ -243,12 +245,12 @@ class VideoOutput
     float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
     PIPLocation db_pip_location;
     int     db_pip_size;      ///< percentage of full window to use for PiP
-
     typedef QMap<PictureAttribute,int> PictureSettingMap;
     PictureSettingMap  db_pict_attr; ///< Picture settings
     AspectOverrideMode db_aspectoverride;
     AdjustFillMode     db_adjustfill;
     QString db_deint_filtername;
+    bool    db_use_picture_controls;
 
     VideoDisplayProfile *db_vdisp_profile;
 
@@ -315,6 +317,7 @@ class VideoOutput
     bool    errored;
     long long framesPlayed;
     bool    db_scaling_allowed; ///< disable this to prevent overscan/underscan
+    PictureAttributeSupported supported_attributes;
 };
 
 #endif
