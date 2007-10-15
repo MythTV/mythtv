@@ -1744,10 +1744,18 @@ fontProp* MythThemedDialog::getFont(const QString &name)
     return font;
 }
 
-/*
----------------------------------------------------------------------
-*/
+/**
+ * \class MythPasswordDialog
+ * \brief Display a window which accepts a password and verifies it.
+ *
+ * Needs the password to be passed in as an argument, because it does the
+ * checking locally, and sets a bool if the entered password matches it.
+ */
 
+/**
+ * \param success Pointer to storage for the result
+ * \param target  The password we are trying to match
+ */
 MythPasswordDialog::MythPasswordDialog(QString message,
                                        bool *success,
                                        QString target,
