@@ -229,8 +229,6 @@ class MPUBLIC TV : public QObject
     void StartOSD(void);
     void StopStuff(bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
     
-    QString GetFiltersForChannel(void);
-
     void ToggleChannelFavorite(void);
     void ChangeChannel(int direction);
     void ChangeChannel(uint chanid, const QString &channum);

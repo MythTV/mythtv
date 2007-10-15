@@ -215,7 +215,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       yuv_scaler(NULL),             yuv_frame_scaled(NULL),
       yuv_scaler_in_size(0,0),      yuv_scaler_out_size(0,0),
       // Filters
-      videoFilterList(""),
+      videoFiltersForProgram(""),   videoFiltersOverride(""),
       postfilt_width(0),            postfilt_height(0),
       videoFilters(NULL),           FiltMan(new FilterManager()),
       // Commercial filtering
@@ -264,10 +264,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
 
     if (info)
-    {
-        m_playbackinfo = new ProgramInfo(*info);
-        m_playbackinfo->MarkAsInUse(true, m_recusage);
-    }
+        SetPlaybackInfo(new ProgramInfo(*info));
 
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
@@ -296,11 +293,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     if (audioOutput)
         delete audioOutput;
 
-    if (m_playbackinfo)
-    {
-        m_playbackinfo->MarkAsInUse(false);
-        delete m_playbackinfo;
-    }
+    SetPlaybackInfo(NULL);
 
     if (weMadeBuffer)
         delete ringBuffer;
@@ -506,6 +499,25 @@ bool NuppelVideoPlayer::IsVideoActuallyPaused(void) const
     return video_actually_paused;
 }
 
+void NuppelVideoPlayer::SetPlaybackInfo(ProgramInfo *pginfo)
+{
+    if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(false);
+        delete m_playbackinfo;
+        videoFiltersForProgram = QString::null;
+    }
+
+    m_playbackinfo = pginfo;
+
+    if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(true, m_recusage);
+        videoFiltersForProgram =
+            QDeepCopy<QString>(m_playbackinfo->chanOutputFilters);
+    }
+}
+
 void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
 {
     prebuffering_lock.lock();
@@ -529,7 +541,6 @@ void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
 
 bool NuppelVideoPlayer::InitVideo(void)
 {
-    InitFilters();
     if (using_null_videoout)
     {
         videoOutput = new VideoOutputNull();
@@ -610,6 +621,8 @@ bool NuppelVideoPlayer::InitVideo(void)
 
     SetCaptionsEnabled(gContext->GetNumSetting("DefaultCCMode"), false);
 
+    InitFilters();
+
     return true;
 }
 
@@ -633,8 +646,6 @@ void NuppelVideoPlayer::ReinitOSD(void)
 
 void NuppelVideoPlayer::ReinitVideo(void)
 {
-    InitFilters();
-
     vidExitLock.lock();
     videofiltersLock.lock();
 
@@ -676,6 +687,8 @@ void NuppelVideoPlayer::ReinitVideo(void)
         DisableCaptions(textDisplayMode, false);
         SetCaptionsEnabled(true, false);
     }
+
+    InitFilters();
 }
 
 QString NuppelVideoPlayer::ReinitAudio(void)
@@ -1114,21 +1127,58 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
 
 void NuppelVideoPlayer::InitFilters(void)
 {
-    VideoFrameType itmp = FMT_YV12;
-    VideoFrameType otmp = FMT_YV12;
-    int btmp;
+    QString filters = "";
+    if (videoOutput)
+        filters = videoOutput->GetFilters();
+
+#if 0
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("InitFilters() vo '%1' prog '%2' over '%3'")
+            .arg(filters).arg(videoFiltersForProgram)
+            .arg(videoFiltersOverride));
+#endif
+
+    if (!videoFiltersForProgram.isEmpty())
+    {
+        if (videoFiltersForProgram[0] != '+')
+        {
+            filters = QDeepCopy<QString>(videoFiltersForProgram);
+        }
+        else
+        {
+            if ((filters.length() > 1) && (filters.right(1) != ","))
+                filters += ",";
+            filters += QDeepCopy<QString>(videoFiltersForProgram.mid(1));
+        }
+    }
+
+    if (!videoFiltersOverride.isEmpty())
+        filters = QDeepCopy<QString>(videoFiltersOverride);
 
     videofiltersLock.lock();
 
     if (videoFilters)
+    {
         delete videoFilters;
+        videoFilters = NULL;
+    }
 
-    postfilt_width = video_width;
-    postfilt_height = video_height;
-    videoFilters = FiltMan->LoadFilters(videoFilterList, itmp, otmp,
-                                        postfilt_width, postfilt_height, btmp);
+    if (!filters.isEmpty())
+    {
+        VideoFrameType itmp = FMT_YV12;
+        VideoFrameType otmp = FMT_YV12;
+        int btmp;
+        postfilt_width = video_width;
+        postfilt_height = video_height;
+
+        videoFilters = FiltMan->LoadFilters(
+            filters, itmp, otmp, postfilt_width, postfilt_height, btmp);
+    }
 
     videofiltersLock.unlock();
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("LoadFilters('%1'..) -> ")
+            .arg(filters)<<videoFilters);
 }
 
 int NuppelVideoPlayer::tbuffer_numvalid(void)
@@ -2877,14 +2927,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     bool newIsDummy = livetvchain->GetCardType(newid) == "DUMMY";
 
-    if (m_playbackinfo)
-    {
-        m_playbackinfo->MarkAsInUse(false);
-        delete m_playbackinfo;
-    }
-
-    m_playbackinfo = pginfo;
-    m_playbackinfo->MarkAsInUse(true, m_recusage);
+    SetPlaybackInfo(pginfo);
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
@@ -2996,14 +3039,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     long long nextpos = livetvchain->GetJumpPos();
     bool newIsDummy = livetvchain->GetCardType(newid) == "DUMMY";
     
-    if (m_playbackinfo)
-    {
-        m_playbackinfo->MarkAsInUse(false);
-        delete m_playbackinfo;
-    }
-
-    m_playbackinfo = pginfo;
-    m_playbackinfo->MarkAsInUse(true, m_recusage);
+    SetPlaybackInfo(pginfo);
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();

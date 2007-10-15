@@ -209,6 +209,9 @@ class VideoOutput
 
     /// \brief returns QRect of PIP based on PIPLocation
     virtual QRect GetPIPRect(int location, NuppelVideoPlayer *pipplayer = NULL);
+
+    QString GetFilters(void) const;
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,

@@ -1512,9 +1512,6 @@ void TV::SetupPlayer(bool isWatchingRecording)
         return;
     }
 
-    QString filters = "";
-    
-    
     nvp = new NuppelVideoPlayer("player", playbackinfo);
     nvp->SetParentWidget(myWindow);
     nvp->SetParentPlayer(this);
@@ -1531,9 +1528,6 @@ void TV::SetupPlayer(bool isWatchingRecording)
 
     nvp->SetAudioStretchFactor(normal_speed);
 
-    filters = GetFiltersForChannel();
-    nvp->SetVideoFilters(filters);
-
     if (embedWinID > 0)
         nvp->EmbedInWidget(embedWinID, embedBounds.x(), embedBounds.y(),
                            embedBounds.width(), embedBounds.height());
@@ -1546,38 +1540,6 @@ void TV::SetupPlayer(bool isWatchingRecording)
         udpnotify = new UDPNotify(this, udp_port);
     else
         udpnotify = NULL;
-}
-
-
-QString TV::GetFiltersForChannel()
-{
-    QString filters;
-    QString chanFilters;
-    
-    QString chan_name;
-
-    pbinfoLock.lock();    
-    if (playbackinfo) // Recordings have this info already.
-        chanFilters = playbackinfo->chanOutputFilters;
-    pbinfoLock.unlock();    
-
-    if ((chanFilters.length() > 1) && (chanFilters[0] != '+'))
-    {
-        filters = chanFilters;
-    }
-    else
-    {
-        filters = baseFilters;
-
-        if ((filters.length() > 1) && (filters.right(1) != ","))
-            filters += ",";
-
-        filters += chanFilters.mid(1);
-    }
-    
-    VERBOSE(VB_CHANNEL, LOC +
-            QString("Output filters for this channel are: '%1'").arg(filters));
-    return filters;
 }
 
 void TV::SetupPipPlayer(void)
@@ -7388,8 +7350,6 @@ void TV::UnpauseLiveTV(void)
 
         chain->JumpTo(-1, 1);
 
-        QString filters = GetFiltersForChannel();
-        activenvp->SetVideoFilters(filters);
         activenvp->Play(normal_speed, true, false);
         activerbuffer->IgnoreLiveEOF(false);
     }

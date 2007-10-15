@@ -372,6 +372,11 @@ void VideoOutput::InitOSD(OSD *osd)
         osd->DisableFade();
 }
 
+QString VideoOutput::GetFilters(void) const
+{
+    return db_vdisp_profile->GetFilters();
+}
+
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
     db_vdisp_profile->SetOutput(playback_fps);

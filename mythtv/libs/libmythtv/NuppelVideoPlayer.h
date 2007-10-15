@@ -139,7 +139,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
     void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
     void SetLength(int len)                   { totalLength = len; }
-    void SetVideoFilters(QString &filters)    { videoFilterList = filters; }
+    void SetVideoFilters(const QString &override)
+        { videoFiltersOverride = QDeepCopy<QString>(override); }
     void SetFramesPlayed(long long played)    { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
     void SetPipPlayer(NuppelVideoPlayer *pip)
@@ -414,6 +415,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void AutoDeint(VideoFrame*);
 
     // Private Sets
+    void SetPlaybackInfo(ProgramInfo *pginfo);
     void SetPrebuffering(bool prebuffer);
 
     // Private Gets
@@ -702,7 +704,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Filters
     QMutex   videofiltersLock;
-    QString  videoFilterList;
+    QString  videoFiltersForProgram;
+    QString  videoFiltersOverride;
     int      postfilt_width;  ///< Post-Filter (output) width
     int      postfilt_height; ///< Post-Filter (output) height
     FilterChain   *videoFilters;
