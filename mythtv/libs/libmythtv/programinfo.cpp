@@ -21,6 +21,7 @@
 #include "jobqueue.h"
 #include "mythdbcon.h"
 #include "storagegroup.h"
+#include "previewgenerator.h"
 
 #define LOC QString("ProgramInfo: ")
 #define LOC_ERR QString("ProgramInfo, Error: ")
@@ -4085,7 +4086,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             }
         }
     }
-    else if (inUseForWhat == "preview_generator")
+    else if (inUseForWhat == PreviewGenerator::kInUseID)
     {
         recDir = "";
     }

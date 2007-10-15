@@ -39,6 +39,7 @@ class MPUBLIC PreviewGenerator : public QObject
     void AttachSignals(QObject*);
     void disconnectSafe(void);
 
+    static const char *kInUseID;
   signals:
     void previewThreadDone(const QString&, bool&);
     void previewReady(const ProgramInfo*);

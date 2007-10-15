@@ -27,6 +27,8 @@
 #define LOC_ERR QString("Preview Error: ")
 #define LOC_WARN QString("Preview Warning: ")
 
+const char *PreviewGenerator::kInUseID = "preview_generator";
+
 /** \class PreviewGenerator
  *  \brief This class creates a preview image of a recording.
  *
@@ -277,7 +279,7 @@ bool PreviewGenerator::SavePreview(QString filename,
 
 void PreviewGenerator::LocalPreviewRun(void)
 {
-    programInfo.MarkAsInUse(true, "preview_generator");
+    programInfo.MarkAsInUse(true, kInUseID);
 
     float aspect = 0;
     int   secsin = (gContext->GetNumSetting("PreviewPixmapOffset", 64) +
@@ -356,7 +358,7 @@ bool PreviewGenerator::SaveScreenshot(ProgramInfo *pginfo, QString &outFile,
         return false;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("Preview", pginfo);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(kInUseID, pginfo);
     nvp->SetRingBuffer(rbuf);
 
     retbuf = nvp->GetScreenGrabAtFrame(frameNumber, true, bufferLen,
@@ -478,7 +480,7 @@ char *PreviewGenerator::GetScreenGrab(
         return NULL;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("Preview", pginfo);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(kInUseID, pginfo);
     nvp->SetRingBuffer(rbuf);
 
     retbuf = nvp->GetScreenGrab(secondsin, bufferlen,
