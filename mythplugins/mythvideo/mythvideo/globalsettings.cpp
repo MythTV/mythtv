@@ -301,7 +301,11 @@ HostLineEdit *SetDVDDevice()
 {
     HostLineEdit *gc = new HostLineEdit("DVDDeviceLocation");
     gc->setLabel(QObject::tr("Location of DVD device"));
+#ifdef Q_WS_MACX
+    gc->setValue("default");
+#else
     gc->setValue("/dev/dvd");
+#endif
     gc->setHelpText(QObject::tr("This device must exist, and the user "
                     "running MythDVD needs to have read permission "
                     "on the device."));
