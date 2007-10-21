@@ -472,7 +472,10 @@ sub getMovieList {
       my $type = "";
       my $movienum = "";
 
-      if ($entry =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a> \((\d+)\)(?: \((.+)\))?/i) {
+      # Some titles are identical, IMDB indicates this by appending /I /II to
+      # the release year.
+      #   e.g. "Mon meilleur ami" 2006/I vs "Mon meilleur ami" 2006/II
+      if ($entry =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a> \((\d+)\/?[a-z]*\)(?: \((.+)\))?/i) {
           $movienum = $1;
           $title = $2;
           $year = $3;
