@@ -51,30 +51,18 @@ our %patches = (
 ===================================================================
 --- libs/libmythui/mythmainwindow.cpp  (revision 12154)
 +++ libs/libmythui/mythmainwindow.cpp  (working copy)
-@@ -1089,9 +1089,13 @@
-     {
-         case QEvent::KeyPress:
+@@ -1094,6 +1094,10 @@
          {
-+            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
-+
+             QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+ 
++            // Work around weird GCC run-time bug. Only manifest on Mac OS X
 +            if (!ke)
-+                {puts("No RTTI?");ke = (QKeyEvent *)e;}
++                ke = (QKeyEvent *)e;
 +
              if (currentWidget())
              {
--                QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
                  ke->accept();
-                 QWidget *current = currentWidget();
-                 if (current && current->isEnabled())
-@@ -1108,7 +1112,7 @@
-                 MythScreenType *top = (*it)->GetTopScreen();
-                 if (top)
-                 {
--                    if (top->keyPressEvent(dynamic_cast<QKeyEvent*>(e)))
-+                    if (top->keyPressEvent(ke))
-                         return true;
-                 }
-             }'
+'
 );
 
 our %depend_order = (
@@ -1022,7 +1010,7 @@ foreach my $target ( @targets )
   }
 }
 
-if ( $backend )
+if ( $backend && grep(m/MythBackend/, @targets) )
 {
   my $BE = "$SCRIPTDIR/MythBackend.app";
 
