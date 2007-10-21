@@ -1092,9 +1092,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
     {
         case QEvent::KeyPress:
         {
+            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+
             if (currentWidget())
             {
-                QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
                 ke->accept();
                 QWidget *current = currentWidget();
                 if (current && current->isEnabled())
@@ -1111,7 +1112,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top)
                 {
-                    if (top->keyPressEvent(dynamic_cast<QKeyEvent*>(e)))
+                    if (top->keyPressEvent(ke))
                         return true;
                 }
             }
