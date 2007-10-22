@@ -32,8 +32,14 @@ MSqlDatabase::~MSqlDatabase()
 
 bool MSqlDatabase::isOpen()
 {
-    if (m_db && m_db->isOpen())
-        return true;
+    if (m_db)
+    {
+        if (!m_db->hostName().length())  // Bootstrapping without a database?
+            return true;                 // Pretend its open to reduce errors
+
+        if (m_db->isOpen())
+            return true;
+    }
     return false;
 }
 
@@ -55,6 +61,12 @@ bool MSqlDatabase::OpenDatabase()
         m_db->setUserName(dbparms.dbUserName);
         m_db->setPassword(dbparms.dbPassword);
         m_db->setHostName(dbparms.dbHostName);
+
+        if (!dbparms.dbHostName.length())  // Bootstrapping without a database?
+        {
+            connected = true;              // Pretend to be connected
+            return true;                   // to reduce errors
+        }
 
         if (dbparms.dbPort)
             m_db->setPort(dbparms.dbPort);
@@ -113,6 +125,13 @@ bool MSqlDatabase::KickDatabase()
     // THEN reestablishes the connection (so the second query succeeds
     // with no intervention).
     // mdz, 2003/08/11
+
+
+    if (!m_db->hostName().length())  // Bootstrapping without a database?
+    {                                // Pretend we kicked, to reduce errors
+        m_lastDBKick = QDateTime::currentDateTime();
+        return true;
+    }
 
     if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 && 
         m_db->isOpen())
@@ -342,6 +361,9 @@ MSqlQueryInfo MSqlQuery::DDCon()
 // by this one method.
 bool MSqlQuery::exec(const QString &query)
 {
+    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
+        return true;                       // Pretend success, to reduce errors
+
     bool result = QSqlQuery::exec(query);
 
     if (print_verbose_messages & VB_DATABASE)
@@ -365,6 +387,9 @@ bool MSqlQuery::exec(const QString &query)
 
 bool MSqlQuery::prepare(const QString& query)
 {
+    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
+        return true;                       // Pretend success, to reduce errors
+
     static QMutex prepareLock;
     QMutexLocker lock(&prepareLock);
     return QSqlQuery::prepare(query); 
@@ -387,6 +412,9 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
 
 QVariant MSqlQuery::lastInsertId()
 {
+    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
+        return value(0);                   // Pretend success, to reduce errors
+
     exec("SELECT LAST_INSERT_ID();");
     if (!isActive() || size() < 1) 
     {

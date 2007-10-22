@@ -159,6 +159,8 @@ class MythMainWindowPrivate
     bool exitingtomain;
     bool popwindows;
 
+    bool m_useDB;              ///< To allow or prevent database access
+
     QDict<KeyContext> keyContexts;
     QMap<int, JumpData*> jumpMap;
     QMap<QString, JumpData> destinationMap;
@@ -217,7 +219,15 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
 static MythMainWindow *mainWin = NULL;
 static QMutex mainLock;
 
-MythMainWindow *MythMainWindow::getMainWindow(void)
+/**
+ * \brief Return the existing main window, or create one
+ * \param useDB
+ *        If this is a temporary window, which is used to bootstrap
+ *        the database, passing false prevents any database access.
+ *
+ * \sa    MythContextPrivate::TempMainWindow()
+ */
+MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
 {
     if (mainWin)
         return mainWin;
@@ -225,7 +235,7 @@ MythMainWindow *MythMainWindow::getMainWindow(void)
     QMutexLocker lock(&mainLock);
 
     if (!mainWin)
-        mainWin = new MythMainWindow();
+        mainWin = new MythMainWindow(useDB);
 
     return mainWin;
 }
@@ -256,7 +266,7 @@ MythPainter *GetMythPainter(void)
 #define QWidget QGLWidget
 #endif
 
-MythMainWindow::MythMainWindow()
+MythMainWindow::MythMainWindow(const bool useDB)
               : QWidget(NULL, "mainWindow")
 {
 
@@ -264,6 +274,9 @@ MythMainWindow::MythMainWindow()
     d = new MythMainWindowPrivate;
 
     d->AllowInput = false;
+
+    // This prevents database errors from RegisterKey() when there is no DB:
+    d->m_useDB = useDB;
 
 
     QString painter = gContext->GetSetting("ThemePainter", "qt");
@@ -814,7 +827,8 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     QString keybind = key;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (query.isConnected())
+
+    if (d->m_useDB && query.isConnected())
     {
         query.prepare("SELECT keylist FROM keybindings WHERE "
                       "context = :CONTEXT AND action = :ACTION AND "

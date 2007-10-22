@@ -342,8 +342,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
  *
  * Used for warnings before the database is opened, or bootstrapping pages.
  * After using the window, call EndTempWindow().
- *
- * \bug The console will spew out hundreds of database errors
  */
 void MythContextPrivate::TempMainWindow(bool languagePrompt)
 {
@@ -354,7 +352,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 #endif
     parent->LoadQtConfig();
 
-    MythMainWindow *mainWindow = GetMythMainWindow();
+    MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
     parent->SetMainWindow(mainWindow);
 

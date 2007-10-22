@@ -93,7 +93,7 @@ class MythMainWindow : public QWidget
 
     bool IsExitingToMain(void) const;
 
-    static MythMainWindow *getMainWindow();
+    static MythMainWindow *getMainWindow(const bool useDB = true);
     static void destroyMainWindow();
 
     MythPainter *GetCurrentPainter();
@@ -123,7 +123,7 @@ class MythMainWindow : public QWidget
     void mouseTimeout();
 
   protected:
-    MythMainWindow();
+    MythMainWindow(const bool useDB = true);
     virtual ~MythMainWindow();
 
     bool eventFilter(QObject *o, QEvent *e);
