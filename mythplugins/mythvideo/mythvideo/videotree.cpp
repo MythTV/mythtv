@@ -12,6 +12,7 @@
 #include "metadata.h"
 #include "videoutils.h"
 #include "imagecache.h"
+#include "parentalcontrols.h"
 
 class VideoTreeImp
 {
@@ -214,19 +215,29 @@ VideoTree::VideoTree(MythMainWindow *lparent, const QString &window_name,
                      const QString &theme_filename, const QString &lname,
                      VideoList *video_list) :
     MythThemedDialog(lparent, window_name, theme_filename, lname),
-    popup(NULL), expectingPopup(false), curitem(NULL), m_video_list(video_list),
-    video_tree_root(NULL), m_exit_type(0)
+    popup(NULL), expectingPopup(false), curitem(NULL),
+    m_video_list(video_list), video_tree_root(NULL), m_exit_type(0)
 {
     m_imp.reset(new VideoTreeImp);
 
-    current_parental_level =
-            gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
+    current_parental_level.reset(new ParentalLevel(
+            gContext->GetNumSetting("VideoDefaultParentalLevel", 1)));
+
+    // Do no allow a default parental level to bypass the password
+    // check.
+    if (!checkParentPassword(current_parental_level->GetLevel()))
+    {
+        *current_parental_level = ParentalLevel::plLowest;
+    }
 
     file_browser = gContext->GetNumSetting("VideoTreeNoDB", 0);
     m_db_folders = gContext->GetNumSetting("mythvideo.db_folder_view", 1);
 
     // Theme and tree stuff
     m_imp->wireUpTheme(this);
+
+    checkedSetText(m_imp->pl_value,
+                   QString::number(current_parental_level->GetLevel()));
 
     connect(m_imp->video_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this,
                 SLOT(handleTreeListSelection(int)));
@@ -302,13 +313,13 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         else if (action == "MENU")
             doMenu(false);
         else if (action == "INCPARENT")
-            setParentalLevel(current_parental_level + 1);
+            setParentalLevel(++ParentalLevel(*current_parental_level));
         else if (action == "DECPARENT")
-            setParentalLevel(current_parental_level - 1);
+            setParentalLevel(--ParentalLevel(*current_parental_level));
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
         {
-            setParentalLevel(action.toInt());
+            setParentalLevel(ParentalLevel(action.toInt()));
         }
         else if (action == "FILTER")
             slotDoFilter();
@@ -335,36 +346,26 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void VideoTree::setParentalLevel(int which_level)
+void VideoTree::setParentalLevel(const ParentalLevel &which_level)
 {
-    if (which_level < 1)
-    {
-        which_level = 1;
-    }
+    ParentalLevel::Level new_level = which_level.GetLevel();
+    if (new_level == ParentalLevel::plNone)
+        new_level = ParentalLevel::plLowest;
 
-    if (which_level > 4)
+    if (checkParentPassword(new_level, current_parental_level->GetLevel()))
     {
-        which_level = 4;
-    }
-
-    if (checkParentPassword())
-    {
-        current_parental_level = which_level;
-        checkedSetText(m_imp->pl_value,
-                       QString::number(current_parental_level));
+        *current_parental_level = new_level;
         buildVideoList();
     }
-    else
-    {
-        checkedSetText(m_imp->pl_value,
-                       QString::number(current_parental_level));
-    }
+
+    checkedSetText(m_imp->pl_value,
+                   QString::number(current_parental_level->GetLevel()));
 }
 
 void VideoTree::buildVideoList()
 {
     video_tree_root = m_video_list->buildVideoList(file_browser, !m_db_folders,
-                                                   current_parental_level,
+                                                   *current_parental_level,
                                                    false);
     GenericTree *video_tree_data = 0;
 

@@ -70,7 +70,7 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     runtime(kRuntimeFilterAll), userrating(kUserRatingFilterAll),
     browse(kBrowseFilterAll), m_inetref(kInetRefFilterAll),
     m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle),
-    m_parental_level(0), m_changed_state(0)
+    m_parental_level(ParentalLevel::plNone), m_changed_state(0)
 {
     if (!_prefix)
         prefix = "VideoDefault";
@@ -285,7 +285,7 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (matches && m_parental_level)
     {
-        matches = (mdata.ShowLevel() != 0) &&
+        matches = (mdata.ShowLevel() != ParentalLevel::plNone) &&
                 (mdata.ShowLevel() <= m_parental_level);
     }
 

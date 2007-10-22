@@ -9,6 +9,7 @@
 
 class Metadata;
 class VideoList;
+class ParentalLevel;
 
 class VideoDialog : public MythDialog
 {
@@ -51,7 +52,7 @@ class VideoDialog : public MythDialog
     virtual void parseContainer(QDomElement&) = 0;
     virtual void loadWindow(QDomElement &element);
     virtual void fetchVideos();
-    virtual void setParentalLevel(int which_level);
+    virtual void setParentalLevel(const ParentalLevel &which_level);
     void shiftParental(int amount);
     bool createPopup();
     void cancelPopup(void);
@@ -59,7 +60,7 @@ class VideoDialog : public MythDialog
     QButton *AddPopupViews();
 
     QPixmap myBackground;
-    int currentParentalLevel;
+    std::auto_ptr<ParentalLevel> currentParentalLevel;
     bool isFileBrowser;
     bool isFlatList;
     Metadata* curitem;

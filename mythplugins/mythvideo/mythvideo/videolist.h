@@ -18,6 +18,7 @@ class GenericTree;
 class VideoFilterSettings;
 class Metadata;
 class MetadataListManager;
+class ParentalLevel;
 
 class VideoList
 {
@@ -26,9 +27,11 @@ class VideoList
     ~VideoList();
 
     GenericTree *buildVideoList(bool filebrowser, bool flatlist,
-                                int parental_level, bool include_updirs);
+                                const ParentalLevel &parental_level,
+                                bool include_updirs);
 
-    void refreshList(bool filebrowser, int parental_level, bool flatlist);
+    void refreshList(bool filebrowser, const ParentalLevel &parental_level,
+                     bool flatlist);
 
     // If the only change to the underlying metadata requires
     // another sort (for video manager currently).

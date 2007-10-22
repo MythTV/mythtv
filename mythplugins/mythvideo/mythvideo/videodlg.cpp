@@ -9,6 +9,7 @@
 #include "videofilter.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "parentalcontrols.h"
 
 bool VideoDialog::IsValidDialogType(int num)
 {
@@ -20,8 +21,8 @@ bool VideoDialog::IsValidDialogType(int num)
 VideoDialog::VideoDialog(DialogType ltype, MythMainWindow *lparent,
                          const QString &lwinName, const QString &lname,
                          VideoList *video_list) :
-    MythDialog(lparent, lname), curitem(NULL), popup(NULL), m_type(ltype),
-    m_video_list(video_list), m_exit_type(0)
+    MythDialog(lparent, lname), curitem(NULL),
+    popup(NULL), m_type(ltype), m_video_list(video_list), m_exit_type(0)
 {
     //
     //  Load the theme. Crap out if we can't find it.
@@ -41,8 +42,15 @@ VideoDialog::VideoDialog(DialogType ltype, MythMainWindow *lparent,
     expectingPopup = false;
     fullRect = QRect(0, 0, size().width(), size().height());
     allowPaint = true;
-    currentParentalLevel =
-            gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
+    currentParentalLevel.reset(new ParentalLevel(
+                gContext->GetNumSetting("VideoDefaultParentalLevel", 1)));
+
+    // Do no allow a default parental level to bypass the password
+    // check.
+    if (!checkParentPassword(currentParentalLevel->GetLevel()))
+    {
+        *currentParentalLevel = ParentalLevel::plLowest;
+    }
 
     VideoFilterSettings video_filter(true, lwinName);
     m_video_list->setCurrentVideoFilter(video_filter);
@@ -197,21 +205,16 @@ void VideoDialog::playVideo(Metadata *someItem)
     update(fullRect);
 }
 
-void VideoDialog::setParentalLevel(int which_level)
+void VideoDialog::setParentalLevel(const ParentalLevel &which_level)
 {
-    if (which_level < 1)
-        which_level = 1;
+    ParentalLevel::Level new_level = which_level.GetLevel();
+    if (new_level == ParentalLevel::plNone)
+        new_level = ParentalLevel::plLowest;
 
-    if (which_level > 4)
-        which_level = 4;
-
-    if ((which_level > currentParentalLevel) && !checkParentPassword())
-        which_level = currentParentalLevel;
-
-
-    if (currentParentalLevel != which_level)
+    if (checkParentPassword(new_level, currentParentalLevel->GetLevel()) &&
+                            *currentParentalLevel != new_level)
     {
-        currentParentalLevel = which_level;
+        *currentParentalLevel = new_level;
         fetchVideos();
         slotParentalLevelChanged();
     }
@@ -219,7 +222,7 @@ void VideoDialog::setParentalLevel(int which_level)
 
 void VideoDialog::shiftParental(int amount)
 {
-    setParentalLevel(currentParentalLevel + amount);
+    setParentalLevel(ParentalLevel(*currentParentalLevel) += amount);
 }
 
 GenericTree *VideoDialog::getVideoTreeRoot(void)
@@ -230,7 +233,7 @@ GenericTree *VideoDialog::getVideoTreeRoot(void)
 void VideoDialog::fetchVideos()
 {
     video_tree_root = m_video_list->buildVideoList(isFileBrowser, isFlatList,
-                                                   currentParentalLevel, true);
+                                                   *currentParentalLevel, true);
 }
 
 void VideoDialog::slotDoFilter()

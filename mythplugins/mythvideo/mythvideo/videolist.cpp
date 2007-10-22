@@ -13,6 +13,7 @@
 #include "quicksp.h"
 #include "dirscan.h"
 #include "videoutils.h"
+#include "parentalcontrols.h"
 
 #include <memory>
 #include <algorithm>
@@ -450,9 +451,11 @@ class VideoListImp
     void build_generic_tree(GenericTree *dst, meta_dir_node *src,
                             bool include_updirs);
     GenericTree *buildVideoList(bool filebrowser, bool flatlist,
-                                int parental_level, bool include_updirs);
+                                const ParentalLevel &parental_level,
+                                bool include_updirs);
 
-    void refreshList(bool filebrowser, int parental_level, bool flat_list);
+    void refreshList(bool filebrowser, const ParentalLevel &parental_level,
+                     bool flat_list);
     void resortList(bool flat_list);
 
     Metadata *getVideoListMetadata(int index);
@@ -566,14 +569,14 @@ VideoList::~VideoList()
 }
 
 GenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
-    int parental_level, bool include_updirs)
+    const ParentalLevel &parental_level, bool include_updirs)
 {
     return m_imp->buildVideoList(filebrowser, flatlist, parental_level,
                                  include_updirs);
 }
 
-void VideoList::refreshList(bool filebrowser, int parental_level,
-                            bool flat_list)
+void VideoList::refreshList(bool filebrowser,
+                            const ParentalLevel &parental_level, bool flat_list)
 {
     m_imp->refreshList(filebrowser, parental_level, flat_list);
 }
@@ -688,7 +691,7 @@ void VideoListImp::build_generic_tree(GenericTree *dst, meta_dir_node *src,
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
 GenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
-                                          int parental_level,
+                                          const ParentalLevel &parental_level,
                                           bool include_updirs)
 {
     refreshList(filebrowser, parental_level, flatlist);
@@ -713,10 +716,11 @@ GenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     return video_tree_root.get();
 }
 
-void VideoListImp::refreshList(bool filebrowser, int parental_level,
+void VideoListImp::refreshList(bool filebrowser,
+                               const ParentalLevel &parental_level,
                                bool flat_list)
 {
-    m_video_filter.setParentalLevel(parental_level);
+    m_video_filter.setParentalLevel(parental_level.GetLevel());
 
     fillMetadata(filebrowser ? ltFileSystem : ltDBMetadata);
 

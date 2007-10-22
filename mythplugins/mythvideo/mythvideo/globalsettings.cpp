@@ -3,6 +3,7 @@
 #include "globalsettings.h"
 #include "globals.h"
 #include "videodlg.h"
+#include "parentalcontrols.h"
 
 #include <qdir.h>
 
@@ -13,10 +14,12 @@ HostComboBox *VideoDefaultParentalLevel()
 {
     HostComboBox *gc = new HostComboBox("VideoDefaultParentalLevel");
     gc->setLabel(QObject::tr("Starting Parental Level"));
-    gc->addSelection(QObject::tr("4 - Highest"), "4");
-    gc->addSelection(QObject::tr("1 - Lowest"), "1");
-    gc->addSelection("2");
-    gc->addSelection("3");
+    gc->addSelection(QObject::tr("4 - Highest"),
+                     QString::number(ParentalLevel::plHigh));
+    gc->addSelection(QObject::tr("1 - Lowest"),
+                     QString::number(ParentalLevel::plLowest));
+    gc->addSelection(QString::number(ParentalLevel::plLow));
+    gc->addSelection(QString::number(ParentalLevel::plMedium));
     gc->setHelpText(QObject::tr("This is the 'level' that MythVideo starts at. "
                     "Any videos with a level at or below this will be shown in "
                     "the list or while browsing by default. The Parental PIN "
@@ -40,14 +43,38 @@ HostComboBox *VideoDefaultView()
     return gc;
 }
 
+const QString password_clue =
+    QObject::tr("Setting this value to all numbers will make your life "
+                "much easier.");
+
 HostLineEdit *VideoAdminPassword()
 {
     HostLineEdit *gc = new HostLineEdit("VideoAdminPassword");
-    gc->setLabel(QObject::tr("Parental Control PIN"));
-    gc->setHelpText(QObject::tr("This PIN is used to control the current "
-                    "Parental Level. If you want to use this feature, then "
-                    "setting the value to all numbers will make your life much "
-                    "easier."));
+    gc->setLabel(QObject::tr("Parental Level 4 PIN"));
+    gc->setHelpText(QString("%1 %2")
+        .arg(QObject::tr("This PIN is used to enter Parental Control "
+                         "Level 4 as well as the Video Manager."))
+        .arg(password_clue));
+    return gc;
+}
+
+HostLineEdit *VideoAdminPasswordThree()
+{
+    HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordThree");
+    gc->setLabel(QObject::tr("Parental Level 3 PIN"));
+    gc->setHelpText(QString("%1 %2")
+        .arg(QObject::tr("This PIN is used to enter Parental Control Level 3."))
+        .arg(password_clue));
+    return gc;
+}
+
+HostLineEdit *VideoAdminPasswordTwo()
+{
+    HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordTwo");
+    gc->setLabel(QObject::tr("Parental Level 2 PIN"));
+    gc->setHelpText(QString("%1 %2")
+        .arg(QObject::tr("This PIN is used to enter Parental Control Level 2."))
+        .arg(password_clue));
     return gc;
 }
 
@@ -554,16 +581,13 @@ HostSpinBox *MTDRipSize()
 
 VideoGeneralSettings::VideoGeneralSettings()
 {
-    const int pages = 5;
+    const int pages = 6;
 
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings (%1/%2)")
                       .arg(1).arg(pages));
     general->addChild(VideoStartupDirectory());
     general->addChild(VideoArtworkDirectory());
-    general->addChild(VideoDefaultParentalLevel());
-    general->addChild(VideoAdminPassword());
-    general->addChild(VideoAggressivePC());
     general->addChild(VideoDefaultView());
     addChild(general);
 
@@ -620,6 +644,20 @@ VideoGeneralSettings::VideoGeneralSettings()
     vgal->addChild(VideoGalleryAspectRatio());
     general5->addChild(vgal);
     addChild(general5);
+
+    VerticalConfigurationGroup *general6 =
+            new VerticalConfigurationGroup(false);
+    general6->setLabel(QObject::tr("General Settings (%1/%2)")
+                       .arg(6).arg(pages));
+    VerticalConfigurationGroup *pctrl =
+            new VerticalConfigurationGroup(true, false);
+    pctrl->addChild(VideoDefaultParentalLevel());
+    pctrl->addChild(VideoAdminPassword());
+    pctrl->addChild(VideoAdminPasswordThree());
+    pctrl->addChild(VideoAdminPasswordTwo());
+    pctrl->addChild(VideoAggressivePC());
+    general6->addChild(pctrl);
+    addChild(general6);
 }
 
 VideoPlayerSettings::VideoPlayerSettings()

@@ -147,7 +147,7 @@ void VideoScannerImp::updateDB(const FileCheckList &add,
                              VIDEO_YEAR_DEFAULT,
                              VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                              VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT,
-                             0, 0, 1);
+                             0, 0, ParentalLevel::plLowest);
 
             newFile.dumpToDatabase();
         }

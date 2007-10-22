@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+#include "parentalcontrols.h"
+
 class MSqlQuery;
 class MetadataListManager;
 
@@ -54,7 +56,9 @@ class Metadata
              const QString &inetref = "", const QString &director = "",
              const QString &plot = "", float userrating = 0.0,
              const QString &rating = "", int length = 0,
-             int id = 0, int showlevel = 1, int categoryID = 0,
+             int id = 0,
+             ParentalLevel::Level showlevel = ParentalLevel::plLowest,
+             int categoryID = 0,
              int childID = -1, bool browse = true,
              const QString &playcommand = "", const QString &category = "",
              const genre_list &genres = genre_list(),
@@ -112,8 +116,8 @@ class Metadata
     const QString &PlayCommand() const;
     void setPlayCommand(const QString &playCommand);
 
-    int ShowLevel() const;
-    void setShowLevel(int showLevel);
+    ParentalLevel::Level ShowLevel() const;
+    void setShowLevel(ParentalLevel::Level showLevel);
 
     const QString& Filename() const;
     void setFilename(const QString &filename);

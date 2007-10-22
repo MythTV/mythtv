@@ -12,8 +12,6 @@ void checkedSetText(T *item, const QString &text)
     if (item) item->SetText(text);
 }
 
-bool checkParentPassword();
-
 QStringList GetVideoDirs();
 
 QString getDisplayYear(int year);

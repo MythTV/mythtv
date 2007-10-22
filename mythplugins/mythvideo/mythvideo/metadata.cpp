@@ -93,7 +93,7 @@ class MetadataImp
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
              const QString &rating, int length,
-             int id, int showlevel, int categoryID,
+             int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
@@ -239,8 +239,11 @@ class MetadataImp
     int getLength() const { return m_length; }
     void setLength(int length) { m_length = length; }
 
-    int getShowLevel() const { return m_showlevel; }
-    void setShowLevel(int showLevel) { m_showlevel = showLevel; }
+    ParentalLevel::Level getShowLevel() const { return m_showlevel; }
+    void setShowLevel(ParentalLevel::Level showLevel)
+    {
+        m_showlevel = ParentalLevel(showLevel).GetLevel();
+    }
 
     bool getBrowse() const { return m_browse; }
     void setBrowse(bool browse) { m_browse = browse; }
@@ -285,7 +288,7 @@ class MetadataImp
     int m_childID;
     int m_year;
     int m_length;
-    int m_showlevel;
+    ParentalLevel::Level m_showlevel;
     bool m_browse;
     unsigned int m_id;  // videometadata.intid
     float m_userrating;
@@ -434,7 +437,7 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
         m_userrating = 0.0;
     m_length = query.value(6).toInt();
     m_filename = QString::fromUtf8(query.value(7).toString());
-    m_showlevel = query.value(8).toInt();
+    m_showlevel = ParentalLevel(query.value(8).toInt()).GetLevel();
     m_coverfile = QString::fromUtf8(query.value(9).toString());
     m_inetref = QString::fromUtf8(query.value(10).toString());
     m_childID = query.value(11).toUInt();
@@ -829,7 +832,7 @@ Metadata::Metadata(const QString &filename, const QString &coverfile,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
              const QString &rating, int length,
-             int id, int showlevel, int categoryID,
+             int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
@@ -1022,12 +1025,12 @@ void Metadata::setPlayCommand(const QString &playCommand)
     m_imp->setPlayCommand(playCommand);
 }
 
-int Metadata::ShowLevel() const
+ParentalLevel::Level Metadata::ShowLevel() const
 {
     return m_imp->getShowLevel();
 }
 
-void Metadata::setShowLevel(int showLevel)
+void Metadata::setShowLevel(ParentalLevel::Level showLevel)
 {
     m_imp->setShowLevel(showLevel);
 }

@@ -27,6 +27,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "videolist.h"
 #include "videoutils.h"
 #include "imagecache.h"
+#include "parentalcontrols.h"
 
 VideoGallery::VideoGallery(MythMainWindow *lparent, const QString &lname,
                            VideoList *video_list) :
@@ -77,7 +78,7 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
             shiftParental(-1);
         else if (action == "1" || action == "2" ||
                  action == "3" || action == "4")
-            setParentalLevel(action.toInt());
+            setParentalLevel(ParentalLevel(action.toInt()));
         else if (action == "FILTER")
             slotDoFilter();
         else if (action == "MENU")

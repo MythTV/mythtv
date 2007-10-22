@@ -33,6 +33,7 @@
 #include "videolist.h"
 #include "videoutils.h"
 #include "dvdripbox.h"
+#include "parentalcontrols.h"
 
 #if defined(AEW_VG)
 #include <valgrind/memcheck.h>
@@ -81,7 +82,7 @@ namespace
       private:
         static int runVideoManager(VideoList *video_list)
         {
-            if (checkParentPassword())
+            if (checkParentPassword(ParentalLevel::plHigh))
             {
                 VideoScanner scanner;
                 scanner.doScan(GetVideoDirs());
@@ -473,7 +474,7 @@ namespace
 
             if (gContext->GetNumSetting("VideoAggressivePC", 0))
             {
-                if (checkParentPassword())
+                if (checkParentPassword(ParentalLevel::plHigh))
                 {
                     VideoGeneralSettings settings;
                     settings.exec();

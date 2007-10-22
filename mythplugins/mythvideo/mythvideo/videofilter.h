@@ -13,6 +13,8 @@
 
 #include <mythtv/mythdialogs.h>
 
+#include "parentalcontrols.h"
+
 class Metadata;
 class VideoList;
 
@@ -115,8 +117,8 @@ class VideoFilterSettings
         orderby = lorderby;
     }
 
-    int getParentalLevel() const { return m_parental_level; }
-    void setParentalLevel(int parental_level)
+    ParentalLevel::Level getParentalLevel() const { return m_parental_level; }
+    void setParentalLevel(ParentalLevel::Level parental_level)
     {
         m_changed_state |= kFilterParentalLevelChanged;
         m_parental_level = parental_level;
@@ -154,7 +156,7 @@ class VideoFilterSettings
     int m_inetref;
     int m_coverfile;
     ordering orderby;
-    int m_parental_level;
+    ParentalLevel::Level m_parental_level;
     QString prefix;
 
     unsigned int m_changed_state;

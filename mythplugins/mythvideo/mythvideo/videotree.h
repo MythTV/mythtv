@@ -7,6 +7,7 @@
 
 class Metadata;
 class VideoList;
+class ParentalLevel;
 
 class VideoTreeImp;
 class VideoTree : public MythThemedDialog
@@ -35,7 +36,7 @@ class VideoTree : public MythThemedDialog
     void handleTreeListSelection(int node_int);
     void handleTreeListEntry(int node_int);
     void playVideo(int node_number);
-    void setParentalLevel(int which_level);
+    void setParentalLevel(const ParentalLevel &which_level);
 
   protected:
     void keyPressEvent(QKeyEvent *e);
@@ -47,7 +48,7 @@ class VideoTree : public MythThemedDialog
     MythPopupBox *popup;
     bool expectingPopup;
     Metadata *curitem;
-    int current_parental_level;
+    std::auto_ptr<ParentalLevel> current_parental_level;
     bool file_browser;
     bool m_db_folders;
 

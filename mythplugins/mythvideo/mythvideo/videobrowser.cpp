@@ -11,6 +11,7 @@
 #include "videolist.h"
 #include "videoutils.h"
 #include "imagecache.h"
+#include "parentalcontrols.h"
 
 VideoBrowser::VideoBrowser(MythMainWindow *lparent, const QString &lname,
                            VideoList *video_list) :
@@ -42,7 +43,7 @@ void VideoBrowser::slotParentalLevelChanged()
     if (container)
     {
         checkedSetText((UITextType *)container->GetType("pl_value"),
-                       QString::number(currentParentalLevel));
+                       QString::number(currentParentalLevel->GetLevel()));
     }
 }
 
@@ -83,7 +84,7 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
             shiftParental(-1);
         else if (action == "1" || action == "2" ||
                 action == "3" || action == "4")
-            setParentalLevel(action.toInt());
+            setParentalLevel(ParentalLevel(action.toInt()));
         else if (action == "FILTER")
             slotDoFilter();
         else if (action == "MENU")
@@ -239,7 +240,7 @@ void VideoBrowser::updateBrowsing(QPainter *p)
                        vidnum);
 
         checkedSetText((UITextType *)container->GetType("pl_value"),
-                       QString::number(currentParentalLevel));
+                       QString::number(currentParentalLevel->GetLevel()));
 
         for (int i = 1; i < 9; ++i)
             container->Draw(&tmp, i, 0);

@@ -409,7 +409,8 @@ void VideoManager::RefreshMovieList(bool resort_only)
     }
     else
     {
-        m_video_list->refreshList(false, 0, true);
+        m_video_list->refreshList(false, ParentalLevel(ParentalLevel::plNone),
+                                  true);
         m_list_behave->setItemCount(m_video_list->count());
     }
     curitem = m_video_list->getVideoListMetadata(m_list_behave->getIndex());
@@ -1152,13 +1153,13 @@ void VideoManager::doParental(int amount)
     if (!curitem)
         return;
 
-    int curshowlevel = curitem->ShowLevel();
+    ParentalLevel curshowlevel = curitem->ShowLevel();
 
     curshowlevel += amount;
 
-    if ( (curshowlevel > -1) && (curshowlevel < 5))
+    if (curshowlevel.GetLevel() != curitem->ShowLevel())
     {
-        curitem->setShowLevel(curshowlevel);
+        curitem->setShowLevel(curshowlevel.GetLevel());
         curitem->updateDatabase();
         RefreshMovieList(true);
         update(infoRect);
@@ -1331,7 +1332,7 @@ void VideoManager::ResetCurrentItem()
     curitem->setUserRating(0.0);
     curitem->setRating(VIDEO_RATING_DEFAULT);
     curitem->setLength(0);
-    curitem->setShowLevel(1);
+    curitem->setShowLevel(ParentalLevel::plLowest);
     curitem->setGenres(Metadata::genre_list());
     curitem->setCountries(Metadata::country_list());
     curitem->updateDatabase();

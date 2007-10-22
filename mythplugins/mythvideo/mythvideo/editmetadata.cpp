@@ -16,6 +16,8 @@
 #include "dbaccess.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
+#include "parentalcontrols.h"
+
 
 EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
                                        const MetadataListManager &cache,
@@ -88,9 +90,11 @@ void EditMetadataDialog::fillWidgets()
 
     if (level_select)
     {
-        for (int i = 1; i < 5; i++)
+        for (ParentalLevel i = ParentalLevel::plLowest;
+                i <= ParentalLevel::plHigh && i.good(); ++i)
         {
-            level_select->addItem(i, QString(tr("Level %1")).arg(i));
+            level_select->addItem(i.GetLevel(),
+                                  QString(tr("Level %1")).arg(i.GetLevel()));
         }
         level_select->setToItem(working_metadata->ShowLevel());
     }
@@ -381,7 +385,8 @@ void EditMetadataDialog::setPlayer(QString new_command)
 
 void EditMetadataDialog::setLevel(int new_level)
 {
-    working_metadata->setShowLevel(new_level);
+    ParentalLevel nl(new_level);
+    working_metadata->setShowLevel(nl.GetLevel());
 }
 
 void EditMetadataDialog::setChild(int new_child)
