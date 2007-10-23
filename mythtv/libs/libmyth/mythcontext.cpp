@@ -758,6 +758,8 @@ bool MythContextPrivate::FindSettingsProbs(void)
     {
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
+        VERBOSE(VB_IMPORTANT, "Assuming localhost");
+        m_settings->SetSetting("DBHostName", "localhost");
     }
     if (m_settings->GetSetting("DBUserName").isEmpty())
     {
@@ -919,6 +921,8 @@ QString MythContextPrivate::TestDBconnection(void)
     if (host == "localhost" || host == "127.0.0.1" || host == m_localhostname)
         doPing = false;
 
+    if (doPing)
+        VERBOSE(VB_GENERAL, "Testing network connectivity to " + host);
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
@@ -933,6 +937,9 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (port && !telnet(host, port))
     {
+        // Cause MSqlQuery to fail, instead of several error lines per DB value
+        m_settings->SetSetting("DBHostName", "");
+
         err = parent->tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
     }
@@ -941,7 +948,12 @@ QString MythContextPrivate::TestDBconnection(void)
     // 3. Finally, try to login, et c:
 
     if (!MSqlQuery::testDBConnection())
+    {
+        // Cause MSqlQuery to fail, instead of several error lines per DB value
+        m_settings->SetSetting("DBHostName", "");
+
         return parent->tr(QString("Cannot login to database?"));
+    }
 
 
     return QString::null;
@@ -3298,21 +3310,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     DatabaseParams cur_params = GetDatabaseParams();
     
     // only rewrite file if it has changed
-    if (params.dbHostName   != cur_params.dbHostName          ||
-        params.dbHostPing   != cur_params.dbHostPing          ||
-        params.dbPort       != cur_params.dbPort              ||
-        params.dbUserName   != cur_params.dbUserName          ||
-        params.dbPassword   != cur_params.dbPassword          ||
-        params.dbName       != cur_params.dbName              ||
-        params.dbType       != cur_params.dbType              ||
-        params.localEnabled != cur_params.localEnabled        ||
-        params.wolEnabled   != cur_params.wolEnabled          ||
-        (params.localEnabled &&
-         (params.localHostName != cur_params.localHostName))  ||
-        (params.wolEnabled &&
-         (params.wolReconnect  != cur_params.wolReconnect ||
-          params.wolRetry      != cur_params.wolRetry     ||
-          params.wolCommand    != cur_params.wolCommand)))
+    if (memcmp((void *)&params, (void *)&cur_params, sizeof(DatabaseParams)))
     {
         ret = d->WriteSettingsFile(params, true);
         if (ret)
