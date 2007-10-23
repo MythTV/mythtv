@@ -211,7 +211,6 @@ class MythContextPrivate
     void LoadLogSettings(void);
     bool LoadDatabaseSettings(DatabaseParams *pParams = NULL);
     
-    bool FixSettingsFile(void);
     bool LoadSettingsFiles(const QString &filename);
     bool WriteSettingsFile(const DatabaseParams &params,
                            bool overwrite = false);
@@ -222,21 +221,25 @@ class MythContextPrivate
     bool    PromptForDatabaseParams(QString error);
     QString TestDBconnection(void);
 
+
     MythContext *parent;
 
     Settings *m_settings;
     Settings *m_qtThemeSettings;
 
-    QString m_installprefix;
-    QString m_installlibdir;
+    QString   m_installprefix;     ///< Compile-time PREFIX, or generated
+                                   ///< from enviroment ($MYTHTVDIR or $cwd)
+    QString   m_installlibdir;     ///< Compile-time LIBDIR, or generated
 
-    bool m_gui;
-    bool m_backend;
-    bool m_themeloaded;
-    QString m_menuthemepathname;
-    QString m_themepathname;
-    QPixmap *m_backgroundimage;
-    QPalette m_palette;
+    bool      m_gui;               ///< Should this context use GUI elements?
+    bool      m_backend;           ///< Is this host any sort of backend?
+
+    bool      m_themeloaded;       ///< To we have a palette and pixmap to use?
+    QString   m_menuthemepathname;
+    QString   m_themepathname;
+    QPixmap  *m_backgroundimage;   ///< Large or tiled image
+    QPalette  m_palette;           ///< Colour scheme
+
 
     // Drawable area of the full screen. May cover several screens,
     // or exclude windowing system fixtures (like Mac menu bar)
@@ -245,9 +248,12 @@ class MythContextPrivate
 
     // Dimensions of the theme
     int m_baseWidth, m_baseHeight;
+
     
-    QMutex m_hostnamelock;
-    QString m_localhostname;
+    QMutex  m_hostnamelock;      ///< Locking for thread-safe copying of:
+    QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
+
+    DatabaseParams  m_DBparams;  ///< Current database host & WOL details
 
     QMutex serverSockLock;
     bool attemptingToConnect;
@@ -593,7 +599,9 @@ bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
     if (!LoadSettingsFiles("mysql.txt"))
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
-        if (!FixSettingsFile())
+        VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
+        m_DBparams = parent->GetDatabaseParams();
+        if (!WriteSettingsFile(m_DBparams))
             return false;
         else
             LoadSettingsFiles("mysql.txt");
@@ -632,14 +640,6 @@ bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
         m_localhostname = localhostname;
     }
     return true;
-}
-
-bool MythContextPrivate::FixSettingsFile(void)
-{
-    VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
-    DatabaseParams defaultParams = parent->GetDatabaseParams();
-    
-    return WriteSettingsFile(defaultParams);
 }
 
 bool MythContextPrivate::LoadSettingsFiles(const QString &filename)
