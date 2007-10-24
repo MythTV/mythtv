@@ -211,7 +211,7 @@ class MythContextPrivate
     void LoadLogSettings(void);
     bool LoadDatabaseSettings(DatabaseParams *pParams = NULL);
     
-    bool LoadSettingsFiles(const QString &filename);
+    bool LoadSettingsFile(void);
     bool WriteSettingsFile(const DatabaseParams &params,
                            bool overwrite = false);
     bool FindSettingsProbs(void);
@@ -224,8 +224,8 @@ class MythContextPrivate
 
     MythContext *parent;
 
-    Settings *m_settings;
-    Settings *m_qtThemeSettings;
+    Settings *m_settings;          ///< connection stuff, theme, button style
+    Settings *m_qtThemeSettings;   ///< everything else theme-related
 
     QString   m_installprefix;     ///< Compile-time PREFIX, or generated
                                    ///< from enviroment ($MYTHTVDIR or $cwd)
@@ -348,6 +348,14 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
  *
  * Used for warnings before the database is opened, or bootstrapping pages.
  * After using the window, call EndTempWindow().
+ *
+ * \bug   Some of these settings (<i>e.g.</I> window size, theme)
+ *        seem to be used after the temp window is destroyed.
+ *
+ * \bug   The default theme here is blue, but as of [12377],
+ *        G.A.N.T is now meant to be the default?
+ *        A simple change to make, but Nigel prefers
+ *        "blue" for these initial screens and popups
  */
 void MythContextPrivate::TempMainWindow(bool languagePrompt)
 {
@@ -592,11 +600,18 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
+/**     
+ * Load database and host settings from mysql.txt and UPnP BE discovery.
+ *      
+ * \note Creating a default mysql.txt is actually not necessary.
+ *       The defaults are enough for a simple "localhost" FE & MBE,
+ *       and UPnP covers the other situations.
+ */
 bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
 {
     // Always load settings first from mysql.txt so LocalHostName can be used.
 
-    if (!LoadSettingsFiles("mysql.txt"))
+    if (!LoadSettingsFile())
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
         VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
@@ -604,7 +619,7 @@ bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
         if (!WriteSettingsFile(m_DBparams))
             return false;
         else
-            LoadSettingsFiles("mysql.txt");
+            LoadSettingsFile();
     }
 
     // Overlay mysql.txt settings if we were passed a DatabaseParams
@@ -642,9 +657,9 @@ bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
     return true;
 }
 
-bool MythContextPrivate::LoadSettingsFiles(const QString &filename)
+bool MythContextPrivate::LoadSettingsFile(void)
 {
-    return m_settings->LoadSettingsFiles(filename, m_installprefix);
+    return m_settings->LoadSettingsFiles("mysql.txt", m_installprefix);
 }
 
 bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
