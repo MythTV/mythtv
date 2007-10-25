@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20070826-5"
+VERSION="0.1.20071025-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -477,10 +477,21 @@ def findEncodingProfile(profile):
     """Returns the XML node for the given encoding profile"""
 
     # which encoding file do we need
+
+    # first look for a custom profile file in ~/.mythtv/MythArchive/
     if videomode == "ntsc":
-        filename = getEncodingProfilePath() + "/ffmpeg_dvd_ntsc.xml"
+        filename = os.path.expanduser("~/.mythtv/MythArchive/ffmpeg_dvd_ntsc.xml")
     else:
-        filename = getEncodingProfilePath() + "/ffmpeg_dvd_pal.xml"
+        filename = os.path.expanduser("~/.mythtv/MythArchive/ffmpeg_dvd_pal.xml")
+
+    if not os.path.exists(filename):
+        # not found so use the default profiles
+        if videomode == "ntsc":
+            filename = getEncodingProfilePath() + "/ffmpeg_dvd_ntsc.xml"
+        else:
+            filename = getEncodingProfilePath() + "/ffmpeg_dvd_pal.xml"
+
+    write("Using encoder profiles from %s" % filename)
 
     DOM = xml.dom.minidom.parse(filename)
 

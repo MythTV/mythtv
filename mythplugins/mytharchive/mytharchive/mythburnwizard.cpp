@@ -534,10 +534,24 @@ void MythburnWizard::loadEncoderProfiles()
     profileList->push_back(item);
 
     // find the encoding profiles
-    QString filename = gContext->GetShareDir() + 
+    // first look in the ConfDir (~/.mythtv)
+    QString filename = MythContext::GetConfDir() + 
+            "/MythArchive/ffmpeg_dvd_" + 
+            ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
+                .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
+
+    if (!QFile::exists(filename))
+    {
+        // not found yet so use the default profiles
+        filename = gContext->GetShareDir() + 
             "mytharchive/encoder_profiles/ffmpeg_dvd_" + 
-            ((gContext->GetSetting("MythArchiveVideoFormat", "pal").lower() == "ntsc") ? "ntsc" : "pal") +
-            ".xml";
+            ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
+                .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("MythArchive: Loading encoding profiles from %1")
+            .arg(filename));
+
     QDomDocument doc("mydocument");
     QFile file(filename);
     if (!file.open(IO_ReadOnly))
