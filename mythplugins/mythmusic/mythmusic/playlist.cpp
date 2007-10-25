@@ -931,8 +931,12 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     AlbumMap                       album_map;
     AlbumMap::iterator             Ialbum;
     QString                        album;
-
-
+    
+    typedef map<QString, uint32_t> ArtistMap;
+    ArtistMap                      artist_map;
+    ArtistMap::iterator            Iartist;
+    QString                        artist;
+    
     for(it = songs.first(); it; it = songs.next())
     {
         if(!it->getCDFlag())
@@ -959,10 +963,26 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                         else if (tmpdata->LastPlay() > lastplayMax) { lastplayMax = tmpdata->LastPlay(); }
                     }
                 }
+                
+                // pre-fill the artist map with the artist name and song title
+                artist = tmpdata->Artist() + "~" + tmpdata->Title();
+                if ((Iartist = artist_map.find(artist)) == artist_map.end()) 
+                {
+                  artist_map.insert(ArtistMap::value_type(artist,
+                                                        0));
+                }
             }
         }
     }
 
+    // populate the sort id into the artist map
+    uint32_t count = 1; 
+    for( Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++ ) 
+    {
+        Iartist->second = count;
+        count++;
+    }    
+    
     int RatingWeight = 2;
     int PlayCountWeight = 2;
     int LastPlayWeight = 2;
@@ -1030,6 +1050,23 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                       integer_rating += tmpdata->Track();
                       added_node->setAttribute(4, integer_rating);
                     }
+                    
+                    // "artist" order, sorts by artist name then track title
+                    // uses the pre-prepared artist map to do this
+                    uint32_t integer_order;
+                    artist = tmpdata->Artist() + "~" + tmpdata->Title();
+                    if ((Iartist = artist_map.find(artist)) == artist_map.end())
+                    {
+                        // we didn't find this track in the map, yet we pre-loaded them all
+                        // we are broken, but we just set the track order to 1, since there
+                        // is no real point in reporting an error
+                        integer_order = 1;
+                    }
+                    else
+                    {
+                        integer_order = Iartist->second;
+                    }    
+                    added_node->setAttribute(5, integer_order);
                 }
             }
             if(it->getValue() < 0)

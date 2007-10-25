@@ -140,6 +140,7 @@ class PlaybackBoxMusic : public MythThemedDialog
       SHUFFLE_RANDOM, 
       SHUFFLE_INTELLIGENT,
       SHUFFLE_ALBUM,
+      SHUFFLE_ARTIST,
       MAX_SHUFFLE_MODES 
     };
     enum ResumeMode

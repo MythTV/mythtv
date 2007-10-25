@@ -124,7 +124,8 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
         MUSIC_SHUFFLE_NONE  = 0,
         MUSIC_SHUFFLE_RAND  = 1,
         MUSIC_SHUFFLE_SMART = 2,
-        MUSIC_SHUFFLE_ALBUM = 3
+        MUSIC_SHUFFLE_ALBUM = 3,
+        MUSIC_SHUFFLE_ARTIST = 4
     };
 
     static class LCD * Get(void);
