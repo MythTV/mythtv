@@ -78,6 +78,13 @@
    </button>
 
    <button>
+     <type>STREAM</type>
+     <text>Play Online Streams</text>
+     <action>PLUGIN mythstream</action>
+     <depends>mythstream</depends>
+   </button>
+
+   <button>
      <type>IMAGES</type>
      <text>Images</text>
      <text lang="IT">Immagini</text>
@@ -138,6 +145,13 @@
      <text lang="RU">Погода</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
+   </button>
+
+   <button>
+       <type>WEATHER</type>
+       <text>Weather Station</text>
+       <action>PLUGIN mythwstation</action>
+       <depends>mythwstation</depends>
    </button>
 
    <button>
@@ -222,21 +236,6 @@
       <text lang="RU">Рецепты</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
-   </button>
-
-   <button>
-      <type>BURN</type>
-      <text>Burn DVD</text>
-      <text lang="FR">Gravure DVD</text>
-      <text lang="PT">Gravar DVD</text>
-      <text lang="ET">DVD kirjutamine</text>
-      <text lang="ES">Grabar DVD</text>
-      <text lang="NL">DVD Branden</text>
-      <text lang="PL">Nagraj DVD</text>
-      <text lang="SV">Br�nn DVD</text>
-      <text lang="RU">Прожиг DVD</text>
-      <action>PLUGIN mythburn</action>
-      <depends>mythburn</depends>
    </button>
 
    <button>

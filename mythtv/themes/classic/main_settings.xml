@@ -137,6 +137,13 @@
    </button>
 
    <button>
+     <type>SETTINGS_STREAM</type>
+     <text>MythStream Settings</text>
+     <action>CONFIGPLUGIN mythstream</action>
+     <depends>mythstream</depends>
+   </button>
+
+   <button>
       <type>SETTINGS_IMAGES</type>
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
@@ -194,6 +201,13 @@
      <text lang="RU">Настройка погоды</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
+   </button>
+
+   <button>
+     <type>SETTINGS_WEATHER</type>
+     <text>Weather Station Settings</text>
+     <action>CONFIGPLUGIN mythwstation</action>
+     <depends>mythwstation</depends>
    </button>
 
    <button>
@@ -320,21 +334,6 @@
      <text lang="RU">Настройка XBOX</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
-   </button>
-
-   <button>
-     <type>SETTINGS_BURN</type>
-     <text>Burn DVD Settings</text>
-     <text lang="FR">Gravure DVD</text>
-     <text lang="PT">Configurar Gravação de DVDs</text>
-     <text lang="ET">DVD-kirjutaja sätted</text>
-     <text lang="ES">Config. Grabación DVD</text>
-     <text lang="NL">DVD Branden Instellingen</text>
-     <text lang="PL">Konfiguracja nagrywarki DVD</text>
-     <text lang="SV">DVD-br�nning</text>
-     <text lang="RU">Настройки прожига DVD</text>
-     <action>CONFIGPLUGIN mythburn</action>
-     <depends>mythburn</depends>
    </button>
 
    <button>

@@ -124,22 +124,6 @@
    </button>
 
    <button>
-      <type>SETTINGS_BURN</type>
-      <text>Burn DVD Settings</text>
-      <text lang="FI">DVD:n Polttoasetukset</text>
-      <text lang="FR">Gravure de DVD</text>
-      <text lang="PT">Conf. Grav. de DVDs</text>
-      <text lang="DE">DVD brennen</text>
-      <text lang="NL">DVD Branden Instellingen</text>
-      <text lang="ET">DVD kirjutamise sätted</text>
-      <text lang="SV">DVD-bränning</text>
-      <text lang="RU">Настройки прожига DVD</text>
-      <text lang="DK">DVD-brænding</text>
-      <action>CONFIGPLUGIN mythburn</action>
-      <depends>mythburn</depends>
-   </button>
-
-   <button>
       <type>SETTINGS_ARCHIVE</type>
       <text>Archive Files Settings</text>
       <text lang="ET">Arhiveerimise sätted</text>
