@@ -1462,14 +1462,7 @@ void PlaybackBoxMusic::stop(void)
     delete input;
     input = 0;
 
-    QString time_string;
-    int maxh = maxTime / 3600;
-    int maxm = (maxTime / 60) % 60;
-    int maxs = maxm % 60;
-    if (maxh > 0)
-        time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
-    else
-        time_string.sprintf("%02d:%02d", maxm, maxs);
+    QString time_string = getTimeString(maxTime, 0);
 
     if (time_text)
         time_text->SetText(time_string);
@@ -1928,36 +1921,11 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
         {
             OutputEvent *oe = (OutputEvent *) event;
 
-            int eh, em, es, rs, ts;
-            currentTime = rs = ts = oe->elapsedSeconds();
+            int rs;
+            currentTime = rs = oe->elapsedSeconds();
 
-            eh = ts / 3600;
-            em = (ts / 60) % 60;
-            es = ts % 60;
+            QString time_string = getTimeString(rs, maxTime);
 
-            QString time_string;
-
-            int maxh = maxTime / 3600;
-            int maxm = (maxTime / 60) % 60;
-            int maxs = maxTime % 60;
-
-            if (maxTime <= 0) 
-            {
-                if (eh > 0) 
-                    time_string.sprintf("%d:%02d:%02d", eh, em, es);
-                else 
-                    time_string.sprintf("%02d:%02d", em, es);
-            } 
-            else
-            {
-                if (maxh > 0)
-                    time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
-                                        es, maxh, maxm, maxs);
-                else
-                    time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
-                                        maxs);
-            }
-            
             showProgressBar();
             
             if (curMeta)
@@ -2127,16 +2095,8 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         maxTime = curMeta->Length() / 1000;
 
-        QString time_string;
-        int maxh = maxTime / 3600;
-        int maxm = (maxTime / 60) % 60;
-        int maxs = maxm % 60;
-        if (maxh > 0)
-            time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
-        else
-            time_string.sprintf("%02d:%02d", maxm, maxs);
-        if (time_text)
-            time_text->SetText(time_string);
+        QString time_string = getTimeString(maxTime, 0);
+        
         if (showrating)
         {
             if(ratings_image)
@@ -2381,4 +2341,36 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
     delete popup;
 
     return (res >= 0);
+}
+
+QString PlaybackBoxMusic::getTimeString(int exTime, int maxTime)
+{
+    QString time_string;
+
+    int eh = exTime / 3600;
+    int em = (exTime / 60) % 60;
+    int es = exTime % 60;
+
+    int maxh = maxTime / 3600;
+    int maxm = (maxTime / 60) % 60;
+    int maxs = maxTime % 60;
+
+    if (maxTime <= 0) 
+    {
+        if (eh > 0) 
+            time_string.sprintf("%d:%02d:%02d", eh, em, es);
+        else 
+            time_string.sprintf("%02d:%02d", em, es);
+    } 
+    else
+    {
+        if (maxh > 0)
+            time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
+                    es, maxh, maxm, maxs);
+        else
+            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
+                    maxs);
+    }
+
+    return time_string;
 }

@@ -117,8 +117,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void bannerToggle(Metadata *mdata);
     void savePosition(uint position);
     void restorePosition(void);
-
     void pushButton(UIPushButtonType *button);
+    QString getTimeString(int exTime, int maxTime);
 
     QIODevice *input;
     AudioOutput *output;
