@@ -1578,6 +1578,29 @@ void PlaybackBoxMusic::seek(int pos)
 
             decoder->unlock();
         }
+
+        if (!isplaying)
+        {
+            currentTime = pos;
+            if (time_text)
+                time_text->SetText(getTimeString(pos, maxTime));
+
+            showProgressBar();
+
+            if (class LCD *lcd = LCD::Get())
+            {
+                float percent_heard = maxTime <= 0 ? 0.0 : ((float)pos /
+                                      (float)maxTime);
+
+                QString lcd_time_string = getTimeString(pos, maxTime);
+
+                // if the string is longer than the LCD width, remove all spaces
+                if (lcd_time_string.length() > lcd->getLCDWidth())
+                    lcd_time_string.remove(' ');
+
+                lcd->setMusicProgress(lcd_time_string, percent_heard);
+            }
+        }
     }
 }
 
