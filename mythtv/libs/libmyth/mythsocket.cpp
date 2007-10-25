@@ -689,7 +689,6 @@ void *MythSocket::readyReadThread(void *)
 {
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
     fd_set rfds;
-    struct timeval timeout;
     MythSocket *sock;
     int maxfd;
     bool found;
@@ -737,10 +736,7 @@ void *MythSocket::readyReadThread(void *)
             ++it;
         }
 
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 10000;
-
-        int rval = select(maxfd + 1, &rfds, NULL, NULL, &timeout);
+        int rval = select(maxfd + 1, &rfds, NULL, NULL, NULL);
         if (rval == -1)
         {
             VERBOSE(VB_SOCKET, "MythSocket: select returned error");
