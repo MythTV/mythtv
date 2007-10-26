@@ -779,6 +779,9 @@ void InitJumpPoints(void)
     REG_JUMP("Status Screen", "", "", showStatus);
     REG_JUMP("Previously Recorded", "", "", startPrevious);
 
+    REG_KEY("qt", "DELETE", "Delete", "D");
+    REG_KEY("qt", "EDIT", "Edit", "E");
+
     TV::InitKeys();
 
     TV::SetEmbedPbbFunc(PlaybackBox::RunPlaybackBox);
