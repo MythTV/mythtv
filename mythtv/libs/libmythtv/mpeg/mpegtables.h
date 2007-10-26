@@ -466,7 +466,11 @@ class ProgramAssociationTable : public PSIPTable
     uint TransportStreamID(void) const { return TableIDExtension(); }
 
     uint ProgramCount(void) const
-        { return (SectionLength()-PSIP_OFFSET-2)>>2; }
+    {
+        if (SectionLength() > (PSIP_OFFSET+2))
+            return (SectionLength()-PSIP_OFFSET-2)>>2;
+        return 0;
+    }
 
     uint ProgramNumber(uint i) const
         { return (psipdata()[(i<<2)] << 8) | psipdata()[(i<<2) + 1]; }
