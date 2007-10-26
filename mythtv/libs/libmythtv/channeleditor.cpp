@@ -119,7 +119,9 @@ void ChannelListSetting::fillSelections(void)
 
     QString querystr = "SELECT channel.name,channum,chanid ";
 
-    if ((currentSourceID == "") || (currentSourceID == "Unassigned"))
+    if ((currentSourceID.isEmpty()) ||
+        (currentSourceID == "Unassigned") ||
+        (currentSourceID == "All"))
     {
         querystr += ",videosource.name FROM channel "
                     "LEFT JOIN videosource ON "
@@ -194,7 +196,7 @@ class SourceSetting : public ComboBoxSetting, public Storage
     SourceSetting() : ComboBoxSetting(this)
     {
         setLabel(QObject::tr("Video Source"));
-        addSelection(QObject::tr("(All)"),"");
+        addSelection(QObject::tr("(All)"),"All");
     };
 
     void load() 
