@@ -285,6 +285,12 @@ int getStatus(bool bWantRecStatus)
         }
     }
 
+    if (isRunning("mythtv-setup"))
+    {
+        VERBOSE(VB_IMPORTANT, "Setup is running...");
+        res = 255;
+    }
+
     VERBOSE(VB_GENERAL, "Mythshutdown: --status returned: " << res);
 
     return res;
@@ -738,6 +744,7 @@ void showUsage()
   cout << "                         32 - Jobs running or pending\n";
   cout << "                         64 - In a daily wakeup/shutdown period\n";
   cout << "                        128 - Less than 15 minutes to next wakeup period\n";
+  cout << "                        255 - Setup is running\n";
   cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
   cout << "-h/--help                (shows this usage)\n";
 }
