@@ -2841,7 +2841,10 @@ static HostCheckBox *EPGShowCategoryText()
 static HostCheckBox *EPGShowChannelIcon()
 {
     HostCheckBox *gc = new HostCheckBox("EPGShowChannelIcon");
-    gc->setLabel(QObject::tr("Display the channel icon"));
+    gc->setLabel(QObject::tr("Display the channel icons"));
+    gc->setHelpText(QObject::tr("Display the icons/logos for the channels "
+                    "in the guide.  See section 9.5 of the "
+                    "Installation Guide for how to grab icons."));
     gc->setValue(true);
     return gc;
 }

@@ -1139,12 +1139,14 @@ void GuideGrid::paintChannels(QPainter *p)
     if (container)
         type = (UIBarType *)container->GetType("chans");
     if (infocontainer)
-        itype = (UIImageType *)container->GetType("icon");
+        itype = (UIImageType *)infocontainer->GetType("icon");
 
     if (type && type->GetNums() != DISPLAY_CHANS)
         type->SetSize(DISPLAY_CHANS);
 
     ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
+
+    bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
     for (unsigned int y = 0; y < (unsigned int)DISPLAY_CHANS; y++)
     {
@@ -1158,7 +1160,7 @@ void GuideGrid::paintChannels(QPainter *p)
         if ((y == (unsigned int)2 && scrolltype != 1) || 
             ((signed int)y == m_currentRow && scrolltype == 1))
         {
-            if (!chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
+            if (showChannelIcon && !chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
             {
                 int iconsize = 0;
                 if (itype)
@@ -1186,10 +1188,13 @@ void GuideGrid::paintChannels(QPainter *p)
 
         if (type)
         {
-            if (!chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
+            if (showChannelIcon && !chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
             {
                 int iconsize = 0;
-                iconsize = type->GetSize();
+                if (itype)
+                    iconsize = itype->GetSize().width();
+                else if (type)
+                    iconsize = type->GetSize();
                 if (!chinfo->iconload)
                     chinfo->LoadIcon(iconsize);
                 if (chinfo->iconload)
@@ -1296,6 +1301,8 @@ void GuideGrid::paintInfo(QPainter *p)
 
     ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
 
+    bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
+
     pginfo->ToMap(infoMap);
 
     LayerSet *container = theme->GetSet("program_info");
@@ -1305,13 +1312,20 @@ void GuideGrid::paintInfo(QPainter *p)
         container->SetText(infoMap);
 
         UIImageType *itype = (UIImageType *)container->GetType("icon");
-        if (itype)
+        if (itype && showChannelIcon)
         {
-            itype->SetImage(chinfo->iconpath);
-            itype->LoadImage();
+            int iconsize = 0;
+            iconsize = itype->GetSize().width();
+            if (!chinfo->iconload)
+                chinfo->LoadIcon(iconsize);
+            if (chinfo->iconload)
+                itype->SetImage(chinfo->icon);
+            else
+                itype->SetImage(QPixmap());
         }
 
-        if (!itype || chinfo->iconpath.isEmpty() || chinfo->iconpath == "none")
+        if (!showChannelIcon || !itype || chinfo->iconpath.isEmpty() ||
+             chinfo->iconpath == "none")
         {
             UITextType *type = (UITextType *)container->GetType("misicon");
             if (type)
