@@ -267,7 +267,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     src->addChild(del);
 
     sort->setValue(sort->getValueIndex(list->getSortMode()));
-    source->setValue(source->getValueIndex(list->getSourceID()));
+    source->setValue(max(source->getValueIndex(list->getSourceID()), 0));
     hide->setValue(list->getHideMode());
 
     addChild(sort);
