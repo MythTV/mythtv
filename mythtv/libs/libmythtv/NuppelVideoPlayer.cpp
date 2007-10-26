@@ -5876,11 +5876,13 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
 
     if (islive)
     {
-        posInfo.extdesc = QObject::tr("(%3 behind)").arg(text3); 
+        posInfo.extdesc = QObject::tr("%1 of %2 (%3 behind)")
+                .arg(text1).arg(text2).arg(text3); 
     }
     else
     {
-        posInfo.extdesc = QObject::tr("(%3 remaining)").arg(text3); 
+        posInfo.extdesc = QObject::tr("%1 of %2 (%3 remaining)")
+                .arg(text1).arg(text2).arg(text3); 
     }
 }
 
