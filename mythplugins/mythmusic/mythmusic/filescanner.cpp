@@ -264,6 +264,7 @@ void FileScanner::AddFileToDB(const QString &filename)
 
     if (decoder)
     {
+        VERBOSE(VB_FILE, QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
         if (data) {
 
