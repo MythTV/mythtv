@@ -113,8 +113,11 @@ int ChannelWizard::countCardtypes() {
 void ChannelListSetting::fillSelections(void) 
 {
     QString currentValue = getValue();
+    uint    currentIndex = max(getValueIndex(currentValue), 0);
     clearSelections();
-    addSelection(QObject::tr("(New Channel)"));
+    addSelection(QObject::tr("(New Channel)"), "0",
+                 0 == currentValue.toUInt());
+
     bool fAllSources = true;
 
     QString querystr = "SELECT channel.name,channum,chanid ";
@@ -146,10 +149,11 @@ void ChannelListSetting::fillSelections(void)
 
     MSqlQuery query(MSqlQuery::InitCon()); 
     query.prepare(querystr);
-    
+
+    uint selidx = 0, idx = 1;
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        while(query.next()) 
+        for (; query.next() ; idx++) 
         {
             QString name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
@@ -185,9 +189,15 @@ void ChannelListSetting::fillSelections(void)
             if ((currentSourceID == "") && (currentSourceID != "Unassigned"))
                 name += " (" + sourceid  + ")";
 
-            addSelection(name, chanid, (chanid == currentValue) ? true : false);
+            bool sel = (chanid == currentValue);
+            selidx = (sel) ? idx : selidx;
+            addSelection(name, chanid, sel);
         }
     }
+
+    // Make sure we select the current item, or the following one after
+    // deletion, with wrap around to "(New Channel)" after deleting last item.
+    setCurrentItem((!selidx && currentIndex < idx) ? currentIndex : selidx);
 }
 
 class SourceSetting : public ComboBoxSetting, public Storage
