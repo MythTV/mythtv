@@ -3374,14 +3374,14 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
         ret = d->WriteSettingsFile(params, true);
         if (ret)
         {
-            // Use a possibly new DB:
-            d->ResetDatabase();
-
             // Reload the new settings:
             if (d->m_settings)
                 delete d->m_settings;
             d->m_settings = new Settings;
             ret = d->LoadDatabaseSettings();
+
+            // If database has changed, force its use:
+            d->ResetDatabase();
         }
     }
     return ret;
