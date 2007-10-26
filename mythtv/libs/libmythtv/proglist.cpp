@@ -1342,16 +1342,40 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (type == plMovies)
     {
-        viewList << "0.0";
+        viewList << ">= 0.0";
         viewTextList << tr("All");
-        viewList << "1.0";
-        viewTextList << tr("4 stars");
-        viewList << "0.875";
-        viewTextList << tr("At least 3 1/2 stars");
-        viewList << "0.75";
-        viewTextList << tr("At least 3 stars");
-        viewList << "0.5";
-        viewTextList << tr("At least 2 stars");
+        viewList << "= 0.0";
+        viewTextList << tr("Unrated");
+        viewList << ">= 1.0";
+        viewTextList << "****";
+        viewList << ">= 0.875 AND program.stars < 1.0";
+        viewTextList << "***/";
+        viewList << ">= 0.75 AND program.stars < 0.875";
+        viewTextList << "***";
+        viewList << ">= 0.625 AND program.stars < 0.75";
+        viewTextList << "**/";
+        viewList << ">= 0.5 AND program.stars < 0.625";
+        viewTextList << "**";
+        viewList << ">= 0.375 AND program.stars < 0.5";
+        viewTextList << "*/";
+        viewList << ">= 0.25 AND program.stars < 0.375";
+        viewTextList << "*";
+        viewList << ">= 0.125 AND program.stars < 0.25";
+        viewTextList << "/";
+        viewList << ">= 0.875";
+        viewTextList << tr("At least ***/");
+        viewList << ">= 0.75";
+        viewTextList << tr("At least ***");
+        viewList << ">= 0.625";
+        viewTextList << tr("At least **/");
+        viewList << ">= 0.5";
+        viewTextList << tr("At least **");
+        viewList << ">= 0.375";
+        viewTextList << tr("At least */");
+        viewList << ">= 0.25";
+        viewTextList << tr("At least *");
+        viewList << ">= 0.125";
+        viewTextList << tr("At least /");
         curView = 0;
     }
     else if (type == plTime)
@@ -1582,7 +1606,7 @@ void ProgLister::fillItemList(void)
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND program.category_type = 'movie' "
-                "  AND program.stars >= :PGILPHRASE ";
+                "  AND program.stars "+qphrase+" ";
     }
     else if (type == plTime) // list by time
     {
