@@ -197,6 +197,8 @@ class MythContextPrivate
    ~MythContextPrivate();
 
     bool Init(bool gui, DatabaseParams *pParams = NULL );
+    bool FindDatabase(DatabaseParams *pParams);
+
     bool IsWideMode() const {return (m_baseWidth == 1280);}
     void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
     bool IsSquareMode() const {return (m_baseWidth == 800);}
@@ -220,6 +222,7 @@ class MythContextPrivate
     int     intResponse(const QString &query, int def);
     bool    PromptForDatabaseParams(QString error);
     QString TestDBconnection(void);
+    void    ResetDatabase(void);
 
 
     MythContext *parent;
@@ -341,6 +344,22 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
     VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
+}
+
+MythContextPrivate::~MythContextPrivate()
+{
+    imageCache.clear();
+
+    if (m_settings)
+        delete m_settings;
+    if (m_qtThemeSettings)
+        delete m_qtThemeSettings;
+    if (serverSock)
+        serverSock->DownRef();
+    if (eventSock)
+        eventSock->DownRef();
+    if (screensaver)
+        delete screensaver;
 }
 
 /**
@@ -473,6 +492,25 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 
     // ---- database connection stuff ----
 
+    if (!FindDatabase(pParams))
+        return false;
+
+    // ---- keep all DB-using stuff below this line ----
+
+    if (gui)
+    {
+        GetScreenBounds();
+        StoreGUIsettings();
+    }
+
+    return true;
+}
+
+/**
+ * Get database connection settings and test connectivity.
+ */
+bool MythContextPrivate::FindDatabase(DatabaseParams *pParams)
+{
     // Attempts to read DB info from "mysql.txt" from the 
     // filesystem, or create it if it does not exist.
     if (!LoadDatabaseSettings(pParams))
@@ -501,31 +539,7 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
         }
     }
 
-    // ---- keep all DB-using stuff below this line ----
-
-    if (gui)
-    {
-        GetScreenBounds();
-        StoreGUIsettings();
-    }
-
     return true;
-}
-
-MythContextPrivate::~MythContextPrivate()
-{
-    imageCache.clear();
-
-    if (m_settings)
-        delete m_settings;
-    if (m_qtThemeSettings)
-        delete m_qtThemeSettings;
-    if (serverSock)
-        serverSock->DownRef();
-    if (eventSock)
-        eventSock->DownRef();
-    if (screensaver)
-        delete screensaver;
 }
 
 /**
@@ -974,6 +988,22 @@ QString MythContextPrivate::TestDBconnection(void)
     return QString::null;
 }
 
+/**
+ * Called when the user changes the DB connection settings
+ *
+ * The current DB connections way be invalid (<I>e.g.</I> wrong password),
+ * or the user may have changed to a different database host. Either way,
+ * any current connections need to be closed so that the new connection
+ * can be attempted.
+ *
+ * Any cached settings also need to be cleared,
+ * so that they can be re-read from the new database
+ */
+void MythContextPrivate::ResetDatabase(void)
+{
+    m_dbmanager.CloseDatabases();
+    parent->ClearSettingsCache();
+}
 
 MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
@@ -3325,11 +3355,28 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     DatabaseParams cur_params = GetDatabaseParams();
     
     // only rewrite file if it has changed
-    if (memcmp((void *)&params, (void *)&cur_params, sizeof(DatabaseParams)))
+    if (params.dbHostName   != cur_params.dbHostName          || 
+        params.dbHostPing   != cur_params.dbHostPing          || 
+        params.dbPort       != cur_params.dbPort              || 
+        params.dbUserName   != cur_params.dbUserName          || 
+        params.dbPassword   != cur_params.dbPassword          || 
+        params.dbName       != cur_params.dbName              || 
+        params.dbType       != cur_params.dbType              || 
+        params.localEnabled != cur_params.localEnabled        || 
+        params.wolEnabled   != cur_params.wolEnabled          || 
+        (params.localEnabled && 
+         (params.localHostName != cur_params.localHostName))  || 
+        (params.wolEnabled && 
+         (params.wolReconnect  != cur_params.wolReconnect || 
+          params.wolRetry      != cur_params.wolRetry     || 
+          params.wolCommand    != cur_params.wolCommand)))
     {
         ret = d->WriteSettingsFile(params, true);
         if (ret)
         {
+            // Use a possibly new DB:
+            d->ResetDatabase();
+
             // Reload the new settings:
             if (d->m_settings)
                 delete d->m_settings;

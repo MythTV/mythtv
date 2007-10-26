@@ -41,6 +41,8 @@ class MDBManager
     MDBManager(void);
     ~MDBManager(void);
 
+    void CloseDatabases(void);
+
   protected:
     MSqlDatabase *popConnection(void);
     void pushConnection(MSqlDatabase *db);

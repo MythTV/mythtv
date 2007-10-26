@@ -244,6 +244,26 @@ MSqlDatabase *MDBManager::getDDCon()
     return m_DDCon;
 }
 
+// Dangerous. Should only be used when the database connection has errored?
+
+void MDBManager::CloseDatabases()
+{
+    m_lock.lock();
+
+    QPtrListIterator<MSqlDatabase> it(m_pool);
+    MSqlDatabase                   *db;
+
+    while ((db = it.current()))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Closing DB connection named '" + db->m_name + "'");
+        db->m_db->close();
+        ++it;
+    }
+
+    m_lock.unlock();
+}
+
 
 // -----------------------------------------------------------------------
 
