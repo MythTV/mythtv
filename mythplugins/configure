@@ -483,10 +483,10 @@ if test "$music" != "no" ; then
     fi
 
     taglib="no"
-    if has_library libtag && has_header taglib/fileref.h ; then
+    if has_library libtag && has_header taglib/fileref.h && test `taglib-config --version` = "1.4"; then
         taglib="yes"
     else
-        echo "MythMusic requires taglib."
+        echo "MythMusic requires taglib 1.4."
     fi 
 
     if test "$targetos" != "Darwin" ; then
