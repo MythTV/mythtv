@@ -313,11 +313,22 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
 
 void ChannelEditor::deleteChannels(void)
 {
+    const QString currentLabel    = source->getSelectionLabel();
     const QString currentSourceID = source->getValue();
+
+    bool del_all = currentSourceID.isEmpty() || currentSourceID == "All";
+    bool del_nul = currentSourceID == "Unassigned";
+
+    QString chan_msg =
+        (del_all) ? tr("Are you sure you would like to delete ALL channels?") :
+        ((del_nul) ?
+         tr("Are you sure you would like to delete all unassigned channels?") :
+         tr("Are you sure you would like to delete the channels on %1?")
+         .arg(currentLabel));
 
     int val = MythPopupBox::show2ButtonPopup(
         gContext->GetMainWindow(), "",
-        tr("Are you sure you would like to delete these channels?"),
+        chan_msg,
         tr("Yes, delete the channels"),
         tr("No, don't"), 2);
 
@@ -325,11 +336,11 @@ void ChannelEditor::deleteChannels(void)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (currentSourceID.isEmpty())
+    if (del_all)
     {
         query.prepare("TRUNCATE TABLE channel");
     }
-    else if (currentSourceID == "Unassigned")
+    else if (del_nul)
     {
         query.prepare("SELECT sourceid "
                       "FROM videosource "
