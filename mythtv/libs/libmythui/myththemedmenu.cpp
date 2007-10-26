@@ -389,7 +389,6 @@ void MythThemedMenuState::parseBackground(
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "background").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -444,7 +443,6 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "text/shadow").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -508,7 +506,6 @@ void MythThemedMenuState::parseOutline(TextAttributes &attributes,
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "text/shadow").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -746,7 +743,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
                 if (!hasnormal)
                 {
                     VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: The 'normal' "
-                            "tag needs to come before the 'normaltext' tag");
+                            "tag needs to come before the 'text' tag");
                     return;
                 }
                 parseText(normalAttributes, info);
@@ -771,7 +768,6 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
                 VERBOSE(VB_GENERAL,
                         QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                 "genericbutton").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -834,7 +830,6 @@ void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in logo").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -919,7 +914,6 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in logo").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -975,7 +969,6 @@ void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in arrow").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -1096,7 +1089,6 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in buttondef").arg(info.tagName()));
-                return;
             }
         }
     }
@@ -1396,7 +1388,6 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in button").arg(info.tagName()));
-                return;
             }
         }
     }
