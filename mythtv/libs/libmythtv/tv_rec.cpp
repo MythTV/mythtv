@@ -2159,10 +2159,14 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     // sharing the prefix we were given.
 
     // Is an extra characher useful for disambiguation?
-    if (query.exec(basequery.arg(prefix)))
-        is_extra_char_useful = query.next();
-    for (uint i = 0; i < ((is_extra_char_useful) ? 0 : fchannum.size()); i++)
+    is_extra_char_useful = false;
+    for (uint i = 0; (i < fchannum.size()) && !is_extra_char_useful; i++)
+    {
         is_extra_char_useful = (fchannum[i] != add_spacer(prefix, fspacer[i]));
+        VERBOSE(VB_IMPORTANT, "is_extra_char_useful("
+                <<fchannum[i]<<"!="<<add_spacer(prefix, fspacer[i])
+                <<"): "<<is_extra_char_useful);
+    }
 
     // Are any of the channels complete w/o spacer?
     // If so set is_complete_valid_channel_on_rec,
@@ -2191,9 +2195,6 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     // then try to commit to any true match immediately.
     for (uint i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
     {
-        if (fcardid[i] != cardid)
-            break;
-
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
             needed_spacer = QDeepCopy<QString>(fspacer[i]);
