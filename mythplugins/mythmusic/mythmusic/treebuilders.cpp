@@ -11,6 +11,10 @@ typedef struct  {
    QString dispStr;
 } FieldSplitInfo;
 
+// arrays for different level of granularity in the tree
+// choose between them by using a global setting.  In an ideal
+// world we would generate these dynamically, but that turned
+// into more change than it was worth
 static FieldSplitInfo splitArray4[] =
 { 
   {"!\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~", " (...)"},
@@ -22,7 +26,63 @@ static FieldSplitInfo splitArray4[] =
   {"PQRST", " (P Q R S T)"},
   {"UVWXYZ", " (U V W X Y Z)"}
 };
+
+static FieldSplitInfo splitArray16[] =
+{ 
+  {"!\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~", " (...)"},
+  {"01234", " (0 1 2 3 4)" },
+  {"56789", " (5 6 7 8 9)" },
+  {"AB", " (A B)"},
+  {"CD", " (C D)"},
+  {"EF", " (E F)"},
+  {"GH", " (G H)"},
+  {"IJ", " (I J)"},
+  {"KL", " (K L)"},
+  {"MN", " (M N)"},
+  {"OP", " (O P)"},
+  {"QR", " (Q R)"},
+  {"ST", " (S T)"},
+  {"UV", " (U V)"},
+  {"WX", " (W X)"},
+  {"YZ", " (Y Z)"}
+};
+
+static FieldSplitInfo splitArray29[] =
+{ 
+  {"!\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~", " (...)"},
+  {"01234", " (0 1 2 3 4)" },
+  {"56789", " (5 6 7 8 9)" },
+  {"A", " A"},
+  {"B", " B"},
+  {"C", " C"},
+  {"D", " D"},
+  {"E", " E"},
+  {"F", " F"},
+  {"G", " G"},
+  {"H", " H"},
+  {"I", " I"},
+  {"J", " J"},
+  {"K", " K"},
+  {"L", " L"},
+  {"M", " M"},
+  {"N", " N"},
+  {"O", " O"},
+  {"P", " P"},
+  {"Q", " Q"},
+  {"R", " R"},
+  {"S", " S"},
+  {"T", " T"},
+  {"U", " U"},
+  {"V", " V"},
+  {"W", " W"},
+  {"X", " X"},
+  {"Y", " Y"},
+  {"Z", " Z"}
+};
+
 const int kSplitArray4_Max = sizeof splitArray4 / sizeof splitArray4[0];
+const int kSplitArray16_Max = sizeof splitArray16 / sizeof splitArray16[0];
+const int kSplitArray29_Max = sizeof splitArray29 / sizeof splitArray29[0];
 
 static QString thePrefix = "the ";
 
@@ -157,16 +217,54 @@ private:
             } 
             else 
             {
-                int split_max = kSplitArray4_Max;
-                FieldSplitInfo *splits = splitArray4;            
-            
-                for(int i = 0; i < split_max; i++) 
+                QString artistGrouping = gContext->GetSetting("ArtistTreeGroups", "none");
+                if (artistGrouping == "2") 
                 {
-                    if (splits[i].testStr.contains(firstchar)) 
+                    int split_max = kSplitArray29_Max;
+                    FieldSplitInfo *splits = splitArray29;            
+                
+                    for(int i = 0; i < split_max; i++) 
                     {
-                        split = QObject::tr("Artists") + splits[i].dispStr;
-                        m_split_map[firstchar] = split;
-                        break;
+                        if (splits[i].testStr.contains(firstchar)) 
+                        {
+                            split = QObject::tr("Artists") + splits[i].dispStr;
+                            m_split_map[firstchar] = split;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (artistGrouping == "1")
+                    {
+                        int split_max = kSplitArray16_Max;
+                        FieldSplitInfo *splits = splitArray16;            
+                    
+                        for(int i = 0; i < split_max; i++) 
+                        {
+                            if (splits[i].testStr.contains(firstchar)) 
+                            {
+                                split = QObject::tr("Artists") + splits[i].dispStr;
+                                m_split_map[firstchar] = split;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // old behaviour is the default
+                        int split_max = kSplitArray4_Max;
+                        FieldSplitInfo *splits = splitArray4;            
+                    
+                        for(int i = 0; i < split_max; i++) 
+                        {
+                            if (splits[i].testStr.contains(firstchar)) 
+                            {
+                                split = QObject::tr("Artists") + splits[i].dispStr;
+                                m_split_map[firstchar] = split;
+                                break;
+                            }
+                        }
                     }
                 }
             }

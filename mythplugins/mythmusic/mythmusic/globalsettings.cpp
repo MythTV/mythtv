@@ -304,6 +304,20 @@ static HostSpinBox *SetSearchMaxResultsReturned()
     return gc;
 };
 
+static HostComboBox *ArtistTreeGroups()
+{
+    HostComboBox *gc = new HostComboBox("ArtistTreeGroups");
+    gc->setLabel(QObject::tr("Number of Artists Tree Groups"));
+    gc->addSelection(QObject::tr("Few"), "0");
+    gc->addSelection(QObject::tr("Average"), "1");
+    gc->addSelection(QObject::tr("Many"), "2");
+    gc->setHelpText(QObject::tr("Determines how many groups we have in the artist"
+                                " tree.  Few gives 'A B C D' as per the old behaviour,"
+                                " average gives two letters per group, many gives one"
+                                " letter per group."));
+    return gc;
+};
+
 static HostCheckBox *UseShowRatings()
 {
     HostCheckBox *gc = new HostCheckBox("MusicShowRatings");
@@ -586,28 +600,33 @@ static HostComboBox *CDBlankType()
 MusicGeneralSettings::MusicGeneralSettings(void)
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General Settings"));
+    general->setLabel(QObject::tr("General Settings (1)"));
     general->addChild(SetMusicDirectory());
     general->addChild(MusicAudioDevice());
     general->addChild(CDDevice());
-    general->addChild(TreeLevels());
-    general->addChild(NonID3FileNameFormat());
-    general->addChild(IgnoreID3Tags());
-    general->addChild(TagEncoding());
     general->addChild(AutoLookupCD());
     general->addChild(AutoPlayCD());
     general->addChild(KeyboardAccelerators());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
-    general2->setLabel(QObject::tr("CD Recording Settings"));
-    general2->addChild(CDWriterEnabled());
-    general2->addChild(CDWriterDevice());
-    general2->addChild(CDDiskSize());
-    general2->addChild(CDCreateDir());
-    general2->addChild(CDWriteSpeed());
-    general2->addChild(CDBlankType());
+    general2->setLabel(QObject::tr("General Settings (2)"));
+    general2->addChild(TreeLevels());
+    general2->addChild(ArtistTreeGroups());
+    general2->addChild(NonID3FileNameFormat());
+    general2->addChild(IgnoreID3Tags());
+    general2->addChild(TagEncoding());
     addChild(general2);
+
+    VerticalConfigurationGroup* general3 = new VerticalConfigurationGroup(false);
+    general3->setLabel(QObject::tr("CD Recording Settings"));
+    general3->addChild(CDWriterEnabled());
+    general3->addChild(CDWriterDevice());
+    general3->addChild(CDDiskSize());
+    general3->addChild(CDCreateDir());
+    general3->addChild(CDWriteSpeed());
+    general3->addChild(CDBlankType());
+    addChild(general3);
 }
 
 MusicPlayerSettings::MusicPlayerSettings(void)
