@@ -9,6 +9,7 @@
 #include <qwidget.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <cerrno>
 #include <pthread.h>
 
 #include <iostream>
@@ -61,6 +62,7 @@ using namespace std;
 static MythThemedMenu *menu;
 static MythThemeBase *themeBase;
 XBox *xbox = NULL;
+QString logfile = "";
 
 MediaRenderer   *g_pUPnp       = NULL;
 
@@ -893,6 +895,37 @@ void PrintHelp(void)
 
 }
 
+int log_rotate(int report_error)
+{
+    int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND, 0664);
+
+    if (new_logfd < 0) {
+        /* If we can't open the new logfile, send data to /dev/null */
+        if (report_error) {
+            cerr << "cannot open logfile " << logfile << endl;
+            return -1;
+        }
+
+        new_logfd = open("/dev/null", O_WRONLY);
+
+        if (new_logfd < 0) {
+            /* There's not much we can do, so punt. */
+            return -1;
+        }
+    }
+
+    while (dup2(new_logfd, 1) < 0 && errno == EINTR);
+    while (dup2(new_logfd, 2) < 0 && errno == EINTR);
+    while (close(new_logfd) < 0   && errno == EINTR);
+
+    return 0;
+}
+
+void log_rotate_handler(int)
+{
+    log_rotate(0);
+}
+
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -933,8 +966,6 @@ int main(int argc, char **argv)
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
     QApplication a(argc, argv);
-
-    QString logfile = "";
 
     QString pluginname = "";
     QMap<QString, QString> settingsOverride;
@@ -1202,28 +1233,12 @@ int main(int argc, char **argv)
         }
     }
 
-    int logfd = -1;
-
     if (logfile != "")
     {
-        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
- 
-        if (logfd < 0)
-        {
-            perror("open(logfile)");
-            return FRONTEND_EXIT_OPENING_LOGFILE_ERROR;
-        }
-    }
-
-    if (logfd != -1)
-    {
-        // Send stdout and stderr to the logfile
-        dup2(logfd, 1);
-        dup2(logfd, 2);
-
-        // Close the unduplicated logfd
-        if (logfd != 1 && logfd != 2)
-            close(logfd);
+        if (log_rotate(1) < 0)
+            cerr << "cannot open logfile; using stdout/stderr" << endl;
+        else
+            signal(SIGHUP, &log_rotate_handler);
     }
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -1441,6 +1456,8 @@ int main(int argc, char **argv)
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, &value);
     }
+
+    signal(SIGHUP, SIG_DFL);
 
     if (networkControl)
         delete networkControl;
