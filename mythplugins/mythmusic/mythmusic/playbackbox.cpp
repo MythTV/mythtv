@@ -672,13 +672,16 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
    if (!playlist_popup)
         return;
 
+    // save all pending metadata to then DB so that the smart playlists can use it
+    all_music->save();
+
     closePlaylistPopup();
-    
+
     SmartPlaylistDialog dialog(gContext->GetMainWindow(), "smartplaylistdialog");
     dialog.setSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
 
     int res = dialog.ExecPopup();
-    
+
     if (res > 0)
     {
         dialog.getSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
@@ -1028,6 +1031,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         branches_to_current_node = *a_route;
 
         // reload music
+        all_music->save();
         all_music->startLoading();
         while (!all_music->doneLoading())
         {
