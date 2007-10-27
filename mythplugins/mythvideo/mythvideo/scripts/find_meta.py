@@ -109,33 +109,6 @@ def print_verbose(string):
 	return
 
 db = None
-def init_db():
-	global db
-	try:
-		config = shlex.shlex(open(os.path.expanduser('~/.mythtv/mysql.txt')))
-	except:
-		print "Error opening ~/.mythtv/mysql.txt"
-		return False
-
-
-	token = config.get_token()
-	db_host = db_user = db_password = None
-	while  token != config.eof and (db_host == None or db_user == None or db_password == None):
-		if token == "DBHostName":
-			if config.get_token() == "=":
-				db_host = config.get_token()
-		elif token == "DBUserName":
-			if config.get_token() == "=":
-				db_user = config.get_token()
-		elif token == "DBPassword":
-			if config.get_token() == "=":
-				db_password = config.get_token()
-
-		token = config.get_token()
-	db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password,
-			db="mythconverg")
-	print_verbose("Database connection successful.")
-	return True
 
 def find_imdb_id_from_text_file(textFile):
 
@@ -555,7 +528,6 @@ def find_metadata_for_video_path(pathName):
 		if candidates is None or len(candidates) == 0:
 			# TODO: Try with the dirname
 			pass
-
 		if candidates is not None and len(candidates) > 0:
 
 			index = 0
@@ -909,7 +881,9 @@ def main():
 			print "You must have the MythTV module to make direct DB importing to work"
 			sys.exit(1)
 		poster_dir = mythdb.getSetting("VideoArtworkDir", socket.gethostname())
-
+		if not mythdb:
+			print "Could not get VideoArtworkDir setting for the current host."
+			sys.exit(1)
 
 	if prune:
 		mythvideo.pruneMetadata()

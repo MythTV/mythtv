@@ -69,6 +69,7 @@ class MythDB:
 		for config_file in config_files:
 			try:
 				config = shlex.shlex(open(config_file))
+				config.wordchars += "."
 			except:
 				continue
 	
