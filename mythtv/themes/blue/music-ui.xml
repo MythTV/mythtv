@@ -558,10 +558,10 @@
             <checkbox name="compilation_check" draworder="0">
                 <context>1</context>
                 <position>195,70</position>
-                <image function="checked" filename="mm_checked.png"></image>
-                <image function="unchecked" filename="mm_unchecked.png"></image>
-                <image function="checked_high" filename="mm_checked_high.png"></image>
-                <image function="unchecked_high" filename="mm_unchecked_high.png"></image>
+                <image function="checked" filename="checked.png"></image>
+                <image function="unchecked" filename="unchecked.png"></image>
+                <image function="checked_high" filename="checked_high.png"></image>
+                <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox> 
 
             <remoteedit name="compilation_artist_edit" draworder="1" align="left">
@@ -573,9 +573,9 @@
             <pushbutton name="searchcompilation_artist_button" draworder="2">
                 <context>1</context>
                 <position>725,110</position>
-                <image function="on" filename="mm_blankbutton_on.png"></image>
-                <image function="off" filename="mm_blankbutton_off.png"></image>
-                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
 
@@ -588,9 +588,9 @@
             <pushbutton name="searchartist_button" draworder="2">
                 <context>1</context>
                 <position>725,150</position>
-                <image function="on" filename="mm_blankbutton_on.png"></image>
-                <image function="off" filename="mm_blankbutton_off.png"></image>
-                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
 
@@ -603,9 +603,9 @@
             <pushbutton name="searchalbum_button" draworder="2">
                 <context>1</context>
                 <position>725,190</position>
-                <image function="on" filename="mm_blankbutton_on.png"></image>
-                <image function="off" filename="mm_blankbutton_off.png"></image>
-                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
             <remoteedit name="title_edit" draworder="1" align="left">
@@ -623,9 +623,9 @@
             <pushbutton name="searchgenre_button" draworder="2">
                 <context>1</context>
                 <position>725,270</position>
-                <image function="on" filename="mm_blankbutton_on.png"></image>
-                <image function="off" filename="mm_blankbutton_off.png"></image>
-                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+                <image function="on" filename="blankbutton_on.png"></image>
+                <image function="off" filename="blankbutton_off.png"></image>
+                <image function="pushed" filename="blankbutton_pushed.png"></image>
             </pushbutton>
 
             <remoteedit name="year_edit" draworder="1" align="left">
@@ -651,9 +651,9 @@
                 <context>1</context>
                 <area>420,350,30,30</area>
                 <font>display</font>
-                <image function="on" filename="mm_leftright_on.png"></image>
-                <image function="off" filename="mm_leftright_off.png"></image>
-                <image function="pushed" filename="mm_leftright_pushed.png"></image>
+                <image function="on" filename="leftright_on.png"></image>
+                <image function="off" filename="leftright_off.png"></image>
+                <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>
 
             <textarea name="playcount_text" draworder="1" align="left">
@@ -935,9 +935,9 @@
            <selector name="quality_selector" draworder="0">
                <area>195,50,300,40</area>
                <font>display</font>
-               <image function="on" filename="mm_leftright_on.png"></image>
-               <image function="off" filename="mm_leftright_off.png"></image>
-               <image function="pushed" filename="mm_leftright_pushed.png"></image>
+               <image function="on" filename="leftright_on.png"></image>
+               <image function="off" filename="leftright_off.png"></image>
+               <image function="pushed" filename="leftright_pushed.png"></image>
            </selector> 
 
            <remoteedit name="artist_edit" draworder="1" align="left">
@@ -947,9 +947,9 @@
 
            <pushbutton name="searchartist_button" draworder="2">
                <position>725,90</position>
-               <image function="on" filename="mm_blankbutton_on.png"></image>
-               <image function="off" filename="mm_blankbutton_off.png"></image>
-               <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+               <image function="on" filename="blankbutton_on.png"></image>
+               <image function="off" filename="blankbutton_off.png"></image>
+               <image function="pushed" filename="blankbutton_pushed.png"></image>
            </pushbutton>
 
 
@@ -960,9 +960,9 @@
 
            <pushbutton name="searchalbum_button" draworder="2">
                <position>725,130</position>
-               <image function="on" filename="mm_blankbutton_on.png"></image>
-               <image function="off" filename="mm_blankbutton_off.png"></image>
-               <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+               <image function="on" filename="blankbutton_on.png"></image>
+               <image function="off" filename="blankbutton_off.png"></image>
+               <image function="pushed" filename="blankbutton_pushed.png"></image>
            </pushbutton>
 
 
@@ -973,9 +973,9 @@
 
            <pushbutton name="searchgenre_button" draworder="2">
                <position>725,170</position>
-               <image function="on" filename="mm_blankbutton_on.png"></image>
-               <image function="off" filename="mm_blankbutton_off.png"></image>
-               <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+               <image function="on" filename="blankbutton_on.png"></image>
+               <image function="off" filename="blankbutton_off.png"></image>
+               <image function="pushed" filename="blankbutton_pushed.png"></image>
            </pushbutton>
 
            <checkbox name="compilation_check" draworder="0">
@@ -1367,9 +1367,9 @@
 
            <pushbutton name="location_button" draworder="2">
                <position>725,60</position>
-               <image function="on" filename="mm_blankbutton_on.png"></image>
-               <image function="off" filename="mm_blankbutton_off.png"></image>
-               <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+               <image function="on" filename="blankbutton_on.png"></image>
+               <image function="off" filename="blankbutton_off.png"></image>
+               <image function="pushed" filename="blankbutton_pushed.png"></image>
            </pushbutton>
 
            <textbutton name="scan_button" draworder="0">
@@ -1768,9 +1768,9 @@
            <selector name="type_selector" draworder="1">
                <area>200,400,300,40</area>
                <font>display</font>
-               <image function="on" filename="mm_leftright_on.png"></image>
-               <image function="off" filename="mm_leftright_off.png"></image>
-               <image function="pushed" filename="mm_leftright_pushed.png"></image>
+               <image function="on" filename="leftright_on.png"></image>
+               <image function="off" filename="leftright_off.png"></image>
+               <image function="pushed" filename="leftright_pushed.png"></image>
            </selector>
 
            <textbutton name="exit_button" draworder="0">
