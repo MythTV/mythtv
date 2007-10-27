@@ -156,6 +156,18 @@ static GlobalCheckBox *DeletesFollowLinks()
     return gc;
 };
 
+static HostLineEdit *MiscStatusScript()
+{
+    HostLineEdit *he = new HostLineEdit("MiscStatusScript");
+    he->setLabel(QObject::tr("Miscellaneous Status Application"));
+    he->setValue("");
+    he->setHelpText(QObject::tr("External application or script that outputs "
+                                "extra information for inclusion in the "
+                                "backend status page.  See "
+                                "contrib/misc_status_info/README"));
+    return he;
+}
+
 static void init_time_offsets(GlobalComboBox *gc)
 {
     gc->addSelection("None");
@@ -713,10 +725,16 @@ BackendSettings::BackendSettings() {
     addChild(locale);
     
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
-    group2->setLabel(QObject::tr("File Management Settings"));
-    group2->addChild(MasterBackendOverride());
-    group2->addChild(DeletesFollowLinks());
-    group2->addChild(TruncateDeletes());
+    group2->setLabel(QObject::tr("Miscellaneous Settings"));
+    VerticalConfigurationGroup* fm = new VerticalConfigurationGroup();
+    fm->setLabel(QObject::tr("File Management Settings"));
+    fm->addChild(MasterBackendOverride());
+    fm->addChild(DeletesFollowLinks());
+    fm->addChild(TruncateDeletes());
+    group2->addChild(fm);
+    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
+    misc->addChild(MiscStatusScript());
+    group2->addChild(misc);
     addChild(group2);
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);

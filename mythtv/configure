@@ -145,7 +145,6 @@ show_help(){
   #echo "  --disable-backend        disable backend  [breaks dependency checking]"
   echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
   echo "  --disable-joystick-menu  disable joystick menu"
-  echo "  --disable-lmsensors      disable linux hw monitor support"
   echo "  --disable-firewire       disable support for FireWire cable boxes"
   echo "  --disable-iptv           disable support for recording RTSP/UDP/RTP streams"
   echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
@@ -802,7 +801,6 @@ MYTHTV_CONFIG_LIST='
     ivtv
     joystick_menu
     lirc
-    lmsensors
     opengl_vsync
     opengl_video
     v4l
@@ -1054,7 +1052,6 @@ ivtv="yes"
 joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
-lmsensors="default"
 mac_bundle="no"
 mac_corevideo="no"
 opengl="no"
@@ -1570,7 +1567,6 @@ EOF
     CCONFIG="$CCONFIG linux"
     backend="yes"
     ! disabled joystick_menu && enable joystick_menu
-    ! disabled lmsensors && enable lmsensors
     LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
     ;;
   irix*)
@@ -2775,8 +2771,6 @@ if enabled directfb; then
         CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
     fi
 fi
-
-enabled lmsensors && has_header sensors/sensors.h && has_library libsensors || disable lmsensors
 
 if test $targetos = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework

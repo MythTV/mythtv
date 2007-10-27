@@ -21,14 +21,10 @@
 #include <qfile.h>
 #include <qregexp.h>
 #include <qbuffer.h>
+#include <qprocess.h>
 #include <math.h>
 
 #include "../../config.h"
-#ifdef CONFIG_LMSENSORS 
-    #define LMSENSOR_DEFAULT_CONFIG_FILE "/etc/sensors.conf" 
-    #include <sensors/sensors.h> 
-    #include <sensors/chips.h> 
-#endif 
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -309,7 +305,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QDomElement mInfo   = pDoc->createElement("MachineInfo");
     QDomElement storage = pDoc->createElement("Storage"    );
     QDomElement load    = pDoc->createElement("Load"       );
-    QDomElement thermal = pDoc->createElement("Thermal"    );
     QDomElement guide   = pDoc->createElement("Guide"      );
 
     root.appendChild (mInfo  );
@@ -368,82 +363,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         load.setAttribute("avg3", rgdAverages[2]);
     }
 
- 
-    //temperature ----------------- 
-    // Try ACPI first, then lmsensor 2nd 
-    QDir dir("/proc/acpi/thermal_zone"); 
-    bool found_acpi = false; 
-    QString acpiTempDir; 
-    if (dir.exists()) 
-    { 
-        QStringList lst = dir.entryList(); 
-        QRegExp rxp = QRegExp ("TH?M?", TRUE, FALSE); 
-        QString line, temp; 
-        for (QStringList::Iterator it = lst.begin(); it != lst.end(); ++it) 
-        { 
-            if ( (*it).contains(rxp)) 
-            { 
-                acpiTempDir = dir.absFilePath(*it); 
-            } 
-        } 
-        
-        QFile acpiTempFile(acpiTempDir.append("/temperature")); 
-        if (acpiTempFile.open(IO_ReadOnly)) 
-        { 
-            QTextStream stream (&acpiTempFile); 
-            line = stream.readLine(); 
-            rxp = QRegExp ("(\\d+)", TRUE, FALSE); 
-            if (rxp.search(line) != -1 ) 
-            { 
-                temp = rxp.cap(1); 
-                temp += " &#8451;"; // print degress Celsius  
-                mInfo.appendChild(thermal); 
-                thermal.setAttribute("temperature", temp); 
-                found_acpi = true; 
-            } 
-        }  
-        acpiTempFile.close(); 
-    }                                                  
-
-#ifdef CONFIG_LMSENSORS
-    m_settingLock.lock();
-
-    if (!found_acpi) 
-    { 
-        int chip_nr, a, b; 
-        char *label = NULL; 
-        double value; 
-        const sensors_chip_name *chip; 
-        const sensors_feature_data *data; 
-        char* lmsensorConfigName = LMSENSOR_DEFAULT_CONFIG_FILE; 
-        a = b = 0; 
-        FILE *lmsensorConfigFile = fopen(lmsensorConfigName, "r"); 
-        sensors_init(lmsensorConfigFile); 
-        fclose(lmsensorConfigFile); 
-        for (chip_nr = 0 ; (chip = sensors_get_detected_chips(&chip_nr)) ; ) 
-        { 
-            while ((data = sensors_get_all_features(*chip, &a, &b))) 
-            { 
-                if ((!sensors_get_label(*chip, data->number, &label)) &&  
-                    (!sensors_get_feature(*chip, data->number, &value))) 
-                { 
-                    // Find label matching "CPU Temp" or "Temp/CPU" 
-                    QRegExp rxp = QRegExp ("(CPU.+Temp)|(Temp.+CPU)", FALSE, FALSE); 
-                    if (rxp.search(QString(label)) != -1  && value > 0) 
-                    { 
-                        QString temp = QString("%1").arg(value); 
-                        temp += " &#8451;"; 
-                        mInfo.appendChild(thermal); 
-                        thermal.setAttribute("temperature", temp); 
-                    } 
-                } 
-            } 
-        }  
-        sensors_cleanup(); 
-    } 
-    m_settingLock.unlock();
-#endif 
-
     // Guide Data ---------------------
 
     QDateTime GuideDataThrough;
@@ -477,6 +396,82 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     QDomText dataDirectMessage = pDoc->createTextNode(gContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
+
+    // Add Miscellaneous information
+
+    // TODO: Add GUI control/setting for info_script
+    QString info_script = gContext->GetSetting("MiscStatusScript");
+    if ((!info_script.isEmpty()) && (info_script != "none"))
+    {
+        QDomElement misc = pDoc->createElement("Miscellaneous");
+        root.appendChild(misc);
+
+        QProcess miscellaneous_status_info_proc(info_script);
+        miscellaneous_status_info_proc.setCommunication(
+                                          QProcess::Stdout|QProcess::Stderr);
+
+        if (miscellaneous_status_info_proc.start())
+        {
+            int i = 0;
+            // Since the miscellaneous status information is not critical
+            // but creating the status document must wait for it, timeout
+            // if the script takes more than 10 seconds to execute.
+            while (miscellaneous_status_info_proc.isRunning() && i < 100)
+            {
+                usleep(100000);
+                ++i;
+            }
+
+            if (miscellaneous_status_info_proc.normalExit())
+            {
+                QString input = "";
+                while (miscellaneous_status_info_proc.canReadLineStdout())
+                {
+                    input = miscellaneous_status_info_proc.readLineStdout();
+                    if (input.isEmpty())
+                        continue;
+
+                    QDomElement info = pDoc->createElement("Information");
+
+                    QStringList list = QStringList::split("[]:[]", input, true);
+                    unsigned int size = list.size();
+                    unsigned int hasAttributes = 0;
+
+                    // TODO: escape XML
+                    if ((size > 0) && (!list[0].isEmpty()))
+                    {
+                        info.setAttribute("display", list[0]);
+                        hasAttributes++;
+                    }
+                    if ((size > 1) && (!list[1].isEmpty()))
+                    {
+                        info.setAttribute("name", list[1]);
+                        hasAttributes++;
+                    }
+                    if ((size > 2) && (!list[2].isEmpty()))
+                    {
+                        info.setAttribute("value", list[2]);
+                        hasAttributes++;
+                    }
+
+                    if (hasAttributes > 0)
+                        misc.appendChild(info);
+                }
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
+                        "status information script or execution timed out: %1")
+                        .arg(info_script));
+            }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Failed to run miscellaneous status "
+                    "information script: %1").arg(info_script));
+        }
+    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -620,6 +615,13 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 
     if (!node.isNull())
         PrintMachineInfo( os, node.toElement());
+
+    // Miscellaneous information ---------------
+
+    node = docElem.namedItem( "Miscellaneous" );
+
+    if (!node.isNull())
+        PrintMiscellaneousInfo( os, node.toElement());
 
     os << "\r\n</body>\r\n</html>\r\n";
 
@@ -1151,24 +1153,6 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
         }
     }
 
-   // ACPI temperature ------------------
-
-    node = info.namedItem( "Thermal" );
-
-    if (!node.isNull())
-    {
-        QDomElement e = node.toElement();
-
-        if (!e.isNull())
-        {
-            QString temperature = e.attribute( "temperature" , "0" );
-
-            os << "      Current CPU temperature: "
-               << temperature
-               << ".<br />\r\n";
-        }
-    }
-	
     // Guide Info ---------------------
 
     node = info.namedItem( "Guide" );
@@ -1229,10 +1213,58 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                    << "Have you run mythfilldatabase?";
 
             if (!sMsg.isNull() && !sMsg.isEmpty())
-                os << "<br />\r\nDataDirect Status: " << sMsg;
+                os << "<br />\r\n    DataDirect Status: " << sMsg;
         }
     }
     os << "\r\n  </div>\r\n";
+
+    return( 1 );
+}
+
+int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
+{
+    if (info.isNull())
+        return( 0 );
+
+    // Miscellaneous information
+
+    QDomNodeList nodes = info.elementsByTagName("Information");
+    uint count = nodes.count();
+    if (count > 0)
+    {
+        QString display, linebreak;
+        //QString name, value;
+        os << "<div class=\"content\">\r\n"
+           << "    <h2>Miscellaneous</h2>\r\n";
+        for (unsigned int i = 0; i < count; i++)
+        {
+            QDomNode node = nodes.item(i);
+            if (node.isNull())
+                continue;
+
+            QDomElement e = node.toElement();
+            if (e.isNull())
+                continue;
+
+            display = e.attribute("display", "");
+            //name = e.attribute("name", "");
+            //value = e.attribute("value", "");
+
+            if (display.isEmpty())
+                continue;
+
+            // Only include HTML line break if display value doesn't already
+            // contain breaks.
+            if ((display.contains("<p>", false) > 0) ||
+                (display.contains("<br", false) > 0))
+                linebreak = "\r\n";
+            else
+                linebreak = "<br />\r\n";
+
+            os << "    " << display << linebreak;
+        }
+        os << "</div>\r\n";
+    }
 
     return( 1 );
 }

@@ -45,11 +45,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "autoexpire.h"
 #include "previewgenerator.h"
-#ifdef CONFIG_LMSENSORS
-    #define LMSENSOR_DEFAULT_CONFIG_FILE "/etc/sensors.conf"
-    #include <sensors/sensors.h>
-    #include <sensors/chips.h>
-#endif
 
 
 /** Milliseconds to wait for an existing thread from
