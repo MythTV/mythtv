@@ -24,6 +24,8 @@
 #     - removed amazon.com searching for now
 
 # changes:
+# 10-26-2007:
+#   Added release date (in ISO 8601 form) to output
 # 9-10-2006: Anduin Withers
 #   Changed output to utf8
 
@@ -31,12 +33,13 @@ use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
 
+eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.3.2";
+$version = "v1.3.3";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 my @countries = qw(USA UK Canada Japan);
@@ -150,6 +153,18 @@ sub getMovieData {
    }
    my $writer = join(",", ($data =~ m/$name_link_pat/g));
 
+   # parse release date
+   my $releasedate = '';
+   if ($has_date_format) {
+      my $dtp = new DateTime::Format::Strptime(pattern => '%d %b %Y',
+         on_error => 'undef');
+      my $dt = $dtp->parse_datetime(parseBetween($response,
+            ">Release Date:</h5> ", "<a "));
+      if (defined($dt)) {
+         $releasedate = $dt->strftime("%F");
+      }
+   }
+
    # parse plot
    my $plot = parseBetween($response, ">Plot Outline:</h5> ", "</div>");
    if (!$plot) {
@@ -221,6 +236,7 @@ sub getMovieData {
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
    print "Year:$year\n";
+   print "ReleaseDate:$releasedate\n";
    print "Director:$director\n";
    print "Plot:$plot\n";
    print "UserRating:$userrating\n";
