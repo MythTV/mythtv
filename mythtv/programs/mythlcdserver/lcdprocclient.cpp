@@ -29,6 +29,8 @@
 #define LCD_TIME_TIME       5000
 #define LCD_SCROLLLIST_TIME 2000
 
+int lcdStartCol = LCD_START_COL;
+
 LCDProcClient::LCDProcClient(LCDServer *lparent) :
     QObject(NULL, "LCDProcClient")
 {
@@ -52,6 +54,12 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     lcdHeight = 1;
     cellWidth = 1;
     cellHeight = 1;
+    lcdStartCol = LCD_START_COL;
+    if (lcdWidth < 12)
+        if (lcdHeight == 1)
+           lcdStartCol = 0;
+        else
+           lcdStartCol = 1;
 
     hostname = "";
     port = 13666;
@@ -429,7 +437,7 @@ void LCDProcClient::init()
     sendToServer("screen_add Menu");
     setPriority("Menu", LOW);
     sendToServer("widget_add Menu topWidget string");
-    for (unsigned int i = 1; i < lcdHeight; i++) 
+    for (unsigned int i = 1; i <= lcdHeight; i++) 
     {
         aString = "widget_add Menu menuWidget";
         aString += QString::number (i);
@@ -1022,6 +1030,8 @@ void LCDProcClient::scrollWidgets()
 void LCDProcClient::startMusic(QString artist, QString album, QString track)
 {
     // Playing music displays:
+    // For 1-line displays:
+    //       <ArtistAlbumTitle>
     // For 2-line displays:
     //       <ArtistAlbumTitle>
     //       <Elapse/Remaining Time>
@@ -1082,7 +1092,7 @@ void LCDProcClient::startChannel(QString channum, QString title, QString subtitl
 
     activeScreen = "Channel";
 
-    if (lcdHeight == 2)
+    if (lcdHeight <= 2)
     {
         aString = channum + "|" + title;
         if (subtitle != "")
@@ -1181,6 +1191,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
         setPriority("Menu", URGENT);
 
     // Write out the app name
+    if (lcdHeight > 1)
     outputCenteredText("Menu", app_name, "topWidget", 1);
 
     QPtrListIterator<LCDMenuItem> it(*menuItems);
@@ -1232,9 +1243,9 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
         ++counter;
     }
 
-    // If there is only two lines on the display, then just write the selected
+    // If there is only one or two lines on the display, then just write the selected
     //  item and leave
-    if (lcdHeight == 2)
+    if (lcdHeight <= 2)
     {
         it.toFirst();
         while ((curItem = it.current()) != 0)
@@ -1243,7 +1254,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
             if (curItem->isSelected())
             {
                 // Set the scroll flag if necessary, otherwise set it to false
-                if (curItem->ItemName().length()  > (lcdWidth - LCD_START_COL))
+                if (curItem->ItemName().length()  > (lcdWidth - lcdStartCol))
                 {
                     menuPreScrollTimer->start(2000, true);
                     curItem->setScroll(true);
@@ -1253,18 +1264,37 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
                     menuPreScrollTimer->stop();
                     curItem->setScroll(false);
                 }
-
-                aString  = "widget_set Menu menuWidget1 1 2 \">";
-
-                switch (curItem->isChecked())
+                if (lcdHeight == 2)
                 {
-                    case CHECKED: aString += "X "; break;
-                    case UNCHECKED: aString += "O "; break;
-                    case NOTCHECKABLE: aString += "  "; break;
-                    default: break;
+                    aString  = "widget_set Menu menuWidget1 1 2 \">";
+                }
+                else
+                {
+                    aString  = "widget_set Menu menuWidget1 1 1 \"";
                 }
 
-                aString += curItem->ItemName().left(lcdWidth - LCD_START_COL) +
+                if (lcdStartCol == 1)  // small display -> don't waste space for additional spaces
+                {
+                    switch (curItem->isChecked())
+                    {
+                        case CHECKED: aString += "X "; break;
+                        case UNCHECKED: aString += "O "; break;
+                        case NOTCHECKABLE: aString += "  "; break;
+                        default: break;
+                    }
+                }
+                else if (lcdStartCol != 0)
+                {
+                    switch (curItem->isChecked())
+                    {
+                        case CHECKED: aString += "X "; break;
+                        case UNCHECKED: aString += "O "; break;
+                        case NOTCHECKABLE: aString += "  "; break;
+                        default: break;
+                    }
+                }
+
+                aString += curItem->ItemName().left(lcdWidth - lcdStartCol) +
                            "\"";
                 sendToServer(aString);
                 return;
@@ -1324,7 +1354,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
             default: break;
         }
 
-        aString += curItem->ItemName().left(lcdWidth - LCD_START_COL) + "\"";
+        aString += curItem->ItemName().left(lcdWidth - lcdStartCol) + "\"";
         sendToServer(aString);
 
         ++counter;
@@ -1365,10 +1395,10 @@ void LCDProcClient::beginScrollingMenuText()
         ++it;
         // Don't setup for smooth scrolling if the item isn't long enough
         // (It causes problems with items being scrolled when they shouldn't)
-        if (curItem->ItemName().length()  > (lcdWidth - LCD_START_COL))
+        if (curItem->ItemName().length()  > (lcdWidth - lcdStartCol))
         {
             temp = temp.fill(QChar(' '), lcdWidth - curItem->getIndent() - 
-                             LCD_START_COL);
+                             lcdStartCol);
             curItem->setItemName(temp + curItem->ItemName());
             curItem->setScrollPos(curItem->getIndent() + temp.length());
             curItem->setScroll(true);
@@ -1411,10 +1441,10 @@ void LCDProcClient::scrollMenuText()
         ++counter;
     }
 
-    // If there is only two lines on the display, then just write the selected
-    // item and leave
+    // If there is only one or two lines on the display, then just write
+    // the selected item and leave
     curItem = it.toFirst();
-    if (lcdHeight == 2)
+    if (lcdHeight <= 2)
     {
         it.toFirst();
         while ((curItem = it.current()) != 0)
@@ -1434,24 +1464,44 @@ void LCDProcClient::scrollMenuText()
                 // Stop the timer if this item really doesn't need to scroll.
                 // This should never have to get invoked because in theory
                 // the code in startMenu has done its job. . .
-                if (curItem->ItemName().length()  < (lcdWidth - LCD_START_COL))
+                if (curItem->ItemName().length()  < (lcdWidth - lcdStartCol))
                     menuScrollTimer->stop();
 
-                aString  = "widget_set Menu menuWidget1 1 2 \">";
-
-                switch(curItem->isChecked())
+                if (lcdHeight == 2)
                 {
-                    case CHECKED: aString += "X "; break;
-                    case UNCHECKED: aString += "O "; break;
-                    case NOTCHECKABLE: aString += "  "; break;
-                    default: break;
+                aString  = "widget_set Menu menuWidget1 1 2 \">";
+                }
+                else
+                {
+                    aString  = "widget_set Menu menuWidget1 1 1 \"";
+                }
+
+                if (lcdWidth < 12)
+                {
+                    switch(curItem->isChecked())
+                    {
+                        case CHECKED: aString += "X"; break;
+                        case UNCHECKED: aString += "O"; break;
+                        case NOTCHECKABLE: aString += ""; break;
+                        default: break;
+                    }
+                }
+                else
+                {
+                    switch(curItem->isChecked())
+                    {
+                        case CHECKED: aString += "X "; break;
+                        case UNCHECKED: aString += "O "; break;
+                        case NOTCHECKABLE: aString += "  "; break;
+                        default: break;
+                    }
                 }
 
                 // Indent this item if nessicary
                 aString += bString.fill(' ', curItem->getIndent());
 
                 aString += curItem->ItemName().mid(curItem->getScrollPos(), 
-                                                   (lcdWidth - LCD_START_COL));
+                                                   (lcdWidth - lcdStartCol));
                 aString += "\"";
                 sendToServer(aString);
                 return;
@@ -1554,7 +1604,7 @@ void LCDProcClient::scrollMenuText()
 
             if (curItem->getScrollPos() <= longest_line)
                 aString += curItem->ItemName().mid(curItem->getScrollPos(), 
-                                                   (lcdWidth-LCD_START_COL));
+                                                   (lcdWidth-lcdStartCol));
 
             aString += "\"";
             sendToServer(aString);
@@ -1572,7 +1622,8 @@ void LCDProcClient::startVolume(QString app_name)
 {
     if (lcd_showvolume)
       setPriority("Volume", TOP);
-    outputCenteredText("Volume", "Myth " + app_name + " Volume");
+    if (lcdHeight > 1)
+        outputCenteredText("Volume", "Myth " + app_name + " Volume");
     volume_level = 0.0;
 
     outputVolume();
@@ -1799,7 +1850,7 @@ void LCDProcClient::dostdclock()
     int x, y;
 
     if (lcdHeight < 3)
-        y = 2;
+        y = lcdHeight;
     else
         y = (int) rint(lcdHeight / 2) + 1;
 
@@ -1912,16 +1963,21 @@ void LCDProcClient::outputRecStatus(void)
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget1", 1);
 
-        int length = tuner->startTime.secsTo(tuner->endTime);
-        int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
-        double rec_progress = (double) delta / length;
+        if (lcdHeight > 1)
+        {
+            int length = tuner->startTime.secsTo(tuner->endTime);
+            int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
+            double rec_progress = (double) delta / length;
 
-        aString = "widget_set RecStatus progressBar 1 ";
-        aString += QString::number(lcdHeight);
-        aString += " ";
-        aString += QString::number((int)rint(rec_progress * lcdWidth * 
-                                cellWidth));
-        sendToServer(aString);
+            aString = "widget_set RecStatus progressBar 1 ";
+            aString += QString::number(lcdHeight);
+            aString += " ";
+            aString += QString::number((int)rint(rec_progress * lcdWidth * 
+                                    cellWidth));
+            sendToServer(aString);
+        }
+        else 
+            sendToServer("widget_set RecStatus progressBar 1 1 0");
 
         listTime = list.count() * LCD_SCROLLLIST_TIME * 2;
     }
@@ -2054,16 +2110,23 @@ void LCDProcClient::outputMusic()
 
 void LCDProcClient::outputChannel()
 {
-    QString aString;
-    aString = "widget_set Channel progressBar 1 ";
-    aString += QString::number(lcdHeight);
-    aString += " ";
-    aString += QString::number((int)rint(progress * lcdWidth * cellWidth));
-    sendToServer(aString);
+    if (lcdHeight > 1)
+    {
+        QString aString;
+        aString = "widget_set Channel progressBar 1 ";
+        aString += QString::number(lcdHeight);
+        aString += " ";
+        aString += QString::number((int)rint(progress * lcdWidth * cellWidth));
+        sendToServer(aString);
+    }
+    else
+        sendToServer("widget_set Channel progressBar 1 1 0");
 }
 
 void LCDProcClient::outputGeneric()
 {
+    if (lcdHeight > 1)
+    {
     QString aString;
     aString = "widget_set Generic progressBar ";
     aString += QString::number (busy_pos);
@@ -2074,19 +2137,31 @@ void LCDProcClient::outputGeneric()
                                cellWidth));
     sendToServer(aString);
 }
+    else sendToServer("widget_set Generic progressBar 1 1 0");
+}
 
 void LCDProcClient::outputVolume()
 {
     QString aString;
-    aString = "widget_set Volume progressBar 1 ";
-    aString += QString::number(lcdHeight);
-    aString += " ";
-    aString += QString::number((int)rint(volume_level * lcdWidth * cellWidth));
-    sendToServer(aString);
+    int line;
+
+    if (lcdHeight > 1)
+    {
+        aString = "widget_set Volume progressBar 1 ";
+        aString += QString::number(lcdHeight);
+        aString += " ";
+        aString += QString::number((int)rint(volume_level * lcdWidth * cellWidth));
+        sendToServer(aString);
+    }
 
     aString = QString::number((int)(volume_level * 100));
     aString += "%";
-    outputRightText("Volume", aString, "botWidget", 3);
+
+    if (lcdHeight > 3)
+        line = 3;
+    else 
+        line = lcdHeight;
+    outputRightText("Volume", aString, "botWidget", line);
 }
 
 void LCDProcClient::switchToTime()
