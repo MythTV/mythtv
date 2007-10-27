@@ -2163,9 +2163,11 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     for (uint i = 0; (i < fchannum.size()) && !is_extra_char_useful; i++)
     {
         is_extra_char_useful = (fchannum[i] != add_spacer(prefix, fspacer[i]));
+#if DEBUG_CHANNEL_PREFIX
         VERBOSE(VB_IMPORTANT, "is_extra_char_useful("
                 <<fchannum[i]<<"!="<<add_spacer(prefix, fspacer[i])
                 <<"): "<<is_extra_char_useful);
+#endif
     }
 
     // Are any of the channels complete w/o spacer?
