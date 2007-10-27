@@ -113,23 +113,59 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
         ComboBoxSetting(this), CodecParamStorage(this, parent, "samplerate")
     {
         setLabel(QObject::tr("Sampling rate"));
-        if (analog)
-        {
-            addSelection("32000");
-            addSelection("44100");
-            addSelection("48000");
-        }
-        else
-        {
-            addSelection("48000");
-            setEnabled(false);
-            //addSelection("44100");
-            //addSelection("32000");
-        }
         setHelpText(QObject::tr("Sets the audio sampling rate for your DSP. "
                     "Ensure that you choose a sampling rate appropriate "
                     "for your device.  btaudio may only allow 32000."));
+
+        rates.push_back(32000);
+        rates.push_back(44100);
+        rates.push_back(48000);
+
+        allowed_rate[48000] = true;
+        for (uint i = 0; analog && (i < rates.size()); i++)
+            allowed_rate[rates[i]] = true;
+
     };
+
+    void load(void)
+    {
+        CodecParamStorage::load();
+        QString val = getValue();
+
+        clearSelections();
+        for (uint i = 0; i < rates.size(); i++)
+        {
+            if (allowed_rate[rates[i]])
+                addSelection(QString::number(rates[i]));
+        }
+
+        int which = getValueIndex(val);
+        setValue(max(which,0));
+
+        if (allowed_rate.size() <= 1)
+            setEnabled(false);
+    }
+
+    void addSelection(const QString &label,
+                      QString        value  = QString::null,
+                      bool           select = false)
+    {
+        QString val = value.isEmpty() ? label : value;
+        uint rate = val.toUInt();
+        if (allowed_rate[rate])
+        {
+            ComboBoxSetting::addSelection(label, value, select);
+        }
+        else
+        {
+            VERBOSE(VB_GENERAL, QString("SampleRate: ") +
+                    QString("Attempted to add a rate %1 Hz, which is "
+                            "not in the list of allowed rates.").arg(rate));
+        }
+    }
+    
+    vector<uint>    rates;
+    QMap<uint,bool> allowed_rate;
 };
 
 class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
@@ -352,6 +388,8 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
     AudioCompressionSettings(const RecordingProfile &parent, QString profName) :
         TriggeredConfigurationGroup(false, true, false, false)
     {
+        setSaveAll(false);
+
         QString labelName;
         if (profName.isNull())
             labelName = QString(QObject::tr("Audio Quality"));

@@ -11,7 +11,7 @@ using namespace std;
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1200";
+const QString currentDatabaseVersion = "1201";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3263,6 +3263,30 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1200", dbver))
+            return false;
+    }
+
+    if (dbver == "1200")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT id "
+                      "FROM recordingprofiles "
+                      "WHERE audiocodec='MPEG-2 Hardware Encoder'");
+        QString in = "";
+        if (query.exec())
+        {
+            while (query.next())
+                in += "'" + query.value(0).toString() + "',";
+        }
+        in = (in.isEmpty()) ? "'5','6','7','8'" : in.left(in.length()-1);
+        const QString updates[] = {
+            QString("UPDATE codecparams "
+                    "SET value=48000 "
+                    "WHERE name='samplerate' AND profile IN (%1);").arg(in),
+            ""
+        };
+
+        if (!performActualUpdate(updates, "1201", dbver))
             return false;
     }
 
