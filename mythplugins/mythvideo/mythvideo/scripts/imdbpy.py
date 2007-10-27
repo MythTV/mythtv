@@ -158,6 +158,10 @@ def title_search(search_string):
 
 	movies = []
 	for m in sorted_movies:
+		try:
+			movies.append([imdb_access.get_imdbID(m), m['title'], int(m['year'])])
+		except KeyError:
+			movies.append([imdb_access.get_imdbID(m), m['title'], 1901])
 		movies.append([imdb_access.get_imdbID(m), m['title'], int(m['year'])])
 	return movies
 

@@ -298,10 +298,14 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		0.0, None, 0, None, None, child, "")
 
 	intid = mythvideo.getMetadataId(videopath)
-	if intid is not None:
-		if not overwrite:
+	has_metadata = mythvideo.hasMetadata(videopath)
+	if intid is not None :
+		if not overwrite and has_metadata:
 			print_verbose("Metadata already exist in MythDB, not overwriting it.")
 			return None
+		else:
+			print_verbose("Entry exists in MythDB with default metadata.  Updating.")
+			mythvideo.setMetadata({'filename': videopath}, id=intid)
 	else:
 		print_verbose("No metadata in MythDB, creating a new one.")
 		# Create a new empty entry at this point so we can use the common UPDATE code
@@ -529,10 +533,11 @@ def find_metadata_for_video_path(pathName):
 			# TODO: Try with the dirname
 			pass
 		if candidates is not None and len(candidates) > 0:
-
 			index = 0
-			if len(candidates) > 1:
-
+			if (len(candidates) == 2) and (candidates[0][0] == candidates[1][0]):
+				imdb_id = candidates[0][0]
+			elif len(candidates) > 1:
+				import pdb; pdb.set_trace()
 				print "Got multiple candidates for title search '%s'. " % title
 				if not interactive:
 					print "Use the '-a' or '-i' switch to choose the correct one."
@@ -555,17 +560,21 @@ def find_metadata_for_video_path(pathName):
 			return None
 
 	print_verbose("Querying IMDb for meta data for ID %s..." % imdb_id)
-	meta = imdbpy.fetch_metadata(imdb_id)
-	if meta is not None:
-		if meta.series_episode:
-			title, season, episode = imdbpy.detect_series_title(title)
-			if meta.season is None:
-				meta.season = season
-			if meta.episode is None:
-				meta.episode = episode
-		metadata = meta.toMetadataString()
-		metadata += "IMDb:%s" % imdb_id + "\n"
-	return metadata
+	try:
+		meta = imdbpy.fetch_metadata(imdb_id)
+		if meta is not None:
+			if meta.series_episode:
+				title, season, episode = imdbpy.detect_series_title(title)
+				if meta.season is None:
+					meta.season = season
+				if meta.episode is None:
+					meta.episode = episode
+			metadata = meta.toMetadataString()
+			metadata += "IMDb:%s" % imdb_id + "\n"
+		return metadata
+	except:
+		print_verbose("Problem occured fetching metadata for ID %s..." % imdb_id)
+		return None
 
 def video_file_list_metadata(videoPaths):
 	videoPaths = [os.path.basename(v) for v in videoPaths]
@@ -769,7 +778,7 @@ def should_be_skipped(path, meta_file = None):
 	# Check if we are not in overwrite mode and there is existing data
 	# for the wanted targets (metadata files and/or MythDB).
 	if not overwrite:
-		need_mythdb_data = dbimport and mythvideo.getMetadataId(path) is None
+		need_mythdb_data = dbimport and not mythvideo.hasMetadata(path)
 		need_metadata_file = metafiles
 		if metafiles and meta_file is not None:
 			need_metadata_file = not os.path.exists(meta_file)

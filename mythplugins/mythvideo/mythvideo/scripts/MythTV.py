@@ -364,6 +364,28 @@ class MythVideo:
 		else:
 			return None
 
+	def hasMetadata(self, videopath):
+		"""
+		Determines if the given videopath has any metadata in the DB
+		
+		Returns False if no metadata was found.
+		"""
+		c = self.db.cursor()
+		c.execute("""
+			SELECT category, year 
+			FROM videometadata
+			WHERE filename = %s""", (videopath,))
+		row = c.fetchone()
+		c.close()
+		
+		if row is not None:
+			# If category is 0 and year is 1895, we can safely assume no metadata
+			if (row[0] == 0) and (row[1] == 1895):
+				return False
+			else:
+				return True
+		else:
+			return False
 	def getMetadata(self, id):
 		"""
 		Finds the MythVideo metadata for the given id from the MythDB, if any.
