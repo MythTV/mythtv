@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20071025-1"
+VERSION="0.1.20071028-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -111,6 +111,7 @@ thumboffset = 10
 usebookmark = True
 clearArchiveTable = True
 nicelevel = 17;
+drivespeed = 0;
 
 #main menu aspect ratio (4:3 or 16:9)
 mainmenuAspectRatio = "16:9"
@@ -778,6 +779,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveDateFormat',
                         'MythArchiveTimeFormat',
                         'MythArchiveClearArchiveTable',
+                        'MythArchiveDriveSpeed',
                         'ISO639Language0',
                         'ISO639Language1',
                         'JobQueueCPU'
@@ -2170,12 +2172,20 @@ def BurnDVDISO():
 
         if drivestatus == CDROM.CDS_DISC_OK or drivestatus == CDROM.CDS_NO_INFO:
             if mediatype == DVD_RW and erasedvdrw == True:
-                command = path_growisofs[0] + " -dvd-compat -use-the-force-luke -Z " + dvddrivepath + \
-                          " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
+                command = path_growisofs[0] + " -dvd-compat "
+                if drivespeed != 0:
+                    command += "-speed=%d " % drivespeed
+                command += " -use-the-force-luke -Z " + dvddrivepath 
+                command += " -dvd-video -V 'MythTV DVD' "
+                command += os.path.join(getTempPath(),'dvd')
             else:
-                command = path_growisofs[0] + " -dvd-compat -Z " + dvddrivepath + \
-                          " -dvd-video -V 'MythTV DVD' " + os.path.join(getTempPath(),'dvd')
+                command = path_growisofs[0] + " -dvd-compat "
+                if drivespeed != 0:
+                    command += "-speed=%d " % drivespeed
+                command += " -Z " + dvddrivepath + " -dvd-video -V 'MythTV DVD' " 
+                command += os.path.join(getTempPath(),'dvd')
 
+            write(command)
             write("Running growisofs to burn DVD")
 
             result = runCommand(command)
@@ -4512,7 +4522,7 @@ def main():
     global videomode, temppath, logpath, dvddrivepath, dbVersion, preferredlang1
     global preferredlang2, useFIFO, encodetoac3, alwaysRunMythtranscode
     global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
-    global timeformat, clearArchiveTable, nicelevel, path_mplex, path_ffmpeg
+    global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex, path_ffmpeg
     global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant
     global path_jpeg2yuv, path_spumux, path_mpeg2enc, progresslog
     global progressfile, jobfile
@@ -4598,6 +4608,7 @@ def main():
     chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
     dateformat = defaultsettings.get("MythArchiveDateFormat", "%a %d %b %Y")
     timeformat = defaultsettings.get("MythArchiveTimeFormat", "%I:%M %p")
+    drivespeed = int(defaultsettings.get("MythArchiveDriveSpeed", "0"))
     if "MythArchiveClearArchiveTable" in defaultsettings:
         clearArchiveTable = (defaultsettings["MythArchiveClearArchiveTable"] == '1')
     nicelevel = defaultsettings.get("JobQueueCPU", "0")

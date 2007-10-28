@@ -59,6 +59,16 @@ static HostLineEdit *MythArchiveDVDLocation()
     return gc;
 };
 
+static HostSpinBox *MythArchiveDriveSpeed()
+{
+    HostSpinBox *gc = new HostSpinBox("MythArchiveDriveSpeed", 0, 48, 1);
+    gc->setLabel(QObject::tr("DVD Drive Write Speed"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("This is the write speed to use when burning a DVD. "
+                "Set to 0 to allow growisofs to choose the fastest available speed."));
+    return gc;
+};
+
 static HostLineEdit *MythArchiveDVDPlayerCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveDVDPlayerCmd");
@@ -292,6 +302,7 @@ ArchiveSettings::ArchiveSettings()
     vcg1->addChild(PALNTSC());
     vcg1->addChild(MythArchiveFileFilter());
     vcg1->addChild(MythArchiveDVDLocation());
+    vcg1->addChild(MythArchiveDriveSpeed());
     vcg1->addChild(MythArchiveDVDPlayerCmd());
     addChild(vcg1);
 
