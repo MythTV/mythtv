@@ -1826,11 +1826,29 @@ void PlaybackBoxMusic::restorePosition()
         for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
             branches_to_current_node.append((*it).toInt());
 
-        // try to restore the saved position
-        if (music_tree_list->tryToSetActive(branches_to_current_node))
+        if (!show_whole_tree)
         {
-            music_tree_list->select();
-            return;
+            // sanity check - if we are not in 'show whole tree' mode we
+            // should only restore the position if it points to a track 
+            // in the active play queue
+            if (branches_to_current_node[0] == 0 && 
+                branches_to_current_node[1] == 1)
+            {
+                if (music_tree_list->tryToSetActive(branches_to_current_node))
+                {
+                    music_tree_list->select();
+                    return;
+                }
+            }
+        }
+        else
+        {
+            //we're in show all tree mode - try to restore the position
+            if (music_tree_list->tryToSetActive(branches_to_current_node))
+            {
+                music_tree_list->select();
+                return;
+            }
         }
     }
 
