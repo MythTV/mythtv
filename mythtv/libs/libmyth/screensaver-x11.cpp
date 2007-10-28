@@ -20,8 +20,11 @@ class ScreenSaverX11Private
         m_dpmsdeactivated(false), m_timeoutInterval(-1), m_resetTimer(0)
     {
         m_xscreensaverRunning =
-                (myth_system("xscreensaver-command -version >&- 2>&-") == 0);
-        if (m_xscreensaverRunning)
+                myth_system("xscreensaver-command -version >&- 2>&-") == 0;
+        m_gscreensaverRunning =
+                myth_system("gnome-screensaver-command --help >&- 2>&-") == 0;
+
+        if (IsScreenSaverRunning())
         {
             m_resetTimer = new QTimer(outer);
             QObject::connect(m_resetTimer, SIGNAL(timeout()),
@@ -58,7 +61,10 @@ class ScreenSaverX11Private
         delete m_resetTimer;
     }
 
-    bool IsScreenSaverRunning() { return m_xscreensaverRunning; }
+    bool IsScreenSaverRunning()
+    {
+        return m_xscreensaverRunning || m_gscreensaverRunning;
+    }
 
     bool IsDPMSEnabled() { return m_dpmsenabled; }
 
@@ -127,6 +133,14 @@ class ScreenSaverX11Private
         }
     }
 
+    void ResetScreenSaver()
+    {
+        if (m_xscreensaverRunning)
+            myth_system("xscreensaver-command -deactivate >&- 2>&- &");
+        else
+            myth_system("gnome-screensaver-command --poke >&- 2>&- &");
+    }
+
   private:
     struct ScreenSaverState
     {
@@ -141,6 +155,7 @@ class ScreenSaverX11Private
   private:
     bool m_dpmsaware;
     bool m_xscreensaverRunning;
+    bool m_gscreensaverRunning;
     BOOL m_dpmsenabled;
     bool m_dpmsdeactivated; // true if we disabled DPMS
 
@@ -222,5 +237,5 @@ bool ScreenSaverX11::Asleep(void)
 
 void ScreenSaverX11::resetSlot()
 {
-    myth_system(QString("xscreensaver-command -deactivate >&- 2>&- &"));
+    d->ResetScreenSaver();
 }
