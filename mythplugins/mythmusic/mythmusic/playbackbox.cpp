@@ -1832,7 +1832,8 @@ void PlaybackBoxMusic::restorePosition()
             // should only restore the position if it points to a track 
             // in the active play queue
             if (branches_to_current_node[0] == 0 && 
-                branches_to_current_node[1] == 1)
+                branches_to_current_node[1] == 1 &&
+                branches_to_current_node[2] == 0)
             {
                 if (music_tree_list->tryToSetActive(branches_to_current_node))
                 {
