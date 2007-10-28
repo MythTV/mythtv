@@ -34,7 +34,7 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
         if (!gContext->GetMainWindow()->
                 HandleMedia(handler, internal_mrl, item->Plot(), item->Title(),
                             item->Director(), item->Length(),
-                            getDisplayYear(item->Year())))
+                            QString::number(item->Year())))
         {
             // No internal handler for this, play external
             QString command = Metadata::getPlayCommand(item.get());

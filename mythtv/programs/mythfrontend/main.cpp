@@ -654,15 +654,17 @@ int internal_play_media(const QString &mrl, const QString &plot,
                                     errorText);
         return res;
     }
-    
+
     ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->recstartts = QDateTime::currentDateTime().addSecs((0 - (lenMins + 1)) * 60 );
+    pginfo->recstartts = QDateTime::currentDateTime()
+            .addSecs((0 - (lenMins + 1)) * 60 );
     pginfo->recendts = QDateTime::currentDateTime().addSecs(-60);
-    pginfo->recstartts.setDate(QDate::fromString(year));
+    pginfo->startts.setDate(QDate::fromString(QString("%1-01-01").arg(year),
+                                              Qt::ISODate));
     pginfo->lenMins = lenMins;
     pginfo->isVideo = true;
     pginfo->pathname = mrl;
-    
+
     QDir d(mrl + "/VIDEO_TS");
     if (mrl.findRev(".iso", -1, false) == (int)mrl.length() - 4 ||
         mrl.findRev(".img", -1, false) == (int)mrl.length() - 4 ||
@@ -673,7 +675,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
     
     pginfo->description = plot;
     
-    if (strlen(director))
+    if (director.length())
         pginfo->subtitle = QString( "%1: %2" ).arg(QObject::tr("Directed By")).arg(director);
     
     pginfo->title = title;
