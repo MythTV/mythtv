@@ -32,6 +32,7 @@ using namespace std;
 #define DEBUG_ATTRIB 1
 
 #define LOC QString("Channel(%1): ").arg(device)
+#define LOC_WARN QString("Channel(%1) Warning: ").arg(device)
 #define LOC_ERR QString("Channel(%1) Error: ").arg(device)
 
 static int format_to_mode(const QString& fmt, int v4l_version);
@@ -481,10 +482,22 @@ bool Channel::SetChannelByString(const QString &channum)
     // Set NTSC, PAL, ATSC, etc.
     SetFormat(tvformat);
 
+    // If a tuneToChannel is set make sure we're still on it
+    if (!(*it)->tuneToChannel.isEmpty() && (*it)->tuneToChannel != "Undefined")
+        TuneTo((*it)->tuneToChannel, 0);
+
     // Tune to proper frequency
     if ((*it)->externalChanger.isEmpty())
     {
-        if (isFrequency)
+        if ((*it)->name.contains("composite", false) ||
+            (*it)->name.contains("s-video", false))
+        {
+            VERBOSE(VB_GENERAL, LOC_WARN + "You have not set "
+                    "an external channel changing"
+                    "\n\t\t\tscript for a composite or s-video "
+                    "input. Channel changing will do nothing.");
+        }
+        else if (isFrequency)
         {
             if (!Tune(frequency, "", (is_dtv) ? "8vsb" : "analog", dtv_si_std))
             {
@@ -898,7 +911,7 @@ bool Channel::SwitchToInput(int inputnum, bool setstarting)
     currentInputID = inputnum;
     curchannelname    = ""; // this will be set by SetChannelByString
 
-    if (setstarting && !tuneFreqId.isEmpty() && tuneFreqId != "Undefined")
+    if (!tuneFreqId.isEmpty() && tuneFreqId != "Undefined")
         ok = TuneTo(tuneFreqId, 0);
 
     if (!ok)
