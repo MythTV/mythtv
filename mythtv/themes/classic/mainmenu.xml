@@ -260,6 +260,7 @@
    <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
+     <text lang="EN_GB">Cinema Listings</text>
      <text lang="FI">Elokuvien Ajat</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>

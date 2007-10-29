@@ -302,6 +302,7 @@
    <button>
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
+     <text lang="EN_GB">Cinema Listings Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
      <text lang="FR">Movie Time</text>
      <text lang="SI">Nastavitve čas filmov</text>

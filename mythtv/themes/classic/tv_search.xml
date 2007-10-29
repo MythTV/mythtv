@@ -96,6 +96,7 @@
    <button>
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
+      <text lang="EN_GB">Films</text>
       <text lang="DE">Spielfilme</text>
       <text lang="FR">Films</text>
       <text lang="SV">Filmer</text>

@@ -21,6 +21,7 @@
    <button>
       <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
+      <text lang="EN_GB">Programme Guide</text>
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
