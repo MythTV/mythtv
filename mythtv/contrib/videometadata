@@ -81,7 +81,7 @@ do
      THUMB_PATH="$THUMB_DIR/`basename "$DATEI"`.png"
      if [ ! -f "$THUMB_PATH" ]
      then
-      mplayer -ss $THUMB_TIME -nosound -frames 3 -vo png "$DATEI" && mv 00000001.png "$THUMB_PATH";rm 0000000?.png 
+      mplayer -ss $THUMB_TIME -nosound -frames 2 -vo png:z=9 "$DATEI" && mv 00000002.png "$THUMB_PATH";rm 0000000?.png 
      fi
      echo "UPDATE  videometadata SET coverfile=\"$THUMB_PATH\"  WHERE filename=\"${DATEI}\" ;" | mysql -u $USER --password=$PASSW -D $DATABASE -h $HOST
     fi
@@ -100,7 +100,7 @@ if [ "$RATED_THUMBS" = true ];then
     THUMB_PATH="$THUMB_DIR/`basename "$DATEI"`.png"
     if [ ! -f "$THUMB_PATH" ]
     then
-     mplayer -ss $THUMB_TIME -nosound -frames 3 -vo png "$DATEI" && mv 00000001.png "$THUMB_PATH";rm 0000000?.png 
+     mplayer -ss $THUMB_TIME -nosound -frames 2 -vo png:z=9 "$DATEI" && mv 00000002.png "$THUMB_PATH";rm 0000000?.png 
     fi
     echo "UPDATE  videometadata SET coverfile=\"$THUMB_PATH\"  WHERE filename=\"${DATEI}\" ;" | mysql -u $USER --password=$PASSW -D $DATABASE -h $HOST
    fi
