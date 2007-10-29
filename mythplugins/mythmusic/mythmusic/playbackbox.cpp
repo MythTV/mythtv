@@ -2151,6 +2151,28 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         return;
     }
 
+    if (attributes->at(0) == 1 && !show_whole_tree)
+    {
+        // check to see if a playlist has been selected
+        GenericTree *node = music_tree_list->getCurrentNode();
+        if (node && node->getAttribute(0) == 0)
+        {
+            // copy the selected playlist to the active playlist
+            Playlist *playlist = all_playlists->getPlaylist(node->getInt());
+            if (playlist)
+            {
+                all_playlists->getActive()->fillSongsFromSonglist(
+                        playlist->getSonglist(), false);
+
+                constructPlaylistTree();
+
+                // play the first track in the active play list
+                playFirstTrack();
+                return;
+            }
+        }
+    }
+
     if (attributes->at(0) == 1)
     {
         //  It's a track
@@ -2162,7 +2184,7 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         maxTime = curMeta->Length() / 1000;
 
         QString time_string = getTimeString(maxTime, 0);
-        
+
         if (showrating)
         {
             if(ratings_image)
@@ -2181,6 +2203,7 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
             play_button->push();
         else
             play();
+
     }
     else
     {
