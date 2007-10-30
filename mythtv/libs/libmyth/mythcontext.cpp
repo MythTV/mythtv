@@ -665,7 +665,7 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
     FindSettingsProbs();
 
     m_localhostname = m_DBparams.localHostName;
-    if (m_localhostname == NULL ||
+    if (m_localhostname.isEmpty() ||
         m_localhostname == "my-unique-identifier-goes-here")
     {
         char localhostname[1024];
@@ -676,7 +676,10 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
             return false;
         }
         m_localhostname = localhostname;
+        VERBOSE(VB_IMPORTANT, "Empty LocalHostName.");
     }
+    VERBOSE(VB_GENERAL, "Using localhost value of " + m_localhostname);
+
     return true;
 }
 
