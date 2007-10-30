@@ -197,7 +197,7 @@ class MythContextPrivate
    ~MythContextPrivate();
 
     bool Init(bool gui, DatabaseParams *pParams = NULL );
-    bool FindDatabase(DatabaseParams *pParams);
+    bool FindDatabase(const DatabaseParams *pParams);
 
     bool IsWideMode() const {return (m_baseWidth == 1280);}
     void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
@@ -211,7 +211,7 @@ class MythContextPrivate
     void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
-    bool LoadDatabaseSettings(DatabaseParams *pParams = NULL);
+    bool LoadDatabaseSettings(const DatabaseParams *pParams = NULL);
     
     bool LoadSettingsFile(void);
     bool WriteSettingsFile(const DatabaseParams &params,
@@ -509,7 +509,7 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 /**
  * Get database connection settings and test connectivity.
  */
-bool MythContextPrivate::FindDatabase(DatabaseParams *pParams)
+bool MythContextPrivate::FindDatabase(const DatabaseParams *pParams)
 {
     // Attempts to read DB info from "mysql.txt" from the 
     // filesystem, or create it if it does not exist.
@@ -621,7 +621,7 @@ void MythContextPrivate::LoadLogSettings(void)
  *       The defaults are enough for a simple "localhost" FE & MBE,
  *       and UPnP covers the other situations.
  */
-bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
+bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
 {
     // Always load settings first from mysql.txt so LocalHostName can be used.
 
@@ -657,7 +657,8 @@ bool MythContextPrivate::LoadDatabaseSettings(DatabaseParams *pParams)
     FindSettingsProbs();
 
     m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
-    if (m_localhostname == NULL)
+    if (m_localhostname == NULL ||
+        m_localhostname == "my-unique-identifier-goes-here")
     {
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
@@ -2068,6 +2069,9 @@ QString MythContext::DBErrorMessage(const QSqlError& err)
         .arg(err.databaseText());
 }
 
+/**
+ * \todo  Remove MythContext::settings() - it is not used anywhere?
+ */
 Settings *MythContext::settings(void)
 {
     return d->m_settings;
