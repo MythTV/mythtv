@@ -521,22 +521,17 @@ bool MythContextPrivate::FindDatabase(const DatabaseParams *pParams)
 
     // Queries the user for the DB info, using the command 
     // line or the GUI depending on the application.
-    if (failure.length())
+    while (failure.length())
     {
         VERBOSE(VB_IMPORTANT, failure);
         if (PromptForDatabaseParams(failure))
         {
             failure = TestDBconnection();
             if (failure.length())
-            {
                 VERBOSE(VB_IMPORTANT, failure);
-                return false;
-            }
         }
         else
-        {
             return false;
-        }
     }
 
     return true;
@@ -628,35 +623,48 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
     if (!LoadSettingsFile())
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
+
+        // Sensible connection defaults.
+        m_DBparams.dbHostName    = "localhost";
+        m_DBparams.dbHostPing    = true;
+        m_DBparams.dbPort        = 0;
+        m_DBparams.dbUserName    = "mythtv";
+        m_DBparams.dbPassword    = "mythtv";
+        m_DBparams.dbName        = "mythconverg";
+        m_DBparams.dbType        = "QMYSQL3";
+        m_DBparams.localEnabled  = false;
+        m_DBparams.localHostName = "my-unique-identifier-goes-here";
+        m_DBparams.wolEnabled    = false;
+        m_DBparams.wolReconnect  = 0;
+        m_DBparams.wolRetry      = 5;
+        m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
+
         VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
-        m_DBparams = parent->GetDatabaseParams();
         if (!WriteSettingsFile(m_DBparams))
             return false;
-        else
-            LoadSettingsFile();
     }
 
     // Overlay mysql.txt settings if we were passed a DatabaseParams
 
     if (pParams != NULL)
     {
-        m_settings->SetSetting( "DBHostName"             , pParams->dbHostName  );
-        m_settings->SetSetting( "DBPort"                 , pParams->dbPort      );
-        m_settings->SetSetting( "DBUserName"             , pParams->dbUserName  );
-        m_settings->SetSetting( "DBPassword"             , pParams->dbPassword  );
-        m_settings->SetSetting( "DBName"                 , pParams->dbName      );
-        m_settings->SetSetting( "DBType"                 , pParams->dbType      );
-      //m_settings->SetSetting( "wolEnabled"             , pParams->wolEnabled  );
-        m_settings->SetSetting( "WOLsqlReconnectWaitTime", pParams->wolReconnect);
-        m_settings->SetSetting( "WOLsqlConnectRetry"     , pParams->wolRetry    );
-        m_settings->SetSetting( "WOLsqlCommand"          , pParams->wolCommand  );
+        m_DBparams.dbHostName   = pParams->dbHostName;
+        m_DBparams.dbPort       = pParams->dbPort;
+        m_DBparams.dbUserName   = pParams->dbUserName;
+        m_DBparams.dbPassword   = pParams->dbPassword;
+        m_DBparams.dbName       = pParams->dbName;
+        m_DBparams.dbType       = pParams->dbType;
+      //m_DBparams.wolEnabled   = pParams->wolEnabled;
+        m_DBparams.wolReconnect = pParams->wolReconnect;
+        m_DBparams.wolRetry     = pParams->wolRetry;
+        m_DBparams.wolCommand   = pParams->wolCommand;
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
     // so we check for missing values and warn user
     FindSettingsProbs();
 
-    m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
+    m_localhostname = m_DBparams.localHostName;
     if (m_localhostname == NULL ||
         m_localhostname == "my-unique-identifier-goes-here")
     {
@@ -672,9 +680,33 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
     return true;
 }
 
+/**
+ * Load mysql.txt and parse its values into m_DBparams
+ */
 bool MythContextPrivate::LoadSettingsFile(void)
 {
-    return m_settings->LoadSettingsFiles("mysql.txt", m_installprefix);
+    if (!m_settings->LoadSettingsFiles("mysql.txt", m_installprefix))
+        return false;
+
+    m_DBparams.dbHostName = m_settings->GetSetting("DBHostName");
+    m_DBparams.dbHostPing = m_settings->GetSetting("DBHostPing") != "no";
+    m_DBparams.dbPort     = m_settings->GetNumSetting("DBPort");
+    m_DBparams.dbUserName = m_settings->GetSetting("DBUserName");
+    m_DBparams.dbPassword = m_settings->GetSetting("DBPassword");
+    m_DBparams.dbName     = m_settings->GetSetting("DBName");
+    m_DBparams.dbType     = m_settings->GetSetting("DBType");
+
+    m_DBparams.localHostName = m_settings->GetSetting("LocalHostName");
+    m_DBparams.localEnabled  = m_DBparams.localHostName.length() > 0;
+
+    m_DBparams.wolReconnect
+        = m_settings->GetNumSetting("WOLsqlReconnectWaitTime");
+    m_DBparams.wolEnabled = m_DBparams.wolReconnect > 0;
+
+    m_DBparams.wolRetry   = m_settings->GetNumSetting("WOLsqlConnectRetry");
+    m_DBparams.wolCommand = m_settings->GetSetting("WOLsqlCommand");
+
+    return true;
 }
 
 bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
@@ -784,24 +816,24 @@ bool MythContextPrivate::FindSettingsProbs(void)
 {
     bool problems = false;
     
-    if (m_settings->GetSetting("DBHostName").isEmpty())
+    if (m_DBparams.dbHostName.isEmpty())
     {
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
         VERBOSE(VB_IMPORTANT, "Assuming localhost");
-        m_settings->SetSetting("DBHostName", "localhost");
+        m_DBparams.dbHostName = "localhost";
     }
-    if (m_settings->GetSetting("DBUserName").isEmpty())
+    if (m_DBparams.dbUserName.isEmpty())
     {
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
     }
-    if (m_settings->GetSetting("DBPassword").isEmpty())
+    if (m_DBparams.dbPassword.isEmpty())
     {
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
     }
-    if (m_settings->GetSetting("DBName").isEmpty())
+    if (m_DBparams.dbName.isEmpty())
     {
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
@@ -934,14 +966,10 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
  */
 QString MythContextPrivate::TestDBconnection(void)
 {
-    bool    doPing = (m_settings->GetSetting("DBHostPing") != "no");
+    bool    doPing = m_DBparams.dbHostPing;
     QString err;
-    QString host = m_settings->GetSetting("DBHostName");
-    int     port = m_settings->GetSetting("DBPort").toInt();
-
-    // Deal with missing hostname line, OR one without a value
-    if (!host.length())
-        host = "localhost";
+    QString host   = m_DBparams.dbHostName;
+    int     port   = m_DBparams.dbPort;
 
 
     // 1. Check the supplied host or IP address, to prevent the app
@@ -956,7 +984,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
-        m_settings->SetSetting("DBHostName", "");
+        m_DBparams.dbHostName = "";
 
         err = parent->tr("Cannot find (ping) database host %1 on the network");
         return err.arg(host);
@@ -968,7 +996,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (port && !telnet(host, port))
     {
         // Cause MSqlQuery to fail, instead of several error lines per DB value
-        m_settings->SetSetting("DBHostName", "");
+        m_DBparams.dbHostName = "";
 
         err = parent->tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
@@ -980,7 +1008,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (!MSqlQuery::testDBConnection())
     {
         // Cause MSqlQuery to fail, instead of several error lines per DB value
-        m_settings->SetSetting("DBHostName", "");
+        m_DBparams.dbHostName = "";
 
         return parent->tr(QString("Cannot login to database?"));
     }
@@ -1005,6 +1033,7 @@ void MythContextPrivate::ResetDatabase(void)
     m_dbmanager.CloseDatabases();
     parent->ClearSettingsCache();
 }
+
 
 MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
@@ -3319,38 +3348,7 @@ MythPrivRequest MythContext::popPrivRequest()
 
 DatabaseParams MythContext::GetDatabaseParams(void)
 {
-    DatabaseParams params;
-    
-    params.dbHostName = d->m_settings->GetSetting("DBHostName", "localhost");
-    params.dbHostPing = d->m_settings->GetSetting("DBHostPing") != "no";
-    params.dbPort     = d->m_settings->GetNumSetting("DBPort", 0);
-    params.dbUserName = d->m_settings->GetSetting("DBUserName", "mythtv");
-    params.dbPassword = d->m_settings->GetSetting("DBPassword", "mythtv");
-    params.dbName     = d->m_settings->GetSetting("DBName",     "mythconverg");
-    params.dbType     = d->m_settings->GetSetting("DBType",     "QMYSQL3");
-    
-    params.localHostName = d->m_settings->GetSetting("LocalHostName", "");
-    if (params.localHostName.isEmpty())
-    {
-        params.localEnabled = false;
-        params.localHostName = "my-unique-identifier-goes-here";
-    }
-    else
-        params.localEnabled = true;
-    
-    params.wolReconnect = d->m_settings->GetNumSetting("WOLsqlReconnectWaitTime", -1);
-    if (params.wolReconnect == -1)
-    {
-        params.wolEnabled = false;
-        params.wolReconnect = 0;
-    }
-    else
-        params.wolEnabled = true;
-
-    params.wolRetry = d->m_settings->GetNumSetting("WOLsqlConnectRetry", 5);
-    params.wolCommand = d->m_settings->GetSetting("WOLsqlCommand", "echo 'WOLsqlServerCommand not set'");
-    
-    return params;
+    return d->m_DBparams;
 }
 
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
@@ -3378,11 +3376,8 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
         ret = d->WriteSettingsFile(params, true);
         if (ret)
         {
-            // Reload the new settings:
-            if (d->m_settings)
-                delete d->m_settings;
-            d->m_settings = new Settings;
-            ret = d->LoadDatabaseSettings();
+            // Save the new settings:
+            d->m_DBparams = params;
 
             // If database has changed, force its use:
             d->ResetDatabase();
