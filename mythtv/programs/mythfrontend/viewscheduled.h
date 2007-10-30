@@ -55,6 +55,7 @@ class ViewScheduled : public MythDialog
     QPixmap myBackground;
 
     bool conflictBool;
+    QDate conflictDate;
     QString dateformat;
     QString timeformat;
     QString channelFormat;

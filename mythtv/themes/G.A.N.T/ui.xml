@@ -428,6 +428,10 @@
       <bold>yes</bold>
     </font>
 
+    <font name="conflictwarn" base="info">
+      <color>#ffff33</color>
+    </font>
+
     <container name="background">
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
@@ -450,6 +454,10 @@
       <textarea name="status" align="right" draworder="4">
         <area>0,0,380,30</area>
         <font>info</font>
+      </textarea>
+      <textarea name="warning" align="right" draworder="4">
+        <area>0,0,380,30</area>
+        <font>conflictwarn</font>
       </textarea>
     </container>
 

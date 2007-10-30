@@ -13,7 +13,6 @@
       <size:big>17</size:big>
     </font>
 
-
     <container name="background">
       <image name="backup" draworder="0" fleximage="no">
         <context>0</context>
@@ -242,6 +241,9 @@
 
   <window name="conflict">
 
+    <font name="conflictwarn" base="info">
+      <color>#ffff33</color>
+    </font>
 
     <container name="background">
       <area> 0, 0, 800, 600</area>
@@ -266,6 +268,10 @@
       <textarea name="status" align="right" draworder="4">
         <area>0,0,380,30</area>
         <font>info</font>
+      </textarea>
+      <textarea name="warning" align="right" draworder="4">
+        <area>0,0,380,30</area>
+        <font>conflictwarn</font>
       </textarea>
     </container>
 

@@ -320,6 +320,21 @@ void ViewScheduled::FillList(void)
         }
     }
 
+    if (conflictBool)
+    {
+        // Find first conflict and store in conflictDate field
+        int i;
+        for (i = 0; i < recList.count(); i++)
+        {
+            ProgramInfo *p = recList[i];
+            if (p->recstatus == rsConflict)
+            {
+                conflictDate = p->recstartts.date();
+                break;
+            }
+        }
+    }
+
     inFill = false;
 }
 
@@ -431,13 +446,36 @@ void ViewScheduled::updateConflict(QPainter *p)
     LayerSet *container = theme->GetSet("conflict_info");
     if (container)
     {
-        UITextType *type = (UITextType *)container->GetType("status");
-        if (type)
+        UITextType *wtype = (UITextType *)container->GetType("warning");
+        UITextType *stype = (UITextType *)container->GetType("status");
+
+        /* if wtype doesn't exist in the theme, use stype instead */
+        if (!wtype)
+            wtype = stype;
+
+        if (stype)
         {
             if (conflictBool)
-                type->SetText(tr("Time Conflict"));
+            {
+                // figure out caption based on conflictDate
+                QString cstring = tr("Time Conflict");
+                QDate now = QDate::currentDate();
+                int daysToConflict = now.daysTo(conflictDate);
+
+                if (daysToConflict == 0)
+                    cstring = tr("Conflict Today");
+                else if (daysToConflict > 0)
+                    cstring = QString(tr("Conflict ")) + 
+                            conflictDate.toString(dateformat);
+
+                stype->SetText("");
+                wtype->SetText(cstring);
+            }
             else
-                type->SetText(tr("No Conflicts"));
+            {
+                wtype->SetText("");
+                stype->SetText(tr("No Conflicts"));
+            }
         }
     }
 
