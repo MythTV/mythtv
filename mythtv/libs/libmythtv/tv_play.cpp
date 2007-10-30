@@ -3466,6 +3466,21 @@ void TV::SwapPIP(void)
     if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
+    bool muted = false;
+
+    // save the mute state so we can restore it later
+    if (nvp)
+    {
+        AudioOutput *aud = nvp->getAudioOutput();
+        if (aud)
+        {
+            muted = aud->GetMute();
+
+            if (!muted)
+                aud->ToggleMute();
+        }
+    }
+
     lockTimerOn = false;
 
     struct pip_info main, pip;
@@ -3509,6 +3524,15 @@ void TV::SwapPIP(void)
     StartPlayer(false);
     activenvp = nvp;
     nvp->FastForward(pip.frame/recorder->GetFrameRate());
+
+    // if we were muted before swapping PIP we need to restore it here
+    if (muted && nvp)
+    {
+        AudioOutput *aud = nvp->getAudioOutput();
+
+        if (aud && !aud->GetMute())
+            aud->ToggleMute();
+    }
 
     piprbuffer->Seek(0, SEEK_SET);
     piprbuffer->Unpause();
