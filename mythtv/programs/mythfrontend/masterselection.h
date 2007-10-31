@@ -17,7 +17,7 @@
 #include <qmap.h>
 #include <math.h>
 
-#include "libmythupnp/upnpdevice.h"
+#include "upnpdevice.h"
 #include "mediarenderer.h"
 
 #ifndef __MASTERSELECTION_H__
@@ -46,7 +46,8 @@ class ListBoxDevice : public QListBoxText
 
         DeviceLocation *m_pLocation;
 
-        ListBoxDevice( QListBox *pList, const QString &sName, DeviceLocation *pLoc )
+        ListBoxDevice( QListBox *pList, const QString &sName,
+                                        DeviceLocation *pLoc )
             : QListBoxText( pList, sName )
         {
             if ((m_pLocation = pLoc) != NULL)

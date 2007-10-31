@@ -14,9 +14,9 @@
 #include <qobject.h>
 #include <qmutex.h>
 
-#include "libmythupnp/upnp.h"
-#include "libmythupnp/upnpcmgr.h"
-#include "libmythupnp/mythxmlclient.h"
+#include "upnp.h"
+#include "upnpcmgr.h"
+#include "mythxmlclient.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -34,15 +34,16 @@ class MediaRenderer : public UPnp
 
     protected:
 
-//        UPnpControl            *m_pUPnpControl;      // Do not delete (auto deleted)
-        UPnpCMGR               *m_pUPnpCMGR;     // Do not delete (auto deleted)
+        //UPnpControl     *m_pUPnpControl;  // Do not delete (auto deleted)
+        UPnpCMGR        *m_pUPnpCMGR;     // Do not delete (auto deleted)
 
     public:
                  MediaRenderer();
         virtual ~MediaRenderer();
 
         DeviceLocation *GetDefaultMaster();
-        void            SetDefaultMaster( DeviceLocation *pDeviceLoc, const QString &sPin );
+        void            SetDefaultMaster( DeviceLocation *pDeviceLoc,
+                                          const QString  &sPin );
 
 };
 
