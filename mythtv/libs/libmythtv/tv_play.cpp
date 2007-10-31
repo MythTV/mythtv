@@ -135,6 +135,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
                     QStringList recTitles;
                     QString buttonTitle;
                     vector<ProgramInfo *>::iterator it = reclist->begin();
+                    recTitles.append(tr("Exit"));
                     while (it != reclist->end())
                     {
                         p = *it;
@@ -149,14 +150,14 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
                                     tr("All Tuners are Busy.\n"
                                        "Select a Current Recording"),
                                     recTitles, 1);
-                    if (ret == -1)
+                    if ((0 < ret) && (ret <= (int)reclist->size()))
                     {
-                        quitAll = true;
+                        p = reclist->at(ret - 1);
+                        curProgram = new ProgramInfo(*p);
                     }
                     else
                     {
-                        p = reclist->at(ret);
-                        curProgram = new ProgramInfo(*p);
+                        quitAll = true;
                     }
                 }
             }
