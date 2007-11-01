@@ -9,6 +9,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputalsa.h"
     
+#define LOC QString("ALSA: ")
+#define LOC_WARN QString("ALSA, Warning: ")
+#define LOC_ERR QString("ALSA, Error: ")
 
 AudioOutputALSA::AudioOutputALSA(
     QString laudio_main_device, QString           laudio_passthru_device,
@@ -113,7 +116,7 @@ bool AudioOutputALSA::OpenDevice()
         return false;
     }
 
-    err = SetParameters(pcm_handle, SND_PCM_ACCESS_MMAP_INTERLEAVED,
+    err = SetParameters(pcm_handle,
                         format, audio_channels, audio_samplerate, buffer_time,
                         period_time);
     if (err < 0) 
@@ -164,7 +167,7 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
     
     while (frames > 0) 
     {
-        lw = snd_pcm_mmap_writei(pcm_handle, tmpbuf, frames);
+        lw = pcm_write_func(pcm_handle, tmpbuf, frames);
         
         if (lw >= 0)
         {
@@ -221,7 +224,7 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("snd_pcm_mmap_writei: %1 (%2)")
+            VERBOSE(VB_IMPORTANT, QString("pcm_write_func: %1 (%2)")
                     .arg(snd_strerror(lw)).arg(lw));
             VERBOSE(VB_IMPORTANT, QString("WriteAudio: snd_pcm_state == %1")
                     .arg(snd_pcm_state(pcm_handle)));
@@ -292,7 +295,7 @@ inline int AudioOutputALSA::getSpaceOnSoundcard(void)
 }
 
 
-int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
+int AudioOutputALSA::SetParameters(snd_pcm_t *handle,
                                    snd_pcm_format_t format, unsigned int channels,
                                    unsigned int rate, unsigned int buffer_time,
                                    unsigned int period_time)
@@ -324,12 +327,26 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
         return err;
     }
 
-    /* set the interleaved read/write format */
-    if ((err = snd_pcm_hw_params_set_access(handle, params, access)) < 0)
+    /* set the interleaved read/write format, use mmap if available */
+    pcm_write_func = &snd_pcm_mmap_writei;
+    err = snd_pcm_hw_params_set_access(
+        handle, params, SND_PCM_ACCESS_MMAP_INTERLEAVED);
+    if (err < 0)
     {
-        Error(QString("Access type not available: %1")
-              .arg(snd_strerror(err)));
-        return err;
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "mmap not available, attempting to fall back to slow writes.");
+        QString old_err = snd_strerror(err);
+        pcm_write_func = &snd_pcm_writei;
+        err = snd_pcm_hw_params_set_access(
+            handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+        if (err < 0)
+        {
+            Error("Interleaved sound types MMAP & RW are not available");
+            VERBOSE(VB_IMPORTANT,
+                    QString("MMAP Error: %1\n\t\t\tRW Error: %2")
+                    .arg(old_err).arg(snd_strerror(err)));
+            return err;
+        }
     }
 
     /* set the sample format */

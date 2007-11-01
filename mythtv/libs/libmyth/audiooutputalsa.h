@@ -37,7 +37,7 @@ class AudioOutputALSA : public AudioOutputBase
     virtual inline int getBufferedOnSoundcard(void);
 
   private:
-    inline int SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
+    inline int SetParameters(snd_pcm_t *handle,
                              snd_pcm_format_t format, unsigned int channels,
                              unsigned int rate, unsigned int buffer_time,
                              unsigned int period_time);
@@ -59,6 +59,8 @@ class AudioOutputALSA : public AudioOutputBase
     float        volume_range_multiplier;
     long         playback_vol_min;
     long         playback_vol_max;
+    snd_pcm_sframes_t (*pcm_write_func)(
+        snd_pcm_t*, const void*, snd_pcm_uframes_t);
 };
 
 #endif
