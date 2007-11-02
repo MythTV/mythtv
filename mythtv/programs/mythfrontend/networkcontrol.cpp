@@ -261,7 +261,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
     if (result != "")
     {
         nrLock.lock();
-        networkControlReplies.push_back(result);
+        networkControlReplies.push_back(QDeepCopy<QString>(result));
         nrLock.unlock();
 
         notifyDataAvailable();
@@ -296,8 +296,13 @@ void NetworkControl::newConnection(int socket)
     client = s;
     cs = os;
 
+    ncLock.lock();
     networkControlCommands.clear();
+    ncLock.unlock();
+
+    nrLock.lock();
     networkControlReplies.clear();
+    nrLock.unlock();
 
     welcomeStr = "MythFrontend Network Control\r\n";
     if (closedOldConn)
@@ -332,10 +337,13 @@ void NetworkControl::readClient(void)
         lineIn.replace(QRegExp("[\r\n]"), "");
         lineIn.replace(QRegExp("^\\s"), "");
 
+        if (lineIn.isEmpty())
+            continue;
+
         tokens = QStringList::split(" ", lineIn);
 
         ncLock.lock();
-        networkControlCommands.push_back(lineIn);
+        networkControlCommands.push_back(QDeepCopy<QString>(lineIn));
         ncCond.wakeOne();
         ncLock.unlock();
     }
@@ -831,7 +839,7 @@ void NetworkControl::customEvent(QCustomEvent *e)
             for (unsigned int i = 3; i < tokens.size(); i++)
                 response += QString(" ") + tokens[i];
             nrLock.lock();
-            networkControlReplies.push_back(response);
+            networkControlReplies.push_back(QDeepCopy<QString>(response));
             nrLock.unlock();
 
             notifyDataAvailable();

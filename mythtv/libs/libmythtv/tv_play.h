@@ -96,7 +96,7 @@ class MPUBLIC TV : public QObject
 
     // User input processing commands
     void ProcessKeypress(QKeyEvent *e);
-    void processNetworkControlCommand(QString command);
+    void ProcessNetworkControlCommand(const QString &command);
     void customEvent(QCustomEvent *e);
     bool HandleTrackAction(const QString &action);
 
