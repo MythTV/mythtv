@@ -920,7 +920,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 
             iconMap.clear();
 
-            iconMap["onscreensub"] = SCREEN;
+            iconMap["onscreensub"] = SUB_ONSCREEN;
             iconMap["subtitles"] = SUB_NORMAL;
             iconMap["cc"] = SUB_HARDHEAR;
             iconMap["deafsigned"] = SUB_SIGNED;
