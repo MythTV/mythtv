@@ -75,7 +75,8 @@ enum SubtitleTypes {
     SUB_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     SUB_HARDHEAR      = 0x01,
     SUB_NORMAL        = 0x02,
-    SUB_ONSCREEN      = 0x04
+    SUB_ONSCREEN      = 0x04,
+    SUB_SIGNED        = 0x08
 };
 
 enum RecStatusType {

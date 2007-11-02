@@ -430,6 +430,10 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 pginfo->subtitletype |= SUB_ONSCREEN;
             }
+            else if (info.tagName() == "subtitles" && info.attribute("type") == "deaf-signed")
+            {
+                pginfo->subtitletype |= SUB_SIGNED;
+            }
             else if (info.tagName() == "audio")
             {
                 parseAudio(info, pginfo);

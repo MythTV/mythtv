@@ -3587,6 +3587,8 @@ void ProgramInfo::showDetails(void) const
         attr += QObject::tr("Subtitles Available") + ", ";
     if (subtype & SUB_ONSCREEN)
         attr += QObject::tr("Subtitled") + ", ";
+    if (subtype & SUB_SIGNED)
+        attr += QObject::tr("Deaf Signing") + ", ";
 
     if (generic && category_type == "series")
         attr += QObject::tr("Unidentified Episode") + ", ";
