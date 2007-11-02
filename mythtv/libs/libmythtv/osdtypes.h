@@ -107,7 +107,7 @@ class OSDSet : public QObject
   signals:
     void OSDClosed(int);
 
-  private:
+  protected:
     int m_screenwidth;
     int m_screenheight;
     int m_frameint;
@@ -157,13 +157,12 @@ class OSDType : public QObject
     Q_OBJECT
   public:
     OSDType(const QString &name);
-    virtual ~OSDType();
 
     void SetParent(OSDSet *parent) { m_parent = parent; }
     void Hide(bool hidden = true) { m_hidden = hidden; }
     bool isHidden(void) { return m_hidden; }
 
-    QString Name() { return m_name; }
+    QString Name();
 
     virtual void Reinit(float wmult, float hmult) = 0;
 
@@ -171,6 +170,10 @@ class OSDType : public QObject
                       int yoff) = 0;
 
   protected:
+    virtual ~OSDType();
+
+  protected:
+    mutable QMutex m_lock;
     bool m_hidden;
     QString m_name;
     OSDSet *m_parent;
@@ -194,7 +197,6 @@ class OSDTypeText : public OSDType
     OSDTypeText(const QString &name, TTFFont *font, const QString &text,
                 QRect displayrect, float wmult, float hmult);
     OSDTypeText(const OSDTypeText &text);
-   ~OSDTypeText();
 
     void Reinit(float wmult, float hmult);
 
@@ -202,25 +204,24 @@ class OSDTypeText : public OSDType
     void SetUseAlt(bool usealt) { m_usingalt = usealt; }
 
     void SetText(const QString &text);
-    QString GetText() { return m_message; }
+    QString GetText(void) const;
 
     void SetDefaultText(const QString &text);
-    QString GetDefaultText() { return m_default_msg; }
+    QString GetDefaultText(void) const;
 
-    void SetMultiLine(bool multi) { m_multiline = multi; }
-    bool GetMultiLine() { return m_multiline; }
+    void SetMultiLine(bool multi);
+    bool GetMultiLine(void) const { return m_multiline; }
 
-    void SetCentered(bool docenter) { m_centered = docenter; }
-    bool GetCentered() { return m_centered; }
+    void SetCentered(bool docenter);
+    bool GetCentered(void) const { return m_centered; }
 
-    void SetRightJustified(bool right) { m_right = right; }
-    bool GetRightJustified() { return m_right; }
+    void SetRightJustified(bool right);
+    bool GetRightJustified(void) const { return m_right; }
 
-    void SetScrolling(int x, int y) { m_scroller = true; m_scrollx = x;
-                                      m_scrolly = y; }
+    void SetScrolling(int x, int y);
 
-    void SetLineSpacing(float linespacing) { m_linespacing = linespacing; }
-    float GetLineSpacing() { return m_linespacing; }
+    void SetLineSpacing(float linespacing);
+    float GetLineSpacing(void) const { return m_linespacing; }
 
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
     bool MoveCursor(int dir);
@@ -237,7 +238,10 @@ class OSDTypeText : public OSDType
     void SetButton(bool is_button)      { m_button = is_button;     }
     void SetEntryNum(int entrynum)      { m_entrynum = entrynum;    }
 
-  private:
+    static QString ConvertFromRtoL(const QString &text);
+  protected:
+    ~OSDTypeText();
+
     void DrawString(OSDSurface *surface, QRect rect, const QString &text,
                     int fade, int maxfade, int xoff, int yoff,
                     bool double_size=false);
