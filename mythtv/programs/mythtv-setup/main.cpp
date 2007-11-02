@@ -37,67 +37,82 @@
 
 using namespace std;
 
-void SetupMenuCallback(void* data, QString& selection) {
-    (void)data;
+void SetupMenuCallback ( void* data, QString& selection )
+{
+    ( void ) data;
 
     QString sel = selection.lower();
 
-    if (sel == "general") {
+    if ( sel == "general" )
+    {
         BackendSettings be;
         be.exec();
-    } else if (sel == "capture cards") {
+    }
+    else if ( sel == "capture cards" )
+    {
         CaptureCardEditor cce;
         cce.exec();
-    } else if (sel == "video sources") {
+    }
+    else if ( sel == "video sources" )
+    {
         VideoSourceEditor vse;
         vse.exec();
-    } else if (sel == "card inputs") {
+    }
+    else if ( sel == "card inputs" )
+    {
         CardInputEditor cie;
         cie.exec();
-    } else if (sel == "channel editor") {
+    }
+    else if ( sel == "channel editor" )
+    {
         ChannelEditor ce;
         ce.exec();
-    } else if (sel == "storage groups") {
+    }
+    else if ( sel == "storage groups" )
+    {
         StorageGroupListEditor sge;
         sge.exec();
     }
 }
 
-void SetupMenu(void) 
+void SetupMenu ( void )
 {
-    QString theme = gContext->GetSetting("Theme", "blue");
+    QString theme = gContext->GetSetting ( "Theme", "blue" );
 
-    MythThemedMenu* menu = new MythThemedMenu(gContext->FindThemeDir(theme),
-                                              "setup.xml",
-                                              GetMythMainWindow()->GetMainStack(),
-                                              "mainmenu", false);
+    MythThemedMenu* menu = new MythThemedMenu ( gContext->FindThemeDir ( theme ),
+            "setup.xml",
+            GetMythMainWindow()->GetMainStack(),
+            "mainmenu", false );
 
-    menu->setCallback(SetupMenuCallback, gContext);
+    menu->setCallback ( SetupMenuCallback, gContext );
     menu->setKillable();
 
-    if (menu->foundTheme()) {
-        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
-        qApp->setMainWidget(GetMythMainWindow());
+    if ( menu->foundTheme() )
+    {
+        GetMythMainWindow()->GetMainStack()->AddScreen ( menu );
+        qApp->setMainWidget ( GetMythMainWindow() );
         qApp->exec();
-    } else {
+    }
+    else
+    {
         cerr << "Couldn't find theme " << theme << endl;
     }
 }
 
-int main(int argc, char *argv[])
+int main ( int argc, char *argv[] )
 {
     QString geometry = QString::null;
     QString display  = QString::null;
-    QString verboseString = QString(" important general");
+    QString verboseString = QString ( " important general" );
 
 #ifdef USING_X11
     // Remember any -display or -geometry argument
     // which QApplication init will remove.
-    for(int argpos = 1; argpos + 1 < argc; ++argpos)
+    for ( int argpos = 1; argpos + 1 < argc; ++argpos )
     {
-        if (!strcmp(argv[argpos],"-geometry"))
+        if ( !strcmp ( argv[argpos],"-geometry" ) )
             geometry = argv[argpos+1];
-        else if (!strcmp(argv[argpos],"-display"))
+        else if ( !strcmp ( argv[argpos],"-display" ) )
             display = argv[argpos+1];
     }
 #endif
@@ -105,21 +120,21 @@ int main(int argc, char *argv[])
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(FALSE);
+    QApplication::setDesktopSettingsAware ( FALSE );
 #endif
-    QApplication a(argc, argv);
+    QApplication a ( argc, argv );
 
     QMap<QString, QString> settingsOverride;
 
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    for ( int argpos = 1; argpos < a.argc(); ++argpos )
     {
-        if (!strcmp(a.argv()[argpos],"-display") ||
-            !strcmp(a.argv()[argpos],"--display"))
+        if ( !strcmp ( a.argv() [argpos],"-display" ) ||
+                !strcmp ( a.argv() [argpos],"--display" ) )
         {
-            if (a.argc()-1 > argpos)
+            if ( a.argc()-1 > argpos )
             {
-                display = a.argv()[argpos+1];
-                if (display.startsWith("-"))
+                display = a.argv() [argpos+1];
+                if ( display.startsWith ( "-" ) )
                 {
                     cerr << "Invalid or missing argument to -display option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
@@ -133,63 +148,63 @@ int main(int argc, char *argv[])
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(a.argv()[argpos],"-geometry") ||
-                 !strcmp(a.argv()[argpos],"--geometry"))      
+        else if ( !strcmp ( a.argv() [argpos],"-geometry" ) ||
+                  !strcmp ( a.argv() [argpos],"--geometry" ) )
         {
-            if (a.argc()-1 > argpos)
+            if ( a.argc()-1 > argpos )
             {
-                geometry = a.argv()[argpos+1];
-                if (geometry.startsWith("-"))
+                geometry = a.argv() [argpos+1];
+                if ( geometry.startsWith ( "-" ) )
                 {
                     cerr << "Invalid or missing argument to "
-                        "-geometry option\n";
+                    "-geometry option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                }                      
+                }
                 else
                     ++argpos;
-            }            
+            }
             else
-            {            
-                cerr << "Missing argument to -geometry option\n"; 
-                return BACKEND_EXIT_INVALID_CMDLINE;
-            }            
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
-                  !strcmp(a.argv()[argpos],"--verbose"))
-        {
-            if (a.argc()-1 > argpos)
             {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return BACKEND_EXIT_INVALID_CMDLINE;                        
+                cerr << "Missing argument to -geometry option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if ( !strcmp ( a.argv() [argpos],"-v" ) ||
+                  !strcmp ( a.argv() [argpos],"--verbose" ) )
+        {
+            if ( a.argc()-1 > argpos )
+            {
+                if ( parse_verbose_arg ( a.argv() [argpos+1] ) ==
+                        GENERIC_EXIT_INVALID_CMDLINE )
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
+        else if ( !strcmp ( a.argv() [argpos],"-O" ) ||
+                  !strcmp ( a.argv() [argpos],"--override-setting" ) )
         {
-            if (a.argc()-1 > argpos)
+            if ( a.argc()-1 > argpos )
             {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
+                QString tmpArg = a.argv() [argpos+1];
+                if ( tmpArg.startsWith ( "-" ) )
                 {
                     cerr << "Invalid or missing argument to -O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                }
+
+                QStringList pairs = QStringList::split ( ",", tmpArg );
+                for ( unsigned int index = 0; index < pairs.size(); ++index )
                 {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    QStringList tokens = QStringList::split ( "=", pairs[index] );
+                    tokens[0].replace ( QRegExp ( "^[\"']" ), "" );
+                    tokens[0].replace ( QRegExp ( "[\"']$" ), "" );
+                    tokens[1].replace ( QRegExp ( "^[\"']" ), "" );
+                    tokens[1].replace ( QRegExp ( "[\"']$" ), "" );
                     settingsOverride[tokens[0]] = tokens[1];
                 }
             }
@@ -203,56 +218,56 @@ int main(int argc, char *argv[])
         }
         else
         {
-            if (!(!strcmp(a.argv()[argpos],"-h") ||
-                !strcmp(a.argv()[argpos],"--help") ||
-                !strcmp(a.argv()[argpos],"--usage")))
-                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            if ( ! ( !strcmp ( a.argv() [argpos],"-h" ) ||
+                     !strcmp ( a.argv() [argpos],"--help" ) ||
+                     !strcmp ( a.argv() [argpos],"--usage" ) ) )
+                cerr << "Invalid argument: " << a.argv() [argpos] << endl;
 
             cerr << "Valid options are: "<<endl
-#ifdef USING_X11 
-                 <<"-display X-server              Create GUI on X-server, not localhost"<<endl
-#endif          
-                 <<"-geometry or --geometry WxH    Override window size settings"<<endl
-                 <<"-geometry WxH+X+Y              Override window size and position"<<endl
-                 <<"-O or "<<endl
-                 <<"  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'"<<endl
-                 <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl 
-                 <<endl;
+#ifdef USING_X11
+            <<"-display X-server              Create GUI on X-server, not localhost"<<endl
+#endif
+            <<"-geometry or --geometry WxH    Override window size settings"<<endl
+            <<"-geometry WxH+X+Y              Override window size and position"<<endl
+            <<"-O or "<<endl
+            <<"  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'"<<endl
+            <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl
+            <<endl;
             return -1;
         }
     }
 
-    if (!display.isEmpty())
+    if ( !display.isEmpty() )
     {
-        MythContext::SetX11Display(display);
+        MythContext::SetX11Display ( display );
     }
 
     gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext = new MythContext ( MYTH_BINARY_VERSION );
 
-    if (!gContext->Init(true))
+    if ( !gContext->Init ( true ) )
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        VERBOSE ( VB_IMPORTANT, "Failed to init MythContext, exiting." );
         return -1;
     }
 
-    if (geometry != "")
-        if (!gContext->ParseGeometryOverride(geometry))
+    if ( geometry != "" )
+        if ( !gContext->ParseGeometryOverride ( geometry ) )
             cerr << "Illegal -geometry argument '"
-                 << geometry << "' (ignored)\n";
+            << geometry << "' (ignored)\n";
 
-    if (settingsOverride.size())
+    if ( settingsOverride.size() )
     {
         QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        for ( it = settingsOverride.begin(); it != settingsOverride.end(); ++it )
         {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+            VERBOSE ( VB_IMPORTANT, QString ( "Setting '%1' being forced to '%2'" )
+                      .arg ( it.key() ).arg ( it.data() ) );
+            gContext->OverrideSettingForSession ( it.key(), it.data() );
         }
-    }   
+    }
 
-    if (!MSqlQuery::testDBConnection())
+    if ( !MSqlQuery::testDBConnection() )
     {
         cerr << "Unable to open database.\n";
         //     << "Driver error was:" << endl
@@ -265,49 +280,49 @@ int main(int argc, char *argv[])
 
     UpgradeTVDatabaseSchema();
 
-    gContext->SetSetting("Theme", "G.A.N.T");
+    gContext->SetSetting ( "Theme", "G.A.N.T" );
     gContext->LoadQtConfig();
 
     QString fileprefix = MythContext::GetConfDir();
 
-    QDir dir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
+    QDir dir ( fileprefix );
+    if ( !dir.exists() )
+        dir.mkdir ( fileprefix );
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
-    gContext->SetMainWindow(mainWindow);
+    gContext->SetMainWindow ( mainWindow );
 
     gContext->UpdateImageCache();
     MythThemeBase *themeBase = new MythThemeBase();
-    (void) themeBase;
+    ( void ) themeBase;
 
     LanguageSettings::prompt();
-    LanguageSettings::load("mythfrontend");
+    LanguageSettings::load ( "mythfrontend" );
 
-    QString warn = 
-        QObject::tr("WARNING") + ": " +
-        QObject::tr("MythTV has detected that the backend is running.")+"\n\n"+
-        QObject::tr("Changing existing card inputs, deleting anything, "
-                    "or scanning for channels may not work.");
+    QString warn =
+        QObject::tr ( "WARNING" ) + ": " +
+        QObject::tr ( "MythTV has detected that the backend is running." ) +"\n\n"+
+        QObject::tr ( "Changing existing card inputs, deleting anything, "
+                      "or scanning for channels may not work." );
 
     bool backendIsRunning = gContext->BackendIsRunning();
 
-    if (backendIsRunning)
+    if ( backendIsRunning )
     {
-        int val = MythPopupBox::show2ButtonPopup(
-            gContext->GetMainWindow(), QObject::tr("WARNING"),
-            warn,
-            QObject::tr("Continue"),
-            QObject::tr("Exit"), 1);
-        if (1 == val)
+        int val = MythPopupBox::show2ButtonPopup (
+                      gContext->GetMainWindow(), QObject::tr ( "WARNING" ),
+                      warn,
+                      QObject::tr ( "Continue" ),
+                      QObject::tr ( "Exit" ), 1 );
+        if ( 1 == val )
             return 0;
 
         backendIsRunning = true;
     }
 
-    REG_KEY("qt", "DELETE", "Delete", "D");
-    REG_KEY("qt", "EDIT", "Edit", "E");
+    REG_KEY ( "qt", "DELETE", "Delete", "D" );
+    REG_KEY ( "qt", "EDIT", "Edit", "E" );
 
     DialogBox *dia = NULL;
     bool haveProblems = false;
@@ -317,47 +332,47 @@ int main(int argc, char *argv[])
         SetupMenu();
 
         // Look for common problems
-        QString *problems = new QString("");
-        haveProblems = CheckSetup(problems);
+        QString *problems = new QString ( "" );
+        haveProblems = CheckSetup ( problems );
 
-        if (haveProblems)
+        if ( haveProblems )
         {
             QString prompt;
 
-            if (problems->contains("\n") > 1)
-                prompt = QObject::tr("Do you want to fix these problems?");
+            if ( problems->contains ( "\n" ) > 1 )
+                prompt = QObject::tr ( "Do you want to fix these problems?" );
             else
-                prompt = QObject::tr("Do you want to fix this problem?");
+                prompt = QObject::tr ( "Do you want to fix this problem?" );
 
-            dia = new DialogBox(mainWindow, problems->append("\n" + prompt));
-            dia->AddButton(QObject::tr("Yes please"));
-            dia->AddButton(QObject::tr("No, I know what I am doing"));
+            dia = new DialogBox ( mainWindow, problems->append ( "\n" + prompt ) );
+            dia->AddButton ( QObject::tr ( "Yes please" ) );
+            dia->AddButton ( QObject::tr ( "No, I know what I am doing" ) );
 
-            if (dia->exec() == 2)
+            if ( dia->exec() == 2 )
                 haveProblems = false;
             delete dia;
         }
 
         delete problems;
 
-    // Execute UI again until there are no more problems:
+        // Execute UI again until there are no more problems:
     }
-    while (haveProblems);
+    while ( haveProblems );
 
-    if (gContext->IsMasterHost())
+    if ( gContext->IsMasterHost() )
     {
-        dia = new DialogBox(mainWindow,
-                            QObject::tr("If this is the master backend server, "
-                                        "please run 'mythfilldatabase' "
-                                        "to populate the database "
-                                        "with channel information."));
-        dia->AddButton(QObject::tr("OK"));
+        dia = new DialogBox ( mainWindow,
+                              QObject::tr ( "If this is the master backend server, "
+                                            "please run 'mythfilldatabase' "
+                                            "to populate the database "
+                                            "with channel information." ) );
+        dia->AddButton ( QObject::tr ( "OK" ) );
         dia->exec();
         delete dia;
     }
 
-    if (backendIsRunning)
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+    if ( backendIsRunning )
+        RemoteSendMessage ( "CLEAR_SETTINGS_CACHE" );
 
     return 0;
 }
