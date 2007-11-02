@@ -415,6 +415,8 @@ public:
 
     virtual void setEnabled(bool b);
 
+    virtual void clearSelections(void);
+
 signals:
     void accepted(int);
     void menuButtonPressed(int);
@@ -428,7 +430,6 @@ signals:
 
 protected slots:
     void setValueByIndex(int index);
-    void widgetDestroyed() { widget=NULL; };
 protected:
     MythListBox* widget;
     MythListBox::SelectionMode selectionMode;

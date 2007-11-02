@@ -1592,12 +1592,22 @@ void ListBoxSetting::setEnabled(bool b)
         widget->setEnabled(b);
 }
 
+void ListBoxSetting::clearSelections(void)
+{
+    SelectSetting::clearSelections();
+    if (widget)
+        widget->clear();
+}
+
 void ListBoxSetting::addSelection(
     const QString &label, QString value, bool select)
 {
     SelectSetting::addSelection(label, value, select);
     if (widget)
+    {
         widget->insertItem(label);
+        //widget->triggerUpdate(true);
+    }
 };
 
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
@@ -1622,8 +1632,6 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             widget->setCurrentItem(i);
     }
 
-    connect(widget, SIGNAL(destroyed()),
-            this, SLOT(widgetDestroyed()));
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
     connect(widget, SIGNAL(accepted(int)),
