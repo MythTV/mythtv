@@ -163,7 +163,7 @@ class OSDType : public QObject
     void Hide(bool hidden = true) { m_hidden = hidden; }
     bool isHidden(void) { return m_hidden; }
 
-    QString Name() { return m_name; }
+    QString Name(void);
 
     virtual void Reinit(float wmult, float hmult) = 0;
 
@@ -171,6 +171,7 @@ class OSDType : public QObject
                       int yoff) = 0;
 
   protected:
+    mutable QMutex m_lock;
     bool m_hidden;
     QString m_name;
     OSDSet *m_parent;
@@ -202,25 +203,24 @@ class OSDTypeText : public OSDType
     void SetUseAlt(bool usealt) { m_usingalt = usealt; }
 
     void SetText(const QString &text);
-    QString GetText() { return m_message; }
+    QString GetText(void) const;
 
     void SetDefaultText(const QString &text);
-    QString GetDefaultText() { return m_default_msg; }
+    QString GetDefaultText(void) const;
 
-    void SetMultiLine(bool multi) { m_multiline = multi; }
-    bool GetMultiLine() { return m_multiline; }
+    void SetMultiLine(bool multi);
+    bool GetMultiLine(void) const { return m_multiline; }
 
-    void SetCentered(bool docenter) { m_centered = docenter; }
-    bool GetCentered() { return m_centered; }
+    void SetCentered(bool docenter);
+    bool GetCentered(void) const { return m_centered; }
 
-    void SetRightJustified(bool right) { m_right = right; }
-    bool GetRightJustified() { return m_right; }
+    void SetRightJustified(bool right);
+    bool GetRightJustified(void) const { return m_right; }
 
-    void SetScrolling(int x, int y) { m_scroller = true; m_scrollx = x;
-                                      m_scrolly = y; }
+    void SetScrolling(int x, int y);
 
-    void SetLineSpacing(float linespacing) { m_linespacing = linespacing; }
-    float GetLineSpacing() { return m_linespacing; }
+    void SetLineSpacing(float linespacing);
+    float GetLineSpacing(void) const { return m_linespacing; }
 
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
     bool MoveCursor(int dir);

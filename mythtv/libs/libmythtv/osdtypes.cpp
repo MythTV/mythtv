@@ -644,10 +644,18 @@ bool OSDSet::CanShowWith(const QString &name) const
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
-OSDType::OSDType(const QString &name)
+OSDType::OSDType(const QString &name) :
+    m_lock(true),
+    m_hidden(false),
+    m_name(QDeepCopy<QString>(name)),
+    m_parent(NULL)
 {
-    m_hidden = false;
-    m_name = name;
+}
+
+QString OSDType::Name(void)
+{
+    QMutexLocker locker(&m_lock);
+    return QDeepCopy<QString>(m_name);
 }
 
 OSDType::~OSDType()
@@ -658,71 +666,76 @@ OSDType::~OSDType()
 
 OSDTypeText::OSDTypeText(const QString &name, TTFFont *font, 
                          const QString &text, QRect displayrect,
-                         float wmult, float hmult)
-           : OSDType(name)
+                         float wmult, float hmult) :
+    OSDType(name),
+    m_displaysize(displayrect),
+    m_screensize(displayrect),
+    m_unbiasedsize(unbias(m_screensize, wmult, hmult)),
+    m_message(QDeepCopy<QString>(text)),
+    m_default_msg(QDeepCopy<QString>(text)),
+
+    m_font(font),
+    m_altfont(NULL),
+
+    m_centered(false),
+    m_right(false),
+
+    m_multiline(false),
+    m_usingalt(false),
+
+    m_selected(false),
+    m_button(false),
+    m_entrynum(-1),
+    m_cursorpos(0),
+
+    m_scroller(false),
+    m_scrollx(0),
+    m_scrolly(0),
+
+    m_scrollinit(false),
+
+    m_linespacing(1.5f),
+
+    m_draw_info_str(""),
+    m_draw_info_len(0)
 {
-    m_message = text;
-    m_default_msg = text;
-    m_font = font;
-
-    m_altfont = NULL;
-    
-    m_displaysize = displayrect;
-    m_screensize = displayrect;
-    m_multiline = false;
-    m_centered = false;
-    m_right = false;
-    m_usingalt = false;
-
-    m_selected  = false;
-    m_button    = false;
-    m_entrynum  = -1;
-    m_cursorpos = 0;
-
-    m_scroller = false;
-    m_scrollx = m_scrolly = 0;
-    m_scrollinit = false;
-
-    m_linespacing = 1.5;
-
-    m_unbiasedsize = unbias(m_screensize, wmult, hmult);
-
-    m_draw_info_str = "";
-    m_draw_info_len = 0;
 }
 
-OSDTypeText::OSDTypeText(const OSDTypeText &other)
-           : OSDType(other.m_name)
+OSDTypeText::OSDTypeText(const OSDTypeText &other) :
+    OSDType(other.m_name),
+    m_draw_info_str(""),
+    m_draw_info_len(0)
 {
-    m_message = other.m_message;
-    m_default_msg = other.m_default_msg;
-    m_font = other.m_font;
-
-    m_altfont = other.m_altfont;
+    QMutexLocker locker(&other.m_lock);
 
     m_displaysize = other.m_displaysize;
-    m_screensize = other.m_screensize; 
-    m_multiline = other.m_multiline;
+    m_screensize = other.m_screensize;
+    m_unbiasedsize = other.m_unbiasedsize;
+
+    m_message = QDeepCopy<QString>(other.m_message);
+    m_default_msg = QDeepCopy<QString>(other.m_default_msg);
+
+    m_font = other.m_font;
+    m_altfont = other.m_altfont;
+
     m_centered = other.m_centered;
     m_right = other.m_right;
-    m_usingalt = other.m_usingalt; 
-   
-    m_selected = other.m_selected; 
-    m_button   = other.m_button; 
-    m_entrynum = other.m_entrynum; 
-    m_cursorpos = other.m_cursorpos; 
- 
+
+    m_multiline = other.m_multiline;
+    m_usingalt = other.m_usingalt;
+
+    m_selected = other.m_selected;
+    m_button   = other.m_button;
+    m_entrynum = other.m_entrynum;
+    m_cursorpos = other.m_cursorpos;
+
     m_scroller = other.m_scroller;
     m_scrollx = other.m_scrollx;
     m_scrolly = other.m_scrolly;
+
     m_scrollinit = other.m_scrollinit;
 
     m_linespacing = other.m_linespacing;
-
-    m_unbiasedsize = other.m_unbiasedsize;
-
-    m_draw_info_str = "";
-    m_draw_info_len = 0;
 }
 
 OSDTypeText::~OSDTypeText()
@@ -731,31 +744,86 @@ OSDTypeText::~OSDTypeText()
 
 void OSDTypeText::SetAltFont(TTFFont *font)
 {
+    QMutexLocker locker(&m_lock);
     m_altfont = font;
 }
 
 void OSDTypeText::SetText(const QString &text)
 {
-    m_message = text;
+    QMutexLocker locker(&m_lock);
+    m_message = QDeepCopy<QString>(text);
     m_cursorpos = text.length();
     m_scrollinit = false;
 }
 
+QString OSDTypeText::GetText(void) const
+{
+    QMutexLocker locker(&m_lock);
+    return QDeepCopy<QString>(m_message);
+}
+
 void OSDTypeText::SetDefaultText(const QString &text)
 {
-    m_message = text;
-    m_default_msg = text;
+    QMutexLocker locker(&m_lock);
+    m_message = QDeepCopy<QString>(text);
+    m_default_msg = QDeepCopy<QString>(text);
     m_scrollinit = false;
+}
+  
+QString OSDTypeText::GetDefaultText(void) const
+{
+    QMutexLocker locker(&m_lock);
+    return QDeepCopy<QString>(m_default_msg);
+}
+
+void OSDTypeText::SetMultiLine(bool multi)
+{
+    QMutexLocker locker(&m_lock);
+    m_multiline = multi;
+}
+
+void OSDTypeText::SetCentered(bool docenter)
+{
+    QMutexLocker locker(&m_lock);
+    m_centered = docenter;
+}
+
+void OSDTypeText::SetRightJustified(bool right)
+{
+    QMutexLocker locker(&m_lock);
+    m_right = right;
+}
+
+void OSDTypeText::SetScrolling(int x, int y)
+{
+    QMutexLocker locker(&m_lock);
+    m_scroller = true;
+    m_scrollx = x;
+    m_scrolly = y;
+}
+
+void OSDTypeText::SetLineSpacing(float linespacing)
+{
+    QMutexLocker locker(&m_lock);
+    m_linespacing = linespacing;
 }
 
 void OSDTypeText::Reinit(float wmult, float hmult)
 {
+    QMutexLocker locker(&m_lock);
     m_displaysize = m_screensize = bias(m_unbiasedsize, wmult, hmult);
 }
 
 void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
                        int yoff)
 {
+    QMutexLocker locker(&m_lock);
+
+    // initialize regular expressions once, this is a very slow operation
+    static QMutex regexp_lock;
+    static QRegExp br("%BR%");
+    static QRegExp nl("\n");
+
     int textlength = 0;
 
     if (m_message == QString::null)
@@ -773,9 +841,11 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     if (m_multiline)
     {
-        QString tmp_msg = m_message;
-        tmp_msg.replace(QRegExp("%BR%"), "\n");
-        tmp_msg.replace(QRegExp("\n")," \n ");
+        QString tmp_msg = QDeepCopy<QString>(m_message);
+        regexp_lock.lock();
+        tmp_msg.replace(br, "\n");
+        tmp_msg.replace(nl," \n ");
+        regexp_lock.unlock();
 
         QStringList wordlist = QStringList::split(" ", tmp_msg);
         int length = 0;
@@ -902,6 +972,8 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
                                    const QString &text, int fade, int maxfade, 
                                    int xoff, int yoff, bool double_size)
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_draw_info_str != text)
     {
         m_draw_info_str = QDeepCopy<QString>(text);
@@ -1015,6 +1087,8 @@ void OSDTypeText::DrawString(OSDSurface *surface, QRect rect,
                              const QString &text, int fade, int maxfade, 
                              int xoff, int yoff, bool doubl)
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_centered || m_right)
     {
         int textlength = 0;
@@ -1067,6 +1141,8 @@ int clamp(int val, int minimum, int maximum)
 
 bool OSDTypeText::MoveCursor(int dir)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!IsEntry() || IsButton())
         return false;
 
@@ -1077,6 +1153,8 @@ bool OSDTypeText::MoveCursor(int dir)
 
 bool OSDTypeText::Delete(int dir)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!IsEntry() || IsButton())
         return false;
 
@@ -1099,6 +1177,8 @@ bool OSDTypeText::Delete(int dir)
 
 void OSDTypeText::InsertCharacter(QChar ch)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!IsEntry() || IsButton())
         return;
 
