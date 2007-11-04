@@ -2555,6 +2555,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     int bins = 1;
     int context = -1;
     int selectPadding = 0;
+    bool selectScale = true;
 
     QPixmap *uparrow_img = NULL;
     QPixmap *downarrow_img = NULL;
@@ -2650,6 +2651,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 {
                     QString imgpoint = "";
                     QString imgPad = "";
+                    QString imgScale = "";
                     imgpoint = info.attribute("location", "");
                     if (!imgpoint.isNull() && !imgpoint.isEmpty())
                     {
@@ -2657,13 +2659,19 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         selectPoint.setX((int)(selectPoint.x() * wmult));
                         selectPoint.setY((int)(selectPoint.y() * hmult));    
                     }
-                    
+
                     imgPad = info.attribute("padding", "");
                     if (!imgPad.isNull() && !imgPad.isEmpty())
                     {
                         selectPadding = (int)(imgPad.toInt() * hmult);
                     }
-                    
+
+                    imgScale = info.attribute("scale", "");
+                    if (imgScale.lower() == "no")
+                    {
+                        selectScale = false;
+                    }
+
                     select_img = gContext->LoadScalePixmap(file);
                     if (!select_img)
                     {
@@ -2847,6 +2855,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
     if (select_img)
     {
+        mtl->setSelectScale(selectScale);
         mtl->setSelectPadding(selectPadding);
         mtl->setSelectPoint(selectPoint);
         mtl->setHighlightImage(*select_img);

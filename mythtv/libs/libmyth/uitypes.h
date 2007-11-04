@@ -1052,6 +1052,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     void    setRightArrowOffset(QPoint& pt) {rightArrowOffset = pt;}
     void    setSelectPoint(QPoint& pt) { selectPoint = pt;}
     void    setSelectPadding(int pad) {selectPadding = pad;}
+    void    setSelectScale(bool scale) {selectScale = scale;}
     void    setArea(QRect an_area) { area = an_area; }
     void    setBins(int l_bins) { bins = l_bins; }
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
@@ -1136,6 +1137,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     int         visual_order;
     int         iconAttr;
     int         selectPadding;
+    bool        selectScale;
     
     QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;

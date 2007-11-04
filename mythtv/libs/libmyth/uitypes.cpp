@@ -3351,6 +3351,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     scrambled_parents = false;
     color_selectables = false;
     selectPadding = 0;
+    selectScale = false;
     selectPoint.setX(0);
     selectPoint.setY(0);
     upArrowOffset.setX(0);
@@ -4035,29 +4036,42 @@ void UIManagedTreeListType::makeHighlights()
 
     for(int i = 1; i <= bins; i++)
     {
-        QImage temp_image = highlight_image.convertToImage();
-        QPixmap *temp_pixmap = new QPixmap();
-        fontProp *tmpfont = NULL;
-        QString a_string = QString("bin%1-active").arg(i);
-        tmpfont = &m_fontfcns[m_fonts[a_string]];
-        temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() + selectPadding));
-        resized_highlight_images.append(temp_pixmap);
-        highlight_map[i] = temp_pixmap;
+        if (selectScale)
+        {
+            QImage temp_image = highlight_image.convertToImage();
+            QPixmap *temp_pixmap = new QPixmap();
+            fontProp *tmpfont = NULL;
+            QString a_string = QString("bin%1-active").arg(i);
+            tmpfont = &m_fontfcns[m_fonts[a_string]];
+            temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() + selectPadding));
+            resized_highlight_images.append(temp_pixmap);
+            highlight_map[i] = temp_pixmap;
+        }
+        else
+        {
+            highlight_map[i] = &highlight_image;
+        }
     }
 
     //
     //  Make no tree version
     //
 
-    QImage temp_image = highlight_image.convertToImage();
-    QPixmap *temp_pixmap = new QPixmap();
-    fontProp *tmpfont = NULL;
-    QString a_string = QString("bin%1-active").arg(bins);
-    tmpfont = &m_fontfcns[m_fonts[a_string]];
-    temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() + selectPadding ));
-    resized_highlight_images.append(temp_pixmap);
-    highlight_map[0] = temp_pixmap;
-
+    if (selectScale)
+    {
+        QImage temp_image = highlight_image.convertToImage();
+        QPixmap *temp_pixmap = new QPixmap();
+        fontProp *tmpfont = NULL;
+        QString a_string = QString("bin%1-active").arg(bins);
+        tmpfont = &m_fontfcns[m_fonts[a_string]];
+        temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() + selectPadding ));
+        resized_highlight_images.append(temp_pixmap);
+        highlight_map[0] = temp_pixmap;
+    }
+    else
+    {
+        highlight_map[0] = &highlight_image;
+    }
 
 }
 
