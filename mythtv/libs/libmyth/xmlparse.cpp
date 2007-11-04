@@ -3485,7 +3485,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 if (fontFcn.lower() == "active")
                     fontActive = fontName;
                 else if (fontFcn.lower() == "inactive")
-                    fontInactive = fontFcn;
+                    fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for listbtn area: "
                               << fontFcn
@@ -3647,7 +3647,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                 if (fontFcn.lower() == "active")
                     fontActive = fontName;
                 else if (fontFcn.lower() == "inactive")
-                    fontInactive = fontFcn;
+                    fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for listbtn area: "
                               << fontFcn
