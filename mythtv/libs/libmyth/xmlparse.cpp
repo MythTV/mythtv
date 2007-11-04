@@ -3604,14 +3604,14 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
 
     QString name = element.attribute("name", "");
     if (name.isEmpty()) {
-        std::cerr << "ListBtn area needs a name" << std::endl;
+        std::cerr << "ListTreeArea area needs a name" << std::endl;
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() || layerNum.isEmpty())
     {
-        cerr << "ListBtn area needs a draworder\n";
+        cerr << "ListTreeArea needs a draworder\n";
         return;
     }
 
@@ -3649,7 +3649,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                 else if (fontFcn.lower() == "inactive")
                     fontInactive = fontName;
                 else {
-                    std::cerr << "Unknown font function for listbtn area: "
+                    std::cerr << "Unknown font function for ListTreeArea: "
                               << fontFcn
                               << std::endl;
                     return;
@@ -3676,20 +3676,20 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
                 else {
-                    std::cerr << "Unknown type for gradient in listbtn area"
+                    std::cerr << "Unknown type for gradient in ListTreeArea"
                               << std::endl;
                     return;
                 }
 
                 if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
                     !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) {
-                    std::cerr << "Unknown color for gradient in listbtn area"
+                    std::cerr << "Unknown color for gradient in ListTreeArea area"
                               << std::endl;
                     return;
                 }
 
                 if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
-                    std::cerr << "Incorrect alpha for gradient in listbtn area"
+                    std::cerr << "Incorrect alpha for gradient in ListTreeArea area"
                               << std::endl;
                     return;
                 }
@@ -3702,7 +3702,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                std::cerr << "Unknown tag in listbtn area: "
+                std::cerr << "Unknown tag in ListTreeArea: "
                           << info.tagName() << endl;
                 return;
             }
@@ -3714,7 +3714,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     if (!fpActive)
     {
         cerr << "Unknown font: " << fontActive
-             << " in listbtn area: " << name << endl;
+             << " in ListTreeArea: " << name << endl;
         return;
     }
 
@@ -3722,7 +3722,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     if (!fpInactive)
     {
         cerr << "Unknown font: " << fontInactive
-             << " in listbtn area: " << name << endl;
+             << " in ListTreeArea: " << name << endl;
         return;
     }
 
