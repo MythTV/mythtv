@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -32,7 +31,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common.h"
 #include "avcodec.h"
 
 #define ALT_BITSTREAM_READER_LE
@@ -203,7 +201,7 @@ static int smacker_decode_header_tree(SmackVContext *smk, GetBitContext *gb, int
 
     if(get_bits1(gb)) {
         smacker_decode_tree(gb, &tmp1, 0, 0);
-        get_bits1(gb);
+        skip_bits1(gb);
         res = init_vlc(&vlc[0], SMKTREE_BITS, tmp1.length,
                     tmp1.lengths, sizeof(int), sizeof(int),
                     tmp1.bits, sizeof(uint32_t), sizeof(uint32_t), INIT_VLC_LE);
@@ -216,7 +214,7 @@ static int smacker_decode_header_tree(SmackVContext *smk, GetBitContext *gb, int
     }
     if(get_bits1(gb)){
         smacker_decode_tree(gb, &tmp2, 0, 0);
-        get_bits1(gb);
+        skip_bits1(gb);
         res = init_vlc(&vlc[1], SMKTREE_BITS, tmp2.length,
                     tmp2.lengths, sizeof(int), sizeof(int),
                     tmp2.bits, sizeof(uint32_t), sizeof(uint32_t), INIT_VLC_LE);
@@ -252,7 +250,7 @@ static int smacker_decode_header_tree(SmackVContext *smk, GetBitContext *gb, int
     huff.values = av_mallocz(huff.length * sizeof(int));
 
     smacker_decode_bigtree(gb, &huff, &ctx);
-    get_bits1(gb);
+    skip_bits1(gb);
     if(ctx.last[0] == -1) ctx.last[0] = huff.current++;
     if(ctx.last[1] == -1) ctx.last[1] = huff.current++;
     if(ctx.last[2] == -1) ctx.last[2] = huff.current++;
@@ -292,7 +290,7 @@ static int decode_header_trees(SmackVContext *smk) {
     } else {
         smacker_decode_header_tree(smk, &gb, &smk->mmap_tbl, smk->mmap_last, mmap_size);
     }
-    if(!get_bits(&gb, 1)) {
+    if(!get_bits1(&gb)) {
         av_log(smk->avctx, AV_LOG_INFO, "Skipping MCLR tree\n");
         smk->mclr_tbl = av_malloc(sizeof(int) * 2);
         smk->mclr_tbl[0] = 0;
@@ -300,7 +298,7 @@ static int decode_header_trees(SmackVContext *smk) {
     } else {
         smacker_decode_header_tree(smk, &gb, &smk->mclr_tbl, smk->mclr_last, mclr_size);
     }
-    if(!get_bits(&gb, 1)) {
+    if(!get_bits1(&gb)) {
         av_log(smk->avctx, AV_LOG_INFO, "Skipping FULL tree\n");
         smk->full_tbl = av_malloc(sizeof(int) * 2);
         smk->full_tbl[0] = 0;
@@ -308,7 +306,7 @@ static int decode_header_trees(SmackVContext *smk) {
     } else {
         smacker_decode_header_tree(smk, &gb, &smk->full_tbl, smk->full_last, full_size);
     }
-    if(!get_bits(&gb, 1)) {
+    if(!get_bits1(&gb)) {
         av_log(smk->avctx, AV_LOG_INFO, "Skipping TYPE tree\n");
         smk->type_tbl = av_malloc(sizeof(int) * 2);
         smk->type_tbl[0] = 0;
@@ -437,11 +435,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                 case 0:
                     for(i = 0; i < 4; i++) {
                         pix = smk_get_code(&gb, smk->full_tbl, smk->full_last);
-                        out[2] = pix & 0xFF;
-                        out[3] = pix >> 8;
+                        AV_WL16(out+2,pix);
                         pix = smk_get_code(&gb, smk->full_tbl, smk->full_last);
-                        out[0] = pix & 0xFF;
-                        out[1] = pix >> 8;
+                        AV_WL16(out,pix);
                         out += stride;
                     }
                     break;
@@ -466,11 +462,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                         uint16_t pix1, pix2;
                         pix1 = smk_get_code(&gb, smk->full_tbl, smk->full_last);
                         pix2 = smk_get_code(&gb, smk->full_tbl, smk->full_last);
-                        out[0] = pix1 & 0xFF; out[1] = pix1 >> 8;
-                        out[2] = pix2 & 0xFF; out[3] = pix2 >> 8;
+                        AV_WL16(out,pix1);
+                        AV_WL16(out+2,pix2);
                         out += stride;
-                        out[0] = pix1 & 0xFF; out[1] = pix1 >> 8;
-                        out[2] = pix2 & 0xFF; out[3] = pix2 >> 8;
+                        AV_WL16(out,pix1);
+                        AV_WL16(out+2,pix2);
                         out += stride;
                     }
                     break;
@@ -594,6 +590,10 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, 
     }
     stereo = get_bits1(&gb);
     bits = get_bits1(&gb);
+    if (unp_size & 0xC0000000 || (unp_size << !bits) > *data_size) {
+        av_log(avctx, AV_LOG_ERROR, "Frame is too large to fit in buffer\n");
+        return -1;
+    }
 
     memset(vlc, 0, sizeof(VLC) * 4);
     memset(h, 0, sizeof(HuffContext) * 4);
@@ -605,9 +605,9 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, 
         h[i].bits = av_mallocz(256 * 4);
         h[i].lengths = av_mallocz(256 * sizeof(int));
         h[i].values = av_mallocz(256 * sizeof(int));
-        get_bits1(&gb);
+        skip_bits1(&gb);
         smacker_decode_tree(&gb, &h[i], 0, 0);
-        get_bits1(&gb);
+        skip_bits1(&gb);
         if(h[i].current > 1) {
             res = init_vlc(&vlc[i], SMKTREE_BITS, h[i].length,
                     h[i].lengths, sizeof(int), sizeof(int),

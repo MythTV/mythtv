@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -455,7 +454,7 @@ static void imc_get_skip_coeff(IMCContext* q) {
             q->skipFlagBits[i] = band_tab[i+1] - band_tab[i];
 
             for(j = band_tab[i]; j < band_tab[i+1]; j++) {
-                if ((q->skipFlags[j] = get_bits(&q->gb,1)))
+                if ((q->skipFlags[j] = get_bits1(&q->gb)))
                     q->skipFlagCount[i]++;
             }
         } else {
@@ -486,7 +485,7 @@ static void imc_get_skip_coeff(IMCContext* q) {
 
             if (j < band_tab[i+1]) {
                 q->skipFlagBits[i]++;
-                if ((q->skipFlags[j] = get_bits(&q->gb,1)))
+                if ((q->skipFlags[j] = get_bits1(&q->gb)))
                     q->skipFlagCount[i]++;
             }
         }

@@ -186,7 +186,6 @@ static HostCheckBox *AC3PassThrough()
     return gc;
 }
 
-#ifdef CONFIG_LIBDTS
 static HostCheckBox *DTSPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("DTSPassThru");
@@ -198,7 +197,6 @@ static HostCheckBox *DTSPassThrough()
                     "audio output device be set to something suitable."));
     return gc;
 }
-#endif
 
 static HostCheckBox *DecodeExtraAudio()
 {
@@ -3124,9 +3122,7 @@ class AudioSettings : public TriggeredConfigurationGroup
          VerticalConfigurationGroup *vgrp0 =
              new VerticalConfigurationGroup(false, false, true, true);
          vgrp0->addChild(AC3PassThrough());
-#ifdef CONFIG_LIBDTS
          vgrp0->addChild(DTSPassThrough());
-#endif
 
          VerticalConfigurationGroup *vgrp1 =
              new VerticalConfigurationGroup(false, false, true, true);

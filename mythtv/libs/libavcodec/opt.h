@@ -19,13 +19,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVOPT_H
-#define AVOPT_H
+#ifndef FFMPEG_OPT_H
+#define FFMPEG_OPT_H
 
 /**
  * @file opt.h
  * AVOptions
  */
+
+#include "rational.h"
 
 enum AVOptionType{
     FF_OPT_TYPE_FLAGS,
@@ -46,7 +48,7 @@ typedef struct AVOption {
 
     /**
      * short English text help.
-     * @fixme what about other languages
+     * @todo what about other languages
      */
     const char *help;
     int offset;             ///< offset to context structure where the parsed value should be stored
@@ -82,4 +84,4 @@ int av_opt_show(void *obj, void *av_log_obj);
 void av_opt_set_defaults(void *s);
 void av_opt_set_defaults2(void *s, int mask, int flags);
 
-#endif
+#endif /* FFMPEG_OPT_H */

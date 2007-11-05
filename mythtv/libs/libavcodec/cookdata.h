@@ -18,13 +18,17 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
  * @file cookdata.h
  * Cook AKA RealAudio G2 compatible decoderdata
  */
+
+#ifndef FFMPEG_COOKDATA_H
+#define FFMPEG_COOKDATA_H
+
+#include <stdint.h>
 
 /* various data tables */
 
@@ -557,3 +561,5 @@ static const float cplscale6[63] = {
 static const float* cplscales[5] = {
     cplscale2, cplscale3, cplscale4, cplscale5, cplscale6,
 };
+
+#endif /* FFMPEG_COOKDATA_H */

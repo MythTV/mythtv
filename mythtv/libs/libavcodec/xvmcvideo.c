@@ -30,10 +30,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#ifdef USE_FASTMEMCPY
-#include "libvo/fastmemcpy.h"
-#endif
-
 #ifdef HAVE_XVMC
 
 //X11 includes are in the xvmc_render.h
@@ -75,8 +71,7 @@ static inline void handle_p_b_block(const MpegEncContext *, const XvMCMacroBlock
 #include "xvmccommon.c"
 
 //set s->block
-void XVMC_init_block(MpegEncContext *s)
-{
+void XVMC_init_block(MpegEncContext *s){
     xvmc_render_state_t *render = render_state(s);
     s->block= (DCTELEM*) (render->data_blocks+(render->next_free_data_block_num)*64);
 }

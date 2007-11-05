@@ -20,6 +20,7 @@
  */
 #include "avformat.h"
 #include "avio.h"
+#include "crc.h"
 #include <stdarg.h>
 
 #define IO_BUFFER_SIZE 32768
@@ -38,11 +39,7 @@ int init_put_byte(ByteIOContext *s,
     s->buffer = buffer;
     s->buffer_size = buffer_size;
     s->buf_ptr = buffer;
-    s->write_flag = write_flag;
-    if (!s->write_flag)
-        s->buf_end = buffer;
-    else
-        s->buf_end = buffer + buffer_size;
+    url_resetbuf(s, write_flag ? URL_WRONLY : URL_RDONLY);
     s->opaque = opaque;
     s->write_packet = write_packet;
     s->read_packet = read_packet;
@@ -269,7 +266,7 @@ void put_tag(ByteIOContext *s, const char *tag)
 
 static void fill_buffer(ByteIOContext *s)
 {
-    int len;
+    int len=0;
 
     /* no need to do anything if EOF already reached */
     if (s->eof_reached)
@@ -281,18 +278,23 @@ static void fill_buffer(ByteIOContext *s)
         s->checksum_ptr= s->buffer;
     }
 
-    len = s->read_packet(s->opaque, s->buffer, s->buffer_size);
+    if(s->read_packet)
+        len = s->read_packet(s->opaque, s->buffer, s->buffer_size);
     if (len <= 0) {
         /* do not modify buffer if EOF reached so that a seek back can
            be done without rereading data */
         s->eof_reached = 1;
-    if(len<0)
-        s->error= len;
+        if(len<0)
+            s->error= len;
     } else {
         s->pos += len;
         s->buf_ptr = s->buffer;
         s->buf_end = s->buffer + len;
     }
+}
+
+unsigned long ff_crc04C11DB7_update(unsigned long checksum, const uint8_t *buf, unsigned int len){
+    return av_crc(av_crc04C11DB7, checksum, buf, len);
 }
 
 unsigned long get_checksum(ByteIOContext *s){
@@ -347,7 +349,8 @@ int get_buffer(ByteIOContext *s, unsigned char *buf, int size)
             len = size;
         if (len == 0) {
             if(size > s->buffer_size && !s->update_checksum){
-                len = s->read_packet(s->opaque, buf, size);
+                if(s->read_packet)
+                    len = s->read_packet(s->opaque, buf, size);
                 if (len <= 0) {
                     /* do not modify buffer if EOF reached so that a seek back can
                     be done without rereading data */
@@ -475,6 +478,17 @@ uint64_t get_be64(ByteIOContext *s)
     return val;
 }
 
+uint64_t ff_get_v(ByteIOContext *bc){
+    uint64_t val = 0;
+    int tmp;
+
+    do{
+        tmp = get_byte(bc);
+        val= (val<<7) + (tmp&127);
+    }while(tmp&128);
+    return val;
+}
+
 /* link with avio functions */
 
 #ifdef CONFIG_MUXERS
@@ -520,7 +534,7 @@ int url_fdopen(ByteIOContext *s, URLContext *h)
                       (h->flags & URL_WRONLY || h->flags & URL_RDWR), h,
                       url_read_packet, url_write_packet, url_seek_packet) < 0) {
         av_free(buffer);
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     s->is_streamed = h->is_streamed;
     s->max_packet_size = max_packet_size;
@@ -538,10 +552,23 @@ int url_setbufsize(ByteIOContext *s, int buf_size)
     s->buffer = buffer;
     s->buffer_size = buf_size;
     s->buf_ptr = buffer;
-    if (!s->write_flag)
-        s->buf_end = buffer;
-    else
-        s->buf_end = buffer + buf_size;
+    url_resetbuf(s, s->write_flag ? URL_WRONLY : URL_RDONLY);
+    return 0;
+}
+
+int url_resetbuf(ByteIOContext *s, int flags)
+{
+    URLContext *h = s->opaque;
+    if ((flags & URL_RDWR) || (h && h->flags != flags && !h->flags & URL_RDWR))
+        return AVERROR(EINVAL);
+
+    if (flags & URL_WRONLY) {
+        s->buf_end = s->buffer + s->buffer_size;
+        s->write_flag = 1;
+    } else {
+        s->buf_end = s->buffer;
+        s->write_flag = 0;
+    }
     return 0;
 }
 

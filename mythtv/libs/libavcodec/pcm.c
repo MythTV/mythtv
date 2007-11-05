@@ -26,6 +26,7 @@
 
 #include "avcodec.h"
 #include "bitstream.h" // for ff_reverse
+#include "bytestream.h"
 
 /* from g711.c by SUN microsystems (unrestricted use) */
 
@@ -169,14 +170,15 @@ static int pcm_encode_close(AVCodecContext *avctx)
  */
 static inline void encode_from16(int bps, int le, int us,
                                short **samples, uint8_t **dst, int n) {
+    int usum = us ? 0x8000 : 0;
     if (bps > 2)
         memset(*dst, 0, n * bps);
     if (le) *dst += bps - 2;
     for(;n>0;n--) {
         register int v = *(*samples)++;
-        if (us) v += 0x8000;
-        (*dst)[le] = v >> 8;
-        (*dst)[1 - le] = v;
+        v += usum;
+        if (le) AV_WL16(*dst, v);
+        else    AV_WB16(*dst, v);
         *dst += bps;
     }
     if (le) *dst -= bps - 2;
@@ -247,74 +249,66 @@ static int pcm_encode_frame(AVCodecContext *avctx,
             uint32_t tmp = ff_reverse[*samples >> 8] +
                            (ff_reverse[*samples & 0xff] << 8);
             tmp <<= 4; // sync flags would go here
-            dst[2] = tmp & 0xff;
-            tmp >>= 8;
-            dst[1] = tmp & 0xff;
-            dst[0] = tmp >> 8;
+            bytestream_put_be24(&dst, tmp);
             samples++;
-            dst += 3;
         }
         break;
     case CODEC_ID_PCM_S16LE:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = v & 0xff;
-            dst[1] = v >> 8;
-            dst += 2;
+            bytestream_put_le16(&dst, v);
         }
         break;
     case CODEC_ID_PCM_S16BE:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = v >> 8;
-            dst[1] = v;
-            dst += 2;
+            bytestream_put_be16(&dst, v);
         }
         break;
     case CODEC_ID_PCM_U16LE:
         for(;n>0;n--) {
             v = *samples++;
             v += 0x8000;
-            dst[0] = v & 0xff;
-            dst[1] = v >> 8;
-            dst += 2;
+            bytestream_put_le16(&dst, v);
         }
         break;
     case CODEC_ID_PCM_U16BE:
         for(;n>0;n--) {
             v = *samples++;
             v += 0x8000;
-            dst[0] = v >> 8;
-            dst[1] = v;
-            dst += 2;
+            bytestream_put_be16(&dst, v);
         }
         break;
     case CODEC_ID_PCM_S8:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = v >> 8;
-            dst++;
+            *dst++ = v >> 8;
         }
         break;
     case CODEC_ID_PCM_U8:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = (v >> 8) + 128;
-            dst++;
+            *dst++ = (v >> 8) + 128;
+        }
+        break;
+    case CODEC_ID_PCM_ZORK:
+        for(;n>0;n--) {
+            v= *samples++ >> 8;
+            if(v<0)   v = -v;
+            else      v+= 128;
+            *dst++ = v;
         }
         break;
     case CODEC_ID_PCM_ALAW:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = linear_to_alaw[(v + 32768) >> 2];
-            dst++;
+            *dst++ = linear_to_alaw[(v + 32768) >> 2];
         }
         break;
     case CODEC_ID_PCM_MULAW:
         for(;n>0;n--) {
             v = *samples++;
-            dst[0] = linear_to_ulaw[(v + 32768) >> 2];
-            dst++;
+            *dst++ = linear_to_ulaw[(v + 32768) >> 2];
         }
         break;
     default:
@@ -361,10 +355,15 @@ static int pcm_decode_init(AVCodecContext * avctx)
 static inline void decode_to16(int bps, int le, int us,
                                uint8_t **src, short **samples, int src_len)
 {
+    int usum = us ? -0x8000 : 0;
     register int n = src_len / bps;
     if (le) *src += bps - 2;
     for(;n>0;n--) {
-        *(*samples)++ = ((*src)[le] << 8 | (*src)[1 - le]) - (us?0x8000:0);
+        register int v;
+        if (le) v = AV_RL16(*src);
+        else    v = AV_RB16(*src);
+        v += usum;
+        *(*samples)++ = v;
         *src += bps;
     }
     if (le) *src -= bps - 2;
@@ -419,61 +418,62 @@ static int pcm_decode_frame(AVCodecContext *avctx,
     case CODEC_ID_PCM_S24DAUD:
         n = buf_size / 3;
         for(;n>0;n--) {
-          uint32_t v = src[0] << 16 | src[1] << 8 | src[2];
+          uint32_t v = bytestream_get_be24(&src);
           v >>= 4; // sync flags are here
           *samples++ = ff_reverse[(v >> 8) & 0xff] +
                        (ff_reverse[v & 0xff] << 8);
-          src += 3;
         }
         break;
     case CODEC_ID_PCM_S16LE:
         n = buf_size >> 1;
         for(;n>0;n--) {
-            *samples++ = src[0] | (src[1] << 8);
-            src += 2;
+            *samples++ = bytestream_get_le16(&src);
         }
         break;
     case CODEC_ID_PCM_S16BE:
         n = buf_size >> 1;
         for(;n>0;n--) {
-            *samples++ = (src[0] << 8) | src[1];
-            src += 2;
+            *samples++ = bytestream_get_be16(&src);
         }
         break;
     case CODEC_ID_PCM_U16LE:
         n = buf_size >> 1;
         for(;n>0;n--) {
-            *samples++ = (src[0] | (src[1] << 8)) - 0x8000;
-            src += 2;
+            *samples++ = bytestream_get_le16(&src) - 0x8000;
         }
         break;
     case CODEC_ID_PCM_U16BE:
         n = buf_size >> 1;
         for(;n>0;n--) {
-            *samples++ = ((src[0] << 8) | src[1]) - 0x8000;
-            src += 2;
+            *samples++ = bytestream_get_be16(&src) - 0x8000;
         }
         break;
     case CODEC_ID_PCM_S8:
         n = buf_size;
         for(;n>0;n--) {
-            *samples++ = src[0] << 8;
-            src++;
+            *samples++ = *src++ << 8;
         }
         break;
     case CODEC_ID_PCM_U8:
         n = buf_size;
         for(;n>0;n--) {
-            *samples++ = ((int)src[0] - 128) << 8;
-            src++;
+            *samples++ = ((int)*src++ - 128) << 8;
+        }
+        break;
+    case CODEC_ID_PCM_ZORK:
+        n = buf_size;
+        for(;n>0;n--) {
+            int x= *src++;
+            if(x&128) x-= 128;
+            else      x = -x;
+            *samples++ = x << 8;
         }
         break;
     case CODEC_ID_PCM_ALAW:
     case CODEC_ID_PCM_MULAW:
         n = buf_size;
         for(;n>0;n--) {
-            *samples++ = s->table[src[0]];
-            src++;
+            *samples++ = s->table[*src++];
         }
         break;
     default:
@@ -522,5 +522,4 @@ PCM_CODEC(CODEC_ID_PCM_S8, pcm_s8);
 PCM_CODEC(CODEC_ID_PCM_U8, pcm_u8);
 PCM_CODEC(CODEC_ID_PCM_ALAW, pcm_alaw);
 PCM_CODEC(CODEC_ID_PCM_MULAW, pcm_mulaw);
-
-#undef PCM_CODEC
+PCM_CODEC(CODEC_ID_PCM_ZORK, pcm_zork);

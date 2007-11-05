@@ -22,8 +22,11 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef TRUEMOTION1DATA_H
-#define TRUEMOTION1DATA_H
+#ifndef FFMPEG_TRUEMOTION1DATA_H
+#define FFMPEG_TRUEMOTION1DATA_H
+
+#include <stdint.h>
+#include <stdlib.h>
 
 /* Y delta tables, skinny and fat */
 static const int16_t ydt1[8] = { 0, -2, 2, -6, 6, -12, 12, -12 };
@@ -826,4 +829,5 @@ static const uint8_t pc_tbl4[] = {
 };
 
 static const uint8_t *tables[] = { pc_tbl2, pc_tbl3, pc_tbl4 };
-#endif
+
+#endif /* FFMPEG_TRUEMOTION1DATA_H */

@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <stdio.h>
@@ -65,12 +65,12 @@ int main(int argc, char **argv)
     uint8_t *dstBuffer= (uint8_t*)av_malloc(SIZE);
     int failedNum=0;
     int passedNum=0;
-    
+
     av_log(NULL, AV_LOG_INFO, "memory corruption test ...\n");
     args_parse(argc, argv);
     av_log(NULL, AV_LOG_INFO, "CPU capabilities forced to %x\n", cpu_caps);
     sws_rgb2rgb_init(cpu_caps);
-    
+
     for(funcNum=0; ; funcNum++){
         struct func_info_s {
             int src_bpp;
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
         av_log(NULL, AV_LOG_INFO,".");
         memset(srcBuffer, srcByte, SIZE);
 
-        for(width=32; width<64; width++){
+        for(width=63; width>0; width--){
             int dstOffset;
             for(dstOffset=128; dstOffset<196; dstOffset+=4){
                 int srcOffset;
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
                     uint8_t *src= srcBuffer+srcOffset;
                     uint8_t *dst= dstBuffer+dstOffset;
                     char *name=NULL;
-                    
+
                     if(failed) break; //don't fill the screen with shit ...
 
                     srcBpp = func_info[funcNum].src_bpp;
@@ -141,24 +141,24 @@ int main(int argc, char **argv)
 
                     for(i=0; i<SIZE; i++){
                         if(srcBuffer[i]!=srcByte){
-                            av_log(NULL, AV_LOG_INFO, "src damaged at %d w:%d src:%d dst:%d %s\n", 
-                                i, width, srcOffset, dstOffset, name);
+                            av_log(NULL, AV_LOG_INFO, "src damaged at %d w:%d src:%d dst:%d %s\n",
+                                   i, width, srcOffset, dstOffset, name);
                             failed=1;
                             break;
                         }
                     }
                     for(i=0; i<dstOffset; i++){
                         if(dstBuffer[i]!=dstByte){
-                            av_log(NULL, AV_LOG_INFO, "dst damaged at %d w:%d src:%d dst:%d %s\n", 
-                                i, width, srcOffset, dstOffset, name);
+                            av_log(NULL, AV_LOG_INFO, "dst damaged at %d w:%d src:%d dst:%d %s\n",
+                                   i, width, srcOffset, dstOffset, name);
                             failed=1;
                             break;
                         }
                     }
                     for(i=dstOffset + width*dstBpp; i<SIZE; i++){
                         if(dstBuffer[i]!=dstByte){
-                            av_log(NULL, AV_LOG_INFO, "dst damaged at %d w:%d src:%d dst:%d %s\n", 
-                                i, width, srcOffset, dstOffset, name);
+                            av_log(NULL, AV_LOG_INFO, "dst damaged at %d w:%d src:%d dst:%d %s\n",
+                                   i, width, srcOffset, dstOffset, name);
                             failed=1;
                             break;
                         }
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
         if(failed) failedNum++;
         else if(srcBpp) passedNum++;
     }
-    
+
     av_log(NULL, AV_LOG_INFO, "\n%d converters passed, %d converters randomly overwrote memory\n", passedNum, failedNum);
     return failedNum;
 }

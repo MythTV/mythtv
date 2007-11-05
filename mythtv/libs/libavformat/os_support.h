@@ -19,18 +19,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _OS_SUPPORT_H
-#define _OS_SUPPORT_H
+#ifndef FFMPEG_OS_SUPPORT_H
+#define FFMPEG_OS_SUPPORT_H
 
 /**
  * @file os_support.h
  * miscellaneous OS support macros and functions.
  *
  * - socklen_t typedef (BeOS, Innotek libc)
- * - usleep() (Win32, BeOS, OS/2)
+ * - usleep() (Win32, BeOS)
  * - lseek() (Win32)
- * - floatf() (OS/2)
- * - strcasecmp() (OS/2)
  * - closesocket()
  * - poll() (BeOS, MinGW)
  */
@@ -45,16 +43,12 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #  define usleep(t)    Sleep((t) / 1000)
 #  include <fcntl.h>
 #  define lseek(f,p,w) _lseeki64((f), (p), (w))
-#  define HAVE_CLOSESOCKET 1
 #endif
 
 #ifdef __BEOS__
 #  include <sys/socket.h>
 #  include <netinet/in.h>
    /* not net_server ? */
-#  if IPPROTO_TCP != 6
-#    define HAVE_CLOSESOCKET 1
-#  endif
 #  include <BeBuild.h>
    /* R5 didn't have usleep, fake it. Haiku and Zeta has it now. */
 #  if B_BEOS_VERSION <= B_BEOS_VERSION_5
@@ -68,14 +62,8 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #  endif
 #endif
 
-#if defined(CONFIG_OS2)
-#include <stdlib.h>
-static inline int usleep(unsigned int t) { return _sleep2(t / 1000); }
-static inline int strcasecmp(const char* s1, const char* s2) { return stricmp(s1,s2); }
-#endif
-
 /* most of the time closing a socket is just closing an fd */
-#if HAVE_CLOSESOCKET != 1
+#ifndef HAVE_CLOSESOCKET
 #define closesocket close
 #endif
 
@@ -108,4 +96,4 @@ extern int poll(struct pollfd *fds, nfds_t numfds, int timeout);
 #endif /* HAVE_SYS_POLL_H */
 #endif /* CONFIG_FFSERVER */
 
-#endif /* _OS_SUPPORT_H */
+#endif /* FFMPEG_OS_SUPPORT_H */

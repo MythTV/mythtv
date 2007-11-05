@@ -16,8 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
+
+#ifndef FFMPEG_SOFTFLOAT_H
+#define FFMPEG_SOFTFLOAT_H
+
+#include <stdint.h>
 
 #define MIN_EXP -126
 #define MAX_EXP  126
@@ -120,3 +124,5 @@ static inline int av_sf2int(SoftFloat v, int frac_bits){
     if(v.exp >= 0) return v.mant <<  v.exp ;
     else           return v.mant >>(-v.exp);
 }
+
+#endif /* FFMPEG_SOFTFLOAT_H */

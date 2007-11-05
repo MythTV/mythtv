@@ -78,7 +78,7 @@ typedef struct MOVContext {
     MOVTrack tracks[MAX_STREAMS];
 } MOVContext;
 
-//FIXME supprt 64bit varaint with wide placeholders
+//FIXME support 64 bit variant with wide placeholders
 static offset_t updateSize (ByteIOContext *pb, offset_t pos)
 {
     offset_t curpos = url_ftell(pb);
@@ -407,7 +407,7 @@ static int mov_write_svq3_tag(ByteIOContext *pb)
 
 static uint8_t *avc_find_startcode( uint8_t *p, uint8_t *end )
 {
-    uint8_t *a = p + 4 - ((int)p & 3);
+    uint8_t *a = p + 4 - ((long)p & 3);
 
     for( end -= 3; p < a && p < end; p++ ) {
         if( p[0] == 0 && p[1] == 0 && p[2] == 1 )
@@ -514,6 +514,51 @@ static int mov_write_avcc_tag(ByteIOContext *pb, MOVTrack *track)
         }
     }
     return updateSize(pb, pos);
+}
+
+/* also used by all avid codecs (dv, imx, meridien) and their variants */
+static int mov_write_avid_tag(ByteIOContext *pb, MOVTrack *track)
+{
+    int i;
+    put_be32(pb, 24); /* size */
+    put_tag(pb, "ACLR");
+    put_tag(pb, "ACLR");
+    put_tag(pb, "0001");
+    put_be32(pb, 1); /* yuv 1 / rgb 2 ? */
+    put_be32(pb, 0); /* unknown */
+
+    put_be32(pb, 24); /* size */
+    put_tag(pb, "APRG");
+    put_tag(pb, "APRG");
+    put_tag(pb, "0001");
+    put_be32(pb, 1); /* unknown */
+    put_be32(pb, 0); /* unknown */
+
+    put_be32(pb, 120); /* size */
+    put_tag(pb, "ARES");
+    put_tag(pb, "ARES");
+    put_tag(pb, "0001");
+    put_be32(pb, AV_RB32(track->vosData + 0x28)); /* dnxhd cid, some id ? */
+    put_be32(pb, track->enc->width);
+    /* values below are based on samples created with quicktime and avid codecs */
+    if (track->vosData[5] & 2) { // interlaced
+        put_be32(pb, track->enc->height/2);
+        put_be32(pb, 2); /* unknown */
+        put_be32(pb, 0); /* unknown */
+        put_be32(pb, 4); /* unknown */
+    } else {
+        put_be32(pb, track->enc->height);
+        put_be32(pb, 1); /* unknown */
+        put_be32(pb, 0); /* unknown */
+        put_be32(pb, 5); /* unknown */
+    }
+    /* padding */
+    for (i = 0; i < 10; i++)
+        put_be64(pb, 0);
+
+    /* extra padding for stsd needed */
+    put_be32(pb, 0);
+    return 0;
 }
 
 static int mov_find_video_codec_tag(AVFormatContext *s, MOVTrack *track)
@@ -623,6 +668,8 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
         mov_write_svq3_tag(pb);
     else if(track->enc->codec_id == CODEC_ID_H264)
         mov_write_avcc_tag(pb, track);
+    else if(track->enc->codec_id == CODEC_ID_DNXHD)
+        mov_write_avid_tag(pb, track);
 
     return updateSize (pb, pos);
 }
@@ -643,7 +690,7 @@ static int mov_write_stsd_tag(ByteIOContext *pb, MOVTrack* track)
 
 static int mov_write_ctts_tag(ByteIOContext *pb, MOVTrack* track)
 {
-    Time2Sample *ctts_entries;
+    MOV_stts_t *ctts_entries;
     uint32_t entries = 0;
     uint32_t atom_size;
     int i;
@@ -677,7 +724,7 @@ static int mov_write_ctts_tag(ByteIOContext *pb, MOVTrack* track)
 /* Time to sample atom */
 static int mov_write_stts_tag(ByteIOContext *pb, MOVTrack* track)
 {
-    Time2Sample *stts_entries;
+    MOV_stts_t *stts_entries;
     uint32_t entries = -1;
     uint32_t atom_size;
     int i;
@@ -845,6 +892,14 @@ static int mov_write_mdhd_tag(ByteIOContext *pb, MOVTrack* track)
     (version == 1) ? put_be64(pb, track->trackDuration) : put_be32(pb, track->trackDuration); /* duration */
     put_be16(pb, track->language); /* language */
     put_be16(pb, 0); /* reserved (quality) */
+
+    if(version!=0 && track->mode == MODE_MOV){
+        av_log(NULL, AV_LOG_ERROR,
+            "FATAL error, file duration too long for timebase, this file will not be\n"
+            "playable with quicktime. Choose a different timebase or a different\n"
+            "container format\n");
+    }
+
     return 32;
 }
 
@@ -1165,37 +1220,49 @@ static int mov_write_meta_tag(ByteIOContext *pb, MOVContext* mov,
 static int mov_write_udta_tag(ByteIOContext *pb, MOVContext* mov,
                               AVFormatContext *s)
 {
-    offset_t pos = url_ftell(pb);
-    int i;
+    int i, req = 0;
 
-    put_be32(pb, 0); /* size */
-    put_tag(pb, "udta");
-
-    /* iTunes meta data */
-    mov_write_meta_tag(pb, mov, s);
-
-  if(mov->mode == MODE_MOV){ // the title field breaks gtkpod with mp4 and my suspicion is that stuff isnt valid in mp4
     /* Requirements */
     for (i=0; i<mov->nb_streams; i++) {
         if(mov->tracks[i].entry <= 0) continue;
         if (mov->tracks[i].enc->codec_id == CODEC_ID_AAC ||
             mov->tracks[i].enc->codec_id == CODEC_ID_MPEG4) {
-            mov_write_string_tag(pb, "\251req", "QuickTime 6.0 or greater", 0);
+            req = 1;
             break;
         }
     }
 
-    mov_write_string_tag(pb, "\251nam", s->title         , 0);
-    mov_write_string_tag(pb, "\251aut", s->author        , 0);
-    mov_write_string_tag(pb, "\251alb", s->album         , 0);
-    mov_write_day_tag(pb, s->year, 0);
-    if(mov->tracks[0].enc && !(mov->tracks[0].enc->flags & CODEC_FLAG_BITEXACT))
-        mov_write_string_tag(pb, "\251enc", LIBAVFORMAT_IDENT, 0);
-    mov_write_string_tag(pb, "\251des", s->comment       , 0);
-    mov_write_string_tag(pb, "\251gen", s->genre         , 0);
-  }
+    if (s->title[0]   || s->author[0] || s->album[0] || s->year ||
+        s->comment[0] || s->genre[0]  || s->track ||
+       (mov->mode == MODE_MOV &&
+      ((mov->tracks[0].enc && !mov->tracks[0].enc->flags & CODEC_FLAG_BITEXACT) || req))) {
+        offset_t pos = url_ftell(pb);
 
-    return updateSize(pb, pos);
+        put_be32(pb, 0); /* size */
+        put_tag(pb, "udta");
+
+        /* iTunes meta data */
+        mov_write_meta_tag(pb, mov, s);
+
+        if(mov->mode == MODE_MOV){ // the title field breaks gtkpod with mp4 and my suspicion is that stuff is not valid in mp4
+            /* Requirements */
+            if (req)
+                mov_write_string_tag(pb, "\251req", "QuickTime 6.0 or greater", 0);
+
+            mov_write_string_tag(pb, "\251nam", s->title         , 0);
+            mov_write_string_tag(pb, "\251aut", s->author        , 0);
+            mov_write_string_tag(pb, "\251alb", s->album         , 0);
+            mov_write_day_tag(pb, s->year, 0);
+            if(mov->tracks[0].enc && !(mov->tracks[0].enc->flags & CODEC_FLAG_BITEXACT))
+                mov_write_string_tag(pb, "\251enc", LIBAVFORMAT_IDENT, 0);
+            mov_write_string_tag(pb, "\251des", s->comment       , 0);
+            mov_write_string_tag(pb, "\251gen", s->genre         , 0);
+        }
+
+        return updateSize(pb, pos);
+    }
+
+    return 0;
 }
 
 static int utf8len(uint8_t *b){
@@ -1328,7 +1395,7 @@ static int mov_write_moov_tag(ByteIOContext *pb, MOVContext *mov,
 
     if (mov->mode == MODE_PSP)
         mov_write_uuidusmt_tag(pb, s);
-    else
+    else if (mov->mode != MODE_3GP && mov->mode != MODE_3G2)
         mov_write_udta_tag(pb, mov, s);
 
     return updateSize(pb, pos);
@@ -1445,6 +1512,11 @@ static int mov_write_header(AVFormatContext *s)
     MOVContext *mov = s->priv_data;
     int i;
 
+    if (url_is_streamed(&s->pb)) {
+        av_log(s, AV_LOG_ERROR, "muxer does not support non seekable output\n");
+        return -1;
+    }
+
     /* Default mode == MP4 */
     mov->mode = MODE_MP4;
 
@@ -1475,6 +1547,11 @@ static int mov_write_header(AVFormatContext *s)
             track->tag = mov_find_video_codec_tag(s, track);
             track->timescale = st->codec->time_base.den;
             av_set_pts_info(st, 64, 1, st->codec->time_base.den);
+            if (track->timescale > 100000)
+                av_log(NULL, AV_LOG_WARNING,
+                       "WARNING codec timebase is very high. If duration is too long,\n"
+                       "file may not be playable by quicktime. Specify a shorter timebase\n"
+                       "or choose different container.\n");
         }else if(st->codec->codec_type == CODEC_TYPE_AUDIO){
             track->tag = mov_find_audio_codec_tag(s, track);
             track->timescale = st->codec->sample_rate;
@@ -1522,7 +1599,7 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
             samplesInChunk++;
         }
         if(samplesInChunk > 1){
-            av_log(s, AV_LOG_ERROR, "fatal error, input is not a single packet, inplement a AVParser for it\n");
+            av_log(s, AV_LOG_ERROR, "fatal error, input is not a single packet, implement a AVParser for it\n");
             return -1;
         }
     } else if (trk->sampleSize)
@@ -1543,6 +1620,13 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         avc_parse_nal_units(&pkt->data, &pkt->size);
         assert(pkt->size);
         size = pkt->size;
+    } else if (enc->codec_id == CODEC_ID_DNXHD && !trk->vosLen) {
+        /* copy frame header to create needed atoms */
+        if (size < 640)
+            return -1;
+        trk->vosLen = 640;
+        trk->vosData = av_malloc(trk->vosLen);
+        memcpy(trk->vosData, pkt->data, 640);
     }
 
     if (!(trk->entry % MOV_INDEX_CLUSTER_SIZE)) {

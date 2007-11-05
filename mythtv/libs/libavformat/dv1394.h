@@ -23,11 +23,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
-#ifndef _DV_1394_H
-#define _DV_1394_H
+#ifndef FFMPEG_DV1394_H
+#define FFMPEG_DV1394_H
 
 #define DV1394_DEFAULT_CHANNEL 63
 #define DV1394_DEFAULT_CARD    0
@@ -354,4 +353,4 @@ struct dv1394_status {
 };
 
 
-#endif /* _DV_1394_H */
+#endif /* FFMPEG_DV1394_H */

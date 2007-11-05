@@ -1,6 +1,8 @@
 /*
  * copyright (c) 2007 Michael Niedermayer <michaelni@gmx.at>
  *
+ * some optimization ideas from aes128.c by Reimar Doeffinger
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,14 +18,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * some optimization ideas from aes128.c by Reimar Doeffinger
  */
 
 #include "common.h"
 #include "aes.h"
 
 typedef struct AVAES{
+    // Note: round_key[16] is accessed in the init code, but this only
+    // overwrites state, which does not matter (see also r7471).
     uint8_t round_key[15][4][4];
     uint8_t state[2][4][4];
     int rounds;
@@ -128,7 +130,7 @@ int av_aes_init(AVAES *a, const uint8_t *key, int key_bits, int decrypt) {
     uint8_t  log8[256];
     uint8_t alog8[512];
 
-    if(!enc_multbl[4][1023]){
+    if(!enc_multbl[0][sizeof(enc_multbl)/sizeof(enc_multbl[0][0])-1]){
         j=1;
         for(i=0; i<255; i++){
             alog8[i]=

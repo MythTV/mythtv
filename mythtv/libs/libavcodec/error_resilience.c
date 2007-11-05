@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
-#include "common.h"
 
 static void decode_mb(MpegEncContext *s){
     s->dest[0] = s->current_picture.data[0] + (s->mb_y * 16* s->linesize  ) + s->mb_x * 16;
@@ -109,7 +108,7 @@ static void filter181(int16_t *data, int width, int height, int stride){
 }
 
 /**
- * guess the dc of blocks which dont have a undamaged dc
+ * guess the dc of blocks which do not have an undamaged dc
  * @param w     width in 8 pixel blocks
  * @param h     height in 8 pixel blocks
  */
@@ -563,6 +562,11 @@ static int is_intra_more_likely(MpegEncContext *s){
     }
 
     if(undamaged_count < 5) return 0; //allmost all MBs damaged -> use temporal prediction
+
+#ifdef HAVE_XVMC
+    //prevent dsp.sad() check, that requires access to the image
+    if(s->avctx->xvmc_acceleration && s->pict_type==I_TYPE) return 1;
+#endif
 
     skip_amount= FFMAX(undamaged_count/50, 1); //check only upto 50 MBs
     is_intra_likely=0;

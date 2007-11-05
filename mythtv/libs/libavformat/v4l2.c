@@ -119,8 +119,12 @@ static int device_open(AVFormatContext *ctx, uint32_t *capabilities)
     struct v4l2_capability cap;
     int fd;
     int res;
+    int flags = O_RDWR;
 
-    fd = open(ctx->filename, O_RDWR /*| O_NONBLOCK*/, 0);
+    if (ctx->flags & AVFMT_FLAG_NONBLOCK) {
+        flags |= O_NONBLOCK;
+    }
+    fd = open(ctx->filename, flags, 0);
     if (fd < 0) {
         av_log(ctx, AV_LOG_ERROR, "Cannot open video device %s : %s\n",
                  ctx->filename, strerror(errno));
@@ -331,9 +335,13 @@ static int mmap_read_frame(AVFormatContext *ctx, AVPacket *pkt)
     buf.memory = V4L2_MEMORY_MMAP;
 
     /* FIXME: Some special treatment might be needed in case of loss of signal... */
-    while ((res = ioctl(s->fd, VIDIOC_DQBUF, &buf)) < 0 &&
-           ((errno == EAGAIN) || (errno == EINTR)));
+    while ((res = ioctl(s->fd, VIDIOC_DQBUF, &buf)) < 0 && (errno == EINTR));
     if (res < 0) {
+        if (errno == EAGAIN) {
+            pkt->size = 0;
+
+            return AVERROR(EAGAIN);
+        }
         av_log(ctx, AV_LOG_ERROR, "ioctl(VIDIOC_DQBUF): %s\n", strerror(errno));
 
         return -1;
@@ -429,45 +437,49 @@ static int v4l2_set_parameters( AVFormatContext *s1, AVFormatParameters *ap )
     struct v4l2_standard standard;
     int i;
 
-    /* set tv video input */
-    memset (&input, 0, sizeof (input));
-    input.index = ap->channel;
-    if(ioctl (s->fd, VIDIOC_ENUMINPUT, &input) < 0) {
-        av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl enum input failed:\n");
-        return AVERROR_IO;
+    if(ap->channel>=0) {
+        /* set tv video input */
+        memset (&input, 0, sizeof (input));
+        input.index = ap->channel;
+        if(ioctl (s->fd, VIDIOC_ENUMINPUT, &input) < 0) {
+            av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl enum input failed:\n");
+            return AVERROR(EIO);
+        }
+
+        av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set input_id: %d, input: %s\n",
+               ap->channel, input.name);
+        if(ioctl (s->fd, VIDIOC_S_INPUT, &input.index) < 0 ) {
+            av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl set input(%d) failed\n",
+                   ap->channel);
+            return AVERROR(EIO);
+        }
     }
 
-    av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set input_id: %d, input: %s\n",
-           ap->channel, input.name);
-    if(ioctl (s->fd, VIDIOC_S_INPUT, &input.index) < 0 ) {
-        av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl set input(%d) failed\n",
-            ap->channel);
-        return AVERROR_IO;
-    }
+    if(ap->standard) {
+        av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set standard: %s\n",
+               ap->standard );
+        /* set tv standard */
+        memset (&standard, 0, sizeof (standard));
+        for(i=0;;i++) {
+            standard.index = i;
+            if (ioctl(s->fd, VIDIOC_ENUMSTD, &standard) < 0) {
+                av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl set standard(%s) failed\n",
+                       ap->standard);
+                return AVERROR(EIO);
+            }
 
-    av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set standard: %s\n",
-           ap->standard );
-    /* set tv standard */
-    memset (&standard, 0, sizeof (standard));
-    for(i=0;;i++) {
-        standard.index = i;
-        if (ioctl(s->fd, VIDIOC_ENUMSTD, &standard) < 0) {
+            if(!strcasecmp(standard.name, ap->standard)) {
+                break;
+            }
+        }
+
+        av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set standard: %s, id: %"PRIu64"\n",
+               ap->standard, standard.id);
+        if (ioctl(s->fd, VIDIOC_S_STD, &standard.id) < 0) {
             av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl set standard(%s) failed\n",
                    ap->standard);
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
-
-        if(!strcasecmp(standard.name, ap->standard)) {
-            break;
-        }
-    }
-
-    av_log(s1, AV_LOG_DEBUG, "The V4L2 driver set standard: %s, id: %"PRIu64"\n",
-           ap->standard, standard.id);
-    if (ioctl(s->fd, VIDIOC_S_STD, &standard.id) < 0) {
-        av_log(s1, AV_LOG_ERROR, "The V4L2 driver ioctl set standard(%s) failed\n",
-            ap->standard);
-        return AVERROR_IO;
     }
 
     return 0;
@@ -514,7 +526,7 @@ static int v4l2_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     if (s->fd < 0) {
         av_free(st);
 
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     av_log(s1, AV_LOG_INFO, "[%d]Capabilities: %x\n", s->fd, capabilities);
 
@@ -541,12 +553,12 @@ static int v4l2_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         close(s->fd);
         av_free(st);
 
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     s->frame_format = desired_format;
 
     if( v4l2_set_parameters( s1, ap ) < 0 )
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     st->codec->pix_fmt = fmt_v4l2ff(desired_format);
     s->frame_size = avpicture_get_size(st->codec->pix_fmt, width, height);
@@ -564,7 +576,7 @@ static int v4l2_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         close(s->fd);
         av_free(st);
 
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     s->top_field_first = first_field(s->fd);
 
@@ -589,14 +601,14 @@ static int v4l2_read_packet(AVFormatContext *s1, AVPacket *pkt)
         res = mmap_read_frame(s1, pkt);
     } else if (s->io_method == io_read) {
         if (av_new_packet(pkt, s->frame_size) < 0)
-            return AVERROR_IO;
+            return AVERROR(EIO);
 
         res = read_frame(s1, pkt);
     } else {
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     if (res < 0) {
-        return AVERROR_IO;
+        return res;
     }
 
     if (s1->streams[0]->codec->coded_frame) {

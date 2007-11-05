@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "avformat.h"
@@ -106,7 +106,7 @@ avs_read_video_packet(AVFormatContext * s, AVPacket * pkt,
     ret = get_buffer(&s->pb, pkt->data + palette_size + 4, size - 4) + 4;
     if (ret < size) {
         av_free_packet(pkt);
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
 
     pkt->size = ret + palette_size;
@@ -127,7 +127,7 @@ static int avs_read_audio_packet(AVFormatContext * s, AVPacket * pkt)
     size = url_ftell(&s->pb) - size;
     avs->remaining_audio_size -= size;
 
-    if (ret == AVERROR_IO)
+    if (ret == AVERROR(EIO))
         return 0;    /* this indicate EOS */
     if (ret < 0)
         return ret;
@@ -154,7 +154,7 @@ static int avs_read_packet(AVFormatContext * s, AVPacket * pkt)
     while (1) {
         if (avs->remaining_frame_size <= 0) {
             if (!get_le16(&s->pb))    /* found EOF */
-                return AVERROR_IO;
+                return AVERROR(EIO);
             avs->remaining_frame_size = get_le16(&s->pb) - 4;
         }
 
@@ -168,7 +168,7 @@ static int avs_read_packet(AVFormatContext * s, AVPacket * pkt)
             case AVS_PALETTE:
                 ret = get_buffer(&s->pb, palette, size - 4);
                 if (ret < size - 4)
-                    return AVERROR_IO;
+                    return AVERROR(EIO);
                 palette_size = size;
                 break;
 
@@ -176,7 +176,7 @@ static int avs_read_packet(AVFormatContext * s, AVPacket * pkt)
                 if (!avs->st_video) {
                     avs->st_video = av_new_stream(s, AVS_VIDEO);
                     if (avs->st_video == NULL)
-                        return AVERROR_NOMEM;
+                        return AVERROR(ENOMEM);
                     avs->st_video->codec->codec_type = CODEC_TYPE_VIDEO;
                     avs->st_video->codec->codec_id = CODEC_ID_AVS;
                     avs->st_video->codec->width = avs->width;
@@ -193,7 +193,7 @@ static int avs_read_packet(AVFormatContext * s, AVPacket * pkt)
                 if (!avs->st_audio) {
                     avs->st_audio = av_new_stream(s, AVS_AUDIO);
                     if (avs->st_audio == NULL)
-                        return AVERROR_NOMEM;
+                        return AVERROR(ENOMEM);
                     avs->st_audio->codec->codec_type = CODEC_TYPE_AUDIO;
                 }
                 avs->remaining_audio_size = size - 4;

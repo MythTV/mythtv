@@ -22,46 +22,42 @@
  */
 
 #include <unistd.h>
-#include <bits/bfin_sram.h>
-#include "../avcodec.h"
-#include "../dsputil.h"
+#include "avcodec.h"
+#include "dsputil.h"
+#include "dsputil_bfin.h"
 
-#define USE_L1CODE
-
-#ifdef USE_L1CODE
-#define L1CODE __attribute__ ((l1_text))
-#else
-#define L1CODE
-#endif
 int off;
 
 
-extern void ff_bfin_idct (DCTELEM *block) L1CODE;
-extern void ff_bfin_fdct (DCTELEM *block) L1CODE;
-extern void ff_bfin_add_pixels_clamped (DCTELEM *block, uint8_t *dest, int line_size) L1CODE;
-extern void ff_bfin_put_pixels_clamped (DCTELEM *block, uint8_t *dest, int line_size) L1CODE;
-extern void ff_bfin_diff_pixels (DCTELEM *block, uint8_t *s1, uint8_t *s2, int stride)  L1CODE;
-extern void ff_bfin_get_pixels  (DCTELEM *restrict block, const uint8_t *pixels, int line_size) L1CODE;
-extern int  ff_bfin_pix_norm1  (uint8_t * pix, int line_size) L1CODE;
-extern int  ff_bfin_z_sad8x8   (uint8_t *blk1, uint8_t *blk2, int dsz, int line_size, int h) L1CODE;
-extern int  ff_bfin_z_sad16x16 (uint8_t *blk1, uint8_t *blk2, int dsz, int line_size, int h) L1CODE;
+extern void ff_bfin_idct (DCTELEM *block) attribute_l1_text;
+extern void ff_bfin_fdct (DCTELEM *block) attribute_l1_text;
+extern void ff_bfin_vp3_idct (DCTELEM *block);
+extern void ff_bfin_vp3_idct_put (uint8_t *dest, int line_size, DCTELEM *block);
+extern void ff_bfin_vp3_idct_add (uint8_t *dest, int line_size, DCTELEM *block);
+extern void ff_bfin_add_pixels_clamped (DCTELEM *block, uint8_t *dest, int line_size) attribute_l1_text;
+extern void ff_bfin_put_pixels_clamped (DCTELEM *block, uint8_t *dest, int line_size) attribute_l1_text;
+extern void ff_bfin_diff_pixels (DCTELEM *block, uint8_t *s1, uint8_t *s2, int stride)  attribute_l1_text;
+extern void ff_bfin_get_pixels  (DCTELEM *restrict block, const uint8_t *pixels, int line_size) attribute_l1_text;
+extern int  ff_bfin_pix_norm1  (uint8_t * pix, int line_size) attribute_l1_text;
+extern int  ff_bfin_z_sad8x8   (uint8_t *blk1, uint8_t *blk2, int dsz, int line_size, int h) attribute_l1_text;
+extern int  ff_bfin_z_sad16x16 (uint8_t *blk1, uint8_t *blk2, int dsz, int line_size, int h) attribute_l1_text;
 
-extern void ff_bfin_z_put_pixels16_xy2     (uint8_t *block, const uint8_t *s0, int dest_size, int line_size, int h) L1CODE;
-extern void ff_bfin_z_put_pixels8_xy2      (uint8_t *block, const uint8_t *s0, int dest_size, int line_size, int h) L1CODE;
-extern void ff_bfin_put_pixels16_xy2_nornd (uint8_t *block, const uint8_t *s0, int line_size, int h) L1CODE;
-extern void ff_bfin_put_pixels8_xy2_nornd  (uint8_t *block, const uint8_t *s0, int line_size, int h) L1CODE;
+extern void ff_bfin_z_put_pixels16_xy2     (uint8_t *block, const uint8_t *s0, int dest_size, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_z_put_pixels8_xy2      (uint8_t *block, const uint8_t *s0, int dest_size, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_put_pixels16_xy2_nornd (uint8_t *block, const uint8_t *s0, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_put_pixels8_xy2_nornd  (uint8_t *block, const uint8_t *s0, int line_size, int h) attribute_l1_text;
 
 
-extern int  ff_bfin_pix_sum (uint8_t *p, int stride) L1CODE;
+extern int  ff_bfin_pix_sum (uint8_t *p, int stride) attribute_l1_text;
 
-extern void ff_bfin_put_pixels8uc        (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int dest_size, int line_size, int h) L1CODE;
-extern void ff_bfin_put_pixels16uc       (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int dest_size, int line_size, int h) L1CODE;
-extern void ff_bfin_put_pixels8uc_nornd  (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int line_size, int h) L1CODE;
-extern void ff_bfin_put_pixels16uc_nornd (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int line_size, int h) L1CODE;
+extern void ff_bfin_put_pixels8uc        (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int dest_size, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_put_pixels16uc       (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int dest_size, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_put_pixels8uc_nornd  (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int line_size, int h) attribute_l1_text;
+extern void ff_bfin_put_pixels16uc_nornd (uint8_t *block, const uint8_t *s0, const uint8_t *s1, int line_size, int h) attribute_l1_text;
 
-extern int ff_bfin_sse4  (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) L1CODE;
-extern int ff_bfin_sse8  (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) L1CODE;
-extern int ff_bfin_sse16 (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) L1CODE;
+extern int ff_bfin_sse4  (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) attribute_l1_text;
+extern int ff_bfin_sse8  (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) attribute_l1_text;
+extern int ff_bfin_sse16 (void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h) attribute_l1_text;
 
 
 static void bfin_idct_add (uint8_t *dest, int line_size, DCTELEM *block)
@@ -168,6 +164,15 @@ static int bfin_pix_abs16 (void *c, uint8_t *blk1, uint8_t *blk2, int line_size,
     return ff_bfin_z_sad16x16 (blk1,blk2,line_size,line_size,h);
 }
 
+static int bfin_vsad_intra16 (void *c, uint8_t *blk1, uint8_t *dummy, int stride, int h) {
+    return ff_bfin_z_sad16x16 (blk1,blk1+stride,stride<<1,stride<<1,h);
+}
+
+static int bfin_vsad (void *c, uint8_t *blk1, uint8_t *blk2, int stride, int h) {
+    return ff_bfin_z_sad16x16 (blk1,blk1+stride,stride<<1,stride<<1,h)
+        + ff_bfin_z_sad16x16 (blk2,blk2+stride,stride<<1,stride<<1,h);
+}
+
 static uint8_t vtmp_blk[256] __attribute__((l1_data_B));
 
 static int bfin_pix_abs16_x2 (void *c, uint8_t *blk1, uint8_t *blk2, int line_size, int h)
@@ -237,6 +242,9 @@ void dsputil_init_bfin( DSPContext* c, AVCodecContext *avctx )
     c->sad[0]             = bfin_pix_abs16;
     c->sad[1]             = bfin_pix_abs8;
 
+    c->vsad[0]            = bfin_vsad;
+    c->vsad[4]            = bfin_vsad_intra16;
+
     /* TODO [0] 16  [1] 8 */
     c->pix_abs[0][0] = bfin_pix_abs16;
     c->pix_abs[0][1] = bfin_pix_abs16_x2;
@@ -285,10 +293,17 @@ void dsputil_init_bfin( DSPContext* c, AVCodecContext *avctx )
     c->put_no_rnd_pixels_tab[0][2] = bfin_put_pixels16_y2_nornd;
     c->put_no_rnd_pixels_tab[0][3] = ff_bfin_put_pixels16_xy2_nornd;
 
-    c->fdct               = ff_bfin_fdct;
-    c->idct               = ff_bfin_idct;
-    c->idct_add           = bfin_idct_add;
-    c->idct_put           = bfin_idct_put;
+    c->idct_permutation_type = FF_NO_IDCT_PERM;
+    c->fdct                  = ff_bfin_fdct;
+    if (avctx->idct_algo==FF_IDCT_VP3) {
+        c->idct               = ff_bfin_vp3_idct;
+        c->idct_add           = ff_bfin_vp3_idct_add;
+        c->idct_put           = ff_bfin_vp3_idct_put;
+    } else {
+        c->idct               = ff_bfin_idct;
+        c->idct_add           = bfin_idct_add;
+        c->idct_put           = bfin_idct_put;
+    }
 }
 
 

@@ -19,15 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*
- * Some useful links for those who may be interested in optimizing code for ARM.
- * ARM Architecture Reference Manual: http://www.arm.com/community/academy/resources.html
- * Instructions timings and optimization guide for ARM9E: http://www.arm.com/pdfs/DDI0222B_9EJS_r1p2.pdf
- */
-
-#include "../dsputil.h"
-#include "../mpegvideo.h"
-#include "../avcodec.h"
+#include "dsputil.h"
+#include "mpegvideo.h"
+#include "avcodec.h"
 
 
 #ifdef ENABLE_ARM_TESTS
@@ -158,7 +152,7 @@ __asm__ __volatile__( \
 static void dct_unquantize_h263_intra_armv5te(MpegEncContext *s,
                                   DCTELEM *block, int n, int qscale)
 {
-    int i, level, qmul, qadd;
+    int level, qmul, qadd;
     int nCoeffs;
 
     assert(s->block_last_index[n]>=0);
@@ -187,7 +181,7 @@ static void dct_unquantize_h263_intra_armv5te(MpegEncContext *s,
 static void dct_unquantize_h263_inter_armv5te(MpegEncContext *s,
                                   DCTELEM *block, int n, int qscale)
 {
-    int i, level, qmul, qadd;
+    int qmul, qadd;
     int nCoeffs;
 
     assert(s->block_last_index[n]>=0);

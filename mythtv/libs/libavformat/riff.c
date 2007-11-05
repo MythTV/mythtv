@@ -22,7 +22,6 @@
 #include "avformat.h"
 #include "avcodec.h"
 #include "riff.h"
-#include "allformats.h" // for asf_muxer
 
 /* Note: when encoding, the first matching tag is used, so order is
    important if multiple tags possible for a given codec. */
@@ -97,15 +96,16 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG1VIDEO, 0x10000001 },
     { CODEC_ID_MPEG2VIDEO, 0x10000002 },
     { CODEC_ID_MPEG2VIDEO, MKTAG('D', 'V', 'R', ' ') },
+    { CODEC_ID_MPEG2VIDEO, MKTAG('M', 'M', 'E', 'S') },
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_LJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('J', 'P', 'G', 'L') }, /* Pegasus lossless JPEG */
+    { CODEC_ID_JPEGLS,MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - encoder */
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - decoder */
     { CODEC_ID_MJPEG, MKTAG('j', 'p', 'e', 'g') },
     { CODEC_ID_MJPEG, MKTAG('I', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('A', 'V', 'R', 'n') },
-    { CODEC_ID_JPEGLS, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - encoder */
     { CODEC_ID_HUFFYUV, MKTAG('H', 'F', 'Y', 'U') },
     { CODEC_ID_FFVHUFF, MKTAG('F', 'F', 'V', 'H') },
     { CODEC_ID_CYUV, MKTAG('C', 'Y', 'U', 'V') },
@@ -117,6 +117,7 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_RAWVIDEO, MKTAG('U', 'Y', 'V', 'Y') },
     { CODEC_ID_RAWVIDEO, MKTAG('I', 'Y', 'U', 'V') },
     { CODEC_ID_RAWVIDEO, MKTAG('Y', '8', '0', '0') },
+    { CODEC_ID_RAWVIDEO, MKTAG('H', 'D', 'Y', 'C') },
     { CODEC_ID_INDEO3, MKTAG('I', 'V', '3', '1') },
     { CODEC_ID_INDEO3, MKTAG('I', 'V', '3', '2') },
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '1') },
@@ -204,6 +205,8 @@ const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_FLAC, 0xF1AC },
     { CODEC_ID_IMC, 0x401 },
     { CODEC_ID_GSM_MS, 0x31 },
+    { CODEC_ID_ATRAC3, 0x270 },
+    { CODEC_ID_VOXWARE, 0x75 },
 
     /* FIXME: All of the IDs below are not 16 bit and thus illegal. */
     // for NuppelVideo (nuv.c)
@@ -212,69 +215,6 @@ const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_MP3, MKTAG('M', 'P', '3', ' ') },
     { 0, 0 },
 };
-
-unsigned int codec_get_tag(const AVCodecTag *tags, int id)
-{
-    while (tags->id != CODEC_ID_NONE) {
-        if (tags->id == id)
-            return tags->tag;
-        tags++;
-    }
-    return 0;
-}
-
-enum CodecID codec_get_id(const AVCodecTag *tags, unsigned int tag)
-{
-    while (tags->id != CODEC_ID_NONE) {
-        if(   toupper((tag >> 0)&0xFF) == toupper((tags->tag >> 0)&0xFF)
-           && toupper((tag >> 8)&0xFF) == toupper((tags->tag >> 8)&0xFF)
-           && toupper((tag >>16)&0xFF) == toupper((tags->tag >>16)&0xFF)
-           && toupper((tag >>24)&0xFF) == toupper((tags->tag >>24)&0xFF))
-            return tags->id;
-        tags++;
-    }
-    return CODEC_ID_NONE;
-}
-
-unsigned int av_codec_get_tag(const AVCodecTag *tags[4], enum CodecID id)
-{
-    int i;
-    for(i=0; tags && tags[i]; i++){
-        int tag= codec_get_tag(tags[i], id);
-        if(tag) return tag;
-    }
-    return 0;
-}
-
-enum CodecID av_codec_get_id(const AVCodecTag *tags[4], unsigned int tag)
-{
-    int i;
-    for(i=0; tags && tags[i]; i++){
-        enum CodecID id= codec_get_id(tags[i], tag);
-        if(id!=CODEC_ID_NONE) return id;
-    }
-    return CODEC_ID_NONE;
-}
-
-unsigned int codec_get_bmp_tag(int id)
-{
-    return codec_get_tag(codec_bmp_tags, id);
-}
-
-unsigned int codec_get_wav_tag(int id)
-{
-    return codec_get_tag(codec_wav_tags, id);
-}
-
-enum CodecID codec_get_bmp_id(unsigned int tag)
-{
-    return codec_get_id(codec_bmp_tags, tag);
-}
-
-enum CodecID codec_get_wav_id(unsigned int tag)
-{
-    return codec_get_id(codec_wav_tags, tag);
-}
 
 #ifdef CONFIG_MUXERS
 offset_t start_tag(ByteIOContext *pb, const char *tag)
@@ -327,7 +267,7 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
     }
 
     if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3 || enc->codec_id == CODEC_ID_GSM_MS) {
-        blkalign = enc->frame_size; //this is wrong, but seems many demuxers dont work if this is set correctly
+        blkalign = enc->frame_size; //this is wrong, but it seems many demuxers do not work if this is set correctly
         //blkalign = 144 * enc->bit_rate/enc->sample_rate;
     } else if (enc->codec_id == CODEC_ID_ADPCM_G726) { //
         blkalign = 1;
@@ -475,6 +415,8 @@ int wav_codec_get_id(unsigned int tag, int bps)
         id = CODEC_ID_PCM_S24LE;
     if (id == CODEC_ID_PCM_S16LE && bps == 32)
         id = CODEC_ID_PCM_S32LE;
+    if (id == CODEC_ID_ADPCM_IMA_WAV && bps == 8)
+        id = CODEC_ID_PCM_ZORK;
     return id;
 }
 #endif // CONFIG_DEMUXERS

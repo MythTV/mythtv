@@ -17,13 +17,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
  * @file rangecoder.h
  * Range coder.
  */
+
+#ifndef FFMPEG_RANGECODER_H
+#define FFMPEG_RANGECODER_H
+
+#include <stdint.h>
+#include <assert.h>
+#include "common.h"
 
 typedef struct RangeCoder{
     int low;
@@ -66,6 +72,13 @@ static inline void renorm_encoder(RangeCoder *c){
     }
 }
 
+static inline int get_rac_count(RangeCoder *c){
+    int x= c->bytestream - c->bytestream_start + c->outstanding_count;
+    if(c->outstanding_byte >= 0)
+        x++;
+    return 8*x - av_log2(c->range);
+}
+
 static inline void put_rac(RangeCoder *c, uint8_t * const state, int bit){
     int range1= (c->range * (*state)) >> 8;
 
@@ -96,7 +109,7 @@ static inline void refill(RangeCoder *c){
 
 static inline int get_rac(RangeCoder *c, uint8_t * const state){
     int range1= (c->range * (*state)) >> 8;
-    int attribute_unused one_mask;
+    int av_unused one_mask;
 
     c->range -= range1;
 #if 1
@@ -125,3 +138,4 @@ static inline int get_rac(RangeCoder *c, uint8_t * const state){
 #endif
 }
 
+#endif /* FFMPEG_RANGECODER_H */

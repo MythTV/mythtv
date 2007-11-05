@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "voc.h"
@@ -34,7 +34,7 @@ static int voc_write_header(AVFormatContext *s)
 
     if (s->nb_streams != 1
         || s->streams[0]->codec->codec_type != CODEC_TYPE_AUDIO)
-        return AVERROR_NOTSUPP;
+        return AVERROR_PATCHWELCOME;
 
     put_buffer(pb, voc_magic, sizeof(voc_magic) - 1);
     put_le16(pb, header_size);

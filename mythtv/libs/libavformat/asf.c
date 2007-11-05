@@ -23,6 +23,7 @@
 #include "mpegaudio.h"
 #include "asf.h"
 #include "common.h"
+#include "asfcrypt.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -145,8 +146,10 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
     int size, i;
     int64_t gsize;
     AVRational dar[128];
+    uint32_t bitrate[128];
 
     memset(dar, 0, sizeof(dar));
+    memset(bitrate, 0, sizeof(bitrate));
 
     get_guid(pb, &g);
     if (memcmp(&g, &asf_header, sizeof(GUID)))
@@ -194,7 +197,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             int type, type_specific_size, sizeX;
             uint64_t total_size;
             unsigned int tag1;
-            int64_t pos1, pos2;
+            int64_t pos1, pos2, start_time;
             int test_for_ext_stream_audio, is_dvr_ms_audio=0;
 
             pos1 = url_ftell(pb);
@@ -207,10 +210,11 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             if (!asf_st)
                 goto fail;
             st->priv_data = asf_st;
-            st->start_time = asf->hdr.preroll;
+            start_time = asf->hdr.preroll;
+
             if(!(asf->hdr.flags & 0x01)) { // if we aren't streaming...
                 st->duration = asf->hdr.send_time /
-                    (10000000 / 1000) - st->start_time;
+                    (10000000 / 1000) - start_time;
             }
             get_guid(pb, &g);
 
@@ -367,7 +371,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                 bitrate= get_le32(pb);
                 stream_id= (flags & 0x7f);
 //                av_log(NULL, AV_LOG_ERROR, "flags: 0x%x stream id %d, bitrate %d\n", flags, stream_id, bitrate);
-                asf->stream_bitrates[stream_id-1]= bitrate;
+                asf->stream_bitrates[stream_id]= bitrate;
             }
        } else if (!memcmp(&g, &extended_content_header, sizeof(GUID))) {
                 int desc_count, i;
@@ -387,12 +391,22 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                         {
                                 if     (!strcmp(name,"WM/AlbumTitle")) get_str16_nolen(pb, value_len, s->album, sizeof(s->album));
                                 else if(!strcmp(name,"WM/Genre"     )) get_str16_nolen(pb, value_len, s->genre, sizeof(s->genre));
+                                else if(!strcmp(name,"WM/Track") && s->track == 0) {
+                                    char track[8];
+                                    get_str16_nolen(pb, value_len, track, sizeof(track));
+                                    s->track = strtol(track, NULL, 10) + 1;
+                                }
+                                else if(!strcmp(name,"WM/TrackNumber")) {
+                                    char track[8];
+                                    get_str16_nolen(pb, value_len, track, sizeof(track));
+                                    s->track = strtol(track, NULL, 10);
+                                }
                                 else url_fskip(pb, value_len);
                         }
                         if ((value_type >= 2) && (value_type <= 5)) // boolean or DWORD or QWORD or WORD
                         {
                                 value_num= get_value(pb, value_type);
-                                if (!strcmp(name,"WM/Track"      )) s->track = value_num + 1;
+                                if (!strcmp(name,"WM/Track"      ) && s->track == 0) s->track = value_num + 1;
                                 if (!strcmp(name,"WM/TrackNumber")) s->track = value_num;
                         }
                 }
@@ -411,7 +425,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
                 get_str16_nolen(pb, name_len, name, sizeof(name));
 //av_log(NULL, AV_LOG_ERROR, "%d %d %d %d %d <%s>\n", i, stream_num, name_len, value_type, value_len, name);
-                value_num= get_le16(pb);//we should use get_value() here but it doesnt work 2 is le16 here but le32 elsewhere
+                value_num= get_le16(pb);//we should use get_value() here but it does not work 2 is le16 here but le32 elsewhere
                 url_fskip(pb, value_len - 2);
 
                 if(stream_num<128){
@@ -421,13 +435,13 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             }
         } else if (!memcmp(&g, &ext_stream_header, sizeof(GUID))) {
             int ext_len, payload_ext_ct, stream_ct;
-            uint32_t ext_d;
+            uint32_t ext_d, leak_rate, stream_num;
             int64_t pos_ex_st;
             pos_ex_st = url_ftell(pb);
 
             get_le64(pb); // starttime
             get_le64(pb); // endtime
-            get_le32(pb); // leak-datarate
+            leak_rate = get_le32(pb); // leak-datarate
             get_le32(pb); // bucket-datasize
             get_le32(pb); // init-bucket-fullness
             get_le32(pb); // alt-leak-datarate
@@ -435,11 +449,14 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             get_le32(pb); // alt-init-bucket-fullness
             get_le32(pb); // max-object-size
             get_le32(pb); // flags (reliable,seekable,no_cleanpoints?,resend-live-cleanpoints, rest of bits reserved)
-            get_le16(pb); // stream-num
+            stream_num = get_le16(pb); // stream-num
             get_le16(pb); // stream-language-id-index
             get_le64(pb); // avg frametime in 100ns units
             stream_ct = get_le16(pb); //stream-name-count
             payload_ext_ct = get_le16(pb); //payload-extension-system-count
+
+            if (stream_num < 128)
+                bitrate[stream_num] = leak_rate;
 
             for (i=0; i<stream_ct; i++){
                 get_le16(pb);
@@ -504,11 +521,14 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
     for(i=0; i<128; i++){
         int stream_num= asf->asfid2avid[i];
-        if(stream_num>=0 && dar[i].num>0 && dar[i].den>0){
+        if(stream_num>=0){
             AVCodecContext *codec= s->streams[stream_num]->codec;
-            av_reduce(&codec->sample_aspect_ratio.num,
-                    &codec->sample_aspect_ratio.den,
-                    dar[i].num, dar[i].den, INT_MAX);
+            if (!codec->bit_rate)
+                codec->bit_rate = bitrate[i];
+            if (dar[i].num > 0 && dar[i].den > 0)
+                av_reduce(&codec->sample_aspect_ratio.num,
+                          &codec->sample_aspect_ratio.den,
+                          dar[i].num, dar[i].den, INT_MAX);
 //av_log(NULL, AV_LOG_ERROR, "dar %d:%d sar=%d:%d\n", dar[i].num, dar[i].den, codec->sample_aspect_ratio.num, codec->sample_aspect_ratio.den);
         }
     }
@@ -696,7 +716,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
     //static int pc = 0;
     for (;;) {
         if(url_feof(pb))
-            return AVERROR_IO;
+            return AVERROR(EIO);
         if (asf->packet_size_left < FRAME_HEADER_SIZE
             || asf->packet_segments < 1) {
             //asf->packet_size_left <= asf->packet_padsize) {
@@ -709,7 +729,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
             asf->packet_pos= url_ftell(&s->pb);
             if (asf->data_object_size != (uint64_t)-1 &&
                 (asf->packet_pos - asf->data_object_offset >= asf->data_object_size))
-                return AVERROR_IO; /* Do not exceed the size of the data object */
+                return AVERROR(EIO); /* Do not exceed the size of the data object */
             ret = asf_get_packet(s);
             //printf("READ ASF PACKET  %d   r:%d   c:%d\n", ret, asf->packet_size_left, pc++);
             if (ret < 0)
@@ -755,6 +775,15 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
             asf->packet_multi_size -= asf->packet_obj_size;
             //printf("COMPRESS size  %d  %d  %d   ms:%d\n", asf->packet_obj_size, asf->packet_frag_timestamp, asf->packet_size_left, asf->packet_multi_size);
         }
+        if(   /*asf->packet_frag_size == asf->packet_obj_size*/
+              asf_st->frag_offset + asf->packet_frag_size <= asf_st->pkt.size
+           && asf_st->frag_offset + asf->packet_frag_size > asf->packet_obj_size){
+            av_log(s, AV_LOG_INFO, "ignoring invalid packet_obj_size (%d %d %d %d)\n",
+                asf_st->frag_offset, asf->packet_frag_size,
+                asf->packet_obj_size, asf_st->pkt.size);
+            asf->packet_obj_size= asf_st->pkt.size;
+        }
+
         if (   asf_st->pkt.size != asf->packet_obj_size
             || asf_st->frag_offset + asf->packet_frag_size > asf_st->pkt.size) { //FIXME is this condition sufficient?
             if(asf_st->pkt.data){
@@ -795,13 +824,29 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 
         get_buffer(pb, asf_st->pkt.data + asf->packet_frag_offset,
                    asf->packet_frag_size);
+        if (s->key && s->keylen == 20)
+            ff_asfcrypt_dec(s->key, asf_st->pkt.data + asf->packet_frag_offset,
+                            asf->packet_frag_size);
         asf_st->frag_offset += asf->packet_frag_size;
         /* test if whole packet is read */
         if (asf_st->frag_offset == asf_st->pkt.size) {
+            //workaround for macroshit radio DVR-MS files
+            if(   s->streams[asf->stream_index]->codec->codec_id == CODEC_ID_MPEG2VIDEO
+               && asf_st->pkt.size > 100){
+                int i;
+                for(i=0; i<asf_st->pkt.size && !asf_st->pkt.data[i]; i++);
+                if(i == asf_st->pkt.size){
+                    av_log(s, AV_LOG_DEBUG, "discarding ms fart\n");
+                    asf_st->frag_offset = 0;
+                    av_free_packet(&asf_st->pkt);
+                    continue;
+                }
+            }
+
             /* return packet */
             if (asf_st->ds_span > 1) {
               if(asf_st->pkt.size != asf_st->ds_packet_size * asf_st->ds_span){
-                    av_log(s, AV_LOG_ERROR, "pkt.size != ds_packet_size * ds_span\n");
+                    av_log(s, AV_LOG_ERROR, "pkt.size != ds_packet_size * ds_span (%d %d %d)\n", asf_st->pkt.size, asf_st->ds_packet_size, asf_st->ds_span);
               }else{
                 /* packet descrambling */
                 uint8_t *newdata = av_malloc(asf_st->pkt.size);
@@ -833,18 +878,6 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
             asf_st->pkt.data = 0;
             break; // packet completed
         }
-    }
-    return 0;
-}
-
-static int asf_read_close(AVFormatContext *s)
-{
-    int i;
-
-    for(i=0;i<s->nb_streams;i++) {
-        AVStream *st = s->streams[i];
-        av_free(st->priv_data);
-        av_free(st->codec->palctrl);
     }
     return 0;
 }
@@ -885,6 +918,19 @@ static void asf_reset_header(AVFormatContext *s)
         asf_st->seq=0;
     }
     asf->asf_st= NULL;
+}
+
+static int asf_read_close(AVFormatContext *s)
+{
+    int i;
+
+    asf_reset_header(s);
+    for(i=0;i<s->nb_streams;i++) {
+        AVStream *st = s->streams[i];
+        av_free(st->priv_data);
+        av_free(st->codec->palctrl);
+    }
+    return 0;
 }
 
 static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos, int64_t pos_limit)

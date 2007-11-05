@@ -230,6 +230,9 @@ struct PESContext {
     int64_t startpos;
 };
 
+extern AVInputFormat mpegts_demuxer;
+
+
 struct SectionContext {
     int pid;
     int stream_type;
@@ -1842,7 +1845,7 @@ static int read_packet(ByteIOContext *pb, uint8_t *buf, int raw_packet_size,
         *position = url_ftell(pb);
         len = get_buffer(pb, buf, TS_PACKET_SIZE);
         if (len != TS_PACKET_SIZE)
-            return AVERROR_IO;
+            return AVERROR(EIO);
         /* check paquet sync byte */
         if (buf[0] != 0x47) {
             /* find a new packet start */

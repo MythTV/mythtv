@@ -21,13 +21,15 @@
 #define ALT_BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "bitstream.h"
+#include "unary.h"
 
 /**
  * @file wavpack.c
  * WavPack lossless audio decoder
  */
 
-#define WV_JOINT 0x0010
+#define WV_JOINT_STEREO 0x00000010
+#define WV_FALSE_STEREO 0x40000000
 
 enum WP_ID_Flags{
     WP_IDF_MASK   = 0x1F,
@@ -66,7 +68,7 @@ typedef struct Decorr {
 
 typedef struct WavpackContext {
     AVCodecContext *avctx;
-    int stereo;
+    int stereo, stereo_in;
     int joint;
     uint32_t CRC;
     GetBitContext gb;
@@ -76,6 +78,7 @@ typedef struct WavpackContext {
     int terms;
     Decorr decorr[MAX_TERMS];
     int zero, one, zeroes;
+    int and, or, shift;
 } WavpackContext;
 
 // exponent table copied from WavPack source
@@ -111,12 +114,6 @@ static av_always_inline int wp_exp2(int16_t val)
     val >>= 8;
     res = (val > 9) ? (res << (val - 9)) : (res >> (9 - val));
     return neg ? -res : res;
-}
-
-static inline int get_unary(GetBitContext *gb){
-    int r=0;
-    while(get_bits1(gb) && r<33)r++;
-    return r;
 }
 
 // macros for manipulating median values
@@ -164,7 +161,7 @@ static int wv_get_value(WavpackContext *ctx, GetBitContext *gb, int *median, int
             if(ctx->zeroes)
                 return 0;
         }else{
-            t = get_unary(gb);
+            t = get_unary_0_33(gb);
             if(t >= 2) t = get_bits(gb, t - 1) | (1 << (t-1));
             ctx->zeroes = t;
             if(ctx->zeroes){
@@ -183,13 +180,13 @@ static int wv_get_value(WavpackContext *ctx, GetBitContext *gb, int *median, int
         t = 0;
         ctx->zero = 0;
     }else{
-        t = get_unary(gb);
+        t = get_unary_0_33(gb);
         if(get_bits_count(gb) >= ctx->data_size){
             *last = 1;
             return 0;
         }
         if(t == 16) {
-            t2 = get_unary(gb);
+            t2 = get_unary_0_33(gb);
             if(t2 < 2) t += t2;
             else t += get_bits(gb, t2 - 1) | (1 << (t2 - 1));
         }
@@ -235,7 +232,7 @@ static int wv_unpack_stereo(WavpackContext *s, GetBitContext *gb, int16_t *dst)
 {
     int i, j, count = 0;
     int last, t;
-    int A, B, L, L2, R, R2;
+    int A, B, L, L2, R, R2, bit;
     int pos = 0;
     uint32_t crc = 0xFFFFFFFF;
 
@@ -299,9 +296,10 @@ static int wv_unpack_stereo(WavpackContext *s, GetBitContext *gb, int16_t *dst)
         if(s->joint)
             L += (R -= (L >> 1));
         crc = (crc * 3 + L) * 3 + R;
-        *dst++ = L;
-        *dst++ = R;
-
+        bit = (L & s->and) | s->or;
+        *dst++ = ((L + bit) << s->shift) - bit;
+        bit = (R & s->and) | s->or;
+        *dst++ = ((R + bit) << s->shift) - bit;
         count++;
     }while(!last && count < s->samples);
 
@@ -316,7 +314,7 @@ static int wv_unpack_mono(WavpackContext *s, GetBitContext *gb, int16_t *dst)
 {
     int i, j, count = 0;
     int last, t;
-    int A, S, T;
+    int A, S, T, bit;
     int pos = 0;
     uint32_t crc = 0xFFFFFFFF;
 
@@ -344,7 +342,8 @@ static int wv_unpack_mono(WavpackContext *s, GetBitContext *gb, int16_t *dst)
         }
         pos = (pos + 1) & 7;
         crc = crc * 3 + S;
-        *dst++ = S;
+        bit = (S & s->and) | s->or;
+        *dst++ = ((S + bit) << s->shift) - bit;
         count++;
     }while(!last && count < s->samples);
 
@@ -389,6 +388,8 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
     }
 
     memset(s->decorr, 0, MAX_TERMS * sizeof(Decorr));
+    memset(s->median, 0, sizeof(s->median));
+    s->and = s->or = s->shift = 0;
 
     s->samples = AV_RL32(buf); buf += 4;
     if(!s->samples){
@@ -400,7 +401,8 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "Packet size is too big to be handled in lavc!\n");
         return -1;
     }
-    s->joint = AV_RL32(buf) & WV_JOINT; buf += 4;
+    s->stereo_in = (AV_RL32(buf) & WV_FALSE_STEREO) ? 0 : s->stereo;
+    s->joint = AV_RL32(buf) & WV_JOINT_STEREO; buf += 4;
     s->CRC = AV_RL32(buf); buf += 4;
     // parse metadata blocks
     while(buf < buf_end){
@@ -445,7 +447,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
                 av_log(avctx, AV_LOG_ERROR, "No decorrelation terms met\n");
                 continue;
             }
-            weights = size >> s->stereo;
+            weights = size >> s->stereo_in;
             if(weights > MAX_TERMS || weights > s->terms){
                 av_log(avctx, AV_LOG_ERROR, "Too many decorrelation weights\n");
                 buf += ssize;
@@ -456,7 +458,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
                 s->decorr[s->terms - i - 1].weightA = t << 3;
                 if(s->decorr[s->terms - i - 1].weightA > 0)
                     s->decorr[s->terms - i - 1].weightA += (s->decorr[s->terms - i - 1].weightA + 64) >> 7;
-                if(s->stereo){
+                if(s->stereo_in){
                     t = (int8_t)(*buf++);
                     s->decorr[s->terms - i - 1].weightB = t << 3;
                     if(s->decorr[s->terms - i - 1].weightB > 0)
@@ -475,7 +477,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
                 if(s->decorr[i].value > 8){
                     s->decorr[i].samplesA[0] = wp_exp2(AV_RL16(buf)); buf += 2;
                     s->decorr[i].samplesA[1] = wp_exp2(AV_RL16(buf)); buf += 2;
-                    if(s->stereo){
+                    if(s->stereo_in){
                         s->decorr[i].samplesB[0] = wp_exp2(AV_RL16(buf)); buf += 2;
                         s->decorr[i].samplesB[1] = wp_exp2(AV_RL16(buf)); buf += 2;
                         t += 4;
@@ -488,26 +490,43 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
                 }else{
                     for(j = 0; j < s->decorr[i].value; j++){
                         s->decorr[i].samplesA[j] = wp_exp2(AV_RL16(buf)); buf += 2;
-                        if(s->stereo){
+                        if(s->stereo_in){
                             s->decorr[i].samplesB[j] = wp_exp2(AV_RL16(buf)); buf += 2;
                         }
                     }
-                    t += s->decorr[i].value * 2 * avctx->channels;
+                    t += s->decorr[i].value * 2 * (s->stereo_in + 1);
                 }
             }
             got_samples = 1;
             break;
         case WP_ID_ENTROPY:
-            if(size != 6 * avctx->channels){
-                av_log(avctx, AV_LOG_ERROR, "Entropy vars size should be %i, got %i", 6 * avctx->channels, size);
+            if(size != 6 * (s->stereo_in + 1)){
+                av_log(avctx, AV_LOG_ERROR, "Entropy vars size should be %i, got %i", 6 * (s->stereo_in + 1), size);
                 buf += ssize;
                 continue;
             }
-            for(i = 0; i < 3 * avctx->channels; i++){
+            for(i = 0; i < 3 * (s->stereo_in + 1); i++){
                 s->median[i] = wp_exp2(AV_RL16(buf));
                 buf += 2;
             }
             got_entropy = 1;
+            break;
+        case WP_ID_INT32INFO:
+            if(size != 4 || *buf){
+                av_log(avctx, AV_LOG_ERROR, "Invalid INT32INFO, size = %i, sent_bits = %i\n", size, *buf);
+                buf += ssize;
+                continue;
+            }
+            if(buf[1])
+                s->shift = buf[1];
+            else if(buf[2]){
+                s->and = s->or = 1;
+                s->shift = buf[2];
+            }else if(buf[3]){
+                s->and = 1;
+                s->shift = buf[3];
+            }
+            buf += 4;
             break;
         case WP_ID_DATA:
             init_get_bits(&s->gb, buf, size * 8);
@@ -541,10 +560,21 @@ static int wavpack_decode_frame(AVCodecContext *avctx,
         return -1;
     }
 
-    if(s->stereo)
+    if(s->stereo_in)
         samplecount = wv_unpack_stereo(s, &s->gb, samples);
-    else
+    else{
         samplecount = wv_unpack_mono(s, &s->gb, samples);
+        if(s->stereo){
+            int16_t *dst = samples + samplecount * 2;
+            int16_t *src = samples + samplecount;
+            int cnt = samplecount;
+            while(cnt--){
+                *--dst = *--src;
+                *--dst = *src;
+            }
+            samplecount *= 2;
+        }
+    }
     *data_size = samplecount * 2;
 
     return buf_size;

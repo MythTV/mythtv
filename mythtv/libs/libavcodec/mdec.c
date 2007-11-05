@@ -2,6 +2,8 @@
  * PSX MDEC codec
  * Copyright (c) 2003 Michael Niedermayer
  *
+ * based upon code from Sebastian Jedruszkiewicz <elf@frogger.rules.pl>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -17,8 +19,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * based upon code from Sebastian Jedruszkiewicz <elf@frogger.rules.pl>
  */
 
 /**
@@ -60,7 +60,7 @@ static inline int mdec_decode_block_intra(MDECContext *a, DCTELEM *block, int n)
 {
     int level, diff, i, j, run;
     int component;
-    RLTable *rl = &rl_mpeg1;
+    RLTable *rl = &ff_rl_mpeg1;
     uint8_t * const scantable= a->scantable.permutated;
     const uint16_t *quant_matrix= ff_mpeg1_default_intra_matrix;
     const int qscale= a->qscale;

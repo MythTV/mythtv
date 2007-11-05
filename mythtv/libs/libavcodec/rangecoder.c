@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -35,8 +34,8 @@
 #include <string.h>
 
 #include "avcodec.h"
-#include "common.h"
 #include "rangecoder.h"
+#include "bytestream.h"
 
 
 void ff_init_range_encoder(RangeCoder *c, uint8_t *buf, int buf_size){
@@ -54,8 +53,7 @@ void ff_init_range_decoder(RangeCoder *c, const uint8_t *buf, int buf_size){
     /* cast to avoid compiler warning */
     ff_init_range_encoder(c, (uint8_t *) buf, buf_size);
 
-    c->low =(*c->bytestream++)<<8;
-    c->low+= *c->bytestream++;
+    c->low = bytestream_get_be16(&c->bytestream);
 }
 
 void ff_build_rac_states(RangeCoder *c, int factor, int max_p){

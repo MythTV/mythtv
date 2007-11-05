@@ -15,8 +15,13 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#ifndef FFMPEG_VORBIS_ENC_DATA_H
+#define FFMPEG_VORBIS_ENC_DATA_H
+
+#include <stdint.h>
 
 static const uint8_t codebook0[] = {
    2, 10,  8, 14,  7, 12, 11, 14,  1,  5,  3,  7,  4,  9,  7,
@@ -496,3 +501,5 @@ static const struct {
     { 4, 2, 2, (const int[]){ -1,  9, 10, 11 } },
     { 3, 2, 3, (const int[]){ -1, 12, 13, 14 } },
 };
+
+#endif /* FFMPEG_VORBIS_ENC_DATA_H */

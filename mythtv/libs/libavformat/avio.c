@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "avstring.h"
 
 static int default_interrupt_cb(void);
 
@@ -100,7 +101,7 @@ int url_read(URLContext *h, unsigned char *buf, int size)
 {
     int ret;
     if (h->flags & URL_WRONLY)
-        return AVERROR_IO;
+        return AVERROR(EIO);
     ret = h->prot->url_read(h, buf, size);
     return ret;
 }
@@ -110,10 +111,10 @@ int url_write(URLContext *h, unsigned char *buf, int size)
 {
     int ret;
     if (!(h->flags & (URL_WRONLY | URL_RDWR)))
-        return AVERROR_IO;
+        return AVERROR(EIO);
     /* avoid sending too big packets */
     if (h->max_packet_size && size > h->max_packet_size)
-        return AVERROR_IO;
+        return AVERROR(EIO);
     ret = h->prot->url_write(h, buf, size);
     return ret;
 }
@@ -169,7 +170,7 @@ int url_get_max_packet_size(URLContext *h)
 
 void url_get_filename(URLContext *h, char *buf, int buf_size)
 {
-    pstrcpy(buf, buf_size, h->filename);
+    av_strlcpy(buf, h->filename, buf_size);
 }
 
 

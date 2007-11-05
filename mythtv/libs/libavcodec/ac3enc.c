@@ -453,7 +453,7 @@ static void bit_alloc_masking(AC3EncodeContext *s,
                                            0, s->nb_coefs[ch],
                                            ff_fgaintab[s->fgaincod[ch]],
                                            ch == s->lfe_channel,
-                                           2, 0, NULL, NULL, NULL,
+                                           DBA_NONE, 0, NULL, NULL, NULL,
                                            mask[blk][ch]);
             }
         }
@@ -534,7 +534,7 @@ static int compute_bit_allocation(AC3EncodeContext *s,
     /* audio blocks */
     for(i=0;i<NB_BLOCKS;i++) {
         frame_bits += s->nb_channels * 2 + 2; /* blksw * c, dithflag * c, dynrnge, cplstre */
-        if (s->acmod == 2) {
+        if (s->acmod == AC3_ACMOD_STEREO) {
             frame_bits++; /* rematstr */
             if(i==0) frame_bits += 4;
         }
@@ -723,11 +723,11 @@ static void output_frame_header(AC3EncodeContext *s, unsigned char *frame)
     put_bits(&s->pb, 5, s->bsid);
     put_bits(&s->pb, 3, s->bsmod);
     put_bits(&s->pb, 3, s->acmod);
-    if ((s->acmod & 0x01) && s->acmod != 0x01)
+    if ((s->acmod & 0x01) && s->acmod != AC3_ACMOD_MONO)
         put_bits(&s->pb, 2, 1); /* XXX -4.5 dB */
     if (s->acmod & 0x04)
         put_bits(&s->pb, 2, 1); /* XXX -6 dB */
-    if (s->acmod == 0x02)
+    if (s->acmod == AC3_ACMOD_STEREO)
         put_bits(&s->pb, 2, 0); /* surround not indicated */
     put_bits(&s->pb, 1, s->lfe); /* LFE */
     put_bits(&s->pb, 5, 31); /* dialog norm: -31 db */
@@ -810,7 +810,7 @@ static void output_audio_block(AC3EncodeContext *s,
         put_bits(&s->pb, 1, 0); /* no new coupling strategy */
     }
 
-    if (s->acmod == 2)
+    if (s->acmod == AC3_ACMOD_STEREO)
       {
         if(block_num==0)
           {
@@ -1136,12 +1136,10 @@ static int output_frame_end(AC3EncodeContext *s)
     /* XXX: could precompute crc_inv */
     crc_inv = pow_poly((CRC16_POLY >> 1), (16 * frame_size_58) - 16, CRC16_POLY);
     crc1 = mul_poly(crc_inv, crc1, CRC16_POLY);
-    frame[2] = crc1 >> 8;
-    frame[3] = crc1;
+    AV_WB16(frame+2,crc1);
 
     crc2 = bswap_16(av_crc(av_crc8005, 0, frame + 2 * frame_size_58, (frame_size - frame_size_58) * 2 - 2));
-    frame[2*frame_size - 2] = crc2 >> 8;
-    frame[2*frame_size - 1] = crc2;
+    AV_WB16(frame+2*frame_size-2,crc2);
 
     //    printf("n=%d frame_size=%d\n", n, frame_size);
     return frame_size * 2;
@@ -1271,6 +1269,7 @@ static int AC3_encode_close(AVCodecContext *avctx)
 /*************************************************************************/
 /* TEST */
 
+#undef random
 #define FN (N/4)
 
 void fft_test(void)

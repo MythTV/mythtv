@@ -22,25 +22,10 @@
 #include <unistd.h>
 #include "network.h"
 #include <sys/time.h>
-#include <fcntl.h>
 
 typedef struct TCPContext {
     int fd;
 } TCPContext;
-
-/* resolve host with also IP address parsing */
-int resolve_host(struct in_addr *sin_addr, const char *hostname)
-{
-    struct hostent *hp;
-
-    if ((inet_aton(hostname, sin_addr)) == 0) {
-        hp = gethostbyname(hostname);
-        if (!hp)
-            return -1;
-        memcpy (sin_addr, hp->h_addr, sizeof(struct in_addr));
-    }
-    return 0;
-}
 
 /* return non zero if error */
 static int tcp_open(URLContext *h, const char *uri, int flags)
@@ -68,6 +53,9 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     if (port <= 0 || port >= 65536)
         goto fail;
 
+    if(!ff_network_init())
+        return AVERROR(EIO);
+
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(port);
     if (resolve_host(&dest_addr.sin_addr, hostname) < 0)
@@ -76,15 +64,16 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0)
         goto fail;
-    fcntl(fd, F_SETFL, O_NONBLOCK);
+    ff_socket_nonblock(fd, 1);
 
  redo:
     ret = connect(fd, (struct sockaddr *)&dest_addr,
                   sizeof(dest_addr));
     if (ret < 0) {
-        if (errno == EINTR)
+        if (ff_neterrno() == FF_NETERROR(EINTR))
             goto redo;
-        if (errno != EINPROGRESS)
+        if (ff_neterrno() != FF_NETERROR(EINPROGRESS) &&
+            ff_neterrno() != FF_NETERROR(EAGAIN))
             goto fail;
 
         /* wait until we are connected or until abort */
@@ -113,7 +102,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     return 0;
 
  fail:
-    ret = AVERROR_IO;
+    ret = AVERROR(EIO);
  fail1:
     if (fd >= 0)
         closesocket(fd);
@@ -140,7 +129,8 @@ static int tcp_read(URLContext *h, uint8_t *buf, int size)
         if (ret > 0 && FD_ISSET(s->fd, &rfds)) {
             len = recv(s->fd, buf, size, 0);
             if (len < 0) {
-                if (errno != EINTR && errno != EAGAIN)
+                if (ff_neterrno() != FF_NETERROR(EINTR) &&
+                    ff_neterrno() != FF_NETERROR(EAGAIN))
                     return AVERROR(errno);
             } else return len;
         } else if (ret < 0) {
@@ -169,7 +159,8 @@ static int tcp_write(URLContext *h, uint8_t *buf, int size)
         if (ret > 0 && FD_ISSET(s->fd, &wfds)) {
             len = send(s->fd, buf, size, 0);
             if (len < 0) {
-                if (errno != EINTR && errno != EAGAIN)
+                if (ff_neterrno() != FF_NETERROR(EINTR) &&
+                    ff_neterrno() != FF_NETERROR(EAGAIN))
                     return AVERROR(errno);
                 continue;
             }
@@ -186,6 +177,7 @@ static int tcp_close(URLContext *h)
 {
     TCPContext *s = h->priv_data;
     closesocket(s->fd);
+    ff_network_close();
     av_free(s);
     return 0;
 }

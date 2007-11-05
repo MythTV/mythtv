@@ -20,33 +20,7 @@
  */
 #include "avformat.h"
 #include "common.h"
-
-typedef enum {
-    PKT_MAP = 0xbc,
-    PKT_MEDIA = 0xbf,
-    PKT_EOS = 0xfb,
-    PKT_FLT = 0xfc,
-    PKT_UMF = 0xfd
-} pkt_type_t;
-
-typedef enum {
-    MAT_NAME = 0x40,
-    MAT_FIRST_FIELD = 0x41,
-    MAT_LAST_FIELD = 0x42,
-    MAT_MARK_IN = 0x43,
-    MAT_MARK_OUT = 0x44,
-    MAT_SIZE = 0x45
-} mat_tag_t;
-
-typedef enum {
-    TRACK_NAME = 0x4c,
-    TRACK_AUX = 0x4d,
-    TRACK_VER = 0x4e,
-    TRACK_MPG_AUX = 0x4f,
-    TRACK_FPS = 0x50,
-    TRACK_LINES = 0x51,
-    TRACK_FPF = 0x52
-} track_tag_t;
+#include "gxf.h"
 
 typedef struct {
     int64_t first_field;
@@ -177,7 +151,7 @@ static int get_sindex(AVFormatContext *s, int id, int format) {
 
 /**
  * \brief filters out interesting tags from material information.
- * \param len lenght of tag section, will be adjusted to contain remaining bytes
+ * \param len length of tag section, will be adjusted to contain remaining bytes
  * \param si struct to store collected information into
  */
 static void gxf_material_tags(ByteIOContext *pb, int *len, st_info_t *si) {
@@ -473,7 +447,7 @@ static int gxf_packet(AVFormatContext *s, AVPacket *pkt) {
         pkt->dts = field_nr;
         return ret;
     }
-    return AVERROR_IO;
+    return AVERROR(EIO);
 }
 
 static int gxf_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int flags) {

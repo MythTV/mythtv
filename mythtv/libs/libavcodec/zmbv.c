@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -28,12 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common.h"
 #include "avcodec.h"
 
-#ifdef CONFIG_ZLIB
 #include <zlib.h>
-#endif
 
 #define ZMBV_KEYFRAME 1
 #define ZMBV_DELTAPAL 2
@@ -68,9 +64,7 @@ typedef struct ZmbvContext {
     int flags;
     int bw, bh, bx, by;
     int decomp_len;
-#ifdef CONFIG_ZLIB
     z_stream zstream;
-#endif
     int (*decode_intra)(struct ZmbvContext *c);
     int (*decode_xor)(struct ZmbvContext *c);
 } ZmbvContext;
@@ -147,7 +141,7 @@ static int zmbv_decode_xor_8(ZmbvContext *c)
         prev += c->width * c->bh;
     }
     if(src - c->decomp_buf != c->decomp_len)
-        av_log(c->avctx, AV_LOG_ERROR, "Used %i of %i bytes\n", src-c->decomp_buf, c->decomp_len);
+        av_log(c->avctx, AV_LOG_ERROR, "Used %ti of %i bytes\n", src-c->decomp_buf, c->decomp_len);
     return 0;
 }
 
@@ -220,7 +214,7 @@ static int zmbv_decode_xor_16(ZmbvContext *c)
         prev += c->width * c->bh;
     }
     if(src - c->decomp_buf != c->decomp_len)
-        av_log(c->avctx, AV_LOG_ERROR, "Used %i of %i bytes\n", src-c->decomp_buf, c->decomp_len);
+        av_log(c->avctx, AV_LOG_ERROR, "Used %ti of %i bytes\n", src-c->decomp_buf, c->decomp_len);
     return 0;
 }
 
@@ -376,7 +370,7 @@ static int zmbv_decode_xor_32(ZmbvContext *c)
         prev += c->width * c->bh;
     }
     if(src - c->decomp_buf != c->decomp_len)
-        av_log(c->avctx, AV_LOG_ERROR, "Used %i of %i bytes\n", src-c->decomp_buf, c->decomp_len);
+        av_log(c->avctx, AV_LOG_ERROR, "Used %ti of %i bytes\n", src-c->decomp_buf, c->decomp_len);
     return 0;
 }
 
@@ -401,9 +395,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 {
     ZmbvContext * const c = avctx->priv_data;
     uint8_t *outptr;
-#ifdef CONFIG_ZLIB
     int zret = Z_OK; // Zlib return code
-#endif
     int len = buf_size;
     int hi_ver, lo_ver;
 
@@ -475,16 +467,13 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
             av_log(avctx, AV_LOG_ERROR, "Unsupported (for now) format %i\n", c->fmt);
             return -1;
         }
-#ifdef CONFIG_ZLIB
+
         zret = inflateReset(&c->zstream);
         if (zret != Z_OK) {
             av_log(avctx, AV_LOG_ERROR, "Inflate reset error: %d\n", zret);
             return -1;
         }
-#else
-        av_log(avctx, AV_LOG_ERROR, "BUG! Zlib support not compiled in frame decoder.\n");
-        return -1;
-#endif  /* CONFIG_ZLIB */
+
         c->cur = av_realloc(c->cur, avctx->width * avctx->height * (c->bpp / 8));
         c->prev = av_realloc(c->prev, avctx->width * avctx->height * (c->bpp / 8));
         c->bx = (c->width + c->bw - 1) / c->bw;
@@ -500,7 +489,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         memcpy(c->decomp_buf, buf, len);
         c->decomp_size = 1;
     } else { // ZLIB-compressed data
-#ifdef CONFIG_ZLIB
         c->zstream.total_in = c->zstream.total_out = 0;
         c->zstream.next_in = buf;
         c->zstream.avail_in = len;
@@ -508,10 +496,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
         c->zstream.avail_out = c->decomp_size;
         inflate(&c->zstream, Z_FINISH);
         c->decomp_len = c->zstream.total_out;
-#else
-        av_log(avctx, AV_LOG_ERROR, "BUG! Zlib support not compiled in frame decoder.\n");
-        return -1;
-#endif
     }
     if(c->flags & ZMBV_KEYFRAME) {
         c->pic.key_frame = 1;
@@ -537,7 +521,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                     out[i * 3 + 0] = c->pal[(*src) * 3 + 0];
                     out[i * 3 + 1] = c->pal[(*src) * 3 + 1];
                     out[i * 3 + 2] = c->pal[(*src) * 3 + 2];
-                    *src++;
+                    src++;
                 }
                 out += c->pic.linesize[0];
             }
@@ -580,9 +564,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                 for(i = 0; i < c->width; i++) {
                     uint32_t tmp = AV_RL32(src);
                     src += 4;
-                    out[i * 3 + 0] = tmp >> 16;
-                    out[i * 3 + 1] = tmp >> 8;
-                    out[i * 3 + 2] = tmp >> 0;
+                    AV_WB24(out+(i*3), tmp);
                 }
                 out += c->pic.linesize[0];
             }
@@ -622,13 +604,9 @@ static int decode_init(AVCodecContext *avctx)
     }
     c->bpp = avctx->bits_per_sample;
 
-#ifdef CONFIG_ZLIB
     // Needed if zlib unused or init aborted before inflateInit
     memset(&(c->zstream), 0, sizeof(z_stream));
-#else
-    av_log(avctx, AV_LOG_ERROR, "Zlib support not compiled.\n");
-    return 1;
-#endif
+
     avctx->pix_fmt = PIX_FMT_RGB24;
     c->decomp_size = (avctx->width + 255) * 4 * (avctx->height + 64);
 
@@ -640,7 +618,6 @@ static int decode_init(AVCodecContext *avctx)
         }
     }
 
-#ifdef CONFIG_ZLIB
     c->zstream.zalloc = Z_NULL;
     c->zstream.zfree = Z_NULL;
     c->zstream.opaque = Z_NULL;
@@ -649,7 +626,6 @@ static int decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
         return 1;
     }
-#endif
 
     return 0;
 }
@@ -669,9 +645,7 @@ static int decode_end(AVCodecContext *avctx)
 
     if (c->pic.data[0])
         avctx->release_buffer(avctx, &c->pic);
-#ifdef CONFIG_ZLIB
     inflateEnd(&(c->zstream));
-#endif
     av_freep(&c->cur);
     av_freep(&c->prev);
 

@@ -59,7 +59,7 @@ QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
 macx:QMAKE_CXXFLAGS += -Wno-long-double
 
-release:contains( TARGET_ARCH_POWERPC, yes ) {
+release:contains( ARCH_POWERPC, yes ) {
     # Auto-inlining causes some Qt moc methods to go missing
     macx:QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
 }

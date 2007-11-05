@@ -17,12 +17,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
+
+#ifndef FFMPEG_NUT_H
+#define FFMPEG_NUT_H
 
 //#include <limits.h>
 #include "avformat.h"
-#include "crc.h"
 //#include "mpegaudio.h"
 #include "riff.h"
 //#include "adler32.h"
@@ -43,10 +44,10 @@ typedef enum{
     FLAG_CODED_PTS  =   8, ///<if set, coded_pts is in the frame header
     FLAG_STREAM_ID  =  16, ///<if set, stream_id is coded in the frame header
     FLAG_SIZE_MSB   =  32, ///<if set, data_size_msb is at frame header, otherwise data_size_msb is 0
-    FLAG_CHECKSUM   =  64, ///<if set then the frame header contains a checksum
+    FLAG_CHECKSUM   =  64, ///<if set, the frame header contains a checksum
     FLAG_RESERVED   = 128, ///<if set, reserved_count is coded in the frame header
-    FLAG_CODED      =4096, ///<if set, coded_flags are stored in the frame header.
-    FLAG_INVALID    =8192, ///<if set, frame_code is invalid.
+    FLAG_CODED      =4096, ///<if set, coded_flags are stored in the frame header
+    FLAG_INVALID    =8192, ///<if set, frame_code is invalid
 }flag_t;
 
 typedef struct {
@@ -63,14 +64,14 @@ typedef struct {
     uint16_t size_lsb;
     int16_t  pts_delta;
     uint8_t  reserved_count;
-} FrameCode; // maybe s/FrameCode/framecode_t/ or change all to java style but dont mix
+} FrameCode; // maybe s/FrameCode/framecode_t/ or change all to Java style but do not mix
 
 typedef struct {
     int last_flags;
     int skip_until_key_frame;
     int64_t last_pts;
     int time_base_id;
-    AVRational time_base;
+    AVRational *time_base;
     int msb_pts_shift;
     int max_pts_distance;
     int decode_delay; //FIXME duplicate of has_b_frames
@@ -79,19 +80,22 @@ typedef struct {
 typedef struct {
     AVFormatContext *avf;
 //    int written_packet_size;
-//    int64_t packet_start[3]; //0-> startcode less, 1-> short startcode 2-> long startcodes
+//    int64_t packet_start;
     FrameCode frame_code[256];
-    uint64_t next_startcode;     ///< stores the next startcode if it has alraedy been parsed but the stream isnt seekable
+    uint64_t next_startcode;     ///< stores the next startcode if it has already been parsed but the stream is not seekable
     StreamContext *stream;
     unsigned int max_distance;
     unsigned int time_base_count;
     int64_t last_syncpoint_pos;
+    int header_count;
     AVRational *time_base;
     struct AVTreeNode *syncpoints;
 } NUTContext;
 
+void ff_nut_reset_ts(NUTContext *nut, AVRational time_base, int64_t val);
+int64_t ff_lsb2full(StreamContext *stream, int64_t lsb);
+int ff_nut_sp_pos_cmp(syncpoint_t *a, syncpoint_t *b);
+int ff_nut_sp_pts_cmp(syncpoint_t *a, syncpoint_t *b);
+void ff_nut_add_sp(NUTContext *nut, int64_t pos, int64_t back_ptr, int64_t ts);
 
-//FIXME move to a common spot, like crc.c/h
-static unsigned long av_crc04C11DB7_update(unsigned long checksum, const uint8_t *buf, unsigned int len){
-    return av_crc(av_crc04C11DB7, checksum, buf, len);
-}
+#endif /* FFMPEG_NUT_H */

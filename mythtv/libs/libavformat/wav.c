@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "allformats.h"
+#include "raw.h"
 #include "riff.h"
 
 typedef struct {
@@ -176,7 +176,7 @@ static int wav_read_header(AVFormatContext *s,
         return -1;
     st = av_new_stream(s, 0);
     if (!st)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     get_wav_header(pb, st->codec, size);
     st->need_parsing = AVSTREAM_PARSE_FULL;
@@ -200,14 +200,14 @@ static int wav_read_packet(AVFormatContext *s,
     WAVContext *wav = s->priv_data;
 
     if (url_feof(&s->pb))
-        return AVERROR_IO;
+        return AVERROR(EIO);
     st = s->streams[0];
 
     left= wav->data_end - url_ftell(&s->pb);
     if(left <= 0){
         left = find_tag(&(s->pb), MKTAG('d', 'a', 't', 'a'));
         if (left < 0) {
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
         wav->data_end= url_ftell(&s->pb) + left;
     }
@@ -221,7 +221,7 @@ static int wav_read_packet(AVFormatContext *s,
     size= FFMIN(size, left);
     ret= av_get_packet(&s->pb, pkt, size);
     if (ret <= 0)
-        return AVERROR_IO;
+        return AVERROR(EIO);
     pkt->stream_index = 0;
 
     /* note: we need to modify the packet size here to handle the last

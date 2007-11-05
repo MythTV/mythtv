@@ -1,5 +1,5 @@
 /*
- * Sample rate convertion for both audio and video
+ * samplerate conversion for both audio and video
  * Copyright (c) 2000 Fabrice Bellard.
  *
  * This file is part of FFmpeg.
@@ -21,7 +21,7 @@
 
 /**
  * @file resample.c
- * Sample rate convertion for both audio and video.
+ * samplerate conversion for both audio and video
  */
 
 #include "avcodec.h"
@@ -191,7 +191,7 @@ int audio_resample(ReSampleContext *s, short *output, short *input, int nb_sampl
     }
 
     /* make some zoom to avoid round pb */
-    lenout= (int)(nb_samples * s->ratio) + 16;
+    lenout= (int)(4*nb_samples * s->ratio) + 16;
     bufout[0]= (short*) av_malloc( lenout * sizeof(short) );
     bufout[1]= (short*) av_malloc( lenout * sizeof(short) );
 

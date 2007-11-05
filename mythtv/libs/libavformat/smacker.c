@@ -28,6 +28,7 @@
 #include "bswap.h"
 
 #define SMACKER_PAL 0x01
+#define SMACKER_FLAG_RING_FRAME 0x01
 
 enum SAudFlags {
     SMK_AUD_PACKED  = 0x80000000,
@@ -112,6 +113,8 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     smk->frames = get_le32(pb);
     smk->pts_inc = (int32_t)get_le32(pb);
     smk->flags = get_le32(pb);
+    if(smk->flags & SMACKER_FLAG_RING_FRAME)
+        smk->frames++;
     for(i = 0; i < 7; i++)
         smk->audio[i] = get_le32(pb);
     smk->treesize = get_le32(pb);
@@ -199,7 +202,7 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     if(ret != st->codec->extradata_size - 16){
         av_free(smk->frm_size);
         av_free(smk->frm_flags);
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     ((int32_t*)st->codec->extradata)[0] = le2me_32(smk->mmap_size);
     ((int32_t*)st->codec->extradata)[1] = le2me_32(smk->mclr_size);
@@ -284,27 +287,27 @@ static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
                 smk->buf_sizes[smk->curstream] = size;
                 ret = get_buffer(&s->pb, smk->bufs[smk->curstream], size);
                 if(ret != size)
-                    return AVERROR_IO;
+                    return AVERROR(EIO);
                 smk->stream_id[smk->curstream] = smk->indexes[i];
             }
             flags >>= 1;
         }
         if (av_new_packet(pkt, frame_size + 768))
-            return AVERROR_NOMEM;
+            return AVERROR(ENOMEM);
         if(smk->frm_size[smk->cur_frame] & 1)
             palchange |= 2;
         pkt->data[0] = palchange;
         memcpy(pkt->data + 1, smk->pal, 768);
         ret = get_buffer(&s->pb, pkt->data + 769, frame_size);
         if(ret != frame_size)
-            return AVERROR_IO;
+            return AVERROR(EIO);
         pkt->stream_index = smk->videoindex;
         pkt->size = ret + 769;
         smk->cur_frame++;
         smk->nextpos = url_ftell(&s->pb);
     } else {
         if (av_new_packet(pkt, smk->buf_sizes[smk->curstream]))
-            return AVERROR_NOMEM;
+            return AVERROR(ENOMEM);
         memcpy(pkt->data, smk->bufs[smk->curstream], smk->buf_sizes[smk->curstream]);
         pkt->size = smk->buf_sizes[smk->curstream];
         pkt->stream_index = smk->stream_id[smk->curstream];

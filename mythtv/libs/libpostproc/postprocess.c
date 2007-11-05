@@ -47,8 +47,8 @@ LinBlendDeinterlace     e               E       E*
 MedianDeinterlace#      E       Ec      Ec
 TempDeNoiser#           E               e       e       Ec
 
-* i dont have a 3dnow CPU -> its untested, but noone said it doesnt work so it seems to work
-# more or less selfinvented filters so the exactness isnt too meaningfull
+* i do not have a 3DNow! CPU -> it is untested, but no one said it does not work so it seems to work
+# more or less selfinvented filters so the exactness is not too meaningful
 E = Exact implementation
 e = allmost exact implementation (slightly different rounding,...)
 a = alternative / approximate impl
@@ -87,13 +87,8 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 //#undef HAVE_MMX
 //#undef ARCH_X86
 //#define DEBUG_BRIGHTNESS
-#ifdef USE_FASTMEMCPY
-#include "libvo/fastmemcpy.h"
-#endif
 #include "postprocess.h"
 #include "postprocess_internal.h"
-
-#include "mangle.h" //FIXME should be supressed
 
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
@@ -106,14 +101,14 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 //#define NUM_BLOCKS_AT_ONCE 16 //not used yet
 
 #if defined(ARCH_X86)
-static uint64_t __attribute__((aligned(8))) attribute_used w05= 0x0005000500050005LL;
-static uint64_t __attribute__((aligned(8))) attribute_used w04= 0x0004000400040004LL;
-static uint64_t __attribute__((aligned(8))) attribute_used w20= 0x0020002000200020LL;
-static uint64_t __attribute__((aligned(8))) attribute_used b00= 0x0000000000000000LL;
-static uint64_t __attribute__((aligned(8))) attribute_used b01= 0x0101010101010101LL;
-static uint64_t __attribute__((aligned(8))) attribute_used b02= 0x0202020202020202LL;
-static uint64_t __attribute__((aligned(8))) attribute_used b08= 0x0808080808080808LL;
-static uint64_t __attribute__((aligned(8))) attribute_used b80= 0x8080808080808080LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, w05)= 0x0005000500050005LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, w04)= 0x0004000400040004LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, w20)= 0x0020002000200020LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, b00)= 0x0000000000000000LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, b01)= 0x0101010101010101LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, b02)= 0x0202020202020202LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, b08)= 0x0808080808080808LL;
+static DECLARE_ALIGNED(8, uint64_t attribute_used, b80)= 0x8080808080808080LL;
 #endif
 
 static uint8_t clip_table[3*256];
@@ -401,8 +396,8 @@ static inline void doHorizLowPass_C(uint8_t dst[], int stride, PPContext *c)
  * Experimental Filter 1 (Horizontal)
  * will not damage linear gradients
  * Flat blocks should look like they where passed through the (1,1,2,2,4,2,2,1,1) 9-Tap filter
- * can only smooth blocks at the expected locations (it cant smooth them if they did move)
- * MMX2 version does correct clipping C version doesnt
+ * can only smooth blocks at the expected locations (it cannot smooth them if they did move)
+ * MMX2 version does correct clipping C version does not
  * not identical with the vertical one
  */
 static inline void horizX1Filter(uint8_t *src, int stride, int QP)
@@ -649,7 +644,7 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 #include "postprocess_template.c"
 #endif
 
-// minor note: the HAVE_xyz is messed up after that line so dont use it
+// minor note: the HAVE_xyz is messed up after that line so do not use it.
 
 static inline void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
         QP_STORE_T QPs[], int QPStride, int isColor, pp_mode_t *vm, pp_context_t *vc)
@@ -658,9 +653,9 @@ static inline void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int 
         PPMode *ppMode= (PPMode *)vm;
         c->ppMode= *ppMode; //FIXME
 
-        // useing ifs here as they are faster than function pointers allthough the
-        // difference wouldnt be messureable here but its much better because
-        // someone might exchange the cpu whithout restarting mplayer ;)
+        // Using ifs here as they are faster than function pointers although the
+        // difference would not be measureable here but it is much better because
+        // someone might exchange the CPU whithout restarting MPlayer ;)
 #ifdef RUNTIME_CPUDETECT
 #if defined(ARCH_X86)
         // ordered per speed fasterst first
@@ -964,7 +959,7 @@ static void reallocBuffers(PPContext *c, int width, int height, int stride, int 
 
         for(i=0; i<3; i++)
         {
-                //Note:the +17*1024 is just there so i dont have to worry about r/w over te end
+                //Note: The +17*1024 is just there so i do not have to worry about r/w over the end.
                 reallocAlign((void **)&c->tempBlured[i], 8, stride*mbHeight*16 + 17*1024);
                 reallocAlign((void **)&c->tempBluredPast[i], 8, 256*((height+7)&(~7))/2 + 17*1024);//FIXME size
         }

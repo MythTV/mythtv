@@ -23,7 +23,12 @@
  * @file h261data.h
  * H.261 tables.
  */
-#define MB_TYPE_H261_FIL 0x800000
+
+#ifndef FFMPEG_H261DATA_H
+#define FFMPEG_H261DATA_H
+
+#include <stdint.h>
+#include "h261.h"
 
 // H.261 VLC table for macroblock addressing
 static const uint8_t h261_mba_code[35] = {
@@ -155,3 +160,5 @@ static RLTable h261_rl_tcoeff = {
     h261_tcoeff_run,
     h261_tcoeff_level,
 };
+
+#endif /* FFMPEG_H261DATA_H */

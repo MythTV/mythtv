@@ -1,5 +1,5 @@
 /*
- * Misc image convertion routines
+ * Misc image conversion routines
  * Copyright (c) 2001, 2002, 2003 Fabrice Bellard.
  *
  * This file is part of FFmpeg.
@@ -21,7 +21,7 @@
 
 /**
  * @file imgconvert.c
- * Misc image convertion routines.
+ * misc image conversion routines
  */
 
 /* TODO:
@@ -32,10 +32,7 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
-
-#ifdef USE_FASTMEMCPY
-#include "libvo/fastmemcpy.h"
-#endif
+#include "colorspace.h"
 
 #ifdef HAVE_MMX
 #include "i386/mmx.h"
@@ -123,6 +120,24 @@ static const PixFmtInfo pix_fmt_info[PIX_FMT_NB] = {
         .depth = 8,
         .x_chroma_shift = 2, .y_chroma_shift = 0,
     },
+    [PIX_FMT_YUV440P] = {
+        .name = "yuv440p",
+        .nb_channels = 3,
+        .color_type = FF_COLOR_YUV,
+        .pixel_type = FF_PIXEL_PLANAR,
+        .depth = 8,
+        .x_chroma_shift = 0, .y_chroma_shift = 1,
+    },
+
+    /* YUV formats with alpha plane */
+    [PIX_FMT_YUVA420P] = {
+        .name = "yuva420p",
+        .nb_channels = 4,
+        .color_type = FF_COLOR_YUV,
+        .pixel_type = FF_PIXEL_PLANAR,
+        .depth = 8,
+        .x_chroma_shift = 1, .y_chroma_shift = 1,
+    },
 
     /* JPEG YUV */
     [PIX_FMT_YUVJ420P] = {
@@ -148,6 +163,14 @@ static const PixFmtInfo pix_fmt_info[PIX_FMT_NB] = {
         .pixel_type = FF_PIXEL_PLANAR,
         .depth = 8,
         .x_chroma_shift = 0, .y_chroma_shift = 0,
+    },
+    [PIX_FMT_YUVJ440P] = {
+        .name = "yuvj440p",
+        .nb_channels = 3,
+        .color_type = FF_COLOR_YUV_JPEG,
+        .pixel_type = FF_PIXEL_PLANAR,
+        .depth = 8,
+        .x_chroma_shift = 0, .y_chroma_shift = 1,
     },
 
     /* RGB formats */
@@ -382,6 +405,27 @@ enum PixelFormat avcodec_get_pix_fmt(const char* name)
     return i;
 }
 
+void avcodec_pix_fmt_string (char *buf, int buf_size, int pix_fmt)
+{
+    PixFmtInfo info= pix_fmt_info[pix_fmt];
+
+    char is_alpha_char= info.is_alpha ? 'y' : 'n';
+
+    /* print header */
+    if (pix_fmt < 0)
+        snprintf (buf, buf_size,
+                  "name      " " nb_channels" " depth" " is_alpha"
+            );
+    else
+        snprintf (buf, buf_size,
+                  "%-10s" "      %1d     " "   %2d " "     %c   ",
+                  info.name,
+                  info.nb_channels,
+                  info.depth,
+                  is_alpha_char
+            );
+}
+
 int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    int pix_fmt, int width, int height)
 {
@@ -399,19 +443,36 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
     case PIX_FMT_YUV444P:
     case PIX_FMT_YUV410P:
     case PIX_FMT_YUV411P:
+    case PIX_FMT_YUV440P:
     case PIX_FMT_YUVJ420P:
     case PIX_FMT_YUVJ422P:
     case PIX_FMT_YUVJ444P:
+    case PIX_FMT_YUVJ440P:
         w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
         h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
         size2 = w2 * h2;
         picture->data[0] = ptr;
         picture->data[1] = picture->data[0] + size;
         picture->data[2] = picture->data[1] + size2;
+        picture->data[3] = NULL;
         picture->linesize[0] = width;
         picture->linesize[1] = w2;
         picture->linesize[2] = w2;
+        picture->linesize[3] = 0;
         return size + 2 * size2;
+    case PIX_FMT_YUVA420P:
+        w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
+        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
+        size2 = w2 * h2;
+        picture->data[0] = ptr;
+        picture->data[1] = picture->data[0] + size;
+        picture->data[2] = picture->data[1] + size2;
+        picture->data[3] = picture->data[1] + size2 + size2;
+        picture->linesize[0] = width;
+        picture->linesize[1] = w2;
+        picture->linesize[2] = w2;
+        picture->linesize[3] = width;
+        return 2 * size + 2 * size2;
     case PIX_FMT_NV12:
     case PIX_FMT_NV21:
         w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
@@ -420,15 +481,18 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = picture->data[0] + size;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width;
         picture->linesize[1] = w2;
         picture->linesize[2] = 0;
+        picture->linesize[3] = 0;
         return size + 2 * size2;
     case PIX_FMT_RGB24:
     case PIX_FMT_BGR24:
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width * 3;
         return size * 3;
     case PIX_FMT_RGB32:
@@ -438,6 +502,7 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width * 4;
         return size * 4;
     case PIX_FMT_GRAY16BE:
@@ -450,18 +515,21 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width * 2;
         return size * 2;
     case PIX_FMT_UYVY422:
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width * 2;
         return size * 2;
     case PIX_FMT_UYYVYY411:
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width + width/2;
         return size + size/2;
     case PIX_FMT_RGB8:
@@ -472,6 +540,7 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width;
         return size;
     case PIX_FMT_RGB4:
@@ -479,6 +548,7 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width / 2;
         return size / 2;
     case PIX_FMT_MONOWHITE:
@@ -486,6 +556,7 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = (width + 7) >> 3;
         return picture->linesize[0] * height;
     case PIX_FMT_PAL8:
@@ -493,6 +564,7 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
         picture->data[0] = ptr;
         picture->data[1] = ptr + size2; /* palette is stored here as 256 32 bit words */
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         picture->linesize[0] = width;
         picture->linesize[1] = 4;
         return size2 + 256 * 4;
@@ -1141,87 +1213,6 @@ static void yuv420p_to_uyvy422(AVPicture *dst, const AVPicture *src,
     }
 }
 
-#define SCALEBITS 10
-#define ONE_HALF  (1 << (SCALEBITS - 1))
-#define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
-
-#define YUV_TO_RGB1_CCIR(cb1, cr1)\
-{\
-    cb = (cb1) - 128;\
-    cr = (cr1) - 128;\
-    r_add = FIX(1.40200*255.0/224.0) * cr + ONE_HALF;\
-    g_add = - FIX(0.34414*255.0/224.0) * cb - FIX(0.71414*255.0/224.0) * cr + \
-            ONE_HALF;\
-    b_add = FIX(1.77200*255.0/224.0) * cb + ONE_HALF;\
-}
-
-#define YUV_TO_RGB2_CCIR(r, g, b, y1)\
-{\
-    y = ((y1) - 16) * FIX(255.0/219.0);\
-    r = cm[(y + r_add) >> SCALEBITS];\
-    g = cm[(y + g_add) >> SCALEBITS];\
-    b = cm[(y + b_add) >> SCALEBITS];\
-}
-
-#define YUV_TO_RGB1(cb1, cr1)\
-{\
-    cb = (cb1) - 128;\
-    cr = (cr1) - 128;\
-    r_add = FIX(1.40200) * cr + ONE_HALF;\
-    g_add = - FIX(0.34414) * cb - FIX(0.71414) * cr + ONE_HALF;\
-    b_add = FIX(1.77200) * cb + ONE_HALF;\
-}
-
-#define YUV_TO_RGB2(r, g, b, y1)\
-{\
-    y = (y1) << SCALEBITS;\
-    r = cm[(y + r_add) >> SCALEBITS];\
-    g = cm[(y + g_add) >> SCALEBITS];\
-    b = cm[(y + b_add) >> SCALEBITS];\
-}
-
-#define Y_CCIR_TO_JPEG(y)\
- cm[((y) * FIX(255.0/219.0) + (ONE_HALF - 16 * FIX(255.0/219.0))) >> SCALEBITS]
-
-#define Y_JPEG_TO_CCIR(y)\
- (((y) * FIX(219.0/255.0) + (ONE_HALF + (16 << SCALEBITS))) >> SCALEBITS)
-
-#define C_CCIR_TO_JPEG(y)\
- cm[(((y) - 128) * FIX(127.0/112.0) + (ONE_HALF + (128 << SCALEBITS))) >> SCALEBITS]
-
-/* NOTE: the clamp is really necessary! */
-static inline int C_JPEG_TO_CCIR(int y) {
-    y = (((y - 128) * FIX(112.0/127.0) + (ONE_HALF + (128 << SCALEBITS))) >> SCALEBITS);
-    if (y < 16)
-        y = 16;
-    return y;
-}
-
-
-#define RGB_TO_Y(r, g, b) \
-((FIX(0.29900) * (r) + FIX(0.58700) * (g) + \
-  FIX(0.11400) * (b) + ONE_HALF) >> SCALEBITS)
-
-#define RGB_TO_U(r1, g1, b1, shift)\
-(((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +         \
-     FIX(0.50000) * b1 + (ONE_HALF << shift) - 1) >> (SCALEBITS + shift)) + 128)
-
-#define RGB_TO_V(r1, g1, b1, shift)\
-(((FIX(0.50000) * r1 - FIX(0.41869) * g1 -           \
-   FIX(0.08131) * b1 + (ONE_HALF << shift) - 1) >> (SCALEBITS + shift)) + 128)
-
-#define RGB_TO_Y_CCIR(r, g, b) \
-((FIX(0.29900*219.0/255.0) * (r) + FIX(0.58700*219.0/255.0) * (g) + \
-  FIX(0.11400*219.0/255.0) * (b) + (ONE_HALF + (16 << SCALEBITS))) >> SCALEBITS)
-
-#define RGB_TO_U_CCIR(r1, g1, b1, shift)\
-(((- FIX(0.16874*224.0/255.0) * r1 - FIX(0.33126*224.0/255.0) * g1 +         \
-     FIX(0.50000*224.0/255.0) * b1 + (ONE_HALF << shift) - 1) >> (SCALEBITS + shift)) + 128)
-
-#define RGB_TO_V_CCIR(r1, g1, b1, shift)\
-(((FIX(0.50000*224.0/255.0) * r1 - FIX(0.41869*224.0/255.0) * g1 -           \
-   FIX(0.08131*224.0/255.0) * b1 + (ONE_HALF << shift) - 1) >> (SCALEBITS + shift)) + 128)
-
 static uint8_t y_ccir_to_jpeg[256];
 static uint8_t y_jpeg_to_ccir[256];
 static uint8_t c_ccir_to_jpeg[256];
@@ -1498,6 +1489,20 @@ static void grow21(uint8_t *dst, int dst_wrap,
         grow21_line(dst, src, width);
         src += src_wrap;
         dst += dst_wrap;
+    }
+}
+
+/* 1x1 -> 1x2 */
+static void grow12(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height-=2) {
+        memcpy(dst, src, width);
+        dst += dst_wrap;
+        memcpy(dst, src, width);
+        dst += dst_wrap;
+        src += src_wrap;
     }
 }
 
@@ -1915,7 +1920,7 @@ typedef struct ConvertEntry {
                     const AVPicture *src, int width, int height);
 } ConvertEntry;
 
-/* Add each new convertion function in this table. In order to be able
+/* Add each new conversion function in this table. In order to be able
    to convert from any format to any format, the following constraints
    must be satisfied:
 
@@ -2453,6 +2458,9 @@ int img_convert(AVPicture *dst, int dst_pix_fmt,
         case 0xf0:
             resize_func = grow21;
             break;
+        case 0x0f:
+            resize_func = grow12;
+            break;
         case 0xe0:
             resize_func = grow41;
             break;
@@ -2816,7 +2824,8 @@ int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
     if (pix_fmt != PIX_FMT_YUV420P &&
         pix_fmt != PIX_FMT_YUV422P &&
         pix_fmt != PIX_FMT_YUV444P &&
-        pix_fmt != PIX_FMT_YUV411P)
+        pix_fmt != PIX_FMT_YUV411P &&
+        pix_fmt != PIX_FMT_GRAY8)
         return -1;
     if ((width & 3) != 0 || (height & 3) != 0)
         return -1;
@@ -2837,6 +2846,9 @@ int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
             default:
                 break;
             }
+            if (pix_fmt == PIX_FMT_GRAY8) {
+                break;
+            }
         }
         if (src == dst) {
             deinterlace_bottom_field_inplace(dst->data[i], dst->linesize[i],
@@ -2847,10 +2859,7 @@ int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                                         width, height);
         }
     }
-#ifdef HAVE_MMX
-    emms();
-#endif
+    emms_c();
     return 0;
 }
 
-#undef FIX

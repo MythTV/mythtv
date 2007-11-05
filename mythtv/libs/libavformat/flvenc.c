@@ -66,10 +66,12 @@ static int get_audio_flags(AVCodecContext *enc){
             break;
         case     8000: //nellymoser only
         case     5512: //not mp3
-            flags |= FLV_SAMPLERATE_SPECIAL;
-            break;
+            if(enc->codec_id != CODEC_ID_MP3){
+                flags |= FLV_SAMPLERATE_SPECIAL;
+                break;
+            }
         default:
-            av_log(enc, AV_LOG_ERROR, "flv doesnt support that sample rate, choose from (44100, 22050, 11025)\n");
+            av_log(enc, AV_LOG_ERROR, "flv does not support that sample rate, choose from (44100, 22050, 11025).\n");
             return -1;
     }
 
@@ -275,9 +277,14 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     AVCodecContext *enc = s->streams[pkt->stream_index]->codec;
     FLVContext *flv = s->priv_data;
     int size= pkt->size;
-    int flags;
+    int flags, flags_size;
 
 //    av_log(s, AV_LOG_DEBUG, "type:%d pts: %"PRId64" size:%d\n", enc->codec_type, timestamp, size);
+
+    if(enc->codec_id == CODEC_ID_VP6 || enc->codec_id == CODEC_ID_VP6F)
+        flags_size= 2;
+    else
+        flags_size= 1;
 
     if (enc->codec_type == CODEC_TYPE_VIDEO) {
         put_byte(pb, FLV_TAG_TYPE_VIDEO);
@@ -298,10 +305,7 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
         put_byte(pb, FLV_TAG_TYPE_AUDIO);
     }
 
-    if ((enc->codec_id == CODEC_ID_VP6) || (enc->codec_id == CODEC_ID_VP6F))
-        put_be24(pb,size+2); // include the extra byte needed for VP6 in flv and flags
-    else
-        put_be24(pb,size+1); // include flags
+    put_be24(pb,size + flags_size);
     put_be24(pb,pkt->pts);
     put_be32(pb,flv->reserved);
     put_byte(pb,flags);
@@ -310,7 +314,7 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     if (enc->codec_id == CODEC_ID_VP6F)
         put_byte(pb, enc->extradata_size ? enc->extradata[0] : 0);
     put_buffer(pb, pkt->data, size);
-    put_be32(pb,size+1+11); // previous tag size
+    put_be32(pb,size+flags_size+11); // previous tag size
     flv->duration = pkt->pts + pkt->duration;
 
     put_flush_packet(pb);

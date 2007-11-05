@@ -20,6 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef FFMPEG_DCAHUFF_H
+#define FFMPEG_DCAHUFF_H
+
+#include <stdint.h>
+#include <stdlib.h>
+
 #define TMODE_COUNT 4
 static const uint8_t tmode_vlc_bits[TMODE_COUNT] = { 3, 3, 3, 2 };
 static const uint16_t tmode_codes[TMODE_COUNT][4] = {
@@ -1066,3 +1072,5 @@ static const uint8_t* bitalloc_bits[10][8] = {
   { bitalloc_129_bits_a, bitalloc_129_bits_b, bitalloc_129_bits_c, bitalloc_129_bits_d,
     bitalloc_129_bits_e, bitalloc_129_bits_f, bitalloc_129_bits_g, NULL }
 };
+
+#endif /* FFMPEG_DCAHUFF_H */

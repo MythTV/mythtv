@@ -23,13 +23,19 @@
  * bitstream api header.
  */
 
-#ifndef BITSTREAM_H
-#define BITSTREAM_H
+#ifndef FFMPEG_BITSTREAM_H
+#define FFMPEG_BITSTREAM_H
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "common.h"
+#include "bswap.h"
+#include "intreadwrite.h"
 #include "log.h"
 
 #if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
-#define ALT_BITSTREAM_READER
+#   define ALT_BITSTREAM_READER
 #endif
 
 //#define ALT_BITSTREAM_WRITER
@@ -38,7 +44,7 @@
 #   ifdef ARCH_ARMV4L
 #       define A32_BITSTREAM_READER
 #   else
-#define ALT_BITSTREAM_READER
+#       define ALT_BITSTREAM_READER
 //#define LIBMPEG2_BITSTREAM_READER
 //#define A32_BITSTREAM_READER
 #   endif
@@ -132,6 +138,7 @@ static inline void flush_put_bits(PutBitContext *s)
 
 void align_put_bits(PutBitContext *s);
 void ff_put_string(PutBitContext * pbc, char *s, int put_zero);
+void ff_copy_bits(PutBitContext *pb, uint8_t *src, int length);
 
 /* bit input */
 /* buffer, buffer_end and size_in_bits must be present and used by every reader */
@@ -166,11 +173,11 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS)
+#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS) || defined(ARCH_BFIN)
 #define UNALIGNED_STORES_ARE_BAD
 #endif
 
-/* used to avoid missaligned exceptions on some archs (alpha, ...) */
+/* used to avoid misaligned exceptions on some archs (alpha, ...) */
 #if defined(ARCH_X86)
 #    define unaligned16(a) (*(const uint16_t*)(a))
 #    define unaligned32(a) (*(const uint32_t*)(a))
@@ -335,8 +342,8 @@ static inline void skip_put_bytes(PutBitContext *s, int n){
 }
 
 /**
- * skips the given number of bits.
- * must only be used if the actual values in the bitstream dont matter
+ * Skips the given number of bits.
+ * Must only be used if the actual values in the bitstream do not matter.
  */
 static inline void skip_put_bits(PutBitContext *s, int n){
 #ifdef ALT_BITSTREAM_WRITER
@@ -400,26 +407,6 @@ LAST_SKIP_BITS(name, gb, num)
 for examples see get_bits, show_bits, skip_bits, get_vlc
 */
 
-static inline int unaligned32_be(const void *v)
-{
-#ifdef CONFIG_ALIGN
-        const uint8_t *p=v;
-        return (((p[0]<<8) | p[1])<<16) | (p[2]<<8) | (p[3]);
-#else
-        return be2me_32( unaligned32(v)); //original
-#endif
-}
-
-static inline int unaligned32_le(const void *v)
-{
-#ifdef CONFIG_ALIGN
-       const uint8_t *p=v;
-       return (((p[3]<<8) | p[2])<<16) | (p[1]<<8) | (p[0]);
-#else
-       return le2me_32( unaligned32(v)); //original
-#endif
-}
-
 #ifdef ALT_BITSTREAM_READER
 #   define MIN_CACHE_BITS 25
 
@@ -432,13 +419,13 @@ static inline int unaligned32_le(const void *v)
 
 # ifdef ALT_BITSTREAM_READER_LE
 #   define UPDATE_CACHE(name, gb)\
-        name##_cache= unaligned32_le( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) >> (name##_index&0x07);\
+        name##_cache= AV_RL32( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) >> (name##_index&0x07);\
 
 #   define SKIP_CACHE(name, gb, num)\
         name##_cache >>= (num);
 # else
 #   define UPDATE_CACHE(name, gb)\
-        name##_cache= unaligned32_be( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) << (name##_index&0x07);\
+        name##_cache= AV_RB32( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) << (name##_index&0x07);\
 
 #   define SKIP_CACHE(name, gb, num)\
         name##_cache <<= (num);
@@ -799,9 +786,19 @@ static inline void align_get_bits(GetBitContext *s)
     if(n) skip_bits(s, n);
 }
 
-int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
+#define init_vlc(vlc, nb_bits, nb_codes,\
+                 bits, bits_wrap, bits_size,\
+                 codes, codes_wrap, codes_size,\
+                 flags)\
+        init_vlc_sparse(vlc, nb_bits, nb_codes,\
+                 bits, bits_wrap, bits_size,\
+                 codes, codes_wrap, codes_size,\
+                 NULL, 0, 0, flags)
+
+int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
+             const void *symbols, int symbols_wrap, int symbols_size,
              int flags);
 #define INIT_VLC_USE_STATIC 1
 #define INIT_VLC_LE         2
@@ -953,4 +950,4 @@ static inline int decode012(GetBitContext *gb){
         return get_bits1(gb) + 1;
 }
 
-#endif /* BITSTREAM_H */
+#endif /* FFMPEG_BITSTREAM_H */

@@ -24,6 +24,12 @@
  * Constants for DV codec.
  */
 
+#ifndef FFMPEG_DVDATA_H
+#define FFMPEG_DVDATA_H
+
+#include "avcodec.h"
+#include "rational.h"
+
 /*
  * DVprofile is used to express the differences between various
  * DV flavors. For now it's primarily used for differentiating
@@ -2534,7 +2540,7 @@ static const uint8_t dv_audio_shuffle625[12][9] = {
   {  31,  67, 103,  21,  57,  93,  11,  47,  83},
 };
 
-static const __attribute__((unused)) int dv_audio_frequency[3] = {
+static const av_unused int dv_audio_frequency[3] = {
     48000, 44100, 32000,
 };
 
@@ -2659,14 +2665,14 @@ static inline const DVprofile* dv_frame_profile(uint8_t* frame)
 {
     if ((frame[3] & 0x80) == 0) {      /* DSF flag */
         /* it's an NTSC format */
-        if ((frame[80*5 + 48 + 3] & 0x4)) { /* 4:2:2 sampling */
+        if ((frame[80*5 + 48 + 3] & 0x4) && (frame[80*5 + 48] == dv_video_source)) { /* 4:2:2 sampling */
             return &dv_profiles[3]; /* NTSC 50Mbps */
         } else { /* 4:1:1 sampling */
             return &dv_profiles[0]; /* NTSC 25Mbps */
         }
     } else {
         /* it's a PAL format */
-        if ((frame[80*5 + 48 + 3] & 0x4)) { /* 4:2:2 sampling */
+        if ((frame[80*5 + 48 + 3] & 0x4) && (frame[80*5 + 48] == dv_video_source)) { /* 4:2:2 sampling */
             return &dv_profiles[4]; /* PAL 50Mbps */
         } else if ((frame[5] & 0x07) == 0) { /* APT flag */
             return &dv_profiles[1]; /* PAL 25Mbps 4:2:0 */
@@ -2722,3 +2728,5 @@ static inline int dv_write_ssyb_id(uint8_t syb_num, uint8_t fr, uint8_t* buf)
     buf[2] = 0xff;             /* reserved -- always 1 */
     return 3;
 }
+
+#endif /* FFMPEG_DVDATA_H */

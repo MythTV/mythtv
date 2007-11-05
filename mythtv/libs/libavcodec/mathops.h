@@ -19,8 +19,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef MATHOPS_H
-#define MATHOPS_H
+#ifndef FFMPEG_MATHOPS_H
+#define FFMPEG_MATHOPS_H
+
+#include "common.h"
 
 #ifdef ARCH_X86_32
 
@@ -33,6 +35,10 @@
 #elif defined(ARCH_PPC)
 
 #include "ppc/mathops.h"
+
+#elif defined(ARCH_BFIN)
+
+#include "bfin/mathops.h"
 
 #endif
 
@@ -65,5 +71,5 @@ static av_always_inline int MULH(int a, int b){
 #   define MUL16(ra, rb) ((ra) * (rb))
 #endif
 
-#endif //MATHOPS_H
+#endif /* FFMPEG_MATHOPS_H */
 

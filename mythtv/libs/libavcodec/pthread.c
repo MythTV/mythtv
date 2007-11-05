@@ -20,12 +20,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 #include <pthread.h>
 
 #include "avcodec.h"
-#include "common.h"
 
 typedef int (action_t)(AVCodecContext *c, void *arg);
 
@@ -44,7 +42,7 @@ typedef struct ThreadContext {
     int done;
 } ThreadContext;
 
-static void* worker(void *v)
+static void* attribute_align_arg worker(void *v)
 {
     AVCodecContext *avctx = v;
     ThreadContext *c = avctx->thread_opaque;
@@ -99,7 +97,7 @@ void avcodec_thread_free(AVCodecContext *avctx)
     pthread_cond_destroy(&c->current_job_cond);
     pthread_cond_destroy(&c->last_job_cond);
     av_free(c->workers);
-    av_free(c);
+    av_freep(&avctx->thread_opaque);
 }
 
 int avcodec_thread_execute(AVCodecContext *avctx, action_t* func, void **arg, int *ret, int job_count)

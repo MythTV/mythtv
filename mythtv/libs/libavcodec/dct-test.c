@@ -30,6 +30,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "dsputil.h"
 
@@ -41,6 +42,7 @@
 #endif
 
 #undef printf
+#undef random
 
 void *fast_memcpy(void *a, const void *b, size_t c){return memcpy(a,b,c);};
 
@@ -51,7 +53,6 @@ extern void ff_idct_xvid_mmx(DCTELEM *block);
 extern void ff_idct_xvid_mmx2(DCTELEM *block);
 extern void init_fdct();
 
-extern void j_rev_dct(DCTELEM *data);
 extern void ff_mmx_idct(DCTELEM *data);
 extern void ff_mmxext_idct(DCTELEM *data);
 
@@ -85,19 +86,23 @@ struct algo {
 
 struct algo algos[] = {
   DCT_ERROR( "REF-DBL",        0, fdct,               fdct, NO_PERM),
+  DCT_ERROR("FAAN",            0, ff_faandct,         fdct, FAAN_SCALE),
   DCT_ERROR("IJG-AAN-INT",     0, fdct_ifast,         fdct, SCALE_PERM),
   DCT_ERROR("IJG-LLM-INT",     0, ff_jpeg_fdct_islow, fdct, NO_PERM),
   DCT_ERROR("REF-DBL",         1, idct,               idct, NO_PERM),
   DCT_ERROR("INT",             1, j_rev_dct,          idct, MMX_PERM),
   DCT_ERROR("SIMPLE-C",        1, simple_idct,        idct, NO_PERM),
 
-#ifdef ARCH_X86
+#ifdef HAVE_MMX
   DCT_ERROR("MMX",             0, ff_fdct_mmx,        fdct, NO_PERM),
+#ifdef HAVE_MMX2
   DCT_ERROR("MMX2",            0, ff_fdct_mmx2,       fdct, NO_PERM),
-  DCT_ERROR("FAAN",            0, ff_faandct,         fdct, FAAN_SCALE),
+#endif
 
+#ifdef CONFIG_GPL
   DCT_ERROR("LIBMPEG2-MMX",    1, ff_mmx_idct,        idct, MMX_PERM),
   DCT_ERROR("LIBMPEG2-MMXEXT", 1, ff_mmxext_idct,     idct, MMX_PERM),
+#endif
   DCT_ERROR("SIMPLE-MMX",      1, ff_simple_idct_mmx, idct, MMX_SIMPLE_PERM),
   DCT_ERROR("XVID-MMX",        1, ff_idct_xvid_mmx,   idct, NO_PERM),
   DCT_ERROR("XVID-MMX2",       1, ff_idct_xvid_mmx2,  idct, NO_PERM),
@@ -333,7 +338,7 @@ void dct_error(const char *name, int is_idct,
             for(i=0; i<64; i++)
                 block[i]= block1[i];
 //            memcpy(block, block1, sizeof(DCTELEM) * 64);
-// dont memcpy especially not fastmemcpy because it does movntq !!!
+// do not memcpy especially not fastmemcpy because it does movntq !!!
             fdct_func(block);
         }
         it1 += NB_ITS_SPEED;
@@ -493,7 +498,7 @@ void idct248_error(const char *name,
             for(i=0; i<64; i++)
                 block[i]= block1[i];
 //            memcpy(block, block1, sizeof(DCTELEM) * 64);
-// dont memcpy especially not fastmemcpy because it does movntq !!!
+// do not memcpy especially not fastmemcpy because it does movntq !!!
             idct248_put(img_dest, 8, block);
         }
         it1 += NB_ITS_SPEED;

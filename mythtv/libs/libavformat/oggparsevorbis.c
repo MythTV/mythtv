@@ -25,49 +25,44 @@
 #include <stdlib.h>
 #include "avformat.h"
 #include "bitstream.h"
+#include "bytestream.h"
 #include "bswap.h"
 #include "ogg2.h"
+#include "avstring.h"
 
 extern int
-vorbis_comment (AVFormatContext * as, uint8_t *buf, int size)
+vorbis_comment(AVFormatContext * as, uint8_t *buf, int size)
 {
-    char *p = buf;
-    int s, n, j;
+    uint8_t *p = buf;
+    uint8_t *end = buf + size;
+    unsigned s, n, j;
 
-    if (size < 4)
+    if (size < 8) /* must have vendor_length and user_comment_list_length */
         return -1;
 
-    s = le2me_32 (unaligned32 (p));
-    p += 4;
-    size -= 4;
+    s = bytestream_get_le32(&p);
 
-    if (size < s + 4)
+    if (end - p < s)
         return -1;
 
     p += s;
-    size -= s;
 
-    n = le2me_32 (unaligned32 (p));
-    p += 4;
-    size -= 4;
+    n = bytestream_get_le32(&p);
 
-    while (size >= 4){
+    while (p < end && n > 0) {
         char *t, *v;
         int tl, vl;
 
-        s = le2me_32 (unaligned32 (p));
-        p += 4;
-        size -= 4;
+        s = bytestream_get_le32(&p);
 
-        if (size < s)
+        if (end - p < s)
             break;
 
         t = p;
         p += s;
-        size -= s;
         n--;
 
-        v = memchr (t, '=', s);
+        v = memchr(t, '=', s);
         if (!v)
             continue;
 
@@ -75,39 +70,40 @@ vorbis_comment (AVFormatContext * as, uint8_t *buf, int size)
         vl = s - tl - 1;
         v++;
 
-        if (tl && vl){
+        if (tl && vl) {
             char tt[tl + 1];
             char ct[vl + 1];
 
             for (j = 0; j < tl; j++)
-                tt[j] = toupper (t[j]);
+                tt[j] = toupper(t[j]);
             tt[tl] = 0;
 
-            memcpy (ct, v, vl);
+            memcpy(ct, v, vl);
             ct[vl] = 0;
 
             // took from Vorbis_I_spec
-            if (!strcmp (tt, "AUTHOR"))
-                strncpy (as->author, ct, FFMIN(sizeof (as->author), vl));
-            else if (!strcmp (tt, "TITLE"))
-                strncpy (as->title, ct, FFMIN(sizeof (as->title), vl));
-            else if (!strcmp (tt, "COPYRIGHT"))
-                strncpy (as->copyright, ct, FFMIN(sizeof (as->copyright), vl));
-            else if (!strcmp (tt, "DESCRIPTION"))
-                strncpy (as->comment, ct, FFMIN(sizeof (as->comment), vl));
-            else if (!strcmp (tt, "GENRE"))
-                strncpy (as->genre, ct, FFMIN(sizeof (as->genre), vl));
-            else if (!strcmp (tt, "TRACKNUMBER"))
-                as->track = atoi (ct);
-            //Too bored to add others for today
+            if (!strcmp(tt, "AUTHOR") || !strcmp(tt, "ARTIST"))
+                av_strlcpy(as->author, ct, sizeof(as->author));
+            else if (!strcmp(tt, "TITLE"))
+                av_strlcpy(as->title, ct, sizeof(as->title));
+            else if (!strcmp(tt, "COPYRIGHT"))
+                av_strlcpy(as->copyright, ct, sizeof(as->copyright));
+            else if (!strcmp(tt, "DESCRIPTION"))
+                av_strlcpy(as->comment, ct, sizeof(as->comment));
+            else if (!strcmp(tt, "GENRE"))
+                av_strlcpy(as->genre, ct, sizeof(as->genre));
+            else if (!strcmp(tt, "TRACKNUMBER"))
+                as->track = atoi(ct);
+            else if (!strcmp(tt, "ALBUM"))
+                av_strlcpy(as->album, ct, sizeof(as->album));
         }
     }
 
-    if (size > 0)
-        av_log (as, AV_LOG_INFO, "%i bytes of comment header remain\n", size);
+    if (p != end)
+        av_log(as, AV_LOG_INFO, "%ti bytes of comment header remain\n", p-end);
     if (n > 0)
-        av_log (as, AV_LOG_INFO,
-                "truncated comment header, %i comments not found\n", n);
+        av_log(as, AV_LOG_INFO,
+               "truncated comment header, %i comments not found\n", n);
 
     return 0;
 }
@@ -134,7 +130,7 @@ typedef struct {
 
 static unsigned int
 fixup_vorbis_headers(AVFormatContext * as, oggvorbis_private_t *priv,
-                     void **buf)
+                     uint8_t **buf)
 {
     int i,offset, len;
     unsigned char *ptr;
@@ -146,7 +142,7 @@ fixup_vorbis_headers(AVFormatContext * as, oggvorbis_private_t *priv,
     offset = 1;
     offset += av_xiphlacing(&ptr[offset], priv->len[0]);
     offset += av_xiphlacing(&ptr[offset], priv->len[1]);
-    for(i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++) {
         memcpy(&ptr[offset], priv->packet[i], priv->len[i]);
         offset += priv->len[i];
     }
@@ -166,22 +162,46 @@ vorbis_header (AVFormatContext * s, int idx)
     if (os->seq > 2)
         return 0;
 
-    if(os->seq == 0) {
+    if (os->seq == 0) {
         os->private = av_mallocz(sizeof(oggvorbis_private_t));
-        if(!os->private)
+        if (!os->private)
             return 0;
     }
+
+    if (os->psize < 1)
+        return -1;
 
     priv = os->private;
     priv->len[os->seq] = os->psize;
     priv->packet[os->seq] = av_mallocz(os->psize);
     memcpy(priv->packet[os->seq], os->buf + os->pstart, os->psize);
     if (os->buf[os->pstart] == 1) {
-        uint8_t *p = os->buf + os->pstart + 11; //skip up to the audio channels
-        st->codec->channels = *p++;
-        st->codec->sample_rate = le2me_32 (unaligned32 (p));
-        p += 8; //skip maximum and and nominal bitrate
-        st->codec->bit_rate = le2me_32 (unaligned32 (p)); //Minimum bitrate
+        uint8_t *p = os->buf + os->pstart + 7; /* skip "\001vorbis" tag */
+        unsigned blocksize, bs0, bs1;
+
+        if (os->psize != 30)
+            return -1;
+
+        if (bytestream_get_le32(&p) != 0) /* vorbis_version */
+            return -1;
+
+        st->codec->channels = bytestream_get_byte(&p);
+        st->codec->sample_rate = bytestream_get_le32(&p);
+        p += 4; // skip maximum bitrate
+        st->codec->bit_rate = bytestream_get_le32(&p); // nominal bitrate
+        p += 4; // skip minimum bitrate
+
+        blocksize = bytestream_get_byte(&p);
+        bs0 = blocksize & 15;
+        bs1 = blocksize >> 4;
+
+        if (bs0 > bs1)
+            return -1;
+        if (bs0 < 6 || bs1 > 13)
+            return -1;
+
+        if (bytestream_get_byte(&p) != 1) /* framing_flag */
+            return -1;
 
         st->codec->codec_type = CODEC_TYPE_AUDIO;
         st->codec->codec_id = CODEC_ID_VORBIS;
@@ -189,7 +209,8 @@ vorbis_header (AVFormatContext * s, int idx)
         st->time_base.num = 1;
         st->time_base.den = st->codec->sample_rate;
     } else if (os->buf[os->pstart] == 3) {
-        vorbis_comment (s, os->buf + os->pstart + 7, os->psize - 8);
+        if (os->psize > 8)
+            vorbis_comment (s, os->buf + os->pstart + 7, os->psize - 8);
     } else {
         st->codec->extradata_size =
             fixup_vorbis_headers(s, priv, &st->codec->extradata);

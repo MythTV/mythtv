@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+ */
 
 /**
  * @file postprocess_template.c
@@ -73,7 +73,7 @@
         "paddb " #a ", " #b " \n\t"
 #endif
 
-//FIXME? |255-0| = 1 (shouldnt be a problem ...)
+//FIXME? |255-0| = 1 (should not be a problem ...)
 #ifdef HAVE_MMX
 /**
  * Check if the middle 8x8 Block in the given 8x16 block is flat
@@ -373,7 +373,8 @@ static inline void RENAME(doVertLowPass)(uint8_t *src, int stride, PPContext *c)
  * Experimental implementation of the filter (Algorithm 1) described in a paper from Ramkishor & Karandikar
  * values are correctly clipped (MMX2)
  * values are wraparound (C)
- * conclusion: its fast, but introduces ugly horizontal patterns if there is a continious gradient
+ * Conclusion: It is fast, but introduces ugly horizontal patterns
+ * if there is a continuous gradient.
         0 8 16 24
         x = 8
         x/2 = 4
@@ -478,8 +479,8 @@ static inline void RENAME(vertRK1Filter)(uint8_t *src, int stride, int QP)
  * Experimental Filter 1
  * will not damage linear gradients
  * Flat blocks should look like they where passed through the (1,1,2,2,4,2,2,1,1) 9-Tap filter
- * can only smooth blocks at the expected locations (it cant smooth them if they did move)
- * MMX2 version does correct clipping C version doesnt
+ * can only smooth blocks at the expected locations (it cannot smooth them if they did move)
+ * MMX2 version does correct clipping C version does not
  */
 static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 {
@@ -3183,8 +3184,8 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
         QP_STORE_T QPs[], int QPStride, int isColor, PPContext *c);
 
 /**
- * Copies a block from src to dst and fixes the blacklevel
- * levelFix == 0 -> dont touch the brighness & contrast
+ * Copies a block from src to dst and fixes the blacklevel.
+ * levelFix == 0 -> do not touch the brighness & contrast
  */
 #undef SCALED_CPY
 
@@ -3348,7 +3349,7 @@ static inline void RENAME(duplicate)(uint8_t src[], int stride)
 static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
         QP_STORE_T QPs[], int QPStride, int isColor, PPContext *c2)
 {
-        PPContext __attribute__((aligned(8))) c= *c2; //copy to stack for faster access
+        DECLARE_ALIGNED(8, PPContext, c)= *c2; //copy to stack for faster access
         int x,y;
 #ifdef COMPILE_TIME_MODE
         const int mode= COMPILE_TIME_MODE;
@@ -3498,7 +3499,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                         );
 
 #elif defined(HAVE_3DNOW)
-//FIXME check if this is faster on an 3dnow chip or if its faster without the prefetch or ...
+//FIXME check if this is faster on an 3dnow chip or if it is faster without the prefetch or ...
 /*                        prefetch(srcBlock + (((x>>3)&3) + 5)*srcStride + 32);
                         prefetch(srcBlock + (((x>>3)&3) + 9)*srcStride + 32);
                         prefetchw(dstBlock + (((x>>3)&3) + 5)*dstStride + 32);
@@ -3642,7 +3643,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                         );
 
 #elif defined(HAVE_3DNOW)
-//FIXME check if this is faster on an 3dnow chip or if its faster without the prefetch or ...
+//FIXME check if this is faster on an 3dnow chip or if it is faster without the prefetch or ...
 /*                        prefetch(srcBlock + (((x>>3)&3) + 5)*srcStride + 32);
                         prefetch(srcBlock + (((x>>3)&3) + 9)*srcStride + 32);
                         prefetchw(dstBlock + (((x>>3)&3) + 5)*dstStride + 32);
@@ -3717,7 +3718,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                                 else if(mode & H_DEBLOCK)
                                 {
 #ifdef HAVE_ALTIVEC
-                                        unsigned char __attribute__ ((aligned(16))) tempBlock[272];
+                                        DECLARE_ALIGNED(16, unsigned char, tempBlock[272]);
                                         transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock - (4 + 1), stride);
 
                                         const int t=vertClassify_altivec(tempBlock-48, 16, &c);

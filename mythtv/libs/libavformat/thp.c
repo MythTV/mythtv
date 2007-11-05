@@ -21,7 +21,6 @@
 
 
 #include "avformat.h"
-#include "allformats.h"
 
 typedef struct ThpDemuxContext {
     int              version;
@@ -96,7 +95,7 @@ static int thp_read_header(AVFormatContext *s,
             /* Video component.  */
             st = av_new_stream(s, 0);
             if (!st)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
 
             /* The denominator and numerator are switched because 1/fps
                is required.  */
@@ -119,7 +118,7 @@ static int thp_read_header(AVFormatContext *s,
             /* Audio component.  */
             st = av_new_stream(s, 0);
             if (!st)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
 
             st->codec->codec_type = CODEC_TYPE_AUDIO;
             st->codec->codec_id = CODEC_ID_ADPCM_THP;
@@ -148,7 +147,7 @@ static int thp_read_packet(AVFormatContext *s,
     if (thp->audiosize == 0) {
         /* Terminate when last frame is reached.  */
         if (thp->frame >= thp->framecnt)
-            return AVERROR_IO;
+            return AVERROR(EIO);
 
         url_fseek(pb, thp->next_frame, SEEK_SET);
 
@@ -169,7 +168,7 @@ static int thp_read_packet(AVFormatContext *s,
         ret = av_get_packet(pb, pkt, size);
         if (ret != size) {
             av_free_packet(pkt);
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
 
         pkt->stream_index = thp->video_stream_index;
@@ -177,7 +176,7 @@ static int thp_read_packet(AVFormatContext *s,
         ret = av_get_packet(pb, pkt, thp->audiosize);
         if (ret != thp->audiosize) {
             av_free_packet(pkt);
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
 
         pkt->stream_index = thp->audio_stream_index;

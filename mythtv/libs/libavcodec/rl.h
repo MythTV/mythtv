@@ -1,10 +1,35 @@
+/*
+ * Copyright (c) 2000-2002 Fabrice Bellard
+ * Copyright (c) 2002-2004 Michael Niedermayer
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 /**
  * @file rl.h
  * rl header.
  */
 
-#ifndef AVCODEC_RL_H
-#define AVCODEC_RL_H
+#ifndef FFMPEG_RL_H
+#define FFMPEG_RL_H
+
+#include <stdint.h>
+#include "bitstream.h"
+#include "mpegvideo.h"
 
 /** RLTable. */
 typedef struct RLTable {
@@ -16,7 +41,7 @@ typedef struct RLTable {
     uint8_t *index_run[2];         ///< encoding only
     int8_t *max_level[2];          ///< encoding & decoding
     int8_t *max_run[2];            ///< encoding & decoding
-    VLC vlc;                       ///< decoding only deprected FIXME remove
+    VLC vlc;                       ///< decoding only deprecated FIXME remove
     RL_VLC_ELEM *rl_vlc[32];       ///< decoding only
 } RLTable;
 
@@ -39,4 +64,4 @@ static inline int get_rl_index(const RLTable *rl, int last, int run, int level)
     return index + level - 1;
 }
 
-#endif
+#endif /* FFMPEG_RL_H */

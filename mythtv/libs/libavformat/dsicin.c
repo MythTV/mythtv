@@ -108,7 +108,7 @@ static int cin_read_header(AVFormatContext *s, AVFormatParameters *ap)
     /* initialize the video decoder stream */
     st = av_new_stream(s, 0);
     if (!st)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     av_set_pts_info(st, 32, 1, 12);
     cin->video_stream_index = st->index;
@@ -121,7 +121,7 @@ static int cin_read_header(AVFormatContext *s, AVFormatParameters *ap)
     /* initialize the audio decoder stream */
     st = av_new_stream(s, 0);
     if (!st)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     av_set_pts_info(st, 32, 1, 22050);
     cin->audio_stream_index = st->index;
@@ -147,7 +147,7 @@ static int cin_read_frame_header(CinDemuxContext *cin, ByteIOContext *pb) {
     hdr->audio_frame_size = get_le32(pb);
 
     if (url_feof(pb) || url_ferror(pb))
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     if (get_le32(pb) != 0xAA55AA55)
         return AVERROR_INVALIDDATA;
@@ -178,7 +178,7 @@ static int cin_read_packet(AVFormatContext *s, AVPacket *pkt)
         pkt_size = (palette_type + 3) * hdr->pal_colors_count + hdr->video_frame_size;
 
         if (av_new_packet(pkt, 4 + pkt_size))
-            return AVERROR_NOMEM;
+            return AVERROR(ENOMEM);
 
         pkt->stream_index = cin->video_stream_index;
         pkt->pts = cin->video_stream_pts++;
@@ -189,7 +189,7 @@ static int cin_read_packet(AVFormatContext *s, AVPacket *pkt)
         pkt->data[3] = hdr->video_frame_type;
 
         if (get_buffer(pb, &pkt->data[4], pkt_size) != pkt_size)
-            return AVERROR_IO;
+            return AVERROR(EIO);
 
         /* sound buffer will be processed on next read_packet() call */
         cin->audio_buffer_size = hdr->audio_frame_size;
@@ -198,14 +198,14 @@ static int cin_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     /* audio packet */
     if (av_new_packet(pkt, cin->audio_buffer_size))
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     pkt->stream_index = cin->audio_stream_index;
     pkt->pts = cin->audio_stream_pts;
     cin->audio_stream_pts += cin->audio_buffer_size * 2 / cin->file_header.audio_frame_size;
 
     if (get_buffer(pb, pkt->data, cin->audio_buffer_size) != cin->audio_buffer_size)
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     cin->audio_buffer_size = 0;
     return 0;

@@ -110,7 +110,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 }
 
 # mmx macros from avlib
-contains( TARGET_MMX, yes ) {
+contains( HAVE_MMX, yes ) {
     HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
 }
 

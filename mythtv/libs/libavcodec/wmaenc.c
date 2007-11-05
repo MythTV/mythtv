@@ -45,19 +45,13 @@ static int encode_init(AVCodecContext * avctx){
     if (avctx->codec->id == CODEC_ID_WMAV1) {
         extradata= av_malloc(4);
         avctx->extradata_size= 4;
-        extradata[0] = flags1;
-        extradata[1] = flags1>>8;
-        extradata[2] = flags2;
-        extradata[3] = flags2>>8;
+        AV_WL16(extradata, flags1);
+        AV_WL16(extradata+2, flags2);
     } else if (avctx->codec->id == CODEC_ID_WMAV2) {
         extradata= av_mallocz(10);
         avctx->extradata_size= 10;
-        extradata[0] = flags1;
-        extradata[1] = flags1>>8;
-        extradata[2] = flags1>>16;
-        extradata[3] = flags1>>24;
-        extradata[4] = flags2;
-        extradata[5] = flags2>>8;
+        AV_WL32(extradata, flags1);
+        AV_WL16(extradata+4, flags2);
     }else
         assert(0);
     avctx->extradata= extradata;
@@ -100,7 +94,7 @@ static void apply_window_and_mdct(AVCodecContext * avctx, signed short * audio, 
 }
 
 //FIXME use for decoding too
-static void init_exp(WMACodecContext *s, int ch, int *exp_param){
+static void init_exp(WMACodecContext *s, int ch, const int *exp_param){
     int n;
     const uint16_t *ptr;
     float v, *q, max_scale, *q_end;
@@ -330,7 +324,7 @@ static int encode_superframe(AVCodecContext *avctx,
                             unsigned char *buf, int buf_size, void *data){
     WMACodecContext *s = avctx->priv_data;
     short *samples = data;
-    int i, total_gain, best;
+    int i, total_gain;
 
     s->block_len_bits= s->frame_len_bits; //required by non variable block len
     s->block_len = 1 << s->block_len_bits;

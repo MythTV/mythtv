@@ -19,8 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef __TRUESPEECH_DATA__
-#define __TRUESPEECH_DATA__
+#ifndef FFMPEG_TRUESPEECH_DATA_H
+#define FFMPEG_TRUESPEECH_DATA_H
+
+#include <stdint.h>
 
 /* codebooks fo expanding input filter */
 static const int16_t ts_cb_0[32] = {
@@ -154,4 +156,4 @@ static const int16_t ts_5E2[8] =
 static const int16_t ts_5F2[8] =
     { 0x6000, 0x4800, 0x3600, 0x2880, 0x1E60, 0x16C8, 0x1116, 0x0CD1 };
 
-#endif
+#endif /* FFMPEG_TRUESPEECH_DATA_H */

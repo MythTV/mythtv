@@ -160,7 +160,7 @@ int ff_rate_control_init(MpegEncContext *s)
 
             next= strchr(p, ';');
             if(next){
-                (*next)=0; //sscanf in unbelieavle slow on looong strings //FIXME copy / dont write
+                (*next)=0; //sscanf in unbelievably slow on looong strings //FIXME copy / do not write
                 next++;
             }
             e= sscanf(p, " in:%d ", &picture_number);
@@ -184,7 +184,7 @@ int ff_rate_control_init(MpegEncContext *s)
 
         //FIXME maybe move to end
         if((s->flags&CODEC_FLAG_PASS2) && s->avctx->rc_strategy == FF_RC_STRATEGY_XVID) {
-#ifdef CONFIG_XVID
+#ifdef CONFIG_LIBXVID
             return ff_xvid_rate_control_init(s);
 #else
             av_log(s->avctx, AV_LOG_ERROR, "XviD ratecontrol requires libavcodec compiled with XviD support\n");
@@ -201,6 +201,10 @@ int ff_rate_control_init(MpegEncContext *s)
         rcc->pass1_rc_eq_output_sum= 0.001;
         rcc->pass1_wanted_bits=0.001;
 
+        if(s->avctx->qblur > 1.0){
+            av_log(s->avctx, AV_LOG_ERROR, "qblur too large\n");
+            return -1;
+        }
         /* init stuff with the user specified complexity */
         if(s->avctx->rc_initial_cplx){
             for(i=0; i<60*30; i++){
@@ -239,7 +243,7 @@ int ff_rate_control_init(MpegEncContext *s)
                 bits= rce.i_tex_bits + rce.p_tex_bits;
 
                 q= get_qscale(s, &rce, rcc->pass1_wanted_bits/rcc->pass1_rc_eq_output_sum, i);
-                rcc->pass1_wanted_bits+= s->bit_rate/(1/av_q2d(s->avctx->time_base)); //FIXME missbehaves a little for variable fps
+                rcc->pass1_wanted_bits+= s->bit_rate/(1/av_q2d(s->avctx->time_base)); //FIXME misbehaves a little for variable fps
             }
         }
 
@@ -256,7 +260,7 @@ void ff_rate_control_uninit(MpegEncContext *s)
     ff_eval_free(rcc->rc_eq_eval);
     av_freep(&rcc->entry);
 
-#ifdef CONFIG_XVID
+#ifdef CONFIG_LIBXVID
     if((s->flags&CODEC_FLAG_PASS2) && s->avctx->rc_strategy == FF_RC_STRATEGY_XVID)
         ff_xvid_rate_control_uninit(s);
 #endif
@@ -367,6 +371,7 @@ static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_f
         q= -q*s->avctx->i_quant_factor + s->avctx->i_quant_offset;
     else if(pict_type==B_TYPE && s->avctx->b_quant_factor<0.0)
         q= -q*s->avctx->b_quant_factor + s->avctx->b_quant_offset;
+    if(q<1) q=1;
 
     return q;
 }
@@ -382,6 +387,7 @@ static double get_diff_limited_q(MpegEncContext *s, RateControlEntry *rce, doubl
         q= last_p_q    *FFABS(a->i_quant_factor) + a->i_quant_offset;
     else if(pict_type==B_TYPE && a->b_quant_factor>0.0)
         q= last_non_b_q*    a->b_quant_factor  + a->b_quant_offset;
+    if(q<1) q=1;
 
     /* last qscale / qdiff stuff */
     if(rcc->last_non_b_pict_type==pict_type || pict_type!=I_TYPE){
@@ -392,7 +398,7 @@ static double get_diff_limited_q(MpegEncContext *s, RateControlEntry *rce, doubl
         else if(q < last_q - maxdiff) q= last_q - maxdiff;
     }
 
-    rcc->last_qscale_for[pict_type]= q; //Note we cant do that after blurring
+    rcc->last_qscale_for[pict_type]= q; //Note we cannot do that after blurring
 
     if(pict_type!=B_TYPE)
         rcc->last_non_b_pict_type= pict_type;
@@ -601,7 +607,7 @@ static void adaptive_quantization(MpegEncContext *s, double q){
         bits_tab[i]= bits;
     }
 
-    /* handle qmin/qmax cliping */
+    /* handle qmin/qmax clipping */
     if(s->flags&CODEC_FLAG_NORMALIZE_AQP){
         float factor= bits_sum/cplx_sum;
         for(i=0; i<s->mb_num; i++){
@@ -672,7 +678,7 @@ float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run)
     Picture * const pic= &s->current_picture;
     emms_c();
 
-#ifdef CONFIG_XVID
+#ifdef CONFIG_LIBXVID
     if((s->flags&CODEC_FLAG_PASS2) && s->avctx->rc_strategy == FF_RC_STRATEGY_XVID)
         return ff_xvid_rate_estimate_qscale(s, dry_run);
 #endif
@@ -693,8 +699,23 @@ float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run)
         rce= &rcc->entry[picture_number];
         wanted_bits= rce->expected_bits;
     }else{
+        Picture *dts_pic;
         rce= &local_rce;
-        wanted_bits= (uint64_t)(s->bit_rate*(double)picture_number/fps);
+
+        //FIXME add a dts field to AVFrame and ensure its set and use it here instead of reordering
+        //but the reordering is simpler for now until h.264 b pyramid must be handeld
+        if(s->pict_type == B_TYPE || s->low_delay)
+            dts_pic= s->current_picture_ptr;
+        else
+            dts_pic= s->last_picture_ptr;
+
+//if(dts_pic)
+//            av_log(NULL, AV_LOG_ERROR, "%Ld %Ld %Ld %d\n", s->current_picture_ptr->pts, s->user_specified_pts, dts_pic->pts, picture_number);
+
+        if(!dts_pic || dts_pic->pts == AV_NOPTS_VALUE)
+            wanted_bits= (uint64_t)(s->bit_rate*(double)picture_number/fps);
+        else
+            wanted_bits= (uint64_t)(s->bit_rate*(double)dts_pic->pts/fps);
     }
 
     diff= s->total_bits - wanted_bits;

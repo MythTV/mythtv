@@ -18,15 +18,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef VP56_H
-#define VP56_H
+#ifndef FFMPEG_VP56_H
+#define FFMPEG_VP56_H
 
 #include "vp56data.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
+#include "bytestream.h"
 
 
 typedef struct vp56_context vp56_context_t;
@@ -48,7 +49,7 @@ typedef int (*vp56_parse_header_t)(vp56_context_t *s, uint8_t *buf,
 typedef struct {
     int high;
     int bits;
-    const uint8_t *buffer;
+    uint8_t *buffer;
     unsigned long code_word;
 } vp56_range_coder_t;
 
@@ -68,12 +69,29 @@ typedef struct {
     vp56_mv_t mv;
 } vp56_macroblock_t;
 
+typedef struct {
+    uint8_t coeff_reorder[64];       /* used in vp6 only */
+    uint8_t coeff_index_to_pos[64];  /* used in vp6 only */
+    uint8_t vector_sig[2];           /* delta sign */
+    uint8_t vector_dct[2];           /* delta coding types */
+    uint8_t vector_pdi[2][2];        /* predefined delta init */
+    uint8_t vector_pdv[2][7];        /* predefined delta values */
+    uint8_t vector_fdv[2][8];        /* 8 bit delta value definition */
+    uint8_t coeff_dccv[2][11];       /* DC coeff value */
+    uint8_t coeff_ract[2][3][6][11]; /* Run/AC coding type and AC coeff value */
+    uint8_t coeff_acct[2][3][3][6][5];/* vp5 only AC coding type for coding group < 3 */
+    uint8_t coeff_dcct[2][36][5];    /* DC coeff coding type */
+    uint8_t coeff_runv[2][14];       /* run value (vp6 only) */
+    uint8_t mb_type[3][10][10];      /* model for decoding MB type */
+    uint8_t mb_types_stats[3][10][2];/* contextual, next MB type stats */
+} vp56_model_t;
+
 struct vp56_context {
     AVCodecContext *avctx;
     DSPContext dsp;
     ScanTable scantable;
-    AVFrame frames[3];
-    AVFrame *framep[4];
+    AVFrame frames[4];
+    AVFrame *framep[6];
     uint8_t *edge_emu_buffer_alloc;
     uint8_t *edge_emu_buffer;
     vp56_range_coder_t c;
@@ -82,8 +100,8 @@ struct vp56_context {
     int sub_version;
 
     /* frame info */
-    int plane_width[3];
-    int plane_height[3];
+    int plane_width[4];
+    int plane_height[4];
     int mb_width;   /* number of horizontal MB */
     int mb_height;  /* number of vertical MB */
     int block_offset[6];
@@ -102,8 +120,6 @@ struct vp56_context {
     vp56_mb_t mb_type;
     vp56_macroblock_t *macroblocks;
     DECLARE_ALIGNED_16(DCTELEM, block_coeff[6][64]);
-    uint8_t coeff_reorder[64];       /* used in vp6 only */
-    uint8_t coeff_index_to_pos[64];  /* used in vp6 only */
 
     /* motion vectors */
     vp56_mv_t mv[6];  /* vectors for each block in MB */
@@ -118,27 +134,16 @@ struct vp56_context {
     int max_vector_length;
     int sample_variance_threshold;
 
-    /* AC models */
-    uint8_t vector_model_sig[2];           /* delta sign */
-    uint8_t vector_model_dct[2];           /* delta coding types */
-    uint8_t vector_model_pdi[2][2];        /* predefined delta init */
-    uint8_t vector_model_pdv[2][7];        /* predefined delta values */
-    uint8_t vector_model_fdv[2][8];        /* 8 bit delta value definition */
-    uint8_t mb_type_model[3][10][10];      /* model for decoding MB type */
-    uint8_t coeff_model_dccv[2][11];       /* DC coeff value */
-    uint8_t coeff_model_ract[2][3][6][11]; /* Run/AC coding type and AC coeff value */
-    uint8_t coeff_model_acct[2][3][3][6][5];/* vp5 only AC coding type for coding group < 3 */
-    uint8_t coeff_model_dcct[2][36][5];    /* DC coeff coding type */
-    uint8_t coeff_model_runv[2][14];       /* run value (vp6 only) */
-    uint8_t mb_types_stats[3][10][2];      /* contextual, next MB type stats */
     uint8_t coeff_ctx[4][64];              /* used in vp5 only */
     uint8_t coeff_ctx_last[4];             /* used in vp5 only */
+
+    int has_alpha;
 
     /* upside-down flipping hints */
     int flip;  /* are we flipping ? */
     int frbi;  /* first row block index in MB */
     int srbi;  /* second row block index in MB */
-    int stride[3];  /* stride for each plan */
+    int stride[4];  /* stride for each plan */
 
     const uint8_t *vp56_coord_div;
     vp56_parse_vector_adjustment_t parse_vector_adjustment;
@@ -149,10 +154,21 @@ struct vp56_context {
     vp56_parse_vector_models_t parse_vector_models;
     vp56_parse_coeff_models_t parse_coeff_models;
     vp56_parse_header_t parse_header;
+
+    vp56_model_t *modelp;
+    vp56_model_t models[2];
+
+    /* huffman decoding */
+    int use_huffman;
+    GetBitContext gb;
+    VLC dccv_vlc[2];
+    VLC runv_vlc[2];
+    VLC ract_vlc[2][3][6];
+    unsigned int nb_null[2][2];       /* number of consecutive NULL DC/AC */
 };
 
 
-void vp56_init(vp56_context_t *s, AVCodecContext *avctx, int flip);
+void vp56_init(AVCodecContext *avctx, int flip, int has_alpha);
 int vp56_free(AVCodecContext *avctx);
 void vp56_init_dequant(vp56_context_t *s, int quantizer);
 int vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
@@ -164,13 +180,12 @@ int vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
  */
 
 static inline void vp56_init_range_decoder(vp56_range_coder_t *c,
-                                           const uint8_t *buf, int buf_size)
+                                           uint8_t *buf, int buf_size)
 {
     c->high = 255;
     c->bits = 8;
     c->buffer = buf;
-    c->code_word = *c->buffer++ << 8;
-    c->code_word |= *c->buffer++;
+    c->code_word = bytestream_get_be16(&c->buffer);
 }
 
 static inline int vp56_rac_get_prob(vp56_range_coder_t *c, uint8_t prob)
@@ -250,4 +265,4 @@ static inline int vp56_rac_get_tree(vp56_range_coder_t *c,
     return -tree->val;
 }
 
-#endif /* VP56_H */
+#endif /* FFMPEG_VP56_H */

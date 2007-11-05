@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -180,6 +179,7 @@ void ff_init_cabac_states(CABACContext *c){
 }
 
 #if 0 //selftest
+#undef random
 #define SIZE 10240
 
 #include "avcodec.h"

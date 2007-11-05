@@ -25,8 +25,11 @@
  * do NOT include this in end user applications
  */
 
-#ifndef FF_RIFF_H
-#define FF_RIFF_H
+#ifndef FFMPEG_RIFF_H
+#define FFMPEG_RIFF_H
+
+#include "avcodec.h"
+#include "avio.h"
 
 offset_t start_tag(ByteIOContext *pb, const char *tag);
 void end_tag(ByteIOContext *pb, offset_t start);
@@ -46,10 +49,6 @@ extern const AVCodecTag codec_wav_tags[];
 
 unsigned int codec_get_tag(const AVCodecTag *tags, int id);
 enum CodecID codec_get_id(const AVCodecTag *tags, unsigned int tag);
-unsigned int codec_get_bmp_tag(int id) attribute_deprecated; //use av_codec_get_tag
-unsigned int codec_get_wav_tag(int id) attribute_deprecated; //use av_codec_get_tag
-enum CodecID codec_get_bmp_id(unsigned int tag) attribute_deprecated; //use av_codec_get_id
-enum CodecID codec_get_wav_id(unsigned int tag) attribute_deprecated; //use av_codec_get_id
 void ff_parse_specific_params(AVCodecContext *stream, int *au_rate, int *au_ssize, int *au_scale);
 
-#endif
+#endif /* FFMPEG_RIFF_H */

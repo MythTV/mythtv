@@ -19,10 +19,10 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "../dsputil.h"
+#include "dsputil.h"
 #include "common.h"
 
 DECLARE_ALIGNED_8(static const uint64_t,ff_pw_4 ) = 0x0004000400040004ULL;

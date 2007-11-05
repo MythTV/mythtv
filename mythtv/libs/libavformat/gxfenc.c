@@ -4,18 +4,18 @@
  *
  * This file is part of FFmpeg.
  *
- * FFmpeg is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with FFmpeg; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -187,7 +187,7 @@ static int gxf_write_mpeg_auxiliary(ByteIOContext *pb, GXFStreamContext *ctx)
                     (float)ctx->codec->bit_rate, ctx->p_per_gop, ctx->b_per_gop,
                     ctx->codec->pix_fmt == PIX_FMT_YUV422P ? 2 : 1, ctx->first_gop_closed == 1,
                     ctx->codec->height / 16);
-    put_byte(pb, 0x4F);
+    put_byte(pb, TRACK_MPG_AUX);
     put_byte(pb, size + 1);
     put_buffer(pb, (uint8_t *)buffer, size + 1);
     return size + 3;
@@ -217,7 +217,7 @@ static int gxf_write_track_description(ByteIOContext *pb, GXFStreamContext *stre
     put_be16(pb, 0); /* size */
 
     /* media file name */
-    put_byte(pb, 0x4C);
+    put_byte(pb, TRACK_NAME);
     put_byte(pb, strlen(ES_NAME_PATTERN) + 3);
     put_tag(pb, ES_NAME_PATTERN);
     put_be16(pb, stream->media_info);
@@ -225,7 +225,7 @@ static int gxf_write_track_description(ByteIOContext *pb, GXFStreamContext *stre
 
     if (stream->codec->codec_id != CODEC_ID_MPEG2VIDEO) {
         /* auxiliary information */
-        put_byte(pb, 0x4D);
+        put_byte(pb, TRACK_AUX);
         put_byte(pb, 8);
         if (stream->codec->codec_id == CODEC_ID_NONE)
             gxf_write_timecode_auxiliary(pb, stream);
@@ -234,7 +234,7 @@ static int gxf_write_track_description(ByteIOContext *pb, GXFStreamContext *stre
     }
 
     /* file system version */
-    put_byte(pb, 0x4E);
+    put_byte(pb, TRACK_VER);
     put_byte(pb, 4);
     put_be32(pb, 0);
 
@@ -242,17 +242,17 @@ static int gxf_write_track_description(ByteIOContext *pb, GXFStreamContext *stre
         gxf_write_mpeg_auxiliary(pb, stream);
 
     /* frame rate */
-    put_byte(pb, 0x50);
+    put_byte(pb, TRACK_FPS);
     put_byte(pb, 4);
     put_be32(pb, stream->frame_rate_index);
 
     /* lines per frame */
-    put_byte(pb, 0x51);
+    put_byte(pb, TRACK_LINES);
     put_byte(pb, 4);
     put_be32(pb, stream->lines_index);
 
     /* fields per frame */
-    put_byte(pb, 0x52);
+    put_byte(pb, TRACK_FPF);
     put_byte(pb, 4);
     put_be32(pb, stream->fields);
 
@@ -272,33 +272,33 @@ static int gxf_write_material_data_section(ByteIOContext *pb, GXFContext *ctx)
         filename++;
     else
         filename = ctx->fc->filename;
-    put_byte(pb, 0x40);
+    put_byte(pb, MAT_NAME);
     put_byte(pb, strlen(SERVER_PATH) + strlen(filename) + 1);
     put_tag(pb, SERVER_PATH);
     put_tag(pb, filename);
     put_byte(pb, 0);
 
     /* first field */
-    put_byte(pb, 0x41);
+    put_byte(pb, MAT_FIRST_FIELD);
     put_byte(pb, 4);
     put_be32(pb, 0);
 
     /* last field */
-    put_byte(pb, 0x42);
+    put_byte(pb, MAT_LAST_FIELD);
     put_byte(pb, 4);
     put_be32(pb, ctx->nb_frames);
 
     /* reserved */
-    put_byte(pb, 0x43);
+    put_byte(pb, MAT_MARK_IN);
     put_byte(pb, 4);
     put_be32(pb, 0);
 
-    put_byte(pb, 0x44);
+    put_byte(pb, MAT_MARK_OUT);
     put_byte(pb, 4);
     put_be32(pb, ctx->nb_frames);
 
     /* estimated size */
-    put_byte(pb, 0x45);
+    put_byte(pb, MAT_SIZE);
     put_byte(pb, 4);
     put_be32(pb, url_fsize(pb) / 1024);
 
@@ -679,9 +679,9 @@ static int gxf_write_trailer(AVFormatContext *s)
     for (i = 0; i < s->nb_streams; ++i) {
         if (s->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
             av_fifo_free(&gxf->streams[i].audio_buffer);
-        }
-        if (s->streams[i]->codec->frame_number > gxf->nb_frames)
+        } else if (s->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
             gxf->nb_frames = 2 * s->streams[i]->codec->frame_number;
+        }
     }
 
     gxf_write_eos_packet(pb, gxf);
@@ -710,7 +710,7 @@ static int gxf_parse_mpeg_frame(GXFStreamContext *sc, const uint8_t *buf, int si
 static int gxf_write_media_preamble(ByteIOContext *pb, GXFContext *ctx, AVPacket *pkt, int size)
 {
     GXFStreamContext *sc = &ctx->streams[pkt->stream_index];
-    int64_t dts = av_rescale(pkt->dts, ctx->sample_rate, sc->codec->time_base.den);
+    int64_t dts = av_rescale_rnd(pkt->dts, ctx->sample_rate, sc->codec->time_base.den, AV_ROUND_UP);
 
     put_byte(pb, sc->media_type);
     put_byte(pb, sc->index);

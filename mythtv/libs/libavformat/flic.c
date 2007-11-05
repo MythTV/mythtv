@@ -39,16 +39,15 @@
                                      originated in Dave's Targa Animator (DTA) */
 #define FLIC_CHUNK_MAGIC_1 0xF1FA
 #define FLIC_CHUNK_MAGIC_2 0xF5FA
-#define FLIC_MC_PTS_INC 6000  /* pts increment for Magic Carpet game FLIs */
-#define FLIC_DEFAULT_PTS_INC 6000  /* for FLIs that have 0 speed */
+#define FLIC_MC_SPEED 5  /* speed for Magic Carpet game FLIs */
+#define FLIC_DEFAULT_SPEED 5  /* for FLIs that have 0 speed */
 
 #define FLIC_HEADER_SIZE 128
 #define FLIC_PREAMBLE_SIZE 6
 
 typedef struct FlicDemuxContext {
-    int frame_pts_inc;
-    int64_t pts;
     int video_stream_index;
+    int frame_number;
 } FlicDemuxContext;
 
 static int flic_probe(AVProbeData *p)
@@ -74,19 +73,21 @@ static int flic_read_header(AVFormatContext *s,
     int speed;
     int magic_number;
 
-    flic->pts = 0;
+    flic->frame_number = 0;
 
     /* load the whole header and pull out the width and height */
     if (get_buffer(pb, header, FLIC_HEADER_SIZE) != FLIC_HEADER_SIZE)
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     magic_number = AV_RL16(&header[4]);
     speed = AV_RL32(&header[0x10]);
+    if (speed == 0)
+        speed = FLIC_DEFAULT_SPEED;
 
     /* initialize the decoder streams */
     st = av_new_stream(s, 0);
     if (!st)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     flic->video_stream_index = st->index;
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_FLIC;
@@ -94,22 +95,26 @@ static int flic_read_header(AVFormatContext *s,
     st->codec->width = AV_RL16(&header[0x08]);
     st->codec->height = AV_RL16(&header[0x0A]);
 
-    if (!st->codec->width || !st->codec->height)
-        return AVERROR_INVALIDDATA;
+    if (!st->codec->width || !st->codec->height) {
+        /* Ugly hack needed for the following sample: */
+        /* http://samples.mplayerhq.hu/fli-flc/fli-bugs/specular.flc */
+        av_log(s, AV_LOG_WARNING,
+               "File with no specified width/height. Trying 640x480.\n");
+        st->codec->width  = 640;
+        st->codec->height = 480;
+    }
 
     /* send over the whole 128-byte FLIC header */
     st->codec->extradata_size = FLIC_HEADER_SIZE;
     st->codec->extradata = av_malloc(FLIC_HEADER_SIZE);
     memcpy(st->codec->extradata, header, FLIC_HEADER_SIZE);
 
-    av_set_pts_info(st, 33, 1, 90000);
-
     /* Time to figure out the framerate: If there is a FLIC chunk magic
      * number at offset 0x10, assume this is from the Bullfrog game,
      * Magic Carpet. */
     if (AV_RL16(&header[0x10]) == FLIC_CHUNK_MAGIC_1) {
 
-        flic->frame_pts_inc = FLIC_MC_PTS_INC;
+        av_set_pts_info(st, 64, FLIC_MC_SPEED, 70);
 
         /* rewind the stream since the first chunk is at offset 12 */
         url_fseek(pb, 12, SEEK_SET);
@@ -121,35 +126,14 @@ static int flic_read_header(AVFormatContext *s,
         memcpy(st->codec->extradata, header, 12);
 
     } else if (magic_number == FLIC_FILE_MAGIC_1) {
-        /*
-         * in this case, the speed (n) is number of 1/70s ticks between frames:
-         *
-         *    pts        n * frame #
-         *  --------  =  -----------  => pts = n * (90000/70) * frame #
-         *   90000           70
-         *
-         *  therefore, the frame pts increment = n * 1285.7
-         */
-        flic->frame_pts_inc = speed * 1285.7;
+        av_set_pts_info(st, 64, speed, 70);
     } else if ((magic_number == FLIC_FILE_MAGIC_2) ||
                (magic_number == FLIC_FILE_MAGIC_3)) {
-        /*
-         * in this case, the speed (n) is number of milliseconds between frames:
-         *
-         *    pts        n * frame #
-         *  --------  =  -----------  => pts = n * 90 * frame #
-         *   90000          1000
-         *
-         *  therefore, the frame pts increment = n * 90
-         */
-        flic->frame_pts_inc = speed * 90;
+        av_set_pts_info(st, 64, speed, 1000);
     } else {
         av_log(s, AV_LOG_INFO, "Invalid or unsupported magic chunk in file\n");
         return AVERROR_INVALIDDATA;
     }
-
-    if (flic->frame_pts_inc == 0)
-        flic->frame_pts_inc = FLIC_DEFAULT_PTS_INC;
 
     return 0;
 }
@@ -169,7 +153,7 @@ static int flic_read_packet(AVFormatContext *s,
 
         if ((ret = get_buffer(pb, preamble, FLIC_PREAMBLE_SIZE)) !=
             FLIC_PREAMBLE_SIZE) {
-            ret = AVERROR_IO;
+            ret = AVERROR(EIO);
             break;
         }
 
@@ -178,20 +162,19 @@ static int flic_read_packet(AVFormatContext *s,
 
         if (((magic == FLIC_CHUNK_MAGIC_1) || (magic == FLIC_CHUNK_MAGIC_2)) && size > FLIC_PREAMBLE_SIZE) {
             if (av_new_packet(pkt, size)) {
-                ret = AVERROR_IO;
+                ret = AVERROR(EIO);
                 break;
             }
             pkt->stream_index = flic->video_stream_index;
-            pkt->pts = flic->pts;
+            pkt->pts = flic->frame_number++;
             pkt->pos = url_ftell(pb);
             memcpy(pkt->data, preamble, FLIC_PREAMBLE_SIZE);
             ret = get_buffer(pb, pkt->data + FLIC_PREAMBLE_SIZE,
                 size - FLIC_PREAMBLE_SIZE);
             if (ret != size - FLIC_PREAMBLE_SIZE) {
                 av_free_packet(pkt);
-                ret = AVERROR_IO;
+                ret = AVERROR(EIO);
             }
-            flic->pts += flic->frame_pts_inc;
             packet_read = 1;
         } else {
             /* not interested in this chunk */

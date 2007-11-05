@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -40,8 +39,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
+#include "bytestream.h"
 #include "dsputil.h"
 
 #define PALETTE_COUNT 256
@@ -298,10 +297,8 @@ static int ipvideo_decode_block_opcode_0x7(IpvideoContext *s)
 
         /* need 2 more bytes from the stream */
         CHECK_STREAM_PTR(2);
-        B[0] = *s->stream_ptr++;
-        B[1] = *s->stream_ptr++;
 
-        flags = (B[1] << 8) | B[0];
+        flags = bytestream_get_le16(&s->stream_ptr);
         bitmask = 0x0001;
         for (y = 0; y < 8; y += 2) {
             for (x = 0; x < 8; x += 2, bitmask <<= 1) {
@@ -479,7 +476,6 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
 {
     int x, y;
     unsigned char P[4];
-    unsigned char B[4];
     unsigned int flags = 0;
     int shifter = 0;
     unsigned char pix;
@@ -497,8 +493,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
 
         for (y = 0; y < 8; y++) {
             /* get the next set of 8 2-bit flags */
-            flags = (s->stream_ptr[1] << 8) | s->stream_ptr[0];
-            s->stream_ptr += 2;
+            flags = bytestream_get_le16(&s->stream_ptr);
             for (x = 0, shifter = 0; x < 8; x++, shifter += 2) {
                 *s->pixel_ptr++ = P[(flags >> shifter) & 0x03];
             }
@@ -510,11 +505,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         /* 1 of 4 colors for each 2x2 block, need 4 more bytes */
         CHECK_STREAM_PTR(4);
 
-        B[0] = *s->stream_ptr++;
-        B[1] = *s->stream_ptr++;
-        B[2] = *s->stream_ptr++;
-        B[3] = *s->stream_ptr++;
-        flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+        flags = bytestream_get_le32(&s->stream_ptr);
         shifter = 0;
 
         for (y = 0; y < 8; y += 2) {
@@ -536,11 +527,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         for (y = 0; y < 8; y++) {
             /* time to reload flags? */
             if ((y == 0) || (y == 4)) {
-                B[0] = *s->stream_ptr++;
-                B[1] = *s->stream_ptr++;
-                B[2] = *s->stream_ptr++;
-                B[3] = *s->stream_ptr++;
-                flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+                flags = bytestream_get_le32(&s->stream_ptr);
                 shifter = 0;
             }
             for (x = 0; x < 8; x += 2, shifter += 2) {
@@ -559,11 +546,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         for (y = 0; y < 8; y += 2) {
             /* time to reload flags? */
             if ((y == 0) || (y == 4)) {
-                B[0] = *s->stream_ptr++;
-                B[1] = *s->stream_ptr++;
-                B[2] = *s->stream_ptr++;
-                B[3] = *s->stream_ptr++;
-                flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+                flags = bytestream_get_le32(&s->stream_ptr);
                 shifter = 0;
             }
             for (x = 0; x < 8; x++, shifter += 2) {

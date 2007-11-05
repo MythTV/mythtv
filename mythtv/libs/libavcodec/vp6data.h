@@ -18,11 +18,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef VP6DATA_H
-#define VP6DATA_H
+#ifndef FFMPEG_VP6DATA_H
+#define FFMPEG_VP6DATA_H
 
 #include "vp56data.h"
 
@@ -297,4 +297,12 @@ static const vp56_tree_t vp6_pcr_tree[] = {
 
 static const uint8_t vp6_coord_div[] = { 4, 4, 4, 4, 8, 8 };
 
-#endif /* VP6DATA_H */
+static const uint8_t vp6_huff_coeff_map[] = {
+    13, 14, 11, 0, 1, 15, 16, 18, 2, 17, 3, 4, 19, 20, 5, 6, 21, 22, 7, 8, 9, 10
+};
+
+static const uint8_t vp6_huff_run_map[] = {
+    10, 13, 11, 12, 0, 1, 2, 3, 14, 8, 15, 16, 4, 5, 6, 7
+};
+
+#endif /* FFMPEG_VP6DATA_H */

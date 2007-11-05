@@ -18,9 +18,11 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef RTSP_H
-#define RTSP_H
+#ifndef FFMPEG_RTSP_H
+#define FFMPEG_RTSP_H
 
+#include <stdint.h>
+#include "avformat.h"
 #include "rtspcodes.h"
 
 enum RTSPProtocol {
@@ -76,19 +78,14 @@ typedef int FFRTSPCallback(enum RTSPCallbackAction action,
                            char *buf, int buf_size,
                            void *arg);
 
-/** useful for modules: set RTSP callback function */
-void rtsp_set_callback(FFRTSPCallback *rtsp_cb);
-
 int rtsp_init(void);
 void rtsp_parse_line(RTSPHeader *reply, const char *buf);
 
 extern int rtsp_default_protocols;
 extern int rtsp_rtp_port_min;
 extern int rtsp_rtp_port_max;
-extern FFRTSPCallback *ff_rtsp_callback;
-extern AVInputFormat rtsp_demuxer;
 
 int rtsp_pause(AVFormatContext *s);
 int rtsp_resume(AVFormatContext *s);
 
-#endif /* RTSP_H */
+#endif /* FFMPEG_RTSP_H */

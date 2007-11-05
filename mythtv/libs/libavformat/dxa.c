@@ -149,7 +149,7 @@ static int dxa_read_packet(AVFormatContext *s, AVPacket *pkt)
         ret = av_get_packet(&s->pb, pkt, size);
         pkt->stream_index = 1;
         if(ret != size)
-            return AVERROR_IO;
+            return AVERROR(EIO);
         c->bytes_left -= size;
         c->wavpos = url_ftell(&s->pb);
         return 0;
@@ -160,7 +160,7 @@ static int dxa_read_packet(AVFormatContext *s, AVPacket *pkt)
         switch(AV_RL32(buf)){
         case MKTAG('N', 'U', 'L', 'L'):
             if(av_new_packet(pkt, 4 + pal_size) < 0)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
             pkt->stream_index = 0;
             if(pal_size) memcpy(pkt->data, pal, pal_size);
             memcpy(pkt->data + pal_size, buf, 4);
@@ -181,12 +181,12 @@ static int dxa_read_packet(AVFormatContext *s, AVPacket *pkt)
                 return -1;
             }
             if(av_new_packet(pkt, size + DXA_EXTRA_SIZE + pal_size) < 0)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
             memcpy(pkt->data + pal_size, buf, DXA_EXTRA_SIZE);
             ret = get_buffer(&s->pb, pkt->data + DXA_EXTRA_SIZE + pal_size, size);
             if(ret != size){
                 av_free_packet(pkt);
-                return AVERROR_IO;
+                return AVERROR(EIO);
             }
             if(pal_size) memcpy(pkt->data, pal, pal_size);
             pkt->stream_index = 0;

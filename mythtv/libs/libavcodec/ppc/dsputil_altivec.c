@@ -20,44 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "gcc_fixes.h"
 
 #include "dsputil_altivec.h"
-
-#ifdef CONFIG_DARWIN
-#include <sys/sysctl.h>
-#else /* CONFIG_DARWIN */
-#ifdef __AMIGAOS4__
-#include <exec/exec.h>
-#include <interfaces/exec.h>
-#include <proto/exec.h>
-#else /* __AMIGAOS4__ */
-#include <signal.h>
-#include <setjmp.h>
-
-static sigjmp_buf jmpbuf;
-static volatile sig_atomic_t canjump = 0;
-
-static void sigill_handler (int sig)
-{
-    if (!canjump) {
-        signal (sig, SIG_DFL);
-        raise (sig);
-    }
-
-    canjump = 0;
-    siglongjmp (jmpbuf, 1);
-}
-#endif /* CONFIG_DARWIN */
-#endif /* __AMIGAOS4__ */
+#include "util_altivec.h"
 
 int sad16_x2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned char zero = (const_vector unsigned char)vec_splat_u8(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned char zero = (const vector unsigned char)vec_splat_u8(0);
     vector unsigned char *tv;
     vector unsigned char pix1v, pix2v, pix2iv, avgv, t5;
     vector unsigned int sad;
@@ -103,8 +77,8 @@ int sad16_x2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h
 int sad16_y2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned char zero = (const_vector unsigned char)vec_splat_u8(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned char zero = (const vector unsigned char)vec_splat_u8(0);
     vector unsigned char *tv;
     vector unsigned char pix1v, pix2v, pix3v, avgv, t5;
     vector unsigned int sad;
@@ -163,10 +137,10 @@ int sad16_y2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h
 int sad16_xy2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
+    DECLARE_ALIGNED_16(int, s);
     uint8_t *pix3 = pix2 + line_size;
-    const_vector unsigned char zero = (const_vector unsigned char)vec_splat_u8(0);
-    const_vector unsigned short two = (const_vector unsigned short)vec_splat_u16(2);
+    const vector unsigned char zero = (const vector unsigned char)vec_splat_u8(0);
+    const vector unsigned short two = (const vector unsigned short)vec_splat_u16(2);
     vector unsigned char *tv, avgv, t5;
     vector unsigned char pix1v, pix2v, pix3v, pix2iv, pix3iv;
     vector unsigned short pix2lv, pix2hv, pix2ilv, pix2ihv;
@@ -218,7 +192,7 @@ int sad16_xy2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int 
         pix3iv = vec_perm(tv[0], tv[1], vec_lvsl(0, &pix3[1]));
 
         /*
-          Note that Altivec does have vec_avg, but this works on vector pairs
+          Note that AltiVec does have vec_avg, but this works on vector pairs
           and rounds up. We could do avg(avg(a,b),avg(c,d)), but the rounding
           would mean that, for example, avg(3,0,0,1) = 2, when it should be 1.
           Instead, we have to split the pixel vectors into vectors of shorts,
@@ -264,8 +238,8 @@ int sad16_xy2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int 
 int sad16_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char perm1, perm2, *pix1v, *pix2v;
     vector unsigned char t1, t2, t3,t4, t5;
     vector unsigned int sad;
@@ -306,8 +280,8 @@ int sad16_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 int sad8_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char perm1, perm2, permclear, *pix1v, *pix2v;
     vector unsigned char t1, t2, t3,t4, t5;
     vector unsigned int sad;
@@ -351,8 +325,8 @@ int sad8_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 int pix_norm1_altivec(uint8_t *pix, int line_size)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char *tv;
     vector unsigned char pixv;
     vector unsigned int sv;
@@ -387,8 +361,8 @@ int pix_norm1_altivec(uint8_t *pix, int line_size)
 int sse8_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char perm1, perm2, permclear, *pix1v, *pix2v;
     vector unsigned char t1, t2, t3,t4, t5;
     vector unsigned int sum;
@@ -443,8 +417,8 @@ int sse8_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 int sse16_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int i;
-    int s __attribute__((aligned(16)));
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    DECLARE_ALIGNED_16(int, s);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char perm1, perm2, *pix1v, *pix2v;
     vector unsigned char t1, t2, t3,t4, t5;
     vector unsigned int sum;
@@ -488,14 +462,14 @@ int sse16_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 
 int pix_sum_altivec(uint8_t * pix, int line_size)
 {
-    const_vector unsigned int zero = (const_vector unsigned int)vec_splat_u32(0);
+    const vector unsigned int zero = (const vector unsigned int)vec_splat_u32(0);
     vector unsigned char perm, *pixv;
     vector unsigned char t1;
     vector unsigned int sad;
     vector signed int sumdiffs;
 
     int i;
-    int s __attribute__((aligned(16)));
+    DECLARE_ALIGNED_16(int, s);
 
     sad = (vector unsigned int)vec_splat_u32(0);
 
@@ -523,7 +497,7 @@ void get_pixels_altivec(DCTELEM *restrict block, const uint8_t *pixels, int line
 {
     int i;
     vector unsigned char perm, bytes, *pixv;
-    const_vector unsigned char zero = (const_vector unsigned char)vec_splat_u8(0);
+    const vector unsigned char zero = (const vector unsigned char)vec_splat_u8(0);
     vector signed short shorts;
 
     for(i=0;i<8;i++)
@@ -550,7 +524,7 @@ void diff_pixels_altivec(DCTELEM *restrict block, const uint8_t *s1,
 {
     int i;
     vector unsigned char perm, bytes, *pixv;
-    const_vector unsigned char zero = (const_vector unsigned char)vec_splat_u8(0);
+    const vector unsigned char zero = (const vector unsigned char)vec_splat_u8(0);
     vector signed short shorts1, shorts2;
 
     for(i=0;i<4;i++)
@@ -769,8 +743,8 @@ POWERPC_PERF_DECLARE(altivec_put_pixels8_xy2_num, 1);
      blockv, temp1, temp2;
    register vector unsigned short
      pixelssum1, pixelssum2, temp3;
-   register const_vector unsigned char vczero = (const_vector unsigned char)vec_splat_u8(0);
-   register const_vector unsigned short vctwo = (const_vector unsigned short)vec_splat_u16(2);
+   register const vector unsigned char vczero = (const vector unsigned char)vec_splat_u8(0);
+   register const vector unsigned short vctwo = (const vector unsigned short)vec_splat_u16(2);
 
    temp1 = vec_ld(0, pixels);
    temp2 = vec_ld(16, pixels);
@@ -845,9 +819,9 @@ POWERPC_PERF_DECLARE(altivec_put_no_rnd_pixels8_xy2_num, 1);
      blockv, temp1, temp2;
    register vector unsigned short
      pixelssum1, pixelssum2, temp3;
-   register const_vector unsigned char vczero = (const_vector unsigned char)vec_splat_u8(0);
-   register const_vector unsigned short vcone = (const_vector unsigned short)vec_splat_u16(1);
-   register const_vector unsigned short vctwo = (const_vector unsigned short)vec_splat_u16(2);
+   register const vector unsigned char vczero = (const vector unsigned char)vec_splat_u8(0);
+   register const vector unsigned short vcone = (const vector unsigned short)vec_splat_u16(1);
+   register const vector unsigned short vctwo = (const vector unsigned short)vec_splat_u16(2);
 
    temp1 = vec_ld(0, pixels);
    temp2 = vec_ld(16, pixels);
@@ -922,8 +896,8 @@ POWERPC_PERF_DECLARE(altivec_put_pixels16_xy2_num, 1);
    register vector unsigned short
      pixelssum1, pixelssum2, temp3,
      pixelssum3, pixelssum4, temp4;
-   register const_vector unsigned char vczero = (const_vector unsigned char)vec_splat_u8(0);
-   register const_vector unsigned short vctwo = (const_vector unsigned short)vec_splat_u16(2);
+   register const vector unsigned char vczero = (const vector unsigned char)vec_splat_u8(0);
+   register const vector unsigned short vctwo = (const vector unsigned short)vec_splat_u16(2);
 
 POWERPC_PERF_START_COUNT(altivec_put_pixels16_xy2_num, 1);
 
@@ -1004,9 +978,9 @@ POWERPC_PERF_DECLARE(altivec_put_no_rnd_pixels16_xy2_num, 1);
    register vector unsigned short
      pixelssum1, pixelssum2, temp3,
      pixelssum3, pixelssum4, temp4;
-   register const_vector unsigned char vczero = (const_vector unsigned char)vec_splat_u8(0);
-   register const_vector unsigned short vcone = (const_vector unsigned short)vec_splat_u16(1);
-   register const_vector unsigned short vctwo = (const_vector unsigned short)vec_splat_u16(2);
+   register const vector unsigned char vczero = (const vector unsigned char)vec_splat_u8(0);
+   register const vector unsigned short vcone = (const vector unsigned short)vec_splat_u16(1);
+   register const vector unsigned short vctwo = (const vector unsigned short)vec_splat_u16(2);
 
 POWERPC_PERF_START_COUNT(altivec_put_no_rnd_pixels16_xy2_num, 1);
 
@@ -1078,25 +1052,25 @@ POWERPC_PERF_STOP_COUNT(altivec_put_no_rnd_pixels16_xy2_num, 1);
 int hadamard8_diff8x8_altivec(/*MpegEncContext*/ void *s, uint8_t *dst, uint8_t *src, int stride, int h){
 POWERPC_PERF_DECLARE(altivec_hadamard8_diff8x8_num, 1);
     int sum;
-    register const_vector unsigned char vzero =
-                            (const_vector unsigned char)vec_splat_u8(0);
+    register const vector unsigned char vzero =
+                            (const vector unsigned char)vec_splat_u8(0);
     register vector signed short temp0, temp1, temp2, temp3, temp4,
                                  temp5, temp6, temp7;
 POWERPC_PERF_START_COUNT(altivec_hadamard8_diff8x8_num, 1);
   {
-    register const_vector signed short vprod1 =(const_vector signed short)
+    register const vector signed short vprod1 =(const vector signed short)
                                         AVV( 1,-1, 1,-1, 1,-1, 1,-1);
-    register const_vector signed short vprod2 =(const_vector signed short)
+    register const vector signed short vprod2 =(const vector signed short)
                                         AVV( 1, 1,-1,-1, 1, 1,-1,-1);
-    register const_vector signed short vprod3 =(const_vector signed short)
+    register const vector signed short vprod3 =(const vector signed short)
                                         AVV( 1, 1, 1, 1,-1,-1,-1,-1);
-    register const_vector unsigned char perm1 = (const_vector unsigned char)
+    register const vector unsigned char perm1 = (const vector unsigned char)
       AVV(0x02, 0x03, 0x00, 0x01, 0x06, 0x07, 0x04, 0x05,
           0x0A, 0x0B, 0x08, 0x09, 0x0E, 0x0F, 0x0C, 0x0D);
-    register const_vector unsigned char perm2 = (const_vector unsigned char)
+    register const vector unsigned char perm2 = (const vector unsigned char)
       AVV(0x04, 0x05, 0x06, 0x07, 0x00, 0x01, 0x02, 0x03,
           0x0C, 0x0D, 0x0E, 0x0F, 0x08, 0x09, 0x0A, 0x0B);
-    register const_vector unsigned char perm3 = (const_vector unsigned char)
+    register const vector unsigned char perm3 = (const vector unsigned char)
       AVV(0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
           0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07);
 
@@ -1226,25 +1200,25 @@ static int hadamard8_diff16x8_altivec(/*MpegEncContext*/ void *s, uint8_t *dst, 
         temp5S REG_v(v13),
         temp6S REG_v(v14),
         temp7S REG_v(v15);
-    register const_vector unsigned char vzero REG_v(v31)=
-        (const_vector unsigned char)vec_splat_u8(0);
+    register const vector unsigned char vzero REG_v(v31)=
+        (const vector unsigned char)vec_splat_u8(0);
   {
-    register const_vector signed short vprod1 REG_v(v16)=
-        (const_vector signed short)AVV( 1,-1, 1,-1, 1,-1, 1,-1);
-    register const_vector signed short vprod2 REG_v(v17)=
-        (const_vector signed short)AVV( 1, 1,-1,-1, 1, 1,-1,-1);
-    register const_vector signed short vprod3 REG_v(v18)=
-        (const_vector signed short)AVV( 1, 1, 1, 1,-1,-1,-1,-1);
-    register const_vector unsigned char perm1 REG_v(v19)=
-        (const_vector unsigned char)
+    register const vector signed short vprod1 REG_v(v16)=
+        (const vector signed short)AVV( 1,-1, 1,-1, 1,-1, 1,-1);
+    register const vector signed short vprod2 REG_v(v17)=
+        (const vector signed short)AVV( 1, 1,-1,-1, 1, 1,-1,-1);
+    register const vector signed short vprod3 REG_v(v18)=
+        (const vector signed short)AVV( 1, 1, 1, 1,-1,-1,-1,-1);
+    register const vector unsigned char perm1 REG_v(v19)=
+        (const vector unsigned char)
         AVV(0x02, 0x03, 0x00, 0x01, 0x06, 0x07, 0x04, 0x05,
             0x0A, 0x0B, 0x08, 0x09, 0x0E, 0x0F, 0x0C, 0x0D);
-    register const_vector unsigned char perm2 REG_v(v20)=
-        (const_vector unsigned char)
+    register const vector unsigned char perm2 REG_v(v20)=
+        (const vector unsigned char)
         AVV(0x04, 0x05, 0x06, 0x07, 0x00, 0x01, 0x02, 0x03,
             0x0C, 0x0D, 0x0E, 0x0F, 0x08, 0x09, 0x0A, 0x0B);
-    register const_vector unsigned char perm3 REG_v(v21)=
-        (const_vector unsigned char)
+    register const vector unsigned char perm3 REG_v(v21)=
+        (const vector unsigned char)
         AVV(0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07);
 
@@ -1419,50 +1393,6 @@ POWERPC_PERF_STOP_COUNT(altivec_hadamard8_diff16_num, 1);
     return score;
 }
 
-int has_altivec(void)
-{
-#ifdef __AMIGAOS4__
-    ULONG result = 0;
-    extern struct ExecIFace *IExec;
-
-    IExec->GetCPUInfoTags(GCIT_VectorUnit, &result, TAG_DONE);
-    if (result == VECTORTYPE_ALTIVEC) return 1;
-    return 0;
-#else /* __AMIGAOS4__ */
-
-#ifdef CONFIG_DARWIN
-    int sels[2] = {CTL_HW, HW_VECTORUNIT};
-    int has_vu = 0;
-    size_t len = sizeof(has_vu);
-    int err;
-
-    err = sysctl(sels, 2, &has_vu, &len, NULL, 0);
-
-    if (err == 0) return (has_vu != 0);
-#else /* CONFIG_DARWIN */
-/* no Darwin, do it the brute-force way */
-/* this is borrowed from the libmpeg2 library */
-    {
-      signal (SIGILL, sigill_handler);
-      if (sigsetjmp (jmpbuf, 1)) {
-        signal (SIGILL, SIG_DFL);
-      } else {
-        canjump = 1;
-
-        asm volatile ("mtspr 256, %0\n\t"
-                      "vand %%v0, %%v0, %%v0"
-                      :
-                      : "r" (-1));
-
-        signal (SIGILL, SIG_DFL);
-        return 1;
-      }
-    }
-#endif /* CONFIG_DARWIN */
-    return 0;
-#endif /* __AMIGAOS4__ */
-}
-
 static void vorbis_inverse_coupling_altivec(float *mag, float *ang,
                                             int blocksize)
 {
@@ -1495,9 +1425,9 @@ POWERPC_PERF_DECLARE(altivec_avg_pixels8_xy2_num, 1);
     register vector unsigned char blockv, temp1, temp2, blocktemp;
     register vector unsigned short pixelssum1, pixelssum2, temp3;
 
-    register const_vector unsigned char vczero = (const_vector unsigned char)
+    register const vector unsigned char vczero = (const vector unsigned char)
                                         vec_splat_u8(0);
-    register const_vector unsigned short vctwo = (const_vector unsigned short)
+    register const vector unsigned short vctwo = (const vector unsigned short)
                                         vec_splat_u16(2);
 
     temp1 = vec_ld(0, pixels);
@@ -1583,7 +1513,6 @@ void dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
 
     c->hadamard8_diff[0] = hadamard8_diff16_altivec;
     c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;
-#ifdef CONFIG_VORBIS_DECODER
-    c->vorbis_inverse_coupling = vorbis_inverse_coupling_altivec;
-#endif
+    if (ENABLE_VORBIS_DECODER)
+        c->vorbis_inverse_coupling = vorbis_inverse_coupling_altivec;
 }

@@ -47,6 +47,7 @@
 #include "rtp_internal.h"
 #include "rtp_h264.h"
 #include "base64.h"
+#include "avstring.h"
 
 /**
     RTP/H264 specific private data.
@@ -77,8 +78,8 @@ static void sdp_parse_fmtp_config_h264(AVStream * stream,
     assert(h264_data != NULL);
 
     if (!strcmp(attr, "packetization-mode")) {
-        av_log(NULL, AV_LOG_DEBUG, "H.264/RTP Packetization Mode: %d\n", atoi(attr));
-        h264_data->packetization_mode = atoi(attr);
+        av_log(NULL, AV_LOG_DEBUG, "H.264/RTP Packetization Mode: %d\n", atoi(value));
+        h264_data->packetization_mode = atoi(value);
         /*
            Packetization Mode:
            0 or not present: Single NAL mode (Only nals from 1-23 are allowed)
@@ -270,14 +271,14 @@ static int h264_handle_packet(RTPDemuxContext * s,
             // these are the same as above, we just redo them here for clarity...
             uint8_t fu_indicator = nal;
             uint8_t fu_header = *buf;   // read the fu_header.
-            uint8_t start_bit = (fu_header & 0x80) >> 7;
+            uint8_t start_bit = fu_header >> 7;
 //            uint8_t end_bit = (fu_header & 0x40) >> 6;
             uint8_t nal_type = (fu_header & 0x1f);
             uint8_t reconstructed_nal;
 
             // reconstruct this packet's true nal; only the data follows..
             reconstructed_nal = fu_indicator & (0xe0);  // the original nal forbidden bit and NRI are stored in this packet's nal;
-            reconstructed_nal |= (nal_type & 0x1f);
+            reconstructed_nal |= nal_type;
 
             // skip the fu_header...
             buf++;
@@ -285,7 +286,7 @@ static int h264_handle_packet(RTPDemuxContext * s,
 
 #ifdef DEBUG
             if (start_bit)
-                data->packet_types_received[nal_type & 0x1f]++;
+                data->packet_types_received[nal_type]++;
 #endif
             if(start_bit) {
                 // copy in the start sequence, and the reconstructed nal....
@@ -357,7 +358,7 @@ static int parse_h264_sdp_line(AVStream * stream, void *data,
 
     assert(h264_data->cookie == MAGIC_COOKIE);
 
-    if (strstart(p, "framesize:", &p)) {
+    if (av_strstart(p, "framesize:", &p)) {
         char buf1[50];
         char *dst = buf1;
 
@@ -375,7 +376,7 @@ static int parse_h264_sdp_line(AVStream * stream, void *data,
         codec->width = atoi(buf1);
         codec->height = atoi(p + 1); // skip the -
         codec->pix_fmt = PIX_FMT_YUV420P;
-    } else if (strstart(p, "fmtp:", &p)) {
+    } else if (av_strstart(p, "fmtp:", &p)) {
         char attr[256];
         char value[4096];
 
@@ -390,7 +391,7 @@ static int parse_h264_sdp_line(AVStream * stream, void *data,
             /* grab the codec extra_data from the config parameter of the fmtp line */
             sdp_parse_fmtp_config_h264(stream, h264_data, attr, value);
         }
-    } else if (strstart(p, "cliprect:", &p)) {
+    } else if (av_strstart(p, "cliprect:", &p)) {
         // could use this if we wanted.
     }
 

@@ -18,13 +18,15 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef RTP_H
-#define RTP_H
+#ifndef FFMPEG_RTP_H
+#define FFMPEG_RTP_H
+
+#include "avcodec.h"
+#include "avformat.h"
 
 #define RTP_MIN_PACKET_LENGTH 12
 #define RTP_MAX_PACKET_LENGTH 1500 /* XXX: suppress this define */
 
-int rtp_init(void);
 int rtp_get_codec_info(AVCodecContext *codec, int payload_type);
 
 /** return < 0 if unknown payload type */
@@ -37,9 +39,6 @@ int rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
                      const uint8_t *buf, int len);
 void rtp_parse_close(RTPDemuxContext *s);
 
-extern AVOutputFormat rtp_muxer;
-extern AVInputFormat rtp_demuxer;
-
 int rtp_get_local_port(URLContext *h);
 int rtp_set_remote_url(URLContext *h, const char *uri);
 void rtp_get_file_handles(URLContext *h, int *prtp_fd, int *prtcp_fd);
@@ -50,8 +49,6 @@ void rtp_get_file_handles(URLContext *h, int *prtp_fd, int *prtcp_fd);
  * (we don't have access to the rtcp handle from here)
  */
 int rtp_check_and_send_back_rr(RTPDemuxContext *s, int count);
-
-extern URLProtocol rtp_protocol;
 
 #define RTP_PT_PRIVATE 96
 #define RTP_VERSION 2
@@ -124,4 +121,4 @@ typedef enum {
 #endif
 
 extern AVRtpPayloadType_t AVRtpPayloadTypes[];
-#endif /* RTP_H */
+#endif /* FFMPEG_RTP_H */

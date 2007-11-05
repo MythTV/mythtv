@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_X86CPU_H
-#define AVUTIL_X86CPU_H
+#ifndef FFMPEG_X86CPU_H
+#define FFMPEG_X86CPU_H
 
 #ifdef ARCH_X86_64
 #  define REG_a "rax"
@@ -57,8 +57,12 @@
 #  define REGSP   esp
 #endif
 
-#if defined(ARCH_X86_64) || (defined(ARCH_X86_32) && defined(CONFIG_EBX_AVAILABLE) && defined(CONFIG_EBP_AVAILABLE))
-#  define CONFIG_7REGS 1
+#if defined(ARCH_X86_64) || (defined(ARCH_X86_32) && defined(HAVE_EBX_AVAILABLE) && defined(HAVE_EBP_AVAILABLE))
+#  define HAVE_7REGS 1
 #endif
 
-#endif /* AVUTIL_X86CPU_H */
+#if defined(ARCH_X86_64) && defined(PIC)
+#  define BROKEN_RELOCATIONS 1
+#endif
+
+#endif /* FFMPEG_X86CPU_H */

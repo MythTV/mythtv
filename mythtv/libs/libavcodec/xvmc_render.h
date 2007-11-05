@@ -1,9 +1,25 @@
-#ifndef XVMC_RENDER_H_
-#define XVMC_RENDER_H_
+/*
+ * Copyright (C) 2003 Ivan Kalvachev
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef FFMPEG_XVMC_RENDER_H
+#define FFMPEG_XVMC_RENDER_H
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -17,9 +33,9 @@ extern "C" {
 #include <X11/extensions/vldXvMC.h>
 #endif
 
-//the surface should be shown, video driver manipulate this
+//the surface should be shown, video driver manipulates this
 #define MP_XVMC_STATE_DISPLAY_PENDING 1
-//the surface is needed for prediction, codec manipulate this
+//the surface is needed for prediction, codec manipulates this
 #define MP_XVMC_STATE_PREDICTION 2
 //this surface is needed for subpicture rendering
 #define MP_XVMC_STATE_OSD_SOURCE 4
@@ -27,7 +43,7 @@ extern "C" {
 #define MP_XVMC_RENDER_MAGIC 0x1DC711C0
 
 typedef   struct{
-//these are not changed by decoder!
+//these are not changed by the decoder!
   int  magic;
 
   short * data_blocks;
@@ -35,7 +51,7 @@ typedef   struct{
   int total_number_of_mv_blocks;
   int total_number_of_data_blocks;
   int mc_type;//XVMC_MPEG1/2/4,XVMC_H263 without XVMC_IDCT
-  int idct;//does we use IDCT acceleration?
+  int idct;//Do we use IDCT acceleration?
   int chroma_format;//420,422,444
   int unsigned_intra;//+-128 for intra pictures after clip
   XvMCSurface* p_surface;//pointer to rendered surface, never changed
@@ -45,14 +61,14 @@ typedef   struct{
   XvMCSurface* p_past_surface;//pointer to the past surface
   XvMCSurface* p_future_surface;//pointer to  the future prediction surface
 
-  unsigned int picture_structure;//top/bottom fields or frame  !
+  unsigned int picture_structure;//top/bottom fields or frame!
   unsigned int flags;//XVMC_SECOND_FIELD - 1'st or 2'd field in the sequence
   unsigned int display_flags; //1,2 or 1+2 fields for XvMCPutSurface,
 
-//these are internal communication one
-  int state;//0-free,1 Waiting to Display,2 Waiting for prediction
-  int start_mv_blocks_num;//offset in the array for the current slice,updated by vo
-  int filled_mv_blocks_num;//processed mv block in this slice,change by decoder
+//these are internal communication ones
+  int state;//0-free, 1 Waiting to Display, 2 Waiting for prediction
+  int start_mv_blocks_num;//offset in the array for the current slice, updated by vo
+  int filled_mv_blocks_num;//processed mv block in this slice, changed by decoder
 
   int next_free_data_block_num;//used in add_mv_block, pointer to next free block
 //extensions
@@ -70,8 +86,4 @@ typedef   struct{
 
 } xvmc_render_state_t;
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif /* FFMPEG_XVMC_RENDER_H */

@@ -71,7 +71,7 @@ static int vid_read_header(AVFormatContext *s,
 
     stream = av_new_stream(s, 0);
     if (!stream)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     av_set_pts_info(stream, 32, 1, 60);     // 16 ms increments, i.e. 60 fps
     stream->codec->codec_type = CODEC_TYPE_VIDEO;
     stream->codec->codec_id = CODEC_ID_BETHSOFTVID;
@@ -84,7 +84,7 @@ static int vid_read_header(AVFormatContext *s,
     // done with video codec, set up audio codec
     stream = av_new_stream(s, 0);
     if (!stream)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     stream->codec->codec_type = CODEC_TYPE_AUDIO;
     stream->codec->codec_id = CODEC_ID_PCM_U8;
     stream->codec->channels = 1;
@@ -104,11 +104,11 @@ static int read_frame(BVID_DemuxContext *vid, ByteIOContext *pb, AVPacket *pkt,
     int code;
     int bytes_copied = 0;
     int position;
-    size_t vidbuf_capacity;
+    unsigned int vidbuf_capacity;
 
     vidbuf_start = av_malloc(vidbuf_capacity = BUFFER_PADDING_SIZE);
     if(!vidbuf_start)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     // save the file position for the packet, include block type
     position = url_ftell(pb) - 1;
@@ -128,7 +128,7 @@ static int read_frame(BVID_DemuxContext *vid, ByteIOContext *pb, AVPacket *pkt,
     do{
         vidbuf_start = av_fast_realloc(vidbuf_start, &vidbuf_capacity, vidbuf_nbytes + BUFFER_PADDING_SIZE);
         if(!vidbuf_start)
-            return AVERROR_NOMEM;
+            return AVERROR(ENOMEM);
 
         code = get_byte(pb);
         vidbuf_start[vidbuf_nbytes++] = code;
@@ -179,7 +179,7 @@ static int vid_read_packet(AVFormatContext *s,
     int ret_value;
 
     if(vid->is_finished || url_feof(pb))
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     block_type = get_byte(pb);
     switch(block_type){
@@ -188,7 +188,7 @@ static int vid_read_packet(AVFormatContext *s,
             ret_value = av_get_packet(pb, pkt, 3 * 256 + 1);
             if(ret_value != 3 * 256 + 1){
                 av_free_packet(pkt);
-                return AVERROR_IO;
+                return AVERROR(EIO);
             }
             pkt->stream_index = 0;
             return ret_value;
@@ -202,7 +202,7 @@ static int vid_read_packet(AVFormatContext *s,
             audio_length = get_le16(pb);
             ret_value = av_get_packet(pb, pkt, audio_length);
             pkt->stream_index = 1;
-            return (ret_value != audio_length ? AVERROR_IO : ret_value);
+            return (ret_value != audio_length ? AVERROR(EIO) : ret_value);
 
         case VIDEO_P_FRAME:
         case VIDEO_YOFF_P_FRAME:
@@ -214,7 +214,7 @@ static int vid_read_packet(AVFormatContext *s,
             if(vid->nframes != 0)
                 av_log(s, AV_LOG_VERBOSE, "reached terminating character but not all frames read.\n");
             vid->is_finished = 1;
-            return AVERROR_IO;
+            return AVERROR(EIO);
         default:
             av_log(s, AV_LOG_ERROR, "unknown block (character = %c, decimal = %d, hex = %x)!!!\n",
                    block_type, block_type, block_type); return -1;

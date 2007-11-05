@@ -48,12 +48,6 @@
     SUMSUBD2_AB( s13, d13, t )\
     SUMSUB_BADC( d13, s02, s13, d02 )
 
-#define TRANSPOSE4(a,b,c,d,t)\
-    SBUTTERFLY(a,b,t,wd) /* a=aebf t=cgdh */\
-    SBUTTERFLY(c,d,b,wd) /* c=imjn b=kolp */\
-    SBUTTERFLY(a,c,d,dq) /* a=aeim d=bfjn */\
-    SBUTTERFLY(t,b,c,dq) /* t=cgko c=dhlp */
-
 #define STORE_DIFF_4P( p, t, z ) \
     "psraw      $6,     "#p" \n\t"\
     "movd       (%0),   "#t" \n\t"\
@@ -370,7 +364,7 @@ static void ff_h264_idct8_dc_add_mmx2(uint8_t *dst, int16_t *block, int stride)
         "paddusb %%mm6              , %%mm2 \n\t"
 
 // in: mm0=p1 mm1=p0 mm2=q0 mm3=q1 mm7=(tc&mask) %8=mm_bone
-// out: (q1addr) = clip( (q2+((p0+q0+1)>>1))>>1, q1-tc0, q1+tc0 )
+// out: (q1addr) = av_clip( (q2+((p0+q0+1)>>1))>>1, q1-tc0, q1+tc0 )
 // clobbers: q2, tmp, tc0
 #define H264_DEBLOCK_Q1(p1, q2, q2addr, q1addr, tc0, tmp)\
         "movq     %%mm1,  "#tmp"   \n\t"\

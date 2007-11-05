@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -28,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common.h"
 #include "avcodec.h"
 
 #include <zlib.h>
@@ -145,9 +143,7 @@ static int encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, void 
     if(chpal){
         uint8_t tpal[3];
         for(i = 0; i < 256; i++){
-            tpal[0] = palptr[i] >> 16;
-            tpal[1] = palptr[i] >>  8;
-            tpal[2] = palptr[i];
+            AV_WB24(tpal, palptr[i]);
             c->work_buf[work_size++] = tpal[0] ^ c->pal[i * 3 + 0];
             c->work_buf[work_size++] = tpal[1] ^ c->pal[i * 3 + 1];
             c->work_buf[work_size++] = tpal[2] ^ c->pal[i * 3 + 2];
@@ -159,9 +155,7 @@ static int encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, void 
     }
     if(keyframe){
         for(i = 0; i < 256; i++){
-            c->pal[i*3 + 0] = palptr[i] >> 16;
-            c->pal[i*3 + 1] = palptr[i] >>  8;
-            c->pal[i*3 + 2] = palptr[i];
+            AV_WB24(c->pal+(i*3), palptr[i]);
         }
         memcpy(c->work_buf, c->pal, 768);
         memcpy(c->pal2, p->data[1], 1024);

@@ -3,6 +3,8 @@
  * Copyright (c) 2000, 2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
+ * alternative bitstream reader & writer by Michael Niedermayer <michaelni@gmx.at>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -18,8 +20,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * alternative bitstream reader & writer by Michael Niedermayer <michaelni@gmx.at>
  */
 
 /**
@@ -36,6 +36,8 @@
  * @param[in] ptr The block of memory to reallocate.
  * @param[in] size The requested size.
  * @return Block of memory of requested size.
+ * @deprecated. Code which uses ff_realloc_static is broken/misdesigned
+ * and should correctly use static arrays
  */
 attribute_deprecated void *ff_realloc_static(void *ptr, unsigned int size);
 
@@ -56,6 +58,28 @@ void ff_put_string(PutBitContext * pbc, char *s, int put_zero)
     }
     if(put_zero)
         put_bits(pbc, 8, 0);
+}
+
+void ff_copy_bits(PutBitContext *pb, uint8_t *src, int length)
+{
+    const uint16_t *srcw= (uint16_t*)src;
+    int words= length>>4;
+    int bits= length&15;
+    int i;
+
+    if(length==0) return;
+
+    if(ENABLE_SMALL || words < 16 || put_bits_count(pb)&7){
+        for(i=0; i<words; i++) put_bits(pb, 16, be2me_16(srcw[i]));
+    }else{
+        for(i=0; put_bits_count(pb)&31; i++)
+            put_bits(pb, 8, src[i]);
+        flush_put_bits(pb);
+        memcpy(pbBufPtr(pb), src+i, 2*words-i);
+        skip_put_bytes(pb, 2*words-i);
+    }
+
+    put_bits(pb, bits, be2me_16(srcw[words])>>(16-bits));
 }
 
 /* VLC decoding */
@@ -102,16 +126,17 @@ static int build_table(VLC *vlc, int table_nb_bits,
                        int nb_codes,
                        const void *bits, int bits_wrap, int bits_size,
                        const void *codes, int codes_wrap, int codes_size,
+                       const void *symbols, int symbols_wrap, int symbols_size,
                        uint32_t code_prefix, int n_prefix, int flags)
 {
-    int i, j, k, n, table_size, table_index, nb, n1, index, code_prefix2;
+    int i, j, k, n, table_size, table_index, nb, n1, index, code_prefix2, symbol;
     uint32_t code;
     VLC_TYPE (*table)[2];
 
     table_size = 1 << table_nb_bits;
     table_index = alloc_table(vlc, table_size, flags & INIT_VLC_USE_STATIC);
 #ifdef DEBUG_VLC
-    printf("new table index=%d size=%d code_prefix=%x n=%d\n",
+    av_log(NULL,AV_LOG_DEBUG,"new table index=%d size=%d code_prefix=%x n=%d\n",
            table_index, table_size, code_prefix, n_prefix);
 #endif
     if (table_index < 0)
@@ -130,8 +155,12 @@ static int build_table(VLC *vlc, int table_nb_bits,
         /* we accept tables with holes */
         if (n <= 0)
             continue;
+        if (!symbols)
+            symbol = i;
+        else
+            GET_DATA(symbol, symbols, i, symbols_wrap, symbols_size);
 #if defined(DEBUG_VLC) && 0
-        printf("i=%d n=%d code=0x%x\n", i, n, code);
+        av_log(NULL,AV_LOG_DEBUG,"i=%d n=%d code=0x%x\n", i, n, code);
 #endif
         /* if code matches the prefix, it is in the table */
         n -= n_prefix;
@@ -156,14 +185,14 @@ static int build_table(VLC *vlc, int table_nb_bits,
                         return -1;
                     }
                     table[j][1] = n; //bits
-                    table[j][0] = i; //code
+                    table[j][0] = symbol;
                     j++;
                 }
             } else {
                 n -= table_nb_bits;
                 j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
 #ifdef DEBUG_VLC
-                printf("%4x: n=%d (subtable)\n",
+                av_log(NULL,AV_LOG_DEBUG,"%4x: n=%d (subtable)\n",
                        j, n);
 #endif
                 /* compute table size */
@@ -187,6 +216,7 @@ static int build_table(VLC *vlc, int table_nb_bits,
             index = build_table(vlc, n, nb_codes,
                                 bits, bits_wrap, bits_size,
                                 codes, codes_wrap, codes_size,
+                                symbols, symbols_wrap, symbols_size,
                                 (flags & INIT_VLC_LE) ? (code_prefix | (i << n_prefix)) : ((code_prefix << table_nb_bits) | i),
                                 n_prefix + table_nb_bits, flags);
             if (index < 0)
@@ -212,6 +242,8 @@ static int build_table(VLC *vlc, int table_nb_bits,
 
    'codes' : table which gives the bit pattern of of each vlc code.
 
+   'symbols' : table which gives the values to be returned from get_vlc().
+
    'xxx_wrap' : give the number of bytes between each entry of the
    'bits' or 'codes' tables.
 
@@ -219,14 +251,15 @@ static int build_table(VLC *vlc, int table_nb_bits,
    or 'codes' tables.
 
    'wrap' and 'size' allows to use any memory configuration and types
-   (byte/word/long) to store the 'bits' and 'codes' tables.
+   (byte/word/long) to store the 'bits', 'codes', and 'symbols' tables.
 
    'use_static' should be set to 1 for tables, which should be freed
    with av_free_static(), 0 if free_vlc() will be used.
 */
-int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
+int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
+             const void *symbols, int symbols_wrap, int symbols_size,
              int flags)
 {
     vlc->bits = nb_bits;
@@ -242,14 +275,15 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
     }
 
 #ifdef DEBUG_VLC
-    printf("build table nb_codes=%d\n", nb_codes);
+    av_log(NULL,AV_LOG_DEBUG,"build table nb_codes=%d\n", nb_codes);
 #endif
 
     if (build_table(vlc, nb_bits, nb_codes,
                     bits, bits_wrap, bits_size,
                     codes, codes_wrap, codes_size,
+                    symbols, symbols_wrap, symbols_size,
                     0, 0, flags) < 0) {
-        av_free(vlc->table);
+        av_freep(&vlc->table);
         return -1;
     }
     return 0;
@@ -258,6 +292,6 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
 
 void free_vlc(VLC *vlc)
 {
-    av_free(vlc->table);
+    av_freep(&vlc->table);
 }
 

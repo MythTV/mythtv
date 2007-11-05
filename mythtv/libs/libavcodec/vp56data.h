@@ -18,11 +18,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef VP56DATA_H
-#define VP56DATA_H
+#ifndef FFMPEG_VP56DATA_H
+#define FFMPEG_VP56DATA_H
 
 #include "common.h"
 
@@ -30,7 +30,9 @@ typedef enum {
     VP56_FRAME_CURRENT  = 0,
     VP56_FRAME_PREVIOUS = 1,
     VP56_FRAME_GOLDEN   = 2,
-    VP56_FRAME_UNUSED   = 3,
+    VP56_FRAME_GOLDEN2  = 3,
+    VP56_FRAME_UNUSED   = 4,
+    VP56_FRAME_UNUSED2  = 5,
 } vp56_frame_t;
 
 typedef enum {
@@ -51,7 +53,7 @@ typedef struct {
   int8_t prob_idx;
 } vp56_tree_t;
 
-extern const uint8_t vp56_b6to3[];
+extern const uint8_t vp56_b2p[];
 extern const uint8_t vp56_b6to4[];
 extern const uint8_t vp56_coeff_parse_table[6][11];
 extern const uint8_t vp56_def_mb_types_stats[3][10][2];
@@ -246,4 +248,4 @@ static const int8_t vp56_candidate_predictor_pos[12][2] = {
     {  2, -2 },
 };
 
-#endif /* VP56DATA */
+#endif /* FFMPEG_VP56DATA_H */

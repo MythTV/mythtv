@@ -16,123 +16,15 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#define SLICE_MIN_START_CODE    0x00000101
-#define SLICE_MAX_START_CODE    0x000001af
-#define EXT_START_CODE          0x000001b5
-#define USER_START_CODE         0x000001b2
-#define SEQ_START_CODE          0x000001b0
-#define PIC_I_START_CODE        0x000001b3
-#define PIC_PB_START_CODE       0x000001b6
+#ifndef FFMPEG_CAVSDATA_H
+#define FFMPEG_CAVSDATA_H
 
-#define A_AVAIL                          1
-#define B_AVAIL                          2
-#define C_AVAIL                          4
-#define D_AVAIL                          8
-#define NOT_AVAIL                       -1
-#define REF_INTRA                       -2
-#define REF_DIR                         -3
+#include "cavs.h"
 
-#define ESCAPE_CODE                     59
-
-#define FWD0                          0x01
-#define FWD1                          0x02
-#define BWD0                          0x04
-#define BWD1                          0x08
-#define SYM0                          0x10
-#define SYM1                          0x20
-#define SPLITH                        0x40
-#define SPLITV                        0x80
-
-#define MV_BWD_OFFS                     12
-#define MV_STRIDE                        4
-
-enum mb_t {
-  I_8X8 = 0,
-  P_SKIP,
-  P_16X16,
-  P_16X8,
-  P_8X16,
-  P_8X8,
-  B_SKIP,
-  B_DIRECT,
-  B_FWD_16X16,
-  B_BWD_16X16,
-  B_SYM_16X16,
-  B_8X8 = 29
-};
-
-enum sub_mb_t {
-  B_SUB_DIRECT,
-  B_SUB_FWD,
-  B_SUB_BWD,
-  B_SUB_SYM
-};
-
-enum intra_luma_t {
-  INTRA_L_VERT,
-  INTRA_L_HORIZ,
-  INTRA_L_LP,
-  INTRA_L_DOWN_LEFT,
-  INTRA_L_DOWN_RIGHT,
-  INTRA_L_LP_LEFT,
-  INTRA_L_LP_TOP,
-  INTRA_L_DC_128
-};
-
-enum intra_chroma_t {
-  INTRA_C_LP,
-  INTRA_C_HORIZ,
-  INTRA_C_VERT,
-  INTRA_C_PLANE,
-  INTRA_C_LP_LEFT,
-  INTRA_C_LP_TOP,
-  INTRA_C_DC_128,
-};
-
-enum mv_pred_t {
-  MV_PRED_MEDIAN,
-  MV_PRED_LEFT,
-  MV_PRED_TOP,
-  MV_PRED_TOPRIGHT,
-  MV_PRED_PSKIP,
-  MV_PRED_BSKIP
-};
-
-enum block_t {
-  BLK_16X16,
-  BLK_16X8,
-  BLK_8X16,
-  BLK_8X8
-};
-
-enum mv_loc_t {
-  MV_FWD_D3 = 0,
-  MV_FWD_B2,
-  MV_FWD_B3,
-  MV_FWD_C2,
-  MV_FWD_A1,
-  MV_FWD_X0,
-  MV_FWD_X1,
-  MV_FWD_A3 = 8,
-  MV_FWD_X2,
-  MV_FWD_X3,
-  MV_BWD_D3 = MV_BWD_OFFS,
-  MV_BWD_B2,
-  MV_BWD_B3,
-  MV_BWD_C2,
-  MV_BWD_A1,
-  MV_BWD_X0,
-  MV_BWD_X1,
-  MV_BWD_A3 = MV_BWD_OFFS+8,
-  MV_BWD_X2,
-  MV_BWD_X3
-};
-
-#ifdef CONFIG_CAVS_DECODER
-static const uint8_t partition_flags[30] = {
+const uint8_t ff_cavs_partition_flags[30] = {
   0,                                 //I_8X8
   0,                                 //P_SKIP
   0,                                 //P_16X16
@@ -165,32 +57,16 @@ static const uint8_t partition_flags[30] = {
                       SPLITH|SPLITV, //B_8X8 = 29
 };
 
-static const uint8_t scan3x3[4] = {4,5,7,8};
+const uint8_t ff_cavs_scan3x3[4] = {4,5,7,8};
 
-static const uint8_t mv_scan[4] = {
-    MV_FWD_X0,MV_FWD_X1,
-    MV_FWD_X2,MV_FWD_X3
-};
-
-static const uint8_t cbp_tab[64][2] = {
-  {63, 0},{15,15},{31,63},{47,31},{ 0,16},{14,32},{13,47},{11,13},
-  { 7,14},{ 5,11},{10,12},{ 8, 5},{12,10},{61, 7},{ 4,48},{55, 3},
-  { 1, 2},{ 2, 8},{59, 4},{ 3, 1},{62,61},{ 9,55},{ 6,59},{29,62},
-  {45,29},{51,27},{23,23},{39,19},{27,30},{46,28},{53, 9},{30, 6},
-  {43,60},{37,21},{60,44},{16,26},{21,51},{28,35},{19,18},{35,20},
-  {42,24},{26,53},{44,17},{32,37},{58,39},{24,45},{20,58},{17,43},
-  {18,42},{48,46},{22,36},{33,33},{25,34},{49,40},{40,52},{36,49},
-  {34,50},{50,56},{52,25},{54,22},{41,54},{56,57},{38,41},{57,38}
-};
-
-static const uint8_t chroma_qp[64] = {
+const uint8_t ff_cavs_chroma_qp[64] = {
   0,  1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
   16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
   32,33,34,35,36,37,38,39,40,41,42,42,43,43,44,44,
   45,45,46,46,47,47,48,48,48,49,49,49,50,50,50,51
 };
 
-static const uint8_t dequant_shift[64] = {
+const uint8_t ff_cavs_dequant_shift[64] = {
   14,14,14,14,14,14,14,14,
   13,13,13,13,13,13,13,13,
   13,12,12,12,12,12,12,12,
@@ -201,7 +77,7 @@ static const uint8_t dequant_shift[64] = {
   7, 7, 7, 7, 7, 7, 7, 7
 };
 
-static const uint16_t dequant_mul[64] = {
+const uint16_t ff_cavs_dequant_mul[64] = {
   32768,36061,38968,42495,46341,50535,55437,60424,
   32932,35734,38968,42495,46177,50535,55109,59933,
   65535,35734,38968,42577,46341,50617,55027,60097,
@@ -212,35 +88,20 @@ static const uint16_t dequant_mul[64] = {
   32771,35734,38965,42497,46341,50535,55109,60099
 };
 
-DECLARE_ALIGNED_8(typedef, struct) {
-    int16_t x;
-    int16_t y;
-    int16_t dist;
-    int16_t ref;
-} vector_t;
-
 /** marks block as unavailable, i.e. out of picture
     or not yet decoded */
-static const vector_t un_mv    = {0,0,1,NOT_AVAIL};
+const vector_t ff_cavs_un_mv    = {0,0,1,NOT_AVAIL};
 
 /** marks block as "no prediction from this direction"
     e.g. forward motion vector in BWD partition */
-static const vector_t dir_mv   = {0,0,1,REF_DIR};
+const vector_t ff_cavs_dir_mv   = {0,0,1,REF_DIR};
 
 /** marks block as using intra prediction */
-static const vector_t intra_mv = {0,0,1,REF_INTRA};
-
-typedef struct residual_vlc_t {
-  int8_t rltab[59][3];
-  int8_t level_add[27];
-  int8_t golomb_order;
-  int inc_limit;
-  int8_t max_run;
-} residual_vlc_t;
+const vector_t ff_cavs_intra_mv = {0,0,1,REF_INTRA};
 
 #define EOB 0,0,0
 
-static const residual_vlc_t intra_2dvlc[7] = {
+const dec_2dvlc_t ff_cavs_intra_dec[7] = {
   {
     { //level / run / table_inc
       {  1, 1, 1},{ -1, 1, 1},{  1, 2, 1},{ -1, 2, 1},{  1, 3, 1},{ -1, 3, 1},
@@ -377,7 +238,7 @@ static const residual_vlc_t intra_2dvlc[7] = {
   }
 };
 
-static const residual_vlc_t inter_2dvlc[7] = {
+const dec_2dvlc_t ff_cavs_inter_dec[7] = {
   {
     { //level / run
       {  1, 1, 1},{ -1, 1, 1},{  1, 2, 1},{ -1, 2, 1},{  1, 3, 1},{ -1, 3, 1},
@@ -514,7 +375,7 @@ static const residual_vlc_t inter_2dvlc[7] = {
   }
 };
 
-static const residual_vlc_t chroma_2dvlc[5] = {
+const dec_2dvlc_t ff_cavs_chroma_dec[5] = {
   {
     { //level / run
       {  1, 1, 1},{ -1, 1, 1},{  1, 2, 1},{ -1, 2, 1},{  1, 3, 1},{ -1, 3, 1},
@@ -636,8 +497,9 @@ static const uint8_t tc_tab[64] = {
   5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9
 };
 
-static const int_fast8_t left_modifier_l[8] = { 0,-1, 6,-1,-1, 7, 6, 7};
-static const int_fast8_t top_modifier_l[8]  = {-1, 1, 5,-1,-1, 5, 7, 7};
-static const int_fast8_t left_modifier_c[7] = { 5,-1, 2,-1, 6, 5, 6};
-static const int_fast8_t top_modifier_c[7]  = { 4, 1,-1,-1, 4, 6, 6};
-#endif /* CONFIG_CAVS_DECODER */
+const int_fast8_t ff_left_modifier_l[8] = { 0,-1, 6,-1,-1, 7, 6, 7};
+const int_fast8_t ff_top_modifier_l[8]  = {-1, 1, 5,-1,-1, 5, 7, 7};
+const int_fast8_t ff_left_modifier_c[7] = { 5,-1, 2,-1, 6, 5, 6};
+const int_fast8_t ff_top_modifier_c[7]  = { 4, 1,-1,-1, 4, 6, 6};
+
+#endif /* FFMPEG_CAVSDATA_H */

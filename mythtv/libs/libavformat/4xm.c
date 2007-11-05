@@ -44,6 +44,9 @@
 #define  ifrm_TAG MKTAG('i', 'f', 'r', 'm')
 #define  pfrm_TAG MKTAG('p', 'f', 'r', 'm')
 #define  cfrm_TAG MKTAG('c', 'f', 'r', 'm')
+#define  ifr2_TAG MKTAG('i', 'f', 'r', '2')
+#define  pfr2_TAG MKTAG('p', 'f', 'r', '2')
+#define  cfr2_TAG MKTAG('c', 'f', 'r', '2')
 #define  snd__TAG MKTAG('s', 'n', 'd', '_')
 
 #define vtrk_SIZE 0x44
@@ -116,9 +119,9 @@ static int fourxm_read_header(AVFormatContext *s,
     /* allocate space for the header and load the whole thing */
     header = av_malloc(header_size);
     if (!header)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     if (get_buffer(pb, header, header_size) != header_size)
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     /* take the lazy approach and search for any and all vtrk and strk chunks */
     for (i = 0; i < header_size - 8; i++) {
@@ -135,22 +138,24 @@ static int fourxm_read_header(AVFormatContext *s,
             }
             fourxm->width = AV_RL32(&header[i + 36]);
             fourxm->height = AV_RL32(&header[i + 40]);
-            i += 8 + size;
 
             /* allocate a new AVStream */
             st = av_new_stream(s, 0);
             if (!st)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
             av_set_pts_info(st, 60, 1, fourxm->fps);
 
             fourxm->video_stream_index = st->index;
 
             st->codec->codec_type = CODEC_TYPE_VIDEO;
             st->codec->codec_id = CODEC_ID_4XM;
-            st->codec->codec_tag = 0;  /* no fourcc */
+            st->codec->extradata_size = 4;
+            st->codec->extradata = av_malloc(4);
+            AV_WL32(st->codec->extradata, AV_RL32(&header[i + 16]));
             st->codec->width = fourxm->width;
             st->codec->height = fourxm->height;
 
+            i += 8 + size;
         } else if (fourcc_tag == strk_TAG) {
             /* check that there is enough data */
             if (size != strk_SIZE) {
@@ -166,7 +171,7 @@ static int fourxm_read_header(AVFormatContext *s,
                     fourxm->track_count * sizeof(AudioTrack));
                 if (!fourxm->tracks) {
                     av_free(header);
-                    return AVERROR_NOMEM;
+                    return AVERROR(ENOMEM);
                 }
             }
             fourxm->tracks[current_track].adpcm = AV_RL32(&header[i + 12]);
@@ -178,7 +183,7 @@ static int fourxm_read_header(AVFormatContext *s,
             /* allocate a new AVStream */
             st = av_new_stream(s, current_track);
             if (!st)
-                return AVERROR_NOMEM;
+                return AVERROR(ENOMEM);
 
             av_set_pts_info(st, 60, 1, fourxm->tracks[current_track].sample_rate);
 
@@ -235,7 +240,7 @@ static int fourxm_read_packet(AVFormatContext *s,
         fourcc_tag = AV_RL32(&header[0]);
         size = AV_RL32(&header[4]);
         if (url_feof(pb))
-            return AVERROR_IO;
+            return AVERROR(EIO);
         switch (fourcc_tag) {
 
         case LIST_TAG:
@@ -248,12 +253,16 @@ static int fourxm_read_packet(AVFormatContext *s,
 
         case ifrm_TAG:
         case pfrm_TAG:
-        case cfrm_TAG:{
+        case cfrm_TAG:
+        case ifr2_TAG:
+        case pfr2_TAG:
+        case cfr2_TAG:
+        {
 
             /* allocate 8 more bytes than 'size' to account for fourcc
              * and size */
             if (size + 8 < size || av_new_packet(pkt, size + 8))
-                return AVERROR_IO;
+                return AVERROR(EIO);
             pkt->stream_index = fourxm->video_stream_index;
             pkt->pts = fourxm->video_pts;
             pkt->pos = url_ftell(&s->pb);
@@ -275,7 +284,7 @@ static int fourxm_read_packet(AVFormatContext *s,
             if (track_number == fourxm->selected_track) {
                 ret= av_get_packet(&s->pb, pkt, size);
                 if(ret<0)
-                    return AVERROR_IO;
+                    return AVERROR(EIO);
                 pkt->stream_index =
                     fourxm->tracks[fourxm->selected_track].stream_index;
                 pkt->pts = fourxm->audio_pts;

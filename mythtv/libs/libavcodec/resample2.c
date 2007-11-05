@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -27,7 +26,6 @@
  */
 
 #include "avcodec.h"
-#include "common.h"
 #include "dsputil.h"
 
 #ifndef CONFIG_RESAMPLE_HP
@@ -178,8 +176,8 @@ void av_build_filter(FELEM *filter, double factor, int tap_count, int phase_coun
 }
 
 /**
- * initalizes a audio resampler.
- * note, if either rate is not a integer then simply scale both rates up so they are
+ * Initializes an audio resampler.
+ * Note, if either rate is not an integer then simply scale both rates up so they are.
  */
 AVResampleContext *av_resample_init(int out_rate, int in_rate, int filter_size, int phase_shift, int linear, double cutoff){
     AVResampleContext *c= av_mallocz(sizeof(AVResampleContext));
@@ -281,7 +279,7 @@ int av_resample(AVResampleContext *c, short *dst, short *src, int *consumed, int
         }
 
 #ifdef CONFIG_RESAMPLE_AUDIOPHILE_KIDDY_MODE
-        dst[dst_index] = av_clip(lrintf(val), -32768, 32767);
+        dst[dst_index] = av_clip_int16(lrintf(val));
 #else
         val = (val + (1<<(FILTER_SHIFT-1)))>>FILTER_SHIFT;
         dst[dst_index] = (unsigned)(val + 32768) > 65535 ? (val>>31) ^ 32767 : val;

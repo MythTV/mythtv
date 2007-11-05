@@ -20,7 +20,6 @@
  */
 
 #include "avformat.h"
-#include "allformats.h"
 #include "bswap.h"
 
 // specs say that maximum block size is 1Mb
@@ -86,7 +85,7 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
     }
     wc->blksize = size;
     ver = get_le16(pb);
-    if(ver < 0x402 || ver > 0x40F){
+    if(ver < 0x402 || ver > 0x410){
         av_log(ctx, AV_LOG_ERROR, "Unsupported version %03X\n", ver);
         return -1;
     }
@@ -103,10 +102,6 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
     }
     if(wc->flags & WV_HYBRID){
         av_log(ctx, AV_LOG_ERROR, "Hybrid coding mode is not supported\n");
-        return -1;
-    }
-    if(wc->flags & WV_INT32){
-        av_log(ctx, AV_LOG_ERROR, "Integer point data is not supported\n");
         return -1;
     }
 
@@ -177,12 +172,12 @@ static int wv_read_packet(AVFormatContext *s,
     }
 
     if(av_new_packet(pkt, wc->blksize + WV_EXTRA_SIZE) < 0)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     memcpy(pkt->data, wc->extra, WV_EXTRA_SIZE);
     ret = get_buffer(&s->pb, pkt->data + WV_EXTRA_SIZE, wc->blksize);
     if(ret != wc->blksize){
         av_free_packet(pkt);
-        return AVERROR_IO;
+        return AVERROR(EIO);
     }
     pkt->stream_index = 0;
     wc->block_parsed = 1;

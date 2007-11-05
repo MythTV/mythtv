@@ -16,8 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "avformat.h"
@@ -78,7 +77,7 @@ static int read_header(AVFormatContext *s,
 
     video = av_new_stream(s, 0);
     if (!video)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     video->codec->codec_type = CODEC_TYPE_VIDEO;
     video->codec->codec_id = CODEC_ID_C93;
@@ -116,7 +115,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
             if (!c93->audio) {
                 c93->audio = av_new_stream(s, 1);
                 if (!c93->audio)
-                    return AVERROR_NOMEM;
+                    return AVERROR(ENOMEM);
                 c93->audio->codec->codec_type = CODEC_TYPE_AUDIO;
             }
             url_fskip(pb, 26); /* VOC header */
@@ -130,7 +129,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
     }
     if (c93->current_frame >= br->frames) {
         if (c93->current_block >= 511 || !br[1].length)
-            return AVERROR_IO;
+            return AVERROR(EIO);
         br++;
         c93->current_block++;
         c93->current_frame = 0;
@@ -155,7 +154,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
     ret = get_buffer(pb, pkt->data + 1, datasize);
     if (ret < datasize) {
-        ret = AVERROR_IO;
+        ret = AVERROR(EIO);
         goto fail;
     }
 
@@ -169,7 +168,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
         pkt->data[0] |= C93_HAS_PALETTE;
         ret = get_buffer(pb, pkt->data + pkt->size, datasize);
         if (ret < datasize) {
-            ret = AVERROR_IO;
+            ret = AVERROR(EIO);
             goto fail;
         }
         pkt->size += 768;

@@ -195,12 +195,12 @@ int rv_decode_dc(MpegEncContext *s, int n)
             } else if (code == 0x7d) {
                 code = -128 + get_bits(&s->gb, 7);
             } else if (code == 0x7e) {
-                if (get_bits(&s->gb, 1) == 0)
+                if (get_bits1(&s->gb) == 0)
                     code = (int8_t)(get_bits(&s->gb, 8) + 1);
                 else
                     code = (int8_t)(get_bits(&s->gb, 8));
             } else if (code == 0x7f) {
-                get_bits(&s->gb, 11);
+                skip_bits(&s->gb, 11);
                 code = 1;
             }
         } else {
@@ -216,7 +216,7 @@ int rv_decode_dc(MpegEncContext *s, int n)
             } else if (code == 0x1fd) {
                 code = -128 + get_bits(&s->gb, 7);
             } else if (code == 0x1fe) {
-                get_bits(&s->gb, 9);
+                skip_bits(&s->gb, 9);
                 code = 1;
             } else {
                 av_log(s->avctx, AV_LOG_ERROR, "chroma dc error\n");
@@ -312,15 +312,15 @@ static int rv10_decode_picture_header(MpegEncContext *s)
     int mb_count, pb_frame, marker, unk, mb_xy;
 
 //printf("ff:%d\n", full_frame);
-    marker = get_bits(&s->gb, 1);
+    marker = get_bits1(&s->gb);
 
-    if (get_bits(&s->gb, 1))
+    if (get_bits1(&s->gb))
         s->pict_type = P_TYPE;
     else
         s->pict_type = I_TYPE;
 //printf("h:%X ver:%d\n",h,s->rv10_version);
     if(!marker) av_log(s->avctx, AV_LOG_ERROR, "marker missing\n");
-    pb_frame = get_bits(&s->gb, 1);
+    pb_frame = get_bits1(&s->gb);
 
 #ifdef DEBUG
     av_log(s->avctx, AV_LOG_DEBUG, "pict_type=%d pb_frame=%d\n", s->pict_type, pb_frame);
@@ -416,7 +416,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
         return -1;
     }
 
-    if (get_bits(&s->gb, 1)){
+    if (get_bits1(&s->gb)){
         av_log(s->avctx, AV_LOG_ERROR, "unknown bit set\n");
         return -1;
     }
@@ -427,7 +427,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
         return -1;
     }
     if(s->avctx->sub_id == 0x30203002){
-        if (get_bits(&s->gb, 1)){
+        if (get_bits1(&s->gb)){
             av_log(s->avctx, AV_LOG_ERROR, "unknown bit2 set\n");
             return -1;
         }
@@ -437,7 +437,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
         int f, new_w, new_h;
         int v= s->avctx->extradata_size >= 4 ? 7&((uint8_t*)s->avctx->extradata)[1] : 0;
 
-        if (get_bits(&s->gb, 1)){
+        if (get_bits1(&s->gb)){
             av_log(s->avctx, AV_LOG_ERROR, "unknown bit3 set\n");
 //            return -1;
         }
@@ -539,43 +539,29 @@ static int rv10_decode_init(AVCodecContext *avctx)
     s->h263_long_vectors= ((uint8_t*)avctx->extradata)[3] & 1;
     avctx->sub_id= AV_RB32((uint8_t*)avctx->extradata + 4);
 
-    switch(avctx->sub_id){
-    case 0x10000000:
+    if (avctx->sub_id == 0x10000000) {
         s->rv10_version= 0;
         s->low_delay=1;
-        break;
-    case 0x10002000:
+    } else if (avctx->sub_id == 0x10002000) {
         s->rv10_version= 3;
         s->low_delay=1;
         s->obmc=1;
-        break;
-    case 0x10003000:
+    } else if (avctx->sub_id == 0x10003000) {
         s->rv10_version= 3;
         s->low_delay=1;
-        break;
-    case 0x10003001:
+    } else if (avctx->sub_id == 0x10003001) {
         s->rv10_version= 3;
         s->low_delay=1;
-        break;
-    case 0x20001000: /* real rv20 decoder fail on this id */
-    /*case 0x20100001:
-    case 0x20101001:
-    case 0x20103001:*/
-    case 0x20100000 ... 0x2019ffff:
+    } else if (    avctx->sub_id == 0x20001000
+               || (avctx->sub_id >= 0x20100000 && avctx->sub_id < 0x201a0000)) {
         s->low_delay=1;
-        break;
-    /*case 0x20200002:
-    case 0x20201002:
-    case 0x20203002:*/
-    case 0x20200002 ... 0x202fffff:
-    case 0x30202002:
-    case 0x30203002:
+    } else if (    avctx->sub_id == 0x30202002
+               ||  avctx->sub_id == 0x30203002
+               || (avctx->sub_id >= 0x20200002 && avctx->sub_id < 0x20300000)) {
         s->low_delay=0;
         s->avctx->has_b_frames=1;
-        break;
-    default:
+    } else
         av_log(s->avctx, AV_LOG_ERROR, "unknown header %X\n", avctx->sub_id);
-    }
 
     if(avctx->debug & FF_DEBUG_PICT_INFO){
         av_log(avctx, AV_LOG_DEBUG, "ver:%X ver0:%X\n", avctx->sub_id, avctx->extradata_size >= 4 ? ((uint32_t*)avctx->extradata)[0] : -1);
@@ -725,6 +711,12 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     return buf_size;
 }
 
+static int get_slice_offset(AVCodecContext *avctx, uint8_t *buf, int n)
+{
+    if(avctx->slice_count) return avctx->slice_offset[n];
+    else                   return AV_RL32(buf + n*8);
+}
+
 static int rv10_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
                              uint8_t *buf, int buf_size)
@@ -732,6 +724,8 @@ static int rv10_decode_frame(AVCodecContext *avctx,
     MpegEncContext *s = avctx->priv_data;
     int i;
     AVFrame *pict = data;
+    int slice_count;
+    uint8_t *slices_hdr = NULL;
 
 #ifdef DEBUG
     av_log(avctx, AV_LOG_DEBUG, "*****frame %d size=%d\n", avctx->frame_number, buf_size);
@@ -742,20 +736,23 @@ static int rv10_decode_frame(AVCodecContext *avctx,
         return 0;
     }
 
-    if(avctx->slice_count){
-        for(i=0; i<avctx->slice_count; i++){
-            int offset= avctx->slice_offset[i];
-            int size;
+    if(!avctx->slice_count){
+        slice_count = (*buf++) + 1;
+        slices_hdr = buf + 4;
+        buf += 8 * slice_count;
+    }else
+        slice_count = avctx->slice_count;
 
-            if(i+1 == avctx->slice_count)
-                size= buf_size - offset;
-            else
-                size= avctx->slice_offset[i+1] - offset;
+    for(i=0; i<slice_count; i++){
+        int offset= get_slice_offset(avctx, slices_hdr, i);
+        int size;
 
-            rv10_decode_packet(avctx, buf+offset, size);
-        }
-    }else{
-        rv10_decode_packet(avctx, buf, buf_size);
+        if(i+1 == slice_count)
+            size= buf_size - offset;
+        else
+            size= get_slice_offset(avctx, slices_hdr, i+1) - offset;
+
+        rv10_decode_packet(avctx, buf+offset, size);
     }
 
     if(s->current_picture_ptr != NULL && s->mb_y>=s->mb_height){

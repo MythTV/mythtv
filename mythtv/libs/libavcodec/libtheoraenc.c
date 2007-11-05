@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /*!
@@ -69,8 +69,8 @@ static int concatenate_packet(unsigned int* offset, AVCodecContext* avc_context,
 
     avc_context->extradata = newdata;
     avc_context->extradata_size = newsize;
-    avc_context->extradata[ (*offset)++ ] = packet->bytes >> 8;
-    avc_context->extradata[ (*offset)++ ] = packet->bytes & 0xff;
+    AV_WB16(avc_context->extradata + (*offset), packet->bytes);
+    *offset += 2;
     memcpy( avc_context->extradata + (*offset), packet->packet, packet->bytes );
     (*offset) += packet->bytes;
     return 0;

@@ -19,9 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef FFMPEG_MPEGTS_H
+#define FFMPEG_MPEGTS_H
+
+#include "avformat.h"
 
 #define TS_FEC_PACKET_SIZE 204
 #define TS_DVHS_PACKET_SIZE 192
@@ -63,8 +64,6 @@ extern "C" {
 #define STREAM_TYPE_SUBTITLE_DVB    0x100
 #define STREAM_TYPE_VBI_DVB         0x101
 
-extern AVOutputFormat mpegts_muxer;
-
 typedef struct MpegTSContext MpegTSContext;
 
 MpegTSContext *mpegts_parse_open(AVFormatContext *s);
@@ -73,6 +72,4 @@ int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
 void mpegts_parse_close(MpegTSContext *ts);
 void mpegts_remove_stream(MpegTSContext *ts, int pid);
 
-#ifdef __cplusplus
-}
-#endif
+#endif /* FFMPEG_MPEGTS_H */

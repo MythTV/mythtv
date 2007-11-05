@@ -3,6 +3,10 @@
  * Copyright (c) 2000, 2001 Fabrice Bellard.
  * Copyright (c) 2003-2004 Michael Niedermayer <michaelni@gmx.at>
  *
+ * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
+ * mostly rewritten by Michael Niedermayer <michaelni@gmx.at>
+ * and improved by Zdenek Kabelac <kabi@users.sf.net>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -18,11 +22,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
- * mostly rewritten by Michael Niedermayer <michaelni@gmx.at>
- * and improved by Zdenek Kabelac <kabi@users.sf.net>
  */
+
+/* This header intentionally has no multiple inclusion guards. It is meant to
+ * be included multiple times and generates different code depending on the
+ * value of certain #defines. */
 
 // put_pixels
 static void DEF(put, pixels8_x2)(uint8_t *block, const uint8_t *pixels, int line_size, int h)
@@ -57,7 +61,7 @@ static void DEF(put, pixels8_x2)(uint8_t *block, const uint8_t *pixels, int line
         :REG_a, "memory");
 }
 
-static void attribute_unused DEF(put, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+static void av_unused DEF(put, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
 {
     MOVQ_BFE(mm6);
     __asm __volatile(
@@ -98,7 +102,7 @@ static void attribute_unused DEF(put, pixels8_l2)(uint8_t *dst, uint8_t *src1, u
         "add    %5, %3                  \n\t"
         "subl   $4, %0                  \n\t"
         "jnz    1b                      \n\t"
-#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cant be used
+#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cannot be used
         :"+m"(h), "+a"(src1), "+c"(src2), "+d"(dst)
 #else
         :"+b"(h), "+a"(src1), "+c"(src2), "+d"(dst)
@@ -153,7 +157,7 @@ static void DEF(put, pixels16_x2)(uint8_t *block, const uint8_t *pixels, int lin
         :REG_a, "memory");
 }
 
-static void attribute_unused DEF(put, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+static void av_unused DEF(put, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
 {
     MOVQ_BFE(mm6);
     __asm __volatile(
@@ -193,7 +197,7 @@ static void attribute_unused DEF(put, pixels16_l2)(uint8_t *dst, uint8_t *src1, 
         "add    $32, %2                 \n\t"
         "subl   $2, %0                  \n\t"
         "jnz    1b                      \n\t"
-#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cant be used
+#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cannot be used
         :"+m"(h), "+a"(src1), "+c"(src2), "+d"(dst)
 #else
         :"+b"(h), "+a"(src1), "+c"(src2), "+d"(dst)
@@ -298,7 +302,7 @@ static void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, int lin
 }
 
 // avg_pixels
-static void attribute_unused DEF(avg, pixels4)(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+static void av_unused DEF(avg, pixels4)(uint8_t *block, const uint8_t *pixels, int line_size, int h)
 {
     MOVQ_BFE(mm6);
     JUMPALIGN();
@@ -380,7 +384,7 @@ static void DEF(avg, pixels8_x2)(uint8_t *block, const uint8_t *pixels, int line
     } while (--h);
 }
 
-static __attribute__((unused)) void DEF(avg, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+static av_unused void DEF(avg, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
 {
     MOVQ_BFE(mm6);
     JUMPALIGN();
@@ -427,7 +431,7 @@ static void DEF(avg, pixels16_x2)(uint8_t *block, const uint8_t *pixels, int lin
     } while (--h);
 }
 
-static __attribute__((unused)) void DEF(avg, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+static av_unused void DEF(avg, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
 {
     MOVQ_BFE(mm6);
     JUMPALIGN();
@@ -588,5 +592,3 @@ static void DEF(avg, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, int li
     DEF(avg, pixels8_xy2)(block  , pixels  , line_size, h);
     DEF(avg, pixels8_xy2)(block+8, pixels+8, line_size, h);
 }
-
-

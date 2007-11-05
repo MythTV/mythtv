@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -25,8 +24,10 @@
  * @file tiff.h
  * @author Konstantin Shishkov
  */
-#ifndef TIFF_H
-#define TIFF_H
+#ifndef FFMPEG_TIFF_H
+#define FFMPEG_TIFF_H
+
+#include <stdint.h>
 
 /** abridged list of TIFF tags */
 enum TiffTags{
@@ -82,4 +83,4 @@ static const uint8_t type_sizes[6] = {
     0, 1, 100, 2, 4, 8
 };
 
-#endif                          /* TIFF_H */
+#endif /* FFMPEG_TIFF_H */

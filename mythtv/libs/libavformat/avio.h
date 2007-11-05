@@ -18,8 +18,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef AVIO_H
-#define AVIO_H
+#ifndef FFMPEG_AVIO_H
+#define FFMPEG_AVIO_H
+
+#include <stdint.h>
 
 /* output byte stream handling */
 
@@ -85,9 +87,9 @@ void url_set_interrupt_cb(URLInterruptCB *interrupt_cb);
 int url_poll(URLPollEntry *poll_table, int n, int timeout);
 
 /**
- * passing this as the "whence" parameter to a seek function causes it to
- * return the filesize without seeking anywhere, supporting this is optional
- * if its not supprted then the seek function will return <0
+ * Passing this as the "whence" parameter to a seek function causes it to
+ * return the filesize without seeking anywhere. Supporting this is optional.
+ * If it is not supported then the seek function will return <0.
  */
 #define AVSEEK_SIZE 0x10000
 
@@ -190,18 +192,27 @@ unsigned int get_be24(ByteIOContext *s);
 unsigned int get_be32(ByteIOContext *s);
 uint64_t get_be64(ByteIOContext *s);
 
+uint64_t ff_get_v(ByteIOContext *bc);
+
 static inline int url_is_streamed(ByteIOContext *s)
 {
     return s->is_streamed;
 }
 
+/** @note when opened as read/write, the buffers are only used for
+   writing */
 int url_fdopen(ByteIOContext *s, URLContext *h);
 
 /** @warning must be called before any I/O */
 int url_setbufsize(ByteIOContext *s, int buf_size);
+/** Reset the buffer for reading or writing.
+ * @note Will drop any data currently in the buffer without transmitting it.
+ * @param flags URL_RDONLY to set up the buffer for reading, or URL_WRONLY
+ *        to set up the buffer for writing. */
+int url_resetbuf(ByteIOContext *s, int flags);
 
 /** @note when opened as read/write, the buffers are only used for
-   reading */
+   writing */
 int url_fopen(ByteIOContext *s, const char *filename, int flags);
 int url_fclose(ByteIOContext *s);
 URLContext *url_fileno(ByteIOContext *s);
@@ -249,24 +260,13 @@ int url_open_dyn_packet_buf(ByteIOContext *s, int max_packet_size);
  */
 int url_close_dyn_buf(ByteIOContext *s, uint8_t **pbuffer);
 
+unsigned long ff_crc04C11DB7_update(unsigned long checksum, const uint8_t *buf, unsigned int len);
 unsigned long get_checksum(ByteIOContext *s);
 void init_checksum(ByteIOContext *s, unsigned long (*update_checksum)(unsigned long c, const uint8_t *p, unsigned int len), unsigned long checksum);
 
-/* file.c */
-extern URLProtocol file_protocol;
-extern URLProtocol pipe_protocol;
-
 /* udp.c */
-extern URLProtocol udp_protocol;
 int udp_set_remote_url(URLContext *h, const char *uri);
 int udp_get_local_port(URLContext *h);
 int udp_get_file_handle(URLContext *h);
 
-/* tcp.c  */
-extern URLProtocol tcp_protocol;
-
-/* http.c */
-extern URLProtocol http_protocol;
-
-#endif
-
+#endif /* FFMPEG_AVIO_H */

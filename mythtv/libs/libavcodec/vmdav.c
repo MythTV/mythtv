@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -45,7 +44,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
 #include "dsputil.h"
 
@@ -70,6 +68,7 @@ typedef struct VmdVideoContext {
     unsigned char *unpack_buffer;
     int unpack_buffer_size;
 
+    int x_off, y_off;
 } VmdVideoContext;
 
 #define QUEUE_SIZE 0x1000
@@ -208,6 +207,15 @@ static void vmd_decode(VmdVideoContext *s)
     frame_y = AV_RL16(&s->buf[8]);
     frame_width = AV_RL16(&s->buf[10]) - frame_x + 1;
     frame_height = AV_RL16(&s->buf[12]) - frame_y + 1;
+
+    if ((frame_width == s->avctx->width && frame_height == s->avctx->height) &&
+        (frame_x || frame_y)) {
+
+        s->x_off = frame_x;
+        s->y_off = frame_y;
+    }
+    frame_x -= s->x_off;
+    frame_y -= s->y_off;
 
     /* if only a certain region will be updated, copy the entire previous
      * frame before the decode */
@@ -381,14 +389,13 @@ static int vmdvideo_decode_frame(AVCodecContext *avctx,
     /* make the palette available on the way out */
     memcpy(s->frame.data[1], s->palette, PALETTE_COUNT * 4);
 
-    if (s->prev_frame.data[0])
-        avctx->release_buffer(avctx, &s->prev_frame);
-
     /* shuffle frames */
-    s->prev_frame = s->frame;
+    FFSWAP(AVFrame, s->frame, s->prev_frame);
+    if (s->frame.data[0])
+        avctx->release_buffer(avctx, &s->frame);
 
     *data_size = sizeof(AVFrame);
-    *(AVFrame*)data = s->frame;
+    *(AVFrame*)data = s->prev_frame;
 
     /* report that the buffer was completely consumed */
     return buf_size;
@@ -461,7 +468,7 @@ static void vmdaudio_decode_audio(VmdAudioContext *s, unsigned char *data,
             s->predictors[chan] -= vmdaudio_table[buf[i] & 0x7F];
         else
             s->predictors[chan] += vmdaudio_table[buf[i]];
-        s->predictors[chan] = av_clip(s->predictors[chan], -32768, 32767);
+        s->predictors[chan] = av_clip_int16(s->predictors[chan]);
         out[i] = s->predictors[chan];
         chan ^= stereo;
     }

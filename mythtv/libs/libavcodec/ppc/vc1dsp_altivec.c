@@ -17,14 +17,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "gcc_fixes.h"
 
-#include "dsputil_altivec.h"
+#include "util_altivec.h"
 
 // main steps of 8x8 transform
 #define STEP8(s0, s1, s2, s3, s4, s5, s6, s7, vec_rnd) \

@@ -20,7 +20,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
  /**
@@ -28,8 +27,10 @@
  * Various QDM2 tables.
  */
 
-#ifndef QDM2DATA_H
-#define QDM2DATA_H
+#ifndef FFMPEG_QDM2DATA_H
+#define FFMPEG_QDM2DATA_H
+
+#include <stdint.h>
 
 /** VLC TABLES **/
 
@@ -527,4 +528,4 @@ static const float type34_delta[10] = { // FIXME: covers 8 entries..
     0.138071194291115f,0.333333343267441f,0.60947573184967f,1.0f,0.0f,
 };
 
-#endif /* QDM2DATA_H */
+#endif /* FFMPEG_QDM2DATA_H */

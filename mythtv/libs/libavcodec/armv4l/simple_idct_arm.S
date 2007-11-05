@@ -1,9 +1,11 @@
 /*
  * simple_idct_arm.S
  * Copyright (C) 2002 Frederic 'dilb' Boulay.
- * All Rights Reserved.
  *
  * Author: Frederic Boulay <dilb@handhelds.org>
+ *
+ * The function defined in this file is derived from the simple_idct function
+ * from the libavcodec library part of the FFmpeg project.
  *
  * This file is part of FFmpeg.
  *
@@ -20,9 +22,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * The function defined in this file, is derived from the simple_idct function
- * from the libavcodec library part of the ffmpeg project.
  */
 
 /* useful constants for the algorithm, they are save in __constant_ptr__ at */

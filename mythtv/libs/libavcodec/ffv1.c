@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -26,9 +25,8 @@
  * FF Video Codec 1 (an experimental lossless codec)
  */
 
-#include "common.h"
-#include "bitstream.h"
 #include "avcodec.h"
+#include "bitstream.h"
 #include "dsputil.h"
 #include "rangecoder.h"
 #include "golomb.h"
@@ -704,6 +702,7 @@ static int common_end(AVCodecContext *avctx){
         PlaneContext *p= &s->plane[i];
 
         av_freep(&p->state);
+        av_freep(&p->vlc_state);
     }
 
     return 0;

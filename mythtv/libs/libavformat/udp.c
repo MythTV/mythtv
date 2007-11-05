@@ -43,16 +43,9 @@ typedef struct {
 } UDPContext;
 
 #define UDP_TX_BUF_SIZE 32768
+#define UDP_MAX_PKT_SIZE 65536
 
 #ifdef CONFIG_IPV6
-
-static int udp_ipv6_is_multicast_address(const struct sockaddr *addr) {
-    if (addr->sa_family == AF_INET)
-        return IN_MULTICAST(ntohl(((struct sockaddr_in *)addr)->sin_addr.s_addr));
-    if (addr->sa_family == AF_INET6)
-        return IN6_IS_ADDR_MULTICAST(&((struct sockaddr_in6 *)addr)->sin6_addr);
-    return -1;
-}
 
 static int udp_ipv6_set_multicast_ttl(int sockfd, int mcastTTL, struct sockaddr *addr) {
     if (addr->sa_family == AF_INET) {
@@ -118,7 +111,7 @@ static struct addrinfo* udp_ipv6_resolve_host(const char *hostname, int port, in
     struct addrinfo hints, *res = 0;
     int error;
     char sport[16];
-    const char *node = 0, *service = 0;
+    const char *node = 0, *service = "0";
 
     if (port > 0) {
         snprintf(sport, sizeof(sport), "%d", port);
@@ -127,15 +120,14 @@ static struct addrinfo* udp_ipv6_resolve_host(const char *hostname, int port, in
     if ((hostname) && (hostname[0] != '\0') && (hostname[0] != '?')) {
         node = hostname;
     }
-    if ((node) || (service)) {
-        memset(&hints, 0, sizeof(hints));
-        hints.ai_socktype = type;
-        hints.ai_family   = family;
-        hints.ai_flags = flags;
-        if ((error = getaddrinfo(node, service, &hints, &res))) {
-            av_log(NULL, AV_LOG_ERROR, "udp_ipv6_resolve_host: %s\n", gai_strerror(error));
-        }
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_socktype = type;
+    hints.ai_family   = family;
+    hints.ai_flags = flags;
+    if ((error = getaddrinfo(node, service, &hints, &res))) {
+        av_log(NULL, AV_LOG_ERROR, "udp_ipv6_resolve_host: %s\n", gai_strerror(error));
     }
+
     return res;
 }
 
@@ -146,7 +138,7 @@ static int udp_ipv6_set_remote_url(URLContext *h, const char *uri) {
     struct addrinfo *res0;
     url_split(NULL, 0, NULL, 0, hostname, sizeof(hostname), &port, NULL, 0, uri);
     res0 = udp_ipv6_resolve_host(hostname, port, SOCK_DGRAM, AF_UNSPEC, 0);
-    if (res0 == 0) return AVERROR_IO;
+    if (res0 == 0) return AVERROR(EIO);
     memcpy(&s->dest_addr, res0->ai_addr, res0->ai_addrlen);
     s->dest_addr_len = res0->ai_addrlen;
     freeaddrinfo(res0);
@@ -161,33 +153,28 @@ static int udp_ipv6_set_local(URLContext *h) {
     char sbuf[NI_MAXSERV];
     char hbuf[NI_MAXHOST];
     struct addrinfo *res0 = NULL, *res = NULL;
+    int family = AF_UNSPEC;
 
-    if (s->local_port != 0) {
-        res0 = udp_ipv6_resolve_host(0, s->local_port, SOCK_DGRAM, AF_UNSPEC, AI_PASSIVE);
-        if (res0 == 0)
-            goto fail;
-        for (res = res0; res; res=res->ai_next) {
-            udp_fd = socket(res->ai_family, SOCK_DGRAM, 0);
-            if (udp_fd > 0) break;
-            perror("socket");
-        }
-    } else {
-        udp_fd = socket(s->dest_addr.ss_family, SOCK_DGRAM, 0);
-        if (udp_fd < 0)
-            perror("socket");
+    if (((struct sockaddr *) &s->dest_addr)->sa_family)
+        family = ((struct sockaddr *) &s->dest_addr)->sa_family;
+    res0 = udp_ipv6_resolve_host(0, s->local_port, SOCK_DGRAM, family, AI_PASSIVE);
+    if (res0 == 0)
+        goto fail;
+    for (res = res0; res; res=res->ai_next) {
+        udp_fd = socket(res->ai_family, SOCK_DGRAM, 0);
+        if (udp_fd > 0) break;
+        perror("socket");
     }
 
     if (udp_fd < 0)
         goto fail;
 
-    if (s->local_port != 0) {
-        if (bind(udp_fd, res0->ai_addr, res0->ai_addrlen) < 0) {
-            perror("bind");
-            goto fail;
-        }
-        freeaddrinfo(res0);
-        res0 = NULL;
+    if (bind(udp_fd, res0->ai_addr, res0->ai_addrlen) < 0) {
+        perror("bind");
+        goto fail;
     }
+    freeaddrinfo(res0);
+        res0 = NULL;
 
     addrlen = sizeof(clientaddr);
     if (getsockname(udp_fd, (struct sockaddr *)&clientaddr, &addrlen) < 0) {
@@ -212,7 +199,7 @@ static int udp_ipv6_set_local(URLContext *h) {
     return -1;
 }
 
-#endif
+#endif /* CONFIG_IPV6 */
 
 
 /**
@@ -244,7 +231,7 @@ int udp_set_remote_url(URLContext *h, const char *uri)
 
     /* set the destination address */
     if (resolve_host(&s->dest_addr.sin_addr, hostname) < 0)
-        return AVERROR_IO;
+        return AVERROR(EIO);
     s->dest_addr.sin_family = AF_INET;
     s->dest_addr.sin_port = htons(port);
     return 0;
@@ -293,7 +280,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
 
     is_output = (flags & URL_WRONLY);
 
-    s = av_malloc(sizeof(UDPContext));
+    s = av_mallocz(sizeof(UDPContext));
     if (!s)
         return AVERROR(ENOMEM);
 
@@ -328,6 +315,9 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     } else {
         udp_set_remote_url(h, uri);
     }
+
+    if(!ff_network_init())
+        return AVERROR(EIO);
 
 #ifndef CONFIG_IPV6
     udp_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -392,7 +382,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
                 goto fail;
         }
     }
-#endif
+#endif /* CONFIG_IPV6 */
 
     if (is_output) {
         /* limit the tx buf size to limit latency */
@@ -401,6 +391,11 @@ static int udp_open(URLContext *h, const char *uri, int flags)
             perror("setsockopt sndbuf");
             goto fail;
         }
+    } else {
+        /* set udp recv buffer size to the largest possible udp packet size to
+         * avoid losing data on OSes that set this too low by default. */
+        tmp = UDP_MAX_PKT_SIZE;
+        setsockopt(udp_fd, SOL_SOCKET, SO_RCVBUF, &tmp, sizeof(tmp));
     }
 
     s->udp_fd = udp_fd;
@@ -409,7 +404,7 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     if (udp_fd >= 0)
         closesocket(udp_fd);
     av_free(s);
-    return AVERROR_IO;
+    return AVERROR(EIO);
 }
 
 static int udp_read(URLContext *h, uint8_t *buf, int size)
@@ -428,8 +423,9 @@ static int udp_read(URLContext *h, uint8_t *buf, int size)
         len = recvfrom (s->udp_fd, buf, size, 0,
                         (struct sockaddr *)&from, &from_len);
         if (len < 0) {
-            if (errno != EAGAIN && errno != EINTR)
-                return AVERROR_IO;
+            if (ff_neterrno() != FF_NETERROR(EAGAIN) &&
+                ff_neterrno() != FF_NETERROR(EINTR))
+                return AVERROR(EIO);
         } else {
             break;
         }
@@ -451,8 +447,9 @@ static int udp_write(URLContext *h, uint8_t *buf, int size)
                       s->dest_addr_len);
 #endif
         if (ret < 0) {
-            if (errno != EINTR && errno != EAGAIN)
-                return AVERROR_IO;
+            if (ff_neterrno() != FF_NETERROR(EINTR) &&
+                ff_neterrno() != FF_NETERROR(EAGAIN))
+                return AVERROR(EIO);
         } else {
             break;
         }
@@ -478,6 +475,7 @@ static int udp_close(URLContext *h)
         udp_ipv6_leave_multicast_group(s->udp_fd, (struct sockaddr *)&s->dest_addr);
 #endif
     closesocket(s->udp_fd);
+    ff_network_close();
     av_free(s);
     return 0;
 }

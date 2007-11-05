@@ -37,6 +37,15 @@ AVCRC av_crc07      [257];
  * Inits a crc table.
  * @param ctx must be an array of sizeof(AVCRC)*257 or sizeof(AVCRC)*1024
  * @param cts_size size of ctx in bytes
+ * @param le if 1, lowest bit represents coefficient for highest exponent
+ *           of corresponding polynomial (both for poly and actual CRC).
+ *           If 0, you must swap the crc parameter and the result of av_crc
+ *           if you need the standard representation (can be simplified in
+ *           most cases to e.g. bswap16):
+ *           bswap_32(crc << (32-bits))
+ * @param bits number of bits for the CRC
+ * @param poly generator polynomial without the x**bits coefficient, in the
+ *             representation as specified by le
  * @return <0 on failure
  */
 int av_crc_init(AVCRC *ctx, int le, int bits, uint32_t poly, int ctx_size){
@@ -70,6 +79,13 @@ int av_crc_init(AVCRC *ctx, int le, int bits, uint32_t poly, int ctx_size){
     return 0;
 }
 
+/**
+ * Calculate the CRC of a block
+ * @param crc CRC of previous blocks if any or initial value for CRC.
+ * @return CRC updated with the data from the given block
+ *
+ * @see av_crc_init() "le" parameter
+ */
 uint32_t av_crc(const AVCRC *ctx, uint32_t crc, const uint8_t *buffer, size_t length){
     const uint8_t *end= buffer+length;
 
@@ -94,10 +110,10 @@ uint32_t av_crc(const AVCRC *ctx, uint32_t crc, const uint8_t *buffer, size_t le
 main(){
     uint8_t buf[1999];
     int i;
-    int p[4][4]={{1, 32, 0xedb88320L, 0x3D5CDD04},
-                 {0, 32, 0x04c11db7L, 0xC0F5BAE0},
-                 {0, 16, 0x8005     , 0x1FBB    },
-                 {0,  8, 0x07       , 0xE3      },};
+    int p[4][4]={{1, 32, AV_CRC_32_IEEE_LE, 0x3D5CDD04},
+                 {0, 32, AV_CRC_32_IEEE   , 0xC0F5BAE0},
+                 {0, 16, AV_CRC_16        , 0x1FBB    },
+                 {0,  8, AV_CRC_8_ATM     , 0xE3      },};
     AVCRC ctx[1 ? 1024:257];
 
     for(i=0; i<sizeof(buf); i++)

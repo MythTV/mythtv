@@ -25,15 +25,15 @@
 
 #include "config.h"
 
-#ifdef ARCH_SPARC
-
 #include <inttypes.h>
-#include <signal.h>
-#include <setjmp.h>
 
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "vis.h"
+
+extern void ff_simple_idct_put_vis(uint8_t *dest, int line_size, DCTELEM *data);
+extern void ff_simple_idct_add_vis(uint8_t *dest, int line_size, DCTELEM *data);
+extern void ff_simple_idct_vis(DCTELEM *data);
 
 /* The trick used in some of this file is the formula from the MMX
  * motion comp code, which is:
@@ -3985,56 +3985,14 @@ static void MC_avg_no_round_xy_8_vis (uint8_t * dest, const uint8_t * _ref,
 
 /* End of no rounding code */
 
-static sigjmp_buf jmpbuf;
-static volatile sig_atomic_t canjump = 0;
-
-static void sigill_handler (int sig)
-{
-    if (!canjump) {
-        signal (sig, SIG_DFL);
-        raise (sig);
-    }
-
-    canjump = 0;
-    siglongjmp (jmpbuf, 1);
-}
-
 #define ACCEL_SPARC_VIS 1
 #define ACCEL_SPARC_VIS2 2
 
 static int vis_level ()
 {
     int accel = 0;
-
-    signal (SIGILL, sigill_handler);
-    if (sigsetjmp (jmpbuf, 1)) {
-        signal (SIGILL, SIG_DFL);
-        return accel;
-    }
-
-    canjump = 1;
-
-    /* pdist %f0, %f0, %f0 */
-    __asm__ __volatile__(".word\t0x81b007c0");
-
-    canjump = 0;
     accel |= ACCEL_SPARC_VIS;
-
-    if (sigsetjmp (jmpbuf, 1)) {
-        signal (SIGILL, SIG_DFL);
-        return accel;
-    }
-
-    canjump = 1;
-
-    /* edge8n %g0, %g0, %g0 */
-    __asm__ __volatile__(".word\t0x81b00020");
-
-    canjump = 0;
     accel |= ACCEL_SPARC_VIS2;
-
-    signal (SIGILL, SIG_DFL);
-
     return accel;
 }
 
@@ -4045,6 +4003,13 @@ void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx)
   int accel = vis_level ();
 
   if (accel & ACCEL_SPARC_VIS) {
+      if(avctx->idct_algo==FF_IDCT_SIMPLEVIS){
+          c->idct_put = ff_simple_idct_put_vis;
+          c->idct_add = ff_simple_idct_add_vis;
+          c->idct     = ff_simple_idct_vis;
+          c->idct_permutation_type = FF_TRANSPOSE_IDCT_PERM;
+      }
+
       c->put_pixels_tab[0][0] = MC_put_o_16_vis;
       c->put_pixels_tab[0][1] = MC_put_x_16_vis;
       c->put_pixels_tab[0][2] = MC_put_y_16_vis;
@@ -4086,5 +4051,3 @@ void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx)
       c->avg_no_rnd_pixels_tab[1][3] = MC_avg_no_round_xy_8_vis;
   }
 }
-
-#endif  /* !(ARCH_SPARC) */

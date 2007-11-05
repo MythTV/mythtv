@@ -22,6 +22,7 @@
 #include "avcodec.h"
 #include "bitstream.h"
 #include "crc.h"
+#include "dsputil.h"
 #include "golomb.h"
 #include "lls.h"
 
@@ -84,7 +85,7 @@ typedef struct FlacSubframe {
     int shift;
     RiceContext rc;
     int32_t samples[FLAC_MAX_BLOCKSIZE];
-    int32_t residual[FLAC_MAX_BLOCKSIZE];
+    int32_t residual[FLAC_MAX_BLOCKSIZE+1];
 } FlacSubframe;
 
 typedef struct FlacFrame {
@@ -107,6 +108,7 @@ typedef struct FlacEncodeContext {
     FlacFrame frame;
     CompressionOptions options;
     AVCodecContext *avctx;
+    DSPContext dsp;
 } FlacEncodeContext;
 
 static const int flac_samplerates[16] = {
@@ -176,6 +178,8 @@ static int flac_encode_init(AVCodecContext *avctx)
     uint8_t *streaminfo;
 
     s->avctx = avctx;
+
+    dsputil_init(&s->dsp, avctx);
 
     if(avctx->sample_fmt != SAMPLE_FMT_S16) {
         return -1;
@@ -447,20 +451,19 @@ static void copy_samples(FlacEncodeContext *s, int16_t *samples)
 
 #define rice_encode_count(sum, n, k) (((n)*((k)+1))+((sum-(n>>1))>>(k)))
 
+/**
+ * Solve for d/dk(rice_encode_count) = n-((sum-(n>>1))>>(k+1)) = 0
+ */
 static int find_optimal_param(uint32_t sum, int n)
 {
-    int k, k_opt;
-    uint32_t nbits[MAX_RICE_PARAM+1];
+    int k;
+    uint32_t sum2;
 
-    k_opt = 0;
-    nbits[0] = UINT32_MAX;
-    for(k=0; k<=MAX_RICE_PARAM; k++) {
-        nbits[k] = rice_encode_count(sum, n, k);
-        if(nbits[k] < nbits[k_opt]) {
-            k_opt = k;
-        }
-    }
-    return k_opt;
+    if(sum <= n>>1)
+        return 0;
+    sum2 = sum-(n>>1);
+    k = av_log2(n<256 ? FASTDIV(sum2,n) : sum2/n);
+    return FFMIN(k, MAX_RICE_PARAM);
 }
 
 static uint32_t calc_optimal_rice_params(RiceContext *rc, int porder,
@@ -471,16 +474,15 @@ static uint32_t calc_optimal_rice_params(RiceContext *rc, int porder,
     uint32_t all_bits;
 
     part = (1 << porder);
-    all_bits = 0;
+    all_bits = 4 * part;
 
     cnt = (n >> porder) - pred_order;
     for(i=0; i<part; i++) {
-        if(i == 1) cnt = (n >> porder);
         k = find_optimal_param(sums[i], cnt);
         rc->params[i] = k;
         all_bits += rice_encode_count(sums[i], cnt, k);
+        cnt = n >> porder;
     }
-    all_bits += (4 * part);
 
     rc->porder = porder;
 
@@ -499,10 +501,11 @@ static void calc_sums(int pmin, int pmax, uint32_t *data, int n, int pred_order,
     res = &data[pred_order];
     res_end = &data[n >> pmax];
     for(i=0; i<parts; i++) {
-        sums[pmax][i] = 0;
+        uint32_t sum = 0;
         while(res < res_end){
-            sums[pmax][i] += *(res++);
+            sum += *(res++);
         }
+        sums[pmax][i] = sum;
         res_end+= n >> pmax;
     }
     /* sums for lower levels */
@@ -604,24 +607,36 @@ static void apply_welch_window(const int32_t *data, int len, double *w_data)
  * Calculates autocorrelation data from audio samples
  * A Welch window function is applied before calculation.
  */
-static void compute_autocorr(const int32_t *data, int len, int lag,
-                             double *autoc)
+void ff_flac_compute_autocorr(const int32_t *data, int len, int lag,
+                              double *autoc)
 {
-    int i, lag_ptr;
-    double tmp[len + lag];
+    int i, j;
+    double tmp[len + lag + 1];
     double *data1= tmp + lag;
 
     apply_welch_window(data, len, data1);
 
-    for(i=0; i<lag; i++){
-        autoc[i] = 1.0;
-        data1[i-lag]= 0.0;
+    for(j=0; j<lag; j++)
+        data1[j-lag]= 0.0;
+    data1[len] = 0.0;
+
+    for(j=0; j<lag; j+=2){
+        double sum0 = 1.0, sum1 = 1.0;
+        for(i=0; i<len; i++){
+            sum0 += data1[i] * data1[i-j];
+            sum1 += data1[i] * data1[i-j-1];
+        }
+        autoc[j  ] = sum0;
+        autoc[j+1] = sum1;
     }
 
-    for(i=0; i<len; i++){
-        for(lag_ptr= i-lag; lag_ptr<=i; lag_ptr++){
-            autoc[i-lag_ptr] += data1[i] * data1[lag_ptr];
+    if(j==lag){
+        double sum = 1.0;
+        for(i=0; i<len; i+=2){
+            sum += data1[i  ] * data1[i-j  ]
+                 + data1[i+1] * data1[i-j+1];
         }
+        autoc[j] = sum;
     }
 }
 
@@ -735,7 +750,8 @@ static int estimate_best_order(double *ref, int max_order)
 /**
  * Calculate LPC coefficients for multiple orders
  */
-static int lpc_calc_coefs(const int32_t *samples, int blocksize, int max_order,
+static int lpc_calc_coefs(FlacEncodeContext *s,
+                          const int32_t *samples, int blocksize, int max_order,
                           int precision, int32_t coefs[][MAX_LPC_ORDER],
                           int *shift, int use_lpc, int omethod)
 {
@@ -748,12 +764,12 @@ static int lpc_calc_coefs(const int32_t *samples, int blocksize, int max_order,
     assert(max_order >= MIN_LPC_ORDER && max_order <= MAX_LPC_ORDER);
 
     if(use_lpc == 1){
-        compute_autocorr(samples, blocksize, max_order+1, autoc);
+        s->dsp.flac_compute_autocorr(samples, blocksize, max_order, autoc);
 
         compute_lpc_coefs(autoc, max_order, lpc, ref);
     }else{
         LLSModel m[2];
-        double var[MAX_LPC_ORDER+1], eval, weight;
+        double var[MAX_LPC_ORDER+1], weight;
 
         for(pass=0; pass<use_lpc-1; pass++){
             av_init_lls(&m[pass&1], max_order);
@@ -764,11 +780,14 @@ static int lpc_calc_coefs(const int32_t *samples, int blocksize, int max_order,
                     var[j]= samples[i-j];
 
                 if(pass){
+                    double eval, inv, rinv;
                     eval= av_evaluate_lls(&m[(pass-1)&1], var+1, max_order-1);
                     eval= (512>>pass) + fabs(eval - var[0]);
+                    inv = 1/eval;
+                    rinv = sqrt(inv);
                     for(j=0; j<=max_order; j++)
-                        var[j]/= sqrt(eval);
-                    weight += 1/eval;
+                        var[j] *= rinv;
+                    weight += inv;
                 }else
                     weight++;
 
@@ -823,33 +842,142 @@ static void encode_residual_fixed(int32_t *res, const int32_t *smp, int n,
         for(i=order; i<n; i++)
             res[i]= smp[i] - smp[i-1];
     }else if(order==2){
-        for(i=order; i<n; i++)
-            res[i]= smp[i] - 2*smp[i-1] + smp[i-2];
+        int a = smp[order-1] - smp[order-2];
+        for(i=order; i<n; i+=2) {
+            int b = smp[i] - smp[i-1];
+            res[i]= b - a;
+            a = smp[i+1] - smp[i];
+            res[i+1]= a - b;
+        }
     }else if(order==3){
-        for(i=order; i<n; i++)
-            res[i]= smp[i] - 3*smp[i-1] + 3*smp[i-2] - smp[i-3];
+        int a = smp[order-1] - smp[order-2];
+        int c = smp[order-1] - 2*smp[order-2] + smp[order-3];
+        for(i=order; i<n; i+=2) {
+            int b = smp[i] - smp[i-1];
+            int d = b - a;
+            res[i]= d - c;
+            a = smp[i+1] - smp[i];
+            c = a - b;
+            res[i+1]= c - d;
+        }
     }else{
-        for(i=order; i<n; i++)
-            res[i]= smp[i] - 4*smp[i-1] + 6*smp[i-2] - 4*smp[i-3] + smp[i-4];
+        int a = smp[order-1] - smp[order-2];
+        int c = smp[order-1] - 2*smp[order-2] + smp[order-3];
+        int e = smp[order-1] - 3*smp[order-2] + 3*smp[order-3] - smp[order-4];
+        for(i=order; i<n; i+=2) {
+            int b = smp[i] - smp[i-1];
+            int d = b - a;
+            int f = d - c;
+            res[i]= f - e;
+            a = smp[i+1] - smp[i];
+            c = a - b;
+            e = c - d;
+            res[i+1]= e - f;
+        }
+    }
+}
+
+#define LPC1(x) {\
+    int c = coefs[(x)-1];\
+    p0 += c*s;\
+    s = smp[i-(x)+1];\
+    p1 += c*s;\
+}
+
+static av_always_inline void encode_residual_lpc_unrolled(
+    int32_t *res, const int32_t *smp, int n,
+    int order, const int32_t *coefs, int shift, int big)
+{
+    int i;
+    for(i=order; i<n; i+=2) {
+        int s = smp[i-order];
+        int p0 = 0, p1 = 0;
+        if(big) {
+            switch(order) {
+                case 32: LPC1(32)
+                case 31: LPC1(31)
+                case 30: LPC1(30)
+                case 29: LPC1(29)
+                case 28: LPC1(28)
+                case 27: LPC1(27)
+                case 26: LPC1(26)
+                case 25: LPC1(25)
+                case 24: LPC1(24)
+                case 23: LPC1(23)
+                case 22: LPC1(22)
+                case 21: LPC1(21)
+                case 20: LPC1(20)
+                case 19: LPC1(19)
+                case 18: LPC1(18)
+                case 17: LPC1(17)
+                case 16: LPC1(16)
+                case 15: LPC1(15)
+                case 14: LPC1(14)
+                case 13: LPC1(13)
+                case 12: LPC1(12)
+                case 11: LPC1(11)
+                case 10: LPC1(10)
+                case  9: LPC1( 9)
+                         LPC1( 8)
+                         LPC1( 7)
+                         LPC1( 6)
+                         LPC1( 5)
+                         LPC1( 4)
+                         LPC1( 3)
+                         LPC1( 2)
+                         LPC1( 1)
+            }
+        } else {
+            switch(order) {
+                case  8: LPC1( 8)
+                case  7: LPC1( 7)
+                case  6: LPC1( 6)
+                case  5: LPC1( 5)
+                case  4: LPC1( 4)
+                case  3: LPC1( 3)
+                case  2: LPC1( 2)
+                case  1: LPC1( 1)
+            }
+        }
+        res[i  ] = smp[i  ] - (p0 >> shift);
+        res[i+1] = smp[i+1] - (p1 >> shift);
     }
 }
 
 static void encode_residual_lpc(int32_t *res, const int32_t *smp, int n,
                                 int order, const int32_t *coefs, int shift)
 {
-    int i, j;
-    int32_t pred;
-
+    int i;
     for(i=0; i<order; i++) {
         res[i] = smp[i];
     }
-    for(i=order; i<n; i++) {
-        pred = 0;
+#ifdef CONFIG_SMALL
+    for(i=order; i<n; i+=2) {
+        int j;
+        int s = smp[i];
+        int p0 = 0, p1 = 0;
         for(j=0; j<order; j++) {
-            pred += coefs[j] * smp[i-j-1];
+            int c = coefs[j];
+            p1 += c*s;
+            s = smp[i-j-1];
+            p0 += c*s;
         }
-        res[i] = smp[i] - (pred >> shift);
+        res[i  ] = smp[i  ] - (p0 >> shift);
+        res[i+1] = smp[i+1] - (p1 >> shift);
     }
+#else
+    switch(order) {
+        case  1: encode_residual_lpc_unrolled(res, smp, n, 1, coefs, shift, 0); break;
+        case  2: encode_residual_lpc_unrolled(res, smp, n, 2, coefs, shift, 0); break;
+        case  3: encode_residual_lpc_unrolled(res, smp, n, 3, coefs, shift, 0); break;
+        case  4: encode_residual_lpc_unrolled(res, smp, n, 4, coefs, shift, 0); break;
+        case  5: encode_residual_lpc_unrolled(res, smp, n, 5, coefs, shift, 0); break;
+        case  6: encode_residual_lpc_unrolled(res, smp, n, 6, coefs, shift, 0); break;
+        case  7: encode_residual_lpc_unrolled(res, smp, n, 7, coefs, shift, 0); break;
+        case  8: encode_residual_lpc_unrolled(res, smp, n, 8, coefs, shift, 0); break;
+        default: encode_residual_lpc_unrolled(res, smp, n, order, coefs, shift, 1); break;
+    }
+#endif
 }
 
 static int encode_residual(FlacEncodeContext *ctx, int ch)
@@ -919,7 +1047,7 @@ static int encode_residual(FlacEncodeContext *ctx, int ch)
     }
 
     /* LPC */
-    opt_order = lpc_calc_coefs(smp, n, max_order, precision, coefs, shift, ctx->options.use_lpc, omethod);
+    opt_order = lpc_calc_coefs(ctx, smp, n, max_order, precision, coefs, shift, ctx->options.use_lpc, omethod);
 
     if(omethod == ORDER_METHOD_2LEVEL ||
        omethod == ORDER_METHOD_4LEVEL ||

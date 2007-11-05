@@ -20,11 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "gcc_fixes.h"
 
-#include "dsputil_altivec.h"
+#include "dsputil_ppc.h"
+#include "util_altivec.h"
 
 /*
   altivec-enhanced gmc1. ATM this code assume stride is a multiple of 8,
@@ -34,10 +35,10 @@
 void gmc1_altivec(uint8_t *dst /* align 8 */, uint8_t *src /* align1 */, int stride, int h, int x16, int y16, int rounder)
 {
 POWERPC_PERF_DECLARE(altivec_gmc1_num, GMC1_PERF_COND);
-    const unsigned short __attribute__ ((aligned(16))) rounder_a[8] =
+    const DECLARE_ALIGNED_16(unsigned short, rounder_a[8]) =
       {rounder, rounder, rounder, rounder,
        rounder, rounder, rounder, rounder};
-    const unsigned short __attribute__ ((aligned(16))) ABCD[8] =
+    const DECLARE_ALIGNED_16(unsigned short, ABCD[8]) =
       {
         (16-x16)*(16-y16), /* A */
         (   x16)*(16-y16), /* B */
@@ -45,8 +46,8 @@ POWERPC_PERF_DECLARE(altivec_gmc1_num, GMC1_PERF_COND);
         (   x16)*(   y16), /* D */
         0, 0, 0, 0         /* padding */
       };
-    register const_vector unsigned char vczero = (const_vector unsigned char)vec_splat_u8(0);
-    register const_vector unsigned short vcsr8 = (const_vector unsigned short)vec_splat_u16(8);
+    register const vector unsigned char vczero = (const vector unsigned char)vec_splat_u8(0);
+    register const vector unsigned short vcsr8 = (const vector unsigned short)vec_splat_u16(8);
     register vector unsigned char dstv, dstv2, src_0, src_1, srcvA, srcvB, srcvC, srcvD;
     register vector unsigned short Av, Bv, Cv, Dv, rounderV, tempA, tempB, tempC, tempD;
     int i;

@@ -8,7 +8,7 @@
 using namespace std;
 
 // MythTV headers
-#include "mythconfig.h" // for CONFIG_LIBDTS
+#include "mythconfig.h"
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
@@ -38,7 +38,7 @@ extern "C" {
 
 extern "C" {
 #include "../libavutil/avutil.h"
-#include "../libavcodec/parser.h"
+#include "../libavcodec/ac3_parser.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
 // from libavcodec
@@ -416,9 +416,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     av_log_set_callback(myth_av_log);
 
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
-#ifdef CONFIG_LIBDTS
     allow_dts_passthru = gContext->GetNumSetting("DTSPassThru", false);
-#endif
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
     itv = GetNVP()->GetInteractiveTV();

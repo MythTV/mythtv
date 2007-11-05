@@ -41,6 +41,7 @@ static ogg_codec_t *ogg_codecs[] = {
     &vorbis_codec,
     &theora_codec,
     &flac_codec,
+    &old_flac_codec,
     &ogm_video_codec,
     &ogm_audio_codec,
     &ogm_old_codec,
@@ -200,7 +201,7 @@ ogg_new_stream (AVFormatContext * s, uint32_t serial)
 
     st = av_new_stream (s, idx);
     if (!st)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     av_set_pts_info(st, 64, 1, 1000000);
 
@@ -540,7 +541,7 @@ ogg_read_packet (AVFormatContext * s, AVPacket * pkt)
     //Get an ogg packet
     do{
         if (ogg_packet (s, &idx, &pstart, &psize) < 0)
-            return AVERROR_IO;
+            return AVERROR(EIO);
     }while (idx < 0 || !s->streams[idx]);
 
     ogg = s->priv_data;
@@ -548,7 +549,7 @@ ogg_read_packet (AVFormatContext * s, AVPacket * pkt)
 
     //Alloc a pkt
     if (av_new_packet (pkt, psize) < 0)
-        return AVERROR_IO;
+        return AVERROR(EIO);
     pkt->stream_index = idx;
     memcpy (pkt->data, os->buf + pstart, psize);
     if (os->lastgp != -1LL){
@@ -575,104 +576,28 @@ ogg_read_close (AVFormatContext * s)
 }
 
 
-static int
-ogg_read_seek (AVFormatContext * s, int stream_index, int64_t target_ts,
-               int flags)
-{
-    AVStream *st = s->streams[stream_index];
-    ogg_t *ogg = s->priv_data;
-    ByteIOContext *bc = &s->pb;
-    uint64_t min = 0, max = ogg->size;
-    uint64_t tmin = st->start_time, tmax = st->start_time + st->duration;
-    int64_t pts = AV_NOPTS_VALUE;
-
-    ogg_save (s);
-
-    if ((uint64_t)target_ts < tmin || target_ts < 0)
-        target_ts = tmin;
-    while (min <= max && tmin < tmax){
-        uint64_t p = min + (max - min) * (target_ts - tmin) / (tmax - tmin);
-        int i = -1;
-
-        url_fseek (bc, p, SEEK_SET);
-
-        while (!ogg_read_page (s, &i)){
-            if (i == stream_index && ogg->streams[i].granule != 0 &&
-                ogg->streams[i].granule != -1)
-                break;
-        }
-
-        if (i == -1)
-            break;
-
-        pts = ogg_gptopts (s, i, ogg->streams[i].granule);
-        p = url_ftell (bc);
-
-        if (FFABS (pts - target_ts) * st->time_base.num < st->time_base.den)
-            break;
-
-        if (pts > target_ts){
-            if (max == p && tmax == pts) {
-                // probably our tmin is wrong, causing us to always end up too late in the file
-                tmin = (target_ts + tmin + 1) / 2;
-                if (tmin == target_ts) {
-                    url_fseek(bc, min, SEEK_SET);
-                    break;
-                }
-            }
-            max = p;
-            tmax = pts;
-        }else{
-            if (min == p && tmin == pts) {
-                // probably our tmax is wrong, causing us to always end up too early in the file
-                tmax = (target_ts + tmax) / 2;
-                if (tmax == target_ts) {
-                    url_fseek(bc, max, SEEK_SET);
-                    break;
-                }
-            }
-            min = p;
-            tmin = pts;
-        }
-    }
-
-    if (FFABS (pts - target_ts) * st->time_base.num < st->time_base.den){
-        ogg_restore (s, 1);
-        ogg_reset (ogg);
-    }else{
-        ogg_restore (s, 0);
-        pts = AV_NOPTS_VALUE;
-    }
-
-    av_update_cur_dts(s, st, pts);
-    return 0;
-
-#if 0
-    //later...
-    int64_t pos;
-    if (av_seek_frame_binary (s, stream_index, target_ts, flags) < 0)
-        return -1;
-    pos = url_ftell (&s->pb);
-    ogg_read_timestamp (s, stream_index, &pos, pos - 1);
-#endif
-
-}
-
-#if 0
 static int64_t
 ogg_read_timestamp (AVFormatContext * s, int stream_index, int64_t * pos_arg,
                     int64_t pos_limit)
 {
     ogg_t *ogg = s->priv_data;
     ByteIOContext *bc = &s->pb;
-    int64_t pos, pts;
-
-    if (*pos_arg < 0)
-        return AV_NOPTS_VALUE;
-
-    pos = *pos_arg;
+    int64_t pts = AV_NOPTS_VALUE;
+    int i;
+    url_fseek(bc, *pos_arg, SEEK_SET);
+    while (url_ftell(bc) < pos_limit && !ogg_read_page (s, &i)) {
+        if (ogg->streams[i].granule != -1 && ogg->streams[i].granule != 0 &&
+            ogg->streams[i].codec && i == stream_index) {
+            pts = ogg_gptopts(s, i, ogg->streams[i].granule);
+            // FIXME: this is the position of the packet after the one with above
+            // pts.
+            *pos_arg = url_ftell(bc);
+            break;
+        }
+    }
+    ogg_reset(ogg);
+    return pts;
 }
-#endif
 
 static int ogg_probe(AVProbeData *p)
 {
@@ -692,7 +617,7 @@ AVInputFormat ogg_demuxer = {
     ogg_read_header,
     ogg_read_packet,
     ogg_read_close,
-    ogg_read_seek,
-// ogg_read_timestamp,
+    NULL,
+    ogg_read_timestamp,
     .extensions = "ogg",
 };

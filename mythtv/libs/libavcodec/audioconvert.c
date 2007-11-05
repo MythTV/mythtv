@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -54,8 +53,8 @@ if(fmt_pair == ofmt + 5*ifmt){\
     }while(po < end);\
 }
 
-//FIXME put things below under ifdefs so we dont waste space for cases no codec will need
-//FIXME rounding and cliping ?
+//FIXME put things below under ifdefs so we do not waste space for cases no codec will need
+//FIXME rounding and clipping ?
 
              CONV(SAMPLE_FMT_U8 , uint8_t, SAMPLE_FMT_U8 ,  *(uint8_t*)pi)
         else CONV(SAMPLE_FMT_S16, int16_t, SAMPLE_FMT_U8 , (*(uint8_t*)pi - 0x80)<<8)

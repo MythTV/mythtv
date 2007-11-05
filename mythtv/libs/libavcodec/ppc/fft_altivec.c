@@ -20,12 +20,12 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "gcc_fixes.h"
 
-#include "dsputil_altivec.h"
-
+#include "dsputil_ppc.h"
+#include "util_altivec.h"
 /*
   those three macros are from libavcodec/fft.c
   and are required for the reference C code

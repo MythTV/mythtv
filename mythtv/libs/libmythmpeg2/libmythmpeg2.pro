@@ -24,18 +24,18 @@ INCLUDEPATH += ../../libs/libavcodec
 
 INSTALLS += inc
 
-contains( TARGET_ALTIVEC, yes ) {
+contains( HAVE_ALTIVEC, yes ) {
     SOURCES += motion_comp_altivec.c idct_altivec.c
 }
-contains( TARGET_MMX, yes ) {
+contains( HAVE_MMX, yes ) {
     HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
     SOURCES += motion_comp_mmx.c idct_mmx.c
 }
-contains( TARGET_ARCH_SPARC, yes ) {
+contains( ARCH_SPARC, yes ) {
     HEADERS += vis.h
     SOURCES += motion_comp_vis.c
 }
-contains( TARGET_ARCH_ALPHA, yes ) {
+contains( ARCH_ALPHA, yes ) {
     HEADERS += alpha_asm.h
     SOURCES += motion_comp_alpha.c idct_alpha.c
 }

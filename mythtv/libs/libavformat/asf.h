@@ -17,6 +17,13 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#ifndef FFMPEG_ASF_H
+#define FFMPEG_ASF_H
+
+#include <stdint.h>
+#include "avformat.h"
+
 #define PACKET_SIZE 3200
 
 typedef struct {
@@ -278,3 +285,5 @@ static const GUID my_guid = {
 #define ASF_PL_MASK_PAYLOAD_LENGTH_FIELD_SIZE     0xc0 //1100 0000
 
 #define ASF_PL_FLAG_KEY_FRAME 0x80 //1000 0000
+
+#endif /* FFMPEG_ASF_H */

@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "avstring.h"
 
 #include <unistd.h>
 #include <stdarg.h>
@@ -72,11 +73,11 @@ static void url_add_option(char *buf, int buf_size, const char *fmt, ...)
 
     va_start(ap, fmt);
     if (strchr(buf, '?'))
-        pstrcat(buf, buf_size, "&");
+        av_strlcat(buf, "&", buf_size);
     else
-        pstrcat(buf, buf_size, "?");
+        av_strlcat(buf, "?", buf_size);
     vsnprintf(buf1, sizeof(buf1), fmt, ap);
-    pstrcat(buf, buf_size, buf1);
+    av_strlcat(buf, buf1, buf_size);
     va_end(ap);
 }
 
@@ -138,7 +139,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
     if (url_open(&s->rtp_hd, buf, flags) < 0)
         goto fail;
     local_port = udp_get_local_port(s->rtp_hd);
-    /* XXX: need to open another connexion if the port is not even */
+    /* XXX: need to open another connection if the port is not even */
 
     /* well, should suppress localport in path */
 
@@ -162,7 +163,7 @@ static int rtp_open(URLContext *h, const char *uri, int flags)
     if (s->rtcp_hd)
         url_close(s->rtcp_hd);
     av_free(s);
-    return AVERROR_IO;
+    return AVERROR(EIO);
 }
 
 static int rtp_read(URLContext *h, uint8_t *buf, int size)
@@ -178,9 +179,10 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
         len = recvfrom (s->rtp_fd, buf, size, 0,
                         (struct sockaddr *)&from, &from_len);
         if (len < 0) {
-            if (errno == EAGAIN || errno == EINTR)
+            if (ff_neterrno() == FF_NETERROR(EAGAIN) ||
+                ff_neterrno() == FF_NETERROR(EINTR))
                 continue;
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
         break;
     }
@@ -201,9 +203,10 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
                 len = recvfrom (s->rtcp_fd, buf, size, 0,
                                 (struct sockaddr *)&from, &from_len);
                 if (len < 0) {
-                    if (errno == EAGAIN || errno == EINTR)
+                    if (ff_neterrno() == FF_NETERROR(EAGAIN) ||
+                        ff_neterrno() == FF_NETERROR(EINTR))
                         continue;
-                    return AVERROR_IO;
+                    return AVERROR(EIO);
                 }
                 break;
             }
@@ -213,9 +216,10 @@ static int rtp_read(URLContext *h, uint8_t *buf, int size)
                 len = recvfrom (s->rtp_fd, buf, size, 0,
                                 (struct sockaddr *)&from, &from_len);
                 if (len < 0) {
-                    if (errno == EAGAIN || errno == EINTR)
+                    if (ff_neterrno() == FF_NETERROR(EAGAIN) ||
+                        ff_neterrno() == FF_NETERROR(EINTR))
                         continue;
-                    return AVERROR_IO;
+                    return AVERROR(EIO);
                 }
                 break;
             }
@@ -262,7 +266,7 @@ static int rtp_close(URLContext *h)
 }
 
 /**
- * Return the local port used by the RTP connexion
+ * Return the local port used by the RTP connection
  * @param s1 media file context
  * @return the local port number
  */

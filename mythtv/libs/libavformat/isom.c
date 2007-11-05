@@ -70,6 +70,7 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_MJPEG,  MKTAG('m', 'j', 'p', 'a') }, /* Motion-JPEG (format A) */
     { CODEC_ID_MJPEG,  MKTAG('A', 'V', 'D', 'J') }, /* MJPEG with alpha-channel (AVID JFIF meridien compressed) */
 /*  { CODEC_ID_MJPEG,  MKTAG('A', 'V', 'R', 'n') }, *//* MJPEG with alpha-channel (AVID ABVB/Truevision NuVista) */
+    { CODEC_ID_MJPEG,  MKTAG('d', 'm', 'b', '1') }, /* Motion JPEG OpenDML */
     { CODEC_ID_MJPEGB, MKTAG('m', 'j', 'p', 'b') }, /* Motion-JPEG (format B) */
 
     { CODEC_ID_SVQ1, MKTAG('S', 'V', 'Q', '1') }, /* Sorenson Video v1 */
@@ -113,6 +114,7 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_MPEG2VIDEO, MKTAG('m', 'x', '5', 'p') }, /* MPEG2 IMX PAL 625/50 50mb/s produced by FCP */
     { CODEC_ID_MPEG2VIDEO, MKTAG('m', 'x', '3', 'n') }, /* MPEG2 IMX NTSC 525/60 30mb/s produced by FCP */
     { CODEC_ID_MPEG2VIDEO, MKTAG('m', 'x', '3', 'p') }, /* MPEG2 IMX PAL 625/50 30mb/s produced by FCP */
+    { CODEC_ID_MPEG2VIDEO, MKTAG('x', 'd', 'v', '2') }, /* XDCAM HD 1080i60 */
     { CODEC_ID_MPEG2VIDEO, MKTAG('A', 'V', 'm', 'p') }, /* AVID IMX PAL */
 
   //{ CODEC_ID_JPEG2000, MKTAG('m', 'j', 'p', '2') }, /* JPEG 2000 produced by FCP */
@@ -136,11 +138,11 @@ const AVCodecTag codec_movaudio_tags[] = {
     { CODEC_ID_PCM_S24BE, MKTAG('i', 'n', '2', '4') },
     { CODEC_ID_PCM_S24LE, MKTAG('i', 'n', '2', '4') },
     { CODEC_ID_PCM_S16BE, MKTAG('t', 'w', 'o', 's') }, /* 16 bits */
-    { CODEC_ID_PCM_S16BE, MKTAG('N', 'O', 'N', 'E') }, /* uncompressed */
     { CODEC_ID_PCM_S16LE, MKTAG('s', 'o', 'w', 't') }, /*  */
     { CODEC_ID_PCM_S16LE, MKTAG('l', 'p', 'c', 'm') },
     { CODEC_ID_PCM_S8,    MKTAG('s', 'o', 'w', 't') },
     { CODEC_ID_PCM_U8,    MKTAG('r', 'a', 'w', ' ') }, /* 8 bits unsigned */
+    { CODEC_ID_PCM_U8,    MKTAG('N', 'O', 'N', 'E') }, /* uncompressed */
     { CODEC_ID_PCM_MULAW, MKTAG('u', 'l', 'a', 'w') }, /*  */
     { CODEC_ID_PCM_ALAW,  MKTAG('a', 'l', 'a', 'w') }, /*  */
 

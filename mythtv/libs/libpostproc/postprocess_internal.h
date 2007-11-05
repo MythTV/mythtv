@@ -23,7 +23,11 @@
  * internal api header.
  */
 
+#ifndef FFMPEG_POSTPROCESS_INTERNAL_H
+#define FFMPEG_POSTPROCESS_INTERNAL_H
+
 #include "avutil.h"
+#include "postprocess.h"
 
 #define V_DEBLOCK       0x01
 #define H_DEBLOCK       0x02
@@ -66,9 +70,9 @@
 #    define PIC
 #endif
 
-//use if u want a faster postprocessing code
-//cant differentiate between chroma & luma filters (both on or both off)
-//obviosly the -pp option at the commandline has no effect except turning the here selected
+//use if you want a faster postprocessing code
+//cannot differentiate between chroma & luma filters (both on or both off)
+//obviously the -pp option on the command line has no effect except turning the here selected
 //filters on
 //#define COMPILE_TIME_MODE 0x77
 
@@ -181,3 +185,5 @@ static inline void linecpy(void *dest, void *src, int lines, int stride)
                 memcpy(dest+(lines-1)*stride, src+(lines-1)*stride, -lines*stride);
         }
 }
+
+#endif /* FFMPEG_POSTPROCESS_INTERNAL_H */

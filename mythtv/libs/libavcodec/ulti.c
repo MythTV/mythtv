@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -30,8 +29,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
+#include "bytestream.h"
 
 #include "ulti_cb.h"
 
@@ -306,9 +305,7 @@ static int ulti_decode_frame(AVCodecContext *avctx,
 
                 case 2:
                     if (modifier) { // unpack four luma samples
-                        tmp = (*buf++) << 16;
-                        tmp += (*buf++) << 8;
-                        tmp += *buf++;
+                        tmp = bytestream_get_be24(&buf);
 
                         Y[0] = (tmp >> 18) & 0x3F;
                         Y[1] = (tmp >> 12) & 0x3F;
@@ -316,8 +313,7 @@ static int ulti_decode_frame(AVCodecContext *avctx,
                         Y[3] = tmp & 0x3F;
                         angle = 16;
                     } else { // retrieve luma samples from codebook
-                        tmp = (*buf++) << 8;
-                        tmp += (*buf++);
+                        tmp = bytestream_get_be16(&buf);
 
                         angle = (tmp >> 12) & 0xF;
                         tmp &= 0xFFF;
@@ -333,33 +329,25 @@ static int ulti_decode_frame(AVCodecContext *avctx,
                     if (modifier) { // all 16 luma samples
                         uint8_t Luma[16];
 
-                        tmp = (*buf++) << 16;
-                        tmp += (*buf++) << 8;
-                        tmp += *buf++;
+                        tmp = bytestream_get_be24(&buf);
                         Luma[0] = (tmp >> 18) & 0x3F;
                         Luma[1] = (tmp >> 12) & 0x3F;
                         Luma[2] = (tmp >> 6) & 0x3F;
                         Luma[3] = tmp & 0x3F;
 
-                        tmp = (*buf++) << 16;
-                        tmp += (*buf++) << 8;
-                        tmp += *buf++;
+                        tmp = bytestream_get_be24(&buf);
                         Luma[4] = (tmp >> 18) & 0x3F;
                         Luma[5] = (tmp >> 12) & 0x3F;
                         Luma[6] = (tmp >> 6) & 0x3F;
                         Luma[7] = tmp & 0x3F;
 
-                        tmp = (*buf++) << 16;
-                        tmp += (*buf++) << 8;
-                        tmp += *buf++;
+                        tmp = bytestream_get_be24(&buf);
                         Luma[8] = (tmp >> 18) & 0x3F;
                         Luma[9] = (tmp >> 12) & 0x3F;
                         Luma[10] = (tmp >> 6) & 0x3F;
                         Luma[11] = tmp & 0x3F;
 
-                        tmp = (*buf++) << 16;
-                        tmp += (*buf++) << 8;
-                        tmp += *buf++;
+                        tmp = bytestream_get_be24(&buf);
                         Luma[12] = (tmp >> 18) & 0x3F;
                         Luma[13] = (tmp >> 12) & 0x3F;
                         Luma[14] = (tmp >> 6) & 0x3F;

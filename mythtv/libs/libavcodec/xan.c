@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -34,7 +33,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
 
 typedef struct XanContext {
@@ -207,7 +205,7 @@ static void xan_unpack(unsigned char *dest, unsigned char *src, int dest_len)
     bytecopy(dest, src, size);  dest += size;  src += size;
 }
 
-static void inline xan_wc3_output_pixel_run(XanContext *s,
+static inline void xan_wc3_output_pixel_run(XanContext *s,
     unsigned char *pixel_buffer, int x, int y, int pixel_count)
 {
     int stride;
@@ -236,7 +234,7 @@ static void inline xan_wc3_output_pixel_run(XanContext *s,
     }
 }
 
-static void inline xan_wc3_copy_pixel_run(XanContext *s,
+static inline void xan_wc3_copy_pixel_run(XanContext *s,
     int x, int y, int pixel_count, int motion_x, int motion_y)
 {
     int stride;
@@ -355,8 +353,7 @@ static void xan_wc3_decode_frame(XanContext *s) {
 
         case 11:
         case 21:
-            size = (size_segment[0] << 16) | (size_segment[1] << 8) |
-                size_segment[2];
+            size = AV_RB24(size_segment);
             size_segment += 3;
             break;
         }

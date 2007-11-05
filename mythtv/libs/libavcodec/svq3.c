@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- *
+ */
+
+/*
  * How to use this decoder:
  * SVQ3 data is transported within Apple Quicktime files. Quicktime files
  * have stsd atoms to describe media trak properties. A stsd atom for a
@@ -37,7 +38,6 @@
  * You will know you have these parameters passed correctly when the decoder
  * correctly decodes this file:
  *  ftp://ftp.mplayerhq.hu/MPlayer/samples/V-codecs/SVQ3/Vertical400kbit.sorenson3.mov
- *
  */
 
 /**
@@ -178,34 +178,6 @@ static void svq3_add_idct_c (uint8_t *dst, DCTELEM *block, int stride, int qp, i
         dst[i + stride*2]= cm[ dst[i + stride*2] + (((z1 - z2)*qmul + rr) >> 20) ];
         dst[i + stride*3]= cm[ dst[i + stride*3] + (((z0 - z3)*qmul + rr) >> 20) ];
     }
-}
-
-static void pred4x4_down_left_svq3_c(uint8_t *src, uint8_t *topright, int stride){
-    LOAD_TOP_EDGE
-    LOAD_LEFT_EDGE
-    const __attribute__((unused)) int unu0= t0;
-    const __attribute__((unused)) int unu1= l0;
-
-    src[0+0*stride]=(l1 + t1)>>1;
-    src[1+0*stride]=
-    src[0+1*stride]=(l2 + t2)>>1;
-    src[2+0*stride]=
-    src[1+1*stride]=
-    src[0+2*stride]=
-    src[3+0*stride]=
-    src[2+1*stride]=
-    src[1+2*stride]=
-    src[0+3*stride]=
-    src[3+1*stride]=
-    src[2+2*stride]=
-    src[1+3*stride]=
-    src[3+2*stride]=
-    src[2+3*stride]=
-    src[3+3*stride]=(l3 + t3)>>1;
-}
-
-static void pred16x16_plane_svq3_c(uint8_t *src, int stride){
-    pred16x16_plane_compat_c(src, stride, 1);
 }
 
 static inline int svq3_decode_block (GetBitContext *gb, DCTELEM *block,
@@ -465,9 +437,9 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
       mb_type = MB_TYPE_16x16;
     }
   } else if (mb_type < 8) {     /* INTER */
-    if (h->thirdpel_flag && h->halfpel_flag == !get_bits (&s->gb, 1)) {
+    if (h->thirdpel_flag && h->halfpel_flag == !get_bits1 (&s->gb)) {
       mode = THIRDPEL_MODE;
-    } else if (h->halfpel_flag && h->thirdpel_flag == !get_bits (&s->gb, 1)) {
+    } else if (h->halfpel_flag && h->thirdpel_flag == !get_bits1 (&s->gb)) {
       mode = HALFPEL_MODE;
     } else {
       mode = FULLPEL_MODE;
@@ -480,7 +452,6 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
         N??11111
         N??11111
         N??11111
-        N
     */
 
     for (m=0; m < 2; m++) {
@@ -749,7 +720,7 @@ static int svq3_decode_slice_header (H264Context *h) {
     i = (s->mb_num < 64) ? 6 : (1 + av_log2 (s->mb_num - 1));
     s->mb_skip_run = get_bits (&s->gb, i) - (s->mb_x + (s->mb_y * s->mb_width));
   } else {
-    get_bits1 (&s->gb);
+    skip_bits1 (&s->gb);
     s->mb_skip_run = 0;
   }
 
@@ -758,17 +729,17 @@ static int svq3_decode_slice_header (H264Context *h) {
   s->adaptive_quant = get_bits1 (&s->gb);
 
   /* unknown fields */
-  get_bits1 (&s->gb);
+  skip_bits1 (&s->gb);
 
   if (h->unknown_svq3_flag) {
-    get_bits1 (&s->gb);
+    skip_bits1 (&s->gb);
   }
 
-  get_bits1 (&s->gb);
-  get_bits (&s->gb, 2);
+  skip_bits1 (&s->gb);
+  skip_bits (&s->gb, 2);
 
   while (get_bits1 (&s->gb)) {
-    get_bits (&s->gb, 8);
+    skip_bits (&s->gb, 8);
   }
 
   /* reset intra predictors and invalidate motion vector references */
@@ -803,12 +774,10 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   if (!s->context_initialized) {
     s->width = avctx->width;
     s->height = avctx->height;
-    h->pred4x4[DIAG_DOWN_LEFT_PRED] = pred4x4_down_left_svq3_c;
-    h->pred16x16[PLANE_PRED8x8] = pred16x16_plane_svq3_c;
     h->halfpel_flag = 1;
     h->thirdpel_flag = 1;
     h->unknown_svq3_flag = 0;
-    h->chroma_qp = 4;
+    h->chroma_qp[0] = h->chroma_qp[1] = 4;
 
     if (MPV_common_init (s) < 0)
       return -1;
@@ -835,26 +804,26 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
       /* 'frame size code' and optional 'width, height' */
       if (get_bits (&gb, 3) == 7) {
-        get_bits (&gb, 12);
-        get_bits (&gb, 12);
+        skip_bits (&gb, 12);
+        skip_bits (&gb, 12);
       }
 
       h->halfpel_flag = get_bits1 (&gb);
       h->thirdpel_flag = get_bits1 (&gb);
 
       /* unknown fields */
-      get_bits1 (&gb);
-      get_bits1 (&gb);
-      get_bits1 (&gb);
-      get_bits1 (&gb);
+      skip_bits1 (&gb);
+      skip_bits1 (&gb);
+      skip_bits1 (&gb);
+      skip_bits1 (&gb);
 
       s->low_delay = get_bits1 (&gb);
 
       /* unknown field */
-      get_bits1 (&gb);
+      skip_bits1 (&gb);
 
       while (get_bits1 (&gb)) {
-        get_bits (&gb, 8);
+        skip_bits (&gb, 8);
       }
 
       h->unknown_svq3_flag = get_bits1 (&gb);
@@ -892,11 +861,11 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   s->current_picture.pict_type = s->pict_type;
   s->current_picture.key_frame = (s->pict_type == I_TYPE);
 
-  /* skip b frames if we dont have reference frames */
+  /* Skip B-frames if we do not have reference frames. */
   if (s->last_picture_ptr == NULL && s->pict_type == B_TYPE) return 0;
-  /* skip b frames if we are in a hurry */
+  /* Skip B-frames if we are in a hurry. */
   if (avctx->hurry_up && s->pict_type == B_TYPE) return 0;
-  /* skip everything if we are in a hurry >= 5 */
+  /* Skip everything if we are in a hurry >= 5. */
   if (avctx->hurry_up >= 5) return 0;
   if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
      ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
@@ -939,7 +908,8 @@ static int svq3_decode_frame (AVCodecContext *avctx,
       int j;
       for(j=-1; j<4; j++)
         h->ref_cache[m][scan8[0] + 8*i + j]= 1;
-      h->ref_cache[m][scan8[0] + 8*i + j]= PART_NOT_AVAILABLE;
+      if(i<3)
+        h->ref_cache[m][scan8[0] + 8*i + j]= PART_NOT_AVAILABLE;
     }
   }
 
@@ -993,7 +963,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
   avctx->frame_number = s->picture_number - 1;
 
-  /* dont output the last pic after seeking */
+  /* Do not output the last pic after seeking. */
   if (s->last_picture_ptr || s->low_delay) {
     *data_size = sizeof(AVFrame);
   }
