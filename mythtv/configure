@@ -1985,7 +1985,7 @@ if disabled cpu_override && enabled proc_opt; then
 # EM64T compatible Intel Celeron
    elif expr "$processor" : ".*Celeron(R) D CPU" > /dev/null ; then
        ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
-       optimize="small"
+       enable small
 # Reportedly Intel Duo, but we assume 32 bit P4 due to generic name
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
@@ -2002,7 +2002,7 @@ if disabled cpu_override && enabled proc_opt; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Celeron(R) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-       optimize="small"
+       enable small
 # P6, which includes Intel Core
    elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then 
        ARCHFLAGS="-march=pentium4" 
@@ -2013,37 +2013,37 @@ if disabled cpu_override && enabled proc_opt; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Coppermine" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*Celeron(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*Pentium(R) M" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Celeron(R) M processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
-       optimize="small"
+       enable small
 # P2
    elif expr "$processor" : "pentium2" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
    elif expr "$processor" : ".*Mendocino" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*Klamath" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*Deschutes" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*Pentium II" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
-       optimize="small"
+       enable small
 # AMD Turion
    elif expr "$processor" : ".*AMD Turion(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
 # AMD Geode NX
    elif expr "$processor" : ".*AMD Geode(tm) NX" > /dev/null ; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
-       optimize="small"
+       enable small
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
@@ -2064,28 +2064,28 @@ if disabled cpu_override && enabled proc_opt; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*AMD Duron(..)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
-       optimize="small"
+       enable small
 # K6
    elif expr "$processor" : ".*AMD-K6(tm) 3D" > /dev/null ; then
        ARCHFLAGS="-march=pentium-mmx"
-       optimize="small"
+       enable small
 # Transmeta Crusoe
    elif expr "$processor" : ".*Crusoe(m) Processor TM5600" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
 # c3-2
    elif expr "$processor" : ".*VIA Esther" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
-       optimize="small"
+       enable small
 # c3
    elif expr "$processor" : ".*VIA.*Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
-       optimize="small"
+       enable small
    elif expr "$processor" : ".*VIA Samuel" > /dev/null ; then
        ARCHFLAGS="-march=c3"
-       optimize="small"
+       enable small
 # if no known processor info, tune base on arch_raw info
    elif test x"$arch_raw" = x"i686" -a x"$mmx" = x"yes" ; then
        ARCHFLAGS="-march=pentium2"

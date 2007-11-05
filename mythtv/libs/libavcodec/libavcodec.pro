@@ -20,6 +20,10 @@ debug:contains(ARCH_X86_32, yes) {
         QMAKE_CFLAGS_SHLIB = 
         QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
 }
+# "-Os" can not compiled with PIC 
+contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
+	QMAKE_CFLAGS_SHLIB =
+}
 
 cygwin:LIBS += -lz
 
@@ -459,3 +463,4 @@ contains( ARCH_BFIN, yes) {
     SOURCES += bfin/pixels_bfin.S bfin/idct_bfin.S bfin/fdct_bfin.S
     SOURCES += bfin/vp3_idct_bfin.S
 }
+
