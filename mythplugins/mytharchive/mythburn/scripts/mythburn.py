@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20071106-1"
+VERSION="0.1.20071106-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -2211,10 +2211,15 @@ def BurnDVDISO():
                 sys.exit(1)
             finished = True
 
-            # eject the burned disc
-            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-            r = ioctl(f,CDROM.CDROMEJECT, 0)
-            os.close(f)
+            try:
+                # eject the burned disc
+                f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+                r = ioctl(f,CDROM.CDROMEJECT, 0)
+                os.close(f)
+            except:
+                write("Failed to eject the disc! "
+                      "Maybe the media monitor has mounted it")
+
         elif drivestatus == CDROM.CDS_TRAY_OPEN:
             # Give the user 10secs to close the Tray
             write("Waiting for tray to close.")
