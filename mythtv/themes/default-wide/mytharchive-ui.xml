@@ -393,7 +393,7 @@ MythTV Archive GUI theme
           <textarea name="title" draworder="1" align="center">
               <area>0,10,1280,50</area>
               <font>title</font>
-              <value>Select Video's</value>
+              <value>Select Videos</value>
           </textarea>
 
           <textarea name="title" draworder="1" align="right">
