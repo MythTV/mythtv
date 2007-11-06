@@ -3101,7 +3101,7 @@ fi
 
 if enabled darwin_da; then
   CCONFIG="$CCONFIG darwin_da"
-  echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> config.mak
+  echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled mac_bundle; then
@@ -3126,6 +3126,8 @@ if test x"$targetos" = x"cygwin" ; then
   echo "}" >> $TMPH
   echo "#endif" >> $TMPH
 fi
+
+echo "EXTRALIBS=$extralibs" >> $MYTH_CONFIG_MAK
 
 print_config ARCH_   $TMPH $MYTH_CONFIG_MAK $ARCH_LIST
 print_config HAVE_   $TMPH $MYTH_CONFIG_MAK $HAVE_LIST

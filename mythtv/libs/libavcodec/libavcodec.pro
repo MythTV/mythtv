@@ -45,12 +45,11 @@ inc.files = avcodec.h i386/mmx.h opt.h
 INSTALLS += inc
 
 LIBS += $$LOCAL_LIBDIR_X11
-LIBS += -L../libavutil -lmythavutil-$$LIBVERSION
+LIBS += -L../libavutil -lmythavutil-$$LIBVERSION $$EXTRALIBS
 
 contains( CONFIG_AASC_DECODER, yes )            { SOURCES *= aasc.c }
 contains( CONFIG_AC3_DECODER, yes )             { SOURCES *= ac3dec.c ac3tab.c ac3.c }
 contains( CONFIG_AC3_ENCODER, yes )             { SOURCES *= ac3enc.c ac3tab.c ac3.c }
-contains( CONFIG_AC3_DECODER, yes )             { SOURCES *= ac3dec.c ac3tab.c ac3.c }
 contains( CONFIG_ALAC_DECODER, yes )            { SOURCES *= alac.c }
 contains( CONFIG_AMV_DECODER, yes )             { SOURCES *= sp5xdec.c mjpegdec.c mjpeg.c }
 contains( CONFIG_APE_DECODER, yes )             { SOURCES *= apedec.c }
@@ -310,10 +309,7 @@ contains( CONFIG_ADPCM_YAMAHA_DECODER, yes )    { SOURCES *= adpcm.c }
 contains( CONFIG_ADPCM_YAMAHA_ENCODER, yes )    { SOURCES *= adpcm.c }
 
 # external codec libraries
-contains( CONFIG_LIBA52, yes )                  {
-    SOURCES *= liba52.c
-    LIBS += -la52
-}
+contains( CONFIG_LIBA52, yes )                  { SOURCES *= liba52.c }
 contains( CONFIG_LIBAMR, yes )                  { SOURCES *= libamr.c }
 contains( CONFIG_LIBFAAC, yes )                 { SOURCES *= libfaac.c }
 contains( CONFIG_LIBFAAD, yes )                 { SOURCES *= libfaad.c }

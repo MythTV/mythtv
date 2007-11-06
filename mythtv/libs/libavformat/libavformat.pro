@@ -11,7 +11,7 @@ INCLUDEPATH += ../ ../../ ../libavcodec ../libavutil ../libmythtv
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
-LIBS += $$LOCAL_LIBDIR_X11
+LIBS += $$LOCAL_LIBDIR_X11 $$EXTRALIBS
 
 cygwin :LIBS += -lz
 
