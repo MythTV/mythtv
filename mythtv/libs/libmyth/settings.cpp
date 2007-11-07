@@ -33,6 +33,17 @@ using namespace std;
 #include "mythdbcon.h"
 #include "DisplayRes.h"
 
+static void clear_widgets(vector<Configurable*> &children,
+                          vector<QWidget*>      &childwidget)
+{
+    for (uint i = 0; (i < childwidget.size()) && (i < children.size()); i++)
+    {
+        if (children[i] && childwidget[i])
+            children[i]->widgetInvalid(childwidget[i]);
+    }
+    childwidget.clear();
+}
+
 /** \class Configurable
  *  \brief Configurable is the root of all the database aware widgets.
  *
@@ -52,6 +63,21 @@ QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
     VERBOSE(VB_IMPORTANT, "BUG: Configurable is visible, but has no "
             "configWidget");
     return NULL;
+}
+
+/** \brief This slot calls the virtual widgetInvalid(QObject*) method.
+ *
+ *  This should not be needed, anyone calling configWidget() should
+ *  also be calling widgetInvalid() directly before configWidget()
+ *  is called again on the Configurable. If widgetInvalid() is not
+ *  called directly before the Configurable's configWidget() is
+ *  called the Configurable may not update properly on screen, but
+ *  if this is connected to from the widget's destroyed(QObject*)
+ *  signal this will prevent a segfault from occurring.
+ */
+void Configurable::widgetDeleted(QObject *obj)
+{
+    widgetInvalid(obj);
 }
 
 /** \fn Configurable::enableOnSet(const QString &val)
@@ -149,6 +175,9 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                   const char* widgetName) 
 {
     widget = new QGroupBox(parent, widgetName);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
+
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (!useframe)
@@ -187,6 +216,17 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     return widget;
 }
 
+void VerticalConfigurationGroup::widgetInvalid(QObject *obj)
+{
+    widget = (widget == obj) ? NULL : widget;
+}
+
+void VerticalConfigurationGroup::deleteLater(void)
+{
+    clear_widgets(children, childwidget);
+    ConfigurationGroup::deleteLater();
+}
+
 bool VerticalConfigurationGroup::replaceChild(
     Configurable *old_child, Configurable *new_child)
 {
@@ -206,18 +246,22 @@ bool VerticalConfigurationGroup::replaceChild(
 
         if (childwidget[i])
         {
+            old_child->widgetInvalid(childwidget[i]);
             layout->remove(childwidget[i]);
             childwidget[i]->deleteLater();
             childwidget[i] = NULL;
         }
 
+        bool was_visible = old_child->isVisible();
+        bool was_enabled = old_child->isEnabled();
+
         old_child->deleteLater();
 
-        if (children[i]->isVisible())
+        if (was_visible)
         {
-            childwidget[i] = children[i]->configWidget(confgrp, widget, NULL);
+            childwidget[i] = new_child->configWidget(confgrp, widget, NULL);
             layout->add(childwidget[i]);
-            children[i]->setEnabled(children[i]->isEnabled());
+            new_child->setEnabled(was_enabled);
             childwidget[i]->resize(1,1);
             childwidget[i]->show();
         }
@@ -353,11 +397,26 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
     return widget;
 }
 
+StackedConfigurationGroup::~StackedConfigurationGroup()
+{
+    clear_widgets(children, childwidget);
+    ConfigurationGroup::deleteLater();
+}
+
+void StackedConfigurationGroup::deleteLater(void)
+{
+    clear_widgets(children, childwidget);
+    ConfigurationGroup::deleteLater();
+}
+
 QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
                                                  QWidget* parent,
                                                  const char* widgetName) 
 {
     widget = new QWidgetStack(parent, widgetName);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
+
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     for (uint i = 0 ; i < children.size() ; ++i)
@@ -382,6 +441,11 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
     confgrp = cg;
 
     return widget;
+}
+
+void StackedConfigurationGroup::widgetInvalid(QObject *obj)
+{
+    widget = (widget == obj) ? NULL : widget;
 }
 
 void StackedConfigurationGroup::addChild(Configurable *child)
@@ -418,7 +482,10 @@ void StackedConfigurationGroup::removeChild(Configurable *child)
     childwidget.erase(cit);
 
     if (widget && cw)
+    {
+        child->widgetInvalid(cw);
         widget->removeWidget(cw);
+    }
 }
 
 QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -622,8 +689,15 @@ QWidget *TriggeredConfigurationGroup::configWidget(
     configLayout->addChild(configStack);
 
     widget = configLayout->configWidget(cg, parent, widgetName);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
 
     return widget;
+}
+
+void TriggeredConfigurationGroup::widgetInvalid(QObject *obj)
+{
+    widget = (widget == obj) ? NULL : widget;
 }
 
 int SelectSetting::findSelection(const QString &label, QString value) const
@@ -806,6 +880,10 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         label->setBackgroundOrigin(QWidget::WindowOrigin);
     }
 
+    bxwidget = widget;
+    connect(bxwidget, SIGNAL(destroyed(QObject*)),
+            this,     SLOT(widgetDeleted(QObject*)));
+
     edit = new MythLineEdit(settingValue, widget,
                                           QString(widgetName) + "-edit");
     edit->setHelpText(getHelpText());
@@ -824,7 +902,16 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     setRW(rw);
     SetPasswordEcho(password_echo);
 
-    return widget;
+    return bxwidget;
+}
+
+void LineEditSetting::widgetInvalid(QObject *obj)
+{
+    if (bxwidget == obj)
+    {
+        bxwidget = NULL;
+        edit     = NULL;
+    }
 }
 
 void LineEditSetting::setEnabled(bool b)
@@ -942,6 +1029,10 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         label->setText(getLabel() + ":     ");
     }
 
+    bxwidget = box;
+    connect(bxwidget, SIGNAL(destroyed(QObject*)),
+            this,     SLOT(widgetDeleted(QObject*)));
+
     spinbox = new MythSpinBox(box, QString(widgetName) + "MythSpinBox", sstep);
     spinbox->setHelpText(getHelpText());
     spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -961,7 +1052,16 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         connect(spinbox, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
-    return box;
+    return bxwidget;
+}
+
+void SpinBoxSetting::widgetInvalid(QObject *obj)
+{
+    if (bxwidget == obj)
+    {
+        bxwidget = NULL;
+        spinbox  = NULL;
+    }
 }
 
 void SpinBoxSetting::setValue(int newValue)
@@ -1060,6 +1160,10 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         box->setStretchFactor(label, 0);
     }
 
+    bxwidget = box;
+    connect(bxwidget, SIGNAL(destroyed(QObject*)),
+            this,     SLOT(widgetDeleted(QObject*)));
+
     widget = new MythComboBox(rw, box);
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -1081,8 +1185,6 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         connect(widget, SIGNAL(highlighted(int)),
                 this, SLOT(setValue(int)));
 
-    connect(widget, SIGNAL(destroyed()),
-            this, SLOT(widgetDestroyed()));
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
 
@@ -1090,7 +1192,16 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         connect(widget, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
-    return box;
+    return bxwidget;
+}
+
+void ComboBoxSetting::widgetInvalid(QObject *obj)
+{
+    if (bxwidget == obj)
+    {
+        bxwidget = NULL;
+        widget   = NULL;
+    }
 }
 
 void ComboBoxSetting::setEnabled(bool b)
@@ -1285,6 +1396,9 @@ QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
     widget = new MythCheckBox(parent, widgetName);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
+
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
@@ -1300,6 +1414,11 @@ QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                 SIGNAL(changeHelpText(QString)));
 
     return widget;
+}
+
+void CheckBoxSetting::widgetInvalid(QObject *obj)
+{
+    widget = (widget == obj) ? NULL : widget;
 }
 
 void CheckBoxSetting::setEnabled(bool fEnabled)
@@ -1337,6 +1456,12 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
         MythDialog::keyPressEvent(e);
 }
 
+ConfigurationDialog::~ConfigurationDialog()
+{
+    clear_widgets(cfgChildren, childwidget);
+    cfgGrp->deleteLater();
+}
+
 MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
                                               const char *widgetName) 
 {
@@ -1349,10 +1474,15 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
     QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
 
     ChildList::iterator it = cfgChildren.begin();
-    for (; it != cfgChildren.end(); ++it)
+    childwidget.clear();
+    childwidget.resize(cfgChildren.size());
+    for (uint i = 0; it != cfgChildren.end(); ++it, ++i)
     {
         if ((*it)->isVisible())
-            layout->addWidget((*it)->configWidget(cfgGrp, dialog));
+        {
+            childwidget[i] = (*it)->configWidget(cfgGrp, dialog);
+            layout->addWidget(childwidget[i]);
+        }
     }
 
     return dialog;
@@ -1372,6 +1502,8 @@ int ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
 
     if ((QDialog::Accepted == ret) && saveOnAccept)
         save();
+
+    clear_widgets(cfgChildren, childwidget);
 
     dialog->deleteLater();
     dialog = NULL;
@@ -1442,6 +1574,17 @@ JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
     }
 }
 
+JumpConfigurationWizard::~JumpConfigurationWizard()
+{
+    clear_widgets(cfgChildren, childwidget);
+}
+
+void JumpConfigurationWizard::deleteLater(void)
+{
+    clear_widgets(cfgChildren, childwidget);
+    QObject::deleteLater();
+}
+
 MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
                                                   const char *widgetName)
 {
@@ -1451,13 +1594,13 @@ MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
     QObject::connect(cfgGrp, SIGNAL(changeHelpText(QString)),
                      wizard, SLOT(  setHelpText(   QString)));
 
-    childWidgets.clear();
+    childwidget.clear();
     QStringList labels, helptext;
     for (uint i = 0; i < cfgChildren.size(); i++)
     {
         if (cfgChildren[i]->isVisible())
         {
-            childWidgets.push_back(cfgChildren[i]->configWidget(cfgGrp, parent));
+            childwidget.push_back(cfgChildren[i]->configWidget(cfgGrp, parent));
             labels.push_back(cfgChildren[i]->getLabel());
             helptext.push_back(cfgChildren[i]->getHelpText());
         }
@@ -1470,10 +1613,10 @@ MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
     connect(jumppane, SIGNAL(pressed( QString)),
             this,     SLOT(  showPage(QString)));
 
-    for (uint i = 0; i < childWidgets.size(); i++)
+    for (uint i = 0; i < childwidget.size(); i++)
     {
-        wizard->addPage(childWidgets[i], labels[i]);
-        wizard->setFinishEnabled(childWidgets[i], true);
+        wizard->addPage(childwidget[i], labels[i]);
+        wizard->setFinishEnabled(childwidget[i], true);
     }
 
     return wizard;
@@ -1482,9 +1625,9 @@ MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
 void JumpConfigurationWizard::showPage(QString page)
 {
     uint pagenum = page.toUInt();
-    if (pagenum >= childWidgets.size() || !dialog)
+    if (pagenum >= childwidget.size() || !dialog)
         return;
-    ((MythJumpWizard*)(dialog))->showPage(childWidgets[pagenum]);
+    ((MythJumpWizard*)(dialog))->showPage(childwidget[pagenum]);
 }
 
 void SimpleDBStorage::load() 
@@ -1611,7 +1754,8 @@ void ListBoxSetting::addSelection(
 };
 
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                      const char* widgetName) {
+                                      const char* widgetName)
+{
     QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -1621,6 +1765,10 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         label->setText(getLabel());
         label->setBackgroundOrigin(QWidget::WindowOrigin);
     }
+
+    bxwidget = box;
+    connect(bxwidget, SIGNAL(destroyed(QObject*)),
+            this,     SLOT(widgetDeleted(QObject*)));
 
     widget = new MythListBox(box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -1654,7 +1802,16 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget->setFocus();
     widget->setSelectionMode(selectionMode);
 
-    return box;
+    return bxwidget;
+}
+
+void ListBoxSetting::widgetInvalid(QObject *obj)
+{
+    if (bxwidget == obj)
+    {
+        bxwidget = NULL;
+        widget   = NULL;
+    }
 }
 
 void ListBoxSetting::setSelectionMode(MythListBox::SelectionMode mode)
@@ -1735,6 +1892,10 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     testlabel->setText("  ");
     testlabel->setBackgroundOrigin(QWidget::WindowOrigin);
 
+    bxwidget = box;
+    connect(bxwidget, SIGNAL(destroyed(QObject*)),
+            this,     SLOT(widgetDeleted(QObject*)));
+
     imagelabel = new QLabel(box);
     imagelabel->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -1773,7 +1934,16 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         connect(widget, SIGNAL(changeHelpText(QString)), cg, 
                 SIGNAL(changeHelpText(QString)));
 
-    return box;
+    return bxwidget;
+}
+
+void ImageSelectSetting::widgetInvalid(QObject *obj)
+{
+    if (bxwidget == obj)
+    {
+        bxwidget   = NULL;
+        imagelabel = NULL;
+    }
 }
 
 HostnameSetting::HostnameSetting(Storage *storage) : Setting(storage)
@@ -1802,6 +1972,8 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
 {
     (void) cg;
     button = new MythPushButton(parent, widgetName);
+    connect(button, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
 
     button->setText(getLabel());
     button->setHelpText(getHelpText());
@@ -1814,6 +1986,11 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                 cg, SIGNAL(changeHelpText(QString)));
 
     return button;
+}
+
+void ButtonSetting::widgetInvalid(QObject *obj)
+{
+    button = (button == obj) ? NULL : button;
 }
 
 void ButtonSetting::SendPressedString(void)

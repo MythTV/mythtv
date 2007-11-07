@@ -106,9 +106,22 @@ class MPUBLIC Configurable : public QObject
     Q_OBJECT
 
   public:
-    // Create and return a widget for configuring this entity
+    /// Create and return a QWidget for configuring this entity
+    /// Note: Any class calling this should call widgetInvalid()
+    ///       before configWidget() is called on the class again,
+    ///       and before the class is deleted; just before removing
+    ///       the instance from a layout or scheduling the delete
+    ///       of a parent container is a good time. Some UI classes
+    ///       depend on this for properly updating the UI.
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
+    /// Tell any Configurable keeping a pointer to a widget,
+    /// that the pointer returned by an earlier configWidget
+    /// call is invalid.
+    /// Note: It is possible that this may be called after 
+    ///       configWidget() has been called another time
+    ///       so you must check the pointer param.
+    virtual void widgetInvalid(QObject*) { }
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -138,6 +151,7 @@ class MPUBLIC Configurable : public QObject
   public slots:
     virtual void enableOnSet(const QString &val);
     virtual void enableOnUnset(const QString &val);
+    virtual void widgetDeleted(QObject *obj);
 
   protected:
     Configurable(Storage *_storage) :
@@ -204,11 +218,13 @@ class MPUBLIC LineEditSetting : public Setting
 {
   protected:
     LineEditSetting(Storage *_storage, bool readwrite = true) :
-        Setting(_storage), edit(NULL), rw(readwrite), password_echo(false) { }
+        Setting(_storage), bxwidget(NULL), edit(NULL),
+        rw(readwrite), password_echo(false) { }
 
   public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     void setRW(bool readwrite = true)
     {
@@ -224,7 +240,8 @@ class MPUBLIC LineEditSetting : public Setting
     virtual void SetPasswordEcho(bool b);
 
   private:
-    MythLineEdit* edit;
+    QWidget      *bxwidget;
+    MythLineEdit *edit;
     bool rw;
     bool password_echo;
 };
@@ -286,6 +303,7 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent, 
                                   const char *widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     virtual void setValue(int newValue);
 
@@ -303,6 +321,7 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
     void relayValueChanged(int newValue);
 
   private:
+    QWidget     *bxwidget;
     MythSpinBox *spinbox;
     bool         relayEnabled;
     bool         sstep;
@@ -366,7 +385,8 @@ class MPUBLIC ComboBoxSetting: public SelectSetting {
 
 protected:
     ComboBoxSetting(Storage *_storage, bool _rw = false, int _step = 1) :
-        SelectSetting(_storage), rw(_rw), widget(NULL), step(_step) { }
+        SelectSetting(_storage), rw(_rw),
+        bxwidget(NULL), widget(NULL), step(_step) { }
 
 public:
     virtual void setValue(QString newValue);
@@ -374,6 +394,7 @@ public:
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     void setFocus() { if (widget) widget->setFocus(); }
 
@@ -387,11 +408,9 @@ public slots:
     bool removeSelection(const QString &label,
                          QString value = QString::null);
 
-protected slots:
-    void widgetDestroyed() { widget=NULL; };
-
 private:
     bool rw;
+    QWidget      *bxwidget;
     MythComboBox *widget;
 
 protected:
@@ -402,11 +421,12 @@ class MPUBLIC ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
     ListBoxSetting(Storage *_storage) :
-        SelectSetting(_storage), widget(NULL),
+        SelectSetting(_storage), bxwidget(NULL), widget(NULL),
         selectionMode(MythListBox::Single) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     void setFocus() { if (widget) widget->setFocus(); }
     void setSelectionMode(MythListBox::SelectionMode mode);
@@ -428,10 +448,10 @@ signals:
                       QString        value  = QString::null,
                       bool           select = false);
 
-protected slots:
     void setValueByIndex(int index);
 protected:
-    MythListBox* widget;
+    QWidget     *bxwidget;
+    MythListBox *widget;
     MythListBox::SelectionMode selectionMode;
 };
 
@@ -446,20 +466,25 @@ public:
 class MPUBLIC ImageSelectSetting: public SelectSetting {
     Q_OBJECT
 public:
-    ImageSelectSetting(Storage *_storage) : SelectSetting(_storage) { }
+    ImageSelectSetting(Storage *_storage) :
+        SelectSetting(_storage), bxwidget(NULL), imagelabel(NULL),
+        m_hmult(1.0f), m_wmult(1.0f) { }
     virtual ~ImageSelectSetting();
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     virtual void addImageSelection(const QString& label,
                                    QImage* image,
                                    QString value=QString::null,
                                    bool select=false);
+
 protected slots:
     void imageSet(int);
 
 protected:
     vector<QImage*> images;
+    QWidget *bxwidget;
     QLabel *imagelabel;
     float m_hmult, m_wmult;
 };
@@ -492,7 +517,10 @@ public:
         BooleanSetting(_storage), widget(NULL) { }
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject*);
+
     virtual void setEnabled(bool b);
+
 protected:
     MythCheckBox *widget;
 };
@@ -593,6 +621,7 @@ class MPUBLIC ButtonSetting: public Setting
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                                   const char* widgetName=0);
+    virtual void widgetInvalid(QObject *obj);
 
     virtual void setEnabled(bool b);
 
@@ -894,9 +923,12 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
     {
     }
 
+    virtual void deleteLater(void);
+
     virtual QWidget *configWidget(ConfigurationGroup *cg,
                                   QWidget            *parent,
                                   const char         *widgetName);
+    virtual void widgetInvalid(QObject *obj);
 
     bool replaceChild(Configurable *old_child, Configurable *new_child);
     void repaint(void);
@@ -967,8 +999,11 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     {
     }
 
+    virtual void deleteLater(void);
+
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
+    virtual void widgetInvalid(QObject *obj);
 
     void raise(Configurable* child);
     virtual void save(void);
@@ -985,7 +1020,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~StackedConfigurationGroup() { }
+    virtual ~StackedConfigurationGroup();
 
   protected:
     vector<QWidget*>    childwidget;
@@ -1025,6 +1060,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     virtual QWidget *configWidget(ConfigurationGroup *cg, 
                                   QWidget            *parent,
                                   const char         *widgetName);
+    virtual void widgetInvalid(QObject *obj);
 
     virtual Setting *byName(const QString &settingName);
 
@@ -1163,7 +1199,7 @@ class MPUBLIC ConfigurationDialog : public Storage
 {
   public:
     ConfigurationDialog() : dialog(NULL), cfgGrp(new ConfigurationGroup()) { }
-    virtual ~ConfigurationDialog() { cfgGrp->deleteLater(); }
+    virtual ~ConfigurationDialog();
 
     // Make a modal dialog containing configWidget
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
@@ -1187,6 +1223,7 @@ class MPUBLIC ConfigurationDialog : public Storage
     typedef vector<Configurable*> ChildList;
 
     ChildList           cfgChildren;
+    vector<QWidget*>    childwidget;
     MythDialog         *dialog;
     ConfigurationGroup *cfgGrp;
 };
@@ -1216,15 +1253,14 @@ class MPUBLIC JumpConfigurationWizard :
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
                                      const char     *widgetName);
 
+    virtual void deleteLater(void);
+
   protected slots:
     void showPage(QString);
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~JumpConfigurationWizard() { }
-
-  protected:
-    vector<QWidget*> childWidgets;
+    virtual ~JumpConfigurationWizard();
 };
 
 class MPUBLIC JumpPane : public VerticalConfigurationGroup
