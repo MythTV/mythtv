@@ -343,7 +343,8 @@ static HostCheckBox *UseShowWholeTree()
     gc->setLabel(QObject::tr("Show entire music tree"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If selected, you can navigate your entire "
-                    "music tree from the playing screen."));
+                    "music tree from the playing screen. N.B. Does not work "
+                    "with accelerated buttons disabled"));
     return gc;
 };
 
