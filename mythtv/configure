@@ -1661,7 +1661,7 @@ has_header()
 {
     HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include"
     INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
-    HPATHS="$HPATHS `echo $INCL | sed 's/$libdir_name/include/g'` "
+    HPATHS="$HPATHS "$(echo $INCL | sed "s/$libdir_name/include/g")
 
     HAS_IT="no"
     for HPATH in $HPATHS ; do
