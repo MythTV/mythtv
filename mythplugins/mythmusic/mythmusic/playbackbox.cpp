@@ -481,13 +481,13 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 if (scrollCount > 19 && scrollCount < 30)
                     scrollAmt = 10;
                 else if (scrollCount > 29)
-                    scrollAmt = 50;
+                    scrollAmt = 30;
 
                 if (!music_tree_list->moveUpByAmount(scrollAmt, true) && scrollAmt > 1)
                     resetScrollCount();
 
                 speed_scroll_timer->stop();
-                speed_scroll_timer->start(500, true);
+                speed_scroll_timer->start(300, true);
 
             }
             else if (action == "DOWN")
@@ -500,15 +500,15 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
                 scrollCount++;
                 if (scrollCount > 19 && scrollCount < 30)
-                    scrollAmt = 10;
+                    scrollAmt = 5;
                 else if (scrollCount > 29)
-                    scrollAmt = 50;
+                    scrollAmt = 30;
 
                 if (!music_tree_list->moveDownByAmount(scrollAmt, true) && scrollCount > 1)
                     resetScrollCount();
 
                 speed_scroll_timer->stop();
-                speed_scroll_timer->start(500, true);
+                speed_scroll_timer->start(300, true);
             }
             else if (action == "LEFT")
                 music_tree_list->popUp();
