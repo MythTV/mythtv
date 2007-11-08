@@ -89,6 +89,7 @@ class VideoOutputXv : public VideoOutput
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
 
+    /// Monitor refresh time in microseconds
     int  GetRefreshRate(void);
 
     virtual bool hasMCAcceleration(void) const

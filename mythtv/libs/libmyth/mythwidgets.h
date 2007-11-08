@@ -174,7 +174,10 @@ class MPUBLIC MythLineEdit : public QLineEdit
     PopupPosition popupPosition;
 };
 
-// A Line edit that does special things when you press number keys 
+/**
+ * A LineEdit that does special things when you press number keys
+ * (enter letters with multiple presses, just like a phone keypad)
+ */
 class MPUBLIC MythRemoteLineEdit : public QTextEdit
 {
     Q_OBJECT
