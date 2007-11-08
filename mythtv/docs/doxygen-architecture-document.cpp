@@ -1,5 +1,5 @@
 /**
-\mainpage %MythTV Architecture
+\mainpage MythTV Architecture
 
 \section intro Introduction
 
@@ -59,7 +59,7 @@ to documentation on the code itself.
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
   <dt>libmythui              <dd>Main user interface rendering library
   <dt>libavcodec/libavformat <dd>This is the ffmpeg A/V decoding library (aka avlib).
-      <a href="http://ffmpeg.sourceforge.net/documentation.php">Documented Externally</a>.
+      <a href="http://ffmpeg.mplayerhq.hu/documentation.html">Documented Externally</a>.
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">External Website</a>.
   <dt>libmythsamplerate      <dd>Audio resampling library
@@ -67,7 +67,7 @@ to documentation on the code itself.
       We use this to support a different output sample rates than the sample
       rate used in the audio streams we play.
   <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
-      <a href="http://sky.prohosting.com/oparviai/soundtouch/">External Website</a>.
+      <a href="http://www.surina.net/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
 </dl>
 Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
