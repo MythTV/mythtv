@@ -219,6 +219,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     UITextType            *info_text;
     UITextType            *current_visualization_text;
 
+    UITextType            *shuffle_state_text;
+    UITextType            *repeat_state_text;
+
     UIRepeatedImageType   *ratings_image;
     UIBlackHoleType       *visual_blackhole;
 

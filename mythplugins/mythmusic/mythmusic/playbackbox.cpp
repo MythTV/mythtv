@@ -1615,85 +1615,57 @@ void PlaybackBoxMusic::seek(int pos)
 void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 {
     shufflemode = mode;
+    QString state;
 
     switch (shufflemode)
     {
         case SHUFFLE_INTELLIGENT:
-            if(shuffle_button)
-            {
-                if (keyboard_accelerators)
-                    shuffle_button->setText(tr("1 Shuffle: Smart"));
-                else
-                    shuffle_button->setText(tr("Shuffle: Smart"));
-            }
-            music_tree_list->scrambleParents(true);
-
+            state = tr("Smart");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_SMART);
-
-            bannerEnable(tr("Shuffle: Smart"), 4000);
             break;
         case SHUFFLE_RANDOM:
-            if(shuffle_button)
-            {
-                if (keyboard_accelerators)
-                    shuffle_button->setText(tr("1 Shuffle: Rand"));
-                else
-                    shuffle_button->setText(tr("Shuffle: Rand"));
-            }
-            music_tree_list->scrambleParents(true);
-
+            state = tr("Rand");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_RAND);
-
-            bannerEnable(tr("Shuffle: Rand"), 4000);
             break;
         case SHUFFLE_ALBUM:
-            if(shuffle_button)
-            {
-                if (keyboard_accelerators)
-                    shuffle_button->setText(tr("1 Shuffle: Album"));
-                else
-                    shuffle_button->setText(tr("Shuffle: Album"));
-            }
-            music_tree_list->scrambleParents(true);
-
+            state = tr("Album");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ALBUM);
-
-            bannerEnable(tr("Shuffle: Album"), 4000);
             break;
         case SHUFFLE_ARTIST:
-            if(shuffle_button)
-            {
-                if (keyboard_accelerators)
-                    shuffle_button->setText(tr("1 Shuffle: Artist"));
-                else
-                    shuffle_button->setText(tr("Shuffle: Artist"));
-            }
-            music_tree_list->scrambleParents(true);
-
+            state = tr("Artist");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ARTIST);
-
-            bannerEnable(tr("Shuffle: Artist"), 4000);
-            break;        
+            break;
         default:
-            if(shuffle_button)
-            {
-                if (keyboard_accelerators)
-                    shuffle_button->setText(tr("1 Shuffle: None"));
-                else
-                    shuffle_button->setText(tr("Shuffle: None"));
-            }
-            music_tree_list->scrambleParents(false);
-
+            state = tr("None");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_NONE);
-
-            bannerEnable(tr("Shuffle: None"), 4000);
             break;
     }
+
+    if (shuffle_state_text)
+        shuffle_state_text->SetText(state);
+
+    if(shuffle_button)
+    {
+        if (keyboard_accelerators)
+            shuffle_button->setText(QString("1 %1: %2").arg(tr("Shuffle"))
+                                                     .arg(state));
+        else
+            shuffle_button->setText(QString("%1: %2").arg(tr("Shuffle"))
+                                                     .arg(state));
+    }
+
+    bannerEnable(QString("%1: %2").arg(tr("Shuffle")).arg(state), 4000);
+
+    if (!shufflemode == SHUFFLE_OFF)
+        music_tree_list->scrambleParents(true);
+    else
+        music_tree_list->scrambleParents(true);
+
     music_tree_list->setTreeOrdering(shufflemode + 1);
     if (listAsShuffled)
         music_tree_list->setVisualOrdering(shufflemode + 1);
@@ -1742,46 +1714,45 @@ void PlaybackBoxMusic::decreaseRating()
 void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
 {
     repeatmode = mode;
-
-    if (!repeat_button)
-        return;
+    QString state;
 
     switch (repeatmode)
     {
         case REPEAT_ALL:
-            if (keyboard_accelerators)
-                repeat_button->setText(tr("2 Repeat: All"));
-            else
-                repeat_button->setText(tr("Repeat: All"));
-
+            state = tr("All");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
-
-            bannerEnable(tr("Repeat: All"), 4000);
             break;
         case REPEAT_TRACK:
-            if (keyboard_accelerators)
-                repeat_button->setText(tr("2 Repeat: Track"));
-            else
-                repeat_button->setText(tr("Repeat: Track"));
-
+            state = tr("Track");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_TRACK);
-
-            bannerEnable(tr("Repeat: Track"), 4000);
             break;
         default:
-            if (keyboard_accelerators)
-                repeat_button->setText(tr("2 Repeat: None"));
-            else
-                repeat_button->setText(tr("Repeat: None"));
-
+            state = tr("None");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_NONE);
-
-            bannerEnable(tr("Repeat: None"), 4000);
             break;
     }
+
+    if (repeat_state_text)
+        repeat_state_text->SetText(state);
+
+
+    if(repeat_button)
+    {
+        if (keyboard_accelerators)
+            repeat_button->setText(QString("2 %1: %2").arg(tr("Repeat"))
+                                                    .arg(state));
+        else
+            repeat_button->setText(QString("%1: %2").arg(tr("Repeat"))
+                                                    .arg(state));
+    }
+
+    if (class LCD *lcd = LCD::Get())
+        lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
+
+    bannerEnable(QString("%1: %2").arg(tr("Repeat")).arg(state), 4000);
 }
 
 void PlaybackBoxMusic::savePosition(uint position)
@@ -2336,9 +2307,13 @@ void PlaybackBoxMusic::wireUpTheme()
     if (shuffle_button)
         connect(shuffle_button, SIGNAL(pushed()), this, SLOT(toggleShuffle()));
 
+    shuffle_state_text = getUITextType("shuffle_state");
+
     repeat_button = getUITextButtonType("repeat_button");
     if (repeat_button)
         connect(repeat_button, SIGNAL(pushed()), this, SLOT(toggleRepeat()));
+
+    repeat_state_text = getUITextType("repeat_state");
 
     pledit_button = getUITextButtonType("pledit_button");
     if (pledit_button)
