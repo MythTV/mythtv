@@ -36,7 +36,7 @@ bool XmlConfiguration::Load( void )
 
     QFile  file( sName );
 
-    if (file.exists())
+    if (file.exists() && m_sFileName.length())  // Ignore empty filenames
     {
 
         if ( !file.open( IO_ReadOnly ) )
@@ -80,6 +80,8 @@ bool XmlConfiguration::Load( void )
 
 bool XmlConfiguration::Save( void )
 {
+    if (m_sFileName.isEmpty())   // Special case. No file is created
+        return true;
 
     QString sName = m_sPath + "/" + m_sFileName;
 
