@@ -99,7 +99,7 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
             videoout->Play();
         else
         {
-            if (GetNVP()->GetPause())
+            if (GetNVP()->IsPaused())
             {
                 videoout->Pause();
                 do
@@ -669,7 +669,7 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame, bool doflush)
 {
     long long number = desiredFrame - videoPlayed;
 
-    if (GetNVP()->GetPause() && number < keyframedist)
+    if (GetNVP()->IsPaused() && number < keyframedist)
     {
         StepFrames(videoPlayed, number+1);
         framesPlayed = desiredFrame + 1;

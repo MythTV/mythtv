@@ -424,6 +424,12 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
             .arg(speed,5,'f',1).arg(normal).arg(unpauseaudio));
 
     internalPauseLock.lock();
+    if (editmode)
+    {
+        internalPauseLock.unlock();
+        VERBOSE(VB_IMPORTANT, LOC + "Ignoring Play(), in edit mode.");
+        return false;
+    }
     UnpauseVideo();
     internalPauseLock.unlock();
 
@@ -439,11 +445,20 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     return true;
 }
 
-bool NuppelVideoPlayer::GetPause(void) const
+bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible) const
 {
-    return (actuallypaused &&
-            (ringBuffer == NULL || ringBuffer->isPaused()) &&
-            (audioOutput == NULL || audioOutput->GetPause()) &&
+    bool rbf_playing = (ringBuffer != NULL) && !ringBuffer->isPaused();
+    bool aud_playing = (audioOutput != NULL) && !audioOutput->GetPause();
+    if (is_pause_still_possible)
+    {
+        bool decoder_pausing = (0.0f == next_play_speed) && !next_normal_speed;
+        bool video_pausing = pausevideo;
+        bool rbuf_paused = !rbf_playing;
+        *is_pause_still_possible = 
+            decoder_pausing && video_pausing && rbuf_paused;
+    }
+
+    return (actuallypaused && !rbf_playing && !aud_playing &&
             IsVideoActuallyPaused());
 }
 
@@ -4443,13 +4458,28 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (alreadyediting)
         return false;
 
-    if (GetPause())
-        osd->EndStatus();
+    // lock internal pause lock so that is_pause is definately still
+    // valid when we enter pause wait loop.
+    internalPauseLock.lock();
+    bool is_paused = IsPaused();
+    if (is_paused)
+        osd->EndStatus(); // hide pause OSD
 
     editmode = true;
-    Pause();
-    while (!GetPause())
-        usleep(1000);
+    bool pause_possible = false;
+    while (!is_paused)
+    {
+        if (!pause_possible)
+        {
+            internalPauseLock.unlock();
+            Pause(true);
+            internalPauseLock.lock();
+        }
+        is_paused = IsPaused(&pause_possible);
+        usleep(5000);
+    }
+    // safe to unlock now, play won't start with editmode enabled
+    internalPauseLock.unlock();
 
     seekamount = keyframedist;
     seekamountpos = 3;

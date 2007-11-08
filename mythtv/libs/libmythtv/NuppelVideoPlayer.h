@@ -236,7 +236,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void Pause(bool waitvideo = true);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
-    bool GetPause(void) const;
+    bool IsPaused(bool *is_pause_still_possible = NULL) const;
 
     // Seek stuff
     bool FastForward(float seconds);
