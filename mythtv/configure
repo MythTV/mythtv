@@ -1113,7 +1113,12 @@ if test -f /usr/bin/hostinfo ; then
         if test x"`echo $processor | cut -c1-3`" = x"ppc" ; then
             tune=$processor 
         else 
-            processor=`/usr/sbin/sysctl -n machdep.cpu.model_string` 
+            # 10.4 only:
+            processor=`/usr/sbin/sysctl -n machdep.cpu.model_string 2>/dev/null`
+            if test x"$processor" = x"" ; then
+                # On 10.5, this contains the type of CPU also:
+                processor=`/usr/sbin/sysctl -n machdep.cpu.brand_string`
+            fi
             processor_flags=`/usr/sbin/sysctl -n machdep.cpu.features` 
             processor_flags=`echo $processor_flags | tr "[A-Z]" "[a-z]"` 
         fi 
