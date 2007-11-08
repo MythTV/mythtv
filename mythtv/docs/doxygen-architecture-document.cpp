@@ -439,8 +439,11 @@ This line is filler that is ignored by Doxygen.
 
 The MythTV backend process currently opens sockets for three different types
 of commands; a custom protocol (by default at port 6543),
-an HTML status server (by default <A HREF="http://127.0.0.1:6544">
+an HTML server (by default <A HREF="http://127.0.0.1:6544">
 http://127.0.0.1:6544
+</A> for the status, and other services under that, like
+< HREF="http://127.0.0.1:6544/Myth/GetMusic?Id=1">
+http://127.0.0.1:6544/Myth/GetMusic?Id=1
 </A>), and a UPnP media server (several ports that I cannot
 remember right now that throw around lots of little bits of XML :-)
 
