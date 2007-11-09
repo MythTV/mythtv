@@ -1079,7 +1079,10 @@ void PlaybackBox::updateVideo(QPainter *p)
         if (previewVideoNVP)
         {
             if (previewVideoNVP->IsPlaying())
+            {
                 previewVideoState = kPlaying;
+                erase(drawVideoBounds);
+            }
         }
         else
         {
@@ -4404,10 +4407,14 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap();
 
-        if (wmult != 1.0f || hmult != 1.0f)
-        {
-            QImage tmp2 = image->smoothScale((int)(image->width() * wmult),
-                                             (int)(image->height() * hmult));
+         if (drawVideoBounds.width() != image->width() &&
+                (wmult != 1.0f || hmult != 1.0f))
+         {
+            float scaleratio = (float)drawVideoBounds.width() / (float)image->width();
+            int previewwidth = (int)(drawVideoBounds.width() * wmult);
+            int previewheight = (int)(image->height() * scaleratio * hmult);
+
+            QImage tmp2 = image->smoothScale(previewwidth, previewheight);
             previewPixmap->convertFromImage(tmp2);
         }
         else
@@ -4418,7 +4425,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     if (!previewPixmap)
     {
-        previewPixmap = new QPixmap((int)(160 * wmult), (int)(120 * hmult));
+        previewPixmap = new QPixmap((int)(drawVideoBounds.x() * wmult),
+                                    (int)(drawVideoBounds.y() * hmult));
         previewPixmap->fill(black);
     }
 
