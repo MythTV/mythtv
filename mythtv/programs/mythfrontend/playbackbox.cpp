@@ -1004,7 +1004,17 @@ void PlaybackBox::updateVideo(QPainter *p)
     {
         QPixmap temp = getPixmap(curitem);
         if (temp.width() > 0)
-            p->drawPixmap(drawVideoBounds.x(), drawVideoBounds.y(), temp);
+        {
+            int pixmap_y = 0;
+
+            if (temp.height() < drawVideoBounds.height())
+                pixmap_y = drawVideoBounds.y() + 
+                                (drawVideoBounds.height() - temp.height())/2;
+            else
+                pixmap_y = drawVideoBounds.y();
+
+            p->drawPixmap(drawVideoBounds.x(), pixmap_y, temp);
+        }
     }
 
     /* keep calling killPlayer() to handle nvp cleanup */
@@ -1104,7 +1114,16 @@ void PlaybackBox::updateVideo(QPainter *p)
         size.setHeight(((size.height() + 7) / 8) * 8);
         size.setWidth( ((size.width()  + 7) / 8) * 8);
         const QImage &img = previewVideoNVP->GetARGBFrame(size);
-        p->drawImage(drawVideoBounds.x(), drawVideoBounds.y(), img);
+
+        int video_y = 0;
+
+        if (img.height() < drawVideoBounds.height())
+            video_y = drawVideoBounds.y() + 
+                            (drawVideoBounds.height() - img.height())/2;
+        else
+            video_y = drawVideoBounds.y();
+
+        p->drawImage(drawVideoBounds.x(), video_y, img);
     }
 
     /* have we timed out waiting for nvp to start? */
