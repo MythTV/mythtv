@@ -1111,9 +1111,9 @@ void PlaybackBox::updateVideo(QPainter *p)
         !playingSomething)
     {
         QSize size = drawVideoBounds.size();
-        float saspect = ((float)size.width()) / ((float)size.height());
+        float saspect = ((float)size.width() / (float)size.height())  / wmult;
         float vaspect = previewVideoNVP->GetVideoAspect();
-        size.setHeight((int) ceil(size.height() * (saspect / vaspect)));
+        size.setHeight((int) ceil(size.height() * (saspect / vaspect) * hmult));
         size.setHeight(((size.height() + 7) / 8) * 8);
         size.setWidth( ((size.width()  + 7) / 8) * 8);
         const QImage &img = previewVideoNVP->GetARGBFrame(size);
@@ -4409,9 +4409,10 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
         if (drawVideoBounds.width() != image->width())
         {
-            float scaleratio = (float)drawVideoBounds.width() / (float)image->width();
+            float scaleratio = ((float)drawVideoBounds.width() / wmult)
+                                    / (float)image->width();
             int previewwidth = (int)drawVideoBounds.width();
-            int previewheight = (int)image->height() * scaleratio;
+            int previewheight = (int)(image->height() * scaleratio * hmult);
 
             QImage tmp2 = image->smoothScale(previewwidth, previewheight);
             previewPixmap->convertFromImage(tmp2);
