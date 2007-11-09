@@ -4407,12 +4407,11 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap();
 
-         if (drawVideoBounds.width() != image->width() &&
-                (wmult != 1.0f || hmult != 1.0f))
-         {
+        if (drawVideoBounds.width() != image->width())
+        {
             float scaleratio = (float)drawVideoBounds.width() / (float)image->width();
-            int previewwidth = (int)(drawVideoBounds.width() * wmult);
-            int previewheight = (int)(image->height() * scaleratio * hmult);
+            int previewwidth = (int)drawVideoBounds.width();
+            int previewheight = (int)image->height() * scaleratio;
 
             QImage tmp2 = image->smoothScale(previewwidth, previewheight);
             previewPixmap->convertFromImage(tmp2);
