@@ -328,13 +328,6 @@ void StatusBox::LoadTheme()
         errored = true;
     }
 
-    heading = (UITextType*)topbar->GetType("heading");
-    if (!heading)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get heading area.");
-        errored = true;
-    }
-
     helptext = (UITextType*)topbar->GetType("helptext");
     if (!helptext)
     {
