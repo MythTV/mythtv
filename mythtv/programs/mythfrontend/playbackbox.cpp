@@ -5322,26 +5322,35 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     recGroupOldPassword->setEchoMode(QLineEdit::Password);
     recGroupNewPassword->setEchoMode(QLineEdit::Password);
 
-    recGroupOkButton->setEnabled(recGroupPassword.isEmpty());
-
+    // set inital ok enabled status and initial focus
     recGroupOldPasswordChanged(QString::null);
+    if (IsRecGroupPasswordCorrect(QString::null))
+        recGroupNewPassword->setFocus();
+    else
+        recGroupOldPassword->setFocus();
 
     connect(recGroupOldPassword, SIGNAL(textChanged(const QString &)), this,
             SLOT(recGroupOldPasswordChanged(const QString &)));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     if (recGroupPopup->ExecPopup() == MythDialog::Accepted)
-        setRecGroupPassword();
+    {
+        SetRecGroupPassword(recGroupOldPassword->text(),
+                            recGroupNewPassword->text());
+    }
 
     closeRecGroupPopup(false);
 }
 
-void PlaybackBox::setRecGroupPassword(void)
+void PlaybackBox::SetRecGroupPassword(const QString &oldPassword,
+                                      const QString &newPassword)
 {
-    QString newPassword = recGroupNewPassword->text();
-
-    if (recGroupOldPassword->text() != recGroupPassword)
+    if (oldPassword != recGroupPassword)
+    {
+        VERBOSE(VB_IMPORTANT, "Not setting password: "
+                "oldPassword != recGroupPassword");
         return;
+    }
 
     if (recGroup == "All Programs")
     {
@@ -5368,15 +5377,20 @@ void PlaybackBox::setRecGroupPassword(void)
             query.exec();
         }
     }
+
+    recGroupPassword = QDeepCopy<QString>(newPassword);
+}
+
+bool PlaybackBox::IsRecGroupPasswordCorrect(const QString &newText) const
+{
+    return ((newText == recGroupChooserPassword) ||
+            (newText.isEmpty() && recGroupChooserPassword.isEmpty()));
 }
 
 void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
 {
-    bool correct =
-        (newText == recGroupChooserPassword) ||
-        (newText.isEmpty() && recGroupChooserPassword.isEmpty());
-
-    recGroupOkButton->setEnabled(correct);
+    if (recGroupOkButton)
+        recGroupOkButton->setEnabled(IsRecGroupPasswordCorrect(newText));
 }
 
 void PlaybackBox::clearProgramCache(void)

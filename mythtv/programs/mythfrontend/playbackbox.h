@@ -195,7 +195,6 @@ class PlaybackBox : public MythDialog
     void setRecGroup(void);
     void setPlayGroup(void);
     void setRecTitle(void);
-    void setRecGroupPassword();
     void recGroupOldPasswordChanged(const QString &newText);
 
     void doJobQueueJob(int jobType, int jobFlags = 0);
@@ -241,6 +240,10 @@ class PlaybackBox : public MythDialog
     bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     bool IsGeneratingPreview(const QString &fn) const;
     uint IncPreviewGeneratorAttempts(const QString &fn);
+
+    void SetRecGroupPassword(const QString &oldPasswd,
+                             const QString &newPasswd);
+    bool IsRecGroupPasswordCorrect(const QString &passwd) const;
 
   private:
     bool FillList(bool useCachedData = false);
