@@ -475,7 +475,7 @@ void MythburnWizard::wireUpTheme()
 
     // add recording button
     addrecording_button = getUITextButtonType("addrecording_button");
-    if (next_button)
+    if (addrecording_button)
     {
         addrecording_button->setText(tr("Add Recording"));
         connect(addrecording_button, SIGNAL(pushed()), this, SLOT(handleAddRecording()));
