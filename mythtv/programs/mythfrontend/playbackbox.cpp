@@ -4425,8 +4425,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     if (!previewPixmap)
     {
-        previewPixmap = new QPixmap((int)(drawVideoBounds.x() * wmult),
-                                    (int)(drawVideoBounds.y() * hmult));
+        previewPixmap = new QPixmap((int)(drawVideoBounds.x()),
+                                    (int)(drawVideoBounds.y()));
         previewPixmap->fill(black);
     }
 
