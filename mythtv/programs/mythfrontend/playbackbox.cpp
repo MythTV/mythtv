@@ -4409,10 +4409,17 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
         if (drawVideoBounds.width() != image->width())
         {
+            VERBOSE(VB_IMPORTANT, QString("%1 %2 x %3").arg(drawVideoBounds.width())
+                                                     .arg(image->width())
+                                                     .arg(image->height()));
+
             float scaleratio = ((float)drawVideoBounds.width() / wmult)
                                     / (float)image->width();
             int previewwidth = (int)drawVideoBounds.width();
             int previewheight = (int)(image->height() * scaleratio * hmult);
+
+            VERBOSE(VB_IMPORTANT, QString("%1 x %2").arg(previewwidth)
+                                                     .arg(previewheight));
 
             QImage tmp2 = image->smoothScale(previewwidth, previewheight);
             previewPixmap->convertFromImage(tmp2);
@@ -4425,8 +4432,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     if (!previewPixmap)
     {
-        previewPixmap = new QPixmap((int)(drawVideoBounds.x()),
-                                    (int)(drawVideoBounds.y()));
+        previewPixmap = new QPixmap((int)(drawVideoBounds.width()),
+                                    (int)(drawVideoBounds.height()));
         previewPixmap->fill(black);
     }
 
