@@ -19,11 +19,11 @@ SOURCES += main.cpp ../mytharchive/archiveutil.cpp
 LIBS += -L$${PREFIX}/lib $$EXTRA_LIBS
 LIBS += -lmyth-$$LIBVERSION -lmythtv-$$LIBVERSION 
 LIBS += -lmythui-$$LIBVERSION -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
+LIBS += -lmythavutil-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION
+LIBS += -lmythavformat-$$LIBVERSION
 
 macx {
     # libmyth depends on the following:
-    LIBS += -lmythavutil-$$LIBVERSION
-    LIBS += -lmythavcodec-$$LIBVERSION
-    LIBS += -lmythavformat-$$LIBVERSION
     using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 }
