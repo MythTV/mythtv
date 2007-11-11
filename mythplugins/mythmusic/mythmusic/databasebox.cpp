@@ -82,12 +82,9 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
                        "does not contain any info lines in the music element.  "
                        "Please contact the theme creator and ask if they could "
-                       "please update it.<br><br>The next screen will be empty."
-                       "  Escape out of it to return to the menu."));
+                       "please update it."));
         diag.AddButton(tr("OK"));
         diag.exec();
-
-        return;
     }
 
     connect(tree, SIGNAL(itemEntered(UIListTreeType *, UIListGenericTree *)),
@@ -119,12 +116,12 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         fillCD();
 
         cd_reader_thread->start();
-    
+
         cd_watcher = new QTimer(this);
         connect(cd_watcher, SIGNAL(timeout()), this, SLOT(occasionallyCheckCD()));
         cd_watcher->start(1000); // Every second?
     }
-    
+
     // Set a timer to keep redoing the fillList stuff until the metadata and 
     // playlist loading threads are done
 
@@ -633,50 +630,65 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
                 return;
             }
         }
-        
+
         unsigned int line = 0;
         QString tmpstr;
 
         if (mdata->Compilation())
         {
             tmpstr = tr("Compilation Artist:\t") + mdata->CompilationArtist();
-            m_lines.at(line++)->SetText(tmpstr);
+            if (m_lines.at(line))
+                m_lines.at(line++)->SetText(tmpstr);
         }
+
         tmpstr = tr("Artist:\t") + mdata->Artist();
-        m_lines.at(line++)->SetText(tmpstr);
+        if (m_lines.at(line))
+            m_lines.at(line++)->SetText(tmpstr);
+
         tmpstr = tr("Album:\t") + mdata->Album();
-        m_lines.at(line++)->SetText(tmpstr);
+        if (m_lines.at(line))
+            m_lines.at(line++)->SetText(tmpstr);
+
         tmpstr = tr("Title:\t") + mdata->Title();
-        m_lines.at(line++)->SetText(tmpstr);
-        
+        if (m_lines.at(line))
+            m_lines.at(line++)->SetText(tmpstr);
+
         if (m_lines.at(line))
         {
             int maxTime = mdata->Length() / 1000;
-            
+
             int maxh = maxTime / 3600;
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
-            
+
             QString timeStr;
             if (maxh > 0)
                 timeStr.sprintf("%02d:%02d:%02d", maxh, maxm, maxs);
             else
                 timeStr.sprintf("%02d:%02d", maxm, maxs);
-            
+
             tmpstr = tr("Length:\t") + timeStr;
-            
-            if (mdata->Genre().length() > 0)
-            {
-                tmpstr += "            " + tr("Genre: ") + mdata->Genre();
-            }
-            
+
+            m_lines.at(line++)->SetText(tmpstr);
+        }
+
+        tmpstr = tr("Genre: ") + mdata->Genre();
+
+        if (m_lines.at(line))
+        {
             m_lines.at(line)->SetText(tmpstr);
         }
-          
-        // Post increment as not incremented from previous use.
+        else
+        {
+            QString prevvalue = m_lines.at(line-1)->GetText();
+            tmpstr = prevvalue + "            " + tmpstr;
+            m_lines.at(line-1)->SetText(tmpstr);
+        }
+
+        // Pre increment as not incremented from previous use.
         while (++line < m_lines.count())
           m_lines.at(line)->SetText("");
-        
+
         // Don't forget to delete the mdata storage if we allocated it.
         if (cd)
           delete mdata;
