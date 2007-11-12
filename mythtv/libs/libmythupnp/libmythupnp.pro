@@ -32,14 +32,10 @@ SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp
 
 INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../..
-DEPENDPATH += ../libmythtv ../libmyth ../libavcodec
-DEPENDPATH += ../libavformat
+DEPENDPATH += ../libmyth
 
-LIBS += -L../libmyth -L../libmythtv -L../libavcodec
-LIBS += -L../libavformat
-
-LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION 
-LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -L../libmyth
+LIBS += -lmyth-$$LIBVERSION
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
@@ -77,8 +73,4 @@ freebsd:SOURCES += darwin-sendfile.c
 macx {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
-
-    # This lib depends on libmythtv which depends on some stuff in libmythui.
-    LIBS += -L../libmythui -lmythui-$$LIBVERSION
-    #QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 }
