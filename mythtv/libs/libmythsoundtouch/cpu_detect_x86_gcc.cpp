@@ -50,10 +50,6 @@
 
 #include "config.h"
 
-#ifdef ARCH_X86_64
-#define ARCH_X86
-#endif
-
 using namespace std;
 
 #include <stdio.h>
