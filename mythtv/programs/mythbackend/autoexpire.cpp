@@ -391,7 +391,7 @@ void AutoExpire::ExpireRecordings(void)
             continue;
         }
 
-        if (fsit->freeSpaceKB < desired_space)
+        if (((size_t) max(0LL, fsit->freeSpaceKB)) < desired_space)
         {
             VERBOSE(VB_FILE,
                     QString("    Not Enough Free Space!  We want %1 MB")
@@ -418,7 +418,7 @@ void AutoExpire::ExpireRecordings(void)
             QString myHostName = gContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) && 
-                   (fsit->freeSpaceKB < desired_space))
+                   (((size_t)(max(0LL, fsit->freeSpaceKB))) < desired_space))
             {
                 ProgramInfo *p = *it;
                 it++;

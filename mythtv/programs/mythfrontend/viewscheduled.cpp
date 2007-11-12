@@ -325,8 +325,7 @@ void ViewScheduled::FillList(void)
     if (conflictBool)
     {
         // Find first conflict and store in conflictDate field
-        int i;
-        for (i = 0; i < recList.count(); i++)
+        for (uint i = 0; i < recList.count(); i++)
         {
             ProgramInfo *p = recList[i];
             if (p->recstatus == rsConflict)
