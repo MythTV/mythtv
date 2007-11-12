@@ -4,6 +4,7 @@
 #include "dbaccess.h"
 #include "cleanup.h"
 
+#include <algorithm>
 #include <vector>
 #include <map>
 

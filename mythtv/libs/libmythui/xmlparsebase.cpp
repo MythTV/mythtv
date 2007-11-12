@@ -1,3 +1,5 @@
+#include <typeinfo>
+
 #include <qfile.h>
 
 #include "xmlparsebase.h"

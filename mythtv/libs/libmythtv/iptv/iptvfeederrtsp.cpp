@@ -3,6 +3,7 @@
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
+#include <algorithm>
 
 #include "iptvfeederrtsp.h"
 

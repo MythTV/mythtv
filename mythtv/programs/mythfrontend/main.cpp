@@ -4,6 +4,7 @@
 #include <qfileinfo.h>
 #include <qmap.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <qdir.h>
 #include <qtextcodec.h>
 #include <qwidget.h>

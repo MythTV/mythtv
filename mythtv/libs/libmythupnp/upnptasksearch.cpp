@@ -12,6 +12,7 @@
 #include "upnptasksearch.h"
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <qstringlist.h>
 #include <quuid.h> 
 #include <qdom.h> 

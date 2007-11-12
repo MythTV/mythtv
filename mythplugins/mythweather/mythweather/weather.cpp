@@ -12,6 +12,7 @@
 #include <qapplication.h>
 
 #include <unistd.h>
+#include <cstdlib>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>

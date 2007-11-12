@@ -5,6 +5,7 @@
 
 // C++ headers
 #include <iostream>
+#include <cstdlib>
 
 // libmyth headers
 #include "mythcontext.h"

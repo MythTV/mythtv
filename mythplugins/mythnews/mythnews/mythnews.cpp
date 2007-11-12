@@ -22,6 +22,7 @@
 #include <iostream>
 #include <math.h>
 #include <unistd.h>
+#include <cstdlib>
 
 #include <qapplication.h>
 #include <qnetwork.h>

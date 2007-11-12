@@ -14,6 +14,7 @@
 #include "libmythui/mythmainwindow.h"
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/wait.h>	// For WIFEXITED on Mac OS X
 #include <cmath>
 

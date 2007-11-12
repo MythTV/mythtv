@@ -4,6 +4,7 @@
 #include "remoteutil.h"
 
 #include <unistd.h>
+#include <stdlib.h>
 
 XBox::XBox(void)
 {

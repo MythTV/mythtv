@@ -2,6 +2,7 @@
 // Copyright (c) 2003-2005, Daniel Kristjansson 
 
 #include <cassert>
+#include <cstdlib>
 
 #include "mythcontext.h"
 #include "cc708decoder.h"

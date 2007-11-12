@@ -8,6 +8,7 @@
 #include "config.h"
 
 #include <iostream>
+#include <cstdlib>
 #include <signal.h>
 
 using namespace std;

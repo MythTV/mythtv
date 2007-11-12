@@ -19,6 +19,7 @@
 #include <qregexp.h>
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <qstringlist.h>
 #include <sys/time.h>
 

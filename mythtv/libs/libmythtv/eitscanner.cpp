@@ -4,6 +4,8 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+#include <cstdlib>
+
 #include "tv_rec.h"
 
 #include "channelbase.h"

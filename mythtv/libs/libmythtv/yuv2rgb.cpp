@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <inttypes.h>
+#include <limits.h>
 #include "config.h"
 
 #ifdef MMX

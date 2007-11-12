@@ -107,6 +107,7 @@ a variable before you overwrite it; deletion before overwriting is automatic.
 #include <unistd.h>
 #include <math.h>
 #include <iostream>
+#include <cstdlib>
 
 #include <mythtv/mythcontext.h>
 

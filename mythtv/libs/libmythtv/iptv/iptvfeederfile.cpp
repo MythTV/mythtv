@@ -7,6 +7,7 @@
  *  Copyright (c) 2006 by Mike Mironov & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
+#include <algorithm>
 
 #include "iptvfeederfile.h"
 

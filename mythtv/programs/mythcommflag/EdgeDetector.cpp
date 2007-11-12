@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "NuppelVideoPlayer.h"
 extern "C" {
 #include "avcodec.h"        // AVPicture

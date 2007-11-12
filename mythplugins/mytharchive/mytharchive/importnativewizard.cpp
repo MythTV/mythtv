@@ -1,3 +1,4 @@
+#include <cstdlib>
 // Qt
 #include <qdir.h>
 #include <qapplication.h>

@@ -1,3 +1,4 @@
+#include <cstdlib>
 using namespace std;
 
 #include "managedlist.h"

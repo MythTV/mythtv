@@ -1,6 +1,7 @@
 #include "Histogram.h"
 #include <string>
 #include <cmath>
+#include <cstring>
 
 Histogram::Histogram()
 {

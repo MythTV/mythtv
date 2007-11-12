@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include <qapplication.h>
 
 #include <mythtv/xmlparse.h>

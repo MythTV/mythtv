@@ -12,6 +12,7 @@
 #include <sys/resource.h>
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 #include "exitcodes.h"

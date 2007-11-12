@@ -9,6 +9,7 @@
 */
 
 #include <unistd.h>
+#include <cstdlib>
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qdir.h>

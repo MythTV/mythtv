@@ -16,6 +16,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <qpixmap.h>
 
 #include <unistd.h>
+#include <cstdlib>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>

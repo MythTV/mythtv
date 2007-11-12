@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <math.h>

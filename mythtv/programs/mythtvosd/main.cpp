@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 
 #include <iostream>
+#include <cstdlib>
 
 #include <qapplication.h>
 #include <qsocketdevice.h>

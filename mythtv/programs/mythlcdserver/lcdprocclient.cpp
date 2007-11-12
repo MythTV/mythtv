@@ -9,6 +9,7 @@
 #include <qapplication.h>
 #include <qregexp.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <cmath>
 
 #include "lcdprocclient.h"

@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <cstdlib>
 
 // qt
 #include <qdatetime.h>

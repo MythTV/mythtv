@@ -10,6 +10,7 @@
 #include <qheader.h>
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 #include "viewschdiff.h"

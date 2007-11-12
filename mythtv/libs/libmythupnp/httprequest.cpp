@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 
 #include "util.h"

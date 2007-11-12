@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cstdlib>
 
 // qt
 #include <qdir.h>

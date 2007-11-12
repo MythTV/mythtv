@@ -3,6 +3,7 @@
 #include <qtextstream.h>
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 #include <unistd.h>
 

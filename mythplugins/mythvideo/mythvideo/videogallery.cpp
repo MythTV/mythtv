@@ -15,6 +15,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <qstringlist.h>
 #include <qpixmap.h>
 #include <unistd.h>
+#include <cstdlib>
 
 #include <cmath>
 

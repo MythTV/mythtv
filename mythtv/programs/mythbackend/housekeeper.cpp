@@ -10,6 +10,7 @@
 #include <qfileinfo.h>
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 #include "housekeeper.h"

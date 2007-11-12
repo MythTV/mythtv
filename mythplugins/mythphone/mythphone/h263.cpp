@@ -12,6 +12,7 @@
 #include <qimage.h>
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 #ifndef WIN32

@@ -1,4 +1,5 @@
 // -*- Mode: c++ -*-
+#include <algorithm>
 
 #include "videodisplayprofile.h"
 #include "mythcontext.h"

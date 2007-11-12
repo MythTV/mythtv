@@ -8,6 +8,7 @@
 #include <qpainter.h>
 
 #include <unistd.h>
+#include <cstdlib>
 
 #include <memory>
 

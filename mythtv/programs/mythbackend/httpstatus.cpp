@@ -23,6 +23,7 @@
 #include <qbuffer.h>
 #include <qprocess.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include "../../config.h"
 

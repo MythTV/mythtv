@@ -55,6 +55,7 @@
 
 */
 
+#include <stdlib.h>
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qdir.h>

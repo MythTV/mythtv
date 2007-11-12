@@ -9,6 +9,8 @@
 #include <qregexp.h>
 #include <qheader.h>
 
+#include <stdlib.h>
+
 #include <iostream>
 using namespace std;
 

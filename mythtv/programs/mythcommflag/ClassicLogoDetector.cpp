@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "ClassicLogoDetector.h"
 #include "ClassicCommDetector.h"

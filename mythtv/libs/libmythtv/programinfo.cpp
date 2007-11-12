@@ -10,6 +10,7 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "programinfo.h"
 #include "progdetails.h"

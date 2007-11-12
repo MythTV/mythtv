@@ -21,6 +21,7 @@
 
 #include <qapplication.h>
 #include <iostream>
+#include <cstdlib>
 
 #include <qptrlist.h>
 #include <qstring.h>

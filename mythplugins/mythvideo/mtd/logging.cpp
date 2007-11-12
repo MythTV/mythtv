@@ -10,6 +10,7 @@
 #include "logging.h"
 
 #include <unistd.h>
+#include <cstdlib>
 #include <qdatetime.h>
 
 #include <mythtv/mythcontext.h>

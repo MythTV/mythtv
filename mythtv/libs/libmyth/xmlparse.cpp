@@ -2,6 +2,7 @@
 using namespace std;
 
 #include <cmath>
+#include <cstdlib>
 
 #include <qapplication.h>
 

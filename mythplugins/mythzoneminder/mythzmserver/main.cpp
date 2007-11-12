@@ -16,6 +16,8 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <cstdlib>
+#include <cstring>
 #include <map>
 #include <sys/types.h>
 #include <sys/socket.h>

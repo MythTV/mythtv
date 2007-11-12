@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <sys/shm.h>
+#include <cstdlib>
 
 // qt
 #include <qdatetime.h>

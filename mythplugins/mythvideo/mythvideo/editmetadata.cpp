@@ -10,6 +10,8 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 
+#include <algorithm>
+
 #include "globals.h"
 #include "editmetadata.h"
 #include "metadata.h"

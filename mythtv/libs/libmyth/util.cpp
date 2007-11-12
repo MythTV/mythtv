@@ -5,6 +5,7 @@ using namespace std;
 // C headers
 #include <cerrno>
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 
 // System specific C headers
