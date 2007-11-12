@@ -36,6 +36,7 @@ DEPENDPATH += ../libmyth
 
 LIBS += -L../libmyth
 LIBS += -lmyth-$$LIBVERSION
+LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
