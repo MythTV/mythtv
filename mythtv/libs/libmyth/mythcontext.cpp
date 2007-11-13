@@ -3108,6 +3108,12 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
     if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
     {
+        if (expertMode)
+        {
+            cout << "Console non-interactive. Using existing schema." << endl;
+            return MYTH_SCHEMA_USE_EXISTING;
+        }
+
         cout << "Console is not interactive, cannot ask user about"
              << " upgrading database schema." << endl << "Upgrading." << endl;
         return MYTH_SCHEMA_UPGRADE;
