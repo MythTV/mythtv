@@ -949,7 +949,9 @@ bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
 
     int res = popup->ExecPopup();
     type = (DiSEqCDevDevice::dvbdev_t)list->currentItem();
-    delete popup;
+
+    popup->hide();
+    popup->deleteLater();
 
     return res >= 0;
 }

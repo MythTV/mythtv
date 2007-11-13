@@ -4343,7 +4343,8 @@ bool UIManagedTreeListType::incSearchStart(void)
         incSearchNext();
     }
 
-    delete popup;
+    popup->hide();
+    popup->deleteLater();
 
     return (res == 0);
 }

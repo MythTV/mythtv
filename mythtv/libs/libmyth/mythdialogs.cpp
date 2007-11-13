@@ -566,63 +566,89 @@ void MythPopupBox::defaultExitHandler(int r)
     done(r);
 }
 
+static int show_ok_popup(
+    MythMainWindow *parent,
+    const QString  &title,
+    const QString  &message,
+    QString         button_msg = QString::null)
+{
+    if (button_msg.isEmpty())
+        button_msg = QObject::tr("OK");
+
+    MythPopupBox *popup = new MythPopupBox(parent, title);
+
+    popup->addLabel(message, MythPopupBox::Medium, true);
+    QButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
+    okButton->setFocus();
+    int ret = popup->ExecPopup();
+
+    popup->hide();
+    popup->deleteLater();
+
+    return ret;
+}
+
 void MythPopupBox::showOkPopup(MythMainWindow *parent, QString title,
                                QString message)
 {
-    MythPopupBox popup(parent, title);
-    popup.addLabel(message, Medium, true);
-    QButton *okButton = popup.addButton(tr("OK"));
-    okButton->setFocus();
-    popup.ExecPopup();
+    show_ok_popup(parent, title, message);
 }
 
 void MythPopupBox::showExitPopup(MythMainWindow *parent, QString title,
                                  QString message)
 {
-    MythPopupBox popup(parent, title);
-    popup.addLabel(message, Medium, true);
-    QButton *okButton = popup.addButton(tr("Exit"));
-    okButton->setFocus();
-    popup.ExecPopup();
+    show_ok_popup(parent, title, message, tr("Exit"));
 }
 
 bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
                                      QString message, bool focusOk)
 {
-    MythPopupBox popup(parent, title);
-    popup.addLabel(message, Medium, true);
-    QButton *okButton = popup.addButton(tr("OK"));
-    QButton *cancelButton = popup.addButton(tr("Cancel"));
+    MythPopupBox *popup = new MythPopupBox(parent, title);
+
+    popup->addLabel(message, Medium, true);
+    QButton *okButton = NULL, *cancelButton = NULL;
+    okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    cancelButton = popup->addButton(tr("Cancel"), popup, SLOT(reject()));
+
     if (focusOk)
         okButton->setFocus();
     else
         cancelButton->setFocus();
 
-    return (popup.ExecPopup() == 0);
+    bool ok = (Accepted == popup->ExecPopup());
+
+    popup->hide();
+    popup->deleteLater();
+
+    return ok;
 }
 
 bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
                                     QString message, QString& text)
 {
-    MythPopupBox popup(parent, title);
-    popup.addLabel(message, Medium, true);
+    MythPopupBox *popup = new MythPopupBox(parent, title);
+
+    popup->addLabel(message, Medium, true);
     
-    MythRemoteLineEdit* textEdit = new MythRemoteLineEdit(&popup, "chooseEdit");
+    MythRemoteLineEdit *textEdit =
+        new MythRemoteLineEdit(popup, "chooseEdit");
+
     textEdit->setText(text);
-    popup.addWidget(textEdit);
+    popup->addWidget(textEdit);
     
-    popup.addButton(tr("OK"));
-    popup.addButton(tr("Cancel"));
+    popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
     
     textEdit->setFocus();
     
-    if (popup.ExecPopup() == 0)
-    {
-        text = textEdit->text();
-        return true;
-    }
-    
-    return false;
+    bool ok = (Accepted == popup->ExecPopup());
+    if (ok)
+        text = QDeepCopy<QString>(textEdit->text());
+
+    popup->hide();
+    popup->deleteLater();
+
+    return ok;
 }
 
 

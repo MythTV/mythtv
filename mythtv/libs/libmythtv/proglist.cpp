@@ -715,9 +715,10 @@ void ProgLister::chooseView(void)
         chooseListBox->setFocus();
         choosePopup->ExecPopup();
 
-        delete chooseListBox;
-        chooseListBox = NULL;
-        delete choosePopup;
+        chooseListBox = NULL; // deleted by popup delete
+
+        choosePopup->hide();
+        choosePopup->deleteLater();
         choosePopup = NULL;
     }
     else if (type == plTitleSearch || type == plKeywordSearch ||
@@ -778,17 +779,14 @@ void ProgLister::chooseView(void)
             chooseListBox->setFocus();
         choosePopup->ExecPopup();
 
-        delete chooseLineEdit;
-        chooseLineEdit = NULL;
-        delete chooseOkButton;
-        chooseOkButton = NULL;
-        delete chooseDeleteButton;
-        chooseDeleteButton = NULL;
-        delete chooseRecordButton;
-        chooseRecordButton = NULL;
-        delete chooseListBox;
-        chooseListBox = NULL;
-        delete choosePopup;
+        chooseLineEdit     = NULL; // deleted by popup delete
+        chooseOkButton     = NULL; // deleted by popup delete
+        chooseDeleteButton = NULL; // deleted by popup delete
+        chooseRecordButton = NULL; // deleted by popup delete
+        chooseListBox      = NULL; // deleted by popup delete
+
+        choosePopup->hide();
+        choosePopup->deleteLater();
         choosePopup = NULL;
 
         if (viewList.count() < 1 || (oldView < 0 && curView < 0))
@@ -852,15 +850,13 @@ void ProgLister::chooseView(void)
             chooseListBox->setFocus();
         choosePopup->ExecPopup();
 
-        delete chooseEditButton;
-        chooseEditButton = NULL;
-        delete chooseDeleteButton;
-        chooseDeleteButton = NULL;
-        delete chooseRecordButton;
-        chooseRecordButton = NULL;
-        delete chooseListBox;
-        chooseListBox = NULL;
-        delete choosePopup;
+        chooseEditButton   = NULL; // deleted by popup delete
+        chooseDeleteButton = NULL; // deleted by popup delete
+        chooseRecordButton = NULL; // deleted by popup delete
+        chooseListBox      = NULL; // deleted by popup delete
+
+        choosePopup->hide();
+        choosePopup->deleteLater();
         choosePopup = NULL;
 
         if (viewList.count() < 1 || (oldView < 0 && curView < 0))
@@ -911,13 +907,12 @@ void ProgLister::chooseView(void)
         chooseOkButton->setFocus();
         choosePopup->ExecPopup();
 
-        delete chooseDay;
-        chooseDay = NULL;
-        delete chooseHour;
-        chooseHour = NULL;
-        delete chooseOkButton;
-        chooseOkButton = NULL;
-        delete choosePopup;
+        chooseDay      = NULL; // deleted by popup delete
+        chooseHour     = NULL; // deleted by popup delete
+        chooseOkButton = NULL; // deleted by popup delete
+
+        choosePopup->hide();
+        choosePopup->deleteLater();
         choosePopup = NULL;
     }
 }
@@ -1036,23 +1031,16 @@ void ProgLister::powerEdit()
     choosePopup->done(0);
     powerPopup->ExecPopup();
 
-    delete powerTitleEdit;
-    powerTitleEdit = NULL;
-    delete powerSubtitleEdit;
-    powerSubtitleEdit = NULL;
-    delete powerDescEdit;
-    powerDescEdit = NULL;
+    powerTitleEdit    = NULL; // deleted by popup delete
+    powerSubtitleEdit = NULL; // deleted by popup delete
+    powerDescEdit     = NULL; // deleted by popup delete
+    powerCatType      = NULL; // deleted by popup delete
+    powerGenre        = NULL; // deleted by popup delete
+    powerStation      = NULL; // deleted by popup delete
+    powerOkButton     = NULL; // deleted by popup delete
 
-    delete powerCatType;
-    powerCatType = NULL;
-    delete powerGenre;
-    powerGenre = NULL;
-    delete powerStation;
-    powerStation = NULL;
-
-    delete powerOkButton;
-    powerOkButton = NULL;
-    delete powerPopup;
+    powerPopup->hide();
+    powerPopup->deleteLater();
     powerPopup = NULL;
 }
 

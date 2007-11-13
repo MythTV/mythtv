@@ -297,25 +297,26 @@ class StorageGroupPopup
 SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
                                  QString title, QString message, QString& text)
 {
-    MythPopupBox popup(parent, title);
-    popup.addLabel(message);
+    MythPopupBox *popup = new MythPopupBox(parent, title);
+    popup->addLabel(message);
 
-    MythLineEdit* textEdit = new MythLineEdit(&popup, "chooseEdit");
+    MythLineEdit *textEdit = new MythLineEdit(popup, "chooseEdit");
     textEdit->setText(text);
-    popup.addWidget(textEdit);
+    popup->addWidget(textEdit);
 
-    popup.addButton(QObject::tr("OK"));
-    popup.addButton(QObject::tr("Cancel"));
+    popup->addButton(QObject::tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
 
     textEdit->setFocus();
 
-    if (popup.ExecPopup() == 0)
-    {
-        text = textEdit->text();
-        return SGPopup_OK;
-    }
+    bool ok = (MythDialog::Accepted == popup->ExecPopup());
+    if (ok)
+        text = QDeepCopy<QString>(textEdit->text());
 
-    return SGPopup_CANCEL;
+    popup->hide();
+    popup->deleteLater();
+
+    return (ok) ? SGPopup_OK : SGPopup_CANCEL;
 }
 
 /****************************************************************************/

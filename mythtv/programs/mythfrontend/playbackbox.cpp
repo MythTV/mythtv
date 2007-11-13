@@ -3300,7 +3300,7 @@ void PlaybackBox::cancelPopup(void)
     popup->hide();
     expectingPopup = false;
 
-    delete popup;
+    popup->deleteLater();
     popup = NULL;
 
     paintSkipUpdate = false;
@@ -4548,7 +4548,8 @@ void PlaybackBox::showIconHelp(void)
 
     if (!displayme)
     {
-        delete iconhelp;
+        iconhelp->hide();
+        iconhelp->deleteLater();
         return;
     }
 
@@ -4561,7 +4562,8 @@ void PlaybackBox::showIconHelp(void)
 
     iconhelp->ExecPopup();
 
-    delete iconhelp;
+    iconhelp->hide();
+    iconhelp->deleteLater();
 
     previewVideoState = kChanging;
 

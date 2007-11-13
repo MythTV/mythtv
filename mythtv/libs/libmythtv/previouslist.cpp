@@ -366,7 +366,9 @@ void PreviousList::chooseView(void)
 
     delete chooseListBox;
     chooseListBox = NULL;
-    delete choosePopup;
+
+    choosePopup->hide();
+    choosePopup->deleteLater();
     choosePopup = NULL;
 }
 
