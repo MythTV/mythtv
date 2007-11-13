@@ -1,19 +1,22 @@
-#include <qdir.h>
-#include <iostream>
-using namespace std;
-
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qregexp.h>
+// POSIX headers
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "config.h"
-#ifdef HAVE_CDAUDIO
-#include <cdaudio.h>
-#endif
+// Qt headers
+#include <qdir.h>
+#include <qapplication.h>
+#include <qregexp.h>
 
+// MythTV headers
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythplugin.h>
+#include <mythtv/mythmediamonitor.h>
+#include <mythtv/mythdbcon.h>
+#include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/myththemedmenu.h>
+
+// MythMusic headers
 #include "decoder.h"
 #include "metadata.h"
 #include "maddecoder.h"
@@ -26,14 +29,12 @@ using namespace std;
 #include "dbcheck.h"
 #include "importmusic.h"
 #include "filescanner.h"
+#include "config.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythpluginapi.h>
-
-#include <mythtv/libmythui/myththemedmenu.h>
+// System header (relies on config.h define)
+#ifdef HAVE_CDAUDIO
+#include <cdaudio.h>
+#endif
 
 // This stores the last MythMediaDevice that was detected:
 QString gCDdevice;

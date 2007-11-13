@@ -1,15 +1,16 @@
+// POSIX headers
 #include <sys/stat.h>
 
-#include <qdir.h>
-#include <iostream>
-using namespace std;
-
+// Qt headers
 #include <qapplication.h>
-#include <qsqldatabase.h>
+#include <qdir.h>
+
+// MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
+// MythMusic headers
 #include "decoder.h"
 #include "maddecoder.h"
 #include "vorbisdecoder.h"

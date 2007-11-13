@@ -3,7 +3,6 @@
 #include <qdir.h>
 #include <qapplication.h>
 #include <qfileinfo.h>
-#include <qsqldatabase.h>
 
 // Myth
 #include <mythtv/mythcontext.h>

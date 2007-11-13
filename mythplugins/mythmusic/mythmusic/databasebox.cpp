@@ -2,7 +2,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
 #include <qregexp.h>

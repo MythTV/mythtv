@@ -253,6 +253,10 @@ void zoom_filter_xmmx (int prevX, int prevY,
 											 int *lbruS, int *lbruD, int buffratio,
 											 int precalCoef[16][16])
 {
+    (void) prevX;     (void) prevY;
+    (void) expix1;    (void) expix2;
+    (void) lbruS;     (void) lbruD;
+    (void) buffratio; (void) precalCoef;
 	return;
 }
 #endif
