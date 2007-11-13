@@ -161,10 +161,10 @@ foreach $item (@{$xml->{channel}->{item}}) {
         ($datalabel, $datavalue) = split(': ', $_);
         if ($datalabel =~ /.*Temp$/) {
             if ($units =~ /ENG/) {
-                $datavalue =~ s/^.*?\((\d{1,2}).*/$1/;
+                $datavalue =~ s/^.*?\((-?\d{1,2}).*/$1/;
             }
             elsif ($units =~ /SI/) {
-                $datavalue =~ s/^(\d{1,2}).*/$1/;
+                $datavalue =~ s/^(-?\d{1,2}).*/$1/;
             }
             if ($datalabel =~ /^Max.*/) {
                 $datalabel = "high-" . $i;

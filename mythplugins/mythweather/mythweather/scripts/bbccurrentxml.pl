@@ -162,10 +162,10 @@ foreach (@data) {
     ($datalabel, $datavalue) = split(': ', $_);
     if ($datalabel =~ /Temperature/) {
         if ($units =~ /ENG/) {
-            $datavalue =~ s/^.*?\((\d{1,2}).*/$1/;
+            $datavalue =~ s/^.*?\((-?\d{1,2}).*/$1/;
         }
         elsif ($units =~ /SI/) {
-            $datavalue =~ s/^(\d{1,2}).*/$1/;
+            $datavalue =~ s/^-?(\d{1,2}).*/$1/;
         }
         $datalabel = "temp";
     }
