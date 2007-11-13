@@ -145,9 +145,14 @@ foreach $item (@{$xml->{channel}->{item}}) {
         $weather_string =~ /^thundery showers$/i) {
         printf "icon-" . $i . "::thunshowers.png\n";
     }
-    elsif ($weather_string =~ /^light snow$/i ||
-        $weather_string =~ /^heavy snow$/i) {
-        printf "icon-" . $i . "::thunshowers.png\n";
+    elsif ($weather_string =~ /^heavy snow$/i) {
+        printf "weather_icon:snowshow.png\n";
+    }
+    elsif ($weather_string =~ /^light snow$/i) {
+        printf "weather_icon::flurries.png\n";
+    }
+    elsif ($weather_string =~ /^sleet$/i) {
+        printf "weather_icon::rainsnow.png\n";
     }
     else {
         printf "icon-" . $i . "::unknown.png\n";

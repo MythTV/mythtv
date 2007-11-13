@@ -146,9 +146,14 @@ elsif ($weather_string =~ /^thundery rain$/i ||
        $weather_string =~ /^thundery showers$/i) {
     printf "weather_icon::thunshowers.png\n";
 }
-elsif ($weather_string =~ /^light snow$/i ||
-       $weather_string =~ /^heavy snow$/i) {
-    printf "weather_icon::thunshowers.png\n";
+elsif ($weather_string =~ /^heavy snow$/i) { 
+    printf "weather_icon:snowshow.png\n"; 
+}
+elsif ($weather_string =~ /^light snow$/i) { 
+    printf "weather_icon::flurries.png\n"; 
+}
+elsif ($weather_string =~ /^sleet$/i) { 
+    printf "weather_icon::rainsnow.png\n"; 
 }
 else {
     printf "weather_icon::unknown.png\n";
