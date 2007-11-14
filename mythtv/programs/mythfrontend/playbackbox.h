@@ -298,6 +298,7 @@ class PlaybackBox : public MythDialog
     void grayOut(QPainter *);
     void updateBackground(void);
     void updateVideo(QPainter *);
+    void drawVideo(QPainter *);
     void updateShowTitles(QPainter *);
     void updateInfo(QPainter *);
     void updateUsage(QPainter *);
@@ -367,6 +368,7 @@ class PlaybackBox : public MythDialog
     QRect               drawGroupBounds;
     QRect               drawUsageBounds;
     QRect               drawVideoBounds;
+    QRect               blackholeBounds;
     QRect               drawCurGroupBounds;
 
     // Popup support //////////////////////////////////////////////////////////

@@ -238,7 +238,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       drawTotalBounds(0, 0, size().width(), size().height()),
       drawListBounds(0, 0, 0, 0),       drawInfoBounds(0, 0, 0, 0),
       drawGroupBounds(0, 0, 0, 0),      drawUsageBounds(0, 0, 0, 0),
-      drawVideoBounds(0, 0, 0, 0),      drawCurGroupBounds(0, 0, 0, 0),
+      drawVideoBounds(0, 0, 0, 0),      blackholeBounds(0, 0, 0, 0),
+      drawCurGroupBounds(0, 0, 0, 0),
       // General popup support
       popup(NULL),                      expectingPopup(false),
       // Recording Group popup support
@@ -516,7 +517,7 @@ void PlaybackBox::killPlayerSafe(void)
             kKilled :  kKilling;
 
         /* NOTE: need unlock/process/lock here because we need
-           to allow updateVideo() to run to handle changes in
+           to allow drawVideo() to run to handle changes in
            previewVideoStates */
         qApp->unlock();
         qApp->processEvents();
@@ -572,7 +573,10 @@ void PlaybackBox::parseContainer(QDomElement &element)
     if (name.lower() == "program_info_del" && context == 1 && type == Delete)
         drawInfoBounds = area;
     if (name.lower() == "video")
+    {
         drawVideoBounds = area;
+        blackholeBounds = area;
+    }
     if (name.lower() == "group_info")
         drawGroupBounds = area;
     if (name.lower() == "usage")
@@ -689,9 +693,14 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
         updateUsage(&p);
     }
 
-    if (r.intersects(drawVideoBounds))
+    if (r.intersects(drawVideoBounds) && !paintSkipUpdate)
     {
         updateVideo(&p);
+    }
+
+    if (r.intersects(blackholeBounds))
+    {
+        drawVideo(&p);
     }
 
     paintSkipCount--;
@@ -986,6 +995,31 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
+    if (!(previewVideoEnabled && previewPixmapEnabled) ||
+            inTitle && haveGroupInfoSet)
+    {
+        return;
+    }
+
+    LayerSet *container = NULL;
+    container = theme->GetSet("video");
+    UIBlackHoleType *blackhole = NULL;
+    blackhole = (UIBlackHoleType *)container->GetType("video_blackhole");
+    if (blackhole)
+    {
+        blackholeBounds = blackhole->getScreenArea();
+        QPixmap pix(drawVideoBounds.size());
+        pix.fill(this, drawVideoBounds.topLeft());
+        QPainter tmp(&pix);
+        container->Draw(&tmp, 1, 1);
+        tmp.end();
+        p->drawPixmap(drawVideoBounds.topLeft(), pix);
+    }
+}
+
+void PlaybackBox::drawVideo(QPainter *p)
+{
+
     if (playbackVideoContainer)
     {
         m_player->DrawUnusedRects(false);
@@ -1007,14 +1041,23 @@ void PlaybackBox::updateVideo(QPainter *p)
         if (temp.width() > 0)
         {
             int pixmap_y = 0;
+            int pixmap_x = 0;
 
-            if (temp.height() < drawVideoBounds.height())
-                pixmap_y = drawVideoBounds.y() + 
-                                (drawVideoBounds.height() - temp.height())/2;
+            // Centre preview in the y axis
+            if (temp.height() < blackholeBounds.height())
+                pixmap_y = blackholeBounds.y() + 
+                                (blackholeBounds.height() - temp.height()) / 2;
             else
-                pixmap_y = drawVideoBounds.y();
+                pixmap_y = blackholeBounds.y();
 
-            p->drawPixmap(drawVideoBounds.x(), pixmap_y, temp);
+            // Centre preview in the x axis
+            if (temp.width() < blackholeBounds.width())
+                pixmap_x = blackholeBounds.x() + 
+                                (blackholeBounds.width() - temp.width()) / 2;
+            else
+                pixmap_x = blackholeBounds.x();
+
+            p->drawPixmap(pixmap_x, pixmap_y, temp);
         }
     }
 
@@ -1082,7 +1125,7 @@ void PlaybackBox::updateVideo(QPainter *p)
             if (previewVideoNVP->IsPlaying())
             {
                 previewVideoState = kPlaying;
-                erase(drawVideoBounds);
+                erase(blackholeBounds);
             }
         }
         else
@@ -1111,7 +1154,7 @@ void PlaybackBox::updateVideo(QPainter *p)
     if ((previewVideoState == kPlaying) && previewVideoNVP->IsPlaying() &&
         !playingSomething)
     {
-        QSize size = drawVideoBounds.size();
+        QSize size = blackholeBounds.size();
         float saspect = ((float)size.width() / (float)size.height())  / wmult;
         float vaspect = previewVideoNVP->GetVideoAspect();
         size.setHeight((int) ceil(size.height() * (saspect / vaspect) * hmult));
@@ -1120,14 +1163,23 @@ void PlaybackBox::updateVideo(QPainter *p)
         const QImage &img = previewVideoNVP->GetARGBFrame(size);
 
         int video_y = 0;
+        int video_x = 0;
 
-        if (img.height() < drawVideoBounds.height())
-            video_y = drawVideoBounds.y() + 
-                            (drawVideoBounds.height() - img.height())/2;
+        // Centre video in the y axis
+        if (img.height() < blackholeBounds.height())
+            video_y = blackholeBounds.y() + 
+                            (blackholeBounds.height() - img.height()) / 2;
         else
-            video_y = drawVideoBounds.y();
+            video_y = blackholeBounds.y();
 
-        p->drawImage(drawVideoBounds.x(), video_y, img);
+        // Centre video in the x axis
+        if (img.width() < blackholeBounds.width())
+            video_x = blackholeBounds.x() + 
+                            (blackholeBounds.width() - img.width()) / 2;
+        else
+            video_x = blackholeBounds.x();
+
+        p->drawImage(blackholeBounds.x(), video_y, img);
     }
 
     /* have we timed out waiting for nvp to start? */
@@ -3921,7 +3973,7 @@ void PlaybackBox::timeout(void)
         return;
 
     if (previewVideoEnabled)
-        update(drawVideoBounds);
+        update(blackholeBounds);
 }
 
 void PlaybackBox::processNetworkControlCommands(void)
@@ -4257,7 +4309,7 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
         }
 
         // ask for repaint
-        update(drawVideoBounds);
+        update(blackholeBounds);
     }
     qApp->unlock();
 }
@@ -4408,19 +4460,33 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap();
 
-        if (drawVideoBounds.width() != image->width())
+        if (blackholeBounds.width() != image->width())
         {
-            VERBOSE(VB_IMPORTANT, QString("%1 %2 x %3").arg(drawVideoBounds.width())
-                                                     .arg(image->width())
-                                                     .arg(image->height()));
+            float blackholeaspect = ((float)blackholeBounds.width())
+                                    / ((float)blackholeBounds.height());
+            float videoaspect = ((float)image->width())
+                                    / ((float)image->height());
 
-            float scaleratio = ((float)drawVideoBounds.width() / wmult)
-                                    / (float)image->width();
-            int previewwidth = (int)drawVideoBounds.width();
-            int previewheight = (int)(image->height() * scaleratio * hmult);
+            float scaleratio = 1;
+            int previewwidth = blackholeBounds.width();
+            int previewheight = blackholeBounds.height();
 
-            VERBOSE(VB_IMPORTANT, QString("%1 x %2").arg(previewwidth)
-                                                     .arg(previewheight));
+            // Calculate new height orwidth according to relative aspect ratio
+            if (blackholeaspect > videoaspect)
+            {
+                scaleratio = (videoaspect / blackholeaspect) / hmult;
+                previewwidth = (int)(previewwidth * scaleratio * wmult);
+            }
+            else if (blackholeaspect < videoaspect)
+            {
+                scaleratio = (blackholeaspect / videoaspect) / wmult;
+                previewheight = (int)(previewheight * scaleratio * hmult);
+            }
+
+            // Ensure preview width/height are multiples of 8 to match
+            // the preview video
+            //previewwidth = ((previewwidth + 7) / 8) * 8;
+            //previewheight = ((previewheight + 7) / 8) * 8;
 
             QImage tmp2 = image->smoothScale(previewwidth, previewheight);
             previewPixmap->convertFromImage(tmp2);
@@ -4433,8 +4499,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     if (!previewPixmap)
     {
-        previewPixmap = new QPixmap((int)(drawVideoBounds.width()),
-                                    (int)(drawVideoBounds.height()));
+        previewPixmap = new QPixmap((int)(blackholeBounds.width()),
+                                    (int)(blackholeBounds.height()));
         previewPixmap->fill(black);
     }
 
