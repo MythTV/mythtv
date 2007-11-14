@@ -201,6 +201,7 @@ class MythThemedMenuPrivate: public XMLParseBase
                       const QString &password_setting,
                       const QString &text);
  
+    void SetupBackground();
     void SetupUITypes();
 
     bool gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
@@ -344,10 +345,7 @@ void MythThemedMenuState::parseBackground(
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (info.tagName() == "image")
-            {
-            }
-            else if (info.tagName() == "buttonarea")
+            if (info.tagName() == "buttonarea")
             {
                 buttonArea = parseRect(info);
                 hasarea = true;
@@ -396,7 +394,7 @@ void MythThemedMenuState::parseBackground(
 
     if (!hasarea)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing buttonaread in background");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing button area in background");
         return;
     }
 }
@@ -1484,6 +1482,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     buttonList.clear();
     buttonRows.clear();
 
+    SetupBackground();
+
     QDomElement docElem = doc.documentElement();
 
     menumode = docElem.attribute("name", "");
@@ -1532,6 +1532,20 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     return true;
 }
 
+/// \brief Sets up menu background, must be done before the buttons are parsed
+void MythThemedMenuPrivate::SetupBackground(void)
+{
+
+    if (m_state->buttonBackground)
+    {
+        MythUIImage *buttonBackground;
+        buttonBackground = new MythUIImage(parent, "menu button background");
+        buttonBackground->SetImage(m_state->buttonBackground);
+        buttonBackground->SetPosition(m_state->buttonArea.topLeft());
+    }
+
+}
+
 /// \brief Sets up UI according to the corresponding mythThemedMenuState.
 void MythThemedMenuPrivate::SetupUITypes(void)
 {
@@ -1549,14 +1563,6 @@ void MythThemedMenuPrivate::SetupUITypes(void)
         logo = new MythUIImage(parent, "menu logo");
         logo->SetImage(m_state->logo);
         logo->SetPosition(m_state->logoRect.topLeft());
-    }
-
-    if (m_state->buttonBackground)
-    {
-        MythUIImage *buttonBackground;
-        buttonBackground = new MythUIImage(parent, "menu button background");
-        buttonBackground->SetImage(m_state->buttonBackground);
-        buttonBackground->SetPosition(m_state->buttonArea.topLeft());
     }
 
     watermark = new MythUIStateType(parent, "menu watermarks");
@@ -2448,7 +2454,7 @@ MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
 /** \brief Loads the main UI theme, and a menu theme.
  *
  *  See also foundTheme(void), it will return true when called after
- *  this method iff this method was successful.
+ *  this method if this method was successful.
  *
  *  See also ReloadTheme(void) which you can use to load a generic theme,
  *  if foundTheme(void) returns false after calling this.
