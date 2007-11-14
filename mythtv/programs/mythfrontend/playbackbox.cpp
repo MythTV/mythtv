@@ -1125,7 +1125,6 @@ void PlaybackBox::drawVideo(QPainter *p)
             if (previewVideoNVP->IsPlaying())
             {
                 previewVideoState = kPlaying;
-                erase(blackholeBounds);
             }
         }
         else
@@ -1155,9 +1154,20 @@ void PlaybackBox::drawVideo(QPainter *p)
         !playingSomething)
     {
         QSize size = blackholeBounds.size();
+
         float saspect = ((float)size.width() / (float)size.height())  / wmult;
         float vaspect = previewVideoNVP->GetVideoAspect();
-        size.setHeight((int) ceil(size.height() * (saspect / vaspect) * hmult));
+
+        // Calculate new height or width according to relative aspect ratio
+        if (saspect > vaspect)
+        {
+            size.setWidth((int) ceil(size.width() * (vaspect / saspect) * wmult));
+        }
+        else if (saspect < vaspect)
+        {
+            size.setHeight((int) ceil(size.height() * (saspect / vaspect) * hmult));
+        }
+
         size.setHeight(((size.height() + 7) / 8) * 8);
         size.setWidth( ((size.width()  + 7) / 8) * 8);
         const QImage &img = previewVideoNVP->GetARGBFrame(size);
@@ -1179,7 +1189,7 @@ void PlaybackBox::drawVideo(QPainter *p)
         else
             video_x = blackholeBounds.x();
 
-        p->drawImage(blackholeBounds.x(), video_y, img);
+        p->drawImage(video_x, video_y, img);
     }
 
     /* have we timed out waiting for nvp to start? */
