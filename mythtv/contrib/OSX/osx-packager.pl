@@ -102,7 +102,7 @@ our %depend = (
     'url'
     => 'http://subversion.tigris.org/downloads/subversion-1.4.3.tar.bz2',
     'pre-conf'
-    => 'tar -xjf subversion-deps-1.4.3.tar.bz2',
+    => 'tar -xjf ../subversion-deps-1.4.3.tar.bz2',
     'conf'
     =>  [
            '--disable-keychain',  # Workaround a 10.3 build problem
@@ -649,16 +649,16 @@ foreach my $sw (@build_depends)
     }
   }
   
-  if ($pkg->{'pre-conf'})
-  { 
-    &Syscall([ $pkg->{'pre-conf'} ], 'munge' => 1) or die;
-  }
-
   # Configure
   chdir($dirname);
   unless (-e '.osx-config')
   {
     &Verbose("Configuring $sw");
+    if ($pkg->{'pre-conf'})
+    { 
+      &Syscall([ $pkg->{'pre-conf'} ], 'munge' => 1) or die;
+    }
+
     my (@configure, $munge);
     
     if ($pkg->{'conf-cmd'})
