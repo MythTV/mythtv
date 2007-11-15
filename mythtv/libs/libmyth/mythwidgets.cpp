@@ -396,6 +396,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
                     delete popup;
                     popup = NULL;
                 }
+                else
+                    handled = false;
             }
             else if (action == "SELECT" && e->text().isNull() )
                 e->ignore();
@@ -405,7 +407,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     }
 
     if (!handled)
-        if (rw || e->key() == Key_Escape || e->key() == Key_Left || e->key() == Key_Right)
+        if (rw || e->key() == Key_Escape || e->key() == Key_Left
+               || e->key() == Key_Return || e->key() == Key_Right)
             QLineEdit::keyPressEvent(e);
 }
 
