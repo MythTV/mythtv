@@ -96,9 +96,7 @@ void VideoDialog::cancelPopup(void)
 
     if (popup)
     {
-        popup->hide();
-        delete popup;
-
+        popup->deleteLater();
         popup = NULL;
 
         update(fullRect);
@@ -163,7 +161,7 @@ void VideoDialog::slotViewPlot()
         okButton->setFocus();
 
         plotbox->ExecPopup();
-        delete plotbox;
+        plotbox->deleteLater();
         allowPaint = true;
     }
     else

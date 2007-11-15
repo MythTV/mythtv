@@ -323,11 +323,11 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
         .arg(ddp.GetListingsProviderName());
         
     VERBOSE(VB_GENERAL, waitMsg);
-    MythProgressDialog pdlg(waitMsg, 2);
+    MythProgressDialog *pdlg = new MythProgressDialog(waitMsg, 2);
 
     clearSelections();
 
-    pdlg.setProgress(1);
+    pdlg->setProgress(1);
 
     if (!ddp.GrabLineupsOnly())
     {
@@ -341,8 +341,9 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     for (it = lineups.begin(); it != lineups.end(); ++it)
         addSelection((*it).displayname, (*it).lineupid);
 
-    pdlg.setProgress(2);
-    pdlg.Close();
+    pdlg->setProgress(2);
+    pdlg->Close();
+    pdlg->deleteLater();
 #else // USING_BACKEND
     VERBOSE(VB_IMPORTANT, "You must compile the backend "
             "to set up a DataDirect line-up");
@@ -419,10 +420,10 @@ void XMLTV_generic_config::save()
                                 "might want to check the output as it\n"
                                 "runs by switching to the terminal from "
                                 "which you started\nthis program."));
-    MythProgressDialog pdlg( waitMsg, 2 );
+    MythProgressDialog *pdlg = new MythProgressDialog(waitMsg, 2);
     VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
                                 "list of available channels"));
-    pdlg.show();
+    pdlg->show();
 
     QString command;
     QString filename = QString("%1/%2.xmltv")
@@ -431,7 +432,7 @@ void XMLTV_generic_config::save()
     command = QString("%1 --config-file '%2' --configure")
         .arg(grabber).arg(filename);
 
-    pdlg.setProgress(1);
+    pdlg->setProgress(1);
 
     int ret = system(command);
     if (ret != 0)
@@ -461,8 +462,9 @@ void XMLTV_generic_config::save()
             gContext->GetMainWindow(), QObject::tr("Warning."), err_msg);
     }
 
-    pdlg.setProgress( 2 );    
-    pdlg.Close();
+    pdlg->setProgress( 2 );    
+    pdlg->Close();
+    pdlg->deleteLater();
 }
 
 EITOnly_config::EITOnly_config(const VideoSource& _parent) :
@@ -569,7 +571,7 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
         }
 
         find_grabbers_dialog->Close();
-        delete find_grabbers_dialog;
+        find_grabbers_dialog->deleteLater();
     }
     else {
         VERBOSE(VB_IMPORTANT, "Failed to run tv_find_grabbers");

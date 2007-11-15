@@ -601,7 +601,8 @@ void CustomEdit::storeClicked(void)
     cancelbtn = button++;
 
     int ret = storediag->exec();
-    delete storediag;
+    storediag->deleteLater();
+    storediag = NULL;
 
     if (ret == sebtn || ret == exbtn)
     {
@@ -709,13 +710,13 @@ bool CustomEdit::checkSyntax(void)
         }
     }
 
-    if (msg > "")
+    if (!msg.isEmpty())
     {
         DialogBox *errdiag = new DialogBox(gContext->GetMainWindow(), msg);
         errdiag->AddButton(QObject::tr("OK"));
         errdiag->exec();
 
-        delete errdiag;
+        errdiag->deleteLater();
         ret = false;
     }
     return ret;

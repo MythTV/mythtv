@@ -4167,23 +4167,23 @@ void ProgramInfo::ShowRecordingDialog(void)
     message += "\n\n";
     message += RecStatusDesc();
 
-    DialogBox diag(gContext->GetMainWindow(), message);
+    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
         clearov = -1, edend = -1, ednorm = -1, edcust = -1;
 
-    diag.AddButton(QObject::tr("OK"));
+    dlg->AddButton(QObject::tr("OK"));
     ok = button++;
 
     if (recstartts < now && recendts > now)
     {
         if (recstatus != rsRecording)
         {
-            diag.AddButton(QObject::tr("Reactivate"));
+            dlg->AddButton(QObject::tr("Reactivate"));
             react = button++;
         }
         else
         {
-            diag.AddButton(QObject::tr("Stop recording"));
+            dlg->AddButton(QObject::tr("Stop recording"));
             stop = button++;
         }
     }
@@ -4193,7 +4193,7 @@ void ProgramInfo::ShowRecordingDialog(void)
         {
             if (recstartts > now)
             {
-                diag.AddButton(QObject::tr("Don't record"));
+                dlg->AddButton(QObject::tr("Don't record"));
                 addov = button++;
             }
             if (recstatus != rsRecording && rectype != kFindOneRecord &&
@@ -4206,7 +4206,7 @@ void ProgramInfo::ShowRecordingDialog(void)
                  ((dupmethod & kDupCheckDesc) && description != "") ||
                  ((dupmethod & kDupCheckSubThenDesc) && (subtitle != "" || description != "")) ))
             {
-                diag.AddButton(QObject::tr("Never record"));
+                dlg->AddButton(QObject::tr("Never record"));
                 forget = button++;
             }
         }
@@ -4215,17 +4215,17 @@ void ProgramInfo::ShowRecordingDialog(void)
         {
             if (recstatus == rsRecording)
             {
-                diag.AddButton(QObject::tr("Change Ending Time"));
+                dlg->AddButton(QObject::tr("Change Ending Time"));
                 edend = button++;
             }
             else
             {
-                diag.AddButton(QObject::tr("Edit Options"));
+                dlg->AddButton(QObject::tr("Edit Options"));
                 ednorm = button++;
 
                 if (rectype != kSingleRecord && rectype != kFindOneRecord)
                 {
-                    diag.AddButton(QObject::tr("Add Override"));
+                    dlg->AddButton(QObject::tr("Add Override"));
                     edcust = button++;
                 }
             }
@@ -4235,20 +4235,22 @@ void ProgramInfo::ShowRecordingDialog(void)
         {
             if (recstatus == rsRecording)
             {
-                diag.AddButton(QObject::tr("Change Ending Time"));
+                dlg->AddButton(QObject::tr("Change Ending Time"));
                 edend = button++;
             }
             else
             {
-                diag.AddButton(QObject::tr("Edit Override"));
+                dlg->AddButton(QObject::tr("Edit Override"));
                 ednorm = button++;
-                diag.AddButton(QObject::tr("Clear Override"));
+                dlg->AddButton(QObject::tr("Clear Override"));
                 clearov = button++;
             }
         }
     }
 
-    int ret = diag.exec();
+    int ret = dlg->exec();
+    dlg->deleteLater();
+    dlg = NULL;
 
     if (ret == react)
         ReactivateRecording();
@@ -4335,11 +4337,11 @@ void ProgramInfo::ShowNotRecordingDialog(void)
         delete confList;
     }
 
-    DialogBox diag(gContext->GetMainWindow(), message);
+    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, react = -1, addov = -1, clearov = -1,
         ednorm = -1, edcust = -1, forget = -1, addov1 = -1, forget1 = -1;
 
-    diag.AddButton(QObject::tr("OK"));
+    dlg->AddButton(QObject::tr("OK"));
     ok = button++;
 
     QDateTime now = QDateTime::currentDateTime();
@@ -4347,7 +4349,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
     if (recstartts < now && recendts > now &&
         recstatus != rsDontRecord && recstatus != rsNotListed)
     {
-        diag.AddButton(QObject::tr("Reactivate"));
+        dlg->AddButton(QObject::tr("Reactivate"));
         react = button++;
     }
 
@@ -4365,11 +4367,11 @@ void ProgramInfo::ShowNotRecordingDialog(void)
              recstatus == rsInactive ||
              recstatus == rsLaterShowing))
         {
-            diag.AddButton(QObject::tr("Record anyway"));
+            dlg->AddButton(QObject::tr("Record anyway"));
             addov = button++;
             if (recstatus == rsPreviousRecording || recstatus == rsNeverRecord)
             {
-                diag.AddButton(QObject::tr("Forget Previous"));
+                dlg->AddButton(QObject::tr("Forget Previous"));
                 forget = button++;
             }
         }
@@ -4384,7 +4386,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
             {
                 if (recstartts > now)
                 {
-                    diag.AddButton(QObject::tr("Don't record"));
+                    dlg->AddButton(QObject::tr("Don't record"));
                     addov1 = button++;
                 }
                 if (rectype != kFindOneRecord &&
@@ -4396,33 +4398,35 @@ void ProgramInfo::ShowNotRecordingDialog(void)
                      ((dupmethod & kDupCheckSub) && subtitle != "") ||
                      ((dupmethod & kDupCheckDesc) && description != "")))
                 {
-                    diag.AddButton(QObject::tr("Never record"));
+                    dlg->AddButton(QObject::tr("Never record"));
                     forget1 = button++;
                 }
             }
 
-            diag.AddButton(QObject::tr("Edit Options"));
+            dlg->AddButton(QObject::tr("Edit Options"));
             ednorm = button++;
 
             if (rectype != kSingleRecord && rectype != kFindOneRecord &&
                 recstatus != rsNotListed)
             {
-                diag.AddButton(QObject::tr("Add Override"));
+                dlg->AddButton(QObject::tr("Add Override"));
                 edcust = button++;
             }
         }
 
         if (rectype == kOverrideRecord || rectype == kDontRecord)
         {
-            diag.AddButton(QObject::tr("Edit Override"));
+            dlg->AddButton(QObject::tr("Edit Override"));
             ednorm = button++;
 
-            diag.AddButton(QObject::tr("Clear Override"));
+            dlg->AddButton(QObject::tr("Clear Override"));
             clearov = button++;
         }
     }
 
-    int ret = diag.exec();
+    int ret = dlg->exec();
+    dlg->deleteLater();
+    dlg = NULL;
 
     if (ret == react)
         ReactivateRecording();

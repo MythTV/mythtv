@@ -144,14 +144,13 @@ void RecordingSelector::showMenu()
     popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
 }
 
-void RecordingSelector::closePopupMenu()
+void RecordingSelector::closePopupMenu(void)
 {
-    if (!popupMenu)
-        return;
-
-    popupMenu->hide();
-    delete popupMenu;
-    popupMenu = NULL;
+    if (popupMenu)
+    {
+        popupMenu->deleteLater();
+        popupMenu = NULL;
+    }
 }
 
 void RecordingSelector::selectAll()

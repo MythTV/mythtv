@@ -643,7 +643,7 @@ void MythFlix::slotCancelPopup(void)
     popup->hide();
     expectingPopup = false;
 
-    delete popup;
+    popup->deleteLater();
     popup = NULL;
 
     setActiveWindow();

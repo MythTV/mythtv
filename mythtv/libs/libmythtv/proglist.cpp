@@ -71,13 +71,19 @@ ProgLister::ProgLister(ProgListType pltype,
 
     if (!theme->LoadTheme(xmldata, "programlist"))
     {
-        DialogBox diag(gContext->GetMainWindow(), "The theme you are using "
-                       "does not contain a 'programlist' element.  Please "
-                       "contact the theme creator and ask if they could "
-                       "please update it.<br><br>The next screen will be empty."
-                       "  Escape out of it to return to the menu.");
-        diag.AddButton("OK");
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(),
+            QObject::tr(
+                "The theme you are using does not contain the "
+                "%1 element. Please contact the theme creator "
+                "and ask if they could please update it.<br><br>"
+                "The next screen will be empty. "
+                "Escape out of it to return to the menu.")
+            .arg("'programlist'"));
+
+        dlg->AddButton("OK");
+        dlg->exec();
+        dlg->deleteLater();
 
         return;
     }

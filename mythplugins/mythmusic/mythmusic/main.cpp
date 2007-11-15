@@ -206,8 +206,10 @@ struct MusicData
 
 void RebuildMusicTree(MusicData *mdata)
 {
-    MythBusyDialog busy(QObject::tr("Rebuilding music tree"));
-    busy.start();
+    MythBusyDialog *busy = new MythBusyDialog(
+        QObject::tr("Rebuilding music tree"));
+
+    busy->start();
     mdata->all_music->startLoading();
     while (!mdata->all_music->doneLoading())
     {
@@ -215,7 +217,8 @@ void RebuildMusicTree(MusicData *mdata)
         usleep(50000);
     }
     mdata->all_playlists->postLoad();
-    busy.Close();
+    busy->Close();
+    busy->deleteLater();
 }
 
 static void postMusic(MusicData *mdata);

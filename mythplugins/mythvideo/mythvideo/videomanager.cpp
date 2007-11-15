@@ -1553,9 +1553,9 @@ void VideoManager::slotRemoveVideo()
     if (curitem && m_state == SHOWING_MAINWINDOW)
     {
         bool okcancel;
-        MythPopupBox *ConfirmationDialog =
+        MythPopupBox *confirmationDialog =
                 new MythPopupBox(gContext->GetMainWindow());
-        okcancel = ConfirmationDialog->showOkCancelPopup(
+        okcancel = confirmationDialog->showOkCancelPopup(
                 gContext->GetMainWindow(), "", tr("Delete this file?"), false);
 
         if (okcancel)
@@ -1563,11 +1563,11 @@ void VideoManager::slotRemoveVideo()
             if (m_video_list->Delete(curitem->ID()))
                 RefreshMovieList(false);
             else
-                ConfirmationDialog->showOkPopup(gContext->GetMainWindow(), "",
+                confirmationDialog->showOkPopup(gContext->GetMainWindow(), "",
                                                 tr("delete failed"));
         }
 
-        delete ConfirmationDialog;
+        confirmationDialog->deleteLater();
     }
 }
 
@@ -1585,9 +1585,7 @@ void VideoManager::cancelPopup(void)
 
     if (popup)
     {
-        popup->hide();
-        delete popup;
-
+        popup->deleteLater();
         popup = NULL;
 
         update(fullRect);

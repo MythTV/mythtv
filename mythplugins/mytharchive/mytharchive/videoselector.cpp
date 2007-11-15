@@ -164,8 +164,7 @@ void VideoSelector::closePopupMenu()
     if (!popupMenu)
         return;
 
-    popupMenu->hide();
-    delete popupMenu;
+    popupMenu->deleteLater();
     popupMenu = NULL;
 }
 

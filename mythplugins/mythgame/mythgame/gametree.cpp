@@ -419,12 +419,11 @@ void GameTreeItem::showGameInfo(RomInfo *rom)
 
 void GameTreeItem::closeGameInfo(void)
 {
-    if (!info_popup)
-        return;
-
-    info_popup->hide();
-    delete info_popup;
-    info_popup = NULL;
+    if (info_popup)
+    {
+        info_popup->deleteLater();
+        info_popup = NULL;
+    }
 }
 
 void GameTreeItem::edit(void)
@@ -434,12 +433,11 @@ void GameTreeItem::edit(void)
         m_romInfo->edit_rominfo();
     }
 
-    if (!info_popup)
-        return;
-
-    info_popup->hide();
-    delete info_popup;
-    info_popup = NULL;
+    if (info_popup)
+    {
+        info_popup->deleteLater();
+        info_popup = NULL;
+    }
 }
 
 void GameTree::keyPressEvent(QKeyEvent *e)

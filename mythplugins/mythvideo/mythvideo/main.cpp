@@ -249,7 +249,7 @@ namespace
             no_player_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
             no_player_dialog->exec();
 
-            delete no_player_dialog;
+            no_player_dialog->deleteLater();
             gContext->removeCurrentLocation();
             return;
         }

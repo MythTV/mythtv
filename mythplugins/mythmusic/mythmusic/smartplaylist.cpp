@@ -1369,8 +1369,7 @@ void SmartPlaylistEditor::closeCategoryPopup(void)
     if (!category_popup)
         return;
 
-    category_popup->hide();
-    delete category_popup;
+    category_popup->deleteLater();
     category_popup = NULL;
     categoryButton->setFocus();
 }

@@ -260,7 +260,7 @@ void showWarningDialog(const QString msg)
     DialogBox *dialog = new DialogBox(gContext->GetMainWindow(), msg);
     dialog->AddButton(QObject::tr("OK"));
     dialog->exec();
-    delete dialog;
+    dialog->deleteLater();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

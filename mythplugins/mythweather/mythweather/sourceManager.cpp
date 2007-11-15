@@ -73,7 +73,8 @@ bool SourceManager::findScripts()
     QDir dir(path);
     dir.setFilter(QDir::Executable | QDir::Files);
     // this kinda goes against idea of keeping ui separate, but oh well
-    MythProgressDialog bsydlg(tr("Searching for scripts"), dir.count());
+    MythProgressDialog *busyd = new MythProgressDialog(
+        tr("Searching for scripts"), dir.count());
     int progress = 0;
 
     if (!dir.exists())
@@ -100,7 +101,7 @@ bool SourceManager::findScripts()
                 VERBOSE(VB_GENERAL, "found script " + file->absFilePath());
             }
         }
-        bsydlg.setProgress(++progress);
+        busyd->setProgress(++progress);
     }
     // run through and see if any scripts have been deleted
     MSqlQuery db(MSqlQuery::InitCon());
@@ -129,7 +130,8 @@ bool SourceManager::findScripts()
             VERBOSE(VB_IMPORTANT,  db.lastError().text());
         }
     }
-    bsydlg.Close();
+    busyd->Close();
+    busyd->deleteLater();
 
     return m_scripts.count() > 0;
 }

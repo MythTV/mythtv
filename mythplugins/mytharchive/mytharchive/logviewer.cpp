@@ -367,7 +367,6 @@ void LogViewer::closePopupMenu()
     if (!m_popupMenu)
         return;
 
-    m_popupMenu->hide();
-    delete m_popupMenu;
+    m_popupMenu->deleteLater();
     m_popupMenu = NULL;
 }

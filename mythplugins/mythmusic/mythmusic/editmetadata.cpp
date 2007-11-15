@@ -527,7 +527,7 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
         res = true;
     }
 
-    delete searchDialog;
+    searchDialog->deleteLater();
     setActiveWindow();
 
     return res;
@@ -639,16 +639,14 @@ void EditMetadataDialog::showSaveMenu()
     topButton->setFocus();
 }
 
-void EditMetadataDialog::cancelPopup()
+void EditMetadataDialog::cancelPopup(void)
 {
-  if (!popup)
-      return;
-
-  popup->hide();
-
-  delete popup;
-  popup = NULL;
-  setActiveWindow();
+    if (popup)
+    {
+        popup->deleteLater();
+        popup = NULL;
+        setActiveWindow();
+    }
 }
 
 void EditMetadataDialog::saveToMetadata()
@@ -731,7 +729,7 @@ void EditMetadataDialog::showMenu()
 
     int res = menu->ExecPopup();
 
-    if ( res != -1)
+    if ((IT_UNKNOWN <= res) && (res < IT_LAST))
     {
         // get selected image in grid
         ImageGridItem *item = coverart_grid->getCurrentItem();
@@ -752,7 +750,7 @@ void EditMetadataDialog::showMenu()
         }
     }
 
-    delete menu;
+    menu->deleteLater();
 }
 
 void EditMetadataDialog::setSaveMetadataOnly()

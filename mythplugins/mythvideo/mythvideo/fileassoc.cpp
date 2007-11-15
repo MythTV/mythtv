@@ -412,7 +412,7 @@ void FileAssocDialog::removeExtensionPopup()
     new_extension_popup->close();
     delete new_extension_editor;
     new_extension_editor = NULL;
-    delete new_extension_popup;
+    new_extension_popup->deleteLater();
     new_extension_popup = NULL;
 
     //

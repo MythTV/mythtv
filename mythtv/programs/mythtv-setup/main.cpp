@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
 
             if (dia->exec() == 2)
                 haveProblems = false;
-            delete dia;
+            dia->deleteLater();
         }
 
         delete problems;
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
                                         "with channel information."));
         dia->AddButton(QObject::tr("OK"));
         dia->exec();
-        delete dia;
+        dia->deleteLater();
     }
 
     if (backendIsRunning)

@@ -523,14 +523,13 @@ void ExportNativeWizard::showMenu()
     popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
 }
 
-void ExportNativeWizard::closePopupMenu()
+void ExportNativeWizard::closePopupMenu(void)
 {
-    if (!popupMenu)
-        return;
-
-    popupMenu->hide();
-    delete popupMenu;
-    popupMenu = NULL;
+    if (popupMenu)
+    {
+        popupMenu->deleteLater();
+        popupMenu = NULL;
+    }
 }
 
 void ExportNativeWizard::removeItem()

@@ -45,13 +45,19 @@ ViewScheduleDiff::ViewScheduleDiff(MythMainWindow *parent, const char *name, QSt
     theme->SetHMult(hmult);
     if (!theme->LoadTheme(xmldata, "schdiff"))
     {
-        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
-                       "does not contain a 'schdiff' element. Please contact "
-                       "the theme creator and ask if they could please update "
-                       "it.<br><br>The next screen will be empty. "
-                       "Escape out of it to return to the menu."));
-        diag.AddButton(tr("OK"));
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(),
+            QObject::tr(
+                "The theme you are using does not contain the "
+                "%1 element. Please contact the theme creator "
+                "and ask if they could please update it.<br><br>"
+                "The next screen will be empty. "
+                "Escape out of it to return to the menu.")
+            .arg("'schdiff'"));
+
+        dlg->AddButton(tr("OK"));
+        dlg->exec();
+        dlg->deleteLater();
 
         return;
     }
@@ -308,9 +314,12 @@ void ViewScheduleDiff::statusDialog()
             pa = recListAfter.next();
         }
     }
-    DialogBox diag(gContext->GetMainWindow(), message);
-    diag.AddButton(QObject::tr("OK"));
-    diag.exec();
+
+    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
+    dlg->AddButton(QObject::tr("OK"));
+    dlg->exec();
+    dlg->deleteLater();
+
     return;
 }
 

@@ -155,12 +155,13 @@ void IconView::SetupMediaMonitor(void)
         }
         else 
         {
-            DialogBox dialog(gContext->GetMainWindow(),
+            DialogBox *dlg = new DialogBox(gContext->GetMainWindow(),
                              tr("Failed to mount device: ") + 
                              m_currDevice->getDevicePath() + "\n\n" +
                              tr("Showing the default MythGallery directory."));
-            dialog.AddButton(tr("OK"));
-            dialog.exec();
+            dlg->AddButton(tr("OK"));
+            dlg->exec();
+            dlg->deleteLater();
             mon->Unlock(m_currDevice);
         }
     }
@@ -1329,10 +1330,14 @@ void IconView::HandleImport(void)
     QFileInfo path;
     QDir importdir;
 
-    DialogBox importDiag(gContext->GetMainWindow(), tr("Import pictures?"));
-    importDiag.AddButton(tr("No"));
-    importDiag.AddButton(tr("Yes"));
-    if (importDiag.exec() != 2)
+    DialogBox *importDlg = new DialogBox(
+        gContext->GetMainWindow(), tr("Import pictures?"));
+
+    importDlg->AddButton(tr("No"));
+    importDlg->AddButton(tr("Yes"));
+    int code = importDlg->exec();
+    importDlg->deleteLater();
+    if (2 != code)
         return;
 
     // Makes import directory samba/windows friendly (no colon)
@@ -1371,10 +1376,13 @@ void IconView::HandleImport(void)
         // (QT < 3.1) rely on automatic fail if dir not empty
         if (importdir.rmdir(importdir.absPath()))
         {
-            DialogBox nopicsDiag(gContext->GetMainWindow(),
-                                 tr("Nothing found to import"));
-            nopicsDiag.AddButton(tr("OK"));
-            nopicsDiag.exec();
+            DialogBox *nopicsDlg = new DialogBox(
+                gContext->GetMainWindow(), tr("Nothing found to import"));
+
+            nopicsDlg->AddButton(tr("OK"));
+            nopicsDlg->exec();
+            nopicsDlg->deleteLater();
+
             return;
         }
 
@@ -1554,9 +1562,11 @@ void IconView::HandleRename(void)
                 msg = tr("Failed to rename directory");
             else
                 msg = tr("Failed to rename file");
-            DialogBox dialog(gContext->GetMainWindow(), msg);
-            dialog.AddButton(tr("OK"));
-            dialog.exec();
+
+            DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), msg);
+            dlg->AddButton(tr("OK"));
+            dlg->exec();
+            dlg->deleteLater();
 
             return;
         }
@@ -1639,7 +1649,7 @@ void IconView::CopyMarkedFiles(bool move)
     }
 
     progress->Close();
-    delete progress;
+    progress->deleteLater();
 
     LoadDirectory(m_currDir, true);
 }

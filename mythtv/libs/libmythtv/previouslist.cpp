@@ -58,13 +58,19 @@ PreviousList::PreviousList(MythMainWindow *parent, const char *name,
 
     if (!theme->LoadTheme(xmldata, "programlist"))
     {
-        DialogBox diag(gContext->GetMainWindow(), "The theme you are using "
-                       "does not contain a 'programlist' element.  Please "
-                       "contact the theme creator and ask if they could "
-                       "please update it.<br><br>The next screen will be empty."
-                       "  Escape out of it to return to the menu.");
-        diag.AddButton("OK");
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(),
+            QObject::tr(
+                "The theme you are using does not contain the "
+                "%1 element. Please contact the theme creator "
+                "and ask if they could please update it.<br><br>"
+                "The next screen will be empty. "
+                "Escape out of it to return to the menu.")
+            .arg("'programlist'"));
+
+        dlg->AddButton("OK");
+        dlg->exec();
+        dlg->deleteLater();
 
         return;
     }
@@ -705,34 +711,37 @@ void PreviousList::removalDialog()
     message += "\n\n\n" + tr("NOTE: removing items from this list will not "
                              "delete any recordings.");
     
-    DialogBox diag(gContext->GetMainWindow(), message);
+    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, cleardup = -1, setdup = -1, rm_episode = -1,
         rm_title = -1;
     // int rm_generics = -1;
 
-    diag.AddButton(tr("OK"));
+    dlg->AddButton(tr("OK"));
     ok = button++;
 
     if (pi->duplicate)
     {
-        diag.AddButton(tr("Allow this episode to re-record"));
+        dlg->AddButton(tr("Allow this episode to re-record"));
         cleardup = button++;
     }
     else
     {
-        diag.AddButton(tr("Never record this episode"));
+        dlg->AddButton(tr("Never record this episode"));
         setdup = button++;
     }
-    diag.AddButton(tr("Remove this episode from the list"));
+    dlg->AddButton(tr("Remove this episode from the list"));
     rm_episode = button++;
 
-    diag.AddButton(tr("Remove all episodes for this title"));
+    dlg->AddButton(tr("Remove all episodes for this title"));
     rm_title = button++;
 
-    // diag.AddButton(tr("Remove all that cannot be used for duplicate matching"));
+    // dlg->AddButton(tr("Remove all that cannot be used "
+    //                   "for duplicate matching"));
     // rm_generics = button++;
 
-    int ret = diag.exec();
+    int ret = dlg->exec();
+    dlg->deleteLater();
+    dlg = NULL;
 
     if (ret == rm_episode)
     {

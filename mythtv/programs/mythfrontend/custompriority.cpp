@@ -469,13 +469,12 @@ bool CustomPriority::checkSyntax(void)
         }
     }
 
-    if (msg > "")
+    if (!msg.isEmpty())
     {
         DialogBox *errdiag = new DialogBox(gContext->GetMainWindow(), msg);
         errdiag->AddButton(QObject::tr("OK"));
         errdiag->exec();
-
-        delete errdiag;
+        errdiag->deleteLater();
     }
     return ret;
 }

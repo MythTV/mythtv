@@ -455,90 +455,108 @@ int handleExit(void)
 
     QString title = QObject::tr("Do you really want to exit MythTV?");
 
-    DialogBox diag(gContext->GetMainWindow(), title);
+    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), title);
 
-    diag.AddButton(QObject::tr("No"));
+    dlg->AddButton(QObject::tr("No"));
     int result;
 
+    enum {
+        kDialogCodeButton0 = 1,
+        kDialogCodeButton1 = 2,
+        kDialogCodeButton2 = 3,
+        kDialogCodeButton3 = 4,
+    };
+
+    int ret = NO_EXIT;
     switch (exitMenuStyle)
     {
         case 0:
-            diag.AddButton(QObject::tr("Yes, Exit now"));
+            dlg->AddButton(QObject::tr("Yes, Exit now"));
             if (frontendOnly)
-                diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = diag.exec();
+                dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return QUIT;
-                case 3: return HALT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = QUIT;    break;
+                case kDialogCodeButton2: ret = HALT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 1:
-            diag.AddButton(QObject::tr("Yes, Exit now"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit now"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return QUIT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = QUIT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 2:
-            diag.AddButton(QObject::tr("Yes, Exit now"));
-            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit now"));
+            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return QUIT;
-                case 3: return HALT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = QUIT;    break;
+                case kDialogCodeButton2: ret = HALT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 3:
-            diag.AddButton(QObject::tr("Yes, Exit now"));
-            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
-            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit now"));
+            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
+            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return QUIT;
-                case 3: return REBOOT;
-                case 4: return HALT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = QUIT;    break;
+                case kDialogCodeButton2: ret = REBOOT;  break;
+                case kDialogCodeButton3: ret = HALT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 4:
-            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return HALT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = HALT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 5:
-            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return REBOOT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = REBOOT;  break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
         case 6:
-            diag.AddButton(QObject::tr("Yes, Exit and Reboot"));
-            diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = diag.exec();
+            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
+            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
+            result = dlg->exec();
             switch (result)
             {
-                case 1: return NO_EXIT;
-                case 2: return REBOOT;
-                case 3: return HALT;
-                default: return NO_EXIT;
+                case kDialogCodeButton0: ret = NO_EXIT; break;
+                case kDialogCodeButton1: ret = REBOOT;  break;
+                case kDialogCodeButton2: ret = HALT;    break;
+                default:                 ret = NO_EXIT; break;
             }
+            break;
     }
 
-    return NO_EXIT;
+    dlg->deleteLater();
+    dlg = NULL;
+
+    return ret;
 }
 
 void haltnow()

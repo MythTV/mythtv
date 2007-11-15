@@ -56,13 +56,19 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     tree = getUIListTreeType("musictree");
     if (!tree)
     {
-        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
-                       "does not contain a 'musictree' element.  "
-                       "Please contact the theme creator and ask if they could "
-                       "please update it.<br><br>The next screen will be empty."
-                       "  Escape out of it to return to the menu."));
-        diag.AddButton(tr("OK"));
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(),
+            QObject::tr(
+                "The theme you are using does not contain the "
+                "%1 element. Please contact the theme creator "
+                "and ask if they could please update it.<br><br>"
+                "The next screen will be empty. "
+                "Escape out of it to return to the menu.")
+            .arg("'musictree'"));
+
+        dlg->AddButton(tr("OK"));
+        dlg->exec();
+        dlg->deleteLater();
 
         return;
     }
@@ -78,12 +84,15 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
     if (m_lines.count() < 3)
     {
-        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
-                       "does not contain any info lines in the music element.  "
-                       "Please contact the theme creator and ask if they could "
-                       "please update it."));
-        diag.AddButton(tr("OK"));
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(),
+            tr("The theme you are using does not contain any info "
+               "lines in the music element. Please contact the theme "
+               "creator and ask if they could please update it."));
+
+        dlg->AddButton(tr("OK"));
+        dlg->exec();
+        dlg->deleteLater();
     }
 
     connect(tree, SIGNAL(itemEntered(UIListTreeType *, UIListGenericTree *)),
@@ -387,7 +396,7 @@ void DatabaseBox::closeErrorPopup(void)
         return;
 
     error_popup->hide();
-    delete error_popup;
+    error_popup->deleteLater();
     error_popup = NULL;
 }
 
@@ -430,7 +439,7 @@ void DatabaseBox::BlankCDRW()
     system(command);
 
     record_progress->Close();
-    delete record_progress;
+    record_progress->deleteLater();
 }
 
 void DatabaseBox::deletePlaylist()
@@ -820,7 +829,7 @@ void DatabaseBox::closePlaylistPopup(void)
         return;
 
     playlist_popup->hide();
-    delete playlist_popup;
+    playlist_popup->deleteLater();
     playlist_popup = NULL;
 }
 
@@ -928,7 +937,7 @@ void DatabaseBox::closeActivePopup(void)
         return;
 
     active_popup->hide();
-    delete active_popup;
+    active_popup->deleteLater();
     active_popup = NULL;
 }
 

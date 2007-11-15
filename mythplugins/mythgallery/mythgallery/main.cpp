@@ -25,9 +25,12 @@ static void run(MythMediaDevice *dev)
         icv.exec();
     else
     {
-        DialogBox diag(gContext->GetMainWindow(), icv.GetError());
-        diag.AddButton(QObject::tr("Ok"));
-        diag.exec();
+        DialogBox *dlg = new DialogBox(
+            gContext->GetMainWindow(), icv.GetError());
+
+        dlg->AddButton(QObject::tr("Ok"));
+        dlg->exec();
+        dlg->deleteLater();
     }
 }
 

@@ -323,7 +323,7 @@ void runBurnDVD(void)
     dialog->AddButton(QObject::tr("Cancel"));
 
     res = dialog->exec();
-    delete dialog;
+    dialog->deleteLater();
 
     // cancel pressed?
     if (res == 4)

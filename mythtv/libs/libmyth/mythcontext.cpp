@@ -1767,7 +1767,7 @@ void MythContext::CacheThemeImagesDirectory(const QString &dirname,
     if (caching)
     {
         caching->Close();
-        delete caching;
+        caching->deleteLater();        
     }
 }
 
@@ -3162,9 +3162,10 @@ bool MythContext::TestPopupVersion(const QString &name,
 
     if (GetMainWindow() && !d->disablelibrarypopup)
     {    
-        DialogBox dbox(gContext->GetMainWindow(), err);
-        dbox.AddButton("OK");
-        dbox.exec();
+        DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), err);
+        dlg->AddButton("OK");
+        dlg->exec();
+        dlg->deleteLater();
     }
 
     return false;

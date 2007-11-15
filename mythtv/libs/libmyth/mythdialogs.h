@@ -162,6 +162,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     virtual void popupDone(int);
 
   protected:
+    ~MythPopupBox() {} // use deleteLater() instead for thread safety
     bool focusNextPrevChild(bool next);
     void keyPressEvent(QKeyEvent *e);
 
@@ -216,7 +217,11 @@ class MPUBLIC MythProgressDialog: public MythDialog
 
     void keyPressEvent(QKeyEvent *);
 
+    virtual void deleteLater(void);
+
   protected:
+    void Teardown(void);
+    ~MythProgressDialog(); // use deleteLater() instead for thread safety
     QProgressBar *progress;
 
   private:
@@ -245,8 +250,6 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
     */
     MythBusyDialog(const QString &title);
 
-    ~MythBusyDialog();
-
     /** \brief Setup a timer to 'move' the spinner
 
         This will create a \p QTimer object that will update the
@@ -262,9 +265,16 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
     */
     void Close();
 
+  public slots:
+    virtual void deleteLater(void);
+
   protected slots:
     void setProgress();
     void timeout();
+
+  protected:
+    void Teardown(void);
+    ~MythBusyDialog();
 
   private:
     QTimer *timer;

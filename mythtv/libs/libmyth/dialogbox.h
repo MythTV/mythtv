@@ -23,6 +23,9 @@ class MPUBLIC DialogBox : public MythDialog
   protected slots:
     void buttonPressed(int which);
 
+  protected:
+    ~DialogBox() {} // use deleteLater() for thread safety
+
   private:
     QVBoxLayout *box;
     QButtonGroup *buttongroup;

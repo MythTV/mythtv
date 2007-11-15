@@ -1068,7 +1068,7 @@ bool MythNews::showEditDialog(bool edit)
         loadSites();
     }
 
-    delete popup;
+    popup->deleteLater();
 
     return (res == 0);
 }
@@ -1090,8 +1090,7 @@ void MythNews::cancelMenu()
 {
     if (menu) 
     {
-        menu->hide();
-        delete menu;
+        menu->deleteLater();
         menu=NULL;
     }
 }

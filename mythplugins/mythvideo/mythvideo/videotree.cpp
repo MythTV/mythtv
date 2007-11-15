@@ -498,8 +498,7 @@ void VideoTree::cancelPopup(void)
 
     if (popup)
     {
-        popup->hide();
-        delete popup;
+        popup->deleteLater();
 
         popup = NULL;
 
@@ -526,7 +525,7 @@ void VideoTree::slotViewPlot()
         okButton->setFocus();
 
         plotbox->ExecPopup();
-        delete plotbox;
+        plotbox->deleteLater();
         //allowPaint = true;
     }
     else

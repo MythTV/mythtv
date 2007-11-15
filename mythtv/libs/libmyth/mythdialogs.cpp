@@ -79,6 +79,7 @@ MythDialog::~MythDialog()
 
 void MythDialog::deleteLater(void)
 {
+    hide();
     TeardownAll();
     QFrame::deleteLater();
 }
@@ -795,16 +796,36 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     qApp->processEvents();
 }
 
+MythProgressDialog::~MythProgressDialog()
+{
+    Teardown();
+}
+
+void MythProgressDialog::deleteLater(void)
+{
+    hide();
+    Teardown();
+    MythDialog::deleteLater();
+}
+
+void MythProgressDialog::Teardown(void)
+{
+    if (textItems)
+    {
+        delete textItems;
+        textItems = NULL;
+    }
+}
+
 void MythProgressDialog::Close(void)
 {
     accept();
 
-    if (textItems)
+    LCD *lcddev = LCD::Get();
+    if (lcddev)
     {
-        LCD * lcddev = LCD::Get();
         lcddev->switchToNothing();
         lcddev->switchToTime();
-        delete textItems;
     }
 }
 
@@ -855,15 +876,23 @@ MythBusyDialog::MythBusyDialog(const QString &title)
 
 MythBusyDialog::~MythBusyDialog()
 {
+    Teardown();
+}
+
+void MythBusyDialog::deleteLater(void)
+{
+    Teardown();
+    MythProgressDialog::deleteLater();
+}
+
+void MythBusyDialog::Teardown(void)
+{
     if (timer)
     {
         timer->disconnect();
         timer->deleteLater();
         timer = NULL;
     }
-
-    if (LCD *lcddev = LCD::Get())
-        lcddev->switchToTime();
 }
 
 void MythBusyDialog::start(int interval)

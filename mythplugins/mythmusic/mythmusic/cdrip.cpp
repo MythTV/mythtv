@@ -720,18 +720,22 @@ void Ripper::startScanCD(void)
                     }
                     else
                     {
-                        DialogBox dialog(gContext->GetMainWindow(),
-                                         tr("Artist: %1\n"
-                                         "Album: %2\n"
-                                         "Track: %3\n\n"
-                                         "This track is already in the database. \n"
-                                         "Do you want to remove the existing track?")
-                                         .arg(m_artistName).arg(m_albumName).arg(title));
-                        dialog.AddButton("No");
-                        dialog.AddButton("No To All");
-                        dialog.AddButton("Yes");
-                        dialog.AddButton("Yes To All");
-                        int res = dialog.exec();
+                        DialogBox *dlg = new DialogBox(
+                            gContext->GetMainWindow(),
+                            tr("Artist: %1\n"
+                               "Album: %2\n"
+                               "Track: %3\n\n"
+                               "This track is already in the database. \n"
+                               "Do you want to remove the existing track?")
+                            .arg(m_artistName).arg(m_albumName).arg(title));
+
+                        dlg->AddButton("No");
+                        dlg->AddButton("No To All");
+                        dlg->AddButton("Yes");
+                        dlg->AddButton("Yes To All");
+                        int res = dlg->exec();
+                        dlg->deleteLater();
+                        dlg = NULL;
 
                         if (res == 1)
                         {
@@ -779,7 +783,7 @@ void Ripper::startScanCD(void)
     buildFocusList();
     updateTrackList();
 
-    delete busy;
+    busy->deleteLater();
 }
 
 void Ripper::scanCD(void)
@@ -1196,7 +1200,7 @@ void Ripper::startEjectCD()
     }
 
     delete ejector;
-    delete busy;
+    busy->deleteLater();
 }
 
 void Ripper::ejectCD()
@@ -1381,7 +1385,7 @@ bool Ripper::showList(QString caption, QString &value)
         res = true;
     }
 
-    delete searchDialog;
+    searchDialog->deleteLater();
     setActiveWindow();
 
     return res;

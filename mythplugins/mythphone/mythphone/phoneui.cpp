@@ -1088,7 +1088,7 @@ void PhoneUIBox::doMenuPopup()
         menuPopup->addButton(tr("Delete all Voicemails"), this, SLOT(vmailEntryDeleteAll()));
         break;
     default:
-        delete menuPopup;
+        menuPopup->deleteLater();
         menuPopup = NULL;
         return;
         break;
@@ -1149,7 +1149,7 @@ void PhoneUIBox::menuHistorySave()
                                                   "\n\n" + QObject::tr("A directory entry already exists with this URL."));
                 NoDeviceDialog->AddButton(QObject::tr("OK"));
                 NoDeviceDialog->exec();
-                delete NoDeviceDialog;
+                NoDeviceDialog->deleteLater();
                 closeMenuPopup();
             }
             else
@@ -1271,8 +1271,7 @@ void PhoneUIBox::closeMenuPopup()
     if (!menuPopup)
         return;
 
-    menuPopup->hide();
-    delete menuPopup;
+    menuPopup->deleteLater();
     menuPopup = NULL;
 }
 
@@ -1317,8 +1316,7 @@ void PhoneUIBox::closeUrlPopup()
     if (!urlPopup)
         return;
 
-    urlPopup->hide();
-    delete urlPopup;
+    urlPopup->deleteLater();
     urlPopup = NULL;
 }
 
@@ -1416,8 +1414,7 @@ void PhoneUIBox::closeIMPopup()
     if (!imPopup)
         return;
 
-    imPopup->hide();
-    delete imPopup;
+    imPopup->deleteLater();
     imPopup = NULL;
 }
 
@@ -1552,8 +1549,7 @@ void PhoneUIBox::closeAddEntryPopup()
     if (!addEntryPopup)
         return;
 
-    addEntryPopup->hide();
-    delete addEntryPopup;
+    addEntryPopup->deleteLater();
     addEntryPopup = NULL;
 }
 
@@ -1644,8 +1640,7 @@ void PhoneUIBox::closeAddDirectoryPopup()
     if (!addDirectoryPopup)
         return;
 
-    addDirectoryPopup->hide();
-    delete addDirectoryPopup;
+    addDirectoryPopup->deleteLater();
     addDirectoryPopup = NULL;
 }
 
@@ -1748,8 +1743,7 @@ void PhoneUIBox::closeCallPopup()
     if (!incallPopup)
         return;
 
-    incallPopup->hide();
-    delete incallPopup;
+    incallPopup->deleteLater();
     incallPopup = NULL;
 }
 
@@ -1914,8 +1908,7 @@ void PhoneUIBox::closeStatisticsPopup()
     if (!statsPopup)
         return;
 
-    statsPopup->hide();
-    delete statsPopup;
+    statsPopup->deleteLater();
     statsPopup = NULL;
     audioPkInOutLabel = audioPlayoutLabel = audioPkRtcpLabel = 0;
     videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;

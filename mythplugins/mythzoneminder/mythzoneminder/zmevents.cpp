@@ -645,11 +645,11 @@ void ZMEvents::showMenu()
                 zm->deleteEventList(m_eventList);
 
                 getEventList();
-                busy->close();
-                delete busy;
+                busy->Close();
+                busy->deleteLater();
             }
             break;
     }
 
-    delete popup;
+    popup->deleteLater();
 }

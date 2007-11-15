@@ -1790,7 +1790,7 @@ int Playlist::CreateCDMP3(void)
     }
 
     progress->Close();
-    delete progress;
+    progress->deleteLater();
 
     progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
     progress->setProgress(2);
@@ -1868,7 +1868,7 @@ int Playlist::CreateCDMP3(void)
     }
 
     progress->Close();
-    delete progress;
+    progress->deleteLater();
 
     QFile::remove(tmprecordlist);
     QFile::remove(tmprecordisofs);

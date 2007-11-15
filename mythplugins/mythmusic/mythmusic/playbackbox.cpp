@@ -251,7 +251,7 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
     if (progress)
     {
         progress->Close();
-        delete progress;
+        progress->deleteLater();
         progress = NULL;
     }
 
@@ -645,7 +645,7 @@ void PlaybackBoxMusic::closePlaylistPopup()
         return;
 
     playlist_popup->hide();
-    delete playlist_popup;
+    playlist_popup->deleteLater();
     playlist_popup = NULL;
 }
 
@@ -1020,8 +1020,9 @@ void PlaybackBoxMusic::showEditMetadataDialog()
            }
         }
 
-        MythBusyDialog busy(QObject::tr("Rebuilding music tree"));
-        busy.start();
+        MythBusyDialog *busy = new MythBusyDialog(
+            QObject::tr("Rebuilding music tree"));
+        busy->start();
 
         // Get a reference to the current track
         QValueList <int> branches_to_current_node;
@@ -1065,7 +1066,8 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
         music_tree_list->refresh();
 
-        busy.Close();
+        busy->Close();
+        busy->deleteLater();
     }
 }
 
@@ -1086,7 +1088,7 @@ void PlaybackBoxMusic::checkForPlaylists()
             if (progress)
             {
                 progress->Close();
-                delete progress;
+                progress->deleteLater();
                 progress = NULL;
                 progress_type = kProgressNone;
             }
@@ -1147,7 +1149,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                 if (progress)
                 {
                     progress->Close();
-                    delete progress;
+                    progress->deleteLater();
                 }
                 progress = NULL;
                 progress_type = kProgressNone;
@@ -2402,7 +2404,7 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
     else
         playOption = PL_CURRENT;
 
-    delete popup;
+    popup->deleteLater();
 
     return (res >= 0);
 }

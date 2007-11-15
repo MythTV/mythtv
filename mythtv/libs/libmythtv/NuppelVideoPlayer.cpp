@@ -679,10 +679,13 @@ void NuppelVideoPlayer::ReinitVideo(void)
         if (!using_null_videoout)
         {
             qApp->lock();
-            DialogBox dialog(gContext->GetMainWindow(),
-                             QObject::tr("Failed to Reinit Video."));
-            dialog.AddButton(QObject::tr("Return to menu."));
-            dialog.exec();
+            DialogBox *dlg = new DialogBox(
+                gContext->GetMainWindow(),
+                QObject::tr("Failed to Reinit Video."));
+
+            dlg->AddButton(QObject::tr("Return to menu."));
+            dlg->exec();
+            dlg->deleteLater();
             qApp->unlock();
         }
         errored = true;
@@ -3150,7 +3153,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if ((errMsg != QString::null) && !using_null_videoout &&
             gContext->GetNumSetting("AudioNag", 1))
         {
-            DialogBox dialog(gContext->GetMainWindow(), errMsg);
+            DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), errMsg);
 
             QString noaudio  = QObject::tr("Continue WITHOUT AUDIO!");
             QString dontask  = noaudio + " " + 
@@ -3159,13 +3162,14 @@ void NuppelVideoPlayer::StartPlaying(void)
                 QObject::tr("And, don't ask again in this session.");
             QString quit     = QObject::tr("Return to menu.");
 
-            dialog.AddButton(noaudio);
-            dialog.AddButton(dontask);
-            dialog.AddButton(neverask);
-            dialog.AddButton(quit);
+            dlg->AddButton(noaudio);
+            dlg->AddButton(dontask);
+            dlg->AddButton(neverask);
+            dlg->AddButton(quit);
 
             qApp->lock();
-            ret = dialog.exec();
+            ret = dlg->exec();
+            dlg->deleteLater();
             qApp->unlock();
         }
             
@@ -3197,7 +3201,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 QObject::tr("Unable to initialize video."));
             dialog->AddButton(QObject::tr("Return to menu."));
             dialog->exec();
-            delete dialog;
+            dialog->deleteLater();
             qApp->unlock();
         }
 
@@ -3580,7 +3584,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                           QObject::tr("Error was encountered while displaying video."));
         dialog->AddButton(QObject::tr("Return to Menu"));
         dialog->exec();
-        delete dialog;
+        dialog->deleteLater();
 
         qApp->unlock();
     }

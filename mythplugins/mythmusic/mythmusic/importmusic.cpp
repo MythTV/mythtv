@@ -607,7 +607,7 @@ void ImportMusicDialog::startScan()
     fillWidgets();
 
     busy->close();
-    delete busy;
+    busy->deleteLater();
 }
 
 void ImportMusicDialog::doScan()
@@ -736,7 +736,7 @@ void ImportMusicDialog::closeMenu()
         return;
 
     m_popupMenu->hide();
-    delete m_popupMenu;
+    m_popupMenu->deleteLater();
     m_popupMenu = NULL;
 }
 

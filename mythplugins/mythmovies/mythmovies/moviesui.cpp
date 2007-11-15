@@ -346,17 +346,17 @@ void MoviesUI::slotUpdateMovieTimes()
     updateDataTrees();
     drawDisplayTree();
     menuPopup->hide();
-    delete menuPopup;
+    menuPopup->deleteLater();
     menuPopup = NULL;
 }
 
-void MoviesUI::closeMenu()
+void MoviesUI::closeMenu(void)
 {
-    if (!menuPopup)
-        return;
-    menuPopup->hide();
-    delete menuPopup;
-    menuPopup = NULL;
+    if (menuPopup)
+    {
+        menuPopup->deleteLater();
+        menuPopup = NULL;
+    }
 }
 
 void MoviesUI::showAbout()
@@ -379,12 +379,11 @@ void MoviesUI::showAbout()
 
 void MoviesUI::closeAboutPopup(void)
 {
-    if (!aboutPopup)
-        return;
-
-    aboutPopup->hide();
-    delete aboutPopup;
-    aboutPopup = NULL;
+    if (aboutPopup)
+    {
+        aboutPopup->deleteLater();
+        aboutPopup = NULL;
+    }
 }
 
 void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)

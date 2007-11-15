@@ -369,7 +369,7 @@ void FileScanner::cleanDB()
     clean_progress->setProgress(++counter);
 
     clean_progress->Close();
-    delete clean_progress;
+    clean_progress->deleteLater();
 }
 
 /*!
@@ -506,7 +506,7 @@ void FileScanner::SearchDir(QString &directory)
     busy->start();
     BuildFileList(m_startdir, music_files, 0);
     busy->Close();
-    delete busy;
+    busy->deleteLater();
 
     ScanMusic(music_files);
     ScanArtwork(music_files);
@@ -540,7 +540,7 @@ void FileScanner::SearchDir(QString &directory)
         file_checking->setProgress(++counter);
     }
     file_checking->Close();
-    delete file_checking;
+    file_checking->deleteLater();
 
     // Cleanup orphaned entries from the database
     cleanDB();
@@ -602,7 +602,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
     }
 
     file_checking->Close();
-    delete file_checking;
+    file_checking->deleteLater();
 }
 
 /*!
@@ -659,5 +659,5 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
     }
 
     file_checking->Close();
-    delete file_checking;
+    file_checking->deleteLater();
 }

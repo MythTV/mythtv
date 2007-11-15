@@ -38,7 +38,7 @@
 #include "mythtv/mythdbcon.h"
 #include "mythtv/mythwidgets.h"
 #include "mythtv/virtualkeyboard.h"
-
+#include "mythtv/mythdialogs.h"
 
 using namespace std;
 
@@ -168,16 +168,21 @@ void TabView::openMenu()
     menuIsOpen = true;
 }
 
-void TabView::cancelMenu()
+void TabView::cancelMenu(void)
 {
-    if (menuIsOpen)
+    if (!menuIsOpen)
+        return;
+
+    if (menu)
     {
-        menu->hide();
-        delete menu;
+        menu->deleteLater();
         menu = NULL;
-        menuIsOpen = false;
-        hadFocus->setFocus();
     }
+
+    menuIsOpen = false;
+
+    if (hadFocus)
+        hadFocus->setFocus();
 }
 
 void TabView::handleMouseAction(QString action)
@@ -338,7 +343,7 @@ void TabView::actionAddBookmark()
         finishAddBookmark(sGroup, sDesc, sUrl);
     }
 
-    delete popup;
+    popup->deleteLater();
 
     hadFocus->setFocus();
 }
@@ -408,7 +413,7 @@ void TabView::showEnterURLDialog()
         newPage(sURL);
     }
 
-    delete popup;
+    popup->deleteLater();
 
     hadFocus->setFocus();
 }

@@ -73,8 +73,9 @@ VideoScannerImp::~VideoScannerImp()
 
 void VideoScannerImp::doScan(const QStringList &dirs)
 {
-    MythProgressDialog progressDlg(QObject::tr("Searching for video files"),
-                                   dirs.size());
+    MythProgressDialog *progressDlg =
+        new MythProgressDialog(QObject::tr("Searching for video files"),
+                               dirs.size());
 
     QStringList imageExtensions = QImage::inputFormatList();
     int counter = 0;
@@ -85,10 +86,11 @@ void VideoScannerImp::doScan(const QStringList &dirs)
          ++iter)
     {
         buildFileList(*iter, imageExtensions, fs_files);
-        progressDlg.setProgress(++counter);
+        progressDlg->setProgress(++counter);
     }
 
-    progressDlg.close();
+    progressDlg->close();
+    progressDlg->deleteLater();
 
     PurgeList db_remove;
     verifyFiles(fs_files, db_remove);
@@ -134,8 +136,8 @@ void VideoScannerImp::updateDB(const FileCheckList &add,
                                const PurgeList &remove)
 {
     int counter = 0;
-    MythProgressDialog progressDlg(QObject::tr("Updating video database"),
-                                   add.size() + remove.size());
+    MythProgressDialog *progressDlg = new MythProgressDialog(
+        QObject::tr("Updating video database"), add.size() + remove.size());
 
     for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
     {
@@ -152,17 +154,18 @@ void VideoScannerImp::updateDB(const FileCheckList &add,
             newFile.dumpToDatabase();
         }
 
-        progressDlg.setProgress(++counter);
+        progressDlg->setProgress(++counter);
     }
 
     for (PurgeList::const_iterator p = remove.begin(); p != remove.end(); ++p)
     {
         promptForRemoval(p->first, p->second);
 
-        progressDlg.setProgress(++counter);
+        progressDlg->setProgress(++counter);
     }
 
-    progressDlg.Close();
+    progressDlg->Close();
+    progressDlg->deleteLater();
 }
 
 void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
@@ -170,8 +173,8 @@ void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
     int counter = 0;
     FileCheckList::iterator iter;
 
-    MythProgressDialog progressDlg(QObject::tr("Verifying video files"),
-                                   m_dbmetadata->getList().size());
+    MythProgressDialog *progressDlg = new MythProgressDialog(
+        QObject::tr("Verifying video files"), m_dbmetadata->getList().size());
 
     // For every file we know about, check to see if it still exists.
     for (MetadataListManager::metadata_list::const_iterator p =
@@ -195,10 +198,11 @@ void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
             }
         }
 
-        progressDlg.setProgress(++counter);
+        progressDlg->setProgress(++counter);
     }
 
-    progressDlg.Close();
+    progressDlg->Close();
+    progressDlg->deleteLater();
 }
 
 namespace

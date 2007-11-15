@@ -354,10 +354,11 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     int counter = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    MythProgressDialog progressDlg(QString("Updating %1(%2) Rom database")
-                                   .arg(handler->SystemName())
-                                   .arg(handler->GameType()),
-                                   m_GameMap.size());
+    MythProgressDialog *progressDlg =
+        new MythProgressDialog(
+            QObject::tr("Updating %1(%2) ROM database")
+            .arg(handler->SystemName()).arg(handler->GameType()),
+            m_GameMap.size());
 
     GameScanMap::Iterator iter;
 
@@ -428,10 +429,11 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             promptForRemoval( iter.data().Rom() , iter.data().RomPath() );
         }
 
-        progressDlg.setProgress(++counter);
+        progressDlg->setProgress(++counter);
     }
 
-    progressDlg.Close();
+    progressDlg->Close();
+    progressDlg->deleteLater();
 }
 
 void GameHandler::VerifyGameDB(GameHandler *handler)
@@ -442,8 +444,9 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT romname,rompath,gamename FROM gamemetadata WHERE system = '" + handler->SystemName() + "';");
 
-    MythProgressDialog progressDlg(QObject::tr("Verifying " + handler->SystemName() + " files"),
-                                   query.numRowsAffected());
+    MythProgressDialog *progressDlg = new MythProgressDialog(
+        QObject::tr("Verifying %1 files").arg(handler->SystemName()),
+        query.numRowsAffected());
 
     // For every file we know about, check to see if it still exists.
     if (query.isActive() && query.size() > 0)
@@ -468,10 +471,11 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
                                          GameName,RomPath);
                 }
             }
-            progressDlg.setProgress(++counter);
+            progressDlg->setProgress(++counter);
         }
     }
-    progressDlg.Close();
+    progressDlg->Close();
+    progressDlg->deleteLater();
 }
 
 // Recurse through the directory and gather a count on how many files there are to process.
@@ -621,8 +625,10 @@ void GameHandler::processGames(GameHandler *handler)
     else
         maxcount = 100;
 
-    MythProgressDialog pdial(QObject::tr("Scanning for " + handler->SystemName() + " game(s)..."), maxcount);
-    pdial.setProgress(0);
+    MythProgressDialog *pdial = new MythProgressDialog(
+        QObject::tr("Scanning for %1 game(s)...").arg(handler->SystemName()),
+        maxcount);
+    pdial->setProgress(0);
 
     if (handler->GameType() == "PC") 
     {
@@ -633,13 +639,13 @@ void GameHandler::processGames(GameHandler *handler)
                                                        handler->SystemCmdLine().left(handler->SystemCmdLine().findRev(QRegExp("/"))));
 
 
-        pdial.setProgress(maxcount);
+        pdial->setProgress(maxcount);
         cout << "PC Game " << handler->SystemName() << endl;
     }
     else
     {   
         int filecount = 0;
-        buildFileList(handler->SystemRomPath(),handler,&pdial, &filecount);
+        buildFileList(handler->SystemRomPath(), handler, pdial, &filecount);
     }
 
     VerifyGameDB(handler);
@@ -658,7 +664,8 @@ void GameHandler::processGames(GameHandler *handler)
         handler->setRebuild(false);
 
 
-    pdial.Close();
+    pdial->Close();
+    pdial->deleteLater();
 }
 
 void GameHandler::processAllGames(void)

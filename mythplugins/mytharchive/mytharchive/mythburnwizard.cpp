@@ -1347,14 +1347,13 @@ void MythburnWizard::showMenu()
     popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
 }
 
-void MythburnWizard::closePopupMenu()
+void MythburnWizard::closePopupMenu(void)
 {
-    if (!popupMenu)
-        return;
-
-    popupMenu->hide();
-    delete popupMenu;
-    popupMenu = NULL;
+    if (popupMenu)
+    {
+        popupMenu->deleteLater();
+        popupMenu = NULL;
+    }
 }
 
 void MythburnWizard::editDetails()
