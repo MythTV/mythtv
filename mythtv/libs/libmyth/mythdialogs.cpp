@@ -651,6 +651,44 @@ bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
     return ok;
 }
 
+/**
+ * \brief Like showGetTextPopup(), but doesn't echo the text entered.
+ *
+ * Turns off the VirtualKeyboard so that PINs can be entered without
+ * having to cycle through the number key "phone entry" mode,
+ * but this means people with remotes will not be able to enter passwords.
+ */
+QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
+                                        QString        title,
+                                        QString        message)
+{
+    MythPopupBox *popup = new MythPopupBox(parent, title);
+
+    popup->addLabel(message, Medium, true);
+
+    MythLineEdit *entry = new MythLineEdit(popup, "passwordEntry");
+    entry->setEchoMode(QLineEdit::Password);
+    entry->setAllowVirtualKeyboard(false);
+
+    popup->addWidget(entry);
+
+    popup->addButton(tr("OK"),    popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"),popup, SLOT(reject()));
+
+    popup->m_parent->connect(entry, SIGNAL(returnPressed()),
+                             popup, SLOT(accept()));
+    entry->setFocus();
+
+    QString password = QString::null;
+    if (popup->ExecPopup() == Accepted)
+        password = QDeepCopy<QString>(entry->text());
+
+    popup->hide();
+    popup->deleteLater();
+
+    return password;
+}
+
 
 int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
                                    QString message, QString button1msg,

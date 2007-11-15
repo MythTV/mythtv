@@ -152,6 +152,8 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text);
+    static QString showPasswordPopup(MythMainWindow *parent,
+                                     QString title, QString message);
 
     virtual void accept(void);
     virtual void reject(void);
@@ -321,8 +323,10 @@ class MPUBLIC MythThemedDialog : public MythDialog
     virtual void updateBackground();
     virtual void initForeground();
     virtual void updateForeground();
-    virtual void updateForeground(const QRect &); // draws anything that intersects
-    virtual void updateForegroundRegion(const QRect &); // only draws the region
+    /// draws anything that intersects
+    virtual void updateForeground(const QRect &);
+    /// only draws the region
+    virtual void updateForegroundRegion(const QRect &);
     virtual bool assignFirstFocus();
     virtual bool nextPrevWidgetFocus(bool up_or_down);
     virtual void activateCurrent();
