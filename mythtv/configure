@@ -1952,10 +1952,9 @@ fi
 # AltiVec flags: The FSF version of GCC differs from the Apple version
 if enabled altivec; then
     test -n "`$cc -v 2>&1 | grep version | grep Apple`" &&
-        add_cflags "-faltivec" ||
-        add_cppflags "-faltivec" ||
-        add_cflags "-maltivec -mabi=altivec" ||
-        add_cppflags "-maltivec -mabi=altivec"
+        add_cflags "-faltivec" && add_cppflags "-faltivec" ||
+        add_cflags "-maltivec -mabi=altivec" &&
+            add_cppflags "-maltivec -mabi=altivec"
 
     check_header altivec.h
 
