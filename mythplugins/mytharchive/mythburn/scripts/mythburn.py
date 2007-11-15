@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20071106-2"
+VERSION="0.1.20071115-1"
 
 
 ##You can use this debug flag when testing out new themes
