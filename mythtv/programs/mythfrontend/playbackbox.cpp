@@ -1155,17 +1155,17 @@ void PlaybackBox::drawVideo(QPainter *p)
     {
         QSize size = blackholeBounds.size();
 
-        float saspect = ((float)size.width() / (float)size.height())  / wmult;
+        float saspect = (float)size.width() / (float)size.height();
         float vaspect = previewVideoNVP->GetVideoAspect();
 
         // Calculate new height or width according to relative aspect ratio
-        if (saspect > vaspect)
+        if ((int)(saspect * 10) > (int)(vaspect * 10))
         {
-            size.setWidth((int) ceil(size.width() * (vaspect / saspect) * wmult));
+            size.setWidth((int) ceil(size.width() * (vaspect / (saspect / hmult)) * wmult));
         }
-        else if (saspect < vaspect)
+        else if ((int)(saspect * 10) < (int)(vaspect * 10))
         {
-            size.setHeight((int) ceil(size.height() * (saspect / vaspect) * hmult));
+            size.setHeight((int) ceil(size.height() * ((saspect / wmult) / vaspect) * hmult));
         }
 
         size.setHeight(((size.height() + 7) / 8) * 8);
@@ -4482,14 +4482,14 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
             int previewheight = blackholeBounds.height();
 
             // Calculate new height orwidth according to relative aspect ratio
-            if (blackholeaspect > videoaspect)
+            if ((int)(blackholeaspect * 10) > (int)(videoaspect * 10))
             {
-                scaleratio = (videoaspect / blackholeaspect) / hmult;
+                scaleratio = (videoaspect / (blackholeaspect / hmult));
                 previewwidth = (int)(previewwidth * scaleratio * wmult);
             }
-            else if (blackholeaspect < videoaspect)
+            else if ((int)(blackholeaspect * 10) < (int)(videoaspect * 10))
             {
-                scaleratio = (blackholeaspect / videoaspect) / wmult;
+                scaleratio = ((blackholeaspect / wmult) / videoaspect);
                 previewheight = (int)(previewheight * scaleratio * hmult);
             }
 
