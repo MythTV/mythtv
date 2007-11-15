@@ -441,7 +441,7 @@ contains( ARCH_SH4, yes) {
 contains( HAVE_ALTIVEC, yes ) {
     SOURCES += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
     SOURCES += ppc/fft_altivec.c ppc/gmc_altivec.c ppc/fdct_altivec.c
-    SOURCES += ppc/float_altivec.c ppc/int_altivec.c
+    SOURCES += ppc/float_altivec.c ppc/int_altivec.c ppc/check_altivec.c
 
     contains( CONFIG_H264_DECODER, yes ) { SOURCES += ppc/h264_altivec.c }
     contains( CONFIG_SNOW_DECODER, yes ) { SOURCES += ppc/snow_altivec.c }

@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 #ifdef HAVE_ALTIVEC
-extern "C" int has_altivec(void);    // in libavcodec/ppc/dsputil_altivec.c
+extern "C" int has_altivec(void);    // in libavcodec/ppc/check_altivec.c
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
 #else
