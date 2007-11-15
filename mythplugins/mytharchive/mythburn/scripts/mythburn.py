@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20071106-1.fixes"
+VERSION="0.1.20071115-1.fixes"
 
 
 ##You can use this debug flag when testing out new themes
@@ -434,7 +434,7 @@ def getVideoParams(folder):
     if float(fr) != float(fps):
         write("WARNING: frames rates do not match")
         write("The frame rate for %s should be %s but the stream info file "
-              "report a fps of %s" % (fr, fps))
+              "report a fps of %s" % (videomode, fr, fps))
         fps = fr
 
     return (videores, fps, aspect_ratio)
