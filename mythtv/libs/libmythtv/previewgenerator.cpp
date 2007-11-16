@@ -245,8 +245,8 @@ bool PreviewGenerator::SavePreview(QString filename,
                      width, height, 32, NULL, 65536 * 65536,
                      QImage::LittleEndian);
 
-    float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 160);
-    float pph = gContext->GetNumSetting("PreviewPixmapHeight", 120);
+    float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 320);
+    float pph = gContext->GetNumSetting("PreviewPixmapHeight", 240);
 
     aspect = (aspect <= 0) ? ((float) width) / height : aspect;
 
