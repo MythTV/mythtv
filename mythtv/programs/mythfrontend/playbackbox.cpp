@@ -1159,13 +1159,13 @@ void PlaybackBox::drawVideo(QPainter *p)
         float vaspect = previewVideoNVP->GetVideoAspect();
 
         // Calculate new height or width according to relative aspect ratio
-        if ((int)(saspect * 10) > (int)(vaspect * 10))
+        if ((int)((saspect + 0.05) * 10) > (int)((vaspect + 0.05) * 10))
         {
-            size.setWidth((int) ceil(size.width() * (vaspect / (saspect / hmult)) * wmult));
+            size.setWidth((int) ceil(size.width() * (vaspect / saspect)));
         }
-        else if ((int)(saspect * 10) < (int)(vaspect * 10))
+        else if ((int)((saspect + 0.05) * 10) < (int)((vaspect + 0.05) * 10))
         {
-            size.setHeight((int) ceil(size.height() * ((saspect / wmult) / vaspect) * hmult));
+            size.setHeight((int) ceil(size.height() * (saspect / vaspect)));
         }
 
         size.setHeight(((size.height() + 7) / 8) * 8);
@@ -4481,16 +4481,16 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
             int previewwidth = blackholeBounds.width();
             int previewheight = blackholeBounds.height();
 
-            // Calculate new height orwidth according to relative aspect ratio
-            if ((int)(blackholeaspect * 10) > (int)(videoaspect * 10))
+            // Calculate new height or width according to relative aspect ratio
+            if ((int)((blackholeaspect + 0.05) * 10) > (int)((videoaspect + 0.05) * 10))
             {
-                scaleratio = (videoaspect / (blackholeaspect / hmult));
-                previewwidth = (int)(previewwidth * scaleratio * wmult);
+                scaleratio = (videoaspect / blackholeaspect);
+                previewwidth = (int)(previewwidth * scaleratio);
             }
-            else if ((int)(blackholeaspect * 10) < (int)(videoaspect * 10))
+            else if ((int)((blackholeaspect + 0.05) * 10) < (int)((videoaspect + 0.05) * 10))
             {
-                scaleratio = ((blackholeaspect / wmult) / videoaspect);
-                previewheight = (int)(previewheight * scaleratio * hmult);
+                scaleratio = (blackholeaspect / videoaspect);
+                previewheight = (int)(previewheight * scaleratio);
             }
 
             // Ensure preview width/height are multiples of 8 to match
