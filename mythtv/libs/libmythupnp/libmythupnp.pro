@@ -74,4 +74,7 @@ freebsd:SOURCES += darwin-sendfile.c
 macx {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
+
+    # This lib depends on libmyth which depends on some stuff in libmythui.
+    LIBS += -L../libmythui -lmythui-$$LIBVERSION
 }
