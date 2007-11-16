@@ -2248,7 +2248,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
         
-        if (ringBuffer->isDVD() && pkt->size == 4 &&
+        if (ringBuffer->isDVD() &&
             start_code_state == SEQ_END_CODE && !indvdstill)
         {
             ringBuffer->DVD()->InStillFrame(true);
@@ -3068,7 +3068,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 gContext->DisableScreensaver();
             }
             
-            if (pkt->size == 4)
+            if (pkt->size < 10)
                 MpegPreProcessPkt(curstream, pkt);
             else if (!d->HasMPEG2Dec())
             {
@@ -3155,7 +3155,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 }
             }
 
-            if (len == 4 && indvdstill)
+            if (len < 10 && indvdstill)
             {
                 indvdstill = false;
                 av_free_packet(pkt);
