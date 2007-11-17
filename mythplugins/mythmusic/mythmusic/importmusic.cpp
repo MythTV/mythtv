@@ -125,9 +125,6 @@ ImportMusicDialog::~ImportMusicDialog()
 
     stopDecoder();
 
-    if (m_decoder)
-        delete m_decoder;
-
     if (m_output)
         delete m_output;
 
