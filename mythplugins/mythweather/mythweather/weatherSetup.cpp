@@ -527,6 +527,57 @@ void ScreenSetup::loadData()
     }
 }
 
+inline QString format_msg(
+    const QStringList &notDefined, uint rows, uint columns)
+{
+    const QString etc = QObject::tr("etc...");
+    uint elen = etc.length();
+    QStringList lines;
+    lines += "";
+    QStringList::iterator oit = lines.begin();
+    QStringList::const_iterator iit = notDefined.begin();
+    while (iit != notDefined.end())
+    {
+        QStringList::const_iterator nit = iit;
+        nit++;
+
+        uint olen = (*oit).length();
+        uint ilen = (*iit).length();
+
+        if (lines.size() >= rows)
+        {
+            if (((olen + 2 + ilen + 2 + elen) < columns) ||
+                (((olen + 2 + ilen) < columns) && (nit == notDefined.end())))
+            {
+                *oit += ", " + *iit;
+            }
+            else
+            {
+                *oit += ", " + etc;
+                nit = notDefined.end();
+            }
+        }
+        else
+        {
+            if ((olen + 2 + ilen) < columns)
+            {
+                *oit += ", " + *iit;
+            }
+            else
+            {
+                *oit += ",";
+                lines += "";
+                oit++;
+                *oit += *iit;
+            }
+        }
+
+        iit = nit;
+    }
+
+    return lines.join("\n").mid(2);
+}
+
 void ScreenSetup::saveData()
 {
     // check if all active screens have sources/locations defined
@@ -556,8 +607,9 @@ void ScreenSetup::saveData()
 
     if (notDefined.size())
     {
-        QString msg = tr("Cannot proceed, the following data items do not have sources defined:\n");
-        msg += notDefined.join("\n");
+        QString msg = tr("Can not proceed, the following data "
+                         "items do not have sources defined:\n");
+        msg += format_msg(notDefined, 1, 400);
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   "Undefined Sources", msg);
         return;
@@ -636,7 +688,22 @@ void ScreenSetup::saveData()
     accept();
 }
 
-void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
+typedef QMap<uint, QString> CommandMap;
+
+static uint add_button(QStringList   &buttons,
+                             CommandMap    &commands,
+                             const QString &button_text,
+                             const QString &command)
+{
+    int idx = buttons.size();
+    buttons += button_text;
+    commands[idx] = command;
+
+    return idx;
+}
+
+void ScreenSetup::doListSelect(UIListBtnType *list,
+                               UIListBtnTypeItem *selected)
 {
     if (!selected)
         return;
@@ -646,37 +713,46 @@ void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
     {
         ScreenListInfo *si = (ScreenListInfo *) selected->getData();
         QStringList buttons;
+        CommandMap commands;
+
         if (!si->multiLoc)
-            buttons << tr("Change Location");
+            add_button(buttons, commands, tr("Change Location"), "change_loc");
 
         if (si->hasUnits)
-            buttons << tr("Change Units");
+            add_button(buttons, commands, tr("Change Units"), "change_units");
 
-        buttons << tr("Move Up") << tr("Move Down") << tr("Remove") <<
-                tr("Cancel");
-        QString result = buttons[MythPopupBox::showButtonPopup(
-                    gContext->GetMainWindow(), "Manipulate Screen",
-                    tr("Action to take on screen ") + selected->text(),
-                    buttons, buttons.count() - 1)];
-        if (result == tr ("Change Location"))
+        add_button(buttons, commands, tr("Move Up"),   "move_up");
+        add_button(buttons, commands, tr("Move Down"), "move_down");
+        add_button(buttons, commands, tr("Remove"),    "remove");
+
+        int cancelbtn =
+            add_button(buttons, commands, tr("Cancel"), "cancel");
+
+        int res = MythPopupBox::showButtonPopup(
+            gContext->GetMainWindow(), "Manipulate Screen",
+            tr("Action to take on screen ") + selected->text(),
+            buttons, cancelbtn);
+
+        QString cmd = commands[res];
+        if (cmd == "change_loc")
         {
             doLocationDialog(si, true);
         }
-        else if (result == tr("Change Units"))
+        else if (cmd == "change_units")
         {
             showUnitsPopup(selected->text(),
                            (ScreenListInfo *) selected->getData());
             updateHelpText();
         }
-        else if (result == tr("Move Up"))
+        else if (cmd == "move_up")
         {
             list->MoveItemUpDown(selected, true);
         }
-        else if (result == tr("Move Down"))
+        else if (cmd == "move_down")
         {
             list->MoveItemUpDown(selected, false);
         }
-        else if (result == tr("Remove"))
+        else if (cmd == "remove")
         {
             deleteScreen(list);
         }

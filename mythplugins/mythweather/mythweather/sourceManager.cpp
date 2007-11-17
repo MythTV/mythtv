@@ -298,14 +298,46 @@ bool SourceManager::findPossibleSources(QStringList types,
         return false;
 }
 
-void SourceManager::connectScreen(uint id, WeatherScreen *screen)
+bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
 {
+    if (!screen)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Can not connect nonexistent screen "<<screen);
+
+        return false;
+    }
+
     WeatherSource *ws = m_sourcemap[id];
+    if (!ws)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Can not connect nonexistent source "<<id);
+
+        return false;
+    }
     ws->connectScreen(screen);
+    return true;
 }
 
-void SourceManager::disconnectScreen(WeatherScreen *screen)
+bool SourceManager::disconnectScreen(WeatherScreen *screen)
 {
+    if (!screen)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Can not disconnect nonexistent screen "<<screen);
+
+        return false;
+    }
+
     WeatherSource *ws = m_sourcemap[screen->getId()];
+    if (!ws)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Can not disconnect nonexistent source "<<screen->getId());
+
+        return false;
+    }
     ws->disconnectScreen(screen);
+    return true;
 }

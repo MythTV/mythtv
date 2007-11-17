@@ -28,8 +28,8 @@ class SourceManager : public QObject
     bool findScripts();
     bool findScriptsDB();
     void setupSources();
-    void connectScreen(uint id, WeatherScreen *screen);
-    void disconnectScreen(WeatherScreen *screen);
+    bool connectScreen(uint id, WeatherScreen *screen);
+    bool disconnectScreen(WeatherScreen *screen);
     ScriptInfo *getSourceByName(const QString &name);
 
   private slots:
