@@ -2686,49 +2686,6 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static GlobalSpinBox *ATSCCheckSignalWait()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("ATSCCheckSignalWait", 
-                                            1000, 10000, 250);
-    bs->setLabel(QObject::tr("Time limit for ATSC signal lock (msec)"));
-    bs->setHelpText(QObject::tr("MythTV can check the signal strength "
-                    "when you tune into a HDTV or other over-the-air "
-                    "digital station. This value is the number of "
-                    "milliseconds to allow before MythTV gives up "
-                    "trying to get an acceptable signal."));
-    bs->setValue(5000);
-    return bs;
-}
-
-static GlobalSpinBox *ATSCCheckSignalThreshold()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("ATSCCheckSignalThreshold",
-                                            50, 90, 1);
-    bs->setLabel(QObject::tr("ATSC Signal Threshold (%)"));
-    bs->setHelpText(QObject::tr("Threshold for a signal to be considered "
-                    "acceptable. If you set this too low MythTV may "
-                    "crash, and if you set it too high you may not be "
-                    "able to tune a channel on which reception would "
-                    "be acceptable."));
-    bs->setValue(65);
-    return bs;
-}
-
-static GlobalSpinBox *HDRingbufferSize()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("HDRingbufferSize",
-                                            25*188, 512*188, 25*188);
-    bs->setLabel(QObject::tr("HD Ringbuffer size (KB)"));
-    bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
-                    "backend to weather moments of stress. "
-                    "The larger the ringbuffer, the longer "
-                    "the moments of stress can be. However, "
-                    "setting the size too large can cause "
-                    "swapping, which is detrimental."));
-    bs->setValue(50*188);
-    return bs;
-}
-
 static HostCheckBox *SmartChannelChange()
 {
     HostCheckBox *gc = new HostCheckBox("SmartChannelChange");
@@ -4561,9 +4518,6 @@ GeneralSettings::GeneralSettings()
     general2->addChild(RecordPreRoll());
     general2->addChild(RecordOverTime());
     general2->addChild(CategoryOverTimeSettings());
-    general2->addChild(ATSCCheckSignalThreshold());
-    general2->addChild(ATSCCheckSignalWait());
-    general2->addChild(HDRingbufferSize());
     addChild(general2);
 
 }
