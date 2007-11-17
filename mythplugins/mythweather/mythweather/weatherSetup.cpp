@@ -198,9 +198,6 @@ void ScreenSetup::wireUI()
                 SLOT(updateHelpText()));
         connect(m_active_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
                 this, SLOT(updateHelpText()));
-
-        if (!m_active_list->GetCount())
-            m_active_list->allowFocus(false);
     }
 
     m_inactive_list = getUIListBtnType("inactivelist");
@@ -279,9 +276,15 @@ void ScreenSetup::keyPressEvent(QKeyEvent *e)
         else if (action == "SELECT")
             cursorSelect(curr);
         else if (action == "RIGHT")
-            cursorRight(curr);
+        {
+            m_active_list->allowFocus(m_active_list->GetCount() > 0);
+            nextPrevWidgetFocus(true);
+        }
         else if (action == "LEFT")
-            cursorLeft(curr);
+        {
+            m_active_list->allowFocus(m_active_list->GetCount() > 0);
+            nextPrevWidgetFocus(false);
+        }
         else if (action == "DELETE")
         {
             if (curr == m_active_list)
@@ -323,8 +326,14 @@ void ScreenSetup::updateHelpText()
     }
     else if (itm == m_active_list)
     {
-        ScreenListInfo *si =
-                (ScreenListInfo *) m_active_list->GetItemCurrent()->getData();
+        UIListBtnTypeItem *lbt = m_active_list->GetItemCurrent();
+        if (!lbt)
+            return;
+
+        ScreenListInfo *si = (ScreenListInfo *) lbt->getData();
+        if (!si)
+            return;
+
         QDictIterator<TypeListInfo> it(si->types);
         TypeListInfo *ti = it.current();
         text += m_active_list->GetItemCurrent()->text() + "\n";
@@ -629,6 +638,9 @@ void ScreenSetup::saveData()
 
 void ScreenSetup::doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected)
 {
+    if (!selected)
+        return;
+
     QString txt = selected->text();
     if (list == m_active_list)
     {
@@ -760,6 +772,8 @@ void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
 {
     if (!itm)
         itm = m_active_list->GetItemCurrent();
+    if (!itm)
+        return;
 
     ScreenListInfo *si = (ScreenListInfo *) itm->getData();
     if (!si)
