@@ -248,13 +248,18 @@ class DeviceLocation : public RefCounted
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 
-            if ( pDevice != NULL)
-                return pDevice->m_rootDevice.m_sFriendlyName;
+            if ( pDevice == NULL)
+               return "<Unknown>";
 
-            return "<Unknown>";
+            QString sName = pDevice->m_rootDevice.m_sFriendlyName;
+
+            if (sName == "mythtv: MythTV AV Media Server")
+                return sName + " (" + pDevice->m_sHostName + ")";
+
+            return sName;
         }
 
-        QString GetNameAndIP( bool bInQtThread = TRUE )
+        QString GetNameAndDetails( bool bInQtThread = TRUE )
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 
@@ -262,7 +267,8 @@ class DeviceLocation : public RefCounted
                return "<Unknown>";
 
             return pDevice->m_rootDevice.m_sFriendlyName
-                   + " (" + pDevice->m_sHostName + ")";
+                   + " (" + pDevice->m_sHostName + "), "
+                   + pDevice->m_rootDevice.m_sUDN;
         }
 };
 

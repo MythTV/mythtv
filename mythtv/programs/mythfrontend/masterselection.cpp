@@ -614,7 +614,7 @@ void MasterSelectionDialog::FillListBox( void )
         if (pEntry != NULL)
         {
             if ( print_verbose_messages & VB_UPNP )
-                AddItem( pEntry, pEntry->GetNameAndIP( true ));
+                AddItem( pEntry, pEntry->GetNameAndDetails( true ));
             else
                 AddItem( pEntry, pEntry->GetFriendlyName( true ));
 
@@ -651,7 +651,7 @@ void MasterSelectionDialog::customEvent(QCustomEvent *e)
                     pLoc->AddRef();
 
                     if ( print_verbose_messages & VB_UPNP )
-                        AddItem( pLoc, pLoc->GetNameAndIP( true ));
+                        AddItem( pLoc, pLoc->GetNameAndDetails( true ));
                     else
                         AddItem( pLoc, pLoc->GetFriendlyName( true ));
 
