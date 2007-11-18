@@ -60,8 +60,6 @@ void KeyGrabPopupBox::Teardown(void)
     m_cancel      = NULL;
     m_label       = NULL;
     releaseKeyboard();
-
-    MythPopupBox::deleteLater();
 }
 
 /// \brief Get the string containing the captured key event plus
