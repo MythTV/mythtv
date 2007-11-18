@@ -250,13 +250,18 @@ void CDRipperThread::run(void)
 
                 if (!encoder->isValid())
                 {
-                    break;
+                    sendEvent(ST_ENCODER_ERROR, "Encoder failed to open file for writing");
+                    VERBOSE(VB_IMPORTANT,
+                        QString("MythMusic: Encoder failed to open file for writing"));
+
+                    return;
                 }
             }
 
             if (!encoder.get())
             {
                 // This should never happen.
+                sendEvent(ST_ENCODER_ERROR, "Failed to create encoder");
                 VERBOSE(VB_IMPORTANT,
                         QString("MythMusic: Error: No encoder, failing"));
                 return;
@@ -1183,6 +1188,15 @@ void Ripper::startRipper(void)
 
         m_somethingwasripped = true;
     }
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Encoding Failed"),
+                                  tr("Encoding failed with the following error:-\n\n")
+                                 + statusDialog.getErrorMessage());
+    }
+
+    if (class LCD * lcd = LCD::Get()) 
+        lcd->switchToTime();
 }
 
 
@@ -1201,6 +1215,9 @@ void Ripper::startEjectCD()
 
     delete ejector;
     busy->deleteLater();
+
+    if (class LCD * lcd = LCD::Get()) 
+        lcd->switchToTime();
 }
 
 void Ripper::ejectCD()
@@ -1511,6 +1528,7 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
                 {
                     m_ripperThread->cancel();
                     m_ripperThread->wait();
+                    m_errorMessage = tr("Cancelled by the user");
                     done(Rejected);
                 }
             }
@@ -1588,6 +1606,14 @@ void RipStatus::customEvent(QCustomEvent *e)
         case ST_FINISHED:
         {
             done(Accepted);
+            break;
+        }
+
+        case ST_ENCODER_ERROR:
+        {
+            m_errorMessage = tr("The encoder failed to create the file.\n"
+                                "Do you have write permissions for the music directory?");
+            done(Rejected);
             break;
         }
 

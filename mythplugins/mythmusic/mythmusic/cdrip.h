@@ -41,7 +41,8 @@ enum StatusTypes
     ST_OVERALL_PROGRESS,
     ST_OVERALL_PERCENT,
     ST_OVERALL_START,
-    ST_FINISHED
+    ST_FINISHED,
+    ST_ENCODER_ERROR
 };
 
 typedef struct
@@ -172,6 +173,7 @@ class RipStatus : public MythThemedDialog
               MythMainWindow *parent, const char *name = 0);
     ~RipStatus(void);
 
+    QString getErrorMessage(void) { return m_errorMessage; }
 
   protected slots:
     void startRip(void);
@@ -184,6 +186,7 @@ class RipStatus : public MythThemedDialog
     vector<RipTrack*> *m_tracks;
     int                m_quality;
     QString            m_CDdevice;
+    QString            m_errorMessage;
 
     UITextType        *m_overallText;
     UITextType        *m_trackText;
