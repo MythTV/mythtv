@@ -59,9 +59,10 @@ void BackendQueryDiskSpace(QStringList &strlist,
     QString localStr = "1";
     struct statfs statbuf;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT dirname "
+    query.prepare("SELECT MIN(id),dirname "
                   "FROM storagegroup "
-                  "WHERE hostname = :HOSTNAME;");
+                  "WHERE hostname = :HOSTNAME "
+                  "GROUP BY dirname;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive())
@@ -70,18 +71,21 @@ void BackendQueryDiskSpace(QStringList &strlist,
         // dirs since that is what StorageGroup::Init() does.
         if (!query.size())
         {
-            query.prepare("SELECT DISTINCT dirname "
+            query.prepare("SELECT MIN(id),dirname "
                           "FROM storagegroup "
-                          "WHERE groupname = :GROUP;");
+                          "WHERE groupname = :GROUP "
+                          "GROUP BY dirname;");
             query.bindValue(":GROUP", "Default");
             query.exec();
         }
 
         QDir checkDir("");
+        QString dirID;
         QString currentDir;
         while (query.next())
         {
-            currentDir = query.value(0).toString();
+            dirID = query.value(0).toString();
+            currentDir = query.value(1).toString();
             if (currentDir.right(1) == "/")
                 currentDir.remove(currentDir.length() - 1, 1);
 
@@ -113,6 +117,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     strlist << currentDir;
                     strlist << localStr;
                     strlist << "-1"; // Ignore fsID
+                    strlist << dirID;
                     encodeLongLong(strlist, totalKB);
                     encodeLongLong(strlist, usedKB);
 
@@ -159,6 +164,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         fsInfo.directory = fsInfo.hostname.section(".", 0, 0) + ":" + *(it++);
         fsInfo.isLocal = (*(it++)).toInt();
         fsInfo.fsID = (*(it++)).toInt();
+        fsInfo.dirID = (*(it++)).toInt();
         fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
         fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
         fsInfo.freeSpaceKB = fsInfo.totalSpaceKB - fsInfo.usedSpaceKB;
@@ -215,6 +221,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         strlist << it1->directory;
         strlist << QString::number(it1->isLocal);
         strlist << QString::number(it1->fsID);
+        strlist << QString::number(it1->dirID);
         encodeLongLong(strlist, it1->totalSpaceKB);
         encodeLongLong(strlist, it1->usedSpaceKB);
 
@@ -227,6 +234,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         strlist << allHostList;
         strlist << "TotalDiskSpace";
         strlist << "0";
+        strlist << "-2";
         strlist << "-2";
         encodeLongLong(strlist, totalKB);
         encodeLongLong(strlist, usedKB);
@@ -251,6 +259,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         fsInfo.isLocal = (*(it++)).toInt();
         fsInfo.fsID = -1;
         it++;
+        fsInfo.dirID = (*(it++)).toInt();
         fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
         fsInfo.liveTVSpaceKB = 0; // FIXME, placeholder
         fsInfo.usedSpaceKB = decodeLongLong(strlist, it);

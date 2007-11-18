@@ -20,6 +20,7 @@ class MPUBLIC FileSystemInfo
     QString directory;
     bool isLocal;
     int fsID;
+    int dirID;
     long long totalSpaceKB;
     long long usedSpaceKB;
     long long liveTVSpaceKB;

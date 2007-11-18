@@ -333,6 +333,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         directory  = *(sit++);
         isLocalstr = *(sit++);
         fsID       = *(sit++);
+        sit++; // ignore dirID
         iTotal     = decodeLongLong(strlist, sit);
         iUsed      = decodeLongLong(strlist, sit);
         iAvail     = iTotal - iUsed;
