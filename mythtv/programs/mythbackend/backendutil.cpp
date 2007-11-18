@@ -7,6 +7,8 @@
 #elif __linux__
 #include <sys/vfs.h>
 #endif
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <qdir.h>
 #include <qmutex.h>
@@ -178,10 +180,22 @@ void BackendQueryDiskSpace(QStringList &strlist,
         {
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
-            if ((absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
+            if (it2->fsID == -1 &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  < maxWriteFiveSec))
             {
+                // If both disks are local, let's see if they have the same
+                // st_dev. If not, then continue since they are distinct
+                if (it1->isLocal && it2->isLocal)
+                {
+                    struct stat it1_s, it2_s;
+                    int ret1 = stat(it1->directory.section(":", 1, 1)
+                                    .section(",", 0, 0), &it1_s);
+                    int ret2 = stat(it2->directory.section(":", 1, 1), &it2_s);
+                    if (!ret1 && !ret2 && it1_s.st_dev != it2_s.st_dev)
+                        continue;
+                }
                 if (!it1->hostname.contains(it2->hostname))
                     it1->hostname = it1->hostname + "," + it2->hostname;
                 it1->directory = it1->directory + "," + it2->directory;
@@ -259,11 +273,23 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         {
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
-            if ((it2->fsID == -1) &&
-                ((absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16 ) &&
-                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
-                  < maxWriteFiveSec)))
+            if (it2->fsID == -1 &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
+                ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
+                 < maxWriteFiveSec))
+            {
+                // If both disks are local, let's see if they have the same
+                // st_dev. If not, then continue since they are distinct
+                if (it1->isLocal && it2->isLocal)
+                {
+                    struct stat it1_s, it2_s;
+                    int ret1 = stat(it1->directory, &it1_s);
+                    int ret2 = stat(it2->directory, &it2_s);
+                    if (!ret1 && !ret2 && it1_s.st_dev != it2_s.st_dev)
+                        continue;
+                }
                 it2->fsID = it1->fsID;
+            }
         }
     }
 
