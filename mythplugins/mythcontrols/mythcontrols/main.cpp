@@ -47,20 +47,22 @@ int mythplugin_init(const char *libversion)
 int mythplugin_run(void)
 {
     bool ok = true;
-    MythControls controls(gContext->GetMainWindow(), ok);
+    MythControls *controls = new MythControls(gContext->GetMainWindow(), ok);
 
     if (ok)
     {
-        controls.exec();
-        return 0;    
+        controls->exec();
     }
+    else
+    {
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(), QObject::tr("Theme Error"),
+            QObject::tr("Could not load the keybinding plugin's theme. "
+                        "See console for details."));
+    }
+    controls->deleteLater();
 
-    MythPopupBox::showOkPopup(
-        gContext->GetMainWindow(), QObject::tr("Theme Error"),
-        QObject::tr("Could not load the keybinding plugin's theme. "
-                    "See console for details."));
-
-    return -1;
+    return (ok) ? 0 : -1;
 }
 
 /// \brief Plug-in config handler, does nothing.

@@ -1,4 +1,4 @@
-/* -*- myth -*- */
+// -*- Mode: c++ -*-
 /**
  * @file keygrabber.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -42,15 +42,17 @@ class KeyGrabPopupBox : public MythPopupBox
   public:
     KeyGrabPopupBox(MythMainWindow *window);
 
-    /// \brief Get the string containing the captured key event plus
-    ///        modifier keys. (note: result not thread-safe)
-    QString GetCapturedKey(void) const { return m_capturedKey; }
+    QString GetCapturedKey(void) const;
+
+    virtual void deleteLater(void);
 
   public slots:
     void Accept(void) { done(1); }
     void Cancel(void) { done(0); }
 
   protected:
+    void Teardown(void);
+    ~KeyGrabPopupBox(); // use deleteLater() instead for thread safety
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
 
@@ -61,120 +63,6 @@ class KeyGrabPopupBox : public MythPopupBox
     QButton *m_ok;
     QButton *m_cancel;
     QLabel  *m_label;
-};
-
-
-/** \class InvalidBindingPopup
- *  \brief Creates a popup that tells the user why a binding change failed.
- */
-class InvalidBindingPopup : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    /// \brief Creates popup that tells the user he is breaking
-    ///        a required binding.
-    InvalidBindingPopup(MythMainWindow *window);
-
-    /// \brief Tell the user that the binding conflicts with another action.
-    InvalidBindingPopup(MythMainWindow *window,
-                        const QString  &action,
-                        const QString  &context);
-
-    /// \brief Execute the error popup
-    int GetOption(void) { return ExecPopup(this, SLOT(Finish())); }
-
-  protected slots:
-    void Finish(void) { done(0); }
-};
-
-
-/** \class OptionsMenu
- *  \brief Creates popup containing a list of options
- */
-class OptionsMenu : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    enum actions { kSave, kChangeView, kCancel, };
-
-    /// \brief Create a new action window. Does not pop-up menu.
-    OptionsMenu(MythMainWindow *window);
-
-    /// \brief Execute the option popup.
-    int GetOption(void) { return ExecPopup(this,SLOT(Cancel())); }
-
-  public slots:
-    void Save(void)       { done(OptionsMenu::kSave);       }
-    void ChangeView(void) { done(OptionsMenu::kChangeView); }
-    void Cancel(void)     { done(OptionsMenu::kCancel);     }
-};
-
-
-/** \class ActionMenu
- *  \brief Creates popup listing ways to modify an action
- */
-class ActionMenu : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    enum actions { kSet, kRemove, kCancel, };
-
-    /// \brief Create a new action window. Does not pop-up menu.
-    ActionMenu(MythMainWindow *window);
-
-    /// \brief Execute the option popup.
-    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
-
-  public slots:
-    void Set(void)      { done(ActionMenu::kSet);    }
-    void Remove(void)   { done(ActionMenu::kRemove); }
-    void Cancel(void)   { done(ActionMenu::kCancel); }
-};
-
-
-/** \class OptionsMenu
- *  \brief Creates popup containing a list of options
- */
-class UnsavedMenu : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    enum actions { kSave, kExit, };
-
-    /// \brief Create a new action window. Does not pop-up menu.
-    UnsavedMenu(MythMainWindow *window);
-
-    /// \brief Execute the option popup.
-    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
-
-  public slots:
-    void Save(void)     { done(UnsavedMenu::kSave); }
-    void Cancel(void)   { done(UnsavedMenu::kExit); }
-};
-
-/** \class ConfirmMenu
- *  \brief Creates popup confirming an action
- */
-class ConfirmMenu : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    enum actions { kConfirm, kCancel, };
-
-    /// \brief Create a new action window. Does not pop-up menu.
-    ConfirmMenu(MythMainWindow *window, const QString &msg);
-
-    /// \brief Execute the option popup.
-    int GetOption(void) { return ExecPopup(this,SLOT(Cancel())); }
-
-  public slots:
-    void Confirm(void)  { done(ConfirmMenu::kConfirm); }
-    void Cancel(void)   { done(ConfirmMenu::kCancel);  }
 };
 
 #endif // KEYGRABBER_H_

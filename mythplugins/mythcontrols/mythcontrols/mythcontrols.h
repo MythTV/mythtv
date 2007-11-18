@@ -1,4 +1,4 @@
-/* -*- myth -*- */
+// -*- Mode: c++ -*-
 /**
  * @file mythcontrols.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -32,29 +32,6 @@
 
 typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 
-/** \class ViewMenu
- *  \brief Prompts the user to change the view.
- */
-class ViewMenu : public MythPopupBox
-{
-    Q_OBJECT
-
-  public:
-    ViewMenu(MythMainWindow *window);
-
-    /// \brief Execute the option popup.
-    int GetOption(void) { return ExecPopup(this, SLOT(Cancel())); }
-
-    /// \brief The available views
-    enum actions { kContextAction, kContextKey, kKeyContext, kCancel, };
-
-  public slots:
-    void ActionsByContext(void) { done(ViewMenu::kContextAction); }
-    void KeysByContext(void)    { done(ViewMenu::kContextKey);    }
-    void ContextsByKey(void)    { done(ViewMenu::kKeyContext);    }
-    void Cancel(void)           { done(ViewMenu::kCancel);        }
-};
-
 /** \class MythControls
  *  \brief The myth controls configuration class.
  */
@@ -71,14 +48,20 @@ class MythControls : public MythThemedDialog
 
   public:
     MythControls(MythMainWindow *parent, bool &ok);
-    ~MythControls();
 
     // Gets
     QString GetCurrentContext(void) const;
     QString GetCurrentAction(void) const;
     QString GetCurrentKey(void) const;
     
+
+  public slots:
+    virtual void deleteLater(void);
+
   protected:
+    void Teardown(void);
+    ~MythControls(); // use deleteLater() instead for thread safety
+
     // Event handlers
     void keyPressEvent(QKeyEvent *e);
 

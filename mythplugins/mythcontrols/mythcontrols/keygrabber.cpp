@@ -1,4 +1,4 @@
-/* -*- myth -*- */
+// -*- Mode: c++ -*-
 /**
  * @file keygrabber.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -36,14 +36,46 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythMainWindow *window)
 {
     addLabel(tr("Press A Key"), Large, false);
     m_label  = addLabel(tr("Waiting for key press"), Small, false);
-    m_ok     = addButton(QObject::tr("OK"),     this, SLOT(Accept()));
-    m_cancel = addButton(QObject::tr("Cancel"), this, SLOT(Cancel()));
+    m_ok     = addButton(QObject::tr("OK"),     this, SLOT(accept()));
+    m_cancel = addButton(QObject::tr("Cancel"), this, SLOT(reject()));
 
     grabKeyboard();
 }
 
+KeyGrabPopupBox::~KeyGrabPopupBox()
+{
+    Teardown();
+}
+
+void KeyGrabPopupBox::deleteLater(void)
+{
+    Teardown();
+    MythPopupBox::deleteLater();
+}
+
+void KeyGrabPopupBox::Teardown(void)
+{
+    m_capturedKey = QString::null;
+    m_ok          = NULL;
+    m_cancel      = NULL;
+    m_label       = NULL;
+    releaseKeyboard();
+
+    MythPopupBox::deleteLater();
+}
+
+/// \brief Get the string containing the captured key event plus
+///        modifier keys.
+QString KeyGrabPopupBox::GetCapturedKey(void) const
+{
+    return QDeepCopy<QString>(m_capturedKey);
+}
+
 void KeyGrabPopupBox::keyReleaseEvent(QKeyEvent *e)
 {
+    if (!m_ok || !m_cancel || !m_label)
+        return;
+
     if (!m_waitingForKeyRelease)
         return;
 
@@ -96,69 +128,4 @@ void KeyGrabPopupBox::keyPressEvent(QKeyEvent *e)
     }
 
     MythPopupBox::keyPressEvent(e);
-}
-
-//////////////////////////////////////////////////////////////////////
-
-InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window)
-    : MythPopupBox(window, "invalidbinding")
-{
-    addLabel(tr("Manditory Action"), Large, false);
-    addLabel(tr("This action is manditory and needs at least one key "
-                "bound to it. Instead, try rebinding with another key."),
-             Small, true);
-}
-
-InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window,
-                                         const QString  &action,
-                                         const QString  &context)
-    : MythPopupBox(window, "invalidbinding")
-{
-    addLabel(tr("Conflicting Binding"), Large, false);
-    addLabel(tr("This key binding conflicts with %1 in the %2 context")
-             .arg(action).arg(context), Small, true);
-}
-
-//////////////////////////////////////////////////////////////////////
-
-OptionsMenu::OptionsMenu(MythMainWindow *window)
-    : MythPopupBox(window, "optionmenu")
-{
-    addLabel(tr("Options"), Large, false);
-    addButton(QObject::tr("Save"),   this, SLOT(Save()));
-    addButton(QObject::tr("Change View"), this, SLOT(ChangeView()));
-    addButton(QObject::tr("Cancel"), this, SLOT(Cancel()))->setFocus();
-}
-    
-//////////////////////////////////////////////////////////////////////
-
-ActionMenu::ActionMenu(MythMainWindow *window)
-    : MythPopupBox(window, "actionmenu")
-{
-    addLabel(tr("Modify Action"), Large, false);
-    addButton(tr("Set Binding"),     this, SLOT(Set()));
-    addButton(tr("Remove Binding"),  this, SLOT(Remove()));
-    addButton(QObject::tr("Cancel"), this, SLOT(Cancel()))->setFocus();
-}
-
-//////////////////////////////////////////////////////////////////////
-
-UnsavedMenu::UnsavedMenu(MythMainWindow *window)
-    : MythPopupBox(window, "unsavedmenu")
-{
-    addLabel(tr("Unsaved Changes"), Large, false);
-    addLabel(tr("Exiting...") + "\n\n" + tr("Save Changes?"));
-    addButton(QObject::tr("Yes"), this, SLOT(Save()))->setFocus();
-    addButton(QObject::tr("No"),  this, SLOT(Cancel()));
-}
-
-//////////////////////////////////////////////////////////////////////
-
-ConfirmMenu::ConfirmMenu(MythMainWindow *window, const QString &msg)
-    : MythPopupBox(window, "unsavedmenu")
-{
-    addLabel(tr("Confirm"), Large, false);
-    addLabel(msg);
-    addButton(tr("Confirm"),         this, SLOT(Confirm()))->setFocus();
-    addButton(QObject::tr("Cancel"), this, SLOT(Cancel()));
 }
