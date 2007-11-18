@@ -31,12 +31,16 @@
 #include <string.h>
 
 /* SA3250HD IDs */
-#define SA3250HD_VENDOR_ID1     0x000011e6
-#define SA3250HD_VENDOR_ID2     0x000014f8
-#define SA3250HD_VENDOR_ID3     0x00001692
+#define SA_VENDOR_ID1           0x000011e6
+#define SA_VENDOR_ID2           0x000014f8
+#define SA_VENDOR_ID3           0x00001692
+#define SA_VENDOR_ID4           0x00001947
+#define SA_VENDOR_ID5           0x00000f21
+#define SA_VENDOR_ID6           0x00001ac3
+#define SA_VENDOR_ID7           0x00000a73
 #define SA3250HD_MODEL_ID1      0x00000be0
-#define SA4200HD_VENDOR_ID1     0x000014f8
 #define SA4200HD_MODEL_ID1      0x00001072
+#define SA4250HDC_MODEL_ID1     0x000010cc
 
 #define AVC1394_SA3250_COMMAND_CHANNEL 0x000007c00   /* subunit command */
 #define AVC1394_SA3250_OPERAND_KEY_PRESS 0xe7
@@ -53,7 +57,8 @@ void usage()
 {
    fprintf(stderr, "Usage: sa3250ch [-v] [-s] <channel_num>\n");
    fprintf(stderr, "  -v : Verbose Mode\n");
-   fprintf(stderr, "  -s : Send command as single digit (for SA4200 and some SA3250s)\n");
+   fprintf(stderr, "  -s : Send command as single digit "
+           "(for SA4200 and some SA3250s and SA4200HD's)\n");
    exit(1);
 }
 
@@ -123,19 +128,36 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 		
-      if ( ((dir.vendor_id == SA4200HD_VENDOR_ID1) &&
-	    (dir.model_id == SA4200HD_MODEL_ID1))  ||
-          (((dir.vendor_id == SA3250HD_VENDOR_ID1) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID2) ||
-            (dir.vendor_id == SA3250HD_VENDOR_ID3)) &&
-            (dir.model_id == SA3250HD_MODEL_ID1))) {
-            device = i;
-            break;
+      /* WARNING: Please update firewiredevice.cpp when adding to this list. */
+      if (((dir.vendor_id == SA_VENDOR_ID1) ||
+           (dir.vendor_id == SA_VENDOR_ID2) ||
+           (dir.vendor_id == SA_VENDOR_ID3) ||
+           (dir.vendor_id == SA_VENDOR_ID4) ||
+           (dir.vendor_id == SA_VENDOR_ID5) ||
+           (dir.vendor_id == SA_VENDOR_ID6) ||
+           (dir.vendor_id == SA_VENDOR_ID7)) &&
+          ((dir.model_id == SA3250HD_MODEL_ID1)  ||
+           (dir.model_id == SA4200HD_MODEL_ID1)  ||
+           (dir.model_id == SA4250HDC_MODEL_ID1)))
+      {
+          if (dir.model_id == SA4250HDC_MODEL_ID1)
+          {
+              fprintf(stderr, "Ignoring SA 4250HDC on node %d -- "
+                      "sorry not supported yet\n", i);
+          }
+          else
+          {
+              device = i;
+              break;
+          }
       }
    }
-    
-   if (device == -1) {
-        fprintf(stderr, "Could not find SA3250HD on the 1394 bus.\n");
+
+   if (device == -1)
+   {
+        fprintf(stderr, "Could not find SA3250HD or SA4200HD "
+                "on the IEEE 1394 bus.\n");
+
         raw1394_destroy_handle(handle);
         exit(1);
    }

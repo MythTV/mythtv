@@ -25,10 +25,28 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <limits.h> //for LLONG_MAX
+#include <getopt.h>
 #include <unistd.h> // for usleep
 
-// Motorola DCT-6200 IDs
-// Note: there are at least eleven different vendor IDs for the 6200
+// Vendor and Model IDs.
+// NOTE: Some Models have more than one possible Vendor ID
+// WARNING: Please update firewiredevice.cpp when adding to this list.
+
+#define DCH3200_VENDOR_ID1 0x00001c11
+#define DCH3200_MODEL_ID1  0x0000d330
+
+#define DCT3412_VENDOR_ID1 0x0000159a
+#define DCT3412_MODEL_ID1  0x000034cb
+
+#define DCT3416_VENDOR_ID1 0x000016b5
+#define DCT3416_VENDOR_ID2 0x00001bdd
+#define DCT3416_MODEL_ID1  0x0000346b
+#define DCT3416_MODEL_ID2  0x0000b630
+
+#define DCT5100_VENDOR_ID1 0x000017ee
+#define DCT5100_MODEL_ID1  0x0000620a
+
 #define DCT6200_VENDOR_ID1 0x00000ce5
 #define DCT6200_VENDOR_ID2 0x00000e5c
 #define DCT6200_VENDOR_ID3 0x00001225
@@ -40,12 +58,22 @@
 #define DCT6200_VENDOR_ID9 0x000014e8
 #define DCT6200_VENDOR_ID10 0x000016b5
 #define DCT6200_VENDOR_ID11 0x00001371
+#define DCT6200_VENDOR_ID12 0x000019a6
+#define DCT6200_VENDOR_ID13 0x00001aad
+#define DCT6200_VENDOR_ID14 0x00000b06
 #define DCT6200_SPEC_ID    0x00005068
 #define DCT6200_SW_VERSION 0x00010101
 #define DCT6200_MODEL_ID1  0x0000620a
 #define DCT6200_MODEL_ID2  0x00006200
+
 #define DCT6412_VENDOR_ID1 0x00000f9f
+#define DCT6412_VENDOR_ID2 0x0000152f
 #define DCT6412_MODEL_ID1  0x000064ca
+#define DCT6412_MODEL_ID2  0x000064cb
+
+#define DCT6416_VENDOR_ID1 0x000017ee
+#define DCT6416_VENDOR_ID2 0x00001a66 
+#define DCT6416_MODEL_ID1  0x0000646b
 
 #define AVC1394_SUBUNIT_TYPE_6200 (9 << 19)  /* uses a reserved subunit type */ 
 
@@ -161,8 +189,13 @@ int main (int argc, char *argv[])
       if (verbose) 
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
-		
-      if ( ((dir.vendor_id == DCT6200_VENDOR_ID1) || 
+
+      if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
+            (dir.vendor_id == DCT3412_VENDOR_ID1) || 
+            (dir.vendor_id == DCT3416_VENDOR_ID1) || 
+            (dir.vendor_id == DCT3416_VENDOR_ID2) || 
+            (dir.vendor_id == DCT5100_VENDOR_ID1) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
             (dir.vendor_id == DCT6200_VENDOR_ID3) ||
             (dir.vendor_id == DCT6200_VENDOR_ID4) ||
@@ -173,10 +206,23 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID9) ||
             (dir.vendor_id == DCT6200_VENDOR_ID10) ||
             (dir.vendor_id == DCT6200_VENDOR_ID11) ||
-            (dir.vendor_id == DCT6412_VENDOR_ID1)) &&
-           ((dir.model_id == DCT6200_MODEL_ID1) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID12) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID13) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID14) ||
+            (dir.vendor_id == DCT6412_VENDOR_ID1) ||
+            (dir.vendor_id == DCT6412_VENDOR_ID2) ||
+            (dir.vendor_id == DCT6416_VENDOR_ID1) || 
+            (dir.vendor_id == DCT6416_VENDOR_ID2)) &&
+           ((dir.model_id == DCH3200_MODEL_ID1) ||
+            (dir.model_id == DCT3412_MODEL_ID1) ||
+            (dir.model_id == DCT3416_MODEL_ID1) ||
+            (dir.model_id == DCT3416_MODEL_ID2) ||
+            (dir.model_id == DCT5100_MODEL_ID1) ||
+            (dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
-            (dir.model_id == DCT6412_MODEL_ID1)) ) {
+            (dir.model_id == DCT6412_MODEL_ID1) ||
+            (dir.model_id == DCT6412_MODEL_ID2) ||
+            (dir.model_id == DCT6416_MODEL_ID1)) ) {
             if (dir.unit_spec_id != DCT6200_SPEC_ID)
                fprintf(stderr, "Warning: Unit Spec ID different.\n");
             if (dir.unit_sw_version != DCT6200_SW_VERSION)
