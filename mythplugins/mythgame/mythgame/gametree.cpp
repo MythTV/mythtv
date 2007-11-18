@@ -382,8 +382,7 @@ void GameTree::showInfo(void)
     GenericTree *curNode = m_gameTreeUI->getCurrentNode();
     int i = curNode->getInt();
     GameTreeItem *curItem = i ? m_gameTreeItems[i - 1] : 0;
-
-    if (curItem->isLeaf())
+    if (curItem && curItem->getRomInfo() && curItem->isLeaf())
         curItem->showGameInfo(curItem->getRomInfo());
 }
 
