@@ -809,12 +809,6 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
     }
 
     v->res_x8 = get_bits1(gb); //reserved
-    if (v->res_x8)
-    {
-        av_log(avctx, AV_LOG_ERROR,
-               "1 for reserved RES_X8 is forbidden\n");
-        //return -1;
-    }
     v->multires = get_bits1(gb);
     v->res_fasttx = get_bits1(gb);
     if (!v->res_fasttx)
@@ -1100,8 +1094,8 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         if (v->multires && v->s.pict_type != B_TYPE) v->respic = get_bits(gb, 2);
 
     if(v->res_x8 && (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)){
-        if(get_bits1(gb))return -1;
-    }
+        v->x8_type = get_bits1(gb);
+    }else v->x8_type = 0;
 //av_log(v->s.avctx, AV_LOG_INFO, "%c Frame: QP=[%i]%i (+%i/2) %i\n",
 //        (v->s.pict_type == P_TYPE) ? 'P' : ((v->s.pict_type == I_TYPE) ? 'I' : 'B'), pqindex, v->pq, v->halfpq, v->rangeredfrm);
 
@@ -1234,14 +1228,17 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         break;
     }
 
-    /* AC Syntax */
-    v->c_ac_table_index = decode012(gb);
-    if (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
+    if(!v->x8_type)
     {
-        v->y_ac_table_index = decode012(gb);
+        /* AC Syntax */
+        v->c_ac_table_index = decode012(gb);
+        if (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
+        {
+            v->y_ac_table_index = decode012(gb);
+        }
+        /* DC Syntax */
+        v->s.dc_table_index = get_bits1(gb);
     }
-    /* DC Syntax */
-    v->s.dc_table_index = get_bits1(gb);
 
     if(v->s.pict_type == BI_TYPE) {
         v->s.pict_type = B_TYPE;
@@ -3096,8 +3093,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
                     s->dsp.vc1_inv_trans_8x8(s->block[i]);
                     if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-                    for(j = 0; j < 64; j++) s->block[i][j] += 128;
-                    s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                    s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
                     if(v->pq >= 9 && v->overlap) {
                         if(v->c_avail)
                             s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
@@ -3199,8 +3195,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
                     s->dsp.vc1_inv_trans_8x8(s->block[i]);
                     if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-                    for(j = 0; j < 64; j++) s->block[i][j] += 128;
-                    s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
+                    s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                     if(v->pq >= 9 && v->overlap) {
                         if(v->c_avail)
                             s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
@@ -3380,8 +3375,7 @@ static void vc1_decode_b_mb(VC1Context *v)
             if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
             s->dsp.vc1_inv_trans_8x8(s->block[i]);
             if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-            for(j = 0; j < 64; j++) s->block[i][j] += 128;
-            s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+            s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
         } else if(val) {
             vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
             if(!v->ttmbf && ttmb < 8) ttmb = -1;
@@ -3755,29 +3749,33 @@ static void vc1_decode_blocks(VC1Context *v)
 {
 
     v->s.esc3_level_length = 0;
+    if(v->x8_type){
+        ff_intrax8_decode_picture(&v->x8, 2*v->pq+v->halfpq, v->pq*(!v->pquantizer) );
+    }else{
 
-    switch(v->s.pict_type) {
-    case I_TYPE:
-        if(v->profile == PROFILE_ADVANCED)
-            vc1_decode_i_blocks_adv(v);
-        else
-            vc1_decode_i_blocks(v);
-        break;
-    case P_TYPE:
-        if(v->p_frame_skipped)
-            vc1_decode_skip_blocks(v);
-        else
-            vc1_decode_p_blocks(v);
-        break;
-    case B_TYPE:
-        if(v->bi_type){
+        switch(v->s.pict_type) {
+        case I_TYPE:
             if(v->profile == PROFILE_ADVANCED)
                 vc1_decode_i_blocks_adv(v);
             else
                 vc1_decode_i_blocks(v);
-        }else
-            vc1_decode_b_blocks(v);
-        break;
+            break;
+        case P_TYPE:
+            if(v->p_frame_skipped)
+                vc1_decode_skip_blocks(v);
+            else
+                vc1_decode_p_blocks(v);
+            break;
+        case B_TYPE:
+            if(v->bi_type){
+                if(v->profile == PROFILE_ADVANCED)
+                    vc1_decode_i_blocks_adv(v);
+                else
+                    vc1_decode_i_blocks(v);
+            }else
+                vc1_decode_b_blocks(v);
+            break;
+        }
     }
 }
 
@@ -3834,6 +3832,10 @@ static int vc1_decode_init(AVCodecContext *avctx)
     v->s.avctx = avctx;
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
     v->s.flags |= CODEC_FLAG_EMU_EDGE;
+
+    if(avctx->idct_algo==FF_IDCT_AUTO){
+        avctx->idct_algo=FF_IDCT_WMV2;
+    }
 
     if(ff_h263_decode_init(avctx) < 0)
         return -1;
@@ -3935,6 +3937,7 @@ static int vc1_decode_init(AVCodecContext *avctx)
 //            return -1;
     }
 
+    ff_intrax8_common_init(&v->x8,s);
     return 0;
 }
 

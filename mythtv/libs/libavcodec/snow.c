@@ -339,7 +339,7 @@ static const uint8_t obmc16[256]={
   0,  0,  0,  0,  0,  4,  4,  4,  4,  4,  4,  0,  0,  0,  0,  0,
 //error:0.000022
 };
-#endif
+#endif /* 0 */
 
 //linear *64
 static const uint8_t obmc8[64]={
@@ -657,7 +657,7 @@ static inline void put_symbol(RangeCoder *c, uint8_t *state, int v, int is_signe
             if(is_signed)
                 put_rac(c, state+11 + FFMIN(e,10), v < 0); //11..21
         }
-#endif
+#endif /* 1 */
     }else{
         put_rac(c, state+0, 1);
     }
@@ -1078,7 +1078,7 @@ static void horizontal_compose53i(IDWTELEM *b, int width){
 #else
     inv_lift(temp   , b   , b+w2, 1, 1, 1, width,  1, 2, 2, 0, 1);
     inv_lift(temp+w2, b+w2, temp, 1, 1, 1, width, -1, 0, 1, 1, 1);
-#endif
+#endif /* 0 */
     for(x=0; x<width2; x++){
         b[2*x    ]= temp[x   ];
         b[2*x + 1]= temp[x+w2];
@@ -1158,13 +1158,6 @@ STOP_TIMER("horizontal_compose53i")}
     cs->b0 = b2;
     cs->b1 = b3;
     cs->y += 2;
-}
-
-static void spatial_compose53i(IDWTELEM *buffer, int width, int height, int stride){
-    dwt_compose_t cs;
-    spatial_compose53i_init(&cs, buffer, height, stride);
-    while(cs.y <= height)
-        spatial_compose53i_dy(&cs, buffer, width, height, stride);
 }
 
 
@@ -1308,13 +1301,6 @@ STOP_TIMER("horizontal_compose97i")}}
     cs->b2=b4;
     cs->b3=b5;
     cs->y += 2;
-}
-
-static void spatial_compose97i(IDWTELEM *buffer, int width, int height, int stride){
-    dwt_compose_t cs;
-    spatial_compose97i_init(&cs, buffer, height, stride);
-    while(cs.y <= height)
-        spatial_compose97i_dy(&cs, buffer, width, height, stride);
 }
 
 static void ff_spatial_idwt_buffered_init(dwt_compose_t *cs, slice_buffer * sb, int width, int height, int stride_line, int type, int decomposition_count){
@@ -2621,7 +2607,7 @@ assert(src_stride > 2*MB_SIZE + 5);
             }
         }
     }
-#endif
+#endif /* 0 */
 }
 
 static av_always_inline void predict_slice_buffered(SnowContext *s, slice_buffer * sb, IDWTELEM * old_buffer, int plane_index, int add, int mb_y){
@@ -3895,7 +3881,7 @@ static int ratecontrol_1pass(SnowContext *s, AVFrame *pict)
     return delta_qlog;
 }
 
-static void calculate_vissual_weight(SnowContext *s, Plane *p){
+static void calculate_visual_weight(SnowContext *s, Plane *p){
     int width = p->width;
     int height= p->height;
     int level, orientation, x, y;
@@ -4037,7 +4023,7 @@ static void dwt_quantize(SnowContext *s, Plane *p, DWTELEM *buffer, int width, i
     memcpy(s->spatial_idwt_buffer, best_dequant, height * stride * sizeof(IDWTELEM)); //FIXME work with that directly insteda of copy at the end
 }
 
-#endif
+#endif /* QUANTIZE2==1 */
 
 static int encode_init(AVCodecContext *avctx)
 {
@@ -4115,7 +4101,7 @@ static int encode_init(AVCodecContext *avctx)
         s->colorspace= 1;
         break;*/
     default:
-        av_log(avctx, AV_LOG_ERROR, "format not supported\n");
+        av_log(avctx, AV_LOG_ERROR, "pixel format not supported\n");
         return -1;
     }
 //    avcodec_get_chroma_sub_sample(avctx->pix_fmt, &s->chroma_h_shift, &s->chroma_v_shift);
@@ -4138,6 +4124,8 @@ static int encode_init(AVCodecContext *avctx)
 
     return 0;
 }
+
+#define USE_HALFPEL_PLANE 0
 
 static void halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *frame){
     int p,x,y;
@@ -4197,10 +4185,8 @@ static int frame_start(SnowContext *s){
     tmp= s->last_picture[s->max_ref_frames-1];
     memmove(s->last_picture+1, s->last_picture, (s->max_ref_frames-1)*sizeof(AVFrame));
     memmove(s->halfpel_plane+1, s->halfpel_plane, (s->max_ref_frames-1)*sizeof(void*)*4*4);
-#ifdef USE_HALFPEL_PLANE
-    if(s->current_picture.data[0])
+    if(USE_HALFPEL_PLANE && s->current_picture.data[0])
         halfpel_interpol(s, s->halfpel_plane[0], &s->current_picture);
-#endif
     s->last_picture[0]= s->current_picture;
     s->current_picture= tmp;
 
@@ -4338,7 +4324,7 @@ redo_frame:
 
     if(s->last_spatial_decomposition_count != s->spatial_decomposition_count){
         for(plane_index=0; plane_index<3; plane_index++){
-            calculate_vissual_weight(s, &s->plane[plane_index]);
+            calculate_visual_weight(s, &s->plane[plane_index]);
         }
     }
 
@@ -4912,5 +4898,4 @@ int64_t g=0;
 }
     return 0;
 }
-#endif
-
+#endif /* 0 */

@@ -49,6 +49,7 @@ void av_register_all(void)
     avcodec_init();
     avcodec_register_all();
 
+    /* (de)muxers */
     REGISTER_DEMUXER  (AAC, aac);
     REGISTER_MUXDEMUX (AC3, ac3);
     REGISTER_MUXER    (ADTS, adts);
@@ -91,8 +92,6 @@ void av_register_all(void)
     REGISTER_MUXDEMUX (IMAGE2PIPE, image2pipe);
     REGISTER_DEMUXER  (INGENIENT, ingenient);
     REGISTER_DEMUXER  (IPMOVIE, ipmovie);
-    REGISTER_DEMUXER  (LIBDC1394, libdc1394);
-    REGISTER_MUXDEMUX (LIBNUT, libnut);
     REGISTER_MUXDEMUX (M4V, m4v);
     REGISTER_MUXDEMUX (MATROSKA, matroska);
     REGISTER_MUXER    (MATROSKA_AUDIO, matroska_audio);
@@ -104,6 +103,7 @@ void av_register_all(void)
     REGISTER_MUXDEMUX (MP3, mp3);
     REGISTER_MUXER    (MP4, mp4);
     REGISTER_DEMUXER  (MPC, mpc);
+    REGISTER_DEMUXER  (MPC8, mpc8);
     REGISTER_MUXER    (MPEG1SYSTEM, mpeg1system);
     REGISTER_MUXER    (MPEG1VCD, mpeg1vcd);
     REGISTER_MUXER    (MPEG1VIDEO, mpeg1video);
@@ -169,6 +169,11 @@ void av_register_all(void)
     REGISTER_DEMUXER  (X11_GRAB_DEVICE, x11_grab_device);
     REGISTER_MUXDEMUX (YUV4MPEGPIPE, yuv4mpegpipe);
 
+    /* external libraries */
+    REGISTER_DEMUXER  (LIBDC1394, libdc1394);
+    REGISTER_MUXDEMUX (LIBNUT, libnut);
+
+    /* protocols */
     REGISTER_PROTOCOL (FILE, file);
     REGISTER_PROTOCOL (HTTP, http);
     REGISTER_PROTOCOL (PIPE, pipe);

@@ -25,6 +25,8 @@
 #include "common.h"
 #include "asfcrypt.h"
 
+extern void ff_mms_set_stream_selection(URLContext *h, AVFormatContext *format);
+
 #undef NDEBUG
 #include <assert.h>
 
@@ -105,6 +107,12 @@ static void get_str16(ByteIOContext *pb, char *buf, int buf_size)
     *q = '\0';
 }
 #endif
+
+static int is_mms(ByteIOContext *pb)
+{
+    return url_fileno(pb) && url_fileno(pb)->prot &&
+         !strcmp(url_fileno(pb)->prot->name, "mmsh");
+}
 
 static void get_str16_nolen(ByteIOContext *pb, int len, char *buf, int buf_size)
 {
@@ -391,6 +399,11 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                         {
                                 if     (!strcmp(name,"WM/AlbumTitle")) get_str16_nolen(pb, value_len, s->album, sizeof(s->album));
                                 else if(!strcmp(name,"WM/Genre"     )) get_str16_nolen(pb, value_len, s->genre, sizeof(s->genre));
+                                else if(!strcmp(name,"WM/Year"      )) {
+                                    char year[8];
+                                    get_str16_nolen(pb, value_len, year, sizeof(year));
+                                    s->year = atoi(year);
+                                }
                                 else if(!strcmp(name,"WM/Track") && s->track == 0) {
                                     char track[8];
                                     get_str16_nolen(pb, value_len, track, sizeof(track));
@@ -532,6 +545,12 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 //av_log(NULL, AV_LOG_ERROR, "dar %d:%d sar=%d:%d\n", dar[i].num, dar[i].den, codec->sample_aspect_ratio.num, codec->sample_aspect_ratio.den);
         }
     }
+
+#ifdef CONFIG_MMSH_PROTOCOL
+    /* Give info about ourselves to the mms protocol */
+    if(is_mms(pb))
+        ff_mms_set_stream_selection(url_fileno(pb), s);
+#endif
 
     return 0;
 

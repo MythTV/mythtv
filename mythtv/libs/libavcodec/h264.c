@@ -3342,6 +3342,7 @@ static void flush_dpb(AVCodecContext *avctx){
     if(h->s.current_picture_ptr)
         h->s.current_picture_ptr->reference= 0;
     h->s.first_field= 0;
+    ff_mpeg_flush(avctx);
 }
 
 /**
@@ -3767,8 +3768,10 @@ static int init_poc(H264Context *h){
         s->current_picture_ptr->field_poc[1]= field_poc[1];
         s->current_picture_ptr->poc = field_poc[1];
     }
-    if(!FIELD_PICTURE || !s->first_field)
-        s->current_picture_ptr->poc= FFMIN(field_poc[0], field_poc[1]);
+    if(!FIELD_PICTURE || !s->first_field) {
+        Picture *cur = s->current_picture_ptr;
+        cur->poc= FFMIN(cur->field_poc[0], cur->field_poc[1]);
+    }
 
     return 0;
 }
@@ -6369,12 +6372,13 @@ static void filter_mb_edgech( H264Context *h, uint8_t *pix, int stride, int16_t 
 
 static void filter_mb_fast( H264Context *h, int mb_x, int mb_y, uint8_t *img_y, uint8_t *img_cb, uint8_t *img_cr, unsigned int linesize, unsigned int uvlinesize) {
     MpegEncContext * const s = &h->s;
+    int mb_y_firstrow = s->picture_structure == PICT_BOTTOM_FIELD;
     int mb_xy, mb_type;
     int qp, qp0, qp1, qpc, qpc0, qpc1, qp_thresh;
 
     mb_xy = mb_x + mb_y*s->mb_stride;
 
-    if(mb_x==0 || mb_y==0 || !s->dsp.h264_loop_filter_strength || h->pps.chroma_qp_diff ||
+    if(mb_x==0 || mb_y==mb_y_firstrow || !s->dsp.h264_loop_filter_strength || h->pps.chroma_qp_diff ||
        (h->deblocking_filter == 2 && (h->slice_table[mb_xy] != h->slice_table[h->top_mb_xy] ||
                                       h->slice_table[mb_xy] != h->slice_table[mb_xy - 1]))) {
         filter_mb(h, mb_x, mb_y, img_y, img_cb, img_cr, linesize, uvlinesize);
@@ -7764,6 +7768,8 @@ static int decode_frame(AVCodecContext *avctx,
 
         } else {
             cur->interlaced_frame = FIELD_OR_MBAFF_PICTURE;
+            /* Derive top_field_first from field pocs. */
+            cur->top_field_first = cur->field_poc[0] < cur->field_poc[1];
 
         //FIXME do something with unavailable reference frames
 

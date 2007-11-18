@@ -49,6 +49,7 @@ void j_rev_dct (DCTELEM *data);
 void j_rev_dct4 (DCTELEM *data);
 void j_rev_dct2 (DCTELEM *data);
 void j_rev_dct1 (DCTELEM *data);
+void ff_wmv2_idct_c(DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
@@ -327,6 +328,9 @@ typedef struct DSPContext {
 
     void (*h261_loop_filter)(uint8_t *src, int stride);
 
+    void (*x8_v_loop_filter)(uint8_t *src, int stride, int qscale);
+    void (*x8_h_loop_filter)(uint8_t *src, int stride, int qscale);
+
     /* assume len is a multiple of 4, and arrays are 16-byte aligned */
     void (*vorbis_inverse_coupling)(float *mag, float *ang, int blocksize);
     /* no alignment needed */
@@ -413,6 +417,12 @@ typedef struct DSPContext {
      * last argument is actually round value instead of height
      */
     op_pixels_func put_vc1_mspel_pixels_tab[16];
+
+    /* intrax8 functions */
+    void (*x8_spatial_compensation[12])(uint8_t *src , uint8_t *dst, int linesize);
+    void (*x8_setup_spatial_compensation)(uint8_t *src, uint8_t *dst, int linesize,
+           int * range, int * sum,  int edges);
+
 } DSPContext;
 
 void dsputil_static_init(void);

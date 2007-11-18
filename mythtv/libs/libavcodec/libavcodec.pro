@@ -133,6 +133,7 @@ contains( CONFIG_MP3_DECODER, yes )             { SOURCES *= mpegaudiodec.c mpeg
 contains( CONFIG_MP3ADU_DECODER, yes )          { SOURCES *= mpegaudiodec.c mpegaudiodecheader.c mpegaudio.c mpegaudiodata.c }
 contains( CONFIG_MP3ON4_DECODER, yes )          { SOURCES *= mpegaudiodec.c mpegaudiodecheader.c mpegaudio.c mpegaudiodata.c }
 contains( CONFIG_MPC7_DECODER, yes )            { SOURCES *= mpc7.c mpc.c mpegaudiodec.c mpegaudiodecheader.c mpegaudio.c mpegaudiodata.c }
+contains( CONFIG_MPC7_DECODER, yes )            { SOURCES *= mpc8.c mpc.c mpegaudiodec.c mpegaudiodecheader.c mpegaudio.c mpegaudiodata.c }
 contains( CONFIG_MPEG1VIDEO_ENCODER, yes )      { SOURCES *= mpeg12enc.c mpeg12data.c mpegvideo_enc.c motion_est.c ratecontrol.c }
 contains( CONFIG_MPEG2VIDEO_ENCODER, yes )      { SOURCES *= mpeg12enc.c mpeg12data.c mpegvideo_enc.c motion_est.c ratecontrol.c }
 contains( CONFIG_MPEG4_DECODER, yes)            { SOURCES *= h263dec.c h263.c }
@@ -205,7 +206,7 @@ contains( CONFIG_TTA_DECODER, yes )             { SOURCES *= tta.c }
 contains( CONFIG_TXD_DECODER, yes )             { SOURCES *= txd.c s3tc.c }
 contains( CONFIG_ULTI_DECODER, yes )            { SOURCES *= ulti.c }
 contains( CONFIG_VB_DECODER, yes )              { SOURCES *= vb.c }
-contains( CONFIG_VC1_DECODER, yes )             { SOURCES *= vc1.c vc1data.c vc1dsp.c msmpeg4data.c }
+contains( CONFIG_VC1_DECODER, yes )             { SOURCES *= vc1.c vc1data.c vc1dsp.c msmpeg4data.c intrax8.c intrax8dsp.c }
 contains( CONFIG_VCR1_DECODER, yes )            { SOURCES *= vcr1.c }
 contains( CONFIG_VCR1_ENCODER, yes )            { SOURCES *= vcr1.c }
 contains( CONFIG_VMDAUDIO_DECODER, yes )        { SOURCES *= vmdav.c }
@@ -226,8 +227,8 @@ contains( CONFIG_WMAV1_ENCODER, yes )           { SOURCES *= wmaenc.c wma.c mdct
 contains( CONFIG_WMAV2_ENCODER, yes )           { SOURCES *= wmaenc.c wma.c mdct.c fft.c }
 contains( CONFIG_WMV1_DECODER, yes )            { SOURCES *= h263dec.c h263.c }
 contains( CONFIG_WMV1_ENCODER, yes )            { SOURCES *= mpegvideo_enc.c motion_est.c ratecontrol.c h263.c }
-contains( CONFIG_WMV2_DECODER, yes )            { SOURCES *= msmpeg4.c msmpeg4data.c h263dec.c h263.c }
-contains( CONFIG_WMV2_ENCODER, yes )            { SOURCES *= msmpeg4.c msmpeg4data.c mpegvideo_enc.c motion_est.c ratecontrol.c h263.c }
+contains( CONFIG_WMV2_DECODER, yes )            { SOURCES *= wmv2.c msmpeg4.c msmpeg4data.c h263dec.c h263.c intrax8.c intrax8dsp.c }
+contains( CONFIG_WMV2_ENCODER, yes )            { SOURCES *= wmv2.c msmpeg4.c msmpeg4data.c mpegvideo_enc.c motion_est.c ratecontrol.c h263.c intrax8.c intrax8dsp.c }
 contains( CONFIG_WMV3_DECODER, yes )            { SOURCES *= vc1.c vc1data.c vc1dsp.c }
 contains( CONFIG_WNV1_DECODER, yes )            { SOURCES *= wnv1.c }
 contains( CONFIG_WS_SND1_DECODER, yes )         { SOURCES *= ws-snd1.c }
@@ -309,6 +310,9 @@ contains( CONFIG_ADPCM_THP_DECODER, yes )       { SOURCES *= adpcm.c }
 contains( CONFIG_ADPCM_XA_DECODER, yes )        { SOURCES *= adpcm.c }
 contains( CONFIG_ADPCM_YAMAHA_DECODER, yes )    { SOURCES *= adpcm.c }
 contains( CONFIG_ADPCM_YAMAHA_ENCODER, yes )    { SOURCES *= adpcm.c }
+
+# libavformat dependencies
+contains( CONFIG_OGG_MUXER, yes )               { SOURCES *= xiph.c }
 
 # external codec libraries
 contains( CONFIG_LIBA52, yes )                  { SOURCES *= liba52.c }

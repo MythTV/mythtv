@@ -103,7 +103,7 @@ typedef struct NellyMoserDecodeContext {
     DECLARE_ALIGNED_16(float,imdct_out[NELLY_BUF_LEN * 2]);
 } NellyMoserDecodeContext;
 
-DECLARE_ALIGNED_16(float,sine_window[128]);
+static DECLARE_ALIGNED_16(float,sine_window[128]);
 
 static inline int signed_shift(int i, int shift) {
     if (shift > 0)
@@ -123,9 +123,9 @@ static void overlap_and_window(NellyMoserDecodeContext *s, float *state, float *
 
     while (bot < NELLY_BUF_LEN/4) {
         s_bot = audio[bot];
-        s_top = audio[top];
-        audio[bot] =  (audio[mid_up]*sine_window[bot]-state[bot   ]*sine_window[top])/s->scale_bias + s->add_bias;
-        audio[top] = (-state[bot   ]*sine_window[bot]-audio[mid_up]*sine_window[top])/s->scale_bias + s->add_bias;
+        s_top = -audio[top];
+        audio[bot] =  (-audio[mid_up]*sine_window[bot]-state[bot   ]*sine_window[top])/s->scale_bias + s->add_bias;
+        audio[top] = (-state[bot   ]*sine_window[bot]+audio[mid_up]*sine_window[top])/s->scale_bias + s->add_bias;
         state[bot] =  audio[mid_down];
 
         audio[mid_down] =  (s_top          *sine_window[mid_down]-state[mid_down]*sine_window[mid_up])/s->scale_bias + s->add_bias;
@@ -281,7 +281,6 @@ void nelly_decode_block(NellyMoserDecodeContext *s, unsigned char block[NELLY_BL
     float *aptr, *bptr, *pptr, val, pval;
     int bits[NELLY_BUF_LEN];
     unsigned char v;
-    float a;
 
     init_get_bits(&s->gb, block, NELLY_BLOCK_LEN * 8);
 
@@ -324,11 +323,8 @@ void nelly_decode_block(NellyMoserDecodeContext *s, unsigned char block[NELLY_BL
                                     aptr, s->imdct_tmp);
         /* XXX: overlapping and windowing should be part of a more
            generic imdct function */
-        a = 1.0 / 8.0;
-        for(j = 0; j < NELLY_BUF_LEN / 2; j++) {
-            aptr[j] = s->imdct_out[j + NELLY_BUF_LEN + NELLY_BUF_LEN / 2] * a;
-            aptr[j + NELLY_BUF_LEN / 2] = -s->imdct_out[j] * a;
-        }
+        memcpy(&aptr[0],&s->imdct_out[NELLY_BUF_LEN+NELLY_BUF_LEN/2], (NELLY_BUF_LEN/2)*sizeof(float));
+        memcpy(&aptr[NELLY_BUF_LEN / 2],&s->imdct_out[0],(NELLY_BUF_LEN/2)*sizeof(float));
         overlap_and_window(s, s->state, aptr);
     }
 }
@@ -345,10 +341,10 @@ static int decode_init(AVCodecContext * avctx) {
 
     if(s->dsp.float_to_int16 == ff_float_to_int16_c) {
         s->add_bias = 385;
-        s->scale_bias = 32768;
+        s->scale_bias = 8*32768;
     } else {
         s->add_bias = 0;
-        s->scale_bias = 1;
+        s->scale_bias = 1*8;
     }
 
     /* Generate overlap window */
@@ -379,8 +375,10 @@ static int decode_tag(AVCodecContext * avctx,
             blocks = 2; break;
         case 256:   // 22050Hz
             blocks = 4; break;
+        case 512:   // 44100Hz
+            blocks = 8; break;
         default:
-            av_log(avctx, AV_LOG_DEBUG, "Tag size %d unknown, report sample!\n", buf_size);
+            av_log(avctx, AV_LOG_ERROR, "Tag size %d unknown, report sample!\n", buf_size);
             return buf_size;
     }
 
@@ -390,7 +388,7 @@ static int decode_tag(AVCodecContext * avctx,
         *data_size += NELLY_SAMPLES*sizeof(int16_t);
     }
 
-    return blocks*NELLY_SAMPLES*sizeof(int16_t);
+    return buf_size;
 }
 
 static int decode_end(AVCodecContext * avctx) {

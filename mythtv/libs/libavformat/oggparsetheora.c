@@ -26,7 +26,7 @@
 #include "avformat.h"
 #include "bitstream.h"
 #include "bswap.h"
-#include "ogg2.h"
+#include "oggdec.h"
 
 typedef struct theora_params {
     int gpshift;
@@ -123,6 +123,9 @@ theora_gptopts(AVFormatContext *ctx, int idx, uint64_t gp)
     theora_params_t *thp = os->private;
     uint64_t iframe = gp >> thp->gpshift;
     uint64_t pframe = gp & thp->gpmask;
+
+    if(!pframe)
+        os->pflags |= PKT_FLAG_KEY;
 
     return iframe + pframe;
 }

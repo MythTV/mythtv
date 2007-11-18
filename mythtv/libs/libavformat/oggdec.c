@@ -31,7 +31,7 @@
 
 
 #include <stdio.h>
-#include "ogg2.h"
+#include "oggdec.h"
 #include "avformat.h"
 
 #define MAX_PAGE_SIZE 65307
@@ -47,38 +47,6 @@ static ogg_codec_t *ogg_codecs[] = {
     &ogm_old_codec,
     NULL
 };
-
-#if 0                           // CONFIG_MUXERS
-static int
-ogg_write_header (AVFormatContext * avfcontext)
-{
-}
-
-static int
-ogg_write_packet (AVFormatContext * avfcontext, AVPacket * pkt)
-{
-}
-
-
-static int
-ogg_write_trailer (AVFormatContext * avfcontext)
-{
-}
-
-
-AVOutputFormat ogg_muxer = {
-    "ogg",
-    "Ogg format",
-    "application/ogg",
-    "ogg",
-    sizeof (OggContext),
-    CODEC_ID_VORBIS,
-    0,
-    ogg_write_header,
-    ogg_write_packet,
-    ogg_write_trailer,
-};
-#endif //CONFIG_MUXERS
 
 //FIXME We could avoid some structure duplication
 static int
@@ -409,6 +377,7 @@ ogg_packet (AVFormatContext * s, int *str, int *dstart, int *dsize)
     }
 
     if (os->header > -1 && os->seq > os->header){
+        os->pflags = 0;
         if (os->codec && os->codec->packet)
             os->codec->packet (s, idx);
         if (str)
@@ -556,6 +525,8 @@ ogg_read_packet (AVFormatContext * s, AVPacket * pkt)
         pkt->pts = ogg_gptopts (s, idx, os->lastgp);
         os->lastgp = -1;
     }
+
+    pkt->flags = os->pflags;
 
     return psize;
 }

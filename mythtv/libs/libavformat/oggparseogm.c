@@ -27,7 +27,7 @@
 #include "bitstream.h"
 #include "bytestream.h"
 #include "intreadwrite.h"
-#include "ogg2.h"
+#include "oggdec.h"
 #include "riff.h"
 
 static int
@@ -133,6 +133,9 @@ ogm_packet(AVFormatContext *s, int idx)
     ogg_stream_t *os = ogg->streams + idx;
     uint8_t *p = os->buf + os->pstart;
     int lb;
+
+    if(*p & 8)
+        os->pflags |= PKT_FLAG_KEY;
 
     lb = ((*p & 2) << 1) | ((*p >> 6) & 3);
     os->pstart += lb + 1;

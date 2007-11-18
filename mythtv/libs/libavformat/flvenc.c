@@ -307,7 +307,8 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     put_be24(pb,size + flags_size);
     put_be24(pb,pkt->pts);
-    put_be32(pb,flv->reserved);
+    put_byte(pb,pkt->pts >> 24);
+    put_be24(pb,flv->reserved);
     put_byte(pb,flags);
     if (enc->codec_id == CODEC_ID_VP6)
         put_byte(pb,0);
@@ -330,7 +331,7 @@ AVOutputFormat flv_muxer = {
 #ifdef CONFIG_LIBMP3LAME
     CODEC_ID_MP3,
 #else // CONFIG_LIBMP3LAME
-    CODEC_ID_NONE,
+    CODEC_ID_ADPCM_SWF,
 #endif // CONFIG_LIBMP3LAME
     CODEC_ID_FLV1,
     flv_write_header,

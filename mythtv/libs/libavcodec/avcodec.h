@@ -33,8 +33,8 @@
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(47<<8)+2)
-#define LIBAVCODEC_VERSION      51.47.2
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(48<<8)+0)
+#define LIBAVCODEC_VERSION      51.48.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -274,6 +274,7 @@ enum CodecID {
     CODEC_ID_VOXWARE,
     CODEC_ID_APE,
     CODEC_ID_NELLYMOSER,
+    CODEC_ID_MUSEPACK8,
 
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
@@ -1326,6 +1327,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_SIMPLEARMV5TE 16
 #define FF_IDCT_SIMPLEARMV6   17
 #define FF_IDCT_SIMPLEVIS     18
+#define FF_IDCT_WMV2          19
 
     /**
      * slice count
@@ -2444,9 +2446,9 @@ int avcodec_find_best_pix_fmt(int pix_fmt_mask, int src_pix_fmt,
  * Print in buf the string corresponding to the pixel format with
  * number pix_fmt, or an header if pix_fmt is negative.
  *
- * @param buf[in] the buffer where to write the string
- * @param buf_size[in] the size of buf
- * @param pix_fmt[in] the number of the pixel format to print the corresponding info string, or
+ * @param[in] buf the buffer where to write the string
+ * @param[in] buf_size the size of buf
+ * @param[in] pix_fmt the number of the pixel format to print the corresponding info string, or
  * a negative value to print the corresponding header.
  * Meaningful values for obtaining a pixel format info vary from 0 to PIX_FMT_NB -1.
  */

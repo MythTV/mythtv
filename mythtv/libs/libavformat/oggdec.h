@@ -22,8 +22,8 @@
     DEALINGS IN THE SOFTWARE.
 **/
 
-#ifndef FFMPEG_OGG2_H
-#define FFMPEG_OGG2_H
+#ifndef FFMPEG_OGGDEC_H
+#define FFMPEG_OGGDEC_H
 
 #include "avformat.h"
 
@@ -42,6 +42,7 @@ typedef struct ogg_stream {
     unsigned int bufpos;
     unsigned int pstart;
     unsigned int psize;
+    unsigned int pflags;
     uint32_t serial;
     uint32_t seq;
     uint64_t granule, lastgp;
@@ -84,4 +85,4 @@ extern ogg_codec_t ogm_old_codec;
 
 extern int vorbis_comment(AVFormatContext *ms, uint8_t *buf, int size);
 
-#endif /* FFMPEG_OGG2_H */
+#endif /* FFMPEG_OGGDEC_H */
