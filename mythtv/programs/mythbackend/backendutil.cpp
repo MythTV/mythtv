@@ -21,6 +21,26 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
 
+static QMap<int, int> fsID_cache;
+static QMutex cache_lock;
+
+/// gets stable fsIDs based of the dirID
+static int GetfsID(int dirID)
+{
+    QMutexLocker lock(&cache_lock);
+    if (!fsID_cache.contains(dirID))
+        fsID_cache[dirID] = fsID_cache.count();
+
+    return fsID_cache[dirID];
+}
+
+// checks the cache if we know this dirID, used to skip known unique file systems
+static bool HasfsID(int dirID)
+{
+    QMutexLocker lock(&cache_lock);
+    return fsID_cache.contains(dirID);
+}
+
 static size_t GetCurrentMaxBitrate(QMap<int, EncoderLink *> *encoderList)
 {
     size_t totalKBperMin = 0;
@@ -175,12 +195,11 @@ void BackendQueryDiskSpace(QStringList &strlist,
     // Consolidate hosts sharing storage
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(encoderList)/12 /*5 seconds*/;
     maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
-    int nextID = 0;
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
-            it1->fsID = nextID++;
+            it1->fsID = GetfsID(it1->dirID);
 
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
@@ -188,6 +207,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
+                (!HasfsID(it2->fsID) || it1->dirID == it2->dirID) &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
@@ -270,12 +290,11 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
 
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
     maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
-    int nextID = 0;
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
-            it1->fsID = nextID++;
+            it1->fsID = GetfsID(it1->dirID);
         else
             continue;
 
@@ -284,7 +303,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         {
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
-            if (it2->fsID == -1 &&
+            if (it2->fsID == -1 && HasfsID(it2->dirID) &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
