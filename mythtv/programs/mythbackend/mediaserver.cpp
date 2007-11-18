@@ -46,10 +46,19 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     if (sIP.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "MediaServer::No BackendServerIP Address defined");
+        VERBOSE(VB_IMPORTANT,
+                "MediaServer:: No BackendServerIP Address defined");
+        m_pHttpServer = NULL;
         return;
     }
 
+    if (sIP == "localhost" || sIP == "127.0.0.1")
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MediaServer:: Bad BackendServerIP Address - " + sIP);
+        m_pHttpServer = NULL;
+        return;
+    }
 
     m_pHttpServer = new HttpServer( nPort ); 
 

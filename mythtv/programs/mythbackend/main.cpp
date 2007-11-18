@@ -649,9 +649,14 @@ int main(int argc, char **argv)
 
     g_pUPnp = new MediaServer( ismaster, noupnp );
 
-    VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
+    HttpServer *pHS = g_pUPnp->GetHttpServer();
+    if (pHS)
+    {
+        VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
 
-    g_pUPnp->GetHttpServer()->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
+        pHS->RegisterExtension( new HttpStatus( &tvList, sched,
+                                                expirer, ismaster ));
+    }
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
