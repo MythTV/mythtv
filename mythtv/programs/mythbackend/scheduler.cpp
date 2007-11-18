@@ -1391,6 +1391,7 @@ void Scheduler::RunScheduler(void)
         for ( ; recIter != reclist.end(); recIter++)
         {
             QString msg, details;
+            int fsID = -1;
 
             nextRecording = *recIter;
 
@@ -1459,7 +1460,7 @@ void Scheduler::RunScheduler(void)
             if (nextRecording->pathname == "")
             {
                 QMutexLocker lockit(reclist_lock);
-                FillRecordingDir(nextRecording, reclist);
+                fsID = FillRecordingDir(nextRecording, reclist);
             }
 
             if (secsleft > 2)
@@ -1497,8 +1498,17 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->sourceid);
 
             if (schedulingEnabled)
+            {
                 nextRecording->recstatus =
                     nexttv->StartRecording(nextRecording);
+
+                nextRecording->AddHistory(false);
+                if (fsID > -1 && expirer)
+                {
+                    // activate auto expirer
+                    expirer->Update(nextRecording->cardid, fsID, true);
+                }
+            }
             else
                 nextRecording->recstatus = rsOffLine;
             bool doSchedAfterStart = 
@@ -2808,7 +2818,12 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     pginfo->title        = "LiveTV";
     pginfo->cardid       = cardid;
 
-    FillRecordingDir(pginfo, reclist);
+    int fsID = FillRecordingDir(pginfo, reclist);
+    if (fsID > -1 && expirer)
+    {
+        // update auto expirer
+        expirer->Update(cardid, fsID, true);
+    }
 
     VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
             .arg(pginfo->pathname));
@@ -2818,10 +2833,12 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     delete pginfo;
 }
 
-void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
+int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
 {
+
     VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Starting");
 
+    int fsID = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<QString, FileSystemInfo>::Iterator fsit;
     QMap<QString, FileSystemInfo>::Iterator fsit2;
@@ -2845,7 +2862,7 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
         pginfo->pathname = dirlist[0];
         VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
 
-        return;
+        return -1;
     }
 
     int weightPerRecording =
@@ -3071,9 +3088,6 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
     long long maxByterate = nexttv->GetMaxBitrate() / 8;
     long long maxSizeKB = maxByterate *
                           pginfo->recstartts.secsTo(pginfo->recendts) / 1024;
-    long long desiredSpaceKB = 0;
-    if (expirer)
-        desiredSpaceKB = expirer->GetDesiredSpace();
 
     // Loop though looking for a directory to put the file in.  The first time
     // through we look for directories with enough free space in them.  If we
@@ -3086,7 +3100,10 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
         for (fslistit = fsInfoList.begin();
             fslistit != fsInfoList.end(); fslistit++)
         {
+            long long desiredSpaceKB = 0;
             FileSystemInfo *fs = *fslistit;
+            if (expirer)
+                desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
 
             if ((fs->hostname == pginfo->hostname) &&
                 (dirlist.contains(fs->directory)) &&
@@ -3094,6 +3111,7 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                  (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
             {
                 pginfo->pathname = fs->directory;
+                fsID = fs->fsID;
 
                 if (pass == 1)
                     VERBOSE(VB_FILE, QString("'%1' will record in '%2' which "
@@ -3122,6 +3140,7 @@ void Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
     }
 
     VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Finished");
+    return fsID;
 }
 
 void Scheduler::FillDirectoryInfoCache(bool force)

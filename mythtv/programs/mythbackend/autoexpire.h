@@ -38,16 +38,13 @@ class AutoExpire : public QObject
     void CalcParams(void);
     void PrintExpireList(QString expHost = "ALL");
 
-    size_t GetDesiredSpace(void) const
-        { return desired_space; }
-
-    size_t GetMaxRecordRate(void) const
-        { return max_record_rate; }
+    size_t GetDesiredSpace(int fsID) const;
 
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);
 
-    static void Update(bool immediately);
+    static void Update(int encoder, int fsID, bool immediately);
+    static void Update(bool immediately) { Update(0, -1, immediately); }
 
     QMap<int, EncoderLink *> *encoderList;
 
@@ -76,10 +73,11 @@ class AutoExpire : public QObject
     // main expire info
     set<QString>  dont_expire_set;
     pthread_t     expire_thread;
-    size_t        desired_space;
     uint          desired_freq;
-    size_t        max_record_rate; // bytes/sec
     bool          expire_thread_running;
+
+    QMap<int, uint64_t> desired_space;
+    QMap<int, int>      used_encoders;
 
     QMutex         instance_lock;
     QWaitCondition instance_cond;

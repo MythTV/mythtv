@@ -77,9 +77,7 @@ AutoExpire::AutoExpire(void)
  */
 void AutoExpire::Init(void)
 {
-    desired_space      = 3 * 1024 * 1024;
-    desired_freq       = 10;
-    max_record_rate    = 5 * 1024 * 1024;
+    desired_freq       = 15;
     update_pending     = false;
 }
 
@@ -104,6 +102,18 @@ AutoExpire::~AutoExpire()
     }
 }
 
+/** \fn AutoExpire::GetDesiredSpace(int fsID)
+ *   returns the desired free space for each file system
+ *   used by the scheduler to select the next recording dir
+ */
+
+size_t AutoExpire::GetDesiredSpace(int fsID) const
+{
+    if (desired_space.contains(fsID))
+        return desired_space[fsID];
+    return 0;
+}
+
 /** \fn AutoExpire::CalcParams()
  *   Calcualtes how much space needs to be cleared, and how often.
  */
@@ -125,106 +135,114 @@ void AutoExpire::CalcParams()
         return;
     }
 
-    size_t totalKBperMin = 0;
-    QMap <int, bool> fsMap;
+    size_t maxKBperMin = 0;
+    size_t extraKB = gContext->GetNumSetting("AutoExpireExtraSpace", 0) << 20;
+
+    QMap<int, uint64_t> fsMap;
+    QMap<int, vector<int> > fsEncoderMap;
+
+    // we use this copying on purpose. The used_encoders map ensures
+    // that every encoder writes only to one fs.
+    // Copying the data minizes the time the lock is held
+    instance_lock.lock();
+    QMap<int, int>::const_iterator ueit = used_encoders.begin();
+    while (ueit != used_encoders.end())
+    {
+        fsEncoderMap[ueit.data()].push_back(ueit.key());
+        ++ueit;
+    }
+    instance_lock.unlock();
+
     vector<FileSystemInfo>::iterator fsit;
     for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
     {
         if (fsMap.contains(fsit->fsID))
             continue;
 
-        fsMap[fsit->fsID] = true;
+        fsMap[fsit->fsID] = 1;
 
         size_t thisKBperMin = 0;
 
-        VERBOSE(VB_FILE, QString(
+        if (fsEncoderMap.contains(fsit->fsID))
+        {
+            VERBOSE(VB_FILE, QString(
                 "fsID #%1: Total: %2 GB   Used: %3 GB   Free: %4 GB")
                 .arg(fsit->fsID)
                 .arg(fsit->totalSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->usedSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->freeSpaceKB / 1024.0 / 1024.0, 7, 'f', 1));
 
-        VERBOSE(VB_FILE, "Checking Hosts that use this filesystem.");
 
-        QMap <QString, bool> hostMap;
-        vector<FileSystemInfo>::iterator fsit2;
-        for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); fsit2++)
-        {
-            if (fsit2->fsID == fsit->fsID)
+            vector<int>::iterator encit = fsEncoderMap[fsit->fsID].begin();
+            for (; encit != fsEncoderMap[fsit->fsID].end(); ++encit)
             {
-                VERBOSE(VB_FILE, QString("  %1:%2")
-                        .arg(fsit2->hostname).arg(fsit2->directory));
+                EncoderLink *enc = *(encoderList->find(*encit));
 
-                if (hostMap.contains(fsit2->hostname))
-                    continue;
-
-                hostMap[fsit2->hostname] = true;
-
-                // check the encoders on this host here
-                QMap<int, EncoderLink*>::iterator it = encoderList->begin();
-                for (; it != encoderList->end(); ++it)
+                if (!enc->IsConnected() || !enc->IsBusy())
                 {
-                    EncoderLink *enc = *it;
-
-                    if (!enc->IsConnected())
-                        continue;
-
-                    if (((enc->IsLocal()) &&
-                         (fsit2->hostname == gContext->GetHostName())) ||
-                        (fsit2->hostname == enc->GetHostName()))
-                    {
-                        long long maxBitrate = enc->GetMaxBitrate();
-                        if (maxBitrate<=0)
-                            maxBitrate = 19500000LL;
-                        thisKBperMin += (((size_t)maxBitrate)*((size_t)15))>>11;
-                        VERBOSE(VB_FILE, QString("    Cardid %1: max bitrate "
-                                "%2 Kb/sec, fsID max is now %3 KB/min")
-                                .arg(enc->GetCardID())
-                                .arg(enc->GetMaxBitrate() >> 10)
-                                .arg(thisKBperMin));
-                    }
+                    // remove the encoder since it can't write to any file system
+                    VERBOSE(VB_FILE, LOC
+                            + QString("Cardid %1: is not recoding, removing it "
+                                      "from used list.").arg(*encit));
+                    instance_lock.lock();
+                    fsEncoderMap.erase(*encit);
+                    instance_lock.unlock();
+                    continue;
                 }
+
+                long long maxBitrate = enc->GetMaxBitrate();
+                if (maxBitrate<=0)
+                    maxBitrate = 19500000LL;
+                thisKBperMin += (((size_t)maxBitrate)*((size_t)15))>>11;
+                VERBOSE(VB_FILE, QString("    Cardid %1: max bitrate "
+                        "%2 Kb/sec, fsID %3 max is now %4 KB/min")
+                        .arg(enc->GetCardID())
+                        .arg(enc->GetMaxBitrate() >> 10)
+                        .arg(fsit->fsID)
+                        .arg(thisKBperMin));
             }
         }
+        fsMap[fsit->fsID] = thisKBperMin;
 
-        if (thisKBperMin > totalKBperMin)
+        if (thisKBperMin > maxKBperMin)
         {
             VERBOSE(VB_FILE,
-                    QString("  Max of %1 KB/min for this fsID is higher "
-                    "than the existing Max of %2 so we'll use this Max instead")
-                    .arg(thisKBperMin).arg(totalKBperMin));
-            totalKBperMin = thisKBperMin;
+                    QString("  Max of %1 KB/min for fsID %2 is higher "
+                    "than the existing Max of %3 so we'll use this Max instead")
+                    .arg(thisKBperMin).arg(fsit->fsID).arg(maxKBperMin));
+            maxKBperMin = thisKBperMin;
         }
     }
 
     VERBOSE(VB_IMPORTANT, LOC +
             QString("Found max recording rate of %1 MB/min")
-            .arg(totalKBperMin >> 10));
+            .arg(maxKBperMin >> 10));
 
-    // Determine GB needed to account for recordings if autoexpire
-    // is run every ten minutes. If this is too big, calculate space
-    // needed to run autoexpire every five minutes.
-    long long tot10min = totalKBperMin * 15, tot5min = totalKBperMin * 8;
-    size_t expireMinKB;
-    uint expireFreq;
-    if (tot10min < SPACE_TOO_BIG_KB)
-        (expireMinKB = tot10min), (expireFreq = 10);
-    else
-        (expireMinKB = tot5min), (expireFreq = 5);
+    // Determine frequency to run autoexpire so it doesn't have to free
+    // too much space
+    uint expireFreq = 15;
+    if (maxKBperMin > 0)
+    {
+        expireFreq = SPACE_TOO_BIG_KB / (maxKBperMin + maxKBperMin/3);
+        expireFreq = max(3U, min(expireFreq, 15U));
+    }
 
-    expireMinKB +=
-        gContext->GetNumSetting("AutoExpireExtraSpace", 0) << 20;
-
-    double expireMinGB = expireMinKB >> 20;
+    double expireMinGB = ((maxKBperMin + maxKBperMin/3)
+                          * expireFreq + extraKB) >> 20;
     VERBOSE(VB_IMPORTANT, LOC +
             QString("CalcParams(): Required Free Space: %2 GB w/freq: %2 min")
             .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
     instance_lock.lock();
-    desired_space      = expireMinKB;
-    desired_freq       = expireFreq;
-    max_record_rate    = (totalKBperMin << 10)/60;
+    desired_freq = expireFreq;
+    // write per file system needed space back, use safety of 33%
+    QMap<int, uint64_t>::iterator it = fsMap.begin();
+    while (it != fsMap.end())
+    {
+        desired_space[it.key()] = (it.data() + it.data()/3) * expireFreq + extraKB;
+        ++it;
+    }
     instance_lock.unlock();
 }
 
@@ -250,13 +268,16 @@ void AutoExpire::RunExpirer(void)
 
     while (expire_thread_running)
     {
+        curTime = QDateTime::currentDateTime();
+        // recalculate auto expire parametes
+        if (curTime >= next_expire)
+            CalcParams();
+
         timer.restart();
 
         instance_lock.lock();
 
         UpdateDontExpireSet();
-
-        curTime = QDateTime::currentDateTime();
 
         // Expire Short LiveTV files for this backend every 2 minutes
         if ((curTime.time().minute() % 2) == 0)
@@ -265,6 +286,7 @@ void AutoExpire::RunExpirer(void)
         // Expire normal recordings depending on frequency calculated
         if (curTime >= next_expire)
         {
+            VERBOSE(VB_FILE, LOC + "Running now!");
             next_expire =
                 QDateTime::currentDateTime().addSecs(desired_freq * 60);
 
@@ -391,11 +413,11 @@ void AutoExpire::ExpireRecordings(void)
             continue;
         }
 
-        if (((size_t) max(0LL, fsit->freeSpaceKB)) < desired_space)
+        if ((size_t)max(0LL, fsit->freeSpaceKB) < desired_space[fsit->fsID])
         {
             VERBOSE(VB_FILE,
                     QString("    Not Enough Free Space!  We want %1 MB")
-                            .arg(desired_space / 1024));
+                            .arg(desired_space[fsit->fsID] / 1024));
 
             QMap<QString, int> dirList;
             vector<FileSystemInfo>::iterator fsit2;
@@ -418,7 +440,7 @@ void AutoExpire::ExpireRecordings(void)
             QString myHostName = gContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) && 
-                   (((size_t)(max(0LL, fsit->freeSpaceKB))) < desired_space))
+                   ((size_t)max(0LL, fsit->freeSpaceKB) < desired_space[fsit->fsID]))
             {
                 ProgramInfo *p = *it;
                 it++;
@@ -947,13 +969,15 @@ void *SpawnUpdateThread(void *autoExpireInstance)
 /**
  *  \brief This is used to update the global AutoExpire instance "expirer".
  *
+ *  \param encoder     This recorder starts a recording now
+ *  \param fsID        file system ID of the writing directory
  *  \param immediately If true CalcParams() is called directly.
  *                     If false, a thread is spawned to call CalcParams(),
  *                     this is for use in the MainServer event thread
  *                     where calling CalcParams() directly
  *                     would deadlock the event thread.
  */
-void AutoExpire::Update(bool immediately)
+void AutoExpire::Update(int encoder, int fsID, bool immediately)
 {
     if (!expirer)
         return;
@@ -963,6 +987,15 @@ void AutoExpire::Update(bool immediately)
     while (expirer->update_pending)
         expirer->instance_cond.wait(&expirer->instance_lock);
     expirer->update_pending = true;
+
+    if (fsID > -1)
+    {
+        VERBOSE(VB_FILE, LOC
+                + QString("Cardid %1: is starting a recording on fsID %2 soon.")
+                .arg(encoder).arg(fsID));
+        expirer->used_encoders[encoder] = fsID;
+    }
+
     expirer->instance_lock.unlock();
 
     // do it..

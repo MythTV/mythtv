@@ -105,7 +105,7 @@ class Scheduler : public QObject
 
     bool WasStartedAutomatically();
 
-    void FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
+    int FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
 
     QValueList<int> reschedQueue;
