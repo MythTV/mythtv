@@ -21,7 +21,7 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
 
-static size_t GetTotalMaxBitrate(QMap<int, EncoderLink *> *encoderList)
+static size_t GetCurrentMaxBitrate(QMap<int, EncoderLink *> *encoderList)
 {
     size_t totalKBperMin = 0;
 
@@ -30,7 +30,7 @@ static size_t GetTotalMaxBitrate(QMap<int, EncoderLink *> *encoderList)
     {
         EncoderLink *enc = *it;
 
-        if (!enc->IsConnected())
+        if (!enc->IsConnected() || !enc->IsBusy())
             continue;
 
         long long maxBitrate = enc->GetMaxBitrate();
@@ -42,7 +42,7 @@ static size_t GetTotalMaxBitrate(QMap<int, EncoderLink *> *encoderList)
                 .arg(enc->GetCardID()).arg(thisKBperMin));
     }
 
-    VERBOSE(VB_FILE, QString("Maximal bitrate of connected encoders is %1 KB/min")
+    VERBOSE(VB_FILE, QString("Maximal bitrate of busy encoders is %1 KB/min")
             .arg(totalKBperMin));
 
     return totalKBperMin;
@@ -167,7 +167,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
     strlist.clear();
 
     // Consolidate hosts sharing storage
-    size_t maxWriteFiveSec = GetTotalMaxBitrate(encoderList)/12 /*5 seconds*/;
+    size_t maxWriteFiveSec = GetCurrentMaxBitrate(encoderList)/12 /*5 seconds*/;
+    maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
     int nextID = 0;
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
@@ -183,7 +184,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
             if (it2->fsID == -1 &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
-                 < maxWriteFiveSec))
+                 <= maxWriteFiveSec))
             {
                 // If both disks are local, let's see if they have the same
                 // st_dev. If not, then continue since they are distinct
@@ -258,7 +259,8 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         fsInfos.push_back(fsInfo);
     }
 
-    size_t maxWriteFiveSec = GetTotalMaxBitrate(tvList)/12  /*5 seconds*/;
+    size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
+    maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
     int nextID = 0;
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
@@ -276,7 +278,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             if (it2->fsID == -1 &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
-                 < maxWriteFiveSec))
+                 <= maxWriteFiveSec))
             {
                 // If both disks are local, let's see if they have the same
                 // st_dev. If not, then continue since they are distinct
