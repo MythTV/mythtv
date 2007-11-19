@@ -111,10 +111,11 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
         VERBOSE( VB_IMPORTANT, QString( "MythXMLClient::GetConnectionInfo Failed - (%1) %2" )
                              .arg( nErrCode )
                              .arg( sErrDesc ));
-
-        if (nErrCode == UPnPResult_ActionNotAuthorized)
-            return UPnPResult_ActionNotAuthorized;
     }
     
+    if (UPnPResult_HumanInterventionRequired == nErrCode
+           || UPnPResult_ActionNotAuthorized == nErrCode)
+        return (UPnPResultCode)nErrCode;
+
     return UPnPResult_ActionFailed;
 }
