@@ -1440,14 +1440,16 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
 void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ]
+                         = "no-cache=\"Ext\", max-age = 5000";
 
     QString sPin         = pRequest->m_mapParams[ "Pin" ];
     QString sSecurityPin = gContext->GetSetting( "SecurityPin", "");
 
     if ( sSecurityPin.length() == 0 )
     {
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionNotAuthorized, 
+        UPnp::FormatErrorResponse( pRequest,
+              UPnPResult_HumanInterventionRequired, 
               "No Security Pin assigned. Run mythtv-setup to set one." );
         return;
     }
