@@ -21,7 +21,6 @@ class LogViewer : public MythDialog
     void setFilenames(const QString &progressLog, const QString &fullLog);
 
   protected slots:
-    void exitClicked(void);
     void cancelClicked(void);
     void updateClicked(void);
     void updateTimerTimeout(void);

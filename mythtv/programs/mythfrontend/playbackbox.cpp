@@ -486,7 +486,7 @@ PlaybackBox::~PlaybackBox(void)
     }
 }
 
-int PlaybackBox::exec(void)
+DialogCode PlaybackBox::exec(void)
 {
     if (recGroup != "")
         return MythDialog::exec();
@@ -497,7 +497,7 @@ int PlaybackBox::exec(void)
         return MythDialog::exec();
     }
 
-    return 0;
+    return kDialogCodeRejected;
 }
 
 /* blocks until playing has stopped */
@@ -4633,7 +4633,8 @@ void PlaybackBox::showIconHelp(void)
 
     iconhelp->addLayout(grid);
 
-    QButton *button = iconhelp->addButton(tr("Ok"));
+    QButton *button = iconhelp->addButton(
+        QObject::tr("OK"), iconhelp, SLOT(accept()));
     button->setFocus();
 
     iconhelp->ExecPopup();
@@ -4763,7 +4764,7 @@ void PlaybackBox::showViewChanger(void)
     recGroupPopup->addWidget(exitbutton);
     connect(exitbutton, SIGNAL(clicked()), recGroupPopup, SLOT(reject()));
 
-    int result = recGroupPopup->ExecPopup();
+    DialogCode result = recGroupPopup->ExecPopup();
 
     if (result != MythDialog::Rejected)
     {
@@ -4929,7 +4930,7 @@ void PlaybackBox::showRecGroupChooser(void)
     connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
             SLOT(recGroupChooserListBoxChanged()));
 
-    int result = recGroupPopup->ExecPopup();
+    DialogCode result = recGroupPopup->ExecPopup();
 
     if (result != MythDialog::Rejected)
         setGroupFilter();
@@ -4989,7 +4990,7 @@ void PlaybackBox::setGroupFilter(void)
                                                      recGroupPassword,
                                                      gContext->GetMainWindow());
         pwd->exec();
-        delete pwd;
+        pwd->deleteLater();
         if (!ok)
         {
             recGroupPassword = savedPW;
@@ -5131,7 +5132,7 @@ void PlaybackBox::showRecGroupChanger(void)
             SLOT(recGroupChangerListBoxChanged()));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
-    int result = recGroupPopup->ExecPopup();
+    DialogCode result = recGroupPopup->ExecPopup();
 
     if (result != MythDialog::Rejected)
         setRecGroup();
@@ -5182,7 +5183,7 @@ void PlaybackBox::showPlayGroupChanger(void)
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
 
-    int result = recGroupPopup->ExecPopup();
+    DialogCode result = recGroupPopup->ExecPopup();
 
     if (result != MythDialog::Rejected)
         setPlayGroup();
@@ -5219,7 +5220,7 @@ void PlaybackBox::showRecTitleChanger()
 
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
-    int result = recGroupPopup->ExecPopup();
+    DialogCode result = recGroupPopup->ExecPopup();
 
     if (result == MythDialog::Accepted)
         setRecTitle();

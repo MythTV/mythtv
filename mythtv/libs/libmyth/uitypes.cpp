@@ -2850,7 +2850,8 @@ UIRemoteEditType::~UIRemoteEditType()
 {
     if (edit)
     {
-        delete edit;
+        edit->hide();
+        edit->deleteLater();
         edit = NULL;
     }    
 }
@@ -4334,9 +4335,9 @@ bool UIManagedTreeListType::incSearchStart(void)
     popup->addButton(tr("Search"));
     popup->addButton(tr("Cancel"));
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
 
-    if (res == 0)
+    if (kDialogCodeButton0 == res)
     {
         incSearch = searchEdit->text();
         bIncSearchContains = (modeCombo->currentItem() == 1);
@@ -4346,7 +4347,7 @@ bool UIManagedTreeListType::incSearchStart(void)
     popup->hide();
     popup->deleteLater();
 
-    return (res == 0);
+    return (kDialogCodeButton0 == res);
 }
 
 bool UIManagedTreeListType::incSearchNext(void)
@@ -5947,7 +5948,7 @@ void UIKeyboardType::close(void)
     if (!m_parentDialog)
         return;
 
-    m_parentDialog->done(0);
+    m_parentDialog->done(kDialogCodeAccepted);
 }
 
 void UIKeyboardType::updateButtons()

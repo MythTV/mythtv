@@ -206,20 +206,26 @@ void GameHandler::promptForRemoval(QString filename, QString RomPath)
     buttonText += QObject::tr("Yes to all");
 
 
-    int result = MythPopupBox::showButtonPopup(gContext->GetMainWindow(), 
-                               QObject::tr("File Missing"),
-                               QString(QObject::tr("%1 appears to be missing.\nRemove it"
-                                                   " from the database?")).arg(filename),
-                                                    buttonText, 0 );
+    DialogCode result = MythPopupBox::ShowButtonPopup(
+        gContext->GetMainWindow(), 
+        QObject::tr("File Missing"),
+        QString(QObject::tr("%1 appears to be missing.\nRemove it"
+                            " from the database?")).arg(filename),
+        buttonText, kDialogCodeButton0);
+
     switch (result)
     {
-        case 1:
+        case kDialogCodeButton0:
+        case kDialogCodeRejected:
+        default:
+            break;
+        case kDialogCodeButton1:
             m_KeepAll = true;
             break;
-        case 2:
+        case kDialogCodeButton2:
             purgeGameDB(filename , RomPath);
             break;
-        case 3:
+        case kDialogCodeButton3:
             m_RemoveAll = true;
             purgeGameDB(filename , RomPath);
             break;
@@ -533,18 +539,22 @@ void GameHandler::clearAllGameData(void)
     buttonText += QObject::tr("No");
     buttonText += QObject::tr("Yes");
 
-    int result = MythPopupBox::showButtonPopup(gContext->GetMainWindow(),
-                               QObject::tr("Are you sure?"),
-                               QString(QObject::tr("This will clear all Game Meta Data\n"
-                                                   "from the database. Are you sure you\n"
-                                                   "want to do this?" )),
-                                                    buttonText, 0 );
+    DialogCode result = MythPopupBox::ShowButtonPopup(
+        gContext->GetMainWindow(),
+        QObject::tr("Are you sure?"),
+        QString(QObject::tr("This will clear all Game Meta Data\n"
+                            "from the database. Are you sure you\n"
+                            "want to do this?" )),
+        buttonText, kDialogCodeButton0);
+
     switch (result)
     {
-        case 0:
+        case kDialogCodeRejected:
+        case kDialogCodeButton0:
+        default:
             // Do Nothing
             break;
-        case 1:
+        case kDialogCodeButton1:
             MSqlQuery query(MSqlQuery::InitCon());
             QString thequery = "DELETE FROM gamemetadata;";
             query.exec(thequery);

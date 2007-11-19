@@ -94,7 +94,7 @@ void ProgDetails::keyPressEvent(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
             if (action == "ESCAPE" || action == "SELECT")
-                done();
+                reject();
             else if (action == "UP")
             {
                 if (getCurrentFocusWidget() == m_richText)
@@ -144,15 +144,10 @@ void ProgDetails::wireUpTheme()
     if (m_okButton)
     {
         m_okButton->setText(tr("OK"));
-        connect(m_okButton, SIGNAL(pushed()), this, SLOT(done()));
+        connect(m_okButton, SIGNAL(pushed()), this, SLOT(accept()));
     }
 
     m_richText = getUIRichTextType("richtext");
 
     buildFocusList();
-}
-
-void ProgDetails::done()
-{
-    MythDialog::done(0);
 }

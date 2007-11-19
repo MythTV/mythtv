@@ -1319,7 +1319,7 @@ void RecordingProfile::setCodecTypes()
         audioSettings->selectCodecs(groupType());
 }
 
-int RecordingProfile::exec(void)
+DialogCode RecordingProfile::exec(void)
 {
     MythDialog *dialog = dialogWidget(
         gContext->GetMainWindow(), "Recording Profile");
@@ -1333,7 +1333,7 @@ int RecordingProfile::exec(void)
     if (tr_filters)
         FiltersChanged(tr_filters->getValue());
     
-    int ret = dialog->exec();
+    DialogCode ret = dialog->exec();
 
     dialog->deleteLater();
 
@@ -1414,12 +1414,12 @@ void RecordingProfileEditor::load(void)
     RecordingProfile::fillSelections(listbox, group);
 }
 
-int RecordingProfileEditor::exec(void)
+DialogCode RecordingProfileEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         open(listbox->getValue().toInt());
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void RecordingProfile::fillSelections(SelectSetting *setting, int group,

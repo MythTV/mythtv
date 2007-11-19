@@ -310,15 +310,14 @@ int main(int argc, char *argv[])
 
     if (backendIsRunning)
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(), QObject::tr("WARNING"),
             warn,
             QObject::tr("Continue"),
-            QObject::tr("Exit"), 1);
-        if (1 == val)
-            return 0;
+            QObject::tr("Exit"), kDialogCodeButton0);
 
-        backendIsRunning = true;
+        if (kDialogCodeButton1 == val)
+            return 0;
     }
 
     REG_KEY("qt", "DELETE", "Delete", "D");
@@ -348,7 +347,7 @@ int main(int argc, char *argv[])
             dia->AddButton(QObject::tr("Yes please"));
             dia->AddButton(QObject::tr("No, I know what I am doing"));
 
-            if (dia->exec() == 2)
+            if (kDialogCodeButton1 == dia->exec())
                 haveProblems = false;
             dia->deleteLater();
         }

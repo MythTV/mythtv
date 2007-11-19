@@ -634,7 +634,7 @@ void *spawn_popup(void *tmp)
 
 void ScanWizardScanner::RunPopup(void)
 {
-    int ret = popupProgress->exec();
+    DialogCode ret = popupProgress->exec();
 
     popupLock.lock();
     popupProgress->deleteLater();

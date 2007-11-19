@@ -611,14 +611,14 @@ void ZMEvents::showMenu()
 
     popup->addButton(tr("Delete All"));
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
     switch (res)
     {
-        case 0:
+        case kDialogCodeButton0:
             // refresh event list;
                 getEventList();
             break;
-        case 1:
+        case kDialogCodeButton1:
             if (getContext() == 1)
             {
                 // switch to grid view;
@@ -630,7 +630,7 @@ void ZMEvents::showMenu()
                 setView(false);
             }
             break;
-        case 2:
+        case kDialogCodeButton2:
             //delete all events
             if (class ZMClient *zm = ZMClient::get())
             {
@@ -648,6 +648,9 @@ void ZMEvents::showMenu()
                 busy->Close();
                 busy->deleteLater();
             }
+            break;
+        case kDialogCodeRejected:
+        default:
             break;
     }
 

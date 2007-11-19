@@ -111,7 +111,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     virtual void modifyPowerSearchByID(int rid, QString textname,
                                        QString from, QString forwhat);
 
-    virtual int exec(bool saveOnExec = true, bool doLoad = false);
+    virtual DialogCode exec(bool saveOnExec = true, bool doLoad = false);
         
     void remove();
     int getRecordID(void) const { return id->intValue(); };
@@ -275,7 +275,7 @@ class ScheduledRecordingEditor :
     ScheduledRecordingEditor() : listbox(new ListBoxSetting(this))
         { addChild(listbox); }
 
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() { };
 

@@ -33,6 +33,7 @@ class VideoGallery : public VideoDialog
     void handleVideoSelect();
 
   protected:
+    ~VideoGallery() {} // use deleteLater instead for thread safety
     virtual void parseContainer(QDomElement &element);
     virtual void fetchVideos();
     void doMenu(bool info = false);

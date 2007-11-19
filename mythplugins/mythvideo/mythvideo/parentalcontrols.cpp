@@ -156,12 +156,12 @@ class MythMultiPasswordDialog : public MythDialog
   public:
     MythMultiPasswordDialog(const QString &message, const QStringList &pwlist,
                             MythMainWindow *lparent, const char *lname = 0);
-    ~MythMultiPasswordDialog();
 
   private slots:
     void checkPassword(const QString &password);
 
   protected:
+    ~MythMultiPasswordDialog(); // use deleteLater for thread safety
     void keyPressEvent(QKeyEvent *e);
 
   private:
@@ -228,7 +228,7 @@ void MythMultiPasswordDialog::checkPassword(const QString &password)
          ++p)
     {
         if (password == *p)
-            done(1);
+            accept();
     }
 }
 
@@ -363,8 +363,8 @@ bool checkParentPassword(ParentalLevel::Level to_level,
             new MythMultiPasswordDialog(QObject::tr("Parental Pin:"),
                                         valid_passwords,
                                         gContext->GetMainWindow());
-    bool ok = pwd->exec();
-    delete pwd;
+    bool ok = (kDialogCodeRejected != pwd->exec());
+    pwd->deleteLater();
 
     if (ok)
     {

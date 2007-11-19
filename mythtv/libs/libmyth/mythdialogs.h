@@ -50,6 +50,32 @@ class MythMainWindow;
 
 #include "libmythui/mythmainwindow.h"
 
+typedef enum DialogCode
+{
+    kDialogCodeRejected  = QDialog::Rejected,
+    kDialogCodeAccepted  = QDialog::Accepted,
+    kDialogCodeListStart = 0x10,
+    kDialogCodeButton0   = 0x10,
+    kDialogCodeButton1   = 0x11,
+    kDialogCodeButton2   = 0x12,
+    kDialogCodeButton3   = 0x13,
+    kDialogCodeButton4   = 0x14,
+    kDialogCodeButton5   = 0x15,
+    kDialogCodeButton6   = 0x16,
+    kDialogCodeButton7   = 0x17,
+    kDialogCodeButton8   = 0x18,
+    kDialogCodeButton9   = 0x19,
+} DialogCode;
+
+inline bool operator==(const DialogCode &a, const QDialog::DialogCode &b)
+{ return ((int)a) == ((int)b); }
+inline bool operator==(const QDialog::DialogCode &a, const DialogCode &b)
+{ return ((int)a) == ((int)b); }
+inline bool operator!=(const DialogCode &a, const QDialog::DialogCode &b)
+{ return ((int)a) == ((int)b); }
+inline bool operator!=(const QDialog::DialogCode &a, const DialogCode &b)
+{ return ((int)a) == ((int)b); }
+
 class MPUBLIC MythDialog : public QFrame
 {
     Q_OBJECT
@@ -57,14 +83,12 @@ class MPUBLIC MythDialog : public QFrame
     MythDialog(MythMainWindow *parent, const char *name = 0, 
                bool setsize = true);
 
-    enum DialogCode
-    {
-        Rejected  = 0,
-        Accepted  = 1,
-        ListStart = 0x10,
-    };
+    // these are for backward compatibility..
+    static const DialogCode Rejected  = kDialogCodeRejected;
+    static const DialogCode Accepted  = kDialogCodeAccepted;
+    static const DialogCode ListStart = kDialogCodeListStart;
 
-    int result(void) const { return rescode; }
+    DialogCode result(void) const { return rescode; }
 
     virtual void Show(void);
 
@@ -74,18 +98,18 @@ class MPUBLIC MythDialog : public QFrame
    
     virtual bool onMediaEvent(MythMediaDevice * mediadevice); 
     
-    void setResult(int r) { rescode = r; }
+    void setResult(DialogCode r);
 
     virtual void deleteLater(void);
+
+    static int CalcItemIndex(DialogCode code);
 
  signals:
     void menuButtonPressed();
 
   public slots:
-    int exec();
-    virtual void done( int );
-
-  protected slots:
+    DialogCode exec(void);
+    virtual void done(int); // Must be given a valid DialogCode
     virtual void AcceptItem(int);
     virtual void accept();
     virtual void reject();
@@ -102,7 +126,7 @@ class MPUBLIC MythDialog : public QFrame
  
     MythMainWindow *m_parent;
 
-    int rescode;
+    DialogCode rescode;
 
     bool in_loop;
 
@@ -133,28 +157,46 @@ class MPUBLIC MythPopupBox : public MythDialog
     void ShowPopupAtXY(int destx, int desty, 
                        QObject *target = NULL, const char *slot = NULL);
 
-    int ExecPopup(QObject *target = NULL, const char *slot = NULL);
-    int ExecPopupAtXY(int destx, int desty,
-                      QObject *target = NULL, const char *slot = NULL);
+    DialogCode ExecPopup(QObject *target = NULL, const char *slot = NULL);
+    DialogCode ExecPopupAtXY(int destx, int desty,
+                             QObject *target = NULL, const char *slot = NULL);
 
-    static void showOkPopup(MythMainWindow *parent, QString title,
-                            QString message);
-    static void showExitPopup(MythMainWindow *parent, QString title,
-                              QString message);
+    static bool showOkPopup(MythMainWindow *parent,
+                            const QString  &title,
+                            const QString  &message,
+                            QString         button_msg = QString::null);
+
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
                                   QString message, bool focusOk);
-    static int show2ButtonPopup(MythMainWindow *parent, QString title,
-                                QString message, QString button1msg,
-                                QString button2msg, int defvalue);
-    static int showButtonPopup(MythMainWindow *parent, QString title,
-                               QString message, QStringList buttonmsgs,
-                               int defvalue);
+
+    static DialogCode Show2ButtonPopup(
+        MythMainWindow *parent,
+        const QString &title, const QString &message,
+        const QString &button1msg, const QString &button2msg,
+        DialogCode default_button)
+    {
+        QStringList buttonmsgs;
+        buttonmsgs += (button1msg.isEmpty()) ?
+            QString("Button 1") : button1msg;
+        buttonmsgs += (button2msg.isEmpty()) ?
+            QString("Button 2") : button2msg;
+        return ShowButtonPopup(
+            parent, title, message, buttonmsgs, default_button);
+    }
+
+    static DialogCode ShowButtonPopup(
+        MythMainWindow *parent,
+        const QString &title, const QString &message,
+        const QStringList &buttonmsgs,
+        DialogCode default_button);
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text);
     static QString showPasswordPopup(MythMainWindow *parent,
                                      QString title, QString message);
 
+  public slots:
+    virtual void AcceptItem(int);
     virtual void accept(void);
     virtual void reject(void);
 
@@ -168,7 +210,6 @@ class MPUBLIC MythPopupBox : public MythDialog
 
   protected slots:
     void defaultButtonPressedHandler(void);
-    void defaultExitHandler(int);
 
   private:
     QVBoxLayout *vbox;
@@ -290,8 +331,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     MythThemedDialog(MythMainWindow *parent, const char *name = 0,
                      bool setsize = true);
 
-   ~MythThemedDialog();
-
     virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);
@@ -329,7 +368,7 @@ class MPUBLIC MythThemedDialog : public MythDialog
     int  getContext(){return context;}
 
   public slots:
-
+    virtual void deleteLater(void);
     virtual void updateBackground();
     virtual void initForeground();
     virtual void updateForeground();
@@ -342,6 +381,7 @@ class MPUBLIC MythThemedDialog : public MythDialog
     virtual void activateCurrent();
 
   protected:
+    ~MythThemedDialog(); // use deleteLater() instead for thread safety
 
     void paintEvent(QPaintEvent* e);
     UIType *widget_with_current_focus;
@@ -383,14 +423,12 @@ class MPUBLIC MythPasswordDialog: public MythDialog
                         MythMainWindow *parent, 
                         const char *name = 0, 
                         bool setsize = true);
-    ~MythPasswordDialog();
-
   public slots:
   
     void checkPassword(const QString &);
 
- protected:
- 
+  protected:
+    ~MythPasswordDialog(); // use deleteLater() instead for thread safety
     void keyPressEvent(QKeyEvent *e);
 
   private:
@@ -407,21 +445,22 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
   public:
 
     MythSearchDialog(MythMainWindow *parent, const char *name = 0); 
-    ~MythSearchDialog();
 
   public: 
     void setCaption(QString text);
     void setSearchText(QString text);
     void setItems(QStringList items); 
     QString getResult(void);
-    
- protected slots:
-    void okPressed(void);
-    void cancelPressed(void);   
+
+  public slots:
+    virtual void deleteLater(void);
+
+  protected slots:
     void searchTextChanged(void);
-    void itemSelected(int index);
      
- protected:
+  protected:
+    void Teardown(void);
+    ~MythSearchDialog(); // use deleteLater() instead for thread safety
     void keyPressEvent(QKeyEvent *e);
 
   private:
@@ -453,8 +492,6 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
                         QString theme_filename = "", 
                         const char *name = 0,
                         bool setsize=true);
-    ~MythImageFileDialog();
-
   public slots:
   
     void handleTreeListSelection(int, IntVector*);
@@ -463,7 +500,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
     void buildFileList(QString directory);
 
   protected:
-  
+    ~MythImageFileDialog(); // use deleteLater() instead for thread safety
     void keyPressEvent(QKeyEvent *e);
 
   private:
@@ -486,11 +523,6 @@ class MPUBLIC MythScrollDialog : public QScrollView
     
   public:
 
-    enum DialogCode {
-        Rejected,
-        Accepted
-    };
-
     enum ScrollMode {
         HScroll=0,
         VScroll
@@ -498,16 +530,15 @@ class MPUBLIC MythScrollDialog : public QScrollView
 
     MythScrollDialog(MythMainWindow *parent, ScrollMode mode=HScroll,
                      const char *name = 0);
-    ~MythScrollDialog();
 
     void setArea(int w, int h);
     void setAreaMultiplied(int areaWTimes, int areaHTimes);
 
-    int  result() const;
+    DialogCode result(void) const;
 
   public slots:
 
-    int  exec();
+    DialogCode exec(void);
     virtual void done(int);
     virtual void show();
     virtual void hide();
@@ -519,11 +550,11 @@ class MPUBLIC MythScrollDialog : public QScrollView
     virtual void reject();
 
   protected:
-
+    ~MythScrollDialog(); // use deleteLater() instead for thread safety
     void         keyPressEvent(QKeyEvent *e);
     virtual void paintEvent(QRegion& region, int x, int y, int w, int h);
 
-    void setResult(int r);
+    void setResult(DialogCode r);
     void viewportPaintEvent(QPaintEvent *pe);
 
     MythMainWindow *m_parent;
@@ -537,7 +568,7 @@ class MPUBLIC MythScrollDialog : public QScrollView
     QFont           m_defaultMediumFont;
     QFont           m_defaultSmallFont;
 
-    int             m_resCode;
+    DialogCode      m_resCode;
     bool            m_inLoop;
     
     QPixmap        *m_bgPixmap;

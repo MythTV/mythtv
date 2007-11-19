@@ -542,7 +542,7 @@ class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() { };
 
@@ -568,7 +568,7 @@ class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     bool cardTypesInclude(const int& SourceID, 
                           const QString& thecardtype);
 
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() { };
 
@@ -588,7 +588,7 @@ class MPUBLIC CardInputEditor : public QObject, public ConfigurationDialog
   public:
     CardInputEditor();
 
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() { };
 

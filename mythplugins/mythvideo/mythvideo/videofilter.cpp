@@ -671,7 +671,7 @@ void VideoFilterDialog::saveAsDefault()
 void VideoFilterDialog::saveAndExit()
 {
     m_fsp->setSettings(m_settings);
-    done(0);
+    reject();
 }
 
 void VideoFilterDialog::setYear(int new_year)

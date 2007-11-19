@@ -32,7 +32,6 @@ class EditMetadataDialog : public MythThemedDialog
     void closeDialog();
     void showSaveMenu();
     void savePressed();
-    void cancelPressed();
     void editLostFocus();
 
   private:

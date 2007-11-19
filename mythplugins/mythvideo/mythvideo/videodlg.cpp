@@ -157,7 +157,8 @@ void VideoDialog::slotViewPlot()
                                               MythPopupBox::Small,true);
         plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
 
-        QButton * okButton = plotbox->addButton(tr("Ok"));
+        QButton *okButton = plotbox->addButton(
+            tr("OK"), plotbox, SLOT(accept()));
         okButton->setFocus();
 
         plotbox->ExecPopup();

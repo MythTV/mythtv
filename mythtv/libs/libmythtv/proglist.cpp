@@ -397,12 +397,12 @@ void ProgLister::nextView(void)
     refillAll = true;
 }
 
-void ProgLister::setViewFromList(void)
+void ProgLister::setViewFromList(int item)
 {
+    int view = item;
+
     if (!choosePopup || (!chooseListBox && !chooseEditButton))
         return;
-
-    int view = chooseListBox->currentItem();
 
     if (type == plTitleSearch || type == plKeywordSearch || 
         type == plPeopleSearch)
@@ -426,7 +426,7 @@ void ProgLister::setViewFromList(void)
         }
     }
 
-    choosePopup->done(0);
+    choosePopup->AcceptItem(item);
 
     if (view == curView)
         return;
@@ -517,7 +517,7 @@ void ProgLister::setViewFromEdit(void)
 
     updateKeywordInDB(text);
   
-    choosePopup->done(0);
+    choosePopup->accept();
 
     fillViewList(text);
 
@@ -549,7 +549,7 @@ void ProgLister::setViewFromPowerEdit()
 
     updateKeywordInDB(text);
 
-    powerPopup->done(0);
+    powerPopup->accept();
 
     fillViewList(text);
 
@@ -676,7 +676,7 @@ void ProgLister::setViewFromTime(void)
     viewList[curView] = searchTime.toString(fullDateFormat);
     viewTextList[curView] = viewList[curView];
 
-    choosePopup->done(0);
+    choosePopup->accept();
 
     curItem = -1;
     refillAll = true;
@@ -716,7 +716,8 @@ void ProgLister::chooseView(void)
             chooseListBox->setCurrentItem(curView);
         choosePopup->addWidget(chooseListBox);
 
-        connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(accepted(int)),
+                this,          SLOT(setViewFromList(int)));
 
         chooseListBox->setFocus();
         choosePopup->ExecPopup();
@@ -771,7 +772,8 @@ void ProgLister::chooseView(void)
         chooseRecordButton->setEnabled(chooseLineEdit->text()
                                        .stripWhiteSpace().length() > 0);
 
-        connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(accepted(int)),
+                this,          SLOT(setViewFromList(int)));
         connect(chooseListBox, SIGNAL(menuButtonPressed(int)), chooseLineEdit, SLOT(setFocus()));
         connect(chooseListBox, SIGNAL(selectionChanged()), this, SLOT(chooseListBoxChanged()));
         connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
@@ -837,8 +839,8 @@ void ProgLister::chooseView(void)
         chooseDeleteButton->setEnabled(curView >= 0);
         chooseRecordButton->setEnabled(curView >= 0);
 
-        connect(chooseListBox, SIGNAL(accepted(int)), this,
-                               SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(accepted(int)),
+                this,          SLOT(setViewFromList(int)));
         connect(chooseListBox, SIGNAL(menuButtonPressed(int)),chooseEditButton,
                                SLOT(setFocus()));
         connect(chooseListBox, SIGNAL(selectionChanged()), this,
@@ -1034,7 +1036,7 @@ void ProgLister::powerEdit()
     powerDescEdit->setText(field[2]);
 
     powerTitleEdit->setFocus();
-    choosePopup->done(0);
+    choosePopup->accept();
     powerPopup->ExecPopup();
 
     powerTitleEdit    = NULL; // deleted by popup delete

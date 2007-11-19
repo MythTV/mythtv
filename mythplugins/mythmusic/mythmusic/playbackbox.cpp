@@ -680,9 +680,9 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
     SmartPlaylistDialog dialog(gContext->GetMainWindow(), "smartplaylistdialog");
     dialog.setSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
 
-    int res = dialog.ExecPopup();
+    DialogCode res = dialog.ExecPopup();
 
-    if (res > 0)
+    if (kDialogCodeRejected != res)
     {
         dialog.getSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
         updatePlaylistFromSmartPlaylist();
@@ -698,9 +698,9 @@ void PlaybackBoxMusic::showSearchDialog()
 
     SearchDialog dialog(gContext->GetMainWindow(), "searchdialog");
 
-    int res = dialog.ExecPopupAtXY(-1, 20);
+    DialogCode res = dialog.ExecPopupAtXY(-1, 20);
 
-    if (res != -1)
+    if (kDialogCodeRejected != res)
     {
           QString whereClause;
           dialog.getWhereClause(whereClause);
@@ -999,7 +999,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
-    if (editDialog.exec())
+    if (kDialogCodeRejected != editDialog.exec())
     {
         // update the metadata copy stored in all_music
         if (all_music->updateMetadata(editMeta->ID(), editMeta))
@@ -2365,18 +2365,22 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
     dupsCheck->setBackgroundOrigin(ParentOrigin);
     popup->addWidget(dupsCheck);
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
     switch (res)
     {
-        case 0:
+        case kDialogCodeButton0:
             insertOption = PL_REPLACE;
             break;
-        case 1:
+        case kDialogCodeButton1:
             insertOption = PL_INSERTAFTERCURRENT;
             break;
-        case 2:
+        case kDialogCodeButton2:
             insertOption = PL_INSERTATEND;
             break;
+        case kDialogCodeRejected:
+        default:
+            popup->deleteLater();
+            return false;
     }
 
     bRemoveDups = dupsCheck->isChecked();
@@ -2406,7 +2410,7 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
 
     popup->deleteLater();
 
-    return (res >= 0);
+    return true;
 }
 
 QString PlaybackBoxMusic::getTimeString(int exTime, int maxTime)

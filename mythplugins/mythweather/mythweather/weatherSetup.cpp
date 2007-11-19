@@ -688,18 +688,18 @@ void ScreenSetup::saveData()
     accept();
 }
 
-typedef QMap<uint, QString> CommandMap;
+typedef QMap<DialogCode, QString> CommandMap;
 
-static uint add_button(QStringList   &buttons,
+static DialogCode add_button(QStringList   &buttons,
                              CommandMap    &commands,
                              const QString &button_text,
                              const QString &command)
 {
     int idx = buttons.size();
     buttons += button_text;
-    commands[idx] = command;
+    commands[(DialogCode)((int)kDialogCodeButton0 + idx)] = command;
 
-    return idx;
+    return (DialogCode)((int)kDialogCodeButton0 + idx);
 }
 
 void ScreenSetup::doListSelect(UIListBtnType *list,
@@ -725,10 +725,11 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
         add_button(buttons, commands, tr("Move Down"), "move_down");
         add_button(buttons, commands, tr("Remove"),    "remove");
 
-        int cancelbtn =
+        DialogCode cancelbtn =
             add_button(buttons, commands, tr("Cancel"), "cancel");
+        commands[kDialogCodeRejected] = "cancel";
 
-        int res = MythPopupBox::showButtonPopup(
+        DialogCode res = MythPopupBox::ShowButtonPopup(
             gContext->GetMainWindow(), "Manipulate Screen",
             tr("Action to take on screen ") + selected->text(),
             buttons, cancelbtn);
@@ -888,16 +889,17 @@ bool ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
     units_t *units = &si->units;
     QStringList unitsBtns;
     unitsBtns << tr("English Units") << tr("SI Units");
-    int ret = MythPopupBox::showButtonPopup(
-            gContext->GetMainWindow(), "Change Units",
-            tr("Select units for screen ") + name, unitsBtns,
-            *units == ENG_UNITS ? 0 : 1);
+    DialogCode ret = MythPopupBox::ShowButtonPopup(
+        gContext->GetMainWindow(), "Change Units",
+        tr("Select units for screen ") + name, unitsBtns,
+        *units == ENG_UNITS ? kDialogCodeButton0 : kDialogCodeButton1);
+
     switch (ret)
     {
-        case 0:
+        case kDialogCodeButton0:
             *units = ENG_UNITS;
             break;
-        case 1:
+        case kDialogCodeButton1:
             *units = SI_UNITS;
             break;
         default:

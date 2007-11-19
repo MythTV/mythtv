@@ -617,19 +617,23 @@ void PhoneUIBox::LoopbackButtonPushed()
 {
     if ((!loopbackMode) && (rtpAudio == 0) && (rtpVideo == 0))
     {
-        int loop = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "AskLoopback", "Loopback Audio and video at ...", "Socket on this machine", "NAT Device", 1);
+        DialogCode loop = MythPopupBox::Show2ButtonPopup(
+            gContext->GetMainWindow(),
+            "AskLoopback", tr("Loopback Audio and video at ..."),
+            tr("Socket on this machine"), tr("NAT Device"),
+            kDialogCodeButton0);
         QString loopIp;
         switch (loop)
         {
-        default:
-        case -1:
-            return;
-        case 0:
-            loopIp = sipStack->getLocalIpAddress();
-            break;
-        case 1:
-            loopIp = sipStack->getNatIpAddress();
-            break;
+            default:
+            case kDialogCodeRejected:
+                return;
+            case kDialogCodeButton0:
+                loopIp = sipStack->getLocalIpAddress();
+                break;
+            case kDialogCodeButton1:
+                loopIp = sipStack->getNatIpAddress();
+                break;
         }
         phoneUIStatusBar->DisplayCallState(QString(tr("Audio and Video Looped to ") + loopIp));
         int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));

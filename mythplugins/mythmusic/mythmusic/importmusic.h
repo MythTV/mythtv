@@ -150,7 +150,6 @@ class ImportCoverArtDialog : public MythThemedDialog
     void copyPressed(void);
     void prevPressed(void);
     void nextPressed(void);
-    void exitPressed(void);
     void selectorChanged(int item);
 
   private:

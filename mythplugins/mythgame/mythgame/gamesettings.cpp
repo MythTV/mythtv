@@ -251,11 +251,12 @@ MythGamePlayerEditor::MythGamePlayerEditor() : listbox(new ListBoxSetting(this))
     addChild(listbox);
 }
 
-int MythGamePlayerEditor::exec() {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+DialogCode MythGamePlayerEditor::exec(void)
+{
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         edit();
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void MythGamePlayerEditor::load(void)
@@ -284,14 +285,14 @@ void MythGamePlayerEditor::menu(void)
     }
     else
     {   
-        int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                                 "",
-                                                 tr("Game Player Menu"),
-                                                 tr("Edit.."),                                                                   tr("Delete.."), 1);
-
-        if (val == 0)
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
+            gContext->GetMainWindow(),
+            "", tr("Game Player Menu"),
+            tr("Edit.."), tr("Delete.."), kDialogCodeButton1);
+        
+        if (kDialogCodeButton0 == val)
             edit();
-        else if (val == 1)
+        else if (kDialogCodeButton1 == val)
             del();
     }
 }
@@ -309,13 +310,14 @@ void MythGamePlayerEditor::edit(void)
 
 void MythGamePlayerEditor::del(void)
 {
-    int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                          tr("Are you sure you want to delete "
-                                             "this item?"),
-                                             tr("Yes, delete It"),
-                                             tr("No, don't"), 2);
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(), "",
+        tr("Are you sure you want to delete "
+           "this item?"),
+        tr("Yes, delete It"),
+        tr("No, don't"), kDialogCodeButton1);
 
-    if (val == 0)
+    if (kDialogCodeButton0 == val)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM gameplayers "

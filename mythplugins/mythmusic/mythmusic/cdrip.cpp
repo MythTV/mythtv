@@ -738,31 +738,36 @@ void Ripper::startScanCD(void)
                         dlg->AddButton("No To All");
                         dlg->AddButton("Yes");
                         dlg->AddButton("Yes To All");
-                        int res = dlg->exec();
+                        DialogCode res = dlg->exec();
                         dlg->deleteLater();
                         dlg = NULL;
 
-                        if (res == 1)
+                        if (kDialogCodeButton0 == res)
                         {
                             delete ripTrack;
                             delete metadata;
                         }
-                        else if (res == 2)
+                        else if (kDialogCodeButton1 == res)
                         {
                             noToAll = true;
                             delete ripTrack;
                             delete metadata;
                         }
-                        else if (res == 3)
+                        else if (kDialogCodeButton2 == res)
                         {
                             deleteTrack(m_artistName, m_albumName, title);
                             m_tracks->push_back(ripTrack);
                         }
-                        else if (res == 4)
+                        else if (kDialogCodeButton3 == res)
                         {
                             yesToAll = true;
                             deleteTrack(m_artistName, m_albumName, title);
                             m_tracks->push_back(ripTrack);
+                        }
+                        else // treat cancel as no
+                        {
+                            delete ripTrack;
+                            delete metadata;
                         }
                     }
                 }
@@ -1176,8 +1181,8 @@ void Ripper::startRipper(void)
 
     RipStatus statusDialog(m_CDdevice, m_tracks, m_qualitySelector->getCurrentInt(),
                            gContext->GetMainWindow(), "edit metadata");
-    int res = statusDialog.exec();
-    if (res == Accepted)
+    DialogCode rescode = statusDialog.exec();
+    if (kDialogCodeAccepted == rescode)
     {
         bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping", 1);
         if (EjectCD) 
@@ -1396,7 +1401,8 @@ bool Ripper::showList(QString caption, QString &value)
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(m_searchList);
-    if (searchDialog->ExecPopupAtXY(-1, 8) == 0)
+    DialogCode rescode = searchDialog->ExecPopupAtXY(-1, 8);
+    if (kDialogCodeRejected != rescode)
     {
         value = searchDialog->getResult();
         res = true;
@@ -1416,7 +1422,7 @@ void Ripper::showEditMetadataDialog()
                                   "edit_metadata", "music-", "edit metadata");
     editDialog.setSaveMetadataOnly();
 
-    if (editDialog.exec())
+    if (kDialogCodeRejected != editDialog.exec())
     {
         updateTrackList();
     }

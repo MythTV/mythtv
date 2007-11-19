@@ -20,9 +20,13 @@ void RomInfo::edit_rominfo()
     QString rom_ver = Version();
 
     GameEditDialog romeditdlg(Romname().latin1());
-    int res = romeditdlg.exec();
 
-    if (res) {
+    DialogCode res = romeditdlg.exec();
+
+    if (kDialogCodeRejected == res)
+        return;
+
+    {
         MSqlQuery query(MSqlQuery::InitCon());
         QString thequery = QString("SELECT gamename,genre,year,country,publisher,favorite FROM gamemetadata "
                                        " WHERE gametype = '%1' AND romname = '%2'; ")

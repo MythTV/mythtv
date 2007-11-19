@@ -20,6 +20,7 @@ class MPUBLIC DialogBox : public MythDialog
 
     bool getCheckBoxState(void) {  if (checkbox) return checkbox->isChecked();
                                    return false; }
+
   protected slots:
     void buttonPressed(int which);
 

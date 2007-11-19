@@ -33,8 +33,6 @@ class SearchDialog: public MythPopupBox
 
     void searchTextChanged(const QString &searchText);
     void itemSelected(int i);
-    void okPressed(void);
-    void cancelPressed(void);
 
   private:
 

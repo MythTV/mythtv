@@ -119,7 +119,7 @@ class MPUBLIC ProfileGroupEditor :
         listbox(new ListBoxSetting(this)), dialog(NULL), redraw(true)
         { addChild(listbox); }
 
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() {};
 

@@ -46,8 +46,8 @@ SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     addWidget(listbox);
 
     // buttons
-    okButton = addButton(tr("OK"), this, SLOT(okPressed()));
-    cancelButton = addButton(tr("Cancel"), this, SLOT(cancelPressed()));
+    okButton = addButton(tr("OK"), this, SLOT(accept()));
+    cancelButton = addButton(tr("Cancel"), this, SLOT(reject()));
 
     // Initially, fill list with all music
     runQuery("");
@@ -223,7 +223,7 @@ void SearchDialog::itemSelected(int i)
 {
     unsigned int id = ((SearchListBoxItem*)listbox->item(i))->getId();
     whereClause = QString("WHERE song_id='%1';").arg(id);
-    done(0);
+    accept();
 }
 
 
@@ -234,16 +234,6 @@ void SearchDialog::getWhereClause(QString &whereClause)
 
 SearchDialog::~SearchDialog()
 {
-}
-
-void SearchDialog::okPressed(void)
-{
-    done(0);
-}
-
-void SearchDialog::cancelPressed(void)
-{
-    done(-1);
 }
 
 void SearchListBoxItem::paint(QPainter *p)

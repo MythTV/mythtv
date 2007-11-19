@@ -1402,7 +1402,7 @@ void MythburnWizard::showEditMetadataDialog()
 
     EditMetadataDialog editDialog(curItem, gContext->GetMainWindow(),
                                   "edit_metadata", "mythburn-", "edit metadata");
-    if (editDialog.exec())
+    if (kDialogCodeRejected != editDialog.exec())
     {
         // update widgets to reflect any changes
         titleChanged(item);
@@ -1476,7 +1476,7 @@ void MythburnWizard::handleFind(void)
     FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
                           "file_selector", "mytharchive-", "file selector");
     qApp->unlock();
-    bool res = selector.exec();
+    bool res = (kDialogCodeRejected != selector.exec());
 
     if (res)
     {

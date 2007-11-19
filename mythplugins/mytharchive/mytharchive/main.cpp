@@ -103,8 +103,6 @@ bool checkLockFile(const QString &lockFile)
 void runCreateDVD(void)
 {
 #ifdef CREATE_DVD 
-    int res;
-
     QString commandline;
     QString tempDir = getTempDirectory(true);
 
@@ -132,12 +130,12 @@ void runCreateDVD(void)
     burnWiz = new MythburnWizard(gContext->GetMainWindow(),
                              "mythburn_wizard", "mythburn-");
     qApp->unlock();
-    res = burnWiz->exec();
+    DialogCode res = burnWiz->exec();
     qApp->lock();
     qApp->processEvents();
     delete burnWiz;
 
-    if (res == 0)
+    if (kDialogCodeRejected == res)
         return;
 
     // now show the log viewer
@@ -152,8 +150,6 @@ void runCreateDVD(void)
 void runCreateArchive(void)
 {
 #ifdef CREATE_NATIVE
-    int res;
-
     QString commandline;
     QString tempDir = getTempDirectory(true);
 
@@ -181,12 +177,12 @@ void runCreateArchive(void)
     nativeWiz = new ExportNativeWizard(gContext->GetMainWindow(),
                                  "exportnative_wizard", "mythnative-");
     qApp->unlock();
-    res = nativeWiz->exec();
+    DialogCode res = nativeWiz->exec();
     qApp->lock();
     qApp->processEvents();
     delete nativeWiz;
 
-    if (res == 0)
+    if (kDialogCodeRejected == res)
         return;
 
     // now show the log viewer
@@ -231,10 +227,10 @@ void runImportVideo(void)
     ImportNativeWizard wiz("/", filter, gContext->GetMainWindow(),
                           "import_native_wizard", "mythnative-", "import native wizard");
     qApp->unlock();
-    int res = wiz.exec();
+    DialogCode res = wiz.exec();
     qApp->lock();
 
-    if (res == 0)
+    if (kDialogCodeRejected == res)
         return;
 
     // now show the log viewer
@@ -311,8 +307,6 @@ void runBurnDVD(void)
         return;
     }
 
-    int res;
-
     // ask the user what type of disk to burn to
     DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
             QObject::tr("\nPlace a blank DVD in the drive and select an option below."));
@@ -322,11 +316,15 @@ void runBurnDVD(void)
     dialog->AddButton(QObject::tr("Burn DVD Rewritable (Force Erase)"));
     dialog->AddButton(QObject::tr("Cancel"));
 
-    res = dialog->exec();
+    DialogCode res = dialog->exec();
     dialog->deleteLater();
 
-    // cancel pressed?
-    if (res == 4)
+    // cancel pressed or escape hit?
+    if ((kDialogCodeButton3 == res) || (kDialogCodeRejected == res))
+        return;
+
+    int fmt = MythDialog::CalcItemIndex(res);
+    if ((fmt < 0) || (fmt > 2))
         return;
 
     QString tempDir = getTempDirectory(true);
@@ -346,8 +344,8 @@ void runBurnDVD(void)
     if (QFile::exists(logDir + "/mythburncancel.lck"))
         QFile::remove(logDir + "/mythburncancel.lck");
 
-    QString sArchiveFormat = QString::number(res - 1);
-    QString sEraseDVDRW = (res == 3 ? "1" : "0");
+    QString sArchiveFormat = QString::number(fmt);
+    QString sEraseDVDRW = (kDialogCodeButton2 == res) ? "1" : "0";
     QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType").startsWith("Native") ? "1" : "0");
 
     commandline = "mytharchivehelper -b " + sArchiveFormat + " " + sEraseDVDRW  + " " + sNativeFormat;

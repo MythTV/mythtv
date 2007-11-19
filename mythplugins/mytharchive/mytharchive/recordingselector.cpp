@@ -56,7 +56,7 @@ void RecordingSelector::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            done(0);
+            done(kDialogCodeRejected);
         }
         else if (action == "DOWN")
         {

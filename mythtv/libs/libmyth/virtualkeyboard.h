@@ -24,15 +24,20 @@ class MPUBLIC VirtualKeyboard : public MythThemedDialog
                     QWidget *parentEdit,
                     const char *name = 0,
                     bool setsize = true);
-    ~VirtualKeyboard();
 
   public slots:
-    void switchLayout(QString language);
-    virtual void show();
+    virtual void SwitchLayout(const QString &language);
+    virtual void Show(void);
     virtual void hide();
+
+    virtual void deleteLater(void);
 
   protected slots:
     virtual void keyPressEvent(QKeyEvent *e);
+
+  protected:
+    void Teardown(void);
+    ~VirtualKeyboard(); // use deleteLater() instead for thread safety
 
   private:
     UIKeyboardType *m_keyboard;

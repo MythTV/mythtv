@@ -721,12 +721,12 @@ void ScheduledRecordingEditor::load(void)
 }
 
 
-int ScheduledRecordingEditor::exec(void) 
+DialogCode ScheduledRecordingEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         open(listbox->getValue().toInt());
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void ScheduledRecordingEditor::open(int id) {
@@ -743,7 +743,7 @@ void ScheduledRecordingEditor::open(int id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int ScheduledRecording::exec(bool saveOnExec, bool doLoad)
+DialogCode ScheduledRecording::exec(bool saveOnExec, bool doLoad)
 {
     if (!dialog)
         dialog = new ScheduledRecordingDialog(this);

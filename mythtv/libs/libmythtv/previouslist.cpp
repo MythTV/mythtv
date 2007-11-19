@@ -336,7 +336,7 @@ void PreviousList::setViewFromList(void)
 
     int view = chooseListBox->currentItem();
 
-    choosePopup->done(0);
+    choosePopup->AcceptItem(view);
 
     if (view == curView)
         return;
@@ -712,7 +712,7 @@ void PreviousList::removalDialog()
                              "delete any recordings.");
     
     DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, cleardup = -1, setdup = -1, rm_episode = -1,
+    int button = 0, ok = -1, cleardup = -1, setdup = -1, rm_episode = -1,
         rm_title = -1;
     // int rm_generics = -1;
 
@@ -739,7 +739,8 @@ void PreviousList::removalDialog()
     //                   "for duplicate matching"));
     // rm_generics = button++;
 
-    int ret = dlg->exec();
+    DialogCode code = dlg->exec();
+    int ret = MythDialog::CalcItemIndex(code);
     dlg->deleteLater();
     dlg = NULL;
 

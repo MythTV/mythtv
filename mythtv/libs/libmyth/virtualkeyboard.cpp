@@ -1,6 +1,3 @@
-#include <iostream>
-using namespace std;
-
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qapplication.h>
@@ -9,6 +6,10 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
+
+#define LOC      QString("VirtualKeyboard: ")
+#define LOC_WARN QString("VirtualKeyboard, Warning: ")
+#define LOC_ERR  QString("VirtualKeyboard, Error: ")
 
 VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
                     QWidget *parentEdit,
@@ -20,12 +21,19 @@ VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
     setLineWidth(1);
     m_parentEdit = parentEdit;
 
-    switchLayout(gContext->GetLanguageAndVariant());
+    SwitchLayout(gContext->GetLanguageAndVariant());
 }
 
-void VirtualKeyboard::switchLayout(QString language)
+void VirtualKeyboard::SwitchLayout(const QString &lang)
 {
-    language = language.lower();
+    if (!m_parentEdit)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No edit receiving output");
+        reject();
+        return;
+    }
+
+    QString language = lang.lower();
 
     // figure out which of the english layouts to use (UK or US)
     if (language.left(2) == "en")
@@ -44,14 +52,16 @@ void VirtualKeyboard::switchLayout(QString language)
 
     if (!loadThemedWindow("keyboard", theme_file))
     {
-        VERBOSE(VB_GENERAL,
-            QString("VirtualKeyboard: cannot find layout for '%1'").arg(language));
+        VERBOSE(VB_GENERAL, LOC_WARN + 
+                QString("Cannot find layout for '%1'").arg(language));
 
         // cannot find layout so fallback to US English layout
         if (!loadThemedWindow("keyboard", "keyboard/en_us_"))
         {
-            VERBOSE(VB_IMPORTANT, "VirtualKeyboard: cannot find layout for US English");
-            done(-1);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                    "Cannot find layout for US English");
+
+            reject();
             return;
         }
     }
@@ -61,9 +71,10 @@ void VirtualKeyboard::switchLayout(QString language)
 
     if (!container)
     {
-        cerr << "VirtualKeyboard: cannot find the 'keyboard_container'"
-                " in your theme" << endl;
-        done(-1);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "Cannot find the 'keyboard_container' in your theme");
+
+        reject();
         return;
     }
 
@@ -161,8 +172,10 @@ void VirtualKeyboard::switchLayout(QString language)
     m_keyboard = getUIKeyboardType("keyboard");
     if (!m_keyboard)
     {
-        cerr << "VirtualKeyboard: cannot find the UIKeyboardType in your theme" << endl;
-        done(-1);
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Cannot find the UIKeyboardType in your theme");
+
+        reject();
         return;
     }
 
@@ -179,13 +192,25 @@ void VirtualKeyboard::switchLayout(QString language)
 
 VirtualKeyboard::~VirtualKeyboard(void)
 {
+    Teardown();
 }
 
-void VirtualKeyboard::show()
+void VirtualKeyboard::deleteLater(void)
+{
+    Teardown();
+}
+
+void VirtualKeyboard::Teardown(void)
+{
+    m_keyboard   = NULL;
+    m_parentEdit = NULL;
+}
+
+void VirtualKeyboard::Show(void)
 {
     grabKeyboard();
 
-    MythDialog::show();
+    MythDialog::Show();
 
     if (m_parentEdit)
         m_parentEdit->setFocus();
@@ -212,14 +237,14 @@ void VirtualKeyboard::keyPressEvent(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
             if (action == "ESCAPE")
-                done(0);
+                accept();
             else
                 handled = false;
         }
     }
 
     //just pass all unhandled key events for the keyboard to handle
-    if (!handled)
+    if (!handled && m_keyboard)
         m_keyboard->keyPressEvent(e);
 }
 

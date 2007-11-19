@@ -59,5 +59,5 @@ void DialogBox::AddButton(const QString &title)
 void DialogBox::buttonPressed(int which)
 {
     if (buttongroup->find(which) != checkbox)
-        done(which + 1);
+        AcceptItem(which);
 }

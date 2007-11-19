@@ -16,17 +16,54 @@ using namespace std;
 #include "virtualkeyboard.h"
 #include "libmythui/mythmainwindow.h"
 
-MythComboBox::~MythComboBox()
+typedef VirtualKeyboard* QWidgetP;
+static void qt_delete(QWidgetP &widget)
 {
-    if (popup)
-        delete popup;
+    if (widget)
+    {
+        widget->disconnect();
+        widget->hide();
+        widget->deleteLater();
+        widget = NULL;
+    }
 }
 
-void MythComboBox::Init()
+MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
+    QComboBox(rw, parent, name),
+    popup(NULL), helptext(QString::null), AcceptOnSelect(false),
+    useVirtualKeyboard(true), allowVirtualKeyboard(rw),
+    popupPosition(VK_POSBELOWEDIT), step(1)
 {
-    popup = NULL;
-    popupPosition = VK_POSBELOWEDIT;
+    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
+
+MythComboBox::~MythComboBox()
+{
+    Teardown();
+}
+
+void MythComboBox::deleteLater(void)
+{
+    Teardown();
+    QComboBox::deleteLater();
+}
+
+void MythComboBox::Teardown(void)
+{
+    qt_delete(popup);
+}
+
+void MythComboBox::popupVirtualKeyboard(void)
+{
+    qt_delete(popup);
+
+    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    gContext->GetMainWindow()->detach(popup);
+    popup->exec();
+
+    qt_delete(popup);
+}
+
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
@@ -73,19 +110,13 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
             else if (action == "SELECT" && AcceptOnSelect)
                 emit accepted(currentItem());
             else if (action == "SELECT" && 
-                    (e->text().isNull() ||
+                    (e->text().isEmpty() ||
                     (e->key() == Qt::Key_Enter) ||
                     (e->key() == Qt::Key_Return) ||
                     (e->key() == Qt::Key_Space)))
             {
-                if ((allowVirtualKeyboard) &&  (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
-                {
-                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
-                    gContext->GetMainWindow()->detach(popup);
-                    popup->exec();
-                    delete popup;
-                    popup = NULL;
-                }
+                if (useVirtualKeyboard && allowVirtualKeyboard)
+                    popupVirtualKeyboard();
                 else
                    handled = true;
             }
@@ -354,16 +385,52 @@ void MythSlider::focusOutEvent(QFocusEvent *e)
     QSlider::focusOutEvent(e);
 }
 
-MythLineEdit::~MythLineEdit()
+MythLineEdit::MythLineEdit(QWidget *parent, const char* widgetName) :
+    QLineEdit(parent, widgetName),
+    popup(NULL), helptext(QString::null), rw(true),
+    useVirtualKeyboard(true),
+    allowVirtualKeyboard(true),
+    popupPosition(VK_POSBELOWEDIT)
 {
-    if (popup)
-        delete popup;
+    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
-void MythLineEdit::Init()
+MythLineEdit::MythLineEdit(
+    const QString &contents, QWidget *parent, const char* widgetName) :
+    QLineEdit(contents, parent, widgetName),
+    popup(NULL), helptext(QString::null), rw(true),
+    useVirtualKeyboard(true),
+    allowVirtualKeyboard(true),
+    popupPosition(VK_POSBELOWEDIT)
 {
-    popup = NULL;
-    popupPosition = VK_POSBELOWEDIT;
+    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
+}
+
+MythLineEdit::~MythLineEdit()
+{
+    Teardown();
+}
+
+void MythLineEdit::deleteLater(void)
+{
+    Teardown();
+    QLineEdit::deleteLater();
+}
+
+void MythLineEdit::Teardown(void)
+{
+    qt_delete(popup);
+}
+
+void MythLineEdit::popupVirtualKeyboard(void)
+{
+    qt_delete(popup);
+
+    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    gContext->GetMainWindow()->detach(popup);
+    popup->exec();
+
+    qt_delete(popup);
 }
 
 void MythLineEdit::keyPressEvent(QKeyEvent *e)
@@ -383,23 +450,16 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
             else if (action == "DOWN")
                 focusNextPrevChild(true);
             else if (action == "SELECT" && 
-                    (e->text().isNull() ||
+                    (e->text().isEmpty() ||
                     (e->key() == Qt::Key_Enter) ||
                     (e->key() == Qt::Key_Return)))
             {
-                if ((allowVirtualKeyboard) && rw &&
-                    (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
-                {
-                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
-                    gContext->GetMainWindow()->detach(popup);
-                    popup->exec();
-                    delete popup;
-                    popup = NULL;
-                }
+                if (useVirtualKeyboard && allowVirtualKeyboard && rw)
+                    popupVirtualKeyboard();
                 else
                     handled = false;
             }
-            else if (action == "SELECT" && e->text().isNull() )
+            else if (action == "SELECT" && e->text().isEmpty() )
                 e->ignore();
             else
                 handled = false;
@@ -412,15 +472,20 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
             QLineEdit::keyPressEvent(e);
 }
 
-void MythLineEdit::setText(const QString& text) 
+void MythLineEdit::setText(const QString &text)
 {
     // Don't mess with the cursor position; it causes
     // counter-intuitive behaviour due to interactions with the
     // communication with the settings stuff
 
     int pos = cursorPosition();
-    QLineEdit::setText(text);
+    QLineEdit::setText(QDeepCopy<QString>(text));
     setCursorPosition(pos);
+}
+
+QString MythLineEdit::text(void)
+{
+    return QDeepCopy<QString>(QLineEdit::text());
 }
 
 void MythLineEdit::focusInEvent(QFocusEvent *e)
@@ -534,6 +599,7 @@ void MythRemoteLineEdit::Init()
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
     
     popup = NULL;
+    useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
     popupPosition = VK_POSBELOWEDIT;
 }
 
@@ -731,8 +797,13 @@ void MythRemoteLineEdit::setText(const QString& text)
     //  of MythLineEdit, and I'm sure he had
     //  a reason ...
     getCursorPosition(&para, &pos);
-    QTextEdit::setText(text);
+    QTextEdit::setText(QDeepCopy<QString>(text));
     setCursorPosition(para, pos);
+}
+
+QString MythRemoteLineEdit::text(void)
+{
+    return QDeepCopy<QString>(QTextEdit::text());
 }
 
 void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
@@ -766,19 +837,12 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             }
             else if ((action == "SELECT") &&
                      (!active_cycle) &&
-                     ((e->text().isNull()) ||
+                     ((e->text().isEmpty()) ||
                       (e->key() == Qt::Key_Enter) || 
                       (e->key() == Qt::Key_Return)))
             {
-                if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
-                {
-                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
-                    gContext->GetMainWindow()->detach(popup);
-                    popup->exec();
-                    delete popup;
-                    popup = NULL;
-                }
- 
+                if (useVirtualKeyboard)
+                    popupVirtualKeyboard();
             }
             else
                 handled = false;
@@ -976,16 +1040,38 @@ void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
     QTextEdit::focusOutEvent(e);
 }
 
-
 MythRemoteLineEdit::~MythRemoteLineEdit()
+{
+    Teardown();
+}
+
+void MythRemoteLineEdit::deleteLater(void)
+{
+    Teardown();
+    QTextEdit::deleteLater();
+}
+
+void MythRemoteLineEdit::Teardown(void)
 {
     if (cycle_timer)
     {
-        delete cycle_timer;
+        cycle_timer->disconnect();
+        cycle_timer->deleteLater();
+        cycle_timer = NULL;
     }
 
-    if (popup)
-        delete popup;
+    qt_delete(popup);
+}
+
+void MythRemoteLineEdit::popupVirtualKeyboard(void)
+{
+    qt_delete(popup);
+
+    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    gContext->GetMainWindow()->detach(popup);
+    popup->exec();
+
+    qt_delete(popup);
 }
 
 void MythRemoteLineEdit::insert(QString text)

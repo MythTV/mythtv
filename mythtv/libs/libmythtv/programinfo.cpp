@@ -4168,7 +4168,7 @@ void ProgramInfo::ShowRecordingDialog(void)
     message += RecStatusDesc();
 
     DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
+    int button = 0, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
         clearov = -1, edend = -1, ednorm = -1, edcust = -1;
 
     dlg->AddButton(QObject::tr("OK"));
@@ -4248,7 +4248,8 @@ void ProgramInfo::ShowRecordingDialog(void)
         }
     }
 
-    int ret = dlg->exec();
+    DialogCode code = dlg->exec();
+    int ret = MythDialog::CalcItemIndex(code);
     dlg->deleteLater();
     dlg = NULL;
 
@@ -4338,7 +4339,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
     }
 
     DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, react = -1, addov = -1, clearov = -1,
+    int button = 0, ok = -1, react = -1, addov = -1, clearov = -1,
         ednorm = -1, edcust = -1, forget = -1, addov1 = -1, forget1 = -1;
 
     dlg->AddButton(QObject::tr("OK"));
@@ -4424,7 +4425,8 @@ void ProgramInfo::ShowNotRecordingDialog(void)
         }
     }
 
-    int ret = dlg->exec();
+    DialogCode code = dlg->exec();
+    int ret = MythDialog::CalcItemIndex(code);
     dlg->deleteLater();
     dlg = NULL;
 

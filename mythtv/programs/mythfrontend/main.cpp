@@ -359,10 +359,10 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings appearance") 
     {
         AppearanceSettings *settings = new AppearanceSettings();
-        int res = settings->exec();
+        DialogCode res = settings->exec();
         delete settings;
 
-        if (res)
+        if (kDialogCodeRejected != res)
         {
             qApp->processEvents();
             GetMythMainWindow()->JumpTo("Reload Theme");
@@ -458,14 +458,7 @@ int handleExit(void)
     DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), title);
 
     dlg->AddButton(QObject::tr("No"));
-    int result;
-
-    enum {
-        kDialogCodeButton0 = 1,
-        kDialogCodeButton1 = 2,
-        kDialogCodeButton2 = 3,
-        kDialogCodeButton3 = 4,
-    };
+    DialogCode result = kDialogCodeRejected;
 
     int ret = NO_EXIT;
     switch (exitMenuStyle)
@@ -719,18 +712,19 @@ int internal_play_media(const QString &mrl, const QString &plot,
                     long long pos = (long long)(atoi((*++it).ascii()) & 0xffffffffLL);
                     if (pos > 0)
                     {
-                        QString msg = QString("DVD contains a bookmark");
-                        QString button1msg = QString("Play from bookmark");
-                        QString button2msg = QString("Play from beginning");
+                        QString msg = QObject::tr("DVD contains a bookmark");
+                        QString btn0msg = QObject::tr("Play from bookmark");
+                        QString btn1msg = QObject::tr("Play from beginning");
         
-                        int ret = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                                            "", msg,
-                                                            button1msg,
-                                                            button2msg,
-                                                            1);
-                        if (ret == 1)
+                        DialogCode ret = MythPopupBox::Show2ButtonPopup(
+                            gContext->GetMainWindow(),
+                            "", msg,
+                            btn0msg,
+                            btn1msg,
+                            kDialogCodeButton0);
+                        if (kDialogCodeButton1 == ret)
                             pginfo->setIgnoreBookmark(true);
-                        else if (ret == -1)
+                        else if (kDialogCodeRejected == ret)
                         {
                             delete tmprbuf;
                             delete pginfo;

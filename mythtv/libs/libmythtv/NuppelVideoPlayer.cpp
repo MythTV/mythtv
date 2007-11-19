@@ -3149,7 +3149,7 @@ void NuppelVideoPlayer::StartPlaying(void)
          !gContext->GetNumSetting("PVR350InternalAudioOnly")))
     {
         QString errMsg = ReinitAudio();
-        int ret = 1;
+        DialogCode ret = kDialogCodeButton0;
         if ((errMsg != QString::null) && !using_null_videoout &&
             gContext->GetNumSetting("AudioNag", 1))
         {
@@ -3173,11 +3173,11 @@ void NuppelVideoPlayer::StartPlaying(void)
             qApp->unlock();
         }
             
-        if (ret == 2)
+        if (kDialogCodeButton1 == ret)
             gContext->SaveSetting("AudioNag", 0);
-        if (ret == 3)
+        if (kDialogCodeButton2 == ret)
             gContext->SetSetting("AudioNag", 0);
-        else if (ret == 4)
+        else if ((kDialogCodeButton3 == ret) || (kDialogCodeRejected == ret))
             return;
     }
 

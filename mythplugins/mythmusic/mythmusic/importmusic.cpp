@@ -356,9 +356,9 @@ void ImportMusicDialog::locationPressed()
 {
     DirectoryFinder finder(m_location_edit->getText(),
                            gContext->GetMainWindow(), "directory finder");
-    bool res = finder.exec();
+    DialogCode res = finder.exec();
 
-    if (res)
+    if (kDialogCodeRejected != res)
     {
         m_location_edit->setText(finder.getSelected());
         editLostFocus();
@@ -671,7 +671,7 @@ void ImportMusicDialog::showEditMetadataDialog()
                                   "edit_metadata", "music-", "edit metadata");
     editDialog.setSaveMetadataOnly();
 
-    if (editDialog.exec())
+    if (kDialogCodeRejected != editDialog.exec())
     {
         m_tracks->at(m_currentTrack)->metadataHasChanged = true;
         m_tracks->at(m_currentTrack)->isNewTune = Ripper::isNewTune(
@@ -1007,7 +1007,7 @@ void ImportCoverArtDialog::wireUpTheme()
     if (m_exit_button)
     {
         m_exit_button->setText(tr("Exit"));
-        connect(m_exit_button, SIGNAL(pushed()), this, SLOT(exitPressed()));
+        connect(m_exit_button, SIGNAL(pushed()), this, SLOT(reject()));
     }
 
     m_prev_button = getUIPushButtonType("prev_button");
@@ -1040,11 +1040,6 @@ void ImportCoverArtDialog::selectorChanged(int item)
 {
     (void) item;
     updateStatus();
-}
-
-void ImportCoverArtDialog::exitPressed()
-{
-    done(0);
 }
 
 void ImportCoverArtDialog::copyPressed()

@@ -3060,41 +3060,48 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         }
 
         if (returnValue == MYTH_SCHEMA_ERROR)
-            MythPopupBox::showExitPopup(d->mainWindow,
-                                        "Database Upgrade Error", message);
+        {
+            MythPopupBox::showOkPopup(
+                d->mainWindow, "Database Upgrade Error",
+                message, QObject::tr("Exit"));
+        }
         else
         {
             QStringList buttonNames;
-            int         selected;
 
             buttonNames += QObject::tr("Exit");
             buttonNames += QObject::tr("Upgrade");
             if (expertMode)
                 buttonNames += QObject::tr("Use current schema");
 
-            selected = MythPopupBox::showButtonPopup(d->mainWindow,
-                                                     "Database Upgrade",
-                                                     message, buttonNames, -1);
+            DialogCode selected = MythPopupBox::ShowButtonPopup(
+                d->mainWindow, "Database Upgrade", message,
+                buttonNames, kDialogCodeButton0);
+
             // The annoying extra confirmation:
-            if (selected == 1)
+            if (kDialogCodeButton1 == selected)
             {
                 message = tr("This cannot be un-done, so having a"
                              " database backup would be a good idea.");
                 if (connections)
                     message += "\n\n" + warnOtherCl;
 
-                selected = MythPopupBox::showButtonPopup(d->mainWindow,
-                                                         "Database Upgrade",
-                                                         message,
-                                                         buttonNames, -1);
+                selected = MythPopupBox::ShowButtonPopup(
+                    d->mainWindow, "Database Upgrade", message,
+                    buttonNames, kDialogCodeButton0);
             }
 
             switch (selected)
             {
-                case 0:  returnValue = MYTH_SCHEMA_EXIT;         break;
-                case 1:  returnValue = MYTH_SCHEMA_UPGRADE;      break;
-                case 2:  returnValue = MYTH_SCHEMA_USE_EXISTING; break;
-                default: returnValue = MYTH_SCHEMA_ERROR;
+                case kDialogCodeRejected:
+                case kDialogCodeButton0:
+                    returnValue = MYTH_SCHEMA_EXIT;         break;
+                case kDialogCodeButton1:
+                    returnValue = MYTH_SCHEMA_UPGRADE;      break;
+                case kDialogCodeButton2:
+                    returnValue = MYTH_SCHEMA_USE_EXISTING; break;
+                default:
+                    returnValue = MYTH_SCHEMA_ERROR;
             }
         }
 

@@ -74,7 +74,7 @@ class TransportListEditor : public QObject, public ConfigurationDialog
   public:
     TransportListEditor(uint initial_sourceid);
 
-    virtual int exec(void);
+    virtual DialogCode exec(void);
 
   public slots:
     void Menu(void);

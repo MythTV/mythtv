@@ -25,8 +25,6 @@ class VideoDialog : public MythDialog
                 const QString &lwinName, const QString &lname,
                 VideoList *video_list);
 
-    virtual ~VideoDialog();
-
     virtual void playVideo(Metadata *someItem);
 
     GenericTree *getVideoTreeRoot(void);
@@ -48,6 +46,7 @@ class VideoDialog : public MythDialog
     virtual void slotWatchVideo();
 
   protected:
+    virtual ~VideoDialog(); // use deleteLater() instead for thread safety
     virtual void updateBackground(void);
     virtual void parseContainer(QDomElement&) = 0;
     virtual void loadWindow(QDomElement &element);

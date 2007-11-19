@@ -296,7 +296,7 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
             {
                 if (m_imp->m_use_arrow_accel)
                 {
-                    done(1);
+                    accept();
                 }
                 else
                     handled = false;
@@ -521,7 +521,8 @@ void VideoTree::slotViewPlot()
                                               MythPopupBox::Small,true);
         plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
 
-        QButton * okButton = plotbox->addButton(tr("Ok"));
+        QButton *okButton = plotbox->addButton(
+            QObject::tr("OK"), plotbox, SLOT(accept()));
         okButton->setFocus();
 
         plotbox->ExecPopup();

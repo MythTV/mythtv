@@ -679,7 +679,7 @@ void ExportNativeWizard::handleFind(void)
     FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
                           "file_selector", "mytharchive-", "file selector");
     qApp->unlock();
-    bool res = selector.exec();
+    bool res = (kDialogCodeRejected != selector.exec());
 
     if (res)
     {

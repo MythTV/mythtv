@@ -244,9 +244,9 @@ void ProfileGroupEditor::load(void)
     listbox->addSelection(QObject::tr("(Create new profile group)"), "0");
 }
 
-int ProfileGroupEditor::exec() 
+DialogCode ProfileGroupEditor::exec(void)
 {
-    int ret = QDialog::Accepted;
+    DialogCode ret = kDialogCodeAccepted;
     redraw = true;
 
     while ((QDialog::Accepted == ret) || redraw)
@@ -278,7 +278,7 @@ int ProfileGroupEditor::exec()
             open(listbox->getValue().toInt());
     }
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void ProfileGroupEditor::callDelete(void)
@@ -296,12 +296,13 @@ void ProfileGroupEditor::callDelete(void)
         QString message = QObject::tr("Delete profile group:") + 
                           QString("\n'%1'?").arg(ProfileGroup::getName(id));
 
-        int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                                   "", message, 
-                                     QObject::tr("Yes, delete group"),
-                                     QObject::tr("No, Don't delete group"), 2);
+        DialogCode value = MythPopupBox::Show2ButtonPopup(
+            gContext->GetMainWindow(),
+            "", message, 
+            QObject::tr("Yes, delete group"),
+            QObject::tr("No, Don't delete group"), kDialogCodeButton1);
 
-        if (value == 0)
+        if (kDialogCodeButton0 == value)
         {
             querystr = QString("DELETE codecparams FROM codecparams, "
                             "recordingprofiles WHERE " 

@@ -112,20 +112,26 @@ void VideoScannerImp::promptForRemoval(unsigned int id, const QString &filename)
     buttonText += QObject::tr("Yes");
     buttonText += QObject::tr("Yes to all");
 
-    int result = MythPopupBox::showButtonPopup(gContext->GetMainWindow(),
-            QObject::tr("File Missing"),
-            QString(QObject::tr("%1 appears to be missing.\nRemove it "
-                                "from the database?")).arg(filename),
-            buttonText, 1);
+    DialogCode result = MythPopupBox::ShowButtonPopup(
+        gContext->GetMainWindow(),
+        QObject::tr("File Missing"),
+        QObject::tr("%1 appears to be missing.\n"
+                    "Remove it from the database?").arg(filename),
+        buttonText, kDialogCodeButton0);
+
     switch (result)
     {
-        case 1:
+        case kDialogCodeRejected:
+        case kDialogCodeButton0:
+        default:
+            break;
+        case kDialogCodeButton1:
             m_KeepAll = true;
             break;
-        case 2:
+        case kDialogCodeButton2:
             m_dbmetadata->purgeByID(id);
             break;
-        case 3:
+        case kDialogCodeButton3:
             m_RemoveAll = true;
             m_dbmetadata->purgeByID(id);
             break;

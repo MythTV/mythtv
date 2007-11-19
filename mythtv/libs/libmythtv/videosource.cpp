@@ -2011,12 +2011,12 @@ CaptureCardEditor::CaptureCardEditor() : listbox(new ListBoxSetting(this))
     addChild(listbox);
 }
 
-int CaptureCardEditor::exec(void)
+DialogCode CaptureCardEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         edit();
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void CaptureCardEditor::load(void)
@@ -2048,17 +2048,17 @@ void CaptureCardEditor::menu(void)
     } 
     else 
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
             "",
             tr("Capture Card Menu"),
             tr("Edit.."),
             tr("Delete.."),
-            1);
+            kDialogCodeButton0);
 
-        if (val == 0)
+        if (kDialogCodeButton0 == val)
             edit();
-        else if (val == 1)
+        else if (kDialogCodeButton1 == val)
             del();
     }
 }
@@ -2068,14 +2068,14 @@ void CaptureCardEditor::edit(void)
     const int cardid = listbox->getValue().toInt();
     if (-1 == cardid)
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(), "",
             tr("Are you sure you want to delete "
                "ALL capture cards on %1?").arg(gContext->GetHostName()),
             tr("Yes, delete capture cards"),
-            tr("No, don't"), 2);
+            tr("No, don't"), kDialogCodeButton1);
 
-        if (0 == val)
+        if (kDialogCodeButton0 == val)
         {
             MSqlQuery cards(MSqlQuery::InitCon());
 
@@ -2104,14 +2104,14 @@ void CaptureCardEditor::edit(void)
     }
     else if (-2 == cardid)
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(), "",
             tr("Are you sure you want to delete "
                "ALL capture cards?"),
             tr("Yes, delete capture cards"),
-            tr("No, don't"), 2);
+            tr("No, don't"), kDialogCodeButton1);
 
-        if (0 == val)
+        if (kDialogCodeButton0 == val)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.exec("TRUNCATE TABLE capturecard;");
@@ -2130,13 +2130,13 @@ void CaptureCardEditor::edit(void)
 
 void CaptureCardEditor::del(void)
 {
-    int val = MythPopupBox::show2ButtonPopup(
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), "",
         tr("Are you sure you want to delete this capture card?"),
         tr("Yes, delete capture card"),
-        tr("No, don't"), 2);
+        tr("No, don't"), kDialogCodeButton1);
 
-    if (val == 0)
+    if (kDialogCodeButton0 == val)
     {
         CardUtil::DeleteCard(listbox->getValue().toUInt());
         load();
@@ -2159,11 +2159,12 @@ MythDialog* VideoSourceEditor::dialogWidget(MythMainWindow* parent,
     return dialog;
 }
 
-int VideoSourceEditor::exec() {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+DialogCode VideoSourceEditor::exec(void)
+{
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         edit();
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void VideoSourceEditor::load(void)
@@ -2183,17 +2184,17 @@ void VideoSourceEditor::menu(void)
     } 
     else 
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
             "",
             tr("Video Source Menu"),
             tr("Edit.."),
             tr("Delete.."),
-            1);
+            kDialogCodeButton0);
 
-        if (val == 0)
+        if (kDialogCodeButton0 == val)
             edit();
-        else if (val == 1)
+        else if (kDialogCodeButton1 == val)
             del();
     }
 }
@@ -2203,14 +2204,14 @@ void VideoSourceEditor::edit(void)
     const int sourceid = listbox->getValue().toInt();
     if (-1 == sourceid)
     {
-        int val = MythPopupBox::show2ButtonPopup(
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(), "",
             tr("Are you sure you want to delete "
                "ALL video sources?"),
             tr("Yes, delete video sources"),
-            tr("No, don't"), 2);
+            tr("No, don't"), kDialogCodeButton1);
 
-        if (0 == val)
+        if (kDialogCodeButton0 == val)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.exec("TRUNCATE TABLE channel;");
@@ -2235,15 +2236,15 @@ void VideoSourceEditor::edit(void)
 
 void VideoSourceEditor::del() 
 {
-    int val = MythPopupBox::show2ButtonPopup(
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), "",
         tr("Are you sure you want to delete "
            "this video source?"),
         tr("Yes, delete video source"),
         tr("No, don't"),
-        2);
+        kDialogCodeButton1);
 
-    if (val == 0)
+    if (kDialogCodeButton0 == val)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2287,12 +2288,12 @@ CardInputEditor::CardInputEditor() : listbox(new ListBoxSetting(this))
     addChild(listbox);
 }
 
-int CardInputEditor::exec(void)
+DialogCode CardInputEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         cardinputs[listbox->getValue().toInt()]->exec();
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void CardInputEditor::load() 

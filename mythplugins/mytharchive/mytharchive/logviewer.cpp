@@ -100,7 +100,7 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
 
     hbox->addWidget(m_exitButton);
 
-    connect(m_exitButton, SIGNAL(clicked()), this, SLOT(exitClicked()));
+    connect(m_exitButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(m_updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
     connect(m_autoupdateCheck, SIGNAL(toggled(bool)), this, SLOT(toggleAutoUpdate(bool)));
@@ -148,11 +148,6 @@ void LogViewer::updateTimeChanged(int value)
     m_updateTime = value;
     m_updateTimer->stop();
     m_updateTimer->changeInterval(value * 1000);
-}
-
-void LogViewer::exitClicked(void)
-{
-    done(-1);
 }
 
 void LogViewer::cancelClicked(void)

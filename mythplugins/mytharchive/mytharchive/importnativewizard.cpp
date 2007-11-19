@@ -259,7 +259,7 @@ void ImportNativeWizard::wireUpTheme()
          || !m_prevButton || !m_cancelButton || !m_homeButton)
     {
         cout << "ImportNativeWizard: Your theme is missing some UI elements! Bailing out." << endl;
-        QTimer::singleShot(100, this, SLOT(done(int)));
+        QTimer::singleShot(100, this, SLOT(reject()));
     }
 
     // load pixmaps
@@ -718,13 +718,14 @@ bool ImportNativeWizard::showList(const QString &caption, QString &value)
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(m_searchList);
-    if (searchDialog->ExecPopupAtXY(-1, 8) == 0)
+    DialogCode rescode = searchDialog->ExecPopupAtXY(-1, 8);
+    if (kDialogCodeRejected != rescode)
     {
         value = searchDialog->getResult();
         res = true;
     }
 
-    delete searchDialog;
+    searchDialog->deleteLater();
     setActiveWindow();
 
     return res;

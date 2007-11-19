@@ -1153,7 +1153,7 @@ class MPUBLIC ConfigurationPopupDialog : public VerticalConfigurationGroup
     virtual MythDialog *dialogWidget(
         MythMainWindow *parent, const char* widgetName);
 
-    int exec(bool saveOnAccept = true);
+    virtual DialogCode exec(bool saveOnAccept = true);
 
     virtual void setLabel(QString str);
 
@@ -1206,7 +1206,7 @@ class MPUBLIC ConfigurationDialog : public Storage
                                      const char     *widgetName);
 
     // Show a dialogWidget, and save if accepted
-    virtual int exec(bool saveOnExec = true, bool doLoad = true);
+    virtual DialogCode exec(bool saveOnExec = true, bool doLoad = true);
 
     virtual void load(void) { cfgGrp->load(); }
     virtual void save(void) { cfgGrp->save(); }

@@ -145,15 +145,17 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
                         recTitles.append(buttonTitle);
                         it++;
                     }
-                    int ret = MythPopupBox::showButtonPopup(
-                                    gContext->GetMainWindow(),
-                                    "",
-                                    tr("All Tuners are Busy.\n"
-                                       "Select a Current Recording"),
-                                    recTitles, 1);
-                    if ((0 < ret) && (ret <= (int)reclist->size()))
+                    DialogCode ret = MythPopupBox::ShowButtonPopup(
+                        gContext->GetMainWindow(),
+                        "",
+                        tr("All Tuners are Busy.\n"
+                           "Select a Current Recording"),
+                        recTitles, kDialogCodeButton1);
+
+                    int idx = MythDialog::CalcItemIndex(ret) - 1;
+                    if ((0 <= idx) && (idx < (int)reclist->size()))
                     {
-                        p = reclist->at(ret - 1);
+                        p = reclist->at(idx);
                         curProgram = new ProgramInfo(*p);
                     }
                     else
@@ -7766,7 +7768,9 @@ bool TV::PromptRecGroupPassword(void)
                                                 recGroupPassword,
                                                 gContext->GetMainWindow());
         pwd->exec();
-        delete pwd;
+        pwd->deleteLater();
+        pwd = NULL;
+
         qApp->unlock();
         if (!ok)
         {

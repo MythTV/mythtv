@@ -360,14 +360,20 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
                 GameHandler::Launchgame(item->getRomInfo(),NULL);
             else if (item->getRomInfo()->RomCount() > 1)
             {
-                QStringList players = QStringList::split(",", item->getRomInfo()->AllSystems());
-                players += "Cancel";
+                QString all_systems = item->getRomInfo()->AllSystems();
+                QStringList players = QStringList::split(",", all_systems);
+                players += QObject::tr("Cancel");
 
-                int val = MythPopupBox::showButtonPopup(gContext->GetMainWindow(), "", tr("Players Available. \n\n Please pick one."), players,0);
+                DialogCode val = MythPopupBox::ShowButtonPopup(
+                    gContext->GetMainWindow(),
+                    "", tr("Players Available. \n\n Please pick one."),
+                    players, kDialogCodeButton0);
 
-                if (val != -1) {
-                    QString systemname = getElement(players,val);
-                    if ((systemname) && (systemname != "Cancel"))
+                int idx = MythDialog::CalcItemIndex(val);
+                if ((0 <= idx) && (idx < ((int)players.size() - 1)))
+                {
+                    QString systemname = getElement(players, idx);
+                    if (!systemname.isEmpty())
                         GameHandler::Launchgame(item->getRomInfo(),systemname);
                 }
             } 

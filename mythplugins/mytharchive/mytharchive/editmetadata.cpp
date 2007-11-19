@@ -146,7 +146,7 @@ void EditMetadataDialog::wireUpTheme()
     if (cancel_button)
     {
         cancel_button->setText(tr("Cancel"));
-        connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelPressed()));
+        connect(cancel_button, SIGNAL(pushed()), this, SLOT(reject()));
     }
 
     buildFocusList();
@@ -182,12 +182,7 @@ void EditMetadataDialog::savePressed()
 {
     *sourceMetadata = workMetadata;
     sourceMetadata->editedDetails = true;
-    done(1);
-}
-
-void EditMetadataDialog::cancelPressed()
-{
-    done(Rejected);
+    done(kDialogCodeAccepted);
 }
 
 EditMetadataDialog::~EditMetadataDialog()

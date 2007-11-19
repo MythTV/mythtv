@@ -71,9 +71,46 @@ namespace
     };
 
     template <typename T>
+    class q_screen_inst
+    {
+      public:
+        q_screen_inst(T *inst, const QString &loc_name) : m_inst(inst),
+            m_location_name(loc_name)
+        {
+        }
+
+        int run()
+        {
+            gContext->addCurrentLocation(m_location_name);
+            qApp->unlock();
+            m_inst->exec();
+            qApp->lock();
+            gContext->removeCurrentLocation();
+            return m_inst->videoExitType();
+        }
+
+        ~q_screen_inst()
+        {
+            m_inst->deleteLater();
+            m_inst = NULL;
+        }
+
+      private:
+        T *m_inst;
+        const QString &m_location_name;
+    };
+
+    template <typename T>
     int exec_screen(T *inst, const QString &loc_name)
     {
         screen_inst<T> si(inst, loc_name);
+        return si.run();
+    }
+
+    template <typename T>
+    int q_exec_screen(T *inst, const QString &loc_name)
+    {
+        q_screen_inst<T> si(inst, loc_name);
         return si.run();
     }
 
@@ -87,10 +124,10 @@ namespace
                 VideoScanner scanner;
                 scanner.doScan(GetVideoDirs());
 
-                return exec_screen(new VideoManager(gContext->GetMainWindow(),
-                                                    "video manager",
-                                                    video_list),
-                                   "videomanager");
+                return q_exec_screen(
+                    new VideoManager(gContext->GetMainWindow(),
+                                     "video manager", video_list),
+                    "videomanager");
             }
             return 0;
         }
@@ -112,9 +149,9 @@ namespace
 
         static int runVideoGallery(VideoList *video_list)
         {
-            return exec_screen(new VideoGallery(gContext->GetMainWindow(),
-                                                "video gallery", video_list),
-                               "videogallery");
+            return q_exec_screen(new VideoGallery(gContext->GetMainWindow(),
+                                                  "video gallery", video_list),
+                                 "videogallery");
         }
 
       public:

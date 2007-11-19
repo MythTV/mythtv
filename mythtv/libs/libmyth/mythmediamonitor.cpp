@@ -144,25 +144,24 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
         return drives.front();
     }
 
-    MythPopupBox *popup = new MythPopupBox(
-        gContext->GetMainWindow(), "select drive");
-
-    popup->addLabel(label);
+    QStringList buttonmsgs;
     for (it = drives.begin(); it != drives.end(); ++it)
-        popup->addButton(DevName(*it));
+        buttonmsgs += DevName(*it);
+    buttonmsgs += tr("Cancel");
+    const DialogCode cancelbtn = (DialogCode)
+        (((int)kDialogCodeButton0) + buttonmsgs.size() - 1);
 
-    popup->addButton(tr("Cancel"))->setFocus();
-
-    int ret = popup->ExecPopup();
-    popup->hide();
-    popup->deleteLater();
+    DialogCode ret = MythPopupBox::ShowButtonPopup(
+        gContext->GetMainWindow(), "select drive", label,
+        buttonmsgs, cancelbtn);
 
     // If the user cancelled, return a special value
-    if (ret < 0)
+    if ((kDialogCodeRejected == ret) || (cancelbtn == ret))
         return (MythMediaDevice *)-1;
 
-    if ((uint)ret < drives.count())
-        return drives[ret];
+    uint idx = MythDialog::CalcItemIndex(ret);
+    if (idx < drives.count())
+        return drives[idx];
 
     return NULL;
 }

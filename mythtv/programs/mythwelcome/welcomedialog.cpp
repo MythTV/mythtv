@@ -84,7 +84,7 @@ void WelcomeDialog::startFrontendClick(void)
     QTimer::singleShot(500, this, SLOT(startFrontend()));
 }
 
-int WelcomeDialog::exec()
+DialogCode WelcomeDialog::exec(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup 
@@ -203,7 +203,7 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "INFO")
         {
             MythWelcomeSettings settings;
-            if (settings.exec() == 1)
+            if (kDialogCodeAccepted == settings.exec())
             {
                 RemoteSendMessage("CLEAR_SETTINGS_CACHE");
                 updateStatus();
@@ -213,7 +213,7 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "SHOWSETTINGS")
         {
             MythShutdownSettings settings;
-            if (settings.exec() == 1)
+            if (kDialogCodeAccepted == settings.exec())
                 RemoteSendMessage("CLEAR_SETTINGS_CACHE");
         }
         else if (action == "0")
@@ -296,7 +296,7 @@ void WelcomeDialog::wireUpTheme()
 
 void WelcomeDialog::closeDialog()
 {
-    done(1);
+    done(kDialogCodeAccepted);
 }
 
 WelcomeDialog::~WelcomeDialog()
@@ -703,7 +703,7 @@ void WelcomeDialog::showPopup(void)
                          SLOT(shutdownNow()));
     popup->addButton(tr("Exit"), this,
                          SLOT(closeDialog()));
-    popup->addButton(tr("Cancel"), this, SLOT(cancelPopup()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
     popup->ShowPopup(this, SLOT(donePopup(int)));
 

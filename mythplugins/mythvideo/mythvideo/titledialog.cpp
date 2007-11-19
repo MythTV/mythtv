@@ -440,7 +440,7 @@ void TitleDialog::ripTitles()
             os << job_string << "\n" ;
         }
     }
-    done(0);
+    reject();
 }
 
 void TitleDialog::takeFocusAwayFromEditor(bool up_or_down)
@@ -534,9 +534,10 @@ void TitleDialog::wireUpTheme()
 
 TitleDialog::~TitleDialog()
 {
-    if(name_editor)
+    if (name_editor)
     {
-        delete name_editor;
+        name_editor->deleteLater();
+        name_editor = NULL;
     }
 }
 

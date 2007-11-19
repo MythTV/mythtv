@@ -1038,8 +1038,8 @@ bool MythNews::showEditDialog(bool edit)
 
     popup->addLayout(vbox, 0);
 
-    popup->addButton(tr("OK"));
-    popup->addButton(tr("Cancel"));
+    popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
     QString siteName = "";
     if (edit)
@@ -1058,9 +1058,9 @@ bool MythNews::showEditDialog(bool edit)
         }
     }
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
 
-    if (res == 0)
+    if (kDialogCodeAccepted == res)
     {
         if (edit && siteName != "")
             removeFromDB(siteName);
@@ -1070,7 +1070,7 @@ bool MythNews::showEditDialog(bool edit)
 
     popup->deleteLater();
 
-    return (res == 0);
+    return (kDialogCodeAccepted == res);
 }
 
 void MythNews::showMenu()

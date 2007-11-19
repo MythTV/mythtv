@@ -206,7 +206,7 @@ void FileSelector::wireUpTheme()
          || !m_cancelButton || !m_homeButton)
     {
         cout << "FileSelector: Your theme is missing some UI elements! Bailing out." << endl;
-        QTimer::singleShot(100, this, SLOT(done(int)));
+        QTimer::singleShot(100, this, SLOT(reject()));
     }
 
     // load pixmaps

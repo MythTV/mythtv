@@ -1335,9 +1335,9 @@ void IconView::HandleImport(void)
 
     importDlg->AddButton(tr("No"));
     importDlg->AddButton(tr("Yes"));
-    int code = importDlg->exec();
+    DialogCode code = importDlg->exec();
     importDlg->deleteLater();
-    if (2 != code)
+    if (kDialogCodeButton1 != code)
         return;
 
     // Makes import directory samba/windows friendly (no colon)

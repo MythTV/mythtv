@@ -2411,7 +2411,7 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
         MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok, password,
                                                      gContext->GetMainWindow());
         pwd->exec();
-        delete pwd;
+        pwd->deleteLater();
 
         if (ok)
         {

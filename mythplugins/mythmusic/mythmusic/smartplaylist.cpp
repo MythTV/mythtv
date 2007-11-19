@@ -624,14 +624,15 @@ void SmartPLCriteriaRow::editDate(MythComboBox *combo)
     
     SmartPLDateDialog *dateDialog = new SmartPLDateDialog(gContext->GetMainWindow(), "");
     dateDialog->setDate(combo->currentText());
-    if (dateDialog->ExecPopup() == 0)
+    if (kDialogCodeAccepted == dateDialog->ExecPopup())
     {
         combo->insertItem(dateDialog->getDate());
         combo->setCurrentText(dateDialog->getDate());
         res = true;
     }
-    
-    delete dateDialog;
+
+    dateDialog->hide();
+    dateDialog->deleteLater();
 }
           
 bool SmartPLCriteriaRow::showList(QString caption, QString &value)
@@ -642,13 +643,13 @@ bool SmartPLCriteriaRow::showList(QString caption, QString &value)
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(searchList);
-    if (searchDialog->ExecPopup() == 0)
+    if (kDialogCodeAccepted == searchDialog->ExecPopup())
     {
         value = searchDialog->getResult();
         res = true;
     }
 
-    delete searchDialog;
+    searchDialog->deleteLater();
 
     return res;
 }
@@ -1089,7 +1090,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     connect(titleEdit, SIGNAL(textChanged(void)), this, SLOT(titleChanged(void)));
     connect(categoryButton, SIGNAL(clicked()), this, SLOT(categoryClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(showResultsButton, SIGNAL(clicked()), this, SLOT(showResultsClicked()));
     connect(orderByButton, SIGNAL(clicked()), this, SLOT(orderByClicked()));
     
@@ -1211,7 +1212,7 @@ void SmartPlaylistEditor::saveClicked(void)
         row->saveToDatabase(ID);
     }
     
-    done(0);        
+    reject();        
 }
 
 void SmartPlaylistEditor::newSmartPlaylist(QString category)
@@ -1306,11 +1307,6 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     {
         cout << "Warning got no smartplaylistitems for ID:" << ID << endl;
     }
-}
-
-void SmartPlaylistEditor::cancelClicked(void)
-{
-    done(-1);
 }
 
 void SmartPlaylistEditor::categoryClicked(void)
@@ -1514,7 +1510,7 @@ void SmartPlaylistEditor::orderByClicked(void)
     
     orderByDialog->setFieldList(orderByCombo->currentText());
     
-    if (orderByDialog->ExecPopup() == 0)
+    if (kDialogCodeAccepted == orderByDialog->ExecPopup())
         orderByCombo->setCurrentText(orderByDialog->getFieldList());
     
     delete orderByDialog;
@@ -1874,7 +1870,7 @@ void SmartPlaylistDialog::keyPressEvent(QKeyEvent *e)
             if (action == "ESCAPE")
             {
                 handled = true;
-                done(-1);        
+                reject();
             }
             else if (action == "LEFT")
             {
@@ -2176,7 +2172,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
     connect(moveDownButton, SIGNAL(clicked()), this, SLOT(moveDownPressed()));
     connect(ascendingButton, SIGNAL(clicked()), this, SLOT(ascendingPressed()));
     connect(descendingButton, SIGNAL(clicked()), this, SLOT(descendingPressed()));
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okPressed()));
+    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
     
     connect(listbox, SIGNAL(selectionChanged(QListBoxItem*)), this, 
             SLOT(listBoxSelectionChanged(QListBoxItem*)));
@@ -2243,7 +2239,7 @@ void SmartPLOrderByDialog::keyPressEvent(QKeyEvent *e)
             if (action == "ESCAPE")
             {
                 handled = true;
-                done(-1);        
+                reject();
             }
             else if (action == "LEFT")
             {
@@ -2298,7 +2294,7 @@ void SmartPLOrderByDialog::keyPressEvent(QKeyEvent *e)
             else if (action == "7")
             {
                 handled = true;
-                okPressed();
+                accept();
             }
         }
     }
@@ -2365,11 +2361,6 @@ void SmartPLOrderByDialog::moveDownPressed(void)
     listbox->changeItem(item2, currentItem);
     
     listbox->setSelected(listbox->selectedItem()->next(), true);
-}
-
-void SmartPLOrderByDialog::okPressed(void)
-{
-    done(0);
 }
 
 void SmartPLOrderByDialog::orderByChanged(void)
@@ -2551,8 +2542,8 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
 
     addLayout(vbox, 0);
     
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okPressed()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelPressed()));
+    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     connect(fixedRadio, SIGNAL(toggled(bool)), this, SLOT(fixedCheckToggled(bool)));
     connect(nowRadio, SIGNAL(toggled(bool)), this, SLOT(nowCheckToggled(bool)));
@@ -2661,7 +2652,7 @@ void SmartPLDateDialog::keyPressEvent(QKeyEvent *e)
             if (action == "ESCAPE")
             {
                 handled = true;
-                done(-1);        
+                reject();
             }
             else if (action == "LEFT")
             {
@@ -2687,16 +2678,6 @@ void SmartPLDateDialog::keyPressEvent(QKeyEvent *e)
     }
     if (!handled)
         MythPopupBox::keyPressEvent(e);
-}
-
-void SmartPLDateDialog::okPressed(void)
-{
-    done(0);
-}
-
-void SmartPLDateDialog::cancelPressed(void)
-{
-    done(-1);
 }
 
 void SmartPLDateDialog::fixedCheckToggled(bool on)

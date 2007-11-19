@@ -130,7 +130,7 @@ class DTVDeviceTreeWizard : public ConfigurationDialog
   public:
     DTVDeviceTreeWizard(DiSEqCDevTree &tree);
 
-    virtual int exec(void);
+    virtual DialogCode exec(void);
 };
 
 class DTVDeviceConfigGroup : public VerticalConfigurationGroup

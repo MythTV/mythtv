@@ -326,13 +326,12 @@ void ChannelEditor::deleteChannels(void)
          tr("Are you sure you would like to delete the channels on %1?")
          .arg(currentLabel));
 
-    int val = MythPopupBox::show2ButtonPopup(
-        gContext->GetMainWindow(), "",
-        chan_msg,
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(), "", chan_msg,
         tr("Yes, delete the channels"),
-        tr("No, don't"), 2);
+        tr("No, don't"), kDialogCodeButton1);
 
-    if (val != 0) 
+    if (kDialogCodeButton0 != val)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -389,10 +388,10 @@ MythDialog* ChannelEditor::dialogWidget(MythMainWindow* parent,
     return dialog;
 }
 
-int ChannelEditor::exec()
+DialogCode ChannelEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)  {}
-    return QDialog::Rejected;
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)  {}
+    return kDialogCodeRejected;
 }
 
 void ChannelEditor::edit()
@@ -414,13 +413,13 @@ void ChannelEditor::del()
 {
     id = list->getValue().toInt();
 
-    int val = MythPopupBox::show2ButtonPopup(
-        gContext->GetMainWindow(), "",
-        tr("Are you sure you would like to delete this channel?"),
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(),
+        "", tr("Are you sure you would like to delete this channel?"),
         tr("Yes, delete the channel"),
-        tr("No, don't"), 2);
+        tr("No, don't"), kDialogCodeButton1);
 
-    if (val == 0) 
+    if (kDialogCodeButton0 == val)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
@@ -439,15 +438,14 @@ void ChannelEditor::menu(int /*iSelected*/)
        edit();
     else
     {
-        int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                                 "",
-                                                 tr("Channel Menu"),
-                                                 tr("Edit.."),
-                                                 tr("Delete.."), 1);
+        DialogCode val = MythPopupBox::Show2ButtonPopup(
+            gContext->GetMainWindow(),
+            "", tr("Channel Menu"),
+            tr("Edit.."), tr("Delete.."), kDialogCodeButton0);
 
-        if (val == 0)
+        if (kDialogCodeButton0 == val)
             emit edit();
-        else if (val == 1)
+        else if (kDialogCodeButton1 == val)
             emit del();
         else
             list->setFocus();

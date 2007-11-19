@@ -327,14 +327,14 @@ void TabView::actionAddBookmark()
     url->setText(((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
     popup->addWidget(url);
 
-    popup->addButton(tr("OK"));
-    popup->addButton(tr("Cancel"));
+    popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
     qApp->removeEventFilter(this);
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
     qApp->installEventFilter(this);
 
-    if (res == 0)
+    if (kDialogCodeAccepted == res)
     {
         QString sGroup = group->text();
         QString sDesc = desc->text();
@@ -396,14 +396,14 @@ void TabView::showEnterURLDialog()
     popup->addWidget(editor);
     editor->setFocus(); 
 
-    popup->addButton(tr("OK"));
-    popup->addButton(tr("Cancel"));
+    popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
     qApp->removeEventFilter(this);
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
     qApp->installEventFilter(this);
 
-    if (res == 0)
+    if (kDialogCodeAccepted == res)
     {
         QString sURL = editor->text();
         if (!sURL.startsWith("http://") && !sURL.startsWith("https://") &&
@@ -606,11 +606,12 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                         return true;
 
                     inputToggled = true;
-                    VirtualKeyboard *keyboard = new VirtualKeyboard(gContext->GetMainWindow(), 
-                                    ((WebPage*)mytab->currentPage())->browser->view());
+                    VirtualKeyboard *keyboard = new VirtualKeyboard(
+                        gContext->GetMainWindow(), 
+                        ((WebPage*)mytab->currentPage())->browser->view());
                     gContext->GetMainWindow()->detach(keyboard);
                     keyboard->exec();
-                    delete keyboard;
+                    keyboard->deleteLater();
 
                     inputToggled = false;
                 }

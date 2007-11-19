@@ -330,7 +330,7 @@ void FileAssocDialog::switchToFA(int which_one)
 void FileAssocDialog::saveAndExit()
 {
     saveFileAssociations();
-    done(0);
+    reject();
 }
 
 void FileAssocDialog::toggleDefault(bool yes_or_no)
@@ -410,7 +410,7 @@ void FileAssocDialog::createExtension()
 void FileAssocDialog::removeExtensionPopup()
 {
     new_extension_popup->close();
-    delete new_extension_editor;
+    new_extension_editor->deleteLater();
     new_extension_editor = NULL;
     new_extension_popup->deleteLater();
     new_extension_popup = NULL;
@@ -503,6 +503,7 @@ FileAssocDialog::~FileAssocDialog()
     file_associations.clear();
     if (command_editor)
     {
-        delete command_editor;
+        command_editor->deleteLater();
+        command_editor = NULL;
     }
 }

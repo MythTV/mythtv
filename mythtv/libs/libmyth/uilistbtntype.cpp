@@ -1503,11 +1503,11 @@ bool UIListBtnType::incSearchStart(void)
     searchEdit->setFocus();
 
     popup->addButton(tr("Search"));
-    popup->addButton(tr("Cancel"));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
 
-    if (res == 0)
+    if (kDialogCodeButton0 == res)
     {
         m_incSearch = searchEdit->text();
         m_bIncSearchContains = (modeCombo->currentItem() == 1);
@@ -1517,7 +1517,7 @@ bool UIListBtnType::incSearchStart(void)
     popup->hide();
     popup->deleteLater();
 
-    return (res == 0);
+    return (kDialogCodeButton0 == res);
 }
 
 bool UIListBtnType::incSearchNext(void)

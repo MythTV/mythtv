@@ -29,7 +29,7 @@ class MPUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
 
   public:
     PlayGroupEditor(void);
-    virtual int exec(void);
+    virtual DialogCode exec(void);
     virtual void load(void);
     virtual void save(void) { };
     virtual void save(QString) { };

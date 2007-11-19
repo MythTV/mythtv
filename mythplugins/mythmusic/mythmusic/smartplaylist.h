@@ -112,7 +112,6 @@ class SmartPlaylistEditor : public MythDialog
     void updateMatches(void);
     void categoryClicked(void);
     void saveClicked(void);
-    void cancelClicked(void);
     void showResultsClicked(void);
     
     // category popup
@@ -232,7 +231,6 @@ class SmartPLOrderByDialog: public MythPopupBox
     void descendingPressed(void);
     void orderByChanged(void);
     void listBoxSelectionChanged(QListBoxItem *item);
-    void okPressed(void);
     
  protected:
     void keyPressEvent(QKeyEvent *e);
@@ -271,9 +269,6 @@ class SmartPLDateDialog: public MythPopupBox
     void addDaysCheckToggled(bool on);
     void valueChanged(void);
     
-    void okPressed(void);
-    void cancelPressed(void);
-        
  protected:
     void keyPressEvent(QKeyEvent *e);
 

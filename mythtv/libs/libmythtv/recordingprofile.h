@@ -85,7 +85,7 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     virtual void loadByID(int id);
     virtual bool loadByType(QString name, QString cardtype);
     virtual bool loadByGroup(QString name, QString group);
-    virtual int exec();
+    virtual DialogCode exec(void);
 
     // sets
     void setCodecTypes();
@@ -135,7 +135,7 @@ class RecordingProfileEditor :
   public:
     RecordingProfileEditor(int id, QString profName);
 
-    virtual int exec();
+    virtual DialogCode exec(void);
     virtual void load();
     virtual void save() { };
     virtual void save(QString /*destination*/) { }

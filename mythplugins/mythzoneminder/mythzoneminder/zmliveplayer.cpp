@@ -74,7 +74,7 @@ void ZMLivePlayer::initMonitorLayout()
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No monitors",
                                   tr("Cannot find any monitors. Bailing out!"));
-        done(0);
+        reject();
         return;
     }
 

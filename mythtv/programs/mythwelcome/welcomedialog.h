@@ -23,7 +23,7 @@ class WelcomeDialog : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
     void wireUpTheme();
-    int exec(void);
+    DialogCode exec(void);
     
   protected slots:
     void startFrontendClick(void);

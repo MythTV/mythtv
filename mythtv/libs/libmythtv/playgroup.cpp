@@ -262,12 +262,13 @@ void PlayGroupEditor::doDelete(void)
     QString message = tr("Delete playback group:") +
         QString("\n'%1'?").arg(name);
 
-    int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                               "", message,
-                                               tr("Yes, delete group"),
-                                               tr("No, Don't delete group"), 2);
+    DialogCode value = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(),
+        "", message,
+        tr("Yes, delete group"),
+        tr("No, Don't delete group"), kDialogCodeButton1);
 
-    if (value == 0)
+    if (kDialogCodeButton0 == value)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
@@ -302,12 +303,12 @@ void PlayGroupEditor::load(void)
     listbox->setValue(lastValue);
 }
 
-int PlayGroupEditor::exec(void)
+DialogCode PlayGroupEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         open(listbox->getValue());
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 MythDialog* PlayGroupEditor::dialogWidget(MythMainWindow* parent,

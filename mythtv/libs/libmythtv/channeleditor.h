@@ -12,7 +12,7 @@ class MPUBLIC ChannelEditor : public QObject, public ConfigurationDialog
     Q_OBJECT
 public:
     ChannelEditor();
-    virtual int exec();
+    virtual DialogCode exec(void);
 
     MythDialog* dialogWidget(MythMainWindow *parent, const char* name);
 

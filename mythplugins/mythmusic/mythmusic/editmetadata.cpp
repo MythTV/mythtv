@@ -521,7 +521,8 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(searchList);
-    if (searchDialog->ExecPopupAtXY(-1, 8) == 0)
+    DialogCode rescode = searchDialog->ExecPopupAtXY(-1, 8);
+    if (kDialogCodeRejected != rescode)
     {
         value = searchDialog->getResult();
         res = true;
@@ -600,7 +601,7 @@ void EditMetadataDialog::searchGenre()
 void EditMetadataDialog::closeDialog()
 {
     cancelPopup();
-    done(1);  
+    accept();
 }
 
 void EditMetadataDialog::showSaveMenu()
@@ -654,7 +655,7 @@ void EditMetadataDialog::saveToMetadata()
     cancelPopup();
 
     *m_sourceMetadata = m_metadata;
-    done(1);
+    accept();
 }
 
 void EditMetadataDialog::saveToDatabase()
@@ -663,7 +664,7 @@ void EditMetadataDialog::saveToDatabase()
 
     m_metadata->dumpToDatabase();
     *m_sourceMetadata = m_metadata;
-    done(1);
+    accept();
 }
 
 void EditMetadataDialog::saveToFile()
@@ -685,7 +686,7 @@ void EditMetadataDialog::saveToFile()
         decoder->commitMetadata(m_metadata);
         delete decoder;
     }
-    done(1);
+    accept();
 }
 
 void EditMetadataDialog::saveAll()
@@ -727,7 +728,8 @@ void EditMetadataDialog::showMenu()
     menu->addButton(albumArt->getTypeName(IT_CD));
     menu->addButton(albumArt->getTypeName(IT_INLAY));
 
-    int res = menu->ExecPopup();
+    DialogCode ret = menu->ExecPopup();
+    int res = MythDialog::CalcItemIndex(ret);
 
     if ((IT_UNKNOWN <= res) && (res < IT_LAST))
     {

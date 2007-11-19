@@ -361,12 +361,14 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             if ((inContent) &&
                 (currentItem == QObject::tr("Log Entries")))
             {
-                int retval = MythPopupBox::show2ButtonPopup(my_parent,
-                                 QString("AckLogEntry"),
-                                 QObject::tr("Acknowledge all log entries at "
-                                             "this priority level or lower?"),
-                                 QObject::tr("Yes"), QObject::tr("No"), 0);
-                if (retval == 0)
+                DialogCode retval = MythPopupBox::Show2ButtonPopup(
+                    my_parent, QString("AckLogEntry"),
+                    QObject::tr("Acknowledge all log entries at "
+                                "this priority level or lower?"),
+                    QObject::tr("Yes"), QObject::tr("No"),
+                    kDialogCodeButton0);
+
+                if (kDialogCodeButton0 == retval)
                 {
                     MSqlQuery query(MSqlQuery::InitCon());
                     query.prepare("UPDATE mythlog SET acknowledged = 1 "
@@ -552,13 +554,13 @@ void StatusBox::clicked()
     {
         if (currentItem == QObject::tr("Log Entries"))
         {
-            int retval;
+            DialogCode retval = MythPopupBox::Show2ButtonPopup(
+                my_parent,
+                QString("AckLogEntry"),
+                QObject::tr("Acknowledge this log entry?"),
+                QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton0);
 
-            retval = MythPopupBox::show2ButtonPopup(my_parent,
-                                   QString("AckLogEntry"),
-                                   QObject::tr("Acknowledge this log entry?"),
-                                   QObject::tr("Yes"), QObject::tr("No"), 0);
-            if (retval == 0)
+            if (kDialogCodeButton0 == retval)
             {
                 MSqlQuery query(MSqlQuery::InitCon());
                 query.prepare("UPDATE mythlog SET acknowledged = 1 "
@@ -572,20 +574,17 @@ void StatusBox::clicked()
         {
             QStringList msgs;
             int jobStatus;
-            int retval;
 
             jobStatus = JobQueue::GetJobStatus(
                                 contentData[contentPos].toInt());
 
             if (jobStatus == JOB_QUEUED)
             {
-                retval = MythPopupBox::show2ButtonPopup(my_parent,
-                                       QString("JobQueuePopup"),
-                                       QObject::tr("Delete Job?"),
-                                       QObject::tr("Yes"),
-                                       QObject::tr("No"), 2);
-                cout << "Popup result = " << retval << endl;
-                if (retval == 0)
+                DialogCode retval = MythPopupBox::Show2ButtonPopup(
+                    my_parent,
+                    QString("JobQueuePopup"), QObject::tr("Delete Job?"),
+                    QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton1);
+                if (kDialogCodeButton0 == retval)
                 {
                     JobQueue::DeleteJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
@@ -598,16 +597,17 @@ void StatusBox::clicked()
                 msgs << QObject::tr("Pause");
                 msgs << QObject::tr("Stop");
                 msgs << QObject::tr("No Change");
-                retval = MythPopupBox::showButtonPopup(my_parent,
-                                       QString("JobQueuePopup"),
-                                       QObject::tr("Job Queue Actions:"),
-                                       msgs, 2);
-                if (retval == 0)
+                DialogCode retval = MythPopupBox::ShowButtonPopup(
+                    my_parent,
+                    QString("JobQueuePopup"),
+                    QObject::tr("Job Queue Actions:"),
+                    msgs, kDialogCodeButton2);
+                if (kDialogCodeButton0 == retval)
                 {
                     JobQueue::PauseJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
-                else if (retval == 1)
+                else if (kDialogCodeButton1 == retval)
                 {
                     JobQueue::StopJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
@@ -618,16 +618,18 @@ void StatusBox::clicked()
                 msgs << QObject::tr("Resume");
                 msgs << QObject::tr("Stop");
                 msgs << QObject::tr("No Change");
-                retval = MythPopupBox::showButtonPopup(my_parent,
-                                       QString("JobQueuePopup"),
-                                       QObject::tr("Job Queue Actions:"),
-                                       msgs, 2);
-                if (retval == 0)
+                DialogCode retval = MythPopupBox::ShowButtonPopup(
+                    my_parent,
+                    QString("JobQueuePopup"),
+                    QObject::tr("Job Queue Actions:"),
+                    msgs, kDialogCodeButton2);
+
+                if (kDialogCodeButton0 == retval)
                 {
                     JobQueue::ResumeJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
-                else if (retval == 1)
+                else if (kDialogCodeButton1 == retval)
                 {
                     JobQueue::StopJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
@@ -635,12 +637,13 @@ void StatusBox::clicked()
             }
             else if (jobStatus & JOB_DONE)
             {
-                retval = MythPopupBox::show2ButtonPopup(my_parent,
-                                       QString("JobQueuePopup"),
-                                       QObject::tr("Requeue Job?"),
-                                       QObject::tr("Yes"),
-                                       QObject::tr("No"), 1);
-                if (retval == 0)
+                DialogCode retval = MythPopupBox::Show2ButtonPopup(
+                    my_parent,
+                    QString("JobQueuePopup"),
+                    QObject::tr("Requeue Job?"),
+                    QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton0);
+
+                if (kDialogCodeButton0 == retval)
                 {
                     JobQueue::ChangeJobStatus(contentData[contentPos].toInt(),
                                               JOB_QUEUED);
@@ -657,22 +660,22 @@ void StatusBox::clicked()
             if (rec) 
             {
                 QStringList msgs;
-                int retval;
 
                 msgs << QObject::tr("Delete Now");
                 msgs << QObject::tr("Disable AutoExpire");
                 msgs << QObject::tr("No Change");
                 
-                retval = MythPopupBox::showButtonPopup(my_parent,
-                             QString("AutoExpirePopup"),
-                             QObject::tr("AutoExpire Actions:"),
-                             msgs, 2);
+                DialogCode retval = MythPopupBox::ShowButtonPopup(
+                    my_parent,
+                    QString("AutoExpirePopup"),
+                    QObject::tr("AutoExpire Actions:"),
+                    msgs, kDialogCodeButton2);
 
-                if (retval == 0 && REC_CAN_BE_DELETED(rec))
+                if ((kDialogCodeButton0 == retval) && REC_CAN_BE_DELETED(rec))
                 {
                     RemoteDeleteRecording(rec, false, false);
                 }
-                else if (retval == 1)
+                else if (kDialogCodeButton1 == retval)
                 {
                     rec->SetAutoExpire(0);
                     if ((rec)->recgroup == "LiveTV")

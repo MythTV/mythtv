@@ -106,7 +106,7 @@ class PlaybackBox : public MythDialog
     static ProgramInfo *RunPlaybackBox(void *player);
 
   public slots:
-    int exec();
+    DialogCode exec();
 
   protected slots:
     void timeout(void);

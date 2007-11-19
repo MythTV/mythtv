@@ -165,7 +165,7 @@ void ScanProgressPopup::SetStatusTitleText(const QString &value)
     setLabel(msg);
 }
 
-int ScanProgressPopup::exec(void)
+DialogCode ScanProgressPopup::exec(void)
 {
     if (!dialog)
     {
@@ -173,7 +173,7 @@ int ScanProgressPopup::exec(void)
             dialogWidget(gContext->GetMainWindow(),
                          "ConfigurationPopupDialog");
     }
-    dialog->setResult(0);
+    dialog->setResult(kDialogCodeRejected);
 
     done = false;
     dialog->ShowPopup(this, SLOT(PopupDone(int)));

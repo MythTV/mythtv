@@ -41,11 +41,7 @@ class MPUBLIC MythComboBox: public QComboBox
 {
     Q_OBJECT
   public:
-    MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
-        QComboBox(rw, parent, name) { AcceptOnSelect = false; step = 1; 
-            allowVirtualKeyboard = rw; Init(); };
-
-    virtual ~MythComboBox();
+    MythComboBox(bool rw, QWidget* parent=0, const char* name=0);
 
     void setHelpText(QString help) { helptext = help; }
     void setAcceptOnSelect(bool Accept) { AcceptOnSelect = Accept; }
@@ -61,20 +57,25 @@ class MPUBLIC MythComboBox: public QComboBox
     void gotFocus();
 
   public slots:
+    virtual void deleteLater(void);
     void insertItem(const QString& item) {
         QComboBox::insertItem(item);
     };
 
   protected:
+    void Teardown(void);
+    virtual ~MythComboBox(); // use deleteLater for thread safety
     virtual void keyPressEvent (QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
     void Init(void);
+    virtual void popupVirtualKeyboard(void);
 
   private:
     VirtualKeyboard *popup;
     QString helptext;
     bool AcceptOnSelect;
+    bool useVirtualKeyboard;
     bool allowVirtualKeyboard;
     PopupPosition popupPosition;
     int step;
@@ -133,16 +134,8 @@ class MPUBLIC MythLineEdit : public QLineEdit
 {
     Q_OBJECT
   public:
-    MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
-      QLineEdit(parent, widgetName)
-	    { rw = true; allowVirtualKeyboard = true; Init(); };
-
-    MythLineEdit(const QString& contents, QWidget *parent=NULL, 
-                 const char* widgetName=0) :
-      QLineEdit(contents, parent, widgetName)
-	    { rw = true; allowVirtualKeyboard = true; Init(); };
-
-    virtual ~MythLineEdit();
+    MythLineEdit(QWidget *parent=NULL, const char* widgetName=0);
+    MythLineEdit(const QString &text, QWidget *p=NULL, const char *name=0);
 
     void setHelpText(QString help) { helptext = help; };
     void setRW(bool readwrite = true) { rw = readwrite; };
@@ -152,24 +145,31 @@ class MPUBLIC MythLineEdit : public QLineEdit
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
     PopupPosition getPopupPosition(void) { return popupPosition; }
 
- public slots:
-     virtual void setText(const QString& text);
+    virtual QString text();
+
+  public slots:
+    virtual void deleteLater(void);
+    virtual void setText(const QString &text);
 
   signals:
     void changeHelpText(QString);
 
   protected:
+    void Teardown(void);
+    virtual ~MythLineEdit(); // use deleteLater for thread safety
+
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e); 
     virtual void focusOutEvent(QFocusEvent *e);
     virtual void hideEvent(QHideEvent *e);
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
-    void Init(void);
+    virtual void popupVirtualKeyboard(void);
 
   private:
     VirtualKeyboard *popup;
     QString helptext;
     bool rw;
+    bool useVirtualKeyboard;
     bool allowVirtualKeyboard;
     PopupPosition popupPosition;
 };
@@ -187,7 +187,7 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
     MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );    
     MythRemoteLineEdit( int lines, QWidget * parent, const char * name = 0 );
-   ~MythRemoteLineEdit();
+
     void setHelpText(QString help) { helptext = help; }
     void setCycleTime(float desired_interval); // in seconds
     void setCharacterColors(QColor unselected, QColor selected, QColor special);
@@ -196,6 +196,8 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     void del();
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; };
     PopupPosition getPopupPosition(void) { return popupPosition; };
+
+    virtual QString text();
 
   signals:
 
@@ -208,14 +210,16 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     void    textChanged(QString);
 
   public slots:
-    
+    virtual void deleteLater(void);
     virtual void setText(const QString& text);
     
   protected:
-    
+    void Teardown(void);
+    virtual ~MythRemoteLineEdit(); // use deleteLater for thread safety
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
+    virtual void popupVirtualKeyboard(void);
 
   private slots:
 
@@ -255,7 +259,8 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     int m_lines;
 
     VirtualKeyboard *popup;
-    PopupPosition popupPosition;
+    bool             useVirtualKeyboard;
+    PopupPosition    popupPosition;
 };
 
 class MPUBLIC MythTable : public QTable

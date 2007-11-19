@@ -28,7 +28,6 @@ class VideoManager : public MythDialog
   public:
     VideoManager(MythMainWindow *lparent, const QString &lname,
                  VideoList *video_list);
-    ~VideoManager();
     int videoExitType() { return 0; }
 
   public slots:
@@ -55,6 +54,7 @@ class VideoManager : public MythDialog
     void exitWin();
 
   protected:
+    ~VideoManager(); // use deleteLater() instead for thread safety
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void doWaitBackground(QPainter &p, const QString &titleText);

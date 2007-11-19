@@ -288,11 +288,11 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     connect(m_list, SIGNAL(deleteButtonPressed(int)), this, SLOT(Delete()));
 }
 
-int TransportListEditor::exec(void)
+DialogCode TransportListEditor::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted);
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted);
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 void TransportListEditor::Edit(void)
@@ -315,13 +315,13 @@ void TransportListEditor::Delete(void)
 {
     uint mplexid = m_list->getValue().toInt();
 
-    int val = MythPopupBox::show2ButtonPopup(
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), "", 
         tr("Are you sure you would like to delete this transport?"), 
         tr("Yes, delete the transport"), 
-        tr("No, don't"), 2);
+        tr("No, don't"), kDialogCodeButton1);
 
-    if (val == 1)
+    if (kDialogCodeButton0 != val)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -350,16 +350,16 @@ void TransportListEditor::Menu(void)
        return;
     }
 
-    int val = MythPopupBox::show2ButtonPopup(
+    DialogCode val = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), 
         "", 
         tr("Transport Menu"), 
         tr("Edit.."), 
-        tr("Delete.."), 1);
+        tr("Delete.."), kDialogCodeButton0);
 
-    if (val == 0)
+    if (kDialogCodeButton0 == val)
         emit Edit();
-    else if (val == 1)
+    else if (kDialogCodeButton1 == val)
         emit Delete();
     else
         m_list->setFocus();

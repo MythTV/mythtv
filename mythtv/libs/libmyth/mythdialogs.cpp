@@ -39,11 +39,13 @@ using namespace std;
 #include "screensaver.h"
 #include "mythdbcon.h"
 
-MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-          : QFrame(parent, name)
-{
-    rescode = 0;
+/** \class MythDialog
+ *  \brief Base dialog for most dialogs in MythTV using the old UI
+ */
 
+MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
+    : QFrame(parent, name), rescode(kDialogCodeAccepted)
+{
     if (!parent)
     {
         cerr << "Trying to create a dialog without a parent.\n";
@@ -115,16 +117,41 @@ void MythDialog::Show(void)
     show();
 }
 
+void MythDialog::setResult(DialogCode r)
+{
+    if ((r < kDialogCodeRejected) ||
+        ((kDialogCodeAccepted < r) && (r < kDialogCodeListStart)))
+    {
+        VERBOSE(VB_IMPORTANT, "Programmer Error: MythDialog::setResult("
+                <<r<<") called with invalid DialogCode");
+    }
+
+    rescode = r;
+}
+
 void MythDialog::done(int r)
 {
     hide();
-    setResult(r);
+    setResult((DialogCode) r);
     close();
 }
 
 void MythDialog::AcceptItem(int i)
 {
-    done(ListStart + i);
+    if (i < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "Programmer Error: MythDialog::AcceptItem("
+                <<i<<") called with negative index");
+        reject();
+        return;
+    }
+
+    done((DialogCode)((int)kDialogCodeListStart + (int)i));
+}
+
+int MythDialog::CalcItemIndex(DialogCode code)
+{
+    return (int)code - (int)kDialogCodeListStart;
 }
 
 void MythDialog::accept()
@@ -137,22 +164,22 @@ void MythDialog::reject()
     done(Rejected);
 }
 
-int MythDialog::exec()
+DialogCode MythDialog::exec(void)
 {
     if (in_loop) 
     {
         qWarning("MythDialog::exec: Recursive call detected.");
-        return -1;
+        return kDialogCodeRejected;
     }
 
-    setResult(Rejected);
+    setResult(kDialogCodeRejected);
 
     Show();
 
     in_loop = TRUE;
     qApp->enter_loop();
 
-    int res = result();
+    DialogCode res = result();
 
     return res;
 }
@@ -212,6 +239,20 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
         }
     }
 }
+
+/** \class MythPopupBox
+ *  \brief Child of MythDialog used for most popup menus in MythTV
+ *
+ *  Most users of this class just call one of the static functions
+ *  These create a dialog and block until it returns with a DialogCode.
+ *
+ *  When creating an instance yourself and using ExecPopup() or
+ *  ShowPopup() you can optionally pass it a target and slot for
+ *  the popupDone(int) signal. It will be sent with the DialogCode
+ *  that the exec function returns, except it is cast to an int.
+ *  This is most useful for ShowPopup() which doesn't block or
+ *  return the result() when the popup is finished.
+ */
 
 MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name, false)
@@ -465,6 +506,12 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
+void MythPopupBox::AcceptItem(int i)
+{
+    MythDialog::AcceptItem(i);
+    emit popupDone(rescode);
+}
+
 void MythPopupBox::accept(void)
 {
     MythDialog::done(MythDialog::Accepted);
@@ -477,21 +524,21 @@ void MythPopupBox::reject(void)
     emit popupDone(MythDialog::Rejected);
 }
 
-int MythPopupBox::ExecPopup(QObject *target, const char *slot)
+DialogCode MythPopupBox::ExecPopup(QObject *target, const char *slot)
 {
     if (!target)
-        ShowPopup(this, SLOT(defaultExitHandler(int)));
+        ShowPopup(this, SLOT(done(int)));
     else
         ShowPopup(target, slot);
 
     return exec();
 }
 
-int MythPopupBox::ExecPopupAtXY(int destx, int desty,
-                            QObject *target, const char *slot)
+DialogCode MythPopupBox::ExecPopupAtXY(int destx, int desty,
+                                       QObject *target, const char *slot)
 {
     if (!target)
-        ShowPopupAtXY(destx, desty, this, SLOT(defaultExitHandler(int)));
+        ShowPopupAtXY(destx, desty, this, SLOT(done(int)));
     else
         ShowPopupAtXY(destx, desty, target, slot);
 
@@ -526,7 +573,7 @@ void MythPopupBox::defaultButtonPressedHandler(void)
     }
     if (foundbutton)
     {
-        done(i);
+        AcceptItem(i);
         return;
     }
 
@@ -553,25 +600,20 @@ void MythPopupBox::defaultButtonPressedHandler(void)
     }
     if (foundbutton)
     {
-        done(i);
+        AcceptItem(i);
         return;
     }
 
     VERBOSE(VB_IMPORTANT, "MythPopupBox::defaultButtonPressedHandler(void)"
             "\n\t\t\tWe should never get here!");
-    done(Rejected);
+    done(kDialogCodeRejected);
 }
 
-void MythPopupBox::defaultExitHandler(int r)
-{
-    done(r);
-}
-
-static int show_ok_popup(
+bool MythPopupBox::showOkPopup(
     MythMainWindow *parent,
     const QString  &title,
     const QString  &message,
-    QString         button_msg = QString::null)
+    QString         button_msg)
 {
     if (button_msg.isEmpty())
         button_msg = QObject::tr("OK");
@@ -581,24 +623,12 @@ static int show_ok_popup(
     popup->addLabel(message, MythPopupBox::Medium, true);
     QButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
     okButton->setFocus();
-    int ret = popup->ExecPopup();
+    bool ret = (kDialogCodeAccepted == popup->ExecPopup());
 
     popup->hide();
     popup->deleteLater();
 
     return ret;
-}
-
-void MythPopupBox::showOkPopup(MythMainWindow *parent, QString title,
-                               QString message)
-{
-    show_ok_popup(parent, title, message);
-}
-
-void MythPopupBox::showExitPopup(MythMainWindow *parent, QString title,
-                                 QString message)
-{
-    show_ok_popup(parent, title, message, tr("Exit"));
 }
 
 bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
@@ -691,48 +721,27 @@ QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
 }
 
 
-int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
-                                   QString message, QString button1msg,
-                                   QString button2msg, int defvalue)
+DialogCode MythPopupBox::ShowButtonPopup(
+    MythMainWindow    *parent,
+    const QString     &title,
+    const QString     &message,
+    const QStringList &buttonmsgs,
+    DialogCode         default_button)
 {
     MythPopupBox *popup = new MythPopupBox(parent, title);
 
     popup->addLabel(message, Medium, true);
     popup->addLabel("");
 
-    QButton *but1 = popup->addButton(button1msg);
-    QButton *but2 = popup->addButton(button2msg);
-
-    if (defvalue == 1)
-        but1->setFocus();
-    else
-        but2->setFocus();
-
-    int ret = popup->ExecPopup();
-
-    popup->hide();
-    popup->deleteLater();
-
-    return ret;
-}
-
-int MythPopupBox::showButtonPopup(MythMainWindow *parent, QString title,
-                                  QString message, QStringList buttonmsgs,
-                                  int defvalue)
-{
-    MythPopupBox *popup = new MythPopupBox(parent, title);
-
-    popup->addLabel(message, Medium, true);
-    popup->addLabel("");
-
+    const uint def = CalcItemIndex(default_button);
     for (unsigned int i = 0; i < buttonmsgs.size(); i++ )
     {
         QButton *but = popup->addButton(buttonmsgs[i]);
-        if (defvalue == (int)i)
+        if (def == i)
             but->setFocus();
     }
 
-    int ret = popup->ExecPopup();
+    DialogCode ret = popup->ExecPopup();
 
     popup->hide();
     popup->deleteLater();
@@ -948,7 +957,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
             .arg(window_name).arg(theme_filename);
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
-        done(-1);
+        reject();
         return;
     }
 }
@@ -1055,7 +1064,20 @@ bool MythThemedDialog::buildFocusList()
 MythThemedDialog::~MythThemedDialog()
 {
     if (theme)
+    {
         delete theme;
+        theme = NULL;
+    }
+}
+
+void MythThemedDialog::deleteLater(void)
+{
+    if (theme)
+    {
+        delete theme;
+        theme = NULL;
+    }
+    MythDialog::deleteLater();
 }
 
 void MythThemedDialog::loadWindow(QDomElement &element)
@@ -1962,7 +1984,7 @@ void MythPasswordDialog::checkPassword(const QString &the_text)
     if (the_text == target_text)
     {
         *success_flag = true;
-        done(0);
+        accept();
     }
     else
     {
@@ -1993,11 +2015,11 @@ MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
-    connect(listbox, SIGNAL(accepted(int)), this, SLOT(itemSelected(int)));
+    connect(listbox, SIGNAL(accepted(int)), this, SLOT(AcceptItem(int)));
     addWidget(listbox);
-    
-    ok_button = addButton(tr("OK"), this, SLOT(okPressed()));
-    cancel_button = addButton(tr("Cancel"), this, SLOT(cancelPressed()));
+
+    ok_button     = addButton(tr("OK"),     this, SLOT(accept()));
+    cancel_button = addButton(tr("Cancel"), this, SLOT(reject()));
 }
 
 void MythSearchDialog::keyPressEvent(QKeyEvent *e)
@@ -2012,7 +2034,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
             if (action == "ESCAPE")
             {
                 handled = true;
-                done(-1);        
+                reject();
             }
             if (action == "LEFT")
             {
@@ -2027,7 +2049,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
             if (action == "SELECT")
             {
                 handled = true;
-                done(0);
+                accept();
             }
         }
     }
@@ -2035,63 +2057,78 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
         MythPopupBox::keyPressEvent(e);
 }
 
-void MythSearchDialog::itemSelected(int index)
-{
-    (void)index;
-    done(0);
-}
-
 void MythSearchDialog::setCaption(QString text)
 {
-    caption->setText(text);
+    if (caption)
+        caption->setText(text);
 }
 
 void MythSearchDialog::setSearchText(QString text)
 {
-    editor->setText(text);
-    editor->setCursorPosition(0, editor->text().length());
+    if (editor)
+    {
+        editor->setText(text);
+        editor->setCursorPosition(0, editor->text().length());
+    }
 }
 
 void MythSearchDialog::searchTextChanged(void)
 {
-    listbox->setCurrentItem(editor->text(), false,  true);
-    listbox->setTopItem(listbox->currentItem());
+    if (listbox && editor)
+    {
+        listbox->setCurrentItem(editor->text(), false,  true);
+        listbox->setTopItem(listbox->currentItem());
+    }
 }
 
 QString MythSearchDialog::getResult(void)
 {
-    return listbox->currentText();
+    if (listbox)
+        return listbox->currentText();
+
+    // Don't return QString::null, might cause segfaults due to
+    // code that doesn't check the return value...
+    return "";
 }
 
 void MythSearchDialog::setItems(QStringList items)
 {
-   listbox->insertStringList(items);
-   searchTextChanged();
-}
-
-void MythSearchDialog::okPressed(void)
-{
-    done(0);  
-}
-
-void MythSearchDialog::cancelPressed(void)
-{
-    done(-1);
+    if (listbox)
+    {
+        listbox->insertStringList(items);
+        searchTextChanged();
+    }
 }
 
 MythSearchDialog::~MythSearchDialog()
 {
-    if (listbox)
-    {
-        delete listbox;
-        listbox = NULL;
-    }    
-    
+    Teardown();
+}
+
+void MythSearchDialog::deleteLater(void)
+{
+    Teardown();
+    MythPopupBox::deleteLater();
+}
+
+void MythSearchDialog::Teardown(void)
+{
+    caption       = NULL; // deleted by Qt
+
     if (editor)
     {
-        delete editor;
-        editor = NULL;
-    }    
+        editor->disconnect();
+        editor    = NULL; // deleted by Qt
+    }
+
+    if (listbox)
+    {
+        listbox->disconnect();
+        listbox   = NULL; // deleted by Qt
+    }
+
+    ok_button     = NULL; // deleted by Qt
+    cancel_button = NULL; // deleted by Qt
 }
 
 /*
@@ -2141,7 +2178,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                        "element. \n\nReturning to the previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
-        done(-1);
+        reject();
         return;
     }
 
@@ -2176,7 +2213,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                        "\n\nReturning to the previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
-        done(-1);
+        reject();
         return;
     }    
     
@@ -2383,7 +2420,7 @@ void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
     if (type > -1)
     {
         *selected_file = image_files[type];
-        done(0);
+        accept();
     }   
 }
 
@@ -2409,14 +2446,14 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
         VERBOSE(VB_IMPORTANT, 
                 "MythScrollDialog: Programmer error, trying to create "
                 "a dialog without a parent.");
-        done(-1);
+        done(kDialogCodeRejected);
         return;
     }
 
     m_parent     = parent;
     m_scrollMode = mode;
         
-    m_resCode    = 0;
+    m_resCode    = kDialogCodeRejected;
     m_inLoop     = false;
     
     gContext->GetScreenSettings(m_xbase, m_screenWidth, m_wmult,
@@ -2511,7 +2548,7 @@ void MythScrollDialog::setAreaMultiplied(int areaWTimes, int areaHTimes)
                    m_screenHeight*areaHTimes);
 }
 
-int MythScrollDialog::result() const
+DialogCode MythScrollDialog::result(void) const
 {
     return m_resCode;    
 }
@@ -2535,23 +2572,23 @@ void MythScrollDialog::hide()
     }
 }
 
-int MythScrollDialog::exec()
+DialogCode MythScrollDialog::exec(void)
 {
     if (m_inLoop) 
     {
         std::cerr << "MythScrollDialog::exec: Recursive call detected."
                   << std::endl;
-        return -1;
+        return kDialogCodeRejected;
     }
 
-    setResult(Rejected);
+    setResult(kDialogCodeRejected);
 
     show();
 
     m_inLoop = true;
     qApp->enter_loop();
 
-    int res = result();
+    DialogCode res = result();
 
     return res;
 }
@@ -2559,21 +2596,21 @@ int MythScrollDialog::exec()
 void MythScrollDialog::done(int r)
 {
     hide();
-    setResult(r);
+    setResult((DialogCode)r);
     close();
 }
 
 void MythScrollDialog::accept()
 {
-    done(Accepted);
+    done(kDialogCodeAccepted);
 }
 
 void MythScrollDialog::reject()
 {
-    done(Rejected);
+    done(kDialogCodeRejected);
 }
 
-void MythScrollDialog::setResult(int r)
+void MythScrollDialog::setResult(DialogCode r)
 {
     m_resCode = r;    
 }

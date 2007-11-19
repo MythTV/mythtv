@@ -55,7 +55,7 @@ void VideoSelector::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            done(0);
+            reject();
         }
         else if (action == "DOWN")
         {
@@ -602,7 +602,7 @@ bool VideoSelector::checkParentPassword()
                 password,
                 gContext->GetMainWindow());
         pwd->exec();
-        delete pwd;
+        pwd->deleteLater();
         if (ok)
         {
             //  All is good

@@ -21,7 +21,6 @@ class ProgDetails : public MythThemedDialog
 
   protected slots:
     virtual void keyPressEvent(QKeyEvent *e);
-    void done(void);
 
   private:
     void wireUpTheme(void);

@@ -65,7 +65,7 @@ class ScanProgressPopup : public ConfigurationPopupDialog
   public:
     ScanProgressPopup(bool lock, bool strength, bool snr);
 
-    virtual int exec(void);
+    virtual DialogCode exec(void);
 
     void SetStatusSignalToNoise(int value);
     void SetStatusSignalStrength(int value);

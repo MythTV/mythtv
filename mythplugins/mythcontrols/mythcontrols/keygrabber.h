@@ -46,10 +46,6 @@ class KeyGrabPopupBox : public MythPopupBox
 
     virtual void deleteLater(void);
 
-  public slots:
-    void Accept(void) { done(1); }
-    void Cancel(void) { done(0); }
-
   protected:
     void Teardown(void);
     ~KeyGrabPopupBox(); // use deleteLater() instead for thread safety

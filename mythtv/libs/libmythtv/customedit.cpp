@@ -570,7 +570,7 @@ void CustomEdit::storeClicked(void)
     msg += m_description->text();
 
     DialogBox *storediag = new DialogBox(gContext->GetMainWindow(), msg);
-    int button = 1, sebtn = -1, exbtn = -1, deletebtn = -1, cancelbtn = -1;
+    int button = 0, sebtn = -1, exbtn = -1, deletebtn = -1, cancelbtn = -1;
 
     QString action = QObject::tr("Store");
     if (nameExists)
@@ -600,7 +600,8 @@ void CustomEdit::storeClicked(void)
     storediag->AddButton(QObject::tr("Cancel"));
     cancelbtn = button++;
 
-    int ret = storediag->exec();
+    DialogCode code = storediag->exec();
+    int ret = MythDialog::CalcItemIndex(code);
     storediag->deleteLater();
     storediag = NULL;
 

@@ -418,12 +418,13 @@ void StorageGroupEditor::doDelete(void)
     QString message =
         tr("Remove '%1'\nDirectory From Storage Group?").arg(name);
 
-    int value =
-        MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "", message,
-                                       tr("Yes, remove directory"),
-                                       tr("No, Don't remove directory"), 2);
+    DialogCode value = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(), "", message,
+        tr("Yes, remove directory"),
+        tr("No, Don't remove directory"),
+        kDialogCodeButton1);
 
-    if (value == 0)
+    if (kDialogCodeButton0 == value)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM storagegroup "
@@ -476,11 +477,12 @@ void StorageGroupEditor::load(void) {
     listbox->setValue(lastValue);
 }
 
-int StorageGroupEditor::exec() {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+DialogCode StorageGroupEditor::exec(void)
+{
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         open(listbox->getValue());
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 MythDialog* StorageGroupEditor::dialogWidget(MythMainWindow* parent,
@@ -557,12 +559,13 @@ void StorageGroupListEditor::doDelete(void)
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
 
-    int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
-                                               "", message,
-                                               tr("Yes, delete group"),
-                                               tr("No, Don't delete group"), 2);
+    DialogCode value = MythPopupBox::Show2ButtonPopup(
+        gContext->GetMainWindow(),
+        "", message,
+        tr("Yes, delete group"),
+        tr("No, Don't delete group"), kDialogCodeButton1);
 
-    if (value == 0)
+    if (kDialogCodeButton0 == value)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM storagegroup "
@@ -673,11 +676,12 @@ void StorageGroupListEditor::load(void)
     listbox->setValue(lastValue);
 }
 
-int StorageGroupListEditor::exec() {
-    while (ConfigurationDialog::exec() == QDialog::Accepted)
+DialogCode StorageGroupListEditor::exec(void)
+{
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
         open(listbox->getValue());
 
-    return QDialog::Rejected;
+    return kDialogCodeRejected;
 }
 
 MythDialog* StorageGroupListEditor::dialogWidget(MythMainWindow* parent,

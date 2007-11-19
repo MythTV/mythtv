@@ -36,7 +36,7 @@ class MPUBLIC StorageGroupEditor :
     Q_OBJECT
   public:
     StorageGroupEditor(QString group);
-    virtual int exec(void);
+    virtual DialogCode exec(void);
     virtual void load(void);
     virtual void save(void) { };
     virtual void save(QString) { };
@@ -59,7 +59,7 @@ class MPUBLIC StorageGroupListEditor :
     Q_OBJECT
   public:
     StorageGroupListEditor(void);
-    virtual int exec(void);
+    virtual DialogCode exec(void);
     virtual void load(void);
     virtual void save(void) { };
     virtual void save(QString) { };

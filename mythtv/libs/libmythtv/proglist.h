@@ -40,7 +40,7 @@ class MPUBLIC ProgLister : public MythDialog
     void cursorUp(bool page = false);
     void prevView(void);
     void nextView(void);
-    void setViewFromList(void);
+    void setViewFromList(int);
     void chooseEditChanged(void);
     void chooseListBoxChanged(void);
     void setViewFromEdit(void);

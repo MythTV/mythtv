@@ -260,34 +260,34 @@ void MythControls::ChangeView(void)
     buttons += tr("Keys By Context");
     buttons += QObject::tr("Cancel");
 
-    int code = MythPopupBox::showButtonPopup(
+    DialogCode code = MythPopupBox::ShowButtonPopup(
         gContext->GetMainWindow(), "mcviewmenu", tr("Change View"),
-        buttons, 3);
+        buttons, kDialogCodeButton3);
 
     QStringList contents;
     QString leftcaption, rightcaption;
 
     switch (code)
     {
-        case 0:
+        case kDialogCodeButton0:
             leftcaption = tr(CAPTION_CONTEXT);
             rightcaption = tr(CAPTION_ACTION);
             m_currentView = kActionsByContext;
             contents = m_bindings->GetContexts();
             break;
-        case 1:
+        case kDialogCodeButton1:
             leftcaption = tr(CAPTION_CONTEXT);
             rightcaption = tr(CAPTION_KEY);
             m_currentView = kKeysByContext;
             contents = m_bindings->GetContexts();
             break;
-        case 2:
+        case kDialogCodeButton2:
             leftcaption = tr(CAPTION_KEY);
             rightcaption = tr(CAPTION_CONTEXT);
             m_currentView = kContextsByKey;
             contents = m_bindings->GetKeys();
             break;
-        case 3:
+        case kDialogCodeButton3:
         default:
             return;
     }
@@ -328,19 +328,19 @@ void MythControls::keyPressEvent(QKeyEvent *e)
             buttons += tr("Change View");
             buttons += QObject::tr("Cancel");
 
-            int code = MythPopupBox::showButtonPopup(
+            DialogCode code = MythPopupBox::ShowButtonPopup(
                 gContext->GetMainWindow(), "optionmenu", tr("Options"),
-                buttons, 2);
+                buttons, kDialogCodeButton2);
 
             switch (code)
             {
-                case 0:
+                case kDialogCodeButton0:
                     Save();
                     break;
-                case 1:
+                case kDialogCodeButton1:
                     ChangeView();
                     break;
-                case 2:
+                case kDialogCodeButton2:
                 default:
                     break;
             }
@@ -368,13 +368,13 @@ void MythControls::keyPressEvent(QKeyEvent *e)
                     buttons += tr("Remove Binding");
                     buttons += QObject::tr("Cancel");
 
-                    int code = MythPopupBox::showButtonPopup(
+                    DialogCode code = MythPopupBox::ShowButtonPopup(
                         gContext->GetMainWindow(), "actionmenu",
-                        tr("Modify Action"), buttons, 2);
+                        tr("Modify Action"), buttons, kDialogCodeButton2);
 
-                    if (0 == code)
+                    if (kDialogCodeButton0 == code)
                         AddKeyToAction();
-                    else if (1 == code)
+                    else if (kDialogCodeButton1 == code)
                         DeleteKey();
                 }
                 else // for blank keys, no reason to ask what to do
@@ -395,13 +395,16 @@ void MythControls::keyPressEvent(QKeyEvent *e)
                     buttons += tr("Exit without saving changes");
                     buttons += tr("Save then Exit");
 
-                    int code = MythPopupBox::showButtonPopup(
+                    DialogCode code = MythPopupBox::ShowButtonPopup(
                         gContext->GetMainWindow(), "exitmenu",
                         tr("Exiting, but there are unsaved changes.")+"\n\n"+
-                        tr("Which would you prefer?"), buttons, 1);
+                        tr("Which would you prefer?"), buttons,
+                        kDialogCodeButton1);
 
-                    if (1 == code)
+                    if (kDialogCodeButton1 == code)
                         Save();
+                    else if (kDialogCodeRejected == code)
+                        handled = true;
                 }
             }
             else if (m_focusedUIElement == m_rightList)
@@ -762,11 +765,11 @@ bool MythControls::ResolveConflict(ActionID *conflict, int error_level)
              "Do you want to bind it anyway?")
         .arg(conflict->GetAction()).arg(conflict->GetContext());
 
-    int res = MythPopupBox::show2ButtonPopup(
+    DialogCode res = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), tr("Conflict Warning"),
-        msg, tr("Bind Key"), QObject::tr("Cancel"), 2);
+        msg, tr("Bind Key"), QObject::tr("Cancel"), kDialogCodeButton1);
 
-    return (0 == res);
+    return (kDialogCodeButton0 == res);
 }
 
 /** \fn MythControls::AddKeyToAction(void)
@@ -781,12 +784,12 @@ void MythControls::AddKeyToAction(void)
 {
     /* grab a key from the user */
     KeyGrabPopupBox *getkey = new KeyGrabPopupBox(gContext->GetMainWindow());
-    int        code = getkey->ExecPopup();
+    DialogCode code = getkey->ExecPopup();
     QString    key  = getkey->GetCapturedKey();
     getkey->deleteLater();
     getkey = NULL;
 
-    if (MythDialog::Rejected == code)
+    if (kDialogCodeRejected == code)
         return; // user hit Cancel button
 
     QString     action  = GetCurrentAction();

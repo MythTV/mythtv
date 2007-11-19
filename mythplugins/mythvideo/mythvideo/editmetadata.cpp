@@ -367,7 +367,7 @@ void EditMetadataDialog::saveAndExit()
     //  All done
     //
 
-    done(0);
+    reject();
 }
 
 void EditMetadataDialog::setTitle(QString new_title)
@@ -437,7 +437,7 @@ void EditMetadataDialog::findCoverArt()
         checkedSetText(coverart_text, new_coverart_file);
     }
 
-    delete nca;
+    nca->deleteLater();
 }
 
 void EditMetadataDialog::wireUpTheme()
@@ -532,14 +532,19 @@ EditMetadataDialog::~EditMetadataDialog()
 {
     if (title_editor)
     {
-        delete title_editor;
+        title_editor->deleteLater();
+        title_editor = NULL;
     }
+
     if (player_editor)
     {
-        delete player_editor;
+        player_editor->deleteLater();
+        player_editor = NULL;
     }
+
     if (working_metadata)
     {
         delete working_metadata;
+        working_metadata = NULL;
     }
 }

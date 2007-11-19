@@ -461,10 +461,10 @@ class RotorPosConfig : public ConfigurationDialog
         addChild(new RotorPosMap(rotor));
     }
 
-    virtual int exec(void)
+    virtual DialogCode exec(void)
     {
-        while (ConfigurationDialog::exec() == QDialog::Accepted);
-        return QDialog::Rejected;
+        while (ConfigurationDialog::exec() == kDialogCodeAccepted);
+        return kDialogCodeRejected;
     }
 };
 
@@ -944,16 +944,16 @@ bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
 
     popup->addWidget(list);
     connect(list,  SIGNAL(accepted(int)),
-            popup, SLOT(  done(    int)));
+            popup, SLOT(  AcceptItem(int)));
     list->setFocus();
 
-    int res = popup->ExecPopup();
+    DialogCode res = popup->ExecPopup();
     type = (DiSEqCDevDevice::dvbdev_t)list->currentItem();
 
     popup->hide();
     popup->deleteLater();
 
-    return res >= 0;
+    return kDialogCodeRejected != res;
 }
 
 void DeviceTree::CreateRootNodeDialog(void)
@@ -1084,10 +1084,10 @@ DTVDeviceTreeWizard::DTVDeviceTreeWizard(DiSEqCDevTree &tree)
     addChild(new DeviceTree(tree));
 }
 
-int DTVDeviceTreeWizard::exec(void)
+DialogCode DTVDeviceTreeWizard::exec(void)
 {
-    while (ConfigurationDialog::exec() == QDialog::Accepted);
-    return QDialog::Rejected;
+    while (ConfigurationDialog::exec() == kDialogCodeAccepted);
+    return kDialogCodeRejected;
 }
 
 //////////////////////////////////////// SwitchSetting
