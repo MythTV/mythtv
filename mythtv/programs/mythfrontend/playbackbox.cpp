@@ -995,7 +995,7 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
-    if (!(previewVideoEnabled && previewPixmapEnabled) ||
+    if ((! previewVideoEnabled && ! previewPixmapEnabled) ||
             inTitle && haveGroupInfoSet)
     {
         return;
