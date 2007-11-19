@@ -2752,6 +2752,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
                 if (ringBuffer->InDVDMenuOrStillFrame())
                 {
+                    if (audioOutput)
+                        audioOutput->Pause(false);
+
                     if (nbframes == 0)
                     {
                         ringBuffer->DVD()->IgnoreStillOrWait(true);
@@ -3688,10 +3691,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
     int samples = len / samplesize;
 
     if (ringBuffer->InDVDMenuOrStillFrame())
-    {
-        audioOutput->Pause(false);
         audioOutput->Drain();
-    }
 
     // If there is no warping, just send it to the audioOutput.
     if (!usevideotimebase)
