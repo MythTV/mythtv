@@ -519,10 +519,15 @@ if test "$archive" != "no" ; then
 fi
 
 if test "$zoneminder" != "no" ; then
-    if test "$zmversion" != "1.22.2" -a "$zmversion" != "1.22.3" ; then
-        echo "Disabling MythZoneMinder. Unknown ZoneMinder version '$zmversion' given."
+    if has_header mysql/mysql.h ; then
+        if test "$zmversion" != "1.22.2" -a "$zmversion" != "1.22.3" ; then
+            echo "Disabling MythZoneMinder. Unknown ZoneMinder version '$zmversion' given."
+            zoneminder="no"
+        fi
+    else
+        echo "Disabling MythZoneMinder. Requires mysql/mysql.h header"
         zoneminder="no"
-    fi 
+    fi
 fi
 
 if test "$browser" != "no" ; then
