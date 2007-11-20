@@ -1141,11 +1141,11 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     if (cachedata)
     {
-        cache_dd_data = tmpDir + QString("/mythtv_dd_cache_%1_%2_%3_%4")
+        cache_dd_data = tmpDir + QString("/mythtv_dd_cache_%1_%2_UTC_%3_to_%4")
             .arg(GetListingsProvider())
             .arg(GetUserID().ascii())
-            .arg(pstartDate.toString())
-            .arg(pendDate.toString());
+            .arg(pstartDate.toString("yyyyMMddhhmmss"))
+            .arg(pendDate.toString("yyyyMMddhhmmss"));
 
         if (QFile(cache_dd_data).exists() && inputfilename.isEmpty())
         {
