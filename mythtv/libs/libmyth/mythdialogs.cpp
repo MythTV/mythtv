@@ -471,24 +471,65 @@ int MythPopupBox::ExecPopupAtXY(int destx, int desty,
 void MythPopupBox::defaultButtonPressedHandler(void)
 {
     const QObjectList *objlist = children();
-    QObjectListIt it(*objlist);
+    QObjectListIt itf(*objlist);
     QObject *objs;
     int i = 0;
-    while ((objs = it.current()) != 0)
+    bool foundbutton = false;
+
+    // this bit of code will work if the window is focused
+    while ((objs = itf.current()) != 0)
     {
-        ++it;
+        ++itf;
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
             if (widget->isA("MythPushButton"))
             {
                 if (widget->hasFocus())
+                {
+                    foundbutton = true;
                     break;
+                }
                 i++;
             }
         }
     }
-    done(i);
+    if (foundbutton)
+    {
+        done(i);
+        return;
+    }
+
+    // this bit of code should always work but requires a cast
+    QObjectListIt itd(*objlist);
+    i = 0;
+    while ((objs = itd.current()) != 0)
+    {
+        ++itd;
+        if (objs->isWidgetType())
+        {
+            QWidget *widget = (QWidget *)objs;
+            if (widget->isA("MythPushButton"))
+            {
+                MythPushButton *button = dynamic_cast<MythPushButton*>(widget);
+                if (button && button->isDown())
+                {
+                    foundbutton = true;
+                    break;
+                }
+                i++;
+            }
+        }
+    }
+    if (foundbutton)
+    {
+        done(i);
+        return;
+    }
+
+    VERBOSE(VB_IMPORTANT, "MythPopupBox::defaultButtonPressedHandler(void)"
+            "\n\t\t\tWe should never get here!");
+    done(Rejected);
 }
 
 void MythPopupBox::defaultExitHandler()
@@ -550,39 +591,49 @@ int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
                                    QString message, QString button1msg,
                                    QString button2msg, int defvalue)
 {
-    MythPopupBox popup(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title);
 
-    popup.addLabel(message, Medium, true);
-    popup.addLabel("");
+    popup->addLabel(message, Medium, true);
+    popup->addLabel("");
 
-    QButton *but1 = popup.addButton(button1msg);
-    QButton *but2 = popup.addButton(button2msg);
+    QButton *but1 = popup->addButton(button1msg);
+    QButton *but2 = popup->addButton(button2msg);
 
     if (defvalue == 1)
         but1->setFocus();
     else
         but2->setFocus();
 
-    return popup.ExecPopup();
+    int ret = popup->ExecPopup();
+
+    popup->hide();
+    popup->deleteLater();
+
+    return ret;
 }
 
 int MythPopupBox::showButtonPopup(MythMainWindow *parent, QString title,
                                   QString message, QStringList buttonmsgs,
                                   int defvalue)
 {
-    MythPopupBox popup(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title);
 
-    popup.addLabel(message, Medium, true);
-    popup.addLabel("");
+    popup->addLabel(message, Medium, true);
+    popup->addLabel("");
 
     for (unsigned int i = 0; i < buttonmsgs.size(); i++ )
     {
-        QButton *but = popup.addButton(buttonmsgs[i]);
+        QButton *but = popup->addButton(buttonmsgs[i]);
         if (defvalue == (int)i)
             but->setFocus();
     }
 
-    return popup.ExecPopup();
+    int ret = popup->ExecPopup();
+
+    popup->hide();
+    popup->deleteLater();
+
+    return ret;
 }
 
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
