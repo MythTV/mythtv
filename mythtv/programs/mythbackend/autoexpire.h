@@ -1,6 +1,8 @@
 #ifndef AUTOEXPIRE_H_
 #define AUTOEXPIRE_H_
 
+#include <stdint.h>
+
 #include <pthread.h>
 
 #include <list>
