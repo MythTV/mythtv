@@ -26,7 +26,7 @@ class MPUBLIC ThemeInfo
 
     bool IsWide();
     QString Aspect() const { return m_aspect; }
-    QSize   BaseRes() const { return m_baseres; }
+    QSize   *BaseRes() { return &m_baseres; }
     QString Name() const { return m_name; }
     QString Description() const { return m_description; }
     QString Errata() const { return m_errata; }
