@@ -15,7 +15,7 @@
       <text lang="JA">全般</text>
       <text lang="SI">Splošno</text>
       <text lang="ET">Üldine</text>
-      <text lang="PL">Og�lne</text>
+      <text lang="PL">Og�ne</text>
       <text lang="RU">Общее</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
@@ -35,7 +35,7 @@
       <text lang="JA">画面表示</text>
       <text lang="SI">Vzgled</text>
       <text lang="ET">Kujundus</text>
-      <text lang="PL">Wygl�d</text>
+      <text lang="PL">Wygld</text>
       <text lang="RU">Внешний вид</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
@@ -51,7 +51,7 @@
       <text lang="ET">Klahvide muutmine</text>
       <text lang="ES">Configurar Teclas</text>
       <text lang="NL">Toetsen Instellen</text>
-      <text lang="PL">Edycja guzik�w</text>
+      <text lang="PL">Edycja guzik�</text>
       <text lang="JA">キー設定</text>
       <text lang="RU">Редактировать клавиши</text>
       <action>PLUGIN mythcontrols</action>
@@ -98,6 +98,13 @@
    </button>
 
    <button>
+      <type>STREAM</type>
+      <text>Internet Radio Settings</text>
+      <action>CONFIGPLUGIN mythstream</action>
+      <depends>mythstream</depends>
+   </button>
+
+   <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
        <text lang="ES">Configurar Videos</text>
@@ -111,7 +118,7 @@
        <text lang="JA">ビデオ設定</text>
        <text lang="SI">Video nastavitve</text>
        <text lang="ET">Video sätted</text>
-       <text lang="PL">Konfiguracja Film�w</text>
+       <text lang="PL">Konfiguracja Film�</text>
        <text lang="RU">Настройка фильмов</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
@@ -224,7 +231,7 @@
      <text lang="ET">Uudiste sätted</text>
      <text lang="DK">Nyheds Indstillinger</text>
      <text lang="PT">Configurar Notícias</text>
-     <text lang="PL">Konfiguracja Wiadomo�ci</text>
+     <text lang="PL">Konfiguracja Wiadomoci</text>
      <text lang="RU">Настройка новостей</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -274,7 +281,7 @@
       <text lang="PT">Configurar Receitas</text>
       <text lang="ES">Configurar Recetas</text>
       <text lang="NL">Recepten Instellingen</text>
-      <text lang="PL">Konfiguracja Przepis�w</text>
+      <text lang="PL">Konfiguracja Przepis�</text>
       <text lang="RU">Настройка рецептов</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>

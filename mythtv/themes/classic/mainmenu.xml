@@ -37,7 +37,14 @@
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
-
+   
+   <button>
+     <type>STREAM</type>
+     <text>Internet Radio</text>
+     <action>PLUGIN mythstream</action>
+     <depends>mythstream</depends>
+   </button>
+   
    <button>
      <type>VIDEO</type>
      <text>Videos</text>
@@ -99,7 +106,7 @@
      <text lang="JA">イメージ</text>
      <text lang="SI">Slike</text>
      <text lang="ET">Galerii</text>
-     <text lang="PL">Zdj�cia</text>
+     <text lang="PL">Zdj�ia</text>
      <text lang="RU">Изображения</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
@@ -168,7 +175,7 @@
      <text lang="ET">Uudised</text>
      <text lang="DK">Nyheder</text>
      <text lang="PT">Notícias</text>
-     <text lang="PL">Wiadomo�ci</text>
+     <text lang="PL">Wiadomoci</text>
      <text lang="RU">Новости</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -303,7 +310,7 @@
      <text lang="DK">Afslut</text>
      <text lang="PT">Desligar</text>
      <text lang="NL">Afsluiten</text>
-     <text lang="PL">Wy��cz</text>
+     <text lang="PL">Wycz</text>
      <text lang="RU">Завершение работы</text>
      <action>SHUTDOWN</action>
    </button> -->
