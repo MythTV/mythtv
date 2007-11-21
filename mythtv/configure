@@ -1564,7 +1564,8 @@ case $targetos in
     enable  darwin
     disable ivtv
     disable need_memalign
-    disable opengl
+    disable opengl_video
+    disable opengl_vsync
     enable  proc_opt
     disable v4l
     disable x11
