@@ -185,7 +185,7 @@ void AutoExpire::CalcParams()
                             + QString("Cardid %1: is not recoding, removing it "
                                       "from used list.").arg(*encit));
                     instance_lock.lock();
-                    fsEncoderMap.erase(*encit);
+                    used_encoders.erase(*encit);
                     instance_lock.unlock();
                     continue;
                 }
