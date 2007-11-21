@@ -2,8 +2,11 @@
 #define AVFECODER_H_
 
 #include "decoder.h"
+
+extern "C" {
 #include <mythtv/ffmpeg/avformat.h>
 #include <mythtv/ffmpeg/avcodec.h>
+}
 
 class Metadata;
 

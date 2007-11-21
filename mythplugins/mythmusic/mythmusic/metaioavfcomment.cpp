@@ -7,8 +7,10 @@ using namespace std;
 #include "metaioavfcomment.h"
 #include "metadata.h"
 
+extern "C" {
 #include <mythtv/ffmpeg/avformat.h>
 #include <mythtv/ffmpeg/avcodec.h>
+}
 
 //==========================================================================
 MetaIOAVFComment::MetaIOAVFComment(void)
