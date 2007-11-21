@@ -192,7 +192,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
 
     // Consolidate hosts sharing storage
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(encoderList)/12 /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
+    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
@@ -276,7 +276,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
     }
 
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)16, maxWriteFiveSec); // safety for NFS mounted dirs
+    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
