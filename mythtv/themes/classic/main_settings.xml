@@ -97,13 +97,7 @@
      <depends>mythmusic</depends>
    </button>
 
-   <button>
-      <type>STREAM</type>
-      <text>Internet Radio Settings</text>
-      <action>CONFIGPLUGIN mythstream</action>
-      <depends>mythstream</depends>
-   </button>
-
+   
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>

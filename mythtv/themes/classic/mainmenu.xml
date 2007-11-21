@@ -39,13 +39,6 @@
    </button>
    
    <button>
-     <type>STREAM</type>
-     <text>Internet Radio</text>
-     <action>PLUGIN mythstream</action>
-     <depends>mythstream</depends>
-   </button>
-   
-   <button>
      <type>VIDEO</type>
      <text>Videos</text>
      <text lang="IT">Video</text>
