@@ -13,6 +13,9 @@
 #include <qobject.h>
 #include <qregexp.h>
 
+// Mythtv Headers
+#include "themeinfo.h"
+
 #include <vector>
 using namespace std;
 
@@ -56,9 +59,11 @@ class OSD : public QObject
 {
     Q_OBJECT
  public:
-    OSD(const QRect &totalBounds,   int   frameRate,
-        const QRect &visibleBounds, float visibleAspect, float fontScaling);
+    OSD();
    ~OSD(void);
+
+    void Init(const QRect &totalBounds,   int   frameRate,
+        const QRect &visibleBounds, float visibleAspect, float fontScaling);
 
     OSDSurface *Display(void);
 
@@ -161,6 +166,8 @@ class OSD : public QObject
 
     void UpdateTeletext(void);
 
+    float GetThemeAspect(void) { return m_themeaspect; }
+
  private:
     bool InitDefaults(void);
     bool InitCC608(void);
@@ -202,6 +209,10 @@ class OSD : public QObject
     QString themepath;
 
     float wscale, fscale;
+
+    ThemeInfo *m_themeinfo;
+    float m_themeaspect;
+
     float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 

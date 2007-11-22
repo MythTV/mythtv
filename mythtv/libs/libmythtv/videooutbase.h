@@ -71,7 +71,8 @@ class VideoOutput
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
     virtual void GetOSDBounds(QRect &visible, QRect &total,
-                              float &pixelAspect, float &fontScale) const;
+                              float &pixelAspect, float &fontScale,
+                              float themeaspect) const;
 
     /// \brief Returns current display's frame refresh period in microseconds.
     ///        e.g. 1000000 / frame_rate_in_Hz
@@ -222,7 +223,7 @@ class VideoOutput
 
     virtual void SetPictureAttributeDBValue(
         PictureAttribute attributeType, int newValue);
-    virtual QRect GetVisibleOSDBounds(float&, float&) const;
+    virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
     virtual QRect GetTotalOSDBounds(void) const;
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);

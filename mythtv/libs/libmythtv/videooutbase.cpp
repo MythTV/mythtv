@@ -640,10 +640,11 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 
 void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
                                float &visible_aspect,
-                               float &font_scaling) const
+                               float &font_scaling,
+                               float themeaspect) const
 {
     total   = GetTotalOSDBounds();
-    visible = GetVisibleOSDBounds(visible_aspect, font_scaling);
+    visible = GetVisibleOSDBounds(visible_aspect, font_scaling, themeaspect);
 }
 
 static float sq(float a) { return a*a; }
@@ -657,13 +658,17 @@ static float sq(float a) { return a*a; }
  * \param font_scaling   scaling to apply to fonts
  */
 QRect VideoOutput::GetVisibleOSDBounds(
-    float &visible_aspect, float &font_scaling) const
+    float &visible_aspect, float &font_scaling, float themeaspect) const
 {
     float dv_w = ((float)video_dim.width())  / display_video_rect.width();
     float dv_h = ((float)video_dim.height()) / display_video_rect.height();
 
-    uint right_overflow = max((display_video_rect.width() + display_video_rect.left()) - display_visible_rect.width(), 0);
-    uint lower_overflow = max((display_video_rect.height() + display_video_rect.top()) - display_visible_rect.height(), 0);
+    uint right_overflow = max((display_video_rect.width()
+                                + display_video_rect.left())
+                                - display_visible_rect.width(), 0);
+    uint lower_overflow = max((display_video_rect.height() 
+                                + display_video_rect.top())
+                                - display_visible_rect.height(), 0);
 
     // top left and bottom right corners respecting letterboxing
     QPoint tl = QPoint((uint) ceil(max(-display_video_rect.left(),0)*dv_w),
@@ -692,12 +697,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
     float dispPixelAdj = (GetDisplayAspect() * display_visible_rect.height()) / display_visible_rect.width();
     // now adjust for scaling of the video on the aspect ratio
     float vs = ((float)vb.width())/vb.height();
-    visible_aspect = 1.3333f * (vs/overriden_video_aspect) * dispPixelAdj;
+    visible_aspect = themeaspect * (vs/overriden_video_aspect) * dispPixelAdj;
 
     // now adjust for scaling of the video on the size
-    font_scaling = 1.0f/sqrtf(2.0/(sq(visible_aspect / 1.3333f) + 1.0f));
+    font_scaling = 1.0f/sqrtf(2.0/(sq(visible_aspect / themeaspect) + 1.0f));
     // now adjust for aspect ratio effect on font size (should be in osd.cpp?)
-    font_scaling *= sqrtf(overriden_video_aspect/1.3333f);
+    font_scaling *= sqrtf(overriden_video_aspect / themeaspect);
     return vb;
 }
 

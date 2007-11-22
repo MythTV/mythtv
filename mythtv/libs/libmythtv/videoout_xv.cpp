@@ -291,19 +291,19 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
 
 // documented in videooutbase.cpp
 QRect VideoOutputXv::GetVisibleOSDBounds(
-    float &visible_aspect, float &font_scaling) const
+    float &visible_aspect, float &font_scaling, float themeaspect) const
 {
     // This rounding works for I420 video...
     QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
                        display_visible_rect.height() & ~0x1);
 
     if (!chroma_osd && !gl_use_osd_opengl2)
-        return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling);
+        return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling, themeaspect);
 
     float dispPixelAdj = 1.0f;
     if (dvr2.height() && dvr2.width())
         dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
-    visible_aspect = 1.3333f / dispPixelAdj;
+    visible_aspect = themeaspect / dispPixelAdj;
     font_scaling   = 1.0f;
     return QRect(QPoint(0,0), dvr2);
 }

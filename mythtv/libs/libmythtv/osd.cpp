@@ -40,56 +40,23 @@ static float sq(float a) { return a*a; }
 #define LOC QString("OSD: ")
 #define LOC_ERR QString("OSD, Error: ")
 
-OSD::OSD(const QRect &osd_bounds, int   frameRate,
-         const QRect &vis_bounds, float visibleAspect, float fontScaling)
+OSD::OSD()
     : QObject(),
-      osdBounds(osd_bounds),              frameint(frameRate),
       needPillarBox(false),
       themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
-      wscale(1.0f), fscale(fontScaling),
-      hmult(vis_bounds.height() / 480.0f),wmult(vis_bounds.width() / 640.0f),
-      xoffset(vis_bounds.left()),         yoffset(vis_bounds.top()),
-      displaywidth(vis_bounds.width()),   displayheight(vis_bounds.height()),
+      wscale(1.0f),
+      m_themeinfo(new ThemeInfo(themepath)),
       m_setsvisible(false),
       totalfadetime(0),                   timeType(0),
       timeFormat(""),                     setList(new vector<OSDSet*>),
       editarrowleft(NULL),                editarrowright(NULL),
-      drawSurface(new OSDSurface(osd_bounds.width(), osd_bounds.height())),
       changed(false),                     runningTreeMenu(NULL),
       treeMenuContainer(""),
       removeHTML(QRegExp("</?.+>"))
 {
-    removeHTML.setMinimal(true);
+    VERBOSE(VB_GENERAL, QString("OSD Theme Dimensions W: %1 H: %2").arg(m_themeinfo->BaseRes()->width()).arg(m_themeinfo->BaseRes()->height()));
 
-    if (!cc708_defaults_initialized)
-        initialize_osd_fonts();
-
-    for (uint i = 0; i < 16; i++)
-        cc708fontnames[i] = cc708_default_font_names[i];
-
-    needPillarBox = visibleAspect > 1.51f;
-    wscale = visibleAspect / 1.3333f;
-    // adjust for wscale font size scaling
-    fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
-
-    if (themepath.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: "
-                <<gContext->GetSetting("OSDTheme"));
-        InitDefaults();
-        return;
-    }
-
-    themepath += "/";
-    if (!LoadTheme())
-    {
-        VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: "
-                <<gContext->GetSetting("OSDTheme")<<" at "<<themepath);
-    }
-    InitDefaults();
-
-    // Reinit since LoadThemes and InitDefaults() appear to mess things up.
-    Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect, fontScaling);
+    m_themeaspect = (float)m_themeinfo->BaseRes()->width() / (float)m_themeinfo->BaseRes()->height();
 }
 
 OSD::~OSD(void)
@@ -110,6 +77,8 @@ OSD::~OSD(void)
             delete set;
     }
 
+    delete m_themeinfo;
+
     if (editarrowleft)
         delete editarrowleft;
     if (editarrowright)
@@ -117,6 +86,55 @@ OSD::~OSD(void)
 
     delete setList;
     delete drawSurface;
+}
+
+void OSD::Init(const QRect &osd_bounds, int   frameRate,
+         const QRect &vis_bounds, float visibleAspect, float fontScaling)
+{
+    removeHTML.setMinimal(true);
+
+    fscale = fontScaling;
+    osdBounds = osd_bounds;
+    frameint = frameRate;
+    hmult = vis_bounds.height() / (float)m_themeinfo->BaseRes()->height();
+    wmult = vis_bounds.width() / (float)m_themeinfo->BaseRes()->width();
+    xoffset = vis_bounds.left();
+    yoffset = vis_bounds.top();
+    displaywidth = vis_bounds.width();
+    displayheight = vis_bounds.height();
+    drawSurface = new OSDSurface(osd_bounds.width(), osd_bounds.height());
+
+    if (!cc708_defaults_initialized)
+        initialize_osd_fonts();
+
+    for (uint i = 0; i < 16; i++)
+        cc708fontnames[i] = cc708_default_font_names[i];
+
+    needPillarBox = visibleAspect > 1.51f;
+    wscale = visibleAspect / m_themeaspect;
+    // adjust for wscale font size scaling
+    fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
+
+    if (themepath.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: "
+                <<gContext->GetSetting("OSDTheme"));
+        InitDefaults();
+        return;
+    }
+
+    themepath += "/";
+    if (!LoadTheme())
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: "
+                <<gContext->GetSetting("OSDTheme")<<" at "<<themepath);
+    }
+
+    InitDefaults();
+
+    // Reinit since LoadThemes and InitDefaults() appear to mess things up.
+    Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect, fontScaling);
+
 }
 
 void OSD::SetFrameInterval(int frint)
@@ -507,12 +525,14 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     yoffset       = visibleBounds.top();
     displaywidth  = visibleBounds.width();
     displayheight = visibleBounds.height();
-    wmult         = displaywidth  / 640.0;
-    hmult         = displayheight / 480.0;
+    wmult         = displaywidth  / (float)m_themeinfo->BaseRes()->width();
+    hmult         = displayheight / (float)m_themeinfo->BaseRes()->height();
     needPillarBox = visibleAspect > 1.51f;
     frameint      = (frameRate <= 0) ? frameRate : frameint;
 
-    wscale = visibleAspect / 1.3333f;
+    float themeaspect = (float)m_themeinfo->BaseRes()->width() / (float)m_themeinfo->BaseRes()->height();
+
+    wscale = visibleAspect / themeaspect;
     fscale = fontScaling;
     // adjust for wscale font size scaling
     fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
@@ -1472,8 +1492,8 @@ bool OSD::LoadTheme(void)
     // HACK begin -- needed to address ticket #989
     xoffset = 0;
     yoffset = 0;
-    displaywidth  = 640;
-    displayheight = 480;
+    displaywidth  = m_themeinfo->BaseRes()->width();
+    displayheight = m_themeinfo->BaseRes()->height();
     hmult = 1.0f;
     wmult = 1.0f;
     // HACK end

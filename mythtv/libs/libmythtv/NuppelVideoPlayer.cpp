@@ -647,9 +647,11 @@ void NuppelVideoPlayer::ReinitOSD(void)
     {
         QRect visible, total;
         float aspect, scaling;
-        videoOutput->GetOSDBounds(total, visible, aspect, scaling);
         if (osd)
+        {
+            videoOutput->GetOSDBounds(total, visible, aspect, scaling, osd->GetThemeAspect());
             osd->Reinit(total, frame_interval, visible, aspect, scaling);
+        }
 
         if (GetInteractiveTV())
         {
@@ -3221,8 +3223,11 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         QRect visible, total;
         float aspect, scaling;
-        videoOutput->GetOSDBounds(total, visible, aspect, scaling);
-        osd = new OSD(total, frame_interval, visible, aspect, scaling);
+
+        osd = new OSD();
+
+        videoOutput->GetOSDBounds(total, visible, aspect, scaling, osd->GetThemeAspect());
+        osd->Init(total, frame_interval, visible, aspect, scaling);
 
         videoOutput->InitOSD(osd);
 
