@@ -3128,7 +3128,8 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                             "will have to be deleted or expired in order for "
                             "this recording to complete successfully.")
                             .arg(pginfo->title).arg(pginfo->pathname)
-                            .arg(fs->freeSpaceKB).arg(desiredSpaceKB));
+                            .arg(fs->freeSpaceKB / 1024)
+                            .arg(desiredSpaceKB / 1024));
 
                 foundDir = true;
                 break;
