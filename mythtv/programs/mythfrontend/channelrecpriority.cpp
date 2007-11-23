@@ -423,8 +423,9 @@ void ChannelRecPriority::FillList(void)
     channelData.clear();
 
     MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                            "icon, recpriority, name FROM channel;");
+    result.prepare("SELECT c.chanid, c.channum, c.sourceid, s.name, c.callsign, "
+                            "c.icon, c.recpriority, c.name FROM channel c, "
+                            "videosource s WHERE s.sourceid=c.sourceid;");
 
     if (result.exec() && result.isActive() && result.size() > 0)
     {
@@ -433,10 +434,11 @@ void ChannelRecPriority::FillList(void)
             chaninfo->chanid = result.value(0).toInt();
             chaninfo->chanstr = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
-            chaninfo->callsign = QString::fromUtf8(result.value(3).toString());
-            chaninfo->iconpath = result.value(4).toString();
-            chaninfo->recpriority = result.value(5).toString();
-            chaninfo->channame = QString::fromUtf8(result.value(6).toString());
+            chaninfo->sourcename = QString::fromUtf8(result.value(3).toString());
+            chaninfo->callsign = QString::fromUtf8(result.value(4).toString());
+            chaninfo->iconpath = result.value(5).toString();
+            chaninfo->recpriority = result.value(6).toString();
+            chaninfo->channame = QString::fromUtf8(result.value(7).toString());
             channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save 
@@ -673,7 +675,12 @@ void ChannelRecPriority::updateInfo(QPainter *p)
  
             type = (UITextType *)container->GetType("source");
             if (type)
-                type->SetText(QString("%1").arg(curitem->sourceid));
+            {
+                if (!curitem->sourcename.isEmpty())
+                    type->SetText(QString("%1").arg(curitem->sourcename));
+                else
+                    type->SetText(QString("%1").arg(curitem->sourceid));
+            }
 
             type = (UITextType *)container->GetType("recpriority");
             if (type) {

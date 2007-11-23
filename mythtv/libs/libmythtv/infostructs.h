@@ -22,6 +22,7 @@ class MPUBLIC ChannelInfo
     QString channame;
     int chanid;
     int sourceid;
+    QString sourcename;
     int favid;
     QString recpriority;
 
