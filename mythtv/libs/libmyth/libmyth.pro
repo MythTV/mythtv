@@ -21,6 +21,7 @@ HEADERS += langsettings.h audiooutputnull.h mythsocket.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
 HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
 HEADERS += mythexp.h mythpluginapi.h themeinfo.h
+HEADERS += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp
@@ -33,6 +34,7 @@ SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
 SOURCES += virtualkeyboard.cpp mythobservable.cpp mythsocket.cpp themeinfo.cpp
+SOURCES += mythstorage.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
@@ -60,6 +62,7 @@ inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
 inc.files += mythexp.h mythpluginapi.h
+inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 using_oss {
     DEFINES += USING_OSS

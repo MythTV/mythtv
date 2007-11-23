@@ -1,7 +1,7 @@
 #ifndef DBSETTINGS_H
 #define DBSETTINGS_H
 
-#include "settings.h"
+#include "mythconfigdialogs.h"
 
 class MPUBLIC DatabaseSettings: public ConfigurationWizard {
 public:
