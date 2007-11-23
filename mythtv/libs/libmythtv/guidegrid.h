@@ -174,7 +174,6 @@ class GuideGrid : public MythDialog
     QString timeformat;
     QString unknownTitle;
     QString unknownCategory;
-    QString currentTimeColor;
 
     QTimer *timeCheck;
     QTimer *videoRepaintTimer;

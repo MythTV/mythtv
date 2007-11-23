@@ -185,7 +185,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     dateformat = gContext->GetSetting("ShortDateFormat", "ddd d");
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
-    currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
     channelFormat.replace(" ", "\n");
 
