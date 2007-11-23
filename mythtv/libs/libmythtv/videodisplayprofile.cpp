@@ -197,6 +197,7 @@ safe_map_t  VideoDisplayProfile::safe_osd;
 safe_map_t  VideoDisplayProfile::safe_equiv_dec;
 safe_list_t VideoDisplayProfile::safe_custom;
 priority_map_t VideoDisplayProfile::safe_renderer_priority;
+pref_map_t  VideoDisplayProfile::dec_name;
 
 VideoDisplayProfile::VideoDisplayProfile()
     : lock(true), last_size(0,0), last_rate(0.0f),
@@ -540,48 +541,79 @@ QStringList VideoDisplayProfile::GetDecoderNames(void)
 {
     QStringList list;
 
-    list += QObject::tr("Standard");
-    list += QObject::tr("libmpeg2");
-    list += QObject::tr("Standard XvMC");
-    list += QObject::tr("VIA XvMC");
-    list += QObject::tr("Mac hardware acceleration");
-    list += QObject::tr("PVR-350 decoder");
+    const QStringList decs = GetDecoders();
+    QStringList::const_iterator it = decs.begin();
+    for (; it != decs.end(); ++it)
+        list += GetDecoderName(*it);
 
     return list;
 }
 
-QString VideoDisplayProfile::GetDecoderHelp(void)
+QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 {
-    return
-        QObject::tr("Decoder to use to play back MPEG2 video.") + " " +
-        QObject::tr("Standard will use ffmpeg library.") + " " +
-        QObject::tr("libmpeg2 will use mpeg2 library; "
-                    "this is faster on some AMD processors.")
-#ifdef USING_XVMC
-        + " " +
-        QObject::tr("Standard XvMC will use XvMC API 1.0 to "
-                    "play back video; this is fast, but does not "
-                    "work well with HDTV sized frames.")
-#endif // USING_XVMC
+    if (decoder.isEmpty())
+        return "";
 
-#ifdef USING_XVMC_VLD
-        + " " +
-        QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.")
-#endif // USING_XVMC_VLD
+    QMutexLocker locker(&safe_lock);
+    if (dec_name.empty())
+    {
+        dec_name["ffmpeg"]   = QObject::tr("Standard");
+        dec_name["libmpeg2"] = QObject::tr("libmpeg2");
+        dec_name["xvmc"]     = QObject::tr("Standard XvMC");
+        dec_name["xvmc-vld"] = QObject::tr("VIA XvMC");
+        dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
+        dec_name["ivtv"]     = QObject::tr("PVR-350 decoder");
+    }
 
-#ifdef USING_DVDV
-        + " " +
-        QObject::tr("Mac hardware will try to use the graphics "
-                    "processor - this may hang or crash your Mac!")
-#endif // USING_DVDV
-#ifdef USING_IVTV
-        + " " +
-        QObject::tr("MythTV can use the PVR-350's TV out and MPEG "
-                    "decoder for high quality playback.  This requires that "
-                    "the ivtv-fb kernel module is also loaded and configured "
-                    "properly.")
-#endif // USING_IVTV
-        ;
+    pref_map_t::const_iterator it = dec_name.find(decoder);
+    if (it != dec_name.end())
+        return QDeepCopy<QString>(*it);
+
+    return QDeepCopy<QString>(decoder);
+}
+
+
+QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
+{
+    QString msg = QObject::tr("Decoder to use to play back MPEG2 video.");
+
+    if (decoder.isEmpty())
+        return msg;
+
+    msg += "\n";
+
+    if (decoder == "ffmpeg")
+        msg += QObject::tr("Standard will use ffmpeg library.");
+
+    if (decoder == "libmpeg2")
+        msg +=  QObject::tr(
+            "libmpeg2 will use mpeg2 library; "
+            "this is faster on some 32 bit AMD processors.") + "\n" +
+            QObject::tr("Note: Closed caption decoding will "
+                        "not work with libmpeg2.");
+
+    if (decoder == "xvmc")
+        msg += QObject::tr(
+            "Standard XvMC will use XvMC API 1.0 to "
+            "play back video; this is fast, but does not "
+            "work well with HDTV sized frames.");
+
+    if (decoder == "xvmc-vld")
+        msg += QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.");
+
+
+    if (decoder == "macaccel")
+        msg += QObject::tr(
+            "Mac hardware will try to use the graphics "
+            "processor - this may hang or crash your Mac!");
+
+    if (decoder == "ivtv")
+        msg += QObject::tr(
+            "MythTV can use the PVR-350's TV out and MPEG decoder for "
+            "high quality playback.  This requires that the ivtv-fb "
+            "kernel module is also loaded and configured properly.");
+
+    return msg;
 }
 
 QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)

@@ -855,6 +855,7 @@ void PlaybackProfileItemConfig::load(void)
     QString pfilter   = item.Get("pref_filters");
     bool    found     = false;
 
+    QString     dech = VideoDisplayProfile::GetDecoderHelp();
     QStringList decr = VideoDisplayProfile::GetDecoders();
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.begin();
@@ -865,7 +866,12 @@ void PlaybackProfileItemConfig::load(void)
         found |= (*itr == pdecoder);
     }
     if (!found && !pdecoder.isEmpty())
-        decoder->SelectSetting::addSelection(pdecoder);
+    {
+        decoder->SelectSetting::addSelection(
+            VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
+    }
+    decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
+
     if (!prenderer.isEmpty())
         vidrend->setValue(prenderer);
     if (!posd.isEmpty())
@@ -928,6 +934,8 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
         if (*it != "null")
             vidrend->addSelection(*it, *it, (*it == prenderer));
     }
+
+    decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
 }
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)

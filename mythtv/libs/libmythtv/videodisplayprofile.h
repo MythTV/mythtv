@@ -103,7 +103,8 @@ class MPUBLIC VideoDisplayProfile
 
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
-    static QString     GetDecoderHelp(void);
+    static QString     GetDecoderName(const QString &decoder);
+    static QString     GetDecoderHelp(QString decoder = QString::null);
 
     static QString     GetDefaultProfileName(const QString &hostname);
     static void        SetDefaultProfileName(const QString &profilename,
@@ -171,6 +172,7 @@ class MPUBLIC VideoDisplayProfile
     static safe_map_t   safe_equiv_dec;
     static safe_list_t  safe_custom;
     static priority_map_t safe_renderer_priority;
+    static pref_map_t   dec_name;
 };
 
 #endif // _VIDEO_DISPLAY_PROFILE_H_
