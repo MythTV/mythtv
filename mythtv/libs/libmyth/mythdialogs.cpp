@@ -377,8 +377,16 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
     
     label->setMaximumWidth((int)m_parent->width() / 2);
     if (wrap)
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-    
+    {
+        QChar::Direction text_dir = QChar::DirL;
+        // Get a char from within the string to determine direction.
+        if (caption.length())
+            text_dir = caption[0].direction();
+        int align = (QChar::DirAL == text_dir) ?
+            Qt::WordBreak | Qt::AlignRight : Qt::WordBreak | Qt::AlignLeft;
+        label->setAlignment(align);
+    }
+
     addWidget(label, false);
     return label;
 }
