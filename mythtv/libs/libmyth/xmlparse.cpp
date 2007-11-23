@@ -3447,6 +3447,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     QRect   area = QRect(0,0,0,0);
     QString fontActive;
     QString fontInactive;
+    QString align = QString::null;
     bool    showArrow = true;
     bool    showScrollArrows = false;
     int     draworder = 0;
@@ -3507,6 +3508,10 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 if (getFirstText(info).lower() == "no")
                     showArrow = false;
             }
+            else if (info.tagName() == "align")
+            {
+                align = getFirstText(info);
+            }
             else if (info.tagName() == "showscrollarrows") {
                 if (getFirstText(info).lower() == "yes")
                     showScrollArrows = true;
@@ -3558,6 +3563,18 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
         }
     }
 
+    int jst = Qt::AlignLeft | Qt::AlignVCenter;
+
+    if (!align.isEmpty())
+    {
+        if (align.lower() == "center")
+            jst = Qt::AlignCenter | Qt::AlignVCenter;
+        else if (align.lower() == "right")
+            jst = Qt::AlignRight  | Qt::AlignVCenter;
+    	else if (align.lower() == "left")
+            jst = Qt::AlignLeft   | Qt::AlignVCenter;
+    }
+
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
@@ -3580,6 +3597,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     l->SetScreen(wmult, hmult);
     l->SetFontActive(fpActive);
     l->SetFontInactive(fpInactive);
+    l->SetJustification(jst);
     l->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
     l->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
     l->SetSpacing((int)(spacing*hmult));

@@ -176,6 +176,7 @@ class MPUBLIC UIListBtnType : public UIType
     void  SetMargin(int margin);
     void  SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
     void  SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
+    void  SetJustification(int justification) { m_justify = justification; }
     
     void  Draw(QPainter *p, int order, int context);
     void  Draw(QPainter *p, int order, int context, bool active_on);
@@ -237,6 +238,8 @@ class MPUBLIC UIListBtnType : public UIType
     int   m_itemSpacing;
     int   m_itemMargin;
     uint  m_itemsVisible;
+
+    int   m_justify;
 
     bool  m_active;
     bool  m_visible;
@@ -334,6 +337,9 @@ class MPUBLIC UIListBtnTypeItem
     void setOverrideInactive(bool flag);
     bool getOverrideInactive(void);
 
+    void setJustification(int justification) { m_justify = justification; }
+    int  getJustification(void) const { return m_justify; }
+
     bool moveUpDown(bool flag);
     
     void paint(QPainter *p, fontProp *font, int x, int y, bool active_on);
@@ -356,6 +362,7 @@ class MPUBLIC UIListBtnTypeItem
     bool           m_showArrow;
 
     bool           m_overrideInactive;
+    int            m_justify;
 
     friend class UIListBtnType;
 };

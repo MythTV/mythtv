@@ -1705,6 +1705,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
             font = m_fontInactive;
             p->setFont(font->face);
             p->setPen(font->color);
+            it.current()->setJustification(m_justify);
             it.current()->paint(p, font, x, y, active_on);
             font = m_active ? m_fontActive : m_fontInactive;;
             p->setFont(font->face);
@@ -1712,6 +1713,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
         }
         else
         {
+            it.current()->setJustification(m_justify);
             it.current()->paint(p, font, x, y, active_on);
         }
 
@@ -1923,19 +1925,21 @@ void UIListBtnType::looseFocus()
 
 //////////////////////////////////////////////////////////////////////////////
 
-UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
-                                     QPixmap *pixmap, bool checkable,
-                                     CheckState state, bool showArrow)
-{
-    m_parent    = lbtype;
-    m_text      = text;
-    m_pixmap    = pixmap;
-    m_checkable = checkable;
-    m_state     = state;
-    m_showArrow = showArrow;
-    m_data      = 0;
-    m_overrideInactive = false;
+UIListBtnTypeItem::UIListBtnTypeItem(
+    UIListBtnType *parent, const QString &text,
+    QPixmap *pixmap, bool checkable,
+    CheckState state, bool showArrow) :
+    m_parent(parent), m_text(QDeepCopy<QString>(text)), m_pixmap(pixmap),
+    m_checkable(checkable), m_state(state), m_data(NULL),
 
+    m_checkRect(0,0,0,0), m_pixmapRect(0,0,0,0),
+    m_textRect(0,0,0,0), m_arrowRect(0,0,0,0),
+
+    m_showArrow(showArrow),
+
+    m_overrideInactive(false),
+    m_justify(Qt::AlignLeft | Qt::AlignVCenter)
+{
     if (state >= NotChecked)
         m_checkable = true;
 
@@ -2153,6 +2157,6 @@ void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y, bool ac
     tr.moveBy(x,y);
     QString text = m_parent->cutDown(m_text, &(font->face), false,
                                      tr.width(), tr.height());
-    p->drawText(tr, Qt::AlignLeft|Qt::AlignVCenter, text);    
+    p->drawText(tr, m_justify, text);    
 }
 
