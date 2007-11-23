@@ -137,7 +137,8 @@ class MPUBLIC Configurable : public QObject
     QString getLabel(void) const { return QDeepCopy<QString>(label); }
     void setLabelAboveWidget(bool l = true) { labelAboveWidget = l; }
 
-    void setHelpText(QString str) { helptext = QDeepCopy<QString>(str); }
+    virtual void setHelpText(const QString &str)
+        { helptext = QDeepCopy<QString>(str); }
     QString getHelpText(void) const { return QDeepCopy<QString>(helptext); }
 
     void setVisible(bool b) { visible = b; };
@@ -239,6 +240,8 @@ class MPUBLIC LineEditSetting : public Setting
     virtual void setVisible(bool b);
     virtual void SetPasswordEcho(bool b);
 
+    virtual void setHelpText(const QString &str);
+
   private:
     QWidget      *bxwidget;
     MythLineEdit *edit;
@@ -313,6 +316,8 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
 
     void SetRelayEnabled(bool enabled) { relayEnabled = enabled; }
     bool IsRelayEnabled(void) const { return relayEnabled; }
+
+    virtual void setHelpText(const QString &str);
 
   signals:
     void valueChanged(const QString &name, int newValue);
@@ -401,6 +406,8 @@ public:
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);
 
+    virtual void setHelpText(const QString &str);
+
 public slots:
     void addSelection(const QString &label,
                       QString value = QString::null,
@@ -437,6 +444,8 @@ public:
 
     virtual void clearSelections(void);
 
+    virtual void setHelpText(const QString &str);
+
 signals:
     void accepted(int);
     void menuButtonPressed(int);
@@ -467,12 +476,14 @@ class MPUBLIC ImageSelectSetting: public SelectSetting {
     Q_OBJECT
 public:
     ImageSelectSetting(Storage *_storage) :
-        SelectSetting(_storage), bxwidget(NULL), imagelabel(NULL),
+        SelectSetting(_storage),
+        bxwidget(NULL), imagelabel(NULL), combo(NULL),
         m_hmult(1.0f), m_wmult(1.0f) { }
-    virtual ~ImageSelectSetting();
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
+    virtual void deleteLater(void);
+    virtual void setHelpText(const QString &str);
 
     virtual void addImageSelection(const QString& label,
                                    QImage* image,
@@ -482,10 +493,15 @@ public:
 protected slots:
     void imageSet(int);
 
+  protected:
+    void Teardown(void);
+    virtual ~ImageSelectSetting();
+
 protected:
     vector<QImage*> images;
     QWidget *bxwidget;
     QLabel *imagelabel;
+    MythComboBox *combo;
     float m_hmult, m_wmult;
 };
 
@@ -520,6 +536,8 @@ public:
     virtual void widgetInvalid(QObject*);
 
     virtual void setEnabled(bool b);
+
+    virtual void setHelpText(const QString &str);
 
 protected:
     MythCheckBox *widget;
@@ -573,10 +591,7 @@ class MPUBLIC DateSetting : public Setting
 
     QDate dateValue(void) const;
 
-    virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                  const char* widgetName = 0);
-
- public slots:
+  public slots:
     void setValue(const QDate& newValue);
 };
 
@@ -589,10 +604,7 @@ class MPUBLIC TimeSetting : public Setting
     TimeSetting(Storage *_storage) : Setting(_storage) { }
     QTime timeValue(void) const;
 
-    virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                  const char* widgetName = 0);
-
- public slots:
+  public slots:
     void setValue(const QTime& newValue);
 };
 
@@ -624,6 +636,8 @@ class MPUBLIC ButtonSetting: public Setting
     virtual void widgetInvalid(QObject *obj);
 
     virtual void setEnabled(bool b);
+
+    virtual void setHelpText(const QString &);
 
 signals:
     void pressed();

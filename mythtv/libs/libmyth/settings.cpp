@@ -941,6 +941,13 @@ void LineEditSetting::SetPasswordEcho(bool b)
         edit->setEchoMode(b ? QLineEdit::Password : QLineEdit::Normal);
 }
 
+void LineEditSetting::setHelpText(const QString &str)
+{
+    if (edit)
+        edit->setHelpText(str);
+    Setting::setHelpText(str);
+}
+
 void BoundedIntegerSetting::setValue(int newValue)
 {
     newValue = std::max(std::min(newValue, max), min);
@@ -1102,6 +1109,13 @@ void SpinBoxSetting::relayValueChanged(int newValue)
 {
     if (relayEnabled)
         emit valueChanged(configName, newValue);
+}
+
+void SpinBoxSetting::setHelpText(const QString &str)
+{
+    if (spinbox)
+        spinbox->setHelpText(str);
+    BoundedIntegerSetting::setHelpText(str);
 }
 
 QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
@@ -1284,6 +1298,13 @@ bool ComboBoxSetting::removeSelection(const QString &label, QString value)
     return false;
 }
 
+void ComboBoxSetting::setHelpText(const QString &str)
+{
+    if (widget)
+        widget->setHelpText(str);
+    SelectSetting::setHelpText(str);
+}
+
 void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 {
     clearSelections();
@@ -1348,30 +1369,12 @@ void TimeSetting::setValue(const QTime& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
 }
 
-QWidget* TimeSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                   const char* widgetName) {
-    //QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    (void)cg;
-    (void)parent;
-    (void)widgetName;
-    return NULL;
-}
-
 QDate DateSetting::dateValue(void) const {
     return QDate::fromString(getValue(), Qt::ISODate);
 }
 
 void DateSetting::setValue(const QDate& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
-}
-
-QWidget* DateSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
-                                   const char* widgetName) {
-    //QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    (void)cg;
-    (void)parent;
-    (void)widgetName;
-    return NULL;
 }
 
 QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -1426,6 +1429,13 @@ void CheckBoxSetting::setEnabled(bool fEnabled)
     BooleanSetting::setEnabled(fEnabled);
     if (widget)
         widget->setEnabled(fEnabled);
+}
+
+void CheckBoxSetting::setHelpText(const QString &str)
+{
+    if (widget)
+        widget->setHelpText(str);
+    BooleanSetting::setHelpText(str);
 }
 
 void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) 
@@ -1827,6 +1837,13 @@ void ListBoxSetting::setValueByIndex(int index)
         setValue(values[index]);
 }
 
+void ListBoxSetting::setHelpText(const QString &str)
+{
+    if (widget)
+        widget->setHelpText(str);
+    SelectSetting::setHelpText(str);
+}
+
 void ImageSelectSetting::addImageSelection(const QString& label,
                                            QImage* image,
                                            QString value,
@@ -1835,11 +1852,28 @@ void ImageSelectSetting::addImageSelection(const QString& label,
     addSelection(label, value, select);
 }
 
-ImageSelectSetting::~ImageSelectSetting() {
-    while (images.size() > 0) {
-        delete images.back();
+ImageSelectSetting::~ImageSelectSetting()
+{
+    Teardown();
+}
+
+void ImageSelectSetting::deleteLater(void)
+{
+    Teardown();
+    SelectSetting::deleteLater();
+}
+
+void ImageSelectSetting::Teardown(void)
+{
+    while (images.size())
+    {
+        QImage *tmp = images.back();
         images.pop_back();
+        delete tmp;
     }
+    bxwidget   = NULL;
+    imagelabel = NULL;
+    combo      = NULL;
 }
 
 void ImageSelectSetting::imageSet(int num)
@@ -1887,6 +1921,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 
     MythComboBox *widget = new MythComboBox(false, box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    combo = widget;
 
     QLabel *testlabel = new QLabel(box);
     testlabel->setText("  ");
@@ -1943,7 +1978,15 @@ void ImageSelectSetting::widgetInvalid(QObject *obj)
     {
         bxwidget   = NULL;
         imagelabel = NULL;
+        combo      = NULL;
     }
+}
+
+void ImageSelectSetting::setHelpText(const QString &str)
+{
+    if (combo)
+        combo->setHelpText(str);
+    SelectSetting::setHelpText(str);
 }
 
 HostnameSetting::HostnameSetting(Storage *storage) : Setting(storage)
@@ -2003,6 +2046,13 @@ void ButtonSetting::setEnabled(bool fEnabled)
     Configurable::setEnabled(fEnabled);
     if (button)
         button->setEnabled(fEnabled);
+}
+
+void ButtonSetting::setHelpText(const QString &str)
+{
+    if (button)
+        button->setHelpText(str);
+    Setting::setHelpText(str);
 }
 
 QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,

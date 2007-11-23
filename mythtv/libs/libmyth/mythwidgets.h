@@ -43,7 +43,8 @@ class MPUBLIC MythComboBox: public QComboBox
   public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0);
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(const QString &help);
+
     void setAcceptOnSelect(bool Accept) { AcceptOnSelect = Accept; }
     void setStep(int _step = 1) { step = _step; }
     void setAllowVirtualKeyboard(bool allowKbd = true)
@@ -90,7 +91,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
         QSpinBox(parent, widgetName),
         singlestep(allow_single_step) { if (singlestep) setLineStep(10); }
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(const QString&);
     
     bool singleStep(void) { return singlestep; }
     void setSingleStep(bool arg = true) { singlestep = arg; }
@@ -115,7 +116,7 @@ class MPUBLIC MythSlider: public QSlider
     MythSlider(QWidget* parent=0, const char* name=0):
         QSlider(parent, name) {};
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(const QString&);
 
   signals:
     void changeHelpText(QString);
@@ -137,7 +138,7 @@ class MPUBLIC MythLineEdit : public QLineEdit
     MythLineEdit(QWidget *parent=NULL, const char* widgetName=0);
     MythLineEdit(const QString &text, QWidget *p=NULL, const char *name=0);
 
-    void setHelpText(QString help) { helptext = help; };
+    void setHelpText(const QString&);;
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
     void setAllowVirtualKeyboard(bool allowKbd = true)
@@ -188,7 +189,7 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );    
     MythRemoteLineEdit( int lines, QWidget * parent, const char * name = 0 );
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(const QString&);
     void setCycleTime(float desired_interval); // in seconds
     void setCharacterColors(QColor unselected, QColor selected, QColor special);
     void insert(QString text);
@@ -296,7 +297,7 @@ class MPUBLIC MythPushButton : public QPushButton
     MythPushButton(const QString &ontext, const QString &offtext,
                    QWidget *parent, bool isOn = true, bool aa = false);
 
-    void setHelpText(const QString &help) { helptext = help; }
+    void setHelpText(const QString &help);
 
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
@@ -328,7 +329,8 @@ class MPUBLIC MythCheckBox: public QCheckBox
         QCheckBox(parent, name) {};
     MythCheckBox(const QString &text, QWidget* parent = 0, const char* name = 0):
         QCheckBox(text, parent, name) {};
-    void setHelpText(QString help) { helptext = help; }
+
+    void setHelpText(const QString&);
 
   signals:
     void changeHelpText(QString);
@@ -348,7 +350,8 @@ class MPUBLIC MythRadioButton: public QRadioButton
   public:
     MythRadioButton(QWidget* parent = 0, const char* name = 0):
         QRadioButton(parent, name) {};
-    void setHelpText(QString help) { helptext = help; }
+
+    void setHelpText(const QString&);
 
   signals:
     void changeHelpText(QString);
@@ -382,7 +385,7 @@ class MPUBLIC MythListBox: public QListBox {
 
     virtual void keyPressEvent(QKeyEvent* e);
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(const QString&);
 
   protected:
     void focusInEvent(QFocusEvent *e);

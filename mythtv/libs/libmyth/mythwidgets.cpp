@@ -53,6 +53,14 @@ void MythComboBox::Teardown(void)
     qt_delete(popup);
 }
 
+void MythComboBox::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
+}
+
 void MythComboBox::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
@@ -203,6 +211,14 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
         e->ignore();
 }
 
+void MythCheckBox::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
+}
+
 void MythCheckBox::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
@@ -243,6 +259,14 @@ void MythRadioButton::keyPressEvent(QKeyEvent* e)
 
     if (!handled)
         e->ignore();
+}
+
+void MythRadioButton::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
 }
 
 void MythRadioButton::focusInEvent(QFocusEvent *e)
@@ -323,6 +347,14 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     return TRUE;
 }
 
+void MythSpinBox::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
+}
+
 void MythSpinBox::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
@@ -367,6 +399,14 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
 
     if (!handled)
         QSlider::keyPressEvent(e);
+}
+
+void MythSlider::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
 }
 
 void MythSlider::focusInEvent(QFocusEvent *e)
@@ -486,6 +526,14 @@ void MythLineEdit::setText(const QString &text)
 QString MythLineEdit::text(void)
 {
     return QDeepCopy<QString>(QLineEdit::text());
+}
+
+void MythLineEdit::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
 }
 
 void MythLineEdit::focusInEvent(QFocusEvent *e)
@@ -1017,6 +1065,14 @@ void MythRemoteLineEdit::toggleShift()
     }
 }
 
+void MythRemoteLineEdit::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
+}
+
 void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
@@ -1170,6 +1226,14 @@ MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
         setText(offText);
 
     setOn(isOn);
+}
+
+void MythPushButton::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
 }
 
 void MythPushButton::keyPressEvent(QKeyEvent *e)
@@ -1495,6 +1559,14 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
 
     if (!handled)
         e->ignore();
+}
+
+void MythListBox::setHelpText(const QString &help)
+{
+    bool changed = helptext != help;
+    helptext = QDeepCopy<QString>(help);
+    if (hasFocus() && changed)
+        emit changeHelpText(QDeepCopy<QString>(help));
 }
 
 void MythListBox::focusOutEvent(QFocusEvent *e)
