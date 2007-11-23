@@ -6,21 +6,22 @@
 
 void SimpleDBStorage::load(void)
 {
-    MSqlBindings bindings;
-    QString querystr = QString("SELECT " + column + " FROM " +
-                               table + " WHERE " +
-                               whereClause(bindings) + ";");
-
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(querystr);
+    MSqlBindings bindings;
+    query.prepare(
+        "SELECT " + column + " "
+        "FROM "   + table + " " +
+        "WHERE "  + whereClause(bindings));
     query.bindValues(bindings);
-    query.exec();
 
-    if (query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
     {
-        query.next();
+        MythContext::DBError("SimpleDBStorage::load()", query);
+    }
+    else if (query.next())
+    {
         QString result = query.value(0).toString();
-        if (result != QString::null)
+        if (!result.isNull())
         {
             result = QString::fromUtf8(query.value(0).toString());
             setting->setValue(result);
@@ -41,9 +42,14 @@ void SimpleDBStorage::save(QString table)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
     query.bindValues(bindings);
-    query.exec();
 
-    if (query.isActive() && query.size() > 0)
+    if (!query.exec())
+    {
+        MythContext::DBError("SimpleDBStorage::save() query", query);
+        return;
+    }
+
+    if (query.isActive() && query.next())
     {
         // Row already exists
         // Don"t change this QString. See the CVS logs rev 1.91.
@@ -54,10 +60,9 @@ void SimpleDBStorage::save(QString table)
 
         query.prepare(querystr);
         query.bindValues(bindings);
-        query.exec();
 
-        if (!query.isActive())
-            MythContext::DBError("simpledbstorage update", querystr);
+        if (!query.exec())
+            MythContext::DBError("SimpleDBStorage::save() update", query);
     }
     else
     {
@@ -69,10 +74,9 @@ void SimpleDBStorage::save(QString table)
 
         query.prepare(querystr);
         query.bindValues(bindings);
-        query.exec();
 
-        if (!query.isActive())
-            MythContext::DBError("simpledbstorage update", querystr);
+        if (!query.exec())
+            MythContext::DBError("SimpleDBStorage::save() insert", query);
     }
 }
 
