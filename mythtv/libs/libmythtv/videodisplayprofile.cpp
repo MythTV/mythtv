@@ -696,7 +696,7 @@ void VideoDisplayProfile::SetDefaultProfileName(
     const QString &profilename, const QString &hostname)
 {
     gContext->SaveSettingOnHost(
-        "DefaultVideoPlaybackProfile", hostname, profilename);
+        "DefaultVideoPlaybackProfile", profilename, hostname);
 }
 
 uint VideoDisplayProfile::GetProfileGroupID(const QString &profilename,
