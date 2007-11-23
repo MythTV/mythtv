@@ -9,7 +9,7 @@
 #include "infostructs.h"
 #include "mythcontext.h"
 
-void ChannelInfo::LoadIcon(int size)
+void ChannelInfo::LoadIcon(int width, int height)
 {
     QImage tempimage(iconpath);
 
@@ -35,10 +35,18 @@ void ChannelInfo::LoadIcon(int size)
     if (tempimage.width() > 0)
     {
         iconload = true;
-        if (tempimage.width() != size || tempimage.height() != size)
+        QImage tmp2;
+
+        if ((height == 0) && (tempimage.width() != width
+                                || tempimage.height() != width))
         {
-            QImage tmp2;
-            tmp2 = tempimage.smoothScale(size, size);
+            tmp2 = tempimage.smoothScale(width, width);
+            icon.convertFromImage(tmp2);
+        }
+        else if ((height > 0) && (tempimage.width() != width
+                                || tempimage.height() != height))
+        {
+            tmp2 = tempimage.smoothScale(width, height);
             icon.convertFromImage(tmp2);
         }
         else

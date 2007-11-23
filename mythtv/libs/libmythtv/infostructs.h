@@ -13,7 +13,7 @@ class MPUBLIC ChannelInfo
     ChannelInfo() {}
    ~ChannelInfo() {}
 
-    void LoadIcon(int size);
+    void LoadIcon(int width, int height=0);
     QString Text(QString format);
 
     QString callsign;

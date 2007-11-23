@@ -660,11 +660,12 @@ void ChannelRecPriority::updateInfo(QPainter *p)
         {
             itype = (UIImageType *)container->GetType("icon");
             if (itype) {
-                int iconsize = itype->GetSize().width();
+                int iconwidth = itype->GetSize().width();
+                int iconheight = itype->GetSize().height();
                 if (curitem->iconpath == "none" || curitem->iconpath == "")
                     curitem->iconpath = "blankicon.jpg";
                 if (!curitem->iconload)
-                    curitem->LoadIcon(iconsize);
+                    curitem->LoadIcon(iconwidth, iconheight);
                 if (curitem->iconload)
                     itype->SetImage(curitem->icon);
             }
