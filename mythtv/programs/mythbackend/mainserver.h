@@ -79,7 +79,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
                                bool forceMetadataDelete);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
-                                 bool forceMetadataDelete);
+                                 bool forceMetadataDelete, bool expirer=false);
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);

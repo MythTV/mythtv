@@ -669,7 +669,7 @@ void MainServer::customEvent(QCustomEvent *e)
                 {
                     pinfo->ForgetHistory();
                 }
-                DoHandleDeleteRecording(pinfo, NULL, false);
+                DoHandleDeleteRecording(pinfo, NULL, false, true);
             }
             else
             {
@@ -1952,14 +1952,14 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
 }
 
 void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
-                                         bool forceMetadataDelete)
+                                         bool forceMetadataDelete, bool expirer)
 {
     int resultCode = -1;
     MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
-    bool justexpire = 
+    bool justexpire = expirer ? false :
             (gContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
             (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
 
