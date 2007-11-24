@@ -738,8 +738,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[4097U << 16] |= EITFixUp::kEFixForceISO8859_1;
     fix[4098U << 16] |= EITFixUp::kEFixForceISO8859_1;
 
-    // DVB-T Germany Berlin dsf
-    fix[  774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Berlin HSE/MonA TV
     fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Ruhrgebiet Tele 5
@@ -774,15 +772,13 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[10004LL<<32 | 61441U << 16 | 53619] = // GemsTV
         EITFixUp::kEFixForceISO8859_15;
     // On transport 10007 only following channels need fixing:
-    fix[    10007LL<<32| 61441U << 16 | 53605] = // terranova
-        fix[10007LL<<32| 61441U << 16 | 53607] = // Eurosport
+    fix[    10007LL<<32| 61441U << 16 | 53607] = // Eurosport
         fix[10007LL<<32| 61441U << 16 | 53608] = // Das Vierte
         fix[10007LL<<32| 61441U << 16 | 53609] = // Viva
         fix[10007LL<<32| 61441U << 16 | 53628] = // COMEDY CENTRAL
         EITFixUp::kEFixForceISO8859_15;
     // On transport 10008 only following channels need fixing:
     fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
-        fix[10008LL<<32 | 61441U << 16 | 53624] = // DSF
         fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
         EITFixUp::kEFixForceISO8859_15;
 
