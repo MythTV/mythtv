@@ -564,19 +564,16 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[10004LL<<32 | 61441U << 16 | 53619] = // GemsTV
         EITFixUp::kEFixPro7Sat;
     // On transport 10007 only following channels need fixing:
-    fix[    10007LL<<32| 61441U << 16 | 53605] = // terranova
-        fix[10007LL<<32| 61441U << 16 | 53607] = // Eurosport
+    fix[    10007LL<<32| 61441U << 16 | 53607] = // Eurosport
         fix[10007LL<<32| 61441U << 16 | 53608] = // Das Vierte
         fix[10007LL<<32| 61441U << 16 | 53609] = // Viva
         fix[10007LL<<32| 61441U << 16 | 53628] = // COMEDY CENTRAL
         EITFixUp::kEFixPro7Sat;
     // On transport 10008 only following channels need fixing:
     fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
-        fix[10008LL<<32 | 61441U << 16 | 53624] = // DSF
         fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
         EITFixUp::kEFixPro7Sat;
 
-    fix[ 774LL << 32 | 8468 << 16 | 16392] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin dsf
     fix[ 772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixPro7Sat; //DVB-T Berlin HSE/MonA TV
     fix[8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixPro7Sat; //DVB-T Ruhrgebiet Tele 5
 
