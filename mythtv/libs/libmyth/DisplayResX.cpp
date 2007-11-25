@@ -21,18 +21,15 @@ DisplayResX::~DisplayResX(void)
 
 bool DisplayResX::GetDisplaySize(int &width_mm, int &height_mm) const
 {
-    Display *display = MythXOpenDisplay();
-    if (display == NULL)
-        return false;
+    QSize dim = MythXGetDisplayDimensions();
+    if ((dim.width() > 0) && (dim.height() > 0))
+    {
+        width_mm  = dim.width();
+        height_mm = dim.height();
+        return true;
+    }
 
-    X11L;
-    int screen_num = DefaultScreen(display);
-    width_mm = DisplayWidthMM(display, screen_num);
-    height_mm = DisplayHeightMM(display, screen_num);
-    XCloseDisplay(display);
-    X11U;
-
-    return true;
+    return false;
 }
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, short desired_rate)

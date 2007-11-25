@@ -39,6 +39,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "exitcodes.h"
 #include "util.h"
+#include "util-x11.h"
 #include "mythcontext.h"
 #include "mythmediamonitor.h"
 
@@ -720,3 +721,11 @@ QString createTempFile(QString name_template, bool dir)
     return tmpFileName;
 }
 
+double MythGetPixelAspectRatio(void)
+{
+    float pixelAspect = 1.0;
+#ifdef USING_X11
+    pixelAspect = MythXGetPixelAspectRatio();
+#endif // USING_X11
+    return pixelAspect;
+}

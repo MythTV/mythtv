@@ -441,8 +441,7 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     }
     else
     {
-        display_dim = QSize(DisplayWidthMM(XJ_disp, XJ_screen_num),
-                            DisplayHeightMM(XJ_disp, XJ_screen_num));
+        display_dim = MythXGetDisplayDimensions(XJ_disp, XJ_screen_num);
 
         if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
             display_dim = db_display_dim;

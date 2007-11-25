@@ -126,4 +126,101 @@ vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors)
     }
     return events;
 }
+
+QSize MythXGetDisplaySize(Display *d, int screen)
+{
+    Display *display = d;
+    if (!display)
+        display = MythXOpenDisplay();
+    if (!display)
+    {
+        VERBOSE(VB_IMPORTANT, "GetXDisplaySize: "
+                "MythXOpenDisplay call failed");
+        return QSize(0,0);
+    }
+
+    X11L;
+
+    int scr = screen;
+    if (scr < 0)
+        scr = DefaultScreen(display);
+
+    int displayWidthPixel  = DisplayWidth( display, scr);
+    int displayHeightPixel = DisplayHeight(display, scr);
+
+    if (display != d)
+        XCloseDisplay(display);
+
+    X11U;
+
+    return QSize(displayWidthPixel, displayHeightPixel);
+}
+
+QSize MythXGetDisplayDimensions(Display *d, int screen)
+{
+    Display *display = d;
+    if (!display)
+        display = MythXOpenDisplay();
+    if (!display)
+    {
+        VERBOSE(VB_IMPORTANT, "GetXDisplayDimensions: "
+                "MythXOpenDisplay call failed");
+        return QSize(0,0);
+    }
+
+    X11L;
+
+    int scr = screen;
+    if (scr < 0)
+        scr = DefaultScreen(display);
+
+    int displayWidthMM  = DisplayWidthMM( display, scr);
+    int displayHeightMM = DisplayHeightMM(display, scr);
+
+    if (display != d)
+        XCloseDisplay(display);
+
+    X11U;
+
+    return QSize(displayWidthMM, displayHeightMM);
+}
+
+double MythXGetPixelAspectRatio(Display *d, int screen)
+{
+    Display *display = d;
+    if (!display)
+        display = MythXOpenDisplay();
+    if (!display)
+    {
+        VERBOSE(VB_IMPORTANT, "GetXPixelAspectRatio: "
+                "MythXOpenDisplay call failed");
+        return 1.0;
+    }
+
+    X11L;
+    int scr = screen;
+    if (scr < 0)
+        scr = DefaultScreen(display);
+    X11U;
+
+    double pixelAspect = 1.0;
+    QSize dim = MythXGetDisplayDimensions(display, screen);
+    QSize sz = MythXGetDisplaySize(display, screen);
+
+    if ((dim.width() > 0) && (dim.height() > 0) &&
+        (sz.width()  > 0) && (sz.height()  > 0))
+    {
+        pixelAspect =
+            ((double)dim.width()  / (double)sz.width()) /
+            ((double)dim.height() / (double)sz.height());
+    }
+
+    X11L;
+    if (display != d)
+        XCloseDisplay(display);
+    X11U;
+
+    return pixelAspect;
+}
+
 #endif // USING_X11

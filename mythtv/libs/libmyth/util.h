@@ -78,4 +78,6 @@ MPUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
 MPUBLIC QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
                                bool dir = false);
 
+MPUBLIC double MythGetPixelAspectRatio(void);
+
 #endif // UTIL_H_

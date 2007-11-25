@@ -397,6 +397,32 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     return false;
 }
 
+QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest)
+{
+    QSize sz = src;
+
+    // calculate screen pixel aspect ratio
+    double pixelAspect = MythGetPixelAspectRatio();
+
+    // calculate image aspect ratio
+    double imageAspect = 1.0;
+    if ((sz.width() > 0) && (sz.height() > 0))
+        imageAspect = (double)sz.width() / (double)sz.height();
+
+    // scale to dest height for most images
+    int scalewidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+    int scaleheight = dest.height();
+    if (scalewidth > dest.width())
+    {
+        // scale to dest width for extra wide images
+        scalewidth = dest.width();
+        scaleheight = (int)((float)dest.width() * pixelAspect / imageAspect);
+    }
+
+    sz.scale(scalewidth, scaleheight, QSize::ScaleFree);
+    return sz;
+}
+
 bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
 {
     QDir srcDir(src.absFilePath());

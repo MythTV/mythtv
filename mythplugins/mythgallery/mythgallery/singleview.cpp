@@ -613,9 +613,14 @@ void SingleView::SetZoom(float zoom)
     if (m_image.isNull())
         return;
 
-    QImage img = m_image.smoothScale((int) (screenwidth  * m_zoom),
-                                     (int) (screenheight * m_zoom),
-                                     QImage::ScaleMin);
+    QImage img = m_image;
+
+    QSize dest = QSize(
+        (int)(screenwidth * m_zoom), (int)(screenheight * m_zoom));
+
+    QSize sz = GalleryUtil::ScaleToDest(m_image.size(), dest);
+    if ((sz.width() > 0) && (sz.height() > 0))
+        img = m_image.smoothScale(sz);
 
     SetPixmap(new QPixmap(img));
 }

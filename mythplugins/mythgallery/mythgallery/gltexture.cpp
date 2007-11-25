@@ -26,6 +26,7 @@
 // MythGallery headers
 #include "thumbview.h"
 #include "gltexture.h"
+#include "galleryutil.h"
 
 /** \fn GLTexture::Init(const QImage&)
  *  \brief Create the texture initialized with QImage
@@ -85,10 +86,13 @@ void GLTexture::MakeQuad(float alpha, float scale)
 
 void GLTexture::ScaleTo(const QSize &dest)
 {
-    QSize sz = GetSize();
-    sz.scale(dest.width(), dest.height(), QSize::ScaleMin);
-    SetScale((float)sz.width()  / (float)dest.width(),
-             (float)sz.height() / (float)dest.height());
+    QSize sz = GalleryUtil::ScaleToDest(GetSize(), dest);
+    if ((sz.width()   > 0) && (sz.height()   > 0) &&
+        (dest.width() > 0) && (dest.height() > 0))
+    {
+        SetScale((float)sz.width()  / (float)dest.width(),
+                 (float)sz.height() / (float)dest.height());
+    }
 }
 
 void GLTexture::SetItem(ThumbItem *thumbItem, const QSize &sz)

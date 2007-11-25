@@ -6,6 +6,7 @@
 #include <qmutex.h>
 
 #ifdef USING_X11
+#include <qsize.h>
 #include <qwindowdefs.h>
 #include <X11/Xlib.h>
 #include <vector>
@@ -16,6 +17,9 @@ MPUBLIC Display *MythXOpenDisplay(void);
 MPUBLIC void InstallXErrorHandler(Display *d);
 MPUBLIC void PrintXErrors(Display *d, const std::vector<XErrorEvent>& events);
 MPUBLIC std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors = true);
+MPUBLIC QSize  MythXGetDisplaySize(      Display *d = NULL, int screen = -1);
+MPUBLIC QSize  MythXGetDisplayDimensions(Display *d = NULL, int screen = -1);
+MPUBLIC double MythXGetPixelAspectRatio( Display *d = NULL, int screen = -1);
 #endif // USING_X11
 
 MPUBLIC int GetNumberOfXineramaScreens();
