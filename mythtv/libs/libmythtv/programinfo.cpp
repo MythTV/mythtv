@@ -369,7 +369,9 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 #define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = (y)atoi(ts.ascii());
 
 #define DATETIME_FROM_LIST(x)  NEXT_STR() (x).setTime_t((uint)atoi(ts.ascii()));
-#define DATE_FROM_LIST(x)      NEXT_STR() (x) = QDate::fromString(ts, Qt::ISODate)
+#define DATE_FROM_LIST(x)      NEXT_STR() (x) = \
+                                   ((ts.isEmpty()) || (ts == "0000-00-00")) ?\
+                                   QDate() : QDate::fromString(ts, Qt::ISODate)
 
 #define LONGLONG_FROM_LIST(x)  INT_FROM_LIST(ti); NEXT_STR() \
                                (x) = ((long long)(ti) << 32) | \
