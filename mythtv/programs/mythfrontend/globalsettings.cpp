@@ -2104,6 +2104,21 @@ static HostComboBox *XineramaMonitorAspectRatio()
     return gc;
 }
 
+static HostComboBox *LetterboxingColour()
+{
+    HostComboBox *gc = new HostComboBox("LetterboxColour");
+    gc->setLabel(QObject::tr("Letterboxing Color"));
+    for (int m = kLetterBoxColour_Black; m < kLetterBoxColour_END; m++)
+        gc->addSelection(toString((LetterBoxColour)m), QString::number(m));
+    gc->setHelpText(
+        QObject::tr(
+            "By default MythTV uses black letterboxing to match broadcaster "
+            "letterboxing, but those with plasma screens may prefer gray "
+            "to minimize burn-in.") +
+        QObject::tr("Currently only works with XVideo video renderer."));
+    return gc;
+}
+
 static HostComboBox *AspectOverride()
 {
     HostComboBox *gc = new HostComboBox("AspectOverride");
@@ -4342,9 +4357,14 @@ PlaybackSettings::PlaybackSettings()
     oscan->addChild(ocol1);
     oscan->addChild(ocol2);
 
+    HorizontalConfigurationGroup* aspect_fill =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    aspect_fill->addChild(AspectOverride());
+    aspect_fill->addChild(AdjustFill());
+
     general2->addChild(oscan);
-    general2->addChild(AspectOverride());
-    general2->addChild(AdjustFill());
+    general2->addChild(aspect_fill);
+    general2->addChild(LetterboxingColour());
     general2->addChild(PIPLocationComboBox());
     general2->addChild(PlaybackExitPrompt());
     general2->addChild(EndOfRecordingExitPrompt());

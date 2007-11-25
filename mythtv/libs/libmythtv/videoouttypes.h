@@ -47,6 +47,14 @@ typedef enum AdjustFillMode
     kAdjustFill_END
 } AdjustFillMode;
 
+typedef enum LetterBoxColour
+{
+    kLetterBoxColour_Toggle = -1,
+    kLetterBoxColour_Black = 0,
+    kLetterBoxColour_Gray25,
+    kLetterBoxColour_END
+} LetterBoxColour;
+
 typedef enum FrameScanType
 {
     kScan_Ignore       = -1,
@@ -142,6 +150,32 @@ inline QString toString(AspectOverrideMode aspectmode)
         case kAspect_Toggle:
         case kAspect_Off:
         case kAspect_END: break;
+    }
+    return QDeepCopy<QString>(ret);
+}
+
+inline QString toString(LetterBoxColour letterboxcolour)
+{ 
+    QString ret = QObject::tr("Black");
+    switch (letterboxcolour)
+    {
+        case kLetterBoxColour_Gray25: ret = QObject::tr("Gray"); break;
+        case kLetterBoxColour_Black:
+        case kLetterBoxColour_Toggle:
+        case kLetterBoxColour_END: break;
+    }
+    return QDeepCopy<QString>(ret);
+}
+
+inline QString toXString(LetterBoxColour letterboxcolour)
+{ 
+    QString ret = "gray0";
+    switch (letterboxcolour)
+    {
+        case kLetterBoxColour_Gray25: ret = "gray25"; break;
+        case kLetterBoxColour_Black:
+        case kLetterBoxColour_Toggle:
+        case kLetterBoxColour_END: break;
     }
     return QDeepCopy<QString>(ret);
 }

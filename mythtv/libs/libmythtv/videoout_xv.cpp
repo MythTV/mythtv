@@ -103,7 +103,8 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       display_res(NULL), global_lock(true),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
-      XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
+      XJ_disp(NULL), XJ_screen_num(0),
+      XJ_white(0), XJ_black(0), XJ_letterbox_colour(0), XJ_depth(0),
       XJ_screenx(0), XJ_screeny(0), XJ_screenwidth(0), XJ_screenheight(0),
       XJ_started(false),
 
@@ -1569,6 +1570,15 @@ bool VideoOutputXv::Init(
     XJ_root       = DefaultRootWindow(XJ_disp);
     XJ_gc         = XCreateGC(XJ_disp, XJ_win, 0, 0);
     XJ_depth      = DefaultDepthOfScreen(XJ_screen);
+
+    // The letterbox color..
+    XJ_letterbox_colour = XJ_black;
+    Colormap cmap = XDefaultColormap(XJ_disp, XJ_screen_num);
+    XColor colour, colour_exact;
+    QString name = toXString(db_letterbox_colour);
+    if (XAllocNamedColor(XJ_disp, cmap, name.ascii(), &colour, &colour_exact))
+        XJ_letterbox_colour = colour.pixel;
+
     X11U;
 
     // Basic setup
@@ -3184,8 +3194,8 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     needrepaint = false;
     xv_need_bobdeint_repaint = false;
 
-    // Draw black in masked areas
-    XSetForeground(XJ_disp, XJ_gc, XJ_black);
+    // Set colour for masked areas
+    XSetForeground(XJ_disp, XJ_gc, XJ_letterbox_colour); 
 
     if (display_video_rect.left() > display_visible_rect.left())
     { // left

@@ -253,6 +253,7 @@ class VideoOutput
     PictureSettingMap  db_pict_attr; ///< Picture settings
     AspectOverrideMode db_aspectoverride;
     AdjustFillMode     db_adjustfill;
+    LetterBoxColour    db_letterbox_colour;
     QString db_deint_filtername;
     bool    db_use_picture_controls;
 

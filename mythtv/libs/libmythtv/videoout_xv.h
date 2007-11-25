@@ -214,6 +214,7 @@ class VideoOutputXv : public VideoOutput
     int                  XJ_screen_num;
     unsigned long        XJ_white;
     unsigned long        XJ_black;
+    unsigned long        XJ_letterbox_colour;
     int                  XJ_depth;
     int                  XJ_screenx;
     int                  XJ_screeny;
