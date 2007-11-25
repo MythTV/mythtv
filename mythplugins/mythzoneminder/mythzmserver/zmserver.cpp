@@ -1147,7 +1147,7 @@ void ZMServer::handleDeleteEvent(vector<string> tokens)
     }
 
     // run zmaudit.pl to clean everything up
-    string command(g_binPath + "/zmaudit.pl");
+    string command(g_binPath + "/zmaudit.pl &");
     system(command.c_str());
     send(outStr);
 }
@@ -1191,7 +1191,7 @@ void ZMServer::handleRunZMAudit(void)
     string outStr("");
 
     // run zmaudit.pl to clean up orphaned db entries etc
-    string command(g_binPath + "/zmaudit.pl");
+    string command(g_binPath + "/zmaudit.pl &");
 
     if (m_debug)
         cout << "Running command: " << command << endl;
