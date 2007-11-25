@@ -5779,6 +5779,8 @@ an actual programming fault within gcc.
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <bf>gdb</bf>, the GNU debugger.
+Note that, on OS X, some data is provided without going through these steps.
+See ~/Library/Logs/CrashReporter/MythFrontend.crash.log
 
 Re-run the <bf>configure</bf> script and add <tt>--compile-type=debug</tt>
 to any previous configuration options you may have used.  Check the
