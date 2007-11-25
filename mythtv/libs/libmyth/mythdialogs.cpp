@@ -11,6 +11,7 @@
 #include <qdict.h>
 #include <qsqldatabase.h>
 #include <qobjectlist.h> 
+#include <qeventloop.h>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -177,7 +178,12 @@ DialogCode MythDialog::exec(void)
     Show();
 
     in_loop = TRUE;
-    qApp->enter_loop();
+
+    QEventLoop *qteloop = QApplication::eventLoop();
+    if (!qteloop)
+        return kDialogCodeRejected;
+
+    qteloop->enterLoop();
 
     DialogCode res = result();
 
@@ -191,10 +197,11 @@ void MythDialog::hide(void)
 
     // Reimplemented to exit a modal when the dialog is hidden.
     QWidget::hide();
-    if (in_loop)  
+    QEventLoop *qteloop = QApplication::eventLoop();
+    if (in_loop && qteloop)
     {
         in_loop = FALSE;
-        qApp->exit_loop();
+        qteloop->exitLoop();
     }
 }
 
@@ -2573,10 +2580,11 @@ void MythScrollDialog::hide()
 
     // Reimplemented to exit a modal when the dialog is hidden.
     QWidget::hide();
-    if (m_inLoop)  
+    QEventLoop *qteloop = QApplication::eventLoop();
+    if (m_inLoop && qteloop)
     {
         m_inLoop = false;
-        qApp->exit_loop();
+        qteloop->exitLoop();
     }
 }
 
@@ -2594,7 +2602,12 @@ DialogCode MythScrollDialog::exec(void)
     show();
 
     m_inLoop = true;
-    qApp->enter_loop();
+
+    QEventLoop *qteloop = QApplication::eventLoop();
+    if (!qteloop)
+        return kDialogCodeRejected;
+
+    qteloop->enterLoop();
 
     DialogCode res = result();
 
