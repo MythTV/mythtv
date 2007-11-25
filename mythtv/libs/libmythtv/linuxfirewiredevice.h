@@ -87,6 +87,7 @@ class LinuxFirewireDevice : public FirewireDevice
 
   private:
     uint                     m_bufsz;
+    bool                     m_db_reset_disabled;
     bool                     m_use_p2p;
     LFDPriv                 *m_priv;
 };

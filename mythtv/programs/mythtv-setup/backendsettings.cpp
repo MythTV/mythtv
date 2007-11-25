@@ -171,6 +171,20 @@ static GlobalSpinBox *HDRingbufferSize()
     return bs;
 }
 
+static HostCheckBox *DisableFirewireReset()
+{
+    HostCheckBox *hc = new HostCheckBox("DisableFirewireReset");
+    hc->setLabel(QObject::tr("Disable Firewire Reset"));
+    hc->setHelpText(
+        QObject::tr(
+            "By default MythTV will reset the firewire bus when a "
+            "firewire recorder stops responding to commands. But "
+            "if this causes problems you can disable this here for "
+            "Linux firewire recorders."));
+    hc->setValue(false);
+    return hc;
+}
+
 static HostLineEdit *MiscStatusScript()
 {
     HostLineEdit *he = new HostLineEdit("MiscStatusScript");
@@ -744,13 +758,15 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* fm = new VerticalConfigurationGroup();
     fm->setLabel(QObject::tr("File Management Settings"));
     fm->addChild(MasterBackendOverride());
-    fm->addChild(DeletesFollowLinks());
-    fm->addChild(TruncateDeletes());
+    HorizontalConfigurationGroup *fmh1 =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    fmh1->addChild(DeletesFollowLinks());
+    fmh1->addChild(TruncateDeletes());
+    fm->addChild(fmh1);
     fm->addChild(HDRingbufferSize());
     group2->addChild(fm);
-    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
-    misc->addChild(MiscStatusScript());
-    group2->addChild(misc);
+    group2->addChild(MiscStatusScript());
+    group2->addChild(DisableFirewireReset());
     addChild(group2);
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);

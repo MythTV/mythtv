@@ -128,10 +128,13 @@ LinuxFirewireDevice::LinuxFirewireDevice(
     uint speed, bool use_p2p, uint av_buffer_size_in_bytes) :
     FirewireDevice(guid, subunitid, speed),
     m_bufsz(av_buffer_size_in_bytes),
+    m_db_reset_disabled(false),
     m_use_p2p(use_p2p), m_priv(new LFDPriv())
 {
     if (!m_bufsz)
         m_bufsz = gContext->GetNumSetting("HDRingbufferSize");
+
+    m_db_reset_disabled = gContext->GetNumSetting("DisableFirewireReset", 0);
 
     UpdateDeviceList();
 }
@@ -779,15 +782,17 @@ bool LinuxFirewireDevice::ResetBus(void)
 {
     VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- begin");
 
-#if 0
+    if (m_db_reset_disabled)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Bus Reset disabled" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- end");
+        return true;
+    }
+
     bool ok = (raw1394_reset_bus_new(GetInfoPtr()->fw_handle,
                                      RAW1394_LONG_RESET) == 0);
     if (!ok)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Bus Reset failed" + ENO);
-#else
-    bool ok = true;
-    VERBOSE(VB_IMPORTANT, LOC_WARN + "Bus Reset disabled" + ENO);
-#endif
 
     VERBOSE(VB_IMPORTANT, LOC + "ResetBus() -- end");
 
