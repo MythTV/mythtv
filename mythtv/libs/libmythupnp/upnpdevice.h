@@ -264,7 +264,7 @@ class DeviceLocation : public RefCounted
             UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 
             if ( pDevice == NULL)
-               return "<Unknown>";
+               return "<Unknown> (" + m_sLocation + ")";
 
             return pDevice->m_rootDevice.m_sFriendlyName
                    + " (" + pDevice->m_sHostName + "), "
