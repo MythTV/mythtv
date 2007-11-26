@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 
 TEMPLATE = app
 CONFIG += thread opengl
@@ -7,7 +8,6 @@ TARGET = mtd
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS 
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 HEADERS += ../mythvideo/dbcheck.h logging.h mtd.h 

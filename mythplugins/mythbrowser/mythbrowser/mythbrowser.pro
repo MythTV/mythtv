@@ -1,5 +1,6 @@
 include (../../mythconfig.mak )
 include (../../settings.pro )
+include (../../programs-libs.pro )
 
 KDEPREFIX = $$SYSTEM(kde-config --prefix)
 INCLUDEPATH += $${KDEPREFIX}/include
@@ -16,7 +17,6 @@ installimages.files = images/*.png
 
 INSTALLS += installimages
 
-LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 LIBS += -L$$SYSTEM(kde-config --expandvars --install lib) -lkhtml
 
 # Input
