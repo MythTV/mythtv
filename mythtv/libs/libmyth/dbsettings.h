@@ -5,7 +5,7 @@
 
 class MPUBLIC DatabaseSettings: public ConfigurationWizard {
 public:
-    DatabaseSettings();
+    DatabaseSettings(const QString &DBhostOverride = QString::null);
     
     // This routine calls wizard->addChild() for each of
     // the database configuration screens.  This allows

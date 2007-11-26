@@ -6,7 +6,7 @@
 
 class MythDbSettings1: public VerticalConfigurationGroup {
 public:
-    MythDbSettings1();
+    MythDbSettings1(const QString &DBhostOverride = QString::null);
 
     void load();
     void save();
@@ -20,6 +20,8 @@ protected:
     TransLineEditSetting *dbUserName;
     TransLineEditSetting *dbPassword;
     TransComboBoxSetting *dbType;
+
+    QString              m_DBhostOverride;
 }; 
 
 class MythDbSettings2: public VerticalConfigurationGroup {
@@ -71,9 +73,11 @@ class WOLsqlSettings : public TriggeredConfigurationGroup
     }
 };
 
-MythDbSettings1::MythDbSettings1() :
+MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
     VerticalConfigurationGroup(false, true, false, false)
 {
+    m_DBhostOverride = DbHostOverride;
+
     setLabel(QObject::tr("Database Configuration") + " 1/2");
 
     info = new TransLabelSetting();
@@ -236,9 +240,13 @@ void MythDbSettings1::load()
         info->setValue(info->getValue() + "\nRequired fields are marked "
                                           "with an asterisk (*).");
 
-    dbHostName->setValue(params.dbHostName);
     if (params.dbHostName.isEmpty())
+    {
         dbHostName->setLabel("* " + dbHostName->getLabel());
+        dbHostName->setValue(m_DBhostOverride);
+    }
+    else
+        dbHostName->setValue(params.dbHostName);
 
     dbHostPing->setValue(params.dbHostPing);
 
@@ -304,9 +312,9 @@ void MythDbSettings2::save()
     gContext->SaveDatabaseParams(params);
 }
 
-DatabaseSettings::DatabaseSettings()
+DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
 {
-    addChild(new MythDbSettings1());
+    addChild(new MythDbSettings1(DBhostOverride));
     addChild(new MythDbSettings2());
 }
 
