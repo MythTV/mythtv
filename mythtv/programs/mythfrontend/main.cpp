@@ -53,7 +53,6 @@ using namespace std;
 #include "libmythui/myththemedmenu.h"
 #include "libmythui/myththemebase.h"
 #include "mediarenderer.h"
-#include "masterselection.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -1059,44 +1058,10 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     g_pUPnp  = new MediaRenderer();
 
-    DatabaseParams *pParams = NULL;
-
-    if (!bBypassAutoDiscovery)
-    {
-        pParams = new DatabaseParams;
-
-        int nRetCode = MasterSelection::GetConnectionInfo( g_pUPnp,
-                                                           pParams, 
-                                                           bPromptForBackend );
-        switch( nRetCode )
-        {
-            case -1:    // Exit Application
-                return FRONTEND_EXIT_OK;
-
-            case  0:    // Continue with no Connection Infomation
-            {
-                delete pParams;
-                pParams = NULL;
-
-                break;
-            }
-
-            case 1:     // Connection Information found
-            default:
-                break;
-        }
-    }
-
-    if (!gContext->Init( true, pParams ))
+    if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
-    }
-
-    if (pParams != NULL)
-    {
-        delete pParams;
-        pParams = NULL;
     }
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
@@ -1480,6 +1445,8 @@ int main(int argc, char **argv)
     DestroyMythMainWindow();
     delete themeBase;
     delete gContext;
+    // This takes a few seconds, so inform the user:
+    VERBOSE(VB_GENERAL, "Deleting UPnP client...");
     delete g_pUPnp;
 
     return FRONTEND_EXIT_OK;

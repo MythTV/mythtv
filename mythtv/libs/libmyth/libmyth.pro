@@ -10,34 +10,37 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
-HEADERS += remotefile.h settings.h util.h mythwizard.h
-HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
-HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h mythmediamonitor.h
-HEADERS += uilistbtntype.h generictree.h screensaver.h
-HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
-HEADERS += dbsettings.h screensaver-null.h output.h visual.h
-HEADERS += langsettings.h audiooutputnull.h mythsocket.h
-HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
-HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
-HEADERS += mythexp.h mythpluginapi.h themeinfo.h
-HEADERS += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
+HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
+HEADERS += backendselect.h dbsettings.h dialogbox.h
+HEADERS += DisplayRes.h DisplayResScreen.h exitcodes.h
+HEADERS += generictree.h httpcomms.h langsettings.h lcddevice.h
+HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
+HEADERS += mythcontext.h mythdbcon.h mythdeque.h mythdialogs.h
+HEADERS += mythevent.h mythexp.h mythmedia.h mythmediamonitor.h
+HEADERS += mythobservable.h mythplugin.h mythpluginapi.h mythsocket.h
+HEADERS += mythstorage.h mythwidgets.h mythwizard.h
+HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
+HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
+HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
+HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
 
-SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
-SOURCES += oldsettings.cpp remotefile.cpp settings.cpp
-SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
-SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp  
-SOURCES += httpcomms.cpp mythmedia.cpp mythmediamonitor.cpp uilistbtntype.cpp 
-SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
-SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
-SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
-SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
-SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-SOURCES += virtualkeyboard.cpp mythobservable.cpp mythsocket.cpp themeinfo.cpp
-SOURCES += mythstorage.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
+SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
+SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
+SOURCES += DisplayRes.cpp DisplayResScreen.cpp
+SOURCES += generictree.cpp httpcomms.cpp langsettings.cpp lcddevice.cpp
+SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
+SOURCES += mythcontext.cpp mythdbcon.cpp mythdialogs.cpp
+SOURCES += mythmedia.cpp mythmediamonitor.cpp
+SOURCES += mythobservable.cpp mythplugin.cpp mythsocket.cpp
+SOURCES += mythstorage.cpp mythwidgets.cpp mythwizard.cpp
+SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
+SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
+SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
+SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
+DEPENDPATH += ../libmythupnp
 
 LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}
@@ -111,7 +114,7 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
 
-    # There is a dependence on some stuff in libmythui.
+    # There is a dependence on some stuff in libmythui and libmythupnp.
     # It isn't built yet, so we have to ignore these for now:
     QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 

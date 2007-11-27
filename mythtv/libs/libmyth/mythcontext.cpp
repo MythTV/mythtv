@@ -27,6 +27,7 @@
 #include "mythplugin.h"
 #include "screensaver.h"
 #include "DisplayRes.h"
+#include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mythdbcon.h"
@@ -35,6 +36,8 @@
 #include "themeinfo.h"
 
 #include "libmythui/mythmainwindow.h"
+#include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/upnp.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -54,6 +57,12 @@ unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 QString verboseString = QString(" important general");
 
 QMutex avcodeclock(true);
+
+// Some common UPnP search and XML value strings
+const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
+const QString kDefaultPIN = "UPnP/MythFrontend/DefaultBackend/SecurityPin";
+const QString kDefaultUSN = "UPnP/MythFrontend/DefaultBackend/USN";
+
 
 int parse_verbose_arg(QString arg)
 {
@@ -190,14 +199,16 @@ void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir )
     }
 }
 
+
 class MythContextPrivate
 {
   public:
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    bool Init(bool gui, DatabaseParams *pParams = NULL );
-    bool FindDatabase(const DatabaseParams *pParams);
+    bool Init        (const bool gui,    UPnp *UPnPclient,
+                      const bool prompt, const bool noPrompt);
+    bool FindDatabase(const bool prompt, const bool noPrompt);
 
     bool IsWideMode() const {return (m_baseWidth == 1280);}
     void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
@@ -211,7 +222,7 @@ class MythContextPrivate
     void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
-    bool LoadDatabaseSettings(const DatabaseParams *pParams = NULL);
+    void LoadDatabaseSettings(void);
     
     bool LoadSettingsFile(void);
     bool WriteSettingsFile(const DatabaseParams &params,
@@ -220,9 +231,16 @@ class MythContextPrivate
 
     QString getResponse(const QString &query, const QString &def);
     int     intResponse(const QString &query, int def);
-    bool    PromptForDatabaseParams(QString error);
+    bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
     void    ResetDatabase(void);
+
+    bool    InitUPnP(void);
+    void    DeleteUPnP(void);
+    int     ChooseBackend(const QString &error);
+    int     UPnPautoconf(const int milliSeconds = 2000);
+    bool    DefaultUPnP(QString &error);
+    bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
 
     MythContext *parent;
@@ -257,6 +275,11 @@ class MythContextPrivate
     QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
 
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
+    QString         m_DBhostCp;  ///< dbHostName backup
+
+    UPnp             *m_UPnP;    ///< For automatic backend discover
+    XmlConfiguration *m_XML;
+    HttpServer       *m_HTTP;
 
     QMutex serverSockLock;
     bool attemptingToConnect;
@@ -322,6 +345,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600),
       m_localhostname(QString::null),
+      m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
       serverSockLock(false),
       attemptingToConnect(false),
       language(""),
@@ -350,6 +374,7 @@ MythContextPrivate::~MythContextPrivate()
 {
     imageCache.clear();
 
+    DeleteUPnP();
     if (m_settings)
         delete m_settings;
     if (m_qtThemeSettings)
@@ -378,6 +403,18 @@ MythContextPrivate::~MythContextPrivate()
  */
 void MythContextPrivate::TempMainWindow(bool languagePrompt)
 {
+    if (mainWindow)
+        return;
+
+    // We clear the hostname so MSqlQuery will fail, instead of long
+    // timeouts per DB value, or hundreds of lines of DB connect errors.
+    // We save the value for later possible editing in the DbSettings pages
+    if (m_DBparams.dbHostName.length())
+    {
+        m_DBhostCp = m_DBparams.dbHostName;
+        m_DBparams.dbHostName = "";
+    }
+
     m_settings->SetSetting("Theme", "blue");
 #ifdef Q_WS_MACX
     // Myth looks horrible in default Mac style for Qt
@@ -482,9 +519,15 @@ void MythContextPrivate::GetScreenBounds()
     }
 }
 
-bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
+bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
+                              const bool promptForBackend, const bool noPrompt)
 {
     m_gui = gui;
+    if (UPnPclient)
+    {
+        m_UPnP = UPnPclient;
+        m_XML  = (XmlConfiguration *)UPnp::g_pConfig;
+    }
 
     // Creates screen saver control if we will have a GUI
     if (gui)
@@ -492,7 +535,7 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 
     // ---- database connection stuff ----
 
-    if (!FindDatabase(pParams))
+    if (!FindDatabase(promptForBackend, noPrompt))
         return false;
 
     // ---- keep all DB-using stuff below this line ----
@@ -508,33 +551,123 @@ bool MythContextPrivate::Init(bool gui, DatabaseParams *pParams)
 
 /**
  * Get database connection settings and test connectivity.
+ *
+ * Can use UPnP AutoDiscovery to locate backends, and get their DB settings.
+ * The user can force the AutoDiscovery chooser with the --prompt argument,
+ * and disable it by using the --disable-autodiscovery argument.
+ * There is also an autoconfigure function, which counts the backends,
+ * and if there is exactly one, uses it as above.
+ *
+ * Despite its name, the disable argument currently only disables the chooser.
+ * If set, autoconfigure will still be attempted in some situations.
  */
-bool MythContextPrivate::FindDatabase(const DatabaseParams *pParams)
+bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 {
-    // Attempts to read DB info from "mysql.txt" from the 
-    // filesystem, or create it if it does not exist.
-    if (!LoadDatabaseSettings(pParams))
-        return false;
+    // The two bool. args actually form a Yes/Maybe/No (A tristate bool :-)
+    bool manualSelect = prompt && !noPrompt;
 
-    // Attempt to connect to the database, get message for user if it failed.
-    QString failure = TestDBconnection();
+    // In addition to the UI chooser, we can also try to autoconfigure
+    bool autoSelect = !manualSelect;
+
+    QString failure;
+
+
+    // 1. Load either mysql.txt, or use sensible "localhost" defaults:
+    LoadDatabaseSettings();
+
+
+    // 2. If the user isn't forcing up the chooser UI, look for a default
+    //    backend in config.xml, then test DB settings we've got so far:
+    if (!manualSelect)
+    {
+        // config.xml may contain a backend host UUID and PIN.
+        // If so, try to AutoDiscover UPnP server, and use its DB settings:
+
+        if (DefaultUPnP(failure))                // Probably a valid backend,
+            autoSelect = manualSelect = false;   // so disable any further UPnP
+        else
+            VERBOSE(VB_IMPORTANT, failure);
+
+        failure = TestDBconnection();
+        if (failure.isEmpty())
+            goto DBfound;
+    }
+
+
+    // 3. Try to automatically find the single backend:
+    if (autoSelect)
+    {
+        int count = UPnPautoconf();
+
+        if (count == 0)
+            failure = "No UPnP backends found";
+
+        if (count == 1)
+        {
+            failure = TestDBconnection();
+            if (failure.isEmpty())
+                goto DBfound;
+        }
+
+        if (count > 1 || count == -1)     // Multiple BEs, or needs PIN.
+            manualSelect = !noPrompt;     // If allowed, prompt user
+    }
+
+    if (!m_gui) 
+        manualSelect = false;  // no interactive command-line chooser yet
+
+
+
+    // Last, get the user to select a backend from a possible list:
+    if (manualSelect)
+    {
+        switch (ChooseBackend(QString::null)) 
+        { 
+            case -1:    // User asked to configure database manually 
+                if (PromptForDatabaseParams(""))
+                    break;
+                else
+                    goto NoDBfound;   // User cancelled - changed their mind?
+    
+            case 0:   // User cancelled. Exit application 
+                goto NoDBfound;
+
+            case 1:    // User selected a backend, so m_DBparams 
+                break; // should now contain the database details 
+
+            default:
+                goto NoDBfound;
+        }
+        failure = TestDBconnection();
+    }
+
 
     // Queries the user for the DB info, using the command 
     // line or the GUI depending on the application.
     while (failure.length())
     {
         VERBOSE(VB_IMPORTANT, failure);
-        if (PromptForDatabaseParams(failure))
+        if (( manualSelect && ChooseBackend(failure)) || 
+            (!manualSelect && PromptForDatabaseParams(failure)))
         {
             failure = TestDBconnection();
             if (failure.length())
                 VERBOSE(VB_IMPORTANT, failure);
         }
         else
-            return false;
+            goto NoDBfound;
     }
 
+DBfound:
+    //VERBOSE(VB_GENERAL, "FindDatabase() - Success!");
+    ResetDatabase();
+    DeleteUPnP();
     return true;
+
+NoDBfound:
+    //VERBOSE(VB_GENERAL, "FindDatabase() - failed");
+    DeleteUPnP();
+    return false;
 }
 
 /**
@@ -610,16 +743,12 @@ void MythContextPrivate::LoadLogSettings(void)
 }
 
 /**     
- * Load database and host settings from mysql.txt and UPnP BE discovery.
- *      
- * \note Creating a default mysql.txt is actually not necessary.
- *       The defaults are enough for a simple "localhost" FE & MBE,
- *       and UPnP covers the other situations.
+ * Load database and host settings from mysql.txt, or set some defaults
+ *
+ * \returns true if mysql.txt was parsed
  */
-bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
+void MythContextPrivate::LoadDatabaseSettings(void)
 {
-    // Always load settings first from mysql.txt so LocalHostName can be used.
-
     if (!LoadSettingsFile())
     {
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
@@ -638,26 +767,6 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
         m_DBparams.wolReconnect  = 0;
         m_DBparams.wolRetry      = 5;
         m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
-
-        VERBOSE(VB_IMPORTANT, "Trying to create a basic mysql.txt file");
-        if (!WriteSettingsFile(m_DBparams))
-            return false;
-    }
-
-    // Overlay mysql.txt settings if we were passed a DatabaseParams
-
-    if (pParams != NULL)
-    {
-        m_DBparams.dbHostName   = pParams->dbHostName;
-        m_DBparams.dbPort       = pParams->dbPort;
-        m_DBparams.dbUserName   = pParams->dbUserName;
-        m_DBparams.dbPassword   = pParams->dbPassword;
-        m_DBparams.dbName       = pParams->dbName;
-        m_DBparams.dbType       = pParams->dbType;
-      //m_DBparams.wolEnabled   = pParams->wolEnabled;
-        m_DBparams.wolReconnect = pParams->wolReconnect;
-        m_DBparams.wolRetry     = pParams->wolRetry;
-        m_DBparams.wolCommand   = pParams->wolCommand;
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
@@ -673,14 +782,12 @@ bool MythContextPrivate::LoadDatabaseSettings(const DatabaseParams *pParams)
         {
             VERBOSE(VB_IMPORTANT,
                     "MCP: Error, could not determine host name." + ENO);
-            return false;
+            localhostname[0] = '\0';
         }
         m_localhostname = localhostname;
         VERBOSE(VB_IMPORTANT, "Empty LocalHostName.");
     }
     VERBOSE(VB_GENERAL, "Using localhost value of " + m_localhostname);
-
-    return true;
 }
 
 /**
@@ -889,7 +996,7 @@ int MythContextPrivate::intResponse(const QString &query, int def)
     return (ok ? resp : def);
 }
 
-bool MythContextPrivate::PromptForDatabaseParams(QString error)
+bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 {
     bool accepted = false;
     if (m_gui)
@@ -901,10 +1008,10 @@ bool MythContextPrivate::PromptForDatabaseParams(QString error)
             MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
         
         // ask user for database parameters
-        DatabaseSettings settings;
+        DatabaseSettings settings(m_DBhostCp);
         accepted = (settings.exec() == QDialog::Accepted);
         if (!accepted)
-            VERBOSE(VB_IMPORTANT, "User canceled database configuration");
+            VERBOSE(VB_IMPORTANT, "User cancelled database configuration");
 
         EndTempWindow();
     }
@@ -986,6 +1093,9 @@ QString MythContextPrivate::TestDBconnection(void)
         VERBOSE(VB_GENERAL, "Testing network connectivity to " + host);
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
+        // Save, to display in DatabaseSettings screens
+        m_DBhostCp = m_DBparams.dbHostName;
+
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
         m_DBparams.dbHostName = "";
 
@@ -998,9 +1108,6 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (port && !telnet(host, port))
     {
-        // Cause MSqlQuery to fail, instead of several error lines per DB value
-        m_DBparams.dbHostName = "";
-
         err = parent->tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
     }
@@ -1009,12 +1116,7 @@ QString MythContextPrivate::TestDBconnection(void)
     // 3. Finally, try to login, et c:
 
     if (!MSqlQuery::testDBConnection())
-    {
-        // Cause MSqlQuery to fail, instead of several error lines per DB value
-        m_DBparams.dbHostName = "";
-
         return parent->tr(QString("Cannot login to database?"));
-    }
 
 
     return QString::null;
@@ -1038,6 +1140,280 @@ void MythContextPrivate::ResetDatabase(void)
 }
 
 
+bool MythContextPrivate::InitUPnP(void)
+{
+    if (m_UPnP)
+        return true;
+
+    VERBOSE(VB_UPNP, "Setting UPnP client for backend autodiscovery...");
+
+    if (!m_XML)
+        m_XML = new XmlConfiguration("");   // No file - use defaults only
+
+    m_UPnP = new UPnp();
+    m_UPnP->SetConfiguration(m_XML);
+
+    int port=6549;
+    m_HTTP = new HttpServer(port);
+
+    if (!m_HTTP->ok())
+    {
+        VERBOSE(VB_IMPORTANT, "MCP::InitUPnP() - HttpServer Create Error");
+        DeleteUPnP();
+        return false;
+    }
+
+    if (!m_UPnP->Initialize(port, m_HTTP))
+    {
+        VERBOSE(VB_IMPORTANT, "MCP::InitUPnP() - UPnp::Initialize() Error");
+        DeleteUPnP();
+        return false;
+    }
+
+    m_UPnP->Start();
+
+    return true;
+}
+
+void MythContextPrivate::DeleteUPnP(void)
+{
+    if (m_UPnP && !m_HTTP)  // Init was passed an existing UPnP
+        return;             // so let the caller delete it cleanly
+
+    if (m_UPnP)
+    {
+        // This takes a few seconds, so inform the user:
+        VERBOSE(VB_GENERAL, "Deleting UPnP client...");
+
+        delete m_UPnP;  // This also deletes m_XML
+        m_UPnP = NULL;
+        m_XML  = NULL;
+    }
+
+    if (m_HTTP)
+    {
+        delete m_HTTP;
+        m_HTTP = NULL;
+    }
+}
+
+/**
+ * Search for backends via UPnP, put up a UI for the user to choose one
+ */
+int MythContextPrivate::ChooseBackend(const QString &error)
+{ 
+    if (!InitUPnP())
+        return -1;
+
+    TempMainWindow(); 
+ 
+    // Tell the user what went wrong:
+    if (error.length())
+        MythPopupBox::showOkPopup(mainWindow, "DB connect failure", error);
+
+    VERBOSE(VB_GENERAL, "Putting up the UPnP backend chooser"); 
+
+    BackendSelect *BEsel = new BackendSelect(mainWindow, &m_DBparams);
+    switch (BEsel->exec())
+    {
+        case kDialogCodeRejected:
+            VERBOSE(VB_IMPORTANT, "User canceled database configuration");
+            return 0;
+
+        case kDialogCodeButton0:
+            VERBOSE(VB_IMPORTANT, "User requested Manual Config");
+            return -1;
+    }
+    //BEsel->hide();
+    //BEsel->deleteLater();
+
+    QStringList buttons;
+    QString     message;
+
+    buttons += QObject::tr("Save database details");
+    buttons += QObject::tr("Save backend details");
+    buttons += QObject::tr("Don't Save");
+
+    message = parent->tr("Save that backend or database as the default?");
+
+    DialogCode selected = MythPopupBox::ShowButtonPopup(
+        mainWindow, "Save default", message, buttons, kDialogCodeButton2);
+    switch (selected)
+    {
+        case kDialogCodeButton0:
+            WriteSettingsFile(m_DBparams, true);
+            break;
+        case kDialogCodeButton1:
+            if (BEsel->m_PIN.length())
+                m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
+            m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
+            m_XML->Save();
+            break;
+    }
+
+    delete BEsel;
+    EndTempWindow(); 
+
+    return 1; 
+} 
+
+/**
+ * If there is only a single UPnP backend, use it.
+ *
+ * This does <i>not</i> prompt for PIN entry. If the backend requires one,
+ * it will fail, and the caller needs to put up a UI to ask for one.
+ */
+int MythContextPrivate::UPnPautoconf(const int milliSeconds)
+{
+    if (!InitUPnP())
+        return 0;
+
+    SSDPCacheEntries *backends = NULL;
+    int               count;
+    QString           LOC = "UPnPautoconf() - ";
+    QTime             timer;
+
+    m_UPnP->PerformSearch(gBackendURI);
+    for (timer.start(); timer.elapsed() < milliSeconds; usleep(25000))
+    {
+        backends = m_UPnP->g_SSDPCache.Find(gBackendURI);
+        if (backends)
+        {
+            backends->AddRef();
+            break;
+        }
+        putchar('.');
+    }
+    putchar('\n');
+
+    if (!backends)
+    {
+        VERBOSE(VB_GENERAL, LOC + "No UPnP backends found");
+        return 0;
+    }
+
+
+    // This could be tied to VB_UPNP?
+    //m_UPnP->g_SSDPCache.Dump();
+
+
+    count = backends->Count();
+    switch (count)
+    {
+        case 0:
+            VERBOSE(VB_IMPORTANT,
+                    LOC + "No UPnP backends found, but SSDP::Find() not NULL!");
+            break;
+        case 1:
+            VERBOSE(VB_GENERAL, LOC + "Found one UPnP backend");
+            break;
+        default:
+            VERBOSE(VB_GENERAL,
+                    (LOC + "More than one UPnP backend found (%1)").arg(count));
+    }
+
+    if (count != 1)
+    {
+        backends->Release();
+        return count;
+    }
+
+
+    // Get this backend's location:
+    backends->Lock();
+    DeviceLocation *BE = backends->GetEntryMap()->begin().data();
+    backends->Unlock();
+    backends->Release();
+
+    // We don't actually know the backend's access PIN, so this will
+    // only work for ones that have PIN access disabled (i.e. 0000)
+    if (UPnPconnect(BE, QString::null))
+        return 1;
+    
+    return -1;   // Try to force chooser & PIN
+}
+
+/** 
+ * Get the default backend from config.xml, use UPnP to find it. 
+ *
+ * Sets a string if there any connection problems
+ */ 
+bool MythContextPrivate::DefaultUPnP(QString &error)
+{ 
+    XmlConfiguration *XML = new XmlConfiguration("config.xml");
+    QString           loc = "MCP::DefaultUPnP() - ";
+    QString           PIN = XML->GetValue(kDefaultPIN, "");
+    QString           USN = XML->GetValue(kDefaultUSN, "");
+
+    delete XML;
+
+    if (USN.isEmpty())
+    {
+        VERBOSE(VB_UPNP, loc + "No default UPnP backend");
+        return false;
+    }
+
+    VERBOSE(VB_UPNP, loc + "config.xml has default PIN '"
+                         + PIN + "' and host USN: " + USN);
+
+    if (!InitUPnP())
+    {
+        error = "UPnP is broken?";
+        return false;
+    }
+
+    m_UPnP->PerformSearch(gBackendURI);
+    DeviceLocation *pDevLoc = m_UPnP->g_SSDPCache.Find(gBackendURI, USN);
+    if (!pDevLoc) 
+    {
+        error = "Cannot find default UPnP backend";
+        return false;
+
+    }
+
+    if (UPnPconnect(pDevLoc, PIN))
+        return true;
+    
+    error = "Cannot connect to defalt backend via UPnP. Wrong saved PIN?";
+    return false;
+}
+
+/** 
+ * Query a backend via UPnP for its database connection parameters
+ */ 
+bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
+                                     const QString        &PIN)
+{
+    QString        error; 
+    QString        LOC = "UPnPconnect() - ";
+    QString        URL = backend->m_sLocation;
+    MythXMLClient  XML(URL);
+ 
+    VERBOSE(VB_UPNP, LOC + "Trying host at " + URL);
+    switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
+    {
+        case UPnPResult_Success:
+            break;
+
+        case UPnPResult_ActionNotAuthorized:
+            // The stored PIN is probably not correct.
+            // We could prompt for the PIN and try again, but that needs a UI. 
+            // Easier to fail for now, and put up the full UI selector later 
+            VERBOSE(VB_UPNP, LOC + error + ". Wrong PIN?");
+            return false;
+
+        default:
+            VERBOSE(VB_UPNP, LOC + error);
+            return false;
+    }
+
+    QString DBhost = m_DBparams.dbHostName;
+    VERBOSE(VB_UPNP, LOC + "Got database hostname: " + DBhost);
+
+    return true;
+}
+
+
 MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
 {
@@ -1046,7 +1422,9 @@ MythContext::MythContext(const QString &binversion)
     d = new MythContextPrivate(this);
 }
 
-bool MythContext::Init(bool gui, DatabaseParams *pParams )
+bool MythContext::Init(const bool gui, UPnp *UPnPclient,
+                       const bool promptForBackend,
+                       const bool disableAutoDiscovery)
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
@@ -1062,15 +1440,14 @@ bool MythContext::Init(bool gui, DatabaseParams *pParams )
             d->TempMainWindow(false);
             MythPopupBox::showOkPopup(d->mainWindow,
                                       "Library version error", warning);
-            SetMainWindow(NULL);
-            DestroyMythMainWindow();
+            d->EndTempWindow();
         }
         VERBOSE(VB_IMPORTANT, warning);
 
         return false;
     }
 
-    if (!d->Init(gui, pParams))
+    if (!d->Init(gui, UPnPclient, promptForBackend, disableAutoDiscovery))
         return false;
 
     ActivateSettingsCache(true);
@@ -2099,14 +2476,6 @@ QString MythContext::DBErrorMessage(const QSqlError& err)
         .arg(err.number())
         .arg(err.driverText())
         .arg(err.databaseText());
-}
-
-/**
- * \todo  Remove MythContext::settings() - it is not used anywhere?
- */
-Settings *MythContext::settings(void)
-{
-    return d->m_settings;
 }
 
 Settings *MythContext::qtconfig(void)

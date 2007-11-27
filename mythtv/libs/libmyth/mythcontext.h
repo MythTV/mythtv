@@ -39,6 +39,7 @@ class MythMediaDevice;
 class DisplayRes;
 class MDBManager;
 class MythContextPrivate;
+class UPnp;
 
 /// This MAP is for the various VERBOSITY flags, used to select which
 /// messages we want printed to the console.
@@ -248,7 +249,10 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     MythContext(const QString &binversion);
     virtual ~MythContext();
 
-    bool Init(bool gui = true, DatabaseParams *pParams = NULL );
+    bool Init(const bool gui = true,
+                    UPnp *UPnPclient = NULL,
+              const bool promptForBackend = false,
+              const bool bypassAutoDiscovery = false);
 
     QString GetMasterHostPrefix(void);
 
@@ -334,7 +338,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
 
-    Settings *settings(void);
     Settings *qtconfig(void);
 
     void SaveSetting(const QString &key, int newValue);
@@ -462,6 +465,9 @@ enum MythSchemaUpgrade
     MYTH_SCHEMA_UPGRADE      = 3,
     MYTH_SCHEMA_USE_EXISTING = 4
 };
+
+/// Service type for the backend's UPnP server
+extern MPUBLIC const QString gBackendURI;
 
 #endif
 
