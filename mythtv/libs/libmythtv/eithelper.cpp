@@ -749,7 +749,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 10001LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10002LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10003LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
-    fix[ 10005LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10006LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     fix[ 10009LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
     // On transport 10004 only DMAX needs no fixing:
@@ -770,6 +769,25 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[10004LL<<32 | 61441U << 16 | 53513] = // Playhouse Disney (engl)
         fix[10004LL<<32 | 61441U << 16 | 53618] = // K1010
         fix[10004LL<<32 | 61441U << 16 | 53619] = // GemsTV
+        EITFixUp::kEFixForceISO8859_15;
+    // On transport 10005 QVC and Giga Digital  needs no fixing:
+    fix[    10005LL<<32 | 61441U << 16 | 50104] = // E! Entertainment
+        fix[10005LL<<32 | 61441U << 16 | 50107] = // 13th Street (KD)
+        fix[10005LL<<32 | 61441U << 16 | 50301] = // ESPN Classic
+        fix[10005LL<<32 | 61441U << 16 | 50302] = // VH1 Classic
+        fix[10005LL<<32 | 61441U << 16 | 50303] = // Wein TV
+        fix[10005LL<<32 | 61441U << 16 | 50304] = // AXN
+        fix[10005LL<<32 | 61441U << 16 | 50305] = // Silverline
+        fix[10005LL<<32 | 61441U << 16 | 50306] = // NASN
+        fix[10005LL<<32 | 61441U << 16 | 50307] = // Disney Toon
+        fix[10005LL<<32 | 61441U << 16 | 53105] = // NASN (engl)
+        fix[10005LL<<32 | 61441U << 16 | 53115] = // VH1 Classic (engl)
+        fix[10005LL<<32 | 61441U << 16 | 53405] = // ESPN Classic (engl)
+        fix[10005LL<<32 | 61441U << 16 | 53402] = // AXN (engl)
+        fix[10005LL<<32 | 61441U << 16 | 53613] = // CNN (engl)
+        fix[10005LL<<32 | 61441U << 16 | 53516] = // Voyages Television
+        fix[10005LL<<32 | 61441U << 16 | 53611] = // Der Schmuckkanal
+        fix[10005LL<<32 | 61441U << 16 | 53104] = // Jukebox
         EITFixUp::kEFixForceISO8859_15;
     // On transport 10007 only following channels need fixing:
     fix[    10007LL<<32| 61441U << 16 | 53607] = // Eurosport
