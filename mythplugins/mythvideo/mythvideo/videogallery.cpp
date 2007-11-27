@@ -223,24 +223,26 @@ void VideoGallery::updateText(QPainter *p)
     // Print the video title
     //
 
-    QRect pr = textRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-
     LayerSet *container = theme->GetSet("text");
     if (container)
     {
+        QRect pr = textRect;
+        QPixmap pix(pr.size());
+        pix.fill(this, pr.topLeft());
+        QPainter tmp(&pix);
+
+
         Metadata *meta =
                 m_video_list->getVideoListMetadata(where_we_are->getInt());
         checkedSetText((UITextType*)container->GetType("text"),
                        meta ? meta->Title() : where_we_are->getString());
 
         container->Draw(&tmp, 0, 0);
-    }
-    tmp.end();
 
-    p->drawPixmap(pr.topLeft(), pix);
+        tmp.end();
+
+        p->drawPixmap(pr.topLeft(), pix);
+    }
 }
 
 void VideoGallery::updateArrows(QPainter *p)
