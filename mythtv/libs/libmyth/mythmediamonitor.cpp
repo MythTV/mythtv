@@ -59,12 +59,12 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         return c_monitor;
 
 #ifdef USING_DARWIN_DA
-        c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
+    c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
 #else
   #if defined(CONFIG_CYGWIN) || defined(_WIN32)
-        c_monitor = new MediaMonitorWindows(NULL, 500, true); 
+    c_monitor = new MediaMonitorWindows(NULL, 500, true); 
   #else
-        c_monitor = new MediaMonitorUnix(NULL, 500, true);
+    c_monitor = new MediaMonitorUnix(NULL, 500, true);
   #endif
 #endif
 
