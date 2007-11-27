@@ -38,6 +38,7 @@ class ExitToMainMenuEvent : public QCustomEvent
 #define REG_KEY(a, b, c, d) GetMythMainWindow()->RegisterKey(a, b, c, d)
 #define GET_KEY(a, b) GetMythMainWindow()->GetKey(a, b)
 #define REG_JUMP(a, b, c, d) GetMythMainWindow()->RegisterJump(a, b, c, d)
+#define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIA_HANDLER(a, b, c, d, e, f) GetMythMainWindow()->RegisterMediaHandler(a, b, c, d, e, f)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
@@ -74,7 +75,8 @@ class MythMainWindow : public QWidget
     void ClearJump(const QString &destination);
     void BindJump(const QString &destination, const QString &key);
     void RegisterJump(const QString &destination, const QString &description,
-                      const QString &key, void (*callback)(void));
+                      const QString &key, void (*callback)(void),
+                      bool exittomain = true);
     void RegisterMediaHandler(const QString &destination,
                               const QString &description, const QString &key,
                               void (*callback)(MythMediaDevice* mediadevice),

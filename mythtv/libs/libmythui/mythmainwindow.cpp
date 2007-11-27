@@ -124,6 +124,7 @@ struct JumpData
     void (*callback)(void);
     QString destination;
     QString description;
+    bool exittomain;
 };
 
 struct MHData
@@ -736,6 +737,14 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     actions.clear();
     int keynum = d->TranslateKeyNum(e);
 
+    if (allowJumps && d->jumpMap.count(keynum) > 0 && 
+            !d->jumpMap[keynum]->exittomain && d->exitmenucallback == NULL)
+    {
+        void (*callback)(void) = d->jumpMap[keynum]->callback;
+        callback();
+        return false;
+    }
+
     if (allowJumps && 
         d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
     {
@@ -945,7 +954,8 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
 void MythMainWindow::RegisterJump(const QString &destination, 
                                   const QString &description,
-                                  const QString &key, void (*callback)(void))
+                                  const QString &key, void (*callback)(void),
+                                  bool exittomain)
 {
     QString keybind = key;
 
@@ -980,8 +990,8 @@ void MythMainWindow::RegisterJump(const QString &destination,
             }
         }
     }
- 
-    JumpData jd = { callback, destination, description };
+
+    JumpData jd = { callback, destination, description, exittomain };
     d->destinationMap[destination] = jd;
 
     BindJump(destination, keybind); 
