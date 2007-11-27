@@ -52,20 +52,19 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
-    if (sIP == "localhost" || sIP == "127.0.0.1")
-    {
-        VERBOSE(VB_IMPORTANT,
-                "MediaServer:: Bad BackendServerIP Address - " + sIP);
-        m_pHttpServer = NULL;
-        return;
-    }
-
     m_pHttpServer = new HttpServer( nPort ); 
 
     if (!m_pHttpServer->ok())
     { 
         VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
+        return;
+    }
+
+    if (sIP == "localhost" || sIP == "127.0.0.1")
+    {
+        VERBOSE(VB_IMPORTANT, "MediaServer:: Bad BackendServerIP Address - "
+                              + sIP + ". Disabling UPnP");
         return;
     }
 
