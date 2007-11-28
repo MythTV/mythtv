@@ -20,7 +20,7 @@
    </button>
 
    <button>
-      <type>GAME_SETTINGS_GENERAL</type>
+      <type>GAME_SETTINGS_PLAYERS</type>
       <text>Game Players</text>
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Reproductores</text>
@@ -55,7 +55,7 @@
    </button>
 
    <button>
-      <type>GAME_SETTINGS_GENERAL</type>
+       <type>GAME_CLEAR_DATA</type>
       <text>Clear Game Data</text>
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Borrar Datos</text>
