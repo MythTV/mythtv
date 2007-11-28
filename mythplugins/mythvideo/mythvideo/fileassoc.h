@@ -43,7 +43,6 @@ class FileAssocDialog : public MythThemedDialog
 
   public slots:
 
-    void takeFocusAwayFromEditor(bool up_or_down);
     void switchToFA(int which_one);
     void saveAndExit();
     void toggleDefault(bool on_or_off);
@@ -63,9 +62,8 @@ class FileAssocDialog : public MythThemedDialog
     //  GUI stuff
     //
 
-    MythRemoteLineEdit  *command_editor;
+    UIRemoteEditType    *command_editor;
     UISelectorType      *extension_select;
-    UIBlackHoleType     *command_hack;
     UICheckBoxType      *default_check;
     UICheckBoxType      *ignore_check;
     UITextButtonType    *done_button;

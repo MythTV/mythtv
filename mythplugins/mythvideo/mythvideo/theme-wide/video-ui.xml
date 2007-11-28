@@ -957,9 +957,10 @@
                 <image function="pushed" filename="leftright_pushed.png"></image>
             </selector>
 
-            <blackhole name="command_hack" draworder="0">
+            <remoteedit name="command" draworder="0">
                 <area>424,205,400,40</area>
-            </blackhole>
+                <font>display</font>
+            </remoteedit>
 
             <checkbox name="default_check" draworder="0">
                 <position>424,265</position>
@@ -1089,9 +1090,10 @@
                     Widgets
             -->
 
-            <blackhole name="title_hack" draworder="0">
+            <remoteedit name="title" draworder="0">
                 <area>410,95,614,40</area>
-            </blackhole>
+                <font>display</font>
+            </remoteedit>
 
 	    <selector name="category_select" draworder="0">
 		<area>410,145,614,40</area>
@@ -1146,9 +1148,10 @@
                 <value>/path/to/the/thing.jpg</value>
             </textarea>
 
-            <blackhole name="player_hack" draworder="0">
+            <remoteedit name="player" draworder="0">
                 <area>410,445,614,40</area>
-            </blackhole>
+                <font>display</font>
+            </remoteedit>
 
             <textbutton name="done_button" draworder="0">
                 <position>410,598</position>

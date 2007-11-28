@@ -43,8 +43,6 @@ EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
 
     working_metadata = new Metadata(*m_orig_metadata);
 
-    title_hack = NULL;
-    player_hack = NULL;
     category_select = NULL;
     level_select = NULL;
     child_check = NULL;
@@ -341,19 +339,6 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-
-void EditMetadataDialog::takeFocusAwayFromEditor(bool up_or_down)
-{
-    nextPrevWidgetFocus(up_or_down);
-
-    MythRemoteLineEdit *which_editor = (MythRemoteLineEdit *)sender();
-
-    if (which_editor)
-    {
-        which_editor->clearFocus();
-    }
-}
-
 void EditMetadataDialog::saveAndExit()
 {
     //
@@ -442,18 +427,10 @@ void EditMetadataDialog::findCoverArt()
 
 void EditMetadataDialog::wireUpTheme()
 {
-    title_hack = getUIBlackHoleType("title_hack");
-    if (title_hack)
+    title_editor = getUIRemoteEditType("title");
+    if (title_editor)
     {
-        title_hack->allowFocus(true);
-        QFont f = gContext->GetMediumFont();
-        title_editor = new MythRemoteLineEdit(&f, this);
-        title_editor->setFocusPolicy(QWidget::NoFocus);
-        title_editor->setGeometry(title_hack->getScreenArea());
-        connect(title_hack, SIGNAL(takingFocus()),
-                title_editor, SLOT(setFocus()));
-        connect(title_editor, SIGNAL(tryingToLooseFocus(bool)),
-                this, SLOT(takeFocusAwayFromEditor(bool)));
+        title_editor->createEdit(this);
         connect(title_editor, SIGNAL(textChanged(QString)),
                 this, SLOT(setTitle(QString)));
     }
@@ -465,18 +442,10 @@ void EditMetadataDialog::wireUpTheme()
                 this, SLOT(setCategory(int)));
     }
 
-    player_hack = getUIBlackHoleType("player_hack");
-    if (player_hack)
+    player_editor = getUIRemoteEditType("player");
+    if (player_editor)
     {
-        player_hack->allowFocus(true);
-        QFont f = gContext->GetMediumFont();
-        player_editor = new MythRemoteLineEdit(&f, this);
-        player_editor->setFocusPolicy(QWidget::NoFocus);
-        player_editor->setGeometry(player_hack->getScreenArea());
-        connect(player_hack, SIGNAL(takingFocus()),
-                player_editor, SLOT(setFocus()));
-        connect(player_editor, SIGNAL(tryingToLooseFocus(bool)),
-                this, SLOT(takeFocusAwayFromEditor(bool)));
+        player_editor->createEdit(this);
         connect(player_editor, SIGNAL(textChanged(QString)),
                 this, SLOT(setPlayer(QString)));
     }

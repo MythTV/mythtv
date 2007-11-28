@@ -42,7 +42,6 @@ class EditMetadataDialog : public MythThemedDialog
 
   public slots:
 
-    void takeFocusAwayFromEditor(bool up_or_down);
     void saveAndExit();
     void setTitle(QString new_title);
     void setCategory(int new_category);
@@ -62,12 +61,8 @@ class EditMetadataDialog : public MythThemedDialog
     //  GUI stuff
     //
 
-    MythRemoteLineEdit  *title_editor;
-    UIBlackHoleType     *title_hack;
-
-    MythRemoteLineEdit  *player_editor;
-    UIBlackHoleType     *player_hack;
-
+    UIRemoteEditType    *title_editor;
+    UIRemoteEditType    *player_editor;
     UISelectorType      *category_select;
     UISelectorType      *level_select;
     UICheckBoxType      *child_check;

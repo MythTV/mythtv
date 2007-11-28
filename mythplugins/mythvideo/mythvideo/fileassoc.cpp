@@ -189,15 +189,6 @@ void FileAssocDialog::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void FileAssocDialog::takeFocusAwayFromEditor(bool up_or_down)
-{
-    nextPrevWidgetFocus(up_or_down);
-    if (command_editor)
-    {
-        command_editor->clearFocus();
-    }
-}
-
 void FileAssocDialog::loadFileAssociations()
 {
     const FileAssociations::association_list &fa_list =
@@ -242,7 +233,7 @@ void FileAssocDialog::showCurrentFA()
         if (command_editor)
         {
             command_editor->hide();
-            command_hack->SetContext(-2);
+            command_editor->SetContext(-2);
         }
         if (default_check)
         {
@@ -292,7 +283,7 @@ void FileAssocDialog::showCurrentFA()
 
         if (command_editor)
         {
-            command_hack->SetContext(-1);
+            command_editor->SetContext(-1);
             command_editor->show();
             command_editor->setText(current_fa->getCommand());
         }
@@ -445,18 +436,10 @@ void FileAssocDialog::wireUpTheme()
         connect(extension_select, SIGNAL(pushed(int)), this,
                 SLOT(switchToFA(int)));
     }
-    command_hack = getUIBlackHoleType("command_hack");
-    if (command_hack)
+    command_editor = getUIRemoteEditType("command");
+    if (command_editor)
     {
-        command_hack->allowFocus(true);
-        QFont f = gContext->GetMediumFont();
-        command_editor = new MythRemoteLineEdit(&f, this);
-        command_editor->setFocusPolicy(QWidget::NoFocus);
-        command_editor->setGeometry(command_hack->getScreenArea());
-        connect(command_hack, SIGNAL(takingFocus()),
-                command_editor, SLOT(setFocus()));
-        connect(command_editor, SIGNAL(tryingToLooseFocus(bool)),
-                this, SLOT(takeFocusAwayFromEditor(bool)));
+        command_editor->createEdit(this);
         connect(command_editor, SIGNAL(textChanged(QString)),
                 this, SLOT(setPlayerCommand(QString)));
     }
