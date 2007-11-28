@@ -52,14 +52,18 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
+
     m_pHttpServer = new HttpServer( nPort ); 
 
     if (!m_pHttpServer->ok())
     { 
         VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
+        delete m_pHttpServer;
+        m_pHttpServer = NULL;
         return;
     }
+
 
     if (sIP == "localhost" || sIP == "127.0.0.1")
     {
