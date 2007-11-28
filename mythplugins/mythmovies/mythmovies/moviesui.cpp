@@ -426,8 +426,6 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
                 for (QStringList::Iterator it = st.begin(); it != st.end();
                      ++it)
                 {
-                    if (i % 4 == 0 && i != 0)
-                        buf+= "\n";
                     buf += (*it).stripWhiteSpace() + " ";
                     i++;
                 }
