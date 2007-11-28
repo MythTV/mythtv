@@ -115,6 +115,7 @@ void SSDP::EnableNotifications()
 {
     if ( m_pNotifyTask == NULL )
     {
+        VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - creating new task");
         m_pNotifyTask = new UPnpNotifyTask( m_nServicePort ); 
 
         // ------------------------------------------------------------------
@@ -127,6 +128,7 @@ void SSDP::EnableNotifications()
         // First Send out Notification that we are leaving the network.
         // ------------------------------------------------------------------
 
+        VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_byebye");
         m_pNotifyTask->SetNTS( NTS_byebye );
         m_pNotifyTask->Execute( NULL );
     }
@@ -135,8 +137,10 @@ void SSDP::EnableNotifications()
     // Add Announcement Task to the Queue
     // ------------------------------------------------------------------
 
+    VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - sending NTS_alive");
     m_pNotifyTask->SetNTS( NTS_alive );
     UPnp::g_pTaskQueue->AddTask( m_pNotifyTask  );
+    VERBOSE(VB_UPNP, "SSDP::EnableNotifications() - Task added to UPnP queue");
 }
 
 /////////////////////////////////////////////////////////////////////////////

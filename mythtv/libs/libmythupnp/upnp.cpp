@@ -149,6 +149,8 @@ void UPnp::Start()
         VERBOSE(VB_UPNP, "UPnp::Start - Enabling Notifications");
         g_pSSDP->EnableNotifications();
     }
+
+    VERBOSE(VB_UPNP, "UPnp::Start - Returning");
 }
 
 //////////////////////////////////////////////////////////////////////////////
