@@ -83,17 +83,18 @@ bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 
 bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer )
 {
-    VERBOSE(VB_UPNP, QString("UPnp::Initialize - Begin"));
+    VERBOSE(VB_UPNP, "UPnp::Initialize - Begin");
 
     if (g_pConfig == NULL)
     {
-        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Must call SetConfiguration." ));
+        VERBOSE(VB_IMPORTANT, "UPnp::Initialize - Must call SetConfiguration.");
         return false;
     }
 
     if ((m_pHttpServer = pHttpServer) == NULL)
     {
-        VERBOSE(VB_IMPORTANT, QString( "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)" ));
+        VERBOSE(VB_IMPORTANT,
+                "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)");
         return false;
     }
 
@@ -104,7 +105,7 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     // Initialize & Start the global Task Queue Processing Thread
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - Starting TaskQueue" ));
+    VERBOSE(VB_UPNP, "UPnp::Initialize - Starting TaskQueue");
 
     g_pTaskQueue = new TaskQueue();
     g_pTaskQueue->start();
@@ -125,11 +126,12 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     // Create the SSDP (Upnp Discovery) Thread.
     // ----------------------------------------------------------------------
 
-    VERBOSE(VB_UPNP, QString(  "UPnp::Initialize - Creating SSDP Thread" ));
+    VERBOSE(VB_UPNP, "UPnp::Initialize - Creating SSDP Thread at port "
+                     + QString::number(m_nServicePort));
 
     g_pSSDP = new SSDP( m_nServicePort );
 
-    VERBOSE(VB_UPNP, QString( "UPnp::Initialize - End" ));
+    VERBOSE(VB_UPNP, "UPnp::Initialize - End");
 
     return true;
 }
@@ -142,8 +144,9 @@ void UPnp::Start()
 {
     if (g_pSSDP != NULL)
     {
-        VERBOSE(VB_UPNP, QString(  "UPnp::UPnp:Starting SSDP Thread (Multicast)" ));
+        VERBOSE(VB_UPNP, "UPnp::Start - Starting SSDP Thread (Multicast)");
         g_pSSDP->start();
+        VERBOSE(VB_UPNP, "UPnp::Start - Enabling Notifications");
         g_pSSDP->EnableNotifications();
     }
 }
@@ -157,11 +160,14 @@ void UPnp::CleanUp( void )
 
     if (g_pSSDP)
     {
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
         g_pSSDP->DisableNotifications();
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - requesting SSDP terminate");
         g_pSSDP->RequestTerminate();
 
         delete g_pSSDP;
         g_pSSDP = NULL;
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - deleted SSDP");
     }
 
     // ----------------------------------------------------------------------
