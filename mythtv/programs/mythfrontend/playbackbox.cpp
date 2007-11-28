@@ -2112,7 +2112,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     titleIndex = titleList.count() - 1;
     for (titleIndex = titleList.count() - 1; titleIndex >= 0; titleIndex--)
     {
-        if (watchListStart && sTitleList[titleIndex] == watchGroup)
+        if (watchListStart && sTitleList[titleIndex] == watchGroup.lower())
         {
             watchListStart = 0;
             break;
