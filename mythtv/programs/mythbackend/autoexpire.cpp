@@ -159,9 +159,13 @@ void AutoExpire::CalcParams()
         if (fsMap.contains(fsit->fsID))
             continue;
 
-        fsMap[fsit->fsID] = 1;
-
+        fsMap[fsit->fsID] = 0;
         size_t thisKBperMin = 0;
+
+        // append unkown recordings to all fsIDs
+        vector<int>::iterator unknownfs_it = fsEncoderMap[-1].begin();
+        for (; unknownfs_it != fsEncoderMap[-1].end(); ++unknownfs_it)
+            fsEncoderMap[fsit->fsID].push_back(*unknownfs_it);
 
         if (fsEncoderMap.contains(fsit->fsID))
         {
@@ -988,11 +992,15 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
         expirer->instance_cond.wait(&expirer->instance_lock);
     expirer->update_pending = true;
 
-    if (fsID > -1)
+    if (encoder > 0)
     {
-        VERBOSE(VB_FILE, LOC
-                + QString("Cardid %1: is starting a recording on fsID %2 soon.")
-                .arg(encoder).arg(fsID));
+        QString msg = QString("Cardid %1: is starting a recording on").arg(encoder);
+        if (fsID == -1)
+            msg.append(" an unknown fsID soon.");
+        else
+            msg.append(QString(" fsID %2 soon.").arg(fsID));
+
+        VERBOSE(VB_FILE, LOC + msg);
         expirer->used_encoders[encoder] = fsID;
     }
 

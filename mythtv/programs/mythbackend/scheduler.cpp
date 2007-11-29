@@ -1503,7 +1503,7 @@ void Scheduler::RunScheduler(void)
                     nexttv->StartRecording(nextRecording);
 
                 nextRecording->AddHistory(false);
-                if (fsID > -1 && expirer)
+                if (expirer)
                 {
                     // activate auto expirer
                     expirer->Update(nextRecording->cardid, fsID, true);
@@ -2819,7 +2819,7 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     pginfo->cardid       = cardid;
 
     int fsID = FillRecordingDir(pginfo, reclist);
-    if (fsID > -1 && expirer)
+    if (expirer)
     {
         // update auto expirer
         expirer->Update(cardid, fsID, true);
