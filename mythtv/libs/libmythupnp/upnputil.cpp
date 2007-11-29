@@ -32,12 +32,20 @@
 QString LookupUDN( QString sDeviceType )
 {
     QStringList sList = QStringList::split( ":", sDeviceType );
+    QString     sLoc  = "LookupUDN(" + sDeviceType + ")";
+    QString     sName;
+    QString     sUDN;
 
-    QString     sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
+    if (sList.size() <= 2) 
+    { 
+        VERBOSE(VB_IMPORTANT, sLoc + "- bad device type, not enough tokens"); 
+        return QString::null; 
+    }
 
-    // cout << "lookupUDN: " << sName << endl;
+    sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
+    sUDN  = UPnp::g_pConfig->GetValue( sName, "" );
 
-    QString sUDN = UPnp::g_pConfig->GetValue( sName, "" );
+    VERBOSE(VB_UPNP, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
     if ( sUDN.length() == 0) 
     {
