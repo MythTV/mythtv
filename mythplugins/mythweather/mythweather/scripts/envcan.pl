@@ -148,7 +148,7 @@ if ($units eq "ENG") {
         }
 	}
 } else {
-	$results{'wind_spdgst'} = sprintf("%.2f (%.2f) kph", $results{'wind_speed'}, $results{'wind_gust'});
+	$results{'wind_spdgst'} = sprintf("%.2f (%.2f)", $results{'wind_speed'}, $results{'wind_gust'});
 }
 	
 

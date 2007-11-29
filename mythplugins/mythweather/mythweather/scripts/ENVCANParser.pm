@@ -3,10 +3,6 @@
 # This script parses the HTML of an Environment Canada weather forecast
 # page as returned from http://www.weatheroffice.gc.ca.
 #
-# TODO 	Not exactly sure how Environment Canada reports windchill.  Looks 
-#		like they don't report it in the summer time.  Using temperature
-#		as a value for now.
-#
 # TODO	Environment Canada only reports 5 day forecasts.  6 day forecast
 #		layout is used to report 5 day information.
 #
@@ -97,23 +93,25 @@ sub text {
 			$results{'observation_time_rfc822'} = rfc822($1);
 		}
 	}
-		
+
 	if ($inside{dt}) {
 		if ($_[0] =~ /(Temperature)/) { $scratch = 1; return; }
 		if ($_[0] =~ /(Pressure)\/ Tendency/) { $scratch = 2; return; }
 		if ($_[0] =~ /(Visibility)/) { $scratch = 3; return; }
 		if ($_[0] =~ /(Humidity)/) { $scratch = 4; return; }
 		if ($_[0] =~ /(Dewpoint)/) { $scratch = 5; return; }
-		if ($_[0] =~ /(Wind)/) { $scratch = 6; return; }
+		if ($_[0] =~ /(Wind Chill)/ ) { $scratch = 6; return; }
+		if ($_[0] =~ /(Wind)/) { $scratch = 7; return; }
 	}
-		
+
 	if ($inside{dd}) {
-		if ($scratch == 1) { $_[0] =~ /(\d*).*/; $results{'temp'} = $1; $results{'windchill'} = $1; $results{'appt'} = $1; }
+		if ($scratch == 1) { $_[0] =~ /(-?\d*).*/; $results{'temp'} = $1; }
 		if ($scratch == 2) { $_[0] =~ /(\d*\.\d+) kPa.*/; $results{'pressure'} = $1 * 10; }
 		if ($scratch == 3) { $_[0] =~ /(\d*) km/; $results{'visibility'} = $1; }
 		if ($scratch == 4) { $_[0] =~ /(\d*) \%/; $results{'relative_humidity'} = $1; }
 		if ($scratch == 5) { $_[0] =~ /(-?\d*).*/; $results{'dewpoint'} = $1; }
-		if ($scratch == 6) { 
+		if ($scratch == 6) { $_[0] =~ /(-?\d*).*/; $results{'appt'} = $1; $results{'windchill'} = $1; }
+		if ($scratch == 7) { 
 			$_[0] =~ /.?(\w+) (\d+) km\/h/;
 			$results{'wind_dir'} = $directions{$1};
 			$results{'wind_speed'} = $2;
