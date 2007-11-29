@@ -250,6 +250,7 @@ package MythTV::Program;
         }
         $shour   = "0$shour"   if ($shour < 10);
         $sminute = "0$sminute" if ($sminute < 10);
+        $ssecond = "0$ssecond" if ($ssecond < 10);
         # Recording end time
         $eyear += 1900;
         $emonth++;
@@ -265,6 +266,7 @@ package MythTV::Program;
         }
         $ehour   = "0$ehour"   if ($ehour < 10);
         $eminute = "0$eminute" if ($eminute < 10);
+        $esecond = "0$esecond" if ($esecond < 10);
         # Program start time
         $spyear += 1900;
         $spmonth++;
@@ -280,6 +282,7 @@ package MythTV::Program;
         }
         $sphour   = "0$sphour"   if ($sphour < 10);
         $spminute = "0$spminute" if ($spminute < 10);
+        $spsecond = "0$spsecond" if ($spsecond < 10);
         # Program end time
         $epyear += 1900;
         $epmonth++;
@@ -295,6 +298,7 @@ package MythTV::Program;
         }
         $ephour   = "0$ephour"   if ($ephour < 10);
         $epminute = "0$epminute" if ($epminute < 10);
+        $epsecond = "0$epsecond" if ($epsecond < 10);
     # Original airdate
         my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
     # Build a list of name format options
