@@ -71,11 +71,11 @@ bool SourceManager::findScripts()
 {
     QString path =  gContext->GetShareDir() + "mythweather/scripts/";
     QDir dir(path);
-    dir.setFilter(QDir::Executable | QDir::Files);
-    // this kinda goes against idea of keeping ui separate, but oh well
-    MythProgressDialog *busyd = new MythProgressDialog(
-        tr("Searching for scripts"), dir.count());
-    int progress = 0;
+    dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
+
+    MythBusyDialog *busy = new MythBusyDialog(
+        QObject::tr("Searching for scripts"));
+
 
     if (!dir.exists())
     {
@@ -83,26 +83,8 @@ bool SourceManager::findScripts()
         return false;
     }
 
-    const QFileInfoList *files = dir.entryInfoList();
-    if (!files)
-        return false;
+    recurseDirs(dir);
 
-    QFileInfoListIterator itr(*files);
-    QFileInfo *file;
-    while ((file = itr.current()))
-    {
-        ++itr;
-        if (file->isExecutable())
-        {
-            ScriptInfo *info = WeatherSource::probeScript(*file);
-            if (info)
-            {
-                m_scripts.append(info);
-                VERBOSE(VB_GENERAL, "found script " + file->absFilePath());
-            }
-        }
-        busyd->setProgress(++progress);
-    }
     // run through and see if any scripts have been deleted
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "SELECT sourceid, path FROM weathersourcesettings "
@@ -340,4 +322,43 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
     }
     ws->disconnectScreen(screen);
     return true;
+}
+
+// Recurses dir for script files
+void SourceManager::recurseDirs( QDir dir )
+{
+    if (!dir.exists()) 
+        return;
+
+    dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
+    const QFileInfoList *files = dir.entryInfoList();
+    if (!files)
+        return;
+
+    QFileInfoListIterator itr(*files);
+    QFileInfo *file;
+
+    while ((file = itr.current())) 
+    {
+        ++itr;
+        if (file->isDir()) 
+        {
+            if (file->fileName() == QString("..")) continue;
+            if (file->fileName() == QString("."))  continue;
+            QDir recurseTo(file->filePath());
+            recurseDirs(recurseTo);
+        }
+
+        if (file->isExecutable() && !(file->isDir())) 
+        {
+            ScriptInfo *info = WeatherSource::probeScript(*file);
+            if (info)
+            {
+                m_scripts.append(info);
+                VERBOSE(VB_GENERAL, "found script " + file->absFilePath());
+            }
+        }
+    }
+
+    return;    
 }

@@ -40,6 +40,7 @@ class SourceManager : public QObject
     QPtrList<WeatherSource> m_sources; //in-use scripts
     QIntDict<WeatherSource> m_sourcemap;
     units_t m_units;
+    void recurseDirs(QDir dir);
 };
 
 #endif

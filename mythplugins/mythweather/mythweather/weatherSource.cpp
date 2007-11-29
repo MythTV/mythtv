@@ -386,6 +386,7 @@ QStringList WeatherSource::getLocationList(const QString &str)
     QStringList locs;
 
     m_proc->clearArguments();
+    m_proc->setWorkingDirectory(m_info->file->dir(true));
     m_proc->addArgument(m_info->file->absFilePath());
     m_proc->addArgument("-l");
     m_proc->addArgument(str);
@@ -421,6 +422,7 @@ void WeatherSource::startUpdate()
     VERBOSE(VB_GENERAL, "Starting update of " + m_info->name);
     m_data.clear();
     m_proc->clearArguments();
+    m_proc->setWorkingDirectory(m_info->file->dir(true));
     m_proc->addArgument("nice");
     m_proc->addArgument(m_info->file->absFilePath());
     m_proc->addArgument("-u");
