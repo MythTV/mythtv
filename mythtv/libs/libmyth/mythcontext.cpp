@@ -586,7 +586,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
         if (DefaultUPnP(failure))                // Probably a valid backend,
             autoSelect = manualSelect = false;   // so disable any further UPnP
         else
-            VERBOSE(VB_IMPORTANT, failure);
+            VERBOSE(VB_IMPORTANT, QString("%1").arg(failure));
 
         failure = TestDBconnection();
         if (failure.isEmpty())
@@ -646,13 +646,13 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
     // line or the GUI depending on the application.
     while (failure.length())
     {
-        VERBOSE(VB_IMPORTANT, failure);
+        VERBOSE(VB_IMPORTANT, QString("%1").arg(failure));
         if (( manualSelect && ChooseBackend(failure)) || 
             (!manualSelect && PromptForDatabaseParams(failure)))
         {
             failure = TestDBconnection();
             if (failure.length())
-                VERBOSE(VB_IMPORTANT, failure);
+                VERBOSE(VB_IMPORTANT, QString("%1").arg(failure));
         }
         else
             goto NoDBfound;
@@ -787,7 +787,9 @@ void MythContextPrivate::LoadDatabaseSettings(void)
         m_localhostname = localhostname;
         VERBOSE(VB_IMPORTANT, "Empty LocalHostName.");
     }
-    VERBOSE(VB_GENERAL, "Using localhost value of " + m_localhostname);
+
+    VERBOSE(VB_GENERAL, QString("Using localhost value of %1")
+            .arg(m_localhostname));
 }
 
 /**
@@ -1090,7 +1092,11 @@ QString MythContextPrivate::TestDBconnection(void)
         doPing = false;
 
     if (doPing)
-        VERBOSE(VB_GENERAL, "Testing network connectivity to " + host);
+    {
+        VERBOSE(VB_GENERAL,
+                QString("Testing network connectivity to %1").arg(host));
+    }
+
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         // Save, to display in DatabaseSettings screens
@@ -1353,8 +1359,9 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
         return false;
     }
 
-    VERBOSE(VB_UPNP, loc + "config.xml has default PIN '"
-                         + PIN + "' and host USN: " + USN);
+    VERBOSE(VB_UPNP, loc + "config.xml has default " +
+            QString("PIN '%1' and host USN: %2")
+            .arg(PIN).arg(USN));
 
     if (!InitUPnP())
     {
@@ -1389,7 +1396,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     QString        URL = backend->m_sLocation;
     MythXMLClient  XML(URL);
  
-    VERBOSE(VB_UPNP, LOC + "Trying host at " + URL);
+    VERBOSE(VB_UPNP, LOC + QString("Trying host at %1").arg(URL));
     switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
@@ -1408,7 +1415,7 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     }
 
     QString DBhost = m_DBparams.dbHostName;
-    VERBOSE(VB_UPNP, LOC + "Got database hostname: " + DBhost);
+    VERBOSE(VB_UPNP, LOC + QString("Got database hostname: %1").arg(DBhost));
 
     return true;
 }
@@ -1442,7 +1449,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
                                       "Library version error", warning);
             d->EndTempWindow();
         }
-        VERBOSE(VB_IMPORTANT, warning);
+        VERBOSE(VB_IMPORTANT, QString("%1").arg(warning));
 
         return false;
     }
@@ -1997,7 +2004,8 @@ void MythContext::ClearOldImageCache(void)
     const size_t max_cached = GetNumSetting("ThemeCacheSize", 1);
     while (dirtimes.size() >= max_cached)
     {
-        VERBOSE(VB_FILE, "Removing cache dir: " << dirtimes.begin().data());
+        VERBOSE(VB_FILE, QString("Removing cache dir: %1")
+                .arg(dirtimes.begin().data()));
         RemoveCacheDir(dirtimes.begin().data());
         dirtimes.erase(dirtimes.begin());
     }
@@ -2005,7 +2013,8 @@ void MythContext::ClearOldImageCache(void)
     QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
     for (; dit != dirtimes.end(); ++dit)
     {
-        VERBOSE(VB_FILE, "Keeping cache dir: " << (*dit).data());
+        VERBOSE(VB_FILE, QString("Keeping cache dir: %1")
+                .arg((*dit).data()));
     }
 }
 
@@ -2016,7 +2025,8 @@ void MythContext::RemoveCacheDir(const QString &dirname)
     if (!dirname.startsWith(cachedirname))
         return;
 
-    VERBOSE(VB_IMPORTANT, "Removing stale cache dir: " << dirname);
+    VERBOSE(VB_IMPORTANT,
+            QString("Removing stale cache dir: %1").arg(dirname));
 
     QDir dir(dirname);
 
@@ -2460,7 +2470,7 @@ void MythContext::DBError(const QString &where, const QSqlQuery& query)
     str += QString::fromUtf8(query.lastQuery()) + "\n";
     str += DBErrorMessage(query.lastError());
 #endif
-    VERBOSE(VB_IMPORTANT, str);
+    VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
 }
 
 QString MythContext::DBErrorMessage(const QSqlError& err)
@@ -2908,7 +2918,8 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
     if (!FindThemeFile(filename))
     {
         VERBOSE(VB_IMPORTANT,
-                "Unable to find image file: " << filename);
+                QString("Unable to find image file: %1").arg(filename));
+
         return NULL;
     }
 
@@ -2925,7 +2936,9 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 
         if (!tmpimage.load(filename))
         {
-            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Error loading image file: %1").arg(filename));
+
             return NULL;
         }
         QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
@@ -2937,7 +2950,9 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         ret = new QImage(filename);
         if (ret->width() == 0)
         {
-            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Error loading image file: %1").arg(filename));
+
             delete ret;
             return NULL;
         }
@@ -3001,7 +3016,8 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     if (!FindThemeFile(filename))
     {
         VERBOSE(VB_IMPORTANT,
-                "Unable to find image file: " << filename);
+                QString("Unable to find image file: %1").arg(filename));
+
         return NULL;
     }
 
@@ -3018,7 +3034,9 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 
         if (!tmpimage.load(filename))
         {
-            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Error loading image file: %1").arg(filename));
+
             delete ret;
             return NULL;
         }
@@ -3030,7 +3048,9 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     {
         if (!ret->load(filename))
         {
-            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Error loading image file: %1").arg(filename));
+
             delete ret;
             return NULL;
         }
@@ -3184,8 +3204,9 @@ void MythContext::readyRead(MythSocket *sock)
         else if (prefix != "BACKEND_MESSAGE")
         {
             VERBOSE(VB_IMPORTANT,
-                    "Received a: " << prefix << " message from the backend"
-                    "\n\t\t\tBut I don't know what to do with it.");
+                    QString("Received a: %1 message from the backend"
+                    "\n\t\t\tBut I don't know what to do with it.")
+                    .arg(prefix));
         }
         else if (message == "CLEAR_SETTINGS_CACHE")
         {
@@ -3702,7 +3723,10 @@ void MythContext::LogEntry(const QString &module, int priority,
         }
 
         if (priority <= d->m_logprintlevel)
-            VERBOSE(VB_IMPORTANT, module + ": " + fullMsg);
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("%1: %2").arg(module).arg(fullMsg));
+        }
     }
 }
 
