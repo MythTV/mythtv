@@ -10276,8 +10276,8 @@ Select a Current Recording</source>
         <translation>Seleccione &quot;Guía de Programas&quot; o &quot;Búsqueda de programas&quot;</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Ordenar por Canal  (2) Ordenar por Preferencia</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Canal  (2) Preferencia</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10324,8 +10324,8 @@ Select a Current Recording</source>
         <translation>No se encuentra este programa en la lista.</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Mostrar (1) Todos (2) Importantes</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Todos (2) Importantes</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10352,8 +10352,8 @@ Select a Current Recording</source>
         <translation>Fuente:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Ordenar por Título    (2) Ordenar por Prioridad    (4) Ordenar por Tipo</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Título    (2) Prioridad    (4) Tipo</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

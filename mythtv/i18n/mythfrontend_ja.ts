@@ -10007,8 +10007,8 @@ Select a Current Recording</source>
         <translation>録画予約:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>表示  (1) 全て  (2) 重要な物のみ</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) 全て  (2) 重要な物のみ</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10035,8 +10035,8 @@ Select a Current Recording</source>
         <translation>チャンネル録画優先順位</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) チャンネルで並べ替え  (2) 優先順位で並べ替え</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) チャンネル  (2) 優先順位</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10107,8 +10107,8 @@ Select a Current Recording</source>
         <translation>ソース:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) タイトルで並び替え   (2) 優先順位で並び替え   (4) タイプで並び替え</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) タイトル   (2) 優先順位   (4) タイプ</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>

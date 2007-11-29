@@ -9793,8 +9793,8 @@ Select a Current Recording</source>
         <translation>Geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Filter (1) Alles  (2) Belangrijke</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Alles  (2) Belangrijke</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9806,7 +9806,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Op zender rangschikken   (2) Op prioriteit rangschikken</translation>
+        <translation>(1) Zender   (2) Prioriteit</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9841,8 +9841,8 @@ Select a Current Recording</source>
         <translation>Bron:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Op titel rangschikken   (2) Op prioriteit rangschikken  (4) Op type rangschikken</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titel   (2) Prioriteit  (4) Type</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

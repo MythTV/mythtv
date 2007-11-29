@@ -9447,8 +9447,8 @@ Select a Current Recording</source>
         <translation>Programmazione registrazione:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Mostra (1) Tutti (2) Importanti</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Tutti (2) Importanti</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9475,8 +9475,8 @@ Select a Current Recording</source>
         <translation>Priorità di registrazione del canale</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Ordina per canale (2) Ordina per priorità</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Canale (2) Priorità</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9539,8 +9539,8 @@ Select a Current Recording</source>
         <translation>Sorgente:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Ordina per Titolo    (2) Ordina per Priorità    (4) Ordina per Tipo</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titolo    (2) Priorità    (4) Tipo</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

@@ -10337,8 +10337,8 @@ Select a Current Recording</source>
         <translation>Planeeritud salvestused:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Näita  (1) kõiki  (2) tähtsaid</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) kõiki  (2) tähtsaid</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10361,8 +10361,8 @@ Select a Current Recording</source>
         <translation>Kanalite salvestusprioriteedid</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>Sorteeri (1) kanali või (2) prioriteedi järgi</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanal    (2) Prioriteet</translation>
     </message>
     <message>
         <source>Source:</source>
@@ -10385,8 +10385,8 @@ Select a Current Recording</source>
         <translation>Lõplik prioriteet</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>Sorteeri (1) pealkirja    (2) prioriteedi    või (3) tüübi järgi</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) pealkirja    (2) prioriteedi    või (3) tüübi järgi</translation>
     </message>
     <message>
         <source>Record Type:</source>

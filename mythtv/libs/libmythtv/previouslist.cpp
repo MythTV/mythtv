@@ -430,13 +430,13 @@ void PreviousList::fillViewList(const QString &view)
     viewTextList.clear();
 
     viewList << "sort by time";
-    viewTextList << tr("Sort by Time");
+    viewTextList << tr("Time");
 
     viewList << "reverse time";
     viewTextList << tr("Reverse Time");
 
     viewList << "sort by title";
-    viewTextList << tr("Sort by Title");
+    viewTextList << tr("Title");
 
     viewList << "reverse title";
     viewTextList << tr("Reverse Title");

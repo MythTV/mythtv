@@ -9323,8 +9323,8 @@ Välj ett inspelat program</translation>
         <translation>Välj &apos;Programguide&apos; eller &apos;Sök program&apos;</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Sortera efter titel  (2) Sortera efter prioritet</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanal  (2) Prioritet</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9371,8 +9371,8 @@ Välj ett inspelat program</translation>
         <translation>Inga visningar funna av detta program. </translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Visa  (1) Alla  (2) Viktiga</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Alla  (2) Viktiga</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9399,8 +9399,8 @@ Välj ett inspelat program</translation>
         <translation>Källa:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Sortera efter titel  (2) Sortera efter prioritet  (4) Sortera efter typ</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titel  (2) Prioritet  (4) Typ</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

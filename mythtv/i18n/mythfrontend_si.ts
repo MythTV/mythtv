@@ -9891,8 +9891,8 @@ Select a Current Recording</source>
         <translation>Nastavljena snemanja</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Pokaži (1) vse (2) pomembne</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Vsi (2) Pomembno</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9915,8 +9915,8 @@ Select a Current Recording</source>
         <translation>Prioritete kanalnih zajemov</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Uredi po kanalu    (2) Uredi po prioriteti</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanalu    (2) Prioriteti</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9983,8 +9983,8 @@ Select a Current Recording</source>
         <translation>Vir:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Uredi po naslovu    (2) Uredi po prioriteti    (4) Uredi po tipu</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Naslovu    (2) Prioriteti    (4) Tipu</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

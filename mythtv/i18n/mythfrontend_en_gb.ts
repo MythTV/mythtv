@@ -9320,7 +9320,7 @@ Select a Current Recording</source>
         <translation></translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
+        <source>(1) All  (2) Important</source>
         <translation></translation>
     </message>
     <message>
@@ -9352,7 +9352,7 @@ Select a Current Recording</source>
         <translation></translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
+        <source>(1) Channel    (2) Priority</source>
         <translation></translation>
     </message>
     <message>
@@ -9376,7 +9376,7 @@ Select a Current Recording</source>
         <translation></translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
+        <source>(1) Title    (2) Priority    (4) Type</source>
         <translation></translation>
     </message>
     <message>

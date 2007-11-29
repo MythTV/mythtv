@@ -10081,8 +10081,8 @@ Select a Current Recording</source>
         <translation>vælg &apos;Program Guide&apos; eller &apos;Program Finder&apos;</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Sortér efter Titel  (2) Sortér efter Prioritet</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Titel  (2) Prioritet</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10125,8 +10125,8 @@ Select a Current Recording</source>
         <translation>Der findes ingen lister for dette program. </translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Vis  (1) Alle (2) Vigtige</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Alle (2) Vigtige</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10157,8 +10157,8 @@ Select a Current Recording</source>
         <translation>Kilde:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Sortér på titel (2) Sortér på prioritet (4) Sortér på type</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titel (2) Prioritet (4) Type</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

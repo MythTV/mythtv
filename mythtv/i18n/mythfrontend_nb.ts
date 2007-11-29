@@ -9720,8 +9720,8 @@ Select a Current Recording</source>
         <translation>Planlagte opptak</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Vis: (1) Alle - (2) Viktige</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Alle  (2) Viktige</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9744,8 +9744,8 @@ Select a Current Recording</source>
         <translation>Opptaksprioritet for kanaler</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Sorter etter kanal - (2) Sorter etter prioritet</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanal    (2) Prioritet</translation>
     </message>
     <message>
         <source>Source:</source>
@@ -9768,8 +9768,8 @@ Select a Current Recording</source>
         <translation>Endelig prioritet</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Sorter etter tittel    (2) Sorter etter prioritet    (4) Sorter etter type</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Tittel    (2) Prioritet    (4) Type</translation>
     </message>
     <message>
         <source>Record Type:</source>

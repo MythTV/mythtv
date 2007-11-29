@@ -9840,8 +9840,8 @@ Select a Current Recording</source>
         <translation>Naplánovaná nahrávání:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Ukaž  (1) Vše  (2) Důležité</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Vše  (2) Důležité</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9864,8 +9864,8 @@ Select a Current Recording</source>
         <translation>Priority nahrávání kanálů</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Třídit dle kanálu    (2) Třídit dle priority</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanálu    (2) Priority</translation>
     </message>
     <message>
         <source>Source:</source>
@@ -9888,8 +9888,8 @@ Select a Current Recording</source>
         <translation>Cílová priorita</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Třídit dle titulu    (2) Třídit dle priority    (4) Třídit dle typu</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titulu    (2) Priority    (4) Typu</translation>
     </message>
     <message>
         <source>Record Type:</source>

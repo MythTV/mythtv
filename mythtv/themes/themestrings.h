@@ -1,6 +1,6 @@
 void strings_null() {
     ThemeUI::tr("Scheduled Recordings:");
-    ThemeUI::tr("Show  (1) All  (2) Important");
+    ThemeUI::tr("(1) All  (2) Important");
     ThemeUI::tr("Showing:");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
     ThemeUI::tr("To schedule a recording, exit this screen and");
@@ -8,7 +8,7 @@ void strings_null() {
     ThemeUI::tr("Preview Schedule Changes:");
     ThemeUI::tr("The recording schedule would not be affected.");
     ThemeUI::tr("Channel Recording Priorities");
-    ThemeUI::tr("(1) Sort by Channel    (2) Sort by Priority");
+    ThemeUI::tr("(1) Channel    (2) Priority");
     ThemeUI::tr("Source:");
     ThemeUI::tr("Priority:");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
@@ -17,8 +17,7 @@ void strings_null() {
     ThemeUI::tr("Program Recording Priorities");
     ThemeUI::tr("Priority");
     ThemeUI::tr("Final Priority");
-    ThemeUI::tr("(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type");
-    ThemeUI::tr("(1) Sort by Channel    (2) Sort by Priority");
+    ThemeUI::tr("(1) Title    (2) Priority    (4) Type");
     ThemeUI::tr("Record Type:");
     ThemeUI::tr("Channel:");
     ThemeUI::tr("Priority:");

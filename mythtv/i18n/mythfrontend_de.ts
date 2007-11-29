@@ -10180,8 +10180,8 @@ Select a Current Recording</source>
         <translation>wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot;</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Sender (2) Rang</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10232,8 +10232,8 @@ Select a Current Recording</source>
         <translation>Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Zeige  (1) Alle  (2) Wichtige</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Alle  (2) Wichtige</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10272,8 +10272,8 @@ Select a Current Recording</source>
         <translation>Quelle:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>Sortieren nach: (1) Name    (2) Priorität    (4) Typ</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Name    (2) Priorität    (4) Typ</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

@@ -10309,7 +10309,7 @@ Select a Current Recording</source>
         <translation>Çizelgelenen Kayıtlar:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
+        <source>(1) All  (2) Important</source>
         <translation>(1) Tümünü  (2) Önemlileri Göster</translation>
     </message>
     <message>
@@ -10341,8 +10341,8 @@ Select a Current Recording</source>
         <translation>Kanal Kayıtları Öncelikleri</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Kanala göre Sırala    (2) Önceliğe göre Sırala</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanal    (2) Öncelik</translation>
     </message>
     <message>
         <source>Source:</source>
@@ -10365,8 +10365,8 @@ Select a Current Recording</source>
         <translation>Son Öncelik</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Başlığa göre Sırala    (2) Önceliğe göre Sırala    (4) Tipe göre Sırala</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Başlığa    (2) Önceliğe    (4) Tipe</translation>
     </message>
     <message>
         <source>Record Type:</source>

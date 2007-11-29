@@ -9374,8 +9374,8 @@ Select a Current Recording</source>
         <translation>vagi a &quot;Guia de programes&quot; o &quot;Cercar Programes&quot;</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Ordenar per Canal  (2) Ordenar per Preferència</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Canal  (2) Preferència</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -9422,7 +9422,7 @@ Select a Current Recording</source>
         <translation>Aquest programa no el trovo llistat.</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
+        <source>(1) All  (2) Important</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9450,7 +9450,7 @@ Select a Current Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
+        <source>(1) Title    (2) Priority    (4) Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

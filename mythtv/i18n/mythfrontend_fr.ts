@@ -10156,8 +10156,8 @@ Select a Current Recording</source>
         <translation>Enregistrements planifiés:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Voir  (1) Tout  (2) Important</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Tout  (2) Important</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10168,8 +10168,8 @@ Select a Current Recording</source>
         <translation>Pour planifier un enregistrement, quittez cet écran et</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(10 Tri par chaîne    (2) Tri par priorité</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Chaîne    (2) Priorité</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10248,8 +10248,8 @@ Select a Current Recording</source>
         <translation>Source:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Trier par titre    (2) trier par priorité    (4) Trier par type</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Titre    (2) Priorité    (4) Type</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>

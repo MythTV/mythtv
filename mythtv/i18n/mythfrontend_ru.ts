@@ -9741,8 +9741,8 @@ Select a Current Recording</source>
         <translation>Расписание записи:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Показывать (1) Все  (2) Важные</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Все  (2) Важные</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -9773,8 +9773,8 @@ Select a Current Recording</source>
         <translation>Приоритеты записи каналов</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Сортировать по каналу    (2) Сортировать по приоритету</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Каналу    (2) Приоритету</translation>
     </message>
     <message>
         <source>Source:</source>
@@ -9797,8 +9797,8 @@ Select a Current Recording</source>
         <translation>Окончательный приоритет</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Сортировать по заголовку    (2) Сортировать по приоритету    (4) Сортировать по типу</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Заголовку    (2) Приоритету    (4) Типу</translation>
     </message>
     <message>
         <source>Record Type:</source>

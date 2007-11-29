@@ -10078,8 +10078,8 @@ Select a Current Recording</source>
         <translation>Ajastetut Nauhoitukset:</translation>
     </message>
     <message>
-        <source>Show  (1) All  (2) Important</source>
-        <translation>Näytä  (1) Kaikki    (2) Tärkeät</translation>
+        <source>(1) All  (2) Important</source>
+        <translation>(1) Kaikki    (2) Tärkeät</translation>
     </message>
     <message>
         <source>Showing:</source>
@@ -10106,8 +10106,8 @@ Select a Current Recording</source>
         <translation>Kanavien Nauhoituksien Prioriteetit</translation>
     </message>
     <message>
-        <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation>(1) Järjestä Kanavittain    (2) Järjestä Prioriteetin Mukaan</translation>
+        <source>(1) Channel    (2) Priority</source>
+        <translation>(1) Kanava    (2) Prioriteetti</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -10170,8 +10170,8 @@ Select a Current Recording</source>
         <translation>Lähde:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation>(1) Järjestys Nimikkeellä   (2) Järjestys Prioriteetilla   (4) Järjestys Tyypillä</translation>
+        <source>(1) Title    (2) Priority    (4) Type</source>
+        <translation>(1) Nimikkeellä   (2) Prioriteetilla   (4) Tyypillä</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
