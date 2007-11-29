@@ -39,7 +39,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.3.3";
+$version = "v1.3.4";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 my @countries = qw(USA UK Canada Japan);
@@ -435,14 +435,24 @@ sub getMovieList {
    # check to see if we got a results page or a movie page
    #    looking for 'add=<movieid>" target=' which only exists
    #    in a movie description page 
-   my $movienum = parseBetween($response, "add=", "\">");
+   my $movienum = parseBetween($response, "add=", "\" ");
+   if (!$movienum) {
+      $movienum = parseBetween($response, ";add=", "'");
+   }
    if ($movienum) {
-       if (defined $opt_d) { printf("# redirected to movie page\n"); }
-       my $movietitle = parseBetween($response, "<title>", "</title>"); 
-       $movietitle =~ m#(.+) \((\d+)\)#;
-       $movietitle = $1;
-       print "$movienum:$movietitle\n";
-       exit(0);
+      if ($movienum !~ m/^[0-9]+$/) {
+         if (defined $opt_d) {
+            printf("# Error: IMDB movie number ($movienum), isn't.\n");
+         }
+         exit(0);
+      }
+
+      if (defined $opt_d) { printf("# redirected to movie page\n"); }
+      my $movietitle = parseBetween($response, "<title>", "</title>"); 
+      $movietitle =~ m#(.+) \((\d+)\)#;
+      $movietitle = $1;
+      print "$movienum:$movietitle\n";
+      exit(0);
    }
 
    # extract possible matches
