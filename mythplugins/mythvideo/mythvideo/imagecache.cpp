@@ -131,12 +131,12 @@ class ImageCacheImp
             m_cache.push_back(*p->second);
             m_cache.erase(p->second);
             ret = *(p->second = --m_cache.end());
-            VERBOSE(VB_GENERAL, QString("ImageCache hit for: %1")
+            VERBOSE(VB_FILE, QString("ImageCache hit for: %1")
                     .arg(image_file));
         }
         else
         {
-            VERBOSE(VB_GENERAL, QString("ImageCache miss for: %1")
+            VERBOSE(VB_FILE, QString("ImageCache miss for: %1")
                     .arg(image_file));
 
             cache_entry_ptr cep(new cache_entry(image_file));
@@ -164,7 +164,7 @@ class ImageCacheImp
             if (ret->scale_image.isNull() || ret->scale_mode != scale ||
                     ret->scale_width != width || ret->scale_height != height)
             {
-                VERBOSE(VB_GENERAL,
+                VERBOSE(VB_FILE,
                         QString("ImageCache miss for scale image: %1")
                         .arg(image_file));
                 ret->scale_mode = scale;
@@ -177,7 +177,7 @@ class ImageCacheImp
             }
             else
             {
-                VERBOSE(VB_GENERAL,
+                VERBOSE(VB_FILE,
                         QString("ImageCache hit for scale image: %1")
                         .arg(image_file));
             }
