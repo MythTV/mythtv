@@ -3496,7 +3496,10 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         }
 
         if (createdTempWindow)
+        {
             d->EndTempWindow();
+            d->m_DBparams.dbHostName = d->m_DBhostCp;
+        }
 
         return returnValue;
     }
