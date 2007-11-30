@@ -132,6 +132,8 @@ void RomInfo::setField(QString field, QString data)
         rompath = data;
     else if (field == "country")
         country = data;
+    else if (field == "publisher")
+	publisher = data;
     else if (field == "crc_value")
         crc_value = data;
     else if (field == "diskcount")
