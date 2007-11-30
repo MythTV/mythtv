@@ -267,15 +267,15 @@ quiere hacerlo?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
-        <translation>SEGA/MASTER SYSTEM</translation>
+        <translation></translation>
     </message>
     <message>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de todas las extensiones separadas por coma usadas por este emulador. Vacío significa que cualquier fichero bajo RUTA ROM será considerado para usar con este emulador</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
