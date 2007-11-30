@@ -1613,6 +1613,7 @@ void PlaybackBox::cursorDown(bool page, bool newview)
             paintSkipUpdate = false;
             update(drawListBounds);
             update(drawInfoBounds);
+            update(blackholeBounds);
         }
     }
 }
@@ -1644,6 +1645,7 @@ void PlaybackBox::cursorUp(bool page, bool newview)
             paintSkipUpdate = false;
             update(drawListBounds);
             update(drawInfoBounds);
+            update(blackholeBounds);
         }
     }
 }
