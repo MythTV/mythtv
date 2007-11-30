@@ -841,7 +841,7 @@
 
     <item>
         <title>MythTV - Commits</title>
-        <url>http://www.gossamer-threads.com/lists/mythtv/commits.xml</url>
+        <url>http://svn.mythtv.org/trac/timeline?changeset=on&amp;milestone=on&amp;max=20&amp;daysback=14&amp;format=rss</url>
     </item>
 
     <item>
