@@ -73,7 +73,7 @@ bool SourceManager::findScripts()
     QDir dir(path);
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
 
-    MythBusyDialog *busy = new MythBusyDialog(
+    MythBusyDialog *busyd = new MythBusyDialog(
         QObject::tr("Searching for scripts"));
 
 
