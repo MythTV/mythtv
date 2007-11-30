@@ -33,7 +33,15 @@ package IO::Socket::INET::MythTV;
     sub read_data {
         my $self = shift;
     # Read the response header to find out how much data we'll be grabbing
-        $self->sysread($length, 8);
+        my $result = $self->sysread($length, 8);
+        if (! defined $result) {
+            warn "Error reading from MythTV backend: $!\n";
+            return '';
+        } 
+        elsif ($result == 0) {
+            #warn "No data returned by MythTV backend.\n";
+            return '';
+        }
         $length = int($length);
     # Read and return any data that was returned
         my $ret;
