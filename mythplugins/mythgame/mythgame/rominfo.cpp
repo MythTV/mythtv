@@ -6,6 +6,9 @@
 #include "rominfo.h"
 #include "romedit.h"
 
+#define LOC_ERR QString("MythGame:ROMINFO Error: ")
+#define LOC QString("MythGame:ROMINFO: ")
+
 bool operator==(const RomInfo& a, const RomInfo& b)
 {
     if (a.Romname() == b.Romname())
@@ -26,14 +29,22 @@ void RomInfo::edit_rominfo()
     if (kDialogCodeRejected == res)
         return;
 
+    if (res)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        QString thequery = QString("SELECT gamename,genre,year,country,publisher,favorite FROM gamemetadata "
-                                       " WHERE gametype = '%1' AND romname = '%2'; ")
-                                       .arg(GameType())
-                                       .arg(Romname());
+	query.prepare("SELECT gamename,genre,year,country,publisher,favorite "
+		      "FROM gamemetadata "
+		      "WHERE gametype = :GAMETYPE "
+		      "AND romname = :ROMNAME");
 
-        query.exec(thequery);
+	query.bindValue(":GAMETYPE", GameType());
+	query.bindValue(":ROMNAME", Romname());
+
+        if (!query.exec())
+	{   
+	    MythContext::DBError("RomInfo::edit_rominfo", query);
+	    return;
+	}
 
         if (query.isActive() && query.size() > 0);
         {
@@ -51,12 +62,17 @@ void RomInfo::edit_rominfo()
             if ((t_gamename != Gamename()) || (t_genre != Genre()) || (t_year != Year()) 
                || (t_country != Country()) || (t_publisher != Publisher()) || (t_favourite != Favorite()))
             {
-                thequery = QString("UPDATE gamemetadata SET version = '%1' WHERE gametype = '%2' AND romname = '%3';")
-                                   .arg(QString("CUSTOM"))
-                                   .arg(GameType())
-                                   .arg(Romname());
+		query.prepare("UPDATE gamemetadata SET version = 'CUSTOM' "
+		              "WHERE gametype = :GAMETYPE "
+			      "AND romname = :ROMNAME");
+		query.bindValue(":GAMETYPE", GameType());
+		query.bindValue(":ROMNAME", Romname());
 
-                query.exec(thequery);
+		if (!query.exec())
+	        {   
+	            MythContext::DBError("RomInfo::edit_rominfo", query);
+	            return;
+	        }
             }
         }
    }
@@ -65,15 +81,23 @@ void RomInfo::edit_rominfo()
 // Return the count of how many times this appears in the db already
 int romInDB(QString rom, QString gametype)
 {
-    QString thequery;
     MSqlQuery query(MSqlQuery::InitCon());
 
     int count = 0;
 
-    thequery = QString("SELECT count(*) FROM gamemetadata WHERE gametype = '%1' AND romname = '%2';")
-                        .arg(gametype)
-                        .arg(rom);
-    query.exec(thequery);
+    query.prepare("SELECT count(*) FROM gamemetadata "
+		  "WHERE gametype = :GAMETYPE "
+		  "AND romname = :ROMNAME");
+
+    query.bindValue(":GAMETYPE", gametype);
+    query.bindValue(":ROMNAME", rom);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("romInDB", query);
+        return -1;
+    }
+
 
     if (query.isActive() && query.size() > 0);
     {
@@ -143,7 +167,7 @@ void RomInfo::setField(QString field, QString data)
     else if (field == "romcount")
         romcount = data.toInt();
     else
-        cout << "Error: Invalid field " << field << endl;
+        VERBOSE(VB_GENERAL, LOC_ERR + QString("Invalid field %1").arg(field));
 
 }
 
@@ -151,10 +175,18 @@ void RomInfo::setFavorite()
 {
     favorite = 1 - favorite;
 
-    QString thequery = QString("UPDATE gamemetadata SET favorite='%1' WHERE "
-                               "romname='%2';").arg(favorite).arg(romname);
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(thequery);
+
+    query.prepare("UPDATE gamemetadata SET favorite = :FAV "
+		  "WHERE romname = :ROMNAME");
+
+    query.bindValue(":FAV", favorite);
+    query.bindValue(":ROMNAME",romname);
+
+    if (!query.exec())
+    {   
+        MythContext::DBError("RomInfo::setFavorite", query);
+    }
 }
 
 QString RomInfo::getExtension()
@@ -177,21 +209,22 @@ void RomInfo::fillData()
         return;
     }
 
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString systemtype;
+    if (system != "") {
+        systemtype  += " AND system = :SYSTEM ";
+    }
+
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,publisher,"
-                       "version FROM gamemetadata WHERE gamename='" 
-                       + gamename + "'";
+                       "version FROM gamemetadata WHERE gamename = :GAMENAME " 
+		       + systemtype + " ORDER BY diskcount DESC";
 
-    if (system != "")
-        thequery += " AND system='" + system + "'";
-
-    // added order by to get the (first) disk with the accurate diskcount
-    thequery += " ORDER BY diskcount DESC";
-    
-    thequery += ";";
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(thequery);
+    query.prepare(thequery);
+    query.bindValue(":SYSTEM", system);
+    query.bindValue(":GAMENAME", gamename);
+    query.exec();
 
     if (query.isActive() && query.size() > 0);
     {
@@ -212,9 +245,10 @@ void RomInfo::fillData()
         setVersion(query.value(12).toString());
     }
 
-    thequery = "SELECT screenshots FROM gameplayers WHERE playername = '" + system + "';";
+    query.prepare("SELECT screenshots FROM gameplayers WHERE playername = :SYSTEM");
+    query.bindValue(":SYSTEM",system);
 
-    query.exec(thequery);
+    query.exec();
 
     if (query.isActive() && query.size() > 0);
     {
@@ -235,8 +269,9 @@ void RomInfo::fillData()
     // systems available to play it.
     if (RomCount() > 1) 
     {
-        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = '" + Romname() + "';";
-
+        query.prepare("SELECT DISTINCT system FROM gamemetadata "
+		      "WHERE romname = :ROMNAME");
+	query.bindValue(":ROMNAME", Romname());
         query.exec(thequery);
 
         if (query.isActive() && query.size() > 0);

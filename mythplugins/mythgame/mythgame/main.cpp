@@ -17,6 +17,9 @@ using namespace std;
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
 
+#define LOC_ERR QString("MythGame:MAIN Error: ")
+#define LOC QString("MythGame:MAIN: ")
+
 struct GameData
 {
 };
@@ -73,7 +76,8 @@ void runMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find theme %1")
+			              .arg(themedir));
         delete diag;
     }
 }

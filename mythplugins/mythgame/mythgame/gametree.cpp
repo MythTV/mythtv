@@ -12,6 +12,9 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 
+#define LOC_ERR QString("MythGame:GAMETREE Error: ")
+#define LOC QString("MythGame:GAMETREE: ")
+
 QString GameTreeItem::getFillSql(QString layer) const
 {
     unsigned childDepth = m_depth + 1;
@@ -183,7 +186,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     if (systemFilter.isEmpty())
     {
         systemFilter = "1=0";
-        cerr << "gametree.o: Couldn't find any game handlers" << endl;
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find any game handlers!"));
     }
     else
         systemFilter += ")";
@@ -283,7 +286,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
         GenericTree *node = m_gameTreeUI->getCurrentNode();
         if (!node)
         {
-            cerr << "gametree.o: Couldn't get current node\n";
+            VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't get current node"));
             return;
         }
         if (!item->isFilled() || node == m_favouriteNode)
@@ -491,7 +494,7 @@ void GameTree::wireUpTheme(void)
     m_gameTreeUI = getUIManagedTreeListType("gametreelist");
     if (!m_gameTreeUI)
     {
-        cerr << "gametree.o: Couldn't find a gametreelist in your theme" << endl;
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a gametreelist in your theme"));
         exit(0);
     }
     m_gameTreeUI->showWholeTree(true);
@@ -504,27 +507,27 @@ void GameTree::wireUpTheme(void)
 
     m_gameTitle = getUITextType("gametitle");
     if (!m_gameTitle)
-        cerr << "gametree.o: Couldn't find a text area gametitle\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a text area gametitle"));
 
     m_gameSystem = getUITextType("systemname");
     if (!m_gameSystem)
-        cerr << "gametree.o: Couldn't find a text area systemname\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a text area systemname"));
 
     m_gameYear = getUITextType("yearname");
     if (!m_gameYear)
-        cerr << "gametree.o: Couldn't find a text area yearname\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a text area yearname"));
 
     m_gameGenre = getUITextType("genrename");
     if (!m_gameGenre)
-        cerr << "gametree.o: Couldn't find a text area genrename\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a text area genrename"));
 
     m_gameFavourite = getUITextType("showfavorite");
     if (!m_gameFavourite)
-        cerr << "gametree.o: Couldn't find a text area showfavorite\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find a text area showfavorite"));
 
     m_gameImage = getUIImageType("gameimage");
     if (!m_gameImage)
-        cerr << "gametree.o: Couldn't find an image gameimage\n";
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find an imagetag gameimage"));
 }
 
 void GameTree::fillNode(GenericTree *node)

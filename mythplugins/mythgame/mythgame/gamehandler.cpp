@@ -14,6 +14,9 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/util.h>
 
+#define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
+#define LOC QString("MythGame:GAMEHANDLER: ")
+
 using namespace std;
 
 static QPtrList<GameHandler> *handlers = 0;
@@ -48,6 +51,7 @@ static void checkHandlers(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT DISTINCT playername FROM gameplayers WHERE playername <> '';");
+
     while (query.next()) 
     {   
         QString name = query.value(0).toString();
@@ -64,7 +68,14 @@ GameHandler* GameHandler::getHandler(uint i)
 void GameHandler::updateSettings(GameHandler *handler)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT rompath, workingpath, commandline, screenshots, gameplayerid, gametype, extensions, spandisks  FROM gameplayers WHERE playername = '" + handler->SystemName() + "';");
+
+    query.prepare("SELECT rompath, workingpath, commandline, screenshots, "
+		  "gameplayerid, gametype, extensions, spandisks  "
+		  "FROM gameplayers WHERE playername = :SYSTEM ");
+
+    query.bindValue(":SYSTEM", handler->SystemName());
+
+    query.exec();
 
     query.next();
     handler->rompath = query.value(0).toString();
@@ -102,11 +113,12 @@ void GameHandler::InitMetaDataMap(QString GameType)
     QString key;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("SELECT crc, category, year, country, name, "
-                               "description, publisher, platform, version, "
-                               "binfile FROM romdb WHERE platform = '%1';")
-                              .arg(GameType);
-    query.exec(thequery);
+    query.prepare("SELECT crc, category, year, country, name, "
+                  "description, publisher, platform, version, "
+                  "binfile FROM romdb WHERE platform = :GAMETYPE;");
+                              
+    query.bindValue(":GAMETYPE",GameType);
+    query.exec();
 
     if (query.isActive() && query.size() > 0)
     {
@@ -128,9 +140,10 @@ void GameHandler::InitMetaDataMap(QString GameType)
     }
 
     if (romDB.count() == 0)
-        cerr << "No romDB data read from database. Not imported?" << endl;
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("No romDB data read from database. Not imported?"));
     else
-        cerr << "Loaded " << romDB.count() << " items from romDB Database" << endl;
+	VERBOSE(VB_GENERAL, LOC + QString("Loaded %1 items from romDB Database")
+			          .arg(romDB.count()));
 
 }
 
@@ -157,7 +170,9 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     {
         if (romDB.contains(key)) 
         {
-            //cerr << "ROMDB FOUND for " << romDB[key].GameName() << endl;
+            VERBOSE(VB_GENERAL, LOC + QString("ROMDB FOUND for %1 - %2")
+			              .arg(romDB[key].GameName())
+				      .arg(key));
             *Year = romDB[key].Year();
             *Country = romDB[key].Country();
             *Genre = romDB[key].Genre();
@@ -165,29 +180,34 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
             *GameName = romDB[key].GameName();
             *Version = romDB[key].Version();
         }
-        //else cerr << "NO ROMDB FOUND for " << rom << endl;
+        else VERBOSE(VB_GENERAL, LOC + QString("NO ROMDB FOUND for %1").arg(rom));
 
     };
 
-    if (*Genre == "Unknown")
+    if ((*Genre == "Unknown") || (*Genre == ""))
         *Genre = QString("Unknown%1").arg( handler->GameType() );
     
 }
 
 void purgeGameDB(QString filename, QString RomPath) 
 {
-    cerr << "Purging " << RomPath << " - " << filename << endl;
+    VERBOSE(VB_GENERAL, LOC + QString("Purging %1 - %2")
+		              .arg(RomPath)
+			      .arg(filename));
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     // This should have the added benefit of removing the rom from
     // other games of the same gametype so we wont be asked to remove it
     // more than once.
-    QString thequery = QString("DELETE FROM gamemetadata WHERE romname = '%1' AND "
-                                " rompath = '%2'; ")
-                              .arg(filename)
-                              .arg(RomPath);
-    query.exec(thequery);
+    query.prepare("DELETE FROM gamemetadata WHERE "
+		  "romname = :ROMNAME AND "
+                  "rompath = :ROMPATH ");
 
+    query.bindValue(":ROMNAME",filename);
+    query.bindValue(":ROMPATH",RomPath);
+
+    query.exec();
 
 }
 
@@ -236,36 +256,42 @@ void GameHandler::promptForRemoval(QString filename, QString RomPath)
 void updateDisplayRom(QString romname, int display, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET display = %1 WHERE romname = '%2' AND "
-                                " system = '%3'; ")
-                              .arg(display)
-                              .arg(romname)
-                              .arg(Systemname);
-    query.exec(thequery);
+    query.prepare("UPDATE gamemetadata SET display = :DISPLAY "
+		  "WHERE romname = :ROMNAME AND system = :SYSTEM");
+	    
+    query.bindValue(":DISPLAY", display);
+    query.bindValue(":ROMNAME", romname);
+    query.bindValue(":SYSTEM", Systemname);
+
+    query.exec();
 
 }
 
 void updateDiskCount(QString romname, int diskcount, QString GameType)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET diskcount = %1 WHERE romname = '%2' AND "
-                                " gametype = '%3'; ")
-                              .arg(diskcount)
-                              .arg(romname)
-                              .arg(GameType);
-    query.exec(thequery);
+    query.prepare("UPDATE gamemetadata SET diskcount = :DISKCOUNT "
+		  "WHERE romname = :ROMNAME AND gametype = :GAMETYPE ");
+
+    query.bindValue(":DISKCOUNT",diskcount);
+    query.bindValue(":ROMNAME", romname);
+    query.bindValue(":GAMETYPE",GameType);
+
+    query.exec();
 
 }
 
 void updateGameName(QString romname, QString GameName, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("UPDATE gamemetadata SET GameName = '%1' WHERE romname = '%2' AND "
-                                " system = '%3'; ")
-                              .arg(GameName)
-                              .arg(romname) 
-                              .arg(Systemname);
-    query.exec(thequery);
+    query.prepare("UPDATE gamemetadata SET GameName = :GAMENAME "
+		  "WHERE romname = :ROMNAME AND system = :SYSTEM ");
+
+    query.bindValue(":GAMENAME", GameName);
+    query.bindValue(":ROMNAME", romname);
+    query.bindValue(":SYSTEM", Systemname);
+
+    query.exec();
 
 }
 
@@ -286,9 +312,17 @@ static void UpdateGameCounts(QStringList updatelist)
     {
         diskcount = 0;
         QString GameType = *it;
-        cerr << "Update gametype " << GameType << endl;
-        QString romquery = QString("SELECT romname,system,spandisks,gamename FROM gamemetadata,gameplayers WHERE gamemetadata.gametype = '%1' AND playername = system ORDER BY romname").arg(GameType);
-        query.exec(romquery);
+	VERBOSE(VB_GENERAL, LOC + QString("Update gametype %1").arg(GameType));
+
+        query.prepare("SELECT romname,system,spandisks,gamename FROM "
+		      "gamemetadata,gameplayers WHERE "
+		      "gamemetadata.gametype = :GAMETYPE AND "
+		      "playername = system ORDER BY romname");
+
+	query.bindValue(":GAMETYPE",GameType);
+
+        query.exec();
+
         if (query.isActive() && query.size() > 0)
         {   
             while (query.next())
@@ -408,26 +442,29 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 // Put the game into the database.
                 // Had to break the values up into 2 pieces since QString only allows 9 arguments and we had 10
 
-            thequery = QString("INSERT INTO gamemetadata "
-                               "(system, romname, gamename, genre, year, gametype, rompath, country, crc_value,"
-                               " diskcount, display, publisher, version) ");
-            queryvalues = QString ("VALUES ('%1', '%2', '%3', '%4', '%5', '%6',")
-                .arg(handler->SystemName())
-                .arg(iter.data().Rom().latin1())
-                .arg(GameName.latin1())
-                .arg(Genre.latin1())
-                .arg(Year.latin1())
-                .arg(handler->GameType());
+	    VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
+            query.prepare("INSERT INTO gamemetadata "
+                          "(system, romname, gamename, genre, year, gametype, " 
+		          "rompath, country, crc_value, diskcount, display, "
+			  "publisher, version) "
+		          "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
+			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PUBLISHER, :VERSION)");
 
-            queryvalues.append( QString("'%1', '%2', '%3', 1 ,'1', '%4', '%5');")
-                .arg(iter.data().RomPath().latin1())
-                .arg(Country.latin1())
-                .arg(CRC32)
-                .arg(Publisher)
-                .arg(Version));
 
-            thequery.append(queryvalues);
-            query.exec(thequery);
+
+	    query.bindValue(":SYSTEM",handler->SystemName());
+            query.bindValue(":ROMNAME",iter.data().Rom());
+            query.bindValue(":GAMENAME",GameName);
+            query.bindValue(":GENRE",Genre);
+            query.bindValue(":YEAR",Year);
+            query.bindValue(":GAMETYPE",handler->GameType());
+	    query.bindValue(":ROMPATH",iter.data().RomPath());
+	    query.bindValue(":COUNTRY",Country);
+	    query.bindValue(":CRC32", CRC32);
+	    query.bindValue(":PUBLISHER", Publisher);
+	    query.bindValue(":VERSION", Version);
+	    	    
+            query.exec();
         } 
         else if ((iter.data().FoundLoc() == inDatabase) && (removalprompt))
         {
@@ -448,7 +485,12 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
     GameScanMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT romname,rompath,gamename FROM gamemetadata WHERE system = '" + handler->SystemName() + "';");
+    query.prepare("SELECT romname,rompath,gamename FROM gamemetadata "
+		  "WHERE system = :SYSTEM");
+
+    query.bindValue(":SYSTEM",handler->SystemName());
+
+    query.exec();
 
     MythProgressDialog *progressDlg = new MythProgressDialog(
         QObject::tr("Verifying %1 files").arg(handler->SystemName()),
@@ -556,8 +598,7 @@ void GameHandler::clearAllGameData(void)
             break;
         case kDialogCodeButton1:
             MSqlQuery query(MSqlQuery::InitCon());
-            QString thequery = "DELETE FROM gamemetadata;";
-            query.exec(thequery);
+            query.exec("DELETE FROM gamemetadata;");
             break;
     };
 }
@@ -607,7 +648,11 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
 
             m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
                                  GameName,Info.dirPath());
-            cout << "Found Rom : (" << handler->SystemName() << ") " << " - " << RomName << endl;
+
+	    VERBOSE(VB_GENERAL, LOC + QString("Found Rom : (%1) - %2")
+			              .arg(handler->SystemName())
+				      .arg(RomName));
+
             *filecount = *filecount + 1;
             pdial->setProgress(*filecount);
 
@@ -628,7 +673,8 @@ void GameHandler::processGames(GameHandler *handler)
             maxcount = buildFileCount(handler->SystemRomPath(),handler);
         else 
         {
-            cout << "Rom Path does not exist : " << handler->SystemRomPath() << endl;
+            VERBOSE(VB_GENERAL, LOC_ERR + QString("Rom Path does not exist: %1")
+			                  .arg(handler->SystemRomPath()));
             return;
         }
     }
@@ -650,7 +696,8 @@ void GameHandler::processGames(GameHandler *handler)
 
 
         pdial->setProgress(maxcount);
-        cout << "PC Game " << handler->SystemName() << endl;
+	VERBOSE(VB_GENERAL, LOC + QString("PC Game %1").arg(handler->SystemName()));
+
     }
     else
     {   
@@ -803,21 +850,24 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
     if (handler->SystemWorkingPath()) {
         if (!d.cd(handler->SystemWorkingPath()))
         {
-            cout << "Failed to change to specified Working Directory : " << handler->SystemWorkingPath() << endl;
+            VERBOSE(VB_GENERAL, LOC_ERR + QString("Failed to change to specified Working Directory: %1")
+			                  .arg(handler->SystemWorkingPath()));
         }
     }
-       
-    cout << "Launching Game : " << handler->SystemName() << " : " << exec << " : " << endl;
+    VERBOSE(VB_GENERAL, LOC + QString("Launching Game : %1 : %2")
+		              .arg(handler->SystemName())
+			      .arg(exec));
+
 
     QStringList cmdlist = QStringList::split(";", exec);
     if (cmdlist.count() > 0) {
         for ( QStringList::Iterator cmd = cmdlist.begin(); cmd != cmdlist.end(); ++cmd ) {
-            cout << "   Executing : " << *cmd <<endl;
+            VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(*cmd));
             myth_system(*cmd);
         }
     }
     else {
-        cout << "   Executing : " << exec <<endl;
+	VERBOSE(VB_GENERAL, LOC + QString("Executing : %1").arg(exec));
         myth_system(exec);
     }
 
