@@ -57,7 +57,7 @@ class VideoManager : public MythDialog
     ~VideoManager(); // use deleteLater() instead for thread safety
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
-    void doWaitBackground(QPainter &p, const QString &titleText);
+    void doWaitBackground(QPainter *p, const QString &titleText="");
 
   private slots:
     void num(const QString &text);
@@ -86,8 +86,6 @@ class VideoManager : public MythDialog
     void updateInfo(QPainter *);
     void updateIMDBEnter(QPainter *);
 
-    void grayOut(QPainter *);
-
   private:
     bool updateML;
     bool noUpdate;
@@ -103,7 +101,6 @@ class VideoManager : public MythDialog
     Metadata *curitem;
     QString curitemMovie;
 
-    std::auto_ptr<QPainter> backup;
     QPixmap myBackground;
 
     DisplayState m_state;
@@ -113,6 +110,7 @@ class VideoManager : public MythDialog
     QRect infoRect;
     QRect fullRect;
     QRect imdbEnterRect;
+    QRect inetWaitRect;
 
     QString movieNumber;
 

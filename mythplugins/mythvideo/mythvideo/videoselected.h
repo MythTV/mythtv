@@ -51,8 +51,6 @@ class VideoSelected : public MythDialog
     void updateInfo(QPainter *);
     void updatePlayWait(QPainter *);
 
-    void grayOut(QPainter *);
-
     void startPlayItem();
 
   private:
@@ -63,7 +61,6 @@ class VideoSelected : public MythDialog
     std::auto_ptr<QPixmap> bgTransBackup;
     const Metadata *m_item;
 
-    QPainter backup;
     QPixmap myBackground;
 
     int m_state;

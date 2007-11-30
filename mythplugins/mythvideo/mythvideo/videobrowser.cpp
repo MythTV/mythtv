@@ -149,12 +149,6 @@ void VideoBrowser::fetchVideos()
     repaint();
 }
 
-void VideoBrowser::grayOut(QPainter *tmp)
-{
-    tmp->fillRect(QRect(QPoint(0, 0), size()),
-                  QBrush(QColor(10, 10, 10), Dense4Pattern));
-}
-
 void VideoBrowser::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
@@ -181,28 +175,29 @@ void VideoBrowser::updatePlayWait(QPainter *p)
 {
     if (m_state < 4)
     {
-        backup.flush();
-        backup.begin(this);
-        if (m_state == 1)
-            grayOut(&backup);
-        backup.end();
-
-        LayerSet *container = NULL;
-        container = theme->GetSet("playwait");
+        LayerSet *container = theme->GetSet("playwait");
         if (container)
         {
+            QRect area = container->GetAreaRect();
+            QPixmap pix(area.size());
+            pix.fill(this, area.topLeft());
+            QPainter tmp(&pix);
+
             for (int i = 0; i < 4; ++i)
-                container->Draw(p, i, 0);
+                container->Draw(&tmp, i, 0);
+
+            tmp.end();
+
+            p->drawPixmap(area.topLeft(), pix);
         }
+
         m_state++;
         update(fullRect);
     }
     else if (m_state == 4)
     {
-        backup.begin(this);
-        backup.drawPixmap(0, 0, myBackground);
-        backup.end();
         allowPaint = true;
+        update(fullRect);
     }
 }
 
@@ -251,98 +246,110 @@ void VideoBrowser::updateBrowsing(QPainter *p)
 
 void VideoBrowser::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-
     if (m_video_list->count() > 0 && curitem)
     {
-       LayerSet *container = theme->GetSet("info");
-       if (container)
-       {
-           checkedSetText((UITextType *)container->GetType("title"),
-                          curitem->Title());
-           checkedSetText((UITextType *)container->GetType("filename"),
-                          curitem->Filename());
-           checkedSetText((UITextType *)container->GetType("video_player"),
-                          Metadata::getPlayer(curitem));
+        LayerSet *container = theme->GetSet("info");
+        if (container)
+        {
+            QRect pr = infoRect;
+            QPixmap pix(pr.size());
+            pix.fill(this, pr.topLeft());
+            QPainter tmp(&pix);
 
-           QString coverfile = curitem->CoverFile();
-           UIImageType *itype = (UIImageType *)container->GetType("coverart");
-           if (itype)
-           {
-               if (isDefaultCoverFile(coverfile))
-               {
-                   if (itype->isShown())
-                       itype->hide();
-               }
-               else
-               {
-                   QSize img_size = itype->GetSize(true);
-                   const QPixmap *img =
-                           ImageCache::getImageCache().load(coverfile,
-                                                            img_size.width(),
-                                                            img_size.height(),
-                                                            QImage::ScaleFree);
-                   if (img)
-                   {
-                       if (itype->GetImage().serialNumber() !=
-                           img->serialNumber())
-                       {
-                           itype->SetImage(*img);
-                       }
-                       if (itype->isHidden())
-                           itype->show();
-                   }
-                   else
-                   {
-                       if (itype->isShown())
-                           itype->hide();
-                   }
-               }
-           }
+            checkedSetText((UITextType *)container->GetType("title"),
+                            curitem->Title());
+            checkedSetText((UITextType *)container->GetType("filename"),
+                            curitem->Filename());
+            checkedSetText((UITextType *)container->GetType("video_player"),
+                            Metadata::getPlayer(curitem));
 
-           checkedSetText((UITextType *)container->GetType("director"),
-                          curitem->Director());
-           checkedSetText((UITextType *)container->GetType("plot"),
-                          curitem->Plot());
-           checkedSetText((UITextType *)container->GetType("rating"),
-                          getDisplayRating(curitem->Rating()));
-           checkedSetText((UITextType *)container->GetType("inetref"),
-                          curitem->InetRef());
-           checkedSetText((UITextType *)container->GetType("year"),
-                          getDisplayYear(curitem->Year()));
-           checkedSetText((UITextType *)container->GetType("userrating"),
-                          getDisplayUserRating(curitem->UserRating()));
-           checkedSetText((UITextType *)container->GetType("length"),
-                          getDisplayLength(curitem->Length()));
-           checkedSetText((UITextType *)container->GetType("coverfile"),
-                          coverfile);
-           checkedSetText((UITextType *)container->GetType("child_id"),
-                          QString::number(curitem->ChildID()));
-           checkedSetText((UITextType *)container->GetType("browseable"),
-                          getDisplayBrowse(curitem->Browse()));
-           checkedSetText((UITextType *)container->GetType("category"),
-                          curitem->Category());
-           checkedSetText((UITextType *)container->GetType("level"),
-                          QString::number(curitem->ShowLevel()));
+            QString coverfile = curitem->CoverFile();
+            UIImageType *itype = (UIImageType *)container->GetType("coverart");
+            if (itype)
+            {
+                if (isDefaultCoverFile(coverfile))
+                {
+                    if (itype->isShown())
+                        itype->hide();
+                }
+                else
+                {
+                    QSize img_size = itype->GetSize(true);
+                    const QPixmap *img =
+                            ImageCache::getImageCache().load(coverfile,
+                                                                img_size.width(),
+                                                                img_size.height(),
+                                                                QImage::ScaleFree);
+                    if (img)
+                    {
+                        if (itype->GetImage().serialNumber() !=
+                            img->serialNumber())
+                        {
+                            itype->SetImage(*img);
+                        }
+                        if (itype->isHidden())
+                            itype->show();
+                    }
+                    else
+                    {
+                        if (itype->isShown())
+                            itype->hide();
+                    }
+                }
+            }
 
-           for (int i = 1; i < 9; ++i)
-               container->Draw(&tmp, i, 0);
-       }
+            checkedSetText((UITextType *)container->GetType("director"),
+                            curitem->Director());
+            checkedSetText((UITextType *)container->GetType("plot"),
+                            curitem->Plot());
+            checkedSetText((UITextType *)container->GetType("rating"),
+                            getDisplayRating(curitem->Rating()));
+            checkedSetText((UITextType *)container->GetType("inetref"),
+                            curitem->InetRef());
+            checkedSetText((UITextType *)container->GetType("year"),
+                            getDisplayYear(curitem->Year()));
+            checkedSetText((UITextType *)container->GetType("userrating"),
+                            getDisplayUserRating(curitem->UserRating()));
+            checkedSetText((UITextType *)container->GetType("length"),
+                            getDisplayLength(curitem->Length()));
+            checkedSetText((UITextType *)container->GetType("coverfile"),
+                            coverfile);
+            checkedSetText((UITextType *)container->GetType("child_id"),
+                            QString::number(curitem->ChildID()));
+            checkedSetText((UITextType *)container->GetType("browseable"),
+                            getDisplayBrowse(curitem->Browse()));
+            checkedSetText((UITextType *)container->GetType("category"),
+                            curitem->Category());
+            checkedSetText((UITextType *)container->GetType("level"),
+                            QString::number(curitem->ShowLevel()));
+
+            for (int i = 1; i < 9; ++i)
+                container->Draw(&tmp, i, 0);
+
+                tmp.end();
+                p->drawPixmap(pr.topLeft(), pix);
+        }
     }
     else
     {
-       LayerSet *norec = theme->GetSet("novideos_info");
-       if (norec)
-       {
-           for (int i = 4; i < 9; ++i)
-               norec->Draw(&tmp, i, 0);
-       }
+        LayerSet *norec = theme->GetSet("novideos_info");
+        if (norec)
+        {
+            QRect pr = norec->GetAreaRect();
+            QPixmap pix(pr.size());
+            pix.fill(this, pr.topLeft());
+            QPainter tmp(&pix);
+
+            for (int i = 1; i <= 9; ++i)
+            {
+                norec->Draw(&tmp, i, 0);
+            }
+
+            tmp.end();
+
+            p->drawPixmap(pr.topLeft(), pix);
+        }
     }
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
 }
 
 void VideoBrowser::jumpToSelection(int index)

@@ -35,11 +35,9 @@ class VideoBrowser : public VideoDialog
     void updateInfo(QPainter *);
     void updateBrowsing(QPainter *);
     void updatePlayWait(QPainter *);
-    void grayOut(QPainter *);
 
   private:
     std::auto_ptr<QPixmap> bgTransBackup;
-    QPainter backup;
 
     unsigned int inData; // index of curItem in VideoList.metas
     int m_state;

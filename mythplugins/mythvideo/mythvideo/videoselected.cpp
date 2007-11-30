@@ -117,12 +117,6 @@ void VideoSelected::updateBackground(void)
     setPaletteBackgroundPixmap(myBackground);
 }
 
-void VideoSelected::grayOut(QPainter *tmp)
-{
-    tmp->fillRect(QRect(QPoint(0, 0), size()),
-                  QBrush(QColor(10, 10, 10), Dense4Pattern));
-}
-
 void VideoSelected::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
@@ -162,23 +156,29 @@ void VideoSelected::updatePlayWait(QPainter *p)
 {
     if (m_state < 4)
     {
-        backup.flush();
-        backup.begin(this);
-        if (m_state == 1)
-            grayOut(&backup);
-        backup.end();
 
         LayerSet *container = theme->GetSet("playwait");
         if (container)
         {
+            QRect area = container->GetAreaRect();
+            QPixmap pix(area.size());
+            pix.fill(this, area.topLeft());
+            QPainter tmp(&pix);
+
             for (int i = 0; i < 4; ++i)
-                container->Draw(p, i, 0);
+                container->Draw(&tmp, i, 0);
+
+            tmp.end();
+
+            p->drawPixmap(area.topLeft(), pix);
         }
+
         m_state++;
         update(fullRect);
     }
     else if (m_state == 4)
     {
+        update(fullRect);
         // This is done so we don't lock the paint event (bad).
         ++m_state;
         QApplication::postEvent(this,
@@ -190,9 +190,6 @@ void VideoSelected::updatePlayWait(QPainter *p)
     }
     else if (m_state == 6)
     {
-        backup.begin(this);
-        backup.drawPixmap(0, 0, myBackground);
-        backup.end();
         noUpdate = false;
 
         gContext->GetMainWindow()->raise();

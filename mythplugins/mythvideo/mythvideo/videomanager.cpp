@@ -274,7 +274,6 @@ VideoManager::VideoManager(MythMainWindow *lparent,  const QString &lname,
                     ListBehaviorManager::lbWrapList));
     m_movie_list_behave.reset(new ListBehaviorManager);
 
-    backup.reset(new QPainter);
     RefreshMovieList(false);
 
     fullRect = QRect(0, 0, size().width(), size().height());
@@ -850,12 +849,6 @@ int VideoManager::GetMovieListing(const QString& movieName)
     return count;
 }
 
-void VideoManager::grayOut(QPainter *tmp)
-{
-    tmp->fillRect(QRect(QPoint(0, 0), size()),
-                  QBrush(QColor(10, 10, 10), Dense4Pattern));
-}
-
 void VideoManager::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
@@ -863,6 +856,11 @@ void VideoManager::paintEvent(QPaintEvent *e)
 
     if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_IMDBMANUAL)
     {
+       // Cleanup after inetWait popup
+       if (r.intersects(inetWaitRect) && noUpdate == false)
+       {
+           doWaitBackground(&p);
+       }
        if (r.intersects(listRect) && noUpdate == false)
        {
            updateList(&p);
@@ -1018,76 +1016,86 @@ void VideoManager::updateIMDBEnter(QPainter *p)
 
 void VideoManager::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
 
     if (m_video_list->count() > 0 && curitem)
     {
-       LayerSet *container = m_theme->GetSet("info");
-       if (container)
-       {
-           checkedSetText((UITextType *)container->GetType("title"),
-                          curitem->Title());
-           checkedSetText((UITextType *)container->GetType("filename"),
-                          curitem->getFilenameNoPrefix());
-           checkedSetText((UITextType *)container->GetType("video_player"),
-                          Metadata::getPlayer(curitem));
-           checkedSetText((UITextType *)container->GetType("director"),
-                          curitem->Director());
-           checkedSetText((UITextType *)container->GetType("plot"),
-                          curitem->Plot());
-           checkedSetText((UITextType *)container->GetType("rating"),
-                          curitem->Rating());
-           checkedSetText((UITextType *)container->GetType("inetref"),
-                          curitem->InetRef());
-           checkedSetText((UITextType *)container->GetType("year"),
-                          getDisplayYear(curitem->Year()));
-           checkedSetText((UITextType *)container->GetType("userrating"),
-                          getDisplayUserRating(curitem->UserRating()));
-           checkedSetText((UITextType *)container->GetType("length"),
-                          getDisplayLength(curitem->Length()));
+        LayerSet *container = m_theme->GetSet("info");
+        if (container)
+        {
+            QRect pr = infoRect;
+            QPixmap pix(pr.size());
+            pix.fill(this, pr.topLeft());
+            QPainter tmp(&pix);
+            checkedSetText((UITextType *)container->GetType("title"),
+                            curitem->Title());
+            checkedSetText((UITextType *)container->GetType("filename"),
+                            curitem->getFilenameNoPrefix());
+            checkedSetText((UITextType *)container->GetType("video_player"),
+                            Metadata::getPlayer(curitem));
+            checkedSetText((UITextType *)container->GetType("director"),
+                            curitem->Director());
+            checkedSetText((UITextType *)container->GetType("plot"),
+                            curitem->Plot());
+            checkedSetText((UITextType *)container->GetType("rating"),
+                            curitem->Rating());
+            checkedSetText((UITextType *)container->GetType("inetref"),
+                            curitem->InetRef());
+            checkedSetText((UITextType *)container->GetType("year"),
+                            getDisplayYear(curitem->Year()));
+            checkedSetText((UITextType *)container->GetType("userrating"),
+                            getDisplayUserRating(curitem->UserRating()));
+            checkedSetText((UITextType *)container->GetType("length"),
+                            getDisplayLength(curitem->Length()));
 
-           QString coverfile = curitem->CoverFile();
-           coverfile.remove(artDir + "/");
-           checkedSetText((UITextType *)container->GetType("coverfile"),
-                          coverfile);
+            QString coverfile = curitem->CoverFile();
+            coverfile.remove(artDir + "/");
+            checkedSetText((UITextType *)container->GetType("coverfile"),
+                            coverfile);
 
-           checkedSetText((UITextType *)container->GetType("child_id"),
-                          QString::number(curitem->ChildID()));
-           checkedSetText((UITextType *)container->GetType("browseable"),
-                          getDisplayBrowse(curitem->Browse()));
-           checkedSetText((UITextType *)container->GetType("category"),
-                          curitem->Category());
-           checkedSetText((UITextType *)container->GetType("level"),
-                          QString::number(curitem->ShowLevel()));
+            checkedSetText((UITextType *)container->GetType("child_id"),
+                            QString::number(curitem->ChildID()));
+            checkedSetText((UITextType *)container->GetType("browseable"),
+                            getDisplayBrowse(curitem->Browse()));
+            checkedSetText((UITextType *)container->GetType("category"),
+                            curitem->Category());
+            checkedSetText((UITextType *)container->GetType("level"),
+                            QString::number(curitem->ShowLevel()));
 
-           for (int i = 1; i <= 8; ++i)
-           {
-               container->Draw(&tmp, i, 0);
-           }
-       }
+            for (int i = 1; i <= 8; ++i)
+            {
+                container->Draw(&tmp, i, 0);
+            }
 
-       allowselect = true;
+            tmp.end();
+
+            p->drawPixmap(pr.topLeft(), pix);
+        }
+
+        allowselect = true;
     }
     else
     {
-       LayerSet *norec = m_theme->GetSet("novideos_info");
-       if (norec)
-       {
-           for (int i = 4; i <= 8; ++i)
-           {
-               norec->Draw(&tmp, i, 0);
-           }
-       }
 
-       allowselect = false;
+        LayerSet *norec = m_theme->GetSet("novideos_info");
+        if (norec)
+        {
+            QRect pr = norec->GetAreaRect();
+            QPixmap pix(pr.size());
+            pix.fill(this, pr.topLeft());
+            QPainter tmp(&pix);
+
+            for (int i = 4; i <= 8; ++i)
+            {
+                norec->Draw(&tmp, i, 0);
+            }
+
+            tmp.end();
+
+            p->drawPixmap(pr.topLeft(), pix);
+        }
+
+        allowselect = false;
     }
-
-    tmp.end();
-
-    p->drawPixmap(pr.topLeft(), pix);
 }
 
 void VideoManager::LoadWindow(QDomElement &element)
@@ -1132,6 +1140,9 @@ void VideoManager::parseContainer(QDomElement &element)
         movieListRect = area;
     if (container_name == "enterimdb")
         imdbEnterRect = area;
+    if (container_name == "inetwait")
+        inetWaitRect = area;
+
 }
 
 void VideoManager::exitWin()
@@ -1139,9 +1150,6 @@ void VideoManager::exitWin()
     if (m_state != SHOWING_MAINWINDOW)
     {
         m_state = SHOWING_MAINWINDOW;
-        backup->begin(this);
-        backup->drawPixmap(0, 0, myBackground);
-        backup->end();
         update(fullRect);
         noUpdate = false;
     }
@@ -1309,17 +1317,32 @@ void VideoManager::videoMenu()
         filterButton->setFocus();
 }
 
-void VideoManager::doWaitBackground(QPainter &p, const QString &titleText)
+void VideoManager::doWaitBackground(QPainter *p, const QString &titleText)
 {
+
     // set the title for the wait background
     LayerSet *container = m_theme->GetSet("inetwait");
     if (container)
     {
+        QRect area = container->GetAreaRect();
+        QPixmap pix(area.size());
+        pix.fill(this, area.topLeft());
+        QPainter tmp(&pix);
+
         checkedSetText((UITextType *)container->GetType("title"), titleText);
 
-        for (int i = 0; i < 4; ++i)
-            container->Draw(&p, i, 0);
+
+        if (m_state != SHOWING_MAINWINDOW)
+        {
+            for (int i = 0; i < 4; ++i)
+                container->Draw(&tmp, i, 0);
+        }
+
+        tmp.end();
+
+        p->drawPixmap(area.topLeft(), pix);
     }
+
 }
 
 void VideoManager::ResetCurrentItem()
@@ -1345,9 +1368,6 @@ void VideoManager::slotManualIMDB()
 {
     cancelPopup();
 
-    backup->begin(this);
-    backup->drawPixmap(0, 0, myBackground);
-    backup->end();
     curIMDBNum = "";
     m_state = SHOWING_IMDBMANUAL;
     update(fullRect);
@@ -1359,24 +1379,16 @@ void VideoManager::handleIMDBManual()
     QPainter p(this);
     movieNumber = curIMDBNum;
 
-    backup->begin(this);
-    grayOut(backup.get());
-    doWaitBackground(p, curIMDBNum);
-    backup->end();
+    doWaitBackground(&p, curIMDBNum);
 
     qApp->processEvents();
 
     GetMovieData(curIMDBNum);
 
-    backup->begin(this);
-    backup->drawPixmap(0, 0, myBackground);
-    backup->end();
     qApp->processEvents(); // Without this we get drawing errors.
 
     m_state = SHOWING_MAINWINDOW;
     noUpdate = false;
-    update(infoRect);
-    update(listRect);
     update(fullRect);
 }
 
@@ -1406,9 +1418,6 @@ void VideoManager::handleIMDBList()
             RefreshMovieList(true);
         }
 
-        backup->begin(this);
-        backup->drawPixmap(0, 0, myBackground);
-        backup->end();
         m_state = SHOWING_MAINWINDOW;
         update(fullRect);
         movieNumber = "";
@@ -1427,29 +1436,20 @@ void VideoManager::handleIMDBList()
         if (movieNumber.isNull() || movieNumber.length() == 0)
         {
             ResetCurrentItem();
-            backup->begin(this);
-            backup->drawPixmap(0, 0, myBackground);
-            backup->end();
+
             update(fullRect);
             return;
         }
         //cout << "GETTING MOVIE #" << movieNumber << endl;
-        backup->begin(this);
-        grayOut(backup.get());
-        doWaitBackground(p, movieNumber);
-        backup->end();
+
+        doWaitBackground(&p, movieNumber);
         qApp->processEvents();
 
         GetMovieData(movieNumber);
 
-        backup->begin(this);
-        backup->drawPixmap(0, 0, myBackground);
-        backup->end();
         qApp->processEvents(); // Without this we get drawing errors.
 
         m_state = SHOWING_MAINWINDOW;
-        update(infoRect);
-        update(listRect);
         update(fullRect);
         movieNumber = "";
     }
@@ -1465,14 +1465,9 @@ void VideoManager::slotAutoIMDB()
     {
         m_state = SHOWING_EDITWINDOW;
 
-        backup->flush();
-        backup->begin(this);
-        grayOut(backup.get());
-        backup->end();
-
         // set the title for the wait background
-        doWaitBackground(p, curitem->Title());
-        backup->flush();
+        doWaitBackground(&p, curitem->Title());
+        qApp->processEvents();
 
         int ret;
 
@@ -1493,37 +1488,27 @@ void VideoManager::slotAutoIMDB()
             if (movieNumber.isNull() || movieNumber.length() == 0)
             {
                 ResetCurrentItem();
-                backup->begin(this);
-                backup->drawPixmap(0, 0, myBackground);
-                backup->end();
+
                 m_state = SHOWING_MAINWINDOW;
                 update(fullRect);
                 return;
             }
             //cout << "GETTING MOVIE #" << movieNumber << endl;
             GetMovieData(movieNumber);
-            backup->begin(this);
-            backup->drawPixmap(0, 0, myBackground);
-            backup->end();
             m_state = SHOWING_MAINWINDOW;
-            update(infoRect);
-            update(listRect);
+            update(fullRect);
         }
         else if (ret >= 0)
         {
             m_movie_list_behave->setIndex(0);
             m_state = SHOWING_IMDBLIST;
-            update(movieListRect);
+            update(fullRect);
         }
         else
         {
             //cout << "Error, movie not found.\n";
-            backup->begin(this);
-            backup->drawPixmap(0, 0, myBackground);
-            backup->end();
             m_state = SHOWING_MAINWINDOW;
-            update(infoRect);
-            update(listRect);
+            update(fullRect);
         }
     }
 }
@@ -1606,10 +1591,6 @@ void VideoManager::slotResetMeta()
         curitem->updateDatabase();
         RefreshMovieList(true);
     }
-
-    backup->begin(this);
-    backup->drawPixmap(0, 0, myBackground);
-    backup->end();
 
     m_state = SHOWING_MAINWINDOW;
     update(fullRect);
