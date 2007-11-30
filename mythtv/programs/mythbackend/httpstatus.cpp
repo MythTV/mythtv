@@ -22,6 +22,7 @@
 #include <qregexp.h>
 #include <qbuffer.h>
 #include <qprocess.h>
+#include <qlocale.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -1136,16 +1137,17 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                     os << nDirs << "</li>\r\n";
                 }
 
+                QLocale c(QLocale::C);
                 os << "            <li>Total Space: ";
-                sRep.sprintf( "%d,%03d MB ", (nTotal) / 1000, (nTotal) % 1000);
+                sRep = c.toString(nTotal) + " MB ";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Used: ";
-                sRep.sprintf( "%d,%03d MB ", (nUsed) / 1000, (nUsed) % 1000);
+                sRep = c.toString(nUsed) + " MB ";
                 os << sRep << "</li>\r\n";
 
                 os << "            <li>Space Free: ";
-                sRep.sprintf( "%d,%03d MB ", (nFree) / 1000, (nFree) % 1000);
+                sRep = c.toString(nFree) + " MB ";
                 os << sRep << "</li>\r\n";
 
                 os << "          </ul>\r\n"
