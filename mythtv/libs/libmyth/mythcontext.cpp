@@ -3381,6 +3381,14 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
                              " database. They should be shut down first.");
 
 
+    // No current DBSchemaVer? Empty database, so upgrade to create tables
+    if (dbver.isEmpty())
+    {
+        VERBOSE(VB_GENERAL, "No current database version. Auto upgrading");
+        return MYTH_SCHEMA_UPGRADE;
+    }
+
+
     // Users and developers can choose to live dangerously,
     // either to silently and automatically upgrade,
     // or an expert option to allow use of existing:
