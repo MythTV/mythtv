@@ -37,7 +37,7 @@ package IO::Socket::INET::MythTV;
         if (! defined $result) {
             warn "Error reading from MythTV backend: $!\n";
             return '';
-        } 
+        }
         elsif ($result == 0) {
             #warn "No data returned by MythTV backend.\n";
             return '';
