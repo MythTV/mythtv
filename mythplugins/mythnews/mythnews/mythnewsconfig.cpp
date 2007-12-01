@@ -215,7 +215,7 @@ void MythNewsConfig::loadTheme()
     m_Theme->SetHMult(hmult);
 
     QDomElement xmldata;
-    m_Theme->LoadTheme(xmldata, "news", "news-");
+    m_Theme->LoadTheme(xmldata, "newsconfig", "news-");
 
     for (QDomNode child = xmldata.firstChild(); !child.isNull();
          child = child.nextSibling()) {

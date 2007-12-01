@@ -116,7 +116,43 @@
 
     </container>
 
+  </window>
 
+  <window name="newsconfig">
+
+      <font name="active" face="Arial Narrow">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+      
+      <font name="inactive" face="Arial Narrow">
+          <color>#9999cc</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+      
+      <font name="title" face="Arial Narrow">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>18</size>
+          <shadow>1,1</shadow>
+          <bold>yes</bold>
+      </font>
+      
+      <font name="desc" face="Arial Narrow">
+          <color>#ffffff</color>
+          <size>16</size>
+          <bold>no</bold>
+      </font>
+      
+      <font name="updated" face="Arial Narrow">
+          <color>#ffffff</color>
+          <dropcolor>#000000</dropcolor>
+          <size>12</size>
+          <bold>no</bold>
+    </font>
+      
     <container name="config-sites">
 
       <area>20,40,760,560</area>
