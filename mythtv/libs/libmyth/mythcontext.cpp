@@ -586,7 +586,8 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
         if (DefaultUPnP(failure))                // Probably a valid backend,
             autoSelect = manualSelect = false;   // so disable any further UPnP
         else
-            VERBOSE(VB_IMPORTANT, QString("%1").arg(failure));
+            if (failure.length())
+                VERBOSE(VB_IMPORTANT, failure);
 
         failure = TestDBconnection();
         if (failure.isEmpty())
@@ -1175,6 +1176,10 @@ bool MythContextPrivate::InitUPnP(void)
         DeleteUPnP();
         return false;
     }
+
+    // Create a dummy device description
+    UPnpDevice   &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
+    device.m_sDeviceType = "urn:schemas-upnp-org:device:MythContextClient:1";
 
     m_UPnP->Start();
 
