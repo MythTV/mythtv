@@ -118,7 +118,7 @@ MythNewsConfig::MythNewsConfig(MythMainWindow *parent,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.exec(queryString)) {
-        cerr << "MythNewsConfig: Error in creating sql table" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNewsConfig: Error in creating sql table");
     }
 
     m_Theme       = 0;
@@ -149,7 +149,7 @@ void MythNewsConfig::populateSites()
     QFile xmlFile(filename);
 
     if (!xmlFile.exists() || !xmlFile.open(IO_ReadOnly)) {
-        cerr << "MythNews: Cannot open news-sites.xml" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Cannot open news-sites.xml");
         return;
     }
 
@@ -161,10 +161,11 @@ void MythNewsConfig::populateSites()
 
     if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn)) 
     {
-        cerr << "MythNews: Error in reading content of news-sites.xml" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Error in reading content of news-sites.xml");
         VERBOSE(VB_IMPORTANT, QString("MythNews: Error, parsing %1\n"
-                                      "at line: %2  column: %3 msg: %4").
-                arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
+                                      "at line: %2  column: %3 msg: %4")
+                                      .arg(filename).arg(errorLine)
+                                      .arg(errorColumn).arg(errorMsg));
         return;
     }
 
@@ -237,12 +238,10 @@ void MythNewsConfig::loadTheme()
                     m_SiteRect = area;
                 else if (name.lower() == "config-freq")
                     m_FreqRect = area;
-                else if (name.lower() == "config-bottom")
-                    m_BotRect = area;
             }
             else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1")
+                                                  .arg(e.tagName()));
                 exit(-1);
             }
         }
@@ -251,7 +250,7 @@ void MythNewsConfig::loadTheme()
 
     LayerSet *container  = m_Theme->GetSet("config-sites");
     if (!container) {
-        std::cerr << "MythNews: Failed to get sites container." << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get sites container.");
         exit(-1);
     }
 
@@ -263,14 +262,13 @@ void MythNewsConfig::loadTheme()
 
     m_UICategory = (UIListBtnType*)container->GetType("category");
     if (!m_UICategory) {
-        std::cerr << "MythNews: Failed to get category list area."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get category list area.");
         exit(-1);
     }
 
     m_UISite = (UIListBtnType*)container->GetType("sites");
     if (!m_UISite) {
-        std::cerr << "MythNews: Failed to get site list area." << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get site list area.");
         exit(-1);
     }
 
@@ -284,8 +282,7 @@ void MythNewsConfig::loadTheme()
 
     container = m_Theme->GetSet("config-freq");
     if (!container) {
-        std::cerr << "MythNews: Failed to get frequency container."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get frequency container.");
         exit(-1);
     }
 
@@ -307,13 +304,13 @@ void MythNewsConfig::loadTheme()
 
     ttype = (UITextType*)container->GetType("help");
     if (ttype) {
-        ttype->SetText(tr("Set update frequency by using the up/down arrows.\n"
-                          "The minimum allowed value is 30 Minutes."));
+        ttype->SetText(tr("Set update frequency by using the up/down arrows."
+                          "Minimum value is 30 Minutes."));
     }
 
     ttype = (UITextType*)container->GetType("context_switch");
     if (ttype) {
-        ttype->SetText(tr("Press MENU to return to feed selection."));
+        ttype->SetText(tr("Press Escape or Menu to exit."));
     }
         
     connect(m_UICategory, SIGNAL(itemSelected(UIListBtnTypeItem*)),
@@ -327,11 +324,6 @@ void MythNewsConfig::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
 
-
-    if (r.intersects(m_BotRect)) {
-     //   updateBot();
-    }
-    
     if (m_Context == 0) {
         if (r.intersects(m_SiteRect)) {
             updateSites();
@@ -408,30 +400,6 @@ void MythNewsConfig::updateFreq()
     p.end();
     
     bitBlt(this, m_FreqRect.left(), m_FreqRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythNewsConfig::updateBot()
-{
-    QPixmap pix(m_BotRect.size());
-    pix.fill(this, m_BotRect.topLeft());
-    QPainter p(&pix);
-    
-    LayerSet* container = m_Theme->GetSet("config-bottom");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-    
-    bitBlt(this, m_BotRect.left(), m_BotRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
@@ -575,26 +543,37 @@ void MythNewsConfig::keyPressEvent(QKeyEvent *e)
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP") {
+        if (action == "UP")
+        {
             cursorUp();
         }
-        else if (action == "PAGEUP") {
+        else if (action == "PAGEUP")
+        {
              cursorUp(true);
         }
-        else if (action == "DOWN") {
+        else if (action == "DOWN")
+        {
             cursorDown();
         }
-        else if (action == "PAGEDOWN") {
+        else if (action == "PAGEDOWN")
+        {
              cursorDown(true);
         }
-        else if (action == "LEFT") {
+        else if (action == "LEFT")
+        {
             cursorLeft();
         }
-        else if (action == "RIGHT") {
+        else if (action == "RIGHT")
+        {
             cursorRight();
         }
-        else if (action == "MENU") {
+        else if (action == "MENU")
+        {
            changeContext();
+        }
+        else if (action == "ESCAPE" && m_Context == 1)
+        {
+            changeContext();
         }
         else if (action == "SELECT") {
             if (m_InColumn == 2 && m_Context == 0) {

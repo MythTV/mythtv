@@ -178,7 +178,7 @@ void NewsSite::slotFinished(QNetworkOperation* op)
         else 
         {
             m_state = NewsSite::WriteFailed;
-            cerr << "MythNews: NewsEngine: Write failed" << endl;
+            VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
         }
     }
     else 
@@ -209,13 +209,13 @@ void NewsSite::process()
 
     if (!xmlFile.open(IO_ReadOnly)) {
         new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
-        cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to open xmlfile");
         return;
     }
 
     if (!domDoc.setContent(&xmlFile)) {
         new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
-        cerr << "MythNews: NewsEngine: failed to set content from xmlfile" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to set content from xmlfile");
         m_errorString += tr("Failed to read downloaded file");
         return;
     }

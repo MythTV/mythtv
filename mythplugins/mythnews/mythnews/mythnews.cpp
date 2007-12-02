@@ -130,7 +130,7 @@ void MythNews::loadSites(void)
     query.exec("SELECT name, url, ico, updated FROM newssites ORDER BY name");
 
     if (!query.isActive()) {
-        cerr << "MythNews: Error in loading Sites from DB" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Error in loading Sites from DB");
     }
     else {
         QString name;
@@ -199,8 +199,8 @@ void MythNews::loadTheme()
                     m_InfoRect = area;
             }
             else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1")
+                                              .arg(e.tagName()));
                 exit(-1);
             }
         }
@@ -208,13 +208,13 @@ void MythNews::loadTheme()
 
     LayerSet *container = m_Theme->GetSet("sites");
     if (!container) {
-        std::cerr << "MythNews: Failed to get sites container." << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get sites container.");
         exit(-1);
     }
         
     m_UISites = (UIListBtnType*)container->GetType("siteslist");
     if (!m_UISites) {
-        std::cerr << "MythNews: Failed to get sites list area." << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get sites list area.");
         exit(-1);
     }
         
@@ -223,15 +223,13 @@ void MythNews::loadTheme()
 
     container = m_Theme->GetSet("articles");
     if (!container) {
-        std::cerr << "MythNews: Failed to get articles container."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get articles container.");
         exit(-1);
     }
 
     m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
     if (!m_UIArticles) {
-        std::cerr << "MythNews: Failed to get articles list area."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get articles list area.");
         exit(-1);
     }
     
