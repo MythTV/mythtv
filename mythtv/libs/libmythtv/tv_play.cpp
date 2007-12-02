@@ -104,6 +104,8 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
         delete p;
     }
 
+    gContext->sendPlaybackStart();
+
     while (!quitAll)
     {
         int freeRecorders = RemoteGetFreeRecorderCount();
@@ -245,6 +247,8 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
         
         delete curProgram;
     }
+
+    gContext->sendPlaybackEnd();
 
     return playCompleted;
 }
