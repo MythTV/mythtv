@@ -1068,22 +1068,14 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band  = NULL;
         directrendering      |= selectedStream;
     }
-    else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-             !(enc->width % 16))
+    else if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
-        enc->flags |= CODEC_FLAG_EMU_EDGE;
-        enc->get_buffer = get_avf_buffer;
-        enc->release_buffer = release_avf_buffer;
+        enc->flags          |= CODEC_FLAG_EMU_EDGE;
+        enc->get_buffer      = get_avf_buffer;
+        enc->release_buffer  = release_avf_buffer;
         enc->draw_horiz_band = NULL;
         if (selectedStream)
             directrendering = true;
-    }
-    else if (codec && codec->capabilities & CODEC_CAP_DR1)
-    {
-        VERBOSE(VB_IMPORTANT, "Direct Rendering codec, but "
-                "no custom frame allocator defined!");
-        enc->get_buffer      = get_avf_buffer;
-        enc->release_buffer  = release_avf_buffer;
     }
 
     if (selectedStream)
