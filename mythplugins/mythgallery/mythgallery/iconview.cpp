@@ -388,12 +388,15 @@ void IconView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            if (m_inMenu & m_inSubMenu)
+            if (!m_parent->IsExitingToMain())
             {
-                HandleMainMenu();
-                m_menuType->SetActive(m_inMenu & !m_inSubMenu);
-                m_submenuType->SetActive(m_inMenu & m_inSubMenu);
-                menuHandled = true;
+                if (m_inMenu & m_inSubMenu)
+                {
+                    HandleMainMenu();
+                    m_menuType->SetActive(m_inMenu & !m_inSubMenu);
+                    m_submenuType->SetActive(m_inMenu & m_inSubMenu);
+                    menuHandled = true;
+                }
             }
         }
         else if (action == "UP")
@@ -511,7 +514,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
     if (!handled && !menuHandled)
     {
         gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
-        if (has_action("ESCAPE", actions))
+        if (has_action("ESCAPE", actions) && !m_parent->IsExitingToMain())
             handled = HandleEscape();
     }
 
