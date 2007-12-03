@@ -1,0 +1,112 @@
+3sat|none|http://www.lyngsat-logo.com/logo/tv/num/3sat.jpg
+Al Jazeera|89.telkku.com|http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera.jpg
+Al Jazeera English|none|http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera.jpg
+ALEM FM 89,3|none|none
+Animal Planet|25.telkku.com|http://www.lyngsat-logo.com/logo/tv/aa/animalplanet.jpg
+arte|none|http://www.welho.fi/PublicFiles/2004/1015/1083/arte_logo_90x26.gif
+ATV|none|none
+Barnkanal|none|http://www.welho.fi/PublicFiles/2004/0806/848/svt_barnkanalen_90.gif
+BBC Food|26.telkku.com|http://www.lyngsat-logo.com/logo/tv/bb/bbc_food.jpg
+BBC Prime|27.telkku.com|http://www.lyngsat-logo.com/logo/tv/bb/bbc_prime.jpg
+BBC World|28.telkku.com|http://www.lyngsat-logo.com/logo/tv/bb/bbc_world.jpg
+BigBrother 24/7|none|http://www.welho.fi/PublicFiles/2007/08/0823/3205/maksu-tv_140x3501.gif
+Bloomberg English TV|29.telkku.com|http://www.lyngsat-logo.com/logo/tv/bb/bloomberg.jpg
+Canal+ Film 1|6.telkku.com|http://lyngsat-logo.com/logo/tv/cc/canalplus_film1.jpg
+Canal+ Film 2|7.telkku.com|http://lyngsat-logo.com/logo/tv/cc/canalplus_film2.jpg
+Canal+ Film 3|65.telkku.com|http://www.lyngsat-logo.com/logo/tv/cc/canalplus_film3.jpg
+Canal+ HD|67.telkku.com|http://www.lyngsat-logo.com/logo/tv/cc/canalplus_pl_hd.jpg
+Canal+ Mix|5.telkku.com|http://lyngsat-logo.com/logo/tv/cc/canalplus_mix.jpg
+Canal+ Sport 1|8.telkku.com|http://lyngsat-logo.com/logo/tv/cc/canalplus_sport1_se.jpg
+Canal+ Sport 2|76.telkku.com|http://www.lyngsat-logo.com/logo/tv/cc/canalplus_pl_sport2.jpg
+Deutsche Welle|33.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/dw_tv.jpg
+DINA|none|http://www.welho.fi/PublicFiles/2006/02/0213/2315/DINA_logo_90.gif
+Discovery|34.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/discovery.jpg
+Discovery HD|none|http://www.lyngsat-logo.com/logo/tv/dd/discovery_hd.jpg
+Disney Channel|38.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/disney_channel.jpg
+DSC Civilization|35.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/discovery_civilisation.jpg
+DSC Science|36.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/discovery_science.jpg
+DSC Travel&Living|37.telkku.com|http://www.lyngsat-logo.com/logo/tv/dd/discovery_travel_living.jpg
+ESPN Classic Sport|none|http://www.lyngsat-logo.com/logo/tv/ee/espn.jpg
+ETV|88.telkku.com|http://www.welho.fi/PublicFiles/2004/1001/1032/etvlogo_rgb_positiiv1.gif
+EuroNews|none|http://www.lyngsat-logo.com/logo/tv/ee/euronews.jpg
+Eurosport|40.telkku.com|http://www.lyngsat-logo.com/logo/tv/ee/eurosport.jpg
+Eurosport 2|41.telkku.com|http://www.lyngsat-logo.com/logo/tv/ee/eurosport2.jpg
+Extreme Sports|42.telkku.com|http://www.lyngsat-logo.com/logo/tv/ee/extremesports.jpg
+FASHION|none|http://www.lyngsat-logo.com/logo/tv/ff/fashion_tv.jpg
+Fox|none|http://www.lyngsat-logo.com/logo/tv/ff/fox.jpg
+FRANCE 2|none|http://www.lyngsat-logo.com/logo/tv/ff/france2.jpg
+France 24 (in English)|none|http://www.lyngsat-logo.com/logo/tv/ff/france24.jpg
+FST5|64.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_finlands_svenska_tv.jpg
+Galaxis|none|none
+History Channel|none|http://www.lyngsat-logo.com/logo/tv/hh/history_channel.jpg
+Infokanava|none|none
+IskelmÃ¤|none|http://www.welho.fi/PublicFiles/2004/0806/799/Iskelma-logo_90.gif
+JIM|48.telkku.com|http://www.welho.fi/PublicFiles/2007/02/0226/2918/Jim_90.gif
+KINOTV|86.telkku.com|http://www.welho.fi/PublicFiles/2007/08/0830/3224/KinoTV_120px.gif
+Mezzo|none|http://www.lyngsat-logo.com/logo/tv/mm/mezzo.jpg
+MTV|45.telkku.com|http://www.lyngsat-logo.com/logo/tv/mm/mtv.jpg
+MTV 2|none|http://www.welho.fi/PublicFiles/2004/0806/812/mtv2_90.gif
+MTV Base|none|http://www.lyngsat-logo.com/logo/tv/mm/mtv_base.jpg
+MTV Finland|45.telkku.com|http://www.lyngsat-logo.com/logo/tv/mm/mtv.jpg
+MTV3 D|2.telkku.com|http://www.lyngsat-logo.com/logo/tv/mm/mtv3_finland.jpg
+MTV3 Fakta|79.telkku.com|http://www.lyngsat-logo.com/logo/tv/mm/mtv3_fakta.jpg
+MTV3 MAX|77.telkku.com|http://www.lyngsat-logo.com/logo/tv/mm/mtv3_max.jpg
+NASN|83.telkku.com|http://www.lyngsat-logo.com/logo/tv/nn/nasn.jpg
+Nat Geo Channel|47.telkku.com|http://www.lyngsat-logo.com/logo/tv/nn/natgeochannel.jpg
+Nature/Crime/Playboy|none|none
+Nelonen D|3.telkku.com|http://www.lyngsat-logo.com/logo/tv/nn/nelonen4_tv.jpg
+Nickelodeon|50.telkku.com|http://www.lyngsat-logo.com/logo/tv/nn/nickelodeon.jpg
+NTV|none|none
+ORT-international|none|none
+RAI1|none|http://www.welho.fi/PublicFiles/2004/0806/834/raiuno_95.gif
+RAI2|none|http://www.welho.fi/PublicFiles/2004/0806/833/raidue_95.gif
+RTL Television|none|http://www.lyngsat-logo.com/logo/tv/rr/rtl.jpg
+SHOW TV|none|none
+Showtime|52.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/showtime.jpg
+Silver|none|http://www.lyngsat-logo.com/logo/tv/ss/silver.jpg
+Silver HD|none|http://www.welho.fi/PublicFiles/2007/08/0830/3258/SilverHD_120px.gif
+Sky News|53.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/sky_news.jpg
+Star|54.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/star_scandinavia.jpg
+subtv|4.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/subtv.jpg
+Subtv Juniori|80.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/subtv_juniori.jpg
+Subtv Leffa|78.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/subtv_leffa.jpg
+SVT Europa|21.telkku.com|/usr/local/share/mythtv/kanavalogot//svteuropa.jpg
+SVT1|15.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/svt1.jpg
+SVT2|16.telkku.com|http://www.lyngsat-logo.com/logo/tv/ss/svt2.jpg
+The Voice|84.telkku.com|http://www.lyngsat-logo.com/logo/tv/tt/the_voice_tv.jpg
+Toto-TV|none|http://www.lyngsat-logo.com/logo/tv/tt/toto_tv.jpg
+TV1|0.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_tv1.jpg
+TV1000|10.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000.jpg
+TV1000 Action|11.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000_action.jpg
+TV1000 Classic|14.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000_classic.jpg
+TV1000 Family|13.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000_family.jpg
+TV1000 Nordic|12.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000_nordic.jpg
+TV1000 PlusOne|none|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv1000_plus_one.jpg
+TV2|1.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_tv2.jpg
+TV3 Sverige|none|http://www.lyngsat-logo.com/logo/tv/vv/viasat_tv3_se.jpg
+TV4|18.telkku.com|http://www.lyngsat-logo.com/logo/tv/tt/tv4.jpg
+TV5MONDE|90.telkku.com|http://www.lyngsat-logo.com/logo/tv/tt/tv5_monde.jpg
+TV7|75.telkku.com|http://www.welho.fi/PublicFiles/770/heaven_tv7_90.gif
+TVE INTERNACIONAL|none|http://www.lyngsat-logo.com/logo/tv/tt/tve_int.jpg
+URHEILU+KANAVA|85.telkku.com|http://www.welho.fi/PublicFiles/2007/07/0702/3173/Urheilulogo_web.jpg
+Urheilukanava|59.telkku.com|http://www.lyngsat-logo.com/logo/tv/uu/urheilukanava.jpg
+VH1|60.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/vh1.jpg
+VH1 Classic|61.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/vh1_classic.jpg
+Viasat Explorer|71.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_explorer.jpg
+Viasat Golf|81.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_golf.jpg
+Viasat History|73.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_history.jpg
+Viasat Sport 1|68.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_sport1.jpg
+Viasat Sport 2|69.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_sport2.jpg
+Viasat Sport 3|70.telkku.com|http://www.lyngsat-logo.com/logo/tv/vv/viasat_sport3.jpg
+VIVA |none|http://www.lyngsat-logo.com/logo/tv/vv/viva.jpg
+Voom|none|http://www.welho.fi/PublicFiles/2007/08/0830/3257/VOOMHD_120px.gif
+YLE Extra|62.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_extra.jpg
+YLE FST|64.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_finlands_svenska_tv.jpg
+YLE Mondo|none|http://www.welho.fi/PublicFiles/2005/09/0930/2089/YLE_Mondo.gif
+YLE PEILI|none|http://www.welho.fi/PublicFiles/2007/04/0419/3000/pikkulogo_ylerp.gif
+YLE Teema|63.telkku.com|http://www.lyngsat-logo.com/logo/tv/yy/yle_teema.jpg
+YLE VEGA+|none|http://www.welho.fi/PublicFiles/2007/04/0419/3002/pikkulogo_vega.gif
+YLE X3M|none|http://www.welho.fi/PublicFiles/2007/04/0419/3001/pikkulogoX3M.jpg
+YLEN KLASSINEN|none|http://www.welho.fi/PublicFiles/2007/04/0419/2999/pikkulogo_ylenk.gif
+Zone Reality|none|http://www.lyngsat-logo.com/logo/tv/zz/zone_reality.jpg
+ZTV Sverige|none|http://www.lyngsat-logo.com/logo/tv/zz/ztv_se.jpg
