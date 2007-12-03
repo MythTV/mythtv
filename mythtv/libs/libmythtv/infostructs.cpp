@@ -13,7 +13,7 @@ void ChannelInfo::LoadIcon(int width, int height)
 {
     QImage tempimage(iconpath);
 
-    if (tempimage.width() == 0)
+    if (!iconpath.isEmpty() && (tempimage.width() == 0))
     {
         QFile existtest(iconpath);
 
