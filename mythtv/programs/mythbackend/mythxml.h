@@ -104,11 +104,6 @@ class MythXML : public Eventing
         void    GetConnectionInfo( HTTPRequest *pRequest );
         void    GetAlbumArt    ( HTTPRequest *pRequest );
 
-        QImage *GeneratePreviewImage( ProgramInfo   *pInfo,
-                                      const QString &sFileName,
-                                      int            nSecsIn,
-                                      float         &fAspect );
-
         void    GetExpiring    ( HTTPRequest *pRequest );
 
         void    GetRecording   ( HttpWorkerThread *pThread, 

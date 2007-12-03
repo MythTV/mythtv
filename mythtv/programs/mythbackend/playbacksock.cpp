@@ -152,12 +152,33 @@ void PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
     pginfo->FromStringList(strlist, 0);
 }
 
-void PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo)
+QStringList PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo)
 {
     QStringList strlist = QString("QUERY_GENPIXMAP");
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
+
+    return strlist;
+}
+
+QStringList PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo,
+                                           bool               time_fmt_sec,
+                                           long long          time,
+                                           const QString     &outputFile,
+                                           const QSize       &outputSize)
+{
+    QStringList strlist = "QUERY_GENPIXMAP";
+    pginfo->ToStringList(strlist);
+    strlist.push_back(time_fmt_sec ? "s" : "f");
+    encodeLongLong(strlist, time);
+    strlist.push_back((outputFile.isEmpty()) ? "<EMPTY>" : outputFile);
+    strlist.push_back(QString::number(outputSize.width()));
+    strlist.push_back(QString::number(outputSize.height()));
+
+    SendReceiveStringList(strlist);
+
+    return strlist;
 }
 
 QString PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)

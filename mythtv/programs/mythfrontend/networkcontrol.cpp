@@ -979,14 +979,23 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
 
         frameNumber = results[7].toInt();
 
-        bool res = PreviewGenerator::SaveScreenshot(pginfo, outFile,
-                                     frameNumber, width, height);
+        PreviewGenerator *previewgen = new PreviewGenerator(pginfo);
+        previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
+        previewgen->SetOutputFilename(outFile);
+        previewgen->SetOutputSize(QSize(width, height));
+        bool ok = previewgen->Run();
+        previewgen->deleteLater();
+
         delete pginfo;
 
-        if (res)
-            return QString("OK %1x%2").arg(width).arg(height);
-        else
-            return "ERROR: Unable to generate screenshot, check logs";
+        QString str = "ERROR: Unable to generate screenshot, check logs";
+        if (ok)
+        {
+            str = QString("OK %1x%2")
+                .arg((width > 0) ? width : 64).arg((height > 0) ? height : 64);
+        }
+
+        return str;
     }
     else
         return "ERROR: Timed out waiting for reply from player";

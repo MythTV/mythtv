@@ -23,6 +23,9 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
         QString FindNextDirMostFree(void);
 
         static void CheckAllStorageGroupDirs(void);
+        static QStringList GetGroupNames(QString hostname = QString::null);
+        static QString FindFile(const QString &filename,
+                                QString hostname = QString::null);
 
     private:
         QString      m_groupname;

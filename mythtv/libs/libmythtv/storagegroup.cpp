@@ -280,6 +280,52 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     }
 }
 
+QStringList StorageGroup::GetGroupNames(QString hostname)
+{
+    QStringList list;
+
+    if (hostname.isEmpty())
+        hostname = gContext->GetHostName();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT groupname "
+        "FROM storagegroup "
+        "WHERE hostname = :HOSTNAME "
+        "GROUP BY groupname");
+    query.bindValue(":HOSTNAME", hostname);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("StorageGroup::GetStorageGroupNames()", query);
+    }
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toString());
+    }
+
+    return list;
+}
+
+QString StorageGroup::FindFile(const QString &filename, QString hostname)
+{
+    // For securities sake, make sure filename is really the pathless.
+    QString lpath = QFileInfo(filename).fileName();
+
+    // Try all possible storage group locations..
+    QStringList sgrp = StorageGroup::GetGroupNames();
+    QStringList::const_iterator it = sgrp.begin();
+    QString tmpURL = QString::null;
+    for ( ; (it != sgrp.end()) && tmpURL.isEmpty(); ++it)
+    {
+        StorageGroup sgroup(*it);
+        tmpURL = sgroup.FindRecordingFile(lpath);
+    }
+
+    return tmpURL;
+}
+
 /****************************************************************************/
 typedef enum {
     SGPopup_OK = 0,

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -53,6 +54,11 @@ using namespace std;
 #define USE_PREV_GEN_THREAD
 
 QWaitCondition pbbIsVisibleCond;
+
+const uint PreviewGenState::maxAttempts     = 5;
+const uint PreviewGenState::minBlockSeconds = 60;
+
+const uint PlaybackBox::previewGeneratorMaxRunning = 2;
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
@@ -273,6 +279,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       // Preview Image Variables
       previewPixmapEnabled(false),      previewPixmap(NULL),
       previewSuspend(false),            previewChanid(""),
+      previewGeneratorRunning(0),
       // Network Control Variables
       underNetworkControl(false),
       m_player(NULL)
@@ -470,11 +477,11 @@ PlaybackBox::~PlaybackBox(void)
 
     // disconnect preview generators
     QMutexLocker locker(&previewGeneratorLock);
-    QMap<QString, PreviewGenerator*>::iterator it = previewGenerator.begin();
+    PreviewMap::iterator it = previewGenerator.begin();
     for (;it != previewGenerator.end(); ++it)
     {
-        if (*it)
-            (*it)->disconnectSafe();
+        if ((*it).gen)
+            (*it).gen->disconnectSafe();
     }
 
     // free preview pixmap after preview generators are
@@ -4240,45 +4247,98 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
     return datetime;
 }
 
+void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
+{
+    QString fn = QDeepCopy<QString>(xfn.mid(max(xfn.findRev('/') + 1,0)));
+
+    QMutexLocker locker(&previewGeneratorLock);
+    vector<QString> &q = previewGeneratorQueue;
+    vector<QString>::iterator it = std::find(q.begin(), q.end(), fn);
+    if (it != q.end())
+        q.erase(it);
+
+    PreviewMap::iterator pit = previewGenerator.find(fn);
+    if (pit != previewGenerator.end() && (*pit).gen && !(*pit).genStarted)
+        q.push_back(fn);
+}
+
+void PlaybackBox::UpdatePreviewGeneratorThreads(void)
+{
+    QMutexLocker locker(&previewGeneratorLock);
+    vector<QString> &q = previewGeneratorQueue;
+    if ((previewGeneratorRunning < previewGeneratorMaxRunning) && q.size())
+    {
+        QString fn = q.back();
+        q.pop_back();
+        PreviewMap::iterator it = previewGenerator.find(fn);
+        if (it != previewGenerator.end() && (*it).gen && !(*it).genStarted)
+        {
+            previewGeneratorRunning++;
+            (*it).gen->Start();
+            (*it).genStarted = true;
+        }
+    }
+}
+
 /** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
  *  \brief Sets the PreviewGenerator for a specific file.
  *  \return true iff call succeeded.
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
-    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
+    QString fn = QDeepCopy<QString>(xfn.mid(max(xfn.findRev('/') + 1,0)));
+    QMutexLocker locker(&previewGeneratorLock);
+
     if (!g)
     {
-        if (previewGeneratorLock.tryLock())
-        {
-            previewGenerator.erase(fn);
-            previewGeneratorLock.unlock();
-            return true;
-        }
-        return false;
+        previewGeneratorRunning = max(0, (int)previewGeneratorRunning - 1);
+        PreviewMap::iterator it = previewGenerator.find(fn);
+        if (it == previewGenerator.end())
+            return false;
+
+        (*it).gen        = NULL;
+        (*it).genStarted = false;
+        (*it).ready      = false;
+        (*it).lastBlockTime =
+            max(PreviewGenState::minBlockSeconds, (*it).lastBlockTime * 2);
+        (*it).blockRetryUntil =
+            QDateTime::currentDateTime().addSecs((*it).lastBlockTime);
+
+        return true;
     }
 
-    QMutexLocker locker(&previewGeneratorLock);
     g->AttachSignals(this);
-    previewGenerator[fn] = g;
-    g->Start();
+    previewGenerator[fn].gen = g;
+    previewGenerator[fn].genStarted = false;
+    previewGenerator[fn].ready = false;
+
+    previewGeneratorLock.unlock();
+    IncPreviewGeneratorPriority(xfn);
+    previewGeneratorLock.lock();
 
     return true;
 }
 
-/** \fn PlaybackBox::IsGeneratingPreview(const QString&) const
+/** \fn PlaybackBox::IsGeneratingPreview(const QString&, bool) const
  *  \brief Returns true if we have already started a
  *         PreviewGenerator to create this file.
  */
-bool PlaybackBox::IsGeneratingPreview(const QString &xfn) const
+bool PlaybackBox::IsGeneratingPreview(const QString &xfn, bool really) const
 {
-    QMap<QString, PreviewGenerator*>::const_iterator it;
+    PreviewMap::const_iterator it;
     QMutexLocker locker(&previewGeneratorLock);
 
     QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
     if ((it = previewGenerator.find(fn)) == previewGenerator.end())
         return false;
-    return *it;
+
+    if (really)
+        return ((*it).gen && !(*it).ready);
+
+    if ((*it).blockRetryUntil.isValid())
+        return QDateTime::currentDateTime() < (*it).blockRetryUntil;
+
+    return (*it).gen;
 }
 
 /** \fn PlaybackBox::IncPreviewGeneratorAttempts(const QString&)
@@ -4289,12 +4349,13 @@ uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
 {
     QMutexLocker locker(&previewGeneratorLock);
     QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
-    return previewGeneratorAttempts[fn]++;
+    return previewGenerator[fn].attempts++;
 }
 
 void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
 {
     success = SetPreviewGenerator(fn, NULL);
+    UpdatePreviewGeneratorThreads();
 }
 
 /** \fn PlaybackBox::previewReady(const ProgramInfo*)
@@ -4304,6 +4365,19 @@ void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
  */
 void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 {
+    QString xfn = pginfo->pathname + ".png";
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
+
+    previewGeneratorLock.lock();
+    PreviewMap::iterator it = previewGenerator.find(fn);
+    if (it != previewGenerator.end())
+    {
+        (*it).ready         = true;
+        (*it).attempts      = 0;
+        (*it).lastBlockTime = 0;
+    }
+    previewGeneratorLock.unlock();
+
     // lock QApplication so that we don't remove pixmap
     // from under a running paint event.
     qApp->lock();
@@ -4358,6 +4432,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (check_date)
         previewLastModified = getPreviewLastModified(pginfo);
 
+    IncPreviewGeneratorPriority(filename);
+
     if (previewFromBookmark &&
         check_date &&
         (!previewLastModified.isValid() ||
@@ -4383,25 +4459,23 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
                 .arg(!IsGeneratingPreview(filename)));
 
         uint attempts = IncPreviewGeneratorAttempts(filename);
-        if (attempts < 5)
+        if (attempts < PreviewGenState::maxAttempts)
         {
-#ifdef USE_PREV_GEN_THREAD
             SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
-#else
-            PreviewGenerator pg(pginfo, false);
-            pg.Run();
-#endif
         }
-        else if (attempts == 5)
+        else if (attempts == PreviewGenState::maxAttempts)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Attempted to generate preview for '%1'")
-                    .arg(filename) + " 5 times, giving up.");
+                    QString("Attempted to generate preview for '%1' "
+                            "%2 times, giving up.")
+                    .arg(filename).arg(PreviewGenState::maxAttempts));
         }
 
-        if (attempts >= 5)
+        if (attempts >= PreviewGenState::maxAttempts)
             return retpixmap;
     }
+
+    UpdatePreviewGeneratorThreads();
 
     // Check and see if we've already tried this one.
     if (previewPixmap &&
@@ -4438,34 +4512,29 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     //if this is a remote frontend, then we need to refresh the pixmap
     //if another frontend has already regenerated the stale pixmap on the disk
     bool refreshPixmap      = (previewLastModified >= previewFilets);
-    bool generating_preview = IsGeneratingPreview(filename);
 
     QImage *image = NULL;
-    if (!generating_preview)
+    if (!IsGeneratingPreview(filename, true))
         image = gContext->CacheRemotePixmap(filename, refreshPixmap);
 
     // If the image is not available remotely either, we need to generate it.
-    if (!image && !generating_preview)
+    if (!image && !IsGeneratingPreview(filename))
     {
-#ifdef USE_PREV_GEN_THREAD
         uint attempts = IncPreviewGeneratorAttempts(filename);
-        if (attempts < 5)
+        if (attempts < PreviewGenState::maxAttempts)
         {
             VERBOSE(VB_PLAYBACK, "Starting preview generator");
             SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
         }
-        else if (attempts == 5)
+        else if (attempts == PreviewGenState::maxAttempts)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Attempted to generate preview for '%1'")
-                    .arg(filename) + " 5 times, giving up.");
+                    QString("Attempted to generate preview for '%1' "
+                            "%2 times, giving up.")
+                    .arg(filename).arg(PreviewGenState::maxAttempts));
+
             return retpixmap;
         }
-#else
-        PreviewGenerator pg(pginfo, false);
-        pg.Run();
-        image = gContext->CacheRemotePixmap(filename, true);
-#endif
     }
 
     if (image)

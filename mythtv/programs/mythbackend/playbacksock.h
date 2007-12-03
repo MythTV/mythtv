@@ -46,7 +46,12 @@ class PlaybackSock
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
-    void GenPreviewPixmap(const ProgramInfo *pginfo);
+    QStringList GenPreviewPixmap(const ProgramInfo *pginfo);
+    QStringList GenPreviewPixmap(const ProgramInfo *pginfo,
+                                 bool               time_fmt_sec,
+                                 long long          time,
+                                 const QString     &outputFile,
+                                 const QSize       &outputSize);
     QString PixmapLastModified(const ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 

@@ -836,33 +836,4 @@ bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
                               callsign, channum, channame, xmltv);
 }
 
-/** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
- *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
- *         <b>This only works on local recorders.</b>
- *  \param pginfo       Recording to grab from.
- *  \param filename     File containing recording.
- *  \param secondsin    Seconds into the video to seek before capturing a frame.
- *  \param bufferlen    Returns size of buffer returned (in bytes).
- *  \param video_width  Returns width of frame grabbed.
- *  \param video_height Returns height of frame grabbed.
- *  \param video_aspect Returns the aspect ratio of frame grabbed.
- *  \return Buffer allocated with new containing frame in RGBA32 format if
- *          successful, NULL otherwise.
- */
-char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
-                                 const QString &filename, 
-                                 int secondsin, int &bufferlen, 
-                                 int &video_width, int &video_height,
-                                 float &video_aspect)
-{
-    if (local)
-    {
-        return PreviewGenerator::GetScreenGrab(
-            pginfo, filename, secondsin, bufferlen, 
-            video_width, video_height, video_aspect);
-    }
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
-    return NULL;
-}
-
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

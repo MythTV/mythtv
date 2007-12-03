@@ -1,3 +1,7 @@
+// POSIX headers
+#include <sys/time.h>     // for setpriority
+#include <sys/resource.h> // for setpriority
+
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -36,6 +40,7 @@ using namespace std;
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/storagegroup.h"
+#include "libmythtv/previewgenerator.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -245,6 +250,121 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
+int preview_helper(const QString &chanid, const QString &starttime,
+                   long long previewFrameNumber, long long previewSeconds,
+                   const QSize &previewSize,
+                   const QString &infile, const QString &outfile)
+{
+    // Lower scheduling priority, to avoid problems with recordings.
+    if (setpriority(PRIO_PROCESS, 0, 9))
+        VERBOSE(VB_GENERAL, "Setting priority failed." + ENO);
+
+    ProgramInfo *pginfo = NULL;
+    if (!chanid.isEmpty() && !starttime.isEmpty())
+    {
+        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+        if (!pginfo)
+        {
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Can not locate recording made on '%1' at '%2'")
+                    .arg(chanid).arg(starttime));
+            return GENERIC_EXIT_NOT_OK;
+        }
+    }
+    else if (!infile.isEmpty())
+    {
+        pginfo = ProgramInfo::GetProgramFromBasename(infile);
+        if (!pginfo)
+        {
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Can not locate recording '%1'").arg(infile));
+            return GENERIC_EXIT_NOT_OK;
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "Can not locate recording for preview");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    PreviewGenerator *previewgen = new PreviewGenerator(pginfo, true);
+
+    if (previewFrameNumber >= 0)
+        previewgen->SetPreviewTimeAsFrameNumber(previewFrameNumber);
+
+    if (previewSeconds >= 0)
+        previewgen->SetPreviewTimeAsSeconds(previewSeconds);
+
+    previewgen->SetOutputSize(previewSize);
+    previewgen->SetOutputFilename(outfile);
+    previewgen->RunReal();
+    previewgen->deleteLater();
+
+    delete pginfo;
+
+    return GENERIC_EXIT_OK;
+}
+
+// [WxH] | [WxH@]seconds[S] | [WxH@]frame_numF
+bool parse_preview_info(const QString &param,
+                        long long     &previewFrameNumber,
+                        long long     &previewSeconds,
+                        QSize         &previewSize)
+{
+    previewFrameNumber = -1;
+    previewSeconds = -1;
+    previewSize = QSize(0,0);
+    if (param.isEmpty())
+        return true;
+
+    int xat = param.find("x", 0, false);
+    int aat = param.find("@", 0, false);
+    if (xat > 0)
+    {
+        QString widthStr  = param.left(xat);
+        QString heightStr = QString::null;
+        if (aat > xat)
+            heightStr = param.mid(xat + 1, aat - xat - 1);
+        else
+            heightStr = param.mid(xat + 1);
+
+        bool ok1, ok2;
+        previewSize = QSize(widthStr.toInt(&ok1), heightStr.toInt(&ok2));
+        if (!ok1 || !ok2)
+        {
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Error: Failed to parse --generate-preview "
+                        "param '%1'").arg(param));
+        }
+    }
+    if ((xat > 0) && (aat < xat))
+        return true;
+
+    QString lastChar = param.at(param.length() - 1).lower();
+    QString frameNumStr = QString::null;
+    QString secsStr = QString::null;
+    if (lastChar == "f")
+        frameNumStr = param.mid(aat + 1, param.length() - aat - 2);
+    else if (lastChar == "s")
+        secsStr = param.mid(aat + 1, param.length() - aat - 2);
+    else
+        secsStr = param.mid(aat + 1, param.length() - aat - 1);
+
+    bool ok = false;
+    if (!frameNumStr.isEmpty())
+        previewFrameNumber = frameNumStr.toUInt(&ok);
+    else if (!secsStr.isEmpty())
+        previewSeconds = secsStr.toUInt(&ok);
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Error: Failed to parse --generate-preview "
+                    "param '%1'").arg(param));
+    }
+
+    return ok;
+}
 
 int main(int argc, char **argv)
 {
@@ -255,6 +375,14 @@ int main(int argc, char **argv)
 
     QMap<QString, QString> settingsOverride;
     QString binname = basename(a.argv()[0]);
+
+    long long previewFrameNumber = -2;
+    long long previewSeconds     = -2;
+    QSize previewSize(0,0);
+    QString chanid    = QString::null;
+    QString starttime = QString::null;
+    QString infile    = QString::null;
+    QString outfile   = QString::null;
 
     bool daemonize = false;
     bool printsched = false;
@@ -417,6 +545,84 @@ int main(int argc, char **argv)
 #endif
             return BACKEND_EXIT_OK;
         }
+        else if (!strcmp(a.argv()[argpos],"--generate-preview"))
+        {
+            QString tmp = QString::null;
+            if ((argpos + 1) < a.argc())
+            {
+                tmp = a.argv()[argpos+1];
+                bool ok = true;
+                if (tmp.left(1) == "-")
+                    tmp.left(2).toInt(&ok);
+                if (ok)
+                    argpos++;
+                else
+                    tmp = QString::null;
+            }
+
+            if (!parse_preview_info(tmp, previewFrameNumber, previewSeconds,
+                                    previewSize))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Unable to parse --generate-preview "
+                                "option '%1'").arg(tmp));
+
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-c") ||
+                 !strcmp(a.argv()[argpos],"--chanid"))
+        {
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "-", 1))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --chanid option");
+
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            chanid = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos],"-s") ||
+                 !strcmp(a.argv()[argpos],"--starttime"))
+        {
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "-", 1))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --starttime option");
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            starttime = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos],"--infile"))
+        {
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "-", 1))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --infile option");
+
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            infile = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos],"--outfile"))
+        {
+            if (((argpos + 1) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "-", 1))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Missing or invalid parameters for --outfile option");
+
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            outfile = a.argv()[++argpos];
+        }
         else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
@@ -439,9 +645,23 @@ int main(int argc, char **argv)
                     "--nohousekeeper                Do not start the Housekeeper" << endl <<
                     "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
                     "--clearcache                   Clear the settings cache on all myth servers" << endl <<
-                    "--version                      Version information" << endl;
+                    "--version                      Version information" << endl <<
+                    "--generate-preview             Generate a preview image" << endl <<
+                    "--infile                       Input file for preview generation" << endl <<
+                    "--outfile                      Optional output file for preview generation" << endl <<
+                    "--chanid                       Channel ID for preview generation" << endl <<
+                    "--starttime                    Recording start time for preview generation" << endl;
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
+    }
+
+    if (((previewFrameNumber >= -1) || previewSeconds >= -1) &&
+        (chanid.isEmpty() || starttime.isEmpty()) && infile.isEmpty())
+    {
+        cerr << "--generate-preview must be accompanied by either " <<endl
+             << "\nboth --chanid and --starttime paramaters, " << endl
+             << "\nor the --infile paramater." << endl;
+        return BACKEND_EXIT_INVALID_CMDLINE;
     }
 
     if (logfile != "" )
@@ -574,6 +794,14 @@ int main(int argc, char **argv)
         expirer->PrintExpireList(printexpire);
         cleanup();
         return BACKEND_EXIT_OK;
+    }
+
+    if ((previewFrameNumber >= -1) || (previewSeconds >= -1))
+    {
+        return preview_helper(
+            chanid, starttime,
+            previewFrameNumber, previewSeconds, previewSize,
+            infile, outfile);
     }
 
     int port = gContext->GetNumSetting("BackendServerPort", 6543);

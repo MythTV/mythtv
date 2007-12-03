@@ -2833,21 +2833,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 sigMonMode  = !sigMonMode;
             }
         }
-        else if ((action == "SCREENSHOT") && (!activerbuffer->isDVD()))
+        else if (action == "SCREENSHOT")
         {
-            long long frameNumber = nvp->GetFramesPlayed();
-            int frameWidth = -1;
-            int frameHeight = -1;
-            QString outFile =
-               QString("%1/.mythtv/%2_%3_%4.png")
-                       .arg(QDir::homeDirPath()).arg(playbackinfo->chanid)
-                       .arg(playbackinfo->recstartts.toString("yyyyMMddhhmmss"))
-                       .arg((long)frameNumber);
-
-            PreviewGenerator::SaveScreenshot(playbackinfo, outFile, frameNumber,
-                                             frameWidth, frameHeight);
-            if (activenvp == nvp && GetOSD())
-                GetOSD()->SetSettingsText(tr("Screen Shot"), 3);
+            if (activenvp && activerbuffer && !activerbuffer->isDVD())
+                ScreenShot(activenvp->GetFramesPlayed());
         }
         else if (action == "EXITSHOWNOPROMPTS")
         {
@@ -7475,6 +7464,45 @@ void TV::ITVRestart(bool isLive)
     pbinfoLock.unlock();
 
     nvp->ITVRestart(chanid, cardid, isLive);
+}
+
+/* \fn TV::ScreenShot(long long frameNumber)
+ * \brief Creates an image of a particular frame from the current
+ *        playbackinfo recording.
+ */
+bool TV::ScreenShot(long long frameNumber)
+{
+    pbinfoLock.lock();
+    if (!playbackinfo)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "ScreenShot called with NULL playbackinfo");
+
+        pbinfoLock.unlock();
+        return false;
+    }
+
+    QString outFile =
+        QString("%1/.mythtv/%2_%3_%4.png")
+        .arg(QDir::homeDirPath()).arg(playbackinfo->chanid)
+        .arg(playbackinfo->recstartts.toString("yyyyMMddhhmmss"))
+        .arg((long)frameNumber);
+
+    PreviewGenerator *previewgen = new PreviewGenerator(playbackinfo, false);
+    pbinfoLock.unlock();
+
+    previewgen->SetPreviewTimeAsFrameNumber(frameNumber);
+    previewgen->SetOutputSize(QSize(-1,-1));
+    previewgen->SetOutputFilename(outFile);
+    bool ok = previewgen->Run();
+    previewgen->deleteLater();
+
+    QString msg = tr("Screen Shot") + " " + ((ok) ? tr("OK") : tr("Error"));
+
+    if (nvp && (activenvp == nvp) && GetOSD())
+        GetOSD()->SetSettingsText(msg, 3);
+
+    return ok;
 }
 
 /* \fn TV::LoadExternalSubtitles(NuppelVideoPlayer*, const QString&)

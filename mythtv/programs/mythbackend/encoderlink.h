@@ -103,11 +103,6 @@ class EncoderLink
                         QString callsign, QString channum,
                         QString channame, QString xmltv);
 
-    char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
-                        int secondsin, int &bufferlen,
-                        int &video_width, int &video_height,
-                        float &video_aspect);
-
   private:
     int m_capturecardnum;
 

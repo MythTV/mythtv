@@ -373,6 +373,8 @@ class MPUBLIC TV : public QObject
 
     void ITVRestart(bool isLive);
 
+    bool ScreenShot(long long frameNumber);
+
     //dvd functions
     void DVDJumpBack(void);
     void DVDJumpForward(void);       

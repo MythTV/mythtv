@@ -15,6 +15,7 @@
 // Qt headers
 #include <qfileinfo.h>
 #include <qimage.h>
+#include <qurl.h>
 
 // MythTV headers
 #include "RingBuffer.h"
@@ -22,6 +23,8 @@
 #include "previewgenerator.h"
 #include "tv_rec.h"
 #include "mythsocket.h"
+#include "remotefile.h"
+#include "storagegroup.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
@@ -63,7 +66,9 @@ const char *PreviewGenerator::kInUseID = "preview_generator";
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    bool local_only)
     : programInfo(*pginfo), localOnly(local_only), isConnected(false),
-      createSockets(false), serverSock(NULL),      pathname(pginfo->pathname)
+      createSockets(false), serverSock(NULL),      pathname(pginfo->pathname),
+      timeInSeconds(true),  captureTime(-1),       outFileName(QString::null),
+      outSize(0,0)
 {
     if (IsLocal())
         return;
@@ -88,6 +93,11 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 PreviewGenerator::~PreviewGenerator()
 {
     TeardownAll();
+}
+
+void PreviewGenerator::SetOutputFilename(const QString &fileName)
+{
+    outFileName = QDeepCopy<QString>(fileName);
 }
 
 void PreviewGenerator::TeardownAll(void)
@@ -150,24 +160,111 @@ void PreviewGenerator::Start(void)
     pthread_detach(previewThread);
 }
 
-/** \fn PreviewGenerator::Run(void)
+/** \fn PreviewGenerator::RunReal(void)
  *  \brief This call creates a preview without starting a new thread.
  */
-void PreviewGenerator::Run(void)
+bool PreviewGenerator::RunReal(void)
 {
-    if (IsLocal())
+    bool ok = false;
+    bool is_local = IsLocal();
+    if (is_local && LocalPreviewRun())
     {
-        LocalPreviewRun();
+        ok = true;
     }
     else if (!localOnly)
     {
-        RemotePreviewRun();
+        if (is_local)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to save preview."
+                    "\n\t\t\tYou may need to check user and group ownership on"
+                    "\n\t\t\tyour frontend and backend for quicker previews.\n"
+                    "\n\t\t\tAttempting to regenerate preview on backend.\n");
+        }
+        ok = RemotePreviewRun();
     }
     else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Run() file not local: '%1'")
                 .arg(pathname));
     }
+
+    return ok;
+}
+
+bool PreviewGenerator::Run(void)
+{
+    bool ok = false;
+    if (!IsLocal())
+    {
+        if (!localOnly)
+        {
+            ok = RemotePreviewRun();
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Run() file not local: '%1'")
+                    .arg(pathname));
+        }
+    }
+    else
+    {
+        // This is where we fork and run mythbackend to actually make preview
+        QString command = "mythbackend --generate-preview ";
+        command += QString("%1x%2")
+            .arg(outSize.width()).arg(outSize.height());
+        if (captureTime >= 0)
+            command += QString("@%1%2")
+                .arg(captureTime).arg(timeInSeconds ? "s" : "f");
+        command += " ";
+        command += QString("--chanid %1 ").arg(programInfo.chanid);
+        command += QString("--starttime %1 ")
+            .arg(programInfo.recstartts.toString("yyyyMMddhhmmss"));
+        if (!outFileName.isEmpty())
+            command += QString("--outfile %1 ").arg(outFileName);
+
+        int ret = myth_system(command);
+        if (ret)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Encountered problems running " +
+                    QString("'%1'").arg(command));
+        }
+        else
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "Preview process returned 0.");
+            QString outname = (!outFileName.isEmpty()) ?
+                outFileName : (pathname + ".png");
+
+            QString lpath = QFileInfo(outname).fileName();
+            if (lpath == outname)
+            {
+                QString url = StorageGroup::FindFile(outname);
+                if (!url.isEmpty())
+                    outname = url.section('/', 0, -2) + "/" + lpath;
+            }
+
+            QFileInfo fi(outname);
+            ok = (fi.exists() && fi.isReadable() && fi.size());
+            if (ok)
+                VERBOSE(VB_PLAYBACK, LOC + "Preview process ran ok.");
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Preview process not ok." +
+                        QString("\n\t\t\tfileinfo(%1)").arg(outname)
+                        <<" exits: "<<fi.exists()
+                        <<" readable: "<<fi.isReadable()
+                        <<" size: "<<fi.size());
+            }
+        }
+    }
+
+    if (ok)
+    {
+        QMutexLocker locker(&previewLock);
+        emit previewReady(&programInfo);
+    }
+
+    return ok;
 }
 
 void *PreviewGenerator::PreviewRun(void *param)
@@ -191,10 +288,24 @@ bool PreviewGenerator::RemotePreviewSetup(void)
     return serverSock;
 }
 
-void PreviewGenerator::RemotePreviewRun(void)
+bool PreviewGenerator::RemotePreviewRun(void)
 {
     QStringList strlist = "QUERY_GENPIXMAP";
     programInfo.ToStringList(strlist);
+    strlist.push_back(timeInSeconds ? "s" : "f");
+    encodeLongLong(strlist, captureTime);
+    if (outFileName.isEmpty())
+    {
+        strlist.push_back("<EMPTY>");
+    }
+    else
+    {
+        QFileInfo fi(outFileName);
+        strlist.push_back(fi.fileName());
+    }
+    strlist.push_back(QString::number(outSize.width()));
+    strlist.push_back(QString::number(outSize.height()));
+
     bool ok = false;
 
     if (createSockets)
@@ -202,7 +313,7 @@ void PreviewGenerator::RemotePreviewRun(void)
         if (!RemotePreviewSetup())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open sockets.");
-            return;
+            return false;
         }
 
         if (serverSock)
@@ -218,11 +329,85 @@ void PreviewGenerator::RemotePreviewRun(void)
         ok = gContext->SendReceiveStringList(strlist);
     }
 
-    if (ok && (strlist[0] == "OK"))
+    if (!ok || strlist.empty() || (strlist[0] != "OK"))
     {
-        QMutexLocker locker(&previewLock);
-        emit previewReady(&programInfo);
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Remote Preview failed due to communications error.");
+        }
+        else if (strlist.size() > 1)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Remote Preview failed, reason given: " <<strlist[1]);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Remote Preview failed due to an uknown error.");
+        }
+        return false;
     }
+
+    if (outFileName.isEmpty())
+        return true;
+
+    // find file, copy/move to output file name & location...
+
+    QString url = QString::null;
+    QString fn = QFileInfo(outFileName).fileName();
+    QByteArray data;
+    ok = false;
+
+    QStringList fileNames; 
+    fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, fn));
+    fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, ""));
+
+    QStringList::const_iterator it = fileNames.begin();
+    for ( ; it != fileNames.end() && (!ok || data.isEmpty()); ++it)
+    {
+        data.resize(0);
+        url = *it;
+        RemoteFile *rf = new RemoteFile(url, false, 0);
+        ok = rf->SaveAs(data);
+        delete rf;
+    }
+
+    if (ok && data.size())
+    {
+        QFile file(outFileName);
+        ok = file.open(IO_Raw|IO_WriteOnly);
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Failed to open: '%1'")
+                    .arg(outFileName));
+        }
+
+        off_t offset = 0;
+        size_t remaining = (ok) ? data.size() : 0;
+        uint failure_cnt = 0;
+        while ((remaining > 0) && (failure_cnt < 5))
+        {
+            ssize_t written = file.writeBlock(data.data() + offset, remaining);
+            if (written < 0)
+            {
+                failure_cnt++;
+                usleep(50000);
+                continue;
+            }
+
+            failure_cnt  = 0;
+            offset      += written;
+            remaining   -= written;
+        }
+        if (ok && !remaining)
+        {
+            VERBOSE(VB_PLAYBACK, QString("Saved: '%1'")
+                    .arg(outFileName));
+        }
+    }
+
+    return ok && data.size();
 }
 
 void PreviewGenerator::RemotePreviewTeardown(void)
@@ -236,7 +421,8 @@ void PreviewGenerator::RemotePreviewTeardown(void)
 
 bool PreviewGenerator::SavePreview(QString filename,
                                    const unsigned char *data,
-                                   uint width, uint height, float aspect)
+                                   uint width, uint height, float aspect,
+                                   int desired_width, int desired_height)
 {
     if (!data || !width || !height)
         return false;
@@ -245,21 +431,41 @@ bool PreviewGenerator::SavePreview(QString filename,
                      width, height, 32, NULL, 65536 * 65536,
                      QImage::LittleEndian);
 
-    float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 320);
-    float pph = gContext->GetNumSetting("PreviewPixmapHeight", 240);
+    float ppw = max(desired_width, 0);
+    float pph = max(desired_height, 0);
+    bool desired_size_exactly_specified = true;
+    if ((ppw < 1.0f) && (pph < 1.0f))
+    {
+        ppw = gContext->GetNumSetting("PreviewPixmapWidth",  320);
+        pph = gContext->GetNumSetting("PreviewPixmapHeight", 240);
+        desired_size_exactly_specified = false;
+    }
 
-    aspect = (aspect <= 0) ? ((float) width) / height : aspect;
+    aspect = (aspect <= 0.0f) ? ((float) width) / height : aspect;
+    pph = (pph < 1.0f) ? (ppw / aspect) : pph;
+    ppw = (ppw < 1.0f) ? (pph * aspect) : ppw;
 
-    if (aspect > ppw / pph)
-        pph = rint(ppw / aspect);
-    else
-        ppw = rint(pph * aspect);
+    if (!desired_size_exactly_specified)
+    {
+        if (aspect > ppw / pph)
+            pph = (ppw / aspect);
+        else
+            ppw = (pph * aspect);
+    }
+
+    ppw = max(1.0f, ppw);
+    pph = max(1.0f, pph);;
 
     QImage small_img = img.smoothScale((int) ppw, (int) pph);
 
     if (small_img.save(filename.ascii(), "PNG"))
     {
         chmod(filename.ascii(), 0666); // Let anybody update it
+
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Saved preview '%0' %1x%2")
+                .arg(filename).arg((int) ppw).arg((int) pph));
+
         return true;
     }
 
@@ -270,6 +476,11 @@ bool PreviewGenerator::SavePreview(QString filename,
     {
         chmod(newfile.ascii(), 0666);
         rename(newfile.ascii(), filename.ascii());
+
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Saved preview '%0' %1x%2")
+                .arg(filename).arg((int) ppw).arg((int) pph));
+
         return true;
     }
 
@@ -277,43 +488,70 @@ bool PreviewGenerator::SavePreview(QString filename,
     return false;
 }
 
-void PreviewGenerator::LocalPreviewRun(void)
+bool PreviewGenerator::LocalPreviewRun(void)
 {
     programInfo.MarkAsInUse(true, kInUseID);
 
     float aspect = 0;
-    int   secsin = (gContext->GetNumSetting("PreviewPixmapOffset", 64) +
-                    gContext->GetNumSetting("RecordPreRoll",       0));
     int   len, width, height, sz;
+    long long captime = captureTime;
+    if (captime < 0)
+    {
+        timeInSeconds = true;
+        captime = (gContext->GetNumSetting("PreviewPixmapOffset", 64) +
+                   gContext->GetNumSetting("RecordPreRoll",       0));
+    }
 
     len = width = height = sz = 0;
     unsigned char *data = (unsigned char*)
-        GetScreenGrab(&programInfo, pathname, secsin,
+        GetScreenGrab(&programInfo, pathname,
+                      captime, timeInSeconds,
                       sz, width, height, aspect);
-    
-    bool ok = SavePreview(pathname + ".png",
-                          data, width, height, aspect);
-    if (ok)
-    {
-        QMutexLocker locker(&previewLock);
-        emit previewReady(&programInfo);
-    }
+
+    QString outname = CreateAccessibleFilename(pathname, outFileName);
+
+    int dw = (outSize.width()  < 0) ? width  : outSize.width();
+    int dh = (outSize.height() < 0) ? height : outSize.height();
+
+    bool ok = SavePreview(outname, data, width, height, aspect, dw, dh);
 
     if (data)
         delete[] data;
 
     programInfo.MarkAsInUse(false);
 
-    // local update failed, try remote...
-    if (!ok && !localOnly)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to save preview."
-                "\n\t\t\tYou may need to check user and group ownership"
-                "\n\t\t\ton your frontend and backend for quicker previews."
-                "\n\n\t\t\tAttempting to regenerate preview on backend.\n");
+    return ok;
+}
 
-        RemotePreviewRun();
+QString PreviewGenerator::CreateAccessibleFilename(
+    const QString &pathname, const QString &outFileName)
+{
+    QString outname = pathname + ".png";
+
+    if (outFileName.isEmpty())
+        return QDeepCopy<QString>(outname);
+
+    outname = outFileName;
+    QFileInfo fi(outname);
+    if (outname == fi.fileName())
+    {
+        QString dir = QString::null;
+        if (pathname.contains(":"))
+        {
+            QUrl uinfo(pathname);
+            uinfo.setPath("");
+            dir = uinfo.toString();
+        }
+        else
+        {
+            dir = QFileInfo(pathname).dirPath();
+        }
+        outname = dir  + "/" + fi.fileName();
+        VERBOSE(VB_IMPORTANT, LOC + QString("outfile '%1' -> '%2'")
+                .arg(outFileName).arg(outname));
     }
+
+    return QDeepCopy<QString>(outname);
 }
 
 bool PreviewGenerator::IsLocal(void) const
@@ -322,103 +560,15 @@ bool PreviewGenerator::IsLocal(void) const
     return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
-/**
- *  \brief Saves a screenshot to a file.
- *
- *  \param pginfo       Recording to grab from.
- *  \param outFile      Filename to save the image to
- *  \param frameNumber  Frame Number to capture
- *  \param thumbWidth   Width of desired image
- *  \param thumbHeight  Height of desired image
- *  \return True if successful, false otherwise.
- */
-bool PreviewGenerator::SaveScreenshot(ProgramInfo *pginfo, QString &outFile,
-        long long frameNumber, int &thumbWidth, int &thumbHeight)
-{
-    float desWidth = (float)thumbWidth;
-    float desHeight = (float)thumbHeight;
-    float frameAspect = 0.0;
-    char *retbuf = NULL;
-    int bufferLen = 0;
-    int frameWidth = 0;
-    int frameHeight = 0;
-
-    if (!pginfo)
-        return false;
-
-    QString inFile = pginfo->GetPlaybackURL();
-    RingBuffer *rbuf = new RingBuffer(inFile, false, false, 0);
-
-    if (!rbuf->IsOpen())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "SaveScreenshot: Could not open file: " +
-                QString("'%1'").arg(inFile));
-        delete rbuf;
-        return false;
-    }
-
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(kInUseID, pginfo);
-    nvp->SetRingBuffer(rbuf);
-
-    retbuf = nvp->GetScreenGrabAtFrame(frameNumber, true, bufferLen,
-                                       frameWidth, frameHeight, frameAspect);
-
-    if (thumbWidth == -1)
-        desWidth = frameWidth;
-    if (thumbHeight == -1)
-        desHeight = frameHeight;
-
-    delete nvp;
-    delete rbuf;
-
-    if (!retbuf || bufferLen == 0)
-        return false;
-
-    if (frameAspect <= 0)
-        frameAspect = frameWidth / frameHeight;
-
-    const QImage img((unsigned char*) retbuf,
-                     frameWidth, frameHeight, 32, NULL, 65536 * 65536,
-                     QImage::LittleEndian);
-
-    if (frameAspect > desWidth / desHeight)
-        desHeight = rint(desWidth / frameAspect);
-    else
-        desWidth = rint(desHeight * frameAspect);
-
-    QImage small_img = img.smoothScale((int) desWidth, (int) desHeight);
-    QString type = "PNG";
-
-    if (outFile.right(4).lower() == ".png")
-        type = outFile.right(3).upper();
-    else
-        VERBOSE(VB_IMPORTANT, LOC_WARN + QString("SaveScreenshot: The filename "
-                "(%1) does not end in .png, but we only support png format. "
-                "The file will contain a PNG formatted image.")
-                .arg(outFile));
-
-    if (small_img.save(outFile.ascii(), type))
-        chmod(outFile.ascii(), 0666);
-    else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("SaveScreenshot: unable to "
-                "open save image").arg(outFile));
-
-    delete retbuf;
-
-    thumbWidth = (int)desWidth;
-    thumbHeight = (int)desHeight;
-
-    return true;
-}
-
-/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
+/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*, const QString&,
+    long long, bool, int&, int&, int&, float&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
  *  \param pginfo       Recording to grab from.
  *  \param filename     File containing recording.
- *  \param secondsin    Seconds into the video to seek before
+ *  \param seektime     Seconds or frames into the video to seek before
  *                      capturing a frame.
+ *  \param time_in_secs if true time is in seconds, otherwise it is in frames.
  *  \param bufferlen    Returns size of buffer returned (in bytes).
  *  \param video_width  Returns width of frame grabbed.
  *  \param video_height Returns height of frame grabbed.
@@ -427,13 +577,15 @@ bool PreviewGenerator::SaveScreenshot(ProgramInfo *pginfo, QString &outFile,
  *          successful, NULL otherwise.
  */
 char *PreviewGenerator::GetScreenGrab(
-    const ProgramInfo *pginfo, const QString &filename, int secondsin,
+    const ProgramInfo *pginfo, const QString &filename,
+    long long seektime, bool time_in_secs,
     int &bufferlen,
     int &video_width, int &video_height, float &video_aspect)
 {
     (void) pginfo;
     (void) filename;
-    (void) secondsin;
+    (void) seektime;
+    (void) time_in_secs;
     (void) bufferlen;
     (void) video_width;
     (void) video_height;
@@ -483,8 +635,13 @@ char *PreviewGenerator::GetScreenGrab(
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(kInUseID, pginfo);
     nvp->SetRingBuffer(rbuf);
 
-    retbuf = nvp->GetScreenGrab(secondsin, bufferlen,
-                                video_width, video_height, video_aspect);
+    if (time_in_secs)
+        retbuf = nvp->GetScreenGrab(seektime, bufferlen,
+                                    video_width, video_height, video_aspect);
+    else
+        retbuf = nvp->GetScreenGrabAtFrame(
+            seektime, true, bufferlen,
+            video_width, video_height, video_aspect);
 
     delete nvp;
     delete rbuf;
@@ -493,6 +650,15 @@ char *PreviewGenerator::GetScreenGrab(
     QString msg = "Backend compiled without USING_FRONTEND !!!!";
     VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 #endif // USING_FRONTEND
+
+    if (retbuf)
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Grabbed preview '%0' %1x%2@%3%4")
+                .arg(filename).arg(video_width).arg(video_height)
+                .arg((Q_LLONG)seektime).arg((time_in_secs) ? "s" : "f"));
+    }
+
     return retbuf;
 }
 

@@ -45,7 +45,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "autoexpire.h"
 #include "previewgenerator.h"
-
+#include "storagegroup.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -3658,8 +3658,51 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
+    bool      time_fmt_sec   = true;
+    long long time           = -1;
+    QString   outputfile     = QString::null;
+    int       width          = -1;
+    int       height         = -1;
+    bool      has_extra_data = false;
+
+    QStringList::iterator it = slist.at(1);
     ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->FromStringList(slist, 1);
+    bool ok = pginfo->FromStringList(slist, it);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "MainServer: Failed to parse pixmap request.");
+        QStringList outputlist = "BAD";
+        outputlist += "ERROR_INVALID_REQUEST";
+        SendResponse(pbssock, outputlist);
+    }
+    if (it != slist.end())
+        (time_fmt_sec = ((*it).lower() == "s")), it++;
+    if (it != slist.end())
+        time = decodeLongLong(slist, it);
+    if (it != slist.end())
+        (outputfile = *it), it++;
+    outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;
+    if (it != slist.end())
+    {
+        width = (*it).toInt(&ok); it++;
+        width = (ok) ? width : -1;
+    }
+    if (it != slist.end())
+    {
+        height = (*it).toInt(&ok); it++;
+        height = (ok) ? height : -1;
+        has_extra_data = true;
+    }
+    QSize outputsize = QSize(width, height);
+
+    if (has_extra_data)
+    {
+        VERBOSE(VB_PLAYBACK, "HandleGenPreviewPixmap got extra data\n\t\t\t"
+                << QString("%1%2 %3x%4 '%5'")
+                .arg(time).arg(time_fmt_sec?"s":"f")
+                .arg(width).arg(height).arg(outputfile));
+    }
+
     pginfo->pathname = GetPlaybackURL(pginfo);
 
     if ((ismaster) &&
@@ -3671,9 +3714,18 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
         if (slave)
         {
-            slave->GenPreviewPixmap(pginfo);
-            slave->DownRef();
             QStringList outputlist = "OK";
+            if (has_extra_data)
+            {
+                outputlist = slave->GenPreviewPixmap(
+                    pginfo, time_fmt_sec, time, outputfile, outputsize);
+            }
+            else
+            {
+                outputlist = slave->GenPreviewPixmap(pginfo);
+            }
+
+            slave->DownRef();
             SendResponse(pbssock, outputlist);
             delete pginfo;
             return;
@@ -3689,36 +3741,37 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         VERBOSE(VB_IMPORTANT, "MainServer: HandleGenPreviewPixmap: Unable to "
                 "find file locally, unable to make preview image.");
         QStringList outputlist = "BAD";
+        outputlist += "ERROR_NOFILE";
         SendResponse(pbssock, outputlist);
         delete pginfo;
         return;
     }
 
-    int len = 0;
-    int width = 0, height = 0;
-    float aspect = 0;
-    int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
-                    gContext->GetNumSetting("RecordPreRoll",0);
-
-    unsigned char *data = (unsigned char *)
-        PreviewGenerator::GetScreenGrab(pginfo, pginfo->pathname, secondsin,
-                                        len, width, height, aspect);
-
-    if (data && PreviewGenerator::SavePreview(pginfo->pathname + ".png", data,
-                                              width, height, aspect))
+    PreviewGenerator *previewgen = new PreviewGenerator(pginfo);
+    if (has_extra_data)
     {
-        QStringList retlist = "OK";
-        SendResponse(pbssock, retlist);    
+        previewgen->SetOutputSize(outputsize);
+        previewgen->SetOutputFilename(outputfile);
+        previewgen->SetPreviewTime(time, time_fmt_sec);
+    }
+    ok = previewgen->Run();
+    previewgen->deleteLater();
+
+    if (ok)
+    {
+        QStringList outputlist = "OK";
+        if (!outputfile.isEmpty())
+            outputlist += outputfile;
+        SendResponse(pbssock, outputlist);
     }
     else
     {
         VERBOSE(VB_IMPORTANT, "MainServer: Failed to make preview image.");
         QStringList outputlist = "BAD";
+        outputlist += "ERROR_UNKNOWN";
         SendResponse(pbssock, outputlist);
     } 
 
-    if (data)
-        delete [] data;
     delete pginfo;
 }
 
@@ -4138,16 +4191,35 @@ QString MainServer::LocalFilePath(QUrl &url)
                 lpath = "";
             }
         }
+        else if (!lpath.isEmpty())
+        {
+            // For securities sake, make sure filename is really the pathless.
+            QString opath = lpath;
+            lpath = QFileInfo(lpath).fileName();
+            QString tmpURL = StorageGroup::FindFile(lpath);
+            if (!tmpURL.isEmpty())
+            {
+                lpath = tmpURL.section('/', 0, -2) + "/" + lpath;
+                VERBOSE(VB_FILE,
+                        QString("LocalFilePath(%1 '%2')").arg(url).arg(opath)
+                        <<", found file through exhaustive search "
+                        <<QString("at '%1' URL: %2").arg(lpath).arg(tmpURL));
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "ERROR: LocalFilePath "
+                        <<QString("unable to find local path for '%1'.")
+                        .arg(opath));
+                lpath = "";
+            }
+        }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("ERROR: LocalFilePath unable to find local "
-                            "path for '%1', but unable to find recording info.")
-                                .arg(lpath));
+            lpath = "";
         }
     }
 
-    return lpath;
+    return QDeepCopy<QString>(lpath);
 }
 
 void MainServer::reconnectTimeout(void)

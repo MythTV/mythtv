@@ -3,6 +3,10 @@
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
+// C++ headers
+#include <vector>
+using namespace std;
+
 #include <qdatetime.h>
 #include <qdom.h>
 #include <qmutex.h>
@@ -29,9 +33,26 @@ class PreviewGenerator;
 
 class LayerSet;
 
+class PreviewGenState
+{
+  public:
+    PreviewGenState() :
+        gen(NULL), genStarted(false), ready(false),
+        attempts(0), lastBlockTime(0) {}
+    PreviewGenerator *gen;
+    bool              genStarted;
+    bool              ready;
+    uint              attempts;
+    uint              lastBlockTime;
+    QDateTime         blockRetryUntil;
+
+    static const uint maxAttempts;
+    static const uint minBlockSeconds;
+};
+
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
-typedef QMap<QString,PreviewGenerator*> PreviewMap;
+typedef QMap<QString,PreviewGenState>   PreviewMap;
 typedef QMap<QString,MythTimer>         LastCheckedMap;
 
 class PlaybackBox : public MythDialog
@@ -238,7 +259,9 @@ class PlaybackBox : public MythDialog
     void keyPressEvent(QKeyEvent *e);
 
     bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
-    bool IsGeneratingPreview(const QString &fn) const;
+    void IncPreviewGeneratorPriority(const QString &fn);
+    void UpdatePreviewGeneratorThreads(void);
+    bool IsGeneratingPreview(const QString &fn, bool really = false) const;
     uint IncPreviewGeneratorAttempts(const QString &fn);
 
     void SetRecGroupPassword(const QString &oldPasswd,
@@ -462,7 +485,9 @@ class PlaybackBox : public MythDialog
     QString             previewChanid;
     mutable QMutex      previewGeneratorLock;
     PreviewMap          previewGenerator;
-    QMap<QString,uint>  previewGeneratorAttempts;
+    vector<QString>     previewGeneratorQueue;
+    uint                previewGeneratorRunning;
+    static const uint   previewGeneratorMaxRunning;
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      ncLock;
