@@ -49,6 +49,7 @@ private:
     void loadWindow(QDomElement &element);
     void paintEvent(QPaintEvent *e);
 
+    void updateBackground();
     void updateSitesView();
     void updateArticlesView();
     void updateInfoView();
@@ -65,6 +66,8 @@ private:
     QString executeExternal(const QStringList& args, const QString& purpose);
 
     XMLParse      *m_Theme;
+
+    QPixmap       m_background;
 
     UIListBtnType *m_UIArticles;
     QRect          m_ArticlesRect;

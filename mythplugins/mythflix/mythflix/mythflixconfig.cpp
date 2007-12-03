@@ -133,6 +133,8 @@ MythFlixConfig::MythFlixConfig(MythMainWindow *parent,
 
     setNoErase();
     loadTheme();
+
+    updateBackground();
 }
 
 MythFlixConfig::~MythFlixConfig()
@@ -340,6 +342,24 @@ void MythFlixConfig::paintEvent(QPaintEvent *e)
     }
 }
 
+void MythFlixConfig::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = m_Theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
+}
 
 void MythFlixConfig::updateSites()
 {

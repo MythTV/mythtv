@@ -64,7 +64,7 @@ private:
     void populateSites();
     void loadTheme();
 
-
+    void updateBackground();
     void updateSites();
     void updateFreq();
     void updateBot();
@@ -90,6 +90,7 @@ private:
 
     MythFlixSpinBox    *m_SpinBox;
 
+    QPixmap             m_background;
 
     QRect               m_SiteRect;
     QRect               m_FreqRect;

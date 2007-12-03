@@ -49,6 +49,7 @@ private:
     void loadWindow(QDomElement &element);
     void paintEvent(QPaintEvent *e);
 
+    void updateBackground();
     void updateSitesView();
     void updateArticlesView();
     void updateInfoView();
@@ -69,12 +70,15 @@ private:
 
     UIListBtnType *m_UISites;
     UIListBtnType *m_UIArticles;
+
+    QPixmap        m_background;
+
     QRect          m_SitesRect;
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
     unsigned int   m_InColumn;
     MythPopupBox  *popup;
-	QString        zoom;
+    QString        zoom;
     QString        browser;
     bool           expectingPopup;
     NewsSite::List m_NewsSites;

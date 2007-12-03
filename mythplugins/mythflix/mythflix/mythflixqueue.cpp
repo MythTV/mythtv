@@ -68,6 +68,8 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
     setNoErase();
     loadTheme();
 
+    updateBackground();
+
     // Load sites from database
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -170,6 +172,24 @@ void MythFlixQueue::paintEvent(QPaintEvent *e)
         updateInfoView();
 }
 
+void MythFlixQueue::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = m_Theme->GetSet("background");
+    if (container)
+    {
+        container->Draw(&tmp, 0, 0);
+    }
+
+    tmp.end();
+    m_background = bground;
+
+    setPaletteBackgroundPixmap(m_background);
+}
 
 void MythFlixQueue::updateSitesView()
 {
