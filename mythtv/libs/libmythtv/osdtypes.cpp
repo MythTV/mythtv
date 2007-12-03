@@ -16,6 +16,11 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogs.h"
 
+#ifdef USING_FRIBIDI
+    #include "fribidi/fribidi.h"
+    #include <qtextcodec.h> 
+#endif // USING_FRIBIDI
+
 /// Shared OSD image cache
 OSDImageCache OSDTypeImage::c_cache;
 
@@ -750,7 +755,7 @@ void OSDTypeText::SetAltFont(TTFFont *font)
     m_altfont = font;
 }
 
-QString OSDTypeText::ConvertFromRtoL(const QString &text)
+QString OSDTypeText::BasicConvertFromRtoL(const QString &text)
 {
     QStringList rtl_string_composer;
     bool handle_rtl = false;
@@ -790,7 +795,48 @@ QString OSDTypeText::ConvertFromRtoL(const QString &text)
         }
     }
 
-    return QDeepCopy<QString>(rtl_string_composer.join(""));
+    QString output = rtl_string_composer.join("");
+
+    return QDeepCopy<QString>(output);
+}
+
+QString OSDTypeText::ConvertFromRtoL(const QString &text) const
+{
+    QString output = BasicConvertFromRtoL(text);
+
+#ifdef USING_FRIBIDI
+    QMutexLocker locker(&fribidi_lock);
+    if (!codeci)
+        codeci = QTextCodec::codecForName("utf8");
+
+    QCString temp = codeci->fromUnicode(output);
+
+    FriBidiCharType base;
+    size_t len;
+
+    bool fribidi_flip_commas = true;
+    base = (fribidi_flip_commas) ? FRIBIDI_TYPE_ON : FRIBIDI_TYPE_L;
+
+    const char *ip = temp;
+    FriBidiChar logical[strlen(ip) + 1], visual[strlen(ip) + 1];
+
+    int char_set_num = fribidi_parse_charset("UTF-8");
+
+    len = fribidi_charset_to_unicode(
+        (FriBidiCharSet) char_set_num, ip, strlen(ip), logical);
+
+    bool log2vis = fribidi_log2vis(
+        logical, len, &base, visual, NULL, NULL, NULL); // output
+
+    if (log2vis)
+        len = fribidi_remove_bidi_marks(visual, len, NULL, NULL, NULL);
+ 
+    output = "";
+    for (size_t i = 0; i < len ; i++)
+        output += QChar(visual[i]);
+#endif // USING_FRIBIDI
+
+    return output;
 }
 
 void OSDTypeText::SetText(const QString &text)

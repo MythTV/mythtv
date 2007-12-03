@@ -248,6 +248,7 @@ using_frontend {
     using_ivtv:SOURCES += ivtvdecoder.cpp
 
     # On screen display (video output overlay)
+    using_fribidi:DEFINES += USING_FRIBIDI
     HEADERS += osd.h                    osdtypes.h
     HEADERS += osdsurface.h             osdlistbtntype.h
     HEADERS += osdimagecache.h          osdtypeteletext.h

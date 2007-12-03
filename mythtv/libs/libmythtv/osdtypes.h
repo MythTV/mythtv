@@ -238,7 +238,10 @@ class OSDTypeText : public OSDType
     void SetButton(bool is_button)      { m_button = is_button;     }
     void SetEntryNum(int entrynum)      { m_entrynum = entrynum;    }
 
-    static QString ConvertFromRtoL(const QString &text);
+    QString ConvertFromRtoL(const QString &text) const;
+
+    static QString BasicConvertFromRtoL(const QString &text);
+
   protected:
     ~OSDTypeText();
 
@@ -288,6 +291,9 @@ class OSDTypeText : public OSDType
     mutable QString m_draw_info_str;
     mutable uint    m_draw_info_len;
     mutable vector<DrawInfo> m_draw_info;
+
+    mutable QMutex      fribidi_lock;
+    mutable QTextCodec *codeci;
 };
     
 class OSDTypeImage : public OSDType

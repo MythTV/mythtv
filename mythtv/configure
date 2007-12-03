@@ -884,6 +884,7 @@ MYTHTV_CONFIG_LIST='
     xvmc_opengl
     xvmc_vld
     dvdv
+    fribidi
 '
 
 MYTHTV_LIST='
@@ -2375,6 +2376,31 @@ check_foo_config imlib2 imlib2 Imlib2.h imlib_load_font
 check_foo_config freetype2 freetype ft2build.h FT_Init_FreeType
 
 ##########################################
+# fribidi check
+
+disable fribidi
+FRIBIDI_CONFIG="pkg-config fribidi"
+if ( pkg-config fribidi --version ) >/dev/null 2>&1 ; then
+    _fribidi_version=`${FRIBIDI_CONFIG} --version | sed 's/[^0-9]//g'`
+    if test "$_fribidi_version" -lt 022 ; then
+        disable fribidi
+    else
+        check_cc `${FRIBIDI_CONFIG} --cflags` `${FRIBIDI_CONFIG} --libs` << EOF && enable fribidi
+#include <stdio.h>
+#include <fribidi/fribidi.h>
+int main()
+{
+    if (fribidi_parse_charset("UTF-8") != FRIBIDI_CHAR_SET_UTF8)
+    {
+        printf("Fribidi headers are not consistents with the library!\n");
+        return 1;
+    }
+    return 0;
+}
+EOF
+	fi
+fi
+##########################################
 # SDL check
 
 disable sdl_too_old
@@ -2948,6 +2974,7 @@ fi
   if test x"$mingw32" = x"yes" -o x"$targetos" = x"cygwin" ; then
     echo "DirectX                   ${directx-no}"
   fi
+  echo "Fribidi formatting        ${fribidi}"
   echo
 fi
 
@@ -3037,6 +3064,10 @@ if enabled freetype2; then
   echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
+fi
+if enabled fribidi; then
+  echo "FRIBIDI_LIBS=`${FRIBIDI_CONFIG} --libs`" >> $MYTH_CONFIG_MAK
+  echo "FRIBIDI_CFLAGS=`${FRIBIDI_CONFIG} --cflags`" >> $MYTH_CONFIG_MAK
 fi
 if enabled sdl; then
   echo "SDL_LIBS=`"${SDL_CONFIG}" --libs`" >> $MYTH_CONFIG_MAK
