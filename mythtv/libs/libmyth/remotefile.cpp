@@ -40,10 +40,10 @@ MythSocket *RemoteFile::openSocket(bool control)
     QString dir = qurl.path();
 
     MythSocket *lsock = new MythSocket();
+    QString stype = (control) ? "control socket" : "file data socket";
     
     if (!lsock->connect(host, port))
     {
-        QString stype = (control) ? "control socket" : "file data socket";
         VERBOSE(VB_IMPORTANT,
                 QString("RemoteFile::openSocket(%1): \n"
                         "\t\t\tCould not connect to server \"%2\" @ port %3")
@@ -66,10 +66,20 @@ MythSocket *RemoteFile::openSocket(bool control)
     {
         strlist = QString("ANN FileTransfer %1 %2 %3")
             .arg(hostname).arg(usereadahead).arg(retries);
-        strlist << dir;
+        strlist << QString("%1").arg(dir);
 
         lsock->writeStringList(strlist);
         lsock->readStringList(strlist, true);
+
+        if (strlist.size() < 4)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("RemoteFile::openSocket(%1): "
+                            "Did not get proper responce from %3:%4")
+                    .arg(stype).arg(dir).arg(host).arg(port));
+
+            return NULL;
+        }
 
         recordernum = strlist[1].toInt();
         filesize = decodeLongLong(strlist, 2);
