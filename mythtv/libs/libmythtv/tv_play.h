@@ -11,6 +11,7 @@
 #include <qmutex.h>
 #include <qstringlist.h>
 #include <qregexp.h>
+#include <qwaitcondition.h>
 
 #include "mythdeque.h"
 #include "tv.h"
