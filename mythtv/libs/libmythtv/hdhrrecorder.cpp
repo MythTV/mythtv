@@ -99,8 +99,17 @@ bool HDHRRecorder::Open(void)
         return true;
     }
 
+    /* Calculate buffer size */
+    uint buffersize = gContext->GetNumSetting(
+        "HDRingbufferSize", 50 * TSPacket::SIZE) * 1024;
+    buffersize /= VIDEO_DATA_PACKET_SIZE;
+    buffersize *= VIDEO_DATA_PACKET_SIZE;
+
+    // Buffer should be at least about 1MB..
+    buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
+
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S);
+    _video_socket = hdhomerun_video_create(0, buffersize);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
@@ -341,11 +350,13 @@ void HDHRRecorder::StartRecording(void)
             AdjustFilters();
         }
 
+        size_t read_size = 64 * 1024; // read about 64KB
+        read_size /= VIDEO_DATA_PACKET_SIZE;
+        read_size *= VIDEO_DATA_PACKET_SIZE;
+
         size_t data_length;
         unsigned char *data_buffer =
-            hdhomerun_video_recv(_video_socket,
-                                 VIDEO_DATA_BUFFER_SIZE_1S / 5,
-                                 &data_length);
+            hdhomerun_video_recv(_video_socket, read_size, &data_length);
         if (!data_buffer)
         {
             usleep(5000);
