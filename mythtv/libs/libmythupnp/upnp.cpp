@@ -159,19 +159,6 @@ void UPnp::Start()
 
 void UPnp::CleanUp( void )
 {
-
-    if (g_pSSDP)
-    {
-        VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
-        g_pSSDP->DisableNotifications();
-        VERBOSE(VB_UPNP, "UPnp::CleanUp() - requesting SSDP terminate");
-        g_pSSDP->RequestTerminate();
-
-        delete g_pSSDP;
-        g_pSSDP = NULL;
-        VERBOSE(VB_UPNP, "UPnp::CleanUp() - deleted SSDP");
-    }
-
     // ----------------------------------------------------------------------
     // Clear the Task Queue & terminate Thread
     // ----------------------------------------------------------------------
@@ -183,6 +170,18 @@ void UPnp::CleanUp( void )
 
         delete g_pTaskQueue;
         g_pTaskQueue = NULL;
+    }
+
+    if (g_pSSDP)
+    {
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
+        g_pSSDP->DisableNotifications();
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - requesting SSDP terminate");
+        g_pSSDP->RequestTerminate();
+
+        delete g_pSSDP;
+        g_pSSDP = NULL;
+        VERBOSE(VB_UPNP, "UPnp::CleanUp() - deleted SSDP");
     }
 
     if (g_pConfig)
