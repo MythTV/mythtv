@@ -238,8 +238,6 @@ void MythFlixConfig::loadTheme()
                     m_SiteRect = area;
                 else if (name.lower() == "config-freq")
                     m_FreqRect = area;
-                else if (name.lower() == "config-bottom")
-                    m_BotRect = area;
             }
             else {
                 VERBOSE(VB_IMPORTANT, QString("MythFlix: Unknown element: %1").arg(e.tagName()));
@@ -305,13 +303,13 @@ void MythFlixConfig::loadTheme()
 
     ttype = (UITextType*)container->GetType("help");
     if (ttype) {
-        ttype->SetText(tr("Set update frequency by using the up/down arrows.\n"
+        ttype->SetText(tr("Set update frequency by using the up/down arrows."
                           "The minimum allowed value is 30 Minutes."));
     }
 
     ttype = (UITextType*)container->GetType("context_switch");
     if (ttype) {
-        ttype->SetText(tr("Press MENU to return to feed selection."));
+        ttype->SetText(tr("Press Escape or Menu to exit."));
     }
         
     connect(m_UICategory, SIGNAL(itemSelected(UIListBtnTypeItem*)),
@@ -324,11 +322,6 @@ void MythFlixConfig::loadTheme()
 void MythFlixConfig::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
-
-
-    if (r.intersects(m_BotRect)) {
-     //   updateBot();
-    }
     
     if (m_Context == 0) {
         if (r.intersects(m_SiteRect)) {
@@ -406,30 +399,6 @@ void MythFlixConfig::updateFreq()
     p.end();
     
     bitBlt(this, m_FreqRect.left(), m_FreqRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythFlixConfig::updateBot()
-{
-    QPixmap pix(m_BotRect.size());
-    pix.fill(this, m_BotRect.topLeft());
-    QPainter p(&pix);
-    
-    LayerSet* container = m_Theme->GetSet("config-bottom");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-    
-    bitBlt(this, m_BotRect.left(), m_BotRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
@@ -593,6 +562,10 @@ void MythFlixConfig::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "MENU") {
            changeContext();
+        }
+        else if (action == "ESCAPE" && m_Context == 1)
+        {
+            changeContext();
         }
         else if (action == "SELECT") {
             if (m_InColumn == 2 && m_Context == 0) {

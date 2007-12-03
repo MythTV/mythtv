@@ -67,13 +67,12 @@ private:
     void updateBackground();
     void updateSites();
     void updateFreq();
-    void updateBot();
-    
+
     void cursorUp(bool page=false);
     void cursorDown(bool page=false);
     void cursorLeft();
     void cursorRight();
-    
+
     void toggleItem(UIListBtnTypeItem* item);
     bool findInDB(const QString& name);
     bool insertInDB(NewsSiteItem* site);
@@ -94,7 +93,6 @@ private:
 
     QRect               m_SiteRect;
     QRect               m_FreqRect;
-    QRect               m_BotRect;
 
     QTimer             *m_updateFreqTimer;
     int                 m_updateFreq;

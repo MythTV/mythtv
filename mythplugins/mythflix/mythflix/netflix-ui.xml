@@ -2,19 +2,19 @@
 
 <window name="browse">
 
-    <font name="active" face="Arial Narrow">
+    <font name="active" face="Bitstream Vera Sans">
         <color>#ffffff</color>
         <size>18</size>
         <bold>yes</bold>
     </font>
     
-    <font name="inactive" face="Arial Narrow">
+    <font name="inactive" face="Bitstream Vera Sans">
         <color>#c5c5c5</color>
         <size>18</size>
         <bold>yes</bold>
     </font>
 
-    <font name="title" face="Arial Narrow">
+    <font name="title" face="Bitstream Vera Sans">
       <color>#ffff00</color>
       <dropcolor>#000000</dropcolor>
       <size>18</size>
@@ -22,7 +22,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="desc" face="Arial Narrow">
+    <font name="desc" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
@@ -100,19 +100,19 @@
 
 <window name="queue">
       
-    <font name="active" face="Arial Narrow">
+    <font name="active" face="Bitstream Vera Sans">
         <color>#ffffff</color>
         <size>18</size>
         <bold>yes</bold>
     </font>
         
-    <font name="inactive" face="Arial Narrow">
+    <font name="inactive" face="Bitstream Vera Sans">
         <color>#c5c5c5</color>
         <size>18</size>
         <bold>yes</bold>
     </font>
   
-      <font name="title" face="Arial Narrow">
+      <font name="title" face="Bitstream Vera Sans">
         <color>#ffff00</color>
         <dropcolor>#000000</dropcolor>
         <size>18</size>
@@ -120,7 +120,7 @@
         <bold>yes</bold>
       </font>
       
-      <font name="desc" face="Arial Narrow">
+      <font name="desc" face="Bitstream Vera Sans">
         <color>#ffffff</color>
         <size>16</size>
         <bold>no</bold>
@@ -181,19 +181,19 @@
 </window>
 
 <window name="config">
-  <font name="active" face="Arial Narrow">
+  <font name="active" face="Bitstream Vera Sans">
     <color>#ffffff</color>
     <size>18</size>
     <bold>yes</bold>
   </font>
   
-  <font name="inactive" face="Arial Narrow">
+  <font name="inactive" face="Bitstream Vera Sans">
     <color>#c5c5c5</color>
     <size>18</size>
     <bold>yes</bold>
   </font>
   
-  <font name="desc" face="Arial Narrow">
+  <font name="desc" face="Bitstream Vera Sans">
     <color>#ffffff</color>
     <size>16</size>
     <bold>no</bold>
@@ -261,17 +261,6 @@
          </textarea>
     </container>
 
-    <container name="config-bottom">
-
-      <area>0,400,800,200</area>
-
-      <image name="background" draworder="0" fleximage="no">
-        <filename>news-info-bg.png</filename>
-        <position>0,0</position>
-      </image>
-
-    </container>
-
 </window>
- 
+
 </mythuitheme>
