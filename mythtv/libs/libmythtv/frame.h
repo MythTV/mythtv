@@ -61,7 +61,7 @@ static inline void init(
     VideoFrameType _codec, unsigned char *_buf,
     int _width, int _height, int _bpp, int _size,
     const int *p = 0, const int *o = 0) __attribute__ ((unused));
-static inline void clear(VideoFrame *vf, int fourcc);
+static inline void clear(VideoFrame *vf, int fourcc) __attribute__ ((unused));
 
 static inline void init(
     VideoFrame *vf,
@@ -140,12 +140,10 @@ static inline void clear(VideoFrame *vf, int fourcc)
     if ((GUID_I420_PLANAR == fourcc) || (GUID_IYUV_PLANAR == fourcc) ||
         (GUID_YV12_PLANAR == fourcc))
     {
-        unsigned int ysize  = vf->width * vf->height;
-        unsigned int uvsize = ysize >> 2;
-
-        bzero( vf->buf + vf->offsets[0], ysize);
-        memset(vf->buf + vf->offsets[1], 127, uvsize);
-        memset(vf->buf + vf->offsets[2], 127, uvsize);
+        int uv_height = vf->height >> 1;
+        bzero( vf->buf + vf->offsets[0],      vf->pitches[0] * vf->height);
+        memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
+        memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
     }
 }
 
