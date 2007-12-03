@@ -6,6 +6,7 @@
 #include <qmutex.h>
 #include <qobject.h>
 #include <qsqldatabase.h>
+#include <qwaitcondition.h>
 #include <pthread.h>
 
 
