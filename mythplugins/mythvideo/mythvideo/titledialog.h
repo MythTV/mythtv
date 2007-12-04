@@ -63,8 +63,6 @@ class TitleDialog : public MythThemedDialog
     DVDTitleInfo           *current_title;
     QSocket                *socket_to_mtd;
 
-    MythRemoteLineEdit     *name_editor;
-
     //
     //  GUI "widgets"
     //
