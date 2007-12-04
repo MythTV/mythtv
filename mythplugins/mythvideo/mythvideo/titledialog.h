@@ -69,7 +69,7 @@ class TitleDialog : public MythThemedDialog
     //  GUI "widgets"
     //
     
-    UIBlackHoleType     *editor_hack;
+    UIRemoteEditType    *name_editor;
     UISelectorType      *audio_select;
     UISelectorType      *quality_select;
     UISelectorType      *subtitle_select;

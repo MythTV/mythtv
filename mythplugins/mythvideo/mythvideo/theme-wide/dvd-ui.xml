@@ -277,9 +277,10 @@
                 <image function="unchecked_high" filename="unchecked_high.png"></image>
             </checkbox>
 
-            <blackhole name="editor_hack" draworder="0">
+            <remoteedit name="name_edit" draworder="0">
                 <area>562,120,300,40</area>
-            </blackhole>
+                <font>display</font>
+            </remoteedit>
 
             <selector name="quality_select" draworder="0">
                 <area>560,170,300,40</area>

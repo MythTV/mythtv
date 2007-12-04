@@ -475,18 +475,11 @@ void TitleDialog::wireUpTheme()
     }
 
     playlength_text = getUITextType("playlength_text");
-    editor_hack = getUIBlackHoleType("editor_hack");
-    if(editor_hack)
+
+    name_editor = getUIRemoteEditType("name_edit");
+    if(name_editor)
     {
-        editor_hack->allowFocus(true);
-        QFont f = gContext->GetMediumFont();
-        name_editor = new MythRemoteLineEdit(&f, this);
-        name_editor->setFocusPolicy(QWidget::NoFocus);
-        name_editor->setGeometry(editor_hack->getScreenArea());
-        connect(editor_hack, SIGNAL(takingFocus()), 
-                name_editor, SLOT(setFocus()));
-        connect(name_editor, SIGNAL(tryingToLooseFocus(bool)), 
-                this, SLOT(takeFocusAwayFromEditor(bool)));
+        name_editor->createEdit(this);
         connect(name_editor, SIGNAL(textChanged(QString)),
                 this, SLOT(changeName(QString)));
     }
