@@ -22,9 +22,9 @@ BackendSelect::BackendSelect(MythMainWindow *parent, DatabaseParams *params)
 
     UPnp::AddListener(this);
 
-    m_backends->setFocus();
+    FillListBox();
 
-    Search();
+    m_backends->setFocus();
 }
 
 BackendSelect::~BackendSelect()
@@ -197,8 +197,8 @@ void BackendSelect::customEvent(QCustomEvent *e)
     QString    URL     = me->ExtraData(2);
 
 
-    VERBOSE(VB_UPNP, "MasterSelectionDialog::customEvent("
-                     + message + ", " + URI + ", " + URN + ", " + URL + ")");
+    VERBOSE(VB_UPNP, "BackendSelect::customEvent(" + message
+                     + ", " + URI + ", " + URN + ", " + URL + ")");
 
     if (message.startsWith("SSDP_ADD") &&
         URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
@@ -216,6 +216,46 @@ void BackendSelect::customEvent(QCustomEvent *e)
         //-=>Note: This code will never get executed until
         //         SSDPCache is changed to handle NotifyRemove correctly
         RemoveItem(URN);
+    }
+}
+
+void BackendSelect::FillListBox(void)
+{
+    EntryMap::Iterator  it;
+    EntryMap            ourMap;
+    DeviceLocation     *pDevLoc;
+    
+
+    SSDPCacheEntries *pEntries = UPnp::g_SSDPCache.Find(gBackendURI);
+
+    if (!pEntries)
+        return;
+
+    pEntries->AddRef();
+    pEntries->Lock();
+
+    EntryMap *pMap = pEntries->GetEntryMap();
+
+    for (it = pMap->begin(); it != pMap->end(); ++it)
+    {
+        pDevLoc = (DeviceLocation *)it.data();
+
+        if (!pDevLoc)
+            continue;
+
+        pDevLoc->AddRef();
+        ourMap.insert(pDevLoc->m_sUSN, pDevLoc);
+    }
+
+
+    pEntries->Unlock();
+    pEntries->Release();
+
+    for (it = ourMap.begin(); it != ourMap.end(); ++it)
+    {
+        pDevLoc = (DeviceLocation *)it.data();
+        AddItem(pDevLoc);
+        pDevLoc->Release();
     }
 }
 
@@ -239,7 +279,7 @@ void BackendSelect::RemoveItem(QString USN)
     }
 }
 
-void BackendSelect::Search(void)
-{
-    UPnp::PerformSearch(gBackendURI);
-}
+//void BackendSelect::Search(void)
+//{
+//    UPnp::PerformSearch(gBackendURI);
+//}

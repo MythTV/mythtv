@@ -47,15 +47,16 @@ class BackendSelect : public MythDialog
 
         void Accept    (void);   ///< Linked to the OK button
         void Manual    (void);   ///< Linked to 'Configure Manually' button
+        //void Search    (void);
 
 
     protected:
 
-        void AddItem   (DeviceLocation *dev);
-        bool Connect   (DeviceLocation *dev);
-        void CreateUI  (void);
-        void RemoveItem(QString URN);
-        void Search    (void);
+        void AddItem    (DeviceLocation *dev);
+        bool Connect    (DeviceLocation *dev);
+        void CreateUI   (void);
+        void FillListBox(void);
+        void RemoveItem (QString URN);
 
         DatabaseParams *m_DBparams;
         ItemMap         m_devices;
