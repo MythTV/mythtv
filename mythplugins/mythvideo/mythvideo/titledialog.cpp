@@ -198,11 +198,6 @@ void TitleDialog::keyPressEvent(QKeyEvent *e)
             prev_title_button->push();
         else if (action == "RIGHT")
             next_title_button->push();
-        else if (action == "0") 
-        {
-            if (ripaway_button->GetContext() == -1)
-                ripaway_button->push();
-        }
         else
             handled = false;
     }
@@ -286,22 +281,16 @@ void TitleDialog::toggleTitle(bool on_or_off)
     {
         if(ripaway_button->GetContext() != -2)
         {
+            ripaway_button->allowFocus(false);
             ripaway_button->SetContext(-2);
             ripaway_button->refresh();
         }
         return;
     }
-    if(numb_selected == 1)
-    {
-        ripaway_button->setText(tr("0 Process Selected Title"));
-    }
-    else
-    {
-        ripaway_button->setText(tr("0 Process Selected Titles"));
-    }
     if(ripaway_button->GetContext() != -1)
     {
         ripaway_button->SetContext(-1);
+        ripaway_button->allowFocus(true);
     }
     ripaway_button->refresh();
 }
@@ -478,8 +467,7 @@ void TitleDialog::wireUpTheme()
     ripaway_button = getUITextButtonType("ripaway_button");
     if(ripaway_button)
     {
-        ripaway_button->setText(tr("0 Process Selected Title"));
-        ripaway_button->allowFocus(false);
+        ripaway_button->setText(tr("Begin Ripping"));
         connect(ripaway_button, SIGNAL(pushed()), this, SLOT(ripTitles()));
     }
 

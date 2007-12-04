@@ -125,6 +125,7 @@ DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
     //
     
     wireUpTheme();
+    assignFirstFocus();
 
     //
     //  Set our initial context and try to connect
@@ -165,6 +166,7 @@ void DVDRipBox::checkDisc()
         {
             if(ripscreen_button->GetContext() != -1)
             {
+                ripscreen_button->allowFocus(true);
                 ripscreen_button->SetContext(-1);
                 ripscreen_button->refresh();
             }    
@@ -188,6 +190,7 @@ void DVDRipBox::checkDisc()
         {
             if(ripscreen_button->GetContext() != -2)
             {
+                ripscreen_button->allowFocus(false);
                 ripscreen_button->SetContext(-2);
                 ripscreen_button->refresh();
             }
@@ -228,11 +231,13 @@ void DVDRipBox::connectionClosed()
     have_disc = false;
     if(ripscreen_button)
     {
+        ripscreen_button->allowFocus(false);
         ripscreen_button->SetContext(-2);
         ripscreen_button->refresh();
     }
     if(cancel_button)
     {
+        cancel_button->allowFocus(false);
         cancel_button->SetContext(-2);
         cancel_button->refresh();
     }
@@ -282,7 +287,15 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
         handled = true;
-    
+        if (action == "UP")
+            nextPrevWidgetFocus(false);
+        else if (action == "DOWN")
+            nextPrevWidgetFocus(true);
+        else if (action == "SELECT")   
+            activateCurrent();
+        else
+            handled = false;
+
         if (getContext() == 1)
         {
             if (action == "0" || action == "1" || action == "2" ||
@@ -588,6 +601,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
         {
             //ripscreen_button->SetContext(3);
             cancel_button->SetContext(3);
+            cancel_button->allowFocus(true);
             setContext(3);
             update();
             if(warning_text)
@@ -610,7 +624,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
                 {
                     if(warning_text)
                     {
-                        warning_text->SetText(tr("No jobs and nothing else to do. You could hit 0 to rip a DVD."));
+                        warning_text->SetText(tr("No jobs and nothing else to do. You could rip a DVD."));
                     }
                 }
             }
@@ -633,7 +647,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
             {
                 if(warning_text)
                 {
-                    warning_text->SetText(tr("No jobs and nothing else to do. You could hit 0 to rip a disc if you like."));
+                    warning_text->SetText(tr("No jobs and nothing else to do. You could rip a disc if you like."));
                 }
             }
             else
@@ -745,6 +759,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
                 {
                     if(ripscreen_button->GetContext() != -1)
                     {
+                        ripscreen_button->allowFocus(true);
                     }
                 }
             }
@@ -755,6 +770,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
                 {
                     if(ripscreen_button->GetContext() != -2)
                     {
+                        ripscreen_button->allowFocus(false);
                         ripscreen_button->SetContext(-1);
                         ripscreen_button->refresh();
                     }
@@ -791,6 +807,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
             {
                 if(ripscreen_button->GetContext() != -2)
                 {
+                    ripscreen_button->allowFocus(false);
                     ripscreen_button->SetContext(-2);
                     ripscreen_button->refresh();
                 }
@@ -1023,7 +1040,7 @@ void DVDRipBox::wireUpTheme()
     ripscreen_button = getUITextButtonType("ripscreen_button");
     if(ripscreen_button)
     {
-        ripscreen_button->setText(tr("0 New Rip"));
+        ripscreen_button->setText(tr("New Rip"));
         connect(ripscreen_button, SIGNAL(pushed()), this, SLOT(goRipScreen()));
         ripscreen_button->SetContext(-2);
     }
@@ -1031,10 +1048,12 @@ void DVDRipBox::wireUpTheme()
     cancel_button = getUITextButtonType("cancel_button");
     if(cancel_button)
     {
-        cancel_button->setText(tr("9 Cancel Job"));
+        cancel_button->setText(tr("Cancel Job"));
         connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelJob()));
         cancel_button->SetContext(-2);
     }
+
+    buildFocusList();
 }
 
 DVDRipBox::~DVDRipBox(void)
