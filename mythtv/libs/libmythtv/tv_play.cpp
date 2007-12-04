@@ -128,42 +128,35 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             int numrecordings = reclist->size();
             if (numrecordings > 0)
             {
-                if (numrecordings == 1)
+                ProgramInfo *p = NULL;
+                QStringList recTitles;
+                QString buttonTitle;
+                vector<ProgramInfo *>::iterator it = reclist->begin();
+                recTitles.append(tr("Exit"));
+                while (it != reclist->end())
                 {
-                    curProgram = new ProgramInfo(*reclist->at(0));
+                    p = *it;
+                    buttonTitle = tr("Chan %1: %2")
+                        .arg(p->chanstr).arg(p->title);
+                    recTitles.append(buttonTitle);
+                    it++;
+                }
+                DialogCode ret = MythPopupBox::ShowButtonPopup(
+                    gContext->GetMainWindow(),
+                    "",
+                    tr("All Tuners are Busy.\n"
+                        "Select a Current Recording"),
+                        recTitles, kDialogCodeButton1);
+
+                int idx = MythDialog::CalcItemIndex(ret) - 1;
+                if ((0 <= idx) && (idx < (int)reclist->size()))
+                {
+                    p = reclist->at(idx);
+                    curProgram = new ProgramInfo(*p);
                 }
                 else
                 {
-                    ProgramInfo *p = NULL;
-                    QStringList recTitles;
-                    QString buttonTitle;
-                    vector<ProgramInfo *>::iterator it = reclist->begin();
-                    recTitles.append(tr("Exit"));
-                    while (it != reclist->end())
-                    {
-                        p = *it;
-                        buttonTitle = tr("Chan %1: %2")
-                            .arg(p->chanstr).arg(p->title);
-                        recTitles.append(buttonTitle);
-                        it++;
-                    }
-                    DialogCode ret = MythPopupBox::ShowButtonPopup(
-                        gContext->GetMainWindow(),
-                        "",
-                        tr("All Tuners are Busy.\n"
-                           "Select a Current Recording"),
-                        recTitles, kDialogCodeButton1);
-
-                    int idx = MythDialog::CalcItemIndex(ret) - 1;
-                    if ((0 <= idx) && (idx < (int)reclist->size()))
-                    {
-                        p = reclist->at(idx);
-                        curProgram = new ProgramInfo(*p);
-                    }
-                    else
-                    {
-                        quitAll = true;
-                    }
+                    quitAll = true;
                 }
             }
 
