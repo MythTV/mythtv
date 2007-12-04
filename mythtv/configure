@@ -2380,12 +2380,9 @@ check_foo_config freetype2 freetype ft2build.h FT_Init_FreeType
 
 disable fribidi
 FRIBIDI_CONFIG="pkg-config fribidi"
-if ( pkg-config fribidi --version ) >/dev/null 2>&1 ; then
-    _fribidi_version=`${FRIBIDI_CONFIG} --version | sed 's/[^0-9]//g'`
-    if test "$_fribidi_version" -lt 022 ; then
-        disable fribidi
-    else
-        check_cc `${FRIBIDI_CONFIG} --cflags` `${FRIBIDI_CONFIG} --libs` << EOF && enable fribidi
+if test x`which pkg-config 2>/dev/null` != x"" ; then
+   if `pkg-config --atleast-version 0.19 fribidi` ; then
+       check_cc `${FRIBIDI_CONFIG} --cflags` `${FRIBIDI_CONFIG} --libs` << EOF && enable fribidi
 #include <stdio.h>
 #include <fribidi/fribidi.h>
 int main()
@@ -2398,7 +2395,9 @@ int main()
     return 0;
 }
 EOF
-	fi
+    else
+        disable fribidi
+    fi
 fi
 ##########################################
 # SDL check
