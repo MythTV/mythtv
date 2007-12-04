@@ -51,7 +51,6 @@ class TitleDialog : public MythThemedDialog
     void setSubTitle(int which_subtitle);
     void toggleAC3(bool);
     void ripTitles();
-    void takeFocusAwayFromEditor(bool up_or_down);
     
   private:
   

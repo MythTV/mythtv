@@ -443,15 +443,6 @@ void TitleDialog::ripTitles()
     reject();
 }
 
-void TitleDialog::takeFocusAwayFromEditor(bool up_or_down)
-{
-    nextPrevWidgetFocus(up_or_down);
-    if(name_editor)
-    {
-        name_editor->clearFocus();
-    }
-}
-
 void TitleDialog::wireUpTheme()
 {
     ripcheck = getUICheckBoxType("ripcheck");
