@@ -123,13 +123,15 @@ foreach $item (@{$xml->{channel}->{item}}) {
     if ($weather_string =~ /^cloudy$/i) {
         printf "icon-" . $i . "::cloudy.png\n";
     }
-    elsif ($weather_string =~ /^foggy$/i) {
+    elsif ($weather_string =~ /^foggy$/i ||
+        $weather_string =~ /^misty$/i) {
         printf "icon-" . $i . "::fog.png\n";
     }
     elsif ($weather_string =~ /^sunny$/i) {
         printf "icon-" . $i . "::sunny.png\n";
     }
-    elsif ($weather_string =~ /^sunny intervals$/i) {
+    elsif ($weather_string =~ /^sunny intervals$/i ||
+        $weather_string =~ /^partly cloudy$/i) {
         printf "icon-" . $i . "::pcloudy.png\n";
     }
     elsif ($weather_string =~ /^drizzle$/i ||
@@ -146,13 +148,17 @@ foreach $item (@{$xml->{channel}->{item}}) {
         printf "icon-" . $i . "::thunshowers.png\n";
     }
     elsif ($weather_string =~ /^heavy snow$/i) {
-        printf "weather_icon:snowshow.png\n";
+        printf "icon-" . $i . "::snowshow.png\n";
     }
-    elsif ($weather_string =~ /^light snow$/i) {
-        printf "weather_icon::flurries.png\n";
+    elsif ($weather_string =~ /^light snow$/i ||
+        $weather_string =~ /^light snow showers$/i) {
+        printf "icon-" . $i . "::flurries.png\n";
     }
     elsif ($weather_string =~ /^sleet$/i) {
-        printf "weather_icon::rainsnow.png\n";
+        printf "icon-" . $i . "::rainsnow.png\n";
+    }
+    elsif ($weather_string =~ /^clear$/i) {
+        printf "icon-" . $i . "::fair.png\n";
     }
     else {
         printf "icon-" . $i . "::unknown.png\n";

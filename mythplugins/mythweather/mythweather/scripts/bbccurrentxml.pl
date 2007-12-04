@@ -124,13 +124,15 @@ printf "weather::" . $weather_string . "\n";
 if ($weather_string =~ /^cloudy$/i) {
     printf "weather_icon::cloudy.png\n";
 }
-elsif ($weather_string =~ /^foggy$/i) {
+elsif ($weather_string =~ /^foggy$/i ||
+       $weather_string =~ /^misty$/i) {
     printf "weather_icon::fog.png\n";
 }
 elsif ($weather_string =~ /^sunny$/i) {
     printf "weather_icon::sunny.png\n";
 }
-elsif ($weather_string =~ /^sunny intervals$/i) {
+elsif ($weather_string =~ /^sunny intervals$/i ||
+       $weather_string =~ /^partly cloudy$/i) {
     printf "weather_icon::pcloudy.png\n";
 }
 elsif ($weather_string =~ /^drizzle$/i ||
@@ -147,13 +149,17 @@ elsif ($weather_string =~ /^thundery rain$/i ||
     printf "weather_icon::thunshowers.png\n";
 }
 elsif ($weather_string =~ /^heavy snow$/i) { 
-    printf "weather_icon:snowshow.png\n"; 
+    printf "weather_icon::snowshow.png\n"; 
 }
-elsif ($weather_string =~ /^light snow$/i) { 
+elsif ($weather_string =~ /^light snow$/i ||
+    $weather_string =~ /^light snow showers$/i) { 
     printf "weather_icon::flurries.png\n"; 
 }
 elsif ($weather_string =~ /^sleet$/i) { 
     printf "weather_icon::rainsnow.png\n"; 
+}
+elsif ($weather_string =~ /^clear$/i) { 
+    printf "weather_icon::fair.png\n"; 
 }
 else {
     printf "weather_icon::unknown.png\n";
