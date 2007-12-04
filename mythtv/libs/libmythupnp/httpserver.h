@@ -31,7 +31,6 @@
 #include "threadpool.h"
 #include "refcounted.h"
 
-#include "mythcontext.h"  // for GetInstallPrefixPath()
 
 typedef struct timeval  TaskTime;
 
@@ -55,19 +54,13 @@ class HttpServerExtension
 
     public:
 
-        HttpServerExtension( const QString &sName ):m_sName( sName )
-        {
-            QString sInstallPrefix( PREFIX ), sLibDir;
-
-            GetInstallPrefixPath( sInstallPrefix, sLibDir );
-
-            m_sSharePath = sInstallPrefix + "/share/mythtv/"; 
-        };
+        HttpServerExtension( const QString &sName ):m_sName( sName ) {};
 
         virtual ~HttpServerExtension() {};
 
 //        virtual bool  Initialize    ( HttpServer  *pServer  ) = 0;
-        virtual bool  ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest ) = 0;
+        virtual bool  ProcessRequest( HttpWorkerThread *pThread,
+                                      HTTPRequest      *pRequest ) = 0;
 //        virtual bool  Uninitialize  ( ) = 0;
 };
 
@@ -90,12 +83,14 @@ class HttpServer : public QServerSocket,
         QMutex                  m_mutex;
         HttpServerExtensionList m_extensions;
 
-        virtual WorkerThread *CreateWorkerThread( ThreadPool *, const QString &sName );
+        virtual WorkerThread *CreateWorkerThread( ThreadPool *,
+                                                  const QString &sName );
         virtual void          newConnection     ( int socket );
 
     public:
 
         static QString      g_sPlatform;
+               QString      m_sSharePath;
 
     public:
 
@@ -105,7 +100,8 @@ class HttpServer : public QServerSocket,
         void     RegisterExtension  ( HttpServerExtension *pExtension );
         void     UnregisterExtension( HttpServerExtension *pExtension );
 
-        void     DelegateRequest    ( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+        void     DelegateRequest    ( HttpWorkerThread *pThread,
+                                      HTTPRequest      *pRequest );
 
 };
 

@@ -100,6 +100,7 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
     {
+        pExtension->m_sSharePath = m_sSharePath;
         m_mutex.lock();
         m_extensions.append( pExtension );
         m_mutex.unlock();

@@ -35,6 +35,7 @@ class MediaServer : public UPnp
         
         UPnpCDS         *m_pUPnpCDS;      // Do not delete (auto deleted)
         UPnpCMGR        *m_pUPnpCMGR;     // Do not delete (auto deleted)
+        QString          m_sSharePath;
 
     public:
                  MediaServer( bool bMaster, bool bDisableUPnp = FALSE );

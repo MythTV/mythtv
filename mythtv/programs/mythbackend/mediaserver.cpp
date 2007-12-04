@@ -64,6 +64,9 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
+    m_sSharePath = gContext->GetShareDir();
+    m_pHttpServer->m_sSharePath = m_sSharePath;
+
 
     if (sIP == "localhost" || sIP == "127.0.0.1")
     {
@@ -91,9 +94,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     if (Initialize( sIPAddrList, nPort, m_pHttpServer ))
     {
-
-        QString sSharePath = gContext->GetShareDir();
-        QString sFileName  = g_pConfig->GetValue( "upnpDescXmlPath", sSharePath );
+        QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
+                                                 m_sSharePath );
         QString sDeviceType;
 
         if ( bIsMaster )
