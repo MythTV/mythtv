@@ -33,7 +33,7 @@ class SourceManager : public QObject
     ScriptInfo *getSourceByName(const QString &name);
 
   private slots:
-    void timeout();
+    void timeout(void) {}
 
   private:
     QPtrList<ScriptInfo> m_scripts; //all scripts

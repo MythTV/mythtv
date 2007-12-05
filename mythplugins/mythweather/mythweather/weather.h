@@ -43,10 +43,10 @@ class Weather : public MythDialog
     void clock_tick();
 
   private slots:
-    void update_timeout();
+    void update_timeout() {}
     void showtime_timeout();
     void nextpage_timeout();
-    void weatherTimeout();
+    void weatherTimeout() {}
     void cursorLeft();
     void cursorRight();
     void holdPage();
