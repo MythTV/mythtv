@@ -52,12 +52,11 @@ protected:
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual inline int getSpaceOnSoundcard(void);
-    virtual inline int getBufferedOnSoundcard(void);
+    virtual int getSpaceOnSoundcard(void);
+    virtual int getBufferedOnSoundcard(void);
     
-    // The following functions may be overridden, but don't need to be
-    virtual inline void StartOutputThread(void);
-    virtual inline void StopOutputThread(void);
+    virtual bool StartOutputThread(void) { return true; }
+    virtual void StopOutputThread(void) {}
 
 private:
 

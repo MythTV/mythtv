@@ -225,14 +225,16 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Create priveleged thread, then drop privs
+    // Create priveledged thread, then drop privs
     pthread_t priv_thread;
+    bool priv_thread_created = true;
 
     int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
     if (status) 
     {
-        perror("pthread_create");
-        priv_thread = 0;
+        VERBOSE(VB_IMPORTANT, QString("Warning: ") +
+                "Failed to create priveledged thread." + ENO);
+        priv_thread_created = false;
     }
     setuid(getuid());
 
@@ -293,7 +295,7 @@ int main(int argc, char *argv[])
     if (pginfo)
         delete pginfo;
     
-    if (priv_thread != 0) 
+    if (priv_thread_created)
     {
         void *value;
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);

@@ -87,7 +87,8 @@ static inline void init(
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;
 
-    bzero(vf->priv, 4 * sizeof(unsigned char *));
+    // MS Windows doesn't like bzero()..
+    memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     if (p)
     {
@@ -141,7 +142,8 @@ static inline void clear(VideoFrame *vf, int fourcc)
         (GUID_YV12_PLANAR == fourcc))
     {
         int uv_height = vf->height >> 1;
-        bzero( vf->buf + vf->offsets[0],      vf->pitches[0] * vf->height);
+        // MS Windows doesn't like bzero()..
+        memset(vf->buf + vf->offsets[0],   0, vf->pitches[0] * vf->height);
         memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
         memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
     }

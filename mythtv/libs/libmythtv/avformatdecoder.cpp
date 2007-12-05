@@ -3815,7 +3815,7 @@ static int encode_frame(bool dts, unsigned char *data, int len,
 
     enc_len = min((uint)enc_len, block_len - 8);
 
-    swab(data, ucsamples + 8, enc_len);
+    swab((const char*) data, (char*) (ucsamples + 8), enc_len);
 
     // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
     // they form a valid IEC958 AC3 header.

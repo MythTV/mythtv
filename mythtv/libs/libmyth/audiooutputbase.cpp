@@ -49,6 +49,9 @@ AudioOutputBase::AudioOutputBase(
     pSoundStretch(NULL),        blocking(false),
 
     lastaudiolen(0),            samples_buffered(0),
+
+    audio_thread_exists(false),
+
     audiotime(0),
     raud(0),                    waud(0),
     audbuf_timecode(0),
@@ -60,14 +63,13 @@ AudioOutputBase::AudioOutputBase(
     pthread_mutex_init(&avsync_lock, NULL);
     pthread_cond_init(&audio_bufsig, NULL);
 
-    output_audio = 0; // TODO FIXME Not POSIX compatible!
-
-    bzero(&src_data,          sizeof(SRC_DATA));
-    bzero(src_in,             sizeof(float) * AUDIO_SRC_IN_SIZE);
-    bzero(src_out,            sizeof(float) * AUDIO_SRC_OUT_SIZE);
-    bzero(tmp_buff,           sizeof(short) * AUDIO_TMP_BUF_SIZE);
-    bzero(&audiotime_updated, sizeof(audiotime_updated));
-    bzero(audiobuffer,        sizeof(char)  * AUDBUFSIZE);
+    // The following are not bzero() because MS Windows doesn't like it.
+    memset(&src_data,          0, sizeof(SRC_DATA));
+    memset(src_in,             0, sizeof(float) * AUDIO_SRC_IN_SIZE);
+    memset(src_out,            0, sizeof(float) * AUDIO_SRC_OUT_SIZE);
+    memset(tmp_buff,           0, sizeof(short) * AUDIO_TMP_BUF_SIZE);
+    memset(&audiotime_updated, 0, sizeof(audiotime_updated));
+    memset(audiobuffer,        0, sizeof(char)  * AUDBUFSIZE);
 
     // You need to call Reconfigure from your concrete class.
     // Reconfigure(laudio_bits,       laudio_channels,
@@ -238,18 +240,32 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     VERBOSE(VB_AUDIO, LOC + "Ending reconfigure");
 }
 
-void AudioOutputBase::StartOutputThread(void)
+bool AudioOutputBase::StartOutputThread(void)
 {
-    pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);    
+    if (audio_thread_exists)
+        return true;
+
+    int status = pthread_create(
+        &audio_thread, NULL, kickoffOutputAudioLoop, this);
+
+    if (status)
+    {
+        Error("Failed to create audio thread" + ENO);
+        return false;
+    }
+
+    audio_thread_exists = true;
+
+    return true;
 }
 
 
 void AudioOutputBase::StopOutputThread(void)
 {
-    if (output_audio)
+    if (audio_thread_exists)
     {
-        pthread_join(output_audio, NULL);
-        output_audio = 0;
+        pthread_join(audio_thread, NULL);
+        audio_thread_exists = false;
     }
 }
 

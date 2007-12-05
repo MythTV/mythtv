@@ -236,9 +236,9 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     return true;
 }
 
-ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool small)
+ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)
 {
-    (void) small; // currently always a small packet..
+    (void) smallPacket; // currently always a small packet..
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
            DEFAULT_PAT_HEADER, sizeof(DEFAULT_PAT_HEADER));
@@ -286,14 +286,14 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     return pat;
 }
 
-ProgramMapTable* ProgramMapTable::CreateBlank(bool small)
+ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
 {
     ProgramMapTable *pmt = NULL;
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
            DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
 
-    if (small)
+    if (smallPacket)
     {
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(len_for_alloc[0]);

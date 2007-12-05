@@ -1264,6 +1264,7 @@ int main(int argc, char **argv)
 
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
+    bool priv_thread_created = true;
 
     VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 before "
                             "privileged thread").arg(getuid()).arg(geteuid()));
@@ -1272,8 +1273,9 @@ int main(int argc, char **argv)
                             "privileged thread").arg(getuid()).arg(geteuid()));
     if (status) 
     {
-        perror("pthread_create");
-        priv_thread = 0;
+        VERBOSE(VB_IMPORTANT, QString("Warning: ") +
+                "Failed to create priveledged thread." + ENO);
+        priv_thread_created = false;
     }
     setuid(getuid());
 
@@ -1430,7 +1432,7 @@ int main(int argc, char **argv)
     }
 #endif
 
-    if (priv_thread != 0)
+    if (priv_thread_created)
     {
         void *value;
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);

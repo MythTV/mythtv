@@ -35,17 +35,18 @@ CC608Decoder::CC608Decoder(CC608Reader *ccr)
         txtmode[i*2+1] =  0;
     }
 
-    bzero(lastrow,  sizeof(lastrow));
-    bzero(newrow,   sizeof(newrow));
-    bzero(newcol,   sizeof(newcol));
-    bzero(timecode, sizeof(timecode));
-    bzero(row,      sizeof(row));
-    bzero(col,      sizeof(col));
-    bzero(rowcount, sizeof(rowcount));
-    bzero(style,    sizeof(style));
-    bzero(linecont, sizeof(linecont));
-    bzero(resumetext, sizeof(resumetext));
-    bzero(lastclr,  sizeof(lastclr));
+    // The following are not bzero() because MS Windows doesn't like it.
+    memset(lastrow,    0, sizeof(lastrow));
+    memset(newrow,     0, sizeof(newrow));
+    memset(newcol,     0, sizeof(newcol));
+    memset(timecode,   0, sizeof(timecode));
+    memset(row,        0, sizeof(row));
+    memset(col,        0, sizeof(col));
+    memset(rowcount,   0, sizeof(rowcount));
+    memset(style,      0, sizeof(style));
+    memset(linecont,   0, sizeof(linecont));
+    memset(resumetext, 0, sizeof(resumetext));
+    memset(lastclr,    0, sizeof(lastclr));
 
     for (uint i = 0; i < 8; i++)
         ccbuf[i] = "";
@@ -64,12 +65,12 @@ CC608Decoder::CC608Decoder(CC608Reader *ccr)
     stdchar[126] = 'ñ';
     stdchar[127] = 0x2588; /* full block */
 
-    // VPS data
-    bzero(vps_pr_label, sizeof(vps_pr_label));
-    bzero(vps_label,    sizeof(vps_label));
+    // VPS data (MS Windows doesn't like bzero())
+    memset(vps_pr_label, 0, sizeof(vps_pr_label));
+    memset(vps_label,    0, sizeof(vps_label));
 
     // XDS data
-    bzero(xds_rating, sizeof(uint) * 2 * 4);
+    memset(xds_rating, 0, sizeof(uint) * 2 * 4);
     for (uint i = 0; i < 2; i++)
     {
         xds_rating_systems[i] = 0;

@@ -408,7 +408,7 @@ VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfm
         return NULL;
     }
 
-    bzero(filter, sizeof (ThisFilter));
+    memset(filter, 0, sizeof(ThisFilter)); /*MS Windows doesn't like bzero()*/
 
     filter->vf.filter = &denoise3DFilter;
     filter->vf.cleanup = &Denoise3DFilterCleanup;

@@ -1,10 +1,12 @@
-#include <dlfcn.h>
-#include <iostream>
+// POSIX headers
+#include <dlfcn.h> // needed for dlopen(), dlerror(), dlsym(), and dlclose()
+
+// Qt headers
 #include <qdir.h>
 #include <qstringlist.h>
 #include <qstrlist.h>
 
-using namespace std;
+// MythTV headers
 #include "filtermanager.h"
 #include "mythcontext.h"
 
@@ -106,7 +108,7 @@ void FilterManager::LoadFilterLib(QString Path)
     if (handle)
     {
         FiltInfo = (FilterInfo *)dlsym(handle, "filter_table");
-        if (dlerror() == NULL)
+        if (FiltInfo)
         {
             for (; FiltInfo->symbol != NULL; FiltInfo++)
             {
@@ -414,7 +416,6 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
                                         int &height, char *opts)
 {
     void *handle;
-    const char *error;
     VideoFilter *Filter;
     VideoFilter *(*InitFilter)(int, int, int *, int *, char *);
 
@@ -441,20 +442,12 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
 
     handle = dlopen(FiltInfo->libname, RTLD_NOW);
 
-    if ((error = dlerror()))
+    if (!handle)
     {
         VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load "
                 "shared library '%1', dlopen reports error '%2'")
                 .arg(FiltInfo->libname)
-                .arg(error));
-        return NULL;
-    }
-
-    if (handle == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, QString("FilterManager: dlopen did not report "
-                "an error, but returned a NULL handle for shared library '%1'")
-                .arg(FiltInfo->libname));
+                .arg(dlerror()));
         return NULL;
     }
 
@@ -463,23 +456,13 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
                                                                  FiltInfo->
                                                                  symbol);
 
-    if ((error = dlerror()))
+    if (!InitFilter)
     {
         VERBOSE(VB_IMPORTANT, QString("FilterManager: unable to load symbol "
                 "'%1' from shared library '%2', dlopen reports error '%3'")
                 .arg(FiltInfo->symbol)
                 .arg(FiltInfo->libname)
-                .arg(error));
-        return NULL;
-    }
-
-    if (InitFilter == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, QString("FilterManager: dlopen did not report "
-                "an error, but returned NULL for symbol '%1' from shared "
-                "library '%2'")
-                .arg(FiltInfo->symbol)
-		.arg(FiltInfo->libname));
+                .arg(dlerror()));
         return NULL;
     }
 

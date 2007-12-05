@@ -383,16 +383,6 @@ void AudioOutputCA::SetAudiotime(void)
     CA_audiotime_updated = hostNanos / 1000000;
 }
 
-void AudioOutputCA::StartOutputThread(void)
-{
-    return;     // no thread for CA
-}
-
-void AudioOutputCA::StopOutputThread(void)
-{
-    return;     // no thread for CA
-}
-
 /* This callback provides converted audio data to the default output device. */
 OSStatus RenderCallbackAnalog(void                       *inRefCon,
                               AudioUnitRenderActionFlags *ioActionFlags,

@@ -52,8 +52,8 @@ SSDP::SSDP( int nServicePort ) : m_bTermRequested( false )
     m_Sockets[ SocketIdx_Broadcast ]->setBlocking( FALSE );
 
     // Setup SearchSocket
-
-    m_Sockets[ SocketIdx_Search ]->bind( INADDR_ANY, m_nSearchPort ); 
+    QHostAddress ip4addr( (Q_UINT32) INADDR_ANY );
+    m_Sockets[ SocketIdx_Search ]->bind( ip4addr, m_nSearchPort ); 
 
     m_pNotifyTask   = NULL;
 

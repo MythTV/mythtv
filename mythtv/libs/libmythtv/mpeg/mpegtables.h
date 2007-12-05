@@ -509,7 +509,7 @@ class ProgramAssociationTable : public PSIPTable
     const QString toString(void) const;
 
   private:
-    static ProgramAssociationTable* CreateBlank(bool small = true);
+    static ProgramAssociationTable* CreateBlank(bool smallPacket = true);
 };
 
 /** \class ProgramMapTable
@@ -660,7 +660,7 @@ class ProgramMapTable : public PSIPTable
         memcpy(psipdata() + 4, streamInfo, infoLength);
     }
 
-    static ProgramMapTable* CreateBlank(bool small = true);
+    static ProgramMapTable* CreateBlank(bool smallPacket = true);
 
     static const uint pmt_header = 4; // minimum PMT header offset
     mutable vector<unsigned char*> _ptrs; // used to parse

@@ -83,7 +83,7 @@ class AudioOutputBase : public AudioOutput
     virtual void SetVolumeChannel(int channel, int volume) = 0; // range 0-100 for vol
 
     // The following functions may be overridden, but don't need to be
-    virtual void StartOutputThread(void);
+    virtual bool StartOutputThread(void);
     virtual void StopOutputThread(void);
 
     int GetAudioData(unsigned char *buffer, int buf_size, bool fill_buffer);
@@ -150,7 +150,9 @@ class AudioOutputBase : public AudioOutput
     int lastaudiolen;
     long long samples_buffered;
     
-    pthread_t output_audio;
+    bool audio_thread_exists;
+    pthread_t audio_thread;
+
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
                                       raud can only be made while holding this
                                       lock */

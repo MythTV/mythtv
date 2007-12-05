@@ -469,7 +469,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    bzero(filter, sizeof(ThisFilter));
+    memset(filter, 0, sizeof(ThisFilter)); /*MS Windows doesn't like bzero()*/
     filter->vf.cleanup        = &cleanup;
     filter->Luma_threshold1   = LUMA_THRESHOLD1_DEFAULT;
     filter->Chroma_threshold1 = CHROMA_THRESHOLD1_DEFAULT;

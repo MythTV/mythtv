@@ -206,7 +206,7 @@ NewIvtcFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    bzero (filter, sizeof (ThisFilter));
+    memset(filter, 0, sizeof(ThisFilter)); /*MS Windows doesn't like bzero()*/
     filter->progressive_frame_seen = 0;
     filter->interlaced_frame_seen = 0;
     filter->apply_filter = 0;
