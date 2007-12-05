@@ -60,7 +60,10 @@ MythControls::MythControls(MythMainWindow *parent, bool &ok)
       m_leftDescription(NULL), m_rightDescription(NULL),
       m_bindings(NULL),     m_container(NULL)
 {
-    bzero(m_actionButtons, sizeof(void*) * Action::kMaximumNumberOfBindings);
+    // MS Windows doesn't like bzero()
+    memset(m_actionButtons, 0,
+           sizeof(void*) * Action::kMaximumNumberOfBindings);
+
     m_contexts.setAutoDelete(true);
     
     // Load up the ui components

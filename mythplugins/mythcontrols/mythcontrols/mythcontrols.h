@@ -89,7 +89,7 @@ class MythControls : public MythThemedDialog
     void DeleteKey(void);
     void LeftSelected(UIListBtnTypeItem *item);
     void RightSelected(UIListBtnTypeItem *item);
-    bool JumpTo(QKeyEvent *e);
+    bool JumpTo(QKeyEvent *e) { return false; }
     /// \brief Save the bindings to the Database.
     void Save(void) { m_bindings->CommitChanges(); }
 
