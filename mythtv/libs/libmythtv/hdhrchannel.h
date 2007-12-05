@@ -14,7 +14,11 @@
 #include "dtvchannel.h"
 
 // HDHomeRun headers
+#ifdef USING_HDHOMERUN
 #include "hdhomerun/hdhomerun.h"
+#else
+struct hdhomerun_control_sock_t { int dummy; };
+#endif
 
 typedef struct hdhomerun_control_sock_t hdhr_socket_t;
 
