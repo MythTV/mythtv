@@ -10,8 +10,5 @@ LIBS += -L../../libs/libavutil -lmythavutil-$${LIBVERSION}
 LIBS += -L../../libs/libavcodec -lmythavcodec-$${LIBVERSION}
 
 # Rebuild (link) this filter if the lib changes
-isEmpty(QMAKE_EXTENSION_SHLIB) {
-    QMAKE_EXTENSION_SHLIB=so
-}
-TARGETDEPS += ../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}

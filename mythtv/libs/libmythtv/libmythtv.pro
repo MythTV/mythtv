@@ -34,23 +34,12 @@ LIBS += -lmythavcodec-$${LIBVERSION} -lmythdvdnav-$${LIBVERSION}
 LIBS += -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION}
 LIBS += $$EXTRA_LIBS
 
-isEmpty(QMAKE_EXTENSION_SHLIB) {
-  QMAKE_EXTENSION_SHLIB=so
-}
-isEmpty(QMAKE_EXTENSION_LIB) {
-  QMAKE_EXTENSION_LIB=a
-}
-
-cygwin {
-  QMAKE_EXTENSION_SHLIB=$${QMAKE_EXTENSION_SHLIB}$${QMAKE_EXTENSION_CYGWIN}
-}
-
-TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
-TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
+TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
 
 DEFINES += _LARGEFILE_SOURCE

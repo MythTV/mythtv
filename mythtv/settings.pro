@@ -10,10 +10,20 @@ VERSION = 0.20.0
 # if CYGWIN compile, set up flag in CONFIG 
 contains(TARGET_OS, CYGWIN) { 
     CONFIG += cygwin 
-    QMAKE_EXTENSION_SHLIB=dll
-    QMAKE_EXTENSION_CYGWIN = .a
+    QMAKE_EXTENSION_SHLIB=dll.a
     DEFINES += CONFIG_CYGWIN
 }
+
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+    QMAKE_EXTENSION_SHLIB=so
+}
+isEmpty(QMAKE_EXTENSION_LIB) {
+    QMAKE_EXTENSION_LIB=a
+}
+# For dependencies on Myth library filenames in TARGETDEPS
+MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '

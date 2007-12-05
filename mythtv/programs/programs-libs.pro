@@ -17,25 +17,14 @@ LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
-isEmpty(QMAKE_EXTENSION_SHLIB) {
-  QMAKE_EXTENSION_SHLIB=so
-}
-isEmpty(QMAKE_EXTENSION_LIB) {
-  QMAKE_EXTENSION_LIB=a
-}
-
-cygwin {
-  QMAKE_EXTENSION_SHLIB=$${QMAKE_EXTENSION_SHLIB}$${QMAKE_EXTENSION_CYGWIN}
-}
-
-TARGETDEPS += ../../libs/libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libsavcodec

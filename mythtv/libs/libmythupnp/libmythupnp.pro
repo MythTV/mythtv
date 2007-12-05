@@ -38,21 +38,10 @@ LIBS += -L../libmyth
 LIBS += -lmyth-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
-isEmpty(QMAKE_EXTENSION_SHLIB) {
-  QMAKE_EXTENSION_SHLIB=so
-}
-isEmpty(QMAKE_EXTENSION_LIB) {
-  QMAKE_EXTENSION_LIB=a
-}
-
-cygwin {
-  QMAKE_EXTENSION_SHLIB=$${QMAKE_EXTENSION_SHLIB}$${QMAKE_EXTENSION_CYGWIN}
-}
-
-TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
 
