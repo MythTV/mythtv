@@ -261,7 +261,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
       // save ebx (-fPIC)
 	    MOVX" %%"REG_b", %6\n\t"
 			"xor %%"REG_a", %%"REG_a"	\n\t"
-			".balign 16		\n\t"
+			ASMALIGN(4)
 			"1:			\n\t"
 				"movl (%0, %%"REG_a"), %%ebx 	\n\t"
 				"movl 32(%0, %%"REG_a"), %%ebx 	\n\t"
@@ -272,9 +272,8 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 				" jb 1b				\n\t"
 
 			"xor %%"REG_a", %%"REG_a"	\n\t"
-
-				".balign 16		\n\t"
-				"2:			\n\t"
+			ASMALIGN(4)
+			"2:			\n\t"
 				"movq (%0, %%"REG_a"), %%mm0\n"
 				"movq 8(%0, %%"REG_a"), %%mm1\n"
 				"movq 16(%0, %%"REG_a"), %%mm2\n"
