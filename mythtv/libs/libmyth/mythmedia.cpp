@@ -19,6 +19,10 @@ using namespace std;
 
 // end for testing
 
+#define LOC      QString("MythMediaDevice: ")
+#define LOC_WARN QString("MythMediaDevice, Warning: ")
+#define LOC_ERR  QString("MythMediaDevice, Error: ")
+
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
 static const QString PATHTO_MOUNT("/bin/mount");
@@ -311,7 +315,8 @@ bool MythMediaDevice::isMounted(bool Verify)
         return (m_Status == MEDIASTAT_MOUNTED);
 
     QFile Mounts(PATHTO_MOUNTS);
-    char lpath[PATH_MAX];
+    char lpath[PATH_MAX + 1];
+    lpath[0] = 0;
 
     // Try to open the mounts file so we can search it for our device.
     if (Mounts.open(IO_ReadOnly)) 
@@ -333,9 +338,13 @@ bool MythMediaDevice::isMounted(bool Verify)
             line = stream.readLine();
             
             // Now lets see if we're mounted...
-            int len = readlink(DeviceName, lpath, PATH_MAX);
-            if (len > 0 && len < PATH_MAX)
-                lpath[len] = 0;
+            ssize_t len = readlink(DeviceName.local8Bit(), lpath, PATH_MAX);
+            if (len < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "readlink() failed: " + ENO);
+                continue;
+            }
+            lpath[len] = 0;
 
             if (m_DevicePath == DeviceName || m_DevicePath == lpath) 
             {
