@@ -40,6 +40,10 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 const uint RingBuffer::kBufferSize = 3 * 1024 * 1024;
 
 #define CHUNK 32768 /* readblocksize increments */
@@ -207,7 +211,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         while (openTimer.elapsed() < timetowait)
         {
             lasterror = 0;
-            fd2 = open(filename.local8Bit(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+            fd2 = open(filename.local8Bit(),
+                       O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
                 
             if (fd2 < 0)
             {
