@@ -2596,7 +2596,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
     if (handled)
         return;
 
-    if (activerbuffer->isDVD() && activerbuffer->DVD()->IsInMenu())
+    if (activerbuffer &&
+        activerbuffer->isDVD() && activerbuffer->DVD()->IsInMenu())
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
