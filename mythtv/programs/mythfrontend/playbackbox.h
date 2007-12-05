@@ -415,6 +415,7 @@ class PlaybackBox : public MythDialog
     // State Variables ////////////////////////////////////////////////////////
     // Main Recording List support
     QTimer             *fillListTimer;
+    bool                fillListFromCache;
     bool                connected;  ///< true if last FillList() succeeded
     int                 titleIndex; ///< Index of selected item in whole list
     int                 progIndex;  ///< Index of selected item index on page
@@ -431,6 +432,7 @@ class PlaybackBox : public MythDialog
     /// Program currently selected for deletion
     ProgramInfo        *delitem;
     /// ProgramInfo cache for FillList()
+    mutable QMutex      progCacheLock;
     vector<ProgramInfo *> *progCache;
     /// playingSomething is set to true iff a full screen recording is playing
     bool                playingSomething;

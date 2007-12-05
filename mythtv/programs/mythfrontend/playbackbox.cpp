@@ -255,7 +255,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       recGroupOldPassword(NULL),        recGroupNewPassword(NULL),
       recGroupOkButton(NULL),
       // Main Recording List support
-      fillListTimer(new QTimer(this)),  connected(false),
+      fillListTimer(new QTimer(this)),  fillListFromCache(false),
+      connected(false),
       titleIndex(0),                    progIndex(0),
       progsInDB(0),
       // Other state
@@ -1539,12 +1540,14 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         UITextType *ttype = (UITextType *)norec->GetType("msg");
         if (ttype)
         {
+            progCacheLock.lock();
             if (progCache && !progCache->empty())
                 ttype->SetText(tr(
                     "There are no recordings in your current view"));
             else
                 ttype->SetText(tr(
                     "There are no recordings available"));
+            progCacheLock.unlock();
         }
 
         if (type != Delete && norec)
@@ -1662,7 +1665,7 @@ void PlaybackBox::listChanged(void)
     if (playingSomething)
         return;
 
-    connected = FillList();
+    connected = FillList(fillListFromCache);
     paintSkipUpdate = false;
     update(drawTotalBounds);
     if (type == Delete)
@@ -1721,11 +1724,27 @@ bool PlaybackBox::FillList(bool useCachedData)
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
+    progCacheLock.lock();
     if (!useCachedData || !progCache || progCache->empty())
     {
         clearProgramCache();
 
         progCache = RemoteGetRecordedList(allOrder == 0 || type == Delete);
+    }
+    else
+    {
+        // Validate the cache
+        vector<ProgramInfo *>::iterator i = progCache->begin();
+        for ( ; i != progCache->end(); )
+        {
+            if ((*i)->availableStatus == asDeleted)
+            {
+                delete *i;
+                i = progCache->erase(i);
+            }
+            else
+                i++;
+        }
     }
 
     if (progCache)
@@ -1866,6 +1885,7 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
     }
+    progCacheLock.unlock();
 
     if (sortedList.count() == 0)
     {
@@ -4189,8 +4209,46 @@ void PlaybackBox::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message == "RECORDING_LIST_CHANGE" && !fillListTimer->isActive())
-            fillListTimer->start(1000, true);
+        if (message.left(21) == "RECORDING_LIST_CHANGE")
+        {
+            QStringList tokens = QStringList::split(" ", message);
+            if (tokens.size() == 1)
+            {
+                fillListFromCache = false;
+                if (!fillListTimer->isActive())
+                    fillListTimer->start(1000, true);
+            }
+            else if ((tokens[1] == "DELETE") && (tokens.size() == 4))
+            {
+                progCacheLock.lock();
+                if (!progCache)
+                {
+                    progCacheLock.unlock();
+                    freeSpaceNeedsUpdate = true;
+                    fillListFromCache = false;
+                    fillListTimer->start(1000, true);
+                    return;
+                }
+                vector<ProgramInfo *>::iterator i = progCache->begin();
+                for ( ; i != progCache->end(); i++)
+                {
+                   if (((*i)->chanid == tokens[2]) &&
+                       ((*i)->recstartts.toString(Qt::ISODate) == tokens[3]))
+                   {
+                       (*i)->availableStatus = asDeleted;
+                       break;
+                   }
+                }
+
+                progCacheLock.unlock();
+                freeSpaceNeedsUpdate = true;
+                if (!fillListTimer->isActive())
+                {
+                    fillListFromCache = true;
+                    fillListTimer->start(1000, true);
+                }
+            }
+        }
         else if (message.left(15) == "NETWORK_CONTROL")
         {
             QStringList tokens = QStringList::split(" ", message);

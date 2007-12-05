@@ -109,7 +109,8 @@ enum AvailableStatusType {
     asAvailable = 0,
     asPendingDelete,
     asFileNotFound,
-    asZeroByte
+    asZeroByte,
+    asDeleted
 };
 
 enum WatchListStatus {

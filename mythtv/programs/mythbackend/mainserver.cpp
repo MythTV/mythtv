@@ -1624,7 +1624,10 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     sleep(1);
 
     // Notify the frontend so it can requery for Free Space
-    MythEvent me("RECORDING_LIST_CHANGE");
+    QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
+                          .arg(ds->chanid)
+                          .arg(ds->recstartts.toString(Qt::ISODate));
+    MythEvent me(msg);
     gContext->dispatch(me);
 
     // sleep a little to let frontends reload the recordings list
@@ -2095,7 +2098,10 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     // Tell MythTV frontends that the recording list needs to be updated.
     if ((fileExists) || (pginfo->filesize == 0) || (forceMetadataDelete))
     {
-        MythEvent me("RECORDING_LIST_CHANGE");
+        QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
+                              .arg(pginfo->chanid)
+                              .arg(pginfo->recstartts.toString(Qt::ISODate));
+        MythEvent me(msg);
         gContext->dispatch(me);
     }
 
