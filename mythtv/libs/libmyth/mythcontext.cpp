@@ -1558,7 +1558,7 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                                              "echo \'would run the "
                                              "WakeServerCommand now, if "
                                              "set!\'");
-                system(wol_cmd.ascii());
+                myth_system(wol_cmd);
 
                 VERBOSE(VB_GENERAL, QString("Waiting for %1 seconds until I "
                                             "try to reconnect again.")
