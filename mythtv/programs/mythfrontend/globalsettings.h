@@ -76,6 +76,9 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
   private slots:
     void decoderChanged(const QString &dec);
     void vrenderChanged(const QString &renderer);
+    void orenderChanged(const QString &renderer);
+    void deint0Changed(const QString &deint);
+    void deint1Changed(const QString &deint);
 
   private:
     ProfileItem          &item;

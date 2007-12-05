@@ -932,6 +932,86 @@ QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
     return tmp;
 }
 
+QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
+{
+    QString msg = QObject::tr("Video rendering method");
+
+    if (renderer.isEmpty())
+        return msg;
+
+    if (renderer == "null")
+        msg = QObject::tr(
+            "Render video offscreen. Used internally.");
+
+    if (renderer == "xlib")
+        msg = QObject::tr(
+            "Use X11 pixel copy to render video. This is not recommended if "
+            "any other option is available. The video will not be scaled to "
+            "fit the screen. This will work with all X11 servers, local "
+            "and remote.");
+
+    if (renderer == "xshm")
+        msg = QObject::tr(
+            "Use X11 shared memory pixel transfer to render video. This is "
+            "only recommended over the X11 pixel copy renderer. The video "
+            "will not be scaled to fit the screen. This works with most "
+            "local X11 servers.");
+
+    if (renderer == "xv-blit")
+        msg = QObject::tr(
+            "This is the standard video renderer for X11 systems. It uses "
+            "XVideo hardware assist for scaling, color conversion. If the "
+            "hardware offers picture controls the renderer supports them.");
+
+    if (renderer == "xvmc-blit")
+        msg = QObject::tr(
+            "This is the standard video renderer for XvMC decoders. It uses "
+            "XVideo hardware assist for scaling, color conversion and "
+            "when available offers XVideo picture controls.");
+
+    if (renderer == "xvmc-opengl")
+        msg = QObject::tr(
+            "This video renderer for XvMC on nVidia cards uses XVideo "
+            "for color conversion and OpenGL for scaling. The main benefit "
+            "of this renderer is that it allows OpenGL OSD rendering, "
+            "which frees two XvMC buffers for decoding. It requires a "
+            "reasonably fast nVidia card.");
+
+    if (renderer == "directfb")
+        msg = QObject::tr(
+            "This video renderer uses DirectFB for scaling and color "
+            "conversion. It is not as feature rich as the standard video "
+            "renderer, but can run on Linux hardware without an X11 server.");
+
+    if (renderer == "directx")
+        msg = QObject::tr(
+            "This is the only video renderer awailable on Microsoft Windows "
+            "systems.");
+
+    if (renderer == "quartz-blit")
+        msg = QObject::tr(
+            "This is the standard video render for Macintosh OS X systems.");
+
+    if (renderer == "quartz-accel")
+        msg = QObject::tr(
+            "This is the only video renderer for the MacAccel decoder.");
+
+    if (renderer == "ivtv")
+        msg = QObject::tr(
+            "This is only video renderer for the PVR-350 decoder.");
+
+    if (renderer == "opengl")
+    {
+        msg = QObject::tr(
+            "This video renderer uses OpenGL for scaling and color conversion "
+            "and can offer limited picture contols. This requires a faster "
+            "GPU than XVideo. Also, when enabled, picture controls consume "
+            "additional resources.");
+    }
+
+    return msg;
+}
+
 QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &decoder)
 {
     return GetBestVideoRenderer(GetVideoRenderers(decoder));
@@ -951,6 +1031,75 @@ QStringList VideoDisplayProfile::GetDeinterlacers(
     return tmp;
 }
 
+QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
+{
+    if (deint.isEmpty())
+        return "";
+
+    QString msg = "";
+
+    QString kNoneMsg =
+        QObject::tr("Perform no deinterlacing.") + " " +
+        QObject::tr(
+            "Use this with an interlaced display whose "
+            "resolution exactly mathes the video size. "
+            "This is incompatible with MythTV zoom modes.");
+
+    QString kOneFieldMsg = QObject::tr(
+        "Shows only one of the two fields in the frame. "
+        "This looks good when displaying a high motion "
+        "1080i video on a 720p display.");
+
+    QString kBobMsg = QObject::tr(
+        "Shows one field of the frame followed by the "
+        "other field displaced vertically. "
+        "This deinterlacer requires the display to be capable "
+        "of twice the frame rate as the source video.");
+
+    QString kLinearBlendMsg = QObject::tr(
+        "Blends the odd and even fields linearly into one frame.");
+
+    QString kKernelMsg = QObject::tr(
+        "This filter disables deinterlacing when the two fields are "
+        "similar, and performs linear deinterlacing otherwise.");
+
+    QString kUsingOpenGL = QObject::tr("(Hardware Accelerated)");
+    QString kUsingOpenGLWorkaround =
+        QObject::tr("With workaround for broken interlaced modelines.") + " " +
+        kUsingOpenGL;
+
+    if (deint == "none")
+        msg = kNoneMsg;
+    else if (deint == "onefield")
+        msg = kOneFieldMsg;
+    else if (deint == "bobdeint")
+        msg = kBobMsg;
+    else if (deint == "linearblend")
+        msg = kLinearBlendMsg;
+    else if (deint == "kerneldeint")
+        msg = kKernelMsg;
+    else if (deint == "openglonefield")
+        msg = kOneFieldMsg + " " + kUsingOpenGL;
+    else if (deint == "openglbobdeint")
+        msg = kBobMsg + " " + kUsingOpenGL;
+    else if (deint == "opengllinearblend")
+        msg = kLinearBlendMsg + " " + kUsingOpenGL;
+    else if (deint == "openglkerneldeint")
+        msg = kKernelMsg + " " + kUsingOpenGL;
+    else if (deint == "opengldoubleratelinearblend")
+        msg = kLinearBlendMsg + " " + kUsingOpenGLWorkaround;
+    else if (deint == "opengldoublerateonefield")
+        msg = kOneFieldMsg + " " + kUsingOpenGLWorkaround;
+    else if (deint == "opengldoubleratekerneldeint")
+        msg = kKernelMsg + " " + kUsingOpenGLWorkaround;
+    else if (deint == "opengldoubleratefieldorder")
+        msg = kNoneMsg  + " " + kUsingOpenGLWorkaround;
+    else
+        msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
+
+    return msg;
+}
+
 QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
 {
     QMutexLocker locker(&safe_lock);
@@ -962,6 +1111,57 @@ QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
         tmp = QDeepCopy<QStringList>(*it);
 
     return tmp;
+}
+
+QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
+{
+
+    QString msg = QObject::tr("OSD rendering method");
+
+    if (osd.isEmpty())
+        return msg;
+
+    if (osd == "chromakey")
+        msg = QObject::tr(
+            "Render the OSD using the XVideo chromakey feature."
+            "This renderer does not alpha blend. But it is the fastest "
+            "OSD renderer; and is particularly efficient compared to the "
+            "ia44blend OSD renderer for XvMC.") + "\n" +
+            QObject::tr(
+                "Note: nVidia hardware after the 5xxx series does not "
+                "have XVideo chromakey support.");
+            
+
+    if (osd == "softblend")
+    {
+        msg = QObject::tr(
+            "Software OSD rendering uses your CPU to alpha blend the OSD.");
+    }
+
+    if (osd == "ia44blend")
+    {
+        msg = QObject::tr(
+            "Uses hardware support for 16 color alpha-blend surfaces for "
+            "rendering the OSD. Because of the limited color range, MythTV "
+            "renders the OSD in 16 level grayscale.") + "\n" +
+            QObject::tr(
+                "Note: Not recommended for nVidia or Intel chipsets. This "
+                "removes two of the limited XvMC buffers from decoding duty.");
+    }
+
+    if (osd == "ivtv")
+    {
+        msg = QObject::tr(
+            "Renders the OSD using the PVR-350 chromakey feature.");
+    }
+
+    if (osd.contains("opengl"))
+    {
+        msg = QObject::tr(
+            "Uses OpenGL to alpha blend the OSD onto the video.");
+    }
+
+    return msg;
 }
 
 bool VideoDisplayProfile::IsFilterAllowed(const QString &video_renderer)
@@ -1061,6 +1261,7 @@ QString VideoDisplayProfile::toString(void) const
 "linearblend"
 "kerneldeint"
 "opengllinearblend"
+"openglkerneldeint"
 "openglonefield"
 "openglbobdeint"
 "opengldoubleratelinearblend"

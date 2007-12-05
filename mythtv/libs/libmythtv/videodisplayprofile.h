@@ -130,10 +130,13 @@ class MPUBLIC VideoDisplayProfile
     static void        CreateProfiles(const QString &hostname);
 
     static QStringList GetVideoRenderers(const QString &decoder);
+    static QString     GetVideoRendererHelp(const QString &renderer);
     static QString     GetPreferredVideoRenderer(const QString &decoder);
     static QStringList GetDeinterlacers(const QString &video_renderer);
     static QString     GetDeinterlacerName(const QString short_name);
-    static QStringList GetOSDs(         const QString &video_renderer);
+    static QString     GetDeinterlacerHelp(const QString &deint);
+    static QStringList GetOSDs(const QString &video_renderer);
+    static QString     GetOSDHelp(const QString &osd);
     static bool        IsFilterAllowed( const QString &video_renderer);
 
     static QStringList GetFilteredRenderers(const QString     &decoder,

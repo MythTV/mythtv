@@ -794,14 +794,15 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     deint1->setLabel(tr("Fallback"));
     filters->setLabel(tr("Custom Filters"));
 
-    deint0->setHelpText(
-        QObject::tr("2x means the deinterlacer doubles the framerate.") + " " +
-        QObject::tr("HW means the deinterlacer uses specialized hardware."));
-    deint1->setHelpText(
-        QObject::tr("HW means the deinterlacer uses specialized hardware."));
-
     filters->setHelpText(
         QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
+
+    osdfade->setHelpText(
+        tr("When unchecked the OSD will not fade away but instead "
+           "will disappear abruptly.") + "\n" +
+        tr("Uncheck this if the video studders while the OSD is "
+           "fading away."));
+
     vid_row->addChild(decoder);
     vid_row->addChild(vidrend);
 
@@ -825,6 +826,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             this,    SLOT(decoderChanged(const QString&)));
     connect(vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
+    connect(osdrend, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(orenderChanged(const QString&)));
+    connect(deint0, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(deint0Changed(const QString&)));
+    connect(deint1, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(deint1Changed(const QString&)));
 }
 
 void PlaybackProfileItemConfig::load(void)
@@ -967,6 +974,26 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
     }
 
     filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
+    vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+}
+
+void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
+{
+    osdrend->setHelpText(VideoDisplayProfile::GetOSDHelp(renderer));
+}
+
+void PlaybackProfileItemConfig::deint0Changed(const QString &deint)
+{
+    deint0->setHelpText(
+        QObject::tr("Main deinterlacing method.") + " " +
+        VideoDisplayProfile::GetDeinterlacerHelp(deint));
+}
+
+void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
+{
+    deint1->setHelpText(
+        QObject::tr("Fallback deinterlacing method.") + " " +
+        VideoDisplayProfile::GetDeinterlacerHelp(deint));
 }
 
 PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename) :
