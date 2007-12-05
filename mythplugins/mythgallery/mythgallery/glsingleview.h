@@ -74,7 +74,7 @@ class GLSingleView : public QGLWidget, public ImageView
     virtual void Rotate(int angle);
     virtual void DisplayNext(bool reset, bool loadImage);
     virtual void DisplayPrev(bool reset, bool loadImage);
-    virtual void LoadImage(void);
+    virtual void Load(void);
     void resizeGL(int w, int h);
 
     void paintGL(void);

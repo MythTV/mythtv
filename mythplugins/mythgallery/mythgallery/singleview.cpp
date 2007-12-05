@@ -128,7 +128,7 @@ SingleView::SingleView(
 
     // --------------------------------------------------------------------
 
-    LoadImage();
+    Load();
 
     // --------------------------------------------------------------------
 
@@ -515,7 +515,7 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
     }
 
     if (loadImage)
-        LoadImage();
+        Load();
 }
 
 void SingleView::DisplayPrev(bool reset, bool loadImage)
@@ -546,10 +546,10 @@ void SingleView::DisplayPrev(bool reset, bool loadImage)
     }
 
     if (loadImage)
-        LoadImage();
+        Load();
 }
 
-void SingleView::LoadImage(void)
+void SingleView::Load(void)
 {
     m_movieState = 0;
 
@@ -1347,7 +1347,7 @@ void SingleView::SlideTimeout(void)
                 DisplayNext(false, false);
 
                 wasMovie = m_movieState > 0;
-                LoadImage();
+                Load();
                 isMovie = m_movieState > 0;
                 // If transitioning to/from a movie, don't do an effect,
                 // and shorten timeout

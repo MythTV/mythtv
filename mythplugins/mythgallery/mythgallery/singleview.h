@@ -56,7 +56,7 @@ class SingleView : public MythDialog, public ImageView
     virtual void Rotate(int angle);
     virtual void DisplayNext(bool reset, bool loadImage);
     virtual void DisplayPrev(bool reset, bool loadImage);
-    virtual void LoadImage(void);
+    virtual void Load(void);
     virtual void paintEvent(QPaintEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
 

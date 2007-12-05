@@ -47,7 +47,7 @@ class ImageView
     virtual void Rotate(int angle) = 0;
     virtual void DisplayNext(bool reset, bool loadImage) = 0;
     virtual void DisplayPrev(bool reset, bool loadImage) = 0;
-    virtual void LoadImage(void) = 0;
+    virtual void Load(void) = 0;
 
     // Sets
     virtual void SetZoom(float zoom) = 0;

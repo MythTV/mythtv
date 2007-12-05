@@ -174,7 +174,7 @@ void GLSingleView::initializeGL(void)
     m_texSize = QSize(GetNearestGLTextureSize(m_screenSize.width()),
                       GetNearestGLTextureSize(m_screenSize.height()));
 
-    LoadImage();
+    Load();
 }
 
 void GLSingleView::resizeGL(int w, int h)
@@ -519,7 +519,7 @@ void GLSingleView::DisplayNext(bool reset, bool loadImage)
     m_texCur      = (m_texCur) ? 0 : 1;
 
     if (loadImage)
-        LoadImage();
+        Load();
 }
 
 void GLSingleView::DisplayPrev(bool reset, bool loadImage)
@@ -553,10 +553,10 @@ void GLSingleView::DisplayPrev(bool reset, bool loadImage)
     m_texCur    = (m_texCur) ? 0 : 1;
 
     if (loadImage)
-        LoadImage();
+        Load();
 }
 
-void GLSingleView::LoadImage(void)
+void GLSingleView::Load(void)
 {
     m_movieState = 0;
     ThumbItem *item = m_itemList.at(m_pos);
@@ -1188,7 +1188,7 @@ void GLSingleView::SlideTimeout(void)
                 DisplayNext(false, false);
 
                 wasMovie = m_movieState > 0;
-                LoadImage();
+                Load();
                 isMovie = m_movieState > 0;
                 // If transitioning to/from a movie, don't do an effect,
                 // and shorten timeout
