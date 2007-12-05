@@ -1253,6 +1253,9 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     {
         case kDialogCodeButton0:
             WriteSettingsFile(m_DBparams, true);
+            // User prefers mysql.txt, so throw away default UPnP backend:
+            m_XML->SetValue(kDefaultUSN, "");
+            m_XML->Save();
             break;
         case kDialogCodeButton1:
             if (BEsel->m_PIN.length())
