@@ -763,11 +763,16 @@ an annotated versions of the code, and saving results.
 // * Derived values
 //
 // They add nothing useful to this programmer doco, so I camouflage these
-// by manually defining the block here. Same for Macroblock stuff from vc1.c
+// by manually defining the block here. Same thing for the few modules
+// in ffmpeg that are documented; Macroblock and VC9 bitplanes from vc1.c,
+// Monkey Audio from apedec.c, multithreaded slicing from h264.h,
 
 /**
  @defgroup coded   .
  @defgroup derived .
  @defgroup block   .
  @defgroup std_mb  .
+ @defgroup rangecoder .
+ @defgroup multithreading .
+ @defgroup bitplane .
  */
