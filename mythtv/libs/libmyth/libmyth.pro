@@ -23,6 +23,7 @@ HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
 HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
 HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
 HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
+HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
@@ -57,7 +58,7 @@ inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
-inc.files += mythexp.h mythpluginapi.h
+inc.files += mythexp.h mythpluginapi.h compat.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 using_oss {
