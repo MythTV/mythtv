@@ -343,8 +343,8 @@ bool MythMediaDevice::isMounted(bool Verify)
             {
                 VERBOSE(VB_IMPORTANT, QString("%1 readlink() failed for %2: %3")
                                             .arg(LOC_ERR)
-                                            .arg(DeviceName.local8Bit()));
-                                            .arg(ENO);
+                                            .arg(DeviceName.local8Bit());
+                                            .arg(ENO));
                 continue;
             }
             lpath[len] = 0;
