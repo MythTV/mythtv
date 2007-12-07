@@ -891,6 +891,7 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_itemsVisible    = 0;
     m_fontActive      = 0;
     m_fontInactive    = 0;
+    m_justify         = Qt::AlignLeft | Qt::AlignVCenter;
 
     m_xdrawoffset     = 0;
 
