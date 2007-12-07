@@ -10,11 +10,13 @@
 #include <string.h>
 #include <math.h>
 
-#include "filter.h"
-#include "frame.h"
+#include "libmythtv/filter.h"
+#include "libmythtv/frame.h"
 
-#include "config.h"
-#include "dsputil.h"
+#include "libmyth/mythconfig.h"
+#include "libavcodec/dsputil.h"
+
+#include "libmyth/mythverbose.h"
 
 #undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
@@ -260,7 +262,7 @@ KernelDeint (VideoFilter * f, VideoFrame * frame)
 
     if (!filter->line)
     {
-        fprintf (stderr, "KernelDeint: failed to allocate line buffer.\n");
+        VERBOSE(VB_GENERAL, "KernelDeint: failed to allocate line buffer");
         return -1;
     }
 
@@ -309,15 +311,16 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if ( inpixfmt != outpixfmt ||
         (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P) )
     {
-        fprintf (stderr, "KernelDeint: valid format conversions are"
-                 " YV12->YV12 or YUV422P->YUV422P\n");
+        VERBOSE(VB_GENERAL, "KernelDeint: valid format conversions are"
+                            " YV12->YV12 or YUV422P->YUV422P\n");
         return NULL;
     }
 
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
-        fprintf (stderr, "KernelDeint: failed to allocate memory for filter.\n");
+        VERBOSE(VB_GENERAL,
+                "KernelDeint: failed to allocate memory for filter");
         return NULL;
     }
     
@@ -342,7 +345,7 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 
     if (filter->line == NULL)
     {
-        fprintf (stderr, "KernelDeint: failed to allocate line buffer.\n");
+        VERBOSE(VB_GENERAL, "KernelDeint: failed to allocate line buffer");
         free (filter);
         return NULL;
     }

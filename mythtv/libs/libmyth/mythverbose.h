@@ -1,0 +1,184 @@
+#ifndef MYTHVERBOSE_H_
+#define MYTHVERBOSE_H_
+
+#ifdef __cplusplus
+    #include <qdatetime.h>
+
+    using namespace std;
+#endif
+
+#include "mythexp.h"  // MPUBLIC, et c.
+
+/// This MAP is for the various VERBOSITY flags, used to select which
+/// messages we want printed to the console.
+///
+/// The 5 fields are:
+///     enum
+///     enum value
+///     "-v" arg string
+///     additive flag (explicit = 0, additive = 1)
+///     help text for "-v help"
+///
+/// To create a new VB_* flag, this is the only piece of code you need to
+/// modify, then you can start using the new flag and it will automatically be
+/// processed by the parse_verbose_arg() function and help info printed when
+/// "-v help" is used.
+
+#define VERBOSE_MAP(F) \
+    F(VB_ALL,       0xffffffff, "all",                                        \
+                             0, "ALL available debug output")                 \
+    F(VB_MOST,      0x7ffeffff, "most",                                       \
+                             0, "Most debug (nodatabase,notimestamp)")        \
+    F(VB_IMPORTANT, 0x00000001, "important",                                  \
+                             0, "Errors or other very important messages")    \
+    F(VB_GENERAL,   0x00000002, "general",                                    \
+                             1, "General info")                               \
+    F(VB_RECORD,    0x00000004, "record",                                     \
+                             1, "Recording related messages")                 \
+    F(VB_PLAYBACK,  0x00000008, "playback",                                   \
+                             1, "Playback related messages")                  \
+    F(VB_CHANNEL,   0x00000010, "channel",                                    \
+                             1, "Channel related messages")                   \
+    F(VB_OSD,       0x00000020, "osd",                                        \
+                             1, "On-Screen Display related messages")         \
+    F(VB_FILE,      0x00000040, "file",                                       \
+                             1, "File and AutoExpire related messages")       \
+    F(VB_SCHEDULE,  0x00000080, "schedule",                                   \
+                             1, "Scheduling related messages")                \
+    F(VB_NETWORK,   0x00000100, "network",                                    \
+                             1, "Network protocol related messages")          \
+    F(VB_COMMFLAG,  0x00000200, "commflag",                                   \
+                             1, "Commercial Flagging related messages")       \
+    F(VB_AUDIO,     0x00000400, "audio",                                      \
+                             1, "Audio related messages")                     \
+    F(VB_LIBAV,     0x00000800, "libav",                                      \
+                             1, "Enables libav debugging")                    \
+    F(VB_JOBQUEUE,  0x00001000, "jobqueue",                                   \
+                             1, "JobQueue related messages")                  \
+    F(VB_SIPARSER,  0x00002000, "siparser",                                   \
+                             1, "Siparser related messages")                  \
+    F(VB_EIT,       0x00004000, "eit",                                        \
+                             1, "EIT related messages")                       \
+    F(VB_VBI,       0x00008000, "vbi",                                        \
+                             1, "VBI related messages")                       \
+    F(VB_DATABASE,  0x00010000, "database",                                   \
+                             1, "Display all SQL commands executed")          \
+    F(VB_DSMCC,     0x00020000, "dsmcc",                                      \
+                             1, "DSMCC carousel related messages")            \
+    F(VB_MHEG,      0x00040000, "mheg",                                       \
+                             1, "MHEG debugging messages")                    \
+    F(VB_UPNP,      0x00080000, "upnp",                                       \
+                             1, "upnp debugging messages")                    \
+    F(VB_SOCKET,    0x00100000, "socket",                                     \
+                             1, "socket debugging messages")                  \
+    F(VB_XMLTV,     0x00200000, "xmltv",                                      \
+                             1, "xmltv output and related messages")          \
+    F(VB_DVBCAM,    0x00400000, "dvbcam",                                     \
+                             1, "DVB CAM debugging messages")                 \
+    F(VB_MEDIA,     0x00800000, "media",                                      \
+                             1, "Media Manager debugging messages")           \
+    F(VB_IDLE,      0x01000000, "idle",                                       \
+                             1, "System idle messages")                       \
+    F(VB_TIMESTAMP, 0x80000000, "timestamp",                                  \
+                             1, "Conditional data driven messages")           \
+    F(VB_NONE,      0x00000000, "none",                                       \
+                             0, "NO debug output")
+
+enum VerboseMask
+{
+#define VERBOSE_ENUM(ARG_ENUM, ARG_VALUE, ARG_STRING, ARG_ADDITIVE, ARG_HELP)\
+    ARG_ENUM = ARG_VALUE ,
+    VERBOSE_MAP(VERBOSE_ENUM)
+    VB_UNUSED_END // keep at end
+};
+
+/// This global variable is set at startup with the flags 
+/// of the verbose messages we want to see.
+extern MPUBLIC unsigned int print_verbose_messages;
+
+
+
+// There are three different types of VERBOSE MACRO:
+// 1. A non-locking one, used in C or Objective C src, or standalone libraries,
+// 2. A MythContext mutex-locked one, which may deadlock, and
+// 3. A MythContext mutex-locked one, which should be deadlock safe.
+// If MYTHCONTEXT_H_ is not defined, we assume the first type,
+// otherwise DEBUG determines the second or third
+
+
+#ifndef MYTHCONTEXT_H_
+    #ifdef  __cplusplus
+        #define VERBOSE(mask,args...)                        \
+            if ((print_verbose_messages & (mask)) == (mask)) \
+                cout << QDateTime::currentDateTime()         \
+                        .toString("yyyy-MM-dd hh:mm:ss.zzz") \
+                     << " " << args << endl;
+    #else
+        #define VERBOSE(mask,args...)                        \
+            if ((print_verbose_messages & (mask)) == (mask)) \
+            {                                                \
+                printf(args);                                \
+                putchar('\n');                               \
+            }
+    #endif
+
+#elif DEBUG // && MYTHCONTEXT_H_
+
+    // The verbose_mutex lock is a recursive lock so it is possible (while
+    // not recommended) to use a VERBOSE macro within another VERBOSE macro.
+    // But waiting for another thread to do something is not safe within a 
+    // VERBOSE macro, since those threads may wish to use the VERBOSE macro
+    // and this will cause a deadlock.
+
+    #define VERBOSE(mask,args...) \
+        do { \
+            if ((print_verbose_messages & (mask)) == (mask)) \
+            { \
+                QDateTime dtmp = QDateTime::currentDateTime(); \
+                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+                MythContext::verbose_mutex.lock(); \
+                cout << dtime << " " << args << endl; \
+                MythContext::verbose_mutex.unlock(); \
+            } \
+        } while (0)
+
+#else // !MYTHCONTEXT_H_ && !DEBUG
+
+    // use a slower non-deadlockable version in release builds
+
+    #define VERBOSE(mask,args...) \
+        do { \
+            if ((print_verbose_messages & (mask)) == (mask)) \
+            { \
+                QDateTime dtmp = QDateTime::currentDateTime(); \
+                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+                ostringstream verbose_macro_tmp; \
+                verbose_macro_tmp << dtime << " " << args; \
+                MythContext::verbose_mutex.lock(); \
+                cout << verbose_macro_tmp.str() << endl; \
+                MythContext::verbose_mutex.unlock(); \
+            } \
+        } while (0)
+
+#endif // MYTHCONTEXT_H_, DEBUG
+
+
+#ifdef  __cplusplus
+    /// Verbose helper function for ENO macro
+    extern MPUBLIC QString safe_eno_to_string(int errnum);
+
+    extern MPUBLIC QString verboseString;
+
+
+    /// This can be appended to the VERBOSE args with either
+    /// "+" (with QStrings) or "<<" (with c strings). It uses
+    /// a thread safe version of strerror to produce the
+    /// string representation of errno and puts it on the 
+    /// next line in the verbose output.
+    #define ENO QString("\n\t\t\teno: ") + safe_eno_to_string(errno)
+#endif
+
+
+#endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

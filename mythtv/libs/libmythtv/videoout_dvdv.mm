@@ -17,7 +17,9 @@ using namespace std;
 #include <qmap.h>
 #include <qsize.h>
 
-#include "mythconfig.h"
+#include "libmyth/mythconfig.h"
+#include "libmyth/mythverbose.h"
+
 #include "videoout_dvdv.h"
 #undef ABS
 extern "C" {
@@ -37,13 +39,6 @@ const int kSubpictureSize = 8 * 1024 * 1024;
 // no less than kNumBuffers from VideoOutput
 const int kAccelBuffers = 33;
 
-// Make a poor copy of Myth's VERBOSE -- we can't include
-// mythcontext.h without running into compilation errors.
-extern unsigned int print_verbose_messages;
-#define VB_IMPORTANT 0x00000001
-#define VB_PLAYBACK  0x00000008
-#define VERBOSE(mask,msg) if (print_verbose_messages & mask) \
-                              cout << msg << endl;
 
 #define LOC     "DVDV::" << __FUNCTION__ << " "
 #define LOC_ERR "DVDV::" << __FUNCTION__ << " - Error: "
