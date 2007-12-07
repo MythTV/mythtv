@@ -29,9 +29,11 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
+LIBS += -L../libmythfreemheg -L../libmythlivemedia
 LIBS += -lmyth-$${LIBVERSION} -lmythavutil-$${LIBVERSION}
 LIBS += -lmythavcodec-$${LIBVERSION} -lmythdvdnav-$${LIBVERSION}
 LIBS += -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION}
+LIBS += -lmythfreemheg-$${LIBVERSION} -lmythlivemedia-$${LIBVERSION}
 LIBS += $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
@@ -40,6 +42,8 @@ TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 
 
 DEFINES += _LARGEFILE_SOURCE
