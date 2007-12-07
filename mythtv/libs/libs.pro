@@ -8,7 +8,11 @@ CONFIG += ordered
 # Directories
 SUBDIRS += libavutil libavcodec libavformat libmythsamplerate 
 SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
-SUBDIRS += libmyth libmythtv libmythui libmythfreemheg
-SUBDIRS += libmythupnp
-SUBDIRS += libmythlivemedia
+SUBDIRS += libmyth
 
+SUBDIRS += libmythupnp libmythui
+
+SUBDIRS += libmythfreemheg libmythlivemedia
+
+# Libmythtv must be last because it links against everything
+SUBDIRS += libmythtv
