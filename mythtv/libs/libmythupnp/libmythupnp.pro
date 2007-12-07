@@ -39,9 +39,6 @@ LIBS += -lmyth-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
 
