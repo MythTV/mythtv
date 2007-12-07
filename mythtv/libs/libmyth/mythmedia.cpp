@@ -341,7 +341,10 @@ bool MythMediaDevice::isMounted(bool Verify)
             ssize_t len = readlink(DeviceName.local8Bit(), lpath, PATH_MAX);
             if (len < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "readlink() failed: " + ENO);
+                VERBOSE(VB_IMPORTANT, QString("%1 readlink() failed for %2: %3")
+                                            .arg(LOC_ERR)
+                                            .arg(DeviceName.local8Bit()));
+                                            .arg(ENO);
                 continue;
             }
             lpath[len] = 0;
