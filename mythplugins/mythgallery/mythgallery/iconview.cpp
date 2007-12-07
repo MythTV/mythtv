@@ -919,6 +919,8 @@ bool IconView::LoadViewTheme(void)
         return false;
     }
 
+    m_iconRect = bhType->getScreenArea();
+
     return true;
 }
 
@@ -950,10 +952,10 @@ bool IconView::LoadThemeImages(void)
     {
         m_thumbW = m_backRegPix.width();
         m_thumbH = m_backRegPix.height();
-        m_nCols  = m_viewRect.width()  / m_thumbW - 1;
-        m_nRows  = m_viewRect.height() / m_thumbH - 1;
-        m_spaceW = m_thumbW / (m_nCols + 1);
-        m_spaceH = m_thumbH / (m_nRows + 1);
+        m_nCols  = m_iconRect.width()  / m_thumbW;
+        m_nRows  = m_iconRect.height() / m_thumbH;
+        m_spaceW = (m_iconRect.width()-(m_nCols*m_thumbW)) / (m_nCols + 1);
+        m_spaceH = (m_iconRect.height()-(m_nRows*m_thumbH)) / (m_nRows + 1);
 
         m_thumbGen->setSize((int)(m_thumbW - 10 * wmult), 
                             (int)(m_thumbH - 10 * hmult));

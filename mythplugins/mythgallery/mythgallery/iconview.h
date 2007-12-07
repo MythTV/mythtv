@@ -119,6 +119,7 @@ class IconView : public MythDialog
     QRect               m_menuRect;
     QRect               m_textRect;
     QRect               m_viewRect;
+    QRect               m_iconRect;
 
     bool                m_inMenu;
     bool                m_inSubMenu;
