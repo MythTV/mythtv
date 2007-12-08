@@ -146,8 +146,10 @@ class MetadataImp
         m_id = rhs.m_id;
         m_userrating = rhs.m_userrating;
 
+        // No DB vars
         m_sort_key = rhs.m_sort_key;
         m_prefix = rhs.m_prefix;
+        m_flat_index = rhs.m_flat_index;
 
         return *this;
     }
@@ -261,6 +263,8 @@ class MetadataImp
 
     bool deleteFile();
     bool dropFromDB();
+
+    void Reset();
 
   private:
     void fillCountries();
@@ -382,6 +386,20 @@ bool MetadataImp::dropFromDB()
     }
 
     return true;
+}
+
+void MetadataImp::Reset()
+{
+    MetadataImp tmp(m_filename, VIDEO_COVERFILE_DEFAULT,
+                    Metadata::FilenameToTitle(m_filename), VIDEO_YEAR_DEFAULT,
+                    VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
+                    VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0, m_id,
+                    ParentalLevel::plLowest, 0, -1, true, "", "",
+                    Metadata::genre_list(), Metadata::country_list());
+    tmp.m_prefix = m_prefix;
+    tmp.m_flat_index = m_flat_index;
+
+    *this = tmp;
 }
 
 void MetadataImp::fillGenres()
@@ -1151,6 +1169,11 @@ bool Metadata::deleteFile()
 bool Metadata::dropFromDB()
 {
     return m_imp->dropFromDB();
+}
+
+void Metadata::Reset()
+{
+    m_imp->Reset();
 }
 
 bool operator==(const Metadata& a, const Metadata& b)

@@ -12,6 +12,9 @@ void checkedSetText(T *item, const QString &text)
     if (item) item->SetText(text);
 }
 
+void checkedSetText(class LayerSet *container, const QString &item_name,
+                           const QString &text);
+
 QStringList GetVideoDirs();
 
 QString getDisplayYear(int year);

@@ -150,6 +150,9 @@ class Metadata
     // drops the metadata from the DB
     bool dropFromDB();
 
+    /// Resets to default metadata
+    void Reset();
+
   private:
     class MetadataImp *m_imp;
 };

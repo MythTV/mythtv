@@ -54,6 +54,14 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
     while (item && playing_time.elapsed() > WATCHED_WATERMARK);
 }
 
+void checkedSetText(LayerSet *container, const QString &item_name,
+                           const QString &text)
+{
+    UITextType *utt = dynamic_cast<UITextType *>(container->GetType(item_name));
+    if (utt)
+        utt->SetText(text);
+}
+
 QStringList GetVideoDirs()
 {
     QStringList tmp = QStringList::split(":",

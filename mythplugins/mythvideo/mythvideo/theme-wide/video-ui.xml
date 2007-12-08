@@ -170,7 +170,7 @@
       <textarea name="imdblbl" draworder="4" align="right">
         <area>0,255,155,35</area>
         <font>labels</font>
-        <value>IMDB Num.:</value>
+        <value>Video Num.:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
         <area>170,255,982,35</area>
@@ -263,7 +263,7 @@
       </image>
       <textarea name="msg" draworder="7" align="center">
         <font>directorfnt</font>
-        <value>Enter IMDB #</value>
+        <value>Enter Video #</value>
         <area>0,36,365,25</area>
       </textarea>
       <textarea name="numhold" draworder="7" align="center">
