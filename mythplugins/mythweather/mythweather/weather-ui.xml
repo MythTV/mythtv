@@ -1334,6 +1334,7 @@
       <textarea name="header" draworder="0" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
+        <value>Screen Setup</value>
       </textarea>
       </container>
       <container name="screen-setup">

@@ -18,6 +18,7 @@ GlobalSetup::GlobalSetup(MythMainWindow *parent)
 {
     wireUI();
     loadData();
+
     buildFocusList();
     assignFirstFocus();
 }
@@ -159,8 +160,8 @@ ScreenSetup::ScreenSetup(MythMainWindow *parent, SourceManager *srcman) :
     m_src_man = srcman;
     wireUI();
     loadData();
-    buildFocusList();
 
+    buildFocusList();
     assignFirstFocus();
 }
 
@@ -171,10 +172,6 @@ void ScreenSetup::wireUI()
     {
         VERBOSE(VB_IMPORTANT, "error loading helptxt");
     }
-
-    UITextType *header = getUITextType("header");
-    if (header)
-        header->SetText(tr("Screen Setup"));
 
     UITextType *activeheader = getUITextType("activehdr");
     if (activeheader)
@@ -1018,6 +1015,7 @@ SourceSetup::SourceSetup(MythMainWindow *parent) :
     MythThemedDialog(parent, "source-setup", "weather-", "Source Setup")
 {
     wireUI();
+
     buildFocusList();
     assignFirstFocus();
 }
@@ -1295,6 +1293,7 @@ LocationDialog::LocationDialog(MythMainWindow *parent, QStringList types,
     gContext->ThemeWidget(this);
     loadThemedWindow("setup-location", "weather-");
     wireUI();
+
     assignFirstFocus();
 }
 
