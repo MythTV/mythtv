@@ -3,40 +3,40 @@
 
  <window name="controls">
 
-  <font name="active" face="Arial">
+  <font name="active" face="Bitstream Vera Sans">
    <color>#ffffff</color>
    <size>14</size>
    <bold>yes</bold>
   </font>
 
-  <font name="inactive" face="Arial">
+  <font name="inactive" face="Bitstream Vera Sans">
    <color>#9999cc</color>
    <size>14</size>
    <bold>yes</bold>
   </font>
 
-  <font name="keys" face="Arial">
+  <font name="keys" face="Bitstream Vera Sans">
    <color>#000000</color>
    <size>18</size>
    <shadow>1,1</shadow>
    <bold>yes</bold>
   </font>
 
-  <font name="info" face="Arial">
+  <font name="info" face="Bitstream Vera Sans">
    <color>#ffffff</color>
    <size>18</size>
    <shadow>1,1</shadow>
    <bold>yes</bold>
   </font>
 
-  <font name="options" face="Arial">
+  <font name="options" face="Bitstream Vera Sans">
    <color>#ffffff</color>
    <size>24</size>
    <bold>yes</bold>
   </font>
 
 
-  <font name="infotitle" face="Arial">
+  <font name="infotitle" face="Bitstream Vera Sans">
    <color>#ffffff</color>
    <size>20</size>
    <shadow>10,10</shadow>

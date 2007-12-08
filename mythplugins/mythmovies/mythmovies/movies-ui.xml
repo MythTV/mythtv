@@ -1,38 +1,38 @@
 <mythuitheme>
 
     <window name="moviesui">
-        <font name="active" face="Arial">
+        <font name="active" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
     
-        <font name="inactive" face="Arial">
+        <font name="inactive" face="Bitstream Vera Sans">
             <color>#9999cc</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
 
-        <font name="selectable" face="Arial">
+        <font name="selectable" face="Bitstream Vera Sans">
             <color>#8cdeff</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
 
-        <font name="largetitle" face="Arial">
+        <font name="largetitle" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <dropcolor>#000000</dropcolor>
             <size>20</size>
             <shadow>3,3</shadow>
         </font>
 
-        <font name="infofont" face="Arial">
+        <font name="infofont" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
 
-        <font name="infofontunderline" face="Arial">
+        <font name="infofontunderline" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>16</size>
             <bold>yes</bold>

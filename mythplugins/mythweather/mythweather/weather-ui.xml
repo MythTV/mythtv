@@ -2,26 +2,26 @@
 
   <window name="weather">
 
-    <font name="active" face="Arial">
+    <font name="active" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
 
-    <font name="inactive" face="Arial">
+    <font name="inactive" face="Bitstream Vera Sans">
       <color>#9999cc</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
 
-    <font name="header" face="Arial">
+    <font name="header" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>28</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
 
-    <font name="timedate" face="Arial">
+    <font name="timedate" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
       <size>14</size>
@@ -29,74 +29,74 @@
       <bold>yes</bold>
     </font>
 
-    <font name="weatherdata" face="Arial">
+    <font name="weatherdata" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>18</size>
       <bold>yes</bold>
     </font>
 
-    <font name="label" face="Arial">
+    <font name="label" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>yes</bold>
     </font>
 
-    <font name="label2" face="Arial">
+    <font name="label2" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>11</size>
       <bold>yes</bold>
     </font>
 
-    <font name="alerttext" face="Arial">
+    <font name="alerttext" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>12</size>
       <bold>no</bold>
     </font>
     
-    <font name="footer" face="Arial">
+    <font name="footer" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>17</size>
       <bold>yes</bold>
     </font>
 
-    <font name="location" face="Arial">
+    <font name="location" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>17</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
 
-    <font name="lohifont" face="Arial">
+    <font name="lohifont" face="Bitstream Vera Sans">
       <color>#ffff33</color>
       <size>17</size>
       <bold>yes</bold>
     </font>
 
-    <font name="lohifont2" face="Arial">
+    <font name="lohifont2" face="Bitstream Vera Sans">
       <color>#ffff33</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
 
-    <font name="tempdata" face="Arial">
+    <font name="tempdata" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>24</size>
       <bold>yes</bold>
     </font>
   
-    <font name="tempdata2" face="Arial">
+    <font name="tempdata2" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
 
-    <font name="todayfont" face="Arial">
+    <font name="todayfont" face="Bitstream Vera Sans">
       <color>#ffffff</color> 
       <size>26</size>
       <bold>yes</bold>
     </font>
 
-    <font name="temp" face="Arial">
+    <font name="temp" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>50</size>
       <bold>yes</bold>
@@ -1179,38 +1179,38 @@
   </window>
 
   <window name="global-setup">
-    <font name="header" face="Arial">
+    <font name="header" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>28</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
-    <font name="active" face="Arial">
+    <font name="active" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="inactive" face="Arial">
+    <font name="inactive" face="Bitstream Vera Sans">
       <color>#9999cc</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="button" face="Arial">
+    <font name="button" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label" face="Arial">
+    <font name="label" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label2" face="Arial">
+    <font name="label2" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>20</size>
       <bold>no</bold>
     </font>
-    <font name="help" face="Arial">
+    <font name="help" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>no</bold>
@@ -1287,38 +1287,38 @@
     </container>
   </window>
   <window name="screen-setup">
-    <font name="header" face="Arial">
+    <font name="header" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>28</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
-    <font name="active" face="Arial">
+    <font name="active" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="inactive" face="Arial">
+    <font name="inactive" face="Bitstream Vera Sans">
       <color>#9999cc</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="button" face="Arial">
+    <font name="button" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label" face="Arial">
+    <font name="label" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label2" face="Arial">
+    <font name="label2" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>20</size>
       <bold>no</bold>
     </font>
-    <font name="help" face="Arial">
+    <font name="help" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>no</bold>
@@ -1392,38 +1392,38 @@
     </container>
   </window>
   <window name="source-setup">
-    <font name="header" face="Arial">
+    <font name="header" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>28</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
-    <font name="active" face="Arial">
+    <font name="active" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="inactive" face="Arial">
+    <font name="inactive" face="Bitstream Vera Sans">
       <color>#9999cc</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="button" face="Arial">
+    <font name="button" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label" face="Arial">
+    <font name="label" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="label2" face="Arial">
+    <font name="label2" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>20</size>
       <bold>no</bold>
     </font>
-    <font name="help" face="Arial">
+    <font name="help" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>no</bold>
@@ -1455,13 +1455,13 @@
         <filename>cr-lines.png</filename>
         <staticsize>500,370</staticsize>
       </image>
-      <textarea name ="updatetxt" draworder="0">
+      <textarea name="updatetxt" draworder="0">
         <area>290,80,300,60</area>
         <font>label</font>
         <multiline>yes</multiline>
         <value>Source Update Timeout (seconds):</value>
       </textarea>
-      <textarea name ="retrievetxt" draworder="0">
+      <textarea name="retrievetxt" draworder="0">
         <area>290,160,300,60</area>
         <font>label</font>
         <multiline>yes</multiline>
@@ -1490,33 +1490,33 @@
   </window>
 
   <window name="setup-location">
-    <font name="header" face="Arial">
+    <font name="header" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>22</size>
       <bold>yes</bold>
       <shadow>1,1</shadow>
     </font>
-    <font name="edit" face="Arial">
+    <font name="edit" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>no</bold>
     </font>
-    <font name="label" face="Arial">
+    <font name="label" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>14</size>
       <bold>no</bold>
     </font>
-    <font name="button" face="Arial">
+    <font name="button" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>no</bold>
     </font>
-    <font name="active" face="Arial">
+    <font name="active" face="Bitstream Vera Sans">
       <color>#ffffff</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
-    <font name="inactive" face="Arial">
+    <font name="inactive" face="Bitstream Vera Sans">
       <color>#9999cc</color>
       <size>16</size>
       <bold>yes</bold>
