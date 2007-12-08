@@ -353,8 +353,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     buttonstreamid = 32;
                     int aspect = dvdnav_get_video_aspect(dvdnav);
-                    if (aspect != 0)
-                        buttonstreamid = spu->physical_wide + buttonstreamid;
+                    if (aspect != 0 && spu->physical_wide > 0)
+                        buttonstreamid += spu->physical_wide;
 
                     if (parent && parent->GetCaptionMode())
                         parent->SetCaptionsEnabled(false, false);
