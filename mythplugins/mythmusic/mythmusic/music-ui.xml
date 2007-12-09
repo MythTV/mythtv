@@ -1813,10 +1813,11 @@
     </font>
 
     <!--
-       This container determines the size of the popup mini player and must be present
+       This container determines the size and position of the 
+       popup mini player and must be present
     -->
     <container name="player_container">
-        <area>0,0,590,170</area>
+        <area>105,5,590,170</area>
         <image name="track_info_background" draworder="0" fleximage="no">
             <filename>miniplayer_background.png</filename>
             <position>10,10</position>

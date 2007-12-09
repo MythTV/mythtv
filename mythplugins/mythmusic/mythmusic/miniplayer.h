@@ -9,14 +9,6 @@ class MusicPlayer;
 class QTimer;
 class Metadata;
 
-/// Preferred position to place popup miniplayer.
-enum PlayerPosition 
-{
-    MP_POSTOPDIALOG,
-    MP_POSBOTTOMDIALOG,
-    MP_POSCENTERDIALOG
-};
-
 class MPUBLIC MiniPlayer : public MythThemedDialog
 {
   Q_OBJECT
@@ -55,8 +47,6 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
     int           m_currTime, m_maxTime;
 
     MusicPlayer  *m_parentPlayer;
-    int           m_popupWidth;
-    int           m_popupHeight;
 
     QTimer       *m_displayTimer;
     QTimer       *m_infoTimer;

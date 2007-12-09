@@ -103,36 +103,24 @@ void MiniPlayer::wireupTheme(void)
         return;
     }
 
-    m_popupWidth = container->GetAreaRect().width();
-    m_popupHeight = container->GetAreaRect().height();
-    setFixedSize(QSize(m_popupWidth, m_popupHeight));
+    QRect area = container->GetAreaRect();
 
-    int xbase, width, ybase, height;
-    float wmult, hmult;
-    gContext->GetScreenSettings(xbase, width, wmult, ybase, height, hmult);
-    QRect tlwg = QRect(0, 0, width, height);
+    // fixup the container position
+    container->SetAreaRect(QRect(0, 0, area.width(), area.height()));
 
-    QPoint newpos;
-
-    PlayerPosition preferredPos = MP_POSTOPDIALOG;
-
-    if (preferredPos == MP_POSTOPDIALOG)
+    //fix up the widget positions
+    vector<UIType *> *types = container->getAllTypes();
+    vector<UIType *>::iterator i = types->begin();
+    for (; i != types->end(); i++)
     {
-        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 5);
-        this->move(newpos);
+        UIType *type = (*i);
+        type->calculateScreenArea();
     }
-    else if (preferredPos == MP_POSBOTTOMDIALOG)
-    {
-        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
-                        tlwg.height() - 5 - m_popupHeight);
-        this->move(newpos);
-    }
-    else if (preferredPos == MP_POSCENTERDIALOG)
-    {
-        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
-                        tlwg.height() / 2 - m_popupHeight / 2);
-        this->move(newpos);
-    }
+
+    setFixedSize(QSize(area.width(), area.height()));
+
+    QPoint pos(area.x(), area.y());
+    this->move(pos);
 
     m_titleText = getUITextType("title_text");
     m_artistText = getUITextType("artist_text");
