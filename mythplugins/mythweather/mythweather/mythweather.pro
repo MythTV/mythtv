@@ -9,13 +9,15 @@ INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = weather-ui.xml 
+datafiles.path = $${PREFIX}/share/mythtv/mythweather/
+datafiles.files = weather-screens.xml
 installfiles.path = $${PREFIX}/share/mythtv/
 installfiles.files = weather_settings.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 installscripts.path = $${PREFIX}/share/mythtv/mythweather/scripts
 installscripts.files = scripts/*
-INSTALLS += installfiles installimages uifiles installscripts
+INSTALLS += installfiles datafiles installimages uifiles installscripts
 
 # Input
 
