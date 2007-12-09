@@ -1,0 +1,123 @@
+<screens>
+    <screen name="Current Conditions">
+        <!-- <multilocation>yes</multilocation> -->
+        <datum name="cclocation" />
+        <datum name="relative_humidity" />
+        <datum name="pressure" />
+        <!-- <datum name="wind_dir" />  -->
+        <datum name="wind_spdgst" />
+        <!-- <datum name="wind_gust" /> -->
+        <datum name="wind_dir" />
+        <datum name="visibility" />
+        <datum name="appt" />
+        <datum name="temp" />
+        <datum name="weather" />
+        <datum name="weather_icon" />
+        <datum name="observation_time" />
+        <!-- <datum name="copyright" /> -->
+    </screen>
+
+    <screen name="Three Day Forecast">
+        <datum name="3dlocation" />
+        <datum name="date-0" />
+        <datum name="icon-0" />
+        <datum name="low-0" />
+        <datum name="high-0" />
+        <datum name="date-1" />
+        <datum name="icon-1" />
+        <datum name="low-1" />
+        <datum name="high-1" />
+        <datum name="date-2" />
+        <datum name="icon-2" />
+        <datum name="low-2" />
+        <datum name="high-2" />
+        <datum name="updatetime" />
+    </screen>
+    
+    <screen name="Six Day Forecast">
+        <datum name="6dlocation" />
+        <datum name="date-0" />
+        <datum name="date-1" />
+        <datum name="date-2" />
+        <datum name="date-3" />
+        <datum name="date-4" />
+        <datum name="date-5" />
+        <datum name="icon-0" />
+        <datum name="icon-1" />
+        <datum name="icon-2" />
+        <datum name="icon-3" />
+        <datum name="icon-4" />
+        <datum name="icon-5" />
+        <datum name="high-0" />
+        <datum name="high-1" />
+        <datum name="high-2" />
+        <datum name="high-3" />
+        <datum name="high-4" />
+        <datum name="high-5" />
+        <datum name="low-0" />
+        <datum name="low-1" />
+        <datum name="low-2" />
+        <datum name="low-3" />
+        <datum name="low-4" />
+        <datum name="low-5" />
+        <datum name="updatetime" />
+    </screen>
+    
+    <!-- <screen name="Today's Forecast">
+        <datum name="header" />
+        <datum name="updatetime" />
+        <datum name="today-desc" />
+    </screen> -->
+
+    <screen name="Static Map">
+        <hasunits>no</hasunits>
+        <datum name="smdesc" />
+        <datum name="updatetime" />
+        <datum name="map" />
+    </screen>
+
+    <screen name="Animated Map">
+        <hasunits>no</hasunits>
+        <datum name="amdesc" />
+        <datum name="updatetime" />
+        <datum name="datum" />
+    </screen>
+    
+    <screen name="Severe Weather Alerts">
+        <hasunits>no</hasunits>
+        <datum name="swlocation" />
+        <datum name="alerts" />
+    </screen>
+    
+    <screen name="18 Hour Forecast">
+        <datum name="18hrlocation" />
+        <datum name="time-0" />
+        <datum name="time-1" />
+        <datum name="time-2" />
+        <datum name="time-3" />
+        <datum name="time-4" />
+        <datum name="time-5" />
+        <datum name="temp-0" />
+        <datum name="temp-1" />
+        <datum name="temp-2" />
+        <datum name="temp-3" />
+        <datum name="temp-4" />
+        <datum name="temp-5" />
+        <datum name="pop-0" />
+        <datum name="pop-1" />
+        <datum name="pop-2" />
+        <datum name="pop-3" />
+        <datum name="pop-4" />
+        <datum name="pop-5" />
+        <datum name="updatetime" />
+    </screen>
+    
+    <!-- <screen name="Tomorrow's Outlook">
+        <datum name="forecastdate" />
+        <datum name="tempforecast" />
+        <datum name="condforecast" />
+        <datum name="todaypic" />
+        <datum name="updatetime" />
+        <datum name="location" />
+    </screen> -->
+</screens>
