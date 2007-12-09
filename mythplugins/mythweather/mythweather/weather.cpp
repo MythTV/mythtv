@@ -41,8 +41,12 @@ Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    theme->LoadTheme(xmldata, "weather", "weather-");
-    updateBackground();
+    
+    if (!theme->LoadTheme(xmldata, "weather", "weather-"))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Weather: Couldn't find the theme."));
+    }
+
     screens.setAutoDelete(true);
 
     /*
@@ -61,6 +65,7 @@ Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
     setNoErase();
 
     setupScreens(xmldata);
+    updateBackground();
     if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
         showLayout(m_startup);
     showtime_timeout();
@@ -102,11 +107,11 @@ void Weather::setupScreens(QDomElement &xml)
             }
             else if (e.tagName() == "container")
             {
+                QRect area;
+                QString name;
+                int context;
                 if (e.attribute("name") == "startup")
                 {
-                    QRect area;
-                    QString name;
-                    int context;
                     if (!theme->GetSet("startup"))
                         theme->parseContainer(e, name, context, area);
                     else
@@ -114,6 +119,10 @@ void Weather::setupScreens(QDomElement &xml)
                     WeatherScreen *ws = WeatherScreen::loadScreen(this, theme->GetSet(name));
                     ws->setInUse(true);
                     m_startup = ws;
+                }
+                else if (e.attribute("name") == "background")
+                {
+                    theme->parseContainer(e, name, context, area);
                 }
                 else
                     containers[e.attribute("name")] = e;
