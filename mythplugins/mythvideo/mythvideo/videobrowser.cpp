@@ -1,5 +1,6 @@
 #include <qpixmap.h>
 #include <unistd.h>
+#include <algorithm>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -12,6 +13,14 @@
 #include "videoutils.h"
 #include "imagecache.h"
 #include "parentalcontrols.h"
+
+namespace
+{
+    int limit_upper(int value, int max)
+    {
+        return std::min(value, max);
+    }
+};
 
 VideoBrowser::VideoBrowser(MythMainWindow *lparent, const QString &lname,
                            VideoList *video_list) :
@@ -67,9 +76,9 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         else if (action == "UP")
             jumpSelection(-1);
         else if (action == "PAGEDOWN")
-            jumpSelection(m_video_list->count() / 5);
+            jumpSelection(limit_upper(m_video_list->count() / 5, 25));
         else if (action == "PAGEUP")
-            jumpSelection(-(m_video_list->count() / 5));
+            jumpSelection(-limit_upper(m_video_list->count() / 5, 25));
         else if (action == "LEFT")
             cursorLeft();
         else if (action == "RIGHT")
