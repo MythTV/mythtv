@@ -1,6 +1,7 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
+// qt
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qptrlist.h>
@@ -8,12 +9,16 @@
 #include <qmap.h>
 #include <qthread.h>
 
-#include "treecheckitem.h"
+// mythtv
 #include <mythtv/uitypes.h>
+
+// mythmusic
+#include "treecheckitem.h"
 
 
 class AllMusic;
 class CoverArt;
+class PlaylistsContainer;
 
 enum ImageType
 {
@@ -25,8 +30,6 @@ enum ImageType
     IT_LAST
 };
 
-#include "metaiotaglib.h"
-
 typedef struct AlbumArtImage
 {
     int       id;
@@ -37,7 +40,6 @@ typedef struct AlbumArtImage
     bool      embedded;
 } AlbumArtImage;
 
-//typedef QValueList<struct AlbumArtImage> AlbumArtList;
 
 class Metadata
 {
@@ -183,7 +185,11 @@ class Metadata
     static QString GetStartdir() { return m_startdir; }
 
     static QStringList fillFieldList(QString field);
+    static Metadata *getMetadataFromID(int id);
 
+    // this looks for any image available - preferring a front cover if available
+    QImage getAlbumArt(void);
+    // this looks only for the given image type
     QImage getAlbumArt(ImageType type);
 
   private:
@@ -307,6 +313,8 @@ class MusicNode
     double              m_lastplayMax;
 };
 
+//---------------------------------------------------------------------------
+
 class MetadataLoadingThread : public QThread
 {
 
@@ -319,6 +327,8 @@ class MetadataLoadingThread : public QThread
 
     AllMusic *parent;
 };
+
+//---------------------------------------------------------------------------
 
 class AllMusic
 {
@@ -392,6 +402,27 @@ class AllMusic
     double                   m_lastplayMax;
 
 };
+
+//----------------------------------------------------------------------------
+
+class MusicData
+{
+  public:
+
+    MusicData();
+    ~MusicData();
+
+    QString             paths;
+    QString             startdir;
+    PlaylistsContainer *all_playlists;
+    AllMusic           *all_music;
+    bool                runPost;
+};
+
+// This global variable contains the MusicData instance for the application
+extern MPUBLIC MusicData *gMusicData;
+
+//----------------------------------------------------------------------------
 
 class AlbumArtImages: public QObject
 {

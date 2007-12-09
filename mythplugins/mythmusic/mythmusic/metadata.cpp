@@ -1,4 +1,6 @@
 #include <iostream> 
+
+// qt
 #include <qapplication.h>
 #include <qregexp.h> 
 #include <qdatetime.h>
@@ -6,12 +8,20 @@
 
 using namespace std;
 
+// mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdbcon.h>
 
+// mythmusic
 #include "metadata.h"
+#include "metaiotaglib.h"
 #include "treebuilders.h"
+#include "playlist.h"
+
+
+// this is the global MusicData object shared thoughout MythMusic
+MusicData  *gMusicData = NULL;
 
 static QString thePrefix = "the ";
 
@@ -70,7 +80,7 @@ void Metadata::persist()
     query.bindValue(":LASTPLAY", m_lastplay);
     query.bindValue(":ID", m_id);
 
-    if (!query.exec() || query.numRowsAffected() < 1)
+    if (!query.exec())
         MythContext::DBError("music persist", query);
 }
 
@@ -706,6 +716,36 @@ QStringList Metadata::fillFieldList(QString field)
     return searchList;
 }
 
+QImage Metadata::getAlbumArt(void)
+{
+    AlbumArtImages albumArt(this);
+
+    QImage image;
+    ImageType type;
+
+    if (albumArt.isImageAvailable(IT_FRONTCOVER))
+        type = IT_FRONTCOVER;
+    else if (albumArt.isImageAvailable(IT_UNKNOWN))
+        type = IT_UNKNOWN;
+    else if (albumArt.isImageAvailable(IT_BACKCOVER))
+        type = IT_BACKCOVER;
+    else if (albumArt.isImageAvailable(IT_INLAY))
+        type = IT_INLAY;
+    else if (albumArt.isImageAvailable(IT_CD))
+        type = IT_CD;
+    else
+        return image;
+
+    AlbumArtImage albumart_image = albumArt.getImage(type);
+
+    if (albumart_image.embedded)
+        image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
+    else
+        image = QImage(albumart_image.filename);
+
+    return image;
+}
+
 QImage Metadata::getAlbumArt(ImageType type)
 {
     AlbumArtImages albumArt(this);
@@ -724,6 +764,80 @@ QImage Metadata::getAlbumArt(ImageType type)
 
     return image;
 }
+
+// static function to get a metadata object given a track id
+// it's upto the caller to delete the returned object when finished
+Metadata *Metadata::getMetadataFromID(int id)
+{
+    Metadata *meta = NULL;
+
+    QString aquery = "SELECT music_songs.song_id, music_artists.artist_name, music_comp_artists.artist_name AS compilation_artist, "
+                     "music_albums.album_name, music_songs.name, music_genres.genre, music_songs.year, "
+                     "music_songs.track, music_songs.length, CONCAT_WS('/', "
+                     "music_directories.path, music_songs.filename) AS filename, "
+                     "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_albums.compilation, "
+                     "music_songs.format "
+                     "FROM music_songs "
+                     "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
+                     "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                     "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                     "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
+                     "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
+                     "WHERE music_songs.song_id = :TRACKID;";
+
+    QString filename, artist, album, title;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(aquery);
+    query.bindValue(":TRACKID", id);
+    query.exec();
+
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        filename = QString::fromUtf8(query.value(9).toString());
+        if (!filename.contains("://"))
+            filename = m_startdir + filename;
+
+        artist = QString::fromUtf8(query.value(1).toString());
+        if (artist.isEmpty())
+            artist = QObject::tr("Unknown Artist");
+
+        album = QString::fromUtf8(query.value(3).toString());
+        if (album.isEmpty())
+            album = QObject::tr("Unknown Album");
+
+        title = QString::fromUtf8(query.value(4).toString());
+        if (title.isEmpty())
+            title = QObject::tr("Unknown Title");
+
+        meta = new Metadata(
+            filename,
+            artist,
+            QString::fromUtf8(query.value(2).toString()),
+            album,
+            title,
+            QString::fromUtf8(query.value(5).toString()),
+            query.value(6).toInt(),
+            query.value(7).toInt(),
+            query.value(8).toInt(),
+            query.value(0).toInt(),
+            query.value(10).toInt(), //rating
+            query.value(11).toInt(), //playcount
+            query.value(12).toString(), //lastplay
+            (query.value(13).toInt() > 0), //compilation
+            query.value(14).toString()); //format
+    }
+    else
+    {
+         VERBOSE(VB_IMPORTANT, QString("Track %1 not found!!").arg(id));
+         return NULL;
+    }
+
+    return meta;
+}
+
+//--------------------------------------------------------------------------
 
 MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
 {
@@ -1558,3 +1672,29 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
 
     return type;
 }
+
+MusicData::MusicData(void)
+{
+    paths = "";
+    startdir = "";
+    all_playlists = NULL;
+    all_music = NULL;
+    runPost = false;
+}
+
+MusicData::~MusicData(void)
+{
+    if (all_playlists)
+    {
+        delete all_playlists;
+        all_playlists = NULL;
+    }
+
+    if (all_music)
+    {
+        delete all_music;
+        all_music = NULL;
+    }
+}
+
+

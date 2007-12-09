@@ -16,7 +16,7 @@
 #include "directoryfinder.h"
 #include "cdrip.h"
 #include "editmetadata.h"
-
+#include "musicplayer.h"
 
 static QString truncateFilename(QString filename, UITextType *textType)
 {
@@ -95,9 +95,6 @@ void FileScannerThread::run()
 ImportMusicDialog::ImportMusicDialog(MythMainWindow *parent, const char* name)
                 :MythThemedDialog(parent, "import_music", "music-", name)
 {
-    m_decoder = NULL;
-    m_output = NULL;
-    m_input = NULL;
     m_popupMenu = NULL;
 
     m_defaultCompilation = false;
@@ -122,14 +119,6 @@ ImportMusicDialog::~ImportMusicDialog()
     gContext->SaveSetting("MythMusicLastImportDir", m_location_edit->getText());
 
     delete m_tracks;
-
-    stopDecoder();
-
-    if (m_output)
-        delete m_output;
-
-    if (m_input)
-        delete m_input;
 }
 
 void ImportMusicDialog::fillWidgets()
@@ -375,82 +364,9 @@ void ImportMusicDialog::playPressed()
     if (m_tracks->size() == 0)
         return;
 
-    stopDecoder();
-
     Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
 
-    if (!m_output)
-        openOutputDevice();
-
-    if (m_input)
-        delete m_input;
-
-    m_input = new QFile(meta->Filename());
-
-    if (m_decoder && !m_decoder->factory()->supports(meta->Filename()))
-        m_decoder = NULL;
-
-    if (!m_decoder)
-    {
-        m_decoder = Decoder::create(meta->Filename(), m_input, m_output);
-        if (!m_decoder)
-        {
-            cout << "Failed to create decoder for playback" << endl;
-            return;
-        }
-
-        m_decoder->setBlockSize(2 * 1024);
-    }
-    else
-    {
-        m_decoder->setInput(m_input);
-        m_decoder->setFilename(meta->Filename());
-    }
-
-    if (m_decoder->initialize())
-    {
-        if (m_output)
-            m_output->Reset();
-
-        m_decoder->start();
-    }
-}
-
-void ImportMusicDialog::stopDecoder(void)
-{
-    if (m_decoder && m_decoder->running()) 
-    {
-        m_decoder->lock();
-        m_decoder->stop();
-        m_decoder->unlock();
-    }
-
-    if (m_decoder) 
-    {
-        m_decoder->lock();
-        m_decoder->cond()->wakeAll();
-        m_decoder->unlock();
-    }
-
-    if (m_decoder)
-        m_decoder->wait();
-}
-
-void ImportMusicDialog::openOutputDevice(void)
-{
-    QString adevice;
-
-    if (gContext->GetSetting("MusicAudioDevice") == "default")
-        adevice = gContext->GetSetting("AudioOutputDevice");
-    else
-        adevice = gContext->GetSetting("MusicAudioDevice");
-
-    // TODO: Error checking that device is opened correctly!
-    m_output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
-                                    AUDIOOUTPUT_MUSIC, true,
-                                    false /* AC3/DTS pass through */);
-    m_output->setBufferSize(256 * 1024);
-    m_output->SetBlocking(false);
+    gPlayer->playFile(*meta);
 }
 
 void ImportMusicDialog::prevPressed()

@@ -29,28 +29,21 @@ using namespace std;
 #include "search.h"
 
 PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
-                                   QString theme_filename, 
-                                   PlaylistsContainer *the_playlists,
-                                   AllMusic *the_music,
-                                   const QString &dev, const char *name)
+                                   QString theme_filename, const QString &dev, const char *name)
 
                 : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     //  A few internal variable defaults
- 
-    input = NULL;
-    output = NULL;
-    decoder = NULL;
     mainvisual = NULL;
     visual_mode_timer = NULL;
     lcd_update_timer = NULL;
     waiting_for_playlists_timer = NULL;
     speed_scroll_timer = NULL;
-    playlist_tree = NULL;
     playlist_popup = NULL;
     progress = NULL;
 
-    isplaying = false;
+    gPlayer->setListener(this);
+
     tree_is_done = false;
     first_playlist_check = true;
     outputBufferSize = 256;
@@ -74,11 +67,6 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     cd_watcher = NULL;
     scan_for_cd = gContext->GetNumSetting("AutoPlayCD", 0);
     m_CDdevice = dev;
-
-    // Set our pointers the playlists and the metadata containers
-
-    all_playlists = the_playlists;
-    all_music = the_music;
 
     // Get some user set options
 
@@ -112,35 +100,11 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                 this, SLOT(hideVolume()));
     }
 
-    // Figure out the shuffle mode
+    setShuffleMode(gPlayer->getShuffleMode());
 
-    QString playmode = gContext->GetSetting("PlayMode", "none");
-    if (playmode.lower() == "random")
-        setShuffleMode(SHUFFLE_RANDOM);
-    else if (playmode.lower() == "intelligent")
-        setShuffleMode(SHUFFLE_INTELLIGENT);
-    else if (playmode.lower() == "album")
-        setShuffleMode(SHUFFLE_ALBUM);
-    else if (playmode.lower() == "artist")
-        setShuffleMode(SHUFFLE_ARTIST);
-    else
-        setShuffleMode(SHUFFLE_OFF);
+    resumemode = gPlayer->getResumeMode();
 
-    QString resumestring = gContext->GetSetting("ResumeMode", "off");
-    if (resumestring.lower() == "off")
-        resumemode = RESUME_OFF;
-    else if (resumestring.lower() == "track")
-        resumemode = RESUME_TRACK;
-    else
-        resumemode = RESUME_EXACT;
-
-    QString repeatmode = gContext->GetSetting("RepeatMode", "all");
-    if (repeatmode.lower() == "track")
-        setRepeatMode(REPEAT_TRACK);
-    else if (repeatmode.lower() == "all")
-        setRepeatMode(REPEAT_ALL);
-    else
-        setRepeatMode(REPEAT_OFF);
+    setRepeatMode(gPlayer->getRepeatMode());
 
     // Set some button values
 
@@ -170,7 +134,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         // Set please wait on the LCD
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
-        
+
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
                          "Generic"));
         lcd->switchToGeneric(&textItems);
@@ -195,6 +159,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     else
         mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
     mainvisual->show();
+
+    gPlayer->setVisual(mainvisual);
 
     fullscreen_blank = false; 
 
@@ -238,16 +204,6 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
-    savePosition(currentTime);
-
-    stopAll();
-
-    if (output)
-    {
-        delete output;
-        output = NULL;
-    }
-
     if (progress)
     {
         progress->Close();
@@ -262,28 +218,11 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         delete cd_reader_thread;
     }
 
-    if (playlist_tree)
-        delete playlist_tree;
-
-    if (shufflemode == SHUFFLE_INTELLIGENT)
-        gContext->SaveSetting("PlayMode", "intelligent");
-    else if (shufflemode == SHUFFLE_RANDOM)
-        gContext->SaveSetting("PlayMode", "random");
-    else if (shufflemode == SHUFFLE_ALBUM)
-        gContext->SaveSetting("PlayMode", "album");
-    else if (shufflemode == SHUFFLE_ARTIST)
-        gContext->SaveSetting("PlayMode", "artist");
-    else
-        gContext->SaveSetting("PlayMode", "none");
-
-    if (repeatmode == REPEAT_TRACK)
-        gContext->SaveSetting("RepeatMode", "track");
-    else if (repeatmode == REPEAT_ALL)
-        gContext->SaveSetting("RepeatMode", "all");
-    else
-        gContext->SaveSetting("RepeatMode", "none");
     if (class LCD *lcd = LCD::Get())
         lcd->switchToTime();
+
+    gMusicData->all_music->save();
+    gPlayer->refreshMetadata();
 }
 
 bool PlaybackBoxMusic::onMediaEvent(MythMediaDevice*)
@@ -304,7 +243,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
     resetTimer();
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions, false);
 
     int scrollAmt = 1;
 
@@ -343,7 +282,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "PAUSE")
         { 
-            if (isplaying)
+            if (gPlayer->isPlaying())
             {
                 if (pause_button)
                     pause_button->push();
@@ -371,7 +310,6 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 stop_button->push();
             else
                 stop();
-
             currentTime = 0;
         }
         else if (action == "THMBUP")
@@ -427,6 +365,32 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 bannerToggle(curMeta);
             else
                 showEditMetadataDialog();
+        else if (action == "ESCAPE" && visualizer_status != 2)
+        {
+            DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+                             tr("Exiting Music Player\n"
+                                "Do you want to continue playing in the background?"));
+            dialog->AddButton(tr("No - Exit, Stop Playing"));
+            dialog->AddButton(tr("Yes - Exit, Continue Playing"));
+            dialog->AddButton(tr("Cancel"));
+            int res = dialog->exec();
+            dialog->deleteLater();
+
+            if (res == kDialogCodeButton0)
+            {
+                gPlayer->savePosition();
+                stopAll();
+                done(kDialogCodeAccepted);
+            }
+            else if (res == kDialogCodeButton1)
+            {
+                gPlayer->setListener(NULL);
+                gPlayer->setVisual(NULL);
+                done(kDialogCodeAccepted);
+            }
+            else
+                handled = true;
+        }
         else
             handled = false;
     }
@@ -541,8 +505,6 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 music_tree_list->incSearchStart();
             else if (action == "INCSEARCHNEXT")
                 music_tree_list->incSearchNext();
-            else
-                handled = false;
         }
     }
     else
@@ -565,9 +527,6 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 handled = false;
         }
     }
-
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
 }
 
 void PlaybackBoxMusic::handlePush(QString buttonname)
@@ -673,7 +632,7 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
         return;
 
     // save all pending metadata to then DB so that the smart playlists can use it
-    all_music->save();
+    gMusicData->all_music->save();
 
     closePlaylistPopup();
 
@@ -800,22 +759,22 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
     {
         // update playlist from quick playlist
         if (menufilters)
-            all_playlists->getActive()->fillSonglistFromQuery(
+            gMusicData->all_playlists->getActive()->fillSonglistFromQuery(
                         whereClause, false, PL_FILTERONLY, curTrackID);
         else
-            all_playlists->getActive()->fillSonglistFromQuery(
+            gMusicData->all_playlists->getActive()->fillSonglistFromQuery(
                         whereClause, bRemoveDups, insertOption, curTrackID);
     }
     else
     {
         // update playlist from smart playlist
         if (menufilters)
-            all_playlists->getActive()->fillSonglistFromSmartPlaylist(
+            gMusicData->all_playlists->getActive()->fillSonglistFromSmartPlaylist(
                     curSmartPlaylistCategory, curSmartPlaylistName,
                     false, PL_FILTERONLY, curTrackID);
         else
         {
-            all_playlists->getActive()->fillSonglistFromSmartPlaylist(
+            gMusicData->all_playlists->getActive()->fillSonglistFromSmartPlaylist(
                     curSmartPlaylistCategory, curSmartPlaylistName,
                     bRemoveDups, insertOption, curTrackID);
         }
@@ -909,8 +868,7 @@ void PlaybackBoxMusic::updatePlaylistFromCD()
 {
     if (!cd_reader_thread)
     {
-        cd_reader_thread = new ReadCDThread(m_CDdevice,
-                                            all_playlists, all_music);
+        cd_reader_thread = new ReadCDThread(m_CDdevice);
         cd_reader_thread->start();
     }
 
@@ -949,7 +907,8 @@ void PlaybackBoxMusic::occasionallyCheckCD()
     if (cd_reader_thread->getLock()->locked())
         return;
 
-    if (!scan_for_cd) {
+    if (!scan_for_cd)
+    {
         cd_watcher->stop();
         delete cd_watcher;
         cd_watcher = NULL;
@@ -961,15 +920,15 @@ void PlaybackBoxMusic::occasionallyCheckCD()
 
     if (!scan_for_cd || cd_reader_thread->statusChanged())
     {
-        all_playlists->clearCDList();
-        all_playlists->getActive()->ripOutAllCDTracksNow();
+        gMusicData->all_playlists->clearCDList();
+        gMusicData->all_playlists->getActive()->ripOutAllCDTracksNow();
 
-        if (all_music->getCDTrackCount())
+        if (gMusicData->all_music->getCDTrackCount())
         {
             visual_mode_timer->stop();
 
-            all_playlists->getActive()->removeAllTracks();
-            all_playlists->getActive()->fillSongsFromCD();
+            gMusicData->all_playlists->getActive()->removeAllTracks();
+            gMusicData->all_playlists->getActive()->fillSongsFromCD();
 
         }
 
@@ -995,29 +954,29 @@ void PlaybackBoxMusic::showEditMetadataDialog()
     // store the current track metadata in case the track changes
     // while we show the edit dialog
     GenericTree *node = music_tree_list->getCurrentNode();
-    Metadata *editMeta = all_music->getMetadata( node->getInt() );
+    Metadata *editMeta = gMusicData->all_music->getMetadata( node->getInt() );
 
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
     if (kDialogCodeRejected != editDialog.exec())
     {
         // update the metadata copy stored in all_music
-        if (all_music->updateMetadata(editMeta->ID(), editMeta))
+        if (gMusicData->all_music->updateMetadata(editMeta->ID(), editMeta))
         {
-           // update the displayed track info
-           if (node)
-           {
-               bool errorFlag;
-               node->setString(all_music->getLabel(editMeta->ID(), &errorFlag));
-               music_tree_list->refresh();
+            // update the displayed track info
+            if (node)
+            {
+                bool errorFlag;
+                node->setString(gMusicData->all_music->getLabel(editMeta->ID(), &errorFlag));
+                music_tree_list->refresh();
 
-               // make sure the track hasn't changed
-               if (curMeta->ID() == editMeta->ID())
-               {
+                // make sure the track hasn't changed
+                if (curMeta->ID() == editMeta->ID())
+                {
                     *curMeta = editMeta;
                     updateTrackInfo(curMeta);
-               }
-           }
+                }
+            }
         }
 
         MythBusyDialog *busy = new MythBusyDialog(
@@ -1032,14 +991,14 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         branches_to_current_node = *a_route;
 
         // reload music
-        all_music->save();
-        all_music->startLoading();
-        while (!all_music->doneLoading())
+        gMusicData->all_music->save();
+        gMusicData->all_music->startLoading();
+        while (!gMusicData->all_music->doneLoading())
         {
             qApp->processEvents();
             usleep(50000);
         }
-        all_playlists->postLoad();
+        gMusicData->all_playlists->postLoad();
 
         constructPlaylistTree();
 
@@ -1060,9 +1019,9 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         }
 
         GenericTree *node = music_tree_list->getCurrentNode();
-        curMeta = all_music->getMetadata(node->getInt());
+        curMeta = gMusicData->all_music->getMetadata(node->getInt());
 
-        setShuffleMode(shufflemode);
+        setShuffleMode(gPlayer->getShuffleMode());
 
         music_tree_list->refresh();
 
@@ -1082,8 +1041,8 @@ void PlaybackBoxMusic::checkForPlaylists()
     }
     else
     {
-        if (all_playlists->doneLoading() &&
-            all_music->doneLoading())
+        if (gMusicData->all_playlists->doneLoading() &&
+            gMusicData->all_music->doneLoading())
         {
             if (progress)
             {
@@ -1104,10 +1063,17 @@ void PlaybackBoxMusic::checkForPlaylists()
                 branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
                 branches_to_current_node.append(0); //  Active play Queue
 
-                if (resumemode > RESUME_OFF)
-                    restorePosition();
+                if (gPlayer->isPlaying())
+                {
+                    restorePosition(gPlayer->getRouteToCurrent());
+                }
                 else
-                    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+                {
+                    if (resumemode > MusicPlayer::RESUME_OFF)
+                        restorePosition(gContext->GetSetting("MusicBookmark", ""));
+                    else
+                        music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+                }
 
                 music_tree_list->refresh();
                 if (show_whole_tree)
@@ -1129,19 +1095,19 @@ void PlaybackBoxMusic::checkForPlaylists()
         }
         else
         {
-            if (!all_music->doneLoading())
+            if (!gMusicData->all_music->doneLoading())
             {
                 // Only bother with progress dialogue
                 // if we have a reasonable number of tracks
-                if (all_music->count() >= 250)
+                if (gMusicData->all_music->count() >= 250)
                 {
                     if (!progress)
                     {
                         progress = new MythProgressDialog(
-                            QObject::tr("Loading Music"), all_music->count());
+                            QObject::tr("Loading Music"), gMusicData->all_music->count());
                         progress_type = kProgressMusic;
                     }
-                    progress->setProgress(all_music->countLoaded());
+                    progress->setProgress(gMusicData->all_music->countLoaded());
                 }
             } 
             else if (progress_type == kProgressMusic)
@@ -1162,55 +1128,54 @@ void PlaybackBoxMusic::checkForPlaylists()
 
 void PlaybackBoxMusic::changeVolume(bool up_or_down)
 {
-    if (volume_control && output)
+    if (volume_control && gPlayer->getOutput())
     {
         if (up_or_down)
-            output->AdjustCurrentVolume(2);
+            gPlayer->getOutput()->AdjustCurrentVolume(2);
         else
-            output->AdjustCurrentVolume(-2);
+            gPlayer->getOutput()->AdjustCurrentVolume(-2);
         showVolume(true);
     }
 }
 
 void PlaybackBoxMusic::toggleMute()
 {
-    if (volume_control && output)
+    if (volume_control && gPlayer->getOutput())
     {
-        output->ToggleMute();
+        gPlayer->getOutput()->ToggleMute();
         showVolume(true);
     }
 }
 
 void PlaybackBoxMusic::showProgressBar()
 {
-
-    if (progress_bar) {
-
-             progress_bar->SetTotal(maxTime);
-             progress_bar->SetUsed(currentTime);
+    if (progress_bar)
+    {
+        progress_bar->SetTotal(maxTime);
+        progress_bar->SetUsed(currentTime);
     }
-
 }
+
 void PlaybackBoxMusic::showVolume(bool on_or_off)
 {
     float volume_level;
-    if (volume_control && output)
+    if (volume_control && gPlayer->getOutput())
     {
         if (volume_status)
         {
             if (on_or_off)
             {
-                volume_status->SetUsed(output->GetCurrentVolume());
+                volume_status->SetUsed(gPlayer->getOutput()->GetCurrentVolume());
                 volume_status->SetOrder(0);
                 volume_status->refresh();
                 volume_display_timer->changeInterval(2000);
                 if (class LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
-                if (output->GetMute())
+                if (gPlayer->getOutput()->GetMute())
                     volume_level = 0.0;
                 else
-                    volume_level = (float)output->GetCurrentVolume() / 
+                    volume_level = (float)gPlayer->getOutput()->GetCurrentVolume() / 
                                    (float)100;
 
                 if (class LCD *lcd = LCD::Get())
@@ -1239,9 +1204,8 @@ void PlaybackBoxMusic::resetTimer()
 
 void PlaybackBoxMusic::play()
 {
-
-    if (isplaying)
-        stop();
+    if (gPlayer->isPlaying())
+        gPlayer->stop();
 
     if (curMeta)
         playfile = curMeta->Filename();
@@ -1252,87 +1216,37 @@ void PlaybackBoxMusic::play()
         return;
     }
 
-    QUrl sourceurl(playfile);
-    QString sourcename(playfile);
-
-    if (!output)
-        openOutputDevice();
-
-    if (output->GetPause())
+    if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
     {
-        pause();
+        gPlayer->pause();
         return;
     }
 
-    if (!sourceurl.isLocalFile()) 
-    {
-        StreamInput streaminput(sourceurl);
-        streaminput.setup();
-        input = streaminput.socket();
-    } 
-    else
-        input = new QFile(playfile);
-    
-    if (decoder && !decoder->factory()->supports(sourcename))
-    {
-        decoder->removeListener(this);
-        decoder = 0;
-    }
-
-    if (!decoder)
-    {
-        decoder = Decoder::create(sourcename, input, output);
-
-        if (!decoder) 
-        {
-            printf("mythmusic: unsupported fileformat\n");
-            stopAll();
-            return;
-        }
-        if (sourcename.contains("cda") == 1)
-            dynamic_cast<CdDecoder*>(decoder)->setDevice(m_CDdevice);
-
-        decoder->setBlockSize(globalBlockSize);
-        decoder->addListener(this);
-    } 
-    else 
-    {
-        decoder->setInput(input);
-        decoder->setFilename(sourcename);
-        decoder->setOutput(output);
-    }
+    gPlayer->setCurrentNode(music_tree_list->getCurrentNode());
+    gPlayer->playFile(playfile);
 
     currentTime = 0;
 
-    mainvisual->setDecoder(decoder);
-    mainvisual->setOutput(output);
+    mainvisual->setDecoder(gPlayer->getDecoder());
+    mainvisual->setOutput(gPlayer->getOutput());
     mainvisual->setMetadata(curMeta);
 
-    if (decoder->initialize()) 
+    if (gPlayer->isPlaying())
     {
-        if (output)
-        {
-            output->Reset();
-        }
-
-        decoder->start();
-
-        if (resumemode == RESUME_EXACT && gContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
+        if (resumemode == MusicPlayer::RESUME_EXACT && 
+                gContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
         {
             seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
             gContext->SaveSetting("MusicBookmarkPosition", 0);
         }
-
-        bannerEnable(curMeta, show_album_art);
-        isplaying = true;
-        curMeta->setLastPlay();
-        curMeta->incPlayCount();
     }
+
+    bannerEnable(curMeta, show_album_art);
 }
 
 void PlaybackBoxMusic::visEnable()
 {
-    if (!visualizer_status != 2 && isplaying)
+    if (!visualizer_status != 2 && gPlayer->isPlaying())
     {
         setUpdatesEnabled(false);
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
@@ -1410,7 +1324,7 @@ void PlaybackBoxMusic::CycleVisualizer()
 void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
 {
     LCD *lcd = LCD::Get();
-    if (!lcd)
+    if (!lcd || !mdata)
         return;
 
     // Set the Artist and Tract on the LCD
@@ -1421,56 +1335,16 @@ void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
 
 void PlaybackBoxMusic::pause(void)
 {
-    if (output) 
-    {
-        isplaying = !isplaying;
-        output->Pause(!isplaying); //Note pause doesn't take effect instantly
-    }
-    // wake up threads
-    if (decoder) 
-    {
-        decoder->lock();
-        decoder->cond()->wakeAll();
-        decoder->unlock();
-    }
-
-}
-
-void PlaybackBoxMusic::stopDecoder(void)
-{
-    if (decoder && decoder->running()) 
-        decoder->stop();
-
-    if (decoder) 
-    {
-        decoder->lock();
-        decoder->cond()->wakeAll();
-        decoder->unlock();
-    }
-
-    if (decoder)
-        decoder->wait();
+    gPlayer->pause();
 }
 
 void PlaybackBoxMusic::stop(void)
 {
-    stopDecoder();
-
-    if (output)
-    {
-        if (output->GetPause())
-        {
-            pause();
-        }
-        output->Reset();
-    }
+    gPlayer->stop();
 
     mainvisual->setDecoder(0);
     mainvisual->setOutput(0);
     mainvisual->deleteMetadata();
-
-    delete input;
-    input = 0;
 
     QString time_string = getTimeString(maxTime, 0);
 
@@ -1478,8 +1352,6 @@ void PlaybackBoxMusic::stop(void)
         time_text->SetText(time_string);
     if (info_text)
         info_text->SetText("");
-
-    isplaying = false;
 }
 
 void PlaybackBoxMusic::stopAll()
@@ -1489,18 +1361,16 @@ void PlaybackBoxMusic::stopAll()
         lcd->switchToTime();
     }
 
-    stop();
+    mainvisual->setDecoder(0);
+    mainvisual->setOutput(0);
+    mainvisual->deleteMetadata();
 
-    if (decoder) 
-    {
-        decoder->removeListener(this);
-        decoder = 0;
-    }
+    gPlayer->stop(true);
 }
 
 void PlaybackBoxMusic::previous()
 {
-    if (repeatmode == REPEAT_ALL)
+    if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_ALL)
     {
         if (music_tree_list->prevActive(true, show_whole_tree))
             music_tree_list->activate();
@@ -1517,7 +1387,7 @@ void PlaybackBoxMusic::previous()
 
 void PlaybackBoxMusic::next()
 {
-    if (repeatmode == REPEAT_ALL)
+    if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_ALL)
     {
         // Grab the next track after this one. First flag is to wrap around
         // to the beginning of the list. Second decides if we will traverse up 
@@ -1541,11 +1411,7 @@ void PlaybackBoxMusic::next()
 
 void PlaybackBoxMusic::nextAuto()
 {
-    stopDecoder();
-
-    isplaying = false;
-
-    if (repeatmode == REPEAT_TRACK)
+    if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_TRACK)
         play();
     else 
         next();
@@ -1569,15 +1435,15 @@ void PlaybackBoxMusic::seekback()
 
 void PlaybackBoxMusic::seek(int pos)
 {
-    if (output)
+    if (gPlayer->getOutput())
     {
-        output->Reset();
-        output->SetTimecode(pos*1000);
+        gPlayer->getOutput()->Reset();
+        gPlayer->getOutput()->SetTimecode(pos*1000);
 
-        if (decoder && decoder->running()) 
+        if (gPlayer->getDecoder() && gPlayer->getDecoder()->running()) 
         {
-            decoder->lock();
-            decoder->seek(pos);
+            gPlayer->getDecoder()->lock();
+            gPlayer->getDecoder()->seek(pos);
 
             if (mainvisual) 
             {
@@ -1586,10 +1452,10 @@ void PlaybackBoxMusic::seek(int pos)
                 mainvisual->mutex()->unlock();
             }
 
-            decoder->unlock();
+            gPlayer->getDecoder()->unlock();
         }
 
-        if (!isplaying)
+        if (!gPlayer->isPlaying())
         {
             currentTime = pos;
             if (time_text)
@@ -1614,29 +1480,29 @@ void PlaybackBoxMusic::seek(int pos)
     }
 }
 
-void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
+void PlaybackBoxMusic::setShuffleMode(MusicPlayer::ShuffleMode mode)
 {
-    shufflemode = mode;
+    MusicPlayer::ShuffleMode shufflemode = mode;
     QString state;
 
     switch (shufflemode)
     {
-        case SHUFFLE_INTELLIGENT:
+        case MusicPlayer::SHUFFLE_INTELLIGENT:
             state = tr("Smart");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_SMART);
             break;
-        case SHUFFLE_RANDOM:
+        case MusicPlayer::SHUFFLE_RANDOM:
             state = tr("Rand");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_RAND);
             break;
-        case SHUFFLE_ALBUM:
+        case MusicPlayer::SHUFFLE_ALBUM:
             state = tr("Album");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ALBUM);
             break;
-        case SHUFFLE_ARTIST:
+        case MusicPlayer::SHUFFLE_ARTIST:
             state = tr("Artist");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ARTIST);
@@ -1663,7 +1529,7 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 
     bannerEnable(QString("%1: %2").arg(tr("Shuffle")).arg(state), 4000);
 
-    if (!shufflemode == SHUFFLE_OFF)
+    if (!shufflemode == MusicPlayer::SHUFFLE_OFF)
         music_tree_list->scrambleParents(true);
     else
         music_tree_list->scrambleParents(true);
@@ -1675,13 +1541,13 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
         music_tree_list->setVisualOrdering(1);
     music_tree_list->refresh();
 
-    if (isplaying)
+    if (gPlayer->isPlaying())
         setTrackOnLCD(curMeta);
 }
 
 void PlaybackBoxMusic::toggleShuffle(void)
 {
-    setShuffleMode(++shufflemode % MAX_SHUFFLE_MODES);
+    setShuffleMode(gPlayer->toggleShuffleMode());
 }
 
 void PlaybackBoxMusic::increaseRating()
@@ -1713,19 +1579,19 @@ void PlaybackBoxMusic::decreaseRating()
     }
 }
 
-void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
+void PlaybackBoxMusic::setRepeatMode(MusicPlayer::RepeatMode mode)
 {
-    repeatmode = mode;
+    MusicPlayer::RepeatMode repeatmode = mode;
     QString state;
 
     switch (repeatmode)
     {
-        case REPEAT_ALL:
+        case MusicPlayer::REPEAT_ALL:
             state = tr("All");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
             break;
-        case REPEAT_TRACK:
+        case MusicPlayer::REPEAT_TRACK:
             state = tr("Track");
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicRepeat (LCD::MUSIC_REPEAT_TRACK);
@@ -1787,14 +1653,13 @@ void PlaybackBoxMusic::savePosition(uint position)
     gContext->SaveSetting("MusicBookmarkPosition", position);
 }
 
-void PlaybackBoxMusic::restorePosition()
+void PlaybackBoxMusic::restorePosition(const QString &position)
 {
     QValueList <int> branches_to_current_node;
-    QString s = gContext->GetSetting("MusicBookmark", "");
 
-    if (s != "")
+    if (position != "")
     {
-        QStringList list = QStringList::split(",", s);
+        QStringList list = QStringList::split(",", position);
 
         for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
             branches_to_current_node.append((*it).toInt());
@@ -1810,7 +1675,26 @@ void PlaybackBoxMusic::restorePosition()
             {
                 if (music_tree_list->tryToSetActive(branches_to_current_node))
                 {
-                    music_tree_list->select();
+                    if (gPlayer->isPlaying())
+                    {
+                        GenericTree *node = music_tree_list->getCurrentNode();
+                        if (node)
+                        {
+                            curMeta = gMusicData->all_music->getMetadata(node->getInt());
+                            updateTrackInfo(curMeta);
+
+                            maxTime = curMeta->Length() / 1000;
+
+                            QString time_string = getTimeString(maxTime, 0);
+
+                            mainvisual->setDecoder(gPlayer->getDecoder());
+                            mainvisual->setOutput(gPlayer->getOutput());
+                            mainvisual->setMetadata(curMeta);
+                            bannerEnable(curMeta, show_album_art);
+                        }
+                    }
+                    else
+                        music_tree_list->select();
                     return;
                 }
             }
@@ -1820,7 +1704,27 @@ void PlaybackBoxMusic::restorePosition()
             //we're in show all tree mode - try to restore the position
             if (music_tree_list->tryToSetActive(branches_to_current_node))
             {
-                music_tree_list->select();
+                if (gPlayer->isPlaying())
+                {
+                    GenericTree *node = music_tree_list->getCurrentNode();
+                    if (node)
+                    {
+                        curMeta = gMusicData->all_music->getMetadata(node->getInt());
+                        updateTrackInfo(curMeta);
+
+                        maxTime = curMeta->Length() / 1000;
+
+                        QString time_string = getTimeString(maxTime, 0);
+
+                        mainvisual->setDecoder(gPlayer->getDecoder());
+                        mainvisual->setOutput(gPlayer->getOutput());
+                        mainvisual->setMetadata(curMeta);
+                        bannerEnable(curMeta, show_album_art);
+                    }
+                }
+                else
+                    music_tree_list->select();
+
                 return;
             }
         }
@@ -1835,27 +1739,14 @@ void PlaybackBoxMusic::restorePosition()
 
 void PlaybackBoxMusic::toggleRepeat()
 {
-    setRepeatMode(++repeatmode % MAX_REPEAT_MODES);
+    setRepeatMode(gPlayer->toggleRepeatMode());
 }
 
 void PlaybackBoxMusic::constructPlaylistTree()
 {
-    if (playlist_tree)
-        delete playlist_tree;
+    GenericTree *active_playlist_node = gPlayer->constructPlaylist();
+    GenericTree *playlist_tree = gPlayer->getPlaylistTree();
 
-    playlist_tree = new GenericTree(tr("playlist root"), 0);
-    playlist_tree->setAttribute(0, 0);
-    playlist_tree->setAttribute(1, 0);
-    playlist_tree->setAttribute(2, 0);
-    playlist_tree->setAttribute(3, 0);
-    playlist_tree->setAttribute(4, 0);
-
-    // We ask the playlist object to write out the whole tree (all playlists 
-    // and all music). It will set attributes for nodes in the tree, such as 
-    // whether a node is selectable, how it can be ordered (normal, random, 
-    // intelligent, album), etc. 
-
-    GenericTree *active_playlist_node = all_playlists->writeTree(playlist_tree);
     music_tree_list->assignTreeData(playlist_tree);
     music_tree_list->setCurrentNode(active_playlist_node);
     tree_is_done = true;
@@ -1885,8 +1776,8 @@ void PlaybackBoxMusic::editPlaylist()
     }
 
     visual_mode_timer->stop();
-    DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      m_CDdevice, "music_select", "music-", "database box");
+    DatabaseBox dbbox(gContext->GetMainWindow(), m_CDdevice, 
+                      "music_select", "music-", "database box");
 
     if (cd_watcher)
         cd_watcher->stop();
@@ -1901,6 +1792,7 @@ void PlaybackBoxMusic::editPlaylist()
     constructPlaylistTree();
     if (music_tree_list->tryToSetActive(branches_to_current_node))
     {
+        music_tree_list->syncCurrentWithActive();
         //  All is well
     }
     else
@@ -1917,19 +1809,6 @@ void PlaybackBoxMusic::editPlaylist()
 
     if (scan_for_cd && cd_watcher)
         cd_watcher->start(1000);
-}
-
-void PlaybackBoxMusic::closeEvent(QCloseEvent *event)
-{
-    stopAll();
-
-    hide();
-    event->accept();
-}
-
-void PlaybackBoxMusic::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
 }
 
 void PlaybackBoxMusic::customEvent(QCustomEvent *event)
@@ -2045,7 +1924,8 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
         }
         case DecoderEvent::Error:
         {
-            stopAll();
+            stop();
+
             QApplication::sendPostedEvents();
 
             statusString = tr("Decoder error.");
@@ -2092,27 +1972,13 @@ void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
     if (album_text)
         album_text->SetText(mdata->Album());
 
+    if (showrating)
+    {
+        if (ratings_image)
+            ratings_image->setRepeat(mdata->Rating());
+    }
+
     setTrackOnLCD(mdata);
-}
-
-void PlaybackBoxMusic::openOutputDevice(void)
-{
-    QString adevice;
-
-    if (gContext->GetSetting("MusicAudioDevice") == "default")
-        adevice = gContext->GetSetting("AudioOutputDevice");
-    else
-        adevice = gContext->GetSetting("MusicAudioDevice");
-
-    // TODO: Error checking that device is opened correctly!
-    output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
-                                    AUDIOOUTPUT_MUSIC, true,
-                                    false /* AC3/DTS pass through */);
-    output->setBufferSize(outputBufferSize * 1024);
-    output->SetBlocking(false);
-    output->addListener(this);
-    output->addListener(mainvisual);
-    output->addVisual(mainvisual);    
 }
 
 void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes)
@@ -2131,10 +1997,10 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
         if (node && node->getAttribute(0) == 0)
         {
             // copy the selected playlist to the active playlist
-            Playlist *playlist = all_playlists->getPlaylist(node->getInt());
+            Playlist *playlist = gMusicData->all_playlists->getPlaylist(node->getInt());
             if (playlist)
             {
-                all_playlists->getActive()->fillSongsFromSonglist(
+                gMusicData->all_playlists->getActive()->fillSongsFromSonglist(
                         playlist->getSonglist(), false);
 
                 constructPlaylistTree();
@@ -2150,7 +2016,15 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
     {
         //  It's a track
 
-        curMeta = all_music->getMetadata(node_int);
+        GenericTree *currentnode = music_tree_list->getCurrentNode();
+        GenericTree *activenode = currentnode;
+        if (currentnode && currentnode->childCount() > 0)
+        {
+            music_tree_list->syncCurrentWithActive();
+            activenode = music_tree_list->getCurrentNode();
+        }
+
+        curMeta = gMusicData->all_music->getMetadata(node_int);
 
         updateTrackInfo(curMeta);
 
@@ -2158,15 +2032,10 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         QString time_string = getTimeString(maxTime, 0);
 
-        if (showrating)
+        if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
         {
-            if(ratings_image)
-                ratings_image->setRepeat(curMeta->Rating());
+            gPlayer->stop();
         }
-
-        if (output && output->GetPause())
-            stop();
-
         if (m_pushedButton && m_pushedButton->Name() == "play_button")
         {
             // Play button already pushed, so don't push it again.
@@ -2176,6 +2045,9 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
             play_button->push();
         else
             play();
+
+        if (activenode != currentnode)
+            music_tree_list->setCurrentNode(currentnode);
 
     }
     else
@@ -2349,7 +2221,7 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
 
     // only give the user a choice of the track to play if shuffle mode is off
     MythComboBox *playCombo = NULL;
-    if (shufflemode == SHUFFLE_OFF)
+    if (gPlayer->getShuffleMode() == MusicPlayer::SHUFFLE_OFF)
     {
         playCombo = new MythComboBox(false, popup, "play_combo" );
         playCombo->insertItem(tr("Continue playing current track"));
@@ -2358,7 +2230,7 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
         playCombo->setBackgroundOrigin(ParentOrigin);
         popup->addWidget(playCombo);
     }
-    
+
     MythCheckBox *dupsCheck = new MythCheckBox(popup);
     dupsCheck->setText(tr("Remove Duplicates"));
     dupsCheck->setChecked(false);
@@ -2388,7 +2260,7 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
 
     // if shuffle mode != SHUFFLE_OFF we always try to continue playing
     // the current track
-    if (shufflemode == SHUFFLE_OFF)
+    if (gPlayer->getShuffleMode() == MusicPlayer::SHUFFLE_OFF)
     {
         switch (playCombo->currentItem())
         {

@@ -20,8 +20,7 @@ class ReadCDThread : public QThread
 {
   public:
 
-    ReadCDThread(const QString &dev,
-                 PlaylistsContainer *all_the_playlist, AllMusic *all_the_music);
+    ReadCDThread(const QString &dev);
     virtual void run();
     bool    statusChanged(){return cd_status_changed;}
     QMutex  *getLock(){return &music_lock;}
@@ -29,8 +28,6 @@ class ReadCDThread : public QThread
   private:
 
     QString             m_CDdevice;
-    AllMusic*           all_music;
-    PlaylistsContainer* the_playlists;
     bool                cd_status_changed;
     QMutex              music_lock;
 };
@@ -39,8 +36,7 @@ class DatabaseBox : public MythThemedDialog
 {
     Q_OBJECT
   public:
-    DatabaseBox(PlaylistsContainer *all_playlists,
-                AllMusic *music_ptr, MythMainWindow *parent, 
+    DatabaseBox(MythMainWindow *parent,
                 const QString dev, const QString &window_name,
                 const QString &theme_filename, const char *name = 0);
    ~DatabaseBox();
@@ -48,7 +44,7 @@ class DatabaseBox : public MythThemedDialog
     void dealWithTracks(PlaylistItem *item_ptr);
     void setCDTitle(const QString& title);
     void fillCD(void);
-    
+
   protected slots:
     void selected(UIListGenericTree *);
     void entered(UIListTreeType *, UIListGenericTree *);
@@ -81,7 +77,7 @@ class DatabaseBox : public MythThemedDialog
     void doPlaylistPopup(TreeCheckItem *item_ptr);
     void doActivePopup(PlaylistTitle *item_ptr);
     void checkParent(UIListGenericTree *);
- 
+
     void checkTree(UIListGenericTree *startingpoint = NULL);
     QPixmap getPixmap(QString &level);
 
@@ -89,17 +85,15 @@ class DatabaseBox : public MythThemedDialog
     UIListTreeType      *tree;
 
     CDCheckItem         *cditem;
-    PlaylistsContainer  *the_playlists;
-    
+
     QString             m_CDdevice;
-    AllMusic            *all_music;
     bool                holding_track;
     PlaylistTrack       *track_held;
     TreeCheckItem       *allmusic;
     TreeCheckItem       *alllists;
     PlaylistTitle       *allcurrent;
     Playlist            *active_playlist;
-    
+
     MythPopupBox        *active_popup;
     MythRemoteLineEdit  *active_pl_edit;
 

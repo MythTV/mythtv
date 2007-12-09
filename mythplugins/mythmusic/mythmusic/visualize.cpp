@@ -356,13 +356,18 @@ void AlbumArt::handleKeyPress(const QString &action)
     if (action == "SELECT")
     {
         AlbumArtImages albumArt(m_pParent->metadata());
-
         int newType = m_currImageType;
+
         if (albumArt.getImageCount() > 0)
         {
-            while(!albumArt.isImageAvailable((ImageType) ++newType))
+            newType++;
+
+            while(!albumArt.isImageAvailable((ImageType) newType))
+            {
+                newType++;
                 if (newType == IT_LAST)
                     newType = IT_UNKNOWN;
+            }
         }
 
         if (newType != m_currImageType)

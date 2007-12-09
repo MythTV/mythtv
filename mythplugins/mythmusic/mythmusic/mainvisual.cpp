@@ -217,20 +217,21 @@ void MainVisual::timeout()
 
     VisualNode *node = 0;
 
-    if (playing && output()) {
+    if (playing && output()) 
+    {
         long synctime = output()->GetAudiotime();
         mutex()->lock();
         VisualNode *prev = 0;
-        while ((node = nodes.first())) {
+        while ((node = nodes.first())) 
+        {
             if (node->offset > synctime)
                 break;
-
             delete prev;
             nodes.removeFirst();
             prev = node;
         }
         mutex()->unlock();
-        node = prev; 
+        node = prev;
     }
 
     bool stop = TRUE;
@@ -276,15 +277,13 @@ void MainVisual::customEvent(QCustomEvent *event)
     switch (event->type()) 
     {
         case OutputEvent::Playing:
-        playing = TRUE;
-        // fall through intended
-
         case OutputEvent::Info:
         case OutputEvent::Buffering:
         case OutputEvent::Paused:
+            playing = TRUE;
+
             if (! timer->isActive())
                 timer->start(1000 / fps);
-
             break;
 
         case OutputEvent::Stopped:
@@ -353,7 +352,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
         return;
 
     QString  text = "\"" + mdata->Title() + "\"\n" +  mdata->Artist() + "\n" + mdata->Album();
-    QImage albumArt = mdata->getAlbumArt(IT_FRONTCOVER);
+    QImage albumArt = mdata->getAlbumArt();
 
     if (text == info)
         return;

@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+// qt
 #include <qapplication.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
@@ -9,34 +10,35 @@ using namespace std;
 #include <qlayout.h>
 #include <qevent.h>
 
-#include "metadata.h"
-#include "databasebox.h"
-#include "treecheckitem.h"
-#include "cddecoder.h"
-#include "playlist.h"
-
+// mythtv
 #include <mythtv/dialogbox.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 
-DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
-                         AllMusic *music_ptr, MythMainWindow *parent, 
+// mythmusic
+#include "metadata.h"
+#include "databasebox.h"
+#include "treecheckitem.h"
+#include "cddecoder.h"
+#include "playlist.h"
+#include "musicplayer.h"
+
+DatabaseBox::DatabaseBox(MythMainWindow *parent,
                          const QString dev, const QString &window_name, 
                          const QString &theme_filename, const char *name)
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     m_CDdevice = dev;
-    the_playlists = all_playlists;
     active_playlist = NULL;
 
-    if (!music_ptr)
+    if (!gMusicData->all_music)
     {
         VERBOSE(VB_IMPORTANT, "We are not going to get very far with a null "
                 "pointer to metadata");
+        exit(0);
     }
-    all_music = music_ptr;
 
     //  Do we check the CD?
     cd_checking_flag = false;
@@ -117,8 +119,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         // Start the CD checking thread, and set up a timer to make it check 
         // occasionally
 
-        cd_reader_thread = new ReadCDThread(m_CDdevice,
-                                            the_playlists, all_music);
+        cd_reader_thread = new ReadCDThread(m_CDdevice);
 
         // filling initialy before thread running
         fillCD();
@@ -150,12 +151,12 @@ DatabaseBox::~DatabaseBox()
         delete cd_reader_thread;
     }
 
-    all_music->cleanOutThreads();
-    the_playlists->cleanOutThreads();
+    gMusicData->all_music->cleanOutThreads();
+    gMusicData->all_playlists->cleanOutThreads();
 
-    all_music->resetListings();
+    gMusicData->all_music->resetListings();
 
-    the_playlists->getActive()->removeAllWidgets();
+    gMusicData->all_playlists->getActive()->removeAllWidgets();
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
@@ -198,18 +199,18 @@ void DatabaseBox::showWaiting()
 
 void DatabaseBox::keepFilling()
 {
-    if (all_music->doneLoading() &&
-        the_playlists->doneLoading())
+    if (gMusicData->all_music->doneLoading() &&
+        gMusicData->all_playlists->doneLoading())
     {
         //  Good, now lets grab some QListItems
-        if (all_music->putYourselfOnTheListView(allmusic))
+        if (gMusicData->all_music->putYourselfOnTheListView(allmusic))
         {
             allmusic->setText(tr("All My Music"));
             fill_list_timer->stop();
-            the_playlists->setActiveWidget(allcurrent);
-            active_playlist = the_playlists->getActive();
+            gMusicData->all_playlists->setActiveWidget(allcurrent);
+            active_playlist = gMusicData->all_playlists->getActive();
             active_playlist->putYourselfOnTheListView(allcurrent);
-            the_playlists->showRelevantPlaylists(alllists);
+            gMusicData->all_playlists->showRelevantPlaylists(alllists);
             // XXX listview->ensureItemVisible(listview->currentItem());
             checkTree();
 
@@ -252,10 +253,10 @@ void DatabaseBox::copyNewPlaylist()
         return;
     }
 
-    if (the_playlists->nameIsUnique(active_pl_edit->text(), 0))
+    if (gMusicData->all_playlists->nameIsUnique(active_pl_edit->text(), 0))
     {
-        the_playlists->copyNewPlaylist(active_pl_edit->text());
-        the_playlists->showRelevantPlaylists(alllists);
+        gMusicData->all_playlists->copyNewPlaylist(active_pl_edit->text());
+        gMusicData->all_playlists->showRelevantPlaylists(alllists);
         checkTree();
         closeActivePopup();
     }
@@ -283,10 +284,10 @@ void DatabaseBox::renamePlaylist()
     {
         if (rename_item->getID() < 0)
         {
-            if (the_playlists->nameIsUnique(playlist_rename->text(), 
+            if (gMusicData->all_playlists->nameIsUnique(playlist_rename->text(), 
                                             rename_item->getID() * -1))
             {
-                the_playlists->renamePlaylist(rename_item->getID() * -1, 
+                gMusicData->all_playlists->renamePlaylist(rename_item->getID() * -1, 
                                               playlist_rename->text());
                 rename_item->setText(playlist_rename->text());
                 tree->Redraw();
@@ -310,8 +311,8 @@ void DatabaseBox::popBackPlaylist()
     if (!active_popup)
         return;
 
-    the_playlists->popBackPlaylist();
-    the_playlists->showRelevantPlaylists(alllists);
+    gMusicData->all_playlists->popBackPlaylist();
+    gMusicData->all_playlists->showRelevantPlaylists(alllists);
     checkTree();
 
     closeActivePopup();
@@ -324,8 +325,8 @@ void DatabaseBox::clearActive()
 
     closeActivePopup();
 
-    the_playlists->clearActive();
-    the_playlists->showRelevantPlaylists(alllists);
+    gMusicData->all_playlists->clearActive();
+    gMusicData->all_playlists->showRelevantPlaylists(alllists);
     checkTree();
 }
 
@@ -462,11 +463,11 @@ void DatabaseBox::deletePlaylist()
             else if (check_item->prevSibling(1))
                 tree->MoveUp();
 
-            the_playlists->deletePlaylist(check_item->getID() * -1);
-            //the_playlists->showRelevantPlaylists(alllists);
+            gMusicData->all_playlists->deletePlaylist(check_item->getID() * -1);
+            //gMusicData->all_playlists->showRelevantPlaylists(alllists);
             item->RemoveFromParent();
             //delete item; will be deleted by generic tree
-            the_playlists->refreshRelevantPlaylists(alllists);
+            gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
             checkTree();
             return;
         }
@@ -490,8 +491,8 @@ void DatabaseBox::copyToActive()
     {
         if (check_item->getID() < 0)
         {
-            the_playlists->copyToActive(check_item->getID() * -1);
-            the_playlists->refreshRelevantPlaylists(alllists);
+            gMusicData->all_playlists->copyToActive(check_item->getID() * -1);
+            gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
             tree->RefreshCurrentLevel();
             checkTree();
             // XXX listview->setCurrentItem(allcurrent);
@@ -531,13 +532,13 @@ void DatabaseBox::fillCD(void)
     
         // Put on whatever all_music tells us is there
     
-        cditem->setText(all_music->getCDTitle());
+        cditem->setText(gMusicData->all_music->getCDTitle());
         cditem->setCheck(0);
         cditem->setCheckable(false);
 
         qApp->lock();
 
-        all_music->putCDOnTheListView(cditem);
+        gMusicData->all_music->putCDOnTheListView(cditem);
         
         //  reflect selections in cd playlist
 
@@ -549,7 +550,7 @@ void DatabaseBox::fillCD(void)
             if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(uit))
             {
                 track_ptr->setCheck(0);
-                if (the_playlists->checkCDTrack(track_ptr->getID() * -1))
+                if (gMusicData->all_playlists->checkCDTrack(track_ptr->getID() * -1))
                     track_ptr->setCheck(2);
             }
             ++it;
@@ -624,7 +625,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         Metadata *mdata;
         if (!cd)
         {
-            mdata = all_music->getMetadata(id);
+            mdata = gMusicData->all_music->getMetadata(id);
             if (!mdata)
                 return;
         }
@@ -632,7 +633,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         {
             // Need to allocate storage for CD Metadata
             mdata = new Metadata;
-            if (!all_music->getCDMetadata(id, mdata))
+            if (!gMusicData->all_music->getCDMetadata(id, mdata))
             {
                 delete mdata;
                 return;
@@ -925,7 +926,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
     active_popup->ShowPopup(this, SLOT(closeActivePopup()));
 
-    if (the_playlists->pendingWriteback())
+    if (gMusicData->all_playlists->pendingWriteback())
         pb->setEnabled(true);
     else
         pb->setEnabled(false);
@@ -1068,7 +1069,7 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
         if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
         {
-            Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * 
+            Playlist *owner = gMusicData->all_playlists->getPlaylist(item_owner->getID() * 
                                                          -1);
             owner->removeTrack(delete_item->getID(), true);
         }
@@ -1083,7 +1084,7 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
                     "whatever you're trying to get rid of");
         }
 
-        the_playlists->refreshRelevantPlaylists(alllists);
+        gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
         checkTree();
     }
     else if (PlaylistTrack *delete_item = dynamic_cast<PlaylistTrack*>(item))
@@ -1096,7 +1097,7 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
         if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
         {
-            Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * 
+            Playlist *owner = gMusicData->all_playlists->getPlaylist(item_owner->getID() * 
                                                          -1);
             owner->removeTrack(delete_item->getID(), false);
         }
@@ -1110,7 +1111,7 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
             VERBOSE(VB_IMPORTANT, "deleteTrack() - I don't know how to delete "
                     "whatever you're trying to get rid of");
         }
-        the_playlists->refreshRelevantPlaylists(alllists);
+        gMusicData->all_playlists->refreshRelevantPlaylists(alllists);
         checkTree();
     }
 }
@@ -1251,13 +1252,9 @@ void DatabaseBox::setCDTitle(const QString& title)
         cditem->setText(title);
 }
 
-ReadCDThread::ReadCDThread(const QString &dev,
-                           PlaylistsContainer *all_the_playlists,
-                           AllMusic *all_the_music)
+ReadCDThread::ReadCDThread(const QString &dev)
 {
     m_CDdevice = dev;
-    the_playlists = all_the_playlists;
-    all_music = all_the_music;
     cd_status_changed = false;
 }
 
@@ -1272,7 +1269,7 @@ void ReadCDThread::run()
 
     bool redo = false;
 
-    if (tracknum != all_music->getCDTrackCount())
+    if (tracknum != gMusicData->all_music->getCDTrackCount())
     {
         cd_status_changed = true;
         VERBOSE(VB_IMPORTANT, QString("CD status has changed."));
@@ -1283,8 +1280,8 @@ void ReadCDThread::run()
     if (tracknum == 0)
     {
         //  No CD, or no recognizable CD
-        all_music->clearCDData();
-        the_playlists->clearCDList();
+        gMusicData->all_music->clearCDData();
+        gMusicData->all_playlists->clearCDList();
     }
     else if (tracknum > 0)
     {
@@ -1293,12 +1290,12 @@ void ReadCDThread::run()
         Metadata *checker = decoder->getLastMetadata();
         if (checker)
         {
-            if (!all_music->checkCDTrack(checker))
+            if (!gMusicData->all_music->checkCDTrack(checker))
             {
                 redo = true;
                 cd_status_changed = true;
-                all_music->clearCDData();
-                the_playlists->clearCDList();
+                gMusicData->all_music->clearCDData();
+                gMusicData->all_playlists->clearCDList();
             }
             else
                 cd_status_changed = false;
@@ -1320,7 +1317,7 @@ void ReadCDThread::run()
         Metadata *track = decoder->getMetadata(actual_tracknum);
         if (track)
         {
-            all_music->addCDTrack(track);
+            gMusicData->all_music->addCDTrack(track);
 
             if (!setTitle)
             {
@@ -1342,7 +1339,7 @@ void ReadCDThread::run()
                     "    More likely, however, is that you need to delete\n"
                     "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
                 }
-                all_music->setCDTitle(parenttitle);
+                gMusicData->all_music->setCDTitle(parenttitle);
                 setTitle = true;
             }
             delete track;

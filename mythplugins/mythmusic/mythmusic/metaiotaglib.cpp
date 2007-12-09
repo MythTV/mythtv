@@ -25,6 +25,7 @@ MetaIOTagLib::~MetaIOTagLib(void)
  */
 bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
 {
+    (void) exclusive;
 
     if (!mdata)
         return false;

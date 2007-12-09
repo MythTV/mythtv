@@ -7,8 +7,6 @@ using namespace std;
 #include <mythtv/mythdialogs.h>
 
 class Metadata;
-class Decoder;
-class AudioOutput;
 class ImportMusicDialog;
 
 typedef struct
@@ -75,19 +73,12 @@ class ImportMusicDialog : public MythThemedDialog
     void fillWidgets();
     void startScan(void);
     void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);
-    void stopDecoder(void);
-    void openOutputDevice(void);
     void showImportCoverArtDialog();
 
     bool                 m_somethingWasImported;
     vector<TrackInfo*>  *m_tracks;
     QStringList          m_sourceFiles;
     int                  m_currentTrack;
-
-    // playback stuff
-    Decoder             *m_decoder;
-    AudioOutput         *m_output;
-    QIODevice           *m_input;
 
     //
     //  GUI stuff
