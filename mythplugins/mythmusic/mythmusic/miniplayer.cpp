@@ -23,7 +23,7 @@ MiniPlayer::MiniPlayer(MythMainWindow *parent,
                     bool setsize)
             : MythThemedDialog(parent, name, setsize)
 {
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
+    setFrameStyle(QFrame::NoFrame | QFrame::Plain);
     setLineWidth(1);
     m_parentPlayer = parentPlayer;
 
