@@ -1797,4 +1797,85 @@
        </container>
    </window>
 
+   <window name="miniplayer">
+
+    <font name="currenttitle" face="Arial">
+        <color>#ffffff</color>
+        <size>20</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="currentartist" face="Arial">
+        <color>#ffffff</color>
+        <size>16</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="infotext" face="Arial">
+        <color>#ffffff</color>
+        <size>12</size>
+        <bold>yes</bold>
+    </font>
+
+    <!--
+       This container determines the size and position of the 
+       popup mini player and must be present
+    -->
+    <container name="player_container">
+        <area>345,5,590,170</area>
+        <image name="track_info_background" draworder="0" fleximage="no">
+            <filename>miniplayer_background.png</filename>
+            <position>10,10</position>
+        </image>
+
+        <image name="mm_blackhole_border" draworder="0" fleximage="no">
+            <filename>mm_blackhole_border.png</filename>
+            <position>20,20</position>
+            <staticsize>126,128</staticsize>
+        </image>
+
+        <textarea name="title_text" draworder="1" align="left">
+            <font>currenttitle</font>
+            <area>160,15,415,34</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="artist_text" draworder="1" align="left">
+            <font>currentartist</font>
+            <area>160,50,415,25</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="album_text" draworder="1" align="left">
+            <font>currentartist</font>
+            <area>160,73,415,25</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <repeatedimage name="ratings_image" draworder="1" fleximage="no">
+            <filename>mm_rating.png</filename>
+            <position>160,105</position>
+            <orientation>LeftToRight</orientation>
+        </repeatedimage>
+
+        <textarea name="info_text" draworder="1" align="left">
+            <font>infotext</font>
+            <area>160,129,250,25</area>
+        </textarea>
+
+        <textarea name="time_text" draworder="1" align="right">
+            <font>currentartist</font>
+            <area>375,125,185,25</area>
+        </textarea>
+
+        <image name="cover_image" draworder="2">
+            <filename>mm_nothumb.png</filename>
+            <position>22,22</position>
+            <staticsize>122,124</staticsize>
+        </image>
+
+    </container>
+
+  </window>
+
 </mythuitheme>
