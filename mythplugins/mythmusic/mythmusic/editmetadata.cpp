@@ -601,7 +601,7 @@ void EditMetadataDialog::searchGenre()
 void EditMetadataDialog::closeDialog()
 {
     cancelPopup();
-    accept();
+    reject();
 }
 
 void EditMetadataDialog::showSaveMenu()
