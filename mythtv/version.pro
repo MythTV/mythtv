@@ -32,6 +32,7 @@ version.commands += ; sh -c "diff .vers.new version.cpp > .vers.diff 2>&1 ; \
 if test -s .vers.diff ; then mv -f .vers.new version.cpp ; fi ; \
 rm -f .vers.new .vers.diff"
 
-version.depends = FORCE 
+!mingw: version.depends = FORCE 
 
 QMAKE_EXTRA_UNIX_TARGETS += version
+mingw: QMAKE_EXTRA_WIN_TARGETS += version

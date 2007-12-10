@@ -1581,6 +1581,7 @@ case $targetos in
     ;;
   mingw32*)
     targetos=mingw32
+    enable backend
     shlibdir="$bindir"
     VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
     VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
@@ -1588,16 +1589,25 @@ case $targetos in
         VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
         VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
     fi
+    dv1394="no"
+    ffserver="no"
+    network="no"
+    opengl="yes"
+    if enabled wince; then
+        protocols="no"
+    fi
     disable ffserver
-    SLIBPREF=""
+    disable v4l
+    disable bindings_perl
+    SLIBPREF="lib"
     SLIBSUF=".dll"
     EXESUF=".exe"
-    SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
-    SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
-    SLIB_EXTRA_CMD='-lib /machine:i386 /def:$(@:$(SLIBSUF)=.def)'
-    SLIB_INSTALL_EXTRA_CMD='-install -m 644 $(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib) "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"'
-    SLIB_UNINSTALL_EXTRA_CMD='rm -f "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"'
-    SHFLAGS='-shared -Wl,--output-def,$(@:$(SLIBSUF)=.def) -Wl,--enable-runtime-pseudo-reloc -Wl,--enable-auto-image-base'
+    SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
+    SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME)-$(LIBMAJOR)$(SLIBSUF)'
+    SLIB_EXTRA_CMD="-lib /machine:i386 /def:\$(@:${SLIBSUF}=.def)"
+    SLIB_INSTALL_EXTRA_CMD="-install -m 644 \$(SLIBNAME_WITH_MAJOR:\$(SLIBSUF)=.lib) \"\$(shlibdir)/\$(SLIBNAME_WITH_MAJOR:\$(SLIBSUF)=.lib)\""
+    SHFLAGS="-shared -Wl,--output-def,\$(@:${SLIBSUF}=.def),--out-implib,lib\$(SLIBNAME:\$(SLIBSUF)=.a) -Wl,--enable-runtime-pseudo-reloc"
+    add_extralibs -lws2_32
     ;;
   cygwin*)
     targetos=cygwin
@@ -2713,6 +2723,7 @@ disabled opengl_video || enable opengl
 disabled opengl_vsync || enable opengl
 disabled x11 || enable opengl
 has_library libGL || disable opengl_video xvmc_opengl opengl_vsync opengl
+has_library libopengl32 && enable opengl
 has_header GL/gl.h || disable opengl_video xvmc_opengl opengl_vsync opengl
 
 # Can only do Mac accel on Mac platform
@@ -2954,6 +2965,9 @@ if enabled frontend; then
   echo "ALSA support              ${audio_alsa-no}"
   echo "aRts support              ${audio_arts-no}"
   echo "JACK support              ${audio_jack-no}"
+  if test x"$targetos" = x"mingw32" ; then
+    echo "Windows support           yes"
+  fi
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
@@ -2972,6 +2986,9 @@ fi
   echo "DirectFB                  ${directfb-no}"
   if test x"$mingw32" = x"yes" -o x"$targetos" = x"cygwin" ; then
     echo "DirectX                   ${directx-no}"
+  fi
+  if test x"$targetos" = x"mingw32" ; then
+    echo "Windows (Direct3D)        yes"
   fi
   echo "Fribidi formatting        ${fribidi}"
   echo
