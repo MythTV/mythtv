@@ -22,3 +22,5 @@ SOURCES += main.cpp moviesui.cpp moviessettings.cpp
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+
+mingw:DEFINES += USING_MINGW

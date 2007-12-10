@@ -61,7 +61,6 @@ class MoviesUI : public MythThemedDialog
   public slots:
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntry(int, IntVector*);
-    void checkDataReady();
 
   protected slots:
     void closeAboutPopup();

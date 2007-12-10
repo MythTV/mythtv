@@ -3,6 +3,8 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/compat.h>
+
 #include <qprocess.h>
 #include <unistd.h>
 #include <cstdlib>
