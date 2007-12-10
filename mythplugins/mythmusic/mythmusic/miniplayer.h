@@ -58,12 +58,13 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
     UITextType   *m_albumText;
     UITextType   *m_timeText;
     UITextType   *m_infoText;
+    UITextType   *m_volText;
     UIImageType  *m_coverImage;
 
-    UITextType   *m_shufflestateText;
-    UITextType   *m_repeatstateText;
-
+    UIStatusBarType     *m_progressBar;
     UIRepeatedImageType *m_ratingsImage;
+
+    QString       m_volFormat;
 };
 
 #endif

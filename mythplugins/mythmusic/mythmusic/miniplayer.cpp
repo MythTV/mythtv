@@ -129,6 +129,15 @@ void MiniPlayer::wireupTheme(void)
     m_albumText = getUITextType("album_text");
     m_ratingsImage = getUIRepeatedImageType("ratings_image");
     m_coverImage = getUIImageType("cover_image");
+    m_progressBar = getUIStatusBarType("progress_bar");
+    m_volText = getUITextType("volume_text");
+
+    if (m_volText && gPlayer->getOutput())
+    {
+        m_volFormat = m_volText->GetText();
+        m_volText->SetText(QString(m_volFormat)
+                .arg((int) gPlayer->getOutput()->GetCurrentVolume()));
+    }
 }
 
 void MiniPlayer::show()
@@ -228,6 +237,15 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
 
                         m_infoTimer->start(5000, true);
                     }
+
+                    if (m_volText)
+                    {
+                        if (gPlayer->getOutput()->GetMute())
+                            m_volText->SetText(QString(m_volFormat).arg(0));
+                        else
+                            m_volText->SetText(QString(m_volFormat)
+                                    .arg((int) gPlayer->getOutput()->GetCurrentVolume()));
+                    }
                 }
             }
             else if (action == "THMBUP")
@@ -304,6 +322,12 @@ void MiniPlayer::customEvent(QCustomEvent *event)
                 m_timeText->SetText(time_string);
             if (m_infoText && !m_showingInfo)
                 m_infoText->SetText(info_string);
+
+            if (m_progressBar)
+            {
+                m_progressBar->SetTotal(m_maxTime);
+                m_progressBar->SetUsed(m_currTime);
+            }
 
             if (gPlayer->getCurrentMetadata())
             {
@@ -617,35 +641,43 @@ void MiniPlayer::showRepeatMode(void)
 
 void MiniPlayer::showVolume(void)
 {
+    float level = (float)gPlayer->getOutput()->GetCurrentVolume();
+    bool muted = gPlayer->getOutput()->GetMute();
+
     if (m_infoText)
     {
         m_infoTimer->stop();
         QString msg = tr("Volume: ");
-        float level;
 
-        level = (float)gPlayer->getOutput()->GetCurrentVolume();
-
-        if (gPlayer->getOutput()->GetMute())
-        {
-            if (class LCD *lcd = LCD::Get())
-            {
-                lcd->switchToVolume("Music (muted)");
-                lcd->setVolumeLevel(level / (float)100);
-            }
+        if (muted)
             msg += QString::number((int) level) + "% " + tr("(muted)");
-        }
         else
-        {
-            if (class LCD *lcd = LCD::Get())
-            {
-                lcd->switchToVolume("Music");
-                lcd->setVolumeLevel(level / (float)100);
-            }
             msg += QString::number((int) level) + "%";
-        }
 
         m_showingInfo = true;
         m_infoText->SetText(msg);
         m_infoTimer->start(5000, true);
+    }
+
+    if (class LCD *lcd = LCD::Get())
+    {
+        if (muted)
+        {
+            lcd->switchToVolume("Music (muted)");
+            lcd->setVolumeLevel(level / (float)100);
+        }
+        else
+        {
+            lcd->switchToVolume("Music");
+            lcd->setVolumeLevel(level / (float)100);
+        }
+    }
+
+    if (m_volText)
+    {
+        if (muted)
+            level = 0.0;
+
+        m_volText->SetText(QString(m_volFormat).arg((int) level));
     }
 }
