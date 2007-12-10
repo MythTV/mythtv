@@ -86,6 +86,7 @@ static inline char * fourcc_str(int i)
 #define FOURCC_DIVX MKTAG('D','I','V','X') /* MPEG4 */
 #define FOURCC_dvsd MKTAG('d','v','s','d') /* DV cameras (FireWire/IEEE1394) */
 #define FOURCC_H263 MKTAG('H','2','6','3')
+#define FOURCC_H264 MKTAG('H','2','6','4')
 #define FOURCC_HFYU MKTAG('H','F','Y','U')
 #define FOURCC_I263 MKTAG('I','2','6','3')
 #define FOURCC_MJPG MKTAG('M','J','P','G')
