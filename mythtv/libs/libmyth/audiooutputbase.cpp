@@ -15,6 +15,7 @@
 
 // MythTV headers
 #include "audiooutputbase.h"
+#include "compat.h"
 
 #define LOC QString("AO: ")
 #define LOC_ERR QString("AO, ERROR: ")
@@ -570,7 +571,9 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
     {
         if (blocking)
         {
-            VERBOSE(VB_AUDIO, LOC + "Waiting for free space");
+            VERBOSE(VB_AUDIO, LOC + "Waiting for free space " +
+                    QString("(need %1, available %2)").arg(len).arg(afree));
+
             // wait for more space
             pthread_cond_wait(&audio_bufsig, &audio_buflock);
             afree = audiofree(false);

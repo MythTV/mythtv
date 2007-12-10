@@ -9,6 +9,10 @@ using namespace std;
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 
+#ifdef USING_MINGW
+#undef LoadImage
+#endif
+
 MPUBLIC QMap<QString, fontProp> globalFontMap;
 
 XMLParse::XMLParse(void)

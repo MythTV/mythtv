@@ -12,6 +12,10 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythwidgets.h"
 
+#ifdef USING_MINGW
+#undef DialogBox
+#endif
+
 DialogBox::DialogBox(MythMainWindow *parent, const QString &text, 
                      const char *checkboxtext,
                      const char *name)

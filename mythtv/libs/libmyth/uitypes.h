@@ -21,6 +21,10 @@
 #include "generictree.h"
 #include "mythwidgets.h"
 
+#ifdef USING_MINGW
+#undef LoadImage
+#endif
+
 using namespace std;
 
 class UIType;

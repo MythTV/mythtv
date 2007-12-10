@@ -18,9 +18,9 @@
 #endif
 
 #include <iostream>
+#include <pthread.h>
 using namespace std;
 
-#include <pthread.h>
 #ifdef USE_LIRC
 #include "lirc.h"
 #include "lircevent.h"
@@ -39,6 +39,10 @@ using namespace std;
 #include "mythmediamonitor.h"
 #include "screensaver.h"
 #include "mythdbcon.h"
+
+#ifdef USING_MINGW
+#undef LoadImage
+#endif
 
 /** \class MythDialog
  *  \brief Base dialog for most dialogs in MythTV using the old UI

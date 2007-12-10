@@ -5,7 +5,12 @@
 #include "mythcontext.h"
 #include "util.h"
 #include "mythsocket.h"
+#ifdef USING_MINGW
+#include <winsock2.h>
+#include "compat.h"
+#else
 #include <sys/select.h>
+#endif
 #include <cassert>
 
 #define SLOC(a) QString("MythSocket(%1:%2): ").arg((unsigned long)a, 0, 16)\
@@ -14,13 +19,23 @@
 
 const uint MythSocket::kSocketBufferSize = 128000;
 
+#ifndef USING_MINGW
 pthread_t MythSocket::m_readyread_thread = (pthread_t)0;
+#else
+pthread_t MythSocket::m_readyread_thread = {0, 0};
+#endif
+
 bool MythSocket::m_readyread_run = false;
 QMutex MythSocket::m_readyread_lock;
 QPtrList<MythSocket> MythSocket::m_readyread_list;
 QPtrList<MythSocket> MythSocket::m_readyread_dellist;
 QPtrList<MythSocket> MythSocket::m_readyread_addlist;
+
+#ifdef USING_MINGW
+HANDLE readyreadevent = NULL;
+#else
 int MythSocket::m_readyread_pipe[2] = {-1, -1};
+#endif
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : QSocketDevice(QSocketDevice::Stream),            m_cb(cb),
@@ -633,8 +648,15 @@ void MythSocket::ShutdownReadyReadThread(void)
     WakeReadyReadThread();
     pthread_join(m_readyread_thread, NULL);
 
+#ifdef USING_MINGW
+    if (readyreadevent) {
+        ::CloseHandle(readyreadevent);
+        readyreadevent = NULL;
+    }
+#else
     ::close(m_readyread_pipe[0]);
     ::close(m_readyread_pipe[1]);
+#endif
 }
 
 void MythSocket::StartReadyReadThread(void)
@@ -644,9 +666,14 @@ void MythSocket::StartReadyReadThread(void)
         QMutexLocker locker(&m_readyread_lock);
         if (m_readyread_run == false)
         {
+#ifdef USING_MINGW
+            readyreadevent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+            assert(readyreadevent);
+#else
             int ret = pipe(m_readyread_pipe);
             (void) ret;
             assert(ret >= 0);
+#endif
 
             m_readyread_run = true;
             pthread_create(&m_readyread_thread, NULL, readyReadThread, NULL);
@@ -658,6 +685,11 @@ void MythSocket::StartReadyReadThread(void)
 
 void MythSocket::AddToReadyRead(MythSocket *sock)
 {
+    if (sock->socket() == -1)
+    {
+        VERBOSE(VB_SOCKET, "MythSocket: attempted to insert invalid socket to ReadyRead");
+        return;
+    }
     StartReadyReadThread();
 
     sock->UpRef();
@@ -679,11 +711,15 @@ void MythSocket::RemoveFromReadyRead(MythSocket *sock)
 
 void MythSocket::WakeReadyReadThread(void)
 {
+#ifdef USING_MINGW
+    if (readyreadevent) ::SetEvent(readyreadevent);
+#else
     if (m_readyread_pipe[1] >= 0)
     {
         char buf[1] = { '0' };
         write(m_readyread_pipe[1], &buf, 1);
     }
+#endif
 }
 
 void *MythSocket::readyReadThread(void *)
@@ -718,6 +754,39 @@ void *MythSocket::readyReadThread(void *)
         }
         m_readyread_lock.unlock();
 
+#ifdef USING_MINGW
+        int n = m_readyread_list.count() + 1;
+        HANDLE* hEvents = new HANDLE[n];
+        memset(hEvents, 0, sizeof(HANDLE) * n);
+        n = 0;
+        hEvents[n++] = readyreadevent;
+        for (unsigned i = 0; i < m_readyread_list.count(); i++) {
+            sock = m_readyread_list.at(i);
+            if (sock->state() == Connected && !sock->m_notifyread && !sock->m_lock.locked()) {
+                HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+                if (!hEvent)
+                    VERBOSE(VB_IMPORTANT, "MythSocket: CreateEvent failed");
+                else {
+                    if (SOCKET_ERROR != ::WSAEventSelect(sock->socket(), hEvent, FD_READ | FD_WRITE | FD_CONNECT | FD_ACCEPT | FD_OOB | FD_CLOSE)) {
+                        hEvents[n++] = hEvent;
+                    } else {
+                        VERBOSE(VB_IMPORTANT, QString("MythSocket: CreateEvent, WSAEventSelect (%1, %2, failed)").arg(sock->socket()));
+                        ::CloseHandle(hEvent);
+                    }
+                }
+            }
+        }
+        int rval = ::WaitForMultipleObjects(n, hEvents, FALSE, INFINITE);
+        for (int i = 1; i < n; i++)
+            ::CloseHandle(hEvents[i]);
+        delete[] hEvents;
+        if (rval == WAIT_FAILED)
+            VERBOSE(VB_IMPORTANT, "MythSocket: WaitForMultipleObjects returned error");
+        else if (rval >= WAIT_OBJECT_0 && rval < WAIT_OBJECT_0 + n) {
+            rval -= WAIT_OBJECT_0;
+            sock = m_readyread_list.at(rval);
+            found = sock->state() == Connected && !sock->m_lock.locked();
+#else
         // add check for bad fd?
         FD_ZERO(&rfds);
         maxfd = m_readyread_pipe[0];
@@ -757,6 +826,7 @@ void *MythSocket::readyReadThread(void *)
                 }
                 ++it;
             }
+#endif
 
             if (found)
             {
@@ -779,11 +849,17 @@ void *MythSocket::readyReadThread(void *)
                     sock->m_cb->readyRead(sock);
                 }
             }
+#ifdef USING_MINGW
+            ::ResetEvent(readyreadevent);
+        } else if (rval >= WAIT_ABANDONED_0 && rval < WAIT_ABANDONED_0 + n) {
+            VERBOSE(VB_SOCKET, "MythSocket: abandoned");
+#else
             if (FD_ISSET(m_readyread_pipe[0], &rfds))
             {
                 char buf[128];
                 read(m_readyread_pipe[0], buf, 128);
             }
+#endif
         }
         else
         {

@@ -14,8 +14,12 @@
 #include "libmythui/mythmainwindow.h"
 
 #include <unistd.h>
+#ifndef USING_MINGW
 #include <stdlib.h>
 #include <sys/wait.h>	// For WIFEXITED on Mac OS X
+#else
+#include "compat.h"
+#endif
 #include <cmath>
 
 #include <qapplication.h>

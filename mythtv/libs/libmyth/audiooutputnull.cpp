@@ -4,7 +4,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
+#ifndef USING_MINGW
 #include <sys/ioctl.h>
+#else
+#include "compat.h"
+#endif
 #include <cerrno>
 #include <cstring>
 #include <iostream>

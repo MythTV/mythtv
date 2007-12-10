@@ -4,6 +4,7 @@
 #include <qcheckbox.h>
 
 #include "mythdialogs.h"
+#include "compat.h" // to undef DialogBox
 
 class QVBoxLayout;
 class QButtonGroup;

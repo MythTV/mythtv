@@ -17,7 +17,9 @@
 
 using namespace std;
 
-// end for testing
+#ifdef USING_MINGW
+#   define O_NONBLOCK 0
+#endif
 
 #define LOC      QString("MythMediaDevice: ")
 #define LOC_WARN QString("MythMediaDevice, Warning: ")

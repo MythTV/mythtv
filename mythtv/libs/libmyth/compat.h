@@ -10,8 +10,18 @@
 #pragma warning(disable:4786)
 #endif
 
-#ifdef _WIN32 
+#ifdef _WIN32
+#define close wsock_close
 #include <windows.h>
+#undef close
+#endif
+
+#ifdef _WIN32
+typedef unsigned int uint;
+#endif
+
+#ifdef _WIN32
+#undef DialogBox
 #endif
 
 // Dealing with Microsoft min/max mess: 
@@ -22,7 +32,7 @@
 // instead of templates min/max
 // define the correct templates here
 
-#if defined(__cplusplus) && defined(_WIN32)
+#if defined(__cplusplus) && defined(_WIN32) && !defined(USING_MINGW)
 template<class _Ty> inline
         const _Ty& max(const _Ty& _X, const _Ty& _Y)
         {return (_X < _Y ? _Y : _X); }
@@ -43,11 +53,14 @@ template<class _Ty, class _Pr> inline
 #define M_PI 3.14159265358979323846
 #endif
 
-#ifdef _WIN32
-inline double drand48(void) { return double(rand())/double(RAND_MAX); }
+#ifdef USING_MINGW
+#define gmtime_r(x, y) gmtime((x))
+#define localtime_r(x, y) localtime((x))
+//used in videodevice only - that code is not windows-compatible anyway
+#define minor(x) 0
 #endif
 
-#ifdef USING_MINGW
+#if defined(__cplusplus) && defined(USING_MINGW)
 inline int random(void)
 {
     srand(GetTickCount());
@@ -67,10 +80,13 @@ inline bool operator!=(const pthread_t& pt, const int n)
 }
 #endif // defined(__cplusplus) && defined(USING_MINGW)
 
-#ifdef USING_MINGW
+#if defined(__cplusplus) && defined(USING_MINGW)
 /* TODO: most small usleep's in MythTV are just a quick way to perform
- * a yield() call, those should just be replaced with an actual yield()
- * invocation.
+ * a yield() call, those should just be replaced with an actual yield().
+ * There is a known bug with Win32 yield(), it basically functions as
+ * a no-op. Sleep(0) yields, but only to higher priority threads, while
+ * Sleep(1), performs an actual yield() to any other thread.
+ * See: http://lists.boost.org/Archives/boost/2003/02/44937.php
  */
 inline int usleep(unsigned int timeout)
 {
@@ -93,17 +109,17 @@ inline int usleep(unsigned int timeout)
     Sleep(timeout < 1000 ? 1 : (timeout + 500) / 1000);
     return 0;
 }
-#endif // USING_MINGW
+#endif // defined(__cplusplus) && defined(USING_MINGW)
 
-#ifdef USING_MINGW
+#if defined(__cplusplus) && defined(USING_MINGW)
 inline unsigned sleep(unsigned int x)
 {
     Sleep(x * 1000);
     return 0;
 }
-#endif // USING_MINGW
+#endif // defined(__cplusplus) && defined(USING_MINGW)
 
-#ifdef USING_MINGW
+#if defined(__cplusplus) && defined(USING_MINGW)
 struct statfs {
 //   long    f_type;     /* type of filesystem */
    long    f_bsize;    /* optimal transfer block size */
@@ -147,6 +163,7 @@ inline int statfs(const char* path, struct statfs* buffer)
 #ifdef USING_MINGW
 //signals: not tested
 #define SIGHUP 1
+#define SIGQUIT 1
 #define SIGPIPE 3   // not implemented in MINGW, will produce "unable to ignore sigpipe"
 #define SIGALRM 13
 

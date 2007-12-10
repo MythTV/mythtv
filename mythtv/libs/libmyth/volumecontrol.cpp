@@ -2,6 +2,7 @@
 #include "config.h"
 
 #ifdef USING_OSS
+    #include <sys/ioctl.h>
     #ifdef HAVE_SYS_SOUNDCARD_H
         #include <sys/soundcard.h>
     #elif HAVE_SOUNDCARD_H
@@ -9,7 +10,6 @@
     #endif
 #endif
 
-#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <cstdio>
 #include <unistd.h>

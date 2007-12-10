@@ -7,6 +7,8 @@
 #include <qregexp.h>
 #include <qvaluevector.h>
 
+#include "compat.h"
+
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;

@@ -23,6 +23,7 @@ HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
 HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
 HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
 HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
+HEADERS += mythhdd.h mythcdrom.h
 HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
@@ -38,8 +39,9 @@ SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
 SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
+SOURCES += mythhdd.cpp mythcdrom.cpp
 
-INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
+INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../ ./
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
 DEPENDPATH += ../libmythupnp
 
@@ -68,8 +70,8 @@ using_oss {
 }
 
 unix:!cygwin {
-    SOURCES += mythhdd.cpp mythcdrom.cpp mediamonitor-unix.cpp
-    HEADERS += mythhdd.h   mythcdrom.h   mediamonitor-unix.h
+    SOURCES += mediamonitor-unix.cpp
+    HEADERS += mediamonitor-unix.h
 }
 
 cygwin {
@@ -77,6 +79,25 @@ cygwin {
     DEFINES += _WIN32
     #HEADERS += mediamonitor-windows.h
     #SOURCES += mediamonitor-windows.cpp
+}
+
+mingw {
+    DEFINES += USING_WINAUDIO USING_MINGW
+    SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
+    HEADERS += mediamonitor-windows.h   audiooutputwin.h
+
+    LIBS += -L. -lmythui-bootstrap -lmythupnp-bootstrap
+    LIBS += -lpthread
+
+    target.path = $${PREFIX}/bin
+    implib.target = libmythui-bootstrap.a
+    implib.commands = test -e libmythui-bootstrap.a || dlltool --input-def ../libmythui/libmythui.def --dllname libmythui-$${LIBVERSION}.dll --output-lib libmythui-bootstrap.a -k
+    QMAKE_EXTRA_WIN_TARGETS += implib
+    POST_TARGETDEPS += libmythui-bootstrap.a
+    implib2.target = libmythupnp-bootstrap.a
+    implib2.commands = test -e libmythupnp-bootstrap.a || dlltool --input-def ../libmythupnp/libmythupnp.def --dllname libmythupnp-$${LIBVERSION}.dll --output-lib libmythupnp-bootstrap.a -k
+    QMAKE_EXTRA_WIN_TARGETS += implib2
+    POST_TARGETDEPS += libmythupnp-bootstrap.a
 }
 
 macx {
@@ -162,6 +183,7 @@ using_jack {
 }
 
 using_directx {
+    DEFINES += USING_DIRECTX
     HEADERS += audiooutputdx.h
     SOURCES += audiooutputdx.cpp
 }

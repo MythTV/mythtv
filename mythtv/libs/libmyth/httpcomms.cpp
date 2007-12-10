@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "mythcontext.h"
+#include "compat.h"
 
 using namespace std;
 

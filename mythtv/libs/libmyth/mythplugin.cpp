@@ -1,5 +1,9 @@
 // C includes
+#ifndef USING_MINGW
 #include <dlfcn.h>
+#else
+#include "compat.h"
+#endif
 
 // Qt includes
 #include <qstringlist.h>

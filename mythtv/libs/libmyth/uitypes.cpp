@@ -13,6 +13,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "lcddevice.h"
 
+#ifdef USING_MINGW
+#undef LoadImage
+#endif
 
 LayerSet::LayerSet(const QString &name)
 {

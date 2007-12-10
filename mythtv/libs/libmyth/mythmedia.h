@@ -50,7 +50,6 @@ class MPUBLIC MythMediaDevice : public QObject
  public:
     MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount, 
                     bool AllowEject);
-    virtual ~MythMediaDevice() {};
 
     const QString& getMountPath() const { return m_MountPath; }
     void setMountPath(const char *path) { m_MountPath = path; }
@@ -72,8 +71,6 @@ class MPUBLIC MythMediaDevice : public QObject
     void setAllowEject(bool allowEject) { m_AllowEject = allowEject; }
 
     bool getLocked() const { return m_Locked; }
-
-    int getDeviceHandle() const { return m_DeviceHandle; }
 
     bool isDeviceOpen() const;
 
@@ -122,6 +119,8 @@ class MPUBLIC MythMediaDevice : public QObject
     void statusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
  protected:
+    virtual ~MythMediaDevice() {} // use deleteLater...
+
     /// Override this to perform any post mount logic.
     virtual void onDeviceMounted(void)
     {

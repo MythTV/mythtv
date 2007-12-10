@@ -9,23 +9,30 @@ using namespace std;
 #include <fcntl.h>
 
 // System specific C headers
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-
-#ifdef linux
-#  include <sys/vfs.h>
-#  include <sys/statvfs.h>
-#  include <sys/sysinfo.h>
+#ifdef USING_MINGW
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/param.h>
+# include "compat.h"
 #else
-#  include <sys/param.h>
-#  include <sys/mount.h>
-#  ifdef CONFIG_CYGWIN
-#    include <sys/statfs.h>
-#  else // if !CONFIG_CYGWIN
-#    include <sys/sysctl.h>
-#  endif // !CONFIG_CYGWIN
-#endif
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <sys/stat.h>
+
+# ifdef linux
+#   include <sys/vfs.h>
+#   include <sys/statvfs.h>
+#   include <sys/sysinfo.h>
+# else
+#   include <sys/param.h>
+//#  include <sys/mount.h>
+#   ifdef CONFIG_CYGWIN
+#     include <sys/statfs.h>
+#   else // if !CONFIG_CYGWIN
+#     include <sys/sysctl.h>
+#   endif // !CONFIG_CYGWIN
+# endif
+#endif //MINGW
 
 // Qt headers
 #include <qapplication.h>
@@ -229,6 +236,7 @@ uint myth_system(const QString &command, int flags)
     JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
 #endif
 
+#ifndef USING_MINGW
     pid_t child = fork();
 
     if (child < 0)
@@ -281,6 +289,34 @@ uint myth_system(const QString &command, int flags)
     }
     return GENERIC_EXIT_NOT_OK;
 }
+#else
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    memset(&si, 0, sizeof(si));
+    memset(&pi, 0, sizeof(pi));
+    si.cb = sizeof(si);
+    QString cmd = QString("cmd.exe /c %1").arg(command.utf8()).ascii();
+    char* ch = new char[cmd.length() + 1];
+	strcpy(ch, cmd);
+    if (!::CreateProcessA(NULL, ch, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+        delete[] ch;
+        VERBOSE(VB_IMPORTANT,
+                QString("myth_system(): Error, CreateProcess() failed because %1")
+                .arg(::GetLastError()));
+        return MYTHSYSTEM__EXIT__EXECL_ERROR;
+    } else {
+        delete[] ch;
+        if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
+            VERBOSE(VB_IMPORTANT,
+                    QString("myth_system(): Error, WaitForSingleObject() failed because %1")
+                    .arg(::GetLastError()));
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+        return GENERIC_EXIT_OK;
+    }
+    return GENERIC_EXIT_NOT_OK;
+}
+#endif
 
 /** \fn cutDownString(const QString&, QFont*, uint)
  *  \brief Returns a string based on "text" that fits within "maxwidth" pixels.
@@ -397,7 +433,8 @@ bool getUptime(time_t &uptime)
     }
     else
         uptime = time(NULL) - bootTime.tv_sec;
-
+#elif defined(USING_MINGW)
+    uptime = ::GetTickCount() / 1000;
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
     VERBOSE(VB_IMPORTANT, "Unknown platform. How do I get the uptime?");
@@ -577,11 +614,137 @@ bool hasUtf8(const char *str)
     return false;
 }
 
+#ifdef USING_MINGW
+u_short in_cksum(u_short *addr, int len)
+{
+	register int nleft = len;
+	register u_short *w = addr;
+	register u_short answer;
+	register int sum = 0;
+
+	/*
+	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
+	 *  we add sequential 16 bit words to it, and at the end, fold
+	 *  back all the carry bits from the top 16 bits into the lower
+	 *  16 bits.
+	 */
+	while( nleft > 1 )  {
+		sum += *w++;
+		nleft -= 2;
+	}
+
+	/* mop up an odd byte, if necessary */
+	if( nleft == 1 ) {
+		u_short	u = 0;
+
+		*(u_char *)(&u) = *(u_char *)w ;
+		sum += u;
+	}
+
+	/*
+	 * add back carry outs from top 16 bits to low 16 bits
+	 */
+	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
+	sum += (sum >> 16);			/* add carry */
+	answer = ~sum;				/* truncate to 16 bits */
+	return (answer);
+}
+#endif
+
 /**
  * \brief Can we ping host within timeout seconds?
  */
 bool ping(const QString &host, int timeout)
 {
+#ifdef USING_MINGW
+    VERBOSE(VB_SOCKET, QString("Ping: pinging %1 (%2 seconds max)").arg(host).arg(timeout));
+	SOCKET	  rawSocket;
+	LPHOSTENT lpHost;
+	struct    sockaddr_in saDest;
+
+    #define ICMP_ECHOREPLY	0
+    #define ICMP_ECHOREQ	8
+    struct IPHDR {
+	    u_char  VIHL;			// Version and IHL
+	    u_char	TOS;			// Type Of Service
+	    short	TotLen;			// Total Length
+	    short	ID;				// Identification
+	    short	FlagOff;		// Flags and Fragment Offset
+	    u_char	TTL;			// Time To Live
+	    u_char	Protocol;		// Protocol
+	    u_short	Checksum;		// Checksum
+	    struct	in_addr iaSrc;	// Internet Address - Source
+	    struct	in_addr iaDst;	// Internet Address - Destination
+    };
+    struct ICMPHDR {
+	    u_char	Type;			// Type
+	    u_char	Code;			// Code
+	    u_short	Checksum;		// Checksum
+	    u_short	ID;				// Identification
+	    u_short	Seq;			// Sequence
+	    char	Data;			// Data
+    };
+
+    struct Request {
+	    ICMPHDR icmpHdr;
+	    DWORD	dwTime;
+	    char	cData[32];
+    };
+    struct Reply {
+	    IPHDR	ipHdr;
+	    Request	echoRequest;
+	    char    cFiller[256];
+    };
+
+    if (INVALID_SOCKET == (rawSocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP))) {
+        VERBOSE(VB_SOCKET, "Ping: can't create socket");
+    	return false;
+    }
+
+	lpHost = gethostbyname(host);
+    if (!lpHost) {
+        VERBOSE(VB_SOCKET, "Ping: gethostbyname failed");
+        closesocket(rawSocket);
+		return false;
+    }
+
+    saDest.sin_addr.s_addr = *((u_long FAR *) (lpHost->h_addr));
+	saDest.sin_family = AF_INET;
+	saDest.sin_port = 0;
+
+    Request echoReq;
+	echoReq.icmpHdr.Type		= ICMP_ECHOREQ;
+	echoReq.icmpHdr.Code		= 0;
+	echoReq.icmpHdr.ID			= 123;
+	echoReq.icmpHdr.Seq			= 456;
+	for (unsigned i = 0; i < sizeof(echoReq.cData); i++)
+		echoReq.cData[i] = ' ' + i;
+	echoReq.dwTime				= GetTickCount();
+	echoReq.icmpHdr.Checksum = in_cksum((u_short *)&echoReq, sizeof(Request));
+
+    if (SOCKET_ERROR == sendto(rawSocket, (LPSTR)&echoReq, sizeof(Request), 0, (LPSOCKADDR)&saDest, sizeof(SOCKADDR_IN))) {
+        VERBOSE(VB_SOCKET, "Ping: send failed");
+        closesocket(rawSocket);
+        return false;
+    }
+
+	struct timeval Timeout;
+	fd_set readfds;
+	readfds.fd_count = 1;
+	readfds.fd_array[0] = rawSocket;
+	Timeout.tv_sec = timeout;
+    Timeout.tv_usec = 0;
+
+    if (SOCKET_ERROR == select(1, &readfds, NULL, NULL, &Timeout)) {
+        VERBOSE(VB_SOCKET, "Ping: timeout expired or select failed");
+        closesocket(rawSocket);
+        return false;
+    }
+
+    closesocket(rawSocket);
+    VERBOSE(VB_SOCKET, "Ping: done");
+    return true;
+#else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null")
                   .arg(timeout).arg(host);
 
@@ -596,6 +759,7 @@ bool ping(const QString &host, int timeout)
     }
 
     return true;
+#endif
 }
 
 /**
@@ -692,6 +856,10 @@ long long copy(QFile &dst, QFile &src, uint block_size)
 
 QString createTempFile(QString name_template, bool dir)
 {
+#ifdef USING_MINGW
+#warning Implement createTempFile
+	return "";
+#else
     const char *tmp = name_template.ascii();
     char *ctemplate = strdup(tmp);
     int ret = -1;
@@ -719,6 +887,7 @@ QString createTempFile(QString name_template, bool dir)
         close(ret);
 
     return tmpFileName;
+#endif
 }
 
 double MythGetPixelAspectRatio(void)

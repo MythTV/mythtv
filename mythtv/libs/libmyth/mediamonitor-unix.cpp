@@ -438,8 +438,8 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
              if (AddDevice(pDevice))
                 return true;
          }
-         delete pDevice;
-      }
+         pDevice->deleteLater();
+     }
 
      return false;
 }
@@ -574,7 +574,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     }
 
     if (pDevice)
-        delete pDevice;
+        pDevice->deleteLater();
 
     return false;
 }

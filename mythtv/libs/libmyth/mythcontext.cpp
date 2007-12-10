@@ -39,11 +39,20 @@
 #include "libmythupnp/mythxmlclient.h"
 #include "libmythupnp/upnp.h"
 
+#ifdef USING_MINGW
+#include <winsock2.h>
+#undef DialogBox
+#include "compat.h"
+#endif
+
 // These defines provide portability for different
 // plugin file names.
 #ifdef CONFIG_DARWIN
 const QString kPluginLibPrefix = "lib";
 const QString kPluginLibSuffix = ".dylib";
+#elif USING_MINGW
+const QString kPluginLibPrefix = "lib";
+const QString kPluginLibSuffix = ".dll";
 #else
 const QString kPluginLibPrefix = "lib";
 const QString kPluginLibSuffix = ".so";
@@ -1432,6 +1441,15 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
 MythContext::MythContext(const QString &binversion)
     : QObject(), d(NULL), app_binary_version(binversion)
 {
+#ifdef USING_MINGW
+    static bool WSAStarted = false;
+    if (!WSAStarted) {
+        WSADATA wsadata;
+        int res = WSAStartup(MAKEWORD(2, 0), &wsadata);
+        VERBOSE(VB_SOCKET, QString("WSAStartup returned %1").arg(res));
+    }
+#endif
+
     qInitNetworkProtocols();
 
     d = new MythContextPrivate(this);
@@ -1488,7 +1506,7 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
         d->serverSock = ConnectServer(d->eventSock, server,
                                       port, blockingClient);
 
-    if (d->eventSock)
+    if (d->serverSock)
         d->eventSock->setCallbacks(this);
 
     return (bool) (d->serverSock);

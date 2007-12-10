@@ -304,7 +304,7 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
         {
             if (m_UseCount[*it] == 0)
             {
-                delete *it;
+                (*it)->deleteLater();
                 m_Devices.remove(it);
                 m_UseCount.remove(*it);
             }
@@ -414,7 +414,7 @@ void MediaMonitor::Unlock(MythMediaDevice *pMedia)
     {
         m_RemovedDevices.remove(pMedia);
         m_UseCount.remove(pMedia);
-        delete pMedia;
+        pMedia->deleteLater();
     }
 }
 
