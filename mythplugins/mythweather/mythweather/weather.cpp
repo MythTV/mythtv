@@ -65,7 +65,6 @@ Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
     setNoErase();
 
     setupScreens(xmldata);
-    updateBackground();
     if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
         showLayout(m_startup);
     showtime_timeout();
@@ -123,6 +122,7 @@ void Weather::setupScreens(QDomElement &xml)
                 else if (e.attribute("name") == "background")
                 {
                     theme->parseContainer(e, name, context, area);
+                    updateBackground();
                 }
                 else
                     containers[e.attribute("name")] = e;

@@ -174,6 +174,7 @@ void WeatherScreen::draw(QPainter *p)
     {
         QRect area = m_container->GetAreaRect();
         QPixmap pix(area.size());
+        pix.fill(m_parent, area.topLeft());
         QPainter tmp(&pix);
         for (int i = 0; i < 9; ++i)
             m_container->Draw(&tmp, i, 0);
