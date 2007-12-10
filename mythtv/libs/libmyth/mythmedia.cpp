@@ -309,56 +309,62 @@ MediaError MythMediaDevice::unlock()
     return MEDIAERR_OK;
 }
 
+/// \brief Tells us if m_DevicePath is a mounted device.
 bool MythMediaDevice::isMounted(bool Verify)
 {
     if (!Verify)
         return (m_Status == MEDIASTAT_MOUNTED);
 
-    QFile Mounts(PATHTO_MOUNTS);
-    char lpath[PATH_MAX + 1];
-    lpath[0] = 0;
+    QFile mountFile(PATHTO_MOUNTS);
 
     // Try to open the mounts file so we can search it for our device.
-    if (Mounts.open(IO_ReadOnly)) 
+    if (!mountFile.open(IO_ReadOnly))
+        return false;
+
+    QTextStream stream(&mountFile);
+
+    while (!stream.eof()) 
     {
-        QTextStream stream(&Mounts);
-        QString line;
+        QString mountPoint;
+        QString deviceName;
+        QStringList deviceNames;
+            
+        // Extract the mount point and device name.
+        stream >> deviceName >> mountPoint;
+        stream.readLine(); // skip the rest of the line
+        deviceNames.push_back(deviceName);
 
-        while (!stream.eof()) 
+        VERBOSE(VB_MEDIA, LOC +
+                QString("Found device: '%1' at mount point '%2'")
+                .arg(deviceName).arg(mountPoint));
+
+        if (deviceName.isEmpty())
+            continue;
+
+        // Get some basic info on the device name, if it looks like a path
+        QFileInfo *fi   = NULL;
+        QString    link = QString::null;
+        if (deviceName[0] == '/')
+            fi = new QFileInfo(deviceName);
+
+        // If the device name in the mounts file is a symlink, follow it..
+        if (fi && fi->isSymLink() && !(link = fi->readLink()).isEmpty())
         {
-            QString MountPoint;
-            QString DeviceName;
-            
-            // Extract the mount point and device name.
-            stream >> DeviceName >> MountPoint;
-            //VERBOSE(VB_MEDIA, "Found Device: " << DeviceName
-            //                  << "  Mountpoint: " << MountPoint);
-
-            // Skip the rest of the line
-            line = stream.readLine();
-            
-            // Now lets see if we're mounted...
-            ssize_t len = readlink(DeviceName.local8Bit(), lpath, PATH_MAX);
-            if (len < 0)
-            {
-                VERBOSE(VB_IMPORTANT, QString("%1 readlink() failed for %2: %3")
-                                            .arg(LOC_ERR)
-                                            .arg(DeviceName.local8Bit())
-                                            .arg(ENO));
-                continue;
-            }
-            lpath[len] = 0;
-
-            if (m_DevicePath == DeviceName || m_DevicePath == lpath) 
-            {
-                m_MountPath = MountPoint;
-                Mounts.close();
-                return true;
-            }
+            if (link[0] == '/') // absolute link
+                deviceNames.push_back(link);
+            else // relative link..
+                deviceNames.push_back(fi->dir(true).absPath() + "/" + link);
         }
-        
-        Mounts.close();
+
+        if (deviceNames.contains(m_DevicePath))
+        {
+            m_MountPath = mountPoint;
+            mountFile.close();
+            return true;
+        }
     }
+
+    mountFile.close();
 
     return false;
 }
