@@ -17,6 +17,7 @@
 
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/compat.h>
 
 #include "mtd.h"
 #include "logging.h"

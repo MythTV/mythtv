@@ -23,6 +23,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/compat.h>
 
 #include "jobthread.h"
 #include "mtd.h"

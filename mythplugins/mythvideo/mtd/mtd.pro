@@ -16,3 +16,4 @@ HEADERS += serversocket.h jobthread.h dvdprobe.h fileobs.h threadevents.h
 SOURCES += main.cpp ../mythvideo/dbcheck.cpp logging.cpp mtd.cpp serversocket.cpp
 SOURCES += jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp
 
+mingw:DEFINES += USING_MINGW

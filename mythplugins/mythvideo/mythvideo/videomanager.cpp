@@ -17,6 +17,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
+#include <mythtv/compat.h>
 
 #include "globals.h"
 #include "videomanager.h"

@@ -19,6 +19,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/langsettings.h>
+#include <mythtv/compat.h>
 
 #include "../mythvideo/dbcheck.h"
 #include "mtd.h"

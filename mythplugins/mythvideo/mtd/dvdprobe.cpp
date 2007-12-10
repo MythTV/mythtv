@@ -12,8 +12,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
 #if defined(__linux__) || defined(__FreeBSD__)
+#include <sys/ioctl.h>
 #include <linux/cdrom.h>
 #endif
 #include <fcntl.h>

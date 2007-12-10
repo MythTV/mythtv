@@ -16,6 +16,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/compat.h>
 
 #include "dvdripbox.h"
 #include "titledialog.h"
