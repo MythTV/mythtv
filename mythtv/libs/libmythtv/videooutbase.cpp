@@ -495,6 +495,19 @@ void VideoOutput::BestDeint(void)
     SetupDeinterlace(true);
 }
 
+/** \fn VideoOutput::IsExtraProcessingRequired(void) const
+ *  \brief Should Prepare() and Show() and ProcessFrame be called
+ *         twice for every Frameloop().
+ *
+ *   All adaptive full framerate deinterlacers require an extra
+ *   ProcessFrame() call.
+ *
+ *  \return true if deint name contains doubleprocess 
+ */
+bool VideoOutput::IsExtraProcessingRequired(void) const
+{
+    return (m_deintfiltername.contains("doubleprocess")) && m_deinterlacing;
+}
 /**
  * \fn VideoOutput::NeedsDoubleFramerate() const
  * \brief Should Prepare() and Show() be called twice for every ProcessFrame().
@@ -505,7 +518,8 @@ bool VideoOutput::NeedsDoubleFramerate() const
 {
     // Bob deinterlace requires doubling framerate
     return ((m_deintfiltername.contains("bobdeint") ||
-             m_deintfiltername.contains("doublerate")) &&
+             m_deintfiltername.contains("doublerate") ||
+             m_deintfiltername.contains("doubleprocess")) &&
             m_deinterlacing);
 }
 

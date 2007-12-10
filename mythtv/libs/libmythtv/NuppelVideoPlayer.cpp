@@ -147,7 +147,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Window stuff
       parentWidget(NULL), embedid(0), embx(-1), emby(-1), embw(-1), embh(-1),
       // State
-      eof(false),                   m_double_framerate(false),
+      eof(false),
+      m_double_framerate(false),    m_double_process(false),
       m_can_double(false),          m_deint_possible(true),
       paused(false),
       pausevideo(false),            actuallypaused(false),
@@ -825,9 +826,13 @@ void NuppelVideoPlayer::SetKeyframeDistance(int keyframedistance)
 void NuppelVideoPlayer::FallbackDeint(void)
 {
      m_double_framerate = false;
+     m_double_process   = false;
 
      if (videosync)
          videosync->SetFrameInterval(frame_interval, false);
+
+     if (osd && !IsIVTVDecoder())
+         osd->SetFrameInterval(frame_interval);
 
      if (videoOutput)
          videoOutput->FallbackDeint();
@@ -893,7 +898,9 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         return;
     }
 
-    if (interlaced)
+    m_double_process = videoOutput->IsExtraProcessingRequired();
+
+    if (interlaced || m_double_process)
     {
         m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
         if (!m_deint_possible)
@@ -917,16 +924,26 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         }
         VERBOSE(VB_PLAYBACK, "Enabled deinterlacing");
     }
-
-    if (kScan_Progressive == scan)
+    else //progressive but !double_process
     {
-        if (m_double_framerate) 
+        if (kScan_Progressive == scan)
         {
-            m_double_framerate = false;
-            videosync->SetFrameInterval(frame_interval, false);
+            if (m_double_framerate) 
+            {
+                m_double_framerate = false;
+                videosync->SetFrameInterval(frame_interval, false);
+            }
+            videoOutput->SetDeinterlacingEnabled(false);
+            VERBOSE(VB_PLAYBACK, "Disabled deinterlacing");
         }
-        videoOutput->SetDeinterlacingEnabled(false);
-        VERBOSE(VB_PLAYBACK, "Disabled deinterlacing");
+    }
+
+    // double_process can switch on/off
+    if (osd && !IsIVTVDecoder())
+    {
+        osd->SetFrameInterval(
+            (m_double_framerate && m_double_process) ?
+            (frame_interval>>1) : frame_interval);
     }
 
     m_scan = scan;
@@ -2289,6 +2306,24 @@ void NuppelVideoPlayer::AVSync(void)
 
         if (m_double_framerate)
         {
+            //second stage of deinterlacer processing
+            if (m_double_process && ps != kScan_Progressive)
+            {
+                videofiltersLock.lock();
+                if (ringBuffer->isDVD() &&
+                    ringBuffer->DVD()->InStillFrame() &&
+                    videoOutput->ValidVideoFrames() < 3)
+                {
+                    videoOutput->ProcessFrame(buffer, NULL, NULL, pipplayer);
+                }
+                else
+                {
+                    videoOutput->ProcessFrame(
+                        buffer, osd, videoFilters, pipplayer);
+                }
+                videofiltersLock.unlock();
+            }
+
             ps = (kScan_Intr2ndField == ps) ?
                 kScan_Interlaced : kScan_Intr2ndField;
 
@@ -2707,6 +2742,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             (videoOutput->SetupDeinterlace(true) &&
              videoOutput->NeedsDoubleFramerate());
 
+        m_double_process = videoOutput->IsExtraProcessingRequired();
+
         videosync = VideoSync::BestMethod(
             videoOutput, fr_int, rf_int, m_double_framerate);
 
@@ -2720,6 +2757,13 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
                         "framerate (refresh rate too low for bob deint)");
                 FallbackDeint();
+            }
+
+            if (osd && !IsIVTVDecoder())
+            {
+                osd->SetFrameInterval(
+                    (m_double_framerate && m_double_process) ?
+                    (frame_interval>>1) : frame_interval);
             }
         }
     }
@@ -3936,7 +3980,12 @@ void NuppelVideoPlayer::DoPause(void)
                                  .arg(video_frame_rate).arg(temp_speed)
                                  .arg(ffrew_skip).arg(frame_interval));
     if (osd && !IsIVTVDecoder())
-        osd->SetFrameInterval(frame_interval);
+    {
+        osd->SetFrameInterval(
+            (m_double_framerate && m_double_process) ?
+            (frame_interval>>1) : frame_interval);
+    }
+
     if (videosync != NULL)
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
 
@@ -4001,9 +4050,6 @@ void NuppelVideoPlayer::DoPlay(void)
             .arg(video_frame_rate).arg(play_speed)
             .arg(ffrew_skip).arg(frame_interval));
 
-    if (osd && !IsIVTVDecoder())
-        osd->SetFrameInterval(frame_interval);
-
     if (videoOutput && videosync)
     {
         // We need to tell it this for automatic deinterlacer settings
@@ -4023,7 +4069,15 @@ void NuppelVideoPlayer::DoPlay(void)
         videofiltersLock.unlock();
 
         m_double_framerate = videoOutput->NeedsDoubleFramerate();
+        m_double_process = videoOutput->IsExtraProcessingRequired();
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
+    }
+
+    if (osd && !IsIVTVDecoder())
+    {
+        osd->SetFrameInterval(
+            (m_double_framerate && m_double_process) ?
+            (frame_interval>>1) : frame_interval);
     }
 
 #ifdef USING_IVTV

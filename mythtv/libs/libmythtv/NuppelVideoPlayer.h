@@ -536,6 +536,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     mutable QMutex internalPauseLock;
     bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
+    bool     m_double_process;///< Output filter must processed at double rate
     bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
     bool     m_deint_possible;
     bool     paused;
