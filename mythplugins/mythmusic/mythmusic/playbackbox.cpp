@@ -1529,10 +1529,10 @@ void PlaybackBoxMusic::setShuffleMode(MusicPlayer::ShuffleMode mode)
 
     bannerEnable(QString("%1: %2").arg(tr("Shuffle")).arg(state), 4000);
 
-    if (!shufflemode == MusicPlayer::SHUFFLE_OFF)
+    if (shufflemode != MusicPlayer::SHUFFLE_OFF)
         music_tree_list->scrambleParents(true);
     else
-        music_tree_list->scrambleParents(true);
+        music_tree_list->scrambleParents(false);
 
     music_tree_list->setTreeOrdering(shufflemode + 1);
     if (listAsShuffled)
