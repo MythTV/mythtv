@@ -2,6 +2,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/compat.h>
 
 #include "weatherScreen.h"
 #include "weatherSource.h"
