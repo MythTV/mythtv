@@ -3665,9 +3665,9 @@ void VideoOutputXv::ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(frame);
 
+    bool safepauseframe = pauseframe && !NeedsDoubleFramerate();
     if (m_deinterlacing && m_deintFilter != NULL &&
-        m_deinterlaceBeforeOSD &&
-        !pauseframe)
+        m_deinterlaceBeforeOSD && (!pauseframe || safepauseframe))
     {
         m_deintFilter->ProcessFrame(frame);
     }
@@ -3677,8 +3677,7 @@ void VideoOutputXv::ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
     DisplayOSD(frame, osd);
 
     if (m_deinterlacing && m_deintFilter != NULL &&
-        !m_deinterlaceBeforeOSD &&
-        !pauseframe)
+        !m_deinterlaceBeforeOSD && (!pauseframe || safepauseframe))
     {
         m_deintFilter->ProcessFrame(frame);
     }
@@ -3709,7 +3708,8 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 
     vbuffers.LockFrame(frame, "ProcessFrameMem");
 
-    if (!pauseframe)
+    bool safepauseframe = pauseframe && !NeedsDoubleFramerate();
+    if (!pauseframe || safepauseframe)
     {
         if (filterList)
             filterList->ProcessFrame(frame);
@@ -3731,8 +3731,11 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
         }
     }
 
-    if (!pauseframe && deint_proc && !m_deinterlaceBeforeOSD)
+    if ((!pauseframe || safepauseframe) &&
+        deint_proc && !m_deinterlaceBeforeOSD)
+    {
         m_deintFilter->ProcessFrame(frame);
+    }
 
     vbuffers.UnlockFrame(frame, "ProcessFrameMem");
 }
