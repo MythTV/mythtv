@@ -1185,12 +1185,13 @@ void MythNews::playVideo(const QString &filename)
 {
     QString command_string = gContext->GetSetting("VideoDefaultPlayer");
 
+    gContext->sendPlaybackStart();
+
     if ((command_string.find("Internal", 0, false) > -1) ||
         (command_string.length() < 1))
     {
         command_string = "Internal";
         gContext->GetMainWindow()->HandleMedia(command_string, filename);
-        return;
     }
     else
     {
@@ -1199,4 +1200,6 @@ void MythNews::playVideo(const QString &filename)
 
         myth_system(command_string);
     }
+
+    gContext->sendPlaybackEnd();
 }
