@@ -18,11 +18,11 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    name = name.lower();
-    if (m_ObjectsByName.contains(name) || !image)
+    QString key = name.lower();
+    if (m_ObjectsByName.contains(key) || !image)
         return false;
 
-    MythUIImage *imType = new MythUIImage(this, name);
+    MythUIImage *imType = new MythUIImage(this, key);
     imType->SetImage(image);
 
     return AddObject(name, imType);
@@ -30,8 +30,8 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 
 bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
-    name = name.lower();
-    if (m_ObjectsByName.contains(name) || !object)
+    QString key = name.lower();
+    if (m_ObjectsByName.contains(key) || !object)
         return false;
 
     object->SetVisible(false);
