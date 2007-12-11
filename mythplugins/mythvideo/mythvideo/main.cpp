@@ -301,7 +301,9 @@ namespace
                     = command_string.replace(QRegExp("%d"),
                                              MediaMonitor::defaultVCDdevice());
             }
+            gContext->sendPlaybackStart();
             myth_system(command_string);
+            gContext->sendPlaybackEnd();
             gContext->GetMainWindow()->raise();
             gContext->GetMainWindow()->setActiveWindow();
             if (gContext->GetMainWindow()->currentWidget())
@@ -351,7 +353,9 @@ namespace
                 command_string =
                         command_string.replace(QRegExp("%d"), dvd_device);
             }
+            gContext->sendPlaybackStart();
             myth_system(command_string);
+            gContext->sendPlaybackEnd();
             if (gContext->GetMainWindow())
             {
                 gContext->GetMainWindow()->raise();
