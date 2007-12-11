@@ -18,6 +18,7 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
+    name = name.lower();
     if (m_ObjectsByName.contains(name) || !image)
         return false;
 
@@ -29,6 +30,7 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 
 bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
+    name = name.lower();
     if (m_ObjectsByName.contains(name) || !object)
         return false;
 
@@ -72,7 +74,7 @@ bool MythUIStateType::DisplayState(const QString &name)
 {
     MythUIType *old = m_CurrentState;
 
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.lower());
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.data();
     else
@@ -165,7 +167,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
 
             if (uitype && m_ObjectsByState.contains((int)stype))
             {
-                delete m_ObjectsByState[(int)stype]; 
+                delete m_ObjectsByState[(int)stype];
                 m_ObjectsByState.erase((int)stype);
             }
             AddObject(stype, uitype);
@@ -185,7 +187,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
 
     return true;
 }
-        
+
 void MythUIStateType::CopyFrom(MythUIType *base)
 {
     MythUIStateType *st = dynamic_cast<MythUIStateType *>(base);
