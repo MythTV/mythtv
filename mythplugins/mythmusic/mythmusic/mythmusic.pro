@@ -68,3 +68,11 @@ macx {
     QMAKE_LFLAGS += -flat_namespace -undefined error
 }
 
+mingw {
+    DEFINES += USING_MINGW
+
+    HEADERS -= cdrip.h   importmusic.h
+    SOURCES -= cdrip.cpp importmusic.cpp cddecoder.cpp
+
+    LIBS += -logg
+}

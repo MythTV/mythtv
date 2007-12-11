@@ -8,6 +8,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include "smartplaylist.h"
 #include <mythtv/mythdbcon.h>
+#include <mythtv/compat.h>
 
 #include <qfileinfo.h>
 #include <qprocess.h>

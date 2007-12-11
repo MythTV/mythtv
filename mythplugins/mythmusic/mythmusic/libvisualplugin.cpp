@@ -3,6 +3,7 @@
 using namespace std;
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/compat.h>
 
 #include "libvisualplugin.h"
 

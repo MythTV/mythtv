@@ -15,6 +15,7 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/compat.h>
 
 // MythMusic headers
 #include "decoder.h"
@@ -23,14 +24,16 @@
 #include "vorbisdecoder.h"
 #include "databasebox.h"
 #include "playbackbox.h"
-#include "cdrip.h"
 #include "playlist.h"
 #include "globalsettings.h"
 #include "dbcheck.h"
-#include "importmusic.h"
 #include "filescanner.h"
 #include "musicplayer.h"
 #include "config.h"
+#ifndef USING_MINGW
+#include "cdrip.h"
+#include "importmusic.h"
+#endif
 
 // System header (relies on config.h define)
 #ifdef HAVE_CDAUDIO
@@ -171,6 +174,7 @@ void startDatabaseTree(void)
 
 bool startRipper(void)
 {
+#ifndef USING_MINGW
     Ripper rip(chooseCD(), gContext->GetMainWindow(), "cd ripper");
 
     qApp->unlock();
@@ -179,12 +183,13 @@ bool startRipper(void)
 
     if (rip.somethingWasRipped())
       return true;
-
+#endif
     return false;
 }
 
 bool startImport(void)
 {
+#ifndef USING_MINGW
     ImportMusicDialog import(gContext->GetMainWindow(), "import music");
 
     qApp->unlock();
@@ -193,7 +198,7 @@ bool startImport(void)
 
     if (import.somethingWasImported())
         return true;
-
+#endif
     return false;
 }
 

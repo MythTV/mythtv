@@ -149,7 +149,7 @@ void MainVisual::setVisual(const QString &name)
     {
         if (pVisFactory->name() == visName)
         {
-            vis = pVisFactory->create(this, winId(), pluginName);
+            vis = pVisFactory->create(this, (long int) winId(), pluginName);
             vis->resize(size());
             fps = vis->getDesiredFPS();
             break;

@@ -191,7 +191,9 @@ static void checkFactories()
         Decoder::registerFactory(new VorbisDecoderFactory);
         Decoder::registerFactory(new MadDecoderFactory);
         Decoder::registerFactory(new FlacDecoderFactory);
+#ifndef USING_MINGW
         Decoder::registerFactory(new CdDecoderFactory);
+#endif // USING_MINGW
         Decoder::registerFactory(new avfDecoderFactory);
 #ifdef AAC_SUPPORT
         Decoder::registerFactory(new aacDecoderFactory);

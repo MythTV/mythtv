@@ -31,13 +31,6 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
-typedef struct {
-    uint32_t v1;
-    uint16_t v2;
-    uint16_t v3;
-    uint8_t v4[8];
-} GUID;
-
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
                        AudioOutput *o) 
           : Decoder(d, i, o)

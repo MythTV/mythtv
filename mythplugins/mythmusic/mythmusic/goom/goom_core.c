@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "config.h"
+#include "../config.h"
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -126,9 +126,9 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 	buffsize = resx * resy;
 
 	pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-	bzero (pixel, buffsize * sizeof (guint32) + 128);
+	memset (pixel, 0, buffsize * sizeof (guint32) + 128);
 	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-	bzero (back, buffsize * sizeof (guint32) + 128);
+	memset (back, 0,  buffsize * sizeof (guint32) + 128);
 	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
 	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 

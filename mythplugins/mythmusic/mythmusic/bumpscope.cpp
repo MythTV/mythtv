@@ -1,6 +1,8 @@
 #include "mainvisual.h"
 #include "bumpscope.h"
 
+#include <mythtv/compat.h>
+
 // This was:
 // Bump Scope - Visualization Plugin for XMMS
 // Copyright (C) 1999-2001 Zinx Verituse

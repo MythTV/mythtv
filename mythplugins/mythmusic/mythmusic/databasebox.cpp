@@ -24,6 +24,9 @@ using namespace std;
 #include "cddecoder.h"
 #include "playlist.h"
 #include "musicplayer.h"
+#ifndef USING_MINGW
+#include "cddecoder.h"
+#endif
 
 DatabaseBox::DatabaseBox(MythMainWindow *parent,
                          const QString dev, const QString &window_name, 
@@ -1260,6 +1263,7 @@ ReadCDThread::ReadCDThread(const QString &dev)
 
 void ReadCDThread::run()
 {
+#ifndef USING_MINGW
     // lock all_music and cd_status_changed while running thread
     QMutexLocker locker(getLock());
 
@@ -1347,5 +1351,6 @@ void ReadCDThread::run()
     }
 
     delete decoder;
+#endif // USING_MINGW
 }
 

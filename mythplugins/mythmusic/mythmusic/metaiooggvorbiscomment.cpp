@@ -1,15 +1,25 @@
-#include <iostream>
+// POSIX headers
 #include <unistd.h>
 #include <sys/stat.h>
-#include <math.h>
+
+// C headers
+#include <cmath>
+
+// C++ headers
+#include <iostream>
 using namespace std;
 
+// MythTV headers
+#include <mythtv/compat.h>
+#include <mythtv/util.h>
+
+// MythMusic headers
 #include "metaiooggvorbiscomment.h"
 #include "metaiovorbiscomment.h"
 #include "metadata.h"
 #include "vcedit.h"
 #include <vorbis/vorbisfile.h>
-
+#include <qfileinfo.h>
 
 //==========================================================================
 MetaIOOggVorbisComment::MetaIOOggVorbisComment(void)
@@ -186,24 +196,11 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
     
     if (!p_input)
         return false;
-    
-    // This may not be the neatest way to create a temporary file....
-    QString newfilename = mdata->Filename() + ".XXXXXX";
-    char* tmp = new char[newfilename.length()+1];
-    strncpy(tmp, newfilename, newfilename.length());
-    tmp[newfilename.length()] = '\0';
-    
-    int fd = mkstemp(tmp);
-    if (fd < 1)
-    {
-        delete[] tmp;
-        fclose(p_input);
-        return false; 
-    }
-    
-    // We need a FILE* not a file descriptor....
-    FILE* p_output = fdopen(fd, "wb");
-    newfilename = tmp;
+
+    QString newfilename = createTempFile(
+        mdata->Filename().local8Bit() + ".XXXXXX");
+
+    FILE *p_output = fopen(newfilename, "wb");
 
     if (!p_output)
     {

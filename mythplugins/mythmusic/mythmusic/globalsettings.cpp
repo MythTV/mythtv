@@ -16,6 +16,7 @@
 
 // mythtv
 #include <mythtv/util.h>
+#include <mythtv/compat.h>
 
 // mythmusic
 #include "globalsettings.h"

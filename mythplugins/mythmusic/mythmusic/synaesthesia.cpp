@@ -26,6 +26,8 @@
 #include <iostream>
 using namespace std;
 
+#include <mythtv/compat.h>
+
 Synaesthesia::Synaesthesia(long int winid)
 {
     fps = 29;

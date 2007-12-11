@@ -15,18 +15,22 @@ using namespace std;
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythmedia.h>
 #include <mythtv/audiooutput.h>
+#include <mythtv/compat.h>
 
 // MythMusic includes
 #include "metadata.h"
 #include "constants.h"
 #include "streaminput.h"
 #include "decoder.h"
-#include "cddecoder.h"
 #include "playbackbox.h"
 #include "databasebox.h"
 #include "mainvisual.h"
 #include "smartplaylist.h"
 #include "search.h"
+
+#ifndef USING_MINGW
+#include "cddecoder.h"
+#endif // USING_MINGW
 
 PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                                    QString theme_filename, const QString &dev, const char *name)
