@@ -899,6 +899,22 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     {
         bgcolor    = kTTColorTransparent;
         newbgcolor = kTTColorTransparent;
+
+        // We don't want to draw completely blank pages,
+        // it slows things down too much.
+        bool isBlank = true;
+        for (uint i = (row == 1 ? 8 : 0); i < (uint) kTeletextColumns; i++)
+        {
+            ch = page[i] & 0x7F;
+            if (ch != ' ')
+            {
+                isBlank = false;
+                break;
+            }
+        }
+
+        if (isBlank)
+            return;
     }
 
     SetForegroundColor(fgcolor);
