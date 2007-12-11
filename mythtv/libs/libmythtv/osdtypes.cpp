@@ -809,6 +809,9 @@ QString OSDTypeText::ConvertFromRtoL(const QString &text) const
     if (!codeci)
         codeci = QTextCodec::codecForName("utf8");
 
+    if (!codeci)
+        return output;
+
     QCString temp = codeci->fromUnicode(output);
 
     FriBidiCharType base;
