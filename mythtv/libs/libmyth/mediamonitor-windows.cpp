@@ -70,7 +70,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
 {
     if (!pDevice)
     {
-        VERBOSE(VB_IMPORTANT, "Error - MediaMonitorUnix::AddDevice(null)");
+        VERBOSE(VB_IMPORTANT, "Error - MediaMonitorWindows::AddDevice(null)");
         return false;
     }
 
