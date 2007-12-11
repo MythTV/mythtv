@@ -358,7 +358,13 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
         limbo.remove(frame);
         available.enqueue(frame);
     }
-    decode.remove(frame);
+
+    // BEGIN HACK HACK HACK, see trac ticket #4159
+    // ffmpeg will wrongly hold on to a frame if it gets the
+    // slices for a frame for which it never got a start code.
+    while (decode.contains(frame))
+      decode.remove(frame);
+    // END  HACK HACK HACK
 }
 
 /**
