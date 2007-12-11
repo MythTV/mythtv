@@ -16,8 +16,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 
-#include <stdio.h>
+#include <cstdio>
+#ifndef USING_MINGW
 #include <sys/mman.h>
+#else
+#define MAP_FAILED -1
+#endif
 
 #include <tiffio.h>
 #include <qimage.h>

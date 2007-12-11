@@ -45,3 +45,5 @@ opengl {
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+
+mingw:DEFINES += USING_MINGW
