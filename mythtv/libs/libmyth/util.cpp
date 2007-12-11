@@ -9,11 +9,11 @@ using namespace std;
 #include <fcntl.h>
 
 // System specific C headers
+#include "compat.h"
 #ifdef USING_MINGW
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <sys/param.h>
-# include "compat.h"
 #else
 # include <sys/types.h>
 # include <sys/wait.h>
@@ -857,8 +857,10 @@ long long copy(QFile &dst, QFile &src, uint block_size)
 QString createTempFile(QString name_template, bool dir)
 {
 #ifdef USING_MINGW
-#warning Implement createTempFile
-	return "";
+    char *tmp = new char[MAX_PATH+1];
+    QFileInfo fi(name_template);
+    ::GetTempFileNameA(fi.filePath(), fi.baseName(), 0, tmp);
+    return QString(tmp);
 #else
     const char *tmp = name_template.ascii();
     char *ctemplate = strdup(tmp);
@@ -897,4 +899,24 @@ double MythGetPixelAspectRatio(void)
     pixelAspect = MythXGetPixelAspectRatio();
 #endif // USING_X11
     return pixelAspect;
+}
+
+unsigned long long myth_get_approximate_large_file_size(const QString &fname)
+{
+    // .local8Bit() not thread-safe.. even with Qt4, make a deep copy first..
+    QString filename = QDeepCopy<QString>(fname);
+#ifdef USING_MINGW
+    struct _stati64 status;
+    _stati64(filename.local8Bit(), &status);
+    return status.st_size;
+#else
+    struct stat status;
+    stat(filename.local8Bit(), &status);
+    // Using off_t requires a lot of 32/64 bit checking.
+    // So just get the size in blocks.
+    unsigned long long bsize = status.st_blksize;
+    unsigned long long nblk  = status.st_blocks;
+    unsigned long long approx_size = nblk * bsize;
+    return approx_size;
+#endif
 }

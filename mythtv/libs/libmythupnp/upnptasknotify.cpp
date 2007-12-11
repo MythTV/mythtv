@@ -8,18 +8,24 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnp.h"
-#include "multicast.h"
-#include "broadcast.h"
+// ANSI C headers
+#include <cstdlib>
 
+// POSIX headers
 #include <unistd.h>
-#include <stdlib.h>
+#include <sys/time.h>
+
+// Qt headers
 #include <qstringlist.h>
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>
-#include <sys/time.h>
 
+// MythTV headers
+#include "upnp.h"
+#include "multicast.h"
+#include "broadcast.h"
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

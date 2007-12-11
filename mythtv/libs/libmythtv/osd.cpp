@@ -26,6 +26,7 @@ using namespace std;
 #include "textsubtitleparser.h"
 #include "libmyth/oldsettings.h"
 #include "udpnotify.h"
+#include "compat.h"
 
 #include "osdtypeteletext.h"
 #include "osdlistbtntype.h"
@@ -1244,7 +1245,7 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
         filename = themepath + filename;
 
     image->SetStaticSize(scale.x(), scale.y());
-    image->LoadImage(filename, wmult, hmult, scale.x(), scale.y());
+    image->Load(filename, wmult, hmult, scale.x(), scale.y());
 
     container->AddType(image);
 }
@@ -1646,9 +1647,9 @@ void OSD::SetText(const QString &name,
         if (cs)
         {
             if ((infoMap.contains("iconpath")) && (infoMap["iconpath"] != ""))
-                cs->LoadImage(infoMap["iconpath"], wmult, hmult, 30, 30);
+                cs->Load(infoMap["iconpath"], wmult, hmult, 30, 30);
             else
-                cs->LoadImage(" ", wmult, hmult, 30, 30);
+                cs->Load(" ", wmult, hmult, 30, 30);
         }
 
         m_setsvisible = true;
@@ -1669,9 +1670,9 @@ void OSD::SetInfoText(QMap<QString, QString> infoMap, int length)
         if (cs)
         {
             if ((infoMap.contains("iconpath")) && (infoMap["iconpath"] != ""))
-                cs->LoadImage(infoMap["iconpath"], wmult, hmult, 30, 30);
+                cs->Load(infoMap["iconpath"], wmult, hmult, 30, 30);
             else
-                cs->LoadImage(" ", wmult, hmult, 30, 30);
+                cs->Load(" ", wmult, hmult, 30, 30);
         }
 
         container->DisplayFor(length * 1000000);
@@ -1725,7 +1726,7 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
             type->SetText(callsign.left(5));
         OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
         if (cs)
-            cs->LoadImage(iconpath, wmult, hmult, 30, 30);
+            cs->Load(iconpath, wmult, hmult, 30, 30);
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;

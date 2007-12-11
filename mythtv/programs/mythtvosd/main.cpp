@@ -1,10 +1,14 @@
+// ANSI C headers
 #include <cstdlib>
+
+// POSIX headers
 #include <sys/types.h>
-#include <sys/socket.h>
 
+// C++ headers
 #include <iostream>
-#include <cstdlib>
+using namespace std;
 
+// Qt headers
 #include <qapplication.h>
 #include <qsocketdevice.h>
 #include <qstring.h>
@@ -12,9 +16,9 @@
 #include <qfile.h>
 #include <qhostaddress.h>
 
+// MythTV headers
 #include "exitcodes.h"
-
-using namespace std;
+#include "compat.h"
 
 const QString kalert =
 "<mythnotify version=\"1\">\n"

@@ -11,10 +11,12 @@
 #ifndef __BUFFEREDSOCKETDEVICE_H__
 #define __BUFFEREDSOCKETDEVICE_H__
 
+// Qt headers
 #include <qsocketdevice.h>
-#include <sys/socket.h>
 
+// MythTV headers
 #include "private/qinternal_p.h"
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

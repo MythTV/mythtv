@@ -7,7 +7,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../.. ..
+INCLUDEPATH += ../.. .. .
 INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
 INCLUDEPATH += ./dvbdev ./mpeg ./iptv
 INCLUDEPATH += ../libmythlivemedia/BasicUsageEnvironment/include
@@ -43,7 +43,7 @@ TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 
 
 DEFINES += _LARGEFILE_SOURCE
@@ -114,7 +114,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Headers needed by frontend & backend
 HEADERS += filter.h                 format.h
-HEADERS += frame.h
+HEADERS += frame.h                  compat.h
 
 # LZO / RTjpegN, used by NuppelDecoder & NuppelVideoRecorder
 HEADERS += lzoconf.h
@@ -495,6 +495,26 @@ using_backend {
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
+mingw {
+    DEFINES -= USING_OPENGL_VSYNC
+    DEFINES += USING_D3D USING_MINGW
+
+    HEADERS -= util-opengl.h   openglcontext.h
+    HEADERS += videoout_d3d.h
+    SOURCES -= util-opengl.cpp openglcontext.cpp
+    SOURCES += videoout_d3d.cpp
+
+    LIBS += -lpthread
+    LIBS += -L../libmythfreemheg -lmythfreemheg-$${LIBVERSION}
+    LIBS += -L. -lmythui-bootstrap
+
+    target.path = $${PREFIX}/bin
+    implib.target = libmythui-bootstrap.a
+    implib.commands = test -e libmythui-bootstrap.a || dlltool --input-def ../libmythui/libmythui.def --dllname libmythui-$${LIBVERSION}.dll --output-lib libmythui-bootstrap.a -k
+    QMAKE_EXTRA_WIN_TARGETS += implib
+    POST_TARGETDEPS += libmythui-bootstrap.a
 }
 
 # install headers required by mytharchive

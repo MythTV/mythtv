@@ -20,7 +20,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
 #include <unistd.h>
@@ -28,7 +27,6 @@
 #include <cctype>
 #include <cerrno>
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>

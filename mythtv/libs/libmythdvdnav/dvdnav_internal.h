@@ -24,13 +24,15 @@
 #ifndef DVDNAV_INTERNAL_H_INCLUDED
 #define DVDNAV_INTERNAL_H_INCLUDED
 
-#include "config.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
 #include <string.h>
+
+// MythTV headers
+#include "mythconfig.h"
+#include "compat.h"
 
 #ifdef WIN32
 

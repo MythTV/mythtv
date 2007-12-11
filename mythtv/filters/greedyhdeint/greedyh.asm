@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "x86-64_macros.inc"
-#include <mangle.h>
+#include "mangle.h"
 
 #if !defined(MASKS_DEFINED)
 #define MASKS_DEFINED

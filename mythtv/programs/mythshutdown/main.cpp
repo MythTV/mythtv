@@ -7,14 +7,13 @@
 using namespace std;
 #include <unistd.h>
 
-#include <sys/wait.h>   // For WIFEXITED on Mac OS X
-
 #include <exitcodes.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include "libmythtv/programinfo.h"
 #include "libmythtv/jobqueue.h"
 #include "tv.h"
+#include "compat.h"
 
 void setGlobalSetting(const QString &key, const QString &value)
 {

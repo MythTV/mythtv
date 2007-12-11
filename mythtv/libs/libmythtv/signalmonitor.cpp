@@ -9,6 +9,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "signalmonitor.h"
+#include "compat.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"

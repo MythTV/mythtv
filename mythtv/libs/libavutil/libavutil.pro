@@ -52,3 +52,5 @@ macx {
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC2000000
 }
+
+mingw:  target.path = $${PREFIX}/bin

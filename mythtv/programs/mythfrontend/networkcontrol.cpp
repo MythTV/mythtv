@@ -14,6 +14,7 @@ using namespace std;
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "previewgenerator.h"
+#include "compat.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")

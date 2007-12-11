@@ -6,7 +6,6 @@
 #include <sys/stat.h>  // for stat
 #include <unistd.h>    // for stat
 #include <sys/time.h>
-#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -25,6 +24,7 @@
 #include "mythsocket.h"
 #include "remotefile.h"
 #include "storagegroup.h"
+#include "util.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
@@ -606,14 +606,9 @@ char *PreviewGenerator::GetScreenGrab(
         if (!invalid)
         {
             // Check size too, QFileInfo can not handle large files
-            struct stat status;
-            stat(filename.ascii(), &status);
-            // Using off_t requires a lot of 32/64 bit checking.
-            // So just get the size in blocks.
-            unsigned long long bsize = status.st_blksize;
-            unsigned long long nblk  = status.st_blocks;
-            unsigned long long approx_size = nblk * bsize;
-            invalid = (approx_size < 8*1024);
+            unsigned long long fsize =
+                myth_get_approximate_large_file_size(filename);
+            invalid = (fsize < 8*1024);
         }
         if (invalid)
         {

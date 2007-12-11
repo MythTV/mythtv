@@ -42,6 +42,13 @@
 #include "avcodec.h"
 #include "avformat.h"
 
+#ifdef USING_MINGW
+# define S_IRGRP 0
+# define S_IWGRP 0
+# define S_IROTH 0
+# define S_IWOTH 0
+#endif
+
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif

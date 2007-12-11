@@ -471,10 +471,10 @@ void MythUIType::AddFocusableChildrenToList(QPtrList<MythUIType> &focusList)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
-QFont MythUIType::CreateFont(const QString &face, int pointSize,
-                             int weight, bool italic)
+QFont MythUIType::CreateQFont(const QString &face, int pointSize,
+                              int weight, bool italic)
 {
-    return GetMythMainWindow()->CreateFont(face, pointSize, weight, italic);
+    return GetMythMainWindow()->CreateQFont(face, pointSize, weight, italic);
 }
 
 QRect MythUIType::NormRect(const QRect &rect)

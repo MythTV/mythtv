@@ -31,6 +31,7 @@ using namespace std;
 #include "livetvchain.h"
 #include "DVDRingBuffer.h"
 #include "util.h"
+#include "compat.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0

@@ -19,19 +19,23 @@
 #elif HAVE_SOUNDCARD_H
     #include <soundcard.h>
 #endif
+#ifndef USING_MINGW
 #include <sys/ioctl.h>
+#endif
 
 #include <list>
 #include <iostream>
 using namespace std;
 
 #include <sys/stat.h>
-#ifdef linux
-#include <sys/vfs.h>
-#else
-#include <sys/param.h>
-#include <sys/mount.h>
-#endif
+#ifdef __linux__
+#  include <sys/vfs.h>
+#else // if !__linux__
+#  include <sys/param.h>
+#  ifndef USING_MINGW
+#    include <sys/mount.h>
+#  endif // USING_MINGW
+#endif // !__linux__
 
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
@@ -46,6 +50,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "previewgenerator.h"
 #include "storagegroup.h"
+#include "compat.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.

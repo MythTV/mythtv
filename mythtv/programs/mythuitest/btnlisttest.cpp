@@ -46,7 +46,7 @@ void TestWindow::setupVList(void)
     vbuttons = new MythListButton(this, "vlist", r, true, true);
 
     MythFontProperties fontProp;
-    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
+    fontProp.SetFace(CreateQFont("Arial", 24, QFont::Bold));
     fontProp.SetColor(QColor(Qt::white));
     fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
@@ -71,7 +71,7 @@ void TestWindow::setupHList(void)
     hbuttons = new MythHorizListButton(this,"hlist",r,true,true, 3);
 
     MythFontProperties fontProp;
-    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
+    fontProp.SetFace(CreateQFont("Arial", 24, QFont::Bold));
     fontProp.SetColor(QColor(Qt::white));
     fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 

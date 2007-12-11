@@ -4,6 +4,11 @@
 #include "DeviceReadBuffer.h"
 #include "mythcontext.h"
 #include "tspacket.h"
+#include "compat.h"
+
+#ifndef USING_MINGW
+#include <sys/poll.h>
+#endif
 
 /// Set this to 1 to report on statistics
 #define REPORT_RING_STATS 0
@@ -282,6 +287,12 @@ bool DeviceReadBuffer::HandlePausing(void)
 
 bool DeviceReadBuffer::Poll(void) const
 {
+#ifdef USING_MINGW
+#warning mingw DeviceReadBuffer::Poll
+    VERBOSE(VB_IMPORTANT, LOC_ERR + 
+            "mingw DeviceReadBuffer::Poll is not implemented");
+    return false;
+#else
     bool retval = true;
     while (true)
     {
@@ -310,10 +321,17 @@ bool DeviceReadBuffer::Poll(void) const
         usleep(2500);
     }
     return retval;
+#endif //!USING_MINGW
 }
 
 bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
 {
+#ifdef USING_MINGW
+#warning mingw DeviceReadBuffer::CheckForErrors
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            "mingw DeviceReadBuffer::CheckForErrors is not implemented");
+    return false;
+#else
     if (len < 0)
     {
         if (EINTR == errno)
@@ -360,6 +378,7 @@ bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
         return false;
     }
     return true;
+#endif
 }
 
 /** \fn DeviceReadBuffer::Read(unsigned char*, const uint)

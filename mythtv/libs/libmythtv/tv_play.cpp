@@ -41,6 +41,7 @@
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "util-osx-cocoa.h"
+#include "compat.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))

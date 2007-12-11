@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "NuppelVideoPlayer.h"
+#include "compat.h"
 
 #include "CommDetector.h"
 #include "CommDetector2.h"

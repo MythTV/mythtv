@@ -10,6 +10,7 @@
 
 #include "upnp.h"
 #include "upnptasksearch.h"
+#include "compat.h"
 
 #include <unistd.h>
 #include <stdlib.h>

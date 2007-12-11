@@ -1294,6 +1294,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_custom += "xshm";
     safe_custom += "directfb";
     safe_custom += "directx";
+    safe_custom += "direct3d";
     safe_custom += "quartz-blit";
     safe_custom += "xv-blit";
     safe_custom += "opengl";
@@ -1360,6 +1361,7 @@ void VideoDisplayProfile::init_statics(void)
         safe_renderer[*it2] += "xshm";
         safe_renderer[*it2] += "directfb";
         safe_renderer[*it2] += "directx";
+        safe_renderer[*it2] += "direct3d";
         safe_renderer[*it2] += "quartz-blit";
         safe_renderer[*it2] += "xv-blit";
         safe_renderer[*it2] += "opengl";
@@ -1383,6 +1385,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_priority["xvmc-opengl"]  = 100;
     safe_renderer_priority["directfb"]     =  60;
     safe_renderer_priority["directx"]      =  50;
+    safe_renderer_priority["direct3d"]     =  55;
     safe_renderer_priority["quartz-blit"]  =  70;
     safe_renderer_priority["quartz-accel"] =  80;
     safe_renderer_priority["ivtv"]         =  40;

@@ -20,6 +20,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "tv_play.h"
+#include "compat.h"
 
 #include "lcdserver.h"
 

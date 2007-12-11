@@ -26,7 +26,10 @@
 #define DECODER_H_INCLUDED
 
 #include <inttypes.h>
+
+#ifndef USING_MINGW
 #include <sys/time.h>
+#endif
 
 #include "ifo_types.h" /*  vm_cmd_t */
 #include "dvdnav_internal.h"

@@ -9,7 +9,7 @@
 #include "infostructs.h"
 #include "mythcontext.h"
 
-void ChannelInfo::LoadIcon(int width, int height)
+void ChannelInfo::LoadChannelIcon(int width, int height)
 {
     QImage tempimage(iconpath);
 

@@ -17,6 +17,7 @@
 #include "mythdbcon.h"
 #include "diseqc.h"
 #include "dtvmultiplex.h"
+#include "compat.h"
 
 #ifdef USING_DVB
 #   include "dvbtypes.h"

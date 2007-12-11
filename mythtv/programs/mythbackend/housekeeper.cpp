@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
@@ -19,6 +18,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
+#include "libmyth/compat.h"
 
 #include "programinfo.h"
 

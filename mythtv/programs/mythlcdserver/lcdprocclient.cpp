@@ -19,7 +19,7 @@
 #include "tv.h"
 #include "lcdserver.h"
 #include "lcddevice.h"
-
+#include "compat.h"
 
 #define LCD_START_COL 3
 

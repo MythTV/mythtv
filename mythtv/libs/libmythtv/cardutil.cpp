@@ -1,7 +1,10 @@
 // Standard UNIX C headers
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
+
+#if defined(USING_V4L) || defined(USING_DVB)
+#include <sys/ioctl.h>
+#endif
 
 // MythTV headers
 #include "cardutil.h"

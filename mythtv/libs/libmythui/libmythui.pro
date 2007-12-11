@@ -72,3 +72,15 @@ using_lirc {
 }
 
 cygwin:DEFINES += _WIN32
+
+mingw {
+    DEFINES += USING_MINGW
+    target.path = $${PREFIX}/bin
+    using_opengl {
+        LIBS += -lopengl32
+        DEFINES += USE_OPENGL_PAINTER
+        SOURCES += mythpainter_ogl.cpp
+        HEADERS += mythpainter_ogl.h
+        inc.files += mythpainter_ogl.h
+    }
+}

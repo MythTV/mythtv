@@ -3,7 +3,6 @@
 // Standard UNIX C headers
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -68,6 +67,12 @@ static HostComboBox *AudioOutputDevice()
 #ifdef USING_COREAUDIO
     gc->addSelection("CoreAudio:", "CoreAudio:"); 
 #endif
+#ifdef USING_DIRECTX
+	gc->addSelection("DirectX:");
+#endif
+#ifdef USING_MINGW
+	gc->addSelection("Windows:");
+#endif
     gc->addSelection("NULL", "NULL");
 
     return gc;
@@ -79,7 +84,9 @@ static HostComboBox *PassThroughOutputDevice()
 
     gc->setLabel(QObject::tr("Passthrough output device"));
     gc->addSelection(QObject::tr("Default"), "Default");
+#ifndef USING_MINGW
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
+#endif
 
     gc->setHelpText(QObject::tr("Audio output device to use for AC3 and "
                     "DTS passthrough. Default is the same as Audio output "
@@ -116,6 +123,12 @@ static HostComboBox *MixerDevice()
 #endif
 #ifdef USING_ALSA
     gc->addSelection("ALSA:default", "ALSA:default");
+#endif
+#ifdef USING_DIRECTX
+    gc->addSelection("DirectX:", "DirectX:");
+#endif
+#ifdef USING_WINAUDIO
+    gc->addSelection("Windows:", "Windows:");
 #endif
 
     return gc;
@@ -4637,11 +4650,11 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(new ThemeSelector("Theme"));
 
-    HorizontalConfigurationGroup *grp1 =
+    HorizontalConfigurationGroup *hgrp1 =
         new HorizontalConfigurationGroup(false, false, false, false);
-    grp1->addChild(RandomTheme());
-    grp1->addChild(ThemeCacheSize());
-    theme->addChild(grp1);
+    hgrp1->addChild(RandomTheme());
+    hgrp1->addChild(ThemeCacheSize());
+    theme->addChild(hgrp1);
 
     theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());

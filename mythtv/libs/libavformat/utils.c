@@ -26,6 +26,11 @@
 #include <sys/time.h>
 #include <time.h>
 
+#ifdef _WIN32
+#define gmtime_r(X, Y)    (memcpy(Y, gmtime(X),    sizeof(struct tm)), Y)
+#define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
+#endif
+
 #undef NDEBUG
 #include <assert.h>
 

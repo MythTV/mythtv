@@ -21,19 +21,18 @@ class OSDSurface;
 class OSDTypeTeletext;
 class TV;
 
-class TTColor
+typedef enum
 {
-  public:
-    static const uint BLACK       = 0;
-    static const uint RED         = 1;
-    static const uint GREEN       = 2;
-    static const uint YELLOW      = 3;
-    static const uint BLUE        = 4;
-    static const uint MAGENTA     = 5;
-    static const uint CYAN        = 6;
-    static const uint WHITE       = 7;
-    static const uint TRANSPARENT = 8;
-};
+    kTTColorBlack       = 0,
+    kTTColorRed         = 1,
+    kTTColorGreen       = 2,
+    kTTColorYellow      = 3,
+    kTTColorBlue        = 4,
+    kTTColorMagenta     = 5,
+    kTTColorCyan        = 6,
+    kTTColorWhite       = 7,
+    kTTColorTransparent = 8,
+} TTColor;
 
 class TTKey
 {

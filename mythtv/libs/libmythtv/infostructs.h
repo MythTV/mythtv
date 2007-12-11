@@ -5,6 +5,10 @@
 
 #include "mythexp.h"
 
+#ifdef USING_MINGW
+#undef LoadIcon
+#endif
+
 class QPixmap;
 
 class MPUBLIC ChannelInfo
@@ -13,7 +17,7 @@ class MPUBLIC ChannelInfo
     ChannelInfo() {}
    ~ChannelInfo() {}
 
-    void LoadIcon(int width, int height=0);
+    void LoadChannelIcon(int width, int height = 0);
     QString Text(QString format);
 
     QString callsign;

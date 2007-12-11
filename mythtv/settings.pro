@@ -7,6 +7,14 @@ isEmpty( PREFIX ) {
 LIBVERSION = 0.20
 VERSION = 0.20.0
 
+isEmpty(TARGET_OS) : win32 {
+    CONFIG += mingw
+    DEFINES -= UNICODE
+    QMAKE_EXTENSION_SHLIB = dll
+    VERSION =
+    CONFIG_OPENGL_LIBS =
+}
+
 # if CYGWIN compile, set up flag in CONFIG 
 contains(TARGET_OS, CYGWIN) { 
     CONFIG += cygwin 

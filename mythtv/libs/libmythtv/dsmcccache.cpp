@@ -271,7 +271,7 @@ DSMCCCacheDir *DSMCCCache::FindGateway(DSMCCCacheReference &ref)
 // Returns zero for success, -1 if we know the object does not
 // currently exist and +1 if the carousel has not so far loaded
 // the object or one of the parent files. 
-int DSMCCCache::GetObject(QStringList &objectPath, QByteArray &result)
+int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 {
     DSMCCCacheDir *dir = FindGateway(m_GatewayRef);
     if (dir == NULL)

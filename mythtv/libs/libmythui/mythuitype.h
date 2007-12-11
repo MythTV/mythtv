@@ -109,8 +109,8 @@ class MythUIType : public QObject, public XMLParseBase
 
     int CalcAlpha(int alphamod);
 
-    QFont CreateFont(const QString &face, int pointSize = 12,
-                     int weight = QFont::Normal, bool italic = FALSE);
+    QFont CreateQFont(const QString &face, int pointSize = 12,
+                      int weight = QFont::Normal, bool italic = FALSE);
     QRect NormRect(const QRect &rect);
     QPoint NormPoint(const QPoint &point);
     int NormX(const int width);

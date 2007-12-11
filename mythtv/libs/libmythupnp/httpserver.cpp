@@ -9,21 +9,27 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include <unistd.h>
+// ANSI C headers
+#include <cmath>
 
+// POSIX headers
+#include <unistd.h>
+#include <sys/time.h>
+#ifndef USING_MINGW
+#include <sys/utsname.h> 
+#endif
+
+// Qt headers
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <qtextstream.h>
 #include <qdatetime.h>
-#include <math.h>
-#include <sys/time.h>
 
-#include <sys/utsname.h> 
-
+// MythTV headers
 #include "httpserver.h"
 #include "upnputil.h"
-
-#include "upnp.h"       // only needed for Config... remove once config is moved.
+#include "upnp.h" // only needed for Config... remove once config is moved.
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -51,12 +57,18 @@ HttpServer::HttpServer( int nPort )
     // Build Platform String
     // ----------------------------------------------------------------------
 
+#ifdef USING_MINGW
+    g_sPlatform = QString( "Windows %1.%1" )
+        .arg(LOBYTE(LOWORD(GetVersion())))
+        .arg(HIBYTE(LOWORD(GetVersion())));
+#else
     struct utsname uname_info;
 
     uname( &uname_info );
 
     g_sPlatform = QString( "%1 %2" ).arg( uname_info.sysname )
                                     .arg( uname_info.release );
+#endif
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions

@@ -7,6 +7,7 @@
 #include "iso639.h"
 
 #include "NuppelVideoPlayer.h"
+#include "compat.h"
 
 #define LOC QString("DVDRB: ")
 #define LOC_ERR QString("DVDRB, Error: ")

@@ -1,5 +1,9 @@
 // POSIX headers
+#ifndef USING_MINGW // dlfcn for mingw defined in compat.h
 #include <dlfcn.h> // needed for dlopen(), dlerror(), dlsym(), and dlclose()
+#else
+#include "compat.h"
+#endif
 
 // Qt headers
 #include <qdir.h>

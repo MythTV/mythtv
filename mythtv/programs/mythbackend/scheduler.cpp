@@ -9,18 +9,18 @@
 #include <algorithm>
 using namespace std;
 
-#ifdef linux
-#include <sys/vfs.h>
-#else
-#include <sys/param.h>
-#include <sys/mount.h>
-#include <sys/resource.h>
-#endif
+#ifdef __linux__
+#  include <sys/vfs.h>
+#else // if !__linux__
+#  include <sys/param.h>
+#  ifndef USING_MINGW
+#    include <sys/mount.h>
+#  endif // USING_MINGW
+#endif // !__linux__
 
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 
 #include "scheduler.h"
 #include "encoderlink.h"
@@ -31,6 +31,7 @@ using namespace std;
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/compat.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/storagegroup.h"

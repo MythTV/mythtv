@@ -11,15 +11,22 @@
 #ifndef __TASKQUEUE_H__
 #define __TASKQUEUE_H__
 
-#include <qthread.h>
-#include <qsocketdevice.h>
-
+// POSIX headers
 #include <sys/types.h>
+#ifndef USING_MINGW
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif // USING_MINGW
+
+// C++ headers
 #include <map>
 
+// Qt headers
+#include <qthread.h>
+#include <qsocketdevice.h>
+
+// MythTV headers
 #include "upnputil.h"
 #include "refcounted.h"
 

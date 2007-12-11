@@ -665,7 +665,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
                 if (curitem->iconpath == "none" || curitem->iconpath == "")
                     curitem->iconpath = "blankicon.jpg";
                 if (!curitem->iconload)
-                    curitem->LoadIcon(iconwidth, iconheight);
+                    curitem->LoadChannelIcon(iconwidth, iconheight);
                 if (curitem->iconload)
                     itype->SetImage(curitem->icon);
             }

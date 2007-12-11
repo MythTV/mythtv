@@ -26,8 +26,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <netinet/in.h>
 #include <string.h>
+
+#ifdef USING_MINGW
+#include <winsock2.h>
+#else
+#include <netinet/in.h>
+#endif
 
 #include "pes.h"
 void printpts(int64_t pts)

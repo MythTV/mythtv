@@ -8,8 +8,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
-#include <sys/resource.h>
 
 #include <iostream>
 #include <cstdlib>
@@ -23,6 +21,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "mythdbcon.h"
 #include "previewgenerator.h"
+#include "compat.h"
 
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")

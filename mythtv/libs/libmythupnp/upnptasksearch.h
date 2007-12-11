@@ -11,14 +11,19 @@
 #ifndef __UPNPTASKSEARCH_H__
 #define __UPNPTASKSEARCH_H__
 
-#include <qsocketdevice.h>
-
+// POSIX headers
 #include <sys/types.h>
-#include <sys/socket.h>
+#ifndef USING_MINGW
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 
+// Qt headers
+#include <qsocketdevice.h>
+
+// MythTV headers
 #include "upnp.h"
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

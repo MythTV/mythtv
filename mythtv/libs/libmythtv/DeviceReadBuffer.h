@@ -6,7 +6,6 @@
 
 #include <unistd.h>
 #include <pthread.h>
-#include <sys/poll.h>
 
 #include <qmutex.h>
 #include <qwaitcondition.h>

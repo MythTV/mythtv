@@ -4,6 +4,7 @@ extern "C" {
 #include "avcodec.h"        /* AVPicture */
 }
 #include "mythcontext.h"    /* gContext */
+#include "compat.h"
 
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"

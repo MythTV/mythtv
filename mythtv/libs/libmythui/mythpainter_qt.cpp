@@ -4,6 +4,7 @@
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
+#include "compat.h"
 
 class MythQtImage : public MythImage
 {

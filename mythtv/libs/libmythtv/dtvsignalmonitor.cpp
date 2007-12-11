@@ -7,6 +7,7 @@
 #include "mpegtables.h"
 #include "atsctables.h"
 #include "dvbtables.h"
+#include "compat.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \

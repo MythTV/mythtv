@@ -6,6 +6,7 @@
 #include "mythfontproperties.h"
 
 #include "mythcontext.h"
+#include "compat.h"
 
 MythUIText::MythUIText(MythUIType *parent, const char *name)
           : MythUIType(parent, name)

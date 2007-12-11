@@ -7,7 +7,7 @@ CONFIG += thread dll warn_off
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH = ../ ../../ ../libavutil ../libswscale
+INCLUDEPATH = ./ ../ ../../ ../libavutil ../libswscale
 
 # remove MMX define since it clashes with a libmp3lame enum
 DEFINES -= MMX
@@ -28,6 +28,7 @@ contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
 }
 
 cygwin:LIBS += -lz
+mingw:target.path = $${PREFIX}/bin
 
 !profile:QMAKE_CFLAGS_DEBUG += -O
 

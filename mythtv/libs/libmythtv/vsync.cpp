@@ -22,10 +22,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "compat.h"
+
+#ifndef _WIN32
+#include <sys/ioctl.h>
 #include <sys/poll.h>
+#endif
 
 #include <mythcontext.h>
 #include "mythdialogs.h" // for OpenGL VSync
@@ -86,13 +90,16 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 	m_forceskip = 0;
     }
     
+#ifndef _WIN32
     TESTVIDEOSYNC(nVidiaVideoSync);
     TESTVIDEOSYNC(DRMVideoSync);
     if (tryOpenGL)
         TESTVIDEOSYNC(OpenGLVideoSync);
+#endif // _WIN32
 #ifdef __linux__
     TESTVIDEOSYNC(RTCVideoSync);
-#endif
+#endif // __linux__
+
     TESTVIDEOSYNC(BusyWaitVideoSync);
 
     tryingVideoSync=false;
@@ -238,10 +245,12 @@ typedef union drm_wait_vblank {
     struct drm_wait_vblank_reply reply;
 } drm_wait_vblank_t;
 
+#ifndef _WIN32
 #define DRM_IOCTL_BASE                  'd'
 #define DRM_IOWR(nr,type)               _IOWR(DRM_IOCTL_BASE,nr,type)
 
 #define DRM_IOCTL_WAIT_VBLANK           DRM_IOWR(0x3a, drm_wait_vblank_t)
+#endif
 
 static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 {
@@ -363,6 +372,9 @@ nVidiaVideoSync::~nVidiaVideoSync()
 
 bool nVidiaVideoSync::dopoll() const
 {
+#ifdef _WIN32
+    return false;
+#else
     int ret;
     struct pollfd polldata;
     polldata.fd = m_nvidia_fd;
@@ -377,6 +389,7 @@ bool nVidiaVideoSync::dopoll() const
         return false;
     }
     return true;
+#endif
 }
 
 bool nVidiaVideoSync::TryInit(void)
@@ -711,6 +724,9 @@ RTCVideoSync::~RTCVideoSync()
 
 bool RTCVideoSync::TryInit(void)
 {
+#ifdef _WIN32
+    return false;
+#else
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
     {
@@ -735,6 +751,7 @@ bool RTCVideoSync::TryInit(void)
     }
     
     return true;
+#endif
 }
 
 void RTCVideoSync::WaitForFrame(int sync_delay)

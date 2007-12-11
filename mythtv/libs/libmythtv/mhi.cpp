@@ -424,7 +424,7 @@ void MHIContext::UpdateOSD(OSDSet *osdSet)
     {
         OSDTypeImage* image = new OSDTypeImage();
         image->SetPosition(QPoint(data->m_x, data->m_y), 1.0, 1.0);
-        image->LoadFromQImage(data->m_image);
+        image->Load(data->m_image);
         osdSet->AddType(image);
     }
 }

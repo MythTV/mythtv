@@ -1,6 +1,8 @@
+// ANSI C
+#include <cstdlib>
+
+// POSIX
 #include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>   // For WIFEXITED on Mac OS X
 
 // qt
 #include <qapplication.h>
@@ -13,6 +15,7 @@
 #include "programinfo.h"
 #include "uitypes.h"
 #include "remoteutil.h"
+#include "compat.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"

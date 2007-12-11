@@ -25,6 +25,10 @@
 #include "videoout_dx.h"
 #endif
 
+#ifdef USING_D3D
+#include "videoout_d3d.h"
+#endif
+
 #ifdef Q_OS_MACX
 #include "videoout_quartz.h"
 #endif
@@ -70,8 +74,12 @@ VideoOutput *VideoOutput::Create(
     renderers += VideoOutputDirectfb::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_DIRECTFB
 
+#ifdef USING_D3D
+    renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
+#endif
+
 #ifdef USING_DIRECTX
-    renderers += VideoOutputDX::GetAllowedRenderers(coded_id, video_dim);
+    renderers += VideoOutputDX::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_DIRECTX
 
 #ifdef USING_XV
@@ -128,6 +136,11 @@ VideoOutput *VideoOutput::Create(
         if (renderer == "directfb")
             vo = new VideoOutputDirectfb();
 #endif // USING_DIRECTFB
+
+#ifdef USING_D3D
+        if (renderer == "direct3d")
+            vo = new VideoOutputD3D();
+#endif // USING_D3D
 
 #ifdef USING_DIRECTX
         if (renderer == "directx")

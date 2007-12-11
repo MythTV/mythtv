@@ -13,7 +13,14 @@
 #ifdef _WIN32
 #define close wsock_close
 #include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
 #undef close
+#else
+#include <sys/resource.h> // for setpriority
+#include <sys/socket.h>
+#include <sys/wait.h>   // For WIFEXITED on Mac OS X
 #endif
 
 #ifdef _WIN32
@@ -22,6 +29,7 @@ typedef unsigned int uint;
 
 #ifdef _WIN32
 #undef DialogBox
+#undef DrawText
 #endif
 
 // Dealing with Microsoft min/max mess: 
@@ -54,10 +62,13 @@ template<class _Ty, class _Pr> inline
 #endif
 
 #ifdef USING_MINGW
-#define gmtime_r(x, y) gmtime((x))
-#define localtime_r(x, y) localtime((x))
+#define gmtime_r(X, Y)    (memcpy(Y, gmtime(X),    sizeof(struct tm)), Y)
+#define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
+#define lseek(X,Y,Z) lseek64(X,Y,Z)
+#define fsync(FD) 0
+#define signal(X,Y) 0
 //used in videodevice only - that code is not windows-compatible anyway
-#define minor(x) 0
+#define minor(X) 0
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
@@ -67,6 +78,11 @@ inline int random(void)
     return rand() << 20 ^ rand() << 10 ^ rand();
 }
 #endif // USING_MINGW
+
+#if defined(__cplusplus) && defined(USING_MINGW)
+#define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
+#define unsetenv(x) 0
+#endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
 #include <pthread.h>

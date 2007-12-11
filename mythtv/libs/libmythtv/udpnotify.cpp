@@ -25,27 +25,23 @@ the corresponding widgets defined within the osd.xml file. If they do not
 match they will be ignored.
 */
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 
 #include <qapplication.h>
 #include <qsocketdevice.h>
 #include <qsocketnotifier.h>
 #include <qhostaddress.h>
 
-#include <iostream>
-using namespace std;
-
 #include "udpnotify.h"
 #include "mythcontext.h"
 #include "osd.h"
 #include "tv_play.h"
+#include "compat.h"
 
 UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name)
 {

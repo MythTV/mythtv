@@ -13,6 +13,7 @@
 // MythTV headers
 #include "ThreadedFileWriter.h"
 #include "mythcontext.h"
+#include "compat.h"
 
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
 #define HAVE_FDATASYNC

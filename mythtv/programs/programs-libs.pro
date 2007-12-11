@@ -16,6 +16,10 @@ LIBS += -lmythfreemheg-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION 
 LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
+mingw {
+    LIBS += -lpthread
+    CONFIG += console
+}
 
 TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
@@ -24,7 +28,7 @@ TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
-TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libsavcodec

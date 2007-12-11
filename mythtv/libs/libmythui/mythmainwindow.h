@@ -105,8 +105,8 @@ class MythMainWindow : public QWidget
     QRect GetUIScreenRect();
 
     int NormalizeFontSize(int pointSize);
-    QFont CreateFont(const QString &face, int pointSize = 12,
-                     int weight = QFont::Normal, bool italic = FALSE);
+    QFont CreateQFont(const QString &face, int pointSize = 12,
+                      int weight = QFont::Normal, bool italic = FALSE);
     QRect NormRect(const QRect &rect);
     QPoint NormPoint(const QPoint &point);
     QSize NormSize(const QSize &size);

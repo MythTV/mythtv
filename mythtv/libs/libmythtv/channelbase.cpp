@@ -7,10 +7,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
+#include <sys/types.h>
 
 // C++ headers
 #include <iostream>
@@ -26,6 +24,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "cardutil.h"
 #include "channelutil.h"
+#include "compat.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
 #define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
@@ -225,6 +224,11 @@ DBChanList ChannelBase::GetChannels(const QString &inputname) const
 
 bool ChannelBase::ChangeExternalChannel(const QString &channum)
 {
+#ifdef USING_MINGW
+    VERBOSE(VB_IMPORTANT, LOC_WARN +
+            QString("ChangeExternalChannel is not implemented in MinGW."));
+    return false;
+#else
     InputMap::const_iterator it = inputs.find(currentInputID);
     QString changer = (*it)->externalChanger;
 
@@ -312,6 +316,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     }
 
     return true;
+#endif // !USING_MINGW
 }
 
 /** \fn ChannelBase::GetCardID(void) const

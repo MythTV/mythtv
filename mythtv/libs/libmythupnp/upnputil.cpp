@@ -8,22 +8,26 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "mythconfig.h"
-#include "upnputil.h"
-#include "upnp.h"
-
-#include <quuid.h>
+// POSIX headers
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/utsname.h> 
 #include <sys/time.h>
+
+#ifndef USING_MINGW
+#include <net/if.h>
+#endif // USING_MINGW
+
+#include "mythconfig.h" // for HAVE_GETIFADDRS
 #ifdef HAVE_GETIFADDRS
 #include <ifaddrs.h>
 #endif
+
+// Qt headers
+#include <quuid.h>
+
+// MythTV headers
+#include "upnputil.h"
+#include "upnp.h"
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -117,6 +121,11 @@ long GetIPAddressList(QStringList &sStrList)
 
 long GetIPAddressList( QStringList &sStrList )
 {
+#ifdef USING_MINGW
+    VERBOSE(VB_UPNP, QString("GetIPAddressList() not implemented in MinGW"));
+    return 0;
+#else
+
     sStrList.clear();
 
     QSocketDevice socket( QSocketDevice::Datagram );
@@ -179,6 +188,7 @@ long GetIPAddressList( QStringList &sStrList )
     }
 
     return( sStrList.count() );
+#endif // !USING_MINGW
 }
 
 #endif // HAVE_GETIFADDRS

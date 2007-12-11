@@ -3,6 +3,7 @@
 
 #include "mythpainter.h"
 #include "mythimage.h"
+#include "compat.h"
 
 class QPainter;
 class QPixmap;

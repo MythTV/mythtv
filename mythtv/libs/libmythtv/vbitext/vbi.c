@@ -1,15 +1,21 @@
-#include <stdlib.h>
-#include <string.h>
+// POSIX headers
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>
+
+#ifndef _WIN32
 #include <sys/ioctl.h>
+#endif
+
+// ANSI C headers
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <stdarg.h>
-//#include "os.h"
+
+// vbitext headers
 #include "vt.h"
 #include "vbi.h"
 #include "hamm.h"
-//#include "lang.h"
 
 #define FAC    (1<<16)         // factor for fix-point arithmetic
 

@@ -29,11 +29,14 @@
 
 #include "config.h"
 
-#include "dvdnav.h"
 #include "dvdnav_internal.h"
+#include "dvdnav.h"
 #include "read_cache.h"
-#include <sys/time.h>
+
 #include <time.h>
+#ifndef _WIN32
+#include <sys/time.h>
+#endif
 
 #define READ_CACHE_CHUNKS 10
 

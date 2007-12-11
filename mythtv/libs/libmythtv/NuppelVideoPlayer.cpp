@@ -13,7 +13,6 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <sys/time.h>
-#include <sys/ioctl.h>
 
 // C++ headers
 #include <algorithm>
@@ -6663,7 +6662,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 
                 OSDTypeImage* image = new OSDTypeImage();
                 image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
-                image->LoadFromQImage(qImage);
+                image->Load(qImage);
 
                 subtitleOSD->AddType(image);
 
@@ -6978,7 +6977,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
         OSDTypeImage* image = new OSDTypeImage();
         image->SetPosition(QPoint(btnX, btnY), hmult, vmult);
-        image->LoadFromQImage(hl_button);
+        image->Load(hl_button);
         image->SetDontRoundPosition(true);
 
         subtitleOSD->AddType(image);

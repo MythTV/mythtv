@@ -33,7 +33,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+// POSIX headers
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
 
 #include "remap.h"
 

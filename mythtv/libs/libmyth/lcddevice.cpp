@@ -7,24 +7,23 @@
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
 
-#include "lcddevice.h"
-#include "mythcontext.h"
-#include "mythdialogs.h"
-
-#include "libmythui/mythmainwindow.h"
-
-#include <unistd.h>
-#ifndef USING_MINGW
-#include <stdlib.h>
-#include <sys/wait.h>	// For WIFEXITED on Mac OS X
-#else
-#include "compat.h"
-#endif
+// ANSI C headers
+#include <cstdlib>
 #include <cmath>
 
+// POSIX headers
+#include <unistd.h>
+
+// Qt headers
 #include <qapplication.h>
 #include <qregexp.h>
 
+// MythTV headers
+#include "libmythui/mythmainwindow.h"
+#include "lcddevice.h"
+#include "mythcontext.h"
+#include "mythdialogs.h"
+#include "compat.h"
 
 /*
   LCD_DEVICE_DEBUG control how much debug info we get

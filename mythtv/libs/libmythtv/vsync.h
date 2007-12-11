@@ -197,6 +197,7 @@ class nVidiaVideoSync : public VideoSync
  *  \sa http://www.ac3.edu.au/SGI_Developer/books/OpenGLonSGI/sgi_html/ch10.html#id37188
  *  \sa http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
  */
+#ifndef USING_MINGW
 class OpenGLVideoSync : public VideoSync
 {
   public:
@@ -217,6 +218,7 @@ class OpenGLVideoSync : public VideoSync
   private:
     QMutex      m_lock;
 };
+#endif // USING_MINGW
 
 #ifdef __linux__
 /** \brief Video synchronization class employing /dev/rtc

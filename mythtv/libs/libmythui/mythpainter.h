@@ -7,6 +7,7 @@
 
 //  #include "mythfontproperties.h"
 
+#include "compat.h"
 
 class MythFontProperties;
 class MythImage;

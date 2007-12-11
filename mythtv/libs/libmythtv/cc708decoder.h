@@ -9,6 +9,7 @@
 #include <qstringlist.h>
 
 #include "format.h"
+#include "compat.h"
 
 #ifndef __CC_CALLBACKS_H__
 /** EIA-708-A closed caption packet */

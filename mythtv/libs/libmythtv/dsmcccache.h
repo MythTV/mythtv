@@ -106,7 +106,7 @@ class DSMCCCache
     void SetGateway(const DSMCCCacheReference &ref);
 
     // Return the contents.
-    int GetObject(QStringList &objectPath, QByteArray &result);
+    int GetDSMObject(QStringList &objectPath, QByteArray &result);
 
   protected:
     // Find File, Directory or Gateway by reference.

@@ -1,11 +1,15 @@
 #ifndef FIFOWRITER
 #define FIFOWRITER
 
-#include <vector>
+// POSIX headers
+#include <pthread.h>
+
+// Qt headers
 #include <qstring.h>
 #include <qmutex.h>
 #include <qptrqueue.h>
 
+// MythTV headers
 #include "mythexp.h"
 
 using namespace std;

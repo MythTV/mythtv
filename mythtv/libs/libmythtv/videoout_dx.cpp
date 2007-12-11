@@ -10,9 +10,9 @@ using namespace std;
 #include "fourcc.h"
 
 #include "mmsystem.h"
-#ifdef CONFIG_CYGWIN
 #include "tv.h"
-#endif
+
+#undef UNICODE
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -200,11 +200,6 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     InitPictureAttributes();
 
     MoveResize();
-
-#ifndef CONFIG_CYGWIN    
-    if (!CreateVideoBuffers())
-        return false;
-#endif
 
     pauseFrame.height = vbuffers.GetScratchFrame()->height;
     pauseFrame.width  = vbuffers.GetScratchFrame()->width;
@@ -1174,7 +1169,7 @@ int VideoOutputDX::NewPicture()
 
             outputpictures = 1;
 
-            VERBOSE(VB_IMPORTANT, "created plain surface of chroma: " << PRINT_FOURCC(chroma) );
+            VERBOSE(VB_IMPORTANT, "created plain surface");
         }
     }
 
@@ -1360,7 +1355,7 @@ int VideoOutputDX::DirectXUpdateOverlay()
         int diff_x  = display_visible_rect.left();
         diff_x     -= display_video_rect.left();
         int diff_w  = display_video_rect.width();
-        diff_x     -= display_visible_rect.width()
+        diff_x     -= display_visible_rect.width();
 
         rect_src.left  += (XJ_width * diff_x) / display_video_rect.width();
         rect_src.right -= ((XJ_width * (diff_w - diff_x)) /
@@ -1383,7 +1378,7 @@ int VideoOutputDX::DirectXUpdateOverlay()
         int diff_h  = display_video_rect.height();
         diff_h     -= display_visible_rect.height();
 
-        rect_src.top += ((video_rect.width() * diff_x) /
+        rect_src.top += ((video_rect.width() * diff_y) /
                          display_video_rect.height());
 
         rect_src.bottom -= (video_rect.height() * (diff_h - diff_y) /

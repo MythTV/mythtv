@@ -15,7 +15,7 @@ TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
            : MythScreenType(parent, name)
 {
     MythFontProperties fontProp1;
-    fontProp1.SetFace(CreateFont("Arial", 48, QFont::Bold));
+    fontProp1.SetFace(CreateQFont("Arial", 48, QFont::Bold));
     fontProp1.SetColor(QColor(Qt::white));
     fontProp1.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
@@ -25,7 +25,7 @@ TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
     main->SetJustification(Qt::AlignCenter);
 
     MythFontProperties fontProp;
-    fontProp.SetFace(CreateFont("Arial", 14));
+    fontProp.SetFace(CreateQFont("Arial", 14));
     fontProp.SetColor(QColor(Qt::white));
     fontProp.SetShadow(true, NormPoint(QPoint(1, 1)), QColor(Qt::black), 64);
 
@@ -280,7 +280,7 @@ TestMove::TestMove(MythUIType *parent, const char *name)
     image->SetPosition(NormPoint(QPoint(30, 30)));
     image->Load();
 
-    QFont fontFace = CreateFont("Arial", 28, QFont::Bold);
+    QFont fontFace = CreateQFont("Arial", 28, QFont::Bold);
 
     MythFontProperties fontProp;
     fontProp.SetFace(fontFace);

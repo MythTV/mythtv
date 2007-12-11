@@ -1,6 +1,7 @@
 #include "osdsurface.h"
 #include "dithertable.h"
 #include "mythcontext.h"
+#include "compat.h"
 
 #include <algorithm>
 using namespace std;

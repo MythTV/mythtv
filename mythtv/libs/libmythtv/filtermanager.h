@@ -9,8 +9,6 @@ extern "C" {
 #include <qdict.h>
 #include <qptrlist.h>
 #include <qstring.h>
-#include <cstdlib>
-#include <dlfcn.h>
 
 using namespace std;
 

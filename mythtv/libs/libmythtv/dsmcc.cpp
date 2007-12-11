@@ -479,7 +479,7 @@ int Dsmcc::GetDSMCCObject(QStringList &objectPath, QByteArray &result)
     // Can we actually have more than one carousel?
     for (; (car = it.current()) != NULL; ++it)
     {
-        int res = car->filecache.GetObject(objectPath, result);
+        int res = car->filecache.GetDSMObject(objectPath, result);
         if (res != -1)
             return res;
     }

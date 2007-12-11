@@ -6,7 +6,7 @@ TARGET = mythdvdnav-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 target.path = $${LIBDIR}
 
-INCLUDEPATH += ../ ../../
+INCLUDEPATH += ../ ../../ ../libmyth
 
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC
@@ -36,3 +36,5 @@ macx {
     # Globals in static libraries need special treatment on OS X
     QMAKE_CFLAGS += -fno-common
 }
+
+mingw:DEFINES += STDC_HEADERS

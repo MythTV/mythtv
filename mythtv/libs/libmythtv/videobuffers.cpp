@@ -8,6 +8,7 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 }
 #include "fourcc.h"
+#include "compat.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h" // for xvmc stuff

@@ -709,7 +709,7 @@ void OSDListBtnType::InitItem(
         QImage img(data, width, height, 32, NULL, 65536 * 65536,
                    QImage::LittleEndian);
         img.setAlphaBuffer(alpha<255);
-        osdImg.LoadFromQImage(img);
+        osdImg.Load(img);
     }
     delete[] data;
 }
@@ -717,7 +717,7 @@ void OSDListBtnType::InitItem(
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
     QString path = gContext->GetThemesParentDir() + "default/lb-";
-    pix.LoadImage(path + fileName + ".png", m_wmult, m_hmult);
+    pix.Load(path + fileName + ".png", m_wmult, m_hmult);
 }
 
 /////////////////////////////////////////////////////////////////////////////

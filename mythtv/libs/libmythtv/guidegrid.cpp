@@ -1167,7 +1167,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 else if (type)
                     iconsize = type->GetSize();
                 if (!chinfo->iconload)
-                    chinfo->LoadIcon(iconsize);
+                    chinfo->LoadChannelIcon(iconsize);
                 if (chinfo->iconload)
                 {
                     if (itype)
@@ -1195,7 +1195,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 else if (type)
                     iconsize = type->GetSize();
                 if (!chinfo->iconload)
-                    chinfo->LoadIcon(iconsize);
+                    chinfo->LoadChannelIcon(iconsize);
                 if (chinfo->iconload)
                     type->SetIcon(y, chinfo->icon);
                 else
@@ -1316,7 +1316,7 @@ void GuideGrid::paintInfo(QPainter *p)
             int iconsize = 0;
             iconsize = itype->GetSize().width();
             if (!chinfo->iconload)
-                chinfo->LoadIcon(iconsize);
+                chinfo->LoadChannelIcon(iconsize);
             if (chinfo->iconload)
                 itype->SetImage(chinfo->icon);
             else

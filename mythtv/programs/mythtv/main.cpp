@@ -13,6 +13,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythdialogs.h"
+#include "libmyth/compat.h"
 
 #include <iostream>
 using namespace std;

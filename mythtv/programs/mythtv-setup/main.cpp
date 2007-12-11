@@ -12,7 +12,6 @@
 #include <cstdio>
 #include <fcntl.h>
 #include <cstdlib>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 
 #include <iostream>

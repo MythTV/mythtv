@@ -684,16 +684,16 @@ QColor color_tt2qt(int ttcolor)
 {
     QColor color;
 
-    switch (ttcolor & ~TTColor::TRANSPARENT)
+    switch (ttcolor & ~kTTColorTransparent)
     {
-        case TTColor::BLACK:   color = OSDTypeTeletext::kColorBlack;   break;
-        case TTColor::RED:     color = OSDTypeTeletext::kColorRed;     break;
-        case TTColor::GREEN:   color = OSDTypeTeletext::kColorGreen;   break;
-        case TTColor::YELLOW:  color = OSDTypeTeletext::kColorYellow;  break;
-        case TTColor::BLUE:    color = OSDTypeTeletext::kColorBlue;    break;
-        case TTColor::MAGENTA: color = OSDTypeTeletext::kColorMagenta; break;
-        case TTColor::CYAN:    color = OSDTypeTeletext::kColorCyan;    break;
-        case TTColor::WHITE:   color = OSDTypeTeletext::kColorWhite;   break;
+        case kTTColorBlack:   color = OSDTypeTeletext::kColorBlack;   break;
+        case kTTColorRed:     color = OSDTypeTeletext::kColorRed;     break;
+        case kTTColorGreen:   color = OSDTypeTeletext::kColorGreen;   break;
+        case kTTColorYellow:  color = OSDTypeTeletext::kColorYellow;  break;
+        case kTTColorBlue:    color = OSDTypeTeletext::kColorBlue;    break;
+        case kTTColorMagenta: color = OSDTypeTeletext::kColorMagenta; break;
+        case kTTColorCyan:    color = OSDTypeTeletext::kColorCyan;    break;
+        case kTTColorWhite:   color = OSDTypeTeletext::kColorWhite;   break;
     }
 
     return color;
@@ -702,7 +702,7 @@ QColor color_tt2qt(int ttcolor)
 /** \fn OSDTypeTeletext::SetForegroundColor(int) const
  *  \brief Set the font color to the given color.
  *
- *   NOTE: TTColor::TRANSPARENT does not do anything!
+ *   NOTE: kTTColorTransparent does not do anything!
  *  \sa TTColor
  */
 void OSDTypeTeletext::SetForegroundColor(int ttcolor) const
@@ -732,7 +732,7 @@ void OSDTypeTeletext::SetBackgroundColor(int ttcolor) const
     m_bgcolor_y = (uint8_t)(y);
     m_bgcolor_u = (uint8_t)(127 + u);
     m_bgcolor_v = (uint8_t)(127 + v);
-    m_bgcolor_a = (ttcolor & TTColor::TRANSPARENT) ? 0x00 : 0xff;
+    m_bgcolor_a = (ttcolor & kTTColorTransparent) ? 0x00 : 0xff;
 }
 
 /** \fn OSDTypeTeletext::DrawBackground(OSDSurface*,int,int) const
@@ -890,15 +890,15 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     char last_ch = ' ';
     char ch;
 
-    uint fgcolor = TTColor::WHITE;
-    uint bgcolor = TTColor::BLACK;
-    uint newfgcolor = TTColor::WHITE;
-    uint newbgcolor = TTColor::BLACK;
+    uint fgcolor = kTTColorWhite;
+    uint bgcolor = kTTColorBlack;
+    uint newfgcolor = kTTColorWhite;
+    uint newbgcolor = kTTColorBlack;
 
     if (m_curpage_issubtitle || m_transparent)
     {
-        bgcolor    = TTColor::TRANSPARENT;
-        newbgcolor = TTColor::TRANSPARENT;
+        bgcolor    = kTTColorTransparent;
+        newbgcolor = kTTColorTransparent;
     }
 
     SetForegroundColor(fgcolor);
@@ -925,13 +925,13 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     {
         if (startbox)
         {
-            bgcolor = TTColor::BLACK;
+            bgcolor = kTTColorBlack;
             startbox = false;
         }
 
         if (endbox)
         {
-            bgcolor = TTColor::TRANSPARENT;
+            bgcolor = kTTColorTransparent;
             endbox = false;
         }
 
@@ -982,7 +982,7 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
                 seperation = true;
                 goto ctrl;
             case 0x1c: // black background
-                bgcolor = TTColor::BLACK;
+                bgcolor = kTTColorBlack;
                 goto ctrl;
             case 0x1d: // new background
                 bgcolor = fgcolor;
@@ -1034,7 +1034,7 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
         if ((row != 0) || (x > 7))
         {
             if (m_transparent)
-                SetBackgroundColor(TTColor::TRANSPARENT);
+                SetBackgroundColor(kTTColorTransparent);
 
             DrawBackground(surface, x, row);
             if (doubleheight && row < (uint)kTeletextRows)
@@ -1128,8 +1128,8 @@ void OSDTypeTeletext::Draw(OSDSurface *surface,
 
 void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
 {
-    SetForegroundColor(TTColor::WHITE);
-    SetBackgroundColor(TTColor::BLACK);
+    SetForegroundColor(kTTColorWhite);
+    SetBackgroundColor(kTTColorBlack);
 
     if (!m_transparent)
         for (int i = 0; i < 40; ++i)
@@ -1144,8 +1144,8 @@ void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
 
     if (!ttpage)
     {
-        SetBackgroundColor(TTColor::BLACK);
-        SetForegroundColor(TTColor::WHITE);
+        SetBackgroundColor(kTTColorBlack);
+        SetForegroundColor(kTTColorWhite);
 
         if (!m_transparent)
             for (int i = 7; i < 40; i++)
@@ -1208,20 +1208,20 @@ void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
         str = "  <" + str.mid(startPos * 3, 27) + " > ";
     }
 
-    SetForegroundColor(TTColor::WHITE);
+    SetForegroundColor(kTTColorWhite);
     for (int x = 0; x < 11; x++)
     {
         if (m_transparent)
-            SetBackgroundColor(TTColor::TRANSPARENT);
+            SetBackgroundColor(kTTColorTransparent);
         else
-            SetBackgroundColor(TTColor::BLACK);
+            SetBackgroundColor(kTTColorBlack);
 
         DrawBackground(surface, x * 3 + 7, 0);
 
         if (str[x * 3] == '*')
         {
             str[x * 3] = ' ';
-            SetBackgroundColor(TTColor::RED);
+            SetBackgroundColor(kTTColorRed);
         }
 
         DrawBackground(surface, x * 3 + 8, 0);

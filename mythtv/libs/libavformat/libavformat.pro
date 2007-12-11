@@ -15,6 +15,8 @@ LIBS += $$LOCAL_LIBDIR_X11 $$EXTRALIBS
 
 cygwin :LIBS += -lz
 
+mingw:  target.path = $${PREFIX}/bin
+
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
@@ -197,3 +199,4 @@ macx {
 #    SOURCES            += audio-darwin.c
 }
 
+mingw:SOURCES -= audio.c

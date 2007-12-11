@@ -2,7 +2,7 @@
 
 // POSIX headers
 #include <sys/time.h>
-#include <sys/resource.h>
+#include "compat.h"
 
 #include <cstdlib>
 

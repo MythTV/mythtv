@@ -15,6 +15,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/compat.h"
 
 #include <qtextstream.h>
 #include <qdir.h>

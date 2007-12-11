@@ -11,9 +11,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <netinet/in.h>
 #include <getopt.h>
 #include <stdint.h>
+
+#ifdef USING_MINGW
+#include <winsock2.h>
+#else
+#include <netinet/in.h>
+#endif
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

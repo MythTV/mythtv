@@ -687,8 +687,8 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
         }
     }
 
-    QFont font = GetMythMainWindow()->CreateFont(fontname, fontsize, 
-                                                 weight, italic);
+    QFont font = GetMythMainWindow()->CreateQFont(
+        fontname, fontsize, weight, italic);
 
     attributes.font.SetFace(font);
 

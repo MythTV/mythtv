@@ -28,7 +28,12 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifdef USING_MINGW
+#include <winsock2.h>
+#else
 #include <netinet/in.h>
+#endif
 
 #include "ts.h"
 #include "element.h"

@@ -18,6 +18,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/util.h"
+#include "libmyth/compat.h"
 
 static QMap<int, int> fsID_cache;
 static QMutex cache_lock;

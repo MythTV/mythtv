@@ -48,7 +48,10 @@ char *      (*dvdinput_error) (dvd_input_t);
 #else
 
 /* dlopening libdvdcss */
+#include "compat.h"
+#ifndef USING_MINGW
 #include <dlfcn.h>
+#endif
 
 typedef struct dvdcss_s *dvdcss_handle;
 static dvdcss_handle (*DVDcss_open)  (const char *);
@@ -288,7 +291,7 @@ int dvdinput_setup(void)
 #ifdef CONFIG_DARWIN
   dvdcss_library = dlopen("libdvdcss.2.dylib", RTLD_LAZY);
 #endif
-#ifdef WIN32
+#ifdef _WIN32
   dvdcss_library = dlopen("libdvdcss.dll", RTLD_LAZY);
 #endif
 

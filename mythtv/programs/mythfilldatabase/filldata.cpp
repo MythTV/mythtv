@@ -1,7 +1,6 @@
 // POSIX headers
 #include <unistd.h>
 #include <signal.h>
-#include <sys/wait.h>
 
 // Std C headers
 #include <cstdlib>
@@ -22,6 +21,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "compat.h"
 
 // libmythtv headers
 #include "videosource.h" // for is_grabber..
@@ -299,8 +299,13 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
     if (xmltv_grabber == "schedulesdirect1")
         return grabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
 
+#ifdef USING_MINGW
+    char tempfilename[MAX_PATH] = "";
+    if (GetTempFileNameA("%TEMP%", "mth", 0, tempfilename) == 0)
+#else
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
+#endif
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Error creating temporary file in /tmp, %1")

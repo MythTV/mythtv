@@ -15,6 +15,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "storagegroup.h"
 #include "backendutil.h"
+#include "compat.h"
 
 /**
  * \class EncoderLink

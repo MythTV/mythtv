@@ -15,12 +15,14 @@
 using namespace std;
 
 #include <sys/stat.h>
-#ifdef linux
-#include <sys/vfs.h>
-#else
-#include <sys/param.h>
-#include <sys/mount.h>
-#endif
+#ifdef __linux__
+#  include <sys/vfs.h>
+#else // if !__linux__
+#  include <sys/param.h>
+#  ifndef USING_MINGW
+#    include <sys/mount.h>
+#  endif // USING_MINGW
+#endif // !__linux__
 
 #include "autoexpire.h"
 #include "programinfo.h"
@@ -32,6 +34,7 @@ using namespace std;
 #include "libmythtv/storagegroup.h"
 #include "encoderlink.h"
 #include "backendutil.h"
+#include "compat.h"
 
 #define LOC QString("AutoExpire: ")
 

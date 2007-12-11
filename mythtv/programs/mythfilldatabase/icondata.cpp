@@ -1,7 +1,6 @@
 // POSIX headers
 #include <unistd.h>
 #include <signal.h>
-#include <sys/wait.h>
 
 // Qt headers
 #include <qdom.h>

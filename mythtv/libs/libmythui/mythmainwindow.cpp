@@ -611,6 +611,18 @@ void MythMainWindow::Show(void)
 /* FIXME compatability only */
 void MythMainWindow::attach(QWidget *child)
 {
+#ifdef USING_MINGW
+#warning TODO FIXME MythMainWindow::attach() not implemented on MS Windows!
+    // if windows are created on different threads,
+    // or if setFocus() is called from a thread other than the main UI thread,
+    // setFocus() hangs the thread that called it
+    // currently, it's impossible to switch to program guide from livetv
+    VERBOSE(VB_IMPORTANT,
+            QString("MythMainWindow::attach old: %1, new: %2, thread: %3")
+            .arg(currentWidget() ? currentWidget()->name() : "none")
+            .arg(child->name())
+            .arg(::GetCurrentThreadId()));
+#endif
     if (currentWidget())
         currentWidget()->setEnabled(false);
 
@@ -1506,8 +1518,15 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     float floatSize = pointSize;
     float desired = 100.0;
 
+#ifdef USING_MINGW
+#warning TODO FIXME DPI needs to be calculated on MS Windows systems..
+    int logicalDpiY = 100;
+#else
+    int logicalDpiY = pdm.logicalDpiY();
+#endif
+
     // adjust for screen resolution relative to 100 dpi
-    floatSize = floatSize * desired / pdm.logicalDpiY();
+    floatSize = floatSize * desired / logicalDpiY;
     // adjust for myth GUI size relative to 800x600
     floatSize = floatSize * d->hmult;
     // adjust by the configurable fine tuning percentage
@@ -1518,8 +1537,8 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     return pointSize;
 }
 
-QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
-                                 int weight, bool italic)
+QFont MythMainWindow::CreateQFont(const QString &face, int pointSize, 
+                                  int weight, bool italic)
 {
     QFont font = QFont(face);
     if (!font.exactMatch())

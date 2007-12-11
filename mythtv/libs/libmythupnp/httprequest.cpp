@@ -18,23 +18,26 @@
 #include <qfileinfo.h>
 
 #include "mythconfig.h"
-#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__)
+#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
 #include "darwin-sendfile.h"
 #else
 #define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <netinet/tcp.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
 
+#ifndef USING_MINGW
+#include <netinet/tcp.h>
+#endif
+
 #include "util.h"
 #include "mythcontext.h"  // for VERBOSE
 #include "upnp.h"
+#include "compat.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

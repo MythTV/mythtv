@@ -1299,7 +1299,7 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
     m_dontround = false;
     m_cacheitem = NULL;
 
-    LoadImage(filename, wmult, hmult, scalew, scaleh);
+    Load(filename, wmult, hmult, scalew, scaleh);
 }
 
 OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
@@ -1417,11 +1417,11 @@ void OSDTypeImage::Reinit(float wmult, float hmult)
         QPoint((int)round(m_unbiasedpos.x() * wmult),
                (int)round(m_unbiasedpos.y() * hmult));
 
-    LoadImage(m_filename, wmult, hmult, m_scalew, m_scaleh);
+    Load(m_filename, wmult, hmult, m_scalew, m_scaleh);
 }
 
-void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
-                             int scalew, int scaleh, bool usecache)
+void OSDTypeImage::Load(const QString &filename, float wmult, float hmult,
+                        int scalew, int scaleh, bool usecache)
 {
     QString ckey;
 
@@ -1535,7 +1535,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     }
 }
 
-void OSDTypeImage::LoadFromQImage(const QImage &img)
+void OSDTypeImage::Load(const QImage &img)
 {
     // this method is not cached
 
@@ -1835,7 +1835,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_scaleh = scaleh;
     m_cacheitem = NULL;
 
-    LoadImage(m_redname, wmult, hmult, scalew, scaleh, false);
+    Load(m_redname, wmult, hmult, scalew, scaleh, false);
     if (m_isvalid)
     {
         m_risvalid = m_isvalid;
@@ -1850,7 +1850,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
         m_alpha = m_yuv = NULL;
     }
 
-    LoadImage(m_bluename, wmult, hmult, scalew, scaleh, false);
+    Load(m_bluename, wmult, hmult, scalew, scaleh, false);
 }
 
 OSDTypeEditSlider::~OSDTypeEditSlider()
@@ -1871,7 +1871,7 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
 
     m_displaypos = m_displayrect.topLeft();
 
-    LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh, false);
+    Load(m_redname, wmult, hmult, m_scalew, m_scaleh, false);
     if (m_isvalid)
     {
         m_risvalid = m_isvalid;
@@ -1886,7 +1886,7 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
         m_alpha = m_yuv = NULL;
     }
 
-    LoadImage(m_bluename, wmult, hmult, m_scalew, m_scaleh, false);
+    Load(m_bluename, wmult, hmult, m_scalew, m_scaleh, false);
 }
 
 void OSDTypeEditSlider::ClearAll(void)

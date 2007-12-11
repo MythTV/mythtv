@@ -1,6 +1,7 @@
 #include "frequencies.h"
 #include "frequencytables.h"
 #include "channelutil.h"
+#include "compat.h"
 
 freq_table_map_t frequencies;
 

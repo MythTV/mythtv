@@ -11,15 +11,20 @@
 #ifndef __UPNPTASKNOTIFY_H__
 #define __UPNPTASKNOTIFY_H__
 
-#include <qsocketdevice.h>
-
+// POSIX headers
 #include <sys/types.h>
-#include <sys/socket.h>
+#ifdef USING_MINGW
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 
+// Qt headers
+#include <qsocketdevice.h>
+
+// MythTV headers
 #include "upnp.h"
 #include "multicast.h"
+#include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs

@@ -12,6 +12,14 @@
 #ifndef __HTTPSERVER_H__
 #define __HTTPSERVER_H__
 
+// POSIX headers
+#include <sys/types.h>
+#ifdef USING_MINGW
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+// Qt headers
 #include <qthread.h>
 #include <qserversocket.h>
 #include <qsocketdevice.h>
@@ -21,16 +29,12 @@
 #include <qtimer.h>
 #include <qptrlist.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
+// MythTV headers
 #include "upnputil.h"
 #include "httprequest.h"
 #include "threadpool.h"
 #include "refcounted.h"
-
+#include "compat.h"
 
 typedef struct timeval  TaskTime;
 
