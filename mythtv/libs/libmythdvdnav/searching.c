@@ -26,6 +26,7 @@
 #include <assert.h>
 #include "dvdnav_internal.h"
 #include "dvdnav.h"
+#include "compat.h"
 
 /*
 #define LOG_DEBUG

@@ -45,7 +45,7 @@ extern "C" {
 #  include <dvdnav/ifo_types.h> /* For vm_cmd_t */
 #endif
 
-
+#include "compat.h"
 
 /*********************************************************************
  * dvdnav data types                                                 *
