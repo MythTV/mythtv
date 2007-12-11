@@ -3900,13 +3900,13 @@ void MythContext::dispatchNow(MythEvent &event)
 void MythContext::sendPlaybackStart(void)
 {
     MythEvent me(QString("PLAYBACK_START %1").arg(GetHostName()));
-    dispatch(me);
+    dispatchNow(me);
 }
 
 void MythContext::sendPlaybackEnd(void)
 {
     MythEvent me(QString("PLAYBACK_END %1").arg(GetHostName()));
-    dispatch(me);
+    dispatchNow(me);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
