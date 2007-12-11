@@ -306,7 +306,7 @@ __GLXextFuncPtr get_gl_proc_address(const QString &procName)
 {
     __GLXextFuncPtr ret = NULL;
 
-#if GLX_VERSION_1_4
+#if GLX_VERSION_1_4 && defined(GLX_GLXEXT_PROTOTYPES)
     X11S(ret = glXGetProcAddress((const GLubyte*)procName.latin1()));
 #elif GLX_ARB_get_proc_address
     X11S(ret = glXGetProcAddressARB((const GLubyte*)procName.latin1()));
