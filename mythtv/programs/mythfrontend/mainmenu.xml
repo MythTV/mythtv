@@ -21,6 +21,7 @@
       <text lang="NB">Se på TV</text>
       <text lang="CZ">Sledovat TV</text>
       <text lang="RU">Смотреть ТВ</text>
+      <text lang="AR">شاهد التلفاز</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -43,9 +44,11 @@
      <text lang="PT">Galeria Multimédia</text>
      <text lang="CZ">Multimediální katalog</text>
      <text lang="RU">Мультимедиа</text>
+     <text lang="AR">مكتبة الوسائط</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <alttext lang="PT">Galeria</alttext>
+     <alttext lang="AR">المكتبة</alttext>
      <action>MENU library.xml</action>
    </button>
    
@@ -70,11 +73,13 @@
       <text lang="NB">Behandle opptak</text>
       <text lang="CZ">Spravovat nahrávky</text>
       <text lang="RU">Управление записями</text>
+      <text lang="AR">أدر التسجيلات</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="PT">Programação</alttext>
       <alttext lang="RU">Записи</alttext>
+      <alttext lang="AR">التسجيلات</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -98,6 +103,7 @@
      <text lang="PT">Centro de Informação</text>
      <text lang="CZ">Centrum informací</text>
      <text lang="RU">Центр информации</text>
+     <text lang="AR">مركز المعلومات</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="DK">Infocenter</alttext>
@@ -106,6 +112,7 @@
      <alttext lang="PT">Informação</alttext>
      <alttext lang="NL">Infocenter</alttext>
      <alttext lang="RU">Информация</alttext>
+     <alttext lang="AR">معلومات</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -129,6 +136,7 @@
      <text lang="PT">CD/DVD</text>
      <text lang="CZ">CD/DVD</text>
      <text lang="RU">CD/DVD</text>
+     <text lang="AR">تشغيل إسطوانات</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythvideo mytharchive mythburn</depends>
    </button>
@@ -154,10 +162,12 @@
      <text lang="NB">Verktøy/Oppsett</text>
      <text lang="CZ">Pomůcky</text>
      <text lang="RU">Утилиты / Настройки</text>
+     <text lang="AR">تضبيطات</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <alttext lang="ET">Sätted</alttext>
      <alttext lang="RU">Настройки</alttext>
+     <alttext lang="AR">تضبيطات</alttext>
      <action>MENU util_menu.xml</action>
    </button>
 
