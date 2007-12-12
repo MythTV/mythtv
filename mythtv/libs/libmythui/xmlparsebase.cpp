@@ -13,6 +13,7 @@
 #include "mythuitext.h"
 #include "mythuiclock.h"
 #include "mythlistbutton.h"
+#include "mythuibutton.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -144,6 +145,7 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
             }
             else if (type == "imagetype" ||
                      type == "textarea" ||
+                     type == "button" ||
                      type == "buttonlist" ||
                      type == "horizontalbuttonlist" ||
                      type == "statetype" ||
@@ -211,6 +213,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIImage(parent, name);
     else if (type == "textarea")
         uitype = new MythUIText(parent, name);
+    else if (type == "button")
+        uitype = new MythUIButton(parent, name);
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
     else if (type == "horizontalbuttonlist")
@@ -262,8 +266,9 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                 if (font)
                     delete font;
             }
-            else if (info.tagName() == "imagetype" || 
-                     info.tagName() == "textarea" || 
+            else if (info.tagName() == "imagetype" ||
+                     info.tagName() == "textarea" ||
+                     info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
                      info.tagName() == "horizontalbuttonlist" ||
                      info.tagName() == "statetype" ||
@@ -365,6 +370,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
                 else if (type == "imagetype" ||
                          type == "textarea" ||
+                         type == "button" ||
                          type == "buttonlist" ||
                          type == "horizontalbuttonlist" ||
                          type == "statetype" ||

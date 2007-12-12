@@ -1,7 +1,9 @@
 #include <iostream>
 using namespace std;
 
+#include "mythcontext.h"
 #include "mythuibutton.h"
+#include "mythmainwindow.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const char *name)
             : MythUIType(parent, name)
@@ -24,6 +26,122 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name)
 
 MythUIButton::~MythUIButton()
 {
+}
+
+bool MythUIButton::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "inactivefont")
+    {
+        QString fontname = getFirstText(element);
+        MythFontProperties *fp = GetFont(fontname);
+        if (!fp)
+            fp = GetGlobalFontMap()->GetFont(fontname);
+        if (fp)
+            SetFont(Disabled, *fp);
+    }
+    else if (element.tagName() == "activefont")
+    {
+        QString fontname = getFirstText(element);
+        MythFontProperties *fp = GetFont(fontname);
+        if (!fp)
+            fp = GetGlobalFontMap()->GetFont(fontname);
+        if (fp)
+            SetFont(Normal, *fp);
+    }
+    else if (element.tagName() == "value")
+    {
+        QString msg = getFirstText(element);
+        m_Text->SetText(msg);
+    }
+    else if (element.tagName() == "showarrow")
+    {
+        EnableRightArrow(parseBool(element));
+    }
+    else if (element.tagName() == "arrow")
+    {
+        MythImage *tmp = LoadImage(element);
+        SetRightArrowImage(tmp);
+    }
+    else if (element.tagName() == "check-empty")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetCheckImage(MythUIStateType::Off, tmp);
+    }
+    else if (element.tagName() == "check-half")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetCheckImage(MythUIStateType::Half, tmp);
+    }
+    else if (element.tagName() == "check-full")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetCheckImage(MythUIStateType::Full, tmp);
+    }
+    else if (element.tagName() == "regular-background")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetBackgroundImage(Normal, tmp);
+        SetBackgroundImage(Active, tmp);
+        SelectState(Normal);
+        SetupPlacement();
+    }
+    else if (element.tagName() == "selected-background")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetBackgroundImage(Selected, tmp);
+    }
+    else if (element.tagName() == "inactive-background")
+    {
+        MythImage *tmp= LoadImage(element);
+        SetBackgroundImage(SelectedInactive,
+                                tmp);
+    }
+    else if (element.tagName() == "margin")
+        m_PaddingMargin = NormX(getFirstText(element).toInt());
+    else if (element.tagName() == "textflags")
+    {
+        QString align = getFirstText(element).lower();
+
+        if (align == "center")
+            m_textFlags |= Qt::AlignCenter;
+        else if (align == "right")
+            m_textFlags |= Qt::AlignRight;
+        else if (align == "left")
+            m_textFlags |= Qt::AlignLeft;
+        else if (align == "allcenter")
+            m_textFlags |= Qt::AlignHCenter | Qt::AlignVCenter;
+        else if (align == "vcenter")
+            m_textFlags |= Qt::AlignVCenter;
+        else if (align == "hcenter")
+            m_textFlags |= Qt::AlignHCenter;
+    }
+    else
+        return MythUIType::ParseElement(element);
+
+    return true;
+}
+
+MythImage* MythUIButton::LoadImage(QDomElement element)
+{
+    MythImage *tmp;
+    QString filename = element.attribute("filename");
+
+    if (!filename.isEmpty())
+    {
+        VERBOSE(VB_FILE, QString("Loading button image: %1").arg(filename));
+        tmp = GetMythPainter()->GetFormatImage();
+        tmp->Load(filename);
+    }
+    else
+    {
+        QColor startcol = QColor(element.attribute("gradientstart", "#505050"));
+        QColor endcol = QColor(element.attribute("gradientend", "#000000"));
+        int alpha = element.attribute("gradientalpha", "100").toInt();
+
+        tmp = MythImage::Gradient(QSize(10, 10), startcol, endcol, alpha);
+    }
+
+    return tmp;
 }
 
 void MythUIButton::SetTextRect(const QRect &textRect)
@@ -91,6 +209,9 @@ void MythUIButton::SetText(const QString &msg, int textFlags)
     m_Text->SetText(msg);
     if (textFlags > 0)
         m_Text->SetJustification(textFlags);
+    else if (m_textFlags > 0)
+        m_Text->SetJustification(m_textFlags);
+    SetRedraw();
 }
 
 void MythUIButton::SelectState(StateType newState)
@@ -103,12 +224,11 @@ void MythUIButton::SelectState(StateType newState)
     if (!m_BackgroundImage->DisplayState(QString::number((int)m_State)))
         m_BackgroundImage->DisplayState(QString::number((int)Normal));
 
-/*
     if (!m_FontProps.contains((int)m_State))
         m_Text->SetFontProperties(m_FontProps[(int)Normal]);
     else
         m_Text->SetFontProperties(m_FontProps[(int)m_State]);
-*/
+
 }
 
 void MythUIButton::SetCheckState(MythUIStateType::StateType state)
@@ -174,3 +294,28 @@ void MythUIButton::SetupPlacement(void)
     SetTextRect(QRect(textx, 0, textwidth, height));
 }
 
+void MythUIButton::CopyFrom(MythUIType *base)
+{
+    MythUIButton *button = dynamic_cast<MythUIButton *>(base);
+    if (!button)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    m_FontProps = button->m_FontProps;
+
+    m_State = button->m_State;
+
+    m_TextRect = button->m_TextRect;
+    m_PaddingMargin = button->m_PaddingMargin;
+    m_textFlags = button->m_textFlags;
+
+    MythUIType::CopyFrom(base);
+}
+
+void MythUIButton::CreateCopy(MythUIType *parent)
+{
+    MythUIButton *button = new MythUIButton(parent, name());
+    button->CopyFrom(this);
+}

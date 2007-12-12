@@ -43,6 +43,12 @@ class MythUIButton : public MythUIType
     void SetupPlacement(void);
 
   protected:
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+
+    MythImage* LoadImage(QDomElement element);
+
     MythUIStateType *m_BackgroundImage;
     MythUIText *m_Text;
     MythUIStateType *m_CheckImage;
@@ -55,6 +61,7 @@ class MythUIButton : public MythUIType
 
     QRect m_TextRect;
     int m_PaddingMargin;
+    int m_textFlags;
 };
 
 #endif
