@@ -676,7 +676,7 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *this, subtitle_t *current
   sub_readtext((char *) &line,&current->text[1]);
   current->lines = 2;
   
-  if ((current->text[0]=="") && (current->text[1]=="")) {
+  if ((current->text[0][0]==0) && (current->text[1][0]==0)) {
     return NULL;
   }
   

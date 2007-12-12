@@ -291,7 +291,7 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
     if (!item)
         return false;
 
-    if (item->name() == "unnamed")
+    if (QString(item->name()) == "unnamed")
         item->setName( QString( "ITEM-%1").arg(itemList.count()));
 
     if (!child(item->name()) && !item->parent())

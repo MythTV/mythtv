@@ -2109,7 +2109,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         for (uint j = 0; j < kSpacerListSize; j++)
         {
 	    QString qprefix = add_spacer(
-                prefix, (spacers[j] == "_") ? "\\_" : spacers[j]);
+                prefix, (QString(spacers[j]) == "_") ? "\\_" : spacers[j]);
             query.prepare(basequery.arg(qprefix) + cardquery[i]);
 
             if (!query.exec() || !query.isActive())
