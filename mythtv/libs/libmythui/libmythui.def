@@ -1,0 +1,24 @@
+LIBRARY  
+EXPORTS  
+;       GetMythMainWindow()  
+        _Z17GetMythMainWindowv  
+;       DestroyMythMainWindow()  
+        _Z21DestroyMythMainWindowv
+;       MythMainWindow::Init()
+        _ZN14MythMainWindow4InitEv
+;       MythMainWindow::NormalizeFontSize(int)  
+        _ZN14MythMainWindow17NormalizeFontSizeEi  
+;       MythMainWindow::TranslateKeyPress(QString const&, QKeyEvent*, QStringList&, bool)  
+        _ZN14MythMainWindow17TranslateKeyPressERK7QStringP9QKeyEventR11QStringListb  
+;       MythMainWindow::detach(QWidget*)  
+        _ZN14MythMainWindow6detachEP7QWidget  
+;       MythMainWindow::attach(QWidget*)  
+        _ZN14MythMainWindow6attachEP7QWidget  
+;       MythMainWindow::RegisterKey(QString const&, QString const&, QString const&, QString const&)  
+        _ZN14MythMainWindow11RegisterKeyERK7QStringS2_S2_S2_ @ 737  
+;       MythMainWindow::GetKey(QString const&, QString const&) const  
+        _ZNK14MythMainWindow6GetKeyERK7QStringS2_  
+;       MythMainWindow::currentWidget()  
+        _ZN14MythMainWindow13currentWidgetEv  
+;       MythMainWindow::getMainWindow(bool)
+        _ZN14MythMainWindow13getMainWindowEb

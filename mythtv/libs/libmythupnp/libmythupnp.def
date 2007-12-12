@@ -1,0 +1,38 @@
+LIBRARY
+EXPORTS
+;	MythXMLClient::MythXMLClient(QUrl const&, bool)
+	_ZN13MythXMLClientC1ERK4QUrlb
+;	MythXMLClient::GetConnectionInfo(QString const&, DatabaseParams*, QString&)
+	_ZN13MythXMLClient17GetConnectionInfoERK7QStringP14DatabaseParamsRS0_
+;	MythXMLClient::~MythXMLClient()
+	_ZN13MythXMLClientD0Ev
+;	MythXMLClient::~MythXMLClient()
+	_ZN13MythXMLClientD1Ev
+;	MythXMLClient::~MythXMLClient()
+	_ZN13MythXMLClientD2Ev
+;	SSDPCache::Find(QString const&)
+	_ZN9SSDPCache4FindERK7QString
+;	SSDPCache::Find(QString const&, QString const&)
+	_ZN9SSDPCache4FindERK7QStringS2_
+;	SSDP::PerformSearch(QString const&)
+	_ZN4SSDP13PerformSearchERK7QString
+;	HttpServer::HttpServer(int)
+	_ZN10HttpServerC1Ei
+;	XmlConfiguration::XmlConfiguration(QString const&)
+	_ZN16XmlConfigurationC1ERK7QString
+;	UPnp::Initialize(int, HttpServer*)
+	_ZN4UPnp10InitializeEiP10HttpServer
+;	UPnp::g_pSSDP
+	_ZN4UPnp7g_pSSDPE
+;	UPnp::g_pConfig
+	_ZN4UPnp9g_pConfigE
+;	UPnp::UPnp()
+	_ZN4UPnpC1Ev
+;	UPnp::g_SSDPCache
+	_ZN4UPnp11g_SSDPCacheE
+;	UPnp::SetConfiguration(Configuration*)
+	_ZN4UPnp16SetConfigurationEP13Configuration
+;	UPnp::g_UPnpDeviceDesc
+	_ZN4UPnp16g_UPnpDeviceDescE
+;	UPnpDeviceDesc::Retrieve(QString&, bool)
+	_ZN14UPnpDeviceDesc8RetrieveER7QStringb
