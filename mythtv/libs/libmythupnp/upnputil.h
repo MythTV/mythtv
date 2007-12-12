@@ -16,15 +16,8 @@
 #include <qmap.h>
 
 // __suseconds_t doesn't exist on some older Unixes. e.g. Darwin/Mac OS X
-
-#if defined(__FreeBSD__) 
-#define __suseconds_t_defined  // It exists on FreeBSD, but doesn't define this
-#endif
-
-#ifndef __suseconds_t_defined
-#define __suseconds_t_defined
-typedef int32_t __suseconds_t;
-#endif
+// let's hope they have suseconds_t in <sys/types.h>
+#include <sys/types.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -110,7 +103,7 @@ long    GetIPAddressList  ( QStringList &sStrList    );
 bool operator<            ( TaskTime t1, TaskTime t2 );
 bool operator==           ( TaskTime t1, TaskTime t2 );
 
-void AddMicroSecToTaskTime( TaskTime &t, __suseconds_t uSecs );
+void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs );
 void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 
 #endif

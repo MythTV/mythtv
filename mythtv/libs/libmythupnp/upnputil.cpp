@@ -224,7 +224,7 @@ bool operator== ( TaskTime t1, TaskTime t2 )
 //           
 /////////////////////////////////////////////////////////////////////////////
 
-void AddMicroSecToTaskTime( TaskTime &t, __suseconds_t uSecs )
+void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs )
 {
     uSecs += t.tv_usec;
 
