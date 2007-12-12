@@ -1115,7 +1115,7 @@ QString MythContextPrivate::TestDBconnection(void)
         // Cause MSqlQuery to fail, instead of minutes timeout per DB value
         m_DBparams.dbHostName = "";
 
-        err = parent->tr("Cannot find (ping) database host %1 on the network");
+        err = QObject::tr("Cannot find (ping) database host %1 on the network");
         return err.arg(host);
     }
 
@@ -1124,7 +1124,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (port && !telnet(host, port))
     {
-        err = parent->tr("Cannot connect to port %1 on database host %2");
+        err = QObject::tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
     }
 
@@ -1132,7 +1132,7 @@ QString MythContextPrivate::TestDBconnection(void)
     // 3. Finally, try to login, et c:
 
     if (!MSqlQuery::testDBConnection())
-        return parent->tr(QString("Cannot login to database?"));
+        return QObject::tr(QString("Cannot login to database?"));
 
 
     return QString::null;
@@ -1254,7 +1254,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     buttons += QObject::tr("Save backend details");
     buttons += QObject::tr("Don't Save");
 
-    message = parent->tr("Save that backend or database as the default?");
+    message = QObject::tr("Save that backend or database as the default?");
 
     DialogCode selected = MythPopupBox::ShowButtonPopup(
         mainWindow, "Save default", message, buttons, kDialogCodeButton2);
