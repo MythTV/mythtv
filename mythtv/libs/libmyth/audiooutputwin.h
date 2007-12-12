@@ -11,6 +11,7 @@ class AudioOutputWinPrivate;
 
 class AudioOutputWin : public AudioOutputBase
 {
+  friend class AudioOutputWinPrivate;
   public:
     AudioOutputWin(QString laudio_main_device,
                    QString laudio_passthru_device,
@@ -32,11 +33,12 @@ class AudioOutputWin : public AudioOutputBase
     virtual inline int getBufferedOnSoundcard(void);
 
   protected:
-    static const uint      kPacketCnt;
     AudioOutputWinPrivate *m_priv;
     long                   m_nPkts;
     int                    m_CurrentPkt;
     unsigned char        **m_OutPkts;
+
+    static const uint      kPacketCnt;
 };
 
 #endif // AUDIOOUTPUTWIN

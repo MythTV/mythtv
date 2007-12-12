@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef CONFIG_NETWORK /* moved for MythTV MinGW support, ticket #4270 */
 #ifndef HAVE_SYS_POLL_H
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
@@ -32,7 +33,6 @@
 #endif
 #endif
 
-#ifdef CONFIG_NETWORK
 #include "network.h"
 
 #if !defined(HAVE_INET_ATON)

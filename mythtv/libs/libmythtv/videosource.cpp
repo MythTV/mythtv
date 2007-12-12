@@ -36,6 +36,7 @@ using namespace std;
 #include "frequencies.h"
 #include "diseqcsettings.h"
 #include "firewiredevice.h"
+#include "compat.h"
 
 
 #ifdef USING_DVB

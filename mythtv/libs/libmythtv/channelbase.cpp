@@ -27,6 +27,7 @@ using namespace std;
 #include "compat.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
+#define LOC_WARN QString("ChannelBase(%1) Warning: ").arg(GetCardID())
 #define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
 
 ChannelBase::ChannelBase(TVRec *parent)

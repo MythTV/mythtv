@@ -17,3 +17,5 @@ using_backend {
 using_frontend:using_backend {
     SUBDIRS += mythtranscode
 }
+
+mingw: SUBDIRS -= mythtranscode mythtranscode/replex

@@ -92,7 +92,9 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
  */
 void *ThreadedFileWriter::boot_writer(void *wotsit)
 {
+#ifndef USING_MINGW
     signal(SIGXFSZ, SIG_IGN);
+#endif
     ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
     fw->DiskLoop();
     return NULL;

@@ -855,15 +855,24 @@ long long copy(QFile &dst, QFile &src, uint block_size)
 
 QString createTempFile(QString name_template, bool dir)
 {
+    int ret = -1;
+
 #ifdef USING_MINGW
-    char *tmp = new char[MAX_PATH+1];
-    QFileInfo fi(name_template);
-    ::GetTempFileNameA(fi.filePath(), fi.baseName(), 0, tmp);
-    return QString(tmp);
+    char temppath[MAX_PATH] = ".";
+    char tempfilename[MAX_PATH] = "";
+    // if GetTempPath fails, use current dir
+    GetTempPathA(MAX_PATH, temppath);
+    if (GetTempFileNameA(temppath, "mth", 0, tempfilename))
+    {
+        if (dir)
+            ret = mkdir(tempfilename);
+        else
+            ret = open(tempfilename, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
+    }
+    QString tmpFileName(tempfilename);
 #else
     const char *tmp = name_template.ascii();
     char *ctemplate = strdup(tmp);
-    int ret = -1;
 
     if (dir)
     {
@@ -876,6 +885,7 @@ QString createTempFile(QString name_template, bool dir)
 
     QString tmpFileName(ctemplate);
     free(ctemplate);
+#endif
 
     if (ret == -1)
     {
@@ -888,7 +898,6 @@ QString createTempFile(QString name_template, bool dir)
         close(ret);
 
     return tmpFileName;
-#endif
 }
 
 double MythGetPixelAspectRatio(void)

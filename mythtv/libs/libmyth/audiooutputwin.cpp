@@ -10,7 +10,7 @@ using namespace std;
 #include <mmsystem.h>
 
 // even number, 42 ~= 1.008 sec @ 48000 with 1152 samples per packet
-uint AudioOutputWin::kPacketCnt = 16;
+const uint AudioOutputWin::kPacketCnt = 16;
 
 class AudioOutputWinPrivate
 {
@@ -18,8 +18,8 @@ class AudioOutputWinPrivate
     AudioOutputWinPrivate() :
         m_WaveHdrs(NULL), m_hEvent(NULL)
     {
-        m_WaveHdrs = new WAVEHDR[kPacketCnt];
-        memset(m_WaveHdrs, 0, sizeof(WAVEHDR) * kPacketCnt);
+        m_WaveHdrs = new WAVEHDR[AudioOutputWin::kPacketCnt];
+        memset(m_WaveHdrs, 0, sizeof(WAVEHDR) * AudioOutputWin::kPacketCnt);
         m_hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
     }
 
@@ -57,15 +57,16 @@ class AudioOutputWinPrivate
     HANDLE    m_hEvent;
 };
 
-void CALLBACK AudioOutputWinPriv::waveOutProc(
+void CALLBACK AudioOutputWinPrivate::waveOutProc(
     HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 {
     if (uMsg == WOM_DONE)
     {
         InterlockedDecrement(&((AudioOutputWin*)dwInstance)->m_nPkts);
-        if (((AudioOutputWin*)dwInstance)->m_nPkts < kPacketCnt)
+        if (((AudioOutputWin*)dwInstance)->m_nPkts <
+            (int)AudioOutputWin::kPacketCnt)
         {
-            SetEvent(((AudioOutputWin*)dwInstance)->m_hEvent);
+            SetEvent(((AudioOutputWin*)dwInstance)->m_priv->m_hEvent);
         }
     }
 }
@@ -87,7 +88,7 @@ AudioOutputWin::AudioOutputWin(
     Reconfigure(laudio_bits,       laudio_channels,
                 laudio_samplerate, laudio_passthru);
 
-    m_OutPkts = calloc(kPacketCnt * sizeof(unsigned char*));
+    m_OutPkts = (unsigned char**) calloc(kPacketCnt, sizeof(unsigned char*));
 }
 
 AudioOutputWin::~AudioOutputWin()
@@ -102,7 +103,7 @@ AudioOutputWin::~AudioOutputWin()
 
     if (m_OutPkts)
     {
-        for (int i = 0; i < kPacketCnt; i++)
+        for (uint i = 0; i < kPacketCnt; i++)
         {
             if (m_OutPkts[i])
                 free(m_OutPkts[i]);
@@ -132,7 +133,7 @@ bool AudioOutputWin::OpenDevice(void)
         &m_priv->m_hWaveOut,
         WAVE_MAPPER,
         &wf,
-        (DWORD) waveOutProc,
+        (DWORD) AudioOutputWinPrivate::waveOutProc,
         (DWORD) this,
         CALLBACK_FUNCTION);
 

@@ -1207,11 +1207,19 @@ long long RingBuffer::Seek(long long pos, int whence)
     else
     {
         if (whence == SEEK_SET)
+#ifdef USING_MINGW
+            ret = lseek64(fd2, pos, whence);
+#else
             ret = lseek(fd2, pos, whence);
+#endif
         else
         {
             long long realseek = readpos + pos;
+#ifdef USING_MINGW
+            ret = lseek64(fd2, realseek, SEEK_SET);
+#else
             ret = lseek(fd2, realseek, SEEK_SET);
+#endif
         }
     }
 

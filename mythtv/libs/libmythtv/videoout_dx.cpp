@@ -8,6 +8,7 @@ using namespace std;
 #include "videoout_dx.h"
 #include "filtermanager.h"
 #include "fourcc.h"
+#include "videodisplayprofile.h"
 
 #include "mmsystem.h"
 #include "tv.h"

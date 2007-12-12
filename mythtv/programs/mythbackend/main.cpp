@@ -368,9 +368,7 @@ bool parse_preview_info(const QString &param,
 
 int main(int argc, char **argv)
 {
-#ifdef USING_MINGW
-#warning TODO FIXME plugins leave open file descriptors on MS Windows
-#else
+#ifndef _WIN32
     for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
 #endif

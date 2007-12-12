@@ -225,6 +225,7 @@ void VideoSync::KeepPhase()
         OffsetTimeval(m_nexttrigger, -2000);
 }
 
+#ifndef _WIN32
 #define DRM_VBLANK_RELATIVE 0x1;
 
 struct drm_wait_vblank_request {
@@ -245,23 +246,19 @@ typedef union drm_wait_vblank {
     struct drm_wait_vblank_reply reply;
 } drm_wait_vblank_t;
 
-#ifndef _WIN32
 #define DRM_IOCTL_BASE                  'd'
 #define DRM_IOWR(nr,type)               _IOWR(DRM_IOCTL_BASE,nr,type)
 
 #define DRM_IOCTL_WAIT_VBLANK           DRM_IOWR(0x3a, drm_wait_vblank_t)
-#endif
 
 static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 {
     int ret = -1;
 
-#ifndef _WIN32
     do {
        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
        vbl->request.type &= ~DRM_VBLANK_RELATIVE;
     } while (ret && errno == EINTR);
-#endif
 
     return ret;
 }
@@ -355,7 +352,9 @@ void DRMVideoSync::AdvanceTrigger(void)
     KeepPhase();
     UpdateNexttrigger();
 }
+#endif /* !_WIN32 */
 
+#ifndef _WIN32
 char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
 
 nVidiaVideoSync::nVidiaVideoSync(VideoOutput *vo,
@@ -372,9 +371,6 @@ nVidiaVideoSync::~nVidiaVideoSync()
 
 bool nVidiaVideoSync::dopoll() const
 {
-#ifdef _WIN32
-    return false;
-#else
     int ret;
     struct pollfd polldata;
     polldata.fd = m_nvidia_fd;
@@ -389,7 +385,6 @@ bool nVidiaVideoSync::dopoll() const
         return false;
     }
     return true;
-#endif
 }
 
 bool nVidiaVideoSync::TryInit(void)
@@ -444,7 +439,9 @@ void nVidiaVideoSync::AdvanceTrigger(void)
     KeepPhase();
     UpdateNexttrigger();
 }
+#endif /* !_WIN32 */
 
+#ifndef _WIN32
 OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced)
@@ -707,6 +704,7 @@ void OpenGLVideoSync::AdvanceTrigger(void)
     UpdateNexttrigger();
 #endif /* USING_OPENGL_VSYNC */
 }
+#endif /* !_WIN32 */
 
 #ifdef __linux__
 #define RTCRATE 1024
@@ -724,9 +722,6 @@ RTCVideoSync::~RTCVideoSync()
 
 bool RTCVideoSync::TryInit(void)
 {
-#ifdef _WIN32
-    return false;
-#else
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
     {
@@ -751,7 +746,6 @@ bool RTCVideoSync::TryInit(void)
     }
     
     return true;
-#endif
 }
 
 void RTCVideoSync::WaitForFrame(int sync_delay)

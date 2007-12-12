@@ -612,7 +612,7 @@ void MythMainWindow::Show(void)
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
-#warning TODO FIXME MythMainWindow::attach() not implemented on MS Windows!
+#warning TODO FIXME MythMainWindow::attach() doesn't always work on MS Windows!
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it
@@ -1519,8 +1519,14 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     float desired = 100.0;
 
 #ifdef USING_MINGW
-#warning TODO FIXME DPI needs to be calculated on MS Windows systems..
+    // logicalDpiY not supported in QT3/win.
     int logicalDpiY = 100;
+    HDC hdc = GetDC(NULL);
+    if (hdc)
+    {
+        logicalDpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+        ReleaseDC(NULL, hdc);
+    }
 #else
     int logicalDpiY = pdm.logicalDpiY();
 #endif

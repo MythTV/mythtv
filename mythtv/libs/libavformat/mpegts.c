@@ -21,6 +21,7 @@
 #include "avformat.h"
 #include "crc.h"
 #include <pthread.h>
+#include "libmyth/compat.h"
 #include "mpegts.h"
 
 //#define DEBUG_SI

@@ -6,7 +6,7 @@
 #define __COMPAT_H__
 
 // Turn off the visual studio warnings (identifier was truncated)
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable:4786)
 #endif
 
@@ -29,7 +29,11 @@ typedef unsigned int uint;
 
 #ifdef _WIN32
 #undef DialogBox
+#undef LoadImage
+#undef LoadIcon
+#undef GetObject
 #undef DrawText
+#undef CreateFont
 #endif
 
 // Dealing with Microsoft min/max mess: 
@@ -62,11 +66,7 @@ template<class _Ty, class _Pr> inline
 #endif
 
 #ifdef USING_MINGW
-#define gmtime_r(X, Y)    (memcpy(Y, gmtime(X),    sizeof(struct tm)), Y)
-#define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
-#define lseek(X,Y,Z) lseek64(X,Y,Z)
 #define fsync(FD) 0
-#define signal(X,Y) 0
 //used in videodevice only - that code is not windows-compatible anyway
 #define minor(X) 0
 #endif
@@ -83,18 +83,6 @@ inline int random(void)
 #define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #define unsetenv(x) 0
 #endif
-
-#if defined(__cplusplus) && defined(USING_MINGW)
-#include <pthread.h>
-inline bool operator==(const pthread_t& pt, const int n)
-{
-    return *((int*)(&pt)) == n;
-}
-inline bool operator!=(const pthread_t& pt, const int n)
-{
-    return *((int*)(&pt)) != n;
-}
-#endif // defined(__cplusplus) && defined(USING_MINGW)
 
 #if defined(__cplusplus) && defined(USING_MINGW)
 /* TODO: most small usleep's in MythTV are just a quick way to perform

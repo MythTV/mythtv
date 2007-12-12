@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#if defined(__FreeBSD__) || defined(CONFIG_DARWIN) || defined(USING_MINGW)
 #include <sys/types.h>
 typedef uint32_t __u32; 
 typedef uint16_t __u16; 

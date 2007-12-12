@@ -11,6 +11,6 @@ SOURCES += filter_postprocess.c
 macx:LIBS += -undefined define_a_way
 
 mingw {
-  SOURCES += ../../libs/libpostproc/postprocess.c
-  TARGET = postprocess
+    SOURCES -= filter_postprocess.c
+    TARGET = postprocess
 }

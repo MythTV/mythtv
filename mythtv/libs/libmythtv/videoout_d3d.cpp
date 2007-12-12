@@ -10,6 +10,7 @@ using namespace std;
 #include "videoout_d3d.h"
 #include "filtermanager.h"
 #include "fourcc.h"
+#include "videodisplayprofile.h"
 
 #include "mmsystem.h"
 #include "tv.h"

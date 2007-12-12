@@ -125,6 +125,7 @@ class VideoSync
     static int m_forceskip;
 };
 
+#ifndef _WIN32
 /** \brief Video synchronization class employing /dev/drm0
  *
  *   Polls /dev/drm0 to wait for retrace.  Phase-maintaining, meaning
@@ -149,7 +150,9 @@ class DRMVideoSync : public VideoSync
     static char *sm_dri_dev;
     
 };
+#endif // !_WIN32
 
+#ifndef _WIN32
 /** \brief Video synchronization class employing /dev/nvidia0
  *
  *   Polls /dev/nvidia0 to wait for retrace.  Phase-maintaining, meaning
@@ -175,7 +178,9 @@ class nVidiaVideoSync : public VideoSync
     int m_nvidia_fd;
     static char *sm_nvidia_dev;
 };
+#endif // !_WIN32
 
+#ifndef _WIN32
 /** \brief Video synchronization class employing SGI_video_sync
  *         OpenGL extension.
  *
@@ -197,7 +202,6 @@ class nVidiaVideoSync : public VideoSync
  *  \sa http://www.ac3.edu.au/SGI_Developer/books/OpenGLonSGI/sgi_html/ch10.html#id37188
  *  \sa http://www.inb.mu-luebeck.de/~boehme/xvideo_sync.html
  */
-#ifndef USING_MINGW
 class OpenGLVideoSync : public VideoSync
 {
   public:
@@ -218,7 +222,7 @@ class OpenGLVideoSync : public VideoSync
   private:
     QMutex      m_lock;
 };
-#endif // USING_MINGW
+#endif // !_WIN32
 
 #ifdef __linux__
 /** \brief Video synchronization class employing /dev/rtc
