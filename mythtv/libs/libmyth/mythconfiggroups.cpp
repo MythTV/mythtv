@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <qwidgetstack.h>
 #include <qtabdialog.h>
 
