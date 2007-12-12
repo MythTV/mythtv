@@ -221,10 +221,6 @@ void AutoExpire::CalcParams()
         }
     }
 
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("Found max recording rate of %1 MB/min")
-            .arg(maxKBperMin >> 10));
-
     // Determine frequency to run autoexpire so it doesn't have to free
     // too much space
     uint expireFreq = 15;
@@ -237,8 +233,8 @@ void AutoExpire::CalcParams()
     double expireMinGB = ((maxKBperMin + maxKBperMin/3)
                           * expireFreq + extraKB) >> 20;
     VERBOSE(VB_IMPORTANT, LOC +
-            QString("CalcParams(): Required Free Space: %2 GB w/freq: %2 min")
-            .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
+            QString("CalcParams(): Max required Free Space: %2 GB w/freq: "
+                    "%2 min").arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
     instance_lock.lock();
