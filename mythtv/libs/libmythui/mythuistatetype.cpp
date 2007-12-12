@@ -35,7 +35,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
         return false;
 
     object->SetVisible(false);
-    m_ObjectsByName[name] = object;
+    m_ObjectsByName[key] = object;
 
     QSize aSize = m_Area.size();
     aSize = aSize.expandedTo(object->GetArea().size());
