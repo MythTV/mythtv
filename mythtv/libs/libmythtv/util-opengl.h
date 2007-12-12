@@ -10,6 +10,7 @@
 #include "util-x11.h"
 
 // GLX headers
+#define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 #include <GL/glu.h>
 
