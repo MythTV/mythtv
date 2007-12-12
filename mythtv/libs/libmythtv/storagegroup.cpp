@@ -11,13 +11,19 @@
 #define LOC_WARN QString("SG(%1) Warning: ").arg(m_groupname)
 #define LOC_ERR QString("SG(%1) Error: ").arg(m_groupname)
 
-#define DEFAULTSTORAGEDIR "/mnt/store"
+const char *StorageGroup::kDefaultStorageDir = "/mnt/store";
 
 /****************************************************************************/
 
+/** \brief StorageGroup constructor.
+ *  \param group    storage group to search, blank will search all groups.
+ *  \param hostname hostname where to search, blank will search all hosts'
+ *                  directories, but only in local directory structure.
+ *                  This is parameter is ignored if group is an empty string.
+ */
 StorageGroup::StorageGroup(const QString group, const QString hostname) :
-    m_groupname(group),
-    m_hostname(hostname)
+    m_groupname(QDeepCopy<QString>(group)),
+    m_hostname(QDeepCopy<QString>(hostname))
 {
     m_dirlist.clear();
 
@@ -26,20 +32,20 @@ StorageGroup::StorageGroup(const QString group, const QString hostname) :
 
 void StorageGroup::Init(const QString group, const QString hostname)
 {
-    QString m_dirname;
+    QString dirname;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    m_groupname = group;
-    m_hostname  = hostname;
+    m_groupname = QDeepCopy<QString>(group);
+    m_hostname  = QDeepCopy<QString>(hostname);
     m_dirlist.clear();
 
     QString sql = "SELECT DISTINCT dirname "
                   "FROM storagegroup ";
 
-    if (m_groupname != "")
+    if (!m_groupname.isEmpty())
     {
         sql.append("WHERE groupname = :GROUP");
-        if (m_hostname != "")
+        if (!m_hostname.isEmpty())
             sql.append(" AND hostname = :HOSTNAME");
     }
 
@@ -49,7 +55,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("StorageGroup::StorageGroup()", query);
-    else if (query.size() < 1)
+    else if (!query.next())
     {
         if (group != "Default")
         {
@@ -59,7 +65,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
             Init("Default", m_hostname);
             return;
         }
-        else if (m_hostname != "")
+        else if (!m_hostname.isEmpty())
         {
             VERBOSE(VB_FILE, LOC +
                     QString("Unable to find any directories for the local "
@@ -71,15 +77,16 @@ void StorageGroup::Init(const QString group, const QString hostname)
     }
     else
     {
-        while(query.next())
+        do
         {
-            m_dirname = query.value(0).toString();
-            m_dirname.replace(QRegExp("^\\s*"), "");
-            m_dirname.replace(QRegExp("\\s*$"), "");
-            if (m_dirname.right(1) == "/")
-                m_dirname.remove(m_dirname.length() - 1, 1);
-            m_dirlist << m_dirname;
+            dirname = query.value(0).toString();
+            dirname.replace(QRegExp("^\\s*"), "");
+            dirname.replace(QRegExp("\\s*$"), "");
+            if (dirname.right(1) == "/")
+                dirname.remove(dirname.length() - 1, 1);
+            m_dirlist << QDeepCopy<QString>(dirname);
         }
+        while (query.next());
     }
 
     if (!m_dirlist.size())
@@ -93,12 +100,12 @@ void StorageGroup::Init(const QString group, const QString hostname)
         }
         else
         {
-            tmpDir = DEFAULTSTORAGEDIR;
+            tmpDir = kDefaultStorageDir;
             msg += QString("Using hardcoded default value of '%1'")
-                           .arg(DEFAULTSTORAGEDIR);
+                           .arg(kDefaultStorageDir);
         }
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-        m_dirlist << tmpDir;
+        m_dirlist << QDeepCopy<QString>(tmpDir);
     }
 }
 
@@ -110,7 +117,7 @@ QString StorageGroup::FindRecordingFile(QString filename)
     QString recDir = FindRecordingDir(filename);
     QString result = "";
     
-    if (recDir != "")
+    if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
         VERBOSE(VB_FILE, LOC + QString("FindRecordingFile: Found '%1'")
@@ -136,49 +143,44 @@ QString StorageGroup::FindRecordingDir(QString filename)
     {
         QString testFile = m_dirlist[curDir] + "/" + filename;
         VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1'")
-                                       .arg(m_dirlist[curDir]));
+                .arg(m_dirlist[curDir]));
         checkFile.setName(testFile);
         if (checkFile.exists())
-            return m_dirlist[curDir];
+            return QDeepCopy<QString>(m_dirlist[curDir]);
 
         curDir++;
     }
 
-    if (result == "")
+    if (m_groupname.isEmpty())
     {
-        if (m_groupname == "")
-        {
-            // Not found in any dir, so try RecordFilePrefix if it exists
-            QString tmpFile =
-                gContext->GetSetting("RecordFilePrefix") + "/" + filename;
-            checkFile.setName(tmpFile);
-            if (checkFile.exists())
-                result = tmpFile;
-        }
-        else if (m_groupname != "Default")
-        {
-            // Not found in current group so try Default
-            StorageGroup sgroup("Default");
-            QString tmpFile = sgroup.FindRecordingDir(filename);
-            if (tmpFile != "")
-                result = tmpFile;
-        }
-        else
-        {
-            // Not found in Default so try any dir
-            StorageGroup sgroup;
-            QString tmpFile = sgroup.FindRecordingDir(filename);
-            if (tmpFile != "")
-                result = tmpFile;
-        }
+        // Not found in any dir, so try RecordFilePrefix if it exists
+        QString tmpFile =
+            gContext->GetSetting("RecordFilePrefix") + "/" + filename;
+        checkFile.setName(tmpFile);
+        if (checkFile.exists())
+            result = tmpFile;
+    }
+    else if (m_groupname != "Default")
+    {
+        // Not found in current group so try Default
+        StorageGroup sgroup("Default");
+        QString tmpFile = sgroup.FindRecordingDir(filename);
+        result = (tmpFile.isEmpty()) ? result : tmpFile;
+    }
+    else
+    {
+        // Not found in Default so try any dir
+        StorageGroup sgroup;
+        QString tmpFile = sgroup.FindRecordingDir(filename);
+        result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 
-    return result;
+    return QDeepCopy<QString>(result);
 }
 
 QString StorageGroup::FindNextDirMostFree(void)
 {
-    QString nextDir = DEFAULTSTORAGEDIR;
+    QString nextDir = kDefaultStorageDir;
     long long nextDirFree = 0;
     long long thisDirTotal;
     long long thisDirUsed;
@@ -220,13 +222,14 @@ QString StorageGroup::FindNextDirMostFree(void)
 
     VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
                                    .arg(nextDir));
-    return nextDir;
+
+    return QDeepCopy<QString>(nextDir);
 }
 
 void StorageGroup::CheckAllStorageGroupDirs(void)
 {
     QString m_groupname;
-    QString m_dirname;
+    QString dirname;
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT groupname, dirname "
@@ -247,27 +250,27 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     while (query.next())
     {
         m_groupname = query.value(0).toString();
-        m_dirname = query.value(1).toString();
+        dirname = query.value(1).toString();
 
-        m_dirname.replace(QRegExp("^\\s*"), "");
-        m_dirname.replace(QRegExp("\\s*$"), "");
+        dirname.replace(QRegExp("^\\s*"), "");
+        dirname.replace(QRegExp("\\s*$"), "");
 
         VERBOSE(VB_FILE, LOC +
                 QString("Checking directory '%1' in group '%2'.")
-                        .arg(m_dirname).arg(m_groupname));
+                        .arg(dirname).arg(m_groupname));
 
-        testDir.setPath(m_dirname);
+        testDir.setPath(dirname);
         if (!testDir.exists())
         {
             VERBOSE(VB_FILE, LOC_WARN + 
                     QString("Group '%1' references directory '%2' but this "
                             "directory does not exist.  This directory "
                             "will not be used on this server.")
-                            .arg(m_groupname).arg(m_dirname));
+                            .arg(m_groupname).arg(dirname));
         }
         else
         {
-            testFile.setName(m_dirname + "/.test");
+            testFile.setName(dirname + "/.test");
             if (testFile.open(IO_WriteOnly))
                 testFile.remove();
             else
@@ -275,55 +278,9 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
                         LOC_ERR +
                         QString("Group '%1' wants to use directory '%2', but "
                                 "this directory is not writeable.")
-                                .arg(m_groupname).arg(m_dirname));
+                                .arg(m_groupname).arg(dirname));
         }
     }
-}
-
-QStringList StorageGroup::GetGroupNames(QString hostname)
-{
-    QStringList list;
-
-    if (hostname.isEmpty())
-        hostname = gContext->GetHostName();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT groupname "
-        "FROM storagegroup "
-        "WHERE hostname = :HOSTNAME "
-        "GROUP BY groupname");
-    query.bindValue(":HOSTNAME", hostname);
-
-    if (!query.exec())
-    {
-        MythContext::DBError("StorageGroup::GetStorageGroupNames()", query);
-    }
-    else
-    {
-        while (query.next())
-            list.push_back(query.value(0).toString());
-    }
-
-    return list;
-}
-
-QString StorageGroup::FindFile(const QString &filename, QString hostname)
-{
-    // For securities sake, make sure filename is really the pathless.
-    QString lpath = QFileInfo(filename).fileName();
-
-    // Try all possible storage group locations..
-    QStringList sgrp = StorageGroup::GetGroupNames();
-    QStringList::const_iterator it = sgrp.begin();
-    QString tmpURL = QString::null;
-    for ( ; (it != sgrp.end()) && tmpURL.isEmpty(); ++it)
-    {
-        StorageGroup sgroup(*it);
-        tmpURL = sgroup.FindRecordingFile(lpath);
-    }
-
-    return tmpURL;
 }
 
 /****************************************************************************/
@@ -579,7 +536,7 @@ void StorageGroupListEditor::open(QString name)
         }
     }
 
-    if (name != "")
+    if (!name.isEmpty())
     {
         StorageGroupEditor sgEditor(name);
         sgEditor.exec();

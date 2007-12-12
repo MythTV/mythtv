@@ -2,35 +2,38 @@
 #define _STORAGEGROUP_H
 
 #include <qstringlist.h>
+#include <qdeepcopy.h>
 
 #include "libmyth/settings.h"
 #include "libmyth/mythwidgets.h"
 
 class MPUBLIC StorageGroup: public ConfigurationWizard
 {
-    public:
-        StorageGroup(const QString group = "", const QString hostname = "");
+  public:
+    StorageGroup(const QString group = "", const QString hostname = "");
 
-        QString getName(void) const { return m_groupname; }
+    void    Init(const QString group = "Default",
+                 const QString hostname = "");
 
-        void    Init(const QString group = "Default",
-                     const QString hostname = "");
+    QString getName(void) const
+        { return QDeepCopy<QString>(m_groupname); }
 
-        QStringList GetDirList(void) { return m_dirlist; }
-        QString FindRecordingFile(QString filename);
-        QString FindRecordingDir(QString filename);
+    QStringList GetDirList(void) const
+        { return QDeepCopy<QStringList>(m_dirlist); }
 
-        QString FindNextDirMostFree(void);
+    QString FindRecordingFile(QString filename);
+    QString FindRecordingDir(QString filename);
 
-        static void CheckAllStorageGroupDirs(void);
-        static QStringList GetGroupNames(QString hostname = QString::null);
-        static QString FindFile(const QString &filename,
-                                QString hostname = QString::null);
+    QString FindNextDirMostFree(void);
 
-    private:
-        QString      m_groupname;
-        QString      m_hostname;
-        QStringList  m_dirlist;
+    static void CheckAllStorageGroupDirs(void);
+
+    static const char *kDefaultStorageDir;
+
+  private:
+    QString      m_groupname;
+    QString      m_hostname;
+    QStringList  m_dirlist;
 };
 
 class MPUBLIC StorageGroupEditor :

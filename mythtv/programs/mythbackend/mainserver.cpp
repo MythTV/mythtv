@@ -4207,14 +4207,15 @@ QString MainServer::LocalFilePath(QUrl &url)
             // For securities sake, make sure filename is really the pathless.
             QString opath = lpath;
             lpath = QFileInfo(lpath).fileName();
-            QString tmpURL = StorageGroup::FindFile(lpath);
-            if (!tmpURL.isEmpty())
+            StorageGroup sgroup;
+            QString tmpFile = sgroup.FindRecordingFile(lpath);
+            if (!tmpFile.isEmpty())
             {
-                lpath = tmpURL.section('/', 0, -2) + "/" + lpath;
+                lpath = tmpFile;
                 VERBOSE(VB_FILE,
                         QString("LocalFilePath(%1 '%2')").arg(url).arg(opath)
                         <<", found file through exhaustive search "
-                        <<QString("at '%1' URL: %2").arg(lpath).arg(tmpURL));
+                        <<QString("at '%1'").arg(lpath));
             }
             else
             {

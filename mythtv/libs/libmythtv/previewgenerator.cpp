@@ -238,9 +238,9 @@ bool PreviewGenerator::Run(void)
             QString lpath = QFileInfo(outname).fileName();
             if (lpath == outname)
             {
-                QString url = StorageGroup::FindFile(outname);
-                if (!url.isEmpty())
-                    outname = url.section('/', 0, -2) + "/" + lpath;
+                StorageGroup sgroup;
+                QString tmpFile = sgroup.FindRecordingFile(lpath);
+                outname = (tmpFile.isEmpty()) ? outname : tmpFile;
             }
 
             QFileInfo fi(outname);
