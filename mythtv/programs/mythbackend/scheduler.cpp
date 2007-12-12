@@ -2241,41 +2241,12 @@ void Scheduler::AddNewRecords(void)
         .arg(kFindWeeklyRecord)
         .arg(kOverrideRecord);
 
-    QString query = QString(
-"SELECT DISTINCT channel.chanid, channel.sourceid, "
-"program.starttime, program.endtime, "
-"program.title, program.subtitle, program.description, "
-"channel.channum, channel.callsign, channel.name, "
-"oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
-"RECTABLE.recpriority, "
-"RECTABLE.dupin, "
-"recorded.endtime IS NOT NULL AS recduplicate, "
-"oldfind.findid IS NOT NULL AS findduplicate, "
-"RECTABLE.type, RECTABLE.recordid, "
-"program.starttime - INTERVAL RECTABLE.startoffset minute AS recstartts, "
-"program.endtime + INTERVAL RECTABLE.endoffset minute AS recendts, "
-"program.previouslyshown, RECTABLE.recgroup, RECTABLE.dupmethod, "
-"channel.commmethod, capturecard.cardid, "
-"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
-"program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
-"RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
-"oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"program.hdtv, program.closecaptioned, program.stereo, "
-"RECTABLE.storagegroup, capturecard.hostname, oldrecorded.recstatus, " + 
-    pwrpri + QString(
-"FROM recordmatch "
+    QString rmquery = QString(
+"UPDATE recordmatch "
 " INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
 " INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
 "                        recordmatch.starttime = program.starttime AND "
 "                        recordmatch.manualid = program.manualid) "
-" INNER JOIN channel ON (channel.chanid = program.chanid) "
-" INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
-" INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
-" LEFT JOIN oldrecorded as oldrecstatus ON "
-"  ( oldrecstatus.station = channel.callsign AND "
-"    oldrecstatus.starttime = program.starttime AND "
-"    oldrecstatus.title = program.title ) "
 " LEFT JOIN oldrecorded ON "
 "  ( "
 "    RECTABLE.dupmethod > 1 AND "
@@ -2342,28 +2313,70 @@ void Scheduler::AddNewRecords(void)
 " LEFT JOIN oldfind ON "
 "  (oldfind.recordid = recordmatch.recordid AND "
 "   oldfind.findid = ") + progfindid + QString(") "
+"  SET oldrecduplicate = (oldrecorded.endtime IS NOT NULL), "
+"      recduplicate = (recorded.endtime IS NOT NULL), "
+"      findduplicate = (oldfind.findid IS NOT NULL), "
+"      oldrecstatus = oldrecorded.recstatus "
+);
+    rmquery.replace("RECTABLE", recordTable);
+
+    QString query = QString(
+"SELECT DISTINCT channel.chanid, channel.sourceid, "
+"program.starttime, program.endtime, "
+"program.title, program.subtitle, program.description, "
+"channel.channum, channel.callsign, channel.name, "
+"oldrecduplicate, program.category, "
+"RECTABLE.recpriority, "
+"RECTABLE.dupin, "
+"recduplicate, "
+"findduplicate, "
+"RECTABLE.type, RECTABLE.recordid, "
+"program.starttime - INTERVAL RECTABLE.startoffset minute AS recstartts, "
+"program.endtime + INTERVAL RECTABLE.endoffset minute AS recendts, "
+"program.previouslyshown, RECTABLE.recgroup, RECTABLE.dupmethod, "
+"channel.commmethod, capturecard.cardid, "
+"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
+"program.seriesid, program.programid, program.category_type, "
+"program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
+"RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
+"oldrecstatus.recstatus, oldrecstatus.reactivate, " 
+"program.hdtv, program.closecaptioned, program.stereo, "
+"RECTABLE.storagegroup, capturecard.hostname, recordmatch.oldrecstatus, " + 
+    pwrpri + QString(
+"FROM recordmatch "
+" INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
+" INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
+"                        recordmatch.starttime = program.starttime AND "
+"                        recordmatch.manualid = program.manualid) "
+" INNER JOIN channel ON (channel.chanid = program.chanid) "
+" INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
+" INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
+" LEFT JOIN oldrecorded as oldrecstatus ON "
+"  ( oldrecstatus.station = channel.callsign AND "
+"    oldrecstatus.starttime = program.starttime AND "
+"    oldrecstatus.title = program.title ) "
 " ORDER BY RECTABLE.recordid DESC "
 );
-
-    while (1)
-    {
-        int i = query.find("RECTABLE");
-        if (i == -1) break;
-        query = query.replace(i, strlen("RECTABLE"), recordTable);
-    }
+    query.replace("RECTABLE", recordTable);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
+    result.prepare(rmquery);
+    result.exec();
+    if (!result.isActive())
+    {
+        MythContext::DBError("AddNewRecords recordmatch", result);
+        return;
+    }
     result.prepare(query);
     result.exec();
-    gettimeofday(&dbend, NULL);
-
     if (!result.isActive())
     {
         MythContext::DBError("AddNewRecords", result);
         return;
     }
+    gettimeofday(&dbend, NULL);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
