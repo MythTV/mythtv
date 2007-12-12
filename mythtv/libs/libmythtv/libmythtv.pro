@@ -499,11 +499,11 @@ use_hidesyms {
 
 mingw {
     DEFINES -= USING_OPENGL_VSYNC
-    DEFINES += USING_D3D USING_MINGW
+    DEFINES += USING_D3D
 
     HEADERS -= util-opengl.h   openglcontext.h
     HEADERS += videoout_d3d.h
-    SOURCES -= util-opengl.cpp openglcontext.cpp
+    SOURCES -= util-opengl.cpp openglcontext.cpp NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
     LIBS += -lpthread

@@ -24,7 +24,4 @@ HEADERS += DynamicLineArt.h TokenGroup.h Link.h Logging.h freemheg.h
 
 LIBS += $$EXTRA_LIBS
 
-mingw {
-    DEFINES += USING_MINGW
-    target.path = $${PREFIX}/bin
-}
+mingw:  target.path = $${PREFIX}/bin

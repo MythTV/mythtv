@@ -74,7 +74,6 @@ using_lirc {
 cygwin:DEFINES += _WIN32
 
 mingw {
-    DEFINES += USING_MINGW
     target.path = $${PREFIX}/bin
     using_opengl {
         LIBS += -lopengl32

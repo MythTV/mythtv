@@ -41,7 +41,6 @@ LIBS += $$EXTRA_LIBS
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 
 mingw {
-    DEFINES += USING_MINGW
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
     target.path = $${PREFIX}/bin

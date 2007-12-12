@@ -82,7 +82,6 @@ cygwin {
 }
 
 mingw {
-    DEFINES += USING_WINAUDIO USING_MINGW
     SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
     HEADERS += mediamonitor-windows.h   audiooutputwin.h
 
