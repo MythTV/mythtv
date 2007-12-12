@@ -12,15 +12,6 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-#ifndef USING_MINGW
-#include <net/if.h>
-#endif // USING_MINGW
-
-#include "mythconfig.h" // for HAVE_GETIFADDRS
-#ifdef HAVE_GETIFADDRS
-#include <ifaddrs.h>
-#endif
-
 // Qt headers
 #include <quuid.h>
 
@@ -28,6 +19,15 @@
 #include "upnputil.h"
 #include "upnp.h"
 #include "compat.h"
+#include "mythconfig.h" // for HAVE_GETIFADDRS
+
+// POSIX headers 2, needs to be after compat.h for OS X
+#ifndef USING_MINGW
+#include <net/if.h>
+#endif // USING_MINGW
+#ifdef HAVE_GETIFADDRS
+#include <ifaddrs.h>
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

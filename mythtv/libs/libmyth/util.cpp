@@ -18,14 +18,12 @@ using namespace std;
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
-
 # ifdef linux
 #   include <sys/vfs.h>
 #   include <sys/statvfs.h>
 #   include <sys/sysinfo.h>
 # else
 #   include <sys/param.h>
-//#  include <sys/mount.h>
 #   ifdef CONFIG_CYGWIN
 #     include <sys/statfs.h>
 #   else // if !CONFIG_CYGWIN
@@ -52,6 +50,7 @@ using namespace std;
 
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
+#include <sys/mount.h>  // for struct statfs
 #endif
 
 #ifdef USE_LIRC
