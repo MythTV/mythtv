@@ -18,6 +18,7 @@
 // font properties).
 class MythUIButton : public MythUIType
 {
+    Q_OBJECT
   public:
     enum StateType { None = 0, Normal, Disabled, Active, Selected, 
                      SelectedInactive };
@@ -42,10 +43,14 @@ class MythUIButton : public MythUIType
 
     void SetupPlacement(void);
 
+  signals:
+    void buttonPressed();
+
   protected:
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual bool keyPressEvent(QKeyEvent *);
 
     MythImage* LoadImage(QDomElement element);
 

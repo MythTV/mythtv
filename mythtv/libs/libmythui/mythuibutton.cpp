@@ -1,7 +1,6 @@
 #include <iostream>
 using namespace std;
 
-#include "mythcontext.h"
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
 
@@ -83,7 +82,6 @@ bool MythUIButton::ParseElement(QDomElement &element)
         SetBackgroundImage(Normal, tmp);
         SetBackgroundImage(Active, tmp);
         SelectState(Normal);
-        SetupPlacement();
     }
     else if (element.tagName() == "selected-background")
     {
@@ -114,6 +112,8 @@ bool MythUIButton::ParseElement(QDomElement &element)
             m_textFlags |= Qt::AlignVCenter;
         else if (align == "hcenter")
             m_textFlags |= Qt::AlignHCenter;
+
+        m_Text->SetJustification(m_textFlags);
     }
     else
         return MythUIType::ParseElement(element);
@@ -128,7 +128,6 @@ MythImage* MythUIButton::LoadImage(QDomElement element)
 
     if (!filename.isEmpty())
     {
-        VERBOSE(VB_FILE, QString("Loading button image: %1").arg(filename));
         tmp = GetMythPainter()->GetFormatImage();
         tmp->Load(filename);
     }
@@ -161,6 +160,8 @@ void MythUIButton::SetBackgroundImage(StateType state, MythImage *image)
     QSize aSize = m_Area.size();
     aSize = aSize.expandedTo(image->size());
     m_Area.setSize(aSize);
+
+    SetupPlacement();
 }
 
 void MythUIButton::SetCheckImage(MythUIStateType::StateType state, 
@@ -229,6 +230,7 @@ void MythUIButton::SelectState(StateType newState)
     else
         m_Text->SetFontProperties(m_FontProps[(int)m_State]);
 
+    SetRedraw();
 }
 
 void MythUIButton::SetCheckState(MythUIStateType::StateType state)
@@ -299,7 +301,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     MythUIButton *button = dynamic_cast<MythUIButton *>(base);
     if (!button)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        cerr << "ERROR, bad parsing" << endl;
         return;
     }
 
@@ -318,4 +320,26 @@ void MythUIButton::CreateCopy(MythUIType *parent)
 {
     MythUIButton *button = new MythUIButton(parent, name());
     button->CopyFrom(this);
+}
+
+bool MythUIButton::keyPressEvent(QKeyEvent *e)
+{
+    QStringList actions;
+    bool handled = false;
+    GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "SELECT")
+        {
+            emit buttonPressed();
+        }
+        else
+            handled = false;
+    }
+
+    return handled;
 }
