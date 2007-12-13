@@ -18,6 +18,7 @@
 #define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
 #undef close
 #else
+#include <sys/time.h>     // Mac OS X needs this before sys/resource
 #include <sys/resource.h> // for setpriority
 #include <sys/socket.h>
 #include <sys/wait.h>   // For WIFEXITED on Mac OS X
