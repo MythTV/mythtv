@@ -68,5 +68,6 @@ macx {
     SOURCES += darwin-sendfile.c
 
     # This lib depends on libmyth which depends on some stuff in libmythui.
-    LIBS += -L../libmythui -lmythui-$$LIBVERSION
+    # It isn't built yet, so we have to ignore these for now:
+    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 }
