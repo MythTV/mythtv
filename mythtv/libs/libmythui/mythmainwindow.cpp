@@ -612,7 +612,7 @@ void MythMainWindow::Show(void)
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
-#warning TODO FIXME MythMainWindow::attach() doesn't always work on MS Windows!
+#warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
     // if windows are created on different threads,
     // or if setFocus() is called from a thread other than the main UI thread,
     // setFocus() hangs the thread that called it
