@@ -620,19 +620,30 @@ void MythListButton::Init()
     {
         QString name = QString("buttonlist button %1").arg(i);
         MythUIButton *button = new MythUIButton(this, name);
-        button->SetBackgroundImage(MythUIButton::Normal, itemRegPix);
-        button->SetBackgroundImage(MythUIButton::Active, itemRegPix);
-        button->SetBackgroundImage(MythUIButton::SelectedInactive,
+        if (itemRegPix)
+        {
+            button->SetBackgroundImage(MythUIButton::Normal, itemRegPix);
+            button->SetBackgroundImage(MythUIButton::Active, itemRegPix);
+        }
+
+        if (itemSelInactPix)
+            button->SetBackgroundImage(MythUIButton::SelectedInactive,
                                    itemSelInactPix);
-        button->SetBackgroundImage(MythUIButton::Selected, itemSelActPix);
+
+        if (itemSelActPix)
+            button->SetBackgroundImage(MythUIButton::Selected, itemSelActPix);
 
         button->SetPaddingMargin(m_itemMargin);
 
-        button->SetCheckImage(MythUIStateType::Off, checkNonePix);
-        button->SetCheckImage(MythUIStateType::Half, checkHalfPix);
-        button->SetCheckImage(MythUIStateType::Full, checkFullPix);
+        if (checkNonePix)
+        {
+            button->SetCheckImage(MythUIStateType::Off, checkNonePix);
+            button->SetCheckImage(MythUIStateType::Half, checkHalfPix);
+            button->SetCheckImage(MythUIStateType::Full, checkFullPix);
+        }
 
-        button->SetRightArrowImage(arrowPix);
+        if (arrowPix)
+            button->SetRightArrowImage(arrowPix);
 
         button->SetFont(MythUIButton::Normal, *m_fontActive);
         button->SetFont(MythUIButton::Disabled, *m_fontInactive);
@@ -644,12 +655,45 @@ void MythListButton::Init()
     SetPositionArrowStates();
 }
 
+bool MythListButton::keyPressEvent(QKeyEvent *e)
+{
+    QStringList actions;
+    bool handled = false;
+    GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+        {
+            MoveUp(MoveItem);
+        }
+        else if (action == "DOWN")
+        {
+            MoveDown(MoveItem);
+        }
+        if (action == "PAGEUP")
+        {
+            MoveUp(MovePage);
+        }
+        else if (action == "PAGEDOWN")
+        {
+            MoveDown(MovePage);
+        }
+        else
+            handled = false;
+    }
+
+    return handled;
+}
+
 QPoint MythListButton::GetButtonPosition(uint i) const
 {
     return QPoint(0, i * (m_itemHeight + m_itemSpacing));
 }
 
-// FIXME: add verbose
 void MythListButton::LoadPixmap(MythImage **pix, QDomElement &element)
 {
     if (*pix)
@@ -890,6 +934,40 @@ void MythHorizListButton::Init(void)
     m_itemWidth = dx / m_itemsVisible;
 
     MythListButton::Init();
+}
+
+bool MythHorizListButton::keyPressEvent(QKeyEvent *e)
+{
+    QStringList actions;
+    bool handled = false;
+    GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "RIGHT")
+        {
+            MoveUp(MoveItem);
+        }
+        else if (action == "LEFT")
+        {
+            MoveDown(MoveItem);
+        }
+        if (action == "PAGEUP")
+        {
+            MoveUp(MovePage);
+        }
+        else if (action == "PAGEDOWN")
+        {
+            MoveDown(MovePage);
+        }
+        else
+            handled = false;
+    }
+
+    return handled;
 }
 
 const QRect MythHorizListButton::PlaceArrows(const QSize &arrowSize)

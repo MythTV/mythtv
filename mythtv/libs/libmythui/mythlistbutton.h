@@ -20,6 +20,8 @@ class MythListButton : public MythUIType
                    bool showScrollArrows = false);
     ~MythListButton();
 
+    virtual bool keyPressEvent(QKeyEvent *);
+
     void SetFontActive(const MythFontProperties &font);
     void SetFontInactive(const MythFontProperties &font);
 
@@ -153,6 +155,7 @@ class MythHorizListButton : public MythListButton
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Init(void);
+    virtual bool keyPressEvent(QKeyEvent *);
 
     int m_itemWidth;
 };
