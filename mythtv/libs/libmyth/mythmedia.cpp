@@ -399,8 +399,8 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
                 break;
         }
         
-        // Don't fire off transitions to unknown or error states
-        if (m_Status != MEDIASTAT_UNKNOWN && m_Status != MEDIASTAT_ERROR)
+        // Don't fire off transitions to / from unknown states
+        if (m_Status != MEDIASTAT_UNKNOWN && OldStatus != MEDIASTAT_UNKNOWN)
             emit statusChanged(OldStatus, this);
     }
 
