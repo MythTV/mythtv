@@ -191,7 +191,7 @@ MediaType MythMediaDevice::DetectMediaType(void)
     QMap<uint, uint>::const_iterator cit = media_cnts.begin();
     for (; cit != media_cnts.end(); ++cit)
     {
-        for (uint key, j = 0; key != MEDIATYPE_END; j++)
+        for (uint key = 0, j = 0; key != MEDIATYPE_END; j++)
         {
             if ((key = 1 << j) & cit.key())
                 media_cnt[key] += *cit;
@@ -399,8 +399,8 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
                 break;
         }
         
-        // Don't fire off transitions to / from unknown states
-        if (m_Status != MEDIASTAT_UNKNOWN && OldStatus != MEDIASTAT_UNKNOWN)
+        // Don't fire off transitions to unknown or error states
+        if (m_Status != MEDIASTAT_UNKNOWN && m_Status != MEDIASTAT_ERROR)
             emit statusChanged(OldStatus, this);
     }
 
