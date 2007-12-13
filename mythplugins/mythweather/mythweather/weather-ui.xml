@@ -101,7 +101,7 @@
       <size>50</size>
       <bold>yes</bold>
     </font>
- <!-- 
+
     <container name="background">
       <image name="backup" draworder="0">
         <filename>mw_background.png</filename>
@@ -111,8 +111,14 @@
         <filename>mw_lines.png</filename>
         <position>22,175</position>
       </image>
+      
+      <image name="logo" draworder="2">
+          <filename>logo.png</filename>
+          <position>25,25</position>
+          <staticsize>150,110</staticsize>
+      </image>
     </container>
--->
+
     <container name="startup">
       <image name="shading" draworder="0">
         <filename>trans-backup.png</filename>
@@ -135,18 +141,10 @@
     </container>
 
     <container name="Current Conditions">
-
+      <area>0,0,800,600</area>
     <!--blackhole name="multilocation" draworder="0">
     <area>0,0,0,0</area>
     </blackhole-->
-      <image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image>
       <textarea name="*currentdatetime" draworder="2" align="right">
         <font>timedate</font>
         <area>630,12,160,40</area>
@@ -159,11 +157,6 @@
         <area>60,181,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>150,110</staticsize>
-      </image>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -259,14 +252,8 @@
     </container> 
 
     <container name="Three Day Forecast">
-      <!--image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image-->
+      <area>0,0,800,600</area>
+
       <textarea name="+3dlocation" draworder="5" align="center">
         <area>175,80,450,70</area>
         <font>location</font>
@@ -284,11 +271,6 @@
         <area>60,540,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>150,110</staticsize>
-      </image>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -415,6 +397,7 @@
   </container>
 
   <container name="Six Day Forecast">
+      <area>0,0,800,600</area>
       <textarea name="+6dlocation" draworder="5" align="center">
         <area>175,80,450,70</area>
         <font>location</font>
@@ -428,11 +411,6 @@
         <area>60,540,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>150,110</staticsize>
-      </image>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -634,19 +612,7 @@
     </container>
    
     <!--container name="Today's Forecast">
-      <image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>157,118</staticsize>
-      </image>
+
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -673,13 +639,11 @@
     </container-->
 
     <container name="Static Map">
+      <area>0,0,800,600</area>
       <blackhole name="nounits" draworder="0">
         <area>0,0,0,0</area>
       </blackhole>
-      <!--image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image-->
+
       <textarea name="*currentdatetime" draworder="2" align="right">
         <font>timedate</font>
         <area>630,12,160,40</area>
@@ -688,11 +652,6 @@
         <area>60,70,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>100,73</staticsize>
-      </image>
       <textarea name="+smdesc" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -705,15 +664,14 @@
         <position>35,100</position>
         <staticsize>730,450</staticsize>
       </image>
-    </container> 
+    </container>
+
     <container name="Animated Map">
+      <area>0,0,800,600</area>
       <blackhole name="nounits" draworder="0">
         <area>0,0,0,0</area>
       </blackhole>
-      <!--image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image-->
+
       <textarea name="*currentdatetime" draworder="2" align="right">
         <font>timedate</font>
         <area>630,12,160,40</area>
@@ -722,11 +680,6 @@
         <area>60,70,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>100,73</staticsize>
-      </image>
       <textarea name="+amdesc" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -744,6 +697,7 @@
     </container> 
 
     <container name="Severe Weather Alerts">
+      <area>0,0,800,600</area>
       <blackhole name="nounits" draworder="0">
         <area>0,0,0,0</area>
       </blackhole>
@@ -760,19 +714,7 @@
         <area>60,540,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>150,110</staticsize>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
+
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -797,6 +739,7 @@
     </container>
 
   <container name="18 Hour Forecast">
+      <area>0,0,800,600</area>
       <textarea name="+18hrlocation" draworder="5" align="center">
         <area>175,80,450,70</area>
         <font>location</font>
@@ -810,11 +753,6 @@
         <area>60,540,700,35</area>
         <font>footer</font>
       </textarea>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>150,110</staticsize>
-      </image>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -1012,19 +950,7 @@
       </textarea>
     </container>
     <!--container name="Tomorrow's Outlook">
-      <image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="logo" draworder="2">
-        <filename>logo.png</filename>
-        <position>25,25</position>
-        <staticsize>157,118</staticsize>
-      </image>
+      <area>0,0,800,600</area>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font>
@@ -1072,14 +998,6 @@
   </container>
 
     <container name="Radar">
-      <image name="backup" draworder="0">
-        <filename>mw_background.png</filename>
-        <position>22,175</position>
-      </image>
-      <image name="lines" draworder="0">
-        <filename>mw_lines.png</filename>
-        <position>22,175</position>
-      </image>
       <textarea name="header" draworder="5" align="center">
         <area>0,18,800,45</area>
         <font>header</font> 
@@ -1170,11 +1088,6 @@
         <startinterval>1000</startinterval>
         <imagecount>5</imagecount>
       </animatedimage>
-      <image name="logo" draworder="7">
-        <filename>logo.png</filename>
-        <position>30,22</position>
-        <staticsize>80,60</staticsize>
-      </image>
     </container-->
   </window>
 
