@@ -236,4 +236,13 @@ inline int statfs(const char* path, struct statfs* buffer)
 #define WTERMSIG(w)	((w) & 0x7f)
 #endif // USING_MINGW
 
+
+// suseconds_t
+#include <sys/types.h>
+
+#include "mythconfig.h"
+#if defined(CONFIG_DARWIN) && ! defined (_SUSECONDS_T)
+        typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
+#endif
+
 #endif // __COMPAT_H__

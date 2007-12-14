@@ -15,9 +15,7 @@
 #include <qstringlist.h>
 #include <qmap.h>
 
-// __suseconds_t doesn't exist on some older Unixes. e.g. Darwin/Mac OS X
-// let's hope they have suseconds_t in <sys/types.h>
-#include <sys/types.h>
+#include "compat.h"     // for suseconds_t
 
 /////////////////////////////////////////////////////////////////////////////
 //
