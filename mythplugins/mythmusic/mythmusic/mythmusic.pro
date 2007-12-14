@@ -63,6 +63,7 @@ macx {
 
     LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythavutil-$$LIBVERSION
     LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION
+    LIBS += -lmythupnp-$$LIBVERSION
 
     #QMAKE_LFLAGS += -flat_namespace -undefined suppress
     QMAKE_LFLAGS += -flat_namespace -undefined error
