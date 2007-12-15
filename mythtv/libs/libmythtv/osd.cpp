@@ -231,20 +231,20 @@ bool OSD::InitCC708(void)
     uint fontsizes[3] = { z / 3600, z / 2900, z / 2200 };
     for (uint i = 0; i < 48; i++)
     {
-	TTFFont *ccfont = GetFont(QString("cc708_font%1").arg(i));
-	if (!ccfont)
-	{
-	    QString name = QString("cc708_font%1").arg(i);
-            int fontsize = fontsizes[i%3];
-	    ccfont = LoadFont(cc708fontnames[i/3], fontsize);
-	    if (ccfont)
-		fontMap[name] = ccfont;
-	    if (!ccfont)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "A CC708 font is missing");
-		return false;
-            }
-	}
+        TTFFont *ccfont = GetFont(QString("cc708_font%1").arg(i));
+        if (!ccfont)
+        {
+            QString name = QString("cc708_font%1").arg(i);
+                int fontsize = fontsizes[i%3];
+            ccfont = LoadFont(cc708fontnames[i/3], fontsize);
+            if (ccfont)
+            fontMap[name] = ccfont;
+            if (!ccfont)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "A CC708 font is missing");
+            return false;
+                }
+        }
         ccfonts[i] = ccfont;
     }
 
