@@ -300,7 +300,7 @@ void ProgLister::updateBackground(void)
             }
             ltype->SetText(value);
         }
-        container->Draw(&tmp, 0, 0);
+        container->Draw(&tmp, 0, 1);
     }
 
     tmp.end();
