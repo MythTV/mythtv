@@ -170,7 +170,7 @@ bool OSD::InitCC608(void)
     if (!ccfont)
     {
         QString name = "cc_font";
-        int fontsize = 480 / 27;
+        int fontsize = m_themeinfo->BaseRes()->height() / 27;
 
         ccfont = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
 
@@ -226,7 +226,8 @@ bool OSD::InitCC708(void)
 
     // Create fonts...
     TTFFont* ccfonts[48];
-    uint z = gContext->GetNumSetting("OSDCC708TextZoom", 100) * 480;
+    uint z = gContext->GetNumSetting("OSDCC708TextZoom", 100) *
+                    m_themeinfo->BaseRes()->height();
     uint fontsizes[3] = { z / 3600, z / 2900, z / 2200 };
     for (uint i = 0; i < 48; i++)
     {
