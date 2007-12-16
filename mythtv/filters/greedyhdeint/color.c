@@ -605,7 +605,7 @@ void init_yuv_conversion(void)
     /* determine best YV12 -> YUY2 converter to use */
     /* determine best YV12 -> YUY2 converter to use */
 
-#if defined (ARCH_X86) || defined (ARCH_X86_64)
+#ifdef MMX
     if (mm_support() & MM_MMXEXT)
     {
         yv12_to_yuy2 = yv12_to_yuy2_mmxext;
