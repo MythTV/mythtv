@@ -604,6 +604,8 @@ void init_yuv_conversion(void)
     /* determine best YUV444 -> YUY2 converter to use */
     /* determine best YV12 -> YUY2 converter to use */
     /* determine best YV12 -> YUY2 converter to use */
+
+#if defined (ARCH_X86) || defined (ARCH_X86_64)
     if (mm_support() & MM_MMXEXT)
     {
         yv12_to_yuy2 = yv12_to_yuy2_mmxext;
@@ -611,6 +613,7 @@ void init_yuv_conversion(void)
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
     }
     else
+#endif
     {
         yv12_to_yuy2 = yv12_to_yuy2_c;
         yuy2_to_yv12 = yuy2_to_yv12_c;

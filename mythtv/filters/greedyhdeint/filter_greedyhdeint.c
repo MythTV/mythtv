@@ -231,6 +231,8 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
 
     if (frame->interlaced_frame)
     {
+#if defined (ARCH_X86) || defined (ARCH_X86_64)
+
         //SSE Version has best quality. 3DNOW and MMX a litte bit impure
         if (filter->mm_flags & MM_SSE) 
         {
@@ -247,6 +249,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
                     greedyh_filter_mmx(filter->deint_frame, 2 * frame->width, filter->frames[cur_frame], filter->frames[last_frame], bottom_field, second_field, frame->width, frame->height);
                 }
                 else
+#endif
                 {
                     //sad. what to do now?
                 }
