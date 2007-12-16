@@ -468,7 +468,9 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3], 
             }
         }
     }
+#ifdef MMX
     emms();
+#endif
 }
 
 
@@ -548,6 +550,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfm
 #endif
 
     filter->filter_line = filter_line_c;
+#ifdef MMX
     if (filter->mm_flags & MM_MMX) 
     {
         filter->filter_line = filter_line_mmx2;
@@ -562,6 +565,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfm
     else if (filter->mm_flags & MM_MMX)
 		  fast_memcpy=fast_memcpy_MMX;
   	else
+#endif
 		  fast_memcpy=memcpy; // prior to mmx we use the standard memcpy
 
     //hard coded for benchmarking
