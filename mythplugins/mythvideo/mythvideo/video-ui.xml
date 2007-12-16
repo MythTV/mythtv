@@ -311,6 +311,27 @@
          </textarea>
       </container>
 
+      <container name="entersearchtitle">
+         <area>200,200,400,170</area>
+
+         <image name="box" draworder="7">
+            <!-- The offset to the black box is x/y 10/10 it is 366x136 -->
+            <filename>mv-search-popup.png</filename> <!-- 400x170 -->
+            <position>0,0</position>
+         </image>
+
+         <textarea name="msg" draworder="7" align="center">
+            <font>directorfnt</font>
+            <value>Enter Video Title</value>
+            <area>14,36,362,25</area>
+         </textarea>
+
+         <textarea name="title" draworder="7" align="center">
+            <area>14,72,360,50</area>
+            <font>titlefnt</font>
+         </textarea>
+      </container>
+
       <container name="playwait">
          <area>0,0,800,600</area>
 
