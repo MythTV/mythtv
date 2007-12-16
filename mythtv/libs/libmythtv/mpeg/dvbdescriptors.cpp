@@ -224,7 +224,7 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x23] = QObject::tr("Documentary");
     categoryDesc[0x24] = QObject::tr("Intelligent Programmes");
     
-    categoryDesc[0x30] = QObject::tr("Show/game Show");
+    categoryDesc[0x30] = QObject::tr("Entertainment");
     categoryDesc[0x31] = QObject::tr("Game Show");
     categoryDesc[0x32] = QObject::tr("Variety Show");
     categoryDesc[0x33] = QObject::tr("Talk Show");
