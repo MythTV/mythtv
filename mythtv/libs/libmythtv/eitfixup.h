@@ -14,6 +14,12 @@ typedef QMap<uint,uint> QMap_uint_t;
 /// EIT Fix Up Functions
 class EITFixUp
 {
+  protected:
+     // max length of subtitle field in db.
+     static const uint SUBTITLE_MAX_LEN = 128;
+     // max number of words up to a period, question mark
+     static const uint kDotToTitle = 6;
+
   public:
     enum FixUpType
     {
@@ -54,6 +60,7 @@ class EITFixUp
 
   private:
     void FixBellExpressVu(DBEvent &event) const; // Canada DVB-S
+    void SetUKSubtitle(DBEvent &event) const;
     void FixUK(DBEvent &event) const;            // UK DVB-T
     void FixPBS(DBEvent &event) const;           // USA ATSC
     void FixComHem(DBEvent &event, bool parse_subtitle) const; // Sweden DVB-C
@@ -75,17 +82,26 @@ class EITFixUp
     const QRegExp m_ukSubtitle;
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
+    const QRegExp m_ukNew1;
     const QRegExp m_ukT4;
     const QRegExp m_ukEQ;
     const QRegExp m_ukEPQ;
+    const QRegExp m_ukColonHyphen;
     const QRegExp m_ukPStart;
     const QRegExp m_ukPEnd;
     const QRegExp m_ukSeries1;
     const QRegExp m_ukSeries2;
+    const QRegExp m_ukSeries3;
     const QRegExp m_ukCC;
     const QRegExp m_ukYear;
     const QRegExp m_uk24ep;
     const QRegExp m_ukStarring;
+    const QRegExp m_ukBBC7rpt;
+    const QRegExp m_ukCBBC;
+    const QRegExp m_ukCBeebies;
+    const QRegExp m_ukStarring1;
+    const QRegExp m_ukDoubleDotEnd;
+    const QRegExp m_ukDoubleDotStart;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
