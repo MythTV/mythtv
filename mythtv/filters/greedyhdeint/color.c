@@ -188,7 +188,7 @@ static void yv12_to_yuy2_c
 }
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
 
 #define MMXEXT_YUV420_YUYV( )                                                      \
     do {                                                                               \
@@ -233,7 +233,7 @@ static void yv12_to_yuy2_mmxext
  unsigned char *yuy2_map, int yuy2_pitch,
  int width, int height, int progressive ) 
 {
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
     uint8_t *p_line1, *p_line2 = yuy2_map;
     const uint8_t *p_y1, *p_y2 = y_src;
     const uint8_t *p_u = u_src;
@@ -418,7 +418,7 @@ static void yuy2_to_yv12_c
 }
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
 
 /* yuy2->yv12 with subsampling (some ideas from mplayer's yuy2toyv12) */
 #define MMXEXT_YUYV_YUV420( )                                                      \
@@ -474,7 +474,7 @@ static void yuy2_to_yv12_mmxext
  unsigned char *v_dst, int v_dst_pitch, 
  int width, int height) 
 {
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
     const uint8_t *p_line1, *p_line2 = yuy2_map;
     uint8_t *p_y1, *p_y2 = y_dst;
     uint8_t *p_u = u_dst;
@@ -516,7 +516,7 @@ static void yuy2_to_yv12_mmxext
 #endif
 }
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
 static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
         uint8_t *m, uint8_t *t, uint8_t *b )
 {

@@ -34,7 +34,7 @@
 
 #ifndef XAX
 
-#if defined (ARCH_X86)
+#if defined (ARCH_X86_32)
 
 #define XAX   "eax"
 #define XBX   "ebx"
@@ -75,7 +75,7 @@
 #define SUBX  "subq"
 
 #else
-#error Undefined architecture. Define either ARCH_X86 or ARCH_X86_64.
+#error Undefined architecture. Define either ARCH_X86_32 or ARCH_X86_64.
 #endif
 
 #endif

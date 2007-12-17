@@ -303,7 +303,7 @@ static void FUNCT_NAME(uint8_t *output, int outstride,
                "m"(oldbx)
 
              : XAX, XCX, XDX, XSI, XDI,
-#ifdef ARCH_X86
+#ifdef ARCH_X86_32
                "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",
 #endif
 #ifdef ARCH_X86_64
@@ -331,7 +331,7 @@ static void FUNCT_NAME(uint8_t *output, int outstride,
     }
 
     // clear out the MMX registers ready for doing floating point again
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_MMX
     __asm__ __volatile__ ("emms\n\t");
 #endif
 }

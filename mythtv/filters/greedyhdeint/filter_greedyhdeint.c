@@ -21,7 +21,7 @@
 
 #include "color.h"
 
-#if defined (ARCH_X86) || defined (ARCH_X86_64)
+#if defined (ARCH_X86)
 
 #include "greedyhmacros.h"
 
