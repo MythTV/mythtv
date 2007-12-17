@@ -47,7 +47,6 @@ class PlaybackBoxMusic : public MythThemedDialog
     void play();
     void stop();
     void pause();
-    void stopDecoder();
     void previous();
     void next();
     void seekforward();
