@@ -1375,14 +1375,12 @@ int main(int argc, char **argv)
 
     qApp->unlock();
 
-#ifndef _WIN32
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
         VERBOSE(VB_IMPORTANT, QString("Starting media monitor."));
         mon->StartMonitoring();
     }
-#endif
 
     NetworkControl *networkControl = NULL;
     if (gContext->GetNumSetting("NetworkControlEnabled", 0))
@@ -1424,13 +1422,11 @@ int main(int argc, char **argv)
 
     pmanager->DestroyAllPlugins();
 
-#ifndef _WIN32
     if (mon)
     {
         mon->StopMonitoring();
         delete mon;
     }
-#endif
 
     if (priv_thread_created)
     {
