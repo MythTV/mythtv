@@ -240,9 +240,13 @@ inline int statfs(const char* path, struct statfs* buffer)
 // suseconds_t
 #include <sys/types.h>
 
+#ifdef USING_MINGW
+    typedef long suseconds_t;
+#endif
+
 #include "mythconfig.h"
 #if defined(CONFIG_DARWIN) && ! defined (_SUSECONDS_T)
-        typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
+    typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
 #endif
 
 #endif // __COMPAT_H__
