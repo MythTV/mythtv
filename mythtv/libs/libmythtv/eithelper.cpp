@@ -476,6 +476,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                             "title: %5. Channel not found!")
                     .arg(networkid).arg(tsid).arg(serviceid)
                     .arg(transmission.TransmissionCount()).arg(title));
+            continue;
         }
 
         // Skip event if we have already processed it before...
