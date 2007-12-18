@@ -403,7 +403,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         //          Need to find out real fix and remove this code.
         // ------------------------------------------------------------------
 
-        bool bDSM = sUserAgent.startsWith( "INTEL_NMPR/2.1 DLNADOC/1.00", false );
+        //bool bDSM = sUserAgent.startsWith( "INTEL_NMPR/2.1 DLNADOC/1.00", false );
 
         os << "<serviceList>";
 
