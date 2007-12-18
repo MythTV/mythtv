@@ -38,9 +38,7 @@ long Task::m_nTaskCount = 0;
 
 Task::Task()
 {
-    m_mutex.lock();
     m_nTaskId = m_nTaskCount++;
-    m_mutex.unlock();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -74,35 +72,11 @@ TaskQueue::TaskQueue() : m_bTermRequested( false )
 
 TaskQueue::~TaskQueue()
 {
-    Clear();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool TaskQueue::IsTermRequested()
-{
-    m_mutex.lock();
-    bool bTermRequested = m_bTermRequested;
-    m_mutex.unlock();
-
-    return( bTermRequested );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void TaskQueue::RequestTerminate( )
-{
-    m_mutex.lock();  
     m_bTermRequested = true; 
-    m_mutex.unlock();
 
-    // Wait for thread to terminate.
+    wait();
 
-    wait( 1000 );
+    Clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,7 +87,7 @@ void TaskQueue::run( )
 {
     Task *pTask;
 
-    while ( !IsTermRequested() )
+    while ( !m_bTermRequested )
     {
         // ------------------------------------------------------------------
         // Process Any Tasks that may need to be executed.

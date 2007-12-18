@@ -129,19 +129,11 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
 
 WorkerThread::~WorkerThread()
 {
-}
+    m_bTermRequested = true;
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
+    m_WorkAvailable.SetEvent();
 
-bool WorkerThread::IsTermRequested()
-{
-    m_mutex.lock();
-    bool bTermRequested = m_bTermRequested;
-    m_mutex.unlock();
-
-    return( bTermRequested );
+    wait();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -158,23 +150,6 @@ bool WorkerThread::WaitForInitialized( unsigned long msecs )
         return true;
 
     return( m_Initialized.WaitForEvent( msecs ));
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void WorkerThread::RequestTerminate()
-{
-    m_mutex.lock();  
-    m_bTermRequested = true; 
-    m_mutex.unlock();
-
-    m_WorkAvailable.SetEvent();
-
-    // Give time for thread to terminate.
-
-    wait( 500 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -219,7 +194,7 @@ void WorkerThread::run( void )
 
     timer.start();
 
-    while( !IsTermRequested() )
+    while ( !m_bTermRequested )
     {
         if (m_bAllowTimeout && (timer.elapsed() > m_nIdleTimeoutMS) )
             break;
@@ -228,7 +203,7 @@ void WorkerThread::run( void )
         {
             m_WorkAvailable.ResetEvent();
 
-            if ( !IsTermRequested() )
+            if ( !m_bTermRequested )
             {
                 try
                 {
@@ -306,11 +281,7 @@ ThreadPool::~ThreadPool( )
         WorkerThread *pThread = *it;
 
         if (pThread != NULL)
-        {
-            pThread->RequestTerminate();
-
             delete pThread;
-        }
 
         it = m_lstThreads.erase( it );
     }

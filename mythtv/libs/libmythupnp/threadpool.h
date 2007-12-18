@@ -66,7 +66,7 @@ class WorkerThread : public QThread
                          
         ThreadPool         *m_pThreadPool;
 
-        bool                m_bTermRequested;
+        volatile bool       m_bTermRequested;
         QString             m_sName;
 
         long                m_nIdleTimeoutMS;
@@ -78,7 +78,6 @@ class WorkerThread : public QThread
         virtual void  run();
         virtual void  ProcessWork() = 0;
 
-        bool    IsTermRequested     ();
 
     public:
 
@@ -86,7 +85,6 @@ class WorkerThread : public QThread
         virtual ~WorkerThread();
 
         bool     WaitForInitialized( unsigned long msecs );
-        void     RequestTerminate  ();
         void     SignalWork        ();
         void     SetTimeout        ( long nIdleTimeout );
 

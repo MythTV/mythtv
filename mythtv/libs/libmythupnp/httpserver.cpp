@@ -251,7 +251,7 @@ void  HttpWorkerThread::ProcessWork()
 
         pSocket->SocketDevice()->setBlocking( true );
 
-        while( !IsTermRequested() && bKeepAlive && pSocket->IsValid())
+        while( !m_bTermRequested && bKeepAlive && pSocket->IsValid())
         {
             bTimeout = 0;
 

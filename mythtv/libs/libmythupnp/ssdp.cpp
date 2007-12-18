@@ -67,6 +67,9 @@ SSDP::~SSDP()
 {
     DisableNotifications();
 
+    m_bTermRequested = true;
+    wait();
+
     if (m_pNotifyTask != NULL)
         m_pNotifyTask->Release();
 
@@ -77,34 +80,6 @@ SSDP::~SSDP()
             delete m_Sockets[ nIdx ];
         }
     }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool SSDP::IsTermRequested()
-{
-    m_lock.lock();
-    bool bTermRequested = m_bTermRequested;
-    m_lock.unlock();
-
-    return( bTermRequested );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDP::RequestTerminate(void)
-{
-    m_lock.lock();  
-    m_bTermRequested = true; 
-    m_lock.unlock();
-
-    // Call wait to give thread time to terminate.
-
-    wait( 500 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -202,7 +177,7 @@ void SSDP::run()
     // Listen for new Requests
     // ----------------------------------------------------------------------
 
-    while (!IsTermRequested())
+    while ( ! m_bTermRequested )
     {
         int nMaxSocket = 0;
 
