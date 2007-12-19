@@ -318,7 +318,10 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
         }
         else
         {
-            if ((uint)position1 < SUBTITLE_MAX_LEN)
+            strList1 = QStringList::split(" ",
+                            event.description.left(position1));
+            if ((strList1.count() < kDotToTitle) &&
+                ((uint)position1 < SUBTITLE_MAX_LEN))
             {
                 event.subtitle = event.description.left(position1);
                 event.description = event.description.mid(position1+1);
