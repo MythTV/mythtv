@@ -1275,7 +1275,9 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
         //  needed to be repainted
         //
 
+        int looper_context = looper->GetContext();
         if (container_area.isValid() &&
+            (looper_context == context || looper_context == -1) &&
             rect_to_update.intersects(container_area) &&
             looper->GetName().lower() != "background")
         {
@@ -1499,6 +1501,22 @@ void MythThemedDialog::activateCurrent()
     }
 }
 
+namespace
+{
+    template <typename T>
+    T *GetUIType(MythThemedDialog *dialog, const QString &name)
+    {
+        UIType *sf = dialog->getUIObject(name);
+        if (sf)
+        {
+            T *ret = dynamic_cast<T *>(sf);
+            if (ret)
+                return ret;
+        }
+        return 0;
+    }
+};
+
 UIType* MythThemedDialog::getUIObject(const QString &name)
 {
     //
@@ -1548,359 +1566,87 @@ void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
 
 UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIManagedTreeListType *hunted;
-            if ( (hunted = dynamic_cast<UIManagedTreeListType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIManagedTreeListType>(this, name);
 }
 
 UITextType* MythThemedDialog::getUITextType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UITextType *hunted;
-            if ( (hunted = dynamic_cast<UITextType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UITextType>(this, name);
 }
 
 UIRichTextType* MythThemedDialog::getUIRichTextType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIRichTextType *hunted;
-            if ( (hunted = dynamic_cast<UIRichTextType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIRichTextType>(this, name);
 }
 
 UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIRemoteEditType *hunted;
-            if ( (hunted = dynamic_cast<UIRemoteEditType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIRemoteEditType>(this, name);
 }
 
 UIMultiTextType* MythThemedDialog::getUIMultiTextType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIMultiTextType *hunted;
-            if ( (hunted = dynamic_cast<UIMultiTextType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIMultiTextType>(this, name);
 }
 
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIPushButtonType *hunted;
-            if ( (hunted = dynamic_cast<UIPushButtonType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIPushButtonType>(this, name);
 }
 
 UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UITextButtonType *hunted;
-            if ( (hunted = dynamic_cast<UITextButtonType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UITextButtonType>(this, name);
 }
 
 UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIRepeatedImageType *hunted;
-            if ( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIRepeatedImageType>(this, name);
 }
 
 UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UICheckBoxType *hunted;
-            if ( (hunted = dynamic_cast<UICheckBoxType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UICheckBoxType>(this, name);
 }
 
 UISelectorType* MythThemedDialog::getUISelectorType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UISelectorType *hunted;
-            if ( (hunted = dynamic_cast<UISelectorType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UISelectorType>(this, name);
 }
 
 UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIBlackHoleType *hunted;
-            if ( (hunted = dynamic_cast<UIBlackHoleType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIBlackHoleType>(this, name);
 }
 
 UIImageType* MythThemedDialog::getUIImageType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIImageType *hunted;
-            if ( (hunted = dynamic_cast<UIImageType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIImageType>(this, name);
 }
 
 UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIStatusBarType *hunted;
-            if ( (hunted = dynamic_cast<UIStatusBarType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIStatusBarType>(this, name);
 }
 
 UIListBtnType* MythThemedDialog::getUIListBtnType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIListBtnType *hunted;
-            if ((hunted = dynamic_cast<UIListBtnType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIListBtnType>(this, name);
 }
 
 UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIListTreeType *hunted;
-            if ((hunted = dynamic_cast<UIListTreeType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIListTreeType>(this, name);
 }
 
 UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIKeyboardType *hunted;
-            if ( (hunted = dynamic_cast<UIKeyboardType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIKeyboardType>(this, name);
 }
 
 UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
-    {
-        UIType *hunter = looper->GetType(name);
-        if (hunter)
-        {
-            UIImageGridType *hunted;
-            if ( (hunted = dynamic_cast<UIImageGridType*>(hunter)) )
-            {
-                return hunted;
-            }
-        }
-        ++an_it;
-    }
-    return NULL;
+    return GetUIType<UIImageGridType>(this, name);
 }
 
 LayerSet* MythThemedDialog::getContainer(const QString& name)
