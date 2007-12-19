@@ -7,7 +7,9 @@
 
 #ifdef CONFIG_DARWIN
 #include <vector>
-#else
+#endif
+
+#ifdef __linux__
 #include <cdaudio.h>
 extern "C" {
 #include <cdda_interface.h>
@@ -62,7 +64,8 @@ class CdDecoder : public Decoder
     double             m_lengthInSecs;
     vector<int>        m_tracks;        ///< Start block offset of each track
     vector<Metadata*>  m_mData;         ///< After lookup, details of each trk
-#else
+#endif
+
     int stat;
     char *output_buf;
     ulong output_bytes, output_at;
@@ -77,13 +80,14 @@ class CdDecoder : public Decoder
     int settracknum;
     int tracknum;
 
+#ifdef __linux__
     cdrom_drive *device;
     cdrom_paranoia *paranoia;
+#endif
 
     long int start;
     long int end;
     long int curpos;
-#endif
 };
 
 #endif
