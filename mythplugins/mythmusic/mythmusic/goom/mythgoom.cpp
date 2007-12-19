@@ -12,6 +12,8 @@ extern "C" {
 #include <math.h>
 #include <stdlib.h>
 
+#include <mythtv/compat.h>
+
 #include <iostream>
 using namespace std;
 
