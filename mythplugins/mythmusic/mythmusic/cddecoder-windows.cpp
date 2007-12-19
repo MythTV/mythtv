@@ -38,18 +38,6 @@ bool CdDecoder::initialize()
     return true;
 }
 
-/**
- * Lookup FreeDB/CDDB, populate m_mData with results
- */
-void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
-{
-}
-
-double CdDecoder::lengthInSeconds()
-{
-    return m_lengthInSecs;
-}
-
 void CdDecoder::seek(double pos)
 {   
     (void)pos;
