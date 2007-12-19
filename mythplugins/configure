@@ -472,7 +472,7 @@ if test "$music" != "no" ; then
     fi
 
     if test "$paranoia" = "no" -a "$targetos" != "Darwin" -a \
-                                  "{targetos:0:5}" != "MINGW"; then
+                                  "${targetos:0:5}" != "MINGW"; then
         echo "MythMusic requires CDDA Paranoia."
     fi
 
@@ -490,7 +490,7 @@ if test "$music" != "no" ; then
         echo "MythMusic requires taglib 1.4."
     fi 
 
-    if test "$targetos" != "Darwin" -a "{targetos:0:5}" != "MINGW" ; then
+    if test "$targetos" != "Darwin" -a "${targetos:0:5}" != "MINGW" ; then
         if test "$cdaudio" = "no" -o "$paranoia" = "no" ; then
             cdlibs="no"
         fi
