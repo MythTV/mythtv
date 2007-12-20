@@ -122,7 +122,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
             }
     #endif
 
-#elif DEBUG // && MYTHCONTEXT_H_
+#elif defined(DEBUG) // && MYTHCONTEXT_H_
 
     // The verbose_mutex lock is a recursive lock so it is possible (while
     // not recommended) to use a VERBOSE macro within another VERBOSE macro.
@@ -142,7 +142,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
             } \
         } while (0)
 
-#else // !MYTHCONTEXT_H_ && !DEBUG
+#else // MYTHCONTEXT_H_ && !DEBUG
 
     // use a slower non-deadlockable version in release builds
 
