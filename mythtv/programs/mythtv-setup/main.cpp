@@ -74,13 +74,12 @@ void SetupMenuCallback ( void* data, QString& selection )
     }
 }
 
-void SetupMenu(void) 
+void SetupMenu(MythMainWindow *win) 
 {
     QString theme = gContext->GetSetting("Theme", "blue");
 
     MythThemedMenu* menu = new MythThemedMenu(gContext->FindThemeDir(theme),
-                                              "setup.xml",
-                                              GetMythMainWindow()->GetMainStack(),
+                                              "setup.xml", win->GetMainStack(),
                                               "mainmenu", false);
 
     menu->setCallback(SetupMenuCallback, gContext);
@@ -88,8 +87,8 @@ void SetupMenu(void)
 
     if ( menu->foundTheme() )
     {
-        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
-        qApp->setMainWidget(GetMythMainWindow());
+        win->GetMainStack()->AddScreen(menu);
+        qApp->setMainWidget(win);
         qApp->exec();
     }
     else
@@ -326,7 +325,7 @@ int main(int argc, char *argv[])
     do
     {
         // Let the user select buttons, type values, scan for channels, et c.
-        SetupMenu();
+        SetupMenu(mainWindow);
 
         // Look for common problems
         QString *problems = new QString("");
