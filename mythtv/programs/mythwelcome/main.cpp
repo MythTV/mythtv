@@ -94,9 +94,8 @@ int main(int argc, char **argv)
     }
     else
     {
-        WelcomeDialog *mythWelcome = new WelcomeDialog(gContext->GetMainWindow(),
-                                                    "welcome_screen", "welcome-", 
-                                                    "welcome_screen");
+        WelcomeDialog *mythWelcome = new WelcomeDialog(mainWindow,
+            "welcome_screen", "welcome-", "welcome_screen");
         mythWelcome->exec();
         
         delete mythWelcome;
