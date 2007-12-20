@@ -310,8 +310,7 @@ int main(int argc, char *argv[])
     if (backendIsRunning)
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(), QObject::tr("WARNING"),
-            warn,
+            mainWindow, QObject::tr("WARNING"), warn,
             QObject::tr("Continue"),
             QObject::tr("Exit"), kDialogCodeButton0);
 
