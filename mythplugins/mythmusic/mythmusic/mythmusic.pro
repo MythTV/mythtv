@@ -74,6 +74,7 @@ mingw {
 
     HEADERS -= cdrip.h   importmusic.h
     SOURCES -= cdrip.cpp importmusic.cpp cddecoder.cpp
+    SOURCES += cddecoder-windows.cpp
 
     LIBS += -logg
 }
