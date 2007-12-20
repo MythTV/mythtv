@@ -1398,7 +1398,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     if (UPnPconnect(pDevLoc, PIN))
         return true;
     
-    error = "Cannot connect to defalt backend via UPnP. Wrong saved PIN?";
+    error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;
 }
 
