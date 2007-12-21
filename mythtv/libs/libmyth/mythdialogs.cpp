@@ -1262,6 +1262,13 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
 
     QPainter whole_dialog_painter(&my_foreground);
 
+    // Updating the background portion isn't optional. The old
+    // behavior left remnants during context transitions if
+    // they happened outside active containers for the current
+    // context.
+    whole_dialog_painter.drawPixmap(rect_to_update.topLeft(), my_background,
+                                    rect_to_update);
+
     QPtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
 
@@ -1275,17 +1282,18 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
         //  needed to be repainted
         //
 
+        const QRect intersect = rect_to_update.intersect(container_area);
         int looper_context = looper->GetContext();
         if (container_area.isValid() &&
             (looper_context == context || looper_context == -1) &&
-            rect_to_update.intersects(container_area) &&
+            intersect.isValid() &&
             looper->GetName().lower() != "background")
         {
             //
             //  Debugging
             //
             /*
-            cout << "A container called \"" << looper->GetName() 
+            cout << "A container called \"" << looper->GetName()
                  << "\" said its area is "
                  << container_area.left()
                  << ","
@@ -1297,31 +1305,21 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
                  << endl;
             */
 
-            QPixmap container_picture(container_area.size());
-            QPainter offscreen_painter(&container_picture);
-            offscreen_painter.drawPixmap(0, 0, my_background, 
-                                         container_area.left(), 
-                                         container_area.top());
-
             //
             //  Loop over the draworder layers
 
+            whole_dialog_painter.save();
+
+            whole_dialog_painter.setClipRect(intersect);
+            whole_dialog_painter.translate(container_area.left(),
+                                           container_area.top());
+
             for (int i = 0; i <= looper->getLayers(); i++)
             {
-                looper->Draw(&offscreen_painter, i, context);
+                looper->Draw(&whole_dialog_painter, i, context);
             }
 
-            //
-            //  If it did in fact paint something (empty
-            //  container?) then tell it we're done
-            //
-            if (offscreen_painter.isActive())
-            {
-                offscreen_painter.end();
-                whole_dialog_painter.drawPixmap(container_area.topLeft(), 
-                                                container_picture);
-            }
-
+            whole_dialog_painter.restore();
         }
         ++an_it;
     }
