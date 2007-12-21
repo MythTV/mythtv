@@ -341,12 +341,12 @@ void Metadata::dumpToDatabase()
     QString strQuery;
     if (m_id < 1)
     {
-        strQuery = "INSERT INTO music_songs ( directory_id, lastplay,"
+        strQuery = "INSERT INTO music_songs ( directory_id,"
                    " artist_id, album_id,  name,         genre_id,"
                    " year,      track,     length,       filename,"
                    " rating,    format,    date_entered, date_modified ) "
                    "VALUES ( "
-                   " :DIRECTORY, :LASTPLAY,"
+                   " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD );";
@@ -385,10 +385,7 @@ void Metadata::dumpToDatabase()
     query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
 
     if (m_id < 1)
-    {
         query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());
-        query.bindValue(":LASTPLAY",  QDateTime::currentDateTime());
-    }
     else
         query.bindValue(":ID", m_id);
 
