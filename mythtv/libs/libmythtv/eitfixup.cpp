@@ -25,7 +25,7 @@ EITFixUp::EITFixUp()
       m_ukColonHyphen("[:-]"),
       m_ukPStart("^\\.+"),
       m_ukPEnd("\\.+$"),
-      m_ukSeries1("^\\s*(\\d{1,2})/(\\d{1,2})\\."),
+      m_ukSeries1("\\s*(\\d{1,2})/(\\d{1,2})"),
       m_ukSeries2("\\((Part|Pt)\\s+(\\d{1,2})\\s+of\\s+(\\d{1,2})\\)", false),
       m_ukSeries3("\\s*Episode\\s+(\\d{1,2})\\s+of\\s+(\\d{1,2})\\.", false),
       m_ukCC("\\[(AD)(,(S)){,1}(,SL){,1}\\]|\\[(S)(,AD){,1}(,SL){,1}\\]|"
@@ -39,6 +39,7 @@ EITFixUp::EITFixUp()
       m_ukStarring1("star(ring)"),
       m_ukDoubleDotEnd("\\.\\.+$"),
       m_ukDoubleDotStart("^\\.\\.+"),
+      m_ukDotSpaceStart("^\\. "),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -297,6 +298,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
     QStringList strList1;
     int position1;
     int position2;
+
     if ((position1 = event.description.find(m_ukEQ)) != -1)
     {
         position2 = event.description.find(":",position1+1);
@@ -320,11 +322,13 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
         {
             strList1 = QStringList::split(" ",
                             event.description.left(position1));
-            if ((strList1.count() < kDotToTitle) &&
-                ((uint)position1 < SUBTITLE_MAX_LEN))
+            if (strList1.count() < kDotToTitle)
             {
-                event.subtitle = event.description.left(position1);
-                event.description = event.description.mid(position1+1);
+                if ((uint)position1 < SUBTITLE_MAX_LEN)
+                {
+                     event.subtitle = event.description.left(position1);
+                     event.description = event.description.mid(position1+1);
+                }
             }
         }
     }
@@ -357,11 +361,10 @@ void EITFixUp::FixUK(DBEvent &event) const
     event.description = event.description.remove(m_ukBBC7rpt);
 
     QRegExp tmp24ep = m_uk24ep;
-    QStringList strList1;
     if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
     {
-        if (((position1=event.title.find(m_ukDoubleDotEnd))!=-1) &&
-            ((position2=event.description.find(m_ukDoubleDotStart))!=-1))
+        if (((position1=event.title.find(m_ukDoubleDotEnd)) != -1) &&
+            ((position2=event.description.find(m_ukDoubleDotStart)) != -1))
         {
             strFull = event.title.remove(m_ukDoubleDotEnd)+" "+
                   event.description.remove(m_ukDoubleDotStart);
@@ -374,7 +377,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                  event.description = strFull.mid(position1 + 1);
                  SetUKSubtitle(event);
             }
-            if ((position1 = strFull.find(m_ukYear)) != -1)
+            else if ((position1 = strFull.find(m_ukYear)) != -1)
             {
                 // Looks like they are using the airdate as a delimiter
                 if ((uint)position1 < SUBTITLE_MAX_LEN)
@@ -393,7 +396,7 @@ void EITFixUp::FixUK(DBEvent &event) const
             event.description = event.description.remove(tmp24ep.cap(0));
         }
         else if (((position1 = event.title.find(m_ukColonHyphen)) != -1) &&
-            (event.description.find(":") == -1))
+            (event.description.find(":") < 0 ))
         {
             if ((uint)position1 < SUBTITLE_MAX_LEN)
             {
@@ -403,6 +406,35 @@ void EITFixUp::FixUK(DBEvent &event) const
         }
         else
             SetUKSubtitle(event);
+    }
+
+    if (event.subtitle.isEmpty())
+    {
+       QStringList strList1 = QStringList::split(".",event.description,TRUE);
+       QStringList strList2 = QStringList::split("?",event.description,TRUE);
+       if (strList1.count()>1 || strList2.count()>1)
+       {
+           QString strEnd;
+           if (strList1[0].length() > strList2[0].length())
+           {
+               strList1=strList2;
+               strEnd="?";
+           }
+           strList2 = QStringList::split(" ",strList1[0]);
+           if (strList2.count() < kDotToTitle)
+           {
+               QStringList strList3 = strList2.grep("Drama",false);
+               QStringList strList4 = strList2.grep("sitcom",false);
+               QStringList strList5 = strList2.grep(m_ukStarring1);
+               if ((strList3.count()==0) && (strList4.count()==0) &&
+                   (strList5.count()==0))
+               {
+                    event.subtitle = strList1[0]+strEnd;
+                    event.description=
+                                 event.description.mid(strList1[0].length()+1);
+               }
+           }
+       }
     }
 
     QRegExp tmpStarring = m_ukStarring;
@@ -456,24 +488,18 @@ void EITFixUp::FixUK(DBEvent &event) const
     {
         event.partnumber = tmpExp1.cap(1).toUInt();
         event.parttotal  = tmpExp1.cap(2).toUInt();
-        event.description = event.description.left(position1) +
-            event.description.mid(position1 + tmpExp1.cap(0).length());
         series = true;
     }
     else if ((position1 = tmpExp2.search(event.description)) != -1)
     {
         event.partnumber = tmpExp2.cap(2).toUInt();
         event.parttotal  = tmpExp2.cap(3).toUInt();
-        event.description = event.description.left(position1) +
-            event.description.mid(position1 + tmpExp2.cap(0).length());
         series = true;
     }
     else if ((position1 = tmpExp3.search(event.description)) != -1)
     {
         event.partnumber = tmpExp3.cap(1).toUInt();
         event.parttotal  = tmpExp3.cap(2).toUInt();
-        event.description = event.description.left(position1) +
-            event.description.mid(position1 + tmpExp3.cap(0).length());
         series = true;
     }
     if (series)
@@ -532,35 +558,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     // Trim trailing '.'
     event.title.remove(m_ukPEnd);
     event.subtitle.remove(m_ukPEnd);
-
-    if (event.subtitle.isEmpty() && !event.category.startsWith("Movie",false))
-    {
-       strList1 = QStringList::split(".",event.description);
-       QStringList strList2 = QStringList::split("?",event.description);
-       if (strList1.count()>1 || strList2.count()>1)
-       {
-           QString strEnd;
-           if (strList1[0].length() > strList2[0].length())
-           {
-               strList1=strList2;
-               strEnd="?";
-           }
-           strList2 = QStringList::split(" ",strList1[0]);
-           if (strList2.count() < kDotToTitle)
-           {
-               QStringList strList3 = strList2.grep("Drama",false);
-               QStringList strList4 = strList2.grep("sitcom",false);
-               QStringList strList5 = strList2.grep(m_ukStarring1);
-               if ((strList3.count()==0) && (strList4.count()==0) &&
-                   (strList5.count()==0))
-               {
-                    event.subtitle = strList1[0]+strEnd;
-                    event.description=
-                                 event.description.mid(strList1[0].length()+1);
-               }
-           }
-       }
-    }
+    event.subtitle.remove(m_ukDotSpaceStart);
 }
 
 /** \fn EITFixUp::FixPBS(DBEvent&) const

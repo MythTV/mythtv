@@ -18,7 +18,7 @@ class EITFixUp
      // max length of subtitle field in db.
      static const uint SUBTITLE_MAX_LEN = 128;
      // max number of words up to a period, question mark
-     static const uint kDotToTitle = 6;
+     static const uint kDotToTitle = 8;
 
   public:
     enum FixUpType
@@ -102,6 +102,7 @@ class EITFixUp
     const QRegExp m_ukStarring1;
     const QRegExp m_ukDoubleDotEnd;
     const QRegExp m_ukDoubleDotStart;
+    const QRegExp m_ukDotSpaceStart;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
