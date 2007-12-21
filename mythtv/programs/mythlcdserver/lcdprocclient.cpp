@@ -1839,7 +1839,7 @@ void LCDProcClient::outputTime()
         if (isRecording)
             outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
         else
-            outputCenteredText("Time", "", "topWidget", 1);
+            outputCenteredText("Time", QDate::currentDate().toString(), "topWidget", 1);
 
         dostdclock();
     }
