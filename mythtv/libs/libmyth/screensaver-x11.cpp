@@ -83,7 +83,7 @@ class ScreenSaverX11Private
         if (m_timeoutInterval == -1)
         {
             m_timeoutInterval = gContext->GetNumSettingOnHost(
-                "xscreensaverInterval", gContext->GetHostName(), 60) * 1000;
+                "xscreensaverInterval", gContext->GetHostName(), 50) * 1000;
         }
 
         if (m_timeoutInterval > 0)
