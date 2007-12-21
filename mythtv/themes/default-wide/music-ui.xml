@@ -105,14 +105,14 @@
         </font>
   
         <font name="selected" face="Trebuchet MS">
-            <color>#ffffff</color>
+            <color>#ffff00</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="currenttitle" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>18</size>
+            <size>20</size>
             <bold>yes</bold>
         </font>
 
@@ -124,7 +124,7 @@
 
         <font name="infotext" face="Trebuchet MS">
             <color>#ffffff</color>
-            <size>18</size>
+            <size>15</size>
             <bold>yes</bold>
         </font>
 
@@ -141,7 +141,7 @@
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
                 <filename>background.png</filename>
-                <position>0,16</position>
+                <position>5,20</position>
             </image>
             <image name="titlelines" draworder="0" fleximage="no">
                 <filename>trans-titles.png</filename>
@@ -153,7 +153,8 @@
             </image>
             <image name="mm_blackhole_border" draworder="0" fleximage="no">
                 <filename>mm_blackhole_border.png</filename>
-                <position>213,369</position>
+                <position>203,359</position>
+                <staticsize>163,160</staticsize>
             </image>
         </container>
 
@@ -169,7 +170,7 @@
                 bins is how many visible layers of the
                 tree there are. 
             -->
-            <managedtreelist name="musictreelist" draworder="1" bins="4">
+            <managedtreelist name="musictreelist" draworder="1" bins="3">
                 <!-- 
                     regular area, but is only used if the user has
                     ShowWholeTree set to false.
@@ -202,19 +203,13 @@
                     <fcnfont name="selected" function="selected"></fcnfont>
                 </bin>
                 <bin number="2">
-                    <area>384,0,208,296</area>
+                    <area>384,10,208,296</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                 </bin>
                 <bin number="3">
-                    <area>609,0,208,296</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="selected" function="selected"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                </bin>
-                <bin number="4">
-                    <area>834,0,366,296</area>
+                    <area>619,10,618,296</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
@@ -263,51 +258,58 @@
         -->
 
         <container name="trackinfo">
-            <area>0,340,1136,200</area>
+            <area>0,340,1136,210</area>
 
             <blackhole name="visual_blackhole">
-                <area>216,33,138,134</area>
+                <area>206,23,158,154</area>
             </blackhole>
 
             <textarea name="title_text" draworder="1" align="left">
                 <font>currenttitle</font>
-                <area>386,24,684,34</area>
+                <area>386,20,684,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="artist_text" draworder="1" align="left">
                 <font>currentartist</font>
-                <area>386,70,684,25</area>
+                <area>386,60,684,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="album_text" draworder="1" align="left">
                 <font>currentartist</font>
-                <area>386,100,684,25</area>
+                <area>386,95,684,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <repeatedimage name="ratings_image" draworder="1" fleximage="no">
                 <filename>mm_rating.png</filename>
-                <position>386,143</position>
+                <position>386,133</position>
                 <orientation>LeftToRight</orientation>
             </repeatedimage>
 
             <textarea name="current_visualization_text" draworder="1" align="right">
                 <font>currentartist</font>
-                <area>885,70,185,25</area>
+                <area>885,60,185,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="info_text" draworder="1" align="right">
                 <font>infotext</font>
-                <area>571,100,499,25</area>
+                <area>571,105,499,30</area>
             </textarea>
 
             <textarea name="time_text" draworder="1" align="right">
                 <font>currentartist</font>
-                <area>885,143,185,25</area>
+                <area>885,153,185,30</area>
             </textarea>
+
+            <statusbar name="progress_bar" draworder="5" whitespace="5">
+                <container fleximage="no">mm_progress-bg.png</container>
+                <fill>mm_progress-fg.png</fill>
+                <position>386,160</position>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
 
         </container>
 
@@ -1822,57 +1824,75 @@
        popup mini player and must be present
     -->
     <container name="player_container">
-        <area>345,5,590,170</area>
+        <area>345,5,590,190</area>
         <image name="track_info_background" draworder="0" fleximage="no">
             <filename>miniplayer_background.png</filename>
             <position>10,10</position>
+            <staticsize>569,170</staticsize>
         </image>
 
         <image name="mm_blackhole_border" draworder="0" fleximage="no">
             <filename>mm_blackhole_border.png</filename>
             <position>20,20</position>
-            <staticsize>126,128</staticsize>
+            <staticsize>146,148</staticsize>
         </image>
 
         <textarea name="title_text" draworder="1" align="left">
             <font>currenttitle</font>
-            <area>160,15,415,34</area>
+            <area>170,15,415,34</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="artist_text" draworder="1" align="left">
             <font>currentartist</font>
-            <area>160,50,415,25</area>
+            <area>170,50,415,27</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="album_text" draworder="1" align="left">
             <font>currentartist</font>
-            <area>160,73,415,25</area>
+            <area>170,77,415,27</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <repeatedimage name="ratings_image" draworder="1" fleximage="no">
             <filename>mm_rating.png</filename>
-            <position>160,105</position>
+            <position>173,107</position>
             <orientation>LeftToRight</orientation>
         </repeatedimage>
 
         <textarea name="info_text" draworder="1" align="left">
             <font>infotext</font>
-            <area>160,129,250,25</area>
+            <area>170,129,250,25</area>
         </textarea>
 
         <textarea name="time_text" draworder="1" align="right">
             <font>currentartist</font>
-            <area>375,125,185,25</area>
+            <area>385,125,185,25</area>
         </textarea>
 
         <image name="cover_image" draworder="2">
             <filename>mm_nothumb.png</filename>
             <position>22,22</position>
-            <staticsize>122,124</staticsize>
+            <staticsize>142,144</staticsize>
         </image>
+
+        <statusbar name="progress_bar" draworder="5" whitespace="5">
+            <container fleximage="no">mm_progress-bg.png</container>
+            <fill>mm_progress-fg.png</fill>
+            <position>170,150</position>
+            <orientation>LeftToRight</orientation>
+        </statusbar>
+<!--
+        <textarea name="volume_text" draworder="5" align="left">
+            <font>infotext</font>
+            <area>490,105,250,25</area>
+            <value>%1</value>                - this would show as '12'
+            <value>%1%</value>               - this would show as '12%'
+            <value>Vol: %1</value>           - this would show as 'Vol: 12'
+            <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
+        </textarea>
+-->
 
     </container>
 
