@@ -371,29 +371,38 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 showEditMetadataDialog();
         else if (action == "ESCAPE" && visualizer_status != 2)
         {
-            DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
-                             tr("Exiting Music Player\n"
-                                "Do you want to continue playing in the background?"));
-            dialog->AddButton(tr("No - Exit, Stop Playing"));
-            dialog->AddButton(tr("Yes - Exit, Continue Playing"));
-            dialog->AddButton(tr("Cancel"));
-            int res = dialog->exec();
-            dialog->deleteLater();
-
-            if (res == kDialogCodeButton0)
+            if (!gPlayer->isPlaying())
             {
                 gPlayer->savePosition();
                 stopAll();
                 done(kDialogCodeAccepted);
             }
-            else if (res == kDialogCodeButton1)
-            {
-                gPlayer->setListener(NULL);
-                gPlayer->setVisual(NULL);
-                done(kDialogCodeAccepted);
-            }
             else
-                handled = true;
+            {
+                DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+                                tr("Exiting Music Player\n"
+                                    "Do you want to continue playing in the background?"));
+                dialog->AddButton(tr("No - Exit, Stop Playing"));
+                dialog->AddButton(tr("Yes - Exit, Continue Playing"));
+                dialog->AddButton(tr("Cancel"));
+                int res = dialog->exec();
+                dialog->deleteLater();
+
+                if (res == kDialogCodeButton0)
+                {
+                    gPlayer->savePosition();
+                    stopAll();
+                    done(kDialogCodeAccepted);
+                }
+                else if (res == kDialogCodeButton1)
+                {
+                    gPlayer->setListener(NULL);
+                    gPlayer->setVisual(NULL);
+                    done(kDialogCodeAccepted);
+                }
+                else
+                    handled = true;
+            }
         }
         else
             handled = false;
