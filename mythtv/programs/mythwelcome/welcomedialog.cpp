@@ -106,7 +106,17 @@ DialogCode WelcomeDialog::exec(void)
     // update status now
     updateAll();
 
-    return MythDialog::exec();
+    setResult(kDialogCodeRejected);
+
+    Show();
+
+    do
+    {
+        qApp->processEvents();
+        usleep(250000);
+    } while (!result());
+
+    return kDialogCodeAccepted;
 }
 
 void WelcomeDialog::customEvent(QCustomEvent *e)
