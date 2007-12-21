@@ -377,7 +377,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                  event.description = strFull.mid(position1 + 1);
                  SetUKSubtitle(event);
             }
-            else if ((position1 = strFull.find(m_ukYear)) != -1)
+            if ((position1 = strFull.find(m_ukYear)) != -1)
             {
                 // Looks like they are using the airdate as a delimiter
                 if ((uint)position1 < SUBTITLE_MAX_LEN)
