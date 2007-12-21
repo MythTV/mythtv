@@ -60,13 +60,8 @@
 
     <item> 
         <title>Topix: Business</title> 
-        <url>http://www.topix.net/rss/business/business.xml</url> 
+        <url>http://www.topix.net/rss/business</url> 
         <ico>http://rss.topix.net/favicon.ico</ico> 
-    </item> 
-
-    <item> 
-        <title>TradeSims</title> 
-        <url>http://www.tradesims.com/AEX.rdf</url> 
     </item> 
 
 </category> 
@@ -80,7 +75,7 @@
 
     <item> 
         <title>Arstechnica</title> 
-        <url>http://arstechnica.com/index.ars/rss</url> 
+        <url>http://feeds.arstechnica.com/arstechnica/BAaf</url> 
         <ico>http://arstechnica.com/favicon.ico</ico> 
     </item> 
 
@@ -136,7 +131,7 @@
 
     <item>
         <title>Gizmodo - The Gadget Guide</title>
-        <url>http://gizmodo.com/index.xml</url>
+        <url>http://feeds.gawker.com/gizmodo/full</url>
         <ico>http://cache.gizmodo.com/assets/base/img/site/www.gizmodo.com/favicon.ico</ico>
     </item>
 
@@ -233,7 +228,7 @@
 
     <item>
         <title>Red Hat Magazine</title>
-        <url>http://www.redhat.com/magazine/rss20.xml</url>
+        <url>http://feeds.feedburner.com/RedHatMagazine</url>
     </item>
 
     <item> 
@@ -287,31 +282,31 @@
 
     <item>
         <title>EFF Action Alerts</title>
-        <url>http://www.eff.org/rss/action.xml</url>
+        <url>http://action.eff.org/feed/rss2_0/alerts.rss</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
     <item>
         <title>EFF Breaking News</title>
-        <url>http://www.eff.org/news/index.xml</url>
+        <url>http://www.eff.org/rss/pressrelease</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
     <item>
         <title>EFF DeepLinks</title>
-        <url>http://www.eff.org/deeplinks/index.xml</url>
+        <url>http://www.eff.org/rss/blog</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
     <item>
         <title>EFF MiniLinks</title>
-        <url>http://www.eff.org/minilinks/index.xml</url>
+        <url>http://w2.eff.org/minilinks/index.xml</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
     <item>
         <title>EFF Weekly Events Calendar</title>
-        <url>http://www.eff.org/calendar/rss/rss.php</url>
+        <url>http://w2.eff.org/calendar/rss/rss.php</url>
         <ico>http://www.eff.org/favicon.ico</ico>
     </item>
 
@@ -320,62 +315,62 @@
 <category name="Entertainment, Gossip, and Movies">
 
     <item>
-        <title>E! News - Headlines</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
-        <title>E! Gossip - The Awful Truth</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/awful.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
-        <title>E! Gossip - Watch with Kristin</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/kristin.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
-        <title>E! Gossip - Party Girl</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/partygirl.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
         <title>E! Gossip - Answer Bitch</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/answer.xml</url>
+        <url>http://feeds.eonline.com/eonline/answer</url>
         <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
     </item>
 
     <item>
         <title>E! Gossip - The Hum</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/hum.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
-        <title>E! Gossip - Planet Gossip</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/planet.xml</url>
-        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
-    </item>
-
-    <item>
-        <title>E! Movies - Reel Girl</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/reelgirl.xml</url>
+        <url>http://feeds.eonline.com/eonline/hum</url>
         <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
     </item>
 
     <item>
         <title>E! Movies - Lyons Den</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/lyonsden.xml</url>
+        <url>http://feeds.eonline.com/eonline/lyonsden</url>
         <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
     </item>
 
     <item>
         <title>E! Movies - Movie Reviews</title>
-        <url>http://www.eonline.com/syndication/feeds/rssfeeds/movies.xml</url>
+        <url>http://feeds.eonline.com/eonline/movies</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Party Girl</title>
+        <url>http://feeds.eonline.com/eonline/partygirl</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Planet Gossip</title>
+        <url>http://feeds.eonline.com/eonline/planet</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Movies - Reel Girl</title>
+        <url>http://feeds.eonline.com/eonline/reelgirl</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - The Awful Truth</title>
+        <url>http://feeds.eonline.com/eonline/awful</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! Gossip - Watch with Kristin</title>
+        <url>http://feeds.eonline.com/eonline/kristin</url>
+        <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
+    </item>
+
+    <item>
+        <title>E! News - Headlines</title>
+        <url>http://feeds.eonline.com/eonline/topstories</url>
         <ico>http://www.eonline.com/images/feeds_logo.gif</ico>
     </item>
 
@@ -391,8 +386,28 @@
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Top Movie News</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/top_news.xml</url>
+        <title>Rotton Tomatoes - Certified Fresh on DVD/Video</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/complete_certified_fresh_dvds.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh in Theaters</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/in_theaters_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh Top DVD/Video Pick</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/video_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Certified Fresh Top Movie Pick</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/movie_certified_fresh.xml</url>
+    </item>
+
+    <item>
+        <title>Rotton Tomatoes - Complete Listing of DVD/Videos</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/complete_dvds.xml</url>
     </item>
 
     <item>
@@ -406,8 +421,8 @@
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Top Movies</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/top_movies.xml</url>
+        <title>Rotton Tomatoes - New DVD Releases</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/new_releases.xml</url>
     </item>
 
     <item>
@@ -416,63 +431,32 @@
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Upcoming Movies</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/upcoming.xml</url>
-    </item>
-
-    <item>
-        <title>Rotton Tomatoes - Certified Fresh Top Movie Pick</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/movie_certified_fresh.xml</url>
-    </item>
-
-    <item>
-        <title>Rotton Tomatoes - Certified Fresh in Theaters</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/in_theaters_certified_fresh.xml</url>
-    </item>
-
-    <item>
-        <title>Rotton Tomatoes - Complete Listing of DVD/Videos</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/complete_dvds.xml</url>
-    </item>
-
-    <item>
         <title>Rotton Tomatoes - Top DVDs</title>
         <url>http://i.rottentomatoes.com/syndication/rss/top_dvds.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - New DVD Releases</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/new_releases.xml</url>
+        <title>Rotton Tomatoes - Top Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/top_movies.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh Top DVD/Video Pick</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/video_certified_fresh.xml</url>
+        <title>Rotton Tomatoes - Top Movie News</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/top_news.xml</url>
     </item>
 
     <item>
-        <title>Rotton Tomatoes - Certified Fresh on DVD/Video</title>
-        <url>http://i.rottentomatoes.com/syndication/rss/complete_certified_fresh_dvds.xml</url>
+        <title>Rotton Tomatoes - Upcoming Movies</title>
+        <url>http://i.rottentomatoes.com/syndication/rss/upcoming.xml</url>
     </item>
+
 </category>
 
 <category name="G4TV">
 
     <item>
-        <title>G4TV X-Play Daily Video Podcast</title>
-        <url>http://www.g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
-    </item> 
-
-    <item>
         <title>G4TV Attack of the Show Daily Video Podcast</title>
         <url>http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>G4TV The Daily Feed Video Podcast</title>
-        <url>http://www.g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
 
@@ -483,8 +467,13 @@
     </item> 
 
     <item>
-        <title>G4TV The Daily Nut</title>
-        <url>http://www.g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
+        <title>G4TV Cinematech: Nocturnal Emissions Video Podcast</title>
+        <url>http://www.g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>G4TV Cinematech Video Podcast</title>
+        <url>http://www.g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
 
@@ -494,6 +483,12 @@
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
 
+    <item>
+        <title>G4TV Filter Video Podcast</title>
+        <url>http://www.g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item>
+ 
     <item>
         <title>G4TV Formula D Video Podcast</title>
         <url>http://www.g4tv.com/formulad/podcasts/18/Formula_D_Video_Podcast.xml</url>
@@ -507,48 +502,42 @@
     </item> 
 
     <item>
+        <title>G4TV The Daily Feed Video Podcast</title>
+        <url>http://www.g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>G4TV The Daily Nut</title>
+        <url>http://www.g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
+        <ico>http://www.g4tv.com/favicon.ico</ico>
+    </item> 
+
+    <item>
         <title>G4TV The Man Show Video Podcast</title>
         <url>http://www.g4tv.com/themanshow/podcasts/14/The_Man_Show_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
-        <title>G4TV Cinematech Video Podcast</title>
-        <url>http://www.g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
+        <title>G4TV X-Play Daily Video Podcast</title>
+        <url>http://www.g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
         <ico>http://www.g4tv.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>G4TV Cinematech: Nocturnal Emissions Video Podcast</title>
-        <url>http://www.g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>G4TV Filter Video Podcast</title>
-        <url>http://www.g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
-    </item> 
+    </item>
 
 </category>
 
 <category name="GoogleVideo">
 
     <item>
-        <title>Google Video Top 100 New Videos</title>
-        <url>http://video.google.com/videofeed?type=search&amp;q=type:gpick&amp;output=rss</url>
-        <ico>http://video.google.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Google Video Google Picks</title>
-        <url>http://video.google.com/videofeed?type=gpickw&amp;output=rss</url>
-        <ico>http://video.google.com/favicon.ico</ico>
-    </item> 
-
-    <item>
         <title>Google Video Comedy</title>
         <url>http://video.google.com/videofeed?type=search&amp;q=genre:comedy&amp;so=1</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Google Video Movie Trailers</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:movie_trailer&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
 
@@ -559,8 +548,14 @@
     </item> 
 
     <item>
-        <title>Google Video Movie Trailers</title>
-        <url>http://video.google.com/videofeed?type=search&amp;q=type:movie_trailer&amp;so=1</url>
+        <title>Google Video Top 100 New Videos</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=type:gpick&amp;output=rss</url>
+        <ico>http://video.google.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Google Video TV Educational</title>
+        <url>http://video.google.com/videofeed?type=search&amp;q=genre:educational&amp;so=1</url>
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
 
@@ -576,11 +571,6 @@
         <ico>http://video.google.com/favicon.ico</ico>
     </item> 
 
-    <item>
-        <title>Google Video TV Educational</title>
-        <url>http://video.google.com/videofeed?type=search&amp;q=genre:educational&amp;so=1</url>
-        <ico>http://video.google.com/favicon.ico</ico>
-    </item> 
 
 </category>
 
@@ -619,7 +609,7 @@
 
     <item>
         <title>The Onion</title>
-        <url>http://www.theonion.com/content/feeds/weekly</url>
+        <url>http://feeds.theonion.com/theonion/weekly</url>
     </item>
 
 </category>
@@ -655,7 +645,7 @@
 
     <item>
         <title>Topix: World News</title>
-        <url>http://www.topix.net/rss/world/world.xml</url>
+        <url>http://www.topix.net/rss/world</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
@@ -670,17 +660,17 @@
     
     <item>
         <title>Linux Journal</title>
-        <url>http://www.linuxjournal.com/node/feed</url>
+        <url>http://feeds.feedburner.com/linuxjournalcom</url>
     </item>
 
     <item>
         <title>Make</title>
-        <url>http://makezine.com/blog/index.rss</url>
+        <url>http://blog.makezine.com/index.rss</url>
     </item>
 
     <item>
         <title>TIME - Top Stories</title>
-        <url>http://rss.time.com/web/time/rss/top/index.xml</url>
+        <url>	http://feeds.feedburner.com/time/topstories</url>
 	<ico>http://www.time.com/favicon.ico</ico>
     </item>
 
@@ -819,13 +809,8 @@
 <category name="MythTV">
 
     <item>
-        <title>KnoppMyth Wiki</title>
-        <url>http://www.knoppmythwiki.org/index.php?page=rss/KnoppMythWiki</url>
-    </item>
-
-    <item>
-        <title>KnoppMyth</title>
-        <url>http://www.mysettopbox.tv/index.xml</url>
+        <title>Mythbuntu </title>
+        <url>http://www.mythbuntu.org/rss.xml</url>
     </item>
 
     <item>
@@ -835,9 +820,8 @@
 
     <item>
         <title>MythPVR</title>
-        <url>http://www.mythpvr.com/mythtv/rss.xml</url>
+        <url>http://feeds.feedburner.com/mythtv</url>
     </item>
-
 
     <item>
         <title>MythTV - Commits</title>
@@ -853,6 +837,11 @@
         <title>MythTV - Users</title>
         <url>http://www.gossamer-threads.com/lists/mythtv/users.xml</url>
     </item>
+
+    <item>
+        <title>MythTV - Wiki Recent Changes</title>
+        <url>http://www.mythtv.org/wiki/index.php?title=Special:Recentchanges&amp;feed=rss</url>
+    </item>
   
 </category>
 
@@ -865,62 +854,14 @@
     </item>
 
     <item>
-        <title>Reuters Video Top News</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=3fe70fe45a9e09f79818a5848a0a6039e8e2a37b</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video In Depth</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video In Depth</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video Entertainment</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=189f8813eb619acad6694531e1004d4fcae3c097</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video Oddly Enough</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=4ccf1d535d893e464710e92b6722e47e8a3524df</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video Business</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=6ffc0233e09c26943b265ef3abd575b2d872818b</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video Technology</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=d45538fb92ef02a065c15e16d3dd6a297c2ae7d7</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>Reuters Video Archive</title>
-        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=2ec8a55340373e6476cf68c0942c4a804b8abd47</url>
-        <ico>http://www.reuters.com/favicon.ico</ico>
+        <title>CNN All Access - Backstage Pass Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/allaccess/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>CNN Daily Video Podcast</title>
         <url>http://rss.cnn.com/services/podcasting/cnnnewsroom/rss.xml</url>
-        <ico>http://rss.cnn.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>CNN Now in the News Commuter Edition Daily Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/nitn/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
 
@@ -931,32 +872,19 @@
     </item> 
 
     <item>
-        <title>CNN All Access - Backstage Pass Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/allaccess/rss.xml</url>
+        <title>CNN Now in the News Commuter Edition Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/nitn/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
 
     <item>
-        <title>CNN The Glenn Beck Show Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/askglenn/rss.xml</url>
+        <title>CNN Late Edition with Wolf Blitzer Weekly Video Podcast</title>
+        <url>http://www.cnn.com/services/podcasting/lateedition/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
-
-    <item>
-        <title>CNN The Gryst Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/thegrist/rss.xml</url>
-        <ico>http://rss.cnn.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>CNN SHOWandTELL Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/showandtell/rss.xml</url>
-        <ico>http://rss.cnn.com/favicon.ico</ico>
-    </item> 
-
     <item>
         <title>CNN Paging Dr. Gupta Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/doctalk/rss.xml</url>
+        <url>http://rss.cnn.com/services/podcasting/gupta/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
 
@@ -967,8 +895,31 @@
     </item> 
 
     <item>
-        <title>CNN Late Edition with Wolf Blitzer Weekly Video Podcast</title>
-        <url>http://www.cnn.com/services/podcasting/lateedition/rss.xml</url>
+        <title>CNN SHOWandTELL Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/showandtell/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>CNN Special Programming Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/rss/cnn_specialvideo.rss</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+    <item>
+        <title>CNN Student News Daily Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/studentnews/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>CNN The Glenn Beck Show Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/glennbeck/rss.xml</url>
+        <ico>http://rss.cnn.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>CNN The Gryst Weekly Video Podcast</title>
+        <url>http://rss.cnn.com/services/podcasting/absurd/rss.xml</url>
         <ico>http://rss.cnn.com/favicon.ico</ico>
     </item> 
 
@@ -979,15 +930,45 @@
     </item> 
 
     <item>
-        <title>CNN Student News Daily Video Podcast</title>
-        <url>http://rss.cnn.com/services/podcasting/studentnews/rss.xml</url>
-        <ico>http://rss.cnn.com/favicon.ico</ico>
+        <title>Reuters Video Archive</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=2ec8a55340373e6476cf68c0942c4a804b8abd47</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
 
     <item>
-        <title>CNN Special Programming Weekly Video Podcast</title>
-        <url>http://rss.cnn.com/rss/cnn_bestinlife.rss</url>
-        <ico>http://rss.cnn.com/favicon.ico</ico>
+        <title>Reuters Video Business</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=6ffc0233e09c26943b265ef3abd575b2d872818b</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Reuters Video Entertainment</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=189f8813eb619acad6694531e1004d4fcae3c097</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Reuters Video In Depth</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=9784d2e333d72cb34b52f788c6e44bb63d086ef0</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Reuters Video Oddly Enough</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=4ccf1d535d893e464710e92b6722e47e8a3524df</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Reuters Video Technology</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=d45538fb92ef02a065c15e16d3dd6a297c2ae7d7</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>Reuters Video Top News</title>
+        <url>http://today.reuters.com/tv/rss/default.aspx?channelId=3fe70fe45a9e09f79818a5848a0a6039e8e2a37b</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
     </item> 
 
 </category>
@@ -1073,8 +1054,8 @@
 <category name="Recreation">
 
     <item>
-        <title>Reuters Life and Leisure</title>
-        <url>http://feeds.reuters.com/reuters/lifeAndLeisureNews/</url>
+        <title>Reuters Lifestyle</title>
+        <url>http://feeds.reuters.com/reuters/Lifestyle</url>
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
@@ -1129,7 +1110,7 @@
 
     <item>
         <title>Expressen (SE)</title>
-        <url>http://expressen.se/rss/nyheter</url>
+        <url>http://www.expressen.se/1.573280?standAlone=true</url>
     </item>
 
     <item>
@@ -1712,7 +1693,7 @@
 
     <item>
         <title>Baseball Primer</title>
-        <url>http://www.baseballthinkfactory.org/files/main/rss_2.0/</url>
+        <url>http://www.baseballthinkfactory.org/files/newsstand/rss_2.0</url>
     </item>
 
     <item>
@@ -1733,7 +1714,7 @@
 
     <item>
         <title>Expressen sport (SE)</title>
-        <url>http://expressen.se/rss/sport</url>
+        <url>http://www.expressen.se/1.573281?standAlone=true</url>
     </item>
 
     <item>
@@ -1754,25 +1735,25 @@
 
     <item>
         <title>Topix: NFL</title>
-        <url>http://www.topix.net/rss/nfl/nfl.xml</url>
+        <url>http://www.topix.net/rss/nfl</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
     <item>
         <title>Topix: Racing</title>
-        <url>http://www.topix.net/rss/racing/racing.xml</url>
+        <url>http://www.topix.net/rss/racing</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
     <item>
         <title>Topix: Sports</title>
-        <url>http://www.topix.net/rss/sports/sports.xml</url>
+        <url>http://www.topix.net/rss/sports</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
     <item>
         <title>Topix: World Soccer</title>
-        <url>http://www.topix.net/rss/world-soccer/world-soccer.xml</url>
+        <url>http://www.topix.net/rss/world-soccer</url>
         <ico>http://www.topix.net/favicon.ico</ico>
     </item>
 
@@ -1780,31 +1761,7 @@
 
 <category name="YouTube">
 
-    <item>
-        <title>YouTube Recently Featured</title>
-        <url>http://youtube.com/rss/global/recently_featured.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Recently Added</title>
-        <url>http://youtube.com/rss/global/recently_added.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Top Favorites</title>
-        <url>http://youtube.com/rss/global/top_favorites.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
-        <title>YouTube Top Rated</title>
-        <url>http://youtube.com/rss/global/top_rated.rss</url>
-        <ico>http://youtube.com/favicon.ico</ico>
-    </item> 
-
-    <item>
+   <item>
         <title>YouTube Most Viewed - Today</title>
         <url>http://youtube.com/rss/global/top_viewed_today.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
@@ -1829,8 +1786,32 @@
     </item>
     
     <item>
+        <title>YouTube Recently Added</title>
+        <url>http://youtube.com/rss/global/recently_added.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+
+    <item>
         <title>YouTube MythTV Channel</title>
         <url>http://www.youtube.com/rss/tag/mythtv.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>YouTube Recently Featured</title>
+        <url>http://youtube.com/rss/global/recently_featured.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>YouTube Top Favorites</title>
+        <url>http://youtube.com/rss/global/top_favorites.rss</url>
+        <ico>http://youtube.com/favicon.ico</ico>
+    </item> 
+
+    <item>
+        <title>YouTube Top Rated</title>
+        <url>http://youtube.com/rss/global/top_rated.rss</url>
         <ico>http://youtube.com/favicon.ico</ico>
     </item> 
 
