@@ -42,7 +42,7 @@
 
 using namespace std;
 
-TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls, 
+TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
                  int zoom, int width, int height, WFlags flags)
     :MythDialog(parent, name)
 {
@@ -69,7 +69,7 @@ TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls,
     scrollSpeed = gContext->GetNumSetting("WebBrowserScrollSpeed", 4);
     scrollPage = gContext->GetNumSetting("WebBrowserScrollMode", 1);
     hideScrollbars = gContext->GetNumSetting("WebBrowserHideScrollbars", 0);
-    if (scrollPage == 1) 
+    if (scrollPage == 1)
        scrollSpeed *= -1;  // scroll page vs background
 
     urlHistory.setAutoDelete(true);
@@ -109,7 +109,7 @@ TabView::~TabView()
 void TabView::pageCompleted(WebPage *page)
 {
     // Strip leading and trailing whitespace from page title
-    QString title = 
+    QString title =
             page->browser->htmlDocument().title().string().stripWhiteSpace();
 
     if (title.isEmpty())
@@ -190,7 +190,7 @@ void TabView::handleMouseAction(QString action)
     int step = 5;
 
     // speed up mouse movement if the same key is held down
-    if (action == lastMouseAction && 
+    if (action == lastMouseAction &&
            lastMouseActionTime.msecsTo(QTime::currentTime()) < 500)
     {
         lastMouseActionTime = QTime::currentTime();
@@ -205,32 +205,32 @@ void TabView::handleMouseAction(QString action)
         mouseKeyCount = 1;
     }
 
-    if (action == "MOUSEUP") 
+    if (action == "MOUSEUP")
     {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x(), curPos.y() - step);
     }
-    else if (action == "MOUSELEFT") 
+    else if (action == "MOUSELEFT")
     {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x() - step, curPos.y());
     }
-    else if (action == "MOUSERIGHT") 
+    else if (action == "MOUSERIGHT")
     {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x() + step, curPos.y());
     }
-    else if (action == "MOUSEDOWN") 
+    else if (action == "MOUSEDOWN")
     {
         QPoint curPos = QCursor::pos();
         QCursor::setPos(curPos.x(), curPos.y() + step);
     }
-    else if (action == "MOUSELEFTBUTTON") 
+    else if (action == "MOUSELEFTBUTTON")
     {
         QPoint curPos = mouse->pos();
         QWidget *widget = QApplication::widgetAt(curPos, TRUE);
 
-        if (widget) 
+        if (widget)
         {
             curPos = widget->mapFromGlobal(curPos);
 
@@ -240,7 +240,7 @@ void TabView::handleMouseAction(QString action)
 
             me = new QMouseEvent(QEvent::MouseButtonRelease, curPos,
                                 Qt::LeftButton, Qt::NoButton);
-            QApplication::postEvent(widget, me); 
+            QApplication::postEvent(widget, me);
         }
     }
 }
@@ -275,7 +275,7 @@ void TabView::actionRemoveTab()
 
     int index = mytab->currentPageIndex();
 
-    // delete web pages stored in history 
+    // delete web pages stored in history
     urlHistory.remove(index);
 
     // delete current web page
@@ -315,15 +315,15 @@ void TabView::actionAddBookmark()
     caption->setAlignment(Qt::AlignCenter);
 
     popup->addLabel(tr("Group:"), MythPopupBox::Small);
-    MythRemoteLineEdit *group = new MythRemoteLineEdit(popup); 
+    MythRemoteLineEdit *group = new MythRemoteLineEdit(popup);
     popup->addWidget(group);
 
     popup->addLabel(tr("Description:"), MythPopupBox::Small);
-    MythRemoteLineEdit *desc = new MythRemoteLineEdit(popup); 
+    MythRemoteLineEdit *desc = new MythRemoteLineEdit(popup);
     popup->addWidget(desc);
 
     popup->addLabel(tr("URL:"), MythPopupBox::Small);
-    MythRemoteLineEdit *url = new MythRemoteLineEdit(popup); 
+    MythRemoteLineEdit *url = new MythRemoteLineEdit(popup);
     url->setText(((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
     popup->addWidget(url);
 
@@ -354,7 +354,7 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     QString descStr = QString(desc);
     QString urlStr = QString(url);
     urlStr.stripWhiteSpace();
-    if( !urlStr.startsWith("http://") && !urlStr.startsWith("https://") && 
+    if( !urlStr.startsWith("http://") && !urlStr.startsWith("https://") &&
             !urlStr.startsWith("file:/") )
         urlStr.prepend("http://");
 
@@ -394,7 +394,7 @@ void TabView::showEnterURLDialog()
 
     MythRemoteLineEdit *editor = new MythRemoteLineEdit(popup);
     popup->addWidget(editor);
-    editor->setFocus(); 
+    editor->setFocus();
 
     popup->addButton(tr("OK"),     popup, SLOT(accept()));
     popup->addButton(tr("Cancel"), popup, SLOT(reject()));
@@ -427,9 +427,9 @@ void TabView::newPage(QString sURL)
     connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
             this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
 
-    connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &, 
-                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ), 
-            this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &, 
+    connect(page, SIGNAL( newWindowRequested( const KURL &, const KParts::URLArgs &,
+                  const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ),
+            this, SLOT( newWindowRequested( const KURL &, const KParts::URLArgs &,
                                   const KParts::WindowArgs &, KParts::ReadOnlyPart *&) ) );
     connect(page, SIGNAL( pageCompleted(WebPage *) ),
             this, SLOT( pageCompleted(WebPage *) ) );
@@ -451,8 +451,8 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
 
     if (mytab->tabLabel(mytab->currentPage()) == "")
     {
-        // if the tab title is blank then a new blank web page has already been 
-        // created for a popup window just need to open the URL 
+        // if the tab title is blank then a new blank web page has already been
+        // created for a popup window just need to open the URL
         ((WebPage*)mytab->currentPage())->openURL(url.url());
 
         mytab->setTabLabel(mytab->currentPage(), tr("Loading..."));
@@ -485,7 +485,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 {
     object = object;
 
-    if (event->type() == QEvent::MouseButtonPress) 
+    if (event->type() == QEvent::MouseButtonPress)
     {
         QMouseEvent* me = (QMouseEvent*)event;
 
@@ -500,19 +500,19 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         }
     }
 
-    if (event->type() == QEvent::MouseButtonRelease) 
+    if (event->type() == QEvent::MouseButtonRelease)
     {
         QMouseEvent* me = (QMouseEvent*)event;
         lastButtonState = me->stateAfter();
     }
 
     QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
-    if (event->type() == QEvent::Show) 
+    if (event->type() == QEvent::Show)
     {
-        // hide scrollbars - kind of a hack to do it on a show event but 
-        // for some reason I can't get it to work upon creation of the page 
+        // hide scrollbars - kind of a hack to do it on a show event but
+        // for some reason I can't get it to work upon creation of the page
         //   - TSH
-        if (hideScrollbars) 
+        if (hideScrollbars)
         {
             QScrollView *view=((WebPage*)mytab->currentPage())->browser->view();
             view->setVScrollBarMode(QScrollView::AlwaysOff);
@@ -522,7 +522,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 
     // MouseMove while middlebutton pressed pans page
     int deltax = 0, deltay = 0;
-    if (event->type() == QEvent::MouseMove) 
+    if (event->type() == QEvent::MouseMove)
     {
         QMouseEvent* me = (QMouseEvent*)event;
         lastButtonState = me->stateAfter();
@@ -530,11 +530,11 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         deltay = me->globalY() - lastPosY;
         deltax *= scrollSpeed;
         deltay *= scrollSpeed;
-        if (lastPosX != -1 
-//            && (lastButtonState & (LeftButton|AltButton)) 
-            && (lastButtonState & (MidButton|AltButton)) 
+        if (lastPosX != -1
+//            && (lastButtonState & (LeftButton|AltButton))
+            && (lastButtonState & (MidButton|AltButton))
             && !view->isHorizontalSliderPressed()
-            && !view->isVerticalSliderPressed() ) 
+            && !view->isVerticalSliderPressed() )
         {
             view->scrollBy(deltax, deltay);
         }
@@ -543,18 +543,18 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
     }
 
     // MouseWheel scrolling while middlebutton/ctrlkey pressed to zoom in/out
-    if (event->type() == QEvent::Wheel) 
+    if (event->type() == QEvent::Wheel)
     {
         QWheelEvent* we = (QWheelEvent*)event;
-        if (lastButtonState & MidButton || we->state() & AltButton) 
+        if (lastButtonState & MidButton || we->state() & AltButton)
         {
-            if (we->delta() > 0) 
+            if (we->delta() > 0)
             {
                 we->accept();
                 ((WebPage*)mytab->currentPage())->zoomIn();
                 return true;
             }
-            else if (we->delta() < 0)  
+            else if (we->delta() < 0)
             {
                 we->accept();
                 ((WebPage*)mytab->currentPage())->zoomOut();
@@ -598,7 +598,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
             QString action = actions[i];
             handled = true;
 
-            if (action == "TOGGLEINPUT") 
+            if (action == "TOGGLEINPUT")
             {
                 if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
                 {
@@ -607,7 +607,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
 
                     inputToggled = true;
                     VirtualKeyboard *keyboard = new VirtualKeyboard(
-                        gContext->GetMainWindow(), 
+                        gContext->GetMainWindow(),
                         ((WebPage*)mytab->currentPage())->browser->view());
                     gContext->GetMainWindow()->detach(keyboard);
                     keyboard->exec();
@@ -627,7 +627,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
             if (inputToggled)
                 return false;
 
-            if (action == "NEXTTAB") 
+            if (action == "NEXTTAB")
             {
                 actionNextTab();
                 return true;
@@ -661,7 +661,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 actionZoomOut();
                 return true;
             }
-            else if (action == "MOUSEUP" || action == "MOUSEDOWN" || 
+            else if (action == "MOUSEUP" || action == "MOUSEDOWN" ||
                      action == "MOUSELEFT" || action == "MOUSERIGHT" ||
                      action == "MOUSELEFTBUTTON") {
                 handleMouseAction(action);
