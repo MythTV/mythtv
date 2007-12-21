@@ -14,6 +14,7 @@
       <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
       <modelDescription>MythTV AV Media Server</modelDescription>
       <modelURL>http://www.mythtv.org/</modelURL>
+      <presentationURL>/</presentationURL>
       <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMS-1.00</dlna:X_DLNADOC>
       <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
       <deviceList>
@@ -26,7 +27,8 @@
           <modelName>MythTV Master Media Server</modelName>
           <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
           <modelDescription>MythTV AV Media Server</modelDescription>
-          <modelURL>http://www.mythtv.org/</modelURL>
+	  <modelURL>http://www.mythtv.org/</modelURL>
+	  <presentationURL>/</presentationURL>
           <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
          </device>
       </deviceList>
