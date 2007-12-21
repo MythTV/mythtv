@@ -14,7 +14,6 @@
      <!-- uncomment to override defaults <modelNumber>0.20</modelNumber> -->
      <modelDescription>MythTV Slave Media Server</modelDescription>
      <modelURL>http://www.mythtv.org/</modelURL>
-     <presentationURL>/</presentationURL>
      <!-- uncomment to override defaults <serialNumber>MYTHTV-UPNP-01</serialNumber> -->
    </device>
 </root>
