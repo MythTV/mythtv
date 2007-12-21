@@ -932,58 +932,77 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     AlbumMap                       album_map;
     AlbumMap::iterator             Ialbum;
     QString                        album;
-    
+
     typedef map<QString, uint32_t> ArtistMap;
     ArtistMap                      artist_map;
     ArtistMap::iterator            Iartist;
     QString                        artist;
-    
-    for(it = songs.first(); it; it = songs.next())
+
+    for (it = songs.first(); it; it = songs.next())
     {
-        if(!it->getCDFlag())
+        if (!it->getCDFlag())
         {
-            if(it->getValue() == 0)
+            if (it->getValue() == 0)
             {
                 VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
                                       "shouldn't happen.");
             }
-            if(it->getValue() > 0)
+            if (it->getValue() > 0)
             {
                 // Normal track
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
                 if (tmpdata && tmpdata->isVisible())
                 {
-                    if (songs.at() == 0) { // first song
+                    if (songs.at() == 0) 
+                    { // first song
                         playcountMin = playcountMax = tmpdata->PlayCount();
                         lastplayMin = lastplayMax = tmpdata->LastPlay();
-                    } else {
-                        if (tmpdata->PlayCount() < playcountMin) { playcountMin = tmpdata->PlayCount(); }
-                        else if (tmpdata->PlayCount() > playcountMax) { playcountMax = tmpdata->PlayCount(); }
-                 
-                        if (tmpdata->LastPlay() < lastplayMin) { lastplayMin = tmpdata->LastPlay(); }
-                        else if (tmpdata->LastPlay() > lastplayMax) { lastplayMax = tmpdata->LastPlay(); }
+                    }
+                    else 
+                    {
+                        if (tmpdata->PlayCount() < playcountMin)
+                            playcountMin = tmpdata->PlayCount();
+                        else if (tmpdata->PlayCount() > playcountMax)
+                            playcountMax = tmpdata->PlayCount();
+
+                        if (tmpdata->LastPlay() < lastplayMin)
+                            lastplayMin = tmpdata->LastPlay();
+                        else if (tmpdata->LastPlay() > lastplayMax) 
+                            lastplayMax = tmpdata->LastPlay();
                     }
                 }
-                
+                // pre-fill the album-map with the album name.  This allows us to do album mode in album order
+                album = tmpdata->Album();
+                if ((Ialbum = album_map.find(album)) == album_map.end()) 
+                {
+                    album_map.insert(AlbumMap::value_type(album,0));
+                }
+
                 // pre-fill the artist map with the artist name and song title
                 artist = tmpdata->Artist() + "~" + tmpdata->Title();
                 if ((Iartist = artist_map.find(artist)) == artist_map.end()) 
                 {
-                  artist_map.insert(ArtistMap::value_type(artist,
-                                                        0));
+                  artist_map.insert(ArtistMap::value_type(artist,0));
                 }
             }
         }
     }
+    // populate the sort id into the album map
+    uint32_t album_count = 1; 
+    for (Ialbum = album_map.begin(); Ialbum != album_map.end(); Ialbum++)
+    {
+        Ialbum->second = album_count;
+        album_count++;
+    }
 
     // populate the sort id into the artist map
     uint32_t count = 1; 
-    for( Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++ ) 
+    for (Iartist = artist_map.begin(); Iartist != artist_map.end(); Iartist++)
     {
         Iartist->second = count;
         count++;
-    }    
-    
+    }
+
     int RatingWeight = 2;
     int PlayCountWeight = 2;
     int LastPlayWeight = 2;
@@ -992,16 +1011,16 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     parent->FillIntelliWeights(RatingWeight, PlayCountWeight, LastPlayWeight,
                                RandomWeight);
 
-    for(it = songs.first(); it; it = songs.next())
+    for (it = songs.first(); it; it = songs.next())
     {
-        if(!it->getCDFlag())
+        if (!it->getCDFlag())
         {
-            if(it->getValue() == 0)
+            if (it->getValue() == 0)
             {
                 VERBOSE(VB_IMPORTANT, "Song with ID of 0 in playlist, this "
                                       "shouldn't happen.");
             }
-            if(it->getValue() > 0)
+            if (it->getValue() > 0)
             {
                 // Normal track
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
@@ -1013,7 +1032,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     added_node->setAttribute(0, 1);
                     added_node->setAttribute(1, a_counter); //  regular order
                     added_node->setAttribute(2, rand()); //  random order
-                    
+
                     //
                     //  Compute "intelligent" weighting
                     //
@@ -1023,10 +1042,17 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     double lastplaydbl = tmpdata->LastPlay();
                     double ratingValue = (double)(rating) / 10;
                     double playcountValue, lastplayValue;
-                    if (playcountMax == playcountMin) { playcountValue = 0; }
-                    else { playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); }
-                    if (lastplayMax == lastplayMin) { lastplayValue = 0; }
-                    else { lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1); }
+
+                    if (playcountMax == playcountMin) 
+                        playcountValue = 0;
+                    else 
+                        playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1);
+
+                    if (lastplayMax == lastplayMin) 
+                        lastplayValue = 0;
+                    else
+                        lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1);
+
                     double rating_value =  (RatingWeight * ratingValue + PlayCountWeight * playcountValue + 
                                             LastPlayWeight * lastplayValue + RandomWeight * (double)rand() / 
                                             (RAND_MAX + 1.0));
@@ -1034,24 +1060,22 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     added_node->setAttribute(3, integer_rating); //  "intelligent" order
 
                     // "intellegent/album" order
-                    album = tmpdata->Artist() + "~" + tmpdata->Album();
-                    if ((Ialbum = album_map.find(album)) == album_map.end()) {
-                      // Add room for 100 albums with 100 tracks.
-                      integer_rating *= 10000;
-                      integer_rating += (a_counter * 100);
-
-                      album_map.insert(AlbumMap::value_type(album,
-                                                            integer_rating));
-
-                      integer_rating += tmpdata->Track();
-                      added_node->setAttribute(4, integer_rating);
+                    uint32_t album_order;
+                    album = tmpdata->Album();
+                    if ((Ialbum = album_map.find(album)) == album_map.end())
+                    {
+                        // we didn't find this album in the map, yet we pre-loaded them all
+                        // we are broken, but we just set the track order to 1, since there
+                        // is no real point in reporting an error
+                        album_order = 1;
                     }
-                    else {
-                      integer_rating = Ialbum->second;
-                      integer_rating += tmpdata->Track();
-                      added_node->setAttribute(4, integer_rating);
+                    else 
+                    {
+                        album_order = Ialbum->second * 100;
                     }
-                    
+                    album_order += tmpdata->Track();
+                    added_node->setAttribute(4, album_order);
+
                     // "artist" order, sorts by artist name then track title
                     // uses the pre-prepared artist map to do this
                     uint32_t integer_order;
@@ -1066,11 +1090,11 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     else
                     {
                         integer_order = Iartist->second;
-                    }    
+                    }
                     added_node->setAttribute(5, integer_order);
                 }
             }
-            if(it->getValue() < 0)
+            if (it->getValue() < 0)
             {
                 // it's a playlist, recurse (mildly)
                 Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
@@ -1088,7 +1112,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 QString a_string = QString("(CD) %1 ~ %2")
                   .arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
 
-                if(tmpdata->FormatArtist().length() < 1 ||
+                if (tmpdata->FormatArtist().length() < 1 ||
                    tmpdata->FormatTitle().length() < 1)
                 {
                     a_string = QString("(CD) Track %1").arg(tmpdata->Track());
@@ -1101,7 +1125,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 added_node->setAttribute(3, rand()); //  "intelligent" order
             }
         }
-    }  
+    }
     return a_counter;
 }
 
