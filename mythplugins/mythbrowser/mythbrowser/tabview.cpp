@@ -688,12 +688,23 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
                 view->scrollBy(0, -view->visibleHeight() / 10);
                 return true;
-
             }
             else if (action == "DOWN") 
             {
                 KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
                 view->scrollBy(0, view->visibleHeight() / 10);
+                return true;
+            }
+            else if (action == "PAGEUP")
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(0, -view->visibleHeight());
+                return true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(0, view->visibleHeight());
                 return true;
             }
         }
