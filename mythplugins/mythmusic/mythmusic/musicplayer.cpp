@@ -25,6 +25,9 @@ using namespace std;
 #include "miniplayer.h"
 #include "playlist.h"
 
+// how long to wait before updating the lastplay and playcount fields
+#define LASTPLAY_DELAY 15
+
 MusicPlayer  *gPlayer = NULL;
 
 ////////////////////////////////////////////////////////////////
@@ -48,6 +51,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_isPlaying = false;
     m_canShowPlayer = true;
     m_wasPlaying = true;
+    m_updatedLastplay = false;
 
     QString playmode = gContext->GetSetting("PlayMode", "none");
     if (playmode.lower() == "random")
@@ -289,25 +293,10 @@ void MusicPlayer::play(void)
 
         if (m_currentNode)
         {
-            // FIXME this is ugly having to keep two metadata objects in sync
             if (m_currentNode->getInt() > 0)
             {
                 m_currentMetadata = Metadata::getMetadataFromID(m_currentNode->getInt());
-                if (m_currentMetadata)
-                {
-                    m_currentMetadata->incPlayCount();
-                    m_currentMetadata->setLastPlay();
-                }
-                // if all_music is still in scope we need to keep that in sync
-                if (gMusicData->all_music)
-                {
-                    Metadata *mdata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
-                    if (mdata)
-                    {
-                        mdata->incPlayCount();
-                        mdata->setLastPlay();
-                    }
-                }
+                m_updatedLastplay = false;
             }
             else
             {
@@ -546,6 +535,9 @@ void MusicPlayer::customEvent(QCustomEvent *event)
     {
         OutputEvent *oe = (OutputEvent *) event;
         m_currentTime = oe->elapsedSeconds();
+
+        if (!m_updatedLastplay && m_currentTime >= LASTPLAY_DELAY)
+            updateLastplay();
     }
 
     QObject::customEvent(event);
@@ -777,4 +769,29 @@ MusicPlayer::ShuffleMode MusicPlayer::toggleShuffleMode(void)
     }
 
     return m_shuffleMode;
+}
+
+void MusicPlayer::updateLastplay()
+{
+    // FIXME this is ugly having to keep two metadata objects in sync
+    if (m_currentNode && m_currentNode->getInt() > 0)
+    {
+        if (m_currentMetadata)
+        {
+            m_currentMetadata->incPlayCount();
+            m_currentMetadata->setLastPlay();
+        }
+        // if all_music is still in scope we need to keep that in sync
+        if (gMusicData->all_music)
+        {
+            Metadata *mdata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
+            if (mdata)
+            {
+                mdata->incPlayCount();
+                mdata->setLastPlay();
+            }
+        }
+    }
+
+    m_updatedLastplay = true;
 }

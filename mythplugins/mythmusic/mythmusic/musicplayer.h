@@ -104,6 +104,7 @@ class MusicPlayer : public QObject
     void stopDecoder(void);
     void openOutputDevice(void);
     QString getFilenameFromID(int id);
+    void updateLastplay(void);
 
     GenericTree *m_playlistTree;
 
@@ -125,6 +126,7 @@ class MusicPlayer : public QObject
     bool         m_isAutoplay;
     bool         m_canShowPlayer;
     bool         m_wasPlaying;
+    bool         m_updatedLastplay;
 
     ShuffleMode  m_shuffleMode;
     RepeatMode   m_repeatMode;
