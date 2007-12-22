@@ -1836,7 +1836,7 @@ void LCDProcClient::outputTime()
         dobigclock(0);
     else
     {
-        if (isRecording)
+        if (lcd_showrecstatus && isRecording)
             outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
         else
             outputCenteredText("Time", QDate::currentDate().toString(), "topWidget", 1);
