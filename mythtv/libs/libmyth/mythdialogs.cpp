@@ -1255,19 +1255,31 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
         rect_to_update = this->geometry();
     }
 
-    //
-    //  We paint offscreen onto a pixmap
-    //  and then BitBlt it over
-    //
+    UpdateForegroundRect(rect_to_update);
 
+    redrawRect = QRect(0, 0, 0, 0);
+}
+
+void MythThemedDialog::updateForegroundRegion(const QRect &r)
+{
+    // Note: DrawRegion is never actually called now. Instead
+    // of controls (only UIListTreeType did it) implementing an
+    // optimized paint, we rely on clipping regions.
+    UpdateForegroundRect(r);
+
+    update(r);
+}
+
+void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
+{
     QPainter whole_dialog_painter(&my_foreground);
 
     // Updating the background portion isn't optional. The old
     // behavior left remnants during context transitions if
     // they happened outside active containers for the current
     // context.
-    whole_dialog_painter.drawPixmap(rect_to_update.topLeft(), my_background,
-                                    rect_to_update);
+    whole_dialog_painter.drawPixmap(inv_rect.topLeft(), my_background,
+                                    inv_rect);
 
     QPtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
@@ -1282,7 +1294,7 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
         //  needed to be repainted
         //
 
-        const QRect intersect = rect_to_update.intersect(container_area);
+        const QRect intersect = inv_rect.intersect(container_area);
         int looper_context = looper->GetContext();
         if (container_area.isValid() &&
             (looper_context == context || looper_context == -1) &&
@@ -1314,7 +1326,7 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
             whole_dialog_painter.translate(container_area.left(),
                                            container_area.top());
 
-            for (int i = 0; i <= looper->getLayers(); i++)
+            for (int i = 0; i <= looper->getLayers(); ++i)
             {
                 looper->Draw(&whole_dialog_painter, i, context);
             }
@@ -1323,56 +1335,6 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
         }
         ++an_it;
     }
-
-    if (whole_dialog_painter.isActive())
-    {
-        whole_dialog_painter.end();
-    }
-
-    redrawRect = QRect(0, 0, 0, 0);
-}
-
-void MythThemedDialog::updateForegroundRegion(const QRect &r)
-{
-    QRect area = r;
-    QPainter whole_dialog_painter(&my_foreground);
-
-    QPtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while ((looper = an_it.current()) != 0)
-    {
-        QRect container_area = looper->GetAreaRect();
-
-        if (container_area.isValid() &&
-            r.intersects(container_area) &&
-            looper->GetName().lower() != "background")
-        {
-            QPixmap container_picture(r.size());
-            QPainter offscreen_painter(&container_picture);
-            offscreen_painter.drawPixmap(0, 0, my_background,
-                                         r.left(), r.top());
-
-            for (int i = 0; i <= looper->getLayers(); i++)
-            {
-                looper->DrawRegion(&offscreen_painter, area, i, context);
-            }
-
-            if (offscreen_painter.isActive())
-            {
-                offscreen_painter.end();
-                whole_dialog_painter.drawPixmap(r.topLeft(),
-                                                container_picture);
-            }
-
-        }
-        ++an_it;
-    }
-
-    if (whole_dialog_painter.isActive())
-        whole_dialog_painter.end();
-
-    update(r);
 }
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)

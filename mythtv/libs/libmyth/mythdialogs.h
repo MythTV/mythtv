@@ -397,6 +397,8 @@ class MPUBLIC MythThemedDialog : public MythDialog
 
     void ReallyUpdateForeground(const QRect &);
 
+    void UpdateForegroundRect(const QRect &inv_rect);
+
     XMLParse *theme;
     QDomElement xmldata;
     int context;
