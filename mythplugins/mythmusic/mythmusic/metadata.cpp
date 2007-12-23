@@ -431,6 +431,19 @@ void Metadata::dumpToDatabase()
             query.exec();
         }
     }
+
+    // make sure the compilation flag is updated
+    query.prepare("UPDATE music_albums SET compilation = :COMPILATION, year = :YEAR "
+                  "WHERE music_albums.album_id = :ALBUMID");
+    query.bindValue(":ALBUMID", m_albumid);
+    query.bindValue(":COMPILATION", m_compilation);
+    query.bindValue(":YEAR", m_year);
+
+    if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+    {
+        MythContext::DBError("music compilation update", query);
+        return;
+    }
 }
 
 // Default values for formats
