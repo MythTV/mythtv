@@ -128,6 +128,8 @@ class MusicPlayer : public QObject
     bool         m_wasPlaying;
     bool         m_updatedLastplay;
 
+    int          m_lastplayDelay;
+
     ShuffleMode  m_shuffleMode;
     RepeatMode   m_repeatMode;
     ResumeMode   m_resumeMode;

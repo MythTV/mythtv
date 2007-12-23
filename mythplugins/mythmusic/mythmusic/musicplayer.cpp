@@ -81,6 +81,8 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         m_resumeMode = RESUME_EXACT;
 
+    m_lastplayDelay = gContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
+
     gContext->addListener(this);
 }
 
@@ -536,8 +538,14 @@ void MusicPlayer::customEvent(QCustomEvent *event)
         OutputEvent *oe = (OutputEvent *) event;
         m_currentTime = oe->elapsedSeconds();
 
-        if (!m_updatedLastplay && m_currentTime >= LASTPLAY_DELAY)
+        if (!m_updatedLastplay)
+        {
+            // we update the lastplay and playcount after playing for m_lastplayDelay seconds
+            // or half the total track time
+            if ((m_currentMetadata &&  m_currentTime > (m_currentMetadata->Length() / 1000) / 2) ||
+                 m_currentTime >= m_lastplayDelay)
             updateLastplay();
+        }
     }
 
     QObject::customEvent(event);
