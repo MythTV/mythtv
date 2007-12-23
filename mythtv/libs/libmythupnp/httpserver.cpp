@@ -70,6 +70,18 @@ HttpServer::HttpServer( int nPort )
                                     .arg( uname_info.release );
 #endif
 
+    // ----------------------------------------------------------------------
+    // Initialize Share Path
+    // ----------------------------------------------------------------------
+
+    QString sInstallPrefix( PREFIX ), sLibDir;  
+
+    GetInstallPrefixPath( sInstallPrefix, sLibDir );  
+
+    m_sSharePath = sInstallPrefix + "/share/mythtv/";  
+
+    VERBOSE( VB_UPNP, QString( "HttpServer( %1 ) - SharePath = %2" ).arg( nPort ).arg( m_sSharePath ));
+
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
 }
