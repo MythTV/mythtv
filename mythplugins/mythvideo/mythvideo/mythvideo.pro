@@ -22,10 +22,14 @@ installfiles.files += dvdmenu.xml dvd_settings.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 
+installimages_wide.path = $${PREFIX}/share/mythtv/themes/default-wide
+installimages_wide.files = theme-wide/images/*.png
+
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
 installscripts.files = scripts/*
 
-INSTALLS += installfiles uifiles uifiles_wide installimages installscripts
+INSTALLS += installfiles uifiles uifiles_wide installimages installimages_wide
+INSTALLS += installscripts
 
 # Input
 
