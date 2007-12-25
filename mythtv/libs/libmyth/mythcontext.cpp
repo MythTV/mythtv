@@ -2599,7 +2599,8 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
         {
             value = d->settingsCache[key];
             d->settingsCacheLock.unlock();
-            return value;
+            if (!value.isNull)
+                return value;
         }
         d->settingsCacheLock.unlock();
     }
@@ -2644,7 +2645,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     if (!found)
         value = d->m_settings->GetSetting(key, defaultval); 
 
-    if (d && d->useSettingsCache)
+    if (!value.isNull() && d && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         d->settingsCache[key] = value;
