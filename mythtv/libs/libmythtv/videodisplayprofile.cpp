@@ -993,7 +993,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
 
     if (renderer == "directx")
         msg = QObject::tr(
-            "This is the only video renderer awailable on Microsoft Windows "
+            "This is the only video renderer available on Microsoft Windows "
             "systems.");
 
     if (renderer == "quartz-blit")
@@ -1050,7 +1050,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         QObject::tr("Perform no deinterlacing.") + " " +
         QObject::tr(
             "Use this with an interlaced display whose "
-            "resolution exactly mathes the video size. "
+            "resolution exactly matches the video size. "
             "This is incompatible with MythTV zoom modes.");
 
     QString kOneFieldMsg = QObject::tr(
