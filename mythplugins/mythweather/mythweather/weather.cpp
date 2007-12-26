@@ -64,7 +64,13 @@ Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
     setNoErase();
 
+    // Run once before loading the background container
+    // to create a background should the window not
+    // contain it's own background - Temporary workaround
+    // until mythui port.
+    updateBackground();
     setupScreens(xmldata);
+
     if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
         showLayout(m_startup);
     showtime_timeout();
