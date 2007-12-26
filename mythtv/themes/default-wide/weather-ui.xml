@@ -113,7 +113,7 @@
                 <position>22,175</position>
             </image>
 
-            <image name="logo" draworder="2">
+            <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>25,25</position>
                 <staticsize>150,110</staticsize>
@@ -261,11 +261,7 @@
                 <area>60,540,700,35</area>
                 <font>footer</font>
             </textarea>
-            <image name="logo" draworder="2">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>150,110</staticsize>
-            </image>
+
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -611,11 +607,7 @@
                 <area>60,70,700,35</area>
                 <font>footer</font>
             </textarea>
-            <image name="logo" draworder="2">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>100,73</staticsize>
-            </image>
+
             <textarea name="+smdesc" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -645,11 +637,7 @@
                 <area>60,70,700,35</area>
                 <font>footer</font>
             </textarea>
-            <image name="logo" draworder="2">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>100,73</staticsize>
-            </image>
+
             <textarea name="+amdesc" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
