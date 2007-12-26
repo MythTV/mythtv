@@ -90,7 +90,7 @@ MediaRenderer::MediaRenderer()
         // m_pHttpServer->RegisterExtension( m_pUPnpAVT = new UPnpAVTransport( RootDevice() ));
 
         VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering CMGR Service." ));
-        m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice(), "", sSinkProtocols ));
+        m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice(), "", "", sSinkProtocols ));
 
         // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering RenderingControl Service." ));
         // m_pHttpServer->RegisterExtension( m_pUPnpRCTL= new UPnpRCTL( RootDevice() ));

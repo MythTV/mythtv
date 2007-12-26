@@ -68,6 +68,7 @@ class UPnpCMGR : public Eventing
 
     public:
                  UPnpCMGR(  UPnpDevice *pDevice,
+                            const QString &sSharePath,
                             const QString &sSourceProtocols = "",
                             const QString &sSinkProtocols   = "" );
 

@@ -150,7 +150,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CMGR Service." );
 
-            m_pUPnpCMGR = new UPnpCMGR( RootDevice(), sSourceProtocols );
+            m_pUPnpCMGR = new UPnpCMGR( RootDevice(),
+                                        m_sSharePath, sSourceProtocols );
             m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CDS Service." );
