@@ -347,7 +347,12 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
     }
     else
+    {
+        VERBOSE(VB_UPNP,
+                QString("HTTPRequest::SendResponseFile(%1) - cannot find file!")
+                .arg(sFileName));
         m_nResponseStatus = 404;
+    }
 
     // -=>TODO: Should set "Content-Length: *" if file is still recording
 
@@ -502,9 +507,6 @@ void HTTPRequest::FormatActionResponse( NameValueList *pArgs )
 
 void HTTPRequest::FormatFileResponse( const QString &sFileName )
 {
-    m_eResponseType   = ResponseTypeHTML;
-    m_nResponseStatus = 404;
-
     m_sFileName = sFileName;
 
     if (QFile::exists( m_sFileName ))
@@ -513,6 +515,12 @@ void HTTPRequest::FormatFileResponse( const QString &sFileName )
         m_eResponseType                     = ResponseTypeFile;
         m_nResponseStatus                   = 200;
         m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    }
+    else
+    {
+        m_eResponseType   = ResponseTypeHTML;
+        m_nResponseStatus = 404;
+        VERBOSE(VB_UPNP, QString("HTTPRequest::FormatFileResponse(%1) - cannot find file").arg(sFileName));
     }
 }
 

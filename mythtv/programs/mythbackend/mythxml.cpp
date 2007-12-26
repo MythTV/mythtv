@@ -1361,6 +1361,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
         (sServerIP         != "localhost") &&
         (sServerIP         != sPeerIP    ))
     {
+        VERBOSE(VB_IMPORTANT, "MythXML::GetConnectionInfo() - DBHostName value of 'localhost' is inappropriate. Changing to " + sServerIP );
         params.dbHostName = sServerIP;
     }
 
