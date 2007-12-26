@@ -3488,9 +3488,10 @@ I	| move a program from one Recording Group to another
 1 or F1		| Meaning of the icons @
 /		| Tags a recording.  Tagged recordings can be played&nbsp;
                   either in order or shuffled and deleted as a group.&nbsp;
-		  You can also change the recording group for several recordings&nbsp;
-		  at once by tagging them and using the popup INFO menu to change&nbsp;
-		  the recording group. @
+                  You can also change the recording group for several&nbsp;
+                  recordings at once by tagging them and using the &nbsp;
+                  Menu (m) button, selecting "Playlist options", &nbsp;
+                  then "Change Recording Group". @
 ?		| Clear the tagged list.
 </tabular>
 </table>
