@@ -113,7 +113,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         // Make sure our device Description is loaded.
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, QString( "MediaServer::Loading UPnp Description" ));
+        VERBOSE(VB_UPNP, "MediaServer::Loading UPnp Description" + sFileName );
 
         g_UPnpDeviceDesc.Load( sFileName );
 
@@ -124,7 +124,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         // Register the MythXML protocol... 
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, QString( "MediaServer::Registering MythXML Service." ));
+        VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
 
         m_pHttpServer->RegisterExtension( new MythXML( pMythDevice ));
 
@@ -144,21 +144,23 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
                                        "http-get:*:video/nupplevideo:*,"
                                        "http-get:*:video/x-ms-wmv:*";
 
-            VERBOSE(VB_UPNP, QString( "MediaServer::Registering MSRR Service." ));
+            VERBOSE(VB_UPNP, "MediaServer::Registering MSRR Service." );
 
             m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice() ));
 
-            VERBOSE(VB_UPNP, QString( "MediaServer::Registering CMGR Service." ));
+            VERBOSE(VB_UPNP, "MediaServer::Registering CMGR Service." );
 
-            m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice(), sSourceProtocols ));
+            m_pUPnpCMGR = new UPnpCMGR( RootDevice(), sSourceProtocols );
+            m_pHttpServer->RegisterExtension( m_pUPnpCMGR );
 
-            VERBOSE(VB_UPNP, QString( "MediaServer::Registering CDS Service." ));
+            VERBOSE(VB_UPNP, "MediaServer::Registering CDS Service." );
 
-            m_pHttpServer->RegisterExtension( m_pUPnpCDS = new UPnpCDS ( RootDevice() ));
+            m_pUPnpCDS = new UPnpCDS ( RootDevice() ));
+            m_pHttpServer->RegisterExtension( m_pUPnpCDS );
 
-            // ------------------------------------------------------------------
+            // ----------------------------------------------------------------
             // Register CDS Extensions
-            // ------------------------------------------------------------------
+            // ----------------------------------------------------------------
 
             VERBOSE(VB_UPNP, "MediaServer::Registering UPnpCDSTv Extension");
 
