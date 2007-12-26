@@ -2,9 +2,14 @@
 #define MYTHVERBOSE_H_
 
 #ifdef __cplusplus
-    #include <qdatetime.h>
+#   include <qdatetime.h>
 
     using namespace std;
+#else
+#   if !defined(_WIN32)
+#      include <sys/time.h> // for gettimeofday
+#   endif
+#   include <time.h> // for localtime()
 #endif
 
 #include "mythexp.h"  // MPUBLIC, et c.
