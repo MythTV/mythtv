@@ -113,7 +113,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         // Make sure our device Description is loaded.
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, "MediaServer::Loading UPnp Description" + sFileName );
+        VERBOSE(VB_UPNP, "MediaServer::Loading UPnp Description " + sFileName );
 
         g_UPnpDeviceDesc.Load( sFileName );
 
@@ -155,7 +155,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CDS Service." );
 
-            m_pUPnpCDS = new UPnpCDS ( RootDevice() ));
+            m_pUPnpCDS = new UPnpCDS ( RootDevice() );
             m_pHttpServer->RegisterExtension( m_pUPnpCDS );
 
             // ----------------------------------------------------------------
