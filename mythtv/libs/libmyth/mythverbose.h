@@ -6,10 +6,12 @@
 
     using namespace std;
 #else
+# ifdef HAVE_GETTIMEOFDAY
 #   if !defined(_WIN32)
 #      include <sys/time.h> // for gettimeofday
 #   endif
 #   include <time.h> // for localtime()
+# endif
 #endif
 
 #include "mythexp.h"  // MPUBLIC, et c.
@@ -120,7 +122,6 @@ extern MPUBLIC unsigned int print_verbose_messages;
                      << " " << args << endl;
     #else
         #ifdef HAVE_GETTIMEOFDAY
-            #include <sys/time.h>
             #define VERBOSEDATE                              \
             {                                                \
                 struct tm      *tp;                          \
