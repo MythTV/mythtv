@@ -114,9 +114,26 @@ extern MPUBLIC unsigned int print_verbose_messages;
                         .toString("yyyy-MM-dd hh:mm:ss.zzz") \
                      << " " << args << endl;
     #else
+        #ifdef HAVE_GETTIMEOFDAY
+            #include <sys/time.h>
+            #define VERBOSEDATE                              \
+            {                                                \
+                struct tm      *tp;                          \
+                struct timeval  tv;                          \
+                gettimeofday(&tv, NULL);                     \
+                tp = localtime(&tv.tv_sec);                  \
+                printf("%4d-%02d-%02d %2d:%02d:%02d.%03d ",  \
+                       1900+tp->tm_year, 1+tp->tm_mon,       \
+                       tp->tm_mday, tp->tm_hour, tp->tm_min, \
+                       tp->tm_sec, tv.tv_usec/10000);        \
+            }
+        #else
+            #define VERBOSEDATE ;
+        #endif
         #define VERBOSE(mask,args...)                        \
             if ((print_verbose_messages & (mask)) == (mask)) \
             {                                                \
+                VERBOSEDATE                                  \
                 printf(args);                                \
                 putchar('\n');                               \
             }
