@@ -67,11 +67,11 @@ static HostComboBox *AudioOutputDevice()
 #ifdef USING_COREAUDIO
     gc->addSelection("CoreAudio:", "CoreAudio:"); 
 #endif
-#ifdef USING_DIRECTX
-	gc->addSelection("DirectX:");
-#endif
 #ifdef USING_MINGW
 	gc->addSelection("Windows:");
+#endif
+#ifdef USING_DIRECTX
+	gc->addSelection("DirectX:");
 #endif
     gc->addSelection("NULL", "NULL");
 
