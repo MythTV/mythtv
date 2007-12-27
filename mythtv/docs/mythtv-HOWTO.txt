@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-09-04, v0.20.26
+  2007-12-27, v0.20.27
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -4141,7 +4141,7 @@
 
 
   1 or F1     Meaning of the icons
-        /     Tags a recording. Tagged recordings can be played either in order or shuffled and deleted as a group. You can also change the recording group for several recordings at once by tagging them and using the popup INFO menu to change the recording group.
+        /     Tags a recording. Tagged recordings can be played either in order or shuffled and deleted as a group. You can also change the recording group for several recordings at once by tagging them and using the  Menu (m) button, selecting "Playlist options",  then "Change Recording Group".
         ?     Clear the tagged list.
 
 
@@ -6763,7 +6763,9 @@
   have discovered a genuine code-bug,  or if the problem is with your
   system.  In order to determine what's going on, you must recompile
   MythTV with debugging support and run MythTV within [1mgdb[22m, the GNU
-  debugger.
+  debugger.  Note that, on OS X, some data is provided without going
+  through these steps.  See
+  /Library/Logs/CrashReporter/MythFrontend.crash.log
 
   Re-run the [1mconfigure [22mscript and add --compile-type=debug to any
   previous configuration options you may have used.  Check the
@@ -6805,15 +6807,17 @@
 
 
 
-       $ gdb mythbackend -x gdbcommands
-       GNU gdb 6.3-debian
-       Copyright 2004 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
-       [Thread debugging using libthread_db enabled]
+  $ gdb mythbackend -x gdbcommands
+  GNU gdb 6.3-debian
+  Copyright 2004 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
+  [Thread debugging using libthread_db enabled]
+
+
 
   [1mgdb [22mwill automatically read the commands that you've placed in the
   gdbcommands file and begin running the program you specified on the
@@ -6880,6 +6884,8 @@
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
+
+
   [1m22.4.  Using[0m
 
   [1m22.4.1.  No programs are displayed in "Watch Recordings"[0m
@@ -6988,13 +6994,14 @@
   Also, look for:
 
 
-       Section "Device"
-           Identifier "device1"
-           VendorName "nVidia Corporation"
-           BoardName "NVIDIA GeForce 256 (generic)"
-           Driver "nv"
-           Option "DPMS"
-       EndSection
+
+  Section "Device"
+      Identifier "device1"
+      VendorName "nVidia Corporation"
+      BoardName "NVIDIA GeForce 256 (generic)"
+      Driver "nv"
+      Option "DPMS"
+  EndSection
 
 
 
@@ -7005,24 +7012,23 @@
   Finally, check:
 
 
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
-
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
 
 
@@ -7049,7 +7055,6 @@
 
 
        $ xset -dpms s off
-
 
 
   Finally, depending on your distribution, you may be able to turn it
@@ -7261,7 +7266,6 @@
   in that case.
 
 
-
   [1m22.5.9.  Where's "canada-cable"?[0m
 
   [1m22.5.10.  Channels are off by one[0m
@@ -7324,7 +7328,6 @@
   decoding video.  Users have reported that rather than speeding up
   their video it appears to be doing the opposite.  You may want to
   check that your color depth is set for 24bpp.
-
 
 
   [1m22.5.17.  Computer is loading a media player application when you[0m
@@ -7513,6 +7516,8 @@
   but can also be run as a desktop application on a computer monitor.
   Here are a few consideration for configuring sizes to best suit you
   needs.
+
+
   [1m23.4.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,
@@ -7559,8 +7564,6 @@
   stretched to fit the entire GUI area regardless of the ``capture
   resolutions'' used. However, during playback, the "W" key can to used
   to correct differences between 16:9 and 4:3.
-
-
   [1m23.4.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
@@ -7622,7 +7625,6 @@
        mysql> quit
 
 
-
   [1m23.7.  Moving your data to new hardware[0m
 
   This assumes that you will be moving your data to newer / bigger
@@ -7634,14 +7636,13 @@
   Next, you will extract only the data that is relevant to the programs:
 
 
-
-  $ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
-  $ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
-  $ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
-  $ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
-  $ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
-  $ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
-  $ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
+       $ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
 
 
 
@@ -7684,6 +7685,7 @@
 
   After successful insertion of the data you may delete the restore.sql
   file.
+
 
 
   [1m23.8.  btaudio[0m
@@ -7756,16 +7758,15 @@
   MySQL:
 
 
-
-  $ mysql -u root mythconverg
-  mysql> select chanid from channel where channum=15;
-  +--------+
-  | chanid |
-  +--------+
-  |   1015 |
-  +--------+
-  1 row in set (0.00 sec)
-  mysql> delete from channel where chanid = 1015;
+       $ mysql -u root mythconverg
+       mysql> select chanid from channel where channum=15;
+       +--------+
+       | chanid |
+       +--------+
+       |   1015 |
+       +--------+
+       1 row in set (0.00 sec)
+       mysql> delete from channel where chanid = 1015;
 
 
 
@@ -7814,9 +7815,6 @@
   http://www.mythtv.org/wiki/index.php/Optimizing_Performance
   <http://www.mythtv.org/wiki/index.php/Optimizing_Performance> for
   additional information regarding performance optimization.
-
-
-
   [1m23.11.  Automatically starting mythfrontend at system boot time[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum

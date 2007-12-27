@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-09-04, v0.20.26
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-12-27, v0.20.27
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3851,7 +3851,7 @@ I       </TD><TD> move a program from one Recording Group to another
 <BR><CENTER>
 <TABLE BORDER><TR><TD>
 1 or F1 </TD><TD> Meaning of the icons </TD></TR><TR><TD>
-/ </TD><TD> Tags a recording. Tagged recordings can be played&nbsp;either in order or shuffled and deleted as a group.&nbsp;You can also change the recording group for several recordings&nbsp;at once by tagging them and using the popup INFO menu to change&nbsp;the recording group. </TD></TR><TR><TD>
+/ </TD><TD> Tags a recording. Tagged recordings can be played&nbsp;either in order or shuffled and deleted as a group.&nbsp;You can also change the recording group for several&nbsp;recordings at once by tagging them and using the &nbsp;Menu (m) button, selecting "Playlist options", &nbsp;then "Change Recording Group". </TD></TR><TR><TD>
 ? </TD><TD> Clear the tagged list.
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -6283,7 +6283,9 @@ an actual programming fault within gcc.</P>
 <P>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
-support and run MythTV within <B>gdb</B>, the GNU debugger.</P>
+support and run MythTV within <B>gdb</B>, the GNU debugger.
+Note that, on OS X, some data is provided without going through these steps.
+See &nbsp;/Library/Logs/CrashReporter/MythFrontend.crash.log</P>
 <P>Re-run the <B>configure</B> script and add <CODE>--compile-type=debug</CODE>
 to any previous configuration options you may have used.  Check the
 <CODE>config.log</CODE> file if you have forgotten.</P>
