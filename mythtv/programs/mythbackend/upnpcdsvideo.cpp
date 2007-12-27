@@ -236,9 +236,9 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             MSqlQuery               &query )
 {
     int            nVidID       = query.value( 0).toInt();
-    QString        sTitle       = query.value( 1).toString();
-    QString        sDirector    = query.value( 2).toString();
-    QString        sDescription = query.value( 3).toString();
+    QString        sTitle       = QString::fromUtf8(query.value( 1).toString());
+    QString        sDirector    = QString::fromUtf8(query.value( 2).toString());
+    QString        sDescription = QString::fromUtf8(query.value( 3).toString());
     QString        sYear        = query.value( 4).toString();
     QString        sUserRating  = query.value( 5).toString();
   //long long      nFileSize    = stringToLongLong( query.value( 6).toString() );
