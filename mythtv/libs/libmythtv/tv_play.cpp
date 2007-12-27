@@ -2156,8 +2156,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
     VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress() ignoreKeys: "<<ignoreKeys);
 #endif // DEBUG_ACTIONS
 
-    if (!GetOSD()->DialogShowing("idletimeout") && StateIsLiveTV(GetState())
-            && idleTimer->isActive())
+    if (!GetOSD() || !GetOSD()->DialogShowing("idletimeout")
+            && StateIsLiveTV(GetState()) && idleTimer->isActive())
         idleTimer->changeInterval(gContext->GetNumSetting("LiveTVIdleTimeout",
                                                           0) * 60 * 1000);
 
