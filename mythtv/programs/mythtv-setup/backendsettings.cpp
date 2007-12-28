@@ -561,79 +561,23 @@ static GlobalCheckBox *AutoCommflagWhileRecording()
     return gc;
 };
 
-static GlobalLineEdit *UserJobDesc1()
+static GlobalLineEdit *UserJob(uint job_num)
 {
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJobDesc1");
-    gc->setLabel(QObject::tr("User Job #1 Description"));
-    gc->setValue("User Job #1");
-    gc->setHelpText(QObject::tr("The Description for this User Job."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJob1()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJob1");
-    gc->setLabel(QObject::tr("User Job #1 Command"));
+    GlobalLineEdit *gc = new GlobalLineEdit(QString("UserJob%1").arg(job_num));
+    gc->setLabel(QObject::tr("User Job #%1 Command").arg(job_num));
     gc->setValue("");
     gc->setHelpText(QObject::tr("The command to run whenever this User Job "
                     "number is scheduled."));
     return gc;
 };
 
-static GlobalLineEdit *UserJobDesc2()
+static GlobalLineEdit *UserJobDesc(uint job_num)
 {
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJobDesc2");
-    gc->setLabel(QObject::tr("User Job #2 Description"));
-    gc->setValue("User Job #2");
-    gc->setHelpText(QObject::tr("The Description for this User Job."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJob2()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJob2");
-    gc->setLabel(QObject::tr("User Job #2 Command"));
-    gc->setValue("");
-    gc->setHelpText(QObject::tr("The command to run whenever this User Job "
-                    "number is scheduled."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJobDesc3()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJobDesc3");
-    gc->setLabel(QObject::tr("User Job #3 Description"));
-    gc->setValue("User Job #3");
-    gc->setHelpText(QObject::tr("The Description for this User Job."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJob3()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJob3");
-    gc->setLabel(QObject::tr("User Job #3 Command"));
-    gc->setValue("");
-    gc->setHelpText(QObject::tr("The command to run whenever this User Job "
-                    "number is scheduled."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJobDesc4()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJobDesc4");
-    gc->setLabel(QObject::tr("User Job #4 Description"));
-    gc->setValue("User Job #4");
-    gc->setHelpText(QObject::tr("The Description for this User Job."));
-    return gc;
-};
-
-static GlobalLineEdit *UserJob4()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("UserJob4");
-    gc->setLabel(QObject::tr("User Job #4 Command"));
-    gc->setValue("");
-    gc->setHelpText(QObject::tr("The command to run whenever this User Job "
-                    "number is scheduled."));
+    GlobalLineEdit *gc = new GlobalLineEdit(QString("UserJobDesc%1")
+                                            .arg(job_num));
+    gc->setLabel(QObject::tr("User Job #%1 Description").arg(job_num));
+    gc->setValue(QObject::tr("User Job #%1").arg(job_num));
+    gc->setHelpText(QObject::tr("The Description for this User Job."));  
     return gc;
 };
 
@@ -678,45 +622,26 @@ static GlobalLineEdit *JobQueueCommFlagCommand()
     return gc;
 };
 
-static HostCheckBox *JobAllowUserJob1()
+static HostCheckBox *JobAllowUserJob(uint job_num)
 {
-    HostCheckBox *gc = new HostCheckBox("JobAllowUserJob1");
-    gc->setLabel(QObject::tr("Allow 'User Job #1' jobs"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
-    return gc;
-};
+    QString dbStr = QString("JobAllowUserJob%1").arg(job_num);
+    QString desc  = gContext->GetSetting(QString("UserJobDesc%1").arg(job_num));
+    QString label = QObject::tr("Allow %1 jobs").arg(desc);
 
-static HostCheckBox *JobAllowUserJob2()
-{
-    HostCheckBox *gc = new HostCheckBox("JobAllowUserJob2");
-    gc->setLabel(QObject::tr("Allow 'User Job #2' jobs"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
-    return gc;
-};
-
-static HostCheckBox *JobAllowUserJob3()
-{
-    HostCheckBox *gc = new HostCheckBox("JobAllowUserJob3");
-    gc->setLabel(QObject::tr("Allow 'User Job #3' jobs"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
-    return gc;
-};
-
-static HostCheckBox *JobAllowUserJob4()
-{
-    HostCheckBox *gc = new HostCheckBox("JobAllowUserJob4");
-    gc->setLabel(QObject::tr("Allow 'User Job #4' jobs"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
-                                "backend."));
-    return gc;
-};
+    HostCheckBox *bc = new HostCheckBox(dbStr);
+    bc->setLabel(label);
+    bc->setValue(false);
+    // FIXME:
+    // It would be nice to disable inactive jobs,
+    // but enabling them currently requires a restart of mythtv-setup
+    // after entering the job command string. Will improve this logic later:
+    // if (QString(gContext->GetSetting(QString("UserJob%1").arg(job_num)))
+    //            .length() == 0)
+    //     bc->setEnabled(false);
+    bc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                    "backend."));
+    return bc;
+}
 
 
 BackendSettings::BackendSettings() {
@@ -824,10 +749,10 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group5a2 =
             new VerticalConfigurationGroup(false, false);
-    group5a2->addChild(JobAllowUserJob1());
-    group5a2->addChild(JobAllowUserJob2());
-    group5a2->addChild(JobAllowUserJob3());
-    group5a2->addChild(JobAllowUserJob4());
+    group5a2->addChild(JobAllowUserJob(1));
+    group5a2->addChild(JobAllowUserJob(2));
+    group5a2->addChild(JobAllowUserJob(3));
+    group5a2->addChild(JobAllowUserJob(4));
     group5a->addChild(group5a2);
     group5->addChild(group5a);
     addChild(group5);    
@@ -844,13 +769,13 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group7 = new VerticalConfigurationGroup(false);
     group7->setLabel(QObject::tr("Job Queue (Job Commands)"));
-    group7->addChild(UserJobDesc1());
-    group7->addChild(UserJob1());
-    group7->addChild(UserJobDesc2());
-    group7->addChild(UserJob2());
-    group7->addChild(UserJobDesc3());
-    group7->addChild(UserJob3());
-    group7->addChild(UserJobDesc4());
-    group7->addChild(UserJob4());
+    group7->addChild(UserJobDesc(1));
+    group7->addChild(UserJob(1));
+    group7->addChild(UserJobDesc(2));
+    group7->addChild(UserJob(2));
+    group7->addChild(UserJobDesc(3));
+    group7->addChild(UserJob(3));
+    group7->addChild(UserJobDesc(4));
+    group7->addChild(UserJob(4));
     addChild(group7);    
 }
