@@ -1355,7 +1355,7 @@ void Scheduler::RunScheduler(void)
                 // have we been started automatically?
                 if (WasStartedAutomatically() ||
                     ((firstRunIter != reclist.end()) &&
-                     ((curtime.secsTo((*firstRunIter)->startts) - prerollseconds)
+                     ((curtime.secsTo((*firstRunIter)->recstartts) - prerollseconds)
                         < (idleWaitForRecordingTime * 60))))
                 {
                     VERBOSE(VB_IMPORTANT, "AUTO-Startup assumed");
@@ -1576,7 +1576,7 @@ void Scheduler::RunScheduler(void)
 
                         if (idleIter != reclist.end())
                         {
-                            if (curtime.secsTo((*idleIter)->startts) - 
+                            if (curtime.secsTo((*idleIter)->recstartts) - 
                                 prerollseconds > idleWaitForRecordingTime * 60)
                             {
                                 idleSince = curtime;
