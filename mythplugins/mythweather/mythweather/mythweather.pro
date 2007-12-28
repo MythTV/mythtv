@@ -17,9 +17,11 @@ installfiles.path = $${PREFIX}/share/mythtv/
 installfiles.files = weather_settings.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
+installwideimages.path = $${PREFIX}/share/mythtv/themes/default-wide
+installwideimages.files = theme-wide/images/*.png
 installscripts.path = $${PREFIX}/share/mythtv/mythweather/scripts
 installscripts.files = scripts/*
-INSTALLS += installfiles datafiles installimages uifiles wideuifiles installscripts
+INSTALLS += installfiles datafiles installimages installwideimages uifiles wideuifiles installscripts
 
 # Input
 
