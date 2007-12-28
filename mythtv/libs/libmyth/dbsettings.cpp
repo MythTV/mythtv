@@ -237,8 +237,9 @@ void MythDbSettings1::load()
         params.dbUserName.isEmpty() ||
         params.dbPassword.isEmpty() ||
         params.dbName.isEmpty())
-        info->setValue(info->getValue() + "\nRequired fields are marked "
-                                          "with an asterisk (*).");
+        info->setValue(info->getValue() + "\n" +
+                       QObject::tr("Required fields are"
+                                   " marked with an asterisk (*)."));
 
     if (params.dbHostName.isEmpty())
     {
