@@ -7,9 +7,7 @@
     using namespace std;
 #else
 # ifdef HAVE_GETTIMEOFDAY
-#   if !defined(_WIN32)
-#      include <sys/time.h> // for gettimeofday
-#   endif
+#   include <sys/time.h>
 #   include <time.h> // for localtime()
 # endif
 #endif
