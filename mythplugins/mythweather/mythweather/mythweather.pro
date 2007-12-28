@@ -8,7 +8,9 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = weather-ui.xml 
+uifiles.files = weather-ui.xml
+wideuifiles.path = $${PREFIX}/share/mythtv/themes/default-wide
+wideuifiles.files = theme-wide/weather-ui.xml
 datafiles.path = $${PREFIX}/share/mythtv/mythweather/
 datafiles.files = weather-screens.xml
 installfiles.path = $${PREFIX}/share/mythtv/
@@ -17,7 +19,7 @@ installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 installscripts.path = $${PREFIX}/share/mythtv/mythweather/scripts
 installscripts.files = scripts/*
-INSTALLS += installfiles datafiles installimages uifiles installscripts
+INSTALLS += installfiles datafiles installimages uifiles wideuifiles installscripts
 
 # Input
 
