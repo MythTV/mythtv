@@ -703,8 +703,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 6144U << 16] = EITFixUp::kFixMCA;
 
     // RTL Subtitle parsing
-    fix[  1089LL << 32 |     1  << 16] = EITFixUp::kFixRTL;// DVB-S
-    fix[   773LL << 32 |  8468U << 16] = EITFixUp::kFixRTL;// DVB-T Berlin
+    fix[      1089LL << 32 |     1  << 16] = // DVB-S
+        fix[   773LL << 32 |  8468U << 16] = // DVB-T Berlin/Brandenburg
+        fix[  2819LL << 32 |  8468U << 16] = // DVB-T Niedersachsen + Bremen
+        fix[  8706LL << 32 |  8468U << 16] = // DVB-T NRW
+        fix[ 12801LL << 32 |  8468U << 16] = // DVB-T Bayern
+        EITFixUp::kFixRTL;
 
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
