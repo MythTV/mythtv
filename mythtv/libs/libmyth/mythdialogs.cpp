@@ -767,7 +767,8 @@ DialogCode MythPopupBox::ShowButtonPopup(
     return ret;
 }
 
-MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
+MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps, 
+                                         bool cancelButton, const QObject *target, const char *slot)
                   : MythDialog(gContext->GetMainWindow(), "progress", false)
 {
     int screenwidth, screenheight;
@@ -795,13 +796,23 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     vbox->setFrameShadow(QFrame::Raised);
     vbox->setMargin((int)(15 * wmult));
 
-    QLabel *msglabel = new QLabel(vbox);
+    msglabel = new QLabel(vbox);
     msglabel->setBackgroundOrigin(ParentOrigin);
     msglabel->setText(message);
+    vbox->setStretchFactor(msglabel, 5);
 
-    progress = new QProgressBar(totalSteps, vbox);
+    QHBox *hbox = new QHBox(vbox);
+    hbox->setSpacing(5);
+    
+    progress = new QProgressBar(totalSteps, hbox);
     progress->setBackgroundOrigin(ParentOrigin);
-    progress->setProgress(0);
+
+    if (cancelButton && slot && target)
+    {
+        MythPushButton *button = new MythPushButton("Cancel", hbox, 0);
+        button->setFocus();
+        connect(button, SIGNAL(pressed()), target, slot);
+    }
 
     setTotalSteps(totalSteps);
 
@@ -870,6 +881,11 @@ void MythProgressDialog::setProgress(int curprogress)
     }
 }
 
+void MythProgressDialog::setLabel(QString newlabel)
+{
+    msglabel->setText(newlabel);
+}
+
 void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
@@ -891,13 +907,17 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 void MythProgressDialog::setTotalSteps(int totalSteps)
 {
     m_totalSteps = totalSteps;
+    progress->setTotalSteps(totalSteps);
     steps = totalSteps / 1000;
     if (steps == 0)
         steps = 1;
 }
 
-MythBusyDialog::MythBusyDialog(const QString &title)
-    : MythProgressDialog(title, 0), timer(NULL)
+MythBusyDialog::MythBusyDialog(const QString &title,
+                               bool cancelButton, const QObject *target, const char *slot)
+    : MythProgressDialog(title, 0,
+                         cancelButton, target, slot),
+                         timer(NULL)
 {
 }
 

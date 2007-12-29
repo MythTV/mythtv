@@ -368,6 +368,8 @@ public:
     void setSelectionMode(MythListBox::SelectionMode mode);
     void setCurrentItem(int i) { if (widget) widget->setCurrentItem(i); }
     void setCurrentItem(const QString& str)  { if (widget) widget->setCurrentItem(str); }
+    int currentItem() { if (widget) return widget->currentItem();
+                         else return -1; }
 
     virtual void setEnabled(bool b);
 
@@ -643,6 +645,14 @@ class MPUBLIC TransSpinBoxSetting :
         SpinBoxSetting(this, minv, maxv, step,
                        allow_single_step, special_value_text) { }
 };
+
+class MPUBLIC TransListBoxSetting :
+    public ListBoxSetting, public TransientStorage
+{
+  public:
+    TransListBoxSetting() : ListBoxSetting(this), TransientStorage() { }
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

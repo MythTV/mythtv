@@ -387,6 +387,8 @@ class MPUBLIC MythListBox: public QListBox {
 
     void setHelpText(const QString&);
 
+    int currentItem() { return QListBox::currentItem(); }
+
   protected:
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);

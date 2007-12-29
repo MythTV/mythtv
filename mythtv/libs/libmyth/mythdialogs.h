@@ -233,13 +233,20 @@ class MPUBLIC MythPopupBox : public MythDialog
 */
 class MPUBLIC MythProgressDialog: public MythDialog
 {
+    Q_OBJECT
   public:
     /** Create a progress bar dialog.
         
         \param message the title string to appear in the progress dialog.
         \param totalSteps the total number of steps
-     */
-    MythProgressDialog(const QString& message, int totalSteps);
+        \param cancelButton display cancel button
+        \param target target for cancel signal
+        \param slot slot for cancel signal
+      */
+    MythProgressDialog(const QString& message, int totalSteps = 0, 
+                       bool cancelButton = false, 
+                       const QObject * target = NULL, 
+                       const char * slot = NULL);
 
     /* \brief Close the dialog.
 
@@ -255,15 +262,21 @@ class MPUBLIC MythProgressDialog: public MythDialog
        The LCD is updated as well.
     */
     void setProgress(int curprogress);
-
+    
+    void setLabel(QString newlabel);
+    
     void keyPressEvent(QKeyEvent *);
 
     virtual void deleteLater(void);
+    
+  signals:
+    void pressed();
 
   protected:
     void Teardown(void);
     ~MythProgressDialog(); // use deleteLater() instead for thread safety
     QProgressBar *progress;
+    QLabel *msglabel;
 
   private:
     void setTotalSteps(int totalSteps);
@@ -288,8 +301,14 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
         the widget to indicate progress every 100msec;
 
         \param title the title to appear in the progress bar dialog
-    */
-    MythBusyDialog(const QString &title);
+        \param cancelButton display cancel button
+        \param target target for cancel signal
+        \param slot slot for cancel signal
+     */
+    MythBusyDialog(const QString &title,
+                   bool cancelButton = false, 
+                   const QObject * target = NULL, 
+                   const char * slot = NULL);
 
     /** \brief Setup a timer to 'move' the spinner
 
