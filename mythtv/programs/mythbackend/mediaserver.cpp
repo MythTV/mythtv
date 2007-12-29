@@ -146,7 +146,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering MSRR Service." );
 
-            m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice() ));
+	    m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice(), 
+				                             m_sSharePath ) );
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CMGR Service." );
 
@@ -156,8 +157,9 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CDS Service." );
 
-            m_pUPnpCDS = new UPnpCDS ( RootDevice() );
-            m_pHttpServer->RegisterExtension( m_pUPnpCDS );
+	    m_pUPnpCDS = new UPnpCDS ( RootDevice(), m_sSharePath );
+	    m_pHttpServer->RegisterExtension( m_pUPnpCDS );
+
 
             // ----------------------------------------------------------------
             // Register CDS Extensions

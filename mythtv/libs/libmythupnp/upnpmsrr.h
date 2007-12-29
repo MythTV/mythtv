@@ -49,7 +49,9 @@ class UPnpMSRR : public Eventing
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
-                 UPnpMSRR( UPnpDevice *pDevice ); 
+                 UPnpMSRR( UPnpDevice *pDevice,
+			   const QString &sSharePath ); 
+
         virtual ~UPnpMSRR();
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

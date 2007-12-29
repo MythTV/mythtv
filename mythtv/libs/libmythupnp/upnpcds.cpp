@@ -53,7 +53,7 @@ QString UPnpCDSExtensionResults::GetResultXML()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDS::UPnpCDS( UPnpDevice *pDevice ) : Eventing( "UPnpCDS", "CDS_Event" )
+UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath ) : Eventing( "UPnpCDS", "CDS_Event" )
 {
     m_extensions.setAutoDelete( true );
 
@@ -71,8 +71,9 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice ) : Eventing( "UPnpCDS", "CDS_Event" )
 
     SetValue< unsigned short >( "SystemUpdateID", 1 );
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", sSharePath );
 
+    m_sSharePath           = sSharePath;
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
 

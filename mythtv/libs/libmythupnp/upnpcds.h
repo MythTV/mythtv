@@ -49,6 +49,7 @@ class UPnpCDSRequest
 
         QString           m_sObjectId;
 
+        QString           m_sContainerID;
         QString           m_sFilter;
         short             m_nStartingIndex;
         short             m_nRequestedCount;
@@ -231,7 +232,9 @@ class UPnpCDS : public Eventing
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
-                 UPnpCDS( UPnpDevice *pDevice ); 
+                 UPnpCDS( UPnpDevice *pDevice,
+		          const QString &sSharePath ); 
+
         virtual ~UPnpCDS();
 
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
