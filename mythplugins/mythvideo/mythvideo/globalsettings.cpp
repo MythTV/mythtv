@@ -296,17 +296,6 @@ HostCheckBox *VideoGallerySubtitle()
     return gc;
 }
 
-HostCheckBox *VideoGalleryAspectRatio()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoGalleryAspectRatio");
-    gc->setLabel(QObject::tr("Maintain aspect ratio of thumbnails"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, the scaled thumbnails will maintain "
-                    "their original aspect ratio. If not set, they are scaled "
-                    "to match the size of the background icon."));
-    return gc;
-}
-
 ///////////////////////////////////////////////////////////
 //// DVD Settings
 ///////////////////////////////////////////////////////////
@@ -641,7 +630,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     vgal->addChild(VideoGalleryColumns());
     vgal->addChild(VideoGalleryRows());
     vgal->addChild(VideoGallerySubtitle());
-    vgal->addChild(VideoGalleryAspectRatio());
     general5->addChild(vgal);
     addChild(general5);
 

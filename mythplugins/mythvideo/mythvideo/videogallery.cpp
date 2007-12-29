@@ -40,7 +40,6 @@ VideoGallery::VideoGallery(MythMainWindow *lparent, const QString &lname,
     nCols           = gContext->GetNumSetting("VideoGalleryColsPerPage", 4);
     nRows           = gContext->GetNumSetting("VideoGalleryRowsPerPage", 3);
     subtitleOn      = gContext->GetNumSetting("VideoGallerySubtitle", 1);
-    keepAspectRatio = gContext->GetNumSetting("VideoGalleryAspectRatio", 1);
 
     loadWindow(xmldata);
     LoadIconWindow(); // load icon settings
@@ -444,7 +443,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         const QPixmap *icon_image = ImageCache::getImageCache().
                 load(icon_file, int(thumbW - 2 * sw),
                      int(thumbH - 2 * sh - yoffset),
-                     keepAspectRatio ?  QImage::ScaleMin : QImage::ScaleFree);
+                     QImage::ScaleMin);
 
         if (icon_image && !icon_image->isNull())
             p->drawPixmap(xpos + sw, ypos + sh + yoffset, *icon_image,
