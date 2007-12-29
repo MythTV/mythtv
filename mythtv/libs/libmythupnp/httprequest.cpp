@@ -164,7 +164,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     sHeader = QString( "HTTP/%1.%2 %3\r\n"
                        "Date: %4\r\n"
-                       "Server: %5, UPnP/1.0, MythTv %6\r\n" )
+                       "Server: %5, UPnP/1.0, MythTV %6\r\n" )
                  .arg( m_nMajor )
                  .arg( m_nMinor )
                  .arg( GetResponseStatus() )
@@ -198,15 +198,15 @@ long HTTPRequest::SendResponse( void )
     {
         case ResponseTypeUnknown:
         case ResponseTypeNone:
-//            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
-//                            .arg(GetResponseStatus())
-//                            .arg(GetPeerAddress()));
+            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
+                            .arg(GetResponseStatus())
+                            .arg(GetPeerAddress()));
             return( -1 );
 
         case ResponseTypeFile:
-//            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
-//                            .arg(GetResponseStatus())
-//                            .arg(GetPeerAddress()));
+            VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
+                            .arg(GetResponseStatus())
+                            .arg(GetPeerAddress()));
 
             return( SendResponseFile( m_sFileName ));
 
@@ -217,9 +217,11 @@ long HTTPRequest::SendResponse( void )
             break;
     }
 
-    // VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) :%1 -> %2:")
-    //                    .arg(GetResponseStatus())
-    //                    .arg(GetPeerAddress()));
+     VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) (%1) :%2 -> %3: %4")
+		        .arg(m_sFileName)
+                        .arg(GetResponseStatus())
+                        .arg(GetPeerAddress())
+			.arg(m_eResponseType));
 
     // ----------------------------------------------------------------------
     // Make it so the header is sent with the data
@@ -250,7 +252,7 @@ long HTTPRequest::SendResponse( void )
           cout << m_aBuffer.data()[i];
 
         cout << endl;
-*/        
+*/       
         nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
     }
 
@@ -276,6 +278,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     long long   llSize  = 0;
     long long   llStart = 0;
     long long   llEnd   = 0;
+
+    VERBOSE(VB_UPNP, QString("SendResponseFile ( %1 )").arg(sFileName));
 
     m_eResponseType     = ResponseTypeOther;
     m_sResponseTypeText = "text/plain";
@@ -367,6 +371,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Write out File.
     // ----------------------------------------------------------------------
 
+    //VERBOSE(VB_UPNP, QString("SendResponseFile : size = %1, start = %2, end = %3").arg(llSize).arg(llStart).arg(llEnd));
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
         __off64_t offset = llStart;
@@ -382,6 +387,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                                 (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
 
             llSize  = llEnd - offset;  
+	    //VERBOSE(VB_UPNP, QString("SendResponseFile : --- size = %1, offset = %2, sent = %3").arg(llSize).arg(offset).arg(sent));
         } 
         while (( sent >= 0 ) && ( llSize > 0 ));  
 
@@ -1030,7 +1036,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // Open Supplied XML uPnp Description file.
     // ----------------------------------------------------------------------
 
-//    VERBOSE(VB_UPNP, QString("HTTPRequest::ProcessSOAPPayload : %1 : ").arg(sSOAPAction));
+    VERBOSE(VB_UPNP, QString("HTTPRequest::ProcessSOAPPayload : %1 : ").arg(sSOAPAction));
     QDomDocument doc ( "request" );
 
     QString sErrMsg;
@@ -1099,12 +1105,13 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
 
 QString &HTTPRequest::Encode( QString &sStr )
 {
+    //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Input : %1").arg(sStr));
     sStr.replace(QRegExp( "&"), "&amp;" ); // This _must_ come first
     sStr.replace(QRegExp( "<"), "&lt;"  );
     sStr.replace(QRegExp( ">"), "&gt;"  );
     sStr.replace(QRegExp("\""), "&quot;");
     sStr.replace(QRegExp( "'"), "&apos;");
-
+    //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Output : %1").arg(sStr));
     return( sStr );
 }
 

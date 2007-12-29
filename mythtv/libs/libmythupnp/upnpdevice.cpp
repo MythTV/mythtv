@@ -278,17 +278,17 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, QTextS
 {
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
-    os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">"
-            "<specVersion>"
-              "<major>1</major>"
-              "<minor>0</minor>"
-            "</specVersion>"
-            "<URLBase>http://" << sBaseAddress << ":" << nPort << "/</URLBase>";
+    os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+          "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">\n"
+            "<specVersion>\n"
+              "<major>1</major>\n"
+              "<minor>0</minor>\n"
+            "</specVersion>\n"
+            "<URLBase>http://" << sBaseAddress << ":" << nPort << "/</URLBase>\n";
 
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
-    os << "</root>";
+    os << "</root>\n";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -313,10 +313,9 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     if (pDevice == &m_rootDevice)
         sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName", sFriendlyName  );
     
-    os << "<device>";
-    os << FormatValue( "UDN"          , pDevice->GetUDN()      );
-    os << FormatValue( "friendlyName" , sFriendlyName          );
+    os << "<device>\n";
     os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
+    os << FormatValue( "friendlyName" , sFriendlyName          );
 
     // ----------------------------------------------------------------------
     // XBox 360 needs specific values in the Device Description.
@@ -326,18 +325,17 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     bool bIsXbox360 = sUserAgent.startsWith( "Xbox/2.0", false ) || sUserAgent.startsWith( "Mozilla/4.0", false);
-                                                                              
+
+    os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
+    os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );    
+
     if ( bIsXbox360 )
     {
-        os << FormatValue( "manufacturer" , "Microsoft"                    );
-        os << FormatValue( "modelName"    , "Windows Media Player Sharing" );
-        os << FormatValue( "modelURL"     , "http://www.microsoft.com/"    );
+        os << FormatValue( "modelName"    , "Windows Media Connect Compatible (MythTV)");
     }
     else
     {
-        os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
         os << FormatValue( "modelName"    , pDevice->m_sModelName       );
-        os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );
     }
 
     os << FormatValue( "manufacturerURL"  , pDevice->m_sManufacturerURL );
@@ -355,7 +353,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         //          handle attributes in a more generic way.
 
         if (pNV->sName == "dlna:X_DLNADOC")
-            os << QString( "<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">%1</dlna:X_DLNADOC>" ).arg( pNV->sValue);
+            os << QString( "<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">%1</dlna:X_DLNADOC>\n" ).arg( pNV->sValue);
         else
             os << FormatValue( pNV->sName, pNV->sValue );
     }
@@ -366,23 +364,25 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
     if (pDevice->m_listIcons.count() > 0)
     {
-        os << "<iconList>";
+        os << "<iconList>\n";
 
         for ( UPnpIcon *pIcon  = pDevice->m_listIcons.first(); 
                         pIcon != NULL;
                         pIcon  = pDevice->m_listIcons.next() )
         {
 
-            os << "<icon>";
+            os << "<icon>\n";
             os << FormatValue( "mimetype", pIcon->m_sMimeType );
             os << FormatValue( "width"   , pIcon->m_nWidth    );
             os << FormatValue( "height"  , pIcon->m_nHeight   );
             os << FormatValue( "depth"   , pIcon->m_nDepth    );
             os << FormatValue( "url"     , pIcon->m_sURL      );
-            os << "</icon>";
+            os << "</icon>\n";
         }
-        os << "</iconList>";
+        os << "</iconList>\n";
     }
+
+    os << FormatValue( "UDN"          , pDevice->GetUDN()      );
 
     // ----------------------------------------------------------------------
     // Output any Services
@@ -405,7 +405,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
         //bool bDSM = sUserAgent.startsWith( "INTEL_NMPR/2.1 DLNADOC/1.00", false );
 
-        os << "<serviceList>";
+        os << "<serviceList>\n";
 
         for ( UPnpService *pService  = pDevice->m_listServices.first(); 
                            pService != NULL;
@@ -414,15 +414,15 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
             if ( !bIsXbox360 && pService->m_sServiceType.startsWith( "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar", false ))
                 continue;
 
-            os << "<service>";
+            os << "<service>\n";
             os << FormatValue( "serviceType", pService->m_sServiceType );
             os << FormatValue( "serviceId"  , pService->m_sServiceId   );
             os << FormatValue( "SCPDURL"    , pService->m_sSCPDURL     );
             os << FormatValue( "controlURL" , pService->m_sControlURL  );
             os << FormatValue( "eventSubURL", pService->m_sEventSubURL );
-            os << "</service>";
+            os << "</service>\n";
         }
-        os << "</serviceList>";
+        os << "</serviceList>\n";
     }
 
     // ----------------------------------------------------------------------
@@ -447,7 +447,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         }
     }
 */
-    os << "</device>";
+    os << "</device>\n";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -459,7 +459,7 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, const QString &sValue
     QString sStr;
 
     if (sValue.length() > 0)
-        sStr = QString( "<%1>%2</%3>" ).arg( sName ).arg(sValue).arg( sName );
+        sStr = QString( "<%1>%2</%3>\n" ).arg( sName ).arg(sValue).arg( sName );
 
     return( sStr );
 }
@@ -468,7 +468,7 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, const QString &sValue
               
 QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 {
-    return( QString( "<%1>%2</%1>" ).arg( sName ).arg(nValue) );
+    return( QString( "<%1>%2</%1>\n" ).arg( sName ).arg(nValue) );
 }
 
 /////////////////////////////////////////////////////////////////////////////
