@@ -476,6 +476,7 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
 
 void MoviesUI::handleTreeListSelection(int nodeInt, IntVector *)
 {
+    (void) nodeInt;
     //perhaps the same as info?
     //VERBOSE(VB_IMPORTANT, QString("In Selection with %1").arg(nodeInt));
 }
