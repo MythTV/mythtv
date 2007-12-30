@@ -2116,7 +2116,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                         // use duration guess from avformat
                         if (inputFC->duration != (uint) AV_NOPTS_VALUE)
                         {
-                            duration = (uint) inputFC->duration / AV_TIME_BASE;
+                            duration = (uint) (inputFC->duration / AV_TIME_BASE);
                             root.setAttribute("duration", duration);
                             VERBOSE(VB_JOBQUEUE, QString("duration = %1")
                                     .arg(duration));
