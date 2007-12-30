@@ -19,6 +19,8 @@
 #include "eventing.h"
 #include "mythdbcon.h"
 
+#define STARTING_VIDEO_OBJECTID 100000
+
 class UPnpCDS;
 
 typedef enum 

@@ -30,10 +30,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
         QStringMap             m_mapBackendIp;
         QStringMap             m_mapBackendPort;
 
-        IntMap                 m_mapGenreNames;
-        IntMap                 m_mapCountryNames;
-        IntMap                 m_mapGenre;
-        IntMap                 m_mapCountry;
+	QStringMap	       m_mapTitleNames;
 
     protected:
 
@@ -53,15 +50,20 @@ class UPnpCDSVideo : public UPnpCDSExtension
     private:
 
         void FillMetaMaps (void);
+	int GetBaseCount(void);
+	QString GetTitleName(QString fPath, QString fName);
+
+        int buildFileList(QString directory, int itemID, MSqlQuery &query);
 
     public:
 
         UPnpCDSVideo( ) : UPnpCDSExtension( "Videos", "Videos",
                                             "object.item.videoItem" )
         {
-            FillMetaMaps();
+	    FillMetaMaps();
+	    BuildMediaMap();
         }
-
+        void BuildMediaMap(void);
         virtual ~UPnpCDSVideo() {}
 };
 

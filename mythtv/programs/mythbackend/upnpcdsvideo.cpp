@@ -10,47 +10,43 @@
 #include <qfileinfo.h>
 #include <qregexp.h>
 #include <qurl.h>
+#include <qdir.h>
 #include <limits.h>
 #include "util.h"
 
 UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
 {
-    {   "All Videos", 
+    {   "VideoRoot", 
         "*",
         "SELECT 0 as key, "
           "title as name, "
           "1 as children "
-            "FROM videometadata "
+            "FROM upnpmedia "
             "%1 "
             "ORDER BY title DESC",
-        "" },
-
-    {   "By Genre",
-        "idgenre",
-        "SELECT intid as id, "
-          "genre as name, "
-          "count( genre ) as children "
-            "FROM videogenre "
-            "%1 "
-            "GROUP BY genre "
-            "ORDER BY genre",
-        "WHERE genre=:KEY" },
-
-     {   "By Country",
-        "idcountry",
-        "SELECT intid as id, "
-          "country as name, "
-          "count( country ) as children "
-            "FROM videocountry "
-            "%1 "
-            "GROUP BY country "
-            "ORDER BY country",
-        "WHERE country=:KEY" }
-
-
+        "" }
 };
 
-int UPnpCDSVideo::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
+int UPnpCDSVideo::GetBaseCount(void)
+{
+    int res;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT COUNT(*) FROM upnpmedia WHERE class = 'VIDEO' "
+		  "AND parentid = :ROOTID");
+
+    query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
+    query.exec();
+
+    res = query.value(0).toInt();
+
+    return res;
+}
+int UPnpCDSVideo::g_nRootCount = 1;
+
+//int UPnpCDSVideo::g_nRootCount;
+//= sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -79,10 +75,7 @@ int UPnpCDSVideo::GetRootCount()
 
 QString UPnpCDSVideo::GetTableName( QString sColumn )
 {
-    if (sColumn == "idgenre"  )   return "videometadatagenre";
-    if (sColumn == "idcountry")   return "videometadatacountry";
-
-    return "videometadata";
+    return "upnpmedia";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -91,38 +84,10 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
-    if ( sColumn == "idgenre" )
-    {
-        return "SELECT intid, title, director, plot, year, " \
-                            "userrating, length, filename, coverfile, " \
-                            "category, idgenre FROM videometadata " \
-                            "LEFT JOIN (videometadatagenre) ON " \
-                            "(videometadatagenre.idvideo = videometadata.intid) ";
-    }
-
-    if ( sColumn == "idcountry" )
-    {
-        return  "SELECT intid, title, director, plot, year, " \
-                 "userrating, length, filename, coverfile, "   \
-                 "category, idcountry FROM videometadata " \
-                 "LEFT JOIN (videometadatacountry) ON " \
-                 "(videometadatacountry.idvideo = videometadata.intid) ";
-    }
-
-    return "SELECT intid, title, director, plot, year, "  \
-              "userrating, length, filename, coverfile, " \
-              "category FROM videometadata ";
+    return "SELECT intid, title, filepath, " \
+	   "itemtype, itemproperties, parentid "\
+           "FROM upnpmedia WHERE class = 'VIDEO'";
 }
-
-/*
-#define SHARED_ALLVIDEO_SQL "SELECT intid, title, director, plot, year, " \
-                            "userrating, length, filename, coverfile, "   \
-                            "category, idgenre, idcountry FROM videometadata " \
-                            "LEFT JOIN (videometadatagenre) ON " \
-                            "(videometadatagenre.idvideo = videometadata.intid) " \
-                            "LEFT JOIN (videometadatacountry) ON " \
-                            "(videometadatacountry.idvideo = videometadata.intid) " 
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -132,13 +97,22 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 {
     int nVideoID = mapParams[ "Id" ].toInt();
 
-    QString sSQL = QString( "%1 WHERE intid=:VIDEOID " ).arg( GetItemListSQL( ) );
+    QString sSQL = QString( "%1 WHERE class = 'VIDEO' AND intid=:VIDEOID " ).arg( GetItemListSQL( ) );
 
     query.prepare( sSQL );
 
     query.bindValue( ":VIDEOID", (int)nVideoID    );
 }
 
+QString UPnpCDSVideo::GetTitleName(QString fPath, QString fName)
+{
+    if (m_mapTitleNames[fPath])
+    {
+        return m_mapTitleNames[fPath];
+    }
+    else
+        return fName;
+}
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -149,83 +123,130 @@ void UPnpCDSVideo::FillMetaMaps(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.isConnected())
-    {   
-        QString sSQL = "SELECT intid, genre FROM videogenre";
+    QString sSQL = "SELECT filename, title FROM videometadata";
 
-        query.prepare  ( sSQL );
-        query.exec();
+    query.prepare  ( sSQL );
+    query.exec();
 
-        if (query.isActive() && query.size() > 0)
-        {   
-            while(query.next())
-                m_mapGenreNames[query.value(0).toInt()] = query.value(1).toString();
-        }
-
-        sSQL = "SELECT intid, country FROM videocountry";
-
-        query.prepare  ( sSQL );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {   
-            while(query.next())
-                m_mapCountryNames[query.value(0).toInt()] = query.value(1).toString();
-        }
-
-        // Forcibly map "0" to "Unknown"
-        m_mapGenreNames[0] = "Unknown";
-        m_mapCountryNames[0] = "Unknown";
-
-
-        int nVidID,nGenreID,nCountryID = 0;
-
-        sSQL = GetItemListSQL( "idgenre" );
-
-        query.prepare  ( sSQL );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-            while(query.next())
-            {   
-                nVidID = query.value(0).toInt();               
-                nGenreID = query.value(10).toInt();
-
-                if (m_mapGenre.contains(nVidID))
-                    m_mapGenre[nVidID] = QString("%1 / %2")
-                                             .arg(m_mapGenre[nVidID])
-                                             .arg(m_mapGenreNames[nGenreID]);
-                else
-                    m_mapGenre[nVidID] = m_mapGenreNames[nGenreID];
-
-            }
-        }
-
-        sSQL = GetItemListSQL( "idcountry" );
-
-        query.prepare  ( sSQL );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {   
-            while(query.next())
-            {   
-                nVidID = query.value(0).toInt();
-                nCountryID = query.value(10).toInt();
-
-                if (m_mapCountry.contains(nVidID))
-                    m_mapCountry[nVidID] =  QString("%1 / %2")
-                                             .arg(m_mapCountry[nVidID])
-                                             .arg(m_mapCountryNames[nCountryID]);
-                else
-                    m_mapCountry[nVidID] = m_mapCountryNames[nCountryID];
-
-            }
-        }
+    if (query.isActive() && query.size() > 0)
+    {
+        while(query.next())
+            m_mapTitleNames[query.value(0).toString()] = query.value(1).toString();
     }
+
 }
 
+
+int UPnpCDSVideo::buildFileList(QString directory, int itemID, MSqlQuery &query)
+{
+
+//    VERBOSE(VB_UPNP, QString("buildFileList(%1)")
+//		    .arg(directory));
+
+    int parentid;
+    QDir vidDir(directory);
+                                // If we can't read it's contents move on
+    if (!vidDir.isReadable())
+        return itemID;
+
+    parentid = itemID;
+
+    vidDir.setSorting( QDir:: DirsFirst | QDir::Name );
+    const QFileInfoList* List = vidDir.entryInfoList();
+    for (QFileInfoListIterator it(*List); it; ++it)
+    {
+        QFileInfo Info(*it.current());
+        QString fName = Info.fileName();
+        QString fPath = Info.filePath();
+
+        if (fName == "." ||
+            fName == "..")
+        {
+            continue;
+        }
+
+        if (Info.isDir())
+        {
+	    itemID++;
+
+//	    VERBOSE(VB_UPNP, QString("UPnpCDSVideo Video Dir : (%1) (%2)")
+//			    .arg(itemID)
+//	                    .arg(fName));
+
+	    query.prepare("INSERT INTO upnpmedia "
+                          "(intid, class, itemtype, parentid, itemproperties, "
+			  "filepath, filename, title) "
+			  "VALUES (:ITEMID, 'VIDEO', 'FOLDER', :PARENTID, '', "
+			  ":FILEPATH, :FILENAME, :TITLE)");
+
+	    query.bindValue(":ITEMID", itemID);
+	    query.bindValue(":PARENTID", parentid);
+	    query.bindValue(":FILEPATH", fPath);
+	    query.bindValue(":FILENAME", fName);
+	    query.bindValue(":TITLE", GetTitleName(fPath,fName));
+	    query.exec();
+			    
+	    itemID = buildFileList(Info.filePath(),itemID, query);
+	    continue;
+
+        }
+        else
+        {
+/*
+            if (handler->validextensions.count() > 0)
+            {
+                QRegExp r;
+
+                r.setPattern("^" + Info.extension( FALSE ) + "$");
+                r.setCaseSensitive(false);
+                QStringList result = handler->validextensions.grep(r);
+                if (result.isEmpty()) {
+                    continue;
+                }
+            }
+*/
+
+	    itemID++;
+//            VERBOSE(VB_UPNP, QString("UPnpCDSVideo Video File : (%1) (%2)")
+//			          .arg(itemID)
+ //                                 .arg(fName));
+            query.prepare("INSERT INTO upnpmedia "
+                          "(intid, class, itemtype, parentid, itemproperties, "
+                          "filepath, filename, title) "
+                          "VALUES (:ITEMID, 'VIDEO', 'FILE', :PARENTID, '', "
+                          ":FILEPATH, :FILENAME, :TITLE)");
+
+            query.bindValue(":ITEMID", itemID);
+            query.bindValue(":PARENTID", parentid);
+            query.bindValue(":FILEPATH", fPath);
+            query.bindValue(":FILENAME", fName);
+            query.bindValue(":TITLE", GetTitleName(fPath,fName));
+	    query.exec();
+
+        }
+    }
+
+    return itemID;
+}
+
+void UPnpCDSVideo::BuildMediaMap(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString RootVidDir;
+    int filecount;
+
+    RootVidDir = gContext->GetSetting("VideoStartupDir");
+    filecount = 0;
+
+    query.exec("DELETE FROM upnpmedia WHERE class = 'VIDEO'");
+
+    filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
+
+
+    VERBOSE(VB_UPNP, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
+
+}
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -236,20 +257,13 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             MSqlQuery               &query )
 {
     int            nVidID       = query.value( 0).toInt();
-    QString        sTitle       = QString::fromUtf8(query.value( 1).toString());
-    QString        sDirector    = QString::fromUtf8(query.value( 2).toString());
-    QString        sDescription = QString::fromUtf8(query.value( 3).toString());
-    QString        sYear        = query.value( 4).toString();
-    QString        sUserRating  = query.value( 5).toString();
-  //long long      nFileSize    = stringToLongLong( query.value( 6).toString() );
-    QString        sFileName    = query.value( 7).toString();
-    QString        sCover       = query.value( 8).toString();
-  //int            nCategory    = query.value( 9).toInt();
+    QString        sTitle       = query.value( 1).toString();
+    QString        sFileName    = query.value( 2).toString();
+    QString        sItemType    = query.value( 3).toString();
+    QString        sParentID    = query.value( 5).toString();
 
-    // This should be a lookup from acache of the videometagenre and such tables.
-    QString        sGenre       = m_mapGenre[nVidID];
-    QString        sCountry     = m_mapCountry[nVidID];
-
+    // VERBOSE(VB_UPNP,QString("ID = %1, Title = %2, fname = %3 sObjectId = %4").arg(nVidID).arg(sTitle).arg(sFileName).arg(sObjectId));
+    
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
     // ----------------------------------------------------------------------
@@ -266,16 +280,34 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sServerIp )
                             .arg( sPort     );
 
-    QString sURIParams = QString( "?Id=%1&amp;" )
+    QString sURIParams = QString( "?Id=%1" )
                             .arg( nVidID );
 
     QString sId        = QString( "%1/item%2")
                             .arg( sObjectId )
                             .arg( sURIParams );
 
-    CDSObject *pItem   = CDSObject::CreateVideoItem( sId, 
-                                                     sName, 
-                                                     sObjectId );
+    CDSObject *pItem;
+
+    if (sItemType == "FILE") 
+    {
+	sURIParams = QString( "/Id%1" )
+		         .arg( nVidID );
+	sId        = QString( "%1/item%2")
+		         .arg( sObjectId )
+			 .arg( sURIParams );
+
+        pItem   = CDSObject::CreateVideoItem( sId, 
+                                                         sName, 
+                                                        sParentID );
+    }
+    else if (sItemType == "FOLDER") 
+    {
+	pItem   = CDSObject::CreateStorageFolder( sId,
+	                                                     sName,
+							     sParentID);
+    }
+
     pItem->m_bRestricted  = false;
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "WRITABLE";
@@ -288,23 +320,6 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
 
         pItem->SetPropValue( "refID", sRefId );
     }
-
-    pItem->SetPropValue( "country"        , sCountry );
-    pItem->SetPropValue( "director"       , sDirector );
-    pItem->SetPropValue( "year"           , sYear    );
-    pItem->SetPropValue( "genre"          , sGenre    );
-    //cerr << QString("Setting GENRE : %1 for item (%3) %2").arg(sGenre).arg(sTitle).arg(nVidID) << endl;
-    pItem->SetPropValue( "longDescription", sDescription );
-    pItem->SetPropValue( "description"    , sDescription    );
-
-    //pItem->SetPropValue( "producer"       , );
-    //pItem->SetPropValue( "rating"         , );
-    //pItem->SetPropValue( "actor"          , );
-    //pItem->SetPropValue( "director"       , );
-    //pItem->SetPropValue( "publisher"      , );
-    //pItem->SetPropValue( "language"       , );
-    //pItem->SetPropValue( "relation"       , );
-    //pItem->SetPropValue( "region"         , );
 
     pResults->Add( pItem );
 

@@ -100,8 +100,18 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
     {
         if (pRequest)
         {
+	    if (pRequest->m_sBaseUrl == "/Myth/GetVideo")
+	    {
+	        pRequest->m_sBaseUrl = m_sControlUrl;
+		pRequest->m_sMethod = "GetVideo";
+	    }
+
             if (pRequest->m_sBaseUrl != m_sControlUrl)
                 return( false );
+
+            VERBOSE(VB_UPNP, QString("MythXML::ProcessRequest: %1 : %2")
+			             .arg(pRequest->m_sMethod)
+				     .arg(pRequest->m_sRawRequest));
 
             switch( GetMethod( pRequest->m_sMethod ))
             {
@@ -1256,7 +1266,18 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
     QString sId   = pRequest->m_mapParams[ "Id" ];
 
     if (sId.length() == 0) 
-        return;
+    {
+        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
+
+	idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+        sId = idPath[0];
+
+	if (sId.startsWith("Id"))
+	    sId = sId.right(sId.length() - 2);
+        else 
+            return;
+	//VERBOSE(VB_UPNP, QString("MythXML::GetVideo : %1 ").arg(sId));
+    }
 
     // ----------------------------------------------------------------------
     // Check to see if this is another request for the same recording...
@@ -1291,7 +1312,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
         if (query.isConnected())
         {
-            query.prepare("SELECT filename FROM videometadata WHERE intid = :KEY" );
+            query.prepare("SELECT filepath FROM upnpmedia WHERE intid = :KEY" );
             query.bindValue(":KEY", sId );
             query.exec();
 
@@ -1361,7 +1382,6 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
         (sServerIP         != "localhost") &&
         (sServerIP         != sPeerIP    ))
     {
-        VERBOSE(VB_IMPORTANT, "MythXML::GetConnectionInfo() - DBHostName value of 'localhost' is inappropriate. Changing to " + sServerIP );
         params.dbHostName = sServerIP;
     }
 
