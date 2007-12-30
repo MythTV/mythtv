@@ -147,9 +147,12 @@ bool avfDecoder::initialize()
     // Determine the output format
     // Given we are outputing to a sound card, this will always
     // be a PCM format
-    fmt = guess_format("audio_device", NULL, NULL);
+    fmt = guess_format("oss", NULL, NULL);
     if (!fmt)
+    {
+        VERBOSE(VB_IMPORTANT, "avfDecoder.o - failed to get output format");
         return FALSE;
+    }
 
     // Populate the output context
     // Create the output stream and attach to output context
