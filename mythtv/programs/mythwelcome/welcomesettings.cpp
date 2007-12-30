@@ -74,6 +74,17 @@ static HostCheckBox *ShutdownWithBE()
     return gc;
 };
 
+static HostLineEdit *MythWelcomeDateFormat()
+{
+    HostLineEdit *gc = new HostLineEdit("MythWelcomeDateFormat");
+    gc->setLabel(QObject::tr("Date Format"));
+    gc->setValue("dddd\ndd MMM yyyy");
+    gc->setHelpText(QObject::tr("This is the format to use to display the date. "
+                                "See http://doc.trolltech.com/3.3/qdate.html#toString "
+                                "for a list of valid format specifiers."));
+    return gc;
+};
+
 MythWelcomeSettings::MythWelcomeSettings()
 {
     HorizontalConfigurationGroup* hcg1 =
@@ -102,6 +113,8 @@ MythWelcomeSettings::MythWelcomeSettings()
     {
         vcg->addChild(ShutdownWithBE());
     }
+
+    vcg->addChild(MythWelcomeDateFormat());
 
     addChild(vcg);
 }

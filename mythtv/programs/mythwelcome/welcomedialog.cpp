@@ -45,6 +45,8 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                        gContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
     m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateFormat = gContext->GetSetting("MythWelcomeDateFormat", "dddd\\ndd MMM yyyy");
+    m_dateFormat.replace("\\n", "\n");
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
@@ -221,6 +223,9 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
                 RemoteSendMessage("CLEAR_SETTINGS_CACHE");
                 updateStatus();
                 updateScreen();
+
+                m_dateFormat = gContext->GetSetting("MythWelcomeDateFormat", "dddd\\ndd MMM yyyy");
+                m_dateFormat.replace("\\n", "\n");
             }
         }
         else if (action == "SHOWSETTINGS")
@@ -333,7 +338,7 @@ void WelcomeDialog::updateTime(void)
     if (s != m_time_text->GetText())
         m_time_text->SetText(s);
 
-    s = QDateTime::currentDateTime().toString("dddd\ndd MMM yyyy");
+    s = QDateTime::currentDateTime().toString(m_dateFormat);
 
     if (s != m_date_text->GetText())
         m_date_text->SetText(s);
@@ -374,7 +379,7 @@ void WelcomeDialog::updateScreen(void)
                 if (tuner->program.subtitle != "") 
                     status += "\n(" + tuner->program.subtitle + ")";
                 status += "\n" + tuner->program.startTime.toString("hh:mm") + 
-                          " to " + tuner->program.endTime.toString("hh:mm");
+                    " " + tr("to") + " " + tuner->program.endTime.toString("hh:mm");
             }
             else
                 status = QString(tr("Tuner %1 is not recording")).arg(tuner->id);
@@ -404,9 +409,8 @@ void WelcomeDialog::updateScreen(void)
             if (prog->subtitle != "")
                 status += "\n(" + prog->subtitle + ")";
 
-            status += "\n" + prog->startTime.
-                    toString("ddd dd MMM yyyy (hh:mm") + " to " +
-                    prog->endTime.toString("hh:mm)");
+            status += "\n" + prog->startTime.toString(m_dateFormat + " (" + m_timeFormat) +
+                " " + tr("to") + " " +  prog->endTime.toString("hh:mm)");
 
             if (m_screenScheduledNo < m_scheduledList.count() - 1)
                 m_screenScheduledNo++;

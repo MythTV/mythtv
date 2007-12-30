@@ -70,6 +70,7 @@ class WelcomeDialog : public MythThemedDialog
 
     QString        m_installDir;
     QString        m_timeFormat;
+    QString        m_dateFormat;
     bool           m_isRecording;
     bool           m_hasConflicts;
     bool           m_bWillShutdown;
