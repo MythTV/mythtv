@@ -131,13 +131,13 @@
     (gimp-context-set-foreground '(0 0 0))
     (gimp-selection-none image)
     (script-fu-selection-rounded-rectangle image bg-layer 14.0 FALSE)
-    (gimp-edit-fill bg-layer FOREGROUND-FILL)
+    (gimp-bucket-fill bg-layer FG-BUCKET-FILL NORMAL-MODE 70.0 0 FALSE 0 0)
     (gimp-selection-shrink image (- border-width trans-border-width))
     (gimp-edit-clear bg-layer)
     (gimp-bucket-fill bg-layer FG-BUCKET-FILL NORMAL-MODE 50.0 0 FALSE 0 0)
     (gimp-selection-shrink image trans-border-width)
     (gimp-edit-clear bg-layer)
-    (gimp-bucket-fill bg-layer FG-BUCKET-FILL NORMAL-MODE 80.0 0 FALSE 0 0)
+    (gimp-bucket-fill bg-layer FG-BUCKET-FILL NORMAL-MODE 60.0 0 FALSE 0 0)
 
     ; add shadow
     (gimp-selection-none image)
