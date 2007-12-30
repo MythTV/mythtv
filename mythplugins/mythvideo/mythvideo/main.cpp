@@ -125,8 +125,7 @@ namespace
                 scanner.doScan(GetVideoDirs());
 
                 return q_exec_screen(
-                    new VideoManager(gContext->GetMainWindow(),
-                                     "video manager", video_list),
+                    new VideoManager(gContext->GetMainWindow(), video_list),
                     "videomanager");
             }
             return 0;

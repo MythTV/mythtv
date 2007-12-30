@@ -16,9 +16,9 @@ class MyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_GET(self):
 		f = self.__send_head(True)
+		self.log_message("Sleeping for %d" % (GET_DELAY,))
+		time.sleep(GET_DELAY)
 		if f:
-			self.log_message("Sleeping for %d" % (GET_DELAY,))
-			time.sleep(GET_DELAY)
 			shutil.copyfileobj(f, self.wfile)
 			f.close()
 
@@ -66,7 +66,7 @@ def main():
 		GET_DELAY = int(options.delay)
 
 	try:
-		httpd = BaseHTTPServer.HTTPServer(('', bind_port),  MyRequestHandler)
+		httpd = BaseHTTPServer.HTTPServer(('', bind_port), MyRequestHandler)
 		print('Waiting for requests')
 		httpd.serve_forever()
 	except KeyboardInterrupt:

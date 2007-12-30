@@ -177,18 +177,19 @@
     </container>
 
     <container name="moviesel">
-      <area>207,100,377,400</area>
+      <area>201,94,413,426</area>
       <listarea name="listing" draworder="4">
-        <area>12,15,359,370</area>
+        <area>30,22,357,378</area>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="355" context="-1"></column>
+        <column number="1" width="357" context="-1"></column>
         <items>11</items>
-        <image function="selectionbar" filename="mv-sel.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="350,15"></image>
-        <image function="downarrow" filename="downarrow.png" location="350,330"></image>
+		<image function="selectionbar" filename="mv-sel.png" location="-20,-1"/>
+		<image function="uparrow" filename="uparrow.png" location="358,23"/>
+		<image function="downarrow" filename="downarrow.png"
+			location="358,359"/>
       </listarea>
       <image name="showinglines" draworder="3" fleximage="no">
         <filename>mv-mselect.png</filename>
@@ -197,7 +198,7 @@
     </container>
 
     <container name="enterimdb">
-      <area>220,200,360,200</area>
+      <area>220,200,367,200</area>
       <image name="box" draworder="7">
         <filename>mv-popup.png</filename>
         <position>0,0</position>
@@ -205,25 +206,12 @@
       <textarea name="msg" draworder="7" align="center">
         <font>info</font>
         <value>Enter IMDB #</value>
-        <area>0,15,360,25</area>
+        <area>10,30,331,25</area>
       </textarea>
-      <textarea name="numhold" draworder="7" align="center">
+      <remoteedit name="numhold" draworder="7" align="center">
         <font>biginfo</font>
-        <area>0,57,360,50</area>
-      </textarea>
-    </container>
-
-    <container name="playwait">
-      <area>0,0,800,600</area>
-      <textarea name="ld1" draworder="0">
-        <area>68,140,350,90</area>
-        <font>bigtitle</font>
-        <value>loading...</value>
-      </textarea>
-      <textarea name="title" draworder="0" align="center">
-        <area>0,320,800,60</area>
-        <font>biginfo</font>
-      </textarea>
+        <area>10,75,331,50</area>
+      </remoteedit>
     </container>
 
     <container name="novideos_info">

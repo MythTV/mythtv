@@ -57,9 +57,13 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
 void checkedSetText(LayerSet *container, const QString &item_name,
                            const QString &text)
 {
-    UITextType *utt = dynamic_cast<UITextType *>(container->GetType(item_name));
-    if (utt)
-        utt->SetText(text);
+    if (container)
+    {
+        UITextType *utt = dynamic_cast<UITextType *>
+                (container->GetType(item_name));
+        if (utt)
+            utt->SetText(text);
+    }
 }
 
 QStringList GetVideoDirs()

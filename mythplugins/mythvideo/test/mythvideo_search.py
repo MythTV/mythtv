@@ -3,6 +3,7 @@
 import sys
 import os
 import socket
+import time
 import MySQLdb
 from optparse import OptionParser
 from mythvideo_test import HTTP_PORT
@@ -79,6 +80,44 @@ items = [
 		ItemInfo('1234569', 'Test Video 2', '2008', '2008-01-02', 'ADirector',
 			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
 			'Action', 'USA', 'poster3.png', ['Test Video Two', 'all']),
+		ItemInfo('1234570', 'Test Video 3', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Three', 'all']),
+		ItemInfo('1234571', 'Test Video 4', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Four', 'all']),
+		ItemInfo('1234572', 'Test Video 5', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Five', 'all']),
+		ItemInfo('1234573', 'Test Video 6', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Six', 'all']),
+		ItemInfo('1234574', 'Test Video 7', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Seven', 'all']),
+		ItemInfo('1234575', 'Test Video 8', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Eight', 'all']),
+		ItemInfo('1234576', 'Test Video 9', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Nine', 'all']),
+		ItemInfo('1234577', 'Test Video 10', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Ten', 'all']),
+		ItemInfo('1234578', 'Test Video 11', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Eleven', 'all']),
+		ItemInfo('1234579', 'Test Video 12', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Twelve', 'all']),
+		ItemInfo('1234580', 'Test Video 13', '2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['Test Video Thirteen', 'all']),
+		ItemInfo('1234580',
+			'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+			'2008', '2008-01-02', 'ADirector',
+			'None.', '5.3', 'Rated PG-13', '103', 'Some Writter', 'Cast member',
+			'Action', 'USA', '', ['long', 'all']),
 		]
 
 poster_map = dict()
@@ -100,9 +139,11 @@ def data_search(uid):
 				break
 
 def poster_search(uid):
-	item = poster_map[uid]
+	item = poster_map.get(uid)
 	if item:
 		print('%s/%s' % (IMAGE_URL_BASE % (URL_HOST, URL_PORT), item));
+	else:
+		print('%s/%s' % (IMAGE_URL_BASE % (URL_HOST, URL_PORT), 'not_there'));
 
 def __open_db():
 	conn = MySQLdb.connect(host = DB_HOST, user = DB_USER,
@@ -202,7 +243,7 @@ def uninstall():
 			for item in items:
 				tf = os.path.join(testdir, item.m_title + '.iso')
 				if os.path.isfile(tf):
-					unlink(tf)
+					os.unlink(tf)
 				else:
 					print('Dummy test file (%s) does not exist, ignoring' %
 							(tf))
@@ -239,6 +280,8 @@ def main():
 			help="Port returned URLs point to.")
 	parser.add_option("-u", "--url-host", type="string", dest="url_host",
 			help="Host serving returned poster URLs.")
+	parser.add_option("--delay", type="int", dest="search_delay", default='1',
+			help="Delay all search commands by DELAY seconds.", metavar="DELAY")
 	(options, args) = parser.parse_args()
 
 	global DB_USER, DB_PASSWORD, DB_HOST, URL_PORT, URL_HOST
@@ -258,10 +301,13 @@ def main():
 	elif options.uninstall:
 		uninstall()
 	elif options.title_search:
+		time.sleep(options.search_delay)
 		title_search(options.title_search)
 	elif options.data_search:
+		time.sleep(options.search_delay)
 		data_search(options.data_search)
 	elif options.poster_search:
+		time.sleep(options.search_delay)
 		poster_search(options.poster_search)
 
 if __name__ == '__main__':

@@ -14,6 +14,8 @@
 #include <list>
 #include <stack>
 #include <set>
+#include <cmath>
+#include <stdint.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -29,6 +31,10 @@
 #include "videoutils.h"
 #include "metadatalistmanager.h"
 
+// AEW
+#define VB_DEBUG VB_IMPORTANT // A way to mark VERBOSE calls that probably
+                              // should not see a commit.
+
 namespace mythvideo_videomanager
 {
     class ListBehaviorManager
@@ -41,219 +47,256 @@ namespace mythvideo_videomanager
             lbWrapList = 0x2
         };
 
-        struct lb_data
+        // an iterator over the window area with accompanying item IDs
+        struct const_iterator
         {
-            unsigned int begin;
-            unsigned int end; // one past the end
-            unsigned int index;
+            const_iterator(unsigned int item_index_) :
+                item_index(item_index_), m_window_index(0)
+            {
+            }
+
+            const_iterator(const const_iterator &other) :
+                item_index(other.item_index),
+                m_window_index(other.m_window_index)
+            {
+            }
+
             unsigned int item_index;
-            bool data_above_window; // true if items "before" window
-            bool data_below_window; // true if items "past" window
+
+            const_iterator &operator++() // pre
+            {
+                ++m_window_index;
+                ++item_index;
+                return *this;
+            }
+
+            bool operator!=(const const_iterator &rhs)
+            {
+                return item_index != rhs.item_index;
+            }
+
+            unsigned int operator*()
+            {
+                return m_window_index;
+            }
+
+          private:
+            unsigned int m_window_index;
         };
 
       public:
         ListBehaviorManager(unsigned int window_size = 0,
                                int behavior = lbNone,
                                unsigned int item_count = 0) :
-            m_window_size(window_size), m_item_count(item_count), m_index(0),
-            m_skip_index(SKIP_MAX)
+            m_item_count(item_count), m_item_index(0), m_skip_index(SKIP_MAX),
+            m_window_size(window_size), m_window_start_index(0),
+            m_window_display_count(0)
         {
             m_scroll_center = behavior & lbScrollCenter;
             m_wrap_list = behavior & lbWrapList;
         }
 
-        void setWindowSize(unsigned int window_size)
+        const_iterator begin()
+        {
+            return const_iterator(m_window_start_index);
+        }
+
+        const_iterator end()
+        {
+            return const_iterator(m_window_start_index +
+                                  m_window_display_count);
+        }
+
+        void SetWindowSize(unsigned int window_size)
         {
             m_window_size = window_size;
+            m_window_display_count = std::min(m_item_count, m_window_size);
+            m_window_start_index = 0;
+            Update();
         }
 
-        unsigned int getWindowSize() const
+        unsigned int GetWindowSize() const { return m_window_size; }
+
+        unsigned int GetWindowIndex() const
         {
-            return m_window_size;
+            return m_item_index - m_window_start_index;
         }
 
-        void setItemCount(unsigned int item_count)
+        bool ItemsAboveWindow() const
+        {
+            return m_window_start_index;
+        }
+
+        bool ItemsBelowWindow() const
+        {
+            return m_window_start_index + m_window_display_count <
+                    m_item_count;
+        }
+
+        void SetItemCount(unsigned int item_count)
         {
             m_item_count = item_count;
+            m_window_display_count = std::min(m_item_count, m_window_size);
+            m_item_index = bounded_index(m_item_index);
+            m_window_start_index = 0;
+            Update();
         }
 
-        unsigned int getItemCount() const
+        unsigned int GetItemCount() const
         {
             return m_item_count;
         }
 
-        const lb_data &setIndex(unsigned int index)
+        void SetItemIndex(unsigned int index)
         {
-            m_index = index;
-            return update_data();
+            m_item_index = bounded_index(index);
+            Update();
         }
 
-        unsigned int getIndex() const
+        unsigned int GetItemIndex() const
         {
-            return m_index;
+            return m_item_index;
         }
 
-        void setSkipIndex(unsigned int skip = SKIP_MAX)
+        void SetSkipIndex(unsigned int skip = SKIP_MAX)
         {
             m_skip_index = skip;
+            Update();
         }
 
-        const lb_data &move_up()
+        void Up()
         {
-            if (m_index)
-                --m_index;
-            else if (m_wrap_list)
-                m_index = m_item_count - 1;
-            return update_data(mdUp);
+            Update(-1);
         }
 
-        const lb_data &move_down()
+        void Down()
         {
-            ++m_index;
-            return update_data(mdDown);
+            Update(1);
         }
 
-        const lb_data &getData()
+        void PageUp()
         {
-            return update_data();
+            Update(-m_window_size);
         }
 
-        const lb_data &page_up()
+        void PageDown()
         {
-            if (m_index == 0)
-                m_index = m_item_count - 1;
-            else if (m_index < m_window_size - 1)
-                m_index = 0;
-            else
-                m_index -= m_window_size;
-            return update_data(mdUp);
-        }
-
-        const lb_data &page_down()
-        {
-            if (m_index == m_item_count - 1)
-                m_index = 0;
-            else if (m_index + m_window_size > m_item_count - 1)
-                m_index = m_item_count - 1;
-            else
-                m_index += m_window_size;
-            return update_data(mdDown);
+            Update(m_window_size);
         }
 
       private:
-        enum movement_direction
+        void Update(int move_by = 0)
         {
-            mdNone,
-            mdUp,
-            mdDown
-        };
-
-        const lb_data &update_data(movement_direction direction = mdNone)
-        {
-            if (m_item_count <= 1)
-            {
-                m_index = 0;
-                m_data.begin = 0;
-                m_data.end = m_item_count;
-                m_data.index = 0;
-                m_data.item_index = 0;
-                m_data.data_below_window = false;
-                m_data.data_above_window = false;
-            }
-            else if (m_item_count)
+            if (move_by && m_item_count)
             {
                 const unsigned int last_item_index = m_item_count - 1;
+                const bool is_negative = move_by < 0 &&
+                        m_item_index < static_cast<unsigned int>
+                                       (std::abs(move_by));
+                unsigned int after_move = 0;
+                if (!is_negative)
+                    after_move = m_item_index + move_by;
 
-                if (m_skip_index != SKIP_MAX && m_index == m_skip_index)
+                if (m_skip_index != SKIP_MAX &&
+                    after_move == m_skip_index)
                 {
-                    if (direction == mdDown)
-                        ++m_index;
-                    else if (direction == mdUp)
-                        --m_index;
-                }
-
-                if (m_wrap_list)
-                {
-                    if (m_index > last_item_index)
+                    if (move_by < 0)
                     {
-                        m_index = 0;
-                    }
-                }
-                else
-                {
-                    if (m_index > last_item_index)
-                    {
-                        m_index = last_item_index;
-                    }
-                }
-
-                const unsigned int max_window_size = m_window_size - 1;
-
-                if (m_scroll_center && m_item_count > max_window_size)
-                {
-                    unsigned int center_buffer = m_window_size / 2;
-                    if (m_index < center_buffer)
-                    {
-                        m_data.begin = 0;
-                        m_data.end = std::min(last_item_index, max_window_size);
-                    }
-                    else if (m_index > m_item_count - center_buffer)
-                    {
-                        m_data.begin = last_item_index - max_window_size;
-                        m_data.end = last_item_index;
+                        if (after_move)
+                            --after_move;
+                        else
+                            ++after_move;
                     }
                     else
-                    {
-                        m_data.begin = m_index - center_buffer;
-                        m_data.end = m_index + center_buffer - 1;
-                    }
+                        ++after_move;
+                }
+
+                if (is_negative)
+                {
+                    if (m_wrap_list && m_item_index == 0)
+                        m_item_index = last_item_index;
+                    else
+                        m_item_index = 0;
+                }
+                else if (after_move >= m_item_count)
+                {
+                    if (m_wrap_list && m_item_index == last_item_index)
+                        m_item_index = 0;
+                    else
+                        m_item_index = last_item_index;
                 }
                 else
-                {
-                    if (m_index <= max_window_size)
-                    {
-                        m_data.begin = 0;
-                        m_data.end = std::min(last_item_index, max_window_size);
-                    }
-                    else
-                    {
-                        m_data.begin = m_index - max_window_size;
-                        m_data.end = m_index;
-                    }
-                }
-                m_data.index = m_index - m_data.begin;
-
-                m_data.data_below_window = m_data.end < m_item_count - 1;
-                m_data.data_above_window = m_data.begin != 0;
-                m_data.item_index = m_index;
-                if (m_data.end != 0) ++m_data.end;
+                    m_item_index = after_move;
             }
 
-            return m_data;
+            // place window
+            const unsigned int half_window_count =
+                    static_cast<unsigned int>(std::ceil(m_window_size / 2.0));
+            const unsigned int sc_end_count =
+                    half_window_count > m_item_count ?
+                    0 : m_item_count - half_window_count;
+            if (m_scroll_center &&
+                m_item_index >= half_window_count &&
+                m_item_index <= sc_end_count)
+            {
+                m_window_start_index = m_item_index - half_window_count;
+            }
+            else
+            {
+                // If the index is outside the window, move
+                // the window.
+                const unsigned int end_window_index =
+                        m_window_start_index + m_window_display_count;
+                if (m_item_index < m_window_start_index)
+                    m_window_start_index = m_item_index;
+                else if (m_item_index >= end_window_index)
+                {
+                    m_window_start_index =
+                            m_item_index >= m_window_display_count ?
+                            m_item_index + 1 - m_window_display_count : 0;
+                }
+            }
+        }
+
+        unsigned int bounded_index(unsigned int index)
+        {
+            unsigned int ret = 0;
+
+            if (m_item_count)
+                ret = index >= m_item_count ?  m_item_count - 1 : index;
+
+            return ret;
         }
 
       private:
-        unsigned int m_window_size;
         unsigned int m_item_count;
-        unsigned int m_index;
+        unsigned int m_item_index;
         unsigned int m_skip_index;
 
-        static const unsigned int SKIP_MAX = -1;
+        unsigned int m_window_size;
+        unsigned int m_window_start_index;
+        unsigned int m_window_display_count;
 
         bool m_scroll_center;
         bool m_wrap_list;
-        lb_data m_data;
+
+        static const unsigned int SKIP_MAX = -1;
     };
 
     const unsigned int ListBehaviorManager::SKIP_MAX;
 
-    void DrawContainer(QPainter &painter, LayerSet *container, int context = 0)
+    // These will be set to support older themes that may not be
+    // aware of the new context.
+    enum DefaultContext
     {
-        for (int i = 0; i < container->getLayers() + 1; ++i)
-        {
-            container->Draw(&painter, i, context);
-        }
-    }
+        edcHidden = -100,
+        edcAlwaysShown = -1,
+        edcWaitContext = 1,
+        edcSearchListContext = 2,
+        edcManualUIDSearchContext = 3,
+        edcManualTitleSearchContext = 4,
+        edcNoVideoContext = 20
+    };
 
     // Note: Containers are control/dialog non-windows, they suck.
     // This whole thing is overly complex, MythThemedDialog
@@ -266,10 +309,10 @@ namespace mythvideo_videomanager
     // source. In other words, one day all of this container stuff
     // will be deleted and replaced by MythUI.
 
-    struct ContainerDoneEvent : public QEvent
+    struct ContainerDoneEvent : public QCustomEvent
     {
         enum MyType { etContainerDone = 311976 };
-        ContainerDoneEvent() : QEvent(static_cast<Type>(etContainerDone)) {}
+        ContainerDoneEvent() : QCustomEvent(etContainerDone) {}
     };
 
     class ContainerHandler : public QObject
@@ -279,11 +322,10 @@ namespace mythvideo_videomanager
       public:
         enum HandlerFlag
         {
-            ehfPaint = 0x1, // Stop paint events from processing
             ehfCanTakeFocus = 0x1 << 1 // Container can take focus
         };
 
-        typedef QWidget ParentWindowType;
+        typedef MythThemedDialog ParentWindowType;
 
         enum ExitType
         {
@@ -294,7 +336,7 @@ namespace mythvideo_videomanager
       public:
         ContainerHandler(QObject *oparent, ParentWindowType *pwt,
                 XMLParse &theme, const QString &container_name,
-                unsigned int flags = ehfPaint | ehfCanTakeFocus) :
+                unsigned int flags, int context_override = edcAlwaysShown) :
             QObject(oparent),
             m_container(0), m_theme(&theme), m_pwt(pwt), m_done(false),
             m_container_name(container_name),
@@ -304,7 +346,14 @@ namespace mythvideo_videomanager
             {
                 m_container = m_theme->GetSet(m_container_name);
                 if (m_container)
+                {
                     m_rect = m_container->GetAreaRect();
+                    if (m_container->GetContext() == edcAlwaysShown &&
+                        context_override != edcAlwaysShown)
+                    {
+                        ForceContext(m_container, context_override);
+                    }
+                }
                 else
                 {
                     VERBOSE(VB_IMPORTANT,
@@ -314,10 +363,80 @@ namespace mythvideo_videomanager
             }
         }
 
-        // returns true if the underlying container exists
-        bool Exists() const
+        ~ContainerHandler()
         {
-            return m_container != 0;
+        }
+
+        unsigned int SetFlags(unsigned int flags)
+        {
+            m_flags = flags;
+            return m_flags;
+        }
+
+        unsigned int GetFlags() const { return m_flags; }
+
+        ParentWindowType *GetParentWindow() { return m_pwt; }
+
+        const QString &GetName() const { return m_container_name; }
+
+        const QRect &GetRect() const { return m_rect; }
+
+        // returns true if action handled
+        virtual bool KeyPress(const QString &action)
+        {
+            if (action == "ESCAPE")
+            {
+                SetDone(true, etFailure);
+                return true;
+            }
+            return false;
+        }
+
+        virtual void OnGainFocus() {}
+        virtual void OnLoseFocus() {}
+
+        int GetContext()
+        {
+            if (m_container)
+                return m_container->GetContext();
+            return edcAlwaysShown;
+        }
+
+        // Called after the container has done Success() or Failure()
+        // and before this object is destroyed.
+        void DoExit()
+        {
+            OnExit(m_exit_type);
+        }
+
+        bool IsDone() const { return m_done; }
+
+        virtual void Invalidate()
+        {
+            Invalidate(m_rect);
+        }
+
+      private:
+        void ForceContext(LayerSet *on, int context)
+        {
+            on->SetContext(context);
+
+            typedef std::vector<UIType *> ui_types_list;
+            ui_types_list *items = on->getAllTypes();
+            if (items)
+            {
+                for (ui_types_list::iterator p = items->begin();
+                     p != items->end(); ++p)
+                {
+                    (*p)->SetContext(context);
+                }
+            }
+        }
+
+      protected:
+        void Invalidate(const QRect &rect)
+        {
+            m_pwt->updateForeground(rect);
         }
 
         void Success()
@@ -330,70 +449,6 @@ namespace mythvideo_videomanager
             SetDone(true, etFailure);
         }
 
-        unsigned int SetFlags(unsigned int flags)
-        {
-            m_flags = flags;
-            return m_flags;
-        }
-
-        unsigned int GetFlags() const { return m_flags; }
-
-        unsigned int SetFlag(HandlerFlag flag)
-        {
-            m_flags |= flag;
-            return m_flags;
-        }
-
-        unsigned int ClearFlag(HandlerFlag flag)
-        {
-            m_flags &= ~flag;
-            return m_flags;
-        }
-
-        ParentWindowType *GetParentWindow()
-        {
-            return m_pwt;
-        }
-
-        const QRect &GetRect() const { return m_rect; }
-
-        // returns true if action handled
-        virtual bool KeyPress(const QString &action, QKeyEvent *raw_event)
-        {
-            (void) raw_event;
-            if (action == "ESCAPE")
-            {
-                SetDone(true, etFailure);
-                return true;
-            }
-            return false;
-        }
-
-        virtual void Paint(QPainter &painter, const QRect &rel_inv_r) = 0;
-
-        const QString &GetName() const { return m_container_name; }
-
-        // Invalidates the rect of this container
-        void Invalidate(const QRect &rect)
-        {
-            m_pwt->update(rect.left(), rect.top(), rect.width(), rect.height());
-        }
-
-        void Invalidate()
-        {
-            Invalidate(m_rect);
-        }
-
-        bool IsDone() const { return m_done; }
-
-        // Called after the container has done Success() or Failure()
-        // and before this object is destroyed.
-        void DoExit()
-        {
-            OnExit(m_exit_type);
-        }
-
-      protected:
         // override to do things like send results
         virtual void OnExit(ExitType et)
         {
@@ -405,7 +460,6 @@ namespace mythvideo_videomanager
             m_done = done;
             m_exit_type = et;
             SetFlags(0);
-            Invalidate();
             qApp->postEvent(parent(), new ContainerDoneEvent());
         }
 
@@ -424,7 +478,7 @@ namespace mythvideo_videomanager
 
     struct ContainerEvent
     {
-        enum EventType { cetNone, cetPaint, cetKeyPress };
+        enum EventType { cetNone, cetKeyPress };
 
         ContainerEvent(EventType event_type = cetNone) :
             m_handled(false), m_event_type(event_type) {}
@@ -445,30 +499,14 @@ namespace mythvideo_videomanager
 
     struct CEKeyPress : public ContainerEvent
     {
-        CEKeyPress(const QString &action, const QKeyEvent *raw_event) :
-            ContainerEvent(ContainerEvent::cetKeyPress), m_action(action),
-            m_raw_event(0)
+        CEKeyPress(const QString &action) :
+            ContainerEvent(ContainerEvent::cetKeyPress), m_action(action)
         {
-            if (raw_event)
-            {
-                m_raw_event = new QKeyEvent(raw_event->type(),
-                                            raw_event->key(),
-                                            raw_event->ascii(),
-                                            raw_event->state(),
-                                            raw_event->text(),
-                                            raw_event->isAutoRepeat(),
-                                            raw_event->count());
-            }
-        }
-
-        ~CEKeyPress()
-        {
-            delete m_raw_event;
         }
 
         void Do(ContainerHandler *handler)
         {
-            SetHandled(handler->KeyPress(m_action, m_raw_event));
+            SetHandled(handler->KeyPress(m_action));
         }
 
       private:
@@ -476,62 +514,24 @@ namespace mythvideo_videomanager
 
       private:
         QString m_action;
-        QKeyEvent *m_raw_event;
-    };
-
-    struct CEPaint : public ContainerEvent
-    {
-        static const bool AEW_debug_paint = false;
-
-        CEPaint(QPainter &painter, const QRect &inv_rect) :
-            ContainerEvent(ContainerEvent::cetPaint), m_painter(&painter),
-            m_inv_rect(inv_rect)
-        {
-        }
-
-        void Do(ContainerHandler *handler)
-        {
-            if (AEW_debug_paint)
-            {
-                QPen orig_pen = m_painter->pen();
-                QBrush orig_brush = m_painter->brush();
-
-                m_painter->setBrush(QBrush());
-                m_painter->setPen(QPen(QColor(0, 255, 0), 1));
-                m_painter->drawRect(m_inv_rect);
-
-                m_painter->setPen(orig_pen);
-                m_painter->setBrush(orig_brush);
-            }
-
-            handler->Paint(*m_painter, m_inv_rect);
-
-        }
-
-        const QRect &GetInvRect() const { return m_inv_rect; }
-        QPainter &GetPainter() { return *m_painter; }
-
-      private:
-        QPainter *m_painter;
-        QRect m_inv_rect;
     };
 
     // Dispatch container events to the top container. If there
     // is no top container it dispatches the events to the base
     // handler.
-    template <typename HandlerType>
+    template <typename HandlerType, typename DialogType>
     class ContainerDispatch
     {
       public:
-        ContainerDispatch(QObject *event_dest, QWidget *canvas) :
-            m_event_dest(event_dest), m_canvas(canvas), m_focus(0)
+        ContainerDispatch(QObject *event_dest, DialogType *parent_dialog) :
+            m_event_dest(event_dest), m_parent_dialog(parent_dialog), m_focus(0)
         {
         }
 
         void push(HandlerType *handler)
         {
             m_handlers.push_back(handler);
-            adjust_focus();
+            attach_handler(handler);
         }
 
         HandlerType *pop()
@@ -541,8 +541,8 @@ namespace mythvideo_videomanager
             {
                 ret = m_handlers.back();
                 m_handlers.pop_back();
+                detach_handler(ret, true);
             }
-            adjust_focus();
 
             return ret;
         }
@@ -560,11 +560,6 @@ namespace mythvideo_videomanager
                         do_dispatch = true;
                         break;
                     }
-                    case ContainerEvent::cetPaint:
-                    {
-                        // implemented below
-                        break;
-                    }
                     case ContainerEvent::cetKeyPress:
                     {
                         handler = GetFocusedContainer();
@@ -577,54 +572,7 @@ namespace mythvideo_videomanager
                     }
                 }
 
-                if (event.GetType() == ContainerEvent::cetPaint)
-                {
-                    // Special dispatch for paint events
-                    // they are sent to every container in the invalidated
-                    // rect.
-
-                    QPixmap container_image(m_canvas->geometry().size());
-                    container_image.fill(m_canvas, 0, 0);
-                    QPainter painter(&container_image);
-
-                    CEPaint *paint_event = dynamic_cast<CEPaint *>(&event);
-
-                    const QRect &invr = paint_event->GetInvRect();
-
-                    for (typename handlers::iterator p = m_handlers.begin();
-                            p != m_handlers.end(); ++p)
-                    {
-                        if ((*p)->GetFlags() & HandlerType::ehfPaint)
-                        {
-                            const QRect hrect = (*p)->GetRect();
-                            const QRect isect = invr.intersect(hrect);
-
-                            if (!isect.isEmpty())
-                            {
-                                bool or_clipped = painter.hasClipping();
-                                QRegion or_clip_rgn = painter.clipRegion();
-                                painter.setClipRect(isect);
-
-                                // ugly
-                                QRect wr(isect);
-                                wr.moveTopLeft(isect.topLeft() -
-                                               hrect.topLeft());
-                                painter.translate((*p)->GetRect().left(),
-                                                  (*p)->GetRect().top());
-                                CEPaint pe(painter, wr);
-                                pe.Do(*p);
-                                painter.resetXForm();
-
-                                painter.setClipRegion(or_clip_rgn);
-                                painter.setClipping(or_clipped);
-                            }
-                        }
-                    }
-                    painter.end();
-                    paint_event->GetPainter().
-                            drawPixmap(invr.topLeft(), container_image, invr);
-                }
-                else if (do_dispatch)
+                if (do_dispatch)
                 {
                     event.Do(handler);
                 }
@@ -644,10 +592,43 @@ namespace mythvideo_videomanager
             return m_focus;
         }
 
-        void adjust_focus()
+        void attach_handler(HandlerType *handler)
         {
-            m_focus = 0;
+            if (m_parent_dialog->getContext() != handler->GetContext())
+            {
+                m_parent_dialog->setContext(handler->GetContext());
+                m_parent_dialog->buildFocusList();
+            }
 
+            HandlerType *next_focus = get_next_focus();
+            if (m_focus && next_focus != m_focus)
+            {
+                m_focus->OnLoseFocus();
+            }
+            if (next_focus && next_focus != m_focus)
+            {
+                m_focus = next_focus;
+                m_focus->OnGainFocus();
+            }
+
+            handler->Invalidate();
+        }
+
+        void detach_handler(HandlerType *handler)
+        {
+            if (handler == m_focus)
+            {
+                handler->OnLoseFocus();
+                m_parent_dialog->buildFocusList();
+                m_focus = get_next_focus();
+                if (m_focus)
+                    m_focus->OnGainFocus();
+            }
+        }
+
+        HandlerType *get_next_focus()
+        {
+            HandlerType *ret = 0;
             if (m_handlers.size())
             {
                 for (typename handlers::reverse_iterator p =
@@ -655,16 +636,17 @@ namespace mythvideo_videomanager
                 {
                     if ((*p)->GetFlags() & ContainerHandler::ehfCanTakeFocus)
                     {
-                        m_focus = *p;
+                        ret = *p;
                         break;
                     }
                 }
             }
+
+            return ret;
         }
 
         void do_container_cleanup()
         {
-            bool refocus = false;
             for (typename handlers::iterator p = m_handlers.begin();
                     p != m_handlers.end();)
             {
@@ -672,19 +654,23 @@ namespace mythvideo_videomanager
                 // mark it for deletion.
                 if ((*p)->IsDone())
                 {
-                    refocus = true;
-                    (*p)->DoExit();
-                    m_canvas->update((*p)->GetRect());
-                    (*p)->deleteLater();
+                    HandlerType *ht = get_next_focus();
+                    int next_context = ht ? ht->GetContext() : edcAlwaysShown;
+                    if (m_parent_dialog->getContext() != next_context)
+                    {
+                        m_parent_dialog->setContext(next_context);
+                    }
 
+                    detach_handler(*p);
+
+                    (*p)->DoExit();
+                    (*p)->Invalidate();
+                    (*p)->deleteLater();
                     p = m_handlers.erase(p);
                 }
                 else
                     ++p;
             }
-
-            if (refocus)
-                adjust_focus();
         }
 
       private:
@@ -692,12 +678,15 @@ namespace mythvideo_videomanager
 
       private:
         QObject *m_event_dest;
-        QWidget *m_canvas;
+        DialogType *m_parent_dialog;
         handlers m_handlers;
         HandlerType *m_focus;
     };
 
+    /////////////////////////////////////////////////////////////////
     // handlers
+    /////////////////////////////////////////////////////////////////
+
     class SearchListHandler : public ContainerHandler
     {
         Q_OBJECT
@@ -717,7 +706,8 @@ namespace mythvideo_videomanager
         SearchListHandler(QObject *oparent, ParentWindowType *pwt,
                 XMLParse &theme, const item_list &items,
                 bool has_manual_title) :
-            ContainerHandler(oparent, pwt, theme, "moviesel"),
+            ContainerHandler(oparent, pwt, theme, "moviesel", ehfCanTakeFocus,
+                             edcSearchListContext),
             m_item_list(items), m_list(0)
         {
             const int initial_size = m_item_list.size();
@@ -737,20 +727,21 @@ namespace mythvideo_videomanager
 
             if (m_container)
             {
-                m_list = dynamic_cast<UIListType *>(m_container->
-                                                    GetType("listing"));
+                m_list = dynamic_cast<UIListType *>
+                        (m_container->GetType("listing"));
                 if (m_list)
                 {
-                    m_list_behave.setWindowSize(m_list->GetItems());
-                    m_list_behave.setItemCount(m_item_list.size());
+                    m_list_behave.SetWindowSize(m_list->GetItems());
+                    m_list_behave.SetItemCount(m_item_list.size());
 
                     if (initial_size)
-                        m_list_behave.setSkipIndex(initial_size + 1);
+                        m_list_behave.SetSkipIndex(initial_size);
+                    UpdateContents();
                 }
             }
         }
 
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
+        bool KeyPress(const QString &action)
         {
             bool ret = true;
             if (action == "SELECT")
@@ -759,65 +750,77 @@ namespace mythvideo_videomanager
             }
             else if (action == "UP")
             {
-                m_list_behave.move_up();
-                Invalidate();
+                m_list_behave.Up();
+                UpdateContents();
             }
             else if (action == "DOWN")
             {
-                m_list_behave.move_down();
-                Invalidate();
+                m_list_behave.Down();
+                UpdateContents();
             }
             else if (action == "PAGEUP")
             {
-                m_list_behave.page_up();
-                Invalidate();
+                m_list_behave.PageUp();
+                UpdateContents();
             }
             else if (action == "PAGEDOWN")
             {
-                m_list_behave.page_down();
-                Invalidate();
+                m_list_behave.PageDown();
+                UpdateContents();
             }
             else
             {
-                ret = ContainerHandler::KeyPress(action, raw_event);
+                ret = ContainerHandler::KeyPress(action);
             }
 
             return ret;
         }
 
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
+        void OnGainFocus()
         {
-            (void) rel_inv_r;
-            if (m_container)
+            if (m_list)
             {
-                if (m_list)
-                {
-                    m_list->ResetList();
-                    m_list->SetActive(true);
+                GetParentWindow()->setCurrentFocusWidget(m_list);
+                m_list->SetActive(true);
+            }
+        }
 
-                    const ListBehaviorManager::lb_data &lbd =
-                            m_list_behave.getData();
-                    for (unsigned int i = lbd.begin; i < lbd.end; ++i)
-                    {
-                        m_list->SetItemText(i, 1, m_item_list.at(i).second);
-                    }
-
-                    m_list->SetItemCurrent(lbd.index);
-                    m_list->SetDownArrow(lbd.data_below_window);
-                    m_list->SetUpArrow(lbd.data_above_window);
-                }
-
-                DrawContainer(painter, m_container);
+        void OnLoseFocus()
+        {
+            if (m_list)
+            {
+                m_list->SetActive(false);
             }
         }
 
       private:
+        void UpdateContents()
+        {
+            if (m_list)
+            {
+                m_list->ResetList();
+                m_list->SetActive(true);
+
+                for (ListBehaviorManager::const_iterator p =
+                     m_list_behave.begin(); p != m_list_behave.end(); ++p)
+                {
+                    m_list->SetItemText(*p, 1,
+                                        m_item_list.at(p.item_index).second);
+                }
+
+                m_list->SetItemCurrent(m_list_behave.GetWindowIndex());
+                m_list->SetDownArrow(m_list_behave.ItemsBelowWindow());
+                m_list->SetUpArrow(m_list_behave.ItemsAboveWindow());
+                m_list->refresh();
+            }
+        }
+
         void OnExit(ExitType et)
         {
             if (et == etSuccess)
             {
                 const item_list::value_type sel_item =
-                        m_item_list.at(m_list_behave.getData().item_index);
+                        m_item_list.at(m_list_behave.GetItemIndex());
 
                 if (sel_item.first == Action_Manual)
                     emit SigManual();
@@ -854,8 +857,85 @@ namespace mythvideo_videomanager
     const QString SearchListHandler::Action_Manual_Title("manual_title");
     const QString SearchListHandler::Action_Reset("reset");
 
+    class RemoteEditKeyFilter : public QObject
+    {
+        Q_OBJECT
+
+      signals:
+        void SigSelect();
+        void SigCancel();
+
+      public:
+        enum FilerBehavior { efbNumbersOnly = 1 };
+
+      public:
+        RemoteEditKeyFilter(QObject *oparent, unsigned int flags = 0) :
+            QObject(oparent), m_flags(flags) {}
+
+      protected:
+        bool eventFilter(QObject *dest, QEvent *levent)
+        {
+            // returns true when the even will NOT be sent
+            bool filtered = false;
+
+            if (levent->type() == QEvent::KeyPress)
+            {
+                QKeyEvent *kp = dynamic_cast<QKeyEvent *>(levent);
+                switch (kp->key())
+                {
+                    case Qt::Key_Return:
+                    case Qt::Key_Enter:
+                    {
+                        emit SigSelect();
+                        filtered = true;
+                        break;
+                    }
+                    // stop MythRemoteLineEdit from doing focus changes
+                    case Qt::Key_Up:
+                    case Qt::Key_Down:
+                    {
+                        filtered = true;
+                        break;
+                    }
+                    case Qt::Key_Escape:
+                    {
+                        filtered = true;
+                        emit SigCancel();
+                        break;
+                    }
+                }
+
+                if (!filtered && (m_flags & efbNumbersOnly))
+                {
+                    if (kp->key() != Qt::Key_Delete &&
+                        kp->key() != Qt::Key_Backspace &&
+                        kp->text().length())
+                    {
+                        filtered = true;
+                        MythRemoteLineEdit *mrle =
+                                dynamic_cast<MythRemoteLineEdit *>(dest);
+                        bool converted = false;
+                        unsigned int num = kp->text().toUInt(&converted);
+                        if (converted && mrle)
+                        {
+                            mrle->insert(QString::number(num));
+                        }
+                    }
+                }
+            }
+
+            return filtered;
+        }
+
+      private:
+        unsigned int m_flags;
+    };
+
     class ManualSearchUIDHandler : public ContainerHandler
     {
+        // TODO: for mythui make something like UIRemoteEditType that
+        // takes a validator (though there is no good reason UIDs be
+        // restricted to ints)
         Q_OBJECT
 
       signals:
@@ -864,61 +944,97 @@ namespace mythvideo_videomanager
       public:
         ManualSearchUIDHandler(QObject *oparent, ParentWindowType *pwt,
                           XMLParse &theme) :
-            ContainerHandler(oparent, pwt, theme, "enterimdb")
+            ContainerHandler(oparent, pwt, theme, "enterimdb", ehfCanTakeFocus,
+                             edcManualUIDSearchContext)
         {
-        }
-
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
-        {
-            bool ret = true;
-            bool converted = false;
-            const int as_int = action.toInt(&converted);
-
-            if (action == "SELECT")
-            {
-                Success();
-            }
-            else if (converted && as_int >= 0 && as_int <= 9)
-            {
-                m_number += action;
-                Invalidate();
-            }
-            else if (action == "DELETE")
-            {
-                // This uncomfortable mapping made necessary
-                // by only passing translated actions.
-                m_number = m_number.left(m_number.length() - 1);
-                Invalidate();
-            }
-            else
-            {
-                ret = ContainerHandler::KeyPress(action, raw_event);
-            }
-
-            return ret;
-        }
-
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
-        {
-            (void) rel_inv_r;
             if (m_container)
             {
-                checkedSetText(m_container, "numhold", m_number);
-                DrawContainer(painter, m_container);
+                m_edit = dynamic_cast<UIRemoteEditType *>
+                        (m_container->GetType("numhold"));
+                if (m_edit)
+                {
+                    QWidget *edit_control = m_edit->getEdit();
+
+                    if (!edit_control)
+                    {
+                        m_edit->createEdit(GetParentWindow());
+                        edit_control = m_edit->getEdit();
+                    }
+                    else
+                    {
+                        // edit control only created once, need to clear
+                        m_edit->setText("");
+                        m_edit->show();
+                    }
+
+                    m_key_filter = new RemoteEditKeyFilter(this,
+                            RemoteEditKeyFilter::efbNumbersOnly);
+                    connect(m_key_filter, SIGNAL(SigSelect()),
+                            SLOT(OnEditSelect()));
+                    connect(m_key_filter, SIGNAL(SigCancel()),
+                            SLOT(OnEditCancel()));
+
+                    if (edit_control)
+                    {
+                        edit_control->installEventFilter(m_key_filter);
+                    }
+
+                    connect(m_edit, SIGNAL(textChanged(QString)),
+                            SLOT(OnTextChange(QString)));
+                }
             }
         }
 
       private:
+        void UpdateContents()
+        {
+//            checkedSetText(m_container, "numhold", m_number);
+        }
+
         void OnExit(ExitType et)
         {
+            if (m_edit)
+            {
+                m_edit->hide();
+                QWidget *edit_control = m_edit->getEdit();
+                if (edit_control)
+                    edit_control->removeEventFilter(m_key_filter);
+            }
+
             if (et == etSuccess)
             {
                 emit SigTextChanged(m_number);
             }
         }
 
+        void OnGainFocus()
+        {
+            if (m_edit)
+            {
+                GetParentWindow()->setCurrentFocusWidget(m_edit);
+            }
+        }
+
+      private slots:
+        void OnTextChange(QString text)
+        {
+            m_number = text;
+        }
+
+        void OnEditSelect()
+        {
+            Success();
+        }
+
+        void OnEditCancel()
+        {
+            Failure();
+        }
+
       private:
         QString m_number;
+        UIRemoteEditType *m_edit;
+        RemoteEditKeyFilter *m_key_filter;
     };
 
     class ManualSearchHandler : public ContainerHandler
@@ -931,84 +1047,114 @@ namespace mythvideo_videomanager
       public:
         ManualSearchHandler(QObject *oparent, ParentWindowType *pwt,
                             XMLParse &theme) :
-            ContainerHandler(oparent, pwt, theme, "entersearchtitle")
+            ContainerHandler(oparent, pwt, theme, container_name,
+                             ehfCanTakeFocus, edcManualTitleSearchContext),
+            m_edit(0), m_key_filter(0)
         {
+            if (m_container)
+            {
+                m_edit = dynamic_cast<UIRemoteEditType *>
+                        (m_container->GetType("title"));
+                if (m_edit)
+                {
+                    QWidget *edit_control = m_edit->getEdit();
+
+                    if (!edit_control)
+                    {
+                        m_edit->createEdit(GetParentWindow());
+                        edit_control = m_edit->getEdit();
+                    }
+                    else
+                    {
+                        // edit control only created once, need to clear
+                        m_edit->setText("");
+                        m_edit->show();
+                    }
+
+                    m_key_filter = new RemoteEditKeyFilter(this);
+                    connect(m_key_filter, SIGNAL(SigSelect()),
+                            SLOT(OnEditSelect()));
+                    connect(m_key_filter, SIGNAL(SigCancel()),
+                            SLOT(OnEditCancel()));
+
+                    if (edit_control)
+                    {
+                        edit_control->installEventFilter(m_key_filter);
+                    }
+
+                    connect(m_edit, SIGNAL(textChanged(QString)),
+                            SLOT(OnTextChange(QString)));
+                }
+            }
         }
 
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
+        static bool Exists(XMLParse *theme)
         {
-            // TODO: ick ick ick
-            bool ret = true;
-            if (action == "SELECT")
-            {
-                if (raw_event && raw_event->key() == Qt::Key_Space)
-                {
-                    m_title += raw_event->text();
-                }
-                else
-                    Success();
-            }
-            else if (action == "DELETE")
-            {
-                m_title = m_title.left(m_title.length() - 1);
-            }
-            else if (!action.length() && raw_event)
-            {
-                ret = false;
-                switch (raw_event->key())
-                {
-                    case Qt::Key_Return:
-                    case Qt::Key_Enter:
-                    case Qt::Key_Escape:
-                        break;
-                    case Qt::Key_Backspace:
-                    case Qt::Key_Delete:
-                    {
-                        m_title = m_title.left(m_title.length() - 1);
-                        ret = true;
-                        break;
-                    }
-                    default:
-                    {
-                        m_title += raw_event->text();
-                        ret = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                ret = ContainerHandler::KeyPress(action, raw_event);
-            }
+            return theme->GetSet(container_name);
+        }
 
-            if (ret)
-                Invalidate();
-
+        bool KeyPress(const QString &action)
+        {
+            VERBOSE(VB_DEBUG, QString("in KeyPress mysteriously"));
+            bool ret = ContainerHandler::KeyPress(action);
             return ret;
         }
 
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
+        void UpdateContents()
         {
-            (void) rel_inv_r;
-            if (m_container)
-            {
-                checkedSetText(m_container, "title", m_title);
-                DrawContainer(painter, m_container);
-            }
+            // do nothing
+            //checkedSetText(m_container, "title", m_title);
+        }
+
+      private slots:
+        void OnTextChange(QString text)
+        {
+            m_title = text;
+        }
+
+        void OnEditSelect()
+        {
+            Success();
+        }
+
+        void OnEditCancel()
+        {
+            Failure();
         }
 
       private:
         void OnExit(ExitType et)
         {
+            if (m_edit)
+            {
+                m_edit->hide();
+                QWidget *edit_control = m_edit->getEdit();
+                if (edit_control)
+                    edit_control->removeEventFilter(m_key_filter);
+            }
+
             if (et == etSuccess)
             {
                 emit SigTextChanged(m_title);
             }
         }
 
+        void OnGainFocus()
+        {
+            if (m_edit)
+            {
+                GetParentWindow()->setCurrentFocusWidget(m_edit);
+            }
+        }
+
       private:
         QString m_title;
+        UIRemoteEditType *m_edit;
+        static const QString container_name;
+        RemoteEditKeyFilter *m_key_filter;
     };
+
+    const QString ManualSearchHandler::container_name("entersearchtitle");
 
     class InfoHandler : public ContainerHandler
     {
@@ -1021,71 +1167,87 @@ namespace mythvideo_videomanager
             virtual ~CurrentInfoItemGetter() {}
         };
 
-
       public:
         InfoHandler(QObject *oparent, ParentWindowType *pwt, XMLParse &theme,
                CurrentInfoItemGetter *item_get, const QString &art_dir) :
-            ContainerHandler(oparent, pwt, theme, "info", ehfPaint),
+            ContainerHandler(oparent, pwt, theme, "info", 0),
             m_art_dir(art_dir), m_item_get(item_get)
         {
+            m_norec_container = m_theme->GetSet("novideos_info");
+            if (m_norec_container &&
+                m_norec_container->GetContext() == edcAlwaysShown)
+                m_norec_container->SetContext(edcNoVideoContext);
         }
 
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
+        void Update()
         {
-            (void) rel_inv_r;
+            UpdateContents();
+            Invalidate();
+        }
+
+      private:
+        void UpdateContents()
+        {
             const Metadata *item = m_item_get->GetItem();
 
-            if (item)
+            if (m_container && m_norec_container)
             {
-               if (m_container)
-               {
-                   checkedSetText(m_container, "title", item->Title());
-                   checkedSetText(m_container, "filename",
-                                  item->getFilenameNoPrefix());
-                   checkedSetText(m_container, "video_player",
-                                  Metadata::getPlayer(item));
-                   checkedSetText(m_container, "director", item->Director());
-                   checkedSetText(m_container, "plot", item->Plot());
-                   checkedSetText(m_container, "rating", item->Rating());
-                   checkedSetText(m_container, "inetref", item->InetRef());
-                   checkedSetText(m_container, "year",
-                                  getDisplayYear(item->Year()));
-                   checkedSetText(m_container, "userrating",
-                                  getDisplayUserRating(item->UserRating()));
-                   checkedSetText(m_container, "length",
-                                  getDisplayLength(item->Length()));
-
-                   QString coverfile = item->CoverFile();
-                   coverfile.remove(m_art_dir + "/");
-                   checkedSetText(m_container, "coverfile", coverfile);
-
-                   checkedSetText(m_container, "child_id",
-                                  QString::number(item->ChildID()));
-                   checkedSetText(m_container, "browseable",
-                                  getDisplayBrowse(item->Browse()));
-                   checkedSetText(m_container, "category", item->Category());
-                   checkedSetText(m_container, "level",
-                                  QString::number(item->ShowLevel()));
-
-                   DrawContainer(painter, m_container);
-               }
-               //allowselect = true;
+               m_container->SetContext(item ? edcAlwaysShown : edcHidden);
+               m_norec_container->SetContext(item ? edcHidden : edcAlwaysShown);
             }
-            else
+
+            if (item && m_container)
             {
-               LayerSet *norec = m_theme->GetSet("novideos_info");
-               if (norec)
-               {
-                   DrawContainer(painter, norec);
-               }
+                checkedSetText(m_container, "title", item->Title());
+                checkedSetText(m_container, "filename",
+                               item->getFilenameNoPrefix());
+                checkedSetText(m_container, "video_player",
+                               Metadata::getPlayer(item));
+                checkedSetText(m_container, "director", item->Director());
+                checkedSetText(m_container, "plot", item->Plot());
+                checkedSetText(m_container, "rating", item->Rating());
+                checkedSetText(m_container, "inetref", item->InetRef());
+                checkedSetText(m_container, "year",
+                               getDisplayYear(item->Year()));
+                checkedSetText(m_container, "userrating",
+                               getDisplayUserRating(item->UserRating()));
+                checkedSetText(m_container, "length",
+                               getDisplayLength(item->Length()));
 
-               //allowselect = false;
+                QString coverfile = item->CoverFile();
+                coverfile.remove(m_art_dir + "/");
+                checkedSetText(m_container, "coverfile", coverfile);
+
+                checkedSetText(m_container, "child_id",
+                               QString::number(item->ChildID()));
+                checkedSetText(m_container, "browseable",
+                               getDisplayBrowse(item->Browse()));
+                checkedSetText(m_container, "category", item->Category());
+                checkedSetText(m_container, "level",
+                               QString::number(item->ShowLevel()));
             }
+        }
+
+      protected:
+        void Invalidate()
+        {
+            QRect ir;
+
+            if (m_container && m_container->GetContext() == edcAlwaysShown)
+                ir |= m_container->GetAreaRect();
+
+            if (m_norec_container && m_norec_container->GetContext() ==
+                     edcAlwaysShown)
+                ir |= m_norec_container->GetAreaRect();
+
+            if (ir.isValid())
+                ContainerHandler::Invalidate(ir);
         }
 
       private:
         QString m_art_dir;
         CurrentInfoItemGetter *m_item_get;
+        LayerSet *m_norec_container;
     };
 
     // Handles the video list part of the video manager
@@ -1107,7 +1269,7 @@ namespace mythvideo_videomanager
       public:
         ListHandler(QObject *oparent, ParentWindowType *pwt, XMLParse &theme,
                 VideoList *video_list) :
-            ContainerHandler(oparent, pwt, theme, "selector"),
+            ContainerHandler(oparent, pwt, theme, "selector", ehfCanTakeFocus),
             m_list_behave(0, ListBehaviorManager::lbScrollCenter |
                           ListBehaviorManager::lbWrapList),
             m_video_list(video_list)
@@ -1115,43 +1277,46 @@ namespace mythvideo_videomanager
             m_list =
                     dynamic_cast<UIListType *>(m_container->GetType("listing"));
             if (m_list)
-                m_list_behave.setWindowSize(m_list->GetItems());
+                m_list_behave.SetWindowSize(m_list->GetItems());
+            SetSelectedItem(0);
         }
 
         void SetSelectedItem(unsigned int index)
         {
-            m_list_behave.setIndex(index);
+            m_list_behave.SetItemIndex(index);
+            UpdateContents();
+            emit SigSelectionChanged();
         }
 
         // called then the underlying list may have changed
         void OnListChanged()
         {
-            m_list_behave.setItemCount(m_video_list->count());
+            m_list_behave.SetItemCount(m_video_list->count());
+            UpdateContents();
             emit SigSelectionChanged();
         }
 
         Metadata *GetCurrentItem()
         {
-            return m_video_list->getVideoListMetadata(m_list_behave.getData().
-                    item_index);
+            return m_video_list->
+                    getVideoListMetadata(m_list_behave.GetItemIndex());
         }
 
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
+        bool KeyPress(const QString &action)
         {
-            (void) raw_event;
             bool ret = true;
-            const unsigned int curindex = m_list_behave.getIndex();
+            const unsigned int curindex = m_list_behave.GetItemIndex();
 
             if (action == "SELECT")
                 emit SigItemEdit();
             else if (action == "UP")
-                m_list_behave.move_up();
+                m_list_behave.Up();
             else if (action == "DOWN")
-                m_list_behave.move_down();
+                m_list_behave.Down();
             else if (action == "PAGEUP")
-                m_list_behave.page_up();
+                m_list_behave.PageUp();
             else if (action == "PAGEDOWN")
-                m_list_behave.page_down();
+                m_list_behave.PageDown();
             else if (action == "DELETE")
                 emit SigItemDelete();
             else if (action == "BROWSE")
@@ -1172,56 +1337,72 @@ namespace mythvideo_videomanager
                 ret = false;
 
             // if the list index changed, we need to emit a change event
-            if (curindex != m_list_behave.getIndex())
+            if (curindex != m_list_behave.GetItemIndex())
             {
+                UpdateContents();
                 emit SigSelectionChanged();
-                Invalidate();
             }
 
             return ret;
         }
 
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
+        void Update()
         {
-            (void) rel_inv_r;
-            if (m_container)
+            UpdateContents();
+        }
+
+        void OnGainFocus()
+        {
+            if (m_list)
             {
-                if (m_list)
-                {
-                    m_list->ResetList();
-                    m_list->SetActive(true);
+                GetParentWindow()->setCurrentFocusWidget(m_list);
+                m_list->SetActive(true);
+            }
+        }
 
-                    const ListBehaviorManager::lb_data &lbd =
-                            m_list_behave.getData();
-                    for (unsigned int i = lbd.begin; i < lbd.end; ++i)
-                    {
-                        Metadata *meta = m_video_list->getVideoListMetadata(i);
-
-                        QString title = meta->Title();
-                        QString filename = meta->Filename();
-                        if (0 == title.compare("title"))
-                        {
-                            title = filename.section('/', -1);
-                            if (!gContext->GetNumSetting("ShowFileExtensions"))
-                                title = title.section('.',0,-2);
-                        }
-
-                        m_list->SetItemText(i - lbd.begin, 1, title);
-                        m_list->SetItemText(i - lbd.begin, 2, meta->Director());
-                        m_list->SetItemText(i - lbd.begin, 3,
-                                           getDisplayYear(meta->Year()));
-                    }
-
-                    m_list->SetItemCurrent(lbd.index);
-                    m_list->SetDownArrow(lbd.data_below_window);
-                    m_list->SetUpArrow(lbd.data_above_window);
-                }
-
-                DrawContainer(painter, m_container);
+        void OnLoseFocus()
+        {
+            if (m_list)
+            {
+                m_list->SetActive(false);
             }
         }
 
       private:
+        void UpdateContents()
+        {
+            if (m_list)
+            {
+                m_list->ResetList();
+                m_list->SetActive(true);
+
+                for (ListBehaviorManager::const_iterator p =
+                     m_list_behave.begin(); p != m_list_behave.end(); ++p)
+                {
+                    Metadata *meta =
+                            m_video_list->getVideoListMetadata(p.item_index);
+
+                    QString title = meta->Title();
+                    QString filename = meta->Filename();
+                    if (0 == title.compare("title"))
+                    {
+                        title = filename.section('/', -1);
+                        if (!gContext->GetNumSetting("ShowFileExtensions"))
+                            title = title.section('.',0,-2);
+                    }
+
+                    m_list->SetItemText(*p, 1, title);
+                    m_list->SetItemText(*p, 2, meta->Director());
+                    m_list->SetItemText(*p, 3, getDisplayYear(meta->Year()));
+                }
+
+                m_list->SetItemCurrent(m_list_behave.GetWindowIndex());
+                m_list->SetDownArrow(m_list_behave.ItemsBelowWindow());
+                m_list->SetUpArrow(m_list_behave.ItemsAboveWindow());
+                m_list->refresh();
+            }
+        }
+
         void OnExit(ExitType et)
         {
             (void) et;
@@ -1238,20 +1419,18 @@ namespace mythvideo_videomanager
     {
         Q_OBJECT
 
-      signals:
-//        void SigWaitCanceled();
-
       public:
         WaitBackgroundHandler(QObject *oparent, ParentWindowType *pwt,
                 XMLParse &theme) :
-            ContainerHandler(oparent, pwt, theme, "inetwait")
+            ContainerHandler(oparent, pwt, theme, "inetwait", ehfCanTakeFocus,
+                             edcWaitContext)
         {
         }
 
         void EnterMessage(const QString &message)
         {
             m_message.push(message);
-            Invalidate();
+            UpdateContents();
         }
 
         bool LeaveMessage()
@@ -1259,7 +1438,9 @@ namespace mythvideo_videomanager
             m_message.pop();
             bool more = m_message.size();
             if (more)
-                Invalidate();
+            {
+                UpdateContents();
+            }
 
             return more;
         }
@@ -1269,68 +1450,24 @@ namespace mythvideo_videomanager
             Success();
         }
 
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
+        bool KeyPress(const QString &action)
         {
             (void) action;
-            (void) raw_event;
-//            if (action == "ESCAPE" || action == "LEFT")
-//            {
-//                Failure();
-//                emit SigWaitCanceled();
-//            }
-
-            // not interruptible for now
             return true;
         }
 
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
+      private:
+        void UpdateContents()
         {
-            (void) rel_inv_r;
             // set the title for the wait background
-            if (m_container && m_message.size())
+            if (m_message.size())
             {
                 checkedSetText(m_container, "title", m_message.top());
-
-                DrawContainer(painter, m_container);
             }
         }
 
       private:
         std::stack<QString> m_message;
-    };
-
-    class BackgroundHandler : public ContainerHandler
-    {
-        Q_OBJECT
-
-      public:
-        BackgroundHandler(QObject *oparent, ParentWindowType *pwt,
-                          XMLParse &theme) :
-            ContainerHandler(oparent, pwt, theme, "background", 0)
-        {
-            QPixmap pix(GetParentWindow()->geometry().size());
-            pix.fill(GetParentWindow(), 0, 0);
-            QPainter painter(&pix);
-            if (m_container)
-            {
-                DrawContainer(painter, m_container);
-            }
-            painter.end();
-            GetParentWindow()->setPaletteBackgroundPixmap(pix);
-        }
-
-        bool KeyPress(const QString &action, QKeyEvent *raw_event)
-        {
-            (void) action;
-            (void) raw_event;
-            return false;
-        }
-
-        void Paint(QPainter &painter, const QRect &rel_inv_r)
-        {
-            (void) painter;
-            (void) rel_inv_r;
-        }
     };
 
     class ExecuteExternalCommand : public QObject
@@ -1472,18 +1609,10 @@ namespace mythvideo_videomanager
                               const SearchListHandler::item_list &items,
                               Metadata *item);
 
-      private:
+      public:
         VideoTitleSearch(QObject *oparent) : ExecuteExternalCommand(oparent),
             m_item(0)
         {
-        }
-
-        ~VideoTitleSearch() {}
-
-      public:
-        static VideoTitleSearch *Create(QObject *oparent)
-        {
-            return new VideoTitleSearch(oparent);
         }
 
         void Run(const QString &title, Metadata *item)
@@ -1502,6 +1631,8 @@ namespace mythvideo_videomanager
         }
 
       private:
+        ~VideoTitleSearch() {}
+
         void OnExecDone(bool normal_exit, const QStringList &out,
                         const QStringList &err)
         {
@@ -1535,18 +1666,10 @@ namespace mythvideo_videomanager
       signals:
         void SigSearchResults(bool normal_exit, const QStringList &results,
                               Metadata *item, const QString &video_uid);
-      private:
+      public:
         VideoUIDSearch(QObject *oparent) : ExecuteExternalCommand(oparent),
             m_item(0)
         {
-        }
-
-        ~VideoUIDSearch() {}
-
-      public:
-        static VideoUIDSearch *Create(QObject *oparent)
-        {
-            return new VideoUIDSearch(oparent);
         }
 
         void Run(const QString &video_uid, Metadata *item)
@@ -1564,6 +1687,8 @@ namespace mythvideo_videomanager
         }
 
       private:
+        ~VideoUIDSearch() {}
+
         void OnExecDone(bool normal_exit, const QStringList &out,
                         const QStringList &err)
         {
@@ -1585,18 +1710,10 @@ namespace mythvideo_videomanager
       signals:
         void SigPosterURL(const QString &url, Metadata *item);
 
-      private:
+      public:
         VideoPosterSearch(QObject *oparent) : ExecuteExternalCommand(oparent),
             m_item(0)
         {
-        }
-
-        ~VideoPosterSearch() {}
-
-      public:
-        static VideoPosterSearch *Create(QObject *oparent)
-        {
-            return new VideoPosterSearch(oparent);
         }
 
         void Run(const QString &video_uid, Metadata *item)
@@ -1613,6 +1730,8 @@ namespace mythvideo_videomanager
         }
 
       private:
+        ~VideoPosterSearch() {}
+
         void OnExecDone(bool normal_exit, const QStringList &out,
                         const QStringList &err)
         {
@@ -1658,6 +1777,12 @@ namespace mythvideo_videomanager
             m_item = item;
             m_url = url;
             m_timer.start(timeout, true);
+        }
+
+        void stop()
+        {
+            if (m_timer.isActive())
+                m_timer.stop();
         }
 
       private slots:
@@ -1740,32 +1865,23 @@ namespace mythvideo_videomanager
         };
 
       public:
-        VideoManagerImp(VideoManager *vm, double wmult, double hmult,
-                        const QRect &area, VideoList *video_list) :
-            m_event_dispatch(this, vm), m_vm(vm), m_area(area),
+        VideoManagerImp(VideoManager *vm, XMLParse *theme, const QRect &area,
+                VideoList *video_list) :
+            m_event_dispatch(this, vm), m_vm(vm), m_theme(theme), m_area(area),
             m_video_list(video_list), m_info_handler(0), m_list_handler(0),
-            m_background_handler(0), m_popup(0),
-            m_wait_background(0), m_has_manual_title_search(false)
+            m_popup(0), m_wait_background(0), m_has_manual_title_search(false)
         {
-            m_theme.SetWMult(wmult);
-            m_theme.SetHMult(hmult);
-            QDomElement xmldata;
-            m_theme.LoadTheme(xmldata, "manager", "video-");
-            LoadWindow(xmldata);
-
             m_art_dir = gContext->GetSetting("VideoArtworkDir");
 
-            m_background_handler = new BackgroundHandler(this, m_vm, m_theme);
-            m_info_handler = new InfoHandler(this, m_vm, m_theme,
+            m_info_handler = new InfoHandler(this, m_vm, *m_theme,
                     &m_current_item_proxy, m_art_dir);
-            m_list_handler = new ListHandler(this, m_vm, m_theme, video_list);
+            m_list_handler = new ListHandler(this, m_vm, *m_theme, video_list);
 
             m_current_item_proxy.connect(m_list_handler);
 
             m_vm->connect(m_list_handler, SIGNAL(ListHandlerExit()),
                          SLOT(ExitWin()));
 
-            m_event_dispatch.push(m_background_handler);
             m_event_dispatch.push(m_info_handler);
             m_event_dispatch.push(m_list_handler);
 
@@ -1788,10 +1904,31 @@ namespace mythvideo_videomanager
             video_list->setCurrentVideoFilter(VideoFilterSettings(true,
                             "VideoManager"));
 
+            // This bit of ugliness done only for theme compatibility.
+            // Without this, themes that don't put the dialogs in
+            // their own context would have a messy screen.
+            struct context_check
+            {
+                context_check(XMLParse *theme, const QString &name,
+                              int default_context)
+                {
+                    LayerSet *s = theme->GetSet(name);
+                    if (s && s->GetContext() == edcAlwaysShown)
+                    {
+                        s->SetContext(default_context);
+                    }
+                }
+            };
+
+            context_check(theme, "moviesel", edcSearchListContext);
+            context_check(theme, "enterimdb", edcManualUIDSearchContext);
+            context_check(theme, "entersearchtitle",
+                          edcManualTitleSearchContext);
+            context_check(theme, "inetwait", edcWaitContext);
+
             RefreshVideoList(false);
 
-            m_has_manual_title_search =
-                    ManualSearchHandler(0, m_vm, m_theme).Exists();
+            m_has_manual_title_search = ManualSearchHandler::Exists(m_theme);
             connect(&m_url_dl_timer,
                     SIGNAL(SigTimeout(const QString &, Metadata *)),
                     SLOT(OnPosterDownloadTimeout(const QString &, Metadata *)));
@@ -1806,16 +1943,6 @@ namespace mythvideo_videomanager
             m_current_item_proxy.disconnect();
         }
 
-        void Invalidate(const QRect &area)
-        {
-            m_vm->update(area);
-        }
-
-        void Invalidate()
-        {
-            Invalidate(m_area);
-        }
-
         bool DispatchEvent(ContainerEvent &event_)
         {
             bool ret = m_event_dispatch.DispatchEvent(event_);
@@ -1827,49 +1954,16 @@ namespace mythvideo_videomanager
             return ret;
         }
 
-        bool event(QEvent *e)
+        void customEvent(QCustomEvent *e)
         {
-            if (e->type() == QEvent::Type(ContainerDoneEvent::etContainerDone))
+            if (static_cast<int>(e->type()) ==
+                ContainerDoneEvent::etContainerDone)
             {
                 m_event_dispatch.ProcessDone();
-                return true;
             }
-
-            return QObject::event(e);
         }
 
       private:
-        void LoadWindow(QDomElement &element)
-        {
-            for (QDomNode chld = element.firstChild(); !chld.isNull();
-                 chld = chld.nextSibling())
-            {
-                QDomElement e = chld.toElement();
-                if (!e.isNull())
-                {
-                    if (e.tagName() == "font")
-                    {
-                        m_theme.parseFont(e);
-                    }
-                    else if (e.tagName() == "container")
-                    {
-                        QRect area;
-                        QString container_name;
-                        int context;
-                        m_theme.parseContainer(e, container_name, context,
-                                area);
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT,
-                                QString("Error: Unknown element: ").
-                                arg(e.tagName()));
-                        exit(0); // TODO bad
-                    }
-                }
-            }
-        }
-
         void CancelPopup()
         {
             if (m_popup)
@@ -1953,7 +2047,7 @@ namespace mythvideo_videomanager
             if (!m_wait_background)
             {
                 m_wait_background =
-                        new WaitBackgroundHandler(this, m_vm, m_theme);
+                        new WaitBackgroundHandler(this, m_vm, *m_theme);
                 m_event_dispatch.push(m_wait_background);
             }
 
@@ -1969,6 +2063,11 @@ namespace mythvideo_videomanager
                     m_wait_background->Close();
                     m_wait_background = 0;
                 }
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "Error: StopWaitBackground called with "
+                                      "no active message.");
             }
         }
 
@@ -2102,15 +2201,17 @@ namespace mythvideo_videomanager
 
         void OnParentalChange(int amount);
 
+        // called when the list selection changed
         void OnListSelectionChange()
         {
-            m_info_handler->Invalidate();
+            m_info_handler->Update();
         }
 
+        // Called when the underlying data for an item changes
         void OnSelectedItemChange()
         {
-            m_info_handler->Invalidate();
-            m_list_handler->Invalidate();
+            m_info_handler->Update();
+            m_list_handler->Update();
         }
 
         void DoResetMetadata();
@@ -2136,8 +2237,6 @@ namespace mythvideo_videomanager
                     item->updateDatabase();
                     RefreshVideoList(true);
                 }
-
-                Invalidate();
             }
         }
 
@@ -2171,14 +2270,13 @@ namespace mythvideo_videomanager
         void OnManualVideoTitle(const QString &title);
 
       private:
-        ContainerDispatch<ContainerHandler> m_event_dispatch;
+        ContainerDispatch<ContainerHandler, VideoManager> m_event_dispatch;
         VideoManager *m_vm;
-        XMLParse m_theme;
+        XMLParse *m_theme;
         QRect m_area;
         VideoList *m_video_list;
         InfoHandler *m_info_handler;
         ListHandler *m_list_handler;
-        BackgroundHandler *m_background_handler;
         MythPopupBox *m_popup;
         WaitBackgroundHandler *m_wait_background;
         CurrentItemGet m_current_item_proxy;
@@ -2210,6 +2308,8 @@ namespace mythvideo_videomanager
                     ParentalLevel(ParentalLevel::plNone), true);
         }
 
+        m_list_handler->OnListChanged();
+
         // TODO: This isn't perfect, if you delete the last item your selection
         // reverts to the first item.
         if (selected_id)
@@ -2222,8 +2322,6 @@ namespace mythvideo_videomanager
             }
         }
 
-        if (!resort_only) // list size may have changed
-            m_list_handler->OnListChanged();
         updateML = false;
     }
 
@@ -2249,7 +2347,7 @@ namespace mythvideo_videomanager
         }
 
         // Obtain video poster
-        VideoPosterSearch *vps = VideoPosterSearch::Create(this);
+        VideoPosterSearch *vps = new VideoPosterSearch(this);
         connect(vps, SIGNAL(SigPosterURL(const QString &, Metadata *)),
                 SLOT(OnPosterURL(const QString &, Metadata *)));
         vps->Run(item->InetRef(), item);
@@ -2315,6 +2413,7 @@ namespace mythvideo_videomanager
     void VideoManagerImp::OnPosterCopyFinished(QNetworkOperation *op,
                                                Metadata *item)
     {
+        m_url_dl_timer.stop();
         QString state, operation;
         switch(op->operation())
         {
@@ -2402,7 +2501,7 @@ namespace mythvideo_videomanager
                                                 Metadata *item)
     {
         StartWaitBackground(video_uid);
-        VideoUIDSearch *vns = VideoUIDSearch::Create(this);
+        VideoUIDSearch *vns = new VideoUIDSearch(this);
         connect(vns, SIGNAL(SigSearchResults(bool, const QStringList &,
                                              Metadata *, const QString &)),
                 SLOT(OnVideoSearchByUIDDone(bool, const QStringList &,
@@ -2489,7 +2588,7 @@ namespace mythvideo_videomanager
         {
             StartWaitBackground(title);
 
-            VideoTitleSearch *vts = VideoTitleSearch::Create(this);
+            VideoTitleSearch *vts = new VideoTitleSearch(this);
             connect(vts,
                     SIGNAL(SigSearchResults(bool,
                             const SearchListHandler::item_list &, Metadata *)),
@@ -2535,8 +2634,9 @@ namespace mythvideo_videomanager
         }
         else
         {
-            SearchListHandler *slh = new SearchListHandler(this, m_vm,
-                    m_theme, results, m_has_manual_title_search);
+            SearchListHandler *slh =
+                    new SearchListHandler(this, m_vm, *m_theme, results,
+                                          m_has_manual_title_search);
             connect(slh, SIGNAL(SigItemSelected(const QString &,
                                                 const QString &)),
                     SLOT(OnVideoSearchListSelection(const QString &,
@@ -2548,7 +2648,6 @@ namespace mythvideo_videomanager
                     SLOT(OnVideoSearchListManualTitle()));
 
             m_event_dispatch.push(slh);
-            slh->Invalidate();
         }
     }
 
@@ -2575,12 +2674,11 @@ namespace mythvideo_videomanager
     {
         CancelPopup();
         ManualSearchUIDHandler *muidh =
-                new ManualSearchUIDHandler(this, m_vm, m_theme);
+                new ManualSearchUIDHandler(this, m_vm, *m_theme);
         connect(muidh, SIGNAL(SigTextChanged(const QString &)),
                 SLOT(OnManualVideoUID(const QString &)));
 
         m_event_dispatch.push(muidh);
-        muidh->Invalidate();
     }
 
     void VideoManagerImp::OnManualVideoUID(const QString &video_uid)
@@ -2594,12 +2692,12 @@ namespace mythvideo_videomanager
     void VideoManagerImp::DoManualVideoTitle()
     {
         CancelPopup();
-        ManualSearchHandler *msh = new ManualSearchHandler(this, m_vm, m_theme);
+        ManualSearchHandler *msh =
+                new ManualSearchHandler(this, m_vm, *m_theme);
         connect(msh, SIGNAL(SigTextChanged(const QString &)),
                 SLOT(OnManualVideoTitle(const QString &)));
 
         m_event_dispatch.push(msh);
-        msh->Invalidate();
     }
 
     void VideoManagerImp::OnManualVideoTitle(const QString &title)
@@ -2712,18 +2810,17 @@ namespace mythvideo_videomanager
         {
             RefreshVideoList(true);
         }
-        Invalidate();
     }
 }; // mythvideo_videomanager namespace
 
-VideoManager::VideoManager(MythMainWindow *lparent,  const QString &lname,
-                           VideoList *video_list) :
-    MythDialog(lparent, lname)
+VideoManager::VideoManager(MythMainWindow *lparent, VideoList *video_list) :
+    MythThemedDialog(lparent, "manager", "video-", "video manager")
 {
-    m_imp.reset(new mythvideo_videomanager::VideoManagerImp(this, wmult, hmult,
+    m_imp.reset(new mythvideo_videomanager::VideoManagerImp(this, getTheme(),
                     QRect(0, 0, size().width(), size().height()),
                     video_list));
-    setNoErase();
+    buildFocusList();
+    assignFirstFocus();
 }
 
 VideoManager::~VideoManager()
@@ -2732,35 +2829,21 @@ VideoManager::~VideoManager()
 
 void VideoManager::keyPressEvent(QKeyEvent *event_)
 {
-    // Get first attempt to raw events, so things like
-    // space = space + SELECTED can be avoided if needed.
-    mythvideo_videomanager::CEKeyPress pkp("", event_);
-    m_imp->DispatchEvent(pkp);
-    bool handled = pkp.GetHandled();
+    bool handled = false;
 
-    if (!handled)
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Video", event_, actions);
+
+    for (QStringList::iterator p = actions.begin();
+            p != actions.end() && !handled; ++p)
     {
-        QStringList actions;
-        gContext->GetMainWindow()->TranslateKeyPress("Video", event_, actions);
-
-        for (QStringList::iterator p = actions.begin();
-                p != actions.end() && !handled; ++p)
-        {
-            mythvideo_videomanager::CEKeyPress kp(*p, event_);
-            m_imp->DispatchEvent(kp);
-            handled = kp.GetHandled();
-        }
+        mythvideo_videomanager::CEKeyPress kp(*p);
+        m_imp->DispatchEvent(kp);
+        handled = kp.GetHandled();
     }
 
     if (!handled)
-        MythDialog::keyPressEvent(event_);
-}
-
-void VideoManager::paintEvent(QPaintEvent *event_)
-{
-    QPainter p(this);
-    mythvideo_videomanager::CEPaint pe(p, event_->rect());
-    m_imp->DispatchEvent(pe);
+        MythThemedDialog::keyPressEvent(event_);
 }
 
 void VideoManager::ExitWin()

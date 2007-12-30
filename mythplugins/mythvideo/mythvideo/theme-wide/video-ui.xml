@@ -78,8 +78,28 @@
          <bold>yes</bold>
       </font>
 
+      <container name="background">
+         <image name="filler" draworder="0" fleximage="yes">
+            <filename>cr-background.png</filename>
+            <position>0,336</position>
+            <staticsize>1280,356</staticsize>
+         </image>
+      </container>
+
+      <container name="novideos_info">
+         <area>64,36,1152,290</area>
+         <context>20</context>
+
+         <textarea name="msg" align="allcenter" draworder="8">
+            <area>64,36,1024,280</area>
+            <font>info</font>
+            <value>No Videos Found</value>
+            <multiline>yes</multiline>
+         </textarea>
+      </container>
+
       <container name="info">
-         <area>64,36,1152,280</area>
+         <area>64,36,1152,290</area>
 
          <textarea name="title" draworder="4" align="center">
             <area>0,0,1152,80</area>
@@ -197,13 +217,6 @@
          </textarea>
       </container>
 
-      <container name="background">
-         <image name="filler" draworder="0" fleximage="yes">
-            <filename>cr-background.png</filename>
-            <position>0,336</position>
-         </image>
-      </container>
-
       <container name="selector">
          <area>0,336,1280,348</area>
 
@@ -241,96 +254,103 @@
       </container>
 
       <container name="inetwait">
-         <area>0,0,1280,720</area>
+         <area>156,86,982,562</area>
+         <context>1</context>
 
-         <textarea name="ld1" draworder="0" align="center">
-            <area>0,140,1280,90</area>
+         <image name="background" draworder="0" fleximage="no">
+            <!-- 982x562 black box (9, 9, 950, 530) -->
+            <filename>mv-wait-background.png</filename>
+            <position>0,0</position>
+         </image>
+
+         <textarea name="ld1" draworder="1" align="center">
+            <area>13,134,942,90</area>
             <font>titlefnt</font>
             <value>retrieving data...</value>
          </textarea>
 
-         <textarea name="finder" draworder="0" align="center">
-            <area>0,270,1280,60</area>
+         <textarea name="finder" draworder="1" align="center">
+            <area>13,244,942,60</area>
             <font>titlefnt</font>
             <value>[ looking for ]</value>
          </textarea>
 
-         <textarea name="title" draworder="0" align="center">
-            <area>0,320,1280,60</area>
+         <textarea name="title" draworder="1" align="center">
+            <area>13,324,942,60</area>
             <font>titlefnt</font>
          </textarea>
       </container>
 
       <container name="moviesel">
-         <area>339,160,602,400</area>
+         <area>338,159,618,426</area>
+         <context>2</context>
+
+         <image name="showinglines" draworder="3" fleximage="no">
+            <!-- 618x426 black box (6, 6, 592, 390) -->
+            <filename>mv-mselect.png</filename>
+            <position>0,0</position>
+         </image>
 
          <listarea name="listing" draworder="4">
-            <area>64,36,538,328</area>
+            <area>30,22,517,368</area>
             <fcnfont name="active_font" function="active"></fcnfont>
             <fcnfont name="inactive_font" function="inactive"></fcnfont>
             <fcnfont name="active_font" function="selected"></fcnfont>
             <columnpadding>10</columnpadding>
-            <column number="1" width="474" context="-1"></column>
+            <column number="1" width="517" context="-1"></column>
             <items>11</items>
-            <image function="selectionbar" filename="mv-sel.png" location="-64,-6"></image>
-            <image function="uparrow" filename="uparrow.png" location="538,36"></image>
-            <image function="downarrow" filename="downarrow.png" location="538,288"></image>
+            <image function="selectionbar" filename="mv-sel.png"
+               location="-20,-1"/>
+            <!-- standard arrows are 15x40 -->
+            <image function="uparrow" filename="uparrow.png"
+               location="563,23"/>
+            <image function="downarrow" filename="downarrow.png"
+               location="563,347"/>
          </listarea>
-
-         <image name="showinglines" draworder="3" fleximage="no">
-            <filename>mv-mselect.png</filename> <!-- 602x400 -->
-            <position>0,0</position>
-         </image>
       </container>
 
       <container name="enterimdb">
-         <area>457,200,365,162</area>
+         <area>464,289,367,162</area>
+         <context>3</context>
 
          <image name="box" draworder="7">
-            <filename>mv-popup.png</filename> <!-- 365x162 -->
+            <!-- 367x156 black box (6, 6, 341, 130) -->
+            <filename>mv-popup.png</filename>
             <position>0,0</position>
          </image>
 
          <textarea name="msg" draworder="7" align="center">
             <font>directorfnt</font>
             <value>Enter Video #</value>
-            <area>0,36,365,25</area>
+            <area>10,30,331,25</area>
          </textarea>
 
-         <textarea name="numhold" draworder="7" align="center">
+         <remoteedit name="numhold" draworder="7" align="center">
+            <area>10,75,331,50</area>
             <font>titlefnt</font>
-            <area>0,72,365,50</area>
-         </textarea>
+         </remoteedit>
       </container>
 
       <container name="entersearchtitle">
-         <area>440,200,400,170</area>
+         <area>451,286,400,170</area>
+         <context>4</context>
 
          <image name="box" draworder="7">
-            <!-- The offset to the black box is x/y 10/10 it is 366x136 -->
-            <filename>mv-search-popup.png</filename> <!-- 400x170 -->
+            <!-- 392x162 black box (6, 6, 366, 136) -->
+            <filename>mv-search-popup.png</filename> <!-- 387x157 -->
             <position>0,0</position>
          </image>
 
          <textarea name="msg" draworder="7" align="center">
             <font>directorfnt</font>
             <value>Enter Video Title</value>
-            <area>14,36,362,25</area>
+            <area>10,33,356,25</area>
          </textarea>
 
-         <textarea name="title" draworder="7" align="center">
-            <area>14,72,360,50</area>
+         <remoteedit name="title" draworder="7" align="center">
+            <area>10,78,356,50</area>
             <font>titlefnt</font>
-         </textarea>
-      </container>
-
-      <container name="novideos_info">
-         <textarea name="msg" align="allcenter" draworder="8">
-            <area>64,36,1024,280</area>
-            <font>info</font>
-            <value>No Videos Found</value>
-            <multiline>yes</multiline> 
-         </textarea>
+         </remoteedit>
       </container>
    </window>
 

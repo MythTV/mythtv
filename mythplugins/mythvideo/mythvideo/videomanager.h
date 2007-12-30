@@ -8,13 +8,12 @@
 namespace mythvideo_videomanager { class VideoManagerImp; };
 
 class VideoList;
-class VideoManager : public MythDialog
+class VideoManager : public MythThemedDialog
 {
     Q_OBJECT
 
   public:
-    VideoManager(MythMainWindow *lparent, const QString &lname,
-                 VideoList *video_list);
+    VideoManager(MythMainWindow *lparent, VideoList *video_list);
 
     int videoExitType() { return 0; }
 
@@ -24,7 +23,6 @@ class VideoManager : public MythDialog
   protected:
     ~VideoManager(); // use deleteLater() instead for thread safety
 
-    void paintEvent(QPaintEvent *event_);
     void keyPressEvent(QKeyEvent *event_);
 
   private:
