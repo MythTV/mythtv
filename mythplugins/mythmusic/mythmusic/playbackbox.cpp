@@ -2119,6 +2119,8 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
 
 void PlaybackBoxMusic::end()
 {
+    stop();
+
     if (class LCD *lcd = LCD::Get()) 
         lcd->switchToTime ();
 }
