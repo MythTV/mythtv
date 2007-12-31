@@ -241,11 +241,15 @@ void UPnpCDSVideo::BuildMediaMap(void)
 
     query.exec("DELETE FROM upnpmedia WHERE class = 'VIDEO'");
 
-    filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
+    if ((!RootVidDir.isNull()) && (RootVidDir != "")) 
+    {
+        VERBOSE(VB_GENERAL, "UPnpCDSVideo::BuildMediaMap - Starting Build of Media Map, this can take a moment.");
+
+        filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
 
 
-    VERBOSE(VB_UPNP, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
-
+        VERBOSE(VB_GENERAL, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
+    }
 }
 /////////////////////////////////////////////////////////////////////////////
 //
