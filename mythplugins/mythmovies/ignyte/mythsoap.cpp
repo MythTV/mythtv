@@ -1,6 +1,7 @@
-#include <mythtv/mythcontext.h>
-
 #include "mythsoap.h"
+#include <iostream>
+
+using namespace std;
 
 void MythSoap::doSoapRequest(QString host, QString path, QString soapAction,
                              QString query)
@@ -38,11 +39,23 @@ void MythSoap::httpDone(bool error)
     if (error)
     {
         cerr << "Error in mythsoap.o retrieving data: " << http.errorString() << endl << flush;
+        m_error = true;
     }
     else
     {
-        m_data = http.readAll();
-        //cout << "Data: " << m_data.data() << endl << flush;
+        const Q_ULONG len = http.bytesAvailable();
+        // QMemArray::assign() will own this so we don't have to delete it
+        char* buffer = new char[len + 1];
+        if (buffer) 
+        {
+            http.readBlock(buffer, len);
+            buffer[len] = '\0';
+            m_data.assign(buffer, len + 1);
+        }
+        else
+        {
+            cerr << "Failed to alloc memory in mythsoap.o" << endl;
+        }
     }
     m_done = true;
 }

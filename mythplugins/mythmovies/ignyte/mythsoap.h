@@ -12,6 +12,7 @@ class MythSoap : public QObject
         QByteArray getResponseData();
         bool isDone();
         bool hasError();
+        inline QString getError() const { return http.errorString(); }
         MythSoap();
 
     private:
