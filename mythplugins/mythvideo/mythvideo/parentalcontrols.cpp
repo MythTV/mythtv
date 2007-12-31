@@ -1,3 +1,5 @@
+#include <map>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 

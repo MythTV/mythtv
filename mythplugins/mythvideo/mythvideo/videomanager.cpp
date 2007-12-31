@@ -11,6 +11,7 @@
 #include <cstdlib>
 
 #include <memory>
+#include <map>
 #include <list>
 #include <stack>
 #include <set>
