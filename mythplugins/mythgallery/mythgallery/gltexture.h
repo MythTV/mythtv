@@ -50,7 +50,7 @@ class GLTexture
         { width = sz.width(); height = sz.height(); }
     void SetScale(float x, float y)
         { cx = x; cy = y; }
-    void ScaleTo(const QSize &dest);
+    void ScaleTo(const QSize &dest, bool scaleMax);
     void SetAngle(int newangle) { angle = newangle; }
 
     // Gets

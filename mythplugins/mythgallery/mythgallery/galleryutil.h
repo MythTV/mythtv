@@ -37,7 +37,7 @@ class GalleryUtil
                               int sortorder, bool recurse,
                               ThumbDict *itemDict, ThumbGenerator *thumbGen);
 
-    static QSize ScaleToDest(const QSize &sz, const QSize &dest);
+    static QSize ScaleToDest(const QSize &sz, const QSize &dest, bool scaleMax);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
         { if (move) return Move(src, dst); else return Copy(src, dst); }

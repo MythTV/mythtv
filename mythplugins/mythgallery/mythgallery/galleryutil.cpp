@@ -397,7 +397,7 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     return false;
 }
 
-QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest)
+QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMax)
 {
     QSize sz = src;
 
@@ -409,17 +409,34 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest)
     if ((sz.width() > 0) && (sz.height() > 0))
         imageAspect = (double)sz.width() / (double)sz.height();
 
-    // scale to dest height for most images
-    int scalewidth = (int)((float)dest.height() * imageAspect / pixelAspect);
-    int scaleheight = dest.height();
-    if (scalewidth > dest.width())
+    int scaleWidth;
+    int scaleHeight;
+    if (scaleMax)
     {
-        // scale to dest width for extra wide images
-        scalewidth = dest.width();
-        scaleheight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        // scale-max to dest width for most images
+        scaleWidth = dest.width();
+        scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        if (scaleHeight < dest.height())
+        {
+            // scale-max to dest height for extra wide images
+            scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+            scaleHeight = dest.height();
+        }
+    }
+    else
+    {
+        // scale-min to dest height for most images
+        scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+        scaleHeight = dest.height();
+        if (scaleWidth > dest.width())
+        {
+            // scale-min to dest width for extra wide images
+            scaleWidth = dest.width();
+            scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        }
     }
 
-    sz.scale(scalewidth, scaleheight, QSize::ScaleFree);
+    sz.scale(scaleWidth, scaleHeight, QSize::ScaleFree);
     return sz;
 }
 

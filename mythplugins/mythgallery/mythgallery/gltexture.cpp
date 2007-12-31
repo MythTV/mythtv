@@ -84,9 +84,9 @@ void GLTexture::MakeQuad(float alpha, float scale)
     glEnd();
 }
 
-void GLTexture::ScaleTo(const QSize &dest)
+void GLTexture::ScaleTo(const QSize &dest, bool scaleMax)
 {
-    QSize sz = GalleryUtil::ScaleToDest(GetSize(), dest);
+    QSize sz = GalleryUtil::ScaleToDest(GetSize(), dest, scaleMax);
     if ((sz.width()   > 0) && (sz.height()   > 0) &&
         (dest.width() > 0) && (dest.height() > 0))
     {

@@ -74,6 +74,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
       // General
       m_source_x(0.0f),
       m_source_y(0.0f),
+      m_scaleMax(false),
 
       // Texture variables (for display and effects)
       m_texMaxDim(512),
@@ -94,6 +95,8 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f)
 {
+    m_scaleMax = (gContext->GetNumSetting("GalleryScaleMax", 0) > 0);
+
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();
 
@@ -132,6 +135,8 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
 GLSingleView::~GLSingleView()
 {
+    // save the current m_scaleMax setting so we can restore it later
+    gContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
 }
 
 void GLSingleView::CleanUp(void)
@@ -408,6 +413,14 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_info_show = !wasInfo && !wasInfoShort;
             m_slideshow_running = wasRunning;
         }
+        else if (action == "FULLSCREEN")
+        {
+            m_scaleMax = !m_scaleMax;
+            m_source_x = 0;
+            m_source_y = 0;
+            SetZoom(1.0f);
+            Load();
+        }
         else
         {
             handled = false;
@@ -578,7 +591,7 @@ void GLSingleView::Load(void)
 
     int a = m_tex1First ? 0 : 1;
     m_texItem[a].SetItem(item, image.size());
-    m_texItem[a].ScaleTo(m_screenSize);
+    m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
     m_texItem[a].Init(convertToGLFormat(image.smoothScale(m_texSize)));
 
     UpdateLCD(item);
@@ -598,7 +611,7 @@ void GLSingleView::Rotate(int angle)
         item->SetRotationAngle(ang);
 
     m_texItem[m_texCur].SwapWidthHeight();
-    m_texItem[m_texCur].ScaleTo(m_screenSize);
+    m_texItem[m_texCur].ScaleTo(m_screenSize, m_scaleMax);
 }
 
 void GLSingleView::SetZoom(float zoom)

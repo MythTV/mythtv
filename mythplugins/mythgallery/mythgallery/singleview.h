@@ -100,6 +100,7 @@ class SingleView : public MythDialog, public ImageView
     QImage        m_image;
     int           m_angle;
     QPoint        m_source_loc;
+    bool          m_scaleMax;
 
     // Info variables
     QPixmap      *m_info_pixmap;
