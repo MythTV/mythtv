@@ -375,9 +375,9 @@ void setupKeys(void)
     REG_KEY("Music", "PAUSE",      "Pause/Start playback",       "P");
     REG_KEY("Music", "PLAY",       "Re/Start playback",          "");
     REG_KEY("Music", "STOP",       "Stop playback",              "O");
-    REG_KEY("Music", "VOLUMEDOWN", "Volume down",                "[,{,F10");
-    REG_KEY("Music", "VOLUMEUP",   "Volume up",                  "],},F11");
-    REG_KEY("Music", "MUTE",       "Mute",                       "|,\\,F9");
+    REG_KEY("Music", "VOLUMEDOWN", "Volume down",       "[,{,F10,Volume Down");
+    REG_KEY("Music", "VOLUMEUP",   "Volume up",         "],},F11,Volume Up");
+    REG_KEY("Music", "MUTE",       "Mute",              "|,\\,F9,Volume Mute");
     REG_KEY("Music", "CYCLEVIS",   "Cycle visualizer mode",      "6");
     REG_KEY("Music", "BLANKSCR",   "Blank screen",               "5");
     REG_KEY("Music", "THMBUP",     "Increase rating",            "9");

@@ -274,9 +274,9 @@ void TV::InitKeys(void)
             "favorites in the program guide.", "/");
     REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "
             "guide in Live TV mode.", "X");
-    REG_KEY("TV Frontend", "VOLUMEDOWN", "Volume down", "[,{,F10");
-    REG_KEY("TV Frontend", "VOLUMEUP", "Volume up", "],},F11");
-    REG_KEY("TV Frontend", "MUTE", "Mute", "|,\\,F9");
+    REG_KEY("TV Frontend", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
+    REG_KEY("TV Frontend", "VOLUMEUP",   "Volume up",   "],},F11,Volume Up");
+    REG_KEY("TV Frontend", "MUTE",       "Mute",        "|,\\,F9,Volume Mute");
     REG_KEY("TV Frontend", "RANKINC", "Increase program or channel rank",
             "Right");
     REG_KEY("TV Frontend", "RANKDEC", "Decrease program or channel rank",
@@ -318,9 +318,9 @@ void TV::InitKeys(void)
             "program", "R");
     REG_KEY("TV Playback", "TOGGLEFAV", "Toggle the current channel as a "
             "favorite", "?");
-    REG_KEY("TV Playback", "VOLUMEDOWN", "Volume down", "[,{,F10");
-    REG_KEY("TV Playback", "VOLUMEUP", "Volume up", "],},F11");
-    REG_KEY("TV Playback", "MUTE", "Mute", "|,\\,F9");
+    REG_KEY("TV Playback", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
+    REG_KEY("TV Playback", "VOLUMEUP",   "Volume up",   "],},F11,Volume Up");
+    REG_KEY("TV Playback", "MUTE",       "Mute",        "|,\\,F9,Volume Mute");
     REG_KEY("TV Playback", "TOGGLEPIPMODE", "Toggle Picture-in-Picture mode",
             "V");
     REG_KEY("TV Playback", "TOGGLEPIPWINDOW", "Toggle active PiP window", "B");

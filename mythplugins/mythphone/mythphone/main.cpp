@@ -127,13 +127,13 @@ void initKeys(void)
     REG_KEY("Phone", "Down", "Down", "Down");
     REG_KEY("Phone", "Left", "Left", "Left");
     REG_KEY("Phone", "Right", "Right", "Right");
-    REG_KEY("Phone", "VOLUMEDOWN", "Volume down", "[,{,F10");
-    REG_KEY("Phone", "VOLUMEUP", "Volume up", "],},F11");
+    REG_KEY("Phone", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
+    REG_KEY("Phone", "VOLUMEUP",   "Volume up",   "],},F11,Volume Up");
+    REG_KEY("Phone", "MUTE",       "Mute",        "|,\\,F9,Volume Mute");
     REG_KEY("Phone", "ZOOMIN", "Zoom the video window in", ">,.,Z,End");
     REG_KEY("Phone", "ZOOMOUT", "Zoom the video window out", ",,<,Q,Home");
     REG_KEY("Phone", "FULLSCRN", "Show received video full-screen", "P");
     REG_KEY("Phone", "HANGUP", "Hangup an active call", "O");
-    REG_KEY("Phone", "MUTE", "Mute", "|,\\,F9");
     REG_KEY("Phone", "LOOPBACK", "Loopback Video", "L");
 }
 

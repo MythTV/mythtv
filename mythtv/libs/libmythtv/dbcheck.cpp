@@ -11,7 +11,7 @@ using namespace std;
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1203";
+const QString currentDatabaseVersion = "1204";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3323,6 +3323,21 @@ thequery,
 ""
 };
        if (!performActualUpdate(updates, "1203", dbver))
+           return false;
+    }
+
+    if (dbver == "1203")
+    {
+        const QString updates[] = {
+"UPDATE keybindings SET keylist = '[,{,F10,Volume Down' "
+"WHERE action = 'VOLUMEDOWN' AND keylist = '[,{,F10';",
+"UPDATE keybindings SET keylist = '],},F11,Volume Up' "
+"WHERE action = 'VOLUMEUP' AND keylist = '],},F11';",
+"UPDATE keybindings SET keylist = '|,\\\\,F9,Volume Mute' "
+"WHERE action = 'MUTE' AND keylist = '|,\\\\,F9';",
+""
+};
+       if (!performActualUpdate(updates, "1204", dbver))
            return false;
     }
 
