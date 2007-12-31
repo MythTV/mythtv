@@ -5,6 +5,9 @@
 #include "videodlg.h"
 #include "parentalcontrols.h"
 
+#include <map>
+#include <vector>
+
 #include <qdir.h>
 
 namespace
@@ -566,77 +569,158 @@ HostSpinBox *MTDRipSize()
                     "used for transcoding."));
     return gc;
 }
+
+struct ConfigPage
+{
+    typedef std::vector<ConfigurationGroup *> PageList;
+
+  protected:
+    ConfigPage(PageList &pl) : m_pl(pl)
+    {
+    }
+
+    void Add(ConfigurationGroup *page)
+    {
+        m_pl.push_back(page);
+    }
+
+  private:
+    ConfigPage(const ConfigPage &);
+    ConfigPage &operator=(const ConfigPage &);
+
+  private:
+    PageList &m_pl;
+};
+
+struct VConfigPage : public ConfigPage
+{
+    VConfigPage(PageList &pl, bool luselabel = true, bool luseframe  = true,
+                bool lzeroMargin = false, bool lzeroSpace = false) :
+        ConfigPage(pl)
+    {
+        m_vc_page = new VerticalConfigurationGroup(luselabel, luseframe,
+                                                   lzeroMargin, lzeroSpace);
+        Add(m_vc_page);
+    }
+
+    VerticalConfigurationGroup *operator->()
+    {
+        return m_vc_page;
+    }
+
+  private:
+    VerticalConfigurationGroup *m_vc_page;
+};
+
+class RatingsToPL : public TriggeredConfigurationGroup
+{
+  public:
+    RatingsToPL() : TriggeredConfigurationGroup(false)
+    {
+        HostCheckBox *r2pl =
+                new HostCheckBox("mythvideo.ParentalLevelFromRating");
+        r2pl->setLabel(QObject::tr("Enable automatic Parental Level from "
+                                   "rating."));
+        r2pl->setValue(false);
+        r2pl->setHelpText(QObject::tr("If enabled, searches will automatically "
+                                      "set the Parental Level to the one "
+                                      "matching the rating below."));
+        addChild(r2pl);
+        setTrigger(r2pl);
+
+        typedef std::map<ParentalLevel::Level, QString> r2pl_map;
+        r2pl_map r2pl_defaults;
+        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLowest,
+                tr("G", "PL 1 default search string.")));
+        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLow,
+                tr("PG", "PL 2 default search string.")));
+        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plMedium,
+                tr("PG-13", "PL3 default search string.")));
+        r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plHigh,
+                tr("R:NC-17", "PL4 default search string.")));
+
+        VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
+
+        for (ParentalLevel pl(ParentalLevel::plLowest);
+             pl.GetLevel() <= ParentalLevel::plHigh && pl.good(); ++pl)
+        {
+            HostLineEdit *hle = new HostLineEdit(QString("mythvideo.AutoR2PL%1")
+                                                 .arg(pl.GetLevel()));
+            hle->setLabel(QObject::tr("Level %1").arg(pl.GetLevel()));
+            hle->setHelpText(QObject::tr("Ratings containing these strings "
+                                         "(separated by :) will be assigned "
+                                         "to Parental Level %1.")
+                             .arg(pl.GetLevel()));
+
+            r2pl_map::const_iterator def_setting =
+                    r2pl_defaults.find(pl.GetLevel());
+            if (def_setting != r2pl_defaults.end())
+            {
+                hle->setValue(def_setting->second);
+            }
+
+            vcg->addChild(hle);
+        }
+
+        addTarget("0", new VerticalConfigurationGroup(true));
+        addTarget("1", vcg);
+
+    }
+};
+
+
 } // namespace
 
 VideoGeneralSettings::VideoGeneralSettings()
 {
-    const int pages = 6;
+    ConfigPage::PageList pages;
 
-    VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General Settings (%1/%2)")
-                      .arg(1).arg(pages));
-    general->addChild(VideoStartupDirectory());
-    general->addChild(VideoArtworkDirectory());
-    general->addChild(VideoDefaultView());
-    addChild(general);
+    VConfigPage page1(pages, false);
+    page1->addChild(VideoStartupDirectory());
+    page1->addChild(VideoArtworkDirectory());
+    page1->addChild(VideoDefaultView());
 
-    VerticalConfigurationGroup *general2 =
-            new VerticalConfigurationGroup(false);
-    general2->setLabel(QObject::tr("General Settings (%1/%2)")
-                       .arg(2).arg(pages));
-    general2->addChild(VideoListUnknownFiletypes());
-    general2->addChild(VideoBrowserNoDB());
-    general2->addChild(VideoGalleryNoDB());
-    general2->addChild(VideoTreeNoDB());
-    general2->addChild(VideoTreeNoMetaData());
-    general2->addChild(VideoNewBrowsable());
-    general2->addChild(VideoSortIgnoresCase());
-    general2->addChild(VideoDBFolderView());
-    general2->addChild(VideoTreeRemeber());
-    general2->addChild(VideoImageCacheSize());
-    addChild(general2);
+    VConfigPage page2(pages, false);
+    page2->addChild(VideoListUnknownFiletypes());
+    page2->addChild(VideoBrowserNoDB());
+    page2->addChild(VideoGalleryNoDB());
+    page2->addChild(VideoTreeNoDB());
+    page2->addChild(VideoTreeNoMetaData());
+    page2->addChild(VideoNewBrowsable());
+    page2->addChild(VideoSortIgnoresCase());
+    page2->addChild(VideoDBFolderView());
+    page2->addChild(VideoTreeRemeber());
+    page2->addChild(VideoImageCacheSize());
 
-    VerticalConfigurationGroup *general3 =
-            new VerticalConfigurationGroup(false);
-    general3->setLabel(QObject::tr("General Settings (%1/%2)")
-                       .arg(3).arg(pages));
-    general3->addChild(SetDVDDevice());
-    general3->addChild(SetVCDDevice());
-    general3->addChild(SetOnInsertDVD());
-    general3->addChild(SetDVDDriveSpeed());
-    general3->addChild(new DVDBookmarkSettings());
-    addChild(general3);
+    VConfigPage page3(pages, false);
+    page3->addChild(SetDVDDevice());
+    page3->addChild(SetVCDDevice());
+    page3->addChild(SetOnInsertDVD());
+    page3->addChild(SetDVDDriveSpeed());
+    page3->addChild(new DVDBookmarkSettings());
 
-    VerticalConfigurationGroup *general4 =
-            new VerticalConfigurationGroup(false);
-    general4->setLabel(QObject::tr("General Settings (%1/%2)")
-                       .arg(4).arg(pages));
+    // page 4
     VerticalConfigurationGroup *vman =
             new VerticalConfigurationGroup(true, false);
     vman->setLabel(QObject::tr("Video Manager"));
     vman->addChild(SearchListingsCommand());
     vman->addChild(GetPostersCommand());
     vman->addChild(GetDataCommand());
-    general4->addChild(vman);
-    addChild(general4);
 
-    VerticalConfigurationGroup *general5 =
-            new VerticalConfigurationGroup(false);
-    general5->setLabel(QObject::tr("General Settings (%1/%2)")
-                       .arg(5).arg(pages));
+    VConfigPage page4(pages, false);
+    page4->addChild(vman);
+
+    // page 5
     VerticalConfigurationGroup *vgal =
             new VerticalConfigurationGroup(true, false);
     vgal->setLabel(QObject::tr("Video Gallery"));
     vgal->addChild(VideoGalleryColumns());
     vgal->addChild(VideoGalleryRows());
     vgal->addChild(VideoGallerySubtitle());
-    general5->addChild(vgal);
-    addChild(general5);
+    VConfigPage page5(pages, false);
+    page5->addChild(vgal);
 
-    VerticalConfigurationGroup *general6 =
-            new VerticalConfigurationGroup(false);
-    general6->setLabel(QObject::tr("General Settings (%1/%2)")
-                       .arg(6).arg(pages));
+    // page 6
     VerticalConfigurationGroup *pctrl =
             new VerticalConfigurationGroup(true, false);
     pctrl->addChild(VideoDefaultParentalLevel());
@@ -644,8 +728,20 @@ VideoGeneralSettings::VideoGeneralSettings()
     pctrl->addChild(VideoAdminPasswordThree());
     pctrl->addChild(VideoAdminPasswordTwo());
     pctrl->addChild(VideoAggressivePC());
-    general6->addChild(pctrl);
-    addChild(general6);
+    VConfigPage page6(pages, false);
+    page6->addChild(pctrl);
+
+    VConfigPage page7(pages, false);
+    page7->addChild(new RatingsToPL());
+
+    int page_num = 1;
+    for (ConfigPage::PageList::const_iterator p = pages.begin();
+         p != pages.end(); ++p, ++page_num)
+    {
+        (*p)->setLabel(QObject::tr("General Settings (%1/%2)").arg(page_num)
+                       .arg(pages.size()));
+        addChild(*p);
+    }
 }
 
 VideoPlayerSettings::VideoPlayerSettings()

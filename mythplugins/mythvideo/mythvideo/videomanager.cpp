@@ -15,7 +15,7 @@
 #include <stack>
 #include <set>
 #include <cmath>
-#include <stdint.h>
+#include <functional>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -1864,6 +1864,20 @@ namespace mythvideo_videomanager
             ListHandler *m_list_handler;
         };
 
+        typedef std::list<std::pair<QString, ParentalLevel::Level> >
+                parental_level_map;
+
+        struct rating_to_pl_less :
+            public std::binary_function<parental_level_map::value_type,
+                                        parental_level_map::value_type, bool>
+        {
+            bool operator()(const parental_level_map::value_type &lhs,
+                           const parental_level_map::value_type &rhs) const
+            {
+                return lhs.first.length() < rhs.first.length();
+            }
+        };
+
       public:
         VideoManagerImp(VideoManager *vm, XMLParse *theme, const QRect &area,
                 VideoList *video_list) :
@@ -1872,6 +1886,26 @@ namespace mythvideo_videomanager
             m_popup(0), m_wait_background(0), m_has_manual_title_search(false)
         {
             m_art_dir = gContext->GetSetting("VideoArtworkDir");
+
+            if (gContext->
+                GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
+            {
+                for (ParentalLevel sl(ParentalLevel::plLowest);
+                     sl.GetLevel() <= ParentalLevel::plHigh && sl.good(); ++sl)
+                {
+                    QStringList ratings = QStringList::split(':', gContext->
+                            GetSetting(QString("mythvideo.AutoR2PL%1")
+                                       .arg(sl.GetLevel())));
+
+                    for (QStringList::const_iterator p = ratings.begin();
+                         p != ratings.end(); ++p)
+                    {
+                        m_rating_to_pl.push_back(
+                            parental_level_map::value_type(*p, sl.GetLevel()));
+                    }
+                }
+                m_rating_to_pl.sort(std::not2(rating_to_pl_less()));
+            }
 
             m_info_handler = new InfoHandler(this, m_vm, *m_theme,
                     &m_current_item_proxy, m_art_dir);
@@ -1905,14 +1939,14 @@ namespace mythvideo_videomanager
                             "VideoManager"));
 
             // This bit of ugliness done only for theme compatibility.
-            // Without this, themes that don't put the dialogs in
+            // Without this, themes that don't put dialogs in
             // their own context would have a messy screen.
             struct context_check
             {
-                context_check(XMLParse *theme, const QString &name,
+                context_check(XMLParse *ltheme, const QString &name,
                               int default_context)
                 {
-                    LayerSet *s = theme->GetSet(name);
+                    LayerSet *s = ltheme->GetSet(name);
                     if (s && s->GetContext() == edcAlwaysShown)
                     {
                         s->SetContext(default_context);
@@ -2070,6 +2104,8 @@ namespace mythvideo_videomanager
                                       "no active message.");
             }
         }
+
+        void AutomaticParentalAdjustment(Metadata *item);
 
       // Start asynchronous functions.
 
@@ -2284,6 +2320,7 @@ namespace mythvideo_videomanager
         bool m_has_manual_title_search;
         URLOperationProxy m_url_operator;
         TimeoutSignalProxy m_url_dl_timer;
+        parental_level_map m_rating_to_pl;
     };
 
     void VideoManagerImp::RefreshVideoList(bool resort_only)
@@ -2323,6 +2360,23 @@ namespace mythvideo_videomanager
         }
 
         updateML = false;
+    }
+
+    void VideoManagerImp::AutomaticParentalAdjustment(Metadata *item)
+    {
+        if (item && m_rating_to_pl.size())
+        {
+            QString rating = item->Rating();
+            for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
+                 rating.length() && p != m_rating_to_pl.end(); ++p)
+            {
+                if (rating.find(p->first) != -1)
+                {
+                    item->setShowLevel(p->second);
+                    break;
+                }
+            }
+        }
     }
 
     // Copy video poster to appropriate directory and set the item's cover file.
@@ -2533,6 +2587,8 @@ namespace mythvideo_videomanager
             item->setUserRating(data["UserRating"].toFloat());
             item->setRating(data["MovieRating"]);
             item->setLength(data["Runtime"].toInt());
+
+            AutomaticParentalAdjustment(item);
 
             // Genres
             Metadata::genre_list video_genres;
