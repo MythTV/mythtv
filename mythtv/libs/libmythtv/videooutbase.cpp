@@ -614,9 +614,13 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     (void)wid;
 
+    bool save_visible_rect = !embedding;
+
     embedding = true;
 
-    tmp_display_visible_rect = display_visible_rect;
+    if (save_visible_rect)
+        tmp_display_visible_rect = display_visible_rect;
+
     display_visible_rect     = QRect(x, y, w, h);
     display_video_rect       = QRect(x, y, w, h);
 
