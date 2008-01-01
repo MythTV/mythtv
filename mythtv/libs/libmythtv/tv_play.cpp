@@ -270,6 +270,9 @@ void TV::InitKeys(void)
             ">,.");
     REG_KEY("TV Frontend", "TOGGLEFAV", "Toggle the current channel as a "
             "favorite", "?");
+    REG_KEY("TV Frontend", "TOGGLEEPGORDER", "Reverse the channel order "
+            "in the program guide", "0");
+
     REG_KEY("TV Frontend", "NEXTFAV", "Toggle showing all channels or just "
             "favorites in the program guide.", "/");
     REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "

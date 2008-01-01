@@ -138,6 +138,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     }
 
     scrolltype = gContext->GetNumSetting("EPGScrollType", 1);
+    sortReverse = gContext->GetNumSetting("EPGSortReverse", 0);
 
     selectChangesChannel = gContext->GetNumSetting("SelectChangesChannel", 0);
     selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
@@ -325,6 +326,8 @@ GuideGrid::~GuideGrid()
         videoRepaintTimer->deleteLater();
         videoRepaintTimer = NULL;
     }
+
+    gContext->SaveSetting("EPGSortReverse", sortReverse ? "1" : "0");
 }
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
@@ -468,6 +471,11 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 volumeUpdate(false);
             else if (action == "MUTE")
                 toggleMute();
+            else if (action == "TOGGLEEPGORDER")
+            {
+                sortReverse = !sortReverse;
+                generateListings();
+            }
             else
                 handled = false;
         }
@@ -629,13 +637,18 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     bool startingset = false;
     for (uint i = 0; i < channels.size(); i++)
     {
+        uint chan=i;
+        if (sortReverse)
+        {
+            chan=channels.size()-i-1;
+        }
         ChannelInfo val;
-        val.chanstr  = channels[i].channum;
-        val.chanid   = channels[i].chanid;
-        val.callsign = channels[i].callsign;
-        val.favid    = channels[i].favorite;
-        val.channame = channels[i].name;
-        val.iconpath = channels[i].icon;
+        val.chanstr  = channels[chan].channum;
+        val.chanid   = channels[chan].chanid;
+        val.callsign = channels[chan].callsign;
+        val.favid    = channels[chan].favorite;
+        val.channame = channels[chan].name;
+        val.iconpath = channels[chan].icon;
         val.iconload = false;
 
         // set starting channel index if it hasn't been set
