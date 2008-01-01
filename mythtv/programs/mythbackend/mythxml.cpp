@@ -86,6 +86,7 @@ MythXMLMethod MythXML::GetMethod( const QString &sURI )
     if (sURI == "GetVideo"             ) return MXML_GetVideo;
     if (sURI == "GetMusic"             ) return MXML_GetMusic;
     if (sURI == "GetConnectionInfo"    ) return MXML_GetConnectionInfo;
+    if (sURI == "GetVideoArt"          ) return MXML_GetVideoArt;
 
     return( MXML_Unknown );
 }
@@ -136,6 +137,8 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
                 case MXML_GetConnectionInfo    : GetConnectionInfo( pRequest ); return true;
                 case MXML_GetAlbumArt          : GetAlbumArt    ( pRequest ); return true;
+		case MXML_GetVideoArt          : GetVideoArt    ( pRequest ); return true;
+
 
                 default: 
                 {
@@ -738,6 +741,57 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void MythXML::GetVideoArt( HTTPRequest *pRequest )
+{
+    bool bDefaultPixmap = false;
+
+    pRequest->m_eResponseType   = ResponseTypeFile;
+
+    int  iId   = pRequest->m_mapParams[ "Id"  ].toInt();
+
+    // Optional Parameters
+    //
+    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
+    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
+    
+    // Read Video poster file path from database
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT coverart FROM upnpmedia WHERE intid = :ITEMID");
+    query.bindValue(":ITEMID", iId);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("GetVideoArt ", query);
+
+/*    if ((nWidth == 0) && (nHeight == 0))
+    {
+         bDefaultPixmap = true;
+    }
+*/
+    query.next();
+
+    QString sFileName = query.value(0).toString();
+
+    if (bDefaultPixmap)
+    {
+        return;
+    }
+
+    // ----------------------------------------------------------------------
+    // check to see if albumart image is already created.
+    // ----------------------------------------------------------------------
+	
+    if (QFile::exists( sFileName ))
+    {
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+	pRequest->m_sFileName = sFileName;
+	return;
+    }
+	
+}
+
 void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 {
     bool bDefaultPixmap = false;
@@ -1270,13 +1324,26 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
         QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
 
 	idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+	idPath = QStringList::split( "?", idPath[0] );
+
         sId = idPath[0];
 
 	if (sId.startsWith("Id"))
 	    sId = sId.right(sId.length() - 2);
         else 
             return;
+
 	//VERBOSE(VB_UPNP, QString("MythXML::GetVideo : %1 ").arg(sId));
+	
+	pRequest->m_mapParams[ "Id" ] = sId;
+    }
+
+    bool wantCoverArt = (pRequest->m_mapParams[ "albumArt" ] == "true");
+
+    if (wantCoverArt)
+    {
+        GetVideoArt(pRequest);
+	return;
     }
 
     // ----------------------------------------------------------------------

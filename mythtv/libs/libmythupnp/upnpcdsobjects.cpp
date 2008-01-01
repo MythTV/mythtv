@@ -355,6 +355,8 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 
+    pObject->AddProperty( new Property( "albumArtURI"         , "upnp" ));
+
     return( pObject );
 }
 
@@ -428,6 +430,8 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "artist"         , "upnp" ));
     pObject->AddProperty( new Property( "album"          , "upnp" ));
     pObject->AddProperty( new Property( "date"           , "dc"   ));
+
+    pObject->AddProperty( new Property( "albumArtURI"    , "upnp"   ));
 
     return( pObject );
 }

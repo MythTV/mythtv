@@ -31,6 +31,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
         QStringMap             m_mapBackendPort;
 
 	QStringMap	       m_mapTitleNames;
+	QStringMap             m_mapCoverArt;
 
     protected:
 
@@ -52,6 +53,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
         void FillMetaMaps (void);
 	int GetBaseCount(void);
 	QString GetTitleName(QString fPath, QString fName);
+	QString GetCoverArt(QString fPath);
 
         int buildFileList(QString directory, int itemID, MSqlQuery &query);
 

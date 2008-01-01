@@ -85,8 +85,8 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
     return "SELECT intid, title, filepath, " \
-	   "itemtype, itemproperties, parentid "\
-           "FROM upnpmedia WHERE class = 'VIDEO'";
+	   "itemtype, itemproperties, parentid, "\
+           "coverart FROM upnpmedia WHERE class = 'VIDEO'";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,6 +113,17 @@ QString UPnpCDSVideo::GetTitleName(QString fPath, QString fName)
     else
         return fName;
 }
+
+QString UPnpCDSVideo::GetCoverArt(QString fPath)
+{
+    if (m_mapCoverArt[fPath])
+    {
+        return m_mapCoverArt[fPath];
+    }
+    else
+        return "";
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -123,7 +134,7 @@ void UPnpCDSVideo::FillMetaMaps(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString sSQL = "SELECT filename, title FROM videometadata";
+    QString sSQL = "SELECT filename, title, coverfile FROM videometadata";
 
     query.prepare  ( sSQL );
     query.exec();
@@ -131,7 +142,10 @@ void UPnpCDSVideo::FillMetaMaps(void)
     if (query.isActive() && query.size() > 0)
     {
         while(query.next())
+	{
             m_mapTitleNames[query.value(0).toString()] = query.value(1).toString();
+	    m_mapCoverArt[query.value(0).toString()] = query.value(2).toString();
+	}
     }
 
 }
@@ -145,6 +159,7 @@ int UPnpCDSVideo::buildFileList(QString directory, int itemID, MSqlQuery &query)
 
     int parentid;
     QDir vidDir(directory);
+    QString title;
                                 // If we can't read it's contents move on
     if (!vidDir.isReadable())
         return itemID;
@@ -175,15 +190,18 @@ int UPnpCDSVideo::buildFileList(QString directory, int itemID, MSqlQuery &query)
 
 	    query.prepare("INSERT INTO upnpmedia "
                           "(intid, class, itemtype, parentid, itemproperties, "
-			  "filepath, filename, title) "
+			  "filepath, filename, title, coverart) "
 			  "VALUES (:ITEMID, 'VIDEO', 'FOLDER', :PARENTID, '', "
-			  ":FILEPATH, :FILENAME, :TITLE)");
+			  ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
 
 	    query.bindValue(":ITEMID", itemID);
 	    query.bindValue(":PARENTID", parentid);
 	    query.bindValue(":FILEPATH", fPath);
 	    query.bindValue(":FILENAME", fName);
+
 	    query.bindValue(":TITLE", GetTitleName(fPath,fName));
+	    query.bindValue(":COVERART", GetCoverArt(fPath));
+
 	    query.exec();
 			    
 	    itemID = buildFileList(Info.filePath(),itemID, query);
@@ -212,15 +230,18 @@ int UPnpCDSVideo::buildFileList(QString directory, int itemID, MSqlQuery &query)
  //                                 .arg(fName));
             query.prepare("INSERT INTO upnpmedia "
                           "(intid, class, itemtype, parentid, itemproperties, "
-                          "filepath, filename, title) "
+                          "filepath, filename, title, coverart) "
                           "VALUES (:ITEMID, 'VIDEO', 'FILE', :PARENTID, '', "
-                          ":FILEPATH, :FILENAME, :TITLE)");
+                          ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
 
             query.bindValue(":ITEMID", itemID);
             query.bindValue(":PARENTID", parentid);
             query.bindValue(":FILEPATH", fPath);
             query.bindValue(":FILENAME", fName);
-            query.bindValue(":TITLE", GetTitleName(fPath,fName));
+
+	    query.bindValue(":TITLE", GetTitleName(fPath,fName));
+	    query.bindValue(":COVERART", GetCoverArt(fPath));
+
 	    query.exec();
 
         }
@@ -241,15 +262,11 @@ void UPnpCDSVideo::BuildMediaMap(void)
 
     query.exec("DELETE FROM upnpmedia WHERE class = 'VIDEO'");
 
-    if ((!RootVidDir.isNull()) && (RootVidDir != "")) 
-    {
-        VERBOSE(VB_GENERAL, "UPnpCDSVideo::BuildMediaMap - Starting Build of Media Map, this can take a moment.");
-
-        filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
+    filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
 
 
-        VERBOSE(VB_GENERAL, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
-    }
+    VERBOSE(VB_UPNP, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
+
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -265,6 +282,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     QString        sFileName    = query.value( 2).toString();
     QString        sItemType    = query.value( 3).toString();
     QString        sParentID    = query.value( 5).toString();
+    QString        sCoverArt    = query.value( 6).toString();
 
     // VERBOSE(VB_UPNP,QString("ID = %1, Title = %2, fname = %3 sObjectId = %4").arg(nVidID).arg(sTitle).arg(sFileName).arg(sObjectId));
     
@@ -291,6 +309,10 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sObjectId )
                             .arg( sURIParams );
 
+    QString sAlbumArtURI= QString( "%1GetVideoArt%2")
+	                    .arg( sURIBase   )
+	                    .arg( sURIParams );
+
     CDSObject *pItem;
 
     if (sItemType == "FILE") 
@@ -316,6 +338,12 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     pItem->m_bSearchable  = true;
     pItem->m_sWriteStatus = "WRITABLE";
 
+    pItem->SetPropValue( "genre"          , "[Unknown Genre]"    );
+    pItem->SetPropValue( "actor"          , "[Unknown Author]"    );
+
+    if ((sCoverArt != "") && (sCoverArt != "No Cover"))
+        pItem->SetPropValue( "albumArtURI"    , sAlbumArtURI);
+
     if ( bAddRef )
     {
         QString sRefId = QString( "%1/0/item%2")
@@ -340,10 +368,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
-   // Wonder if we should add the filesize to videometadata. would make this cleaner since we 
-   // are hitting the db for everything else.
-
     pRes->AddAttribute( "size"      , QString("%1").arg(fInfo.size()) );
+    pRes->AddAttribute( "duration"  , "0:00:00.000"      );
 
 }
-
