@@ -129,16 +129,17 @@ AppleRemote::_initCookieMap()
     cookieToButtonMapping["19_"]                  = ControlSwitched;
 
     // 10.5 sequences:
-    cookieToButtonMapping["31_29_28_19_18_"]          = VolumePlus;
-    cookieToButtonMapping["31_30_28_19_18_"]          = VolumeMinus;
-    cookieToButtonMapping["31_20_19_18_31_20_19_18_"] = Menu;
-    cookieToButtonMapping["31_21_19_18_31_21_19_18_"] = Play;
-    cookieToButtonMapping["31_22_19_18_31_22_19_18_"] = Right;
-    cookieToButtonMapping["31_23_19_18_31_23_19_18_"] = Left;
-    cookieToButtonMapping["31_19_18_4_2_"]            = RightHold;
-    cookieToButtonMapping["31_19_18_3_2_"]            = LeftHold;
-    cookieToButtonMapping["31_19_18_31_19_18_"]       = MenuHold;
-    cookieToButtonMapping["35_31_19_18_35_31_19_18_"] = PlaySleep;
+    cookieToButtonMapping["31_29_28_18_"]         = VolumePlus;
+    cookieToButtonMapping["31_30_28_18_"]         = VolumeMinus;
+    cookieToButtonMapping["31_20_18_31_20_18_"]   = Menu;
+    cookieToButtonMapping["31_21_18_31_21_18_"]   = Play;
+    cookieToButtonMapping["31_22_18_31_22_18_"]   = Right;
+    cookieToButtonMapping["31_23_18_31_23_18_"]   = Left;
+    cookieToButtonMapping["31_18_4_2_"]           = RightHold;
+    cookieToButtonMapping["31_18_3_2_"]           = LeftHold;
+    cookieToButtonMapping["31_18_31_18_"]         = MenuHold;
+    cookieToButtonMapping["35_31_18_35_31_18_"]   = PlaySleep;
+    cookieToButtonMapping["39_"]                  = ControlSwitched;
 }
 
 // private
