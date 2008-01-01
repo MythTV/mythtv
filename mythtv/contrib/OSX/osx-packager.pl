@@ -219,7 +219,7 @@ our %depend = (
     'url'
     =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.8.tar.gz',
     'pre-conf' =>
-    'echo \'' . q^
+    '/bin/echo \'' . q^
 diff -ru qt-mac-free-3.3.8.orig/config.tests/mac/mac_version.test qt-mac-free-3.3.8.new/config.tests/mac/mac_version.test
 --- qt-mac-free-3.3.8.orig/config.tests/mac/mac_version.test	2004-04-24 02:40:40.000000000 +1000
 +++ qt-mac-free-3.3.8.new/config.tests/mac/mac_version.test	2008-01-01 10:33:55.000000000 +1100
