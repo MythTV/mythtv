@@ -90,7 +90,9 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
     {
         if (!it->getCDFlag())
             to_ptr->addTrack((*it).getValue(), update_display, false);
-    }  
+    }
+
+    to_ptr->fillSonglistFromSongs();
 }
 
 
@@ -1295,7 +1297,6 @@ void PlaylistsContainer::copyToActive(int index)
 
     active_playlist->Changed();
     backup_playlist->Changed();
-
 }
 
 
