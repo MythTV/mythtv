@@ -1564,6 +1564,10 @@ case $targetos in
     enable  backend
     enable  darwin
     disable ivtv
+    osxver=`uname -r` 
+    if [ ${osxver:0:1} = "9" ]; then 
+      disable mmx 
+    fi
     disable need_memalign
     disable opengl_video
     disable opengl_vsync
