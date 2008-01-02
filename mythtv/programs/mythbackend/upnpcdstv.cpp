@@ -277,11 +277,13 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     uint uiEnd   = dtProgEnd.toTime_t();
     uint uiDur   = uiEnd - uiStart;
 
+    QString sDur;
 
-    QString sDur = QString( "%1:%2:%3" )
-                    .arg( (uiDur / 3600) % 24, 2 )
-                    .arg( (uiDur / 60) % 60  , 2 )
-                    .arg(  uiDur % 60        , 2 );
+    sDur.sprintf("%02d:%02d:%02d",
+                  (uiDur / 3600) % 24,
+                  (uiDur / 60) % 60,
+                   uiDur % 60);
+
 
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
