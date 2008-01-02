@@ -68,7 +68,10 @@ static MIMETypes g_MIMETypes[] =
     { "mpg" , "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
     { "vob",  "video/mpeg"                 },
+    { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
+    { "mov" , "video/quicktime"            },
+    { "mp4" , "video/mp4"                  },
     { "wmv" , "video/x-ms-wmv"             }
 };
 
