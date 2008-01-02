@@ -56,9 +56,6 @@ class UPnpNotifyTask : public Task
         int             m_nMaxAge;    
 
         UPnpNotifyNTS   m_eNTS;
-        
-        QStringList     m_addressList;
-
 
     protected:
 

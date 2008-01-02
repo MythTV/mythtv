@@ -89,9 +89,16 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
 //                        .arg( sUSN ));
 
     {
-    QMutexLocker qml(&m_mutex); // for m_addressList
-    for ( QStringList::Iterator it  = m_addressList.begin(); 
-                                it != m_addressList.end(); 
+    QMutexLocker qml(&m_mutex); // for addressList
+
+    // ----------------------------------------------------------------------
+    // Refresh IP Address List in case of changes
+    // ----------------------------------------------------------------------
+
+    QStringList addressList = QDeepCopy<QStringList>(UPnp::g_IPAddrList);
+
+    for ( QStringList::Iterator it  = addressList.begin(); 
+                                it != addressList.end(); 
                               ++it ) 
     {
         if (!*it)
@@ -133,12 +140,6 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 
     QSocketDevice *pMulticast = new QMulticastSocket( SSDP_GROUP       , SSDP_PORT );
 //    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
-
-    // ----------------------------------------------------------------------
-    // Refresh IP Address List in case of changes
-    // ----------------------------------------------------------------------
-
-    m_addressList = QDeepCopy<QStringList>(UPnp::g_IPAddrList);
 
     // ----------------------------------------------------------------------
     // Must send rootdevice Notification for first device.
