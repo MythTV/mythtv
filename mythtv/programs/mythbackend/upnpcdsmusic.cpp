@@ -290,9 +290,12 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
 
     nLength /= 1000;
 
-    QString sDur = QString( "0:%1:%2" )
-                    .arg( (nLength / 60) % 60, 2 )
-                    .arg( (nLength % 60)     , 2 );
+    QString sDur;
+
+    sDur.sprintf("%02d:%02d:%02d",
+                  (nLength / 3600) % 24,
+                  (nLength / 60) % 60,
+	           nLength % 60);
 
     pRes->AddAttribute( "duration"  , sDur      );
 }
