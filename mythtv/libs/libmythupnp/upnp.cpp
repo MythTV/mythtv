@@ -162,7 +162,6 @@ void UPnp::CleanUp( void )
     if (g_pSSDP)
     {
         VERBOSE(VB_UPNP, "UPnp::CleanUp() - disabling SSDP notifications");
-        g_pSSDP->DisableNotifications();
 
         delete g_pSSDP;
         g_pSSDP = NULL;
