@@ -407,6 +407,15 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
             usleep(10000);
         }
 
+        int statusCode = httpGrabber->getStatusCode();
+        if (statusCode < 200 || statusCode > 401)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Server returned an error status code %1 for url: %2")
+                                            .arg(statusCode)
+                                            .arg(url.latin1()));
+            break;
+        }
+
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
