@@ -125,7 +125,6 @@
 
 
   <background style="normal">
-    <image>background.png</image>
     <buttonarea>25,150,750,450</buttonarea>
 <!--    <visiblerowlimit>6</visiblerowlimit> --> <!-- Don't override this 
                                                       unless you've got good
