@@ -4072,6 +4072,8 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         prog = ProgramInfo::GetProgramAtDateTime(
             chanids, mythCurrentDateTime(), true, hoursMax);
 
+    prog->cardid = cardid;
+
     if (prog->recstartts == prog->recendts)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
