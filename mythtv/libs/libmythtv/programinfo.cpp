@@ -4008,14 +4008,13 @@ void ProgramInfo::UpdateRecGroup(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recgroup FROM recorded"
-                    "WHERE chaind = :CHANID"
+                    "WHERE chanid = :CHANID"
                     "AND starttime = :START ;");
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        if(query.next() && recgroup != query.value(0).toString())
-            recgroup = QString::fromUtf8(query.value(0).toString());
+        recgroup = QString::fromUtf8(query.value(0).toString());
     }
 }
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
