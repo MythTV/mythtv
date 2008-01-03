@@ -2397,12 +2397,14 @@ void TVRec::CheckForRecGroupChange(void)
         pi = ProgramInfo::GetProgramFromRecorded(
             curRecording->chanid, curRecording->recstartts);
     }
+    if (!pi)
+        return;
 
-    if (pi && pi->recgroup != "LiveTV" && !pseudoLiveTVRecording)
+    if (pi->recgroup != "LiveTV" && !pseudoLiveTVRecording)
     {
         // User wants this recording to continue
         SetPseudoLiveTVRecording(pi);
-        pi = NULL;
+        return;
     }
     else if (pi->recgroup == "LiveTV" && pseudoLiveTVRecording)
     {
@@ -2410,8 +2412,7 @@ void TVRec::CheckForRecGroupChange(void)
         SetPseudoLiveTVRecording(NULL);
     }
 
-    if (pi)
-        delete pi;
+    delete pi;
 }
 
 static uint get_input_id(uint cardid, const QString &inputname)
