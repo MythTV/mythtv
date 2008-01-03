@@ -1595,8 +1595,8 @@ void VideoOutput::SetVideoScalingAllowed(bool change)
 {
     if (change)
     {
-        db_scale_vert  = gContext->GetNumSetting("VertScanPercentage",  5) / 100.0;
-        db_scale_horiz = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+        db_scale_vert  = gContext->GetNumSetting("VertScanPercentage",  0) / 100.0;
+        db_scale_horiz = gContext->GetNumSetting("HorizScanPercentage", 0) / 100.0;
         db_scaling_allowed = true;
     }
     else
