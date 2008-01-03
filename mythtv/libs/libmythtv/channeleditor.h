@@ -22,14 +22,16 @@ public slots:
     void edit();
     void edit(int);
     void scan(void);
-    void transportEditor();
-    void deleteChannels();
+    void transportEditor(void);
+    void channelIconImport(void);
+    void deleteChannels(void);
 
 private:
     int                 id;
     SourceSetting      *source;
     ChannelListSetting *list;
     TransButtonSetting *buttonScan;
+    TransButtonSetting *buttonImportIcon;
     TransButtonSetting *buttonTransportEditor;
 };
 
@@ -68,7 +70,7 @@ public:
     bool getHideMode() { return currentHideMode; };
 
 public slots:
-    void fillSelections(void);
+    int fillSelections(void);
     void setSortMode(const QString& sort) {
         if (currentSortMode != sort) {
             currentSortMode = sort;

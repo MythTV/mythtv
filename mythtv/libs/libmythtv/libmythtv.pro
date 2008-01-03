@@ -141,6 +141,7 @@ HEADERS += livetvchain.h
 HEADERS += playgroup.h              progdetails.h
 HEADERS += channeleditor.h          channelsettings.h
 HEADERS += previewgenerator.h       transporteditor.h
+HEADERS += importicons.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += storagegroup.cpp
@@ -163,6 +164,7 @@ SOURCES += playgroup.cpp
 SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
 SOURCES += previewgenerator.cpp     transporteditor.cpp
+SOURCES += importicons.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

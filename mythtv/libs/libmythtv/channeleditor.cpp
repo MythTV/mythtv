@@ -19,6 +19,7 @@
 #include "sourceutil.h"
 
 #include "scanwizard.h"
+#include "importicons.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
     : ConfigurationWizard()
@@ -110,7 +111,7 @@ int ChannelWizard::countCardtypes() {
         return 0;
 }
 
-void ChannelListSetting::fillSelections(void) 
+int ChannelListSetting::fillSelections(void) 
 {
     QString currentValue = getValue();
     uint    currentIndex = max(getValueIndex(currentValue), 0);
@@ -166,7 +167,7 @@ void ChannelListSetting::fillSelections(void)
                 if (currentSourceID == "Unassigned")
                     continue;
             }
- 
+
             if (channum == "" && currentHideMode) 
                 continue;
 
@@ -198,6 +199,7 @@ void ChannelListSetting::fillSelections(void)
     // Make sure we select the current item, or the following one after
     // deletion, with wrap around to "(New Channel)" after deleting last item.
     setCurrentItem((!selidx && currentIndex < idx) ? currentIndex : selidx);
+    return idx;
 }
 
 class SourceSetting : public ComboBoxSetting, public Storage
@@ -278,6 +280,11 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     buttonScan->setLabel(QObject::tr("Channel Scanner"));
     buttonScan->setHelpText(QObject::tr("Starts the channel scanner."));
     buttonScan->setEnabled(SourceUtil::IsAnySourceScanable());
+    
+    buttonImportIcon = new TransButtonSetting();
+    buttonImportIcon->setLabel(QObject::tr("Icon Download"));
+    buttonImportIcon->setHelpText(QObject::tr("Starts the icon downloader"));
+    buttonImportIcon->setEnabled(SourceUtil::IsAnySourceScanable());
 
     buttonTransportEditor = new TransButtonSetting();
     buttonTransportEditor->setLabel(QObject::tr("Transport Editor"));
@@ -290,6 +297,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     HorizontalConfigurationGroup *h = 
         new HorizontalConfigurationGroup(false, false);
     h->addChild(buttonScan);
+    h->addChild(buttonImportIcon);
     h->addChild(buttonTransportEditor);
     addChild(h);
 
@@ -305,6 +313,8 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
             this, SLOT(menu(int)));
     connect(buttonScan, SIGNAL(pressed()),
             this, SLOT(scan()));
+    connect(buttonImportIcon,  SIGNAL(pressed()),
+            this, SLOT(channelIconImport()));
     connect(buttonTransportEditor, SIGNAL(pressed()),
             this, SLOT(transportEditor()));
     connect(del,  SIGNAL(pressed()),
@@ -399,7 +409,7 @@ void ChannelEditor::edit()
     id = list->getValue().toInt();
     ChannelWizard cw(id, source->getValue().toUInt());
     cw.exec();
-
+    
     list->fillSelections();
     list->setFocus();
 }
@@ -476,6 +486,56 @@ void ChannelEditor::transportEditor(void)
     TransportListEditor *editor = new TransportListEditor(sourceid);
     editor->exec();
     editor->deleteLater();
+
+    list->fillSelections();
+    list->setFocus();
+}
+
+void ChannelEditor::channelIconImport(void)
+{
+    if (list->fillSelections() == 0)
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "",
+                                        tr("Add some for channels first!"));
+        return;
+    }
+    
+    // Get selected channel name from database
+    QString querystr = QString("SELECT channel.name FROM channel WHERE chanid='%1' ").arg(list->getValue());
+    QString channelname = "";
+    MSqlQuery query(MSqlQuery::InitCon()); 
+    query.prepare(querystr);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        channelname = QString::fromUtf8(query.value(0).toString());
+    }
+
+    QStringList buttons;
+    buttons.append(tr("Cancel"));
+    buttons.append(tr("Download all icons.."));
+    buttons.append(tr("Rescan for missing icons.."));
+    if (!channelname.isEmpty())
+        buttons.append(tr("Download icon for ") + channelname);
+
+    int val = MythPopupBox::ShowButtonPopup(gContext->GetMainWindow(),
+                                             "", "Channel Icon Import", buttons, kDialogCodeButton2);
+
+    ImportIconsWizard *iconwizard;
+    if (val == kDialogCodeButton0) // Cancel pressed
+        return;
+    else if (val == kDialogCodeButton1) // Import all icons pressed
+        iconwizard = new ImportIconsWizard(false);
+    else if (val == kDialogCodeButton2) // Rescan for missing pressed
+        iconwizard = new ImportIconsWizard(true);
+    else if (val == kDialogCodeButton3) // Import a single channel icon
+        iconwizard = new ImportIconsWizard(true, channelname);
+    else
+        return;
+
+    iconwizard->exec();
+    iconwizard->deleteLater();
 
     list->fillSelections();
     list->setFocus();
