@@ -3490,15 +3490,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         VideoFrame *xf = picframe;
                         picframe = GetNVP()->GetNextVideoFrame(false);
 
-                        tmppicture.data[0] = picframe->buf;
-                        tmppicture.data[1] = tmppicture.data[0] + 
-                                        picframe->width * picframe->height;
-                        tmppicture.data[2] = tmppicture.data[1] + 
-                                        picframe->width * picframe->height / 4;
-
-                        tmppicture.linesize[0] = picframe->width;
-                        tmppicture.linesize[1] = picframe->width / 2;
-                        tmppicture.linesize[2] = picframe->width / 2;
+                        unsigned char *buf = picframe->buf;
+                        tmppicture.data[0] = buf + picframe->offsets[0];
+                        tmppicture.data[1] = buf + picframe->offsets[1];
+                        tmppicture.data[2] = buf + picframe->offsets[2];
+                        tmppicture.linesize[0] = picframe->pitches[0];
+                        tmppicture.linesize[1] = picframe->pitches[1];
+                        tmppicture.linesize[2] = picframe->pitches[2];
 
                         img_convert(&tmppicture, PIX_FMT_YUV420P, 
                                     (AVPicture *)&mpa_pic,
