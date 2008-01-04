@@ -75,9 +75,9 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     {
         // oops, not for us
         QString message = strlist[1];
-        QString extra = strlist[2];
+        strlist.pop_front(); strlist.pop_front();
 
-        MythEvent me(message, extra);
+        MythEvent me(message, strlist);
         gContext->dispatch(me);
 
         ok = sock->readStringList(strlist);
