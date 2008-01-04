@@ -2651,9 +2651,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoPlay();
         else if (action == "PAUSE") 
             DoPause();
-        else if (action == "SPEEDINC" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SPEEDINC" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(1);
-        else if (action == "SPEEDDEC" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SPEEDDEC" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(-1);
         else if (action == "ADJUSTSTRETCH")
             ChangeTimeStretch(0);   // just display
@@ -2696,7 +2698,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 AddKeyToInputQueue(0);
             }            
         }
-        else if (action == "SEEKFFWD" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SEEKFFWD" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_FORWARD);
@@ -2715,7 +2718,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "FFWDSTICKY" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "FFWDSTICKY" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_END);
@@ -2727,7 +2731,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "SEEKRWND" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SEEKRWND" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_REWIND);
@@ -2745,7 +2750,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(-1);
         }
-        else if (action == "RWNDSTICKY" && !activerbuffer->InDVDMenuOrStillFrame())
+        else if (action == "RWNDSTICKY" &&
+                 activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_SET);
@@ -2867,8 +2873,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else 
             {
-                if (nvp && 5 & gContext->GetNumSetting("PlaybackExitPrompt") &&
-                    !underNetworkControl && !prbuffer->InDVDMenuOrStillFrame())
+                if (nvp &&
+                    (5 & gContext->GetNumSetting("PlaybackExitPrompt")) &&
+                    !underNetworkControl &&
+                    prbuffer && !prbuffer->InDVDMenuOrStillFrame())
                 {
                     PromptStopWatchingRecording();
                     break;
@@ -3005,7 +3013,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     if ((StateIsLiveTV(GetState()) || StateIsPlaying(internalState)) &&
-        (!activerbuffer->InDVDMenuOrStillFrame()))
+        (activerbuffer && !activerbuffer->InDVDMenuOrStillFrame()))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -3252,7 +3260,7 @@ void TV::ProcessNetworkControlCommand(const QString &command)
         }
         else if (tokens[2].contains(QRegExp("^\\d+\\/\\d+x$")))
         {
-            if (activerbuffer->InDVDMenuOrStillFrame())
+            if (activerbuffer && activerbuffer->InDVDMenuOrStillFrame())
                 return;
 
             if (paused)
@@ -3296,7 +3304,7 @@ void TV::ProcessNetworkControlCommand(const QString &command)
     }
     else if (tokens.size() >= 3 && tokens[1] == "SEEK" && activenvp)
     {
-        if (activerbuffer->InDVDMenuOrStillFrame())
+        if (activerbuffer && activerbuffer->InDVDMenuOrStillFrame())
             return;
 
         if (tokens[2] == "BEGINNING")
@@ -7570,8 +7578,8 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
  */
 void TV::DVDJumpBack(void)
 {
-    if (!activerbuffer->isDVD())
-     return;
+    if (!activerbuffer || !activenvp || !activerbuffer->isDVD())
+        return;
                
     if (activerbuffer->InDVDMenuOrStillFrame())
         UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
