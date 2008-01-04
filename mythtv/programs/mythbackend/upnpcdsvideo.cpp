@@ -260,12 +260,24 @@ void UPnpCDSVideo::BuildMediaMap(void)
     RootVidDir = gContext->GetSetting("VideoStartupDir");
     filecount = 0;
 
-    query.exec("DELETE FROM upnpmedia WHERE class = 'VIDEO'");
+    if ((!RootVidDir.isNull()) && (RootVidDir != ""))  
+    {
 
-    filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
+        FillMetaMaps();
 
+        query.exec("DELETE FROM upnpmedia WHERE class = 'VIDEO'");
 
-    VERBOSE(VB_UPNP, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
+        VERBOSE(VB_GENERAL, QString("UPnpCDSVideo::BuildMediaMap starting in :%1:").arg(RootVidDir));
+
+        filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query) - STARTING_VIDEO_OBJECTID;
+
+        VERBOSE(VB_GENERAL, QString("UPnpCDSVideo::BuildMediaMap Done. Found %1 objects").arg(filecount));
+
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("UPnpCDSVideo::BuildMediaMap - no VideoStartupDir set, skipping scan."));
+    }
 
 }
 /////////////////////////////////////////////////////////////////////////////
