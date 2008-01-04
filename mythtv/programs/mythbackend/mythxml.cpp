@@ -722,6 +722,9 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
     if (fAspect <= 0)
            fAspect = (float)(pImage->width()) / pImage->height();
 
+    if (fAspect == 0)
+        return;
+
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
 
@@ -1033,10 +1036,8 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 
         delete pInfo;
 
-        return;     
+        return;
     }
-
-    // ----------------------------------------------------------------------
 
     bDefaultPixmap = (nWidth == 0) && (nHeight == 0) && (nSecsIn >= 0);
 
@@ -1048,42 +1049,79 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     QString sFileName     = GetPlaybackURL(pInfo);
+    int defaultOffset = gContext->GetNumSetting("PreviewPixmapOffset", 64);
+
+    if (nSecsIn <= 0 || nSecsIn == defaultOffset)
+    {
+        nSecsIn = defaultOffset;
+    }
+    else
+        sFileName = QString("%1.%2").arg(sFileName).arg(nSecsIn);
+
+    // ----------------------------------------------------------------------
+    // check to see if default preview image is already created.
+    // ----------------------------------------------------------------------
+    if (!QFile::exists( sFileName + ".png" ))
+    {
+        // ------------------------------------------------------------------
+        // Must generate Preview Image, Generate Image and save.
+        // ------------------------------------------------------------------
+
+        PreviewGenerator *previewgen = new PreviewGenerator(pInfo, true);
+        previewgen->SetPreviewTimeAsSeconds(nSecsIn);
+        previewgen->SetOutputFilename(sFileName + ".png");
+        bool ok = previewgen->Run();
+        if (!ok)
+        {
+            pRequest->m_eResponseType   = ResponseTypeFile;
+            pRequest->m_nResponseStatus = 404;
+            return;
+        }
+        previewgen->deleteLater();
+    }
+
+    pRequest->m_eResponseType   = ResponseTypeFile;
+    pRequest->m_nResponseStatus = 200;
+
+    float fAspect = 0.0;
+
+    QImage *pImage = new QImage(sFileName + ".png");
+
+    if (!pImage)
+        return;
+
+    if (fAspect <= 0)
+        fAspect = (float)(pImage->width()) / pImage->height();
+
+    if (fAspect == 0)
+        return;
+
+    if ( nWidth == 0 )
+        nWidth = (int)rint(nHeight * fAspect);
+
+    if ( nHeight == 0 )
+        nHeight = (int)rint(nWidth / fAspect);
 
     if (bDefaultPixmap)
         pRequest->m_sFileName = sFileName + ".png";
     else
-        pRequest->m_sFileName = QString( "%1.%2x%3x%4.png" )
-                                   .arg( sFileName )
-                                   .arg( nWidth    )
-                                   .arg( nHeight   )
-                                   .arg( nSecsIn   );
+        pRequest->m_sFileName = QString( "%1.%2x%3.png" )
+                                    .arg( sFileName )
+                                    .arg( nWidth    )
+                                    .arg( nHeight   );
 
     // ----------------------------------------------------------------------
-    // check to see if preview image is already created.
+    // check to see if scaled preview image is already created.
     // ----------------------------------------------------------------------
 
     if (QFile::exists( pRequest->m_sFileName ))
-    {
-        pRequest->m_eResponseType   = ResponseTypeFile;
-        pRequest->m_nResponseStatus = 200;
         return;
-    }
 
-    // ------------------------------------------------------------------
-    // Must generate Preview Image, Generate Image and save.
-    // ------------------------------------------------------------------
+    QImage img = pImage->smoothScale( nWidth, nHeight);
 
-    PreviewGenerator *previewgen = new PreviewGenerator(pInfo, true);
-    previewgen->SetPreviewTimeAsSeconds(nSecsIn);
-    previewgen->SetOutputFilename(pRequest->m_sFileName);
-    previewgen->SetOutputSize(QSize(nWidth, nHeight));
-    bool ok = previewgen->Run();
-    if (ok)
-    {
-        pRequest->m_eResponseType   = ResponseTypeFile;
-        pRequest->m_nResponseStatus = 200;
-    }
-    previewgen->deleteLater();
+    img.save( pRequest->m_sFileName.ascii(), "PNG" );
+
+    delete pImage;
 }
 
 /////////////////////////////////////////////////////////////////////////////
