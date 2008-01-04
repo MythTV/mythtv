@@ -1,0 +1,31 @@
+                                   MythAppearance
+
+
+GENERAL INFO
+------------
+
+MythAppearance is a new (and intended to be temporary - until it's included in mythfrontend) plugin intended to ease setting up the GUI size of mythfrontend.
+
+USAGE
+-----
+
+When first run, mythappearance presents the user with an arrow located at the top left corner of the screen.  The arrow can be moved to the visible edges of the 
+screen with the arrow keys.
+
+Pressing SELECT shows an arrow in the bottom right hand corner of the screen.  Again the arrow can be moved to the visible edges of the screen with the arrow 
+keys.
+
+Pressing ESC quits the plugin & discards any changes.
+
+Pressing MENU shows a menu which can be used to change the arrow movement amount (toggles between coarse (10 pixels at a time) and fine (1 pixel at a time)).  
+The same menu also allows the screen size & offset amounts to be reset to a default of zero effectively making mythfrontend use the whole screen again.
+Within the menu is also an option to save the newly changed settings & quit the plugin.
+
+FURTHER INFORMATION
+-------------------
+
+Feel free to subscribe to the development mailing list at:
+http://www.mythtv.org/mailman/listinfo/mythtv-dev
+
+A list that's restricted to the svn commit messages is available at:
+http://www.mythtv.org/mailman/listinfo/mythtv-commits
