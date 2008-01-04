@@ -36,7 +36,7 @@ MythAppearance::MythAppearance(MythMainWindow *parent, QString windowName,
     m_fine = 1; //fine moves arrows by one pixel
     m_coarse = 10; // coarse moves arrows by ten pixels
     m_change = m_fine;
-
+    m_screenheight = 0, m_screenwidth = 0;
     m_arrowsize_x = 30; // maybe get the image size later
     m_arrowsize_y = 30; // maybe get the image size later
     m_topleftarrow_x = 0;
@@ -67,7 +67,6 @@ MythAppearance::~MythAppearance() {}
 
 void MythAppearance::getSettings()
 {
-    m_screenheight = 0, m_screenwidth = 0;
     float m_wmult = 0, m_hmult = 0;
     gContext->GetScreenSettings(m_screenwidth, m_wmult, m_screenheight, m_hmult);
 }
@@ -107,8 +106,6 @@ void MythAppearance::keyPressEvent(QKeyEvent *e)
         else
             handled = false;
     }
-//test for changes here eventually
-    anythingChanged();
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
 }
@@ -137,7 +134,6 @@ void MythAppearance::moveUp()
     if (m_whicharrow) // do the top left arrow
     {
         m_topleftarrow_y -= m_change;
-        m_changed = true;
         if (m_topleftarrow_y < 0)
             m_topleftarrow_y = 0;
     }
@@ -145,12 +141,12 @@ void MythAppearance::moveUp()
     else // do the bottom right arrow
     {
             m_bottomrightarrow_y -= m_change;
-            m_changed = true;
             if (m_bottomrightarrow_y < int(m_screenheight * 0.75))
                 m_bottomrightarrow_y = int(m_screenheight * 0.75);
     }
 
     updateScreen(); // now update the screen
+    anythingChanged();
 }
 
 void MythAppearance::moveLeft()
@@ -158,7 +154,6 @@ void MythAppearance::moveLeft()
     if (m_whicharrow) // do the top left arrow
     {
         m_topleftarrow_x -= m_change;
-        m_changed = true;
         if (m_topleftarrow_x < 0)
             m_topleftarrow_x = 0;
     }
@@ -166,13 +161,12 @@ void MythAppearance::moveLeft()
     else // do the bottom right arrow
     {
         m_bottomrightarrow_x -= m_change;
-        m_changed = true;
         if (m_bottomrightarrow_x < int(m_screenwidth * 0.75))
             m_bottomrightarrow_x = int(m_screenwidth * 0.75);
     }
 
     updateScreen(); // now update the screen
-
+    anythingChanged();
 }
 
 void MythAppearance::moveDown()
@@ -181,7 +175,6 @@ void MythAppearance::moveDown()
     {
         {
             m_topleftarrow_y += m_change;
-            m_changed = true;
             if (m_topleftarrow_y > int(m_screenheight * 0.25))
                 m_topleftarrow_y = int(m_screenheight * 0.25);
         }
@@ -190,12 +183,11 @@ void MythAppearance::moveDown()
     else // do the bottom right arrow
     {
         m_bottomrightarrow_y += m_change;
-        m_changed = true;
         if (m_bottomrightarrow_y > m_screenheight - m_arrowsize_y)
             m_bottomrightarrow_y = m_screenheight - m_arrowsize_y;
     }
     updateScreen(); // now update the screen
-
+    anythingChanged();
 }
 
 void MythAppearance::moveRight()
@@ -203,7 +195,6 @@ void MythAppearance::moveRight()
     if (m_whicharrow) // do the top left arrow
     {
         m_topleftarrow_x += m_change;
-        m_changed = true;
         if (m_topleftarrow_x > int (screenwidth * 0.25))
             m_topleftarrow_x = int (screenwidth * 0.25);
     }
@@ -211,11 +202,11 @@ void MythAppearance::moveRight()
     else // do the bottom right arrow
     {
         m_bottomrightarrow_x += m_change;
-        m_changed = true;
         if (m_bottomrightarrow_x > m_screenwidth - m_arrowsize_x)
             m_bottomrightarrow_x = m_screenwidth - m_arrowsize_x;
     }
         updateScreen(); // now update the screen
+    anythingChanged();
 }
 
 void MythAppearance::wireUpTheme()
@@ -267,8 +258,8 @@ void MythAppearance::closeMenu(void)
 {
     if (menuPopup)
     {
-    menuPopup->deleteLater();
-    menuPopup = NULL;
+        menuPopup->deleteLater();
+        menuPopup = NULL;
     }
 }
 
@@ -311,25 +302,26 @@ void MythAppearance::updateSettings()
 
 void MythAppearance::slotResetSettings()
 {
-        gContext->SaveSetting("GuiOffsetX", 0);
-        gContext->SaveSetting("GuiOffsetY", 0);
-        gContext->SaveSetting("GuiWidth", 0);
-        gContext->SaveSetting("GuiHeight", 0);
-        m_changed = false;
-        GetMythMainWindow()->JumpTo("Reload Theme");
-        getSettings();
-        getScreenInfo();
-        updateScreen();
+     gContext->SaveSetting("GuiOffsetX", 0);
+     gContext->SaveSetting("GuiOffsetY", 0);
+     gContext->SaveSetting("GuiWidth", 0);
+     gContext->SaveSetting("GuiHeight", 0);
+     m_changed = false;
+     GetMythMainWindow()->JumpTo("Reload Theme");
+     getSettings();
+     getScreenInfo();
+     updateScreen();
 }
 
 void MythAppearance::anythingChanged()
 {
     if (m_xsize != m_screenwidth)
         m_changed = true;
-    if (m_xoffset != m_xoffset_old)
-        m_changed = true;
-    if (m_ysize != m_screenheight)
-        m_changed = true;
-    if (m_yoffset != m_yoffset_old)
-        m_changed = true;
+    else if (m_xoffset != m_xoffset_old)
+            m_changed = true;
+    else if (m_ysize != m_screenheight)
+            m_changed = true;
+    else if (m_yoffset != m_yoffset_old)
+            m_changed = true;
+    else m_changed = false;
 }
