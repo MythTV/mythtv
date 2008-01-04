@@ -949,62 +949,62 @@
             <bold>no</bold>
         </font>
         <container name="header">
-            <area>0,0,800,600</area>
+            <area>0,0,1280,600</area>
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>25,25</position>
                 <staticsize>157,118</staticsize>
             </image>
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Global Settings</value>
             </textarea>
         </container>
         <container name="global-setup">
-            <area>0,150,800,550</area>
+            <area>0,150,1280,550</area>
             <!-- Context 0 - Global Setup (screens and timeouts) -->
-            <textarea name="timeout_text" draworder="0">
-                <area>25,5,400,60</area>
+            <textarea name="timeout_text" draworder="0" align="right">
+                <area>50,5,620,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Seconds to display each page:</value>
             </textarea>
-            <textarea name="holdtimeout_text" draworder="0">
-                <area>25,85,500,60</area>
+            <textarea name="holdtimeout_text" draworder="0" align="right">
+                <area>50,85,620,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Seconds to display page after manual page change:</value>
             </textarea>
 
             <blackhole name="pgto_spinbox" draworder="0">
-                <area>495,0,50,30</area>
+                <area>675,0,50,30</area>
             </blackhole>
             <blackhole name="hold_spinbox" draworder="0">
-                <area>495,80,50,30</area>
+                <area>675,80,50,30</area>
             </blackhole>
-            <textarea name="backgroundlbl" draworder="0">
-                <area>25,165,500,60</area>
+            <textarea name="backgroundlbl" draworder="0" align="right">
+                <area>50,165,620,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Retrieve data in the background:</value>
             </textarea>
-            <textarea name="skiplbl" draworder="0">
-                <area>25,245,500,60</area>
+            <textarea name="skiplbl" draworder="0" align="right">
+                <area>50,245,620,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Skip pages still waiting for data (Not Implemented):</value>
             </textarea>
             <!-- Don't really like these images -->
             <checkbox name="backgroundcheck" draworder="0">
-                <position>495,160</position>
+                <position>675,160</position>
                 <image function="checked" filename="mw_checked.png"></image>
                 <image function="unchecked" filename="mw_unchecked.png"></image>
                 <image function="checked_high" filename="mw_checked_high.png"></image>
                 <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
             </checkbox>
             <checkbox name="skipcheck" draworder="0">
-                <position>495,240</position>
+                <position>675,240</position>
                 <image function="checked" filename="mw_checked.png"></image>
                 <image function="unchecked" filename="mw_unchecked.png"></image>
                 <image function="checked_high" filename="mw_checked_high.png"></image>
@@ -1012,7 +1012,7 @@
             </checkbox>
 
             <textbutton name="finishbutton" draworder="0">
-                <position>500,500</position>
+                <position>500,400</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
@@ -1059,39 +1059,39 @@
         </font>
 
         <container name="header">
-            <area>0,0,800,600</area>
+            <area>0,0,1280,600</area>
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>25,25</position>
                 <staticsize>157,118</staticsize>
             </image>
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
             </textarea>
         </container>
         <container name="screen-setup">
-            <area>0,150,800,550</area>
+            <area>0,150,1280,550</area>
             <listbtnarea name="inactivelist" draworder="0">
-                <area>30,45,230,140</area>
+                <area>30,45,430,140</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
                 <showarrow>no</showarrow>
             </listbtnarea>
             <listbtnarea name="activelist" draworder="0">
-                <area>30,220,230,175</area>
+                <area>30,220,430,175</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
                 <showarrow>no</showarrow>
             </listbtnarea>
             <textarea name="activehdr" draworder="0" align="left">
-                <area>15, 190, 375, 30</area>
+                <area>15, 400, 375, 30</area>
                 <font>active</font>
             </textarea>
             <textarea name="inactivehdr" draworder="0" align="left">
-                <area>25,20,200,30</area>
+                <area>25,20,400,30</area>
                 <font>active</font>
             </textarea>
             <listbtnarea name="typelist" draworder="0">
@@ -1170,49 +1170,49 @@
                 <staticsize>157,118</staticsize>
             </image>
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Source Setup</value>
             </textarea>
         </container>
         <container name="global-setup">
-            <area>0,150,800,550</area>
+            <area>0,150,1280,650</area>
             <listbtnarea name="srclist" draworder="0">
-                <area>30,45,200,348</area>
+                <area>30,45,350,348</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
             </listbtnarea>
             <image name="srclines" draworder="0">
-                <position>265,45</position>
+                <position>465,45</position>
                 <filename>cr-lines.png</filename>
                 <staticsize>500,370</staticsize>
             </image>
             <textarea name ="updatetxt" draworder="0">
-                <area>290,80,300,60</area>
+                <area>490,80,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Source Update Timeout (seconds):</value>
             </textarea>
             <textarea name ="retrievetxt" draworder="0">
-                <area>290,160,300,60</area>
+                <area>490,160,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Data Retrieval Interval (minutes):</value>
             </textarea>
             <blackhole name="update_spinbox" draworder="0">
-                <area>600,75,70,30</area>
+                <area>800,75,70,30</area>
             </blackhole>
             <blackhole name="retrieve_spinbox" draworder="0">
-                <area>600,155,70,30</area>
+                <area>800,155,70,30</area>
             </blackhole>
             <textarea name="srcinfo" draworder="0" align="left">
-                <area>290,290,450,90</area>
+                <area>490,290,450,90</area>
                 <multiline>yes</multiline>
                 <font>help</font>
             </textarea>
             <textbutton name="finishbutton" draworder="0">
-                <position>500,500</position>
+                <position>500,400</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
@@ -1255,19 +1255,19 @@
             <bold>yes</bold>
         </font>
         <container name="search">
-            <area>0,0,600,400</area>
-            <textarea name="header" draworder="0" align="center">
+            <area>0,0,900,500</area>
+            <textarea name="header" draworder="0" align="left">
                 <area>0,10,600,40</area>
                 <value>Location Search</value>
                 <font>header</font>
             </textarea>
-            <textarea name="editlbl" draworder="0" align="left">
-                <area>25,80,170,40</area>
+            <textarea name="editlbl" draworder="0" align="right">
+                <area>25,80,280,40</area>
                 <font>label</font>
                 <value>Enter Search String:</value>
             </textarea>
             <remoteedit name="loc-edit" draworder="0" align="left">
-                <area>215,75,360,30</area>
+                <area>315,75,360,30</area>
                 <font>edit</font>
             </remoteedit>
             <textarea name="numresults" draworder="0" align="left">
@@ -1282,14 +1282,14 @@
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
             <listbtnarea name="results" draworder="0">
-                <area>25,175,550,210</area>
+                <area>25,175,700,270</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
                 <showarrow>no</showarrow>
             </listbtnarea>
             <textarea name="source" draworder="0" align="left">
-                <area>25,150,200,40</area>
+                <area>25,150,350,40</area>
                 <font>label</font>
             </textarea>
         </container>
