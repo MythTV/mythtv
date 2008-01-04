@@ -151,7 +151,7 @@
 
             <textarea name="*currentdatetime" draworder="2" align="right">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>830,185,360,40</area>
             </textarea>
             <textarea name="+cclocation" draworder="5">
                 <area>39,181,700,35</area>
@@ -162,7 +162,7 @@
                 <font>footer</font>
             </textarea>
             <textarea name="header" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Current Conditions</value>
             </textarea>
@@ -247,14 +247,14 @@
         <container name="Three Day Forecast">
             <area>0,0,1280,720</area>
 
-            <textarea name="+3dlocation" draworder="5" align="center">
-                <area>175,80,450,70</area>
+            <textarea name="+3dlocation" draworder="5" align="left">
+                <area>39,181,450,70</area>
                 <font>location</font>
                 <multiline>yes</multiline>
             </textarea>
             <textarea name="*currentdatetime" draworder="2" align="right">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>830,185,360,40</area>
             </textarea>
 
             <textarea name="*pause_text" draworder="5" align="right">
@@ -263,109 +263,109 @@
             </textarea>
 
             <textarea name="header" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Three Day Forecast</value>
             </textarea>
             <image name="background-0" draworder="0">
-                <filename>mw-shading.png</filename>
-                <position>40,150</position>
+                <filename>mw_shading.png</filename>
+                <position>40,220</position>
                 <staticsize>230,305</staticsize>
             </image>
             <image name="background-1" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>285,220</position>
                 <staticsize>230,305</staticsize>
             </image>
             <image name="background-2" draworder="0">
-                <filename>mw-shading.png</filename>
-                <position>530,150</position>
+                <filename>mw_shading.png</filename>
+                <position>530,220</position>
                 <staticsize>230,305</staticsize>
             </image>
             <textarea name="+date-0" draworder="5" align="center">
-                <area>40,160,230,32</area>
+                <area>40,230,230,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-0" draworder="6">
-                <position>55,195</position>
+                <position>55,265</position>
                 <staticsize>200,150</staticsize>
             </image>
 
             <textarea name="lolbl0" draworder="5" align="center">
-                <area>50,395,100,32</area>
+                <area>50,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl0" draworder="5" align="center">
-                <area>50,350,100,32</area>
+                <area>50,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-0" draworder="5" align="center">
-                <area>160,395,100,32</area>
+                <area>160,465,100,32</area>
                 <cutdown>no</cutdown>
                 <font>tempdata</font>
             </textarea>
             <textarea name="+high-0" draworder="5" align="center">
-                <area>160,350,100,32</area>
+                <area>160,420,100,32</area>
                 <cutdown>no</cutdown>
                 <font>tempdata</font>
             </textarea>
             <textarea name="+date-1" draworder="5" align="center">
-                <area>285,230,235,32</area>
+                <area>500,230,235,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-1" draworder="6">
-                <position>300,265</position>
+                <position>520,265</position>
                 <staticsize>200,150</staticsize>
             </image>
 
             <textarea name="lolbl1" draworder="5" align="center">
-                <area>295,465,100,32</area>
+                <area>520,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl1" draworder="5" align="center">
-                <area>295,420,100,32</area>
+                <area>520,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-1" draworder="5" align="center">
-                <area>405,465,100,32</area>
+                <area>620,465,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+high-1" draworder="5" align="center">
-                <area>405,420,100,32</area>
+                <area>620,420,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+date-2" draworder="5" align="center">
-                <area>530,160,235,32</area>
+                <area>930,230,235,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-2" draworder="6">
-                <position>545,195</position>
+                <position>945,265</position>
                 <staticsize>200,150</staticsize>
             </image>
 
             <textarea name="lolbl2" draworder="5" align="center">
-                <area>540,395,100,32</area>
+                <area>940,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl2" draworder="5" align="center">
-                <area>540,350,100,32</area>
+                <area>940,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-2" draworder="5" align="center">
-                <area>650,395,100,32</area>
+                <area>1050,465,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+high-2" draworder="5" align="center">
-                <area>650,350,100,32</area>
+                <area>1050,420,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
@@ -398,32 +398,32 @@
                 <value>Six Day Forecast</value>
             </textarea>
             <image name="background-0" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>40,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-1" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>283,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-2" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>526,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-3" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>40,335</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-4" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>283,335</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-5" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>526,335</position>
                 <staticsize>233,190</staticsize>
             </image>
@@ -688,8 +688,8 @@
                 <image function="downarrow-reg" filename="blank.png" location="750,480"></image>
                 <image function="uparrow-sel" filename="uparrow.png" location="750,230"></image>
                 <image function="downarrow-sel" filename="downarrow.png" location="750,480"></image>
-                <backgroundreg>mw-shading.png</backgroundreg>
-                <backgroundsel>mw-shading.png</backgroundsel>
+                <backgroundreg>mw_shading.png</backgroundreg>
+                <backgroundsel>mw_shading.png</backgroundsel>
             </richtextarea>
             <textarea name="*updatetime" draworder="5">
                 <area>39,540,700,35</area>
@@ -719,32 +719,32 @@
                 <value>18 Hour Forecast</value>
             </textarea>
             <image name="background-0" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>40,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-1" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>283,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-2" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>526,135</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-3" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>40,335</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-4" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>283,335</position>
                 <staticsize>233,190</staticsize>
             </image>
             <image name="background-5" draworder="0">
-                <filename>mw-shading.png</filename>
+                <filename>mw_shading.png</filename>
                 <position>526,335</position>
                 <staticsize>233,190</staticsize>
             </image>
