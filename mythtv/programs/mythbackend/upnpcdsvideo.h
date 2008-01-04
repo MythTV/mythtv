@@ -62,7 +62,6 @@ class UPnpCDSVideo : public UPnpCDSExtension
         UPnpCDSVideo( ) : UPnpCDSExtension( "Videos", "Videos",
                                             "object.item.videoItem" )
         {
-	    FillMetaMaps();
 	    BuildMediaMap();
         }
         void BuildMediaMap(void);
