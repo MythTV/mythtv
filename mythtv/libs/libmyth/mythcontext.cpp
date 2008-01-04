@@ -2403,9 +2403,9 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
             // oops, not for us
             VERBOSE(VB_IMPORTANT, "SRSL you shouldn't see this!!");
             QString message = strlist[1];
-            QString extra = strlist[2];
+            strlist.pop_front(); strlist.pop_front();
 
-            MythEvent me(message, extra);
+            MythEvent me(message, strlist);
             dispatch(me);
 
             ok = d->serverSock->readStringList(strlist, quickTimeout);
