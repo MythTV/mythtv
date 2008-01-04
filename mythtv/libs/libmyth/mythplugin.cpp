@@ -36,11 +36,15 @@ int MythPlugin::init(const char *libversion)
     if (ifunc)
         return ifunc(libversion);
 
-    if (!dlerror())
+    QString error_msg(dlerror());
+    if (!error_msg)
+    {
         (void)dlopen(QLibrary::library().ascii(), RTLD_LAZY);
+        error_msg = dlerror();
+    }
 
     VERBOSE(VB_IMPORTANT, QString("MythPlugin::init() dlerror: %1")
-            .arg(dlerror()));
+            .arg(error_msg));
 
     return -1;
 }
