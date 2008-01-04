@@ -21,7 +21,6 @@ public:
 
 protected: 
     void doMenu();
-    void doSaveQuit();
 private:
     int m_x_offset;
     int m_y_offset;
@@ -43,7 +42,9 @@ private:
     int m_ysize;
     int m_xoffset;
     int m_yoffset;
-
+    int m_xoffset_old;
+    int m_yoffset_old;
+    
     void getSettings();
     void getScreenInfo();
 
@@ -65,7 +66,7 @@ private:
     void updateScreen();
     void updateSettings();
     void keyPressEvent(QKeyEvent *e);
-    void doEsc();
+    void anythingChanged();
     MythPopupBox *menuPopup;
     QButton *OKButton;
     QButton *updateButton;
@@ -74,7 +75,6 @@ protected slots:
     void slotSaveSettings();
     void slotChangeCoarseFine();
     void closeMenu();
-    void closeAndQuit();
     void slotResetSettings();
 };
 

@@ -74,8 +74,10 @@ void MythAppearance::getSettings()
 
 void MythAppearance::getScreenInfo()
 {
-    m_xoffset = gContext->GetNumSetting("GuiOffsetX", 0);
-    m_yoffset = gContext->GetNumSetting("GuiOffsetY", 0);
+    m_xoffset_old = gContext->GetNumSetting("GuiOffsetX", 0);
+    m_yoffset_old = gContext->GetNumSetting("GuiOffsetY", 0);
+    m_xoffset = m_xoffset_old;
+    m_yoffset = m_yoffset_old;
 }
 
 
@@ -102,12 +104,11 @@ void MythAppearance::keyPressEvent(QKeyEvent *e)
             moveRight();
         else if (action == "MENU")
             doMenu();
-        //else if (action == "ESCAPE")
-        //    doEsc();
         else
             handled = false;
     }
-
+//test for changes here eventually
+    anythingChanged();
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
 }
@@ -250,8 +251,11 @@ void MythAppearance::doMenu()
         return;
     menuPopup = new MythPopupBox(gContext->GetMainWindow(), "menuPopup");
     menuPopup->addLabel("MythAppearance Menu");
-    updateButton = menuPopup->addButton("Reset Screen Size Settings and Quit", this, SLOT(slotResetSettings()));
-    updateButton = menuPopup->addButton("Save and Quit", this, SLOT(slotSaveSettings()));
+    if (m_changed)
+    {
+        updateButton = menuPopup->addButton("Reset Screen Size Settings and Quit", this, SLOT(slotResetSettings()));
+        updateButton = menuPopup->addButton("Save and Quit", this, SLOT(slotSaveSettings()));
+    }
     updateButton = menuPopup->addButton("Coarse/Fine adjustment", this, SLOT(slotChangeCoarseFine()));
     OKButton = menuPopup->addButton("Close Menu", this, SLOT(closeMenu()));
     OKButton->setFocus();
@@ -270,9 +274,9 @@ void MythAppearance::closeMenu(void)
 
 void MythAppearance::slotSaveSettings()
 {
-    VERBOSE(VB_IMPORTANT, "Updating screen size settings");
-    updateSettings();
-    updateScreen();
+        VERBOSE(VB_IMPORTANT, "Updating screen size settings");
+        updateSettings();
+        updateScreen();
 }
 
 void MythAppearance::slotChangeCoarseFine()
@@ -307,42 +311,25 @@ void MythAppearance::updateSettings()
 
 void MythAppearance::slotResetSettings()
 {
-    gContext->SaveSetting("GuiOffsetX", 0);
-    gContext->SaveSetting("GuiOffsetY", 0);
-    gContext->SaveSetting("GuiWidth", 0);
-    gContext->SaveSetting("GuiHeight", 0);
-    m_changed = false;
-    GetMythMainWindow()->JumpTo("Reload Theme");
-    getSettings();
-    getScreenInfo();
-    updateScreen();
+        gContext->SaveSetting("GuiOffsetX", 0);
+        gContext->SaveSetting("GuiOffsetY", 0);
+        gContext->SaveSetting("GuiWidth", 0);
+        gContext->SaveSetting("GuiHeight", 0);
+        m_changed = false;
+        GetMythMainWindow()->JumpTo("Reload Theme");
+        getSettings();
+        getScreenInfo();
+        updateScreen();
 }
 
-void MythAppearance::doEsc()
+void MythAppearance::anythingChanged()
 {
-    if (m_changed)
-        doSaveQuit();
-    else
-        reject();
-}
-void MythAppearance::doSaveQuit()
-{
-        if (menuPopup)
-            return;
-        menuPopup = new MythPopupBox(gContext->GetMainWindow(), "menuPopup");
-        menuPopup->addLabel("Settings have changed. Do you want to save changes? ");
-        updateButton = menuPopup->addButton("Save and Quit", this, SLOT(slotSaveSettings()));
-        OKButton = menuPopup->addButton("Quit", this, SLOT(closeAndQuit()));
-        OKButton->setFocus();
-        menuPopup->ShowPopup(this, SLOT(closeAndQuit()));
-}
-
-void MythAppearance::closeAndQuit(void)
-{
-    if (menuPopup)
-    {
-        menuPopup->deleteLater();
-        menuPopup = NULL;
-        reject();
-    }
+    if (m_xsize != m_screenwidth)
+        m_changed = true;
+    if (m_xoffset != m_xoffset_old)
+        m_changed = true;
+    if (m_ysize != m_screenheight)
+        m_changed = true;
+    if (m_yoffset != m_yoffset_old)
+        m_changed = true;
 }
