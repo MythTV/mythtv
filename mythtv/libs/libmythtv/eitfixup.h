@@ -103,6 +103,7 @@ class EITFixUp
     const QRegExp m_ukDoubleDotEnd;
     const QRegExp m_ukDoubleDotStart;
     const QRegExp m_ukDotSpaceStart;
+    const QRegExp m_ukTime;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;

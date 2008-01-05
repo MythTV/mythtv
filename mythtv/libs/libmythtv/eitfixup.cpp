@@ -17,7 +17,7 @@ EITFixUp::EITFixUp()
       m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
       m_ukSubtitle("\\[.*S\\]"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", false),
-      m_ukNew("\\s*(Brand New|New)\\s*Series\\s*[:\\.\\-]",false),
+      m_ukNew("\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-]",false),
       m_ukNew1("^New\\."),
       m_ukT4("^[tT]4:"),
       m_ukEQ("[:\\!\\?]"),
@@ -34,12 +34,13 @@ EITFixUp::EITFixUp()
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
       m_ukStarring("(?:Western\\s)?[Ss]tarring ([\\w\\s\\-']+)[Aa]nd\\s([\\w\\s\\-']+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
       m_ukBBC7rpt("\\[Rptd?[^]]+\\d{1,2}\\.\\d{1,2}[ap]m\\]\\."),
-      m_ukCBBC("^CBBC."),
-      m_ukCBeebies("^CBeebies."),
-      m_ukStarring1("star(ring)"),
+      m_ukCBBC("^CBBC\\s*[\\.]"),
+      m_ukCBeebies("^CBeebies\\s*[\\.]"),
+      m_ukStarring1("star(ring|s)"),
       m_ukDoubleDotEnd("\\.\\.+$"),
       m_ukDoubleDotStart("^\\.\\.+"),
       m_ukDotSpaceStart("^\\. "),
+      m_ukTime("\\d{1,2}[\\.:]\\d{1,2}\\s*(am|pm|)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -357,8 +358,15 @@ void EITFixUp::FixUK(DBEvent &event) const
     event.description = event.description.remove(m_ukNew1);
     event.title  = event.title.remove(m_ukT4);
 
+    // Removal of CBBC and CBeebies
+    event.description = event.description.remove(m_ukCBBC);
+    event.description = event.description.remove(m_ukCBeebies);
+
     // BBC 7 [Rpt of ...] case.
     event.description = event.description.remove(m_ukBBC7rpt);
+
+    event.title = event.title.stripWhiteSpace();
+    event.description = event.description.stripWhiteSpace();
 
     QRegExp tmp24ep = m_uk24ep;
     if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
@@ -375,6 +383,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);
+                 event.description = event.description.remove(m_ukNew1);
                  SetUKSubtitle(event);
             }
             if ((position1 = strFull.find(m_ukYear)) != -1)
@@ -395,20 +404,23 @@ void EITFixUp::FixUK(DBEvent &event) const
                                 tmp24ep.cap(0).length() - 2);
             event.description = event.description.remove(tmp24ep.cap(0));
         }
-        else if (((position1 = event.title.find(m_ukColonHyphen)) != -1) &&
-            (event.description.find(":") < 0 ))
+        else if ((position1 = event.description.find(m_ukTime)) == -1)
         {
-            if ((uint)position1 < SUBTITLE_MAX_LEN)
+            if (((position1 = event.title.find(m_ukColonHyphen)) != -1) &&
+                (event.description.find(":") < 0 ))
             {
-                event.subtitle = event.title.mid(position1 + 1);
-                event.title = event.title.left(position1);
+                if ((uint)position1 < SUBTITLE_MAX_LEN)
+                {
+                    event.subtitle = event.title.mid(position1 + 1);
+                    event.title = event.title.left(position1);
+                }
             }
+            else
+                SetUKSubtitle(event);
         }
-        else
-            SetUKSubtitle(event);
     }
 
-    if (event.subtitle.isEmpty())
+    if ((event.description.find(m_ukTime) == -1) && (event.subtitle.isEmpty()))
     {
        QStringList strList1 = QStringList::split(".",event.description,TRUE);
        QStringList strList2 = QStringList::split("?",event.description,TRUE);
@@ -426,8 +438,9 @@ void EITFixUp::FixUK(DBEvent &event) const
                QStringList strList3 = strList2.grep("Drama",false);
                QStringList strList4 = strList2.grep("sitcom",false);
                QStringList strList5 = strList2.grep(m_ukStarring1);
+               QStringList strList6 = strList2.grep("Series",false);
                if ((strList3.count()==0) && (strList4.count()==0) &&
-                   (strList5.count()==0))
+                   (strList5.count()==0) && (strList6.count()==0))
                {
                     event.subtitle = strList1[0]+strEnd;
                     event.description=
@@ -468,27 +481,42 @@ void EITFixUp::FixUK(DBEvent &event) const
     QRegExp tmpExp3 = m_ukSeries3;
     if ((position1 = tmpExp1.search(event.title)) != -1)
     {
-        event.partnumber = tmpExp1.cap(1).toUInt();
-        event.parttotal  = tmpExp1.cap(2).toUInt();
-        // Remove from the title
-        event.title =
-            event.title.mid(position1 + tmpExp1.cap(0).length());
-        series = true;
+        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
+            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+            && tmpExp1.cap(2).toUInt()<=50)
+        {
+            event.partnumber = tmpExp1.cap(1).toUInt();
+            event.parttotal  = tmpExp1.cap(2).toUInt();
+            // Remove from the title
+            event.title = event.title.left(position1) +
+                event.title.mid(position1 + tmpExp1.cap(0).length());
+            series = true;
+        }
     }
     else if ((position1 = tmpExp1.search(event.subtitle)) != -1)
     {
-        event.partnumber = tmpExp1.cap(1).toUInt();
-        event.parttotal  = tmpExp1.cap(2).toUInt();
-        // Remove from the sub title
-        event.subtitle =
-            event.subtitle.mid(position1 + tmpExp1.cap(0).length());
-        series = true;
+        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
+            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+            && tmpExp1.cap(2).toUInt()<=50)
+        {
+            event.partnumber = tmpExp1.cap(1).toUInt();
+            event.parttotal  = tmpExp1.cap(2).toUInt();
+            // Remove from the subtitle
+            event.subtitle = event.subtitle.left(position1) +
+                event.subtitle.mid(position1 + tmpExp1.cap(0).length());
+            series = true;
+        }
     }
     else if ((position1 = tmpExp1.search(event.description)) != -1)
     {
-        event.partnumber = tmpExp1.cap(1).toUInt();
-        event.parttotal  = tmpExp1.cap(2).toUInt();
-        series = true;
+        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
+            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+            && tmpExp1.cap(2).toUInt()<=50)
+        {
+            event.partnumber = tmpExp1.cap(1).toUInt();
+            event.parttotal  = tmpExp1.cap(2).toUInt();
+            series = true;
+        }
     }
     else if ((position1 = tmpExp2.search(event.description)) != -1)
     {
@@ -548,12 +576,6 @@ void EITFixUp::FixUK(DBEvent &event) const
         if (ok)
             event.originalairdate = QDate(y, 1, 1);
     }
-
-    // Remove spurious channel names
-    event.subtitle = event.subtitle.remove(m_ukCBBC);
-    event.description = event.description.remove(m_ukCBBC);
-    event.subtitle = event.subtitle.remove(m_ukCBeebies);
-    event.description = event.description.remove(m_ukCBeebies);
 
     // Trim trailing '.'
     event.title.remove(m_ukPEnd);
