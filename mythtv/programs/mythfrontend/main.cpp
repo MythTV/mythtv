@@ -1421,12 +1421,13 @@ int main(int argc, char **argv)
         if (!RunMenu(themedir))
             break;
 
-        struct sigaction new_action, old_action;
+        //struct sigaction new_action, old_action;
         /* Set up the structure to specify the new action. */
-        new_action.sa_handler = signal_USR1_handler;
-        ::sigemptyset(&new_action.sa_mask);
-        new_action.sa_flags = 0;
-        ::sigaction (SIGUSR1, &new_action, &old_action);
+        //new_action.sa_handler = signal_USR1_handler;
+        //::sigemptyset(&new_action.sa_mask);
+        //new_action.sa_flags = 0;
+        //::sigaction (SIGUSR1, &new_action, &old_action);
+	signal(SIGUSR1, &signal_USR1_handler);
 
         qApp->setMainWidget(mainWindow);
         qApp->exec();
