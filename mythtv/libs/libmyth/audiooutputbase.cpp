@@ -458,13 +458,18 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
 {
     // NOTE: This function is not threadsafe
     int afree = audiofree(true);
-    int len = samples * audio_bytes_per_sample;
+    int abps = audio_bytes_per_sample;
+    int len = samples * abps;
 
     // Check we have enough space to write the data
     if (need_resampler && src_ctx)
         len = (int)ceilf(float(len) * src_data.src_ratio);
 
-    if ((len > afree) && !blocking)
+    if (pSoundStretch)
+        len += (pSoundStretch->numUnprocessedSamples() +
+                (int)(pSoundStretch->numSamples()/audio_stretchfactor))*abps;
+
+    if (((len > afree) || ((audbuf_timecode - GetAudiotime()) > 2000)) && !blocking) 
     {
         VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4") 
@@ -515,19 +520,25 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
     // NOTE: This function is not threadsafe
 
     int afree = audiofree(true);
-    int len = samples * audio_bytes_per_sample;
+    int abps = audio_bytes_per_sample;
+    int len = samples * abps;
 
     // Check we have enough space to write the data
     if (need_resampler && src_ctx)
         len = (int)ceilf(float(len) * src_data.src_ratio);
 
-    if ((len > afree) && !blocking)
+    if (pSoundStretch)
+    {
+        len += (pSoundStretch->numUnprocessedSamples() +
+                (int)(pSoundStretch->numSamples()/audio_stretchfactor))*abps;
+    }
+
+    if (((len > afree) || (audiotime && ((audbuf_timecode - GetAudiotime()) > 2000))) && !blocking) 
     {
         VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4") 
                 .arg(len).arg(AUDBUFSIZE-afree).arg(afree)
                 .arg(timecode)); 
-
         return false; // would overflow
     }
 

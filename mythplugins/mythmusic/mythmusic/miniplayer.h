@@ -43,6 +43,7 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
     void    showShuffleMode(void);
     void    showRepeatMode(void);
     void    showVolume(void);
+    void    showSpeed(void);
 
     int           m_currTime, m_maxTime;
 

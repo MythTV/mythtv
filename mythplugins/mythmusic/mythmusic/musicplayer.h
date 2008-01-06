@@ -32,6 +32,11 @@ class MusicPlayer : public QObject
     void unMute(void) {};
     void setVolume(void) {};
 
+    void setSpeed(float speed);
+    void incSpeed();
+    void decSpeed();
+    float getSpeed() { return m_playSpeed; }
+
     void play(void);
     void stop(bool stopAll = false);
     void pause(void);
@@ -133,6 +138,8 @@ class MusicPlayer : public QObject
     ShuffleMode  m_shuffleMode;
     RepeatMode   m_repeatMode;
     ResumeMode   m_resumeMode;
+
+    float        m_playSpeed;
 };
 
 // This global variable contains the MusicPlayer instance for the application

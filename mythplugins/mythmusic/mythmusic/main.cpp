@@ -386,6 +386,8 @@ void setupKeys(void)
     REG_KEY("Music", "FILTER",     "Filter All My Music",        "F");
     REG_KEY("Music", "INCSEARCH",     "Show incremental search dialog",     "Ctrl+S");
     REG_KEY("Music", "INCSEARCHNEXT", "Incremental search find next match", "Ctrl+N");
+    REG_KEY("Music", "SPEEDUP",    "Increase Play Speed",   "W");
+    REG_KEY("Music", "SPEEDDOWN",  "Decrease Play Speed",   "X");
 
     REG_MEDIA_HANDLER("MythMusic Media Handler 1/2", "", "", handleMedia,
                       MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);

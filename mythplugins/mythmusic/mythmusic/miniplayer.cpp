@@ -265,6 +265,16 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                 increaseRating();
             else if (action == "THMBDOWN")
                 decreaseRating();
+            else if (action == "SPEEDDOWN") 
+            {
+                gPlayer->decSpeed();
+                showSpeed();
+            }
+            else if (action == "SPEEDUP")
+            {
+                gPlayer->incSpeed();
+                showSpeed();
+            }
             else if (action == "1")
             {
                 gPlayer->toggleShuffleMode();
@@ -692,5 +702,32 @@ void MiniPlayer::showVolume(void)
             level = 0.0;
 
         m_volText->SetText(QString(m_volFormat).arg((int) level));
+    }
+}
+
+void MiniPlayer::showSpeed(void)
+{
+    float level = (float)gPlayer->getSpeed();
+    QString msg = tr("Speed: ");
+    QString param;
+
+    param.sprintf("x%4.2f",level);
+    msg += param;
+
+    if (m_infoText)
+    {
+        m_infoTimer->stop();
+        m_showingInfo = true;
+        m_infoText->SetText(msg);
+        m_infoTimer->start(5000, true);
+    }
+
+    if (class LCD *lcd = LCD::Get())
+    {
+        QPtrList<LCDTextItem> textItems;
+        textItems.setAutoDelete(true);
+        textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
+                                         msg, "Generic", false));
+        lcd->switchToGeneric(&textItems);
     }
 }

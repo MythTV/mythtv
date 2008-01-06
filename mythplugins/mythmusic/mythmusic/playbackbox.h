@@ -67,10 +67,12 @@ class PlaybackBoxMusic : public MythThemedDialog
     void visEnable();
     void bannerDisable();
     void changeVolume(bool up_or_down);
+    void changeSpeed(bool up_or_down);
     void toggleMute();
     void resetTimer();
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
+    void showSpeed(bool on_or_off);
     void showProgressBar();
     void wipeTrackInfo();
     void toggleFullBlankVisualizer();
@@ -191,6 +193,7 @@ class PlaybackBoxMusic : public MythThemedDialog
 
     UIStatusBarType       *volume_status;
     UIStatusBarType       *progress_bar;
+    UITextType            *speed_status;
 
     UIPushButtonType      *prev_button;
     UIPushButtonType      *rew_button;

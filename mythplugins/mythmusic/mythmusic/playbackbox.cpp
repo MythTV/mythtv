@@ -99,10 +99,10 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     if (gContext->GetNumSetting("MythControlsVolume", 0))
     {
         volume_control = true;
-        volume_display_timer->start(2000);
-        connect(volume_display_timer, SIGNAL(timeout()),
-                this, SLOT(hideVolume()));
     }
+    volume_display_timer->start(2000, true);
+    connect(volume_display_timer, SIGNAL(timeout()),
+            this, SLOT(hideVolume()));
 
     setShuffleMode(gPlayer->getShuffleMode());
 
@@ -352,6 +352,10 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             changeVolume(false);
         else if (action == "VOLUMEUP")
             changeVolume(true);
+        else if (action == "SPEEDDOWN") 
+            changeSpeed(false);
+        else if (action == "SPEEDUP")
+            changeSpeed(true);
         else if (action == "MUTE")
             toggleMute();
         else if (action == "MENU" && visualizer_status != 2)
@@ -1151,6 +1155,18 @@ void PlaybackBoxMusic::changeVolume(bool up_or_down)
     }
 }
 
+void PlaybackBoxMusic::changeSpeed(bool up_or_down)
+{
+    if (gPlayer->getOutput())
+    {
+        if (up_or_down)
+            gPlayer->incSpeed();
+        else
+            gPlayer->decSpeed();
+        showSpeed(true);
+    }
+}
+
 void PlaybackBoxMusic::toggleMute()
 {
     if (volume_control && gPlayer->getOutput())
@@ -1172,6 +1188,12 @@ void PlaybackBoxMusic::showProgressBar()
 void PlaybackBoxMusic::showVolume(bool on_or_off)
 {
     float volume_level;
+    if (speed_status && speed_status->getOrder() != -1)
+    {
+        speed_status->SetOrder(-1);
+        speed_status->refresh();
+    }
+
     if (volume_control && gPlayer->getOutput())
     {
         if (volume_status)
@@ -1181,7 +1203,7 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 volume_status->SetUsed(gPlayer->getOutput()->GetCurrentVolume());
                 volume_status->SetOrder(0);
                 volume_status->refresh();
-                volume_display_timer->changeInterval(2000);
+                volume_display_timer->start(2000, true);
                 if (class LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
@@ -1200,12 +1222,48 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 {
                     volume_status->SetOrder(-1);
                     volume_status->refresh();
-
-                    if (curMeta)
-                        setTrackOnLCD(curMeta);
                 }
+
+                if (curMeta)
+                    setTrackOnLCD(curMeta);
             }
         }
+    }
+}
+
+void PlaybackBoxMusic::showSpeed(bool on_or_off)
+{
+    if (speed_status)
+    {
+        if (volume_status && (volume_status->getOrder() != -1))
+        {
+            volume_status->SetOrder(-1);
+            volume_status->refresh();
+        }
+
+        if (on_or_off)
+        {
+            QString speed_text;
+            float playSpeed = gPlayer->getSpeed();
+            speed_text.sprintf("x%4.2f",playSpeed);
+            speed_status->SetText(speed_text);
+            speed_status->SetOrder(0);
+            speed_status->refresh();
+            volume_display_timer->start(2000, true);
+        }
+    }
+
+    if (class LCD *lcd = LCD::Get())
+    {
+        QString speed_text;
+        float playSpeed = gPlayer->getSpeed();
+        speed_text.sprintf("x%4.2f", playSpeed);
+        speed_text = tr("Speed: ") + speed_text;
+        QPtrList<LCDTextItem> textItems;
+        textItems.setAutoDelete(true);
+        textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
+                                         speed_text, "Generic", false));
+        lcd->switchToGeneric(&textItems);
     }
 }
 
@@ -2154,6 +2212,12 @@ void PlaybackBoxMusic::wireUpTheme()
     {
         volume_status->SetTotal(100);
         volume_status->SetOrder(-1);
+    }
+    speed_status = getUITextType("speed_status");
+    if (speed_status)
+    {
+        speed_status->SetText("");
+        speed_status->SetOrder(-1);
     }
     visual_blackhole = getUIBlackHoleType("visual_blackhole");
 

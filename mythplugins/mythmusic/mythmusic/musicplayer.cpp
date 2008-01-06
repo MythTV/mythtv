@@ -53,6 +53,8 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_wasPlaying = true;
     m_updatedLastplay = false;
 
+    m_playSpeed = 1.0;
+
     QString playmode = gContext->GetSetting("PlayMode", "none");
     if (playmode.lower() == "random")
         setShuffleMode(SHUFFLE_RANDOM);
@@ -802,4 +804,25 @@ void MusicPlayer::updateLastplay()
     }
 
     m_updatedLastplay = true;
+}
+
+void MusicPlayer::setSpeed(float newspeed)
+{
+    if (m_output)
+    {
+        m_playSpeed = newspeed;
+        m_output->SetStretchFactor(m_playSpeed);
+    }
+}
+
+void MusicPlayer::incSpeed()
+{
+    m_playSpeed += 0.05;
+    setSpeed(m_playSpeed);
+}
+
+void MusicPlayer::decSpeed()
+{
+    m_playSpeed -= 0.05;
+    setSpeed(m_playSpeed);
 }

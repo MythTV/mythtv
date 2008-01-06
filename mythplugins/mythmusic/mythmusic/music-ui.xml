@@ -329,6 +329,13 @@
                 <orientation>BottomToTop</orientation>
             </statusbar>
         </container>
+        <container name="speeddisplay">
+            <area>690,385,105,25</area>
+            <textarea name="speed_status" draworder="-1" align="left">
+                <font>infotext</font>
+                <area>0,0,105,25</area>
+            </textarea>
+        </container>
 
         <!--
             All the buttons
