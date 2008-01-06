@@ -355,5 +355,12 @@
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
+   
+   <button>
+       <type>MYTHAPPEARANCE</type>
+       <text>Screen Setup Wizard</text>
+       <action>PLUGIN mythappearance</action>
+       <depends>mythappearance</depends>
+   </button>
 
 </mythmenu>
