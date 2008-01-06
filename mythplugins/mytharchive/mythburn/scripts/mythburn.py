@@ -26,12 +26,15 @@
 #Optional (only needed for tcrequant)
 #transcode - v1.0.2
 
+#Optional (for Right To Left languages)
+#pyfribidi
+
 #******************************************************************************
 #******************************************************************************
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20071115-1"
+VERSION="0.1.20080106-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -156,6 +159,22 @@ themeFonts = {}
 # no. of processors we have access to
 cpuCount = 1
 
+#############################################################
+
+# fix rtl text where pyfribidi is not available
+# should write a simple algorithm, meanwhile just return the original string
+def simple_fix_rtl(str):
+  return str
+
+# Bind the name fix_rtl to the appropriate function
+try:
+    import pyfribidi
+except ImportError:
+    sys.stdout.write("Using simple_fix_rtl\n")
+    fix_rtl = simple_fix_rtl
+else:
+    sys.stdout.write("Using pyfribidi.log2vis\n")
+    fix_rtl = pyfribidi.log2vis
 
 #############################################################
 # class to hold a font definition
@@ -968,7 +987,7 @@ def intelliDraw(drawer, text, font, containerWidth):
             finished = True
     tmp = []
     for i in lines:
-        tmp.append( ' '.join(i) )
+        tmp.append( fix_rtl( ' '.join(i) ) )
     lines = tmp
     return lines
 
