@@ -21,7 +21,7 @@ using namespace std;
 #   define O_NONBLOCK 0
 #endif
 
-#define LOC      QString("MythMediaDevice: ")
+#define LOC      QString("MythMediaDevice:")
 #define LOC_WARN QString("MythMediaDevice, Warning: ")
 #define LOC_ERR  QString("MythMediaDevice, Error: ")
 
@@ -323,6 +323,7 @@ bool MythMediaDevice::isMounted(bool Verify)
     if (!mountFile.open(IO_ReadOnly))
         return false;
 
+    QString     debug;
     QTextStream stream(&mountFile);
 
     while (!stream.eof()) 
@@ -336,9 +337,9 @@ bool MythMediaDevice::isMounted(bool Verify)
         stream.readLine(); // skip the rest of the line
         deviceNames.push_back(deviceName);
 
-        VERBOSE(VB_MEDIA, LOC +
-                QString("Found device: '%1' at mount point '%2'")
-                .arg(deviceName).arg(mountPoint));
+        if (print_verbose_messages & VB_MEDIA)
+            debug += QString("                 %1 | %2\n")
+                     .arg(deviceName, 16).arg(mountPoint);
 
         if (deviceName.isEmpty())
             continue;
@@ -367,6 +368,16 @@ bool MythMediaDevice::isMounted(bool Verify)
     }
 
     mountFile.close();
+
+    if (print_verbose_messages & VB_MEDIA)
+    {
+        debug = LOC + ":isMounted() - mount '" + m_MountPath + "' not found.\n"
+                + "                 Device name/type | Current mountpoint\n"
+                + "                 -----------------+-------------------\n"
+                + debug
+                + "                 =================+===================";
+        VERBOSE(VB_MEDIA, debug);
+    }
 
     return false;
 }
