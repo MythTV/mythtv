@@ -439,7 +439,7 @@ void Metadata::dumpToDatabase()
     query.bindValue(":COMPILATION", m_compilation);
     query.bindValue(":YEAR", m_year);
 
-    if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+    if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("music compilation update", query);
         return;
