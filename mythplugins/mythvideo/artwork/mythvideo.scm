@@ -34,8 +34,8 @@
 
     ; draw white rect layer
     (gimp-image-add-layer image bg-layer 1)
-    (gimp-edit-clear bg-layer)
     (gimp-selection-none image)
+    (gimp-edit-clear bg-layer)
     (script-fu-selection-rounded-rectangle image bg-layer 14.0 FALSE)
     (gimp-context-set-foreground '(255 255 255))
     (gimp-edit-fill bg-layer FOREGROUND-FILL)
@@ -47,8 +47,8 @@
                                           "black box" 100 NORMAL-MODE))))
       ; draw black rect layer
       (gimp-image-add-layer image tmp-draw -1)
-      (gimp-edit-clear tmp-draw)
       (gimp-selection-none image)
+      (gimp-edit-clear tmp-draw)
       (script-fu-selection-rounded-rectangle image tmp-draw 14.0 FALSE)
       (gimp-selection-shrink image border-width)
       (gimp-context-set-foreground '(0 0 0))
@@ -73,8 +73,8 @@
                                           NORMAL-MODE))))
         (gimp-image-undo-disable sel-image)
         (gimp-image-add-layer sel-image sel-bg 1)
-        (gimp-edit-clear sel-bg)
         (gimp-selection-none sel-image)
+        (gimp-edit-clear sel-bg)
         (script-fu-selection-rounded-rectangle sel-image sel-bg 60.0 FALSE)
         (gimp-context-set-foreground '(18 0 255))
         (gimp-context-set-background '(126 121 234))
@@ -127,9 +127,9 @@
     (gimp-image-undo-disable image)
 
     (gimp-image-add-layer image bg-layer 1)
+    (gimp-selection-none image)
     (gimp-edit-clear bg-layer)
     (gimp-context-set-foreground '(0 0 0))
-    (gimp-selection-none image)
     (script-fu-selection-rounded-rectangle image bg-layer 14.0 FALSE)
     (gimp-bucket-fill bg-layer FG-BUCKET-FILL NORMAL-MODE 70.0 0 FALSE 0 0)
     (gimp-selection-shrink image (- border-width trans-border-width))
