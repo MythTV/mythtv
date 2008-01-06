@@ -303,7 +303,7 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
         {
             QFile file(v->filename);
             if (file.exists())
-                v->size = (long long)file.size();
+                v->size = (unsigned long long)file.size();
             else
                 cout << "VideoSelector: Cannot find file: " << v->filename << endl;
         }

@@ -13,14 +13,14 @@
 
 typedef struct
 {
-    int id;
+    int     id;
     QString title;
     QString plot;
     QString category;
     QString filename;
     QString coverfile;
     int     parentalLevel;
-    uint    size;
+    unsigned long long size;
 } VideoInfo;
 
 class VideoSelector : public MythThemedDialog
