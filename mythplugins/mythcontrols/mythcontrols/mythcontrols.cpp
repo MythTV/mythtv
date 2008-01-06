@@ -401,7 +401,7 @@ void MythControls::keyPressEvent(QKeyEvent *e)
                     DialogCode code = MythPopupBox::ShowButtonPopup(
                         gContext->GetMainWindow(), "exitmenu",
                         tr("Exiting, but there are unsaved changes.")+"\n\n"+
-                        tr("Which would you prefer?"), buttons,
+                        tr("Which would you prefer?") + "\n\n", buttons,
                         kDialogCodeButton1);
 
                     if (kDialogCodeButton1 == code)
