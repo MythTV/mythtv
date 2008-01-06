@@ -1549,7 +1549,7 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                     "You probably should modify the Master Server \n\t\t\t"
                     "settings in the setup program and set the    \n\t\t\t"
                     "proper IP address.");
-                if (d->m_height && d->m_width)
+                if (d->m_gui && d->m_height && d->m_width)
                 {
                     bool manageLock = false;
                     if (!blockingClient && d->serverSockLock.locked())

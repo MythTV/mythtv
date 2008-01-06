@@ -30,8 +30,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                                  const char* name)
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    checkConnectionToServer();
-
     LCD::SetupLCD();
 
     if (class LCD *lcd = LCD::Get())
@@ -73,6 +71,8 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
     m_scheduledList.setAutoDelete(true);
 
     popup = NULL;
+
+    checkConnectionToServer();
 }
 
 void WelcomeDialog::startFrontend(void)
@@ -680,15 +680,27 @@ void WelcomeDialog::updateStatusMessage(void)
 
 bool WelcomeDialog::checkConnectionToServer(void)
 {
+    m_updateStatusTimer->stop();
+
     bool bRes = false;
 
     if (gContext->IsConnectedToMaster())
         bRes = true;
     else
     {
-        if (!gContext->ConnectToMasterServer(false))
+        if (gContext->ConnectToMasterServer(false))
+        {
             bRes = true;
+            updateAll();
+        }
+        else
+           updateScreen();
     }
+
+    if (bRes)
+        m_updateStatusTimer->start(UPDATE_STATUS_INTERVAL);
+    else
+        m_updateStatusTimer->start(5000);
 
     return bRes;
 }

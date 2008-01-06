@@ -33,12 +33,12 @@ void initKeys(void)
 int main(int argc, char **argv)
 {
     bool bShowSettings = false;
-    
+
     QApplication a(argc, argv);
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init()) 
+    if (!gContext->Init(false)) 
     {
         VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize myth context. "
                         "Exiting.");
@@ -55,7 +55,6 @@ int main(int argc, char **argv)
     // Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        
         if (!strcmp(a.argv()[argpos],"-v") ||
             !strcmp(a.argv()[argpos],"--verbose"))
         {
