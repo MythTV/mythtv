@@ -156,6 +156,14 @@ The database schema is documented here \ref db_schema.
   <dt>mythweb     <dd>Provides a PHP based web pages to control mythbackend.
 </dl>
 
+\section spt_scripts Support Scripts
+These tools are in the contrib directory of the source tree:
+<dl>
+  <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
+                            source, of MythTV and all the official plugins,
+                            on Mac OS 10.3 thru 10.5
+  <dt>win32-packager.pl <dd>Similar tool for Windows XP
+</dl>
  */
 
 /** \defgroup database_subsystem    Database Subsystem
