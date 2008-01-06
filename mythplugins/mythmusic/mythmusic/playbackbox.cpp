@@ -1688,9 +1688,6 @@ void PlaybackBoxMusic::setRepeatMode(MusicPlayer::RepeatMode mode)
                                                     .arg(state));
     }
 
-    if (class LCD *lcd = LCD::Get())
-        lcd->setMusicRepeat (LCD::MUSIC_REPEAT_ALL);
-
     bannerEnable(QString("%1: %2").arg(tr("Repeat")).arg(state), 4000);
 }
 
