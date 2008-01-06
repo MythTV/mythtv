@@ -132,13 +132,18 @@ MediaStatus MythCDROMLinux::checkMedia()
         switch (ret) 
         {
             case CDS_DISC_OK:
-                VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK...");
+                VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
+                                  + MediaTypeString(m_MediaType) );
+                // 1. Audio CDs are not mounted
+                // 2. If we don't know the media type yet,
+                //    test the disk after this switch exits
+                if (m_MediaType == MEDIATYPE_AUDIO ||
+                    m_MediaType == MEDIATYPE_UNKNOWN)
+                    break;
                 // If the disc is ok and we already know it's mediatype
                 // returns MOUNTED.
-                if (isMounted(true) && m_MediaType != MEDIATYPE_UNKNOWN)
+                if (isMounted(true))
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
-                // If the disk is ok but not yet mounted we'll test it further down after this switch exits.
-                break;
             case CDS_TRAY_OPEN:
                 VERBOSE(VB_MEDIA, getDevicePath() + " Tray open");
                 setStatus(MEDIASTAT_OPEN, OpenedHere);
