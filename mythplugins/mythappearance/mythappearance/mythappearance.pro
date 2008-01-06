@@ -17,13 +17,10 @@ uifiles_wide.files = theme-wide/appear-ui.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 
-installimages_wide.path = $${PREFIX}/share/mythtv/themes/default-wide
-installimages_wide.files = images/*.png
-
 installxml.path = $${PREFIX}/share/mythtv
 installxml.files = util_menu.xml
 
-INSTALLS += uifiles uifiles_wide installimages installimages_wide installxml
+INSTALLS += uifiles uifiles_wide installimages installxml
 
 # Input
 HEADERS += mythappearance.h
