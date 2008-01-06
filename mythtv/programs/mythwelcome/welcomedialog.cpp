@@ -409,7 +409,8 @@ void WelcomeDialog::updateScreen(void)
             if (prog->subtitle != "")
                 status += "\n(" + prog->subtitle + ")";
 
-            status += "\n" + prog->startTime.toString(m_dateFormat + " (" + m_timeFormat) +
+            QString dateFormat = gContext->GetSetting("DateFormat", "ddd dd MMM yyyy");
+            status += "\n" + prog->startTime.toString(dateFormat + " (" + m_timeFormat) +
                 " " + tr("to") + " " +  prog->endTime.toString("hh:mm)");
 
             if (m_screenScheduledNo < m_scheduledList.count() - 1)
