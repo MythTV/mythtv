@@ -176,6 +176,19 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                 seekforward();
             else if (action == "RWND")
                 seekback();
+            else if (action == "PLAY")
+            {
+                if (gPlayer->isPlaying())
+                    return;
+
+                if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
+                {
+                    gPlayer->pause();
+                    return;
+                }
+
+                gPlayer->play();
+            }
             else if (action == "PAUSE")
             {
                 if (gPlayer->isPlaying())
