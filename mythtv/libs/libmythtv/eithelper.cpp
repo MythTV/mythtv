@@ -21,6 +21,7 @@ using namespace std;
 #include "util.h"
 
 const uint EITHelper::kChunkSize = 20;
+EITCache *EITHelper::eitcache = new EITCache();
 
 static uint get_chan_id_from_db(uint sourceid,
                                 uint atscmajor, uint atscminor);
@@ -33,7 +34,7 @@ static int calc_eit_utc_offset(void);
 #define LOC_ERR QString("EITHelper, Error: ")
 
 EITHelper::EITHelper() :
-    eitfixup(new EITFixUp()), eitcache(new EITCache()),
+    eitfixup(new EITFixUp()),
     gps_offset(-1 * GPS_LEAP_SECONDS),          utc_offset(0),
     sourceid(0)
 {
@@ -59,7 +60,6 @@ EITHelper::~EITHelper()
         delete db_events.dequeue();
 
     delete eitfixup;
-    delete eitcache;
 }
 
 uint EITHelper::GetListSize(void) const

@@ -259,7 +259,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     return eventMap;
 }
 
-void EITCache::DropChannel(uint chanid)
+void EITCache::WriteChannelToDB(uint chanid)
 {
     event_map_t * eventMap = channelMap[chanid];
 
@@ -280,16 +280,8 @@ void EITCache::DropChannel(uint chanid)
             replace_in_db(chanid, it.key(), *it);
             updated++;
         }
-
-        event_map_t::iterator tmp = it;
-        ++tmp;
-        eventMap->erase(it);
-        it = tmp;
+        it++;
     }
-    delete eventMap;
-    channelMap.erase(chanid);
-    entryCnt -= size;
-
     unlock_channel(chanid, updated);
 
     VERBOSE(VB_EIT, LOC + QString("Wrote %1 modified entries of %2 "
@@ -306,7 +298,7 @@ void EITCache::WriteToDB(void)
     {
         key_map_t::iterator tmp = it;
         ++tmp;
-        DropChannel(it.key());
+        WriteChannelToDB(it.key());
         it = tmp;
     }
     entryCnt = 0;
