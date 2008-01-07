@@ -32,4 +32,4 @@ using_oss:DEFINES += USING_OSS
 
 using_dvb:DEFINES += USING_DVB
 
-sing_valgrind:DEFINES += USING_VALGRIND
+using_valgrind:DEFINES += USING_VALGRIND
