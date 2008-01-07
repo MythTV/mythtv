@@ -190,9 +190,7 @@ inline int statfs(const char* path, struct statfs* buffer)
 #define dlopen(x, y) LoadLibraryA((x))
 #define dlclose(x) !FreeLibrary((HMODULE)(x))
 #define dlsym(x, y) GetProcAddress((HMODULE)(x), (y))
-//
-//#define dlerror()  ""
-//
+#ifdef __cplusplus
 inline const char *dlerror(void)
 {
   #define DLERR_MAX 512
@@ -210,6 +208,9 @@ inline const char *dlerror(void)
 
     return errStr;
 }
+#else  // __cplusplus
+#define dlerror()  "dlerror() is unimplemented."
+#endif // __cplusplus
 #endif // USING_MINGW
 
 #ifdef USING_MINGW
