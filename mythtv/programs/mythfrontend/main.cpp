@@ -35,6 +35,7 @@ using namespace std;
 #include "networkcontrol.h"
 #include "DVDRingBuffer.h"
 
+#include "libmyth/compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "mythcontext.h"
