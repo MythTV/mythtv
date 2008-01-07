@@ -107,7 +107,7 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     childwidget.resize(children.size());
     for (uint i = 0; i < children.size(); i++)
     {
-        if (children[i]->isVisible())
+        if (children[i] && children[i]->isVisible())
         {
             childwidget[i] = children[i]->configWidget(cg, widget, NULL);
             layout->add(childwidget[i]);
@@ -472,7 +472,7 @@ void TriggeredConfigurationGroup::load(void)
 
     configLayout->load();
 
-    if (!widget)
+    if (!widget && configStack)
         configStack->load();
 }
 
