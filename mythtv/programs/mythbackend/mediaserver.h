@@ -20,6 +20,8 @@
 #include "libmythupnp/upnpcmgr.h"
 #include "libmythupnp/upnpmsrr.h"
 
+#include "upnpmedia.h"
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -35,11 +37,16 @@ class MediaServer : public UPnp
         
         UPnpCDS         *m_pUPnpCDS;      // Do not delete (auto deleted)
         UPnpCMGR        *m_pUPnpCMGR;     // Do not delete (auto deleted)
+	UPnpMedia	*upnpMedia;
+
         QString          m_sSharePath;
 
     public:
                  MediaServer( bool bMaster, bool bDisableUPnp = FALSE );
+
         virtual ~MediaServer();
+
+	void RebuildMediaMap(void) { upnpMedia->BuildMediaMap(); };
 
 //        void     customEvent( QCustomEvent *e );
 

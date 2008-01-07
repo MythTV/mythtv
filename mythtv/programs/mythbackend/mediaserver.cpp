@@ -176,6 +176,9 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
             VERBOSE(VB_UPNP, "MediaServer::Registering UPnpCDSVideo Extension");
 
             RegisterExtension(new UPnpCDSVideo());
+
+	    upnpMedia = new UPnpMedia(true,true);
+	    //upnpMedia->BuildMediaMap();
         }
 
         // VERBOSE(VB_UPNP, QString( "MediaServer::Adding Context Listener" ));

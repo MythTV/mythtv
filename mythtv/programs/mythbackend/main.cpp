@@ -217,6 +217,7 @@ void cleanup(void)
         unlink(pidfile.ascii());
 
     signal(SIGHUP, SIG_DFL);
+    signal(SIGUSR1, SIG_DFL);
 }
 
 int log_rotate(int report_error)
@@ -248,6 +249,15 @@ int log_rotate(int report_error)
 void log_rotate_handler(int)
 {
     log_rotate(0);
+}
+
+void upnp_rebuild(int)
+{
+    if (gContext->IsMasterHost())
+    {
+        g_pUPnp->RebuildMediaMap();
+    }
+
 }
 
 int preview_helper(const QString &chanid, const QString &starttime,
@@ -397,6 +407,7 @@ int main(int argc, char **argv)
     bool noexpirer = false;
     QString printexpire = "";
     bool clearsettingscache = false;
+    bool wantupnprebuild = false;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -508,6 +519,10 @@ int main(int argc, char **argv)
         {
             noupnp = true;
         } 
+	else if (!strcmp(a.argv()[argpos],"--upnprebuild"))
+	{
+            wantupnprebuild = true;
+	}
         else if (!strcmp(a.argv()[argpos],"--nojobqueue"))
         {
             nojobqueue = true;
@@ -649,6 +664,7 @@ int main(int argc, char **argv)
                     "--clearcache                   Clear the settings cache on all myth servers" << endl <<
                     "--version                      Version information" << endl <<
                     "--generate-preview             Generate a preview image" << endl <<
+		    "--upnprebuild                  Force an update of UPNP media" << endl <<
                     "--infile                       Input file for preview generation" << endl <<
                     "--outfile                      Optional output file for preview generation" << endl <<
                     "--chanid                       Channel ID for preview generation" << endl <<
@@ -711,6 +727,16 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_NO_MYTHCONTEXT;
     }
     gContext->SetBackend(true);
+
+    if (wantupnprebuild)
+    {
+        VERBOSE(VB_GENERAL, "Rebuilding UPNP Media Map");
+
+        UPnpMedia *rebuildit = new UPnpMedia(false,false);
+        rebuildit->BuildMediaMap();
+
+        return BACKEND_EXIT_OK;
+    }
 
     if (clearsettingscache)
     {
@@ -819,7 +845,6 @@ int main(int argc, char **argv)
 
     bool ismaster = gContext->IsMasterHost();
 
-
     if (ismaster)
     {
         cerr << "Starting up as the master server.\n";
@@ -829,6 +854,9 @@ int main(int argc, char **argv)
         if (nosched)
             cerr << "********** The Scheduler has been DISABLED with "
                     "the --nosched option **********\n";
+
+	// kill -USR1 mythbackendpid will force a upnpmedia rebuild
+	signal(SIGUSR1, &upnp_rebuild);
     }
     else
     {
