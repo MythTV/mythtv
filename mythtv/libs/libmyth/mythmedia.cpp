@@ -317,6 +317,12 @@ bool MythMediaDevice::isMounted(bool Verify)
     if (!Verify)
         return (m_Status == MEDIASTAT_MOUNTED);
 
+    if (m_MountPath.isEmpty())
+    {
+        VERBOSE(VB_MEDIA, LOC + ":isMounted() - logic error, no mountpath");
+        return false;
+    }
+
     QFile mountFile(PATHTO_MOUNTS);
 
     // Try to open the mounts file so we can search it for our device.
