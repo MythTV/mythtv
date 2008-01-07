@@ -115,7 +115,7 @@ MythMovies related options:
   --enable-mythmovies      build the mythmovies plugin [$movies]
 
 MythAppearance related options:
-  --enable-mythappearance      build the mythappearance plugin [$appearance]
+  --enable-mythappearance  build the mythappearance plugin [$appearance]
 EOF
 exit 1
 fi
@@ -709,10 +709,10 @@ else
 fi
 
 if test "$appearance" = "yes" ; then
-  echo "        MythAppearance     plugin will be built"
+  echo "        MythAppearance plugin will be built"
   echo "SUBDIRS += mythappearance" >> ./config.pro
 else
-  echo "        MythAppearance     plugin will not be built"
+  echo "        MythAppearance plugin will not be built"
 fi
 ###########################################################
 #                                                         #
