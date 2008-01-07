@@ -17,11 +17,12 @@
 #include <ws2tcpip.h>
 #define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
 #undef close
+#include <stdio.h>        // for snprintf(), used by inline dlerror()
 #else
 #include <sys/time.h>     // Mac OS X needs this before sys/resource
 #include <sys/resource.h> // for setpriority
 #include <sys/socket.h>
-#include <sys/wait.h>   // For WIFEXITED on Mac OS X
+#include <sys/wait.h>     // For WIFEXITED on Mac OS X
 #endif
 
 #ifdef _WIN32
@@ -189,7 +190,26 @@ inline int statfs(const char* path, struct statfs* buffer)
 #define dlopen(x, y) LoadLibraryA((x))
 #define dlclose(x) !FreeLibrary((HMODULE)(x))
 #define dlsym(x, y) GetProcAddress((HMODULE)(x), (y))
-#define dlerror GetLastError
+//
+//#define dlerror()  ""
+//
+inline const char *dlerror(void)
+{
+  #define DLERR_MAX 512
+    static char errStr[DLERR_MAX];
+    DWORD       errCode = GetLastError();
+
+    if (!FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
+                        FORMAT_MESSAGE_IGNORE_INSERTS |
+                        FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                        NULL, errCode,
+                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                        errStr, DLERR_MAX - 1, NULL))
+        snprintf(errStr, DLERR_MAX - 1,
+                 "dlopen()/dlsym() caused error %d", errCode);
+
+    return errStr;
+}
 #endif // USING_MINGW
 
 #ifdef USING_MINGW
