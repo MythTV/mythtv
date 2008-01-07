@@ -89,27 +89,28 @@ The database schema is documented here \ref db_schema.
 
 <dl>
   <dt>mythbackend      <dd>This is the backend which runs the recorders.
-  <dt>mythfrontend     <dd>This is the frontend which is the main application for viewing
-                           programs and using the %MythTV plugins.
+  <dt>mythfrontend
+      <dd>This is the frontend which is the main application
+          for viewing programs and using the %MythTV plugins.
   <dt>mythtv-setup     <dd>This is the program which sets up the database
                            to use a machine as a backend server.
   <dt>mythtv           <dd>This was an "External Player" used to play videos
                            from within mythfrontend. Setting the player command
                            to "internal" does the same thing now. This is handy
                            for testing the audio and videoout code, though.
-  <dt>mythtvosd        <dd>This is used externally by programs that want to pop-up
-                            an <i>on screen display</i> in %MythTV while one is watching a
-                           recording.
-  <dt>mythfilldatabase <dd>This is used both internally and externally to
-                           fetch program listings.
-                           <a href="http://tms.tribune.com/">Tribune Media</a> provides
-                           listings in exchange for demographic information in
-                           the USA, and <a href="http://d1.com.au/">D1</a> has
-                           donated free listings in Australia as thanks for the
-                           %MythTV code used in their <i>Home Media Centre</i>
-                           product. Other markets are served by the
-                           <a href="http://membled.com/work/apps/xmltv/xmltv">XMLTV</a>
-                           web spiders.
+  <dt>mythtvosd
+      <dd>This is used externally by programs that want to pop-up an
+          <i>on screen display</i> in %MythTV while one is watching a recording.
+  <dt>mythfilldatabase
+      <dd>This is used both internally and externally to fetch program listings.
+          <a href="http://tms.tribune.com/">Tribune Media</a> provides
+          listings in exchange for demographic information in the USA,
+          and Australia uses a
+          <a href="http://minnie.tuhs.org/twiki/bin/view/TVGuide">
+          community-driven TV guide</a> originally developed for OzTiVo.
+          Other markets are served by the
+          <a href="http://membled.com/work/apps/xmltv/xmltv">XMLTV</a>
+          web spiders.
   <dt>mythtranscode    <dd>This is used both internally and externally to
                            transcode videos from one format to another. 
                            This is used to shrink HDTV programs to lower
@@ -160,7 +161,7 @@ The database schema is documented here \ref db_schema.
 These tools are in the contrib directory of the source tree:
 <dl>
   <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
-                            source, of MythTV and all the official plugins,
+                            source, of %MythTV and all the official plugins,
                             on Mac OS 10.3 thru 10.5
   <dt>win32-packager.pl <dd>Similar tool for Windows XP
 </dl>
