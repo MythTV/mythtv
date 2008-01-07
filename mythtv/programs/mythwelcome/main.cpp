@@ -9,7 +9,8 @@
 #include "libmyth/settings.h"
 #include "libmyth/langsettings.h"
 #include "libmyth/mythdbcon.h"
-#include <libmyth/exitcodes.h>
+#include "libmyth/exitcodes.h"
+#include "libmyth/compat.h"
 
 #include "libmythtv/tv.h"
 
