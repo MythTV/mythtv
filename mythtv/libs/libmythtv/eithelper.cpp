@@ -19,6 +19,7 @@ using namespace std;
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
 #include "util.h"
+#include "programinfo.h" // for subtitle types and audio and video properties
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
@@ -279,18 +280,18 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
 }
 
 static inline void parse_dvb_component_descriptors(desc_list_t list,
-                                                   bool &hdtv,
-                                                   bool &stereo,
-                                                   bool &subtitled)
+                                                   unsigned char &subtitle_type,
+                                                   unsigned char &audio_properties,
+                                                   unsigned char &video_properties)
 {
     desc_list_t components =
         MPEGDescriptor::FindAll(list, DescriptorID::component);
     for (uint j = 0; j < components.size(); j++)
     {
         ComponentDescriptor component(components[j]);
-        hdtv      |= component.IsHDTV();
-        stereo    |= component.IsStereo();
-        subtitled |= component.IsReallySubtitled();
+        video_properties |= component.VideoProperties();
+        audio_properties |= component.AudioProperties();
+        subtitle_type    |= component.SubtitleType();
     }
 }
 
@@ -327,7 +328,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString description   = QString::null;
         QString category      = QString::null;
         MythCategoryType category_type = kCategoryNone;
-        bool hdtv = false, stereo = false, subtitled = false;
+        unsigned char subtitle_type, audio_props, video_props;
 
         // Parse descriptors
         desc_list_t list = MPEGDescriptor::Parse(
@@ -358,7 +359,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                                         title, subtitle, description);
         }
 
-        parse_dvb_component_descriptors(list, hdtv, stereo, subtitled);
+        parse_dvb_component_descriptors(list, subtitle_type, audio_props,
+                                        video_props);
 
         const unsigned char *content_data =
             MPEGDescriptor::Find(list, DescriptorID::content);
@@ -395,8 +397,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                                      title,     subtitle,      description,
                                      category,  category_type,
                                      starttime, endtime,       fix,
-                                     false,     subtitled,
-                                     stereo,    hdtv,
+                                     subtitle_type,
+                                     audio_props,
+                                     video_props,
                                      seriesId,  programId);
         db_events.enqueue(event);
     }
@@ -415,7 +418,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     QString description   = QString::null;
     QString category      = QString::null;
     MythCategoryType category_type = kCategoryNone;
-    bool hdtv = false, stereo = false, subtitled = false;
+    unsigned char subtitle_type, audio_props, video_props;
 
     // Parse descriptors
     desc_list_t list = MPEGDescriptor::Parse(
@@ -424,7 +427,8 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     parse_dvb_event_descriptors(list, fix, languagePreferences,
                                 title, subtitle, description);
 
-    parse_dvb_component_descriptors(list, hdtv, stereo, subtitled);
+    parse_dvb_component_descriptors(list, subtitle_type, audio_props,
+                                    video_props);
 
     const unsigned char *content_data =
         MPEGDescriptor::Find(list, DescriptorID::content);
@@ -495,8 +499,9 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                                          title,     subtitle,      description,
                                          category,  category_type,
                                          starttime, endtime,       fix,
-                                         false,     subtitled,
-                                         stereo,    hdtv,
+                                         subtitle_type,
+                                         audio_props,
+                                         video_props,
                                          "",  "");
             db_events.enqueue(event);
         }
@@ -547,8 +552,11 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     QDateTime endtime = starttime.addSecs(event.length);
 
     desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
-    bool captioned = MPEGDescriptor::Find(list, DescriptorID::caption_service);
-    bool stereo = false;
+    unsigned char subtitle_type =
+        MPEGDescriptor::Find(list, DescriptorID::caption_service) ?
+        SUB_HARDHEAR : SUB_UNKNOWN;
+    unsigned char audio_properties = AUD_UNKNOWN;
+    unsigned char video_properties = VID_UNKNOWN;
 
     uint atsc_key = (atsc_major << 16) | atsc_minor;
 
@@ -556,7 +564,8 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     db_events.enqueue(new DBEvent(chanid, QDeepCopy<QString>(event.title),
                                   QDeepCopy<QString>(ett),
                                   starttime, endtime,
-                                  fixup[atsc_key], captioned, stereo));
+                                  fixup[atsc_key], subtitle_type,
+                                  audio_properties, video_properties));
 }
 
 uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)

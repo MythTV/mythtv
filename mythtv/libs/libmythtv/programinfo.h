@@ -62,13 +62,16 @@ enum AudioProps {
     AUD_STEREO        = 0x01,
     AUD_MONO          = 0x02,
     AUD_SURROUND      = 0x04,
-    AUD_DOLBY         = 0x08
+    AUD_DOLBY         = 0x08,
+    AUD_HARDHEAR      = 0x10,
+    AUD_VISUALIMPAIR  = 0x20,
 };
 
 enum VideoProps {
     VID_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     VID_HDTV          = 0x01,
-    VID_WIDESCREEN    = 0x02
+    VID_WIDESCREEN    = 0x02,
+    VID_AVC           = 0x04,
 };
 
 enum SubtitleTypes {

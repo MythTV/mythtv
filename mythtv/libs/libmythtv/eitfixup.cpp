@@ -2,6 +2,8 @@
 #include "mythcontext.h"
 #include "dvbdescriptors.h" // for MythCategoryType
 
+#include "programinfo.h" // for subtitle types and audio and video properties
+
 /*------------------------------------------------------------------------
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table
  *------------------------------------------------------------------------*/
@@ -117,7 +119,7 @@ void EITFixUp::Fix(DBEvent &event) const
     }
 
     if (kFixHDTV & event.fixup)
-        event.flags |= DBEvent::kHDTV;
+        event.videoProps |= VID_HDTV;
 
     if (kFixBell & event.fixup)
         FixBellExpressVu(event);
@@ -237,7 +239,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     position = event.description.find("(CC)");
     if (position != -1)
     {
-        event.flags |= DBEvent::kCaptioned;
+        event.subtitleType |= SUB_HARDHEAR;
         event.description = event.description.replace("(CC)", "");
     }
 
@@ -245,7 +247,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     position = event.description.find("(Stereo)");
     if (position != -1)
     {
-        event.flags |= DBEvent::kStereo;
+        event.audioProps |= AUD_STEREO;
         event.description = event.description.replace("(Stereo)", "");
     }
 
@@ -261,7 +263,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     if (position != -1)
     {
         event.title = event.title.replace(m_bellPPVTitleHD, "");
-        event.flags |= DBEvent::kHDTV;
+        event.videoProps |= VID_HDTV;
     }
 
     // Check for subtitle "All Day (... Eastern)" in the subtitle
@@ -347,7 +349,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     position1 = event.description.find(m_ukSubtitle);
     if (position1 != -1)
     {
-        event.flags |= DBEvent::kSubtitled;
+        event.subtitleType |= SUB_NORMAL;
         event.description.remove(m_ukSubtitle);
     }
 
@@ -545,7 +547,7 @@ void EITFixUp::FixUK(DBEvent &event) const
         for (it = captures.begin(); it != captures.end(); ++it)
         {
             if (*it == "S")
-                event.flags |= DBEvent::kSubtitled;
+                event.subtitleType |= SUB_NORMAL;
         }
     }
     else if ((position1 = tmpUKCC.search(event.subtitle)) != -1)
@@ -554,7 +556,7 @@ void EITFixUp::FixUK(DBEvent &event) const
         for (it = captures.begin(); it != captures.end(); ++it)
         {
             if (*it == "S")
-                event.flags |= DBEvent::kSubtitled;
+                event.subtitleType |= SUB_NORMAL;
         }
 
         // We remove [AD,S] from the subtitle.
@@ -790,7 +792,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     int position = event.description.find(m_comHemTT);
     if (position != -1)
     {
-        event.flags |= DBEvent::kSubtitled;
+        event.subtitleType |= SUB_NORMAL;
     }
 
     // Try to findout if this is a rerun and if so the date.
@@ -917,7 +919,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     position = event.description.find(m_mcaCC);
     if (position > 0)
     {
-        event.flags |= DBEvent::kCaptioned;
+        event.subtitleType |= SUB_HARDHEAR;
         event.description.replace(m_mcaCC, "");
     }
 
@@ -925,7 +927,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     position = event.description.find(m_mcaDD);
     if ((position > 0) && (position > (int) (event.description.length() - 7)))
     {
-        event.flags |= DBEvent::kStereo;
+        event.audioProps |= AUD_STEREO;
         dd = true;
         event.description.replace(m_mcaDD, "");
     }
@@ -1081,7 +1083,7 @@ void EITFixUp::FixFI(DBEvent &event) const
     position = event.description.find(m_Stereo);
     if (position != -1)
     {
-        event.flags |= DBEvent::kStereo;
+        event.audioProps |= AUD_STEREO;
         event.description = event.description.replace(m_Stereo, "");
     }
 }
@@ -1214,7 +1216,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     int position;
     if ((position = fullinfo.find(m_nlStereo)) != -1)
     {
-        event.flags |= DBEvent::kStereo;
+        event.audioProps |= AUD_STEREO;
         fullinfo = fullinfo.replace("stereo", ".");
     }
     
@@ -1233,14 +1235,14 @@ void EITFixUp::FixNL(DBEvent &event) const
     // Get teletext subtitle info
     if ((position = fullinfo.find(m_nlTxt)) != -1)
     {
-        event.flags |= DBEvent::kSubtitled;
+        event.subtitleType |= SUB_NORMAL;
         fullinfo = fullinfo.replace("txt", ".");
     }
     
     // Get HDTV information
     if ((position = event.title.find(m_nlHD)) != -1)
     {
-        event.flags |= DBEvent::kHDTV;
+        event.videoProps |= VID_HDTV;
         event.title = event.title.replace(m_nlHD, "");
     }
 

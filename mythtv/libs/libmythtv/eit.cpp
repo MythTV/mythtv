@@ -11,6 +11,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "eit.h"
 #include "dvbdescriptors.h"
+#include "programinfo.h" // for subtitle types and audio and video properties
 
 DBPerson::DBPerson(Role _role, const QString &_name) :
     role(_role), name(QDeepCopy<QString>(_name))
@@ -132,7 +133,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "SELECT title,          subtitle,      description, "
         "       category,       category_type, "
         "       starttime,      endtime, "
-        "       closecaptioned, subtitled,     stereo,      hdtv, "
+        "       closecaptioned,     stereo,      hdtv, "
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
@@ -167,20 +168,21 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
                      category_type,
                      query.value(5).toDateTime(), query.value(6).toDateTime(),
                      fixup,
-                     query.value(7).toBool(),     query.value(8).toBool(),
-                     query.value(9).toBool(),     query.value(10).toBool(),
-                     QString::fromUtf8(query.value(16).toString()),
-                     QString::fromUtf8(query.value(17).toString())
+                     query.value(7).toUInt(),
+                     query.value(8).toUInt(),
+                     query.value(9).toUInt(),
+                     QString::fromUtf8(query.value(15).toString()),
+                     QString::fromUtf8(query.value(16).toString())
                      );
 
-        prog.partnumber = query.value(11).toUInt();
-        prog.parttotal  = query.value(12).toUInt();
+        prog.partnumber = query.value(10).toUInt();
+        prog.parttotal  = query.value(11).toUInt();
         prog.syndicatedepisodenumber = 
-                          QString::fromUtf8(query.value(13).toString());
-        prog.airdate    = query.value(14).toString();
-        prog.originalairdate = query.value(15).toDate();
+                          QString::fromUtf8(query.value(12).toString());
+        prog.airdate    = query.value(13).toString();
+        prog.originalairdate = query.value(14).toDate();
 
-        prog.previouslyshown = query.value(16).toBool();
+        prog.previouslyshown = query.value(17).toBool();
 
         programs.push_back(prog);
         count++;
@@ -326,10 +328,9 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     QString lcattype = myth_category_type_to_string(tmp);
 
-    bool lcc        = IsCaptioned() | match.IsCaptioned();
-    bool lstereo    = IsStereo()    | match.IsStereo();
-    bool lsubtitled = IsSubtitled() | match.IsSubtitled();
-    bool lhdtv      = IsHDTV()      | match.IsHDTV();
+    unsigned char lsubtype = subtitleType | match.subtitleType;
+    unsigned char laudio   = audioProps   | match.audioProps;
+    unsigned char lvideo   = videoProps   | match.videoProps;
 
     uint lpartnumber =
         (!partnumber && match.partnumber) ? match.partnumber : partnumber;
@@ -349,7 +350,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    description    = :DESC, "
         "    category       = :CAT,       category_type = :CATTYPE, "
         "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
-        "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
+        "    closecaptioned = :CC, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
         "    syndicatedepisodenumber = :SYNDICATENO, "
@@ -369,10 +370,9 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":CATTYPE",     lcattype.utf8());
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
-    query.bindValue(":CC",          lcc);
-    query.bindValue(":SUBTITLED",   lsubtitled);
-    query.bindValue(":STEREO",      lstereo);
-    query.bindValue(":HDTV",        lhdtv);
+    query.bindValue(":CC",          lsubtype);
+    query.bindValue(":STEREO",      laudio);
+    query.bindValue(":HDTV",        lvideo);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
     query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber.utf8());
@@ -504,7 +504,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  chanid,         title,          subtitle,        description, "
         "  category,       category_type, "
         "  starttime,      endtime, "
-        "  closecaptioned, subtitled,      stereo,          hdtv, "
+        "  closecaptioned,      stereo,          hdtv, "
         "  partnumber,     parttotal, "
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
@@ -513,7 +513,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
         " :STARTTIME,     :ENDTIME, "
-        " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
+        " :CC,            :STEREO,         :HDTV, "
         " :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
@@ -529,10 +529,9 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":CATTYPE",     cattype.utf8());
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
-    query.bindValue(":CC",          IsCaptioned());
-    query.bindValue(":SUBTITLED",   IsSubtitled());
-    query.bindValue(":STEREO",      IsStereo());
-    query.bindValue(":HDTV",        IsHDTV());
+    query.bindValue(":CC",          subtitleType);
+    query.bindValue(":STEREO",      audioProps);
+    query.bindValue(":HDTV",        videoProps);
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
     query.bindValue(":SYNDICATENO", syndicatedepisodenumber.utf8());

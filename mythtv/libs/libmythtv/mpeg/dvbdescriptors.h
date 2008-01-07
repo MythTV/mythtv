@@ -10,6 +10,7 @@
 #include <qstring.h>
 #include "mythcontext.h"
 #include "mpegdescriptors.h"
+#include "../programinfo.h" // for subtitle types and audio and video properties
 
 using namespace std;
 
@@ -333,38 +334,175 @@ class ComponentDescriptor : public MPEGDescriptor
     // 
     // for (i=0; i<N; i++) { text_char 8 }
 
-    bool IsVideo(void)    const { return 0x1 == StreamContent(); }
-    bool IsAudio(void)    const { return 0x2 == StreamContent(); }
-    bool IsSubtitle(void) const { return 0x3 == StreamContent(); }
-
-    bool IsHDTV(void) const
+    bool IsVideo(void) const
     {
-        return IsVideo() && 0x9 <= ComponentType() && ComponentType() <= 0x10;
+        return 0x1 == StreamContent() ||
+               0x5 == StreamContent();
     }
-
-    bool IsStereo(void) const
+    bool IsAudio(void) const
     {
-        return IsAudio() &&
-            ((0x3 == ComponentType()) || (0x5 == ComponentType()));
-    }
-
-    bool IsReallySubtitled(void) const
-    {
-        if (!IsSubtitle())
-            return false;
-        switch (ComponentType())
+        switch(StreamContent())
         {
-            case 0x1:
-            case 0x3:
-            case 0x10 ... 0x13:
-            case 0x20 ... 0x23:
+            case 0x02:
+            case 0x04:
+            case 0x06:
+            case 0x07:
                 return true;
             default:
                 return false;
         }
     }
+    bool IsSubtitle(void) const { return 0x3 == StreamContent(); }
 
-    QString toString() const { return QString("ComponentDescriptor(stub)"); }
+    unsigned char VideoProperties(void) const
+    {
+        if (0x1 == StreamContent())
+            return MPEG2Properties();
+        if (0x5 == StreamContent())
+            return VID_AVC || AVCProperties();
+
+        return VID_UNKNOWN;
+    }
+
+    unsigned char MPEG2Properties(void) const
+    {
+        switch(ComponentType())
+        {
+            case 0x2 ... 0x4:
+            case 0x6 ... 0x8:
+                return VID_WIDESCREEN;
+            case 0x09:
+            case 0x0D:
+                return VID_HDTV;
+            case 0x0A ... 0x0C:
+            case 0x0E ... 0x10:
+                return VID_WIDESCREEN | VID_HDTV;
+            default:
+                return VID_UNKNOWN;
+        }
+    }
+
+    unsigned char AVCProperties(void) const
+    {
+        switch(ComponentType())
+        {
+            case 0x3 ... 0x4:
+            case 0x7 ... 0x8:
+                return VID_WIDESCREEN;
+            case 0x0B ... 0x0C:
+            case 0x0F ... 0x10:
+                return VID_WIDESCREEN | VID_HDTV;
+            default:
+                return VID_UNKNOWN;
+        }
+    }
+
+    unsigned char AudioProperties(void) const
+    {
+        switch (StreamContent())
+        {
+            case 0x2:
+                return MP2Properties();
+            case 0x04:
+                return AC3Properties();
+            case 0x06:
+                return HEAACProperties();
+            default:
+                return AUD_UNKNOWN;
+        }
+    }
+
+    unsigned char MP2Properties(void) const
+    {
+        switch (ComponentType())
+        {
+            case 0x1:
+                return AUD_MONO;
+            case 0x3:
+                return AUD_STEREO;
+            case 0x5:
+                return AUD_SURROUND;
+            case 0x40:
+                return AUD_VISUALIMPAIR;
+            case 0x41:
+                return AUD_HARDHEAR;
+            default:
+                return AUD_UNKNOWN;
+        }
+    }
+
+    unsigned char AC3Properties(void) const
+    {
+        unsigned char properties = AUD_UNKNOWN;
+
+        switch (ComponentType() & 0x7)
+        {
+            case 0x0:
+                properties |= AUD_MONO;
+                break;
+            case 0x2:
+                properties |= AUD_STEREO;
+                break;
+            case 0x3:
+                properties |= AUD_DOLBY;
+                break;
+            case 0x4 ... 0x5:
+                properties |= AUD_SURROUND;
+                break;
+        }
+
+        if ((ComponentType() >> 3) & 0x7 == 0x2)
+            properties |= AUD_VISUALIMPAIR;
+
+        if ((ComponentType() >> 3) & 0x7 == 0x3)
+            properties |= AUD_HARDHEAR;
+
+        return properties;
+    }
+
+    unsigned char HEAACProperties(void) const
+    {
+        switch (ComponentType())
+        {
+            case 0x1:
+                return AUD_MONO;
+            case 0x3:
+            case 0x43:
+                return AUD_STEREO;
+            case 0x5:
+                return AUD_SURROUND;
+            case 0x40:
+            case 0x44:
+                return AUD_VISUALIMPAIR;
+            case 0x41:
+            case 0x45:
+                return AUD_HARDHEAR;
+            default:
+                return AUD_UNKNOWN;
+        }
+    }
+
+    unsigned char SubtitleType(void) const
+    {
+        if (!IsSubtitle())
+            return SUB_UNKNOWN;
+
+        switch (ComponentType())
+        {
+            case 0x1:
+            case 0x3:
+            case 0x10 ... 0x13:
+                return SUB_NORMAL;
+            case 0x20 ... 0x23:
+                return SUB_HARDHEAR;
+            default:
+                return SUB_UNKNOWN;
+        }
+    }
+
+        QString toString() const { return QString("ComponentDescriptor(stream_content: 0x%1, "
+                                                  "component_type: 0x%2)").arg(StreamContent(), 0, 16)
+                .arg(ComponentType(), 0, 16); }
 };
 
 typedef enum
