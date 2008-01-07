@@ -3578,11 +3578,17 @@ void ProgramInfo::showDetails(void) const
         attr += QObject::tr("Surround Sound") + ", ";
     if (audioprop & AUD_DOLBY)
         attr += QObject::tr("Dolby Sound") + ", ";
+    if (audioprop & AUD_HARDHEAR)
+        attr += QObject::tr("Audio for Hearing Impaired") + ", ";
+    if (audioprop & AUD_VISUALIMPAIR)
+        attr += QObject::tr("Audio for Visually Impaired") + ", ";
 
     if (videoprop & VID_HDTV)
         attr += QObject::tr("HDTV") + ", ";
     if  (videoprop & VID_WIDESCREEN)
         attr += QObject::tr("Widescreen") + ", ";
+    if  (videoprop & VID_AVC)
+        attr += QObject::tr("AVC/H.264") + ", ";
 
     if (subtype & SUB_HARDHEAR)
         attr += QObject::tr("CC","Closed Captioned") + ", ";
