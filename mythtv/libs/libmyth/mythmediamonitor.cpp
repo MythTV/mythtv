@@ -551,7 +551,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
                                 new MediaEvent(stat, pMedia));
     }
     else
-        VERBOSE(VB_IMPORTANT, "Media status changed..." + msg);
+        VERBOSE(VB_MEDIA, "Media status changed, but not sending event" + msg);
 
 
     if (stat == MEDIASTAT_OPEN || stat == MEDIASTAT_NODISK
