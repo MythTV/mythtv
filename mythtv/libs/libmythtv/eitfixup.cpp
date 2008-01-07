@@ -1073,6 +1073,7 @@ void EITFixUp::FixFI(DBEvent &event) const
     int position = event.description.find(m_fiRerun);
     if (position != -1)
     {
+        event.previouslyshown = true;
         event.description = event.description.replace(m_fiRerun, "");
     }
 

@@ -136,7 +136,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
-        "       seriesid,       programid "
+        "       seriesid,       programid, previouslyshown "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -179,6 +179,8 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
                           QString::fromUtf8(query.value(13).toString());
         prog.airdate    = query.value(14).toString();
         prog.originalairdate = query.value(15).toDate();
+
+        prog.previouslyshown = query.value(16).toBool();
 
         programs.push_back(prog);
         count++;
@@ -334,6 +336,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     uint lparttotal =
         (!parttotal  && match.parttotal ) ? match.parttotal  : parttotal;
 
+    bool lpreviouslyshown = previouslyshown | match.previouslyshown;
+
     QString lsyndicatedepisodenumber = syndicatedepisodenumber;
     if (lsyndicatedepisodenumber.isEmpty() && 
         !match.syndicatedepisodenumber.isEmpty())
@@ -351,7 +355,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    syndicatedepisodenumber = :SYNDICATENO, "
         "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
         "    listingsource  = :LSOURCE, "
-        "    seriesid       = :SERIESID,  programid     = :PROGRAMID "
+        "    seriesid       = :SERIESID,  programid     = :PROGRAMID, "
+        "    previouslyshown = :PREVSHOWN "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
 
@@ -376,6 +381,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":LSOURCE",     1);
     query.bindValue(":SERIESID",    lseriesId.utf8());
     query.bindValue(":PROGRAMID",   lprogramId.utf8());
+    query.bindValue(":PREVSHOWN",   lpreviouslyshown);
 
     if (!query.exec())
     {
@@ -502,7 +508,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  partnumber,     parttotal, "
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
-        "  seriesid,       programid ) "
+        "  seriesid,       programid,      previouslyshown ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
@@ -511,7 +517,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         " :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
-        " :SERIESID,      :PROGRAMID ) ");
+        " :SERIESID,      :PROGRAMID ,    :PREVSHOWN) ");
 
     QString cattype = myth_category_type_to_string(category_type);
 
@@ -535,6 +541,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":LSOURCE",     1);
     query.bindValue(":SERIESID",    lseriesId.utf8());
     query.bindValue(":PROGRAMID",   lprogramId.utf8());
+    query.bindValue(":PREVSHOWN",   previouslyshown);
 
     if (!query.exec())
     {

@@ -73,7 +73,8 @@ class DBEvent
         fixup(_fixup),           flags(0),
         category_type(_category_type),
         seriesId(_seriesId),
-        programId(_programId)
+        programId(_programId),
+        previouslyshown(false)
     {
         flags |= (_captioned) ? kCaptioned : 0;
         flags |= (_subtitled) ? kSubtitled : 0;
@@ -96,7 +97,7 @@ class DBEvent
         partnumber(0),           parttotal(0),
         syndicatedepisodenumber(QString::null),
         fixup(_fixup),           flags(0),
-        category_type(0/*kCategoryNone*/)
+        category_type(0/*kCategoryNone*/), previouslyshown(false)
     {
         flags |= (_captioned) ? kCaptioned : 0;
         flags |= (_stereo)    ? kStereo    : 0;
@@ -142,6 +143,7 @@ class DBEvent
     unsigned char category_type;
     QString       seriesId;
     QString       programId;
+    bool          previouslyshown;
 
     static const unsigned char kCaptioned = 0x1;
     static const unsigned char kSubtitled = 0x2;
