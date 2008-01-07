@@ -172,6 +172,7 @@ inline int statfs(const char* path, struct statfs* buffer)
 #define SIGQUIT 1
 #define SIGPIPE 3   // not implemented in MINGW, will produce "unable to ignore sigpipe"
 #define SIGALRM 13
+#define SIGUSR1 16  // used to force UPnP mediamap rebuild in the backend
 
 #define S_IRGRP 0
 #define S_IROTH 0
