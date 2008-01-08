@@ -140,6 +140,9 @@ MediaStatus MythCDROMLinux::checkMedia()
                 if (m_MediaType == MEDIATYPE_AUDIO ||
                     m_MediaType == MEDIATYPE_UNKNOWN)
                     break;
+                // If we have tried to mount and failed, don't keep trying:
+                if (m_Status == MEDIASTAT_ERROR)
+                    return m_Status;
                 // If the disc is ok and we already know it's mediatype
                 // returns MOUNTED.
                 if (isMounted(true))
@@ -206,7 +209,10 @@ MediaStatus MythCDROMLinux::checkMedia()
                         if (isMounted(true))
                             onDeviceMounted();
                         else
-                            mount();  // onDeviceMounted() called as side-effect
+                            if (mount())
+                                ;    // onDeviceMounted() called as side-effect
+                            else
+                                return setStatus(MEDIASTAT_ERROR, OpenedHere);
 
                         if (isMounted(true))
                         {
