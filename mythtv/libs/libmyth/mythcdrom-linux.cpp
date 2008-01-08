@@ -1,11 +1,14 @@
 #include "mythcdrom.h"
 #include "mythcdrom-linux.h"
-#include <sys/ioctl.h>                // ioctls
-#include <linux/cdrom.h>        // old ioctls for cdrom
+#include <sys/ioctl.h>       // ioctls
+#include <linux/cdrom.h>     // old ioctls for cdrom
 #include <scsi/sg.h>
 #include <fcntl.h>
 #include <errno.h>
+
+#include "mythconfig.h"      // for WORDS_BIGENDIAN
 #include "mythcontext.h"
+
 #include <linux/iso_fs.h>
 #include <unistd.h>
 
@@ -13,6 +16,43 @@
 #define LOC_ERR QString("mythcdrom-linux, Error: ")
 
 #define ASSUME_WANT_AUDIO 1
+
+
+// Some structures which contain the result of a low-level SCSI CDROM query
+struct event_header
+{
+    unsigned char data_len[2];
+#ifdef WORDS_BIGENDIAN
+    unsigned char nea                : 1;
+    unsigned char reserved1          : 4;
+    unsigned char notification_class : 3;
+#else
+    unsigned char notification_class : 3;
+    unsigned char reserved1          : 4;
+    unsigned char nea                : 1;
+#endif
+    unsigned char supp_event_class;
+};
+
+struct media_event_desc
+{
+#ifdef WORDS_BIGENDIAN
+    unsigned char reserved1          : 4;
+    unsigned char media_event_code   : 4;
+    unsigned char reserved2          : 6;
+    unsigned char media_present      : 1;
+    unsigned char door_open          : 1;
+#else
+    unsigned char media_event_code   : 4;
+    unsigned char reserved1          : 4;
+    unsigned char door_open          : 1;
+    unsigned char media_present      : 1;
+    unsigned char reserved2          : 6;
+#endif
+    unsigned char start_slot;
+    unsigned char end_slot;
+};
+
 
 class MythCDROMLinux: public MythCDROM
 {
@@ -31,6 +71,10 @@ public:
     virtual bool isSameDevice(const QString &path);
     virtual MediaError lock(void);
     virtual MediaError unlock(void);
+
+private:
+    int driveStatus(void);
+    int SCSIstatus(void);
 };
 
 MythCDROM *GetMythCDROMLinux(QObject* par, const char* devicePath,
@@ -38,6 +82,82 @@ MythCDROM *GetMythCDROMLinux(QObject* par, const char* devicePath,
 {
     return new MythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 }
+
+
+/** \brief Exhaustively determine the status.
+ *
+ * If the CDROM is managed by the SCSI driver, then CDROM_DRIVE_STATUS
+ * as reported by ioctl will always return CDS_TRAY_OPEN if the tray is
+ * closed with no media.  To determine the actual drive status we need
+ * to ask the drive directly by sending a SCSI packet to the drive.
+ */
+
+int MythCDROMLinux::driveStatus()
+{
+    int drive_status = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
+
+    if (drive_status == CDS_TRAY_OPEN && getDevicePath().contains("/dev/scd"))
+        return SCSIstatus();
+
+    return drive_status;
+}
+
+
+/** \brief Use a SCSI query packet to see if the drive is _really_ open.
+ *
+ * Note that in recent kernels, whether you have an IDE/ATA/SATA or SCSI CDROM,
+ * the drive is managed by the SCSI driver and therefore needs this workaround.
+ * This code is based on the routine cdrom_get_media_event
+ * in cdrom.c of the linux kernel
+ */
+
+int MythCDROMLinux::SCSIstatus()
+{
+    unsigned char                buffer[8];
+    struct cdrom_generic_command cgc;
+    struct event_header         *eh;
+    struct media_event_desc     *med;
+
+
+    memset(buffer, 0, sizeof(buffer));
+    memset(&cgc,   0, sizeof(cgc));
+
+    cgc.cmd[0] = GPCMD_GET_EVENT_STATUS_NOTIFICATION;
+    cgc.cmd[1] = 1;
+    cgc.cmd[4] = 1 << 4;
+    cgc.cmd[8] = sizeof(buffer);
+    cgc.quiet  = 1;
+    cgc.buffer = buffer;
+    cgc.buflen = sizeof(buffer);
+    cgc.data_direction = CGC_DATA_READ;
+
+    eh  = (struct event_header     *)  buffer;
+    med = (struct media_event_desc *) (buffer + sizeof(struct event_header));
+
+    if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
+        || eh->nea || (eh->notification_class != 0x4))
+    {
+        VERBOSE(VB_MEDIA,
+                LOC + ":SCSIstatus() - failed to send SCSI packet to "
+                    + m_DevicePath);
+        return CDS_TRAY_OPEN;
+    }
+
+    if (med->media_present)
+    {
+//        VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - disc ok");
+        return CDS_DISC_OK;
+    }
+    else if (med->door_open)
+    {
+        VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - tray is definitely open");
+        return CDS_TRAY_OPEN;
+    }
+
+//    VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - no disc");
+    return CDS_NO_DISC;
+}
+
 
 MediaError MythCDROMLinux::eject(bool open_close)
 {
@@ -54,12 +174,13 @@ MediaError MythCDROMLinux::eject(bool open_close)
 
         // This allows us to catch any drives that the OS has problems
         // detecting the status of (some always report OPEN when empty)
-        if (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS) == CDS_TRAY_OPEN)
+        if (driveStatus() == CDS_TRAY_OPEN)
             return MEDIAERR_FAILED;
         else
             return MEDIAERR_OK;
     }
 }
+
 
 bool MythCDROMLinux::mediaChanged()
 {
@@ -94,7 +215,7 @@ MediaError MythCDROMLinux::testMedia()
     }
 
     // Since the device was is/was open we can get it's status...
-    int Stat = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
+    int Stat = driveStatus();
 
     // Be nice and close the device if we opened it,
     // otherwise it might be locked when the user doesn't want it to be.
@@ -129,7 +250,7 @@ MediaStatus MythCDROMLinux::checkMedia()
     if (isDeviceOpen())
     {
         //VERBOSE(VB_MEDIA, LOC + ":checkMedia - Device is open...");
-        switch (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT))
+        switch (driveStatus())
         {
             case CDS_DISC_OK:
                 VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
@@ -148,7 +269,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                 if (isMounted(true))
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
             case CDS_TRAY_OPEN:
-                VERBOSE(VB_MEDIA, getDevicePath() + " Tray open");
+                VERBOSE(VB_MEDIA, getDevicePath() + " Tray open or no disc");
                 setStatus(MEDIASTAT_OPEN, OpenedHere);
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return MEDIASTAT_OPEN;
