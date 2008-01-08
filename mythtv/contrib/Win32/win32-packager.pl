@@ -26,6 +26,8 @@ my $NOISY = 1; # set to 0 for less output to the screen
 
 $| = 1; # autoflush stdout;
 
+my $SVNRELEASE = '15367' ;# this scipt was last tested to work with this version, on other versions YMMV.
+
 # We allow SourceForge to tell us which server to download from,
 # rather than assuming specific server/s
 my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
@@ -439,7 +441,7 @@ rem rename '.$dosmsys.'bin\sh_.exe sh.exe
 # mythtv,mythplugins,myththemes
 foreach my $comp( @components ) {
 push @{$expect}, 
-[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['set PATH='.$dosmsys.'bin;%PATH% && cd '.$dosmythtv.' && IF NOT EXIST '.$dosmythtv.'mythtv/mythtv.pro svn checkout http://svn.mythtv.org/svn/trunk/'."$comp $comp","nocheck"],comment => 'Get all the mythtv sources from SVN!:'.$comp ];
+[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['set PATH='.$dosmsys.'bin;%PATH% && cd '.$dosmythtv.' && IF NOT EXIST '.$dosmythtv.'mythtv/mythtv.pro svn checkout  http://svn.mythtv.org/svn/trunk/'."$comp $comp","nocheck"],comment => 'Get all the mythtv sources from SVN!:'.$comp ];
 }
 push @{$expect}, 
 # now lets write some build scripts to help with mythtv itself
@@ -504,8 +506,8 @@ cd '.$unixmythtv.'mythplugins
 
 #----------------------------------------
 # now we build mythtv! 
-
 ;
+
 # SVN update every time, before patches, unless we are using a proxy
 foreach my $comp( @components ) {
 push @{$expect}, 
@@ -523,30 +525,37 @@ push @{$expect},
 #[ file => $mythtv.'mythtv/videoout_embedding.patch', exec => "copy /Y $sources/videoout_embedding.patch $mythtv/mythtv/" ],
 #[ file => $mythtv.'mythtv/videoout_embedding.patch_', shell => ["cd /c/mythtv/mythtv/","patch -p0 < videoout_embedding.patch","touch videoout_embedding.patch_"] ],
 
-# unknown status: 
+# in SVN at 7th Jan 2008
+#[ archive => $sources.'setup.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4391/setup.patch'],
+#[ file => $mythtv.'mythtv/setup.patch', exec => "copy /Y ".$dossources."setup.patch ".$dosmythtv."mythtv",comment => '4391: - configgroups patch' ],
+#[ grep => ['children\[i\] \&\& children\[i\]->isVisible\(\)',$mythtv.'mythtv/libs/libmyth/mythconfiggroups.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < setup.patch"] ],
 
 ##
-[ archive => $sources.'setup.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4391/setup.patch'],
-[ file => $mythtv.'mythtv/setup.patch', exec => "copy /Y ".$dossources."setup.patch ".$dosmythtv."mythtv",comment => '4391: - configgroups patch' ],
-# apply it
-[ grep => ['children\[i\] \&\& children\[i\]->isVisible\(\)',$mythtv.'mythtv/libs/libmyth/mythconfiggroups.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < setup.patch"] ],
 
-##
+# in SVN at 7th Jan 2008
+#[ archive => $sources.'mythwelcome.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4409/mythwelcome.patch'],
+#[ file => $mythtv.'mythtv/mythwelcome.patch', exec => "copy /Y ".$dossources."mythwelcome.patch ".$dosmythtv."mythtv",comment => '4409 mythwelcome patch: (MinGW SIGHUP undefined)' ],
+#[ grep => ['\#include \"libmyth\/compat\.h\"',$mythtv.'mythtv/programs/mythwelcome/main.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < mythwelcome.patch"] ],
+
+# no longer required as at [15335] - 7th jan 2008
+#[ archive => $sources.'themereload_win32.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4411/themereload_win32.patch'],
+#[ file => $mythtv.'mythtv/themereload_win32.patch', exec => "copy /Y ".$dossources."themereload_win32.patch ".$dosmythtv."mythtv",comment => '4411 changeset 15290 is incompatible with Win32' ],
+#[ grep => ['\#ifndef _WIN32',$mythtv.'mythtv/programs/mythfrontend/main.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < themereload_win32.patch"] ],
+
+# in SVN at 7th Jan 2008
+#[ archive => $sources.'dlerr.win.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4422/dlerr.win.patch'],
+#[ file => $mythtv.'mythtv/dlerr.win.patch', exec => "copy /Y ".$dossources."dlerr.win.patch ".$dosmythtv."mythtv",comment => '4422 fixes error: "call of overloaded QString(DWORD) is ambiguous" ' ],
+#[ grep => ['inline const char \*dlerror(void)',$mythtv.'mythtv/libs/libmyth/compat.h'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < dlerr.win.patch"] ],
+
+
 [ archive => $sources.'backend.patch.gz' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4392/backend.patch.gz'],
 [ file => $mythtv.'mythtv/backend.patch.gz', exec => "copy /Y ".$dossources."backend.patch.gz ".$dosmythtv."mythtv",comment => '4392: - backend connections being accepted patch ' ],
 [ grep => ['unsigned\* Indexes = new unsigned\[n\]\;',$mythtv.'mythtv/libs/libmyth/mythsocket.cpp'], shell => ["cd ".$unixmythtv."mythtv/","gunzip -f backend.patch.gz","patch -p0 < backend.patch"] ],
 
-#tested working:
 
-#
-[ archive => $sources.'mythwelcome.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4409/mythwelcome.patch'],
-[ file => $mythtv.'mythtv/mythwelcome.patch', exec => "copy /Y ".$dossources."mythwelcome.patch ".$dosmythtv."mythtv",comment => '4409 mythwelcome patch: (MinGW SIGHUP undefined)' ],
-[ grep => ['\#include \"libmyth\/compat\.h\"',$mythtv.'mythtv/programs/mythwelcome/main.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < mythwelcome.patch"] ],
-
-#
-[ archive => $sources.'themereload_win32.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4411/themereload_win32.patch'],
-[ file => $mythtv.'mythtv/themereload_win32.patch', exec => "copy /Y ".$dossources."themereload_win32.patch ".$dosmythtv."mythtv",comment => '4411 changeset 15290 is incompatible with Win32' ],
-[ grep => ['\#ifndef _WIN32',$mythtv.'mythtv/programs/mythfrontend/main.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < themereload_win32.patch"] ],
+[ archive => $sources.'importicons_windows_2.diff' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/3334/importicons_windows_2.diff'],
+[ file => $mythtv.'mythtv/importicons_windows_2.diff', exec => "copy /Y ".$dossources."importicons_windows_2.diff ".$dosmythtv."mythtv",comment => '3334 fixes error with mkdir() unknown. ' ],
+[ grep => ['\#include <qdir\.h>',$mythtv.'mythtv/libs/libmythtv/importicons.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < importicons_windows_2.diff"] ],
 
 # next the build process: 
 # 
@@ -558,7 +567,10 @@ push @{$expect},
 
 
 sub _end {
-    print << "END";
+	
+	comment("This verson of the Win32 Build script last was last tested on: $SVNRELEASE");
+
+print << "END";    
 #
 # SCRIPT TODO/NOTES:  - further notes on this scripts direction....
 # ok, how about the test-run process?  
@@ -588,13 +600,7 @@ foreach my $dep ( @{$expect} ) {
     my $comment = $dep[5] || '';
 
     if ( $comment && $NOISY ) {
-        print "\nCOMMENTS:";
-        print "-"x30;
-        print "\n";
-        print "COMMENTS:$comment\nCOMMENTS:";
-        print "-"x30;
-        print "\n";
-        print "\n";
+        comment($comment);
     }
 
     my @cause;
@@ -909,3 +915,14 @@ sub _grep {
     return $found;
 }
 #------------------------------------------------------------------------------
+
+sub comment {
+	      my $comment = shift;
+				print "\nCOMMENTS:";
+        print "-"x30;
+        print "\n";
+        print "COMMENTS:$comment\nCOMMENTS:";
+        print "-"x30;
+        print "\n";
+        print "\n";
+}
