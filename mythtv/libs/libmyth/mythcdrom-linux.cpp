@@ -9,7 +9,7 @@
 #include <linux/iso_fs.h>
 #include <unistd.h>
 
-#define LOC QString("mythcdrom-linux: ")
+#define LOC     QString("MythCDROMLinux:")
 #define LOC_ERR QString("mythcdrom-linux, Error: ")
 
 #define ASSUME_WANT_AUDIO 1
@@ -82,29 +82,29 @@ MediaError MythCDROMLinux::testMedia()
         //cout << "Device is not open - ";
         if (!openDevice()) 
         {
-            //VERBOSE(VB_MEDIA, "MythCDROMLinux::testMedia - failed to open "
+            //VERBOSE(VB_MEDIA, LOC + ":testMedia - failed to open "
             //                  + getDevicePath() + ENO);
             if (errno == EBUSY)
                 return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
             else 
                 return MEDIAERR_FAILED; 
         }
-        //VERBOSE(VB_MEDIA, "MythCDROMLinux::testMedia - Opened device");
+        //VERBOSE(VB_MEDIA, LOC + ":testMedia - Opened device");
         OpenedHere = true;
     }
 
     // Since the device was is/was open we can get it's status...
     int Stat = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
-    
-    // Be nice and close the device if we opened it, otherwise it might be locked when the user doesn't want it to be.
+
+    // Be nice and close the device if we opened it,
+    // otherwise it might be locked when the user doesn't want it to be.
     if (OpenedHere)
         closeDevice();
 
     if (Stat == -1)
     {
-        VERBOSE(VB_MEDIA,
-                "MythCDROMLinux::testMedia - Failed to get drive status of "
-                + getDevicePath() + ENO);
+        VERBOSE(VB_MEDIA, LOC + ":testMedia - Failed to get drive status of "
+                          + getDevicePath() + ENO);
         return MEDIAERR_FAILED;    
     }
 
@@ -121,13 +121,14 @@ MediaStatus MythCDROMLinux::checkMedia()
         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
 
-    // If it's not already open we need to at least TRY to open it for most of these checks to work.
+    // If it's not already open we need to at least
+    // TRY to open it for most of these checks to work.
     if (!isDeviceOpen())
         OpenedHere = openDevice();
 
     if (isDeviceOpen()) 
     {
-        //VERBOSE(VB_MEDIA, "MythCDROMLinux::checkMedia - Device is open...");
+        //VERBOSE(VB_MEDIA, LOC + ":checkMedia - Device is open...");
         int ret = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
         switch (ret) 
         {
@@ -239,8 +240,9 @@ MediaStatus MythCDROMLinux::checkMedia()
                     case CDS_MIXED:
                         m_MediaType = MEDIATYPE_MIXED;
                         VERBOSE(VB_MEDIA, "found a mixed CD");
-                        // Note: Mixed mode CDs require an explixit mount call since we'll usually want the audio portion.
-                        //         undefine ASSUME_WANT_AUDIO to change this behavior.
+                        // Note: Mixed mode CDs require an explixit mount call
+                        //       since we'll usually want the audio portion.
+                        // undefine ASSUME_WANT_AUDIO to change this behavior.
                         #ifdef ASSUME_WANT_AUDIO
                             return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                         #else
@@ -317,7 +319,7 @@ MediaError MythCDROMLinux::unlock()
 {
     if (isDeviceOpen() || openDevice()) 
     { 
-        //VERBOSE(VB_MEDIA, "MythCDROMLinux::unlock - Unlocking CDROM door");
+        //VERBOSE(VB_MEDIA, LOC + ":unlock - Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
     }
     else
@@ -336,7 +338,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 
     if (stat(path, &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "MythCDROMLinux::SameDevice() -- " +
+        VERBOSE(VB_IMPORTANT, LOC + ":SameDevice() -- " +
                 QString("Failed to stat '%1'")
                 .arg(path) + ENO);
         return false;
@@ -346,7 +348,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     // Check against m_DevicePath...
     if (stat(m_DevicePath, &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "MythCDROMLinux::SameDevice() -- " +
+        VERBOSE(VB_IMPORTANT, LOC + ":SameDevice() -- " +
                 QString("Failed to stat '%1'")
                 .arg(m_DevicePath) + ENO);
         return false;
@@ -407,7 +409,7 @@ void MythCDROMLinux::setSpeed(int speed)
         {
             rate = 0;
             buffer[0] = 4;
-            VERBOSE(VB_MEDIA, LOC + "Restored CD/DVD Speed");
+            VERBOSE(VB_MEDIA, LOC + ":setSpeed() - Restored CD/DVD Speed");
             break;
         }
         default:
@@ -417,7 +419,8 @@ void MythCDROMLinux::setSpeed(int speed)
 
             rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
 
-            VERBOSE(VB_MEDIA, LOC + QString("Limit CD/DVD Speed to %1KB/s")
+            VERBOSE(VB_MEDIA,
+                    (LOC + ":setSpeed() - Limiting CD/DVD Speed to %1KB/s"))
                     .arg(rate));
             break;
         }
@@ -458,7 +461,7 @@ void MythCDROMLinux::setSpeed(int speed)
             VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
     }
     else 
-        VERBOSE(VB_MEDIA, LOC + "CD/DVD Speed Set Successful");
+        VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set Successful");
     
     close(fd);
 }
