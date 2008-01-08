@@ -213,6 +213,8 @@ void UPnpMedia::BuildMediaMap(void)
             query.bindValue(":ITEMCLASS", sMediaType);
        	    query.exec();
 
+	    query.exec("LOCK TABLES upnpmedia WRITE");
+
             VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan starting in :%1:")
     			            .arg(sMediaType)
     			            .arg(RootVidDir));
@@ -221,6 +223,8 @@ void UPnpMedia::BuildMediaMap(void)
             filecount -= STARTING_VIDEO_OBJECTID;
 
             VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found %1 objects").arg(filecount));
+
+	    query.exec("UNLOCK TABLES");
 
         }
         else
