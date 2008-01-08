@@ -133,11 +133,12 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "SELECT title,          subtitle,      description, "
         "       category,       category_type, "
         "       starttime,      endtime, "
-        "       closecaptioned,     stereo,      hdtv, "
+        "       closecaptioned, stereo,        hdtv, "
+        "       seriesid,       programid, "
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
-        "       seriesid,       programid, previouslyshown "
+        "       previouslyshown "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -171,16 +172,16 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
                      query.value(7).toUInt(),
                      query.value(8).toUInt(),
                      query.value(9).toUInt(),
-                     QString::fromUtf8(query.value(15).toString()),
-                     QString::fromUtf8(query.value(16).toString())
+                     QString::fromUtf8(query.value(10).toString()),
+                     QString::fromUtf8(query.value(11).toString())
                      );
 
-        prog.partnumber = query.value(10).toUInt();
-        prog.parttotal  = query.value(11).toUInt();
+        prog.partnumber = query.value(12).toUInt();
+        prog.parttotal  = query.value(13).toUInt();
         prog.syndicatedepisodenumber = 
-                          QString::fromUtf8(query.value(12).toString());
-        prog.airdate    = query.value(13).toString();
-        prog.originalairdate = query.value(14).toDate();
+                          QString::fromUtf8(query.value(14).toString());
+        prog.airdate    = query.value(15).toString();
+        prog.originalairdate = query.value(16).toDate();
 
         prog.previouslyshown = query.value(17).toBool();
 
