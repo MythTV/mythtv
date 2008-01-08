@@ -252,8 +252,9 @@ event_map_t * EITCache::LoadChannel(uint chanid)
         (*eventMap)[eventid] = construct_sig(tableid, version, endtime, false);
     }
 
-    VERBOSE(VB_EIT, LOC + QString("Loaded %1 entries for channel %2")
-            .arg(eventMap->size()).arg(chanid));
+    if (eventMap->size())
+        VERBOSE(VB_EIT, LOC + QString("Loaded %1 entries for channel %2")
+                .arg(eventMap->size()).arg(chanid));
 
     entryCnt += eventMap->size();
     return eventMap;
@@ -285,9 +286,10 @@ void EITCache::WriteChannelToDB(uint chanid)
     }
     unlock_channel(chanid, updated);
 
-    VERBOSE(VB_EIT, LOC + QString("Wrote %1 modified entries of %2 "
-                                  "for channel %3 to database.")
-            .arg(updated).arg(size).arg(chanid));
+    if (updated)
+        VERBOSE(VB_EIT, LOC + QString("Wrote %1 modified entries of %2 "
+                                      "for channel %3 to database.")
+                .arg(updated).arg(size).arg(chanid));
 }
 
 void EITCache::WriteToDB(void)
