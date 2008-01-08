@@ -367,6 +367,14 @@ bool MythMediaDevice::isMounted(bool Verify)
 
         if (deviceNames.contains(m_DevicePath))
         {
+            // Deal with any escaped characters. At the moment, suspect
+            // whitespace is the only thing that would be escaped.
+            //
+            // TODO: Check linux kernel source for /proc/mounts escaping
+            //
+            if (mountPoint.contains("\\040"))
+                mountPoint.replace("\\040", " ");
+
             m_MountPath = mountPoint;
             mountFile.close();
             return true;
