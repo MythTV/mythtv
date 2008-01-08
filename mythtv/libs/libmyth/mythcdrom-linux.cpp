@@ -420,7 +420,7 @@ void MythCDROMLinux::setSpeed(int speed)
             rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
 
             VERBOSE(VB_MEDIA,
-                    (LOC + ":setSpeed() - Limiting CD/DVD Speed to %1KB/s"))
+                    (LOC + ":setSpeed() - Limiting CD/DVD Speed to %1KB/s")
                     .arg(rate));
             break;
         }
