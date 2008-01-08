@@ -317,9 +317,9 @@ bool MythMediaDevice::isMounted(bool Verify)
     if (!Verify)
         return (m_Status == MEDIASTAT_MOUNTED);
 
-    if (m_MountPath.isEmpty())
+    if (m_DevicePath.isEmpty())
     {
-        VERBOSE(VB_MEDIA, LOC + ":isMounted() - logic error, no mountpath");
+        VERBOSE(VB_MEDIA, LOC + ":isMounted() - logic error, no device path");
         return false;
     }
 
@@ -377,7 +377,8 @@ bool MythMediaDevice::isMounted(bool Verify)
 
     if (print_verbose_messages & VB_MEDIA)
     {
-        debug = LOC + ":isMounted() - mount '" + m_MountPath + "' not found.\n"
+        debug = LOC + ":isMounted() - mount of '"
+                + m_DevicePath + "' not found.\n"
                 + "                 Device name/type | Current mountpoint\n"
                 + "                 -----------------+-------------------\n"
                 + debug
