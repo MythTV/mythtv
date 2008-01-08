@@ -62,13 +62,13 @@ MediaError MythCDROMLinux::eject(bool open_close)
 }
 
 bool MythCDROMLinux::mediaChanged()
-{  
+{
     return (ioctl(m_DeviceHandle, CDROM_MEDIA_CHANGED, CDSL_CURRENT) > 0);
 }
 
 bool MythCDROMLinux::checkOK()
 {
-    return (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT) == 
+    return (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT) ==
                   CDS_DISC_OK);
 }
 
@@ -77,17 +77,17 @@ MediaError MythCDROMLinux::testMedia()
 {
     //cout << "MythCDROMLinux::testMedia - ";
     bool OpenedHere = false;
-    if (!isDeviceOpen()) 
+    if (!isDeviceOpen())
     {
         //cout << "Device is not open - ";
-        if (!openDevice()) 
+        if (!openDevice())
         {
             //VERBOSE(VB_MEDIA, LOC + ":testMedia - failed to open "
             //                  + getDevicePath() + ENO);
             if (errno == EBUSY)
                 return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
-            else 
-                return MEDIAERR_FAILED; 
+            else
+                return MEDIAERR_FAILED;
         }
         //VERBOSE(VB_MEDIA, LOC + ":testMedia - Opened device");
         OpenedHere = true;
@@ -105,7 +105,7 @@ MediaError MythCDROMLinux::testMedia()
     {
         VERBOSE(VB_MEDIA, LOC + ":testMedia - Failed to get drive status of "
                           + getDevicePath() + ENO);
-        return MEDIAERR_FAILED;    
+        return MEDIAERR_FAILED;
     }
 
     return MEDIAERR_OK;
@@ -113,9 +113,9 @@ MediaError MythCDROMLinux::testMedia()
 
 MediaStatus MythCDROMLinux::checkMedia()
 {
-    bool OpenedHere = false;    
-   
-    if (testMedia() != MEDIAERR_OK) 
+    bool OpenedHere = false;
+
+    if (testMedia() != MEDIAERR_OK)
     {
         m_MediaType = MEDIATYPE_UNKNOWN;
         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
@@ -126,11 +126,10 @@ MediaStatus MythCDROMLinux::checkMedia()
     if (!isDeviceOpen())
         OpenedHere = openDevice();
 
-    if (isDeviceOpen()) 
+    if (isDeviceOpen())
     {
         //VERBOSE(VB_MEDIA, LOC + ":checkMedia - Device is open...");
-        int ret = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
-        switch (ret) 
+        switch (ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT))
         {
             case CDS_DISC_OK:
                 VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
@@ -172,24 +171,24 @@ MediaStatus MythCDROMLinux::checkMedia()
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         }
 
-        if (mediaChanged()) 
+        if (mediaChanged())
         {
             VERBOSE(VB_MEDIA, getDevicePath() + " Media changed");
             // Regardless of the actual status lie here and say
             // it's open for now, so we can cover the case of a missed open.
             return setStatus(MEDIASTAT_OPEN, OpenedHere);
-        } 
-        else 
+        }
+        else
         {
             //VERBOSE(VB_MEDIA, getDevicePath() + " Media unchanged...");
-            if ((m_Status == MEDIASTAT_OPEN) || 
-                (m_Status == MEDIASTAT_UNKNOWN)) 
+            if ((m_Status == MEDIASTAT_OPEN) ||
+                (m_Status == MEDIASTAT_UNKNOWN))
             {
                 VERBOSE(VB_MEDIA, getDevicePath() + " Current status " +
                         MythMediaDevice::MediaStatusStrings[m_Status]);
                 int type = ioctl(m_DeviceHandle,
                                  CDROM_DISC_STATUS, CDSL_CURRENT);
-                switch (type) 
+                switch (type)
                 {
                     case CDS_DATA_1:
                     case CDS_DATA_2:
@@ -273,10 +272,10 @@ MediaStatus MythCDROMLinux::checkMedia()
                                           + QString().setNum(type));
                         m_MediaType = MEDIATYPE_UNKNOWN;
                         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
-                }            
+                }
             }
-            else if (m_Status == MEDIASTAT_MOUNTED || 
-                     m_Status == MEDIASTAT_NOTMOUNTED) 
+            else if (m_Status == MEDIASTAT_MOUNTED ||
+                     m_Status == MEDIASTAT_NOTMOUNTED)
             {
                 VERBOSE(VB_MEDIA, QString("Current status == ") +
                         MythMediaDevice::MediaStatusStrings[m_Status]);
@@ -291,7 +290,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                 ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
         }// mediaChanged()
     } // isDeviceOpen();
-    else 
+    else
     {
         VERBOSE(VB_MEDIA, "Device not open - returning UNKNOWN");
         m_MediaType = MEDIATYPE_UNKNOWN;
@@ -306,7 +305,7 @@ MediaStatus MythCDROMLinux::checkMedia()
     return m_Status;
 }
 
-MediaError MythCDROMLinux::lock() 
+MediaError MythCDROMLinux::lock()
 {
     MediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
@@ -315,10 +314,10 @@ MediaError MythCDROMLinux::lock()
     return ret;
 }
 
-MediaError MythCDROMLinux::unlock() 
+MediaError MythCDROMLinux::unlock()
 {
-    if (isDeviceOpen() || openDevice()) 
-    { 
+    if (isDeviceOpen() || openDevice())
+    {
         //VERBOSE(VB_MEDIA, LOC + ":unlock - Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
     }
@@ -338,7 +337,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 
     if (stat(path, &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + ":SameDevice() -- " +
+        VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
                 QString("Failed to stat '%1'")
                 .arg(path) + ENO);
         return false;
@@ -348,7 +347,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     // Check against m_DevicePath...
     if (stat(m_DevicePath, &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + ":SameDevice() -- " +
+        VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
                 QString("Failed to stat '%1'")
                 .arg(m_DevicePath) + ENO);
         return false;
@@ -376,7 +375,7 @@ void MythCDROMLinux::setSpeed(int speed)
     memset(cmd, 0, sizeof(cmd));
     memset(&st, 0, sizeof(st));
 
-    if (stat(m_DevicePath, &st) == -1 ) 
+    if (stat(m_DevicePath, &st) == -1)
     {
         VERBOSE(VB_MEDIA, LOC_ERR +
                 QString("setSpeed() Failed. device %1 not found")
@@ -384,17 +383,15 @@ void MythCDROMLinux::setSpeed(int speed)
         return;
     }
 
-    if (!S_ISBLK(st.st_mode)) 
+    if (!S_ISBLK(st.st_mode))
     {
-        VERBOSE(VB_MEDIA, LOC_ERR + 
-                "MythCDROMLinux::SetSpeed() Failed. Not a block device");
+        VERBOSE(VB_MEDIA, LOC_ERR + "setSpeed() Failed. Not a block device");
         return;
     }
 
     if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
     {
-        VERBOSE(VB_MEDIA, LOC_ERR + 
-                "Changing CD/DVD speed needs write access");
+        VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
         return;
     }
 
@@ -455,14 +452,14 @@ void MythCDROMLinux::setSpeed(int speed)
 
     // On my system (2.6.18 + ide-cd),  SG_IO succeeds without doing anything,
     // while CDROM_SELECT_SPEED works...
-    if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0) 
+    if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
     {
         if (ioctl(fd, SG_IO, &sghdr) < 0)
             VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
     }
-    else 
+    else
         VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set Successful");
-    
+
     close(fd);
 }
 #endif
