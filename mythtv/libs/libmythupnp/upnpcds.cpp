@@ -316,6 +316,10 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 	else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
             request.m_sObjectId = request.m_sContainerID;
 
+	// WMP11 compatibility code
+	if (request.m_sObjectId == "13")
+	    request.m_sObjectId = "Videos/0";
+
         UPnpCDSExtension *pExtension = m_extensions.first();
 
         while (( pExtension != NULL ) && (pResult == NULL))
@@ -408,6 +412,12 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
         request.m_sObjectId = request.m_sContainerID;
 
+    // WMP11 compatibility code
+    if (request.m_sObjectId == "0")
+    {
+	request.m_sObjectId = "Videos/0";
+	request.m_sParentId = "8";
+    }
 
     VERBOSE(VB_UPNP, QString("UPnpCDS::HandleSearch ObjectID=%1, ContainerId=%2")
 		                                 .arg(request.m_sObjectId)
@@ -729,16 +739,14 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessRoot( UPnpCDSRequest          
             if ( pRequest->m_nRequestedCount == 0)
                 pRequest->m_nRequestedCount = nRootCount ;
 
-	    VERBOSE(VB_UPNP, "CDS_BrowseDirectChildren2");
             short nStart = Max( pRequest->m_nStartingIndex, short( 0 ));
             short nEnd   = Min( nRootCount, short( nStart + pRequest->m_nRequestedCount));
-VERBOSE(VB_UPNP, QString("CDS_BrowseDirectChildren2 : %1 : %2").arg(nStart).arg(nRootCount));
+
             if (nStart < nRootCount)
             {
                 for (short nIdx = nStart; nIdx < nEnd; nIdx++)
                 {
                     UPnpCDSRootInfo *pInfo = GetRootInfo( nIdx );
-VERBOSE(VB_UPNP, QString("CDS_BrowseDirectChildren3"));
                     if (pInfo != NULL)
                     {
 
@@ -971,7 +979,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
 
             case CDS_BrowseDirectChildren:
             {
-		    VERBOSE(VB_UPNP, "Process Key CDS_BrowseDirectChildren");
+		
                 CreateItems( pRequest, pResults, nNodeIdx, sKey, true );
 
                 break;
@@ -1226,7 +1234,16 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
 	        pRequest->m_sParentId = tokens.last();
             }
 
-            ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
+	    if (pRequest->m_sSearchClass == "")
+                ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
+	    else
+		pRequest->m_sParentId = "8";
+
+            if (pRequest->m_sObjectId.startsWith("Videos/0", true))
+            {
+                pRequest->m_sObjectId = "Videos/0";
+            }
+
 	    /*
             VERBOSE(VB_UPNP, QString("pRequest->m_sParentId=:%1: , "
 				     "pRequest->m_sObjectId=:%2:, sKey=:%3:")
@@ -1243,7 +1260,7 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
                           .arg( pRequest->m_nRequestedCount );
 
         query.prepare  ( sSQL );
-	//VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
+	VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
         query.bindValue(":KEY", sKey );
         query.exec();
 
