@@ -279,6 +279,7 @@ void EITCache::WriteChannelToDB(uint chanid)
         {
             replace_in_db(chanid, it.key(), *it);
             updated++;
+            *it &= ~(uint64_t)0 >> 1; // mark as synced
         }
         it++;
     }
@@ -296,12 +297,9 @@ void EITCache::WriteToDB(void)
     key_map_t::iterator it = channelMap.begin();
     while (it != channelMap.end())
     {
-        key_map_t::iterator tmp = it;
-        ++tmp;
         WriteChannelToDB(it.key());
-        it = tmp;
+        ++it;
     }
-    entryCnt = 0;
 }
 
 
