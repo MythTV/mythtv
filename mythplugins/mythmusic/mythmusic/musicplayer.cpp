@@ -501,14 +501,13 @@ void MusicPlayer::customEvent(QCustomEvent *event)
                 if (me->Message().left(14) == "PLAYBACK_START")
                 {
                     m_wasPlaying = m_isPlaying;
-                    if (m_isPlaying)
+                    QString hostname = me->Message().mid(15);
+
+                    if (hostname == gContext->GetHostName())
                     {
-                        QString hostname = me->Message().mid(15);
-                        if (hostname == gContext->GetHostName())
-                        {
+                        if (m_isPlaying)
                             savePosition();
-                            stop(true);
-                        }
+                        stop(true);
                     }
                 }
 
