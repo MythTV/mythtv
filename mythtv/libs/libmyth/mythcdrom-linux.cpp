@@ -15,7 +15,11 @@
 #define LOC     QString("MythCDROMLinux:")
 #define LOC_ERR QString("mythcdrom-linux, Error: ")
 
+// On a mixed-mode disc (audio+data), set this to 0 to mount the data portion:
 #define ASSUME_WANT_AUDIO 1
+
+// This class is verbose enough, but if you really need more output:
+//#define EXTRA_VERBOSITY   1
 
 
 // Some structures which contain the result of a low-level SCSI CDROM query
@@ -145,16 +149,24 @@ int MythCDROMLinux::SCSIstatus()
 
     if (med->media_present)
     {
-//        VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - disc ok");
+#ifdef EXTRA_VERBOSITY
+        VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - ioctl() said tray was open,"
+                                "but drive is actually closed with a disc");
+#endif
         return CDS_DISC_OK;
     }
     else if (med->door_open)
     {
+#ifdef EXTRA_VERBOSITY
         VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - tray is definitely open");
+#endif
         return CDS_TRAY_OPEN;
     }
 
-//    VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - no disc");
+#ifdef EXTRA_VERBOSITY
+    VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - ioctl() said tray was open,"
+                            " but drive is actually closed with no disc");
+#endif
     return CDS_NO_DISC;
 }
 
@@ -203,14 +215,18 @@ MediaError MythCDROMLinux::testMedia()
         //cout << "Device is not open - ";
         if (!openDevice())
         {
-            //VERBOSE(VB_MEDIA, LOC + ":testMedia - failed to open "
-            //                  + getDevicePath() + ENO);
+#ifdef EXTRA_VERBOSITY
+            VERBOSE(VB_MEDIA, LOC + ":testMedia - failed to open "
+                              + getDevicePath() + ENO);
+#endif
             if (errno == EBUSY)
                 return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
             else
                 return MEDIAERR_FAILED;
         }
-        //VERBOSE(VB_MEDIA, LOC + ":testMedia - Opened device");
+#ifdef EXTRA_VERBOSITY
+        VERBOSE(VB_MEDIA, LOC + ":testMedia - Opened device");
+#endif
         OpenedHere = true;
     }
 
@@ -249,7 +265,9 @@ MediaStatus MythCDROMLinux::checkMedia()
 
     if (isDeviceOpen())
     {
-        //VERBOSE(VB_MEDIA, LOC + ":checkMedia - Device is open...");
+#ifdef EXTRA_VERBOSITY
+        VERBOSE(VB_MEDIA, LOC + ":checkMedia - Device is open...");
+#endif
         switch (driveStatus())
         {
             case CDS_DISC_OK:
@@ -301,7 +319,9 @@ MediaStatus MythCDROMLinux::checkMedia()
         }
         else
         {
-            //VERBOSE(VB_MEDIA, getDevicePath() + " Media unchanged...");
+#ifdef EXTRA_VERBOSITY
+            VERBOSE(VB_MEDIA, getDevicePath() + " Media unchanged...");
+#endif
             if ((m_Status == MEDIASTAT_OPEN) ||
                 (m_Status == MEDIASTAT_UNKNOWN))
             {
@@ -421,8 +441,10 @@ MediaStatus MythCDROMLinux::checkMedia()
     if (OpenedHere)
         closeDevice();
 
-    //VERBOSE(VB_MEDIA, QString("Returning ")
-    //                  + MythMediaDevice::MediaStatusStrings[m_Status]);
+#ifdef EXTRA_VERBOSITY
+    VERBOSE(VB_MEDIA, QString("Returning ")
+                      + MythMediaDevice::MediaStatusStrings[m_Status]);
+#endif
     return m_Status;
 }
 
@@ -439,7 +461,9 @@ MediaError MythCDROMLinux::unlock()
 {
     if (isDeviceOpen() || openDevice())
     {
-        //VERBOSE(VB_MEDIA, LOC + ":unlock - Unlocking CDROM door");
+#ifdef EXTRA_VERBOSITY
+        VERBOSE(VB_MEDIA, LOC + ":unlock - Unlocking CDROM door");
+#endif
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
     }
     else
