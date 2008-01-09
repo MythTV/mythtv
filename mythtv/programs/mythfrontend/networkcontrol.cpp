@@ -673,6 +673,15 @@ QString NetworkControl::processQuery(QStringList tokens)
                 result = "ERROR: Timed out waiting for reply from player";
         }
     }
+    else if (is_abbrev("liveTV", tokens[1]))
+    {
+        if(tokens.size() == 3) // has a channel ID
+            return listSchedule(tokens[2]);
+        else
+            return listSchedule();
+    }
+    else if(is_abbrev("time", tokens[1]))
+        return QDateTime::currentDateTime().toString(Qt::ISODate);
     else if ((tokens.size() == 4) &&
              is_abbrev("recording", tokens[1]) &&
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
@@ -780,7 +789,10 @@ QString NetworkControl::processHelp(QStringList tokens)
             "query location        - Query current screen or location\r\n"
             "query recordings      - List currently available recordings\r\n"
             "query recording CHANID STARTTIME\r\n"
-            "                      - List info about the specified program\r\n";
+            "                      - List info about the specified program\r\n"
+            "query liveTV          - List current TV schedule\r\n"
+            "query liveTV CHANID   - Query current program for specified channel\r\n"
+            "query time            - Query current time on server\r\n";
     }
     else if (command == "exit")
     {
@@ -882,6 +894,56 @@ void NetworkControl::customEvent(QCustomEvent *e)
             clientLock.unlock();
         }
     }
+}
+
+QString NetworkControl::listSchedule(const QString& chanID) const
+{
+    QString result("");
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool appendCRLF = true;
+    QString queryStr("SELECT chanid, starttime, endtime, title, subtitle "
+                         "FROM program "
+                         "WHERE starttime < :NOW AND endtime > :NOW ");
+
+    if(chanID != "")
+    {
+        queryStr += " AND chanid = :CHANID";
+        appendCRLF = false;
+    }
+
+    queryStr += " ORDER BY starttime, endtime, chanid";
+
+    query.prepare(queryStr);
+    query.bindValue(":NOW", QDateTime::currentDateTime());
+    query.bindValue(":CHANID", chanID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString title = QString::fromUtf8(query.value(3).toString());
+            QString subtitle = QString::fromUtf8(query.value(4).toString());
+
+            if (subtitle > " ")
+                title += QString(" -\"%1\"").arg(subtitle);
+
+            result +=
+                QString("%1 %2 %3 %4")
+                        .arg(QString::number(query.value(0).toInt())
+                             .rightJustify(5, ' '))
+                        .arg(query.value(1).toDateTime().toString(Qt::ISODate))
+                        .arg(query.value(2).toDateTime().toString(Qt::ISODate))
+                        .arg(title.local8Bit());
+
+            if (appendCRLF)
+                result += "\r\n";
+        }
+    }
+    else
+    {
+       result = "ERROR: Unable to retrieve current schedule list.";
+    }
+    return result;
 }
 
 QString NetworkControl::listRecordings(QString chanid, QString starttime)
