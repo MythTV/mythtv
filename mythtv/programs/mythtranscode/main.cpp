@@ -4,6 +4,7 @@
 #include <qmap.h>
 #include <qfileinfo.h>
 #include <qregexp.h>
+#include <qdir.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -719,11 +720,11 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             pginfo->SetRecordBasename(newbase);
         }
 
-        if (rename(filename, oldfile) == -1)
+        if (rename(filename.local8Bit(), oldfile.local8Bit()) == -1)
             perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
                    .arg(filename).arg(oldfile).ascii());
 
-        if (rename(tmpfile, newfile) == -1)
+        if (rename(tmpfile.local8Bit(), newfile.local8Bit()) == -1)
             perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
                    .arg(tmpfile).arg(newfile).ascii());
 
@@ -754,12 +755,57 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                                               .arg(strerror(errno)));
         }
 
-        oldfile = filename + ".png";
-        newfile += ".png";
+        // Delete previews if cutlist was applied.  They will be re-created as
+        // required.  This prevents the user from being stuck with a preview
+        // from a cut area and ensures that the "dimensioned" previews
+        // correspond to the new timeline
+        if (useCutlist)
+        {
+            QFileInfo fInfo(filename);
+            QString nameFilter = fInfo.fileName() + "*.png";
+            // QDir's nameFilter uses spaces or semicolons to separate globs,
+            // so replace them with the "match any character" wildcard
+            // since mythrename.pl may have included them in filenames
+            nameFilter.replace(QRegExp("( |;)"), "?");
+            QDir dir (fInfo.dirPath(), nameFilter);
 
-        QFile checkFile(oldfile);
-        if ((oldfile != newfile) && (checkFile.exists()))
-            rename(oldfile, newfile);
+            for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
+            {
+                oldfile = QString("%1/%2").arg(fInfo.dirPath() )
+                                          .arg(dir[nIdx]);
+                // If unlink fails, keeping the old preview is not a problem.
+                // The RENAME_TO_NUV check below will attempt to rename the
+                // file, if required.
+                unlink(oldfile.local8Bit());
+            }
+        }
+
+        /* Rename all preview thumbnails. */
+        if (jobArgs == "RENAME_TO_NUV")
+        {
+            QFileInfo fInfo(filename);
+            QString nameFilter = fInfo.fileName() + "*.png";
+            // QDir's nameFilter uses spaces or semicolons to separate globs,
+            // so replace them with the "match any character" wildcard
+            // since mythrename.pl may have included them in filenames
+            nameFilter.replace(QRegExp("( |;)"), "?");
+
+            QDir dir (fInfo.dirPath(), nameFilter);
+
+            for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
+            {
+                oldfile = QString("%1/%2").arg(fInfo.dirPath() )
+                                          .arg(dir[nIdx]);
+                newfile = oldfile;
+                QRegExp re("mpg(\\..*)?\\.png$");
+                if (re.search(newfile))
+                    newfile.replace(re, QString("nuv%1.png").arg(re.cap(1)));
+
+                QFile checkFile(oldfile);
+                if ((oldfile != newfile) && (checkFile.exists()))
+                    rename(oldfile.local8Bit(), newfile.local8Bit());
+            }
+        }
 
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -818,10 +864,10 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         // Not a successful run, so remove the files we created
         filename += ".tmp";
         VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename));
-        unlink(filename);
+        unlink(filename.local8Bit());
 
         filename += ".map";
-        unlink(filename);
+        unlink(filename.local8Bit());
 
         if (status == JOB_ABORTING)                     // Stop command was sent
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTED, "Job Aborted");
