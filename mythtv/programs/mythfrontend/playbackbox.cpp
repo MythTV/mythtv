@@ -334,7 +334,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         groupDisplayName = recGroup;
         if ((recGroup == "All Programs") ||
             (recGroup == "Default") ||
-            (recGroup == "LiveTV"))
+            (recGroup == "LiveTV") ||
+            (recGroup == "Deleted"))
         {
             groupDisplayName = tr(recGroup);
         }
@@ -4955,16 +4956,19 @@ void PlaybackBox::showRecGroupChooser(void)
             dispGroup = QString::fromUtf8(query.value(0).toString());
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
+
+            if ((dispGroup != "LiveTV" || liveTVInAll) &&
+                (dispGroup != "Deleted"))
+                totalItems += items;
+
             dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
+            dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
             dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
 
             groups += QString("%1 [%2 %3]").arg(dispGroup)
                               .arg(items).arg(itemStr);
 
             recGroupType[query.value(0).toString()] = "recgroup";
-
-            if (dispGroup != "LiveTV" || liveTVInAll)
-                totalItems += items;
         }
     }
 
@@ -5043,6 +5047,8 @@ void PlaybackBox::showRecGroupChooser(void)
         dispGroup = tr("Default");
     else if (recGroup == "LiveTV")
         dispGroup = tr("LiveTV");
+    else if (recGroup == "Deleted")
+        dispGroup = tr("Deleted");
     else
         dispGroup = recGroup;
 
@@ -5109,6 +5115,8 @@ void PlaybackBox::setGroupFilter(void)
         recGroup = "All Programs";
     else if (recGroup == tr("LiveTV"))
         recGroup = "LiveTV";
+    else if (recGroup == tr("Deleted"))
+        recGroup = "Deleted";
 
     recGroupPassword = getRecGroupPassword(recGroup);
 
@@ -5216,6 +5224,8 @@ void PlaybackBox::showRecGroupChanger(void)
                 dispGroup = tr("Default");
             else if (dispGroup == "LiveTV")
                 dispGroup = tr("LiveTV");
+            else if (dispGroup == "Deleted")
+                dispGroup = tr("Deleted");
 
             groups += QString("%1 [%2 %3]").arg(dispGroup)
                               .arg(query.value(1).toInt()).arg(itemStr);
@@ -5246,6 +5256,8 @@ void PlaybackBox::showRecGroupChanger(void)
             dispGroup = tr("Default");
         else if (recGroup == "LiveTV")
             dispGroup = tr("LiveTV");
+        else if (recGroup == "Deleted")
+            dispGroup = tr("Deleted");
 
         recGroupLineEdit->setText(dispGroup);
         recGroupListBox->setCurrentItem(recGroupListBox->index(
@@ -5374,6 +5386,8 @@ void PlaybackBox::setRecGroup(void)
             newRecGroup = "Default";
         else if (newRecGroup == tr("LiveTV"))
             newRecGroup = "LiveTV";
+        else if (newRecGroup == tr("Deleted"))
+            newRecGroup = "Deleted";
 
         if (delitem)
         {
@@ -5491,7 +5505,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
     if ((recGroup == "Default") || (recGroup == "All Programs") ||
-        (recGroup == "LiveTV"))
+        (recGroup == "LiveTV") || (recGroup == "Deleted"))
         label = new QLabel(tr(recGroup), recGroupPopup);
     else
         label = new QLabel(recGroup, recGroupPopup);
