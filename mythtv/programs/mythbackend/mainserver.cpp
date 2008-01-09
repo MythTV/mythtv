@@ -1582,7 +1582,12 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     /* Delete all preview thumbnails. */
 
     QFileInfo fInfo( ds->filename );
-    QDir      dir  ( fInfo.dirPath(), fInfo.fileName() + "*.png" );
+    QString nameFilter = fInfo.fileName() + "*.png";
+    // QDir's nameFilter uses spaces or semicolons to separate globs,
+    // so replace them with the "match any character" wildcard
+    // since mythrename.pl may have included them in filenames
+    nameFilter.replace(QRegExp("( |;)"), "?");
+    QDir      dir  ( fInfo.dirPath(), nameFilter );
 
     for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
     {
