@@ -191,7 +191,7 @@ GetOptions('verbose+'=>\$verbose,
 my $dbh = DBI->connect("dbi:mysql:database=$database:host=$dbhost",
 		"$user","$pass") or die "Cannot connect to database ($!)\n";
 
-my ($starttime, $endtime, $title, $subtitle, $channel, $description);
+my ($starttime, $endtime, $title, $subtitle, $channel, $description, $recgroup);
 my ($syear, $smonth, $sday, $shour, $sminute, $ssecond, $eyear, $emonth, $eday,
 		$ehour, $eminute, $esecond);
 
@@ -208,7 +208,7 @@ if (!$dir) {
 $dir =~ s/\/$//;
 
 if ($show_existing) {
-	$q = "select title, subtitle, starttime, endtime, chanid from recorded order by starttime";
+	$q = "select title, subtitle, starttime, endtime, chanid, recgroup from recorded order by starttime";
 	$sth = $dbh->prepare($q);
 	$sth->execute or die "Could not execute ($q)\n";
 
@@ -220,6 +220,7 @@ if ($show_existing) {
 		$starttime = $row[2];
 		$endtime = $row[3];
 		$channel = $row[4];
+		$recgroup = $row[5];
 
 ## get the pieces of the time
 		if ($starttime =~ m/$db_date_regx/) {
@@ -237,7 +238,8 @@ if ($show_existing) {
 		print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
 		print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
 		print "Title:      $title\n";
-		print "Subtitle:   $subtitle\n\n";
+		print "Subtitle:   $subtitle\n";
+		print "RecGroup:   $recgroup\n\n";
 	}
 }
 
@@ -366,6 +368,8 @@ foreach my $show (@files) {
         print("     subtitle: '$newsubtitle'\n");
         print("  description: '$newdescription'\n");
 
+		$recgroup = "Default";
+
     } else {
 
         $channel = GetAnswer("Enter channel", $channel);
@@ -373,6 +377,7 @@ foreach my $show (@files) {
         $newsubtitle = GetAnswer("... subtitle", $newsubtitle);
         $newdescription = GetAnswer("Description", $newdescription);
         $starttime = GetAnswer("... start time (YYYY-MM-DD HH:MM:SS)", $starttime);
+        $recgroup = GetAnswer("... Recording Group", "Default");
     }
 
     if ($endtime) {
@@ -392,14 +397,14 @@ foreach my $show (@files) {
         $mythfile = sprintf("%s_%s.%s", $channel, $time1, $ext);
     }
 
-    my $sql = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend, storagegroup) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
+    my $sql = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend, storagegroup, recgroup) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
 
     if ($test_mode) {
 
         $sql =~ s/\(\?\)/"%s"/g;
         my $statement = sprintf($sql, $channel, $starttime, $endtime, $newtitle,
                                 $newsubtitle, $newdescription, $host, $mythfile,
-                                $starttime, $endtime, $storagegroup);
+                                $starttime, $endtime, $storagegroup, $recgroup);
         print("Test mode: insert would have been been:\n");
         print($statement, ";\n");
 
@@ -408,7 +413,7 @@ foreach my $show (@files) {
         $sth = $dbh->prepare($sql);
         $sth->execute($channel, $starttime, $endtime, $newtitle,
                       $newsubtitle, $newdescription, $host, $mythfile,
-                      $starttime, $endtime, $storagegroup)
+                      $starttime, $endtime, $storagegroup, $recgroup)
             or die "Could not execute ($sql)\n";
 
         if ($mythfile ne $showBase) {
