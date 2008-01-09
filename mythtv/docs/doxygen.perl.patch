@@ -1,0 +1,141 @@
+diff -ru doxygen-1.5.4.orig/src/scanner.l doxygen-1.5.4/src/scanner.l
+--- doxygen-1.5.4.orig/src/scanner.l	2007-10-26 21:52:35.000000000 +1000
++++ doxygen-1.5.4/src/scanner.l	2008-01-09 13:19:14.000000000 +1100
+@@ -115,6 +115,7 @@
+ static bool             insideObjC  = FALSE;            //!< processing Objective C code?
+ static bool             insideCli   = FALSE;            //!< processing C++/CLI code?
+ static bool             insideJS    = FALSE;            //!< processing JavaScript code?
++static bool             insidePerl  = FALSE;            //!< processing Perl code?
+ 
+ static bool             insideCppQuote = FALSE;
+ static bool             insideProtocolList = FALSE;
+@@ -332,13 +333,15 @@
+   insidePHP  = langExt==SrcLangExt_PHP;
+   insideObjC = langExt==SrcLangExt_ObjC;
+   insideJS   = langExt==SrcLangExt_JS;
++  insidePerl = langExt==SrcLangExt_Perl;
+   if ( insidePHP )
+   {
+     useOverrideCommands = TRUE;
+   }
+   //printf("setContext(%s) insideIDL=%d insideJava=%d insideCS=%d "
+-  //       "insideD=%d insidePHP=%d insideObjC=%d\n",
+-  //       yyFileName.data(),insideIDL,insideJava,insideCS,insideD,insidePHP,insideObjC
++  //       "insideD=%d insidePHP=%d insideObjC=%d insidePerl=%d\n",
++  //       yyFileName.data(),insideIDL,insideJava,insideCS,insideD,
++  //       insidePHP,insideObjC,insidePerl
+   //	);
+ }
+ 
+@@ -591,6 +594,7 @@
+ %x	Define
+ %x	DefineEnd
+ %x	CompoundName
++%x	PerlSubName
+ %x	ClassVar
+ %x	CSConstraintName
+ %x	CSConstraintType
+@@ -604,6 +608,7 @@
+ %x	BitFields
+ %x	FindMembers
+ %x	FindMembersPHP
++%x	FindMembersPerl
+ %x	FindMemberName
+ %x      FindFields
+ %x      FindFieldArg
+@@ -920,6 +925,29 @@
+ 					     REJECT;
+ 					   }
+ 					}
++<FindMembersPerl>{B}*"sub"{B}+		{
++					  BEGIN( PerlSubName );
++					}
++<PerlSubName>{LABELID}			{
++	//printf("### Perl SUB name = %s\n", yytext);
++                                          isTypedef=FALSE;
++					  current->name = yytext;
++                                          current->section
++                                                        = Entry::FUNCTION_SEC;
++                                          current->type = "sub" ;
++                                          current->fileName  = yyFileName;
++                                          current->startLine = yyLineNr;
++                                          current->bodyLine  = yyLineNr;
++                                          lineCount();
++					  curlyCount = 0;
++					  current_root->addSubEntry(current);
++                                          //current_root = current ;
++                                          current = new Entry ;
++                                          initEntry();
++					  lastCurlyContext = FindMembersPerl;
++                                          BEGIN( SkipCurly );
++                                          BEGIN( FindMembersPerl );
++					}
+ <CliPropertyType>{ID}			{
+   					  addType( current );
+   					  current->name = yytext;
+@@ -3431,6 +3459,13 @@
+ 					      BEGIN( CopyArgComment );
+ 					  }
+   					}
++	/* Same in Perl or Sh */
++<FindMembersPerl>"###"			{
++					  fullArgString+=yytext;
++					  lastCopyArgChar=0;
++					  lastCommentInArgContext=YY_START;
++					  BEGIN( CopyArgCommentLine );
++  					}
+ 	/* a non-special comment */
+ <ReadFuncArgType,ReadTempArgs>"/*"	{
+   					  lastCContext = YY_START;
+@@ -5434,6 +5469,10 @@
+     {
+       BEGIN( FindMembersPHP );
+     }
++    else if ( insidePerl )
++    {
++      BEGIN( FindMembersPerl );
++    }
+     else
+     {
+       BEGIN( FindMembers );
+diff -ru doxygen-1.5.4.orig/src/util.cpp doxygen-1.5.4/src/util.cpp
+--- doxygen-1.5.4.orig/src/util.cpp	2007-10-26 21:33:49.000000000 +1000
++++ doxygen-1.5.4/src/util.cpp	2008-01-09 09:27:43.000000000 +1100
+@@ -6158,6 +6158,9 @@
+     extLookup.insert(".m",     new int(SrcLangExt_ObjC));
+     extLookup.insert(".M",     new int(SrcLangExt_ObjC));
+     extLookup.insert(".mm",    new int(SrcLangExt_ObjC));
++    extLookup.insert(".pl",    new int(SrcLangExt_Perl));
++    extLookup.insert(".pm",    new int(SrcLangExt_Perl));
++    extLookup.insert(".sh",    new int(SrcLangExt_Shell));
+     init=TRUE;
+   }
+   if (i!=-1) // name has an extension
+diff -ru doxygen-1.5.4.orig/src/util.h doxygen-1.5.4/src/util.h
+--- doxygen-1.5.4.orig/src/util.h	2007-08-12 05:45:51.000000000 +1000
++++ doxygen-1.5.4/src/util.h	2008-01-09 09:28:43.000000000 +1100
+@@ -85,14 +85,16 @@
+ 
+ enum SrcLangExt
+ {
+-  SrcLangExt_IDL    = 0x008,
+-  SrcLangExt_Java   = 0x010,
+-  SrcLangExt_CSharp = 0x020,
+-  SrcLangExt_D      = 0x040,
+-  SrcLangExt_PHP    = 0x080,
+-  SrcLangExt_ObjC   = 0x100,
+-  SrcLangExt_Cpp    = 0x200,
+-  SrcLangExt_JS     = 0x400,
++  SrcLangExt_IDL    = 0x0008,
++  SrcLangExt_Java   = 0x0010,
++  SrcLangExt_CSharp = 0x0020,
++  SrcLangExt_D      = 0x0040,
++  SrcLangExt_PHP    = 0x0080,
++  SrcLangExt_ObjC   = 0x0100,
++  SrcLangExt_Cpp    = 0x0200,
++  SrcLangExt_JS     = 0x0400,
++  SrcLangExt_Perl   = 0x0800,
++  SrcLangExt_Shell  = 0x1000,
+ };
+ 
+ //--------------------------------------------------------------------
