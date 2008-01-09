@@ -328,7 +328,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString description   = QString::null;
         QString category      = QString::null;
         MythCategoryType category_type = kCategoryNone;
-        unsigned char subtitle_type, audio_props, video_props;
+        unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
         // Parse descriptors
         desc_list_t list = MPEGDescriptor::Parse(
