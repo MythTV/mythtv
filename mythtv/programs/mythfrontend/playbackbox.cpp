@@ -520,6 +520,9 @@ void PlaybackBox::killPlayerSafe(void)
     while (previewVideoState != kKilled && previewVideoState != kStopped &&
            previewVideoThreadRunning)
     {
+        // Make sure state changes can still occur
+        killPlayer();
+
         /* ensure that key events don't mess up our previewVideoStates */
         previewVideoState = (previewVideoState == kKilled) ?
             kKilled :  kKilling;
@@ -2285,7 +2288,7 @@ bool PlaybackBox::killPlayer(void)
             (previewVideoKillTimeout.elapsed() > 2000))
         {
             pthread_join(previewVideoThread, NULL);
-            previewVideoThreadRunning = true;
+            previewVideoThreadRunning = false;
             delete previewVideoNVP;
             delete previewVideoRingBuf;
 
