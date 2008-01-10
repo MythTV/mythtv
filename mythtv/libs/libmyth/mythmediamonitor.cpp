@@ -195,10 +195,9 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     }
 
     bool doEject = false;
-    int   status = selected->getStatus();
     QString  dev = DevName(selected);
 
-    if (MEDIASTAT_OPEN == status)
+    if (selected->getStatus() == MEDIASTAT_OPEN)
     {
         VERBOSE(VB_MEDIA,
                 QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
@@ -212,7 +211,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
                                       tr(msg).arg(dev));
         }
     }
-    else if (MEDIASTAT_MOUNTED == status)
+    else if (selected->isMounted(true))
     {
         VERBOSE(VB_MEDIA, QString("Disk %1 is mounted? Unmounting").arg(dev));
         selected->unmount();
@@ -283,6 +282,13 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="
                           + (m_SendEvent?QString("true"):QString("false"))
                           + ", IgnoreDevices=" + ignore);
+    else
+#ifdef USING_DARWIN_DA
+        VERBOSE(VB_MEDIA, "MediaMonitor is disabled. Eject will not work");
+#else
+        VERBOSE(VB_MEDIA,
+                "Creating inactive MediaMonitor and static device list");
+#endif
 }
 
 MediaMonitor::~MediaMonitor()
