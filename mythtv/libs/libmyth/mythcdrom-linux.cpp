@@ -286,6 +286,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                 // returns MOUNTED.
                 if (isMounted(true))
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+                break;
             case CDS_TRAY_OPEN:
                 VERBOSE(VB_MEDIA, getDevicePath() + " Tray open or no disc");
                 setStatus(MEDIASTAT_OPEN, OpenedHere);
