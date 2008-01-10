@@ -102,8 +102,9 @@ class MPUBLIC MediaMonitor : public QObject
     // List of devices/mountpoints that the user doesn't want to monitor:
     QStringList                  m_IgnoreList;
 
-    bool                         m_Active;
-    bool                         m_SendEvent;
+    bool                         m_Active;      ///< Was MonitorThread started?
+    bool                         m_SendEvent;   ///< Send MediaEvent to plugins?
+    bool                         m_StartThread; ///< Should we actually monitor?
 
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;

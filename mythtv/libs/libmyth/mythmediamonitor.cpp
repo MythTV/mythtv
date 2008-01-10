@@ -266,10 +266,12 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     : QObject(par), m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
-    // MediaMonitor is now always created (i.e. devices always monitored),
-    // but by default we don't send status changed events:
-    m_SendEvent = gContext->GetNumSetting("MonitorDrives");
+    // MediaMonitor object is always created,
+    // but the user can elect not to actually do monitoring:
+    m_StartThread = gContext->GetNumSetting("MonitorDrives");
 
+    // or not send status changed events:
+    m_SendEvent = gContext->GetNumSetting("MediaChangeEvents");
 
     // User can specify that some devices are not monitored
     QString ignore = gContext->GetSetting("IgnoreDevices", "");
@@ -351,8 +353,8 @@ void MediaMonitor::StartMonitoring(void)
     if (m_Active)
         return;
 
-    //if (!m_SendEvent)
-    //    Should we be starting the monitor thread? Or returning here.
+    if (!m_StartThread)
+        return;
 
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);

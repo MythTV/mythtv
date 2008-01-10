@@ -19,21 +19,21 @@
 #include <qimage.h>
 
 // MythTV headers
-#include "mythconfig.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "dbsettings.h"
-#include "langsettings.h"
-#include "mpeg/iso639.h"
+#include "libmyth/mythconfig.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
+#include "libmyth/dbsettings.h"
+#include "libmyth/langsettings.h"
+#include "libmythtv/mpeg/iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
-#include "recordingprofile.h"
-#include "scheduledrecording.h"
-#include "util-x11.h"
-#include "DisplayRes.h"
-#include "uitypes.h"
-#include "cardutil.h"
-#include "themeinfo.h"
+#include "libmythtv/recordingprofile.h"
+#include "libmythtv/scheduledrecording.h"
+#include "libmyth/util-x11.h"
+#include "libmyth/DisplayRes.h"
+#include "libmyth/uitypes.h"
+#include "libmythtv/cardutil.h"
+#include "libmyth/themeinfo.h"
 
 static HostComboBox *AudioOutputDevice()
 {
@@ -3334,6 +3334,16 @@ static HostCheckBox *EnableMediaMon()
     return gc;
 }
 
+static HostCheckBox *EnableMediaEvents()
+{
+    HostCheckBox *gc = new HostCheckBox("MediaChangeEvents");
+    gc->setLabel(QObject::tr("Use new media"));
+    gc->setHelpText(QObject::tr("This will cause MythTV to jump, "
+                    "to an appropriate plugin, when new media is inserted."));
+    gc->setValue(false);
+    return gc;
+}
+
 static HostLineEdit *IgnoreMedia()
 {
     HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
@@ -3344,6 +3354,29 @@ static HostLineEdit *IgnoreMedia()
                                 "in-between. The plugins will ignore them"));
     return ge;
 }
+
+class MythMediaSettings : public TriggeredConfigurationGroup
+{
+  public:
+     MythMediaSettings() :
+         TriggeredConfigurationGroup(false, true, false, false)
+     {
+         setLabel(QObject::tr("MythMediaMonitor"));
+         setUseLabel(false);
+
+         Setting* enabled = EnableMediaMon();
+         addChild(enabled);
+         setTrigger(enabled);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(EnableMediaEvents());
+         settings->addChild(IgnoreMedia());
+         addTarget("1", settings);
+
+         // show nothing if fillEnabled is off
+         addTarget("0", new VerticalConfigurationGroup(true));
+     };
+};
 
 
 static HostComboBox *DisplayGroupTitleSort()
@@ -4298,10 +4331,9 @@ MainGeneralSettings::MainGeneralSettings()
     col2->addChild(NetworkControlEnabled());
     row->addChild(col1);
     row->addChild(col2);
-    ConfigurationGroup *mediaMon = new VerticalConfigurationGroup();
-    mediaMon->setLabel(QObject::tr("Removable Media"));
-    mediaMon->addChild(EnableMediaMon());
-    mediaMon->addChild(IgnoreMedia());
+
+    MythMediaSettings *mediaMon = new MythMediaSettings();
+
     general->addChild(LircKeyPressedApp());
     general->addChild(row);
     general->addChild(NetworkControlPort());
