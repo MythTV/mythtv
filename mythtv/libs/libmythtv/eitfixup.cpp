@@ -20,11 +20,9 @@ EITFixUp::EITFixUp()
       m_ukSubtitle("\\[.*S\\]"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", false),
       m_ukNew("\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-]",false),
-      m_ukNew1("^New\\."),
       m_ukT4("^[tT]4:"),
       m_ukEQ("[:\\!\\?]"),
       m_ukEPQ("[:\\!\\.\\?]"),
-      m_ukColonHyphen("[:-]"),
       m_ukPStart("^\\.+"),
       m_ukPEnd("\\.+$"),
       m_ukSeries1("\\s*(\\d{1,2})/(\\d{1,2})"),
@@ -43,6 +41,9 @@ EITFixUp::EITFixUp()
       m_ukDoubleDotStart("^\\.\\.+"),
       m_ukDotSpaceStart("^\\. "),
       m_ukTime("\\d{1,2}[\\.:]\\d{1,2}\\s*(am|pm|)"),
+      m_ukBBC34("BBC [THREE|FOUR] on BBC [ONE|TWO]\\.",false),
+      m_ukBBCSwitch("BBC Switch\\."),
+      m_ukYearColon("^\\d\\d\\d\\d:"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -356,13 +357,17 @@ void EITFixUp::FixUK(DBEvent &event) const
     // BBC three case (could add another record here ?)
     event.description = event.description.remove(m_ukThen);
     event.description = event.description.remove(m_ukNew);
-
-    event.description = event.description.remove(m_ukNew1);
     event.title  = event.title.remove(m_ukT4);
 
     // Removal of CBBC and CBeebies
     event.description = event.description.remove(m_ukCBBC);
     event.description = event.description.remove(m_ukCBeebies);
+
+    // Removal of BBC FOUR and BBC THREE
+    event.description = event.description.remove(m_ukBBC34);
+
+    // Removal of BBC Switch
+    event.description = event.description.remove(m_ukBBCSwitch);
 
     // BBC 7 [Rpt of ...] case.
     event.description = event.description.remove(m_ukBBC7rpt);
@@ -385,7 +390,6 @@ void EITFixUp::FixUK(DBEvent &event) const
                      position1++;
                  event.title = strFull.left(position1);
                  event.description = strFull.mid(position1 + 1);
-                 event.description = event.description.remove(m_ukNew1);
                  SetUKSubtitle(event);
             }
             if ((position1 = strFull.find(m_ukYear)) != -1)
@@ -408,17 +412,20 @@ void EITFixUp::FixUK(DBEvent &event) const
         }
         else if ((position1 = event.description.find(m_ukTime)) == -1)
         {
-            if (((position1 = event.title.find(m_ukColonHyphen)) != -1) &&
-                (event.description.find(":") < 0 ))
+            if (event.title.find(m_ukYearColon) < 0)
             {
-                if ((uint)position1 < SUBTITLE_MAX_LEN)
+                if (((position1 = event.title.find(":")) != -1) &&
+                    (event.description.find(":") < 0 ))
                 {
-                    event.subtitle = event.title.mid(position1 + 1);
-                    event.title = event.title.left(position1);
+                    if ((uint)position1 < SUBTITLE_MAX_LEN)
+                    {
+                        event.subtitle = event.title.mid(position1 + 1);
+                        event.title = event.title.left(position1);
+                    }
                 }
+                else
+                    SetUKSubtitle(event);
             }
-            else
-                SetUKSubtitle(event);
         }
     }
 
@@ -517,6 +524,9 @@ void EITFixUp::FixUK(DBEvent &event) const
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
             event.parttotal  = tmpExp1.cap(2).toUInt();
+            // Remove from the description
+            event.description = event.description.left(position1) +
+                event.description.mid(position1+tmpExp1.cap(0).length());
             series = true;
         }
     }
@@ -524,12 +534,18 @@ void EITFixUp::FixUK(DBEvent &event) const
     {
         event.partnumber = tmpExp2.cap(2).toUInt();
         event.parttotal  = tmpExp2.cap(3).toUInt();
+        // Remove from the description
+        event.description = event.description.left(position1) +
+            event.description.mid(position1+tmpExp2.cap(0).length());
         series = true;
     }
     else if ((position1 = tmpExp3.search(event.description)) != -1)
     {
         event.partnumber = tmpExp3.cap(1).toUInt();
         event.parttotal  = tmpExp3.cap(2).toUInt();
+        // Remove from the description
+        event.description = event.description.left(position1) +
+            event.description.mid(position1+tmpExp3.cap(0).length());
         series = true;
     }
     if (series)

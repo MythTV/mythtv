@@ -82,11 +82,9 @@ class EITFixUp
     const QRegExp m_ukSubtitle;
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
-    const QRegExp m_ukNew1;
     const QRegExp m_ukT4;
     const QRegExp m_ukEQ;
     const QRegExp m_ukEPQ;
-    const QRegExp m_ukColonHyphen;
     const QRegExp m_ukPStart;
     const QRegExp m_ukPEnd;
     const QRegExp m_ukSeries1;
@@ -104,6 +102,9 @@ class EITFixUp
     const QRegExp m_ukDoubleDotStart;
     const QRegExp m_ukDotSpaceStart;
     const QRegExp m_ukTime;
+    const QRegExp m_ukBBC34;
+    const QRegExp m_ukBBCSwitch;
+    const QRegExp m_ukYearColon;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
