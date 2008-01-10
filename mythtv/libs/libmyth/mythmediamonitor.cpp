@@ -277,11 +277,9 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     else
         m_IgnoreList = QStringList::QStringList();  // Force empty list
 
-
     if (m_StartThread)
         VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="
-                          + (m_SendEvent?QString("true"):QString("false"))
-                          + ", IgnoreDevices=" + ignore);
+                          + (m_SendEvent?QString("true"):QString("false")));
     else
 #ifdef USING_DARWIN_DA
         VERBOSE(VB_MEDIA, "MediaMonitor is disabled. Eject will not work");
@@ -289,6 +287,27 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         VERBOSE(VB_MEDIA,
                 "Creating inactive MediaMonitor and static device list");
 #endif
+    VERBOSE(VB_MEDIA, "IgnoreDevices=" + ignore);
+
+    // If any of IgnoreDevices are symlinks, also add the real device
+    QStringList::Iterator dev;
+    for (dev = m_IgnoreList.begin(); dev != m_IgnoreList.end(); ++dev)
+    {
+        QFileInfo *fi = new QFileInfo(*dev);
+
+        if (fi && fi->isSymLink())
+        {
+            QString target = fi->readLink();
+
+            if (m_IgnoreList.grep(target).isEmpty())
+            {
+                VERBOSE(VB_MEDIA, "Also ignoring " + target +
+                                  " (symlinked from " + *dev + ").");
+                m_IgnoreList += target;
+            }
+        }
+    }
+
 }
 
 MediaMonitor::~MediaMonitor()
