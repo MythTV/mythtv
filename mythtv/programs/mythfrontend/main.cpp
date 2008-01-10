@@ -1389,10 +1389,7 @@ int main(int argc, char **argv)
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Starting media monitor."));
         mon->StartMonitoring();
-    }
 
     NetworkControl *networkControl = NULL;
     if (gContext->GetNumSetting("NetworkControlEnabled", 0))

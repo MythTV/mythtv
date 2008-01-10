@@ -255,9 +255,6 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 /**
  * \brief  Lookup some settings, and do OS-specific stuff in sub-classes
  *
- * \bug    After r13882, the media monitor loops and checks drives,
- *         even if the user didn't select MonitorDrives.
- * 
  * \bug    If the user changes the MonitorDrives or IgnoreDevices settings,
  *         it will have no effect until the frontend is restarted.
  */
@@ -280,6 +277,12 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         m_IgnoreList = QStringList::split(',', ignore);
     else
         m_IgnoreList = QStringList::QStringList();  // Force empty list
+
+
+    if (m_StartThread)
+        VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="
+                          + (m_SendEvent?QString("true"):QString("false"))
+                          + ", IgnoreDevices=" + ignore);
 }
 
 MediaMonitor::~MediaMonitor()
@@ -359,6 +362,7 @@ void MediaMonitor::StartMonitoring(void)
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
 
+    VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
     m_Thread->start();
 }
@@ -372,6 +376,7 @@ void MediaMonitor::StopMonitoring(void)
     if (!m_Active)
         return;
 
+    VERBOSE(VB_MEDIA, "Stopping MediaMonitor");
     m_Active = false;
     m_Thread->wait();
 }

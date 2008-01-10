@@ -486,9 +486,9 @@ void MediaMonitorDarwin::StartMonitoring(void)
 
 
     if (!m_Thread)
-    {
         m_Thread = new MonitorThreadDarwin(this, m_MonitorPollingInterval);
-    }
+
+    VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
     m_Thread->start();
 }
