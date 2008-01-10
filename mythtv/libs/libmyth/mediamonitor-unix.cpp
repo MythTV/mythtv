@@ -65,6 +65,9 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
                                    unsigned long interval, bool allowEject)
                 : MediaMonitor(par, interval, allowEject)
 {
+    if (!m_StartThread)  // If we are not going to start the monitoring thread
+        return;          // there is no point in getting device lists
+
     CheckFileSystemTable();
     CheckMountable();
 }
