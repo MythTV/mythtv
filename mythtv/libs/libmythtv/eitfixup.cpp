@@ -490,8 +490,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     QRegExp tmpExp3 = m_ukSeries3;
     if ((position1 = tmpExp1.search(event.title)) != -1)
     {
-        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
-            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+        if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
             && tmpExp1.cap(2).toUInt()<=50)
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
@@ -504,8 +503,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     }
     else if ((position1 = tmpExp1.search(event.subtitle)) != -1)
     {
-        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
-            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+        if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
             && tmpExp1.cap(2).toUInt()<=50)
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
@@ -518,8 +516,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     }
     else if ((position1 = tmpExp1.search(event.description)) != -1)
     {
-        if ((tmpExp1.cap(1).toUInt() != tmpExp1.cap(2).toUInt())
-            && (tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
+        if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
             && tmpExp1.cap(2).toUInt()<=50)
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
