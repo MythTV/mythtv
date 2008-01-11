@@ -307,7 +307,6 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
             }
         }
     }
-
 }
 
 MediaMonitor::~MediaMonitor()
@@ -599,6 +598,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
 bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
 {
     if (m_IgnoreList.contains(device->getMountPath()) ||
+        m_IgnoreList.contains(device->getRealDevice())||
         m_IgnoreList.contains(device->getDevicePath()) )
     {
         VERBOSE(VB_MEDIA, "Ignoring device: " + device->getDevicePath());
@@ -708,4 +708,34 @@ QString MediaMonitor::defaultWriter()
                                    tr("Select a DVD writer"), "/dev/dvd");
 
     return device;
+}
+
+
+/**
+ * \brief A string summarising the current devices, for debugging
+ */
+const QString MediaMonitor::listDevices(void)
+{
+    QValueList<MythMediaDevice*>::const_iterator dev;
+    QStringList list;
+
+    for (dev = m_Devices.begin(); dev != m_Devices.end(); ++dev)
+    {
+        QString devStr;
+        QString model = (*dev)->getDeviceModel();
+        QString path  = (*dev)->getDevicePath();
+        QString real  = (*dev)->getRealDevice();
+
+        if (path != real)
+            devStr += path + "->";
+        devStr += real;
+
+        if (!model.length())
+            model = "unknown";
+        devStr += " (" + model + ")";
+
+        list += devStr;
+    }
+
+    return list.join(", ");
 }

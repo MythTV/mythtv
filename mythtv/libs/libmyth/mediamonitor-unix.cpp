@@ -67,6 +67,8 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
 {
     CheckFileSystemTable();
     CheckMountable();
+
+    VERBOSE(VB_MEDIA, "Initial device list: " + listDevices());
 }
 
 
@@ -230,13 +232,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
 static void LookupModel(MythMediaDevice* device)
 {
     QString   desc;
-    QString   devname = device->getDevicePath();
-    QFileInfo devpath(devname);
-
-
-    // Paths like /dev/cdrom usually point to something like /dev/hdc
-    if (devpath.isSymLink())
-        devname = devpath.readLink();
+    QString   devname = device->getRealDevice();
 
 
     // Given something like /dev/hda1, extract hda1

@@ -64,6 +64,8 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
 
         AddDevice(media);
     }
+
+    VERBOSE(VB_MEDIA, "Initial device list: " + listDevices());
 }
 
 bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)

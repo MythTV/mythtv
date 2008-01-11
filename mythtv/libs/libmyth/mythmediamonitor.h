@@ -89,6 +89,8 @@ class MPUBLIC MediaMonitor : public QObject
     bool RemoveDevice(const QString &dev);
     bool shouldIgnore(MythMediaDevice *device);
 
+    const QString listDevices(void);
+
     static QString defaultDevice(const QString setting,
                                  const QString label,  char *hardCodedDefault);
     MythMediaDevice *selectDrivePopup(const QString label, bool mounted=false);
