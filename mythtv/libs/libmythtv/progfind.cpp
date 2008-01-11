@@ -208,7 +208,7 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
             escape();
         else if (action == "TOGGLERECORD")
             quickRecord();
-        else if (action == "4")
+        else if (action == "GUIDE" || action == "4")
             showGuide();
         else
             handled = false;

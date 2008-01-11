@@ -423,7 +423,7 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 jumpToChannelDeleteLastDigit();
             else if (action == "NEXTFAV" || action == "4")
                 toggleGuideListing();
-            else if (action == "6")
+            else if (action == "FINDER" || action == "6")
                 showProgFinder();
             else if (action == "MENU")
                 enter();                    
