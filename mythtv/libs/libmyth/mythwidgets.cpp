@@ -1546,6 +1546,42 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                 QListBox::keyPressEvent(&ev);
                 handled = true;
             }
+            else if (action == "0" || action == "1" || action == "2" ||
+                     action == "3" || action == "4" || action == "5" ||
+                     action == "6" || action == "7" || action == "8" ||
+                     action == "9")
+            {
+                int percent = action.toInt() * 10;
+                int nextItem = percent * count() / 100;
+                if (!itemVisible(nextItem))
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
+                handled = true;
+            }
+            else if (action == "PREVVIEW")
+            {
+                int nextItem = currentItem();
+                if (nextItem > 0)
+                    nextItem--;
+                while (nextItem > 0 && text(nextItem)[0] == ' ')
+                    nextItem--;
+                if (!itemVisible(nextItem))
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
+                handled = true;
+            }
+            else if (action == "NEXTVIEW")
+            {
+                int nextItem = currentItem();
+                if (nextItem < count() - 1)
+                    nextItem++;
+                while (nextItem < count() - 1 && text(nextItem)[0] == ' ')
+                    nextItem++;
+                if (!itemVisible(nextItem))
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
+                handled = true;
+            }
             else if (action == "MENU")
                 emit menuButtonPressed(currentItem());
             else if (action == "EDIT")
