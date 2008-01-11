@@ -105,6 +105,7 @@ class MPUBLIC ProgLister : public MythDialog
     bool refillAll;
     bool titleSort;
     bool reverseSort;
+    bool useGenres;
 
     void updateBackground(void);
     void updateView(QPainter *);

@@ -60,6 +60,7 @@ ProgLister::ProgLister(ProgListType pltype,
     refillAll = false;
     titleSort = false;
     reverseSort = false;
+    useGenres = false;
 
     fullRect = QRect(0, 0, size().width(), size().height());
     viewRect = QRect(0, 0, 0, 0);
@@ -716,6 +717,9 @@ void ProgLister::chooseView(void)
             chooseListBox->setCurrentItem(curView);
         choosePopup->addWidget(chooseListBox);
 
+        if (type == plCategory)
+            choosePopup->addLabel(tr("0 .. 9 moves to Nx10 percent in list"));
+
         connect(chooseListBox, SIGNAL(accepted(int)),
                 this,          SLOT(setViewFromList(int)));
 
@@ -1243,22 +1247,73 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (type == plCategory) // list by category
     {
+        QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
         MSqlQuery query(MSqlQuery::InitCon()); 
-        query.prepare("SELECT category FROM program GROUP BY category;");
+        query.prepare("SELECT g1.genre, g2.genre "
+                      "FROM program "
+                      "JOIN programgenres g1 ON "
+                      "  program.chanid = g1.chanid AND "
+                      "  program.starttime = g1.starttime "
+                      "LEFT JOIN programgenres g2 ON "
+                      "  g1.chanid = g2.chanid AND "
+                      "  g1.starttime = g2.starttime "
+                      "WHERE program.endtime > :PGILSTART "
+                      "GROUP BY g1.genre, g2.genre;");
+        query.bindValue(":PGILSTART", startstr);
         query.exec();
 
         if (query.isActive() && query.size())
         {
+            QString lastGenre1;
+
             while (query.next())
             {
-                QString category = query.value(0).toString();
-                if (category <= " " || category == NULL)
+                QString genre1 = query.value(0).toString().utf8();
+                if (genre1 <= " ")
                     continue;
-                category = QString::fromUtf8(query.value(0).toString());
-                viewList << category;
-                viewTextList << category;
+
+                if (genre1 != lastGenre1)
+                {
+                    viewList << genre1;
+                    viewTextList << genre1;
+                    lastGenre1 = genre1;
+                }
+
+                QString genre2 = query.value(1).toString().utf8();
+                if (genre2 <= " " || genre2 == genre1)
+                    continue;
+
+                viewList << genre1 + ":/:" + genre2;
+                viewTextList << "    " + genre1 + " / " + genre2;
             }
+
+            useGenres = true;
         }
+        else
+        {
+            query.prepare("SELECT category "
+                          "FROM program "
+                          "WHERE program.endtime > :PGILSTART "
+                          "GROUP BY category;");
+            query.bindValue(":PGILSTART", startstr);
+            query.exec();
+
+            if (query.isActive() && query.size())
+            {
+                while (query.next())
+                {
+                    QString category = query.value(0).toString();
+                    if (category <= " " || category == NULL)
+                        continue;
+                    category = QString::fromUtf8(query.value(0).toString());
+                    viewList << category;
+                    viewTextList << category;
+                }
+            }
+
+            useGenres = false;
+        }
+
         if (view != "")
             curView = viewList.findIndex(view);
     }
@@ -1593,9 +1648,36 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plCategory) // list by category
     {
-        where = "WHERE channel.visible = 1 "
-                "  AND program.endtime > :PGILSTART "
-                "  AND program.category = :PGILPHRASE ";
+        if (!useGenres)
+        {
+            where = "WHERE channel.visible = 1 "
+                    "  AND program.endtime > :PGILSTART "
+                    "  AND program.category = :PGILPHRASE ";
+        }
+        else if (viewList[curView].find(":/:") < 0)
+        {
+            where = "JOIN programgenres g ON "
+                    "  program.chanid = g.chanid AND "
+                    "  program.starttime = g.starttime AND "
+                    "  genre = :PGILPHRASE "
+                    "WHERE channel.visible = 1 "
+                    "  AND program.endtime > :PGILSTART ";
+        }
+        else
+        {
+            where = "JOIN programgenres g1 ON "
+                    "  program.chanid = g1.chanid AND "
+                    "  program.starttime = g1.starttime AND "
+                    "  g1.genre = :GENRE1 "
+                    "JOIN programgenres g2 ON "
+                    "  program.chanid = g2.chanid AND "
+                    "  program.starttime = g2.starttime AND "
+                    "  g2.genre = :GENRE2 "
+                    "WHERE channel.visible = 1 "
+                    "  AND program.endtime > :PGILSTART ";
+            bindings[":GENRE1"] = viewList[curView].section(":/:", 0, 0);
+            bindings[":GENRE2"] = viewList[curView].section(":/:", 1, 1);
+        }
     }
     else if (type == plMovies) // list movies
     {
