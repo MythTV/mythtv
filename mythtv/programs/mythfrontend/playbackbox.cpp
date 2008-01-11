@@ -1664,6 +1664,67 @@ void PlaybackBox::cursorUp(bool page, bool newview)
     }
 }
 
+void PlaybackBox::pageTop()
+{
+    if (inTitle)
+    {
+        titleIndex = 0;
+
+        progIndex = 0;
+
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
+    }
+    else 
+    {
+        progIndex = 0;
+
+        paintSkipUpdate = false;
+        update(drawListBounds);
+        update(drawInfoBounds);
+    }
+}
+
+void PlaybackBox::pageMiddle()
+{
+    if (inTitle)
+    {
+        titleIndex = (int)floor(titleList.count() / 2.0);
+
+        progIndex = 0;
+
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
+    }
+    else 
+    {
+        int progCount = progLists[titleList[titleIndex]].count();
+
+        if (progCount > 0)
+        {
+            progIndex = (int)floor(progCount / 2.0);
+
+            paintSkipUpdate = false;
+            update(drawListBounds);
+            update(drawInfoBounds);
+        }
+    }
+}
+
+void PlaybackBox::pageBottom()
+{
+    if (inTitle)
+        pageTop();
+    else 
+    {
+        progIndex = progLists[titleList[titleIndex]].count() - 1;
+
+        paintSkipUpdate = false;
+        update(drawListBounds);
+        update(drawInfoBounds);
+    }
+}
+
 void PlaybackBox::listChanged(void)
 {
     if (playingSomething)
@@ -4186,6 +4247,12 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 pageUp();
             else if (action == "PAGEDOWN")
                 pageDown();
+            else if (action == "PAGETOP")
+                pageTop();
+            else if (action == "PAGEMIDDLE")
+                pageMiddle();
+            else if (action == "PAGEBOTTOM")
+                pageBottom();
             else if (action == "PREVVIEW")
                 cursorUp(false, true);
             else if (action == "NEXTVIEW")
