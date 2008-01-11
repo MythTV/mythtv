@@ -993,8 +993,14 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
 
     if (renderer == "directx")
         msg = QObject::tr(
-            "This is the only video renderer available on Microsoft Windows "
-            "systems.");
+            "Windows video renderer based on overlays. "
+            "Not compatible with Vista Aero Glass.");
+
+    if (renderer == "direct3d")
+        msg = QObject::tr(
+            "Windows video renderer based on Direct3D. Requires "
+            "video card compatible with Direct3D 9. This is the preferred "
+            "renderer for current Windows systems.");
 
     if (renderer == "quartz-blit")
         msg = QObject::tr(

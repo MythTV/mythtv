@@ -156,7 +156,7 @@ bool setupTVs(bool ismaster, bool &error)
                 {
                     gContext->LogEntry("mythbackend", LP_CRITICAL,
                                        "Problem with capture cards",
-                                       cidmsg + "failed init");
+                                       cidmsg + " failed init");
                     delete tv;
                     // The master assumes card comes up so we need to
                     // set error and exit if a non-master card fails.
