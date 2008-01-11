@@ -182,4 +182,10 @@
       <depends>mythzoneminder</depends>
  </button>
 
+   <button>
+      <type>SMOLT</type>
+      <text>Hardware profile</text>
+      <action>PLUGIN mythsmolt</action>
+      <depends>mythsmolt</depends>
+ </button>
 </mythmenu>
