@@ -180,7 +180,8 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     MythMediaDevice *selected;
 
 
-    selected = selectDrivePopup(tr("Select removable media to eject"), true);
+    selected = selectDrivePopup(tr("Select removable media"
+                                   " to eject or insert"), true);
 
     // If the user cancelled, no need to display or do anything more
     if (selected == (MythMediaDevice *) -1)
@@ -194,7 +195,6 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         return;
     }
 
-    bool doEject = false;
     QString  dev = DevName(selected);
 
     if (selected->getStatus() == MEDIASTAT_OPEN)
@@ -210,8 +210,11 @@ void MediaMonitor::ChooseAndEjectMedia(void)
                                       "eject close-tray fail",
                                       tr(msg).arg(dev));
         }
+
+        return;
     }
-    else if (selected->isMounted(true))
+
+    if (selected->isMounted(true))
     {
         VERBOSE(VB_MEDIA, QString("Disk %1 is mounted? Unmounting").arg(dev));
         selected->unmount();
@@ -221,33 +224,24 @@ void MediaMonitor::ChooseAndEjectMedia(void)
             MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       "eject unmount fail",
                                       tr("Failed to unmount %1").arg(dev));
+            return;
         }
-        else
-            doEject = true;
     }
-    else
-        doEject = true;
 
-    if (doEject)
+    VERBOSE(VB_MEDIA, QString("Unlocking disk %1, then eject()ing").arg(dev));
+    selected->unlock();
+
+    MediaError err = selected->eject();
+
+    if (err == MEDIAERR_UNSUPPORTED)
     {
-        VERBOSE(VB_MEDIA,
-                QString("Unlocking disk %1, then eject()ing").arg(dev));
-        selected->unlock();
-
-        MediaError err = selected->eject();
-
-        if (err == MEDIAERR_UNSUPPORTED)
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      "eject success",
-                                      tr("You may safely remove %1").arg(dev));
-        }
-        else if (err == MEDIAERR_FAILED)
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      "eject fail",
-                                      tr("Failed to eject %1").arg(dev));
-        }
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject success",
+                                  tr("You may safely remove %1").arg(dev));
+    }
+    else if (err == MEDIAERR_FAILED)
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject fail",
+                                  tr("Failed to eject %1").arg(dev));
     }
 }
 
