@@ -62,6 +62,12 @@ MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
     m_SuperMount = SuperMount;
     m_Status = MEDIASTAT_UNKNOWN;
     m_MediaType = MEDIATYPE_UNKNOWN;
+
+    QFileInfo *fi = new QFileInfo(DevicePath); 
+    if (fi && fi->isSymLink()) 
+        m_RealDevice = m_DevicePath.section('/', 0, -2) + "/" + fi->readLink();
+    else
+        m_RealDevice = QString::null;
 }
 
 bool MythMediaDevice::openDevice()

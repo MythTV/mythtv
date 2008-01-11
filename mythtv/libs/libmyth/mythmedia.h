@@ -8,13 +8,13 @@
 #include "mythexp.h"
 
 typedef enum {
-    MEDIASTAT_ERROR,
+    MEDIASTAT_ERROR,        ///< Unable to mount, but could be usable
     MEDIASTAT_UNKNOWN,
     MEDIASTAT_UNPLUGGED,
-    MEDIASTAT_OPEN,         ///< CD/DVD tray open (meaningless for other devs?)
+    MEDIASTAT_OPEN,         ///< CD/DVD tray open (meaningless for non-CDs?)
     MEDIASTAT_NODISK,       ///< CD/DVD tray closed but empty, device unusable
     MEDIASTAT_UNFORMATTED,  ///< For devices/media a plugin might erase/format
-    MEDIASTAT_USEABLE,    
+    MEDIASTAT_USEABLE,
     MEDIASTAT_NOTMOUNTED,
     MEDIASTAT_MOUNTED
 } MediaStatus;
@@ -48,14 +48,17 @@ class MPUBLIC MythMediaDevice : public QObject
     friend class MonitorThreadDarwin;  // and trigger posting of MediaEvents
 
  public:
-    MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount, 
+    MythMediaDevice(QObject* par, const char* DevicePath, bool SuperMount,
                     bool AllowEject);
 
     const QString& getMountPath() const { return m_MountPath; }
     void setMountPath(const char *path) { m_MountPath = path; }
 
     const QString& getDevicePath() const { return m_DevicePath; }
-    void setDevicePath(const char *devPath) { m_DevicePath = devPath; }
+
+    const QString& getRealDevice() const
+    { return m_RealDevice.length() ? m_RealDevice : m_DevicePath; }
+
 
     const QString& getDeviceModel() const  { return m_DeviceModel;  }
     void setDeviceModel(const char *model) { m_DeviceModel = model; }
@@ -68,7 +71,6 @@ class MPUBLIC MythMediaDevice : public QObject
     const QString& getKeyID() const { return m_KeyID; }
 
     bool getAllowEject() const { return m_AllowEject; }
-    void setAllowEject(bool allowEject) { m_AllowEject = allowEject; }
 
     bool getLocked() const { return m_Locked; }
 
@@ -81,23 +83,22 @@ class MPUBLIC MythMediaDevice : public QObject
             || m_Status == MEDIASTAT_MOUNTED
             || m_Status == MEDIASTAT_NOTMOUNTED;
     }
-    
+
     MediaType getMediaType() const { return m_MediaType; }
 
     bool isSuperMount() const { return m_SuperMount; }
-    void setSuperMount(bool SuperMount) { m_SuperMount = SuperMount; }
 
     virtual MediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
     virtual bool openDevice();
     virtual bool closeDevice();
     virtual bool isSameDevice(const QString &path);
     virtual void setSpeed(int speed);
-    virtual MediaStatus checkMedia() = 0; // Derived classes MUST implement this.
+    virtual MediaStatus checkMedia() = 0;// Derived classes MUST implement this.
     virtual MediaError eject(bool open_close = true);
     virtual MediaError lock();
     virtual MediaError unlock();
-    virtual bool performMountCmd( bool DoMount );    
-    
+    virtual bool performMountCmd( bool DoMount );
+
     bool mount() {  return performMountCmd(true); }
     bool unmount() { return performMountCmd(false); }
     bool isMounted(bool bVerify = false);
@@ -105,7 +106,7 @@ class MPUBLIC MythMediaDevice : public QObject
     void RegisterMediaExtensions(uint mediatype,
                                  const QString& extensions);
 
-    
+
     static const char* MediaStatusStrings[];
     static const char* MediaErrorStrings[];
 
@@ -137,18 +138,30 @@ class MPUBLIC MythMediaDevice : public QObject
 
     MediaStatus setStatus(MediaStatus newStat, bool CloseIt=false);
 
-    QString m_MountPath;        ///< The path to this media's mount point (i.e. /mnt/cdrom). Read only.
-    QString m_DevicePath;       ///< The path to this media's device (i.e. /dev/cdrom). Read/write.
-    QString m_DeviceModel;      ///< The device Manufacturer/Model. Read/write.
-    MediaStatus m_Status;       ///< The status of the media as of the last call to checkMedia. Read only.
-    QString m_VolumeID;         ///< The volume ID of the media. Read Only.
-    QString m_KeyID;            ///< KeyID of the media. Read Only
-                                ///< for iso9660 volumeid + creation_date
-    bool m_Locked;              ///< Is this media locked? Read only.
-    bool m_AllowEject;          ///< Allow the user to eject the media? Read/write.
-    int m_DeviceHandle;         ///< A file handle for opening and closing the device.
-    MediaType m_MediaType;      ///< The type of media
-    bool m_SuperMount;          ///< Is this a supermount device?
+    QString m_DeviceModel;   ///< The device Manufacturer/Model. Read/write
+    QString m_DevicePath;    ///< The path to this media's device.
+                             ///  (e.g. /dev/cdrom) Read only
+    QString m_KeyID;         ///< KeyID of the media. Read only
+                             ///  (For ISO9660, volumeid + creation_date)
+    QString m_MountPath;     ///< The path to this media's mount point.
+                             ///  (e.g. /mnt/cdrom) Read/write
+    QString m_RealDevice;    ///< If m_DevicePath is a symlink, its target.
+                             ///  (e.g. /dev/hdc) Read only
+    QString m_VolumeID;      ///< The volume ID of the media. Read/write
+
+    MediaStatus m_Status;    ///< The status of the media as of the
+                             ///  last call to checkMedia. Read only
+    MediaType   m_MediaType; ///< The type of media. Read only
+
+    bool m_AllowEject;       ///< Allow the user to eject the media?. Read only
+    bool m_Locked;           ///< Is this media locked?.              Read only
+    bool m_SuperMount;       ///< Is this a supermount device?.       Read only
+
+    int  m_DeviceHandle;     ///< A file handle for opening and closing
+                             ///  the device, ioctls(), et c. This should
+                             ///  be private, but a subclass of a
+                             ///  subclass needs it (MythCDRomLinux)
+ private:
     ext_to_media_t m_ext_to_media; ///< Map of extension to media type.
 };
 
