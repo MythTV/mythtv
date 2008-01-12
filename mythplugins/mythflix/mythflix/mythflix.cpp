@@ -59,11 +59,11 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
         dir.mkdir(fileprefix);
     
     // Initialize variables
-	zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
-	expectingPopup = false;
+    expectingPopup = false;
     m_InColumn     = 0;
     m_UISites      = 0;
     m_UIArticles   = 0;
@@ -570,24 +570,24 @@ void MythFlix::processAndShowNews(NewsSite* site)
 
 void MythFlix::slotShowNetFlixPage()
 {
-	if (expectingPopup)
-	slotCancelPopup();
+    if (expectingPopup)
+        slotCancelPopup();
     
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-	if (articleUIItem && articleUIItem->getData())
+    if (articleUIItem && articleUIItem->getData())
     {
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
-			QString cmdUrl(article->articleURL());
-			cmdUrl.replace('\'', "%27");
-	
-			QString cmd = QString("%1 %2 '%3'")
-				 .arg(browser)
-				 .arg(zoom)
-				 .arg(cmdUrl);
-			VERBOSE(VB_GENERAL, QString("MythFlixBrowse: Opening Neflix site: (%1)").arg(cmd));
-			myth_system(cmd);
+            QString cmdUrl(article->articleURL());
+            cmdUrl.replace('\'', "%27");
+
+            QString cmd = QString("%1 %2 '%3'")
+                 .arg(browser)
+                 .arg(zoom)
+                 .arg(cmdUrl);
+            VERBOSE(VB_GENERAL, QString("MythFlixBrowse: Opening Neflix site: (%1)").arg(cmd));
+            myth_system(cmd);
         }
     }
 }
@@ -610,8 +610,8 @@ void MythFlix::slotViewArticle()
 {
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
-	if (expectingPopup)
-	    slotCancelPopup();
+    if (expectingPopup)
+        slotCancelPopup();
 
     if (articleUIItem && articleUIItem->getData())
     {
@@ -628,10 +628,10 @@ void MythFlix::slotViewArticle()
             int index = movieID.findRev("/");
             movieID = movieID.mid(index+1,length);
             args += movieID;
-		
-			// execute external command to obtain list of possible movie matches 
-			QString results = executeExternal(args, "Add Movie");
-		
+
+            // execute external command to obtain list of possible movie matches 
+            QString results = executeExternal(args, "Add Movie");
+
         }
     } 
 }
@@ -776,4 +776,4 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
     return ret;
 }
 
-
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
