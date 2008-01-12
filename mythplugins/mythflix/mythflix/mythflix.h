@@ -59,10 +59,11 @@ private:
     void cursorDown(bool page=false);
     void cursorRight();
     void cursorLeft();
-	void displayOptions();
+    void displayOptions();
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
+    void InsertMovieIntoQueue(bool atTop = false);
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
@@ -85,6 +86,7 @@ private:
 
 private slots:
     void slotViewArticle();
+    void slotViewArticleTop();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 

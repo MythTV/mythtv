@@ -608,31 +608,49 @@ void MythFlix::slotArticleSelected(UIListBtnTypeItem*)
 
 void MythFlix::slotViewArticle()
 {
+    InsertMovieIntoQueue(false);
+}
+
+void MythFlix::slotViewArticleTop()
+{
+    InsertMovieIntoQueue(true);
+}
+
+void MythFlix::InsertMovieIntoQueue(bool atTop)
+{
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
     if (expectingPopup)
         slotCancelPopup();
 
-    if (articleUIItem && articleUIItem->getData())
+    if (!articleUIItem)
+        return;
+
+    NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+    if(!article)
+        return;
+
+    QStringList args = QStringList::split(' ',
+            gContext->GetSetting("NetFlixAddQueueCommandLine", 
+            gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
+
+    QString movieID(article->articleURL());
+    int length = movieID.length();
+    int index = movieID.findRev("/");
+    movieID = movieID.mid(index+1,length);
+    args += movieID;
+
+    QString results = executeExternal(args, "Add Movie");
+
+    if (atTop)
     {
-        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
-        if(article)
-        {
+        // Move to top of queue as well
+        args = QStringList::split(' ',
+                gContext->GetSetting("NetFlixMoveToTopCommandLine",
+                gContext->GetShareDir() + "mythflix/scripts/netflix.pl -1"));
+        args += movieID;
 
-            QStringList args = QStringList::split(' ',
-                    gContext->GetSetting("NetFlixAddQueueCommandLine", 
-                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
-
-            QString movieID(article->articleURL());
-            int length = movieID.length();
-            int index = movieID.findRev("/");
-            movieID = movieID.mid(index+1,length);
-            args += movieID;
-
-            // execute external command to obtain list of possible movie matches 
-            QString results = executeExternal(args, "Add Movie");
-
-        }
+        results = executeExternal(args, "Move To Top");
     } 
 }
 
@@ -645,11 +663,11 @@ void MythFlix::displayOptions()
                                   MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    QButton *topButton = popup->addButton(tr("Add To Queue"), this,
-                     SLOT(slotViewArticle()));
+    QButton *topButton = popup->addButton(tr("Add to Top of Queue"), this,
+                     SLOT(slotViewArticleTop()));
+    popup->addButton(tr("Add to Bottom of Queue"), this, SLOT(slotViewArticle()));
                      
-    popup->addButton(tr("Show NetFlix Page"), this,
-                     SLOT(slotShowNetFlixPage()));
+    popup->addButton(tr("Show NetFlix Page"), this, SLOT(slotShowNetFlixPage()));
 
     popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
 
