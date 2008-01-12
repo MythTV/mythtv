@@ -454,7 +454,7 @@ void MythFlix::keyPressEvent(QKeyEvent *e)
             cursorLeft();
         else if (action == "RIGHT")
             cursorRight();
-        else if(action == "SELECT")
+        else if((action == "SELECT") || (action == "MENU"))
             displayOptions();
         else
             handled = false;
@@ -609,6 +609,9 @@ void MythFlix::slotArticleSelected(UIListBtnTypeItem*)
 void MythFlix::slotViewArticle()
 {
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+
+	if (expectingPopup)
+	    slotCancelPopup();
 
     if (articleUIItem && articleUIItem->getData())
     {
