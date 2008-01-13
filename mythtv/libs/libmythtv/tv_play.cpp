@@ -1546,7 +1546,10 @@ void TV::SetupPlayer(bool isWatchingRecording)
 
     int udp_port = gContext->GetNumSetting("UDPNotifyPort");
     if (udp_port > 0)
-        udpnotify = new UDPNotify(this, udp_port);
+    {
+        if (udpnotify == NULL)
+            udpnotify = new UDPNotify(this, udp_port);
+    }
     else
         udpnotify = NULL;
 }

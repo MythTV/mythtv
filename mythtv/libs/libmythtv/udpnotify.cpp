@@ -157,7 +157,8 @@ UDPNotify::~UDPNotify(void)
 {
     qApp->lock();
 
-    disconnect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
+    if (qsn != NULL)
+       disconnect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
 
     qsd->close();
 
