@@ -30,6 +30,9 @@ MythCDROM *GetMythCDROMFreeBSD(QObject* par, const char* devicePath,
 
 MediaError MythCDROMFreeBSD::eject(bool open_close)
 {
+    if (!isDeviceOpen())
+        openDevice();
+
     if (open_close)
         return (ioctl(m_DeviceHandle, CDIOCEJECT) == 0) ? MEDIAERR_OK :
                                                           MEDIAERR_FAILED;
