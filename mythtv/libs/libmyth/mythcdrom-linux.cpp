@@ -22,6 +22,11 @@
 //#define EXTRA_VERBOSITY   1
 
 
+// Some features cannot be detected (reliably) using the standard
+// Linux ioctl()s, so we use some direct low-level device queries.
+
+typedef struct cdrom_generic_command CDROMgenericCmd;
+
 // Some structures which contain the result of a low-level SCSI CDROM query
 struct event_header
 {
@@ -57,6 +62,61 @@ struct media_event_desc
     unsigned char end_slot;
 };
 
+// and this is returned by GPCMD_READ_DISC_INFO
+typedef struct {
+    uint16_t disc_information_length;
+#ifdef WORDS_BIGENDIAN
+    uint8_t  reserved1          : 3;
+    uint8_t  erasable           : 1;
+    uint8_t  border_status      : 2;
+    uint8_t  disc_status        : 2;
+#else
+    uint8_t  disc_status        : 2;
+    uint8_t  border_status      : 2;
+    uint8_t  erasable           : 1;
+    uint8_t  reserved1          : 3;
+#endif
+    uint8_t  n_first_track;
+    uint8_t  n_sessions_lsb;
+    uint8_t  first_track_lsb;
+    uint8_t  last_track_lsb;
+#ifdef WORDS_BIGENDIAN
+    uint8_t  did_v              : 1;
+    uint8_t  dbc_v              : 1;
+    uint8_t  uru                : 1;
+    uint8_t  reserved2          : 5;
+#else
+    uint8_t  reserved2          : 5;
+    uint8_t  uru                : 1;
+    uint8_t  dbc_v              : 1;
+    uint8_t  did_v              : 1;
+#endif
+    uint8_t  disc_type;
+    uint8_t  n_sessions_msb;
+    uint8_t  first_track_msb;
+    uint8_t  last_track_msb;
+    uint32_t disc_id;
+    uint32_t lead_in;
+    uint32_t lead_out;
+    uint8_t  disc_bar_code[8];
+    uint8_t  reserved3;
+    uint8_t  n_opc;
+} CDROMdiscInfo;
+
+enum CDROMdiscStatus
+{
+    MEDIA_IS_EMPTY      = 0x0,
+    MEDIA_IS_APPENDABLE = 0x1,
+    MEDIA_IS_COMPLETE   = 0x2,
+    MEDIA_IS_OTHER      = 0x3
+};
+
+
+/** \class MythCDROMLinux
+ *
+ * Use Linux-specific ioctl()s to detect Audio-CDs,
+ * changed media, open trays and blank writable media.
+ */
 
 class MythCDROMLinux: public MythCDROM
 {
@@ -78,6 +138,7 @@ public:
 
 private:
     int driveStatus(void);
+    bool hasWritableMedia(void);
     int SCSIstatus(void);
 };
 
@@ -106,6 +167,54 @@ int MythCDROMLinux::driveStatus()
     return drive_status;
 }
 
+/** \brief Is there blank or eraseable media in the drive?
+ */
+
+bool MythCDROMLinux::hasWritableMedia()
+{
+    unsigned char    buffer[32];
+    CDROMgenericCmd  cgc;
+    CDROMdiscInfo   *di;
+
+
+    memset(buffer, 0, sizeof(buffer));
+    memset(&cgc,   0, sizeof(cgc));
+
+    cgc.cmd[0] = GPCMD_READ_DISC_INFO;
+    cgc.cmd[8] = sizeof(buffer);
+    cgc.quiet  = 1;
+    cgc.buffer = buffer;
+    cgc.buflen = sizeof(buffer);
+    cgc.data_direction = CGC_DATA_READ;
+
+    if (ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
+    {
+        VERBOSE(VB_MEDIA,
+                LOC + ":hasWritableMedia() - failed to send packet to "
+                    + m_DevicePath);
+        return 0;
+    }
+
+    di = (CDROMdiscInfo *) buffer;
+
+    switch (di->disc_status)
+    {
+        case MEDIA_IS_EMPTY:
+            return true;
+
+        case MEDIA_IS_APPENDABLE:
+            // It is unlikely that any plugins will support multi-session
+            // writing, so we treat it just like a finished disc:
+
+        case MEDIA_IS_COMPLETE:
+            return di->erasable;
+
+        case MEDIA_IS_OTHER:
+            ;
+    }
+
+    return false;
+}
 
 /** \brief Use a SCSI query packet to see if the drive is _really_ open.
  *
@@ -405,6 +514,12 @@ MediaStatus MythCDROMLinux::checkMedia()
                         break;
                     case CDS_NO_INFO:
                     case CDS_NO_DISC:
+                        if (hasWritableMedia())
+                        {
+                            VERBOSE(VB_MEDIA, "found a blank or writable disk");
+                            return setStatus(MEDIASTAT_UNFORMATTED, OpenedHere);
+                        }
+
                         VERBOSE(VB_MEDIA, "found no disk");
                         m_MediaType = MEDIATYPE_UNKNOWN;
                         return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
