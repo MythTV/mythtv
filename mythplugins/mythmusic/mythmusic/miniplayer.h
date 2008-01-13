@@ -44,6 +44,7 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
     void    showRepeatMode(void);
     void    showVolume(void);
     void    showSpeed(void);
+    void    showAutoMode(void);
 
     int           m_currTime, m_maxTime;
 

@@ -285,6 +285,12 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                 gPlayer->toggleRepeatMode();
                 showRepeatMode();
             }
+            else if (action == "MENU")
+            {
+                gPlayer->autoShowPlayer(!gPlayer->getAutoShowPlayer());
+                showAutoMode();
+            }
+
             else
                 handled = false;
         }
@@ -655,6 +661,23 @@ void MiniPlayer::showRepeatMode(void)
                     lcd->setMusicRepeat (LCD::MUSIC_REPEAT_NONE);
                 break;
         }
+
+        m_showingInfo = true;
+        m_infoText->SetText(msg);
+        m_infoTimer->start(5000, true);
+    }
+}
+
+void MiniPlayer::showAutoMode(void)
+{
+    if (m_infoText)
+    {
+        m_infoTimer->stop();
+        QString msg = tr("Auto Show Player: ");
+        if (gPlayer->getAutoShowPlayer())
+            msg += tr("On");
+        else
+            msg += tr("Off");
 
         m_showingInfo = true;
         m_infoText->SetText(msg);

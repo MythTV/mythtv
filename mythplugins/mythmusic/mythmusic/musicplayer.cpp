@@ -85,6 +85,8 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
 
     m_lastplayDelay = gContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
 
+    m_autoShowPlayer = (gContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
     gContext->addListener(this);
 }
 
@@ -123,6 +125,8 @@ MusicPlayer::~MusicPlayer()
         gContext->SaveSetting("RepeatMode", "all");
     else
         gContext->SaveSetting("RepeatMode", "none");
+
+    gContext->SaveSetting("MusicAutoShowPlayer", (m_autoShowPlayer ? "1" : "0"));
 }
 
 void MusicPlayer::setListener(QObject *listener)
@@ -442,7 +446,7 @@ void MusicPlayer::nextAuto(void)
     else
         next();
 
-    if (m_canShowPlayer)
+    if (m_canShowPlayer && m_autoShowPlayer)
     {
         MiniPlayer *popup = new MiniPlayer(gContext->GetMainWindow(), this);
         popup->showPlayer(10);

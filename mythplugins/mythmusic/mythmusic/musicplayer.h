@@ -48,6 +48,11 @@ class MusicPlayer : public QObject
     bool isPlaying(void) { return m_isPlaying; }
     bool hasClient(void) { return (m_listener != NULL); }
 
+    /// This will allow/disallow the mini player showing on track changes
+    void autoShowPlayer(bool autoShow) { m_autoShowPlayer = autoShow; }
+    bool getAutoShowPlayer(void) { return m_autoShowPlayer; }
+
+    /// This will allow/disallow the minplayer showing even using its jumppoint
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
     bool getCanShowPlayer(void) { return m_canShowPlayer; }
 
@@ -130,6 +135,7 @@ class MusicPlayer : public QObject
     bool         m_isPlaying;
     bool         m_isAutoplay;
     bool         m_canShowPlayer;
+    bool         m_autoShowPlayer;
     bool         m_wasPlaying;
     bool         m_updatedLastplay;
 
