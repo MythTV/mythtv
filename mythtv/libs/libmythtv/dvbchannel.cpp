@@ -707,7 +707,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     if (is_dvbs)
     {
         // make sure we tune to frequency, no matter what happens..
-        reset = first_tune = true;
+        // causes glitches after multirec merge
+        //reset = first_tune = true;
 
         // configure for new input
         if (!same_input)
