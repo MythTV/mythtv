@@ -349,11 +349,10 @@ bool MythMediaDevice::isMounted(bool Verify)
         stream.readLine(); // skip the rest of the line
         deviceNames.push_back(deviceName);
 
-        if (print_verbose_messages & VB_MEDIA)
-            debug += QString("                 %1 | %2\n")
-                     .arg(deviceName, 16).arg(mountPoint);
-
         if (deviceName.isEmpty())
+            continue;
+
+        if (!deviceName.startsWith("/dev/"))
             continue;
 
         // Get some basic info on the device name, if it looks like a path
@@ -385,6 +384,10 @@ bool MythMediaDevice::isMounted(bool Verify)
             mountFile.close();
             return true;
         }
+
+        if (print_verbose_messages & VB_MEDIA)
+            debug += QString("                 %1 | %2\n")
+                     .arg(deviceName, 16).arg(mountPoint);
     }
 
     mountFile.close();
