@@ -6,6 +6,7 @@ using namespace std;
 
 #include <stdint.h>
 #include <qstring.h>
+#include <qpixmap.h>
 
 #include "mythexp.h"
 #include "dtvmultiplex.h"
@@ -18,17 +19,12 @@ class DBChannel
     DBChannel(const DBChannel&);
     DBChannel(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
-              uint _favorite, bool _visible,
-              const QString &_name, const QString &_icon) :
-        channum(_channum), callsign(_callsign), chanid(_chanid),
-        major_chan(_major_chan), minor_chan(_minor_chan),
-        favorite(_favorite), visible(_visible),
-        name(_name), icon(_icon) {}
+              uint _favorite, uint _mplexid, bool _visible,
+              const QString &_name, const QString &_icon);
+    DBChannel& operator=(const DBChannel&);
 
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
-
-    DBChannel& operator=(const DBChannel&);
 
   public:
     QString channum;
@@ -37,11 +33,31 @@ class DBChannel
     uint    major_chan;
     uint    minor_chan;
     uint    favorite;
+    uint    mplexid;
     bool    visible;
     QString name;
     QString icon;
 };
 typedef vector<DBChannel> DBChanList;
+
+class PixmapChannel : public DBChannel
+{
+  public:
+    PixmapChannel(const PixmapChannel &other) :
+        DBChannel(other),
+        iconPixmap(other.iconPixmap),
+        iconLoaded(other.iconLoaded) { }
+    PixmapChannel(const DBChannel &other) :
+        DBChannel(other),
+        iconLoaded(false) { }
+
+    bool LoadChannelIcon(uint size) const;
+    QString GetFormatted(const QString &format) const;
+
+  public:
+    mutable QPixmap iconPixmap;
+    mutable bool    iconLoaded;
+};
 
 
 /** \class ChannelUtil
@@ -81,6 +97,7 @@ class MPUBLIC ChannelUtil
                               uint transport_id, uint network_id);
     static int     GetMplexID(uint sourceid,
                               uint transport_id, uint network_id);
+    static uint    GetMplexID(uint chanid);
     static int     GetBetterMplexID(int current_mplexid,
                                     int transport_id, int network_id);
 
@@ -145,6 +162,7 @@ class MPUBLIC ChannelUtil
 
     // Misc gets
 
+    static vector<uint> GetCardIDs(uint chanid);
     static QString GetUnknownCallsign(void);
     static uint    FindChannel(uint sourceid, const QString &freqid);
     static int     GetChanID(uint sourceid, const QString &channum)
@@ -169,8 +187,10 @@ class MPUBLIC ChannelUtil
                                 bool eliminate_duplicates = false);
     static void    EliminateDuplicateChanNum(DBChanList &list);
 
-    static uint    GetNextChannel(const DBChanList &sorted,
-                                  uint old_chanid, int direction);
+    static uint    GetNextChannel(const DBChanList  &sorted,
+                                  uint               old_chanid,
+                                  uint               mplexid_restriction,
+                                  int                direction);
 
     static QString GetChannelValueStr(const QString &channel_field,
                                       uint           sourceid,
@@ -200,6 +220,7 @@ class MPUBLIC ChannelUtil
      */
     static QString GetServiceName(int chanid);
     static int     GetSourceID(int mplexid);
+    static uint    GetSourceIDForChannel(uint chanid);
     static int     GetInputID(int sourceid, int cardid);
 
     // Misc sets

@@ -82,4 +82,33 @@ MPUBLIC unsigned long long myth_get_approximate_large_file_size(
 
 MPUBLIC double MythGetPixelAspectRatio(void);
 
+// CPU Tick timing function
+#ifdef MMX
+#ifdef _WIN32
+typedef LONGLONG uint64_t
+inline void rdtsc(uint64_t &x)
+{
+    QueryPerformanceCounter((LARGE_INTEGER*)(&x));
+}
+#else
+typedef struct {
+    uint a;
+    uint b;
+} timing_ab_t;
+inline void rdtsc(uint64_t &x)
+{
+    timing_ab_t &y = (timing_ab_t&) x;
+    asm("rdtsc \n"
+        "mov %%eax, %0 \n"
+        "mov %%edx, %1 \n"
+        : 
+        : "m"(y.a), "m"(y.b)
+        : "%eax", "%edx");
+}
+#endif
+
+#else // if !MMX
+inline void rdtsc(uint64_t &x) { x = 0ULL; }
+#endif // !MMX
+
 #endif // UTIL_H_

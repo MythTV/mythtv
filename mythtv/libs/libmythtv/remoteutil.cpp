@@ -1,3 +1,4 @@
+#include <qdeepcopy.h>
 #include <qfile.h>
 #include <qstringlist.h>
 

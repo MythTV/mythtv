@@ -68,7 +68,10 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
         chanid = ChannelUtil::GetChanID((*it)->sourceid, curchannelname);
     }
 
-    return ChannelUtil::GetNextChannel(allchannels, chanid, direction);
+    uint mplexid_restriction = 0;
+
+    return ChannelUtil::GetNextChannel(
+        allchannels, chanid, mplexid_restriction, direction);
 }
 
 uint ChannelBase::GetNextChannel(const QString &channum, int direction) const

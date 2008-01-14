@@ -7,6 +7,8 @@ using namespace std;
 #include <qdeepcopy.h>
 #include <qregexp.h>
 #include <stdint.h>
+#include <qimage.h>
+#include <qfile.h>
 
 #include "channelutil.h"
 #include "mythdbcon.h"
@@ -21,6 +23,22 @@ DBChannel::DBChannel(const DBChannel &other)
     (*this) = other;
 }
 
+DBChannel::DBChannel(
+    const QString &_channum, const QString &_callsign,
+    uint _chanid, uint _major_chan, uint _minor_chan,
+    uint _favorite, uint _mplexid, bool _visible,
+    const QString &_name, const QString &_icon) :
+    channum(QDeepCopy<QString>(_channum)),
+    callsign(QDeepCopy<QString>(_callsign)),
+    chanid(_chanid), major_chan(_major_chan), minor_chan(_minor_chan),
+    favorite(_favorite), mplexid(_mplexid), visible(_visible),
+    name(QDeepCopy<QString>(_name)),
+    icon(QDeepCopy<QString>(_icon))
+{
+    mplexid = (mplexid == 32767) ? 0 : mplexid;
+    icon = (icon == "none") ? QString::null : icon;
+}
+
 DBChannel& DBChannel::operator=(const DBChannel &other)
 {
     channum    = QDeepCopy<QString>(other.channum);
@@ -29,11 +47,69 @@ DBChannel& DBChannel::operator=(const DBChannel &other)
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
     favorite   = other.favorite;
+    mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
     visible    = other.visible;
     name       = QDeepCopy<QString>(other.name);
     icon       = QDeepCopy<QString>(other.icon);
 
     return *this;
+}
+
+bool PixmapChannel::LoadChannelIcon(uint size) const
+{
+    if (!size || size > 3000)
+        return false;
+
+    QImage tempimage(icon);
+
+    if (tempimage.width() == 0)
+    {
+        QFile existtest(icon);
+
+        // we have the file, just couldn't load it.
+        if (existtest.exists())
+            return false;
+
+        QString url = gContext->GetMasterHostPrefix();
+        if (url.length() < 1)
+            return false;
+
+        url += icon;
+
+        QImage *cached = gContext->CacheRemotePixmap(url);
+        if (cached)
+            tempimage = *cached;
+    }
+
+    if (tempimage.width() > 0)
+    {
+        iconLoaded = true;
+        if ((tempimage.width()  != (int) size) ||
+            (tempimage.height() != (int) size))
+        {
+            QImage tmp2;
+            tmp2 = tempimage.smoothScale(size, size);
+            iconPixmap.convertFromImage(tmp2);
+        }
+        else
+            iconPixmap.convertFromImage(tempimage);
+    }
+
+    return iconLoaded;
+}
+
+QString PixmapChannel::GetFormatted(const QString &format) const
+{
+    QString tmp = format;
+
+    if (tmp.isEmpty())
+        return "";
+
+    tmp.replace("<num>",  channum);
+    tmp.replace("<sign>", callsign);
+    tmp.replace("<name>", name);
+
+    return tmp;
 }
 
 static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
@@ -479,6 +555,25 @@ int ChannelUtil::GetMplexID(uint sourceid,
     return -1;
 }
 
+uint ChannelUtil::GetMplexID(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    /* See if mplexid is already in the database */
+    query.prepare(
+        "SELECT mplexid "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythContext::DBError("GetMplexID 4", query);
+    else if (query.next())
+        return query.value(0).toInt();
+
+    return 0;
+}
+
 /** \fn ChannelUtil::GetBetterMplexID(int, int, int)
  *  \brief Returns best match multiplex ID, creating one if needed.
  *
@@ -697,6 +792,24 @@ int ChannelUtil::GetSourceID(int db_mplexid)
         return query.value(0).toInt();
     }
     return -1;
+}
+
+uint ChannelUtil::GetSourceIDForChannel(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT sourceid "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythContext::DBError("Selecting channel/dtv_multiplex", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
 }
 
 int ChannelUtil::GetInputID(int source_id, int card_id)
@@ -1315,7 +1428,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
     QString qstr =
         "SELECT channum, callsign, chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
-        "       name, icon, visible "
+        "       name, icon, mplexid, visible "
         "FROM channel ";
 
     if (sourceid)
@@ -1350,7 +1463,8 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
             query.value(3).toUInt(),                      /* ATSC major */
             query.value(4).toUInt(),                      /* ATSC minor */
             favorites[query.value(2).toUInt()],           /* favid      */
-            query.value(7).toBool(),                      /* visible    */
+            query.value(7).toUInt(),                      /* mplexid    */
+            query.value(8).toBool(),                      /* visible    */
             QString::fromUtf8(query.value(5).toString()), /* name       */
             query.value(6).toString());                   /* icon       */
 
@@ -1498,8 +1612,11 @@ void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
     }
 }
 
-uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
-                                 uint old_chanid, int direction)
+uint ChannelUtil::GetNextChannel(
+    const DBChanList &sorted,
+    uint              old_chanid,
+    uint              mplexid_restriction,
+    int               direction)
 {
     DBChanList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
@@ -1522,8 +1639,11 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
                           sorted.rbegin()->chanid);
             else
                 it--;
-        } while ((it != start) && skip_non_visible && !it->visible);
-
+        }
+        while ((it != start) &&
+               ((skip_non_visible && !it->visible) ||
+                (mplexid_restriction &&
+                 (mplexid_restriction != it->mplexid))));
     }
     else if (CHANNEL_DIRECTION_UP == direction)
     {
@@ -1532,7 +1652,11 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
             it++;
             if (it == sorted.end())
                 it = sorted.begin();
-        } while ((it != start) && skip_non_visible && !it->visible);
+        }
+        while ((it != start) &&
+               ((skip_non_visible && !it->visible) ||
+                (mplexid_restriction &&
+                 (mplexid_restriction != it->mplexid))));
     }
     else if (CHANNEL_DIRECTION_FAVORITE == direction)
     {
@@ -1541,9 +1665,12 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
             it++;
             if (it == sorted.end())
                 it = sorted.begin();
-
-        } while ((it != start) &&
-                 (!it->favorite || (skip_non_visible && !it->visible)));
+        }
+        while ((it != start) &&
+               (!it->favorite ||
+                (skip_non_visible && !it->visible) ||
+                (mplexid_restriction &&
+                 (mplexid_restriction != it->mplexid))));
     }
 
     return it->chanid;

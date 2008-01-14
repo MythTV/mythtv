@@ -10,6 +10,8 @@
 class MPUBLIC SourceUtil
 {
   public:
+    static bool    HasDigitalChannel(uint sourceid);
+    static QString GetSourceName(uint sourceid);
     static QString GetChannelSeparator(uint sourceid);
     static QString GetChannelFormat(uint sourceid);
     static uint    GetChannelCount(uint sourceid);
@@ -23,6 +25,9 @@ class MPUBLIC SourceUtil
     static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(
         uint sourceid, QString cardtype = QString::null);
+
+    static bool    DeleteSource(uint sourceid);
+    static bool    DeleteAllSources(void);
 };
 
 #endif //_SOURCEUTIL_H_

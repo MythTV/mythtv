@@ -9,6 +9,59 @@
 #include "mythdbcon.h"
 #include "util.h"
 
+bool SourceUtil::HasDigitalChannel(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT mplexid, atsc_minor_chan, serviceid "
+        "FROM channel "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("SourceUtil::HasDigitalChannel()", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        uint mplexid = query.value(0).toUInt();
+        uint minor   = query.value(1).toUInt();
+        uint prognum = query.value(2).toUInt();
+        mplexid = (32767 == mplexid) ? 0 : mplexid;
+
+        if (mplexid && (minor || prognum))
+            return true;
+    }
+
+    return false;
+}
+
+QString SourceUtil::GetSourceName(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT name "
+        "FROM videosource "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("SourceUtil::GetSourceName()", query);
+        return QString::null;
+    }
+    else if (!query.next())
+    {
+        return QString::null;
+    }
+
+    return query.value(0).toString();
+}
+
 QString SourceUtil::GetChannelSeparator(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -287,4 +340,60 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
     myth_system(cmd);
                         
     return true;
+}
+
+bool SourceUtil::DeleteSource(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // Delete the channels associated with the source
+    query.prepare("DELETE FROM channel "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Deleting Channels", query);
+        return false;
+    }
+
+    // Delete the inputs associated with the source
+    query.prepare("DELETE FROM cardinput "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Deleting cardinputs", query);
+        return false;
+    }
+
+    // Delete the source itself
+    query.prepare("DELETE FROM videosource "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Deleting VideoSource", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool SourceUtil::DeleteAllSources(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    return (query.exec("TRUNCATE TABLE channel") &&
+            query.exec("TRUNCATE TABLE program") &&
+            query.exec("TRUNCATE TABLE videosource") &&
+            query.exec("TRUNCATE TABLE credits") &&
+            query.exec("TRUNCATE TABLE programrating") &&
+            query.exec("TRUNCATE TABLE programgenres") &&
+            query.exec("TRUNCATE TABLE dtv_multiplex") &&
+            query.exec("TRUNCATE TABLE inputgroup") &&
+            query.exec("TRUNCATE TABLE diseqc_config") &&
+            query.exec("TRUNCATE TABLE diseqc_tree") &&
+            query.exec("TRUNCATE TABLE cardinput"));
 }
