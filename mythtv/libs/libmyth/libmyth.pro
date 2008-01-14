@@ -60,7 +60,7 @@ inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
-inc.files += mythexp.h mythpluginapi.h compat.h mythverbose.h
+inc.files += mythexp.h mythpluginapi.h compat.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 using_oss {
