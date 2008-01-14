@@ -52,7 +52,7 @@ TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h
+inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h mythverbose.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
