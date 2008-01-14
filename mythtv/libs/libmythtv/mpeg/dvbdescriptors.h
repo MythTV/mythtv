@@ -451,10 +451,10 @@ class ComponentDescriptor : public MPEGDescriptor
                 break;
         }
 
-        if ((ComponentType() >> 3) & 0x7 == 0x2)
+        if (((ComponentType() >> 3) & 0x7) == 0x2)
             properties |= AUD_VISUALIMPAIR;
 
-        if ((ComponentType() >> 3) & 0x7 == 0x3)
+        if (((ComponentType() >> 3) & 0x7) == 0x3)
             properties |= AUD_HARDHEAR;
 
         return properties;
