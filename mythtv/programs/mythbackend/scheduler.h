@@ -20,6 +20,7 @@ using namespace std;
 
 typedef list<ProgramInfo *> RecList;
 typedef RecList::iterator RecIter;
+typedef RecList::const_iterator RecConstIter;
 
 class Scheduler : public QObject
 {

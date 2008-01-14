@@ -39,7 +39,7 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
 
     if (gContext->SendReceiveStringList(strlist))
     {
-        QStringList::iterator it = strlist.begin();
+        QStringList::const_iterator it = strlist.begin();
         while (it != strlist.end())
         {
             fsInfo.hostname = *(it++);
@@ -215,11 +215,11 @@ int RemoteGetRecordingList(vector<ProgramInfo *> *reclist, QStringList &strList)
             return 0;
         }
 
-        QStringList::iterator it = strList.at(1);
+        QStringList::const_iterator it = strList.at(1);
         for (int i = 0; i < numrecordings; i++)
         {
             ProgramInfo *pginfo = new ProgramInfo();
-            pginfo->FromStringList(strList, it);
+            pginfo->FromStringList(it, strList.end());
             reclist->push_back(pginfo);
         }
     }

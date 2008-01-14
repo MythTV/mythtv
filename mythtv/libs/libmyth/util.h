@@ -48,7 +48,7 @@ MPUBLIC inline long long absLongLong(long long  n) { return n >= 0 ? n : -n; }
 
 MPUBLIC void encodeLongLong(QStringList &list, long long num);
 MPUBLIC long long decodeLongLong(QStringList &list, uint offset);
-MPUBLIC long long decodeLongLong(QStringList &list, QStringList::iterator &it);
+MPUBLIC long long decodeLongLong(QStringList &list, QStringList::const_iterator &it);
 
 MPUBLIC QRgb blendColors(QRgb source, QRgb add, int alpha);
 

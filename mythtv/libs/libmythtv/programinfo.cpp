@@ -286,8 +286,8 @@ QString ProgramInfo::MakeUniqueKey(void) const
 /** \fn ProgramInfo::ToStringList(QStringList&) const
  *  \brief Serializes ProgramInfo into a QStringList which can be passed
  *         over a socket.
- *  \sa FromStringList(QStringList&,int),
- *      FromStringList(QStringList&,QStringList::iterator&)
+ *  \sa FromStringList(QStringList::const_iterator&,
+                       QStringList::const_iterator)
  */
 void ProgramInfo::ToStringList(QStringList &list) const
 {
@@ -341,19 +341,25 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(subtitleType)
 }
 
-/** \fn ProgramInfo::FromStringList(QStringList&,int)
+/** \fn ProgramInfo::FromStringList(const QStringList&,uint)
  *  \brief Uses a QStringList to initialize this ProgramInfo instance.
+ *
+ *  This is a convenience method which calls FromStringList(
+    QStringList::const_iterator&,QStringList::const_iterator)
+ *  with an iterator created using list.at(offset).
+ *
  *  \param list   QStringList containing serialized ProgramInfo.
  *  \param offset First field in list to treat as beginning of
  *                serialized ProgramInfo.
  *  \return true if it succeeds, false if it fails.
- *  \sa ToStringList(QStringList&),
- *      FromStringList(QStringList&,QStringList::iterator&)
+ *  \sa FromStringList(QStringList::const_iterator&,
+                       QStringList::const_iterator)
+ *      ToStringList(QStringList&) const
  */
-bool ProgramInfo::FromStringList(QStringList &list, int offset)
+bool ProgramInfo::FromStringList(const QStringList &list, uint offset)
 {
-    QStringList::iterator it = list.at(offset);
-    return FromStringList(list, it);
+    QStringList::const_iterator it = list.at(offset);
+    return FromStringList(it, list.end());
 }
 
 #define NEXT_STR()             if (it == listend)     \
@@ -381,18 +387,21 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
 
 #define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = atof(ts.ascii());
 
-/** \fn ProgramInfo::FromStringList(QStringList&,QStringList::iterator&)
+/** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
+                                    QStringList::const_iterator)
  *  \brief Uses a QStringList to initialize this ProgramInfo instance.
- *  \param list   QStringList containing serialized ProgramInfo.
- *  \param it     Iterator pointing to first field in list to treat as
+ *  \param beg    Iterator pointing to first item in list to treat as
  *                beginning of serialized ProgramInfo.
+ *  \param end    Iterator that will stop parsing of the ProgramInfo
  *  \return true if it succeeds, false if it fails.
- *  \sa ToStringList(QStringList&), FromStringList(QStringList&,int)
+ *  \sa FromStringList(const QStringList&,uint)
+ *      ToStringList(QStringList&) const
  */
-bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
+
+bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
+                                 QStringList::const_iterator  listend)
 {
-    const char* listerror = LOC + "FromStringList, not enough items in list.\n"; 
-    QStringList::iterator listend = list.end();
+    QString listerror = LOC + "FromStringList, not enough items in list."; 
     QString ts;
     int ti;
 
@@ -4508,12 +4517,12 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
     hasConflicts = slist[0].toInt();
 
     bool result = true;
-    QStringList::Iterator sit = slist.at(2);
+    QStringList::const_iterator sit = slist.at(2);
 
     while (result && sit != slist.end())
     {
         ProgramInfo *p = new ProgramInfo();
-        result = p->FromStringList(slist, sit);
+        result = p->FromStringList(sit, slist.end());
         if (result)
             append(p);
         else

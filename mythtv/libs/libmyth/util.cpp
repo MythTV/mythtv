@@ -100,7 +100,7 @@ int calc_utc_offset(void)
  *   32 bit integers.
  *
  *  \sa decodeLongLong(QStringList&,uint)
- *      decodeLongLong(QStringList&,QStringList::iterator&)
+ *      decodeLongLong(QStringList&,QStringList::const_iterator&)
  */
 void encodeLongLong(QStringList &list, long long num)
 {
@@ -123,7 +123,7 @@ void encodeLongLong(QStringList &list, long long num)
  *  \param offset Offset in list where to find first 32 bits of
  *                long long.
  *  \sa encodeLongLong(QStringList&,long long),
- *      decodeLongLong(QStringList&,QStringList::iterator&)
+ *      decodeLongLong(QStringList&,QStringList::const_iterator&)
  */
 long long decodeLongLong(QStringList &list, uint offset)
 {
@@ -143,7 +143,7 @@ long long decodeLongLong(QStringList &list, uint offset)
     return retval;
 }
 
-/** \fn decodeLongLong(QStringList&,QStringList::iterator&)
+/** \fn decodeLongLong(QStringList&,QStringList::const_iterator&)
  *  \brief Decodes a long encoded for streaming in the MythTV protocol.
  *
  *   We need this for Qt3.1 compatibility, since it will not
@@ -156,7 +156,7 @@ long long decodeLongLong(QStringList &list, uint offset)
  *  \sa encodeLongLong(QStringList&,long long),
  *      decodeLongLong(QStringList&,uint)
  */
-long long decodeLongLong(QStringList &list, QStringList::iterator &it)
+long long decodeLongLong(QStringList &list, QStringList::const_iterator &it)
 {
     (void)list;
 

@@ -220,7 +220,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QDomElement scheduled = pDoc->createElement("Scheduled");
     root.appendChild(scheduled);
 
-    list<ProgramInfo *> recordingList;
+    RecList recordingList;
 
     if (m_pSched)
         m_pSched->getAllPending(&recordingList);
@@ -228,7 +228,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     unsigned int iNum = 10;
     unsigned int iNumRecordings = 0;
 
-    list<ProgramInfo *>::iterator itProg = recordingList.begin();
+    RecConstIter itProg = recordingList.begin();
     for (; (itProg != recordingList.end()) && iNumRecordings < iNum; itProg++)
     {
         if (((*itProg)->recstatus  <= rsWillRecord) &&
@@ -329,7 +329,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     BackendQueryDiskSpace(strlist, m_pEncoders, true, m_bIsMaster);
 
-    QStringList::iterator sit = strlist.begin();
+    QStringList::const_iterator sit = strlist.begin();
     while (sit != strlist.end())
     {
         hostname   = *(sit++);

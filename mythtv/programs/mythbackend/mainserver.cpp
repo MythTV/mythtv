@@ -962,10 +962,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             ProgramInfo pinfo;
             ProgramList slavelist;
-            QStringList::Iterator sit = slist.at(1);
+            QStringList::const_iterator sit = slist.at(1);
             while (sit != slist.end())
             {
-                if (!pinfo.FromStringList(slist, sit))
+                if (!pinfo.FromStringList(sit, slist.end()))
                     break;
                 slavelist.append(new ProgramInfo(pinfo));
             }
@@ -3681,9 +3681,10 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     int       height         = -1;
     bool      has_extra_data = false;
 
-    QStringList::iterator it = slist.at(1);
+    QStringList::const_iterator it = slist.at(1);
+    QStringList::const_iterator end = slist.end();
     ProgramInfo *pginfo = new ProgramInfo();
-    bool ok = pginfo->FromStringList(slist, it);
+    bool ok = pginfo->FromStringList(it, end);
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "MainServer: Failed to parse pixmap request.");

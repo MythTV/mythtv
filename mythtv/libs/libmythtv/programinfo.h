@@ -151,8 +151,10 @@ class MPUBLIC ProgramInfo
 
     ProgramInfo& operator=(const ProgramInfo &other);
     ProgramInfo& clone(const ProgramInfo &other);
-    bool FromStringList(QStringList &list, int offset);
-    bool FromStringList(QStringList &list, QStringList::iterator &it);
+    bool FromStringList(QStringList::const_iterator &it,
+                        QStringList::const_iterator  end);
+    bool FromStringList(const QStringList &list, uint offset);
+
     bool FillInRecordInfo(const vector<ProgramInfo *> &reclist);
     
     // Destructor

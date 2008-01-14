@@ -176,7 +176,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     FileSystemInfo fsInfo;
     vector<FileSystemInfo> fsInfos;
 
-    QStringList::iterator it = strlist.begin();
+    QStringList::const_iterator it = strlist.begin();
     while (it != strlist.end())
     {
         fsInfo.hostname = *(it++);
@@ -259,7 +259,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
 
     BackendQueryDiskSpace(strlist, tvList, false, true);
 
-    QStringList::iterator it = strlist.begin();
+    QStringList::const_iterator it = strlist.begin();
     while (it != strlist.end())
     {
         fsInfo.hostname = *(it++);
