@@ -354,7 +354,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
-        prefixDir.cd(m_installlibdir);
+        prefixDir.cd(m_installprefix);
         m_installprefix = prefixDir.canonicalPath();
     }
     else if (prefixDir.path().contains(".app/Contents/MacOS"))
@@ -364,11 +364,11 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
             QDir(prefixDir.canonicalPath() + "/share").exists())
             m_installprefix = prefixDir.canonicalPath();
         if (QDir(prefixDir.canonicalPath() + "/lib").exists())
-            m_installprefix = prefixDir.canonicalPath() + "/lib";
+            m_installlibdir = prefixDir.canonicalPath() + "/lib";
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
-            .arg(m_installprefix));
+    VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1, libdir = %2")
+                          .arg(m_installprefix).arg(m_installlibdir));
 }
 
 MythContextPrivate::~MythContextPrivate()
