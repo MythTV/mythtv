@@ -173,41 +173,6 @@ QString safe_eno_to_string(int errnum)
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
-/**
- * Global function to retrieve InstallPrefix path
- */
-void GetInstallPrefixPath( QString &sInstallPrefix, QString &sInstallLibDir )
-{
-    char *tmp_installprefix = getenv("MYTHTVDIR");
-    if (tmp_installprefix)
-        sInstallPrefix = tmp_installprefix;
-
-#if QT_VERSION >= 0x030200
-    QDir prefixDir = qApp->applicationDirPath();
-#else
-    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
-    QDir prefixDir(appPath.left(appPath.findRev("/")));
-#endif
-
-    if (QDir( sInstallPrefix ).isRelative())
-    {
-        // If the PREFIX is relative, evaluate it relative to our
-        // executable directory. This can be fragile on Unix, so
-        // use relative PREFIX values with care.
-        prefixDir.cd( sInstallPrefix );
-        sInstallPrefix = prefixDir.canonicalPath();
-    }
-    else if (prefixDir.path().contains(".app/Contents/MacOS"))
-    {
-        prefixDir.cd("../Resources");
-        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
-            QDir(prefixDir.canonicalPath() + "/share").exists())
-            sInstallPrefix = prefixDir.canonicalPath();
-        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
-            sInstallLibDir = prefixDir.canonicalPath() + "/lib";
-    }
-}
-
 
 class MythContextPrivate
 {
@@ -373,7 +338,34 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       display_res(NULL),
       useSettingsCache(false)
 {
-    GetInstallPrefixPath( m_installprefix, m_installlibdir );
+    char *tmp_installprefix = getenv("MYTHTVDIR");
+    if (tmp_installprefix)
+        m_installprefix = tmp_installprefix;
+
+#if QT_VERSION >= 0x030200
+    QDir prefixDir = qApp->applicationDirPath();
+#else
+    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
+    QDir prefixDir(appPath.left(appPath.findRev("/")));
+#endif
+
+    if (QDir(m_installprefix).isRelative())
+    {
+        // If the PREFIX is relative, evaluate it relative to our
+        // executable directory. This can be fragile on Unix, so
+        // use relative PREFIX values with care.
+        prefixDir.cd(m_installlibdir);
+        m_installprefix = prefixDir.canonicalPath();
+    }
+    else if (prefixDir.path().contains(".app/Contents/MacOS"))
+    {
+        prefixDir.cd("../Resources");
+        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
+            QDir(prefixDir.canonicalPath() + "/share").exists())
+            m_installprefix = prefixDir.canonicalPath();
+        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
+            m_installprefix = prefixDir.canonicalPath() + "/lib";
+    }
 
     VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
@@ -1100,6 +1092,27 @@ QString MythContextPrivate::TestDBconnection(void)
     // No need to ping myself
     if (host == "localhost" || host == "127.0.0.1" || host == m_localhostname)
         doPing = false;
+
+    // If WOL is setup, the backend might be sleeping:
+    if (doPing && m_DBparams.wolEnabled)
+        for (int attempt = 0; attempt < m_DBparams.wolRetry; ++attempt)
+        {
+            int wakeupTime = m_DBparams.wolReconnect;
+
+            if (ping(host, wakeupTime))
+            {
+                doPing = false;
+                break;
+            }
+
+            VERBOSE(VB_GENERAL, QString("Trying to wake up host %1, attempt %2")
+                                .arg(host).arg(attempt));
+            system(m_DBparams.wolCommand);
+
+            VERBOSE(VB_GENERAL,
+                    QString("Waiting for %1 seconds").arg(wakeupTime));
+            sleep(m_DBparams.wolReconnect);
+        }
 
     if (doPing)
     {
