@@ -7,25 +7,29 @@
 #include "qstringlist.h"
 
 class DVBChannel;
-
-typedef QMap<uint,int> FilterMap;
-
-#define RETUNE_TIMEOUT 5000
+class DVBStreamHandler;
 
 class DVBSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
   public:
-    DVBSignalMonitor(int db_cardnum, DVBChannel* _channel, uint _flags = 0,
+    DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
+                     uint64_t _flags =
+                     kDTVSigMon_WaitForSig | kDVBSigMon_WaitForSNR |
+                     kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB,
                      const char *_name = "DVBSignalMonitor");
     virtual ~DVBSignalMonitor();
 
     virtual QStringList GetStatusList(bool kick);
     void Stop(void);
 
-    bool UpdateFiltersFromStreamData(void);
-
     virtual void SetRotorTarget(float target);
+    virtual void GetRotorStatus(bool &was_moving, bool &is_moving);
+    virtual void SetRotorValue(int)
+    {
+        QMutexLocker locker(&statusLock);
+        rotorPosition.SetValue(100);
+    }
 
     // MPEG
     virtual void HandlePMT(uint, const ProgramMapTable*);
@@ -52,29 +56,16 @@ class DVBSignalMonitor: public DTVSignalMonitor
     virtual void UpdateValues(void);
     void EmitDVBSignals(void);
 
-    void RetuneMonitor(void);
-    static void *TableMonitorThread(void *param);
-    void RunTableMonitor(void);
-    void RunTableMonitorTS(void);
-    void RunTableMonitorSR(void);
-    bool AddPIDFilter(uint pid);
-    bool RemovePIDFilter(uint pid);
-
-    int GetDVBCardNum(void) const;
     DVBChannel *GetDVBChannel(void);
 
-    bool SupportsTSMonitoring(void);
   protected:
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;
     SignalMonitorValue rotorPosition;
 
-    bool               useSectionReader;
-    bool               dtvMonitorRunning;
-    pthread_t          table_monitor_thread;
-
-    FilterMap          filters; ///< PID filters for table monitoring
+    bool               streamHandlerStarted;
+    DVBStreamHandler  *streamHandler;
 };
 
 #endif // DVBSIGNALMONITOR_H

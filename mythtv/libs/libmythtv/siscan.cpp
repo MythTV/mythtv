@@ -688,11 +688,13 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     const uint64_t freq = item.freq_offset(transport.offset());
 
 #ifdef USING_DVB
-    if (GetDVBSignalMonitor())
+    if (GetDVBSignalMonitor() && GetDVBChannel())
     {
-        // always wait for rotor to finish
-        GetDVBSignalMonitor()->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
-        GetDVBSignalMonitor()->SetRotorTarget(1.0f);
+        if (GetDVBChannel()->GetRotor())
+        {
+            GetDVBSignalMonitor()->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
+            GetDVBSignalMonitor()->SetRotorTarget(1.0f);
+        }
     }
 #endif // USING_DVB
 

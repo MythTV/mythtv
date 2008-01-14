@@ -282,6 +282,13 @@ bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
         if (tspacket.HasPayload())
         {
             const unsigned int lpid = tspacket.PID();
+
+            if ((GetStreamData()->VideoPIDSingleProgram() > 0x1fff) &&
+                _wait_for_keyframe_option)
+            {
+                _wait_for_keyframe_option = false;
+            }
+
             // Pass or reject frames based on PID, and parse info from them
             if (lpid == GetStreamData()->VideoPIDSingleProgram())
             {
@@ -292,6 +299,7 @@ bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
             else if (GetStreamData()->IsAudioPID(lpid))
             {
                 //cerr<<"a";
+                _buffer_packets = !FindAudioKeyframes(&tspacket);
                 BufferedWrite(tspacket);
             }
             else if (GetStreamData()->IsListeningPID(lpid))

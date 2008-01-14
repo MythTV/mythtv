@@ -120,12 +120,18 @@ bool setupTVs(bool ismaster, bool &error)
         }
     }
 
-    query.exec("SELECT cardid, hostname "
-               "FROM capturecard "
-               "WHERE parentid = '0' "
-               "ORDER BY cardid");
+    if (!query.exec(
+            "SELECT cardid, hostname "
+            "FROM capturecard "
+            "ORDER BY cardid"))
+    {
+        MythContext::DBError("Querying Recorders", query);
+        return false;
+    }
 
-    while (query.isActive() && query.next())
+    vector<uint>    cardids;
+    vector<QString> hosts;
+    while (query.next())
     {
         uint    cardid = query.value(0).toUInt();
         QString host   = query.value(1).toString();
@@ -136,17 +142,33 @@ bool setupTVs(bool ismaster, bool &error)
             QString msg = cidmsg + " does not have a hostname defined.\n"
                 "Please run setup and confirm all of the capture cards.\n";
 
-            cerr << msg;
+            VERBOSE(VB_IMPORTANT, msg);
             gContext->LogEntry("mythbackend", LP_CRITICAL,
                                "Problem with capture cards", msg);
             continue;
         }
 
+        cardids.push_back(cardid);
+        hosts.push_back(host);
+    }
+
+    for (uint i = 0; i < cardids.size(); i++)
+    {
+        if (hosts[i] == localhostname)
+            new TVRec(cardids[i]);
+    }
+
+    for (uint i = 0; i < cardids.size(); i++)
+    {
+        uint    cardid = cardids[i];
+        QString host   = hosts[i];
+        QString cidmsg = QString("Card %1").arg(cardid);
+
         if (!ismaster)
         {
             if (host == localhostname)
             {
-                TVRec *tv = new TVRec(cardid);
+                TVRec *tv = TVRec::GetTVRec(cardid);
                 if (tv->Init())
                 {
                     EncoderLink *enc = new EncoderLink(cardid, tv);
@@ -168,7 +190,7 @@ bool setupTVs(bool ismaster, bool &error)
         {
             if (host == localhostname)
             {
-                TVRec *tv = new TVRec(cardid);
+                TVRec *tv = TVRec::GetTVRec(cardid);
                 if (tv->Init())
                 {
                     EncoderLink *enc = new EncoderLink(cardid, tv);

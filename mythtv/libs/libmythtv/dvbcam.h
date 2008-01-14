@@ -10,8 +10,9 @@ using namespace std;
 
 #include "dvbtypes.h"
 
+class ChannelBase;
 class cCiHandler;
-typedef deque<ProgramMapTable> pmt_list_t;
+typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
 
 class DVBCam
 {
@@ -22,7 +23,7 @@ class DVBCam
     bool Start();
     bool Stop();
     bool IsRunning() const { return ciThreadRunning; }
-    void SetPMT(const ProgramMapTable *pmt);
+    void SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt);
     void SetTimeOffset(double offset_in_seconds);
 
   private:

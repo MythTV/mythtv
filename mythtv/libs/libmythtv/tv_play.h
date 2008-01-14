@@ -17,6 +17,7 @@
 #include "tv.h"
 #include "util.h"
 #include "programinfo.h"
+#include "channelutil.h"
 #include "videoouttypes.h"
 
 #include <qobject.h>
@@ -76,6 +77,30 @@ enum scheduleEditTypes {
     kPlaybackBox,
 };
 
+typedef enum
+{
+    kAskAllowCancel,
+    kAskAllowOneRec,
+    kAskAllowMultiRec,
+} AskAllowType;
+
+class AskProgramInfo
+{
+  public:
+    AskProgramInfo() : info(NULL) {}
+    AskProgramInfo(const QDateTime &e, bool r, bool l, ProgramInfo *i) :
+        expiry(e), has_rec(r), has_later(l),
+        is_in_same_input_group(false), is_conflicting(false),
+        info(i) {}
+
+    QDateTime    expiry;
+    bool         has_rec;
+    bool         has_later;
+    bool         is_in_same_input_group;
+    bool         is_conflicting;
+    ProgramInfo *info;
+};
+
 class MPUBLIC TV : public QObject
 {
     Q_OBJECT
@@ -113,7 +138,9 @@ class MPUBLIC TV : public QObject
     void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
     bool IsEmbedding(void);
-    void EPGChannelUpdate(uint chanid, QString channum);
+    bool IsTunable(uint chanid);
+    void ChangeChannel(const DBChanList &options);
+
     void DrawUnusedRects(bool sync);
    
     // Recording commands
@@ -130,7 +157,7 @@ class MPUBLIC TV : public QObject
 
     void ShowNoRecorderDialog(void);
     void FinishRecording(void);
-    void AskAllowRecording(const QStringList&, int, bool);
+    void AskAllowRecording(const QStringList&, int, bool, bool);
     void PromptStopWatchingRecording(void);
     void PromptDeleteRecording(QString title);
     bool PromptRecGroupPassword(void);
@@ -261,9 +288,10 @@ class MPUBLIC TV : public QObject
     QString GetQueuedChanNum(void) const;
     uint    GetQueuedChanID(void)  const { return queuedChanID; }
 
-    void ToggleInputs(void); 
-
-    void SwitchCards(uint chanid = 0, QString channum = "");
+    void SwitchSource(uint source_direction);
+    void SwitchInputs(uint inputid);
+    void ToggleInputs(uint inputid = 0); 
+    void SwitchCards(uint chanid = 0, QString channum = "", uint inputid = 0);
 
     void ToggleSleepTimer(void);
     void ToggleSleepTimer(const QString);
@@ -326,6 +354,8 @@ class MPUBLIC TV : public QObject
     void UpdateOSDTextEntry(const QString &message);
     void UpdateOSDSignal(const QStringList& strlist);
     void UpdateOSDTimeoutMessage(void);
+    void UpdateOSDAskAllowDialog(void);
+    void HandleOSDAskAllowResponse(void);
 
     void EditSchedule(int editType = kScheduleProgramGuide);
 
@@ -360,6 +390,8 @@ class MPUBLIC TV : public QObject
 
     void BuildOSDTreeMenu(void);
     void ShowOSDTreeMenu(void);
+    void FillMenuLiveTV(OSDGenericTree *treeMenu);
+    void FillMenuPlaying(OSDGenericTree *treeMenu);
 
     void UpdateLCD(void);
     void ShowLCDChannelInfo(void);
@@ -395,6 +427,7 @@ class MPUBLIC TV : public QObject
   private:
     // Configuration variables from database
     QString baseFilters;
+    QString db_channel_format;
     QString db_time_format;
     QString db_short_date_format;
     int     fftime;
@@ -423,6 +456,7 @@ class MPUBLIC TV : public QObject
     mutable QMutex     stateLock;
     TVState            internalState;
 
+    uint switchToInputId;
     bool menurunning;
     bool runMainLoop;
     bool wantsToQuit;
@@ -446,6 +480,11 @@ class MPUBLIC TV : public QObject
     PictureAdjustType adjustingPicture;
     /// Picture attribute to modify (on arrow left or right)
     PictureAttribute  adjustingPictureAttribute;
+
+    // Ask Allow state
+    AskAllowType                 askAllowType;
+    QMap<QString,AskProgramInfo> askAllowPrograms;
+    QMutex                       askAllowLock;
 
     bool ignoreKeys;
     bool needToSwapPIP;
@@ -626,6 +665,9 @@ class MPUBLIC TV : public QObject
     static const int kSMExitTimeout;
     static const int kInputKeysMax;  ///< When to start discarding early keys
     static const int kInputModeTimeout; ///< Timeout for entry modes in msec
+
+    static const uint kNextSource;
+    static const uint kPreviousSource;
 
     // Network Control stuff
     QValueList<QString> networkControlCommands;

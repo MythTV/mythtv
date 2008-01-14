@@ -22,7 +22,7 @@ class DTVSignalMonitor : public SignalMonitor,
   public:
     DTVSignalMonitor(int db_cardnum,
                      DTVChannel *_channel,
-                     uint wait_for_mask,
+                     uint64_t wait_for_mask,
                      const char *name = "DTVSignalMonitor");
     ~DTVSignalMonitor();
 
@@ -49,6 +49,9 @@ class DTVSignalMonitor : public SignalMonitor,
 
     /// Sets rotor target pos from 0.0 to 1.0
     virtual void SetRotorTarget(float) {}
+    virtual void GetRotorStatus(bool &was_moving, bool &is_moving)
+        { was_moving = is_moving = false; }
+    virtual void SetRotorValue(int) {}
 
     virtual void AddFlags(uint64_t _flags);
     virtual void RemoveFlags(uint64_t _flags);

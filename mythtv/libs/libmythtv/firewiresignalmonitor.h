@@ -19,7 +19,7 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
   public:
     FirewireSignalMonitor(int db_cardnum, FirewireChannel *_channel,
-                          uint _flags = kFWSigMon_WaitForPower,
+                          uint64_t _flags = kFWSigMon_WaitForPower,
                           const char *_name = "FirewireSignalMonitor");
 
     virtual void HandlePAT(const ProgramAssociationTable*);

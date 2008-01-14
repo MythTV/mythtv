@@ -115,7 +115,7 @@ class SignalMonitor : public QObject
     void AllGood(void);
   protected:
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
-                  uint wait_for_mask, const char *name = "SignalMonitor");
+                  uint64_t wait_for_mask, const char *name = "SignalMonitor");
     
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
@@ -148,7 +148,7 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_SDTSeen    = 0x0000000080ULL;
     /// We've seen the FireWire STB power state
     static const uint64_t kFWSigMon_PowerSeen   = 0x0000000100ULL;
-    /// We can encrypt the stream
+    /// We've seen something indicating whether the data stream is encrypted
     static const uint64_t kDTVSigMon_CryptSeen  = 0x0000000200ULL;
 
     /// We've seen a PAT matching our requirements
@@ -169,7 +169,7 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_SDTMatch   = 0x0000080000ULL;
     /// We've seen a FireWire STB power state matching our requirements
     static const uint64_t kFWSigMon_PowerMatch  = 0x0000100000ULL;
-    /// We can encrypt the stream
+    /// We've seen unencrypted data in data stream
     static const uint64_t kDTVSigMon_CryptMatch = 0x0000200000ULL;
 
     static const uint64_t kDTVSigMon_WaitForPAT = 0x0001000000ULL;

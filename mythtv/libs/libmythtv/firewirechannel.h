@@ -21,8 +21,6 @@ class FirewireChannel : public DTVChannel
     // Commands
     virtual bool Open(void);
     virtual void Close(void);
-    virtual bool SwitchToInput(const QString &inputname, const QString &chan);
-    virtual bool SwitchToInput(int newcapchannel, bool setstarting);
 
     virtual bool TuneMultiplex(uint /*mplexid*/, QString /*inputname*/)
         { return false; }

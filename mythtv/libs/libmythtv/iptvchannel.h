@@ -25,8 +25,6 @@ class IPTVChannel : public DTVChannel
 
     bool IsOpen(void) const;
 
-    bool SwitchToInput(const QString &inputname, const QString &channum);
-    bool SwitchToInput(int inputNum, bool setstarting);
     bool SetChannelByString(const QString &channum);
     bool TuneMultiplex(uint /*mplexid*/, QString /*sourceid*/)
         { return false; } // TODO

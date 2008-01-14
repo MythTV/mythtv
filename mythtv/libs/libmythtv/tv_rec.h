@@ -10,6 +10,8 @@
 #include <qstringlist.h>
 #include <qwaitcondition.h>
 
+#include "inputinfo.h"
+#include "inputgroupmap.h"
 #include "mythdeque.h"
 #include "programinfo.h"
 #include "tv.h"
@@ -130,6 +132,22 @@ class TuningRequest
 };
 typedef MythDeque<TuningRequest> TuningQueue;
 
+class PendingInfo
+{
+  public:
+    PendingInfo() :
+        info(NULL), hasLaterShowing(false), canceled(false),
+        ask(false), doNotAsk(false) { }
+    ProgramInfo *info;
+    QDateTime    recordingStart;
+    bool         hasLaterShowing;
+    bool         canceled;
+    bool         ask;
+    bool         doNotAsk;
+    vector<uint> possibleConflicts;
+};
+typedef QMap<uint,PendingInfo> PendingMap;
+
 class MPUBLIC TVRec : public QObject
 {
     friend class TuningRequest;
@@ -140,7 +158,7 @@ class MPUBLIC TVRec : public QObject
 
     bool Init(void);
 
-    void RecordPending(const ProgramInfo *rcinfo, int secsleft);
+    void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
     RecStatusType StartRecording(const ProgramInfo *rcinfo);
 
     void StopRecording(void);
@@ -156,7 +174,7 @@ class MPUBLIC TVRec : public QObject
     /// \brief Tells TVRec to stop event loop
     void Stop(void)             { ClearFlags(kFlagRunMainLoop); }
 
-    TVState GetState(void);
+    TVState GetState(void) const;
     /// \brief Returns "state == kState_RecordingPreRecorded"
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     /// \brief Returns "state == kState_RecordingRecordedOnly"
@@ -165,7 +183,7 @@ class MPUBLIC TVRec : public QObject
 
     bool SetVideoFiltersForChannel(uint sourceid, const QString &channum);
 
-    bool IsBusy(void);
+    bool IsBusy(TunedInputInfo *busy_input = NULL, int time_buffer = 5) const;
     bool IsReallyRecording(void);
 
     float GetFramerate(void);
@@ -181,7 +199,7 @@ class MPUBLIC TVRec : public QObject
 
     void SetLiveRecording(int recording);
 
-    QStringList GetConnectedInputs(void) const;
+    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
     QString     GetInput(void) const;
     QString     SetInput(QString input, uint requestType = kFlagDetect);
 
@@ -220,6 +238,10 @@ class MPUBLIC TVRec : public QObject
     void RecorderPaused(void);
 
     void SetNextLiveTVDir(QString dir);
+
+    uint GetFlags(void) const { return stateFlags; }
+
+    static TVRec *GetTVRec(uint cardid);
 
   public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
@@ -290,6 +312,8 @@ class MPUBLIC TVRec : public QObject
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
+    void HandlePendingRecordings(void);
+
     bool WaitForNextLiveTVDir(void);
     bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
     bool CreateLiveTVRingBuffer(void);
@@ -324,6 +348,7 @@ class MPUBLIC TVRec : public QObject
     int     overRecordSecNrml;
     int     overRecordSecCat;
     QString overRecordCategory;
+    InputGroupMap igrp;
 
     // Configuration variables from setup routines
     int               cardid;
@@ -336,7 +361,7 @@ class MPUBLIC TVRec : public QObject
     DBox2DBOptions     dboxOpt;
 
     // State variables
-    QMutex         stateChangeLock;
+    mutable QMutex stateChangeLock;
     TVState        internalState;
     TVState        desiredNextState;
     bool           changeState;
@@ -356,8 +381,7 @@ class MPUBLIC TVRec : public QObject
     int          overrecordseconds;
 
     // Pending recording info
-    ProgramInfo *pendingRecording;
-    QDateTime    recordPendingStart;
+    PendingMap   pendingRecordings;
 
     // Pseudo LiveTV recording
     ProgramInfo *pseudoLiveTVRecording;
@@ -372,6 +396,9 @@ class MPUBLIC TVRec : public QObject
     RingBuffer  *ringBuffer;
     QString      rbFileExt;
 
+    static QMutex            cardsLock;
+    static QMap<uint,TVRec*> cards;
+
   public:
     static const uint kSignalMonitoringRate;
 
@@ -382,7 +409,6 @@ class MPUBLIC TVRec : public QObject
     static const uint kFlagFinishRecording      = 0x00000008;
     static const uint kFlagErrored              = 0x00000010;
     static const uint kFlagCancelNextRecording  = 0x00000020;
-    static const uint kFlagAskAllowRecording    = 0x00000040;
 
     // Tuning flags
     /// final result desired is LiveTV recording

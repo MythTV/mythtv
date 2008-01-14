@@ -140,6 +140,16 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
 
     VERBOSE(VB_CHANNEL, LOC + QString("Changing to '%1'.").arg(chan));
 
+    // input switching code would go here
+
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return false;
+
+    uint mplexid_restriction;
+    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+        return false;
+
     if (m_lastChannel != curchannelname)
         m_lastChannel = curchannelname;
     curchannelname = chan;
@@ -209,17 +219,6 @@ bool DBox2Channel::Open(void)
 void DBox2Channel::Close(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Close()");
-}
-
-bool DBox2Channel::SwitchToInput(const QString &input, const QString &chan)
-{
-    int inputNum = GetInputByName(input);
-    if (inputNum < 0)
-        return false;
-
-    // input switching code would go here
-
-    return SetChannelByString(chan);
 }
 
 void DBox2Channel::LoadChannels(void)
@@ -421,7 +420,8 @@ void DBox2Channel::RecorderAlive(bool alive)
     else
     {
         VERBOSE(VB_EIT, LOC + "Recorder now offline. Reactivating EPG scan");
-        SetChannelByDirection(CHANNEL_DIRECTION_UP);
+        uint nextchanid = GetNextChannel(0, CHANNEL_DIRECTION_UP);
+        SetChannelByString(ChannelUtil::GetChanNum(nextchanid));
     }
 }
 
@@ -437,6 +437,7 @@ void DBox2Channel::EPGFinished(void)
     {
         VERBOSE(VB_EIT, LOC + "EPG finished. Recorder still offline. "
                 "Continuing EPG scan");
-        SetChannelByDirection(CHANNEL_DIRECTION_UP);
+        uint nextchanid = GetNextChannel(0, CHANNEL_DIRECTION_UP);
+        SetChannelByString(ChannelUtil::GetChanNum(nextchanid));
     }
 }

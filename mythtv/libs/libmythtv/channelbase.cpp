@@ -12,6 +12,7 @@
 
 // C++ headers
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 // MythTV headers
@@ -24,6 +25,9 @@ using namespace std;
 #include "mythdbcon.h"
 #include "cardutil.h"
 #include "channelutil.h"
+#include "remoteutil.h"
+#include "sourceutil.h"
+#include "cardutil.h"
 #include "compat.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
@@ -41,18 +45,68 @@ ChannelBase::~ChannelBase(void)
 {
 }
 
-bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
+bool ChannelBase::Init(QString &inputname, QString &startchannel)
 {
-    uint startchanid = GetNextChannel(GetCurrentName(), dir);
-    uint nextchanid  = startchanid;
+    bool ok;
 
-    bool ok = false;
-    do
+    if (inputname.isEmpty())
+        ok = SetChannelByString(startchannel);
+    else
+        ok = SwitchToInput(inputname, startchannel);
+
+    if (ok)
+        return true;
+
+    // try to find a valid channel if given start channel fails.
+    QString msg1 = QString("Setting start channel '%1' failed, ")
+        .arg(startchannel);
+    QString msg2 = "and we failed to find any suitible channels on any input.";
+    bool msg_error = true;
+
+    QStringList inputs = GetConnectedInputs();
+    QStringList::const_iterator start =
+        find(inputs.begin(), inputs.end(), inputname);
+    start = (start == inputs.end()) ?  inputs.begin() : start;
+
+    QStringList::const_iterator it = start;
+    while (it != inputs.end() && !ok)
     {
-        if (!(ok = SetChannelByString(ChannelUtil::GetChanNum(nextchanid))))
-            nextchanid = GetNextChannel(nextchanid, dir);
+        uint mplexid_restriction = 0;
+
+        DBChanList channels = GetChannels(*it);
+        if (IsInputAvailable(GetInputByName(*it), mplexid_restriction) &&
+            channels.size())
+        {
+            uint chanid = ChannelUtil::GetNextChannel(
+                channels, channels[0].chanid,
+                mplexid_restriction, CHANNEL_DIRECTION_UP);
+
+            DBChanList::const_iterator cit =
+                find(channels.begin(), channels.end(), chanid);
+
+            if (chanid && cit != channels.end())
+            {
+                ok = SwitchToInput(*it, (*cit).channum);
+                if (ok)
+                {
+                    inputname    = *it;
+                    startchannel = QDeepCopy<QString>((*cit).channum);
+                    msg2 = QString("tuned to '%1' on input '%2' instead.")
+                        .arg(startchannel).arg(inputname);
+                    msg_error = false;
+                }
+            }
+        }
+
+        it++;
+        it = (it == inputs.end()) ? inputs.begin() : it;
+        if (it == start)
+            break;
     }
-    while (!ok && (nextchanid != startchanid));
+
+    VERBOSE(((msg_error) ? VB_IMPORTANT : VB_GENERAL),
+            ((msg_error) ? LOC_ERR : LOC_WARN) +
+            msg1 + "\n\t\t\t" + msg2);
 
     return ok;
 }
@@ -69,6 +123,7 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
     }
 
     uint mplexid_restriction = 0;
+    IsInputAvailable(currentInputID, mplexid_restriction);
 
     return ChannelUtil::GetNextChannel(
         allchannels, chanid, mplexid_restriction, direction);
@@ -192,6 +247,218 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
                         "setting channel %2\n").arg(inputname).arg(chan));
     }
     return ok;
+}
+
+bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
+{
+    InputMap::const_iterator it = inputs.find(newInputNum);
+    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
+        return false;
+
+    uint mplexid_restriction;
+    if (!IsInputAvailable(newInputNum, mplexid_restriction))
+        return false;
+
+    // input switching code would go here
+
+    if (setstarting)
+        return SetChannelByString((*it)->startChanNum);
+
+    return true;
+}
+
+static bool is_input_group_busy(
+    uint                       inputid,
+    uint                       groupid,
+    const vector<uint>        &excluded_cardids,
+    QMap<uint,bool>           &busygrp,
+    QMap<uint,bool>           &busyrec,
+    QMap<uint,TunedInputInfo> &busyin,
+    uint                      &mplexid_restriction)
+{
+    // If none are busy, we don't need to check further
+    QMap<uint,bool>::const_iterator bit = busygrp.find(groupid);
+    if ((bit != busygrp.end()) && !*bit)
+        return false;
+
+    vector<TunedInputInfo> conflicts;
+    vector<uint> cardids = CardUtil::GetGroupCardIDs(groupid);
+    for (uint i = 0; i < cardids.size(); i++)
+    {
+        if (find(excluded_cardids.begin(),
+                 excluded_cardids.end(), cardids[i]) != excluded_cardids.end())
+        {
+            continue;
+        }
+
+        TunedInputInfo info;
+        QMap<uint,bool>::const_iterator it = busyrec.find(cardids[i]);
+        if (it == busyrec.end())
+        {
+            busyrec[cardids[i]] = RemoteIsBusy(cardids[i], info);
+            it = busyrec.find(cardids[i]);
+            if (*it)
+                busyin[cardids[i]] = info;
+        }
+
+        if (*it)
+            conflicts.push_back(busyin[cardids[i]]);
+    }
+
+    // If none are busy, we don't need to check further
+    busygrp[groupid] = !conflicts.empty();
+    if (conflicts.empty())
+        return false;
+
+    InputInfo in;
+    in.inputid = inputid;
+    if (!CardUtil::GetInputInfo(in))
+        return true;
+
+    // If they aren't using the same source they are definately busy
+    bool is_busy_input = false;
+
+    for (uint i = 0; i < conflicts.size() && !is_busy_input; i++)
+        is_busy_input = (in.sourceid != conflicts[i].sourceid);
+
+    if (is_busy_input)
+        return true;
+
+    // If the source's channels aren't digitally tuned then there is a conflict
+    is_busy_input = !SourceUtil::HasDigitalChannel(in.sourceid);
+    if (!is_busy_input && conflicts[0].chanid)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT mplexid "
+            "FROM channel "
+            "WHERE chanid = :CHANID");
+        query.bindValue(":CHANID", conflicts[0].chanid);
+        if (!query.exec())
+            MythContext::DBError("is_input_group_busy", query);
+        else if (query.next())
+        {
+            mplexid_restriction = query.value(0).toUInt();
+            mplexid_restriction = (32767 == mplexid_restriction) ?
+                0 : mplexid_restriction;
+        }
+    }
+
+    return is_busy_input;
+}
+
+static bool is_input_busy(
+    uint                       inputid,
+    const vector<uint>        &groupids,
+    const vector<uint>        &excluded_cardids,
+    QMap<uint,bool>           &busygrp,
+    QMap<uint,bool>           &busyrec,
+    QMap<uint,TunedInputInfo> &busyin,
+    uint                      &mplexid_restriction)
+{
+    bool is_busy = false;
+    for (uint i = 0; i < groupids.size() && !is_busy; i++)
+    {
+        is_busy |= is_input_group_busy(
+            inputid, groupids[i], excluded_cardids,
+            busygrp, busyrec, busyin, mplexid_restriction);
+    }
+    return is_busy;
+}
+
+bool ChannelBase::IsInputAvailable(
+    int inputid, uint &mplexid_restriction) const
+{
+    if (inputid < 0)
+        return false;
+
+    // Check each input to make sure it doesn't belong to an
+    // input group which is attached to a busy recorder.
+    QMap<uint,bool>           busygrp;
+    QMap<uint,bool>           busyrec;
+    QMap<uint,TunedInputInfo> busyin;
+
+    // Cache our busy input if applicable
+    uint cid = GetCardID();
+    TunedInputInfo info;
+    busyrec[cid] = pParent->IsBusy(&info);
+    if (busyrec[cid])
+    {
+        busyin[cid] = info;
+        info.chanid = GetChanID();
+    }
+
+    vector<uint> excluded_cardids;
+    excluded_cardids.push_back(cid);
+
+    mplexid_restriction = 0;
+
+    vector<uint> groupids = CardUtil::GetInputGroups(inputid);
+
+    return !is_input_busy(inputid, groupids, excluded_cardids,
+                          busygrp, busyrec, busyin, mplexid_restriction);
+}
+
+/** \fn ChannelBase::GetFreeInputs(const vector<uint>&) const
+ *  \brief Returns the recorders available inputs.
+ *
+ *   This filters out the connected inputs that belong to an input 
+ *   group which is busy. Recorders in the excluded cardids will 
+ *   not be considered busy for the sake of determining free inputs.
+ *
+ */
+vector<InputInfo> ChannelBase::GetFreeInputs(
+    const vector<uint> &excluded_cardids) const
+{
+    vector<InputInfo> new_list;
+
+    QStringList list = GetConnectedInputs();
+    if (list.empty())
+        return new_list;
+
+    // Check each input to make sure it doesn't belong to an
+    // input group which is attached to a busy recorder.
+    QMap<uint,bool>           busygrp;
+    QMap<uint,bool>           busyrec;
+    QMap<uint,TunedInputInfo> busyin;
+
+    // Cache our busy input if applicable
+    TunedInputInfo info;
+    uint cid = GetCardID();
+    busyrec[cid] = pParent->IsBusy(&info);
+    if (busyrec[cid])
+    {
+        busyin[cid] = info;
+        info.chanid = GetChanID();
+    }
+
+    // If we're busy and not excluded, all inputs are busy
+    if (busyrec[cid] &&
+        (find(excluded_cardids.begin(), excluded_cardids.end(),
+              cid) == excluded_cardids.end()))
+    {
+        return new_list;
+    }
+
+    QStringList::const_iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
+    {
+        InputInfo info;
+        vector<uint> groupids;
+        info.inputid = GetInputByName(*it);
+
+        if (!CardUtil::GetInputInfo(info, &groupids))
+            continue;
+
+        bool is_busy_grp = is_input_busy(
+            info.inputid, groupids, excluded_cardids, 
+            busygrp, busyrec, busyin, info.mplexid);
+
+        if (!is_busy_grp)
+            new_list.push_back(info);
+    }
+
+    return new_list;
 }
 
 uint ChannelBase::GetInputCardID(int inputNum) const
@@ -337,13 +604,8 @@ int ChannelBase::GetCardID(void) const
     if (GetDevice().isEmpty())
         return -1;
 
-    int tmpcardid = CardUtil::GetCardID(GetDevice());
-    if (tmpcardid > 0)
-    {
-        uint pcardid = CardUtil::GetParentCardID(tmpcardid);
-        tmpcardid = (pcardid) ? pcardid : tmpcardid;
-    }
-    return tmpcardid;
+    uint tmpcardid = CardUtil::GetFirstCardID(GetDevice());
+    return (tmpcardid <= 0) ? -1 : tmpcardid;
 }
 
 int ChannelBase::GetChanID() const
@@ -393,7 +655,7 @@ bool ChannelBase::InitializeInputs(void)
         "SELECT cardinputid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
-        "       sourceid,    childcardid "
+        "       sourceid "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
@@ -416,19 +678,17 @@ bool ChannelBase::InitializeInputs(void)
     QString order = gContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
-        // If there is a childcardid use it instead of cardid
-        uint inputcardid = query.value(6).toUInt();
-        inputcardid = (inputcardid) ? inputcardid : cardid;
-
         uint sourceid = query.value(5).toUInt();
         DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
 
-        inputs[query.value(0).toUInt()] = new InputBase(
+        inputs[query.value(0).toUInt()] = new ChannelInputInfo(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
-            sourceid, inputcardid, channels);
+            sourceid,                  cardid,
+            query.value(0).toUInt(),   0,
+            channels);
 
         allchannels.insert(allchannels.end(),
                            channels.begin(), channels.end());

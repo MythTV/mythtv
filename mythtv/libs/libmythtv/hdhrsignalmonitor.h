@@ -15,7 +15,7 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     Q_OBJECT
   public:
     HDHRSignalMonitor(int db_cardnum, HDHRChannel* _channel,
-                      uint _flags = 0,
+                      uint64_t _flags = 0,
                       const char *_name = "HDHRSignalMonitor");
     virtual ~HDHRSignalMonitor();
 

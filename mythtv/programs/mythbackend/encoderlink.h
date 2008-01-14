@@ -5,6 +5,7 @@
 
 #include "tv.h"
 #include "programinfo.h"
+#include "inputinfo.h"
 
 class TVRec;
 class MainServer;
@@ -49,14 +50,15 @@ class EncoderLink
     long long GetMaxBitrate(void);
     int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
-    bool IsBusy(void);
+    bool IsBusy(TunedInputInfo *busy_input = NULL, int time_buffer = 5);
     bool IsBusyRecording(void);
 
     TVState GetState();
+    uint GetFlags(void) const;
     bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
     bool MatchesRecording(const ProgramInfo *rec);
-    void RecordPending(const ProgramInfo *rec, int secsleft);
+    void RecordPending(const ProgramInfo *rec, int secsleft, bool hasLater);
     RecStatusType StartRecording(const ProgramInfo *rec);
     void StopRecording(void);
     void FinishRecording(void);
@@ -76,7 +78,7 @@ class EncoderLink
     void PauseRecorder(void);
     void SetLiveRecording(int);
     void SetNextLiveTVDir(QString dir);
-    QStringList GetConnectedInputs(void) const;
+    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(void);

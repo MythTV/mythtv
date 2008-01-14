@@ -409,7 +409,7 @@ void ProgFinder::showGuide()
         if (startchannel == "")
             startchannel = "3";
         uint startchanid = 0;
-        RunProgramGuide(startchanid, startchannel);
+        GuideGrid::Run(startchanid, startchannel);
     }
                 
     running = false;

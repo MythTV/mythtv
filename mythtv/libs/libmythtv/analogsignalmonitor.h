@@ -14,7 +14,7 @@ class AnalogSignalMonitor : public SignalMonitor
   public:
     AnalogSignalMonitor(
         int db_cardnum, Channel *_channel,
-        uint _flags = kDTVSigMon_WaitForSig,
+        uint64_t _flags = kDTVSigMon_WaitForSig,
         const char *_name = "AnalogSignalMonitor");
 
     virtual void UpdateValues(void);

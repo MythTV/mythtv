@@ -17,6 +17,9 @@ using namespace std;
 #include "backendutil.h"
 #include "compat.h"
 
+#define LOC QString("EncoderLink(%1): ").arg(m_capturecardnum)
+#define LOC_ERR QString("EncoderLink(%1) Error: ").arg(m_capturecardnum)
+
 /**
  * \class EncoderLink
  * \brief Provides an interface to both local and remote TVRec's for the mythbackend.
@@ -85,23 +88,23 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     sock = lsock;
 }
 
-/** \fn EncoderLink::IsBusy()
+/** \fn EncoderLink::IsBusy(TunedInputInfo*,int)
  *  \brief  Returns true if the recorder is busy, or will be within the 
- *          next 5 seconds.
- *  \sa IsBusyRecording(), TVRec::IsBusy()
+ *          next time_buffer seconds.
+ *  \sa IsBusyRecording(void), TVRec::IsBusy(TunedInputInfo*)
  */
-bool EncoderLink::IsBusy(void)
+bool EncoderLink::IsBusy(TunedInputInfo *busy_input, int time_buffer)
 {
     if (local)
-        return tv->IsBusy();
+        return tv->IsBusy(busy_input, time_buffer);
 
     if (sock)
-        return sock->IsBusy(m_capturecardnum);
+        return sock->IsBusy(m_capturecardnum, busy_input, time_buffer);
 
     return false;
 }
 
-/** \fn EncoderLink::IsBusyRecording()
+/** \fn EncoderLink::IsBusyRecording(void)
  *  \brief Returns true if the TVRec state is in a recording state.
  *
  *   Contrast with IsBusy() which returns true if a recording is pending
@@ -141,6 +144,27 @@ TVState EncoderLink::GetState(void)
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
     else
         cerr << "Broken for card: " << m_capturecardnum << endl;
+
+    return retval;
+}
+
+/** \fn EncoderLink::GetFlags(void) const
+ *  \brief Returns the flag state of the recorder.
+ *  \sa TVRec::GetFlags(void) const, \ref recorder_subsystem
+ */
+uint EncoderLink::GetFlags(void) const
+{
+    uint retval = 0;
+
+    if (!IsConnected())
+        return retval;
+
+    if (local)
+        retval = tv->GetFlags();
+    else if (sock)
+        retval = sock->GetEncoderState(m_capturecardnum);
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFlags failed");
 
     return retval;
 }
@@ -201,18 +225,21 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     return retval;
 }
 
-/** \fn EncoderLink::RecordPending(const ProgramInfo*, int)
+/** \fn EncoderLink::RecordPending(const ProgramInfo*, int, bool)
  *  \brief Tells TVRec there is a pending recording "rec" in "secsleft" seconds.
+ *
  *  \param rec      Recording to make.
  *  \param secsleft Seconds to wait before starting recording.
+ *  \param hasLater If true, a later non-conflicting showing is available.
  *  \sa StartRecording(const ProgramInfo*), CancelNextRecording(bool)
  */
-void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft)
+void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft,
+                                bool hasLater)
 {
     if (local)
-        tv->RecordPending(rec, secsleft);
+        tv->RecordPending(rec, secsleft, hasLater);
     else if (sock)
-        sock->RecordPending(m_capturecardnum, rec, secsleft);
+        sock->RecordPending(m_capturecardnum, rec, secsleft, hasLater);
 }
 
 /** \fn EncoderLink::WouldConflict(const ProgramInfo*)
@@ -313,7 +340,7 @@ int EncoderLink::LockTuner()
  *
  *  \return +1 if the recording started successfully,
  *          -1 if TVRec is busy doing something else, 0 otherwise.
- *  \sa RecordPending(const ProgramInfo*, int), StopRecording()
+ *  \sa RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
 RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
 {
@@ -489,19 +516,18 @@ void EncoderLink::FrontendReady(void)
 
 /** \fn EncoderLink::CancelNextRecording(bool)
  *  \brief Tells TVRec to cancel the next recording.
- *         <b>This only works on local recorders.</b>
  *
  *   This is used when the user is watching "Live TV" and does not
  *   want to allow the recorder to be taken for a pending recording.
  *
- *  \sa RecordPending(const ProgramInfo*,int)
+ *  \sa RecordPending(const ProgramInfo*, int, bool)
  */
 void EncoderLink::CancelNextRecording(bool cancel)
 {
     if (local)
         tv->CancelNextRecording(cancel);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: CancelNextRecording");
+        sock->CancelNextRecording(m_capturecardnum, cancel);
 }
 
 /** \fn EncoderLink::SpawnLiveTV(LiveTVChain*, bool, QString)
@@ -586,20 +612,20 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
         sock->SetNextLiveTVDir(m_capturecardnum, dir);
 }
 
-/** \fn EncoderLink::GetConnectedInputs(void) const
+/** \fn EncoderLink::GetFreeInputs(const vector<uint>&) const
  *  \brief Returns TVRec's recorders connected inputs.
- *         <b>This only works on local recorders.</b>
  *
- *  \sa TVRec::GetConnectedInputs(void) const
+ *  \sa TVRec::GetFreeInputs(const vector<uint>&) const
  */
-QStringList EncoderLink::GetConnectedInputs(void) const
+vector<InputInfo> EncoderLink::GetFreeInputs(
+    const vector<uint> &excluded_cardids) const
 {
-    QStringList list;
+    vector<InputInfo> list;
 
     if (local)
-        list = tv->GetConnectedInputs();
+        list = tv->GetFreeInputs(excluded_cardids);
     else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetConnectedInputs");
+        list = sock->GetFreeInputs(m_capturecardnum, excluded_cardids);
 
     return list;
 }
@@ -625,7 +651,7 @@ QString EncoderLink::GetInput(void) const
  *
  *   You must call PauseRecorder(void) before calling this.
  *
- *  \param input Input to switch to, or "SwitchToNectInput".
+ *  \param input Input to switch to, or "SwitchToNextInput".
  *  \return input we have switched to
  *  \sa TVRec::SetInput(QString)
  */

@@ -9,6 +9,7 @@
 class MythSocket;
 class MainServer;
 class ProgramInfo;
+class InputInfo;
 
 class PlaybackSock
 {
@@ -55,16 +56,22 @@ class PlaybackSock
     QString PixmapLastModified(const ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 
-    bool IsBusy(int capturecardnum);
+    bool IsBusy(int        capturecardnum,
+                InputInfo *busy_input  = NULL,
+                int        time_buffer = 5);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(int capturecardnum);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     RecStatusType StartRecording(int capturecardnum, 
                                  const ProgramInfo *pginfo);
-    void RecordPending(int capturecardnum, const ProgramInfo *pginfo, int secsleft);
+    void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
+                       int secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
     void SetNextLiveTVDir(int capturecardnum, QString dir);
+    vector<InputInfo> GetFreeInputs(int capturecardnum,
+                                    const vector<uint> &excluded_cardids);
+    void CancelNextRecording(int capturecardnum, bool cancel);
 
   private:
     bool SendReceiveStringList(QStringList &strlist);

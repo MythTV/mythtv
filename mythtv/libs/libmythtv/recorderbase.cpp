@@ -9,8 +9,12 @@ using namespace std;
 #include "recordingprofile.h"
 #include "util.h"
 
-#define LOC QString("RecBase(%1): ").arg(videodevice)
-#define LOC_ERR QString("RecBase(%1) Error: ").arg(videodevice)
+#define LOC      QString("RecBase(%1:%2): ") \
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
+#define LOC_WARN QString("RecBase(%1:%2) Warning: ") \
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
+#define LOC_ERR  QString("RecBase(%1:%2) Error: ") \
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),

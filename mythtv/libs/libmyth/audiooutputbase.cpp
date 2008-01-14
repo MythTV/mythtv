@@ -752,6 +752,12 @@ void AudioOutputBase::Status()
     }
 }
 
+void AudioOutputBase::GetBufferStatus(uint &fill, uint &total)
+{
+    fill = AUDBUFSIZE - audiofree(true);
+    total = AUDBUFSIZE;
+}
+
 void AudioOutputBase::OutputAudioLoop(void)
 {
     int space_on_soundcard, last_space_on_soundcard;

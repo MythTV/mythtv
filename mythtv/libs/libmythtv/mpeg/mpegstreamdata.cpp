@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
-#include <algorithm> // for find
+#include <algorithm> // for find & max
 using namespace std;
 
 // POSIX headers
@@ -11,6 +11,11 @@ using namespace std;
 #include "mpegtables.h"
 #include "RingBuffer.h"
 #include "mpegtables.h"
+
+#include "atscstreamdata.h"
+#include "atsctables.h"
+
+//#define DEBUG_MPEG_RADIO // uncomment to strip video streams from TS stream
 
 void init_sections(sections_t &sect, uint last_section)
 {
@@ -61,6 +66,9 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _cache_tables(cacheTables), _cache_lock(true),
       // Single program stuff
       _desired_program(desiredProgram),
+      _recording_type("all"),
+      _strip_pmt_descriptors(false),
+      _normalize_stream_type(true),
       _pid_video_single_program(0xffffffff),
       _pid_pmt_single_program(0xffffffff),      
       _pmt_single_program_num_video(1),
@@ -125,6 +133,20 @@ void MPEGStreamData::SetDesiredProgram(int p)
         Reset(p);
 }
 
+void MPEGStreamData::SetRecordingType(const QString &recording_type)
+{
+    _recording_type = QDeepCopy<QString>(recording_type);
+    uint neededVideo = (_recording_type == "tv")    ? 1 : 0;
+    uint neededAudio = (_recording_type == "audio") ? 1 : 0;
+    SetVideoStreamsRequired(neededVideo);
+    SetAudioStreamsRequired(neededAudio);
+}
+
+QString MPEGStreamData::GetRecordingType(void) const
+{
+    return QDeepCopy<QString>(_recording_type);
+}
+
 void MPEGStreamData::SetEITHelper(EITHelper *eit_helper)
 {
     QMutexLocker locker(&_listener_lock);
@@ -139,7 +161,11 @@ void MPEGStreamData::SetEITRate(float rate)
 
 void MPEGStreamData::Reset(int desiredProgram)
 {
-    _desired_program = desiredProgram;
+    _desired_program       = desiredProgram;
+    _recording_type        = "all";
+    _strip_pmt_descriptors = false;
+    _normalize_stream_type = true;
+
     _invalid_pat_seen = false;
 
     SetPATSingleProgram(NULL);
@@ -416,7 +442,51 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
 }
 
-bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
+desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
+                              const cvct_vec_t &cvct,
+                              uint pnum)
+{
+    desc_list_t desc;
+
+    vector<const VirtualChannelTable*> vct;
+
+    for (uint i = 0; i < tvct.size(); i++)
+        vct.push_back(tvct[i]);
+
+    for (uint i = 0; i < cvct.size(); i++)
+        vct.push_back(cvct[i]);
+
+    for (uint i = 0; i < tvct.size(); i++)
+    {
+        for (uint j = 0; j < vct[i]->ChannelCount(); j++)
+        {
+            if (vct[i]->ProgramNumber(j) == pnum)
+            {
+                desc_list_t ldesc = MPEGDescriptor::ParseOnlyInclude(
+                    vct[i]->Descriptors(j), vct[i]->DescriptorsLength(j),
+                    DescriptorID::caption_service);
+
+                if (ldesc.size())
+                    desc.insert(desc.end(), ldesc.begin(), ldesc.end());
+            }
+        }
+
+        if (0 != vct[i]->GlobalDescriptorsLength())
+        {
+            desc_list_t vdesc = MPEGDescriptor::ParseOnlyInclude(
+                vct[i]->GlobalDescriptors(),
+                vct[i]->GlobalDescriptorsLength(),
+                DescriptorID::caption_service); 
+
+            if (vdesc.size())
+                desc.insert(desc.end(), vdesc.begin(), vdesc.end());
+        }
+    }
+
+    return desc;
+}
+
+bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 {
     VERBOSE(VB_RECORD, "CreatePMTSingleProgram()");
     VERBOSE(VB_RECORD, "PMT in input stream");
@@ -429,35 +499,102 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     }
     pmt.Parse();
 
-    vector<uint> videoPIDs, audioPIDs;
-    vector<uint> videoTypes;
-    vector<uint> pids, types;
+    uint programNumber = 1; // MPEG Program Number
 
-    // Video
-    uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs,
-                                  videoTypes, _sistandard, true);
+    ATSCStreamData *sd = NULL;
+    tvct_vec_t tvct;
+    cvct_vec_t cvct;
+
+    desc_list_t gdesc;
+
+    if (!_strip_pmt_descriptors)
+    {
+        gdesc = MPEGDescriptor::ParseAndExclude(
+            pmt.ProgramInfo(), pmt.ProgramInfoLength(),
+            DescriptorID::conditional_access);
+
+        // If there is no caption descriptor in PMT, copy any caption
+        // descriptor found in VCT to global descriptors...
+        sd = dynamic_cast<ATSCStreamData*>(this);
+        if (sd && !MPEGDescriptor::Find(gdesc, DescriptorID::caption_service))
+        {
+            tvct = sd->GetAllCachedTVCTs();
+            cvct = sd->GetAllCachedCVCTs();
+
+            desc_list_t vdesc = extract_atsc_desc(
+                tvct, cvct, pmt.ProgramNumber());
+
+            if (vdesc.size())
+                gdesc.insert(gdesc.end(), vdesc.begin(), vdesc.end());
+        }
+    }
+
+    vector<uint> pids;
+    vector<uint> types;
+    vector<desc_list_t> pdesc;
+
+    uint video_cnt = 0;
+    uint audio_cnt = 0;
+
+    vector<uint> videoPIDs, audioPIDs, dataPIDs;
+
+    for (uint i = 0; i < pmt.StreamCount(); i++)
+    {
+        desc_list_t desc = MPEGDescriptor::ParseAndExclude(
+            pmt.StreamInfo(i), pmt.StreamInfoLength(i),
+            DescriptorID::conditional_access);
+
+        uint type = StreamID::Normalize(
+            pmt.StreamType(i), desc, _sistandard);
+
+        bool is_video = StreamID::IsVideo(type);
+        bool is_audio = StreamID::IsAudio(type);
+
+        uint pid = pmt.StreamPID(i);
+
+        if (is_audio)
+        {
+            audio_cnt++;
+            audioPIDs.push_back(pid);
+        }
+
+#ifdef DEBUG_MPEG_RADIO
+        if (is_video)
+            continue;
+#endif // DEBUG_MPEG_RADIO
+
+        if (is_video)
+        {
+            video_cnt++;
+            videoPIDs.push_back(pid);
+        }
+
+        if (_strip_pmt_descriptors)
+            desc.clear();
+
+        // Filter out streams not used for basic television
+        if (_recording_type == "tv" && !is_audio && !is_video &&
+            !MPEGDescriptor::Find(desc, DescriptorID::teletext) &&
+            !MPEGDescriptor::Find(desc, DescriptorID::subtitling))
+        {
+            continue;
+        }
+
+        if (!is_audio && !is_video)
+            dataPIDs.push_back(pid);
+
+        pdesc.push_back(desc);
+        pids.push_back(pid);
+        types.push_back(type);
+    }
+
     if (video_cnt < _pmt_single_program_num_video) 
     {
         VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
                 "but "<<_pmt_single_program_num_video<<" are required.");
         return false;
     }
-    if (videoPIDs.size() > 1)
-    {
-        VERBOSE(VB_RECORD,
-                "Warning: More than one video stream in old PMT, "
-                "only using first one in new PMT");
-    }
 
-    if (videoPIDs.size() > 0)
-    {
-        _pid_video_single_program = videoPIDs[0];
-        pids.push_back(videoPIDs[0]);
-        types.push_back(videoTypes[0]);
-    }
-
-    // Audio
-    pmt.FindPIDs(StreamID::AnyAudio, audioPIDs, _sistandard);
     if (audioPIDs.size() < _pmt_single_program_num_audio)
     {
         VERBOSE(VB_RECORD, "Only "<<audioPIDs.size()
@@ -465,8 +602,18 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
                 <<_pmt_single_program_num_audio<<" are required.");
         return false;
     }
+
+    _pids_audio.clear();
     for (uint i = 0; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
+
+    if (videoPIDs.size() >= 1)
+        _pid_video_single_program = videoPIDs[0];
+    for (uint i = 1; i < videoPIDs.size(); i++)
+        AddWritingPID(videoPIDs[i]);
+
+    for (uint i = 0; i < dataPIDs.size(); i++)
+        AddWritingPID(dataPIDs[i]);
 
     // Timebase
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
@@ -477,14 +624,17 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
         AddWritingPID(pmt.PCRPID());
     }
 
-    // Misc
-    uint programNumber = 1;
+    // Create the PMT
+    ProgramMapTable *pmt2 = ProgramMapTable::Create(
+        programNumber, _pid_pmt_single_program, pmt.PCRPID(),
+        pmt.Version(), gdesc, pids, types, pdesc);
 
-    // Construct
-    pmt.FindPIDs(StreamID::AnyAudio, pids, types, _sistandard, true);
-    ProgramMapTable *pmt2 = ProgramMapTable::
-        Create(programNumber, _pid_pmt_single_program,
-               pmt.PCRPID(), pmt.Version(), pids, types);
+    // Return any TVCT & CVCT tables, once we've copied any descriptors.
+    if (sd)
+    {
+        sd->ReturnCachedTVCTTables(tvct);
+        sd->ReturnCachedCVCTTables(cvct);
+    }
 
     // Set Continuity Header
     uint cc_cnt = pmt.tsheader()->ContinuityCounter();
@@ -802,14 +952,41 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     {
         ProcessEncryptedPacket(tspacket);
     }
-    else
-    if (ok && !tspacket.ScramplingControl() && tspacket.HasPayload() &&
-        IsListeningPID(tspacket.PID()))
+
+    if (!ok)
+        return false;
+
+    if (!tspacket.ScramplingControl() && tspacket.HasPayload())
     {
-        HandleTSTables(&tspacket);
+        if (IsVideoPID(tspacket.PID()))
+        {
+            for (uint j = 0; j < _ts_av_listeners.size(); j++)
+                _ts_av_listeners[j]->ProcessVideoTSPacket(tspacket);
+
+            return true;
+        }
+
+        if (IsAudioPID(tspacket.PID()))
+        {
+            for (uint j = 0; j < _ts_av_listeners.size(); j++)
+                _ts_av_listeners[j]->ProcessAudioTSPacket(tspacket);
+
+            return true;
+        }
+
+        if (IsWritingPID(tspacket.PID()) && _ts_writing_listeners.size())
+        {
+            for (uint j = 0; j < _ts_writing_listeners.size(); j++)
+                _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+        }
+
+        if (IsListeningPID(tspacket.PID()))
+        {
+            HandleTSTables(&tspacket);
+        }
     }
 
-    return ok;
+    return true;
 }
 
 int MPEGStreamData::ResyncStream(unsigned char *buffer, int curr_pos, int len)
@@ -833,26 +1010,70 @@ int MPEGStreamData::ResyncStream(unsigned char *buffer, int curr_pos, int len)
 
 bool MPEGStreamData::IsListeningPID(uint pid) const
 {
-    QMap<uint, bool>::const_iterator it = _pids_listening.find(pid);
+    pid_map_t::const_iterator it = _pids_listening.find(pid);
     return it != _pids_listening.end();
 }
 
 bool MPEGStreamData::IsNotListeningPID(uint pid) const
 {
-    QMap<uint, bool>::const_iterator it = _pids_notlistening.find(pid);
+    pid_map_t::const_iterator it = _pids_notlistening.find(pid);
     return it != _pids_notlistening.end();
 }
 
 bool MPEGStreamData::IsWritingPID(uint pid) const
 {
-    QMap<uint, bool>::const_iterator it = _pids_writing.find(pid);
+    pid_map_t::const_iterator it = _pids_writing.find(pid);
     return it != _pids_writing.end();
 }
 
 bool MPEGStreamData::IsAudioPID(uint pid) const
 {
-    QMap<uint, bool>::const_iterator it = _pids_audio.find(pid);
+    pid_map_t::const_iterator it = _pids_audio.find(pid);
     return it != _pids_audio.end();
+}
+
+uint MPEGStreamData::GetPIDs(pid_map_t &pids) const
+{
+    uint sz = pids.size();
+
+    if (_pid_video_single_program < 0x1fff)
+        pids[_pid_video_single_program] = kPIDPriorityHigh;
+
+    pid_map_t::const_iterator it = _pids_listening.begin();
+    for (; it != _pids_listening.end(); ++it)
+        pids[it.key()] = max(pids[it.key()], *it);
+
+    it = _pids_audio.begin();
+    for (; it != _pids_audio.end(); ++it)
+        pids[it.key()] = max(pids[it.key()], *it);
+
+    it = _pids_writing.begin();
+    for (; it != _pids_writing.end(); ++it)
+        pids[it.key()] = max(pids[it.key()], *it);
+
+    return pids.size() - sz;
+}
+
+PIDPriority MPEGStreamData::GetPIDPriority(uint pid) const
+{
+    if (_pid_video_single_program == pid)
+        return kPIDPriorityHigh;
+
+    pid_map_t::const_iterator it;
+    it = _pids_listening.find(pid);
+    if (it != _pids_listening.end())
+        return *it;
+    it = _pids_notlistening.find(pid);
+    if (it != _pids_notlistening.end())
+        return *it;
+    it = _pids_writing.find(pid);
+    if (it != _pids_writing.end())
+        return *it;
+    it = _pids_audio.find(pid);
+    if (it != _pids_audio.end())
+        return *it;
+
+    return kPIDPriorityNone;
 }
 
 void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
@@ -1235,6 +1456,60 @@ void MPEGStreamData::RemoveMPEGListener(MPEGStreamListener *val)
         if (((void*)val) == ((void*)*it))
         {
             _mpeg_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void MPEGStreamData::AddWritingListener(TSPacketListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ts_listener_vec_t::iterator it = _ts_writing_listeners.begin();
+    for (; it != _ts_writing_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _ts_writing_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemoveWritingListener(TSPacketListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ts_listener_vec_t::iterator it = _ts_writing_listeners.begin();
+    for (; it != _ts_writing_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _ts_writing_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void MPEGStreamData::AddAVListener(TSPacketListenerAV *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ts_av_listener_vec_t::iterator it = _ts_av_listeners.begin();
+    for (; it != _ts_av_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _ts_av_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemoveAVListener(TSPacketListenerAV *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    ts_av_listener_vec_t::iterator it = _ts_av_listeners.begin();
+    for (; it != _ts_av_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _ts_av_listeners.erase(it);
             return;
         }
     }

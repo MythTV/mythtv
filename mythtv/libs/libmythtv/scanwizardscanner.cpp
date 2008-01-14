@@ -280,8 +280,7 @@ void ScanWizardScanner::dvbSignalStrength(int i)
 // existing transport scan broken
 void ScanWizardScanner::Scan(
     int            scantype,
-    uint           parent_cardid,
-    uint           child_cardid,
+    uint           cardid,
     const QString &inputname,
     uint           sourceid,
     bool           do_delete_channels,
@@ -296,7 +295,7 @@ void ScanWizardScanner::Scan(
     const QString &atsc_format /* any ATSC scan */)
 {
     nVideoSource = sourceid;
-    PreScanCommon(scantype, parent_cardid, child_cardid, inputname,
+    PreScanCommon(scantype, cardid, inputname,
                   sourceid, do_ignore_signal_timeout);
 
     VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete()");
@@ -394,12 +393,11 @@ void ScanWizardScanner::Scan(
 
         VERBOSE(VB_SIPARSER, LOC + "ScanForChannels("<<sourceid<<")");
 
-        QString card_type = CardUtil::GetRawCardType(parent_cardid, inputname);
+        QString card_type = CardUtil::GetRawCardType(cardid);
         QString sub_type  = card_type;
         if (card_type == "DVB")
         {
-            QString device = CardUtil::GetVideoDevice(
-                parent_cardid, inputname);
+            QString device = CardUtil::GetVideoDevice(cardid);
 
             ok = !device.isEmpty();
             if (ok)
@@ -469,25 +467,23 @@ void ScanWizardScanner::ImportDVBUtils(uint sourceid, int cardtype,
 }
 
 void ScanWizardScanner::PreScanCommon(int scantype,
-                                      uint pcardid,
-                                      uint ccardid,
+                                      uint cardid,
                                       const QString &inputname,
                                       uint sourceid,
                                       bool do_ignore_signal_timeout)
 {
-    uint hw_cardid       = (ccardid) ? ccardid : pcardid;
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
-    CardUtil::GetTimeouts(hw_cardid, signal_timeout, channel_timeout);
+    CardUtil::GetTimeouts(cardid, signal_timeout, channel_timeout);
 
-    QString device = CardUtil::GetVideoDevice(pcardid, inputname);
+    QString device = CardUtil::GetVideoDevice(cardid);
     if (device.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "No Device");
         return;
     }
 
-    QString card_type = CardUtil::GetRawCardType(pcardid, inputname);
+    QString card_type = CardUtil::GetRawCardType(cardid);
 
     if ("DVB" == card_type)
     {
@@ -522,7 +518,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 #ifdef USING_HDHOMERUN
     if ("HDHOMERUN" == card_type)
     {
-        uint tuner = CardUtil::GetHDHRTuner(pcardid, inputname);
+        uint tuner = CardUtil::GetHDHRTuner(cardid);
         channel = new HDHRChannel(NULL, device, tuner);
     }
 #endif // USING_HDHOMERUN
@@ -534,7 +530,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
     }
 
     // explicitly set the cardid
-    channel->SetCardID(pcardid);
+    channel->SetCardID(cardid);
 
     // If the backend is running this may fail...
     if (!channel->Open())
@@ -548,10 +544,10 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 
     scanner->SetForceUpdate(true);
 
-    bool ftao = CardUtil::IgnoreEncrypted(pcardid, inputname);
+    bool ftao = CardUtil::IgnoreEncrypted(cardid, inputname);
     scanner->SetFTAOnly(ftao);
 
-    bool tvo = CardUtil::TVOnly(pcardid, inputname);
+    bool tvo = CardUtil::TVOnly(cardid, inputname);
     scanner->SetTVOnly(tvo);
 
     connect(scanner, SIGNAL(ServiceScanComplete(void)),

@@ -1096,7 +1096,7 @@ void LCDProcClient::startChannel(QString channum, QString title, QString subtitl
     if (lcdHeight <= 2)
     {
         aString = channum + "|" + title;
-        if (subtitle != "")
+        if (!subtitle.isEmpty())
             aString += "|" + subtitle;
         QStringList list = formatScrollerText(aString);
         assignScrollingList(list, "Channel", "topWidget", 1);
@@ -1928,8 +1928,8 @@ void LCDProcClient::outputRecStatus(void)
         outputCenteredText("RecStatus", tr("RECORDING"), "textWidget1", 1);
 
         status = tuner->title;
-        if (tuner->subTitle != "") 
-            status += " (" + tuner->subTitle + ")";
+        if (!tuner->subtitle.isEmpty())
+            status += " (" + tuner->subtitle + ")";
 
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget2", 2);
@@ -1955,8 +1955,8 @@ void LCDProcClient::outputRecStatus(void)
     {
         status = tr("RECORDING|");
         status += tuner->title;
-        if (tuner->subTitle != "") 
-            status += "|(" + tuner->subTitle + ")";
+        if (tuner->subtitle != "") 
+            status += "|(" + tuner->subtitle + ")";
 
         status += "|" + tuner->startTime.toString("hh:mm") + " to " + 
                 tuner->endTime.toString("hh:mm");
@@ -2381,73 +2381,11 @@ void LCDProcClient::updateRecordingList(void)
         }
     }
 
-    QStringList strlist;
-
-    // are we currently recording
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid FROM capturecard "
-        "WHERE parentid='0' ORDER BY cardid");
-    QString Status = "";
-
-    if (query.exec() && query.isActive() && query.numRowsAffected())
-    {
-        while(query.next())
-        {
-            QString status = "";
-            int cardid = query.value(0).toInt();
-            int state = kState_ChangingState;
-            QString channelName = "";
-            QString title = "";
-            QString subtitle = "";
-            QDateTime dtStart = QDateTime();
-            QDateTime dtEnd = QDateTime();
-
-            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
-
-            while (state == kState_ChangingState)
-            {
-                strlist = cmd;
-                strlist << "GET_STATE";
-                gContext->SendReceiveStringList(strlist);
-
-                state = strlist[0].toInt();
-                if (state == kState_ChangingState)
-                    usleep(500);
-            }
-
-            if (state == kState_RecordingOnly || state == kState_WatchingRecording)
-            {
-                isRecording = true;
-
-                strlist = QString("QUERY_RECORDER %1").arg(cardid);
-                strlist << "GET_RECORDING";
-                gContext->SendReceiveStringList(strlist);
-                title = strlist[0];
-                subtitle = strlist[1];
-                channelName = strlist[7];
-                dtStart.setTime_t((uint)atoi(strlist[11].ascii()));
-                dtEnd.setTime_t((uint)atoi(strlist[12].ascii())); 
-            }
-            else
-                continue;
-
-            TunerStatus *tuner = new TunerStatus;
-            tuner->id = cardid;
-            tuner->isRecording = (state == kState_RecordingOnly || 
-                                  state == kState_WatchingRecording);
-            tuner->channel = channelName;
-            tuner->title = title;
-            tuner->subTitle = subtitle;
-            tuner->startTime = dtStart;
-            tuner->endTime = dtEnd;
-            tunerList.append(tuner); 
-        }
-    }
+    isRecording = RemoteGetRecordingStatus(&tunerList, false);
 
     lcdTunerNo = 0;
 
-    if  (activeScreen == "Time" || activeScreen == "RecStatus")
+    if (activeScreen == "Time" || activeScreen == "RecStatus")
         startTime();
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

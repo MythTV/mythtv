@@ -12,7 +12,8 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
     Q_OBJECT
 
   public:
-    IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel, uint _flags = 0,
+    IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
+                      uint64_t _flags = 0,
                       const char *_name = "IPTVSignalMonitor");
     virtual ~IPTVSignalMonitor();
 

@@ -316,16 +316,6 @@ void RemoteEncoder::SetLiveRecording(bool recording)
     SendReceiveStringList(strlist);
 }
 
-QStringList RemoteEncoder::GetInputs(void)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "GET_CONNECTED_INPUTS";
-
-    SendReceiveStringList(strlist);
-
-    return strlist;
-}
-
 QString RemoteEncoder::GetInput(void)
 {
     if (lastinput.length() > 2)
@@ -431,10 +421,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
         "FROM cardinput, capturecard "
         "WHERE cardinput.inputname = :INNAME AND "
         "      cardinput.cardid    = :CARDID AND "
-        "      ( ( cardinput.childcardid =  '0' AND "
-        "          cardinput.cardid = capturecard.cardid) OR "
-        "        ( cardinput.childcardid != '0' AND "
-        "          cardinput.childcardid = capturecard.cardid) )");
+        "      cardinput.cardid    = capturecard.cardid");
     query.bindValue(":INNAME", input);
     query.bindValue(":CARDID", cardid);
     if (!query.exec() || !query.isActive())

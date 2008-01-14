@@ -400,7 +400,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
-      disable_passthru(false),
+      disable_passthru(false),      dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
       dvdmenupktseen(false), indvdstill(false),
@@ -442,6 +442,13 @@ AvFormatDecoder::~AvFormatDecoder()
     delete h264_kf_seq;
     if (audioSamples)
         delete [] audioSamples;
+
+    if (dummy_frame)
+    {
+        delete [] dummy_frame->buf;
+        delete dummy_frame;
+        dummy_frame = NULL;
+    }
 
     if (avfRingBuffer)
         delete avfRingBuffer;
@@ -2893,6 +2900,7 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
     }
 }
 
+// documented in decoderbase.h
 bool AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket *pkt = NULL;
@@ -2916,6 +2924,22 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
     bool skipaudio = (lastvpts == 0);
 
+    bool has_video = HasVideo(ic);
+
+    if (!has_video && (onlyvideo >= 0))
+    {
+        gotvideo = GenerateDummyVideoFrame();
+        onlyvideo = -1;
+        skipaudio = false;
+    }
+
+    uint ofill = 0, ototal = 0, othresh = 0, total_decoded_audio = 0;
+    if (GetNVP()->GetAudioBufferStatus(ofill, ototal))
+    {
+        othresh =  ((ototal>>1) + (ototal>>2));
+        allowedquit = (onlyvideo < 0) && (ofill > othresh);
+    }
+
     while (!allowedquit)
     {
         if ((onlyvideo == 0) &&
@@ -2923,7 +2947,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
              (selectedTrack[kTrackTypeAudio].av_stream_index < 0)))
         {
             // disable audio request if there are no audio streams anymore
-            onlyvideo = 1;
+            // and we have video, otherwise allow decoding to stop
+            if (has_video)
+                onlyvideo = 1;
+            else
+                allowedquit = true;
         }
 
         if (ringBuffer->isDVD())
@@ -2992,7 +3020,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 //cout << "behind: " << lastapts << " " << lastvpts << endl;
                 storevideoframes = true;
             }
-            else
+            else if (onlyvideo >= 0)
             {
                 allowedquit = true;
                 continue;
@@ -3287,7 +3315,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         lastapts = (long long)(av_q2d(curstream->time_base) *
                                                pkt->pts * 1000);
 
-                    if (onlyvideo != 0 || (pkt->stream_index != audIdx))
+                    if ((onlyvideo > 0) || (pkt->stream_index != audIdx))
                     {
                         ptr += len;
                         len = 0;
@@ -3370,11 +3398,26 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                              (char*)audioSamples, data_size);
                     }
 
-                    GetNVP()->AddAudioData((char *)audioSamples, data_size,
-                                           temppts);
+                    GetNVP()->AddAudioData(
+                        (char *)audioSamples, data_size, temppts);
 
-                    if (ringBuffer->InDVDMenuOrStillFrame())
-                        allowedquit = true;
+                    total_decoded_audio += data_size;
+
+                    allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
+                    allowedquit |= (onlyvideo < 0) &&
+                        (ofill + total_decoded_audio > othresh);
+
+                    // top off audio buffers initially in audio only mode
+                    if (!allowedquit && (onlyvideo < 0))
+                    {
+                        uint fill, total;
+                        GetNVP()->GetAudioBufferStatus(fill, total);
+                        allowedquit =
+                            (fill == 0) || (fill > (total>>1)) ||
+                            ((total - fill) < (uint) data_size) ||
+                            (ofill + total_decoded_audio > (total>>2)) ||
+                            ((total - fill) < (uint) data_size * 2);
+                    }
 
                     break;
                 }
@@ -3642,6 +3685,73 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
     if (pkt)
         delete pkt;
+
+    return true;
+}
+
+bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
+{
+    if (!ic || !ic->cur_pmt_sect)
+        return true;
+
+    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
+    const PSIPTable psip(pes);
+    const ProgramMapTable pmt(psip);
+
+    bool has_video = false;
+    for (uint i = 0; i < pmt.StreamCount(); i++)
+    {
+        // MythTV remaps OpenCable Video to normal video during recording
+        // so "dvb" is the safest choice for system info type, since this
+        // will ignore other uses of the same stream id in DVB countries.
+        has_video |= pmt.IsVideo(i, "dvb");
+    }
+
+    return has_video;
+}
+
+bool AvFormatDecoder::GenerateDummyVideoFrame(void)
+{
+    if (!GetNVP()->getVideoOutput())
+        return false;
+
+    VideoFrame *frame = GetNVP()->GetNextVideoFrame(true);
+    if (!frame)
+        return false;
+
+    if (dummy_frame && !compatible(frame, dummy_frame))
+    {
+        delete [] dummy_frame->buf;
+        delete dummy_frame;
+        dummy_frame = NULL;
+    }
+
+    if (!dummy_frame)
+    {
+        dummy_frame = new VideoFrame;
+        init(dummy_frame,
+             frame->codec, new unsigned char[frame->size],
+             frame->width, frame->height, frame->bpp, frame->size,
+             frame->pitches, frame->offsets);
+
+        clear(dummy_frame, GUID_YV12_PLANAR);
+        // Note: instead of clearing the frame to black, one
+        // could load an image or a series of images...
+
+        dummy_frame->interlaced_frame = 0; // not interlaced
+        dummy_frame->top_field_first  = 1; // top field first
+        dummy_frame->repeat_pict      = 0; // not a repeated picture
+    }
+
+    memcpy(frame->buf, dummy_frame->buf, dummy_frame->size);
+
+    frame->frameNumber = framesPlayed;
+
+    GetNVP()->ReleaseNextVideoFrame(frame, lastvpts);
+    GetNVP()->getVideoOutput()->DeLimboFrame(frame);
+
+    decoded_video_frame = frame;
+    framesPlayed++;
 
     return true;
 }

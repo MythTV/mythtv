@@ -1,11 +1,10 @@
 #ifndef WELCOMEDIALOG_H_
 #define WELCOMEDIALOG_H_
 
-#include <iostream>
-using namespace std;
-
 #include <qdatetime.h>
+
 #include "mythdialogs.h"
+#include "remoteutil.h"
 
 class WelcomeDialog : public MythThemedDialog
 {
@@ -89,13 +88,6 @@ class WelcomeDialog : public MythThemedDialog
         QDateTime startTime, endTime;
     } ProgramDetail;
 
-    typedef struct
-    {
-        int     id;
-        bool    isRecording;
-        ProgramDetail program;
-    } TunerStatus;
-    
     QPtrList<TunerStatus>    m_tunerList;
     QPtrList<ProgramDetail>  m_scheduledList;        
 

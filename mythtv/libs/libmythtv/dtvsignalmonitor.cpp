@@ -22,7 +22,7 @@
 
 DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
                                    DTVChannel *_channel,
-                                   uint wait_for_mask,
+                                   uint64_t wait_for_mask,
                                    const char *name)
     : SignalMonitor(db_cardnum, _channel, wait_for_mask, name),
       stream_data(NULL),
@@ -463,6 +463,7 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
         DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
                .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
         AddFlags(kDTVSigMon_SDTMatch);
+        RemoveFlags(kDVBSigMon_WaitForPos);
     }
 }
 

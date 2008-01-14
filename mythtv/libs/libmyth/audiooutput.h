@@ -63,6 +63,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     QString GetError(void)   const { return lastError; }
     QString GetWarning(void) const { return lastWarn; }
 
+    virtual void GetBufferStatus(uint &fill, uint &total) { fill = total = 0; }
+
     //  Only really used by the AudioOutputNULL object
     
     virtual void bufferOutputData(bool y) = 0;

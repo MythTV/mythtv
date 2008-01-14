@@ -62,6 +62,8 @@ static inline void init(
     int _width, int _height, int _bpp, int _size,
     const int *p = 0, const int *o = 0) __attribute__ ((unused));
 static inline void clear(VideoFrame *vf, int fourcc) __attribute__ ((unused));
+static inline bool compatible(
+    const VideoFrame *a, const VideoFrame *b) __attribute__ ((unused));
 
 static inline void init(
     VideoFrame *vf,
@@ -147,6 +149,21 @@ static inline void clear(VideoFrame *vf, int fourcc)
         memset(vf->buf + vf->offsets[1], 127, vf->pitches[1] * uv_height);
         memset(vf->buf + vf->offsets[2], 127, vf->pitches[2] * uv_height);
     }
+}
+
+static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
+{
+    return a && b &&
+        (a->codec      == b->codec)      &&
+        (a->width      == b->width)      &&
+        (a->height     == b->height)     &&
+        (a->size       == b->size)       &&
+        (a->offsets[0] == b->offsets[0]) &&
+        (a->offsets[1] == b->offsets[1]) &&
+        (a->offsets[2] == b->offsets[2]) &&
+        (a->pitches[0] == b->pitches[0]) &&
+        (a->pitches[1] == b->pitches[1]) &&
+        (a->pitches[2] == b->pitches[2]);
 }
 
 #endif /* __cplusplus */

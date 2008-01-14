@@ -11,7 +11,7 @@ using namespace std;
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1205";
+const QString currentDatabaseVersion = "1207";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3351,6 +3351,29 @@ thequery,
             return false;
     }
 
+    // Until we merge to the trunk this must be done manually...
+    if (dbver == "1205")
+    {
+        const QString updates[] = {
+"DELETE FROM keybindings "
+"WHERE context = 'TV PLAYBACK' AND "
+"      (action = 'TOGGLEINPUTS' OR action = 'SWITCHCARDS');",
+""
+};
+        if (!performActualUpdate(updates, "1206", dbver))
+            return false;
+    }
+
+    if (dbver == "1206")
+    {
+        const QString updates[] = {
+"ALTER TABLE capturecard DROP parentid;",
+"ALTER TABLE cardinput DROP childcardid;",
+""
+};
+        if (!performActualUpdate(updates, "1207", dbver))
+            return false;
+    }
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
@@ -3364,32 +3387,6 @@ thequery,
 //"ALTER TABLE capturecard DROP firewire_node;" in 0.22
 //"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
 //"ALTER TABLE channel DROP COLUMN commfree;" in 0.22
-
-/*
-    // Until we merge to the trunk this must be done manually...
-    if (dbver == "119X")
-    {
-        const QString updates[] = {
-"DELETE FROM keybindings "
-"WHERE context = 'TV PLAYBACK' AND "
-"      (action = 'TOGGLEINPUTS' OR action = 'SWITCHCARDS');",
-""
-};
-        if (!performActualUpdate(updates, "119X", dbver))
-            return false;
-    }
-
-    if (dbver == "119X")
-    {
-        const QString updates[] = {
-"ALTER TABLE capturecard DROP parentid;",
-"ALTER TABLE cardinput DROP childcardid;",
-""
-};
-        if (!performActualUpdate(updates, "119X", dbver))
-            return false;
-    }
-*/
 
     return true;
 }

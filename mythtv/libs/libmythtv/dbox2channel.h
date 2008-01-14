@@ -55,9 +55,6 @@ class DBox2Channel : public ChannelBase
     bool IsOpen(void) const { return m_recorderAlive; }
     void Close(void);
     void SwitchToLastChannel(void);
-    bool SwitchToInput(const QString &inputname, const QString &chan);
-    bool SwitchToInput(int newcapchannel, bool setstarting)
-        { (void)newcapchannel; (void)setstarting; return false; }
 
     QString GetChannelNameFromNumber(const QString&);
     QString GetChannelNumberFromName(const QString &channelName);

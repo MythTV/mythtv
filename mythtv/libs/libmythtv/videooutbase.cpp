@@ -1086,6 +1086,13 @@ void VideoOutput::MoveResize(void)
     video_rect         = QRect(QPoint(0, 0), fix_1080i(video_dim));
     display_video_rect = display_visible_rect;
 
+    // Avoid too small frames for audio only streams (for OSD).
+    if ((video_rect.width() <= 0) || (video_rect.height() <= 0))
+    {
+        video_dim  = display_visible_rect.size();
+        video_rect = QRect(QPoint(0, 0), video_dim);
+    }
+
     // Apply various modifications
     ApplyDBScaleAndMove();
     ApplyLetterboxing();

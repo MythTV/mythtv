@@ -38,6 +38,8 @@ typedef uchar_vec_t                     sections_t;
 typedef QMap<uint, sections_t>          sections_map_t;
 
 typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
+typedef vector<TSPacketListener*>       ts_listener_vec_t;
+typedef vector<TSPacketListenerAV*>     ts_av_listener_vec_t;
 typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
 
 typedef enum
@@ -66,6 +68,15 @@ class CryptInfo
 };
 
 void init_sections(sections_t &sect, uint last_section);
+
+typedef enum
+{
+    kPIDPriorityNone   = 0,
+    kPIDPriorityLow    = 1,
+    kPIDPriorityNormal = 2,
+    kPIDPriorityHigh   = 3,
+} PIDPriority;
+typedef QMap<uint, PIDPriority> pid_map_t;
 
 class MPEGStreamData : public EITSource
 {
@@ -100,10 +111,17 @@ class MPEGStreamData : public EITSource
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
     // Listening
-    virtual void AddListeningPID(uint pid)  { _pids_listening[pid] = true; }
-    virtual void AddNotListeningPID(uint pid){_pids_notlistening[pid] = true;}
-    virtual void AddWritingPID(uint pid)    { _pids_writing[pid] = true;   }
-    virtual void AddAudioPID(uint pid)      { _pids_audio[pid] = true;     }
+    virtual void AddListeningPID(
+        uint pid, PIDPriority priority = kPIDPriorityNormal)
+        { _pids_listening[pid] = priority; }
+    virtual void AddNotListeningPID(uint pid)
+        { _pids_notlistening[pid] = kPIDPriorityNormal; }
+    virtual void AddWritingPID(
+        uint pid, PIDPriority priority = kPIDPriorityHigh)
+        { _pids_writing[pid] = priority; }
+    virtual void AddAudioPID(
+        uint pid, PIDPriority priority = kPIDPriorityHigh)
+        { _pids_audio[pid] = priority; }
 
     virtual void RemoveListeningPID(uint pid) { _pids_listening.erase(pid);  }
     virtual void RemoveNotListeningPID(uint pid)
@@ -114,10 +132,21 @@ class MPEGStreamData : public EITSource
     virtual bool IsListeningPID(uint pid) const;
     virtual bool IsNotListeningPID(uint pid) const;
     virtual bool IsWritingPID(uint pid) const;
+    bool IsVideoPID(uint pid) const
+        { return _pid_video_single_program == pid; }
     virtual bool IsAudioPID(uint pid) const;
 
-    virtual QMap<uint, bool> ListeningPIDs(void) const
+    const pid_map_t& ListeningPIDs(void) const
         { return _pids_listening; }
+    const pid_map_t& AudioPIDs(void) const
+        { return _pids_audio; }
+    const pid_map_t& WritingPIDs(void) const
+        { return _pids_writing; }
+
+    uint GetPIDs(pid_map_t&) const;
+
+    // PID Priorities
+    PIDPriority GetPIDPriority(uint pid) const;
 
     // Table versions
     void SetVersionPAT(uint tsid, int version, uint last_section)
@@ -202,9 +231,14 @@ class MPEGStreamData : public EITSource
     void UpdateCAT(const ConditionalAccessTable*);
     void UpdatePMT(uint program_num, const ProgramMapTable*);
 
+    void AddWritingListener(TSPacketListener*);
+    void RemoveWritingListener(TSPacketListener*);
+
     // Single Program Stuff, signals with processed tables
     void AddMPEGSPListener(MPEGSingleProgramStreamListener*);
     void RemoveMPEGSPListener(MPEGSingleProgramStreamListener*);
+    void AddAVListener(TSPacketListenerAV*);
+    void RemoveAVListener(TSPacketListenerAV*);
     void UpdatePATSingleProgram(ProgramAssociationTable*);
     void UpdatePMTSingleProgram(ProgramMapTable*);
 
@@ -221,10 +255,12 @@ class MPEGStreamData : public EITSource
         { _pmt_single_program_num_audio = num;  }
     uint GetAudioStreamsRequired() const
         { return _pmt_single_program_num_audio; }
+    void SetRecordingType(const QString &recording_type);
 
     // Single program stuff, gets
     int DesiredProgram(void) const          { return _desired_program; }
     uint VideoPIDSingleProgram(void) const  { return _pid_video_single_program; }
+    QString GetRecordingType(void) const;
 
     const ProgramAssociationTable* PATSingleProgram(void) const
         { return _pat_single_program; }
@@ -284,10 +320,10 @@ class MPEGStreamData : public EITSource
     float                     _eit_rate;
 
     // Listening
-    QMap<uint, bool>          _pids_listening;
-    QMap<uint, bool>          _pids_notlistening;
-    QMap<uint, bool>          _pids_writing;
-    QMap<uint, bool>          _pids_audio;
+    pid_map_t _pids_listening;
+    pid_map_t _pids_notlistening;
+    pid_map_t _pids_writing;
+    pid_map_t _pids_audio;
 
     // Encryption monitoring
     mutable QMutex            _encryption_lock;
@@ -300,6 +336,8 @@ class MPEGStreamData : public EITSource
     mutable QMutex            _listener_lock;
     mpeg_listener_vec_t       _mpeg_listeners;
     mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
+    ts_listener_vec_t         _ts_writing_listeners;
+    ts_av_listener_vec_t      _ts_av_listeners;
 
     // Table versions
     QMap<uint, int>           _pat_version;
@@ -321,6 +359,9 @@ class MPEGStreamData : public EITSource
 
     // Single program variables
     int                       _desired_program;
+    QString                   _recording_type;
+    bool                      _strip_pmt_descriptors;
+    bool                      _normalize_stream_type;
     uint                      _pid_video_single_program;
     uint                      _pid_pmt_single_program;
     uint                      _pmt_single_program_num_video;

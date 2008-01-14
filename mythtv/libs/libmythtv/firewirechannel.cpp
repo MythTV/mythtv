@@ -42,9 +42,23 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 
 bool FirewireChannel::SetChannelByString(const QString &channum)
 {
+    QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
+    VERBOSE(VB_CHANNEL, loc);
+
     InputMap::const_iterator it = inputs.find(currentInputID);
     if (it == inputs.end())
         return false;
+
+    uint mplexid_restriction;
+    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Requested channel '%1' is on input '%2' "
+                    "which is in a busy input group")
+                .arg(channum).arg(currentInputID));
+
+        return false;
+    }
 
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, dtv_si_std;
@@ -60,6 +74,21 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
         mplexid, commfree))
     {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Requested channel '%1' is on input '%2' "
+                    "which is in a busy input group")
+                .arg(channum).arg(currentInputID));
+
+        return false;
+    }
+
+    if (mplexid_restriction && (mplexid != mplexid_restriction))
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Requested channel '%1' is not available because "
+                    "the tuner is currently in use on another transport.")
+                .arg(channum));
+
         return false;
     }
 
@@ -82,6 +111,8 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         curchannelname = QDeepCopy<QString>(channum);
         (*it)->startChanNum = QDeepCopy<QString>(channum);
     }
+
+    VERBOSE(VB_CHANNEL, loc + " " + ((ok) ? "success" : "failure"));
 
     return ok;
 }
@@ -125,26 +156,6 @@ void FirewireChannel::Close(void)
         device->ClosePort();
         isopen = false;
     }
-}
-
-bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)
-{
-    int inputNum = GetInputByName(input);
-    if (inputNum < 0)
-        return false;
-
-    return SetChannelByString(chan);
-}
-
-bool FirewireChannel::SwitchToInput(int newInputNum, bool setstarting)
-{
-    (void) setstarting;
-
-    InputMap::const_iterator it = inputs.find(newInputNum);
-    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
-        return false;
-
-    return SetChannelByString((*it)->startChanNum);
 }
 
 QString FirewireChannel::GetDevice(void) const

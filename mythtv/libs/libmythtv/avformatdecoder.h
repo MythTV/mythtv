@@ -104,8 +104,6 @@ class AvFormatDecoder : public DecoderBase
                  char testbuf[kDecoderProbeBufferSize],
                  int testbufsize = kDecoderProbeBufferSize);
 
-    /// Decode a frame of video/audio. If onlyvideo is set, 
-    /// just decode the video portion.
     bool GetFrame(int onlyvideo);
 
     bool isLastFrameKey(void) { return false; }
@@ -206,6 +204,10 @@ class AvFormatDecoder : public DecoderBase
     /// Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
 
+    bool GenerateDummyVideoFrame(void);
+    static bool HasVideo(const AVFormatContext *ic);
+
+  private:
     class AvFormatDecoderPrivate *d;
     H264::KeyframeSequencer *h264_kf_seq;
 
@@ -259,6 +261,7 @@ class AvFormatDecoder : public DecoderBase
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
     bool              disable_passthru;
+    VideoFrame       *dummy_frame;
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;

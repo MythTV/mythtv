@@ -32,7 +32,7 @@
  */
 IPTVSignalMonitor::IPTVSignalMonitor(
     int db_cardnum, IPTVChannel *_channel,
-    uint _flags, const char *_name)
+    uint64_t _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
       dtvMonitorRunning(false)
 {

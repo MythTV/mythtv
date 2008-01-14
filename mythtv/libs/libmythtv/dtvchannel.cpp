@@ -14,6 +14,9 @@
 #define LOC_WARN QString("DTVChan(%1) Warning: ").arg(GetDevice())
 #define LOC_ERR QString("DTVChan(%1) Error: ").arg(GetDevice())
 
+QMutex                    DTVChannel::master_map_lock;
+QMap<QString,DTVChannel*> DTVChannel::master_map;
+
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
       sistandard("mpeg"),         tuningMode(QString::null),
@@ -21,6 +24,20 @@ DTVChannel::DTVChannel(TVRec *parent)
       currentATSCMajorChannel(0), currentATSCMinorChannel(0),
       currentTransportID(0),      currentOriginalNetworkID(0)
 {
+}
+
+DTVChannel::~DTVChannel()
+{
+    QMutexLocker locker(&master_map_lock);
+    QMap<QString,DTVChannel*>::iterator it = master_map.begin();
+    for (; it != master_map.end(); ++it)
+    {
+        if (*it == this)
+        {
+            master_map.erase(it);
+            break;
+        }
+    }
 }
 
 /** \fn DTVChannel::GetCachedPids(int, pid_cache_t&)
@@ -141,4 +158,30 @@ void DTVChannel::SetTuningMode(const QString &tuning_mode)
 {
     QMutexLocker locker(&dtvinfo_lock);
     tuningMode = QDeepCopy<QString>(tuning_mode.lower());
+}
+
+DTVChannel *DTVChannel::GetMaster(const QString &videodevice)
+{
+    QMutexLocker locker(&master_map_lock);
+
+    QMap<QString,DTVChannel*>::iterator it = master_map.find(videodevice);
+    if (it != master_map.end())
+        return *it;
+
+    master_map[QDeepCopy<QString>(videodevice)] = this;
+
+    return this;
+}
+
+const DTVChannel *DTVChannel::GetMaster(const QString &videodevice) const
+{
+    QMutexLocker locker(&master_map_lock);
+
+    QMap<QString,DTVChannel*>::iterator it = master_map.find(videodevice);
+    if (it != master_map.end())
+        return *it;
+
+    master_map[QDeepCopy<QString>(videodevice)] = (DTVChannel*) this;
+
+    return this;
 }

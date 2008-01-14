@@ -7,6 +7,7 @@
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qmap.h>
+#include <qregexp.h>
 #include <vector>
 
 using namespace std;
@@ -224,6 +225,7 @@ class MPUBLIC ProgramInfo
 
     // DB gets
     long long GetFilesize(void);
+    int GetMplexID(void) const;
     long long GetBookmark(void) const;
     QStringList GetDVDBookmark(QString serialid, bool delbookmark) const;
     bool IsEditing(void) const;
@@ -381,6 +383,8 @@ class MPUBLIC ProgramInfo
   private:
     bool ignoreBookmark;
     mutable class ScheduledRecording* record;
+    mutable QMutex regExpLock;
+    QRegExp regExpSeries;
 
     QString inUseForWhat;
 };

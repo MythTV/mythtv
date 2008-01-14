@@ -6,6 +6,10 @@
 #include <sys/ioctl.h>
 #endif
 
+// Qt headers
+#include <qmap.h>
+#include <qdir.h>
+
 // MythTV headers
 #include "cardutil.h"
 #include "videosource.h"
@@ -22,31 +26,182 @@
 #include "videodev_myth.h"
 #endif
 
-/** \fn CardUtil::IsCardTypePresent(const QString&)
- *  \brief Returns true if the card type is present
- *  \param strType card type being checked for
- */
-bool CardUtil::IsCardTypePresent(const QString &strType)
+#define LOC      QString("CardUtil: ")
+#define LOC_WARN QString("CardUtil, Warning: ")
+#define LOC_ERR  QString("CardUtil, Error: ")
+
+bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 {
+    VERBOSE(VB_IMPORTANT, QString("IsTunerShared(%1,%2)")
+            .arg(cardidA).arg(cardidB));
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT count(cardtype) "
-                  "FROM capturecard, cardinput "
-                  "WHERE cardinput.cardid = capturecard.cardid AND "
-                  "      capturecard.cardtype = :CARDTYPE AND "
-                  "      capturecard.hostname = :HOSTNAME");
-    query.bindValue(":CARDTYPE", strType);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.prepare("SELECT videodevice, hostname, cardtype "
+                  "FROM capturecard "
+                  "WHERE ( (cardid = :CARDID_A) OR "
+                  "        (cardid = :CARDID_B) )");
+    query.bindValue(":CARDID_A", cardidA);
+    query.bindValue(":CARDID_B", cardidB);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec())
     {
-        query.next();
-        int count = query.value(0).toInt();
-
-        if (count > 0)
-            return true;
+        MythContext::DBError("CardUtil::is_tuner_shared", query);
+        return false;
     }
 
-    return false;
+    if (!query.next())
+        return false;
+
+    const QString vdevice  = query.value(0).toString();
+    const QString hostname = query.value(1).toString();
+    const QString cardtype = query.value(2).toString();
+
+    if (!IsTunerSharingCapable(cardtype.upper()))
+        return false;
+
+    if (!query.next())
+        return false;
+
+    bool ret = ((vdevice  == query.value(0).toString()) &&
+                (hostname == query.value(1).toString()) &&
+                (cardtype == query.value(2).toString()));
+
+    VERBOSE(VB_RECORD, QString("IsTunerShared(%1,%2) -> %3")
+            .arg(cardidA).arg(cardidB).arg(ret));
+
+    return ret;
+}
+
+/** \fn CardUtil::IsCardTypePresent(const QString&, QString)
+ *  \brief Returns true if the card type is present and connected to an input
+ *  \param rawtype  Card type as used in DB or empty string for all cards
+ *  \param hostname Host to check, or empty string for current host
+ */
+bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
+{
+    if (hostname.isEmpty())
+        hostname = gContext->GetHostName();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr = 
+        "SELECT count(cardtype) "
+        "FROM capturecard, cardinput "
+        "WHERE cardinput.cardid = capturecard.cardid AND "
+        "      capturecard.hostname = :HOSTNAME";
+
+    if (!rawtype.isEmpty())
+        qstr += " AND capturecard.cardtype = :CARDTYPE";
+
+    query.prepare(qstr);
+
+    if (!rawtype.isEmpty())
+        query.bindValue(":CARDTYPE", rawtype.upper());
+
+    query.bindValue(":HOSTNAME", hostname);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::IsCardTypePresent", query);
+        return false;
+    }
+
+    uint count = 0;
+    if (query.next())
+        count = query.value(0).toUInt();
+
+    return count > 0;
+}
+
+/** \fn CardUtil::GetVideoDevices(const QString&, QString)
+ *  \brief Returns the videodevices of the matching cards, duplicates removed
+ *  \param rawtype  Card type as used in DB or empty string for all cardids
+ *  \param hostname Host to check, or empty string for current host
+ */
+QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
+{
+    QStringVec list;
+
+    if (hostname.isEmpty())
+        hostname = gContext->GetHostName();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr = 
+        "SELECT videodevice "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME";
+
+    if (!rawtype.isEmpty())
+        qstr += " AND cardtype = :CARDTYPE";
+
+    query.prepare(qstr);
+
+    if (!rawtype.isEmpty())
+        query.bindValue(":CARDTYPE", rawtype.upper());
+
+    query.bindValue(":HOSTNAME", hostname);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetVideoDevices", query);
+        return list;
+    }
+
+    QMap<QString,bool> dup;
+    while (query.next())
+    {
+        QString videodevice = query.value(0).toString();
+        if (dup[videodevice])
+            continue;
+
+        list.push_back(videodevice);
+        dup[videodevice] = true;
+    }
+
+    return list;
+}
+
+QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
+{
+    QStringVec devs;
+
+    if (rawtype.upper() == "DVB")
+    {
+        QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::All);
+        const QFileInfoList *il = dir.entryInfoList();
+        if (!il)
+            return devs;
+        
+        vector<uint> list;
+        QMap<uint,bool> dups;
+        QFileInfoListIterator it( *il );
+        QFileInfo *fi;
+
+        for (; (fi = it.current()) != 0; ++it)
+        {
+            if (fi->fileName().left(7).lower() != "adapter")
+                continue;
+
+            bool ok;
+            uint num = fi->fileName().mid(7).toUInt(&ok);
+            if (!ok || dups[num])
+                continue;
+
+            list.push_back(num);
+            dups[num] = true;
+        }
+
+        stable_sort(list.begin(), list.end());
+
+        for (uint i = 0; i < list.size(); i++)
+            devs.push_back(QString::number(list[i]));
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("CardUtil::ProbeVideoDevices: ") +
+                QString("Raw Type: '%1' is not supported").arg(rawtype));
+    }
+
+    return devs;
 }
 
 QString CardUtil::ProbeDVBType(uint device)
@@ -144,13 +299,13 @@ uint CardUtil::GetMinSignalMonitoringDelay(uint device)
     return 25;
 }
 
-QString CardUtil::ProbeSubTypeName(uint cardid, const QString &inputname)
+QString CardUtil::ProbeSubTypeName(uint cardid)
 {
-    QString type = GetRawCardType(cardid, inputname);
+    QString type = GetRawCardType(cardid);
     if ("DVB" != type)
         return type;
 
-    QString device = GetVideoDevice(cardid, inputname);
+    QString device = GetVideoDevice(cardid);
 
     if (device.isEmpty())
         return "ERROR_OPEN";
@@ -168,67 +323,17 @@ bool CardUtil::IsDVBCardType(const QString card_type)
         (ct == "OFDM") || (ct == "ATSC");
 }
 
-QString get_on_source(const QString &to_get, uint cardid, uint sourceid)
+QString get_on_cardid(const QString &to_get, uint cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    if (sourceid)
-    {
-        query.prepare(
-            QString("SELECT %1 ").arg(to_get) +
-            "FROM capturecard, cardinput "
-            "WHERE sourceid         = :SOURCEID AND "
-            "      cardinput.cardid = :CARDID   AND "
-            "      ( ( cardinput.childcardid != '0' AND "
-            "          cardinput.childcardid  = capturecard.cardid ) OR "
-            "        ( cardinput.childcardid  = '0' AND "
-            "          cardinput.cardid       = capturecard.cardid ) )");
-        query.bindValue(":SOURCEID", sourceid);
-    }
-    else
-    {
-        query.prepare(
-            QString("SELECT %1 ").arg(to_get) +
-            "FROM capturecard "
-            "WHERE capturecard.cardid = :CARDID");
-    }
+    query.prepare(
+        QString("SELECT %1 ").arg(to_get) +
+        "FROM capturecard "
+        "WHERE capturecard.cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythContext::DBError("CardUtil::get_on_source", query);
-    else if (query.next())
-        return query.value(0).toString();
-
-    return QString::null;
-}
-
-QString get_on_input(const QString &to_get,
-                     uint cardid, const QString &input)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!input.isEmpty())
-    {
-        query.prepare(
-            QString("SELECT %1 ").arg(to_get) +
-            "FROM capturecard, cardinput "
-            "WHERE inputname        = :INNAME AND "
-            "      cardinput.cardid = :CARDID AND "
-            "      ( ( cardinput.childcardid != '0' AND "
-            "          cardinput.childcardid  = capturecard.cardid ) OR "
-            "        ( cardinput.childcardid  = '0' AND "
-            "          cardinput.cardid       = capturecard.cardid ) )");
-        query.bindValue(":INNAME", input);
-    }
-    else
-    {
-        query.prepare(
-            QString("SELECT %1 ").arg(to_get) +
-            "FROM capturecard "
-            "WHERE capturecard.cardid = :CARDID");
-    }
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::get_on_input", query);
     else if (query.next())
         return query.value(0).toString();
 
@@ -238,7 +343,7 @@ QString get_on_input(const QString &to_get,
 bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
                    const QString value)
 {
-    QString tmp = get_on_source("capturecard.cardid", cardid, sourceid);
+    QString tmp = get_on_cardid("capturecard.cardid", cardid);
     if (tmp.isEmpty())
         return false;
 
@@ -261,81 +366,415 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
     return false;
 }
 
-/** \fn CardUtil::GetCardID(const QString&, QString)
- *  \brief Returns the cardid of the card that uses the specified
- *         videodevice, and optionally a non-local hostname.
- *  \param videodevice Video device we want card id for
+/** \fn CardUtil::GetCardIDs(const QString&, QString, QString)
+ *  \brief Returns all cardids of cards that uses the specified
+ *         videodevice, and optionally rawtype and a non-local 
+ *         hostname. The result is ordered from smallest to largest.
+ *  \param videodevice Video device we want card ids for
+ *  \param rawtype     Card type as used in DB or empty string for any type
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-int CardUtil::GetCardID(const QString &videodevice, QString hostname)
+vector<uint> CardUtil::GetCardIDs(const QString &videodevice,
+                                  QString        rawtype,
+                                  QString        hostname)
 {
-    if (hostname == QString::null)
+    vector<uint> list;
+
+    if (hostname.isEmpty())
         hostname = gContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery =
-        QString("SELECT cardid FROM capturecard "
-                "WHERE videodevice = '%1' AND "
-                "      hostname = '%2'")
-        .arg(videodevice).arg(hostname);
+    QString qstr = 
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE videodevice = :DEVICE AND "
+        "      hostname    = :HOSTNAME";
 
-    query.prepare(thequery);
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetCardID()", query);
-    else if (query.next())
-        return query.value(0).toInt();
+    if (!rawtype.isEmpty())
+        qstr += " AND cardtype = :CARDTYPE";
 
-    return -1;
+    qstr += " ORDER BY cardid";
+
+    query.prepare(qstr);
+
+    query.bindValue(":DEVICE",   videodevice);
+    query.bindValue(":HOSTNAME", hostname);
+
+    if (!rawtype.isEmpty())
+        query.bindValue(":CARDTYPE", rawtype.upper());
+
+    if (!query.exec())
+        MythContext::DBError("CardUtil::GetCardIDs(videodevice...)", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
 }
 
-uint CardUtil::GetChildCardID(uint cardid)
+static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 {
-    // check if child card definition does exist
+    uint dst_cardid = orig_dst_cardid;
+
     MSqlQuery query(MSqlQuery::InitCon());
+    if (!dst_cardid)
+    {
+        query.prepare(
+            "DELETE FROM capturecard "
+            "WHERE videodevice = 'temp_dummy'");
+
+        if (!query.exec())
+        {
+            MythContext::DBError("clone_capturecard -- delete temp", query);
+            return 0;
+        }
+
+        query.prepare(
+            "INSERT INTO capturecard "
+            "SET videodevice = 'temp_dummy'");
+
+        if (!query.exec())
+        {
+            MythContext::DBError("clone_capturecard -- insert temp", query);
+            return 0;
+        }
+
+        query.prepare(
+            "SELECT cardid "
+            "FROM capturecard "
+            "WHERE videodevice = 'temp_dummy'");
+
+        if (!query.exec())
+        {
+            MythContext::DBError("clone_capturecard -- get temp id", query);
+            return 0;
+        }
+
+        if (!query.next())
+        {
+            VERBOSE(VB_IMPORTANT, "clone_capturecard -- get temp id");
+            return 0;
+        }
+
+        dst_cardid = query.value(0).toUInt();
+    }
+
+    query.prepare(
+        "SELECT videodevice,           cardtype,       defaultinput,     "
+        "       hostname,              signal_timeout, channel_timeout,  "
+        "       dvb_wait_for_seqstart, dvb_on_demand,  dvb_tuning_delay, "
+        "       dvb_diseqc_type,       diseqcid "
+        "FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", src_cardid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("clone_capturecard -- get data", query);
+        return 0;
+    }
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, "clone_cardinput -- get data 2");
+        return 0;
+    }
+
+    MSqlQuery query2(MSqlQuery::InitCon());
+    query2.prepare(
+        "UPDATE capturecard "
+        "SET videodevice           = :V0, "
+        "    cardtype              = :V1, "
+        "    defaultinput          = :V2, "
+        "    hostname              = :V3, "
+        "    signal_timeout        = :V4, "
+        "    channel_timeout       = :V5, "
+        "    dvb_wait_for_seqstart = :V6, "
+        "    dvb_on_demand         = :V7, "
+        "    dvb_tuning_delay      = :V8, "
+        "    dvb_diseqc_type       = :V9, "
+        "    diseqcid              = :V10 "
+        "WHERE cardid = :CARDID");
+    for (uint i = 0; i < 11; i++)
+        query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
+    query2.bindValue(":CARDID", dst_cardid);
+
+    if (!query2.exec())
+    {
+        MythContext::DBError("clone_capturecard -- save data", query2);
+        if (!orig_dst_cardid)
+            CardUtil::DeleteCard(dst_cardid);
+        return 0;
+    }
+
+    return dst_cardid;
+}
+
+bool clone_cardinputs(uint src_cardid, uint dst_cardid)
+{
+    vector<uint> src_inputs = CardUtil::GetInputIDs(src_cardid);
+    vector<uint> dst_inputs = CardUtil::GetInputIDs(dst_cardid);
+    vector<QString> src_names;
+    vector<QString> dst_names;
+    QMap<uint,bool> dst_keep;
+
+    for (uint i = 0; i < src_inputs.size(); i++)
+        src_names.push_back(CardUtil::GetInputName(src_inputs[i]));
+
+    for (uint i = 0; i < dst_inputs.size(); i++)
+        dst_names.push_back(CardUtil::GetInputName(dst_inputs[i]));
+
+    bool ok = true;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query2(MSqlQuery::InitCon());
+
+    for (uint i = 0; i < src_inputs.size(); i++)
+    {
+        query.prepare(
+            "SELECT sourceid,        inputname,       externalcommand, "
+            "       preference,      tunechan,        startchan,       "
+            "       freetoaironly,   displayname,     radioservices,   "
+            "       dishnet_eit,     recpriority,     quicktune        "
+            "FROM cardinput "
+            "WHERE cardinputid = :INPUTID");
+        query.bindValue(":INPUTID", src_inputs[i]);
+        if (!query.exec())
+        {
+            MythContext::DBError("clone_cardinput -- get data", query);
+            ok = false;
+            break;
+        }
+        if (!query.next())
+        {
+            VERBOSE(VB_IMPORTANT, "clone_cardinput -- get data 2");
+            ok = false;
+            break;
+        }
+
+        int match = -1;
+        for (uint j = 0; j < dst_inputs.size(); j++)
+        {
+            if (src_names[i] == dst_names[j])
+            {
+                match = (int) j;
+                break;
+            }
+        }
+
+        uint dst_inputid = 0;
+        if (match >= 0)
+        {
+            dst_keep[match] = true;
+
+            // copy data from src[i] to dst[match]
+            query2.prepare(
+                "UPDATE cardinput "
+                "SET sourceid        = :V0, "
+                "    inputname       = :V1, "
+                "    externalcommand = :V2, "
+                "    preference      = :V3, "
+                "    tunechan        = :V4, "
+                "    startchan       = :V5, "
+                "    freetoaironly   = :V6, "
+                "    displayname     = :V7, "
+                "    radioservices   = :V8, "
+                "    dishnet_eit     = :V9, "
+                "    recpriority     = :V10, "
+                "    quicktune       = :V11  "
+                "WHERE cardinputid = :INPUTID");
+
+            for (uint j = 0; j < 12; j++)
+            {
+                query2.bindValue(QString(":V%1").arg(j),
+                                 query.value(j).toString());
+            }
+            query2.bindValue(":INPUTID", dst_inputs[match]);
+
+            if (!query2.exec())
+            {
+                MythContext::DBError("clone_cardinput -- update data", query2);
+                ok = false;
+                break;
+            }
+
+            dst_inputid = dst_inputs[match];
+        }
+        else
+        {
+            // create new input for dst with data from src
+
+            query2.prepare(
+                "INSERT cardinput "
+                "SET cardid          = :CARDID, "
+                "    sourceid        = :V0, "
+                "    inputname       = :V1, "
+                "    externalcommand = :V2, "
+                "    preference      = :V3, "
+                "    tunechan        = :V4, "
+                "    startchan       = :V5, "
+                "    freetoaironly   = :V6, "
+                "    displayname     = :V7, "
+                "    radioservices   = :V8, "
+                "    dishnet_eit     = :V9, "
+                "    recpriority     = :V10, "
+                "    quicktune       = :V11  ");
+
+            query2.bindValue(":CARDID", dst_cardid);
+            for (uint j = 0; j < 12; j++)
+            {
+                query2.bindValue(QString(":V%1").arg(j),
+                                 query.value(j).toString());
+            }
+
+            if (!query2.exec())
+            {
+                MythContext::DBError("clone_cardinput -- insert data", query2);
+                ok = false;
+                break;
+            }
+
+            query2.prepare(
+                "SELECT cardinputid "
+                "FROM cardinput "
+                "WHERE cardid    = :CARDID AND "
+                "      inputname = :NAME");
+            query2.bindValue(":CARDID", dst_cardid);
+            query2.bindValue(":NAME", query.value(1).toString());
+            if (!query2.exec())
+            {
+                MythContext::DBError("clone_cardinput -- "
+                                     "insert, query inputid", query2);
+                ok = false;
+                break;
+            }
+            if (!query2.next())
+            {
+                VERBOSE(VB_IMPORTANT, "clone_cardinput -- insert failed");
+                ok = false;
+                break;
+            }
+
+            dst_inputid = query2.value(0).toUInt();
+        }
+
+        // copy input group linkages
+        vector<uint> src_grps = CardUtil::GetInputGroups(src_inputs[i]);
+        vector<uint> dst_grps = CardUtil::GetInputGroups(dst_inputid);
+        for (uint j = 0; j < dst_grps.size(); j++)
+            CardUtil::UnlinkInputGroup(dst_inputid, dst_grps[j]);
+        for (uint j = 0; j < src_grps.size(); j++)
+            CardUtil::LinkInputGroup(dst_inputid, src_grps[j]);
+
+        // clone diseqc_config (just points to the same diseqc_tree row)
+        DiSEqCDevSettings diseqc;
+        if (diseqc.Load(src_inputs[i]))
+            diseqc.Store(dst_inputid);
+    }
+
+    // delete extra inputs in dst
+    for (uint i = 0; i < dst_inputs.size(); i++)
+    {
+        if (!dst_keep[i])
+            ok &= CardUtil::DeleteInput(dst_inputs[i]);
+    }
+
+    return ok;
+}
+
+bool CardUtil::CloneCard(uint src_cardid, uint orig_dst_cardid)
+{
+    QString type = CardUtil::GetRawCardType(src_cardid);
+    if (!IsTunerSharingCapable(type))
+        return false;
+
+    uint dst_cardid = clone_capturecard(src_cardid, orig_dst_cardid);
+    if (!dst_cardid)
+        return false;
+
+    if (!clone_cardinputs(src_cardid, dst_cardid) && !orig_dst_cardid)
+    {
+        DeleteCard(dst_cardid);
+        return false;
+    }
+
+    return true;
+}
+
+vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
+{
+    vector<uint> list;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardtype, videodevice, hostname "
+        "FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID",   cardid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetCloneCardIDs() 1", query);
+        return list;
+    }
+
+    if (!query.next())
+        return list;
+
+    QString rawtype     = query.value(0).toString();
+    QString videodevice = query.value(1).toString();
+    QString hostname    = query.value(2).toString();
+
+    if (!IsTunerSharingCapable(rawtype))
+        return list;
+
     query.prepare(
         "SELECT cardid "
         "FROM capturecard "
-        "WHERE parentid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+        "WHERE cardid      != :CARDID AND "
+        "      videodevice  = :DEVICE AND "
+        "      cardtype     = :TYPE   AND "
+        "      hostname     = :HOSTNAME");
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":DEVICE",   videodevice);
+    query.bindValue(":TYPE",     rawtype);
+    query.bindValue(":HOSTNAME", hostname);
 
-    int ret = 0;
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CaptureCard::GetChildCardID()", query);
-    else if (query.next())
-        ret = query.value(0).toInt();
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetCloneCardIDs() 2", query);
+        return list;
+    }
+    
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
 
-    return ret;
+    return list;
 }
 
-uint CardUtil::GetParentCardID(uint cardid)
+vector<uint> CardUtil::GetCardIDs(uint sourceid)
 {
-    // check if child card definition does exists
     MSqlQuery query(MSqlQuery::InitCon());
+
     query.prepare(
-        "SELECT parentid "
-        "FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+        "SELECT DISTINCT cardid "
+        "FROM cardinput "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
 
-    int ret = 0;
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CaptureCard::GetParentCardID()", query);
-    else if (query.next())
-        ret = query.value(0).toInt();
+    vector<uint> list;
 
-    return ret;
-}
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetCardIDs()", query);
+        return list;
+    }
 
-/** \fn CardUtil::IsDVB(uint, const QString&)
- *  \brief Returns true if the card is a DVB card
- *  \param cardid card id to check
- *  \param inputname input name of input to check
- *  \return true if the card is a DVB one
- */
-bool CardUtil::IsDVB(uint cardid, const QString &inputname)
-{
-    return "DVB" == GetRawCardType(cardid, inputname);
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
 }
 
 /** \fn CardUtil::GetDefaultInput(uint)
@@ -382,6 +821,405 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
     }
 
     return list;
+}
+
+bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
+{
+    if (!input.inputid)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT inputname, sourceid, cardid "
+                  "FROM cardinput "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", input.inputid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetInputInfo()", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    input.name     = query.value(0).toString();
+    input.sourceid = query.value(1).toUInt();
+    input.cardid   = query.value(2).toUInt();
+
+    if (groupids)
+        *groupids = GetInputGroups(input.inputid);
+
+    return true;
+}
+
+uint CardUtil::GetCardID(uint inputid)
+{
+    InputInfo info(QString::null, 0, inputid, 0, 0);
+    GetInputInfo(info);
+    return info.cardid;
+}
+
+QString CardUtil::GetInputName(uint inputid)
+{
+    InputInfo info(QString::null, 0, inputid, 0, 0);
+    GetInputInfo(info);
+    return info.name;
+}
+
+QString CardUtil::GetDisplayName(uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT displayname "
+                  "FROM cardinput "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythContext::DBError("CardUtil::GetDisplayName(uint)", query);
+    else if (query.next())
+        return QString::fromUtf8(query.value(0).toString());
+
+    return QString::null;
+}
+
+QString CardUtil::GetDisplayName(uint cardid, const QString &inputname)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT displayname "
+                  "FROM cardinput "
+                  "WHERE inputname = :INPUTNAME AND "
+                  "      cardid    = :CARDID");
+    query.bindValue(":INPUTNAME", inputname);
+    query.bindValue(":CARDID",    cardid);
+
+    if (!query.exec())
+        MythContext::DBError("CardUtil::GetDisplayName(uint,QString)", query);
+    else if (query.next())
+        return QString::fromUtf8(query.value(0).toString());
+
+    return QString::null;
+}
+
+vector<uint> CardUtil::GetInputIDs(uint cardid)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardinputid "
+        "FROM cardinput "
+        "WHERE cardid = :CARDID");
+    
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetInputIDs(uint)", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
+}
+
+bool CardUtil::DeleteInput(uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE FROM cardinput "
+        "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("DeleteInput", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool CardUtil::DeleteOrphanInputs(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardinputid "
+                  "FROM cardinput "
+                  "LEFT JOIN capturecard "
+                  "ON (capturecard.cardid = cardinput.cardid) "
+                  "WHERE capturecard.cardid IS NULL");
+    if (!query.exec())
+    {
+        MythContext::DBError("DeleteOrphanInputs -- query disconnects", query);
+        return false;
+    }
+
+    bool ok = true;
+    while (query.next())
+    {
+        uint inputid = query.value(0).toUInt();
+        if (DeleteInput(inputid))
+        {
+            VERBOSE(VB_IMPORTANT, QString("DeleteOrphanInputs -- ") +
+                    QString("Removed orphan input %1").arg(inputid));
+        }
+        else
+        {
+            ok = false;
+            VERBOSE(VB_IMPORTANT, QString("DeleteOrphanInputs -- ") +
+                    QString("Failed to remove orphan input %1")
+                    .arg(inputid));
+        }
+    }
+
+    return ok;
+}
+
+uint CardUtil::CreateInputGroup(const QString &name)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT MAX(inputgroupid) FROM inputgroup");
+    if (!query.exec())
+    {
+        MythContext::DBError("CreateNewInputGroup 1", query);
+        return 0;
+    }
+    uint inputgroupid = (query.next()) ? query.value(0).toUInt() + 1 : 1;
+
+    query.prepare(
+        "INSERT INTO inputgroup "
+        "       (cardinputid, inputgroupid, inputgroupname) "
+        "VALUES (:INPUTID,    :GROUPID,     :GROUPNAME    ) ");
+
+    query.bindValue(":INPUTID",   0);
+    query.bindValue(":GROUPID",   inputgroupid);
+    query.bindValue(":GROUPNAME", name.utf8());
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CreateNewInputGroup 2", query);
+        return 0;
+    }
+
+    return inputgroupid;
+}
+
+bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
+{
+    // Make sure the card's inputs are all in a single
+    // input group, create one if needed.
+    vector<uint> ingrps = CardUtil::GetSharedInputGroups(cardid);
+    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
+
+    if (ingrps.empty() && !inputs.empty())
+    {
+        QString dev = CardUtil::GetVideoDevice(cardid);
+        QString name = QString::null;
+        uint id = 0;
+        for (uint i = 0; !id && (i < 100); i++)
+        {
+            name = QString("DVB%1").arg(dev.toUInt());
+            name += (i) ? QString(":%1").arg(i) : QString("");
+            id = CardUtil::CreateInputGroup(name);
+        }
+        if (!id)
+        {
+            VERBOSE(VB_IMPORTANT, "Failed to create input group");
+            return false;
+        }
+
+        bool ok = true;
+        for (uint i = 0; i < inputs.size(); i++)
+            ok &= CardUtil::LinkInputGroup(inputs[i], id);
+
+        if (!ok)
+            VERBOSE(VB_IMPORTANT, "Failed to link to new input group");
+
+        return ok;
+    }
+
+    return true;
+}
+
+bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT cardinputid, inputgroupid, inputgroupname "
+        "FROM inputgroup "
+        "WHERE inputgroupid = :GROUPID "
+        "ORDER BY inputgroupid, cardinputid, inputgroupname");
+    query.bindValue(":GROUPID", inputgroupid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::CreateInputGroup() 1", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    const QString name = QString::fromUtf8(query.value(2).toString());
+
+    query.prepare(
+        "INSERT INTO inputgroup "
+        "       (cardinputid, inputgroupid, inputgroupname) "
+        "VALUES (:INPUTID,    :GROUPID,     :GROUPNAME    ) ");
+
+    query.bindValue(":INPUTID",   inputid);
+    query.bindValue(":GROUPID",   inputgroupid);
+    query.bindValue(":GROUPNAME", name.utf8());
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::CreateInputGroup() 2", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool CardUtil::UnlinkInputGroup(uint inputid, uint inputgroupid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!inputid && !inputgroupid)
+    {
+        query.prepare(
+            "DELETE FROM inputgroup "
+            "WHERE cardinputid = 0 ");
+    }
+    else
+    {
+        query.prepare(
+            "DELETE FROM inputgroup "
+            "WHERE cardinputid  = :INPUTID AND "
+            "      inputgroupid = :GROUPID ");
+
+        query.bindValue(":INPUTID", inputid);
+        query.bindValue(":GROUPID", inputgroupid);
+    }
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::DeleteInputGroup()", query);
+        return false;
+    }
+
+    return true;
+}
+
+vector<uint> CardUtil::GetInputGroups(uint inputid)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT inputgroupid "
+        "FROM inputgroup "
+        "WHERE cardinputid = :INPUTID "
+        "ORDER BY inputgroupid, cardinputid, inputgroupname");
+
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetInputGroups()", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
+}
+
+vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
+{
+    vector<uint> list;
+
+    vector<uint> inputs = GetInputIDs(cardid);
+    if (inputs.empty())
+        return list;
+
+    list = GetInputGroups(inputs[0]);
+    for (uint i = 1; (i < inputs.size()) && list.size(); i++)
+    {
+        vector<uint> curlist = GetInputGroups(inputs[i]);
+        vector<uint> newlist;
+        for (uint j = 0; j < list.size(); j++)
+        {
+            if (find(curlist.begin(), curlist.end(), list[j]) != curlist.end())
+                newlist.push_back(list[j]);
+        }
+        list = newlist;
+    }
+
+    return list;
+}
+
+vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT DISTINCT cardid "
+        "FROM cardinput, inputgroup "
+        "WHERE inputgroupid = :GROUPID AND "
+	"      cardinput.cardinputid = inputgroup.cardinputid "
+        "ORDER BY cardid");
+
+    query.bindValue(":GROUPID", inputgroupid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetGroupCardIDs()", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
+}
+
+vector<uint> CardUtil::GetConflictingCards(uint inputid, uint exclude_cardid)
+{
+    vector<uint> inputgroupids = CardUtil::GetInputGroups(inputid);
+
+    for (uint i = 0; i < inputgroupids.size(); i++)
+    {
+        VERBOSE(VB_RECORD, LOC +
+                QString("  Group ID %1").arg(inputgroupids[i]));
+    }
+
+    vector<uint> cardids;
+    for (uint i = 0; i < inputgroupids.size(); i++)
+    {
+        vector<uint> tmp = CardUtil::GetGroupCardIDs(inputgroupids[i]);
+        for (uint j = 0; j < tmp.size(); j++)
+        {
+            if (tmp[j] == exclude_cardid)
+                continue;
+
+            if (find(cardids.begin(), cardids.end(), tmp[j]) != cardids.end())
+                continue;
+
+            cardids.push_back(tmp[j]);
+        }
+    }
+
+    for (uint i = 0; i < cardids.size(); i++)
+        VERBOSE(VB_RECORD, LOC + QString("  Card ID %1").arg(cardids[i]));
+
+    return cardids;
 }
 
 bool CardUtil::GetTimeouts(uint cardid,
@@ -625,8 +1463,6 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype)
     else
         ret += probeV4LInputs(device);
 
-    ret += probeChildInputs(device);
-
     return ret;
 }
 
@@ -665,7 +1501,7 @@ QStringList CardUtil::probeDVBInputs(QString device)
     QStringList ret;
 
 #ifdef USING_DVB
-    int cardid = CardUtil::GetCardID(device);
+    uint cardid = CardUtil::GetFirstCardID(device);
     if (!cardid)
         return ret;
 
@@ -680,30 +1516,6 @@ QStringList CardUtil::probeDVBInputs(QString device)
     (void) device;
     ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
-
-    return ret;
-}
-
-QStringList CardUtil::probeChildInputs(QString device)
-{
-    QStringList ret;
-
-    int cardid = CardUtil::GetCardID(device);
-    if (cardid <= 0)
-        return ret;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice, cardtype "
-                  "FROM capturecard "
-                  "WHERE parentid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        return ret;
-
-    while (query.next())
-        ret += probeInputs(query.value(0).toString(),
-                           query.value(1).toString());
 
     return ret;
 }
@@ -755,14 +1567,12 @@ QString CardUtil::GetDeviceLabel(uint cardid,
 }
 
 void CardUtil::GetCardInputs(
-    int                 cardid,
-    QString             device,
-    QString             cardtype,
+    uint                cardid,
+    const QString      &device,
+    const QString      &cardtype,
     QStringList        &inputLabels,
-    vector<CardInput*> &cardInputs,
-    int                 parentid)
+    vector<CardInput*> &cardInputs)
 {
-    int rcardid = (parentid) ? parentid : cardid;
     QStringList inputs;
     bool is_dtv = !IsEncoder(cardtype) && !IsUnscanable(cardtype);
 
@@ -776,15 +1586,13 @@ void CardUtil::GetCardInputs(
     else if ("DVB" != cardtype)
         inputs += probeV4LInputs(device);
 
-    QString dev_label = (parentid) ? " -> " : "";
-    dev_label += GetDeviceLabel(cardid, cardtype, device);
+    QString dev_label = GetDeviceLabel(cardid, cardtype, device);
 
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput* cardinput = new CardInput(is_dtv, false, false, cardid);
-        cardinput->loadByInput(rcardid, (*it));
-        cardinput->SetChildCardID((parentid) ? cardid : 0);
+        CardInput *cardinput = new CardInput(is_dtv, false, false, cardid);
+        cardinput->loadByInput(cardid, (*it));
         inputLabels.push_back(
             dev_label + QString(" (%1) -> %2")
             .arg(*it).arg(cardinput->getSourceName()));
@@ -796,16 +1604,15 @@ void CardUtil::GetCardInputs(
     {
         InputNames list;
         list[0] = "DVBInput";
-        bool needs_conf = IsInNeedOfExternalInputConf(rcardid);
+        bool needs_conf = IsInNeedOfExternalInputConf(cardid);
         if (needs_conf)
-            list = GetConfiguredDVBInputs(rcardid);
+            list = GetConfiguredDVBInputs(cardid);
 
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput *cardinput = new CardInput(is_dtv, true, false, rcardid);
-            cardinput->loadByInput(rcardid, *it);
-            cardinput->SetChildCardID(parentid ? cardid : 0);
+            CardInput *cardinput = new CardInput(is_dtv, true, false, cardid);
+            cardinput->loadByInput(cardid, *it);
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
                 .arg(*it).arg(cardinput->getSourceName()));
@@ -815,44 +1622,25 @@ void CardUtil::GetCardInputs(
         // plus add one "new" input
         if (needs_conf)
         {
-            CardInput *newcard = new CardInput(is_dtv, true, true, rcardid);
+            CardInput *newcard = new CardInput(is_dtv, true, true, cardid);
             QString newname = QString("DVBInput #%1").arg(list.size() + 1);
-            newcard->loadByInput(rcardid, newname);
-            newcard->SetChildCardID((parentid) ? cardid : 0);
+            newcard->loadByInput(cardid, newname);
             inputLabels.push_back(dev_label + " " + QObject::tr("New Input"));
             cardInputs.push_back(newcard);
         }
     }
 #endif // USING_DVB
-
-    if (parentid)
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid, videodevice, cardtype "
-                  "FROM capturecard "
-                  "WHERE parentid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-
-    if (!query.exec() || !query.isActive())
-        return;
-
-    while (query.next())
-    {
-        GetCardInputs(query.value(0).toUInt(),
-                      query.value(1).toString(),
-                      query.value(2).toString(),
-                      inputLabels, cardInputs, cardid);
-    }
 }
 
 bool CardUtil::DeleteCard(uint cardid)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool ok = true;
+
     if (!cardid)
         return true;
 
-#ifdef USING_DVB
-    // delete device tree
+    // delete any DiSEqC device tree
     DiSEqCDevTree tree;
     tree.Load(cardid);
     if (!tree.Root())
@@ -860,52 +1648,92 @@ bool CardUtil::DeleteCard(uint cardid)
         tree.SetRoot(NULL);
         tree.Store(cardid);
     }
-#endif
 
-    // delete any children
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid "
-        "FROM capturecard "
-        "WHERE parentid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-    if (!query.exec() || !query.isActive())
+    // delete any clones
+    QString rawtype     = GetRawCardType(cardid);
+    QString videodevice = GetVideoDevice(cardid);
+    if (IsTunerSharingCapable(rawtype) && !videodevice.isEmpty())
     {
-        MythContext::DBError("DeleteCard -- find child cards", query);
-        return false;
+        query.prepare(
+            "SELECT cardid "
+            "FROM capturecard "
+            "WHERE videodevice = :DEVICE AND "
+            "      cardid      > :CARDID");
+        query.bindValue(":DEVICE", videodevice);
+        query.bindValue(":CARDID", cardid);
+
+        if (!query.exec())
+        {
+            MythContext::DBError("DeleteCard -- find clone cards", query);
+            return false;
+        }
+
+        while (query.next())
+            ok &= DeleteCard(query.value(0).toUInt());
+
+        if (!ok)
+            return false;
     }
 
-    bool ok = true;
-    while (query.next())
-        ok &= DeleteCard(query.value(0).toUInt());
+    // delete inputs
+    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
+    for (uint i = 0; i < inputs.size(); i++)
+        ok &= CardUtil::DeleteInput(inputs[i]);
 
     if (!ok)
         return false;
 
-    // delete all connected inputs
-    query.prepare(
-        "DELETE FROM cardinput "
-        "WHERE cardid = :CARDID");
+    // actually delete the capturecard row for this card
+    query.prepare("DELETE FROM capturecard WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
+
     if (!query.exec())
     {
-        MythContext::DBError("DeleteCard -- delete inputs", query);
-        return false;
-    }
-        
-    // delete the card itself
-    query.prepare(
-        "DELETE FROM capturecard "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-    if (!query.exec())
-    {
-        MythContext::DBError("DeleteCard -- deleting capture card", query);
-        return false;
+        MythContext::DBError("DeleteCard -- delete row", query);
+        ok = false;
     }
 
-    return true;
+    if (ok)
+    {
+        // delete any orphaned inputs & unused input groups
+        DeleteOrphanInputs();
+        UnlinkInputGroup(0,0);
+    }
+
+    return ok;
 }
+
+bool CardUtil::DeleteAllCards(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    return (query.exec("TRUNCATE TABLE inputgroup") &&
+            query.exec("TRUNCATE TABLE diseqc_config") &&
+            query.exec("TRUNCATE TABLE diseqc_tree") &&
+            query.exec("TRUNCATE TABLE cardinput") &&
+            query.exec("TRUNCATE TABLE capturecard"));
+}
+
+vector<uint> CardUtil::GetCardList(void)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid "
+        "FROM capturecard "
+        "ORDER BY cardid");
+
+    if (!query.exec())
+        MythContext::DBError("CardUtil::GetCardList()", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
+}
+
 
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, uint cardnum)
 {

@@ -47,8 +47,6 @@ class HDHRChannel : public DTVChannel
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Commands
-    bool SwitchToInput(const QString &inputname, const QString &chan);
-    bool SwitchToInput(int newcapchannel, bool setstarting);
     bool AddPID(uint pid, bool do_update = true);
     bool DelPID(uint pid, bool do_update = true);
     bool DelAllPIDs(void);

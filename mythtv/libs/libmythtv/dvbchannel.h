@@ -10,6 +10,7 @@
 
 #include <qobject.h>
 #include <qstring.h>
+#include <qmap.h>
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -20,6 +21,9 @@
 class TVRec;
 class DVBCam;
 class DVBRecorder;
+class DVBChannel;
+
+typedef QMap<const DVBChannel*,bool> IsOpenMap;
 
 class DVBChannel : public DTVChannel
 {
@@ -27,8 +31,10 @@ class DVBChannel : public DTVChannel
     DVBChannel(int cardnum, TVRec *parent = NULL);
     ~DVBChannel();
 
-    bool Open(void);
-    void Close(void);
+    bool Open(void) { return Open(this); }
+    void Close(void) { Close(this); }
+
+    bool Init(QString &inputname, QString &startchannel);
 
     // Sets
     void SetPMT(const ProgramMapTable*);
@@ -37,7 +43,7 @@ class DVBChannel : public DTVChannel
         { tuning_delay = how_slow_in_ms; }
 
     // Gets
-    bool IsOpen(void)                   const { return GetFd() >= 0; }
+    bool IsOpen(void) const;
     int  GetFd(void)                    const { return fd_frontend; }
     bool IsTuningParamsProbeSupported(void) const;
 
@@ -47,20 +53,37 @@ class DVBChannel : public DTVChannel
     /// Returns frontend name as reported by driver
     QString GetFrontendName(void)       const;
     DTVTunerType GetCardType(void)      const { return card_type; }
+    bool IsMaster(void)                 const { return master == NULL; }
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
     /// Returns rotor object if it exists, NULL otherwise.
     const DiSEqCDevRotor *GetRotor(void) const;
 
+    /// Returns true iff we have a signal carrier lock.
+    bool HasLock(bool *ok = NULL) const;
+    /// Returns signal strength in the range [0.0..1.0] (non-calibrated).
+    double GetSignalStrength(bool *ok = NULL) const;
+    /// \brief Returns signal/noise in the range [0..1.0].
+    /// Some drivers report the actual ratio, while others report
+    /// the dB, but in this case some weak signals may report a
+    /// very high S/N since negative dB are not supported by 
+    /// MythTV or the 4.0 version of the DVB API due to the
+    /// large number of drivers that ignored the fact that this
+    /// was a signed number in the 3.0 API.
+    double GetSNR(bool *ok = NULL) const;
+    /// Returns # of corrected bits since last call. First call undefined.
+    double GetBitErrorRate(bool *ok = NULL) const;
+    /// Returns # of uncorrected blocks since last call. First call undefined.
+    double GetUncorrectedBlockCount(bool *ok = NULL) const;
+
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool SetChannelByString(const QString &chan);
-    bool Tune(const DTVMultiplex &tuning, QString inputname)
-        { return Tune(tuning, inputname, false, false); }
-    bool Tune(const DTVMultiplex &tuning, QString inputname,
-              bool force_reset, bool same_input);
+    bool Tune(const DTVMultiplex &tuning, QString inputname);
+    bool Tune(const DTVMultiplex &tuning, uint inputid,
+              bool force_reset = false, bool same_input = false);
     bool TuneMultiplex(uint mplexid, QString inputname);
     bool Retune(void);
 
@@ -71,6 +94,9 @@ class DVBChannel : public DTVChannel
     void GetCachedPids(pid_cache_t&) const;
 
   private:
+    bool Open(DVBChannel*);
+    void Close(DVBChannel*);
+
     int  GetChanID(void) const;
 
     void CheckOptions(DTVMultiplex &t) const;
@@ -78,6 +104,9 @@ class DVBChannel : public DTVChannel
     bool CheckCodeRate(DTVCodeRate rate) const;
 
   private:
+    DVBChannel       *master;
+    IsOpenMap         is_open;
+
     // Data
     DiSEqCDev         diseqc_dev;
     DiSEqCDevSettings diseqc_settings;
@@ -96,6 +125,7 @@ class DVBChannel : public DTVChannel
 
     // Tuning State
     mutable QMutex    tune_lock;
+    mutable QMutex    hw_lock;
     /// Last tuning options Tune() attempted to send to hardware
     DTVMultiplex      desired_tuning;
     /// Last tuning options Tune() succesfully sent to hardware

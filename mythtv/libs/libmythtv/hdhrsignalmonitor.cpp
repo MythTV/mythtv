@@ -39,7 +39,7 @@
  */
 HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
                                      HDHRChannel* _channel,
-                                     uint _flags, const char *_name)
+                                     uint64_t _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
       dtvMonitorRunning(false)
 {
@@ -100,10 +100,10 @@ bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
 
     UpdateListeningForEIT();
 
-    const QMap<uint, bool> &listening = GetStreamData()->ListeningPIDs();
+    const pid_map_t &listening = GetStreamData()->ListeningPIDs();
 
     // PIDs that need to be added..
-    QMap<uint, bool>::const_iterator lit = listening.constBegin();
+    pid_map_t::const_iterator lit = listening.constBegin();
     for (; lit != listening.constEnd(); ++lit)
         if (lit.data() && (filters.find(lit.key()) == filters.end()))
             add_pids.push_back(lit.key());

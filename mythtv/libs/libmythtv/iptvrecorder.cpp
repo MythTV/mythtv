@@ -230,7 +230,10 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
                 BufferedWrite(tspacket);            
         }
         else if (_stream_data->IsAudioPID(lpid))
+        {
+            _buffer_packets = !FindAudioKeyframes(&tspacket);
             BufferedWrite(tspacket);
+        }
         else if (_stream_data->IsListeningPID(lpid))
             _stream_data->HandleTSTables(&tspacket);
         else if (_stream_data->IsWritingPID(lpid))

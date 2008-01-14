@@ -66,6 +66,8 @@ class AudioOutputBase : public AudioOutput
 
     virtual void SetSourceBitrate(int rate);
 
+    virtual void GetBufferStatus(uint &fill, uint &total);
+
     //  Only really used by the AudioOutputNULL object
     
     virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }

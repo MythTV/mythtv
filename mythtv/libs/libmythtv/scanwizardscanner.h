@@ -66,8 +66,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
         { Teardown(); VerticalConfigurationGroup::deleteLater(); }
 
     void Scan(int            scantype,
-              uint           parent_cardid,
-              uint           child_cardid,
+              uint           cardid,
               const QString &inputname,
               uint           sourceid,
               bool           do_delete_channels,
@@ -101,7 +100,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     ~ScanWizardScanner();
     void Teardown(void);
 
-    void PreScanCommon(int scantype, uint parent_cardid, uint child_cardid,
+    void PreScanCommon(int scantype, uint cardid,
                        const QString &inputname,
                        uint sourceid, bool do_ignore_signal_timeout);
 

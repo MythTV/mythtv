@@ -14,7 +14,7 @@
 #define LOC_ERR QString("AnalogSM, Error: ").arg(channel->GetDevice())
 
 AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum, Channel *_channel,
-                                         uint _flags, const char *_name) :
+                                         uint64_t _flags, const char *_name) :
     SignalMonitor(db_cardnum, _channel, _flags, _name),
     usingv4l2(false)
 {

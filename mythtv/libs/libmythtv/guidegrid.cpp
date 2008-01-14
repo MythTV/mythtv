@@ -16,6 +16,7 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 #include "mythcontext.h"
@@ -33,12 +34,16 @@ using namespace std;
 #include "util.h"
 #include "remoteutil.h"
 #include "channelutil.h"
+#include "cardutil.h"
 
-bool RunProgramGuide(uint &chanid, QString &channum,
-                     bool thread, TV *player,
-                     bool allowsecondaryepg)
+DBChanList GuideGrid::Run(
+    uint           chanid,
+    const QString &channum,
+    bool           thread,
+    TV            *player,
+    bool           allowsecondaryepg)
 {
-    bool channel_changed = false;
+    DBChanList channel_changed;
 
     if (thread)
         qApp->lock();
@@ -61,11 +66,14 @@ bool RunProgramGuide(uint &chanid, QString &channum,
     else
         gg->exec();
 
-    if (chanid != gg->GetChanID())
+    if (gg->selectState)
     {
-        chanid  = gg->GetChanID();
-        channum = gg->GetChanNum();
-        channel_changed = true;
+        DBChanList sel = gg->GetSelection();
+        if (sel.size() &&
+            (std::find(sel.begin(), sel.end(), chanid) == sel.end()))
+        {
+            channel_changed = sel;
+        }
     }
 
     if (thread)
@@ -248,7 +256,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     //int filltime = clock.elapsed();
     //clock.restart();
     fillChannelInfos();
-    maxchannel = max((int)m_channelInfos.size() - 1, 0);
+    maxchannel = max((int)GetChannelCount() - 1, 0);
     setStartChannel((int)(m_currentStartChannel) - 
                     (int)(desiredDisplayChans / 2));
     DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
@@ -561,23 +569,161 @@ void GuideGrid::parseContainer(QDomElement &element)
         videoRect = area;
 }
 
-QString GuideGrid::GetChanNum(void)
+PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 {
-    if (m_channelInfos.empty() || !selectState)
-        return "";
+    sel = (sel >= 0) ? sel : m_channelInfoIdx[chan_idx];
 
-    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
-    return m_channelInfos[idx].chanstr;
+    if (chan_idx >= GetChannelCount())
+        return NULL;
+
+    if (sel >= (int) m_channelInfos[chan_idx].size())
+        return NULL;
+
+    return &(m_channelInfos[chan_idx][sel]);
 }
 
-uint GuideGrid::GetChanID(void)
+const PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
 {
-    if (m_channelInfos.empty() || !selectState)
-        return 0;
-
-    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
-    return m_channelInfos[idx].chanid;
+    return ((GuideGrid*)this)->GetChannelInfo(chan_idx, sel);
 }
+
+uint GuideGrid::GetChannelCount(void) const
+{
+    return m_channelInfos.size();
+}
+
+int GuideGrid::GetStartChannelOffset(int row) const
+{
+    uint cnt = GetChannelCount();
+    if (!cnt)
+        return -1;
+
+    row = (row < 0) ? m_currentRow : row;
+    return (row + m_currentStartChannel) % cnt;
+}
+
+ProgramList GuideGrid::GetProgramList(uint chanid) const
+{
+    ProgramList proglist;
+    MSqlBindings bindings;
+    QString querystr =
+        "WHERE program.chanid     = :CHANID  AND "
+        "      program.endtime   >= :STARTTS AND "
+        "      program.starttime <= :ENDTS   AND "
+        "      program.manualid   = 0 ";
+    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
+    bindings[":ENDTS"]   = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
+    bindings[":CHANID"]  = chanid;
+
+    ProgramList dummy;
+    proglist.FromProgram(querystr, bindings, dummy);
+
+    return proglist;
+}
+
+uint GuideGrid::GetAlternateChannelIndex(
+    uint chan_idx, bool with_same_channum) const
+{
+    uint si = m_channelInfoIdx[chan_idx];
+    const PixmapChannel *chinfo = GetChannelInfo(chan_idx, si);
+
+    for (uint i = 0; (i < m_channelInfos[chan_idx].size()); i++)
+    {
+        if (i == si)
+            continue;
+
+        const PixmapChannel *ciinfo = GetChannelInfo(chan_idx, i);
+        bool same_channum = ciinfo->channum == chinfo->channum;
+
+        if (with_same_channum != same_channum)
+            continue;
+
+        if (!ciinfo || !m_player->IsTunable(ciinfo->chanid))
+            continue;
+
+        if (with_same_channum ||
+            (GetProgramList(chinfo->chanid) ==
+             GetProgramList(ciinfo->chanid)))
+        {
+            si = i;
+            break;
+        }
+    }
+
+    return si;
+}
+
+
+#define MKKEY(IDX,SEL) ((((uint64_t)IDX) << 32) | SEL)
+DBChanList GuideGrid::GetSelection(void) const
+{
+    DBChanList selected;
+
+    int idx = GetStartChannelOffset();
+    if (idx < 0)
+        return selected;
+
+    uint si  = m_channelInfoIdx[idx];
+
+    vector<uint64_t> sel;
+    sel.push_back( MKKEY(idx, si) );
+
+    const PixmapChannel *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
+    if (!ch)
+        return selected;
+
+    selected.push_back(*ch);
+    if (m_channelInfos[idx].size() <= 1)
+        return selected;
+
+    ProgramList proglist = GetProgramList(selected[0].chanid);
+
+    if (proglist.count() == 0)
+        return selected;
+
+    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    {
+        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        if (ci && (i != si) &&
+            (ci->callsign == ch->callsign) && (ci->channum  == ch->channum))
+        {
+            sel.push_back( MKKEY(idx, i) );
+        }
+    }
+
+    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    {
+        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        if (ci && (i != si) &&
+            (ci->callsign == ch->callsign) && (ci->channum  != ch->channum))
+        {
+            sel.push_back( MKKEY(idx, i) );
+        }
+    }
+
+    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    {
+        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        if ((i != si) && (ci->callsign != ch->callsign))
+        {
+            sel.push_back( MKKEY(idx, i) );
+        }
+    }
+
+    for (uint i = 1; i < sel.size(); i++)
+    {
+        const PixmapChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
+        if (!ci)
+            continue;
+
+        ProgramList ch_proglist = GetProgramList(ch->chanid);
+        if (proglist == ch_proglist)
+            selected.push_back(*ci);
+    }
+
+    return selected;
+}
+#undef MKKEY
 
 void GuideGrid::timeCheckTimeout(void)
 {
@@ -616,10 +762,10 @@ void GuideGrid::repaintVideoTimeout(void)
 void GuideGrid::fillChannelInfos(bool gotostartchannel)
 {
     m_channelInfos.clear();
+    m_channelInfoIdx.clear();
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true,
-                                                   "channum, callsign");
-    ChannelUtil::SortChannels(channels, channelOrdering, true);
+    DBChanList channels = ChannelUtil::GetChannels(0, true);
+    ChannelUtil::SortChannels(channels, channelOrdering, false);
 
     if (showFavorites)
     {
@@ -634,7 +780,12 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             channels = tmp;
     }
 
+    typedef vector<uint> uint_list_t;
+    QMap<QString,uint_list_t> channum_to_index_map;
+    QMap<QString,uint_list_t> callsign_to_index_map;
+
     bool startingset = false;
+    m_currentStartChannel = 0;
     for (uint i = 0; i < channels.size(); i++)
     {
         uint chan=i;
@@ -642,32 +793,51 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         {
             chan=channels.size()-i-1;
         }
-        ChannelInfo val;
-        val.chanstr  = channels[chan].channum;
-        val.chanid   = channels[chan].chanid;
-        val.callsign = channels[chan].callsign;
-        val.favid    = channels[chan].favorite;
-        val.channame = channels[chan].name;
-        val.iconpath = channels[chan].icon;
-        val.iconload = false;
+
+        bool ndup = channum_to_index_map[channels[chan].channum].size();
+        bool cdup = callsign_to_index_map[channels[chan].callsign].size();
+
+        if (ndup && cdup)
+            continue;
+
+        PixmapChannel val(channels[chan]);
 
         // set starting channel index if it hasn't been set
-        bool match   = gotostartchannel && !startingset;
-        match &= (startChanID)  ? val.chanid  == (int)startChanID : true;
-        match &= (!startChanID) ? val.chanstr == startChanNum     : true;
+        bool match = gotostartchannel && !startingset;
+        match &= (startChanID)  ? (val.chanid  == startChanID)  : true;
+        match &= (!startChanID) ? (val.channum == startChanNum) : true;
         if (match)
         {
-            m_currentStartChannel = m_channelInfos.size();
+            m_currentStartChannel = GetChannelCount();
             startingset = true;
         }
 
+        channum_to_index_map[val.channum].push_back(GetChannelCount());
+        callsign_to_index_map[val.callsign].push_back(GetChannelCount());
+
         // add the new channel to the list
-        m_channelInfos.push_back(val);
+        pix_chan_list_t tmp;
+        tmp.push_back(val);
+        m_channelInfos.push_back(tmp);
     }
  
-    // set starting channel index to 0 if it hasn't been set
-    if (gotostartchannel)
-        m_currentStartChannel = (startingset) ? m_currentStartChannel : 0;
+    // handle duplicates
+    for (uint i = 0; i < channels.size(); i++)
+    {
+        const uint_list_t &ndups = channum_to_index_map[channels[i].channum];
+        for (uint j = 0; j < ndups.size(); j++)
+        {
+            if (channels[i].chanid != m_channelInfos[ndups[j]][0].chanid)
+                m_channelInfos[ndups[j]].push_back(channels[i]);
+        }
+
+        const uint_list_t &cdups = callsign_to_index_map[channels[i].callsign];
+        for (uint j = 0; j < cdups.size(); j++)
+        {
+            if (channels[i].chanid != m_channelInfos[cdups[j]][0].chanid)
+                m_channelInfos[cdups[j]].push_back(channels[i]);
+        }
+    }
 
     if (m_channelInfos.empty())
     {
@@ -789,7 +959,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                        "  AND program.endtime >= :STARTTS "
                        "  AND program.starttime <= :ENDTS "
                        "  AND program.manualid = 0 ";
-    bindings[":CHANID"] = m_channelInfos[chanNum].chanid;
+    bindings[":CHANID"]  = GetChannelInfo(chanNum)->chanid;
     bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
     bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
 
@@ -1010,12 +1180,18 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
+    if (r.intersects(channelRect) && paintChannels(&p))
+    {
+        fillProgramInfos();
+        update(programRect|curInfoRect|r);
+        qApp->unlock();
+        return;
+    }
+
     if (r.intersects(infoRect))
         paintInfo(&p);
     if (r.intersects(dateRect) && (jumpToChannelHasRect || (!jumpToChannelHasRect && !jumpToChannelActive)))
         paintDate(&p);
-    if (r.intersects(channelRect))
-        paintChannels(&p);
     if (r.intersects(timeRect))
         paintTimes(&p);
     if (r.intersects(programRect))
@@ -1135,12 +1311,13 @@ void GuideGrid::paintCurrentInfo(QPainter *p)
     p->drawPixmap(dr.topLeft(), pix);
 }
 
-void GuideGrid::paintChannels(QPainter *p)
+bool GuideGrid::paintChannels(QPainter *p)
 {
     QRect cr = channelRect;
     QPixmap pix(cr.size());
     pix.fill(this, cr.topLeft());
     QPainter tmp(&pix);
+    bool channelsChanged = false;
 
     LayerSet *container = NULL;
     LayerSet *infocontainer = NULL;
@@ -1156,11 +1333,11 @@ void GuideGrid::paintChannels(QPainter *p)
     if (type && type->GetNums() != DISPLAY_CHANS)
         type->SetSize(DISPLAY_CHANS);
 
-    ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
+    PixmapChannel *chinfo = GetChannelInfo(m_currentStartChannel);
 
     bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
-    for (unsigned int y = 0; y < (unsigned int)DISPLAY_CHANS; y++)
+    for (unsigned int y = 0; (y < (unsigned int)DISPLAY_CHANS) && chinfo; y++)
     {
         unsigned int chanNumber = y + m_currentStartChannel;
         if (chanNumber >= m_channelInfos.size())
@@ -1168,52 +1345,79 @@ void GuideGrid::paintChannels(QPainter *p)
         if (chanNumber >= m_channelInfos.size())
             break;  
 
-        chinfo = &(m_channelInfos[chanNumber]);
+        chinfo = GetChannelInfo(chanNumber);
+
+        bool unavailable = false;
+        if (m_player && !m_player->IsTunable(chinfo->chanid))
+        {
+            unavailable = true;
+
+            // Try alternates with same channum if applicable
+            uint alt = GetAlternateChannelIndex(chanNumber, true);
+            if (alt != m_channelInfoIdx[chanNumber])
+            {
+                unavailable = false;
+                m_channelInfoIdx[chanNumber] = alt;
+                chinfo = GetChannelInfo(chanNumber);
+                channelsChanged = true;
+            }
+
+            // Try alternates with different channum if applicable
+            if (unavailable && GetProgramList(chinfo->chanid).count())
+            {
+                alt = GetAlternateChannelIndex(chanNumber, false);
+                unavailable = (alt == m_channelInfoIdx[chanNumber]);
+            }
+        }
+
         if ((y == (unsigned int)2 && scrolltype != 1) || 
             ((signed int)y == m_currentRow && scrolltype == 1))
         {
-            if (showChannelIcon && !chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
+            if (showChannelIcon && !chinfo->icon.isEmpty())
             {
                 int iconsize = 0;
                 if (itype)
                     iconsize = itype->GetSize().width();
                 else if (type)
                     iconsize = type->GetSize();
-                if (!chinfo->iconload)
+                if (!chinfo->iconLoaded)
                     chinfo->LoadChannelIcon(iconsize);
-                if (chinfo->iconload)
+                if (chinfo->iconLoaded)
                 {
                     if (itype)
-                        itype->SetImage(chinfo->icon);
+                        itype->SetImage(chinfo->iconPixmap);
                 }
                 else
-                    chinfo->iconpath = QString::null;
+                    chinfo->icon = QString::null;
             }
         }
 
         QString tmpChannelFormat = channelFormat;
-        if (chinfo->favid > 0)
+        if (chinfo->favorite > 0)
         {
             tmpChannelFormat.insert(tmpChannelFormat.find('<'), "* ");
             tmpChannelFormat.insert(tmpChannelFormat.find('>') + 1, " *");
         }
 
+        if (unavailable)
+            tmpChannelFormat.insert(tmpChannelFormat.find('<'), "X ");
+
         if (type)
         {
-            if (showChannelIcon && !chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
+            if (showChannelIcon && !chinfo->icon.isEmpty())
             {
                 int iconsize = 0;
                 if (itype)
                     iconsize = itype->GetSize().width();
                 else if (type)
                     iconsize = type->GetSize();
-                if (!chinfo->iconload)
+                if (!chinfo->iconLoaded)
                     chinfo->LoadChannelIcon(iconsize);
-                if (chinfo->iconload)
+                if (chinfo->iconLoaded)
                     type->SetIcon(y, chinfo->icon);
                 else
                 {
-                    chinfo->iconpath = QString::null;
+                    chinfo->icon = QString::null;
                     type->ResetImage(y);
                 }
             }
@@ -1222,7 +1426,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 type->ResetImage(y);
             }
 
-            type->SetText(y, chinfo->Text(tmpChannelFormat));
+            type->SetText(y, chinfo->GetFormatted(tmpChannelFormat));
         }
     }
 
@@ -1240,6 +1444,8 @@ void GuideGrid::paintChannels(QPainter *p)
 
     tmp.end();
     p->drawPixmap(cr.topLeft(), pix);
+
+    return channelsChanged;
 }
 
 void GuideGrid::paintTimes(QPainter *p)
@@ -1311,7 +1517,7 @@ void GuideGrid::paintInfo(QPainter *p)
     if (chanNum < 0)
         chanNum = 0;
 
-    ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
+    PixmapChannel *chinfo = GetChannelInfo(chanNum);
 
     bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
@@ -1328,16 +1534,15 @@ void GuideGrid::paintInfo(QPainter *p)
         {
             int iconsize = 0;
             iconsize = itype->GetSize().width();
-            if (!chinfo->iconload)
+            if (!chinfo->iconLoaded)
                 chinfo->LoadChannelIcon(iconsize);
-            if (chinfo->iconload)
+            if (chinfo->iconLoaded)
                 itype->SetImage(chinfo->icon);
             else
                 itype->SetImage(QPixmap());
         }
 
-        if (!showChannelIcon || !itype || chinfo->iconpath.isEmpty() ||
-             chinfo->iconpath == "none")
+        if (!showChannelIcon || !itype || chinfo->icon.isEmpty())
         {
             UITextType *type = (UITextType *)container->GetType("misicon");
             if (type)
@@ -1372,7 +1577,7 @@ void GuideGrid::generateListings()
     int maxchannel = 0;
     DISPLAY_CHANS = desiredDisplayChans;
     fillChannelInfos();
-    maxchannel = max((int)m_channelInfos.size() - 1, 0);
+    maxchannel = max((int)GetChannelCount() - 1, 0);
     DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
 
     m_recList.FromScheduler();
@@ -1393,8 +1598,9 @@ void GuideGrid::toggleChannelFavorite()
     if (chanNum < 0)
         chanNum = 0;
 
-    int favid = m_channelInfos[chanNum].favid;
-    int chanid = m_channelInfos[chanNum].chanid;
+    PixmapChannel *ch = GetChannelInfo(chanNum);
+    uint favid  = ch->favorite;
+    uint chanid = ch->chanid;
 
     if (favid > 0) 
     {
@@ -1417,7 +1623,7 @@ void GuideGrid::toggleChannelFavorite()
         int maxchannel = 0;
         DISPLAY_CHANS = desiredDisplayChans;
         fillChannelInfos(false);
-        maxchannel = max((int)m_channelInfos.size() - 1, 0);
+        maxchannel = max((int)GetChannelCount() - 1, 0);
         DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
 
         repaint(channelRect, false);
@@ -1572,9 +1778,9 @@ void GuideGrid::scrollRight()
 void GuideGrid::setStartChannel(int newStartChannel)
 {
     if (newStartChannel <= 0)
-        m_currentStartChannel = newStartChannel + m_channelInfos.size();
-    else if (newStartChannel >= (int) m_channelInfos.size())
-        m_currentStartChannel = newStartChannel - m_channelInfos.size();
+        m_currentStartChannel = newStartChannel + GetChannelCount();
+    else if (newStartChannel >= (int) GetChannelCount())
+        m_currentStartChannel = newStartChannel - GetChannelCount();
     else
         m_currentStartChannel = newStartChannel;
 }
@@ -1859,15 +2065,14 @@ void GuideGrid::details()
 
 void GuideGrid::channelUpdate(void)
 {
-    if (m_channelInfos.empty())
+    if (!m_player)
         return;
 
-    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
-    ChannelInfo info = m_channelInfos[idx];
+    DBChanList sel = GetSelection();
 
-    if (m_player)
+    if (sel.size())
     {
-        m_player->EPGChannelUpdate(info.chanid, info.chanstr);
+        m_player->ChangeChannel(sel);
         videoRepaintTimer->start(200);
     }
 }
@@ -1944,11 +2149,14 @@ void GuideGrid::jumpToChannelShowSelection()
     
     // Not the best method, but the channel list is small and this isn't time critical
     // Go through until the ith channel is equal to or greater than the one we're looking for
-    for (i=0; (i < m_channelInfos.size()-1) &&
-             (m_channelInfos[i].chanstr.toInt() < jumpToChannel); i++);
+
+    for (i=0; (i < GetChannelCount()-1) &&
+             (GetChannelInfo(i)->channum.toInt() < jumpToChannel); i++);
     
     if ((i > 0) &&
-        ((m_channelInfos[i].chanstr.toInt() - jumpToChannel) > (jumpToChannel - m_channelInfos[i-1].chanstr.toInt()))) {
+        ((GetChannelInfo(i)->channum.toInt() - jumpToChannel) >
+         (jumpToChannel - GetChannelInfo(i-1)->channum.toInt())))
+    {
         i--;
     }
 

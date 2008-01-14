@@ -170,17 +170,13 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
 
     virtual void load(void);
 
-    uint GetParentCardID(void) const;
-    uint GetChildCardID(void) const;
-    uint GetHWCardID(void) const
-        { return GetChildCardID() ? GetChildCardID() : GetParentCardID(); }
+    uint GetCardID(void) const;
 
     QString GetInputName(void) const;
 
-    static bool Parse(const QString &cardids_inputname,
-                      uint &parent_cardid,
-                      uint &child_cardid,
-                      QString &inputname);
+    static bool Parse(const QString &cardid_inputname,
+                      uint          &cardid,
+                      QString       &inputname);
 
   public slots:
     void SetSourceID(const QString &_sourceid);
@@ -298,9 +294,7 @@ class ScanWizardConfig: public VerticalConfigurationGroup
     QString GetATSCFormat(void)   const;
     QString GetModulation(void)   const { return scanConfig->GetModulation(); }
     int     GetScanType(void)     const { return scanType->getValue().toInt();}
-    uint    GetParentCardID(void) const { return input->GetParentCardID();    }
-    uint    GetChildCardID(void)  const { return input->GetChildCardID();     }
-    uint    GetHWCardID(void)     const { return input->GetHWCardID();        }
+    uint    GetCardID(void)       const { return input->GetCardID();          }
     QString GetInputName(void)    const { return input->GetInputName();       }
     QString GetFilename(void)     const { return scanConfig->GetFilename();   }
     uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }

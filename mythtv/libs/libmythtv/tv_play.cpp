@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <algorithm>
+using namespace std;
+
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qfile.h>
@@ -40,6 +43,7 @@
 #include "DVDRingBuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
+#include "cardutil.h"
 #include "util-osx-cocoa.h"
 #include "compat.h"
 
@@ -54,6 +58,8 @@ const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
 const int TV::kInputModeTimeout=5000;
+const uint TV::kNextSource    = 1;
+const uint TV::kPreviousSource= 2;
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
@@ -314,8 +320,10 @@ void TV::InitKeys(void)
             "frame while paused", ">,.");
     REG_KEY("TV Playback", "RWNDSTICKY", "Rewind (Sticky) or Rewind one frame "
             "while paused", ",,<");
-    REG_KEY("TV Playback", "TOGGLEINPUTS", "Toggle Inputs", "C");
-    REG_KEY("TV Playback", "SWITCHCARDS", "Switch Capture Cards", "Y");
+    REG_KEY("TV Playback", "NEXTSOURCE",    "Next Video Source",     "Y");
+    REG_KEY("TV Playback", "PREVSOURCE",    "Previous Video Source", "Ctrl+Y");
+    REG_KEY("TV Playback", "NEXTINPUT",     "Next Input",            "C");
+    REG_KEY("TV Playback", "NEXTCARD",      "Next Card",             "");
     REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
     REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
             "Q,Home");
@@ -437,7 +445,7 @@ void TV::InitKeys(void)
 
   Global:           I   M              0123456789
   Playback: ABCDEFGH JK  NOPQRSTUVWXYZ
-  Frontend:    D          OP R  U  X   01 3   7 9
+  Frontend:   CD          OP R  U  XY  01 3   7 9
   Editing:    C E   I       Q        Z
   Teletext:                    T
 
@@ -458,7 +466,7 @@ void TV::InitKeys(void)
   Teletext     F2,F3,F4,F5,F6,F7,F8
   ITV          F2,F3,F4,F5,F6,F7,F12
 
-  Playback: Ctrl-B,Ctrl-G
+  Playback: Ctrl-B,Ctrl-G,Ctrl-Y
 */
 }
 
@@ -480,7 +488,9 @@ void *SpawnDecode(void *param)
 TV::TV(void)
     : QObject(NULL, "TV"),
       // Configuration variables from database
-      baseFilters(""), db_time_format("h:mm AP"), db_short_date_format("M/d"),
+      baseFilters(""), 
+      db_channel_format("<num> <sign>"),
+      db_time_format("h:mm AP"), db_short_date_format("M/d"),
       fftime(0), rewtime(0),
       jumptime(0), smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
@@ -492,6 +502,7 @@ TV::TV(void)
       vbimode(VBIMode::None),
       // State variables
       internalState(kState_None),
+      switchToInputId(0),
       menurunning(false), runMainLoop(false), wantsToQuit(true),
       exitPlayer(false), paused(false), errored(false),
       stretchAdjustment(false),
@@ -504,6 +515,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       adjustingPicture(kAdjustingPicture_None),
       adjustingPictureAttribute(kPictureAttribute_None),
+      askAllowType(kAskAllowCancel), askAllowLock(true),
       ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
       // Channel Editing
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
@@ -601,6 +613,7 @@ bool TV::Init(bool createWindow)
     }
 
     baseFilters         += gContext->GetSetting("CustomFilters");
+    db_channel_format    =gContext->GetSetting("ChannelFormat","<num> <sign>");
     db_time_format       = gContext->GetSetting("TimeFormat", "h:mm AP");
     db_short_date_format = gContext->GetSetting("ShortDateFormat", "M/d");
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
@@ -918,43 +931,366 @@ void TV::FinishRecording(void)
     activerecorder->FinishRecording();
 }
 
-void TV::AskAllowRecording(const QStringList &messages, int timeuntil,
-                           bool hasrec)
+void TV::AskAllowRecording(const QStringList &msg, int timeuntil,
+                           bool hasrec, bool haslater)
 {
+    //VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording");
     if (!StateIsLiveTV(GetState()))
        return;
 
-    QString title = messages[0];
-    QString chanstr = messages[1];
-    QString chansign = messages[2];
-    QString channame = messages[3];
+    ProgramInfo *info = new ProgramInfo;
+    QStringList::const_iterator it = msg.begin();
+    info->FromStringList(it, msg.end());
 
-    QString channel = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    channel.replace("<num>", chanstr)
-        .replace("<sign>", chansign)
-        .replace("<name>", channame);
+    QMutexLocker locker(&askAllowLock);
+    QString key = info->MakeUniqueKey();
+    if (timeuntil > 0)
+    {
+        // add program to list
+        //VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording -- " +
+        //        QString("adding '%1'").arg(info->title));
+        QDateTime expiry = QDateTime::currentDateTime().addSecs(timeuntil);
+        askAllowPrograms[key] = AskProgramInfo(expiry, hasrec, haslater, info);
+    }
+    else
+    {
+        // remove program from list
+        VERBOSE(VB_IMPORTANT, LOC + "AskAllowRecording -- " +
+                QString("removing '%1'").arg(info->title));
+        QMap<QString,AskProgramInfo>::iterator it = askAllowPrograms.find(key);
+        if (it != askAllowPrograms.end())
+        {
+            delete (*it).info;
+            askAllowPrograms.erase(it);
+        }
+        delete info;
+    }
+
+    UpdateOSDAskAllowDialog();
+}
+
+void TV::UpdateOSDAskAllowDialog(void)
+{
+    QMutexLocker locker(&askAllowLock);
+    uint cardid = recorder->GetRecorderNumber();
+
+    QString single_rec =
+        tr("MythTV wants to record \"%1\" on %2 in %d seconds. "
+           "Do you want to:");
+
+    QString record_watch  = tr("Record and watch while it records");
+    QString let_record1   = tr("Let it record and go back to the Main Menu");
+    QString let_recordm   = tr("Let them record and go back to the Main Menu");
+    QString record_later1 = tr("Record it later, I want to watch TV");
+    QString record_laterm = tr("Record them later, I want to watch TV");
+    QString do_not_record1= tr("Don't let it record, I want to watch TV");
+    QString do_not_recordm= tr("Don't let them record, I want to watch TV");
+
+    // eliminate timed out programs
+    QDateTime timeNow = QDateTime::currentDateTime();
+    QMap<QString,AskProgramInfo>::iterator it = askAllowPrograms.begin();
+    QMap<QString,AskProgramInfo>::iterator next = it;
+    while (it != askAllowPrograms.end())
+    {
+        next = it; next++;
+        if ((*it).expiry <= timeNow)
+        {
+            //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- " +
+            //        QString("removing '%1'").arg((*it).info->title));
+            delete (*it).info;
+            askAllowPrograms.erase(it);
+        }
+        it = next;
+    }        
+
+    AskAllowType type      = kAskAllowCancel;
+    int          sel       = 0;
+    int          timeuntil = 0;
+    QString      message   = QString::null;
+    QStringList  options;
+
+    uint conflict_count = askAllowPrograms.size();
+
+    it = askAllowPrograms.begin();
+    if ((1 == askAllowPrograms.size()) && ((uint)(*it).info->cardid == cardid))
+    {
+        (*it).is_in_same_input_group = (*it).is_conflicting = true;
+    }
+    else if (!askAllowPrograms.empty())
+    {
+        // get the currently used input on our card
+        bool busy_input_grps_loaded = false;
+        vector<uint> busy_input_grps;
+        TunedInputInfo busy_input;
+        RemoteIsBusy(cardid, busy_input);
+
+        // check if current input can conflict
+        it = askAllowPrograms.begin();
+        for (; it != askAllowPrograms.end(); ++it)
+        {
+            (*it).is_in_same_input_group =
+                (cardid == (uint)(*it).info->cardid);
+
+            if ((*it).is_in_same_input_group)
+                continue;
+
+            // is busy_input in same input group as recording
+            if (!busy_input_grps_loaded)
+            {
+                busy_input_grps = CardUtil::GetInputGroups(busy_input.inputid);
+                busy_input_grps_loaded = true;
+            }
+
+            vector<uint> input_grps =
+                CardUtil::GetInputGroups((*it).info->inputid);
+
+            for (uint i = 0; i < input_grps.size(); i++)
+            {
+                if (find(busy_input_grps.begin(), busy_input_grps.end(),
+                         input_grps[i]) !=  busy_input_grps.end())
+                {
+                    (*it).is_in_same_input_group = true;
+                    break;
+                }
+            }
+        }
+
+        // check if inputs that can conflict are ok
+        conflict_count = 0;
+        it = askAllowPrograms.begin();
+        for (; it != askAllowPrograms.end(); ++it)
+        {
+            if (!(*it).is_in_same_input_group)
+                (*it).is_conflicting = false;
+            else if ((cardid == (uint)(*it).info->cardid))
+                (*it).is_conflicting = true;
+            else if (!CardUtil::IsTunerShared(cardid, (*it).info->cardid))
+                (*it).is_conflicting = true;
+            else if ((busy_input.sourceid == (uint)(*it).info->sourceid) &&
+                     (busy_input.mplexid  == (uint)(*it).info->GetMplexID()))
+                (*it).is_conflicting = false;
+            else
+                (*it).is_conflicting = true;
+
+            conflict_count += (*it).is_conflicting ? 1 : 0;
+        }
+    }
+
+    it = askAllowPrograms.begin();
+    for (; it != askAllowPrograms.end() && !(*it).is_conflicting; ++it);
+
+    if (conflict_count == 0)
+    {
+        VERBOSE(VB_GENERAL, LOC + "The scheduler wants to make "
+                "a non-conflicting recording.");
+        // TODO take down mplexid and inform user of problem
+        // on channel changes.
+    }
+    else if (conflict_count == 1 && ((uint)(*it).info->cardid == cardid))
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- " +
+        //        "kAskAllowOneRec");
+
+        type = kAskAllowOneRec;
+        it = askAllowPrograms.begin();
+
+        QString channel = QDeepCopy<QString>(db_channel_format);
+        channel
+            .replace("<num>",  (*it).info->chanstr)
+            .replace("<sign>", (*it).info->chansign)
+            .replace("<name>", (*it).info->channame);
     
-    QString message = QObject::tr(
-        "MythTV wants to record \"%1\" on %2 in %3 seconds. Do you want to:")
-        .arg(title).arg(channel).arg(" %d ");
+        message = single_rec.arg((*it).info->title).arg(channel);
     
+        options += record_watch;
+        options += let_record1;
+        options += ((*it).has_later) ? record_later1 : do_not_record1;
+
+        sel = ((*it).has_rec) ? 2 : 0;
+        timeuntil = QDateTime::currentDateTime().secsTo((*it).expiry);
+    }
+    else
+    {
+        type = kAskAllowMultiRec;
+
+        if (conflict_count > 1)
+        {
+            message = QObject::tr(
+                "MythTV wants to record these programs in %d seconds:");
+            message += "\n";
+        }
+
+        bool has_rec = false;
+        it = askAllowPrograms.begin();
+        for (; it != askAllowPrograms.end(); ++it)
+        {
+            if (!(*it).is_conflicting)
+                continue;
+
+            QString title = (*it).info->title;
+            if ((title.length() < 10) && !(*it).info->subtitle.isEmpty())
+                title += ": " + (*it).info->subtitle;
+            if (title.length() > 20)
+                title = title.left(17) + "...";
+
+            QString channel = QDeepCopy<QString>(db_channel_format);
+            channel
+                .replace("<num>",  (*it).info->chanstr)
+                .replace("<sign>", (*it).info->chansign)
+                .replace("<name>", (*it).info->channame);
+
+            if (conflict_count > 1)
+            {
+                message += QObject::tr("\"%1\" on %2").arg(title).arg(channel);
+                message += "\n";
+            }
+            else
+            {
+                message = single_rec.arg((*it).info->title).arg(channel);
+                has_rec = (*it).has_rec;
+            }
+        }
+
+        if (conflict_count > 1)
+        {
+            message += "\n";
+            message += QObject::tr("Do you want to:");
+        }
+
+        bool all_have_later = true;
+        it = askAllowPrograms.begin();
+        for (; it != askAllowPrograms.end(); ++it)
+        {
+            if ((*it).is_conflicting)
+                all_have_later &= (*it).has_later;
+        }
+
+        if (conflict_count > 1)
+        {
+            options += let_recordm;
+            options += (all_have_later) ? record_laterm : do_not_recordm;
+            sel = 0;
+        }
+        else
+        {
+            options += let_record1;
+            options += (all_have_later) ? record_later1 : do_not_record1;
+            sel = (has_rec) ? 1 : 0;
+        }
+
+        it = askAllowPrograms.begin();
+        timeuntil = 9999;
+        for (; it != askAllowPrograms.end(); ++it)
+        {
+            if (!(*it).is_conflicting)
+                continue;
+            int tmp = QDateTime::currentDateTime().secsTo((*it).expiry);
+            timeuntil = min(timeuntil, max(tmp, 0));
+        }
+        timeuntil = (9999 == timeuntil) ? 0 : timeuntil;
+    }
+
+
+    //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- waiting begin");
+
     while (!GetOSD())
     {
+        //cerr<<":";
         qApp->unlock();
         qApp->processEvents();
         usleep(1000);
         qApp->lock();
     }
 
-    QStringList options;
-    options += tr("Record and watch while it records");
-    options += tr("Let it record and go back to the Main Menu");
-    options += tr("Don't let it record, I want to watch TV");
-    int sel = (hasrec) ? 2 : 0;
+    //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- waiting done");
 
-    dialogname = "allowrecordingbox";
-    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, sel);
+    if ((dialogname == "allowrecordingbox") &&
+        GetOSD()->DialogShowing(dialogname))
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- closing");
+        askAllowType = kAskAllowCancel;
+        GetOSD()->HideSet("allowrecordingbox");
+        while (GetOSD()->DialogShowing(dialogname))
+        {
+            //cerr<<".";
+            usleep(1000);
+        }
+    }
+
+    askAllowType = type;
+
+    if (kAskAllowCancel != askAllowType)
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- opening");
+        dialogname = "allowrecordingbox";
+        GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, sel);
+    }
+
+    //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- done");
 }
+
+void TV::HandleOSDAskAllowResponse(void)
+{
+    if (!askAllowLock.tryLock())
+    {
+        //VERBOSE(VB_IMPORTANT, "allowrecordingbox : askAllowLock is locked");
+        return;
+    }
+
+    int result = GetOSD()->GetDialogResponse(dialogname);
+    if (kAskAllowOneRec == askAllowType)
+    {
+        //VERBOSE(VB_IMPORTANT, "allowrecordingbox : one : "<<result);
+        switch (result)
+        {
+            default:
+            case 1:
+                // watch while it records
+                recorder->CancelNextRecording(false);
+                break;
+            case 2:
+                // return to main menu
+                StopLiveTV();
+                break;
+            case 3:
+                // cancel scheduled recording
+                recorder->CancelNextRecording(true);
+                break;                        
+        }
+    }
+    else if (kAskAllowMultiRec == askAllowType)
+    {
+        //VERBOSE(VB_IMPORTANT, "allowrecordingbox : multi : "<<result);
+        switch (result)
+        {
+            default:
+            case 1:
+                // return to main menu
+                StopLiveTV();
+                break;
+            case 2:
+            {
+                // cancel conflicting scheduled recordings
+                QMap<QString,AskProgramInfo>::iterator it =
+                    askAllowPrograms.begin();
+                for (; it != askAllowPrograms.end(); ++it)
+                {
+                    if ((*it).is_conflicting)
+                        RemoteCancelNextRecording((*it).info->cardid, true);
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        //VERBOSE(VB_IMPORTANT,
+        //        "allowrecordingbox : cancel : "<<result);
+    }
+
+    askAllowLock.unlock();
+}
+
 
 int TV::Playback(ProgramInfo *rcinfo)
 {
@@ -1991,6 +2327,13 @@ void TV::RunTV(void)
             ClearInputQueues(true);
         }   
 
+        if (switchToInputId)
+        {
+            uint tmp = switchToInputId;
+            switchToInputId = 0;
+            SwitchInputs(tmp);
+        }
+
         if (class LCD * lcd = LCD::Get())
         {
             QDateTime curTime = QDateTime::currentDateTime();
@@ -2496,14 +2839,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 }
                 else if (dialogname == "allowrecordingbox")
                 {
-                    int result = GetOSD()->GetDialogResponse(dialogname);
-
-                    if (result == 1)
-                        recorder->CancelNextRecording(false);
-                    else if (result == 2)
-                        StopLiveTV();
-                    else if (result == 3)
-                        recorder->CancelNextRecording(true);
+                    HandleOSDAskAllowResponse();
                 }
                 else if (dialogname == "idletimeout")
                 {
@@ -3057,9 +3393,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (action == "NEXTFAV")
                 ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
-            else if (action == "TOGGLEINPUTS")
+            else if (action == "NEXTSOURCE")
+                SwitchSource(kNextSource);
+            else if (action == "PREVSOURCE")
+                SwitchSource(kPreviousSource);
+            else if (action == "NEXTINPUT")
                 ToggleInputs();
-            else if (action == "SWITCHCARDS")
+            else if (action == "NEXTCARD")
                 SwitchCards();
             else if (action == "GUIDE")
                 EditSchedule(kScheduleProgramGuide);
@@ -3995,23 +4335,117 @@ void TV::DoSkipCommercials(int direction)
         muteTimer->start(kMuteTimeout, true);
 }
 
-void TV::SwitchCards(uint chanid, QString channum)
+void TV::SwitchSource(uint source_direction)
+{
+    QMap<uint,InputInfo> sources;
+    vector<uint> cardids = RemoteRequestFreeRecorderList();
+    uint         cardid  = activerecorder->GetRecorderNumber();
+    cardids.push_back(cardid);
+    stable_sort(cardids.begin(), cardids.end());
+
+    vector<uint> excluded_cardids;
+    excluded_cardids.push_back(cardid);
+
+    InfoMap info;
+    activerecorder->GetChannelInfo(info);
+    uint sourceid = info["sourceid"].toUInt();
+
+    vector<uint>::const_iterator it = cardids.begin();
+    for (; it != cardids.end(); ++it)
+    {
+        vector<InputInfo> inputs = RemoteRequestFreeInputList(
+            *it, excluded_cardids);
+
+        if (inputs.empty())
+            continue;
+
+        for (uint i = 0; i < inputs.size(); i++)
+        {
+            // prefer the current card's input in sources list
+            if ((sources.find(inputs[i].sourceid) == sources.end()) ||
+                ((cardid == inputs[i].cardid) && 
+                 (cardid != sources[inputs[i].sourceid].cardid)))
+            {
+                sources[inputs[i].sourceid] = inputs[i];
+            }
+        }
+    }
+
+    // Source switching
+    QMap<uint,InputInfo>::const_iterator beg = sources.find(sourceid);
+    QMap<uint,InputInfo>::const_iterator sit = beg;
+
+    if (sit == sources.end())
+        return;
+
+    if (kNextSource == source_direction)
+    {
+        sit++;
+        if (sit == sources.end())
+            sit = sources.begin();
+    }
+
+    if (kPreviousSource == source_direction)
+    {
+        if (sit != sources.begin())
+            sit--;
+        else
+        {
+            QMap<uint,InputInfo>::const_iterator tmp = sources.begin();
+            while (tmp != sources.end())
+            {
+                sit = tmp;
+                tmp++;
+            }
+        }
+    }
+
+    if (sit == beg)
+        return;
+
+    switchToInputId = (*sit).inputid;
+}
+
+void TV::SwitchInputs(uint inputid)
+{
+    VERBOSE(VB_PLAYBACK, LOC + QString("SwitchInputd(%1)").arg(inputid));
+
+    if ((uint)activerecorder->GetRecorderNumber() == 
+        CardUtil::GetCardID(inputid))
+    {
+        ToggleInputs(inputid);
+    }
+    else
+    {
+        SwitchCards(0, QString::null, inputid);
+    }
+}
+
+void TV::SwitchCards(uint chanid, QString channum, uint inputid)
 {
     VERBOSE(VB_PLAYBACK, LOC +
-            QString("SwitchCards(%1,'%2')").arg(chanid).arg(channum));
+            QString("SwitchCards(%1,'%2',%3)")
+            .arg(chanid).arg(channum).arg(inputid));
 
     RemoteEncoder *testrec = NULL;
 
     if (!StateIsLiveTV(GetState()) || (activenvp != nvp) || pipnvp)
         return;
 
-    if (/*chanid || */!channum.isEmpty())
+    // If we are switching to a channel not on the current recorder
+    // we need to find the next free recorder with that channel.
+    QStringList reclist;
+    if (!channum.isEmpty())
+        reclist = GetValidRecorderList(chanid, channum);
+    else if (inputid)
     {
-        // If we are switching to a channel not on the current recorder
-        // we need to find the next free recorder with that channel.
-        QStringList reclist = GetValidRecorderList(chanid, channum);
-        testrec = RemoteRequestFreeRecorderFromList(reclist);
+        uint cardid = CardUtil::GetCardID(inputid);
+        if (cardid)
+            reclist.push_back(QString::number(cardid));
     }
+
+    if (!reclist.empty())
+        testrec = RemoteRequestFreeRecorderFromList(reclist);
 
     // If we are just switching recorders find first available recorder.
     if (!testrec)
@@ -4110,7 +4544,7 @@ void TV::SwitchCards(uint chanid, QString channum)
     ITVRestart(true);
 }
 
-void TV::ToggleInputs(void)
+void TV::ToggleInputs(uint inputid)
 {
     // If main Nuppel Video Player is paused, unpause it
     if (activenvp == nvp && paused)
@@ -4121,18 +4555,42 @@ void TV::ToggleInputs(void)
         paused = false;
     }
 
-    QString inputname = "Unknown";
-    QStringList inputs = activerecorder->GetInputs();
-    if (inputs.size() <= 1)
-        inputname = activerecorder->GetInput();
+    const QString curinputname = activerecorder->GetInput();
+    QString inputname = curinputname;
+
+    uint cardid = activerecorder->GetRecorderNumber();
+    vector<uint> excluded_cardids;
+    excluded_cardids.push_back(cardid);
+    vector<InputInfo> inputs = RemoteRequestFreeInputList(
+        cardid, excluded_cardids);
+
+    vector<InputInfo>::const_iterator it = inputs.end();
+
+    if (inputid)
+    {
+        it = find(inputs.begin(), inputs.end(), inputid);
+    }
     else
+    {
+        it = find(inputs.begin(), inputs.end(), inputname);
+        if (it != inputs.end())
+            it++;
+    }
+
+    if (it == inputs.end())
+        it = inputs.begin();
+
+    if (it != inputs.end())
+        inputname = (*it).name;
+
+    if (curinputname != inputname)
     {
         // Pause the backend recorder, send command, and then unpause..
         PauseLiveTV();
         lockTimerOn = false;
-        inputname = activerecorder->SetInput("SwitchToNextInput");
+        inputname = activerecorder->SetInput(inputname);
         UnpauseLiveTV();
-    }        
+    }
 
     // If activenvp is main nvp, show new input in on screen display
     if (nvp && activenvp == nvp)
@@ -4721,8 +5179,6 @@ void TV::UpdateOSDSeekMessage(const QString &mesg, int disptime)
 
 void TV::UpdateOSDInput(QString inputname)
 {
-    QString displayName = QString::null;
-
     if (!activerecorder || !tvchain)
         return;
 
@@ -4731,17 +5187,7 @@ void TV::UpdateOSDInput(QString inputname)
     if (inputname.isEmpty())
         inputname = tvchain->GetInputName(-1);
 
-    // Try to get display name
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname "
-                  "FROM cardinput "
-                  "WHERE inputname = :INPUTNAME AND "
-                  "      cardid    = :CARDID");
-    query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", inputname);
-    if (query.exec() && query.isActive() && query.next())
-        displayName = query.value(0).toString();
-
+    QString displayName = CardUtil::GetDisplayName(cardid, inputname);
     // If a display name doesn't exist use cardid and inputname
     if (displayName.isEmpty())
         displayName = QString("%1: %2").arg(cardid).arg(inputname);
@@ -4927,15 +5373,15 @@ void TV::UpdateOSDTimeoutMessage(void)
     // create dialog...
     static QString chan_up   = GET_KEY("TV Playback", "CHANNELUP");
     static QString chan_down = GET_KEY("TV Playback", "CHANNELDOWN");
-    static QString tog_in    = GET_KEY("TV Playback", "TOGGLEINPUTS");
-    static QString tog_cards = GET_KEY("TV Playback", "SWITCHCARDS");
+    static QString next_src  = GET_KEY("TV Playback", "NEXTSOURCE");
+    static QString tog_cards = GET_KEY("TV Playback", "NEXTCARD");
 
     QString message = tr(
         "You should have gotten a channel lock by now. "
         "You can continue to wait for a signal, or you "
         "can change the channels with %1 or %2, change "
-        "input's (%3), capture cards (%4), etc.")
-        .arg(chan_up).arg(chan_down).arg(tog_in).arg(tog_cards);
+        "video source (%3), change cards  (%4), etc.")
+        .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
 
     QStringList options;
     options += tr("OK");
@@ -5093,6 +5539,63 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     infoMap["programid"]   = programid;
 }
 
+bool TV::IsTunable(uint chanid)
+{
+    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1)").arg(chanid));
+
+    if (!chanid)
+        return false;
+
+    uint mplexid = ChannelUtil::GetMplexID(chanid);
+    mplexid = (32767 == mplexid) ? 0 : mplexid;
+
+    vector<uint> excluded_cards;
+    if (recorder)
+        excluded_cards.push_back(recorder->GetRecorderNumber());
+
+    uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
+    vector<uint> cardids = CardUtil::GetCardIDs(sourceid);
+
+#if 0
+    cout << "cardids[" << sourceid << "]: ";
+    for (uint i = 0; i < cardids.size(); i++)
+        cout << cardids[i] << ", ";
+    cout << endl;
+#endif
+
+    for (uint i = 0; i < cardids.size(); i++)
+    {
+        vector<InputInfo> inputs = 
+            RemoteRequestFreeInputList(cardids[i], excluded_cards);
+
+#if 0
+        cout << "inputs[" << cardids[i] << "]: ";
+        for (uint j = 0; j < inputs.size(); j++)
+            cout << inputs[j].inputid << ", ";
+        cout << endl;
+#endif
+
+        for (uint j = 0; j < inputs.size(); j++)
+        {
+            if (inputs[j].sourceid != sourceid)
+                continue;
+
+            if (inputs[j].mplexid &&
+                inputs[j].mplexid != mplexid)
+                continue;
+
+            VERBOSE(VB_PLAYBACK, QString("IsTunable(%1) -> true\n")
+                    .arg(chanid));
+
+            return true;
+        }
+    }
+
+    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1, %2) -> false\n").arg(chanid));
+
+    return false;
+}
+
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
 {
     embedWinID = wid;
@@ -5150,7 +5653,7 @@ void TV::doEditSchedule(int editType)
     QString channum = playbackinfo->chanstr;
     pbinfoLock.unlock();
 
-    bool changeChannel = false;
+    DBChanList changeChannel;
     ProgramInfo *nextProgram = NULL;
 
     if (StateIsLiveTV(GetState()))
@@ -5166,7 +5669,9 @@ void TV::doEditSchedule(int editType)
                     allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
 
                 // Start up EPG
-                changeChannel = RunProgramGuide(chanid, channum, true, this, allowsecondary);
+                changeChannel = GuideGrid::Run(
+                    chanid, channum, true, this, allowsecondary);
+
                 break;
             }
             case kPlaybackBox:
@@ -5208,7 +5713,7 @@ void TV::doEditSchedule(int editType)
         {
             default:
             case kScheduleProgramGuide:
-                RunProgramGuide(chanid, channum, true);
+                GuideGrid::Run(chanid, channum, true);
                 break;
             case kScheduleProgramFinder:
                 RunProgramFind(true, false);
@@ -5267,8 +5772,8 @@ void TV::doEditSchedule(int editType)
     }
 
     // If user selected a new channel in the EPG, change to that channel
-    if (changeChannel)
-        EPGChannelUpdate(chanid, channum);
+    if (changeChannel.size())
+        ChangeChannel(changeChannel);
 
     if (nvp && jumpToProgram)
         nvp->DiscardVideoFrames(true);
@@ -5586,19 +6091,24 @@ void TV::ToggleAdjustFill(AdjustFillMode adjustfillMode)
         GetOSD()->SetSettingsText(text, 3);
 }
 
-void TV::EPGChannelUpdate(uint chanid, QString channum)
+void TV::ChangeChannel(const DBChanList &options)
 {
-    if (chanid && !channum.isEmpty())
+    for (uint i = 0; i < options.size(); i++)
     {
-        // hide the channel number, activated by certain signal monitors
-        if (GetOSD())
-            GetOSD()->HideSet("channel_number");
+        uint    chanid  = options[i].chanid;
+        QString channum = options[i].channum;
 
-        QMutexLocker locker(&queuedInputLock);
-        // we need to use deep copy bcs this can be called from another thread.
-        queuedInput   = QDeepCopy<QString>(channum);
-        queuedChanNum = QDeepCopy<QString>(channum);
-        queuedChanID  = chanid;
+        if (chanid && !channum.isEmpty() && IsTunable(chanid))
+        {
+            // hide the channel number, activated by certain signal monitors
+            if (GetOSD())
+                GetOSD()->HideSet("channel_number");
+            
+            QMutexLocker locker(&queuedInputLock);
+            queuedInput   = QDeepCopy<QString>(channum);
+            queuedChanNum = QDeepCopy<QString>(channum);
+            queuedChanID  = chanid;
+        }
     }
 }
 
@@ -5666,12 +6176,15 @@ void TV::customEvent(QCustomEvent *e)
             int cardnum = tokens[1].toInt();
             int timeuntil = tokens[2].toInt();
             int hasrec    = tokens[3].toInt();
-            VERBOSE(VB_IMPORTANT, LOC + message << " hasrec: "<<hasrec);
+            int haslater  = tokens[4].toInt();
+            VERBOSE(VB_GENERAL, LOC + message << " hasrec: "<<hasrec
+                    << " haslater: " << haslater);
 
             if (recorder && cardnum == recorder->GetRecorderNumber())
             {
                 menurunning = false;
-                AskAllowRecording(me->ExtraDataList(), timeuntil, hasrec);
+                AskAllowRecording(
+                    me->ExtraDataList(), timeuntil, hasrec, haslater);
             }
             else if (piprecorder &&
                      cardnum == piprecorder->GetRecorderNumber())
@@ -6681,6 +7194,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             BrowseStart();
         else if (action == "PREVCHAN")
             PreviousChannel();
+        else if (action.left(14) == "SWITCHTOINPUT_")
+            switchToInputId = action.mid(14).toUInt();
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -6769,104 +7284,10 @@ void TV::BuildOSDTreeMenu(void)
     OSDGenericTree *item, *subitem;
 
     if (StateIsLiveTV(GetState()))
-    {
-        bool freeRecorders = (pipnvp != NULL);
-        if (!freeRecorders)
-            freeRecorders = RemoteGetFreeRecorderCount();
+        FillMenuLiveTV(treeMenu);
+    else if (StateIsPlaying(GetState()))
+        FillMenuPlaying(treeMenu);
 
-        item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
-        if (!gContext->GetNumSetting("JumpToProgramOSD", 1))
-        {
-            item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
-            subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
-            if (lastProgram != NULL)
-            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
-        }
-        if (freeRecorders)
-        {
-            item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
-            subitem = new OSDGenericTree(item, tr("Enable/Disable"), 
-                                         "TOGGLEPIPMODE");
-            subitem = new OSDGenericTree(item, tr("Swap PiP/Main"), "SWAPPIP");
-            subitem = new OSDGenericTree(item, tr("Change Active Window"),
-                                         "TOGGLEPIPWINDOW");
-        }
-
-        if (!persistentbrowsemode)
-            item = new OSDGenericTree(treeMenu, tr("Enable Browse Mode"),
-                                      "TOGGLEBROWSE");
-
-        item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
-                                  "PREVCHAN");
-    }
-    else if (StateIsPlaying(internalState) && activerbuffer->isDVD())
-    {
-        item = new OSDGenericTree(treeMenu,tr("DVD Root Menu"), 
-                "JUMPTODVDROOTMENU");
-        item = new OSDGenericTree(treeMenu, tr("DVD Chapter Menu"), 
-                "JUMPTODVDCHAPTERMENU");
-    }
-    else if (StateIsPlaying(internalState))
-    {
-        item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
-
-        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
-        
-        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
-        if (lastProgram != NULL)
-            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
-
-        pbinfoLock.lock();
-
-        if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
-                                   playbackinfo->chanid, playbackinfo->startts))
-            item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
-        else
-        {
-            item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
-            subitem = new OSDGenericTree(item, tr("Default"),
-                                         "QUEUETRANSCODE");
-            subitem = new OSDGenericTree(item, tr("Autodetect"),
-                                         "QUEUETRANSCODE_AUTO");
-            subitem = new OSDGenericTree(item, tr("High Quality"),
-                                         "QUEUETRANSCODE_HIGH");
-            subitem = new OSDGenericTree(item, tr("Medium Quality"),
-                                         "QUEUETRANSCODE_MEDIUM");
-            subitem = new OSDGenericTree(item, tr("Low Quality"),
-                                         "QUEUETRANSCODE_LOW");
-        }
-
-
-        item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
-        subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
-                                     "TOGGLECOMMSKIP0",
-                                     (autoCommercialSkip == 0) ? 1 : 0, NULL,
-                                     "COMMSKIPGROUP");
-        subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
-                                     "TOGGLECOMMSKIP2",
-                                     (autoCommercialSkip == 2) ? 1 : 0, NULL,
-                                     "COMMSKIPGROUP");
-        subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
-                                     "TOGGLECOMMSKIP1",
-                                     (autoCommercialSkip == 1) ? 1 : 0, NULL,
-                                     "COMMSKIPGROUP");
-
-        if (playbackinfo->GetAutoExpireFromRecorded())
-            item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire OFF"),
-                                      "TOGGLEAUTOEXPIRE");
-        else
-            item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
-                                      "TOGGLEAUTOEXPIRE");
-
-        pbinfoLock.unlock();
-
-        item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
-        subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
-        subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
-        subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
-                                     "SCHEDULE");
-    }
-    
     FillMenuTracks(treeMenu, kTrackTypeAudio);
     FillMenuTracks(treeMenu, kTrackTypeSubtitle);
     FillMenuTracks(treeMenu, kTrackTypeCC708);
@@ -7004,6 +7425,198 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, "60 " + tr("minutes"), "TOGGLESLEEP60");
     subitem = new OSDGenericTree(item, "90 " + tr("minutes"), "TOGGLESLEEP90");
     subitem = new OSDGenericTree(item, "120 " + tr("minutes"), "TOGGLESLEEP120");
+}
+
+void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
+{
+    OSDGenericTree *item, *subitem;
+
+    bool freeRecorders = (pipnvp != NULL);
+    if (!freeRecorders)
+        freeRecorders = RemoteGetFreeRecorderCount();
+
+    item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+
+    if (!gContext->GetNumSetting("JumpToProgramOSD", 1))
+    {
+        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+        if (lastProgram != NULL)
+            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
+    }
+
+    if (freeRecorders)
+    {
+        // Picture-in-Picture
+        item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
+        subitem = new OSDGenericTree(item, tr("Enable/Disable"),
+                                     "TOGGLEPIPMODE");
+        subitem = new OSDGenericTree(item, tr("Swap PiP/Main"), "SWAPPIP");
+        subitem = new OSDGenericTree(item, tr("Change Active Window"),
+                                     "TOGGLEPIPWINDOW");
+
+        // Input switching
+        item = NULL;
+
+        QMap<uint,InputInfo> sources;
+        vector<uint> cardids = RemoteRequestFreeRecorderList();
+        uint         cardid  = activerecorder->GetRecorderNumber();
+        cardids.push_back(cardid);
+        stable_sort(cardids.begin(), cardids.end());
+
+        vector<uint> excluded_cardids;
+        excluded_cardids.push_back(cardid);
+
+        InfoMap info;
+        activerecorder->GetChannelInfo(info);
+        uint sourceid = info["sourceid"].toUInt();
+
+        vector<uint>::const_iterator it = cardids.begin();
+        for (; it != cardids.end(); ++it)
+        {
+            vector<InputInfo> inputs = RemoteRequestFreeInputList(
+                *it, excluded_cardids);
+
+            if (inputs.empty())
+                continue;
+
+            if (!item)
+                item = new OSDGenericTree(treeMenu, tr("Switch Input"));
+
+            for (uint i = 0; i < inputs.size(); i++)
+            {
+                // prefer the current card's input in sources list
+                if ((sources.find(inputs[i].sourceid) == sources.end()) ||
+                    ((cardid == inputs[i].cardid) && 
+                     (cardid != sources[inputs[i].sourceid].cardid)))
+                {
+                    sources[inputs[i].sourceid] = inputs[i];
+                }
+
+                // don't add current input to list
+                if ((inputs[i].cardid   == cardid) &&
+                    (inputs[i].sourceid == sourceid))
+                {
+                    continue;
+                }
+
+                QString name = CardUtil::GetDisplayName(inputs[i].inputid);
+                if (name.isEmpty())
+                {
+                    name = tr("C", "Card") + ":" + QString::number(*it) + " " +
+                        tr("I", "Input") + ":" + inputs[i].name;
+                }
+
+                subitem = new OSDGenericTree(
+                    item, name,
+                    QString("SWITCHTOINPUT_%1").arg(inputs[i].inputid));
+            }
+        }
+
+        // Source switching
+
+        // delete current source from list
+        sources.erase(sourceid);
+
+        // create menu if we have any sources left
+        QMap<uint,InputInfo>::const_iterator sit = sources.begin();
+        if (sit != sources.end())
+            item = new OSDGenericTree(treeMenu, tr("Switch Source"));
+        for (; sit != sources.end(); ++sit)
+        {
+            subitem = new OSDGenericTree(
+                item, SourceUtil::GetSourceName((*sit).sourceid),
+                QString("SWITCHTOINPUT_%1").arg((*sit).inputid));
+        }
+    }
+
+    if (!persistentbrowsemode)
+    {
+        item = new OSDGenericTree(
+            treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");
+    }
+
+    item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
+                              "PREVCHAN");
+}
+
+void TV::FillMenuPlaying(OSDGenericTree *treeMenu)
+{
+    OSDGenericTree *item, *subitem;
+
+    if (activerbuffer->isDVD())
+    {
+        item = new OSDGenericTree(
+            treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");
+        item = new OSDGenericTree(
+            treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
+
+        return;
+    }
+
+    item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+
+    item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+
+    subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+    if (lastProgram != NULL)
+        subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
+
+    pbinfoLock.lock();
+
+    if (JobQueue::IsJobQueuedOrRunning(
+            JOB_TRANSCODE, playbackinfo->chanid, playbackinfo->startts))
+    {
+        item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"),
+                                  "QUEUETRANSCODE");
+    }
+    else
+    {
+        item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
+        subitem = new OSDGenericTree(item, tr("Default"),
+                                     "QUEUETRANSCODE");
+        subitem = new OSDGenericTree(item, tr("Autodetect"),
+                                     "QUEUETRANSCODE_AUTO");
+        subitem = new OSDGenericTree(item, tr("High Quality"),
+                                     "QUEUETRANSCODE_HIGH");
+        subitem = new OSDGenericTree(item, tr("Medium Quality"),
+                                     "QUEUETRANSCODE_MEDIUM");
+        subitem = new OSDGenericTree(item, tr("Low Quality"),
+                                     "QUEUETRANSCODE_LOW");
+    }
+
+    item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
+    subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
+                                 "TOGGLECOMMSKIP0",
+                                 (autoCommercialSkip == 0) ? 1 : 0, NULL,
+                                 "COMMSKIPGROUP");
+    subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
+                                 "TOGGLECOMMSKIP2",
+                                 (autoCommercialSkip == 2) ? 1 : 0, NULL,
+                                 "COMMSKIPGROUP");
+    subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
+                                 "TOGGLECOMMSKIP1",
+                                 (autoCommercialSkip == 1) ? 1 : 0, NULL,
+                                 "COMMSKIPGROUP");
+
+    if (playbackinfo->GetAutoExpireFromRecorded())
+    {
+        item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire OFF"),
+                                  "TOGGLEAUTOEXPIRE");
+    }
+    else
+    {
+        item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
+                                  "TOGGLEAUTOEXPIRE");
+    }
+
+    pbinfoLock.unlock();
+
+    item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
+    subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
+    subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
+    subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
+                                 "SCHEDULE");
 }
 
 bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)

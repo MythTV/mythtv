@@ -33,7 +33,7 @@ class DTVChannel : public ChannelBase
 {
   public:
     DTVChannel(TVRec *parent);
-    virtual ~DTVChannel() {}
+    virtual ~DTVChannel();
 
     // Commands
 
@@ -82,6 +82,9 @@ class DTVChannel : public ChannelBase
     virtual void GetCachedPids(pid_cache_t &pid_cache) const
         { (void) pid_cache; }
 
+    DTVChannel *GetMaster(const QString &videodevice);
+    const DTVChannel *GetMaster(const QString &videodevice) const;
+
     // Sets
 
     /// \brief Sets tuning mode: "mpeg", "dvb", "atsc", etc.
@@ -114,6 +117,9 @@ class DTVChannel : public ChannelBase
     uint    currentATSCMinorChannel;
     uint    currentTransportID;
     uint    currentOriginalNetworkID;
+
+    static QMutex                    master_map_lock;
+    static QMap<QString,DTVChannel*> master_map;
 };
 
 #endif // _DTVCHANNEL_H_

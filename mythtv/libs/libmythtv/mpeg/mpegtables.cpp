@@ -183,21 +183,37 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     if (TableID::PAT == TableID())
     {
         uint pcnt = (SectionLength() - PSIP_OFFSET - 2) >> 2;
-        return (psipdata() + (pcnt << 2) + 3 < bufend);
+        bool ok = (psipdata() + (pcnt << 2) + 3 < bufend);
+        if (!ok)
+        {
+            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: program "
+                    "list extends past end of buffer");            
+            return false;
+        }
+
+        if ((Length() == 0xfff) && (TableIDExtension() == 0xffff) &&
+            (Section() == 0xff) && (LastSection() == 0xff))
+        {
+            VERBOSE(VB_SIPARSER, "PSIPTable: PAT: All values a maximums");
+            return false;
+        }
+
+        return true;
     }
 
     if (TableID::PMT == TableID())
     {
         if (psipdata() + 3 >= bufend)
         {
-            VERBOSE(VB_SIPARSER, "can't query program info length");
-            return false; // can't query program info length
+            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: "
+                    "can't query program info length");
+            return false;
         }
 
         if (psipdata() + Length() - 9 > bufend)
         {
-            VERBOSE(VB_SIPARSER, "reported length to large");
-            return false; // reported length to large
+            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: reported length to large");
+            return false;
         }
 
         uint proginfolen = ((psipdata()[2]<<8) | psipdata()[3]) & 0x0fff;
@@ -205,7 +221,8 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         const unsigned char *cpos = proginfo + proginfolen;
         if (cpos > bufend)
         {
-            VERBOSE(VB_SIPARSER, "program info extends past end of buffer");
+            VERBOSE(VB_SIPARSER, "PSIPTable: PMT: "
+                    "program info extends past end of buffer");
             return false;
         }
 
@@ -217,16 +234,18 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
             const unsigned char *ptr = pos;
             if (pos + 4 > bufend)
             {
-                VERBOSE(VB_SIPARSER, QString("stream info %1 extends past "
-                                             "end of buffer").arg(i));
+                VERBOSE(VB_SIPARSER, QString(
+                            "PSIPTable: PMT: stream info %1 extends "
+                            "past end of buffer").arg(i));
                 return false;
             }
             pos += 5 + ((ptr[3] << 8) | ptr[4]) & 0x0fff;
         }
         if (pos > bufend)
         {
-            VERBOSE(VB_SIPARSER, QString("last stream info %1 extends past "
-                                         "end of buffer").arg(i));
+            VERBOSE(VB_SIPARSER,
+                    QString("PSIPTable: PMT: last stream info %1 extends "
+                            "past end of buffer").arg(i));
             return false;
         }
 
@@ -662,14 +681,36 @@ const QString ProgramAssociationTable::toString() const
     str.append(static_cast<const PSIPTable*>(this)->toString());
     str.append(QString("         tsid: %1\n").arg(TransportStreamID()));
     str.append(QString(" programCount: %1\n").arg(ProgramCount()));
+
+    uint cnt0 = 0, cnt1fff = 0;
     for (uint i = 0; i < ProgramCount(); i++)
     {
         const unsigned char* p = psipdata() + (i<<2);
-        str.append(QString("  program number %1").arg(int(ProgramNumber(i)))).
+
+        if (0x1fff == ProgramPID(i))
+        {
+            cnt1fff++;
+            continue;
+        }
+
+        if (0x0 == ProgramPID(i))
+        {
+            cnt0++;
+            continue;
+        }
+
+        str.append(QString("  program number %1").arg(ProgramNumber(i),5)).
             append(QString(" has PID 0x%1   data ").arg(ProgramPID(i),4,16)).
             append(QString(" 0x%1 0x%2").arg(p[0],2,16).arg(p[1],2,16)).
             append(QString(" 0x%1 0x%2\n").arg(p[2],2,16).arg(p[3],2,16));
     }
+
+    if (cnt0 || cnt1fff)
+    {
+        str.append(QString("  also contains %1 + %2 dummy programs\n")
+                   .arg(cnt0).arg(cnt1fff));
+    }
+
     return str;
 }
 

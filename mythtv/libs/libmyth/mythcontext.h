@@ -106,7 +106,7 @@ class MPUBLIC MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.21.20080113-1"
+#define MYTH_BINARY_VERSION "0.21.20080114-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -125,7 +125,7 @@ class MPUBLIC MythPrivRequest
  *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (version number)
  *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "36"
+#define MYTH_PROTO_VERSION "37"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.

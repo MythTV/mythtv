@@ -43,7 +43,6 @@ class MPUBLIC RemoteEncoder
     void CancelNextRecording(bool cancel);
 
     void SetLiveRecording(bool recording);
-    QStringList GetInputs(void);
     QString GetInput(void);
     QString SetInput(QString);
     int  GetPictureAttribute(PictureAttribute attr);

@@ -145,7 +145,10 @@ void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
             BufferedWrite(tspacket);
         }
         else if (GetStreamData()->IsAudioPID(lpid))
+        {
+            _buffer_packets = !FindAudioKeyframes(&tspacket);
             BufferedWrite(tspacket);
+        }
         else if (GetStreamData()->IsListeningPID(lpid))
             GetStreamData()->HandleTSTables(&tspacket);
         else if (GetStreamData()->IsWritingPID(lpid))

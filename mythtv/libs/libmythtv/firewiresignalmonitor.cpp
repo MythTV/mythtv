@@ -42,7 +42,7 @@ QMutex           FirewireSignalMonitor::pat_keys_lock;
 FirewireSignalMonitor::FirewireSignalMonitor(
     int db_cardnum,
     FirewireChannel *_channel,
-    uint _flags, const char *_name) :
+    uint64_t _flags, const char *_name) :
     DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
     dtvMonitorRunning(false),
     stb_needs_retune(true),

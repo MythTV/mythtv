@@ -2765,11 +2765,22 @@ static GlobalCheckBox *LastFreeCard()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("LastFreeCard");
     bc->setLabel(QObject::tr("Avoid conflicts between live TV and "
-                 "scheduled shows."));
+                 "scheduled shows"));
     bc->setValue(false);
     bc->setHelpText(QObject::tr("If enabled, live TV will choose a tuner card "
                     "that is less likely to have scheduled recordings "
                     "rather than the best card available."));
+    return bc;
+}
+
+static GlobalCheckBox *LiveTVPriority()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("LiveTVPriority");
+    bc->setLabel(QObject::tr("Allow live TV to move scheduled shows"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("If enabled, scheduled recordings will "
+                    "be moved to other cards (where possible), so that "
+                    "live TV will not be interrupted."));
     return bc;
 }
 
@@ -4571,6 +4582,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(LongChannelFormat());
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
+    general->addChild(LiveTVPriority());
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);

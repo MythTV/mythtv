@@ -2959,13 +2959,21 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->SetLiveRecording(recording);
         retlist << "ok";
     }
-    else if (command == "GET_CONNECTED_INPUTS")
+    else if (command == "GET_FREE_INPUTS")
     {
-        QStringList ret = enc->GetConnectedInputs();
-        if (ret.empty())
+        vector<uint> excluded_cardids;
+        for (uint i = 2; i < slist.size(); i++)
+            excluded_cardids.push_back(slist[i].toUInt());
+
+        vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);
+
+        if (inputs.empty())
             retlist << "EMPTY_LIST";
         else
-            retlist += ret;
+        {
+            for (uint i = 0; i < inputs.size(); i++)
+                inputs[i].ToStringList(retlist);
+        }
     }
     else if (command == "GET_INPUT")
     {
@@ -3221,9 +3229,16 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         retlist << QString::number((int)enc->GetState());
     }
+    else if (command == "GET_FLAGS")
+    {
+        retlist << QString::number(enc->GetFlags());
+    }
     else if (command == "IS_BUSY")
     {
-        retlist << QString::number((int)enc->IsBusy());
+        int time_buffer = (slist.size() >= 3) ? slist[2].toInt() : 5;
+        TunedInputInfo busy_input;
+        retlist << QString::number((int)enc->IsBusy(&busy_input, time_buffer));
+        busy_input.ToStringList(retlist);
     }
     else if (command == "MATCHES_RECORDING")
     {
@@ -3247,12 +3262,24 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         ProgramInfo *pginfo = new ProgramInfo();
         int secsleft = slist[2].toInt();
-        pginfo->FromStringList(slist, 3);
+        int haslater = slist[3].toInt();
+        pginfo->FromStringList(slist, 4);
 
-        enc->RecordPending(pginfo, secsleft);
+        enc->RecordPending(pginfo, secsleft, haslater);
  
         retlist << "OK";
         delete pginfo;
+    }
+    else if (command == "CANCEL_NEXT_RECORDING")
+    {
+        bool cancel = (bool) slist[2].toInt();
+        enc->CancelNextRecording(cancel);
+        retlist << "OK";
+    }
+    else if (command == "STOP_RECORDING")
+    {
+        enc->StopRecording();
+        retlist << "OK";
     }
     else if (command == "GET_MAX_BITRATE")
     {
@@ -3264,6 +3291,22 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         ProgramInfo *info = enc->GetRecording();
         info->ToStringList(retlist);
         delete info;
+    }
+    else if (command == "GET_FREE_INPUTS")
+    {
+        vector<uint> excluded_cardids;
+        for (uint i = 2; i < slist.size(); i++)
+            excluded_cardids.push_back(slist[i].toUInt());
+
+        vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);
+
+        if (inputs.empty())
+            retlist << "EMPTY_LIST";
+        else
+        {
+            for (uint i = 0; i < inputs.size(); i++)
+                inputs[i].ToStringList(retlist);
+        }
     }
 
     SendResponse(pbssock, retlist);

@@ -914,7 +914,7 @@ void StatusBox::doTunerStatus()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardid, cardtype, videodevice "
-        "FROM capturecard WHERE parentid='0' ORDER BY cardid");
+        "FROM capturecard ORDER BY cardid");
 
     if (!query.exec() || !query.isActive())
     {

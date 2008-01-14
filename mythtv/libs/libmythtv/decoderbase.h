@@ -78,6 +78,9 @@ class DecoderBase
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 
     virtual void setWatchingRecording(bool mode);
+    /// Decode a frame of video/audio. If onlyvideo is +1,
+    /// decodes the video portion, if it is -1 only decodes
+    /// the audio portion, if it is 0 it decodes audio and video
     virtual bool GetFrame(int onlyvideo) = 0;
     NuppelVideoPlayer *GetNVP() { return m_parent; }
     

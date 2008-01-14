@@ -265,17 +265,12 @@ void InputSelector::load(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT capturecard.cardid, cardinput.childcardid, "
-        "       cardtype, videodevice, inputname, capturecard.parentid "
+        "SELECT capturecard.cardid, cardtype, videodevice, inputname "
         "FROM capturecard, cardinput, videosource "
         "WHERE cardinput.sourceid = videosource.sourceid AND "
         "      hostname           = :HOSTNAME            AND "
         "      cardinput.sourceid = :SOURCEID            AND "
-        "      ( ( cardinput.childcardid != '0' AND "
-        "          cardinput.childcardid  = capturecard.cardid ) OR "
-        "        ( cardinput.childcardid  = '0' AND "
-        "          cardinput.cardid       = capturecard.cardid ) "
-        "      )");
+        "      cardinput.cardid   = capturecard.cardid");
 
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     query.bindValue(":SOURCEID", sourceid);
@@ -289,43 +284,19 @@ void InputSelector::load(void)
     uint which = 0, cnt = 0;
     for (; query.next(); cnt++)
     {
-        uint parent_cardid = query.value(0).toUInt();
-        uint child_cardid  = query.value(1).toUInt();
-        if (child_cardid)
-            parent_cardid = query.value(5).toUInt();
-
-        QString inputname  = query.value(4).toString();
+        uint    cardid     = query.value(0).toUInt();
+        QString inputname  = query.value(3).toString();
 
         QString desc = CardUtil::GetDeviceLabel(
-            parent_cardid,
-            query.value(2).toString(), query.value(3).toString());
-
-        if (child_cardid)
-        {
-            MSqlQuery query2(MSqlQuery::InitCon());
-            query2.prepare(
-                "SELECT cardtype, videodevice "
-                "FROM capturecard "
-                "WHERE cardid = :CARDID");
-
-            if (query2.next())
-            {
-                desc += " " + CardUtil::GetDeviceLabel(
-                    child_cardid,
-                    query2.value(0).toString(), query2.value(1).toString());
-            }
-        }
+            cardid, query.value(1).toString(), query.value(2).toString());
 
         desc += QString(" (%1)").arg(inputname);
 
-        QString key = QString("%1:%2:%3")
-            .arg(parent_cardid).arg(child_cardid).arg(inputname);
+        QString key = QString("%1:%2").arg(cardid).arg(inputname);
 
         addSelection(desc, key);
 
-        which = (((default_cardid == parent_cardid) ||
-                  (default_cardid == child_cardid)) &&
-                 (default_inputname == inputname)) ? cnt : which;
+        which = (default_cardid == cardid) ? cnt : which;
     }
 
     if (cnt)
@@ -341,81 +312,58 @@ void InputSelector::SetSourceID(const QString &_sourceid)
     }
 }
 
-uint InputSelector::GetParentCardID(void) const
+uint InputSelector::GetCardID(void) const
 {
-    uint    parent_cardid = 0;
-    uint    child_cardid  = 0;
-    QString inputname     = QString::null;
+    uint    cardid    = 0;
+    QString inputname = QString::null;
 
-    Parse(getValue(), parent_cardid, child_cardid, inputname);
+    Parse(getValue(), cardid, inputname);
 
-    return parent_cardid;
-}
-
-uint InputSelector::GetChildCardID(void) const
-{
-    uint    parent_cardid = 0;
-    uint    child_cardid  = 0;
-    QString inputname     = QString::null;
-
-    Parse(getValue(), parent_cardid, child_cardid, inputname);
-
-    return child_cardid;
+    return cardid;
 }
 
 QString InputSelector::GetInputName(void) const
 {
-    uint    parent_cardid = 0;
-    uint    child_cardid  = 0;
+    uint    cardid    = 0;
     QString inputname = QString::null;
 
-    Parse(getValue(), parent_cardid, child_cardid, inputname);
+    Parse(getValue(), cardid, inputname);
 
     return inputname;
 }
 
-bool InputSelector::Parse(const QString &cardids_inputname,
-                          uint &parent_cardid,
-                          uint &child_cardid,
-                          QString &inputname)
+bool InputSelector::Parse(const QString &cardid_inputname,
+                          uint          &cardid,
+                          QString       &inputname)
 {
-    parent_cardid = 0;
-    child_cardid  = 0;
-    inputname     = QString::null;
+    cardid    = 0;
+    inputname = QString::null;
 
-    int sep0 = cardids_inputname.find(':');
+    int sep0 = cardid_inputname.find(':');
     if (sep0 < 1)
         return false;
 
-    QString child_cardid_inputname = cardids_inputname.mid(sep0 + 1);
-    int sep1 = child_cardid_inputname.find(':');
-    if (sep1 < 1)
-        return false;
-
-    parent_cardid = cardids_inputname.left(sep0).toUInt();
-    child_cardid  = child_cardid_inputname.left(sep1).toUInt();
-    inputname     = child_cardid_inputname.mid(sep1 + 1);
+    cardid    = cardid_inputname.left(sep0).toUInt();
+    inputname = cardid_inputname.mid(sep0 + 1);
 
     return true;
 }
 
 void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 {
-    uint pcardid, ccardid;
-    QString inputname;
-    if (!InputSelector::Parse(cardids_inputname, pcardid, ccardid, inputname))
+    uint    cardid    = 0;
+    QString inputname = QString::null;
+    if (!InputSelector::Parse(cardids_inputname, cardid, inputname))
         return;
-
-    const uint new_cardid = ccardid ? ccardid : pcardid;
 
     // Only refresh if we really have to. If we do it too often
     // Then we end up fighting the scan routine when we want to
     // check the type of dvb card :/
-    if (new_cardid == hw_cardid)
+    if (cardid == hw_cardid)
         return;
 
-    hw_cardid       = new_cardid;
-    QString subtype = CardUtil::ProbeSubTypeName(hw_cardid, 0);
+    hw_cardid       = cardid;
+    QString subtype = CardUtil::ProbeSubTypeName(hw_cardid);
     int nCardType   = CardUtil::toCardType(subtype);
     clearSelections();
 

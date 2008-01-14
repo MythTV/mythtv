@@ -1,7 +1,6 @@
 #ifndef LCDPROCCLIENT_H_
 #define LCDPROCCLIENT_H_
 
-#include <iostream>
 #include <qobject.h>
 #include <qstringlist.h>
 #include <qvaluevector.h>
@@ -9,7 +8,7 @@
 #include <qtimer.h>
 #include <qdatetime.h>
 
-using namespace std;
+#include "remoteutil.h"
 
 class LCDServer;
 class LCDTextItem;
@@ -229,15 +228,6 @@ class LCDProcClient : public QObject
     LCDServer *m_parent;
     QString startup_message;
     uint startup_showtime; 
-
-    // recording status stuff
-    typedef struct
-    {
-        int     id;
-        bool    isRecording;
-        QString channel, title, subTitle;
-        QDateTime startTime, endTime;
-    } TunerStatus;
 
     bool isRecording;
     bool isTimeVisible;

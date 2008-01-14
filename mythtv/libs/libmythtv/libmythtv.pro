@@ -343,10 +343,10 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               dtvchannel.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += inputinfo.h
+    HEADERS += inputinfo.h                 inputgroupmap.h
     SOURCES += channelbase.cpp             dtvchannel.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
-    SOURCES += inputinfo.cpp
+    SOURCES += inputinfo.cpp               inputgroupmap.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
@@ -484,8 +484,8 @@ using_backend {
         SOURCES += dvbcam.cpp
 
         # DVB Recorder
-        HEADERS += dvbrecorder.h
-        SOURCES += dvbrecorder.cpp
+        HEADERS += dvbrecorder.h          dvbstreamhandler.h
+        SOURCES += dvbrecorder.cpp        dvbstreamhandler.cpp
 
         # Misc
         HEADERS += dvbdev/dvbci.h

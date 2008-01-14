@@ -58,6 +58,13 @@ Channel::~Channel(void)
     Close();
 }
 
+bool Channel::Init(QString &inputname, QString &startchannel)
+{
+    SetFormat(gContext->GetSetting("TVFormat"));
+    SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
+    return ChannelBase::Init(inputname, startchannel);
+}
+
 bool Channel::Open(void)
 {
 #if FAKE_VIDEO
@@ -371,41 +378,6 @@ void Channel::GetCachedPids(pid_cache_t &pid_cache) const
         DTVChannel::GetCachedPids(chanid, pid_cache);
 }
 
-bool Channel::SetChannelByDirection(ChannelChangeDirection dir)
-{
-    if (ChannelBase::SetChannelByDirection(dir))
-        return true;
-
-    if ((CHANNEL_DIRECTION_UP != dir) && (CHANNEL_DIRECTION_DOWN != dir))
-        return false;
-
-    QString nextchan;
-    bool finished = false;
-    int chancount = 0;
-    int curchannel = GetCurrentChannelNum(curchannelname);
-    int incrDir = (CHANNEL_DIRECTION_UP == dir) ? 1 : -1;
-
-    while (!finished)
-    {
-        curchannel += incrDir;
-        curchannel = (curchannel < 0) ? totalChannels - 1 : curchannel;
-        curchannel = (curchannel > totalChannels) ? 0 : curchannel;
-        chancount++;
-
-        nextchan = curList[curchannel].name;
-        finished = SetChannelByString(nextchan);
-
-        if (chancount > totalChannels)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Couldn't find any available channels."
-                    "\n\t\t\tYour database is most likely setup incorrectly.");
-            break;
-        }
-    }
-    return finished;
-}
-
 bool Channel::SetChannelByString(const QString &channum)
 {
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
@@ -442,6 +414,10 @@ bool Channel::SetChannelByString(const QString &channum)
     if (it == inputs.end())
         return false;
 
+    uint mplexid_restriction;
+    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+        return false;
+
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, dtv_si_std;
     int finetune;
@@ -458,6 +434,9 @@ bool Channel::SetChannelByString(const QString &channum)
     {
         return false;
     }
+
+    if (mplexid_restriction && (mplexid != mplexid_restriction))
+        return false;
 
     // If the frequency is zeroed out, don't use it directly.
     bool ok = (frequency > 0);
@@ -883,6 +862,10 @@ bool Channel::SwitchToInput(int inputnum, bool setstarting)
             .arg(device).arg(inputnum)
             .arg(setstarting ? channum : QString("")));
 
+    uint mplexid_restriction;
+    if (!IsInputAvailable(inputnum, mplexid_restriction))
+        return false;
+
     QString newFmt = mode_to_format((*it)->videoModeV4L2, 2);
 
     // If we are setting a channel, get its video mode...
@@ -976,7 +959,7 @@ bool Channel::InitPictureAttribute(const QString db_col_name)
     int cfield = ChannelUtil::GetChannelValueInt(
         db_col_name, GetCurrentSourceID(), curchannelname);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, GetCardID(), GetCurrentSourceID());
+        db_col_name, GetCardID());
 
     if ((cfield == -1) || (sfield == -1))
         return false;
@@ -1088,7 +1071,7 @@ int Channel::GetPictureAttribute(PictureAttribute attr) const
     int cfield = ChannelUtil::GetChannelValueInt(
         db_col_name, GetCurrentSourceID(), curchannelname);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, GetCardID(), GetCurrentSourceID());
+        db_col_name, GetCardID());
     int dfield = 0;
 
     if (pict_attr_default.find(db_col_name) != pict_attr_default.end())
@@ -1281,7 +1264,7 @@ int Channel::ChangePictureAttribute(
     else if (kAdjustingPicture_Recording == type)
     {
         int adj_value = CardUtil::GetValueInt(
-            db_col_name, GetCardID(), GetCurrentSourceID());
+            db_col_name, GetCardID());
 
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;

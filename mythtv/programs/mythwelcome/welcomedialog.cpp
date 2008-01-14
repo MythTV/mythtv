@@ -14,7 +14,6 @@
 #include "tv.h"
 #include "programinfo.h"
 #include "uitypes.h"
-#include "remoteutil.h"
 #include "compat.h"
 
 #include "welcomedialog.h"
@@ -373,16 +372,20 @@ void WelcomeDialog::updateScreen(void)
 
             if (tuner->isRecording)
             {
-                status = QString(tr("Tuner %1 is recording:\n")).arg(tuner->id);
-                status += tuner->program.channel;
-                status += "\n" + tuner->program.title;
-                if (tuner->program.subtitle != "") 
-                    status += "\n(" + tuner->program.subtitle + ")";
-                status += "\n" + tuner->program.startTime.toString("hh:mm") + 
-                    " " + tr("to") + " " + tuner->program.endTime.toString("hh:mm");
+                status = QObject::tr("Tuner %1 is recording:\n")
+                    .arg(tuner->id);
+                status += QDeepCopy<QString>(tuner->channame);
+                status += "\n" + QDeepCopy<QString>(tuner->title);
+                if (!tuner->subtitle.isEmpty()) 
+                    status += "\n("+QDeepCopy<QString>(tuner->subtitle)+")";
+                status += "\n" + tuner->startTime.toString("hh:mm") + 
+                          " " + tr("to") + " " + tuner->endTime.toString("hh:mm");
             }
             else
-                status = QString(tr("Tuner %1 is not recording")).arg(tuner->id);
+            {
+                status = QObject::tr("Tuner %1 is not recording")
+                    .arg(tuner->id);
+            }
 
             if (m_screenTunerNo < m_tunerList.count() - 1)
                 m_screenTunerNo++;
@@ -491,69 +494,7 @@ bool WelcomeDialog::updateRecordingList()
     if (!gContext->IsConnectedToMaster())
         return false;
 
-    QStringList strlist;
-
-    // get list of current recordings
-    QString querytext = QString("SELECT cardid FROM capturecard WHERE parentid = 0;");
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querytext);
-    QString Status = "";
-
-    if (query.isActive() && query.numRowsAffected())
-    {
-        while(query.next())
-        {
-            QString status = "";
-            int cardid = query.value(0).toInt();
-            int state = kState_ChangingState;
-            QString channelName = "";
-            QString title = "";
-            QString subtitle = "";
-            QDateTime dtStart = QDateTime();
-            QDateTime dtEnd = QDateTime();
-
-            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
-
-            while (state == kState_ChangingState)
-            {
-                strlist = cmd;
-                strlist << "GET_STATE";
-                gContext->SendReceiveStringList(strlist);
-
-                state = strlist[0].toInt();
-                if (state == kState_ChangingState)
-                    usleep(500);
-            }
-
-            if (state == kState_RecordingOnly || state == kState_WatchingRecording)
-            {
-                m_isRecording = true;
-
-                strlist = QString("QUERY_RECORDER %1").arg(cardid);
-                strlist << "GET_RECORDING";
-                gContext->SendReceiveStringList(strlist);
-                ProgramInfo *progInfo = new ProgramInfo;
-                progInfo->FromStringList(strlist, 0);
-
-                title = progInfo->title;
-                subtitle = progInfo->subtitle;
-                channelName = progInfo->channame;
-                dtStart = progInfo->startts;
-                dtEnd = progInfo->endts;
-            }
-
-            TunerStatus *tuner = new TunerStatus;
-            tuner->id = cardid;
-            tuner->isRecording = (state == kState_RecordingOnly ||
-                                  state == kState_WatchingRecording);
-            tuner->program.channel = channelName;
-            tuner->program.title = title;
-            tuner->program.subtitle = subtitle;
-            tuner->program.startTime = dtStart;
-            tuner->program.endTime = dtEnd;
-            m_tunerList.append(tuner);
-        }
-    }
+    m_isRecording = RemoteGetRecordingStatus(&m_tunerList, true);
 
     return true;
 }

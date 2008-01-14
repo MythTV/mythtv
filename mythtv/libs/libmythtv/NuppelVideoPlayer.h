@@ -193,6 +193,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetBookmark(void) const;
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
+    bool      GetAudioBufferStatus(uint &fill, uint &total) const;
 
     // Bool Gets
     bool    GetRawAudioState(void) const;

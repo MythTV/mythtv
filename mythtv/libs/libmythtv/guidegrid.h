@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 #ifndef GUIDEGRID_H_
 #define GUIDEGRID_H_
 
@@ -12,12 +13,12 @@
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "libmythtv/programinfo.h"
+#include "channelutil.h"
 
 using namespace std;
 
 class ProgramInfo;
 class TimeInfo;
-class ChannelInfo;
 class TV;
 class QTimer;
 class QWidget;
@@ -25,25 +26,22 @@ class QWidget;
 #define MAX_DISPLAY_CHANS 12
 #define MAX_DISPLAY_TIMES 30
 
-// Use this function to instantiate a guidegrid instance.
-MPUBLIC
-bool RunProgramGuide(uint &startChanId, QString &startChanNum,
-                     bool thread = false, TV *player = NULL,
-                     bool allowsecondaryepg = true);
+typedef vector<PixmapChannel>   pix_chan_list_t;
+typedef vector<pix_chan_list_t> pix_chan_list_list_t;
 
-
-class GuideGrid : public MythDialog
+class MPUBLIC GuideGrid : public MythDialog
 {
     Q_OBJECT
-  public:
-    GuideGrid(MythMainWindow *parent,
-              uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool allowsecondaryepg = true,
-              const char *name = "GuideGrid");
-   ~GuideGrid();
 
-    uint    GetChanID(void);
-    QString GetChanNum(void);
+  public:
+    // Use this function to instantiate a guidegrid instance.
+    static DBChanList Run(uint           startChanId,
+                          const QString &startChanNum,
+                          bool           thread = false,
+                          TV            *player = NULL,
+                          bool           allowsecondaryepg = true);
+
+    DBChanList GetSelection(void) const;
 
   protected slots:
     void cursorLeft();
@@ -85,6 +83,12 @@ class GuideGrid : public MythDialog
     void customEvent(QCustomEvent *e);
 
   protected:
+    GuideGrid(MythMainWindow *parent,
+              uint chanid = 0, QString channum = "",
+              TV *player = NULL, bool allowsecondaryepg = true,
+              const char *name = "GuideGrid");
+   ~GuideGrid();
+
     void paintEvent(QPaintEvent *);
 
   private slots:
@@ -99,7 +103,7 @@ class GuideGrid : public MythDialog
     void updateBackground(void);
     void paintDate(QPainter *);
     void paintJumpToChannel(QPainter *);
-    void paintChannels(QPainter *);
+    bool paintChannels(QPainter *);
     void paintTimes(QPainter *);
     void paintPrograms(QPainter *);
     void paintCurrentInfo(QPainter *);
@@ -140,7 +144,18 @@ class GuideGrid : public MythDialog
 
     void createProgramLabel(int, int);
 
-    vector<ChannelInfo> m_channelInfos;
+    PixmapChannel       *GetChannelInfo(uint chan_idx, int sel = -1);
+    const PixmapChannel *GetChannelInfo(uint chan_idx, int sel = -1) const;
+    uint                 GetChannelCount(void) const;
+    int                  GetStartChannelOffset(int row = -1) const;
+
+    ProgramList GetProgramList(uint chanid) const;
+    uint GetAlternateChannelIndex(uint chan_idx, bool with_same_channum) const;
+
+  private:
+    pix_chan_list_list_t m_channelInfos;
+    QMap<uint,uint>      m_channelInfoIdx;
+
     TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
     ProgramList *m_programs[MAX_DISPLAY_CHANS];
     ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];

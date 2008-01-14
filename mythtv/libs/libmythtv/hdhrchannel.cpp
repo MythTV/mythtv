@@ -282,6 +282,10 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     if (it == inputs.end())
         return false;
 
+    uint mplexid_restriction;
+    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+        return false;
+
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, si_std;
     int finetune;
@@ -298,6 +302,9 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     {
         return false;
     }
+
+    if (mplexid_restriction && (mplexid != mplexid_restriction))
+        return false;
 
     // If the frequency is zeroed out, don't use it directly.
     bool ok = (frequency > 0);
@@ -400,41 +407,6 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
         SetSIStandard(si_std);
 
     return ok;
-}
-
-bool HDHRChannel::SwitchToInput(const QString &inputname,
-                                const QString &chan)
-{
-    if (inputname == GetCurrentInput())
-    {
-        return SetChannelByString(chan);
-    }
-
-    int inputnum = GetInputByName(inputname);
-    if (inputnum < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to locate input '%1'").arg(inputname));
-        return false;
-    }
-
-    /* Device only has one input so there is nothing on it to configure. */
-    /* Maybe there will be a rev 2 one day? */
-    currentInputID = inputnum;
-
-    /* Set channel. */
-    return SetChannelByString(chan);
-}
-
-bool HDHRChannel::SwitchToInput(int newInputNum, bool setstarting)
-{
-    (void)setstarting;
-
-    InputMap::const_iterator it = inputs.find(newInputNum);
-    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
-        return false;
-
-    return SwitchToInput((*it)->name, (*it)->startChanNum);
 }
 
 bool HDHRChannel::AddPID(uint pid, bool do_update)

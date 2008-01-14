@@ -46,6 +46,25 @@ class TSDataListener
     virtual ~TSDataListener() { }
 };
 
+class TSPacketListener
+{
+  public:
+    virtual bool ProcessTSPacket(const TSPacket& tspacket) = 0;
+
+  protected:
+    virtual ~TSPacketListener() { }
+};
+
+class TSPacketListenerAV
+{
+  public:
+    virtual bool ProcessVideoTSPacket(const TSPacket& tspacket) = 0;
+    virtual bool ProcessAudioTSPacket(const TSPacket& tspacket) = 0;
+
+  protected:
+    virtual ~TSPacketListenerAV() { }
+};
+
 class MPEGStreamListener
 {
   protected:

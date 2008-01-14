@@ -11,6 +11,7 @@ using namespace std;
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
+#include "libmythtv/inputinfo.h"
 
 PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock, 
                            QString lhostname, bool wantevents)
@@ -204,15 +205,24 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     return exists;
 }
 
-bool PlaybackSock::IsBusy(int capturecardnum)
+bool PlaybackSock::IsBusy(
+    int capturecardnum, InputInfo *busy_input, int time_buffer)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
 
     strlist << "IS_BUSY";
+    strlist << QString::number(time_buffer);
 
     SendReceiveStringList(strlist);
 
-    bool state = strlist[0].toInt();
+    QStringList::const_iterator it = strlist.begin();
+    bool state = (*it).toInt();
+    if (busy_input)
+    {
+        it++;
+        busy_input->FromStringList(it, strlist.end());
+    }
+
     return state;
 }
 
@@ -287,11 +297,12 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
-                                 int secsleft)
+                                 int secsleft, bool hasLater)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
     strlist << "RECORD_PENDING";
     strlist << QString::number(secsleft);
+    strlist << QString::number(hasLater);
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
@@ -315,6 +326,45 @@ void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
 {
     QStringList strlist =
         QString("SET_NEXT_LIVETV_DIR %1 %2").arg(capturecardnum).arg(dir);
+
+    SendReceiveStringList(strlist);
+}
+
+vector<InputInfo> PlaybackSock::GetFreeInputs(int capturecardnum,
+                                        const vector<uint> &excluded_cardids)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "GET_FREE_INPUTS";
+
+    for (uint i = 0; i < excluded_cardids.size(); i++)
+        strlist << QString::number(excluded_cardids[i]);
+
+    SendReceiveStringList(strlist);
+
+    vector<InputInfo> list;
+
+    QStringList::const_iterator it = strlist.begin();
+    if ((it == strlist.end()) || (*it == "EMPTY_LIST"))
+        return list;
+
+    while (it != strlist.end())
+    {
+        InputInfo info;
+        if (!info.FromStringList(it, strlist.end()))
+            break;
+        list.push_back(info);
+    }
+
+    return list;
+}
+
+void PlaybackSock::CancelNextRecording(int capturecardnum, bool cancel)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1")
+        .arg(capturecardnum);
+
+    strlist << "CANCEL_NEXT_RECORDING";
+    strlist << QString::number(cancel);
 
     SendReceiveStringList(strlist);
 }

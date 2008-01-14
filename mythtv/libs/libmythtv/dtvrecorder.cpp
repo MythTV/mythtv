@@ -8,6 +8,7 @@
 #include "RingBuffer.h"
 #include "programinfo.h"
 #include "mpegtables.h"
+#include "mpegstreamdata.h"
 #include "dtvrecorder.h"
 #include "tv_rec.h"
 
@@ -64,7 +65,7 @@ DTVRecorder::~DTVRecorder()
 void DTVRecorder::SetOption(const QString &name, const QString &value)
 {
     if (name == "recordingtype")
-        _recording_type = value;
+        _recording_type = QDeepCopy<QString>(value);
     else
         RecorderBase::SetOption(name, value);
 }
@@ -138,12 +139,12 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
     return ret;
 }
 
-// documented in recorderbase.h
-void DTVRecorder::Reset(void)
+void DTVRecorder::ResetForNewFile(void)
 {
+    VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
     QMutexLocker locker(&positionMapLock);
 
-    _start_code                 = 0xffffffff;
+    //_start_code
     _first_keyframe             =-1;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
@@ -160,6 +161,18 @@ void DTVRecorder::Reset(void)
     positionMap.clear();
     positionMapDelta.clear();
     _payload_buffer.clear();
+}
+
+// documented in recorderbase.h
+void DTVRecorder::Reset(void)
+{
+    VERBOSE(VB_RECORD, LOC + "Reset(void)");
+    ResetForNewFile();
+
+    _start_code = 0xffffffff;
+
+    if (curRecording)
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
@@ -220,6 +233,9 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 {
     bool haveBufferedData = !_payload_buffer.empty();
     if (!tspacket->HasPayload()) // no payload to scan
+        return !haveBufferedData;
+
+    if (!ringBuffer)
         return !haveBufferedData;
 
     // if packet contains start of PES packet, start
@@ -292,6 +308,42 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));
 }
 
+bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
+{
+    bool hasKeyFrame = false;
+    if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
+        return hasKeyFrame;
+
+    static const uint64_t msec_per_day = 24 * 60 * 60 * 1000ULL;
+    const double frame_interval = (1000.0 / video_frame_rate);
+    uint64_t elapsed = (uint64_t) max(_audio_timer.elapsed(), 0);
+    uint64_t expected_frame =
+        (uint64_t) ((double)elapsed / frame_interval);
+
+    while (_frames_seen_count > expected_frame + 10000)
+        expected_frame += (uint64_t) ((double)msec_per_day / frame_interval);
+
+    if (!_frames_seen_count || (_frames_seen_count < expected_frame))
+    {
+        if (!_frames_seen_count)
+            _audio_timer.start();
+
+        _frames_seen_count++;
+
+        if (1 == (_frames_seen_count & 0x7))
+        {
+            _last_keyframe_seen = _frames_seen_count;
+            HandleKeyframe();
+            hasKeyFrame = true;
+        }
+
+        if (!_wait_for_keyframe_option || _first_keyframe>=0)
+            _frames_written_count++;
+    }
+
+    return hasKeyFrame;
+}
+
 // documented in recorderbase.h
 void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 {
@@ -316,18 +368,15 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     nextRingBufferLock.unlock();
 }
 
-void DTVRecorder::ResetForNewFile(void)
-{
-    VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
-    Reset();
-}
-
 /** \fn DTVRecorder::HandleKeyframe(void)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
  */
 void DTVRecorder::HandleKeyframe(void)
 {
+    if (!ringBuffer)
+        return;
+
     unsigned long long frameNum = _frames_written_count;
 
     _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
@@ -353,8 +402,11 @@ void DTVRecorder::HandleKeyframe(void)
  *  \param TSPacket Pointer the the TS packet data.
  *  \return Returns true if a keyframe has been found.
  */
-bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
+bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
 {
+    if (!ringBuffer)
+        return false;
+
     bool haveBufferedData = !_payload_buffer.empty();
     if (!tspacket->HasPayload()) // no payload to scan
         return !haveBufferedData;

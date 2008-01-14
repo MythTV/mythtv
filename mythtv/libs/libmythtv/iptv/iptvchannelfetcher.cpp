@@ -99,7 +99,7 @@ void IPTVChannelFetcher::RunScan(void)
     _thread_running = true;
 
     // Step 1/4 : Get info from DB
-    QString url = CardUtil::GetVideoDevice(_cardid, _inputname);
+    QString url = CardUtil::GetVideoDevice(_cardid);
 
     if (_stop_now || url.isEmpty())
     {

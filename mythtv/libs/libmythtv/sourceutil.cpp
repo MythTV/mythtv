@@ -379,6 +379,10 @@ bool SourceUtil::DeleteSource(uint sourceid)
         return false;
     }
 
+    // Delete any orphaned inputs & unused input groups
+    CardUtil::DeleteOrphanInputs();
+    CardUtil::UnlinkInputGroup(0,0);
+
     return true;
 }
 

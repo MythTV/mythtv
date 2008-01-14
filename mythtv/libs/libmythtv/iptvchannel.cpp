@@ -84,41 +84,19 @@ bool IPTVChannel::IsOpen(void) const
     return open;
 }
 
-bool IPTVChannel::SwitchToInput(const QString &inputname,
-                                const QString &channum)
-{
-    VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputname));
-    QMutexLocker locker(&m_lock);
-
-    int inputNum = GetInputByName(inputname);
-    if (inputNum < 0)
-        return false;
-
-    return SetChannelByString(channum);
-}
-
-bool IPTVChannel::SwitchToInput(int inputNum, bool setstarting)
-{
-    VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputNum));
-    QMutexLocker locker(&m_lock);
-
-    InputMap::const_iterator it = inputs.find(inputNum);
-    if (it == inputs.end())
-        return false;
-
-    QString channum = (*it)->startChanNum;
-
-    if (setstarting)
-        return SetChannelByString(channum);
-
-    return true;
-}
-
 bool IPTVChannel::SetChannelByString(const QString &channum)
 {
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- begin");
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- locked");
+
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return false;
+
+    uint mplexid_restriction;
+    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+        return false;
 
     // Verify that channel exists
     if (!GetChanInfo(channum).isValid())

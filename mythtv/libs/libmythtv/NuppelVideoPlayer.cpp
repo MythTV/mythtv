@@ -3656,6 +3656,19 @@ void NuppelVideoPlayer::SetEffDsp(int dsprate)
         audioOutput->SetEffDsp(dsprate);
 }
 
+bool NuppelVideoPlayer::GetAudioBufferStatus(uint &fill, uint &total) const
+{
+    fill = total = 0;
+
+    if (audioOutput)
+    {
+        audioOutput->GetBufferStatus(fill, total);
+        return true;
+    }
+
+    return false;
+}
+
 void NuppelVideoPlayer::SetTranscoding(bool value)
 {
     transcoding = value;
@@ -5384,9 +5397,18 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
 
     if ((video_width <= 0) || (video_height <= 0))
     {
-        VERBOSE(VB_IMPORTANT, QString("NVP: Video Resolution invalid %1x%2")
+        VERBOSE(VB_PLAYBACK, QString("NVP: Video Resolution invalid %1x%2")
             .arg(video_width).arg(video_height));
-        return NULL;
+
+        // This is probably an audio file, just return a grey frame.
+        vw = 640;
+        vh = 480;
+        ar = 4.0f / 3.0f;
+
+        bufflen = vw * vh * 4;
+        outputbuf = new unsigned char[bufflen];
+        memset(outputbuf, 0x3f, bufflen * sizeof(unsigned char));
+        return (char*) outputbuf;
     }
 
     if (!InitVideo())

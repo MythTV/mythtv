@@ -15,11 +15,11 @@ class CaptureCard;
 class VBIDevice;
 class CardInput;
 class CardID;
-class ChildID;
 class InputName;
 class SourceID;
 class DiSEqCDevTree;
 class DiSEqCDevSettings;
+class InputGroup;
 
 static inline bool is_grabber_external(const QString &grabber)
 {
@@ -385,6 +385,7 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
     TunerCardInput    *input;
 };
 
+class DVBCardNum;
 class DVBInput;
 class DVBCardName;
 class DVBCardType;
@@ -406,6 +407,7 @@ public slots:
 private:
     CaptureCard        &parent;
 
+    DVBCardNum         *cardnum;
     DVBInput           *defaultinput;
     DVBCardName        *cardname;
     DVBCardType        *cardtype;
@@ -465,15 +467,16 @@ public:
     int  getCardID(void) const { return id->intValue(); }
 
     void loadByID(int id);
-    void setParentID(int id);
 
     static void fillSelections(SelectSetting* setting);
-    static void fillSelections(SelectSetting* setting, bool no_children);
 
     void reload(void);
 
+    virtual void save(void);
+
+    uint GetInstanceCount(void) const { return instance_count; }
+
 public slots:
-    void analogPanel();
     void recorderOptionsPanel();
 
 private:
@@ -487,17 +490,6 @@ private:
         };
     };
 
-    class ParentID : public LabelSetting, public CaptureCardDBStorage
-    {
-      public:
-        ParentID(const CaptureCard &parent) :
-            LabelSetting(this), CaptureCardDBStorage(this, parent, "parentid")
-        {
-            setValue("0");
-            setVisible(false);
-        }
-    };
-
     class Hostname : public HostnameSetting, public CaptureCardDBStorage
     {
       public:
@@ -508,7 +500,7 @@ private:
 
 private:
     ID       *id;
-    ParentID *parentid;
+    uint      instance_count;
 };
 
 class CardInputDBStorage : public SimpleDBStorage
@@ -629,12 +621,11 @@ class CardInput : public QObject, public ConfigurationWizard
     void loadByInput(int cardid, QString input);
     QString getSourceName(void) const;
 
-    void SetChildCardID(uint);
-
     virtual void save();
     virtual void save(QString /*destination*/) { save(); }
 
   public slots:
+    void CreateNewInputGroup();
     void channelScanner();
     void sourceFetch();
     void SetSourceID(const QString &sourceid);
@@ -652,13 +643,14 @@ class CardInput : public QObject, public ConfigurationWizard
 
     ID              *id;
     CardID          *cardid;
-    ChildID         *childid;
     InputName       *inputname;
     SourceID        *sourceid;
     StartingChannel *startchan;
     TransButtonSetting *scan;
     TransButtonSetting *srcfetch;
     DiSEqCDevSettings  *externalInputSettings;
+    InputGroup         *inputgrp0;
+    InputGroup         *inputgrp1;
 };
 
 #endif

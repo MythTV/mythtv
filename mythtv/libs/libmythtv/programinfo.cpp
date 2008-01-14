@@ -70,7 +70,8 @@ static QString StripHTMLTags(const QString& src)
 /** \fn ProgramInfo::ProgramInfo(void)
  *  \brief Null constructor.
  */
-ProgramInfo::ProgramInfo(void)
+ProgramInfo::ProgramInfo(void) :
+    regExpLock(false), regExpSeries("0000$")
 {
     spread = -1;
     startCol = -1;
@@ -148,10 +149,9 @@ ProgramInfo::ProgramInfo(void)
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other) 
  *  \brief Copy constructor.
  */
-ProgramInfo::ProgramInfo(const ProgramInfo &other)
-{           
-    record = NULL;
-    
+ProgramInfo::ProgramInfo(const ProgramInfo &other) :
+    record(NULL), regExpLock(false), regExpSeries("0000$")
+{
     clone(other);
 }
 
@@ -1404,26 +1404,31 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (dupmethod & kDupCheckNone)
         return false;
 
-    if (catType == "series" && programid.contains(QRegExp("0000$")))
-        return false;
+    if (catType == "series")
+    {
+        QMutexLocker locker(&regExpLock);
+        if (programid.contains(regExpSeries))
+            return false;
+    }
 
-    if (programid != "" && other.programid != "")
+    if (!programid.isEmpty() && !other.programid.isEmpty())
         return programid == other.programid;
 
     if ((dupmethod & kDupCheckSub) &&
-        ((subtitle == "") ||
+        ((subtitle.isEmpty()) ||
          (subtitle.lower() != other.subtitle.lower())))
         return false;
 
     if ((dupmethod & kDupCheckDesc) &&
-        ((description == "") ||
+        ((description.isEmpty()) ||
          (description.lower() != other.description.lower())))
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
-        ((subtitle == "" && other.subtitle == "" && description.lower() != other.description.lower()) ||
+        ((subtitle.isEmpty() && other.subtitle.isEmpty() &&
+          description.lower() != other.description.lower()) ||
          (subtitle.lower() != other.subtitle.lower()) ||
-         (description == "" && subtitle == "")))
+         (description.isEmpty() && subtitle.isEmpty())))
         return false;
 
     return true;
@@ -1889,6 +1894,32 @@ long long ProgramInfo::GetFilesize(void)
         filesize = 0;
 
     return filesize;
+}
+
+/** \fn ProgramInfo::GetMplexID(void) const
+ *  \brief Gets multiplex any recording would be made on, zero if unknown.
+ */
+int ProgramInfo::GetMplexID(void) const
+{
+    int ret = 0;
+    if (chanid)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT mplexid FROM channel "
+                      "WHERE chanid = :CHANID");
+        query.bindValue(":CHANID", chanid);
+
+        if (!query.exec())
+            MythContext::DBError("GetMplexID", query);
+        else if (query.next())
+            ret = query.value(0).toUInt();
+
+        // clear out bogus mplexid's
+        ret = (32767 == ret) ? 0 : ret;
+    }
+
+    return ret;
 }
 
 /** \fn ProgramInfo::SetBookmark(long long pos) const

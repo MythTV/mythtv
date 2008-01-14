@@ -157,8 +157,10 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
         "SELECT capturecard.cardid "
         "FROM cardinput, capturecard "
         "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      cardinput.sourceid = :SOURCEID");
+        "      cardinput.sourceid = :SOURCEID AND "
+        "    capturecard.hostname = :HOSTNAME");
     query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
     {
@@ -188,34 +190,28 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     vector<uint>::const_iterator it = cardids.begin();
     for (; it != cardids.end(); ++it)
     {
-        QStringList inputnames = CardUtil::GetInputNames(*it, sourceid);
-        QStringList::const_iterator it2 = inputnames.begin();
+        CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
+        QString cardtype = CardUtil::GetRawCardType(*it);
+        if (cardtype == "DVB")
+            cardtype = CardUtil::ProbeSubTypeName(*it);
+        nType = CardUtil::toCardType(cardtype);
 
-        for (; it2 != inputnames.end(); ++it2)
+        if ((CardUtil::ERROR_OPEN    == nType) ||
+            (CardUtil::ERROR_UNKNOWN == nType) ||
+            (CardUtil::ERROR_PROBE   == nType))
         {
-            CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-            QString cardtype = CardUtil::GetRawCardType(*it, *it2);
-            if (cardtype == "DVB")
-                cardtype = CardUtil::ProbeSubTypeName(*it, *it2);
-            nType = CardUtil::toCardType(cardtype);
+            MythPopupBox::showOkPopup(
+                gContext->GetMainWindow(), 
+                QObject::tr("Transport Editor"), 
+                QObject::tr(
+                    "Failed to probe a capture card connected to this "
+                    "transport's video source. Please make sure the "
+                    "backend is not running."));
 
-            if ((CardUtil::ERROR_OPEN    == nType) ||
-                (CardUtil::ERROR_UNKNOWN == nType) ||
-                (CardUtil::ERROR_PROBE   == nType))
-            {
-                MythPopupBox::showOkPopup(
-                    gContext->GetMainWindow(), 
-                    QObject::tr("Transport Editor"), 
-                    QObject::tr(
-                        "Failed to probe a capture card connected to this "
-                        "transport's video source. Please make sure the "
-                        "backend is not running."));
-
-                return CardUtil::ERROR_PROBE;
-            }
-
-            cardtypes.push_back(nType);
+            return CardUtil::ERROR_PROBE;
         }
+
+        cardtypes.push_back(nType);
     }
 
     // This should never happen... (unless DB has changed under us)

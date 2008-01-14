@@ -153,7 +153,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *  \param name          Instance name for Qt signal/slot debugging
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
-                             uint wait_for_mask,  const char *name)
+                             uint64_t wait_for_mask,  const char *name)
     : QObject(NULL, name),             channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),

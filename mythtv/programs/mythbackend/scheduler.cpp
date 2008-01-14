@@ -35,12 +35,14 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/storagegroup.h"
+#include "libmythtv/cardutil.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_ERR QString("Scheduler, Error: ")
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-                     QString tmptable, Scheduler *master_sched)
+                     QString tmptable, Scheduler *master_sched) :
+    livetvTime(QDateTime())
 {
     m_tvList = tvList;
     specsched = false;
@@ -175,7 +177,7 @@ void Scheduler::verifyCards(void)
     }
 }
 
-static inline bool Recording(ProgramInfo *p)
+static inline bool Recording(const ProgramInfo *p)
 {
     return (p->recstatus == rsRecording || p->recstatus == rsWillRecord);
 }
@@ -308,26 +310,28 @@ bool Scheduler::FillRecordList(void)
     AddNotListed();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
-    worklist.sort(comp_overlap);
+    SORT_RECLIST(worklist, comp_overlap);
     VERBOSE(VB_SCHEDULE, "PruneOverlaps...");
     PruneOverlaps();
 
     VERBOSE(VB_SCHEDULE, "Sort by priority...");
-    worklist.sort(comp_priority);
+    SORT_RECLIST(worklist, comp_priority);
     VERBOSE(VB_SCHEDULE, "BuildListMaps...");
     BuildListMaps();
     VERBOSE(VB_SCHEDULE, "SchedNewRecords...");
     SchedNewRecords();
+    VERBOSE(VB_SCHEDULE, "SchedPreserveLiveTV...");
+    SchedPreserveLiveTV();
     VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
-    worklist.sort(comp_redundant);
+    SORT_RECLIST(worklist, comp_redundant);
     VERBOSE(VB_SCHEDULE, "PruneRedundants...");
     PruneRedundants();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
-    worklist.sort(comp_recstart);
+    SORT_RECLIST(worklist, comp_recstart);
     VERBOSE(VB_SCHEDULE, "ClearWorkList...");
     bool res = ClearWorkList();
 
@@ -440,7 +444,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     cout << "---  print list end  ---\n";
 }
 
-void Scheduler::PrintRec(ProgramInfo *p, const char *prefix)
+void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
 {
     if ((print_verbose_messages & VB_SCHEDULE) == 0)
         return;
@@ -701,6 +705,21 @@ bool Scheduler::ClearWorkList(void)
     return true;
 }
 
+static void erase_nulls(RecList &reclist)
+{
+    RecIter it = reclist.begin();
+    uint dst = 0;
+    for (it = reclist.begin(); it != reclist.end(); ++it)
+    {
+        if (*it)
+        {
+            reclist[dst] = *it;
+            dst++;
+        }
+    }
+    reclist.resize(dst);
+}
+
 void Scheduler::PruneOverlaps(void)
 {
     ProgramInfo *lastp = NULL;
@@ -718,9 +737,11 @@ void Scheduler::PruneOverlaps(void)
         else
         {
             delete p;
-            dreciter = worklist.erase(dreciter);
+            *(dreciter++) = NULL;
         }
     }
+
+    erase_nulls(worklist);
 }
 
 void Scheduler::BuildListMaps(void)
@@ -745,38 +766,127 @@ void Scheduler::ClearListMaps(void)
     cardlistmap.clear();
     titlelistmap.clear();
     recordidlistmap.clear();
+    cache_is_same_program.clear();
 }
 
-bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j,
-                                 bool openEnd)
+bool Scheduler::IsSameProgram(
+    const ProgramInfo *a, const ProgramInfo *b) const
 {
+    IsSameKey X(a,b);
+    IsSameCacheType::const_iterator it = cache_is_same_program.find(X);
+    if (it != cache_is_same_program.end())
+        return *it;
+
+    IsSameKey Y(b,a);
+    it = cache_is_same_program.find(Y);
+    if (it != cache_is_same_program.end())
+        return *it;
+
+    return cache_is_same_program[X] = a->IsSameProgram(*b);
+}
+
+bool Scheduler::FindNextConflict(
+    const RecList     &cardlist,
+    const ProgramInfo *p,
+    RecConstIter      &j,
+    bool               openEnd) const
+{
+    bool is_conflict_dbg = false;
+
     for ( ; j != cardlist.end(); j++)
     {
-        ProgramInfo *q = *j;
+        const ProgramInfo *q = *j;
 
         if (p == q)
             continue;
+
         if (!Recording(q))
             continue;
-        if (p->cardid != 0 && p->cardid != q->cardid)
+
+        if (is_conflict_dbg)
+            cout << QString("\n  comparing with '%1' ").arg(q->title);
+
+        if (p->cardid != 0 && (p->cardid != q->cardid) &&
+            !igrp.GetSharedInputGroup(p->inputid, q->inputid))
+        {
+            if (is_conflict_dbg)
+                cout << "  cardid== ";
             continue;
+        }
+
         if (openEnd && p->chanid != q->chanid)
         {
             if (p->recendts < q->recstartts || p->recstartts > q->recendts)
+            {
+                if (is_conflict_dbg)
+                    cout << "  no-overlap ";
                 continue;
+            }
         }
         else
         {
             if (p->recendts <= q->recstartts || p->recstartts >= q->recendts)
+            {
+                if (is_conflict_dbg)
+                    cout << "  no-overlap ";
                 continue;
+            }
         }
-        if (p->inputid == q->inputid && p->shareable)
+
+        if (is_conflict_dbg)
+            cout << "\n" <<
+                QString("  cardid's: %1, %2 ").arg(p->cardid).arg(q->cardid) +
+                QString("Shared input group: %1 ")
+                .arg(igrp.GetSharedInputGroup(p->inputid, q->inputid)) +
+                QString("mplexid's: %1, %2")
+                .arg(p->GetMplexID()).arg(q->GetMplexID());
+
+        // if two inputs are in the same input group we have a conflict
+        // unless the programs are on the same multiplex.
+        if (p->cardid && (p->cardid != q->cardid) &&
+            igrp.GetSharedInputGroup(p->inputid, q->inputid) &&
+            p->GetMplexID() && (p->GetMplexID() == q->GetMplexID()))
+        {
             continue;
+        }
+
+        if (is_conflict_dbg)
+            cout << "\n  Found conflict" << endl;
 
         return true;
     }
 
+    if (is_conflict_dbg)
+        cout << "\n  No conflict" << endl;
+
     return false;
+}
+
+const ProgramInfo *Scheduler::FindConflict(
+    const QMap<int, RecList> &reclists,
+    const ProgramInfo        *p,
+    bool openend) const
+{
+    bool is_conflict_dbg = false;
+
+    QMap<int, RecList>::const_iterator it = reclists.begin();
+    for (; it != reclists.end(); ++it)
+    {
+        if (is_conflict_dbg)
+        {
+            cout << QString("Checking '%1' for conflicts on cardid %2")
+                .arg(p->title).arg(it.key());
+        }
+
+        const RecList &cardlist = *it;
+        RecConstIter k = cardlist.begin();
+        if (FindNextConflict(cardlist, p, k, openend))
+        {
+            return *k;
+        }
+    }
+
+    return NULL;
 }
 
 void Scheduler::MarkOtherShowings(ProgramInfo *p)
@@ -817,7 +927,7 @@ void Scheduler::MarkShowingsList(RecList &showinglist, ProgramInfo *p)
             q->recstatus = rsLaterShowing;
         else if (q->rectype != kSingleRecord && 
                  q->rectype != kOverrideRecord && 
-                 q->IsSameProgram(*p))
+                 IsSameProgram(q,p))
         {
             if (q->recstartts < p->recstartts)
                 q->recstatus = rsLaterShowing;
@@ -847,7 +957,7 @@ void Scheduler::RestoreRecStatus(void)
     }
 }
 
-bool Scheduler::TryAnotherShowing(ProgramInfo *p)
+bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool preserveLive)
 {
     PrintRec(p, "     >");
 
@@ -864,6 +974,8 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
     RecStatusType oldstatus = p->recstatus;
     p->recstatus = rsLaterShowing;
 
+    bool hasLaterShowing = false;
+
     RecIter j = showinglist->begin();
     for ( ; j != showinglist->end(); j++)
     {
@@ -871,28 +983,63 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
         if (q == p)
             continue;
 
+        hasLaterShowing = false;
+
         if (q->recstatus != rsEarlierShowing &&
             q->recstatus != rsLaterShowing &&
             q->recstatus != rsUnknown)
             continue;
         if (!p->IsSameTimeslot(*q))
         {
-            if (!p->IsSameProgram(*q))
+            if (!IsSameProgram(p,q))
                 continue;
             if ((p->rectype == kSingleRecord || 
                  p->rectype == kOverrideRecord))
                 continue;
             if (q->recstartts < schedTime && p->recstartts >= schedTime)
                 continue;
+
+            hasLaterShowing |= preserveLive;
         }
 
         PrintRec(q, "     #");
-        RecList &cardlist = cardlistmap[q->cardid];
-        RecIter k = cardlist.begin();
-        if (FindNextConflict(cardlist, q, k))
+
+        if (preserveLive)
         {
-            PrintRec(*k, "        !");
+            if (p->recpriority > q->recpriority - livetvpriority)
+                continue;
+
+            // retrylist contains dummy livetv pginfo's
+            RecConstIter k = retrylist.begin();
+            if (FindNextConflict(retrylist, q, k))
+            {
+                PrintRec(*k, "       L!");
+                continue;
+            }
+        }
+
+        const ProgramInfo *conflict = FindConflict(cardlistmap, q);
+        if (conflict)
+        {
+            PrintRec(conflict, "        !");
             continue;
+        }
+
+        if (hasLaterShowing)
+        {
+            QString id = p->schedulerid;
+            hasLaterList[id] = true;
+            continue;
+        }
+
+        if (preserveLive)
+        {
+            QString msg = QString(
+                "Moved \"%1\" on chanid: %2 from card: %3 to %4 "
+                "to avoid LiveTV conflict")
+                .arg(p->title.local8Bit()).arg(p->chanid)
+                .arg(p->cardid).arg(q->cardid);
+            VERBOSE(VB_SCHEDULE, msg);
         }
 
         q->recstatus = rsWillRecord;
@@ -920,11 +1067,21 @@ void Scheduler::SchedNewRecords(void)
             MarkOtherShowings(p);
         else if (p->recstatus == rsUnknown)
         {
-            RecList &cardlist = cardlistmap[p->cardid];
-            RecIter k = cardlist.begin();
-            if (!FindNextConflict(cardlist, p, k, openEnd))
+            const ProgramInfo *conflict = FindConflict(cardlistmap, p, openEnd);
+            if (!conflict)
             {
                 p->recstatus = rsWillRecord;
+
+                if (p->recstartts < schedTime.addSecs(90))
+                {
+                    QString id = p->schedulerid;
+                    if (!recPendingList.contains(id))
+                        recPendingList[id] = false;
+
+                    livetvTime = (livetvTime < schedTime) ?
+                        schedTime : livetvTime;
+                }
+  
                 MarkOtherShowings(p);
                 PrintRec(p, "  +");
             }
@@ -932,7 +1089,7 @@ void Scheduler::SchedNewRecords(void)
             {
                 retrylist.push_front(p);
                 PrintRec(p, "  #");
-                PrintRec(*k, "     !");
+                PrintRec(conflict, "     !");
             }
         }
 
@@ -946,7 +1103,7 @@ void Scheduler::SchedNewRecords(void)
     }
 }
 
-void Scheduler::MoveHigherRecords(void)
+void Scheduler::MoveHigherRecords(bool move_this)
 {
     RecIter i = retrylist.begin();
     for ( ; i != retrylist.end(); i++)
@@ -957,26 +1114,35 @@ void Scheduler::MoveHigherRecords(void)
 
         PrintRec(p, "  ?");
 
-        if (TryAnotherShowing(p))
+        if (move_this && TryAnotherShowing(p))
             continue;
 
         BackupRecStatus();
         p->recstatus = rsWillRecord;
-        MarkOtherShowings(p);
+        if (move_this)
+            MarkOtherShowings(p);
 
-        RecList &cardlist = cardlistmap[p->cardid];
-        RecIter k = cardlist.begin();
+        RecList cardlist;
+        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
+        for (; it != cardlistmap.end(); ++it)
+        {
+            RecConstIter it2 = (*it).begin();
+            for (; it2 != (*it).end(); ++it2)
+                cardlist.push_back(*it2);
+        }
+        
+        RecConstIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k); k++)
         {
-            if ((p->recpriority < (*k)->recpriority && !schedMoveHigher) ||
-                !TryAnotherShowing(*k))
+            if ((p->recpriority < (*k)->recpriority && !schedMoveHigher &&
+                move_this) || !TryAnotherShowing(*k, !move_this))
             {
                 RestoreRecStatus();
                 break;
             }
         }
 
-        if (p->recstatus == rsWillRecord)
+        if (move_this && p->recstatus == rsWillRecord)
             PrintRec(p, "  +");
     }
 }
@@ -997,7 +1163,7 @@ void Scheduler::PruneRedundants(void)
             p->recendts < schedTime)
         {
             delete p;
-            i = worklist.erase(i);
+            *(i++) = NULL;
             continue;
         }
 
@@ -1027,9 +1193,11 @@ void Scheduler::PruneRedundants(void)
         else
         {
             delete p;
-            i = worklist.erase(i);
+            *(i++) = NULL;
         }
     }
+
+    erase_nulls(worklist);
 }
 
 void Scheduler::UpdateNextRecord(void)
@@ -1111,10 +1279,10 @@ void Scheduler::getConflicting(ProgramInfo *pginfo, RecList *retlist)
 {
     QMutexLocker lockit(reclist_lock);
 
-    RecIter i = reclist.begin();
+    RecConstIter i = reclist.begin();
     for (; FindNextConflict(reclist, pginfo, i); i++)
     {
-        ProgramInfo *p = *i;
+        const ProgramInfo *p = *i;
         retlist->push_back(new ProgramInfo(*p));
     }
 }
@@ -1134,7 +1302,7 @@ bool Scheduler::getAllPending(RecList *retList)
         retList->push_back(new ProgramInfo(*p));
     }
 
-    retList->sort(comp_timechannel);
+    SORT_RECLIST(*retList, comp_timechannel);
 
     return hasconflicts;
 }
@@ -1218,6 +1386,47 @@ void Scheduler::AddRecording(const ProgramInfo &pi)
     ScheduledRecording::signalChange(pi.recordid);
 }
 
+bool Scheduler::IsBusyRecording(const ProgramInfo *rcinfo)
+{
+    if (!m_tvList || !rcinfo)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusyRecording() -> true, "
+                "no tvList or no rcinfo");
+
+        return true;
+    }
+
+    EncoderLink *rctv = (*m_tvList)[rcinfo->cardid];
+    // first check the card we will be recording on...
+    if (!rctv || rctv->IsBusyRecording())
+        return true;
+
+    // now check other cards in the same input group as the recording.
+    TunedInputInfo busy_input;
+    uint inputid = rcinfo->inputid;
+    vector<uint> cardids = CardUtil::GetConflictingCards(
+        inputid, rcinfo->cardid);
+    for (uint i = 0; i < cardids.size(); i++)
+    {
+        rctv = (*m_tvList)[cardids[i]];
+        if (!rctv)
+        {
+            VERBOSE(VB_SCHEDULE, LOC_ERR + "IsBusyRecording() -> true, "
+                    "rctv("<<rctv<<"==NULL) for card "<<cardids[i]);
+
+            return true;
+        }
+
+        if (rctv->IsBusy(&busy_input, -1) &&
+            igrp.GetSharedInputGroup(busy_input.inputid, inputid))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
@@ -1227,6 +1436,7 @@ void Scheduler::RunScheduler(void)
 
     ProgramInfo *nextRecording = NULL;
     QDateTime nextrectime;
+    QString schedid;
 
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
@@ -1406,6 +1616,20 @@ void Scheduler::RunScheduler(void)
 
             nextrectime = nextRecording->recstartts;
             secsleft = curtime.secsTo(nextrectime);
+            schedid = nextRecording->schedulerid;
+
+            if (secsleft - prerollseconds < 60)
+            {
+                if (!recPendingList.contains(schedid))
+                {
+                    recPendingList[schedid] = false;
+
+                    livetvTime = (livetvTime < nextrectime) ?
+                        nextrectime : livetvTime;
+
+                    Reschedule(0);
+                }
+            }
 
             if (secsleft - prerollseconds > 35)
                 break;
@@ -1446,7 +1670,7 @@ void Scheduler::RunScheduler(void)
                 continue;
             }
 
-            if (!nexttv->IsBusyRecording())
+            if (!IsBusyRecording(nextRecording))
             {
                 // Will use pre-roll settings only if no other
                 // program is currently being recorded
@@ -1464,16 +1688,11 @@ void Scheduler::RunScheduler(void)
                 fsID = FillRecordingDir(nextRecording, reclist);
             }
 
-            if (secsleft > 2)
+            if (!recPendingList[schedid])
             {
-                QString id = nextRecording->schedulerid;
-                if (!recPendingList.contains(id))
-                    recPendingList[id] = false;
-                if (recPendingList[id] == false)
-                {
-                    nexttv->RecordPending(nextRecording, secsleft);
-                    recPendingList[id] = true;
-                }
+                nexttv->RecordPending(nextRecording, max(secsleft, 0),
+                                      hasLaterList.contains(schedid));
+                recPendingList[schedid] = true;
             }
 
             if (secsleft > -2)
@@ -2674,7 +2893,7 @@ void Scheduler::AddNotListed(void) {
         worklist.push_back(*tmp);
 }
 
-void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
+void Scheduler::findAllScheduledPrograms(RecList &proglist)
 {
     QString temptime, tempdate;
     QString query = QString("SELECT RECTABLE.chanid, RECTABLE.starttime, "
@@ -3182,6 +3401,62 @@ void Scheduler::FillDirectoryInfoCache(bool force)
             "filesystems").arg(fsMap.size()));
 
     fsInfoCacheFillTime = QDateTime::currentDateTime();
+}
+
+void Scheduler::SchedPreserveLiveTV(void)
+{
+    if (!livetvTime.isValid())
+        return;
+
+    if (livetvTime < schedTime)
+    {
+        livetvTime = QDateTime();
+        return;
+    }
+    
+    livetvpriority = gContext->GetNumSetting("LiveTVPriority");
+
+    // Build a list of active livetv programs
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = enciter.data();
+
+        if (kState_WatchingLiveTV != enc->GetState())
+            continue;
+
+        TunedInputInfo in;
+        enc->IsBusy(&in);
+
+        if (!in.inputid)
+            continue;
+
+        // Get the program that will be recording on this channel
+        // at record start time, if this LiveTV session continues.
+        ProgramInfo *dummy =
+            dummy->GetProgramAtDateTime(QString::number(in.chanid),
+                                        livetvTime, true, 4);
+        if (!dummy)
+            continue;
+
+        dummy->cardid = enc->GetCardID();
+        dummy->inputid = in.inputid;
+        dummy->recstatus = rsUnknown;
+
+        retrylist.push_front(dummy);
+    }
+
+    if (!retrylist.size())
+        return;
+
+    MoveHigherRecords(false);
+
+    while (retrylist.size() > 0)
+    {
+        ProgramInfo *p = retrylist.back();
+        delete p;
+        retrylist.pop_back();
+    }
 }
 
 /* Determines if the system was started by the auto-wakeup process */

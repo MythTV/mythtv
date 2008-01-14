@@ -1,24 +1,33 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
+// C++ headers
+#include <deque>
+#include <vector>
+using namespace std;
+
+// Qt headers
+#include <qmutex.h>
+#include <qwaitcondition.h>
+#include <qmap.h> 
+#include <qobject.h>
+
+// MythTV headers
+#include "scheduledrecording.h"
+#include "programinfo.h"
+#include "remoteutil.h"
+#include "inputgroupmap.h"
+
 class EncoderLink;
 class MainServer;
 class AutoExpire;
 
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qmap.h> 
-#include <list>
-#include <vector>
-#include <qobject.h>
+#define USE_DEQUE_RECLIST 1
+typedef deque<ProgramInfo*> RecList;
+#define SORT_RECLIST(LIST, ORDER) \
+  do { stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
 
-#include "scheduledrecording.h"
-#include "programinfo.h"
-#include "remoteutil.h"
-
-using namespace std;
-
-typedef list<ProgramInfo *> RecList;
+typedef RecList::const_iterator RecConstIter;
 typedef RecList::iterator RecIter;
 typedef RecList::const_iterator RecConstIter;
 
@@ -52,7 +61,7 @@ class Scheduler : public QObject
     void PrintList(bool onlyFutureRecordings = false) 
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
-    void PrintRec(ProgramInfo *p, const char *prefix = NULL);
+    void PrintRec(const ProgramInfo *p, const char *prefix = NULL);
 
     void SetMainServer(MainServer *ms);
 
@@ -85,21 +94,30 @@ class Scheduler : public QObject
     void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);
-    bool FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &iter,
-                          bool openEnd = false);
+
+    bool IsBusyRecording(const ProgramInfo *rcinfo);
+
+    bool IsSameProgram(const ProgramInfo *a, const ProgramInfo *b) const;
+
+    bool FindNextConflict(const RecList &cardlist,
+                          const ProgramInfo *p, RecConstIter &iter,
+                          bool openEnd = false) const;
+    const ProgramInfo *FindConflict(const QMap<int, RecList> &reclists,
+                                    const ProgramInfo *p, bool openEnd = false) const;
     void MarkOtherShowings(ProgramInfo *p);
     void MarkShowingsList(RecList &showinglist, ProgramInfo *p);
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
-    bool TryAnotherShowing(ProgramInfo *p);
+    bool TryAnotherShowing(ProgramInfo *p, bool preserveLive = false);
     void SchedNewRecords(void);
-    void MoveHigherRecords(void);
+    void MoveHigherRecords(bool move_this = true);
+    void SchedPreserveLiveTV(void);
     void PruneRedundants(void);
     void UpdateNextRecord(void);
 
     bool ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp);
 
-    void findAllScheduledPrograms(list<ProgramInfo *> &proglist);
+    void findAllScheduledPrograms(RecList &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
@@ -119,6 +137,7 @@ class Scheduler : public QObject
     QMap<int, RecList> cardlistmap;
     QMap<int, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
+    InputGroupMap igrp;
 
     QMutex *reclist_lock;
     bool reclist_changed;
@@ -143,6 +162,16 @@ class Scheduler : public QObject
 
     QDateTime fsInfoCacheFillTime;
     QMap<QString, FileSystemInfo> fsInfoCache;
+
+    // Try to avoid LiveTV sessions until this time
+    QDateTime livetvTime;
+    int livetvpriority;
+    QMap<QString, bool> hasLaterList;
+
+    // cache IsSameProgram()
+    typedef pair<const ProgramInfo*,const ProgramInfo*> IsSameKey;
+    typedef QMap<IsSameKey,bool> IsSameCacheType;
+    mutable IsSameCacheType cache_is_same_program;
 };
 
 #endif

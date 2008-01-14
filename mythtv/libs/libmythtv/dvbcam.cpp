@@ -130,6 +130,17 @@ bool DVBCam::Stop()
         ciHandler = NULL;
     }
 
+    QMutexLocker locker(&pmt_lock);
+    pmt_list_t::iterator it;
+
+    for (it = PMTList.begin(); it != PMTList.end(); ++it)
+        delete *it;
+    PMTList.clear();
+
+    for (it = PMTAddList.begin(); it != PMTAddList.end(); ++it)
+        delete *it;
+    PMTAddList.clear();
+
     return true;
 }
 
@@ -198,11 +209,12 @@ void DVBCam::HandlePMT(void)
         // Send added PMT
         while (PMTAddList.size() > 0)
         {
-            ProgramMapTable pmt = PMTAddList.front();
-            PMTAddList.pop_front();
-
-            SendPMT(pmt, CPLM_ADD);
-            PMTList.push_back(pmt);
+            pmt_list_t::iterator it = PMTAddList.begin();
+            const ChannelBase *chan = it.key();
+            ProgramMapTable *pmt = it.data();
+            PMTList[chan] = pmt;
+            PMTAddList.erase(it);
+            SendPMT(*pmt, CPLM_ADD);
         }
 
         pmt_updated = false;
@@ -213,8 +225,11 @@ void DVBCam::HandlePMT(void)
     // Grab any added PMT
     while (PMTAddList.size() > 0)
     {
-        PMTList.push_back(PMTAddList.front());
-        PMTAddList.pop_front();
+        pmt_list_t::iterator it = PMTAddList.begin();
+        const ChannelBase *chan = it.key();
+        ProgramMapTable *pmt = it.data();
+        PMTList[chan] = pmt;
+        PMTAddList.erase(it);
     }
 
     uint length = PMTList.size();
@@ -227,7 +242,7 @@ void DVBCam::HandlePMT(void)
         cplm      = (count + 1 == length) ? CPLM_LAST  : cplm;
         cplm      = (length    == 1)      ? CPLM_ONLY  : cplm;
 
-        SendPMT(*pmtit, cplm);
+        SendPMT(**pmtit, cplm);
 
         count++;
     }
@@ -261,16 +276,35 @@ void DVBCam::CiHandlerLoop()
     VERBOSE(VB_DVBCAM, LOC + "CiHandler thread stopped");
 }
 
-void DVBCam::SetPMT(const ProgramMapTable *pmt)
+void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_DVBCAM, LOC + "SetPMT() program num #"<<pmt->ProgramNumber());
-
     QMutexLocker locker(&pmt_lock);
-    PMTList.clear();
-    PMTList.push_back(*pmt);
 
-    have_pmt    = true;
-    pmt_updated = true;
+    pmt_list_t::iterator it = PMTList.find(chan);
+    pmt_list_t::iterator it2 = PMTAddList.find(chan);
+    if (!pmt && (it != PMTList.end()))
+    {
+        delete it.data();
+        PMTList.erase(it);
+        pmt_updated = true;
+    }
+    else if (!pmt && (it2 != PMTAddList.end()))
+    {
+        delete it2.data();
+        PMTAddList.erase(it2);
+        pmt_added = !PMTAddList.empty();
+    }
+    else if (pmt && (PMTList.empty() || (it != PMTList.end())))
+    {
+        PMTList[chan] = new ProgramMapTable(*pmt);
+        have_pmt    = true;
+        pmt_updated = true;
+    }
+    else if (pmt && (it == PMTList.end()))
+    {
+        PMTAddList[chan] = new ProgramMapTable(*pmt);
+        pmt_added = true;
+    }
 }
 
 void DVBCam::SetTimeOffset(double offset_in_seconds)

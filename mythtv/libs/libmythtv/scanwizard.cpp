@@ -72,15 +72,15 @@ void ScanWizard::SetPage(const QString &pageTitle)
     QMap<QString,QString> start_chan;
     DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
 
-    uint    pcardid   = configPane->GetParentCardID();
+    uint    cardid    = configPane->GetCardID();
     QString inputname = configPane->GetInputName();
     uint    sourceid  = configPane->GetSourceID();
     int     scantype  = configPane->GetScanType();
     bool    do_scan   = true;
 
     VERBOSE(VB_SIPARSER, LOC + "SetPage(): " +
-            QString("type(%1) pcardid(%2) inputname(%3)")
-            .arg(scantype).arg(pcardid).arg(inputname));
+            QString("type(%1) cardid(%2) inputname(%3)")
+            .arg(scantype).arg(cardid).arg(inputname));
 
     if (scantype == ScanTypeSetting::DVBUtilsImport)
     {
@@ -105,7 +105,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::IPTVImport)
     {
         do_scan = false;
-        scannerPane->ImportM3U(pcardid, inputname, sourceid);
+        scannerPane->ImportM3U(cardid, inputname, sourceid);
     }
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||
@@ -119,8 +119,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     {
         do_scan = false;
         VERBOSE(VB_SIPARSER, LOC_ERR + "SetPage(): " +
-                QString("type(%1) src(%2) pcardid(%3) not handled")
-                .arg(scantype).arg(sourceid).arg(pcardid));
+                QString("type(%1) src(%2) cardid(%3) not handled")
+                .arg(scantype).arg(sourceid).arg(cardid));
 
         MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), tr("ScanWizard"),
@@ -150,9 +150,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     if (do_scan)
     {
         scannerPane->Scan(
-            configPane->GetScanType(),       configPane->GetParentCardID(),
-            configPane->GetChildCardID(),    configPane->GetInputName(),
-            configPane->GetSourceID(),
+            configPane->GetScanType(),       configPane->GetCardID(),
+            configPane->GetInputName(),      configPane->GetSourceID(),
             configPane->DoDeleteChannels(),  configPane->DoRenameChannels(),
             configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
             start_chan,
@@ -163,21 +162,19 @@ void ScanWizard::SetPage(const QString &pageTitle)
 
 void ScanWizard::SetInput(const QString &cardids_inputname)
 {
-    uint pcardid, ccardid;
+    uint    cardid;
     QString inputname;
-    if (!InputSelector::Parse(cardids_inputname, pcardid, ccardid, inputname))
+    if (!InputSelector::Parse(cardids_inputname, cardid, inputname))
         return;
-
-    uint hw_cardid = (ccardid) ? ccardid : pcardid;
 
     // Work out what kind of card we've got
     // We need to check against the last capture card so that we don't
     // try and probe a card which is already open by scan()
-    if ((lastHWCardID != hw_cardid) ||
+    if ((lastHWCardID != cardid) ||
         (lastHWCardType == CardUtil::ERROR_OPEN))
     {
-        lastHWCardID    = hw_cardid;
-        QString subtype = CardUtil::ProbeSubTypeName(hw_cardid, 0);
+        lastHWCardID    = cardid;
+        QString subtype = CardUtil::ProbeSubTypeName(cardid);
         lastHWCardType  = CardUtil::toCardType(subtype);
         configPane->SetDefaultATSCFormat(
             SourceUtil::GetChannelFormat(configPane->GetSourceID()));

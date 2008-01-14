@@ -31,6 +31,8 @@ class Channel : public DTVChannel
     Channel(TVRec *parent, const QString &videodevice);
     virtual ~Channel(void);
 
+    bool Init(QString &inputname, QString &startchannel);
+
     bool Open(void);
     void Close(void);
 
@@ -39,7 +41,6 @@ class Channel : public DTVChannel
     void SetFormat(const QString &format);
     int  SetDefaultFreqTable(const QString &name);
     bool SetChannelByString(const QString &chan); 
-    bool SetChannelByDirection(ChannelChangeDirection);
 
     // Gets
     bool IsOpen(void)       const { return GetFd() >= 0; }

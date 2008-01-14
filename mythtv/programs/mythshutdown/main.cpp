@@ -13,6 +13,7 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/jobqueue.h"
 #include "tv.h"
+#include "remoteutil.h"
 #include "compat.h"
 
 void setGlobalSetting(const QString &key, const QString &value)
@@ -121,8 +122,6 @@ QDateTime getDailyWakeupTime(QString sPeriod)
 
 bool isRecording()
 {
-    bool m_isRecording = false;
-
     if (!gContext->IsConnectedToMaster())
     {
         VERBOSE(VB_IMPORTANT, "isRecording: Attempting to connect to master server...");
@@ -133,50 +132,7 @@ bool isRecording()
         }
     }
 
-    QStringList strlist;
-
-    // get list of current recordings
-    QString querytext = QString("SELECT cardid FROM capturecard WHERE parentid = 0;");
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querytext);
-    QString Status = "";
-
-    if (query.isActive() && query.numRowsAffected())
-    {
-        VERBOSE(VB_IMPORTANT, "isRecording: Query active");
-        while(query.next())
-        {
-            QString status = "";
-            int cardid = query.value(0).toInt();
-            int state = kState_ChangingState;
-            QString channelName = "";
-            QString title = "";
-            QString subtitle = "";
-            QDateTime dtStart = QDateTime();
-            QDateTime dtEnd = QDateTime();
-
-            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
-
-            while (state == kState_ChangingState)
-            {
-                strlist = cmd;
-                strlist << "GET_STATE";
-                gContext->SendReceiveStringList(strlist);
-
-                state = strlist[0].toInt();
-                if (state == kState_ChangingState)
-                    usleep(500);
-            }
-            VERBOSE(VB_IMPORTANT, "isRecording: Successfully queried encoder.");
-
-            if (state == kState_RecordingOnly || state == kState_WatchingRecording)
-            {
-                VERBOSE(VB_IMPORTANT, "Recorder is recording. Returning true");
-                m_isRecording = true;
-            }
-        }
-    }
-    return m_isRecording;
+    return RemoteGetRecordingStatus(NULL, false);
 }
 
 int getStatus(bool bWantRecStatus)
