@@ -208,10 +208,11 @@ push @{$expect},
 # fetch mysql
 # primary server site is: http://dev.mysql.com/get/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi/from/http://mysql.mirrors.ilisys.com.au/
 [ archive => $sources.'mysql-essential-5.0.45-win32.msi', 'fetch' => 'http://mirror.services.wisc.edu/mysql/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi',comment => 'fetch mysql binaries - this is a big download(23MB) so it might take a while' ],
-[ file => $mingw.'bin/libmySQL.dll', exec => $sources.'mysql-essential-5.0.45-win32.msi',comment => 'Install mysql - be sure to choose to do a "COMPLETE" install. You should also choose NOT to "configure the server now" ' ],
+[ file => "c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll", exec => $sources.'mysql-essential-5.0.45-win32.msi',comment => 'Install mysql - be sure to choose to do a "COMPLETE" install. You should also choose NOT to "configure the server now" ' ],
 
-# TODO after install (not done yet)
+# after mysql install 
 [ file => $mingw.'bin/libmySQL.dll',  exec => "copy /Y \"c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll\" $dosmingw/bin/",comment => 'post-mysql-install' ],
+[ file => $mingw.'lib/libmySQL.dll',  exec => "copy /Y \"c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll\" $dosmingw/lib/",comment => 'post-mysql-install' ],
 [ file => $mingw.'include/mysql.h',  exec => "copy /Y \"c:/Program Files/MySQL/MySQL Server 5.0/include/*\" $dosmingw/include/" ],
 [ file => $mingw.'lib/libmysql.lib',  exec => "copy /Y \"c:/Program Files/MySQL/MySQL Server 5.0/lib/opt/libmysql.lib\" $dosmingw/lib/" ],
 # cp /c/Program\ Files/MySQL/MySQL\ Server\ 5.0/include/* /c/MinGW/include/
