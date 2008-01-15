@@ -29,12 +29,15 @@
 #Optional (for Right To Left languages)
 #pyfribidi
 
+#Optional (alternate demuxer)
+#ProjectX - 0.90.4.00
+
 #******************************************************************************
 #******************************************************************************
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080106-1"
+VERSION="0.1.20080115-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -53,6 +56,7 @@ useSyncOffset = True
 # if the theme doesn't have a chapter menu and this is set to true then the
 # chapter marks will be set to the cut point end marks
 addCutlistChapters = False
+
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -554,8 +558,8 @@ def getLengthOfVideo(index):
     if infoDOM.documentElement.tagName != "file":
         fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
     file = infoDOM.getElementsByTagName("file")[0]
-    if file.attributes["duration"].value != 'N/A':
-        duration = int(file.attributes["duration"].value)
+    if file.attributes["cutduration"].value != 'N/A':
+        duration = int(file.attributes["cutduration"].value)
     else:
         duration = 0;
 
@@ -804,6 +808,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveEncodeToAc3',
                         'MythArchiveCopyRemoteFiles',
                         'MythArchiveAlwaysUseMythTranscode',
+                        'MythArchiveUseProjectX',
                         'MythArchiveUseFIFO',
                         'MythArchiveMainMenuAR',
                         'MythArchiveChapterMenuAR',
@@ -1802,11 +1807,15 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 
     write("Multiplexing MPEG stream to %s" % destination)
 
-    if useSyncOffset == True:
-        write("Adding sync offset of %dms" % syncOffset)
-    else:
-        write("Using sync offset is disabled - it would be %dms" % syncOffset)
+    # no need to use a sync offset if projectx was used to demux the streams 
+    if useprojectx:
         syncOffset = 0
+    else:
+        if useSyncOffset == True:
+            write("Adding sync offset of %dms" % syncOffset)
+        else:
+            write("Using sync offset is disabled - it would be %dms" % syncOffset)
+            syncOffset = 0
 
     if doesFileExist(destination)==True:
         os.remove(destination)
@@ -1874,7 +1883,7 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
 
     # print out the streaminfo.xml file to the log
     infoDOM = xml.dom.minidom.parse(xmlFilename)
-    write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""))
+    write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""), False)
 
 #############################################################
 # Gets the video width and height from a file's stream xml file
@@ -1926,6 +1935,184 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
         return False;
 
     return True
+
+
+#############################################################
+# Create a projectX cut list for a recording
+
+def generateProjectXCutlist(chanid, starttime, folder):
+    """generate cutlist_x.txt for ProjectX"""
+
+    sqlstatement  = """SELECT mark FROM recordedmarkup 
+                    WHERE chanid = '%s' AND starttime = '%s' 
+                    AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
+
+    db = getDatabaseConnection()
+    cursor = db.cursor()
+    cursor.execute(sqlstatement)
+    result = cursor.fetchall()
+    numrows = int(cursor.rowcount)
+
+    #We must have at least one row returned for this recording
+    if numrows==0:
+        write("No cutlist in the DB for chanid %s, starttime %s" % chanid, starttime)
+        db.close()
+        del db
+        del cursor
+        return False
+
+    cutlist_f=open(os.path.join(folder, "cutlist_x.txt"), 'w')
+    cutlist_f.write("CollectionPanel.CutMode=2\n")
+
+    # iterate through resultset
+    for i in range(len(result)):
+        if i == 0:
+            if result[i][0] <> 0  and result[i][0] != "":
+                cutlist_f.write("0\n")
+        if result[i][0] != "" and result[i][0] <> 0:
+            cutlist_f.write("%d\n" % result[i])
+
+    cutlist_f.close()
+
+    return True
+
+
+#############################################################
+# Use Project-X to cut commercials and/or demux an mpeg2 file
+
+def runProjectX(chanid, starttime, folder, usecutlist, file):
+    """Use Project-X to cut commercials and demux an mpeg2 file"""
+
+    if usecutlist:
+        if generateProjectXCutlist(chanid, starttime, folder) == False:
+            write("Failed to generate Project-X cutlist.")
+            return False
+
+    pxbasename = os.path.splitext(os.path.basename(file))[0]
+
+    if os.path.exists(file) != True:
+        write("Error: input file doesn't exist on local filesystem")
+        return False
+
+
+    qdestdir = quoteFilename(folder)
+    qpxbasename = quoteFilename(pxbasename)
+    qfile = quoteFilename(file)
+    qcutlist = os.path.join(folder, "cutlist_x.txt")
+
+    command = path_projectx[0]
+    if usecutlist == True:
+        command += " -cut %s -out %s -name %s %s" % (qcutlist, qdestdir, qpxbasename, qfile)
+    else:
+        command += " -out %s -name %s %s" % (qdestdir, qpxbasename, qfile)
+
+    write(command)
+
+    result = runCommand(command)
+
+    if (result != 0):
+        write("Failed while running Project-X to cut commercials and/or demux an mpeg2 file.\n"
+              "Result: %d, Command was %s" % (result, command))
+        return False;
+
+
+    # workout which streams we need and rename them
+    renameProjectXFiles(folder, pxbasename)
+
+    return True
+
+#############################################################
+# find the required stream files and rename them
+
+def renameProjectXFiles(folder, pxbasename):
+
+    write("renameProjectXFiles start -----------------------------------------", False)
+    logf = open(os.path.join(folder, pxbasename + "_log.txt"))
+    logdata = logf.readlines()
+    logf.close()
+
+    # find stream PIDs
+    streamIds = []
+    for line in logdata:
+         tokens = line.split()
+         if len(tokens) > 0:
+            if tokens[0] == "ok>":
+                write("found stream %s" % tokens[2], False)
+                streamIds.append(int(tokens[2], 16))
+
+    # if we haven't found any PIDs look for PES-IDs
+    if len(streamIds) == 0:
+         for line in logdata:
+            if line.startswith("-> found PES-ID"):
+                index = line.find("(SubID 0x")
+                if index > 0:
+                    streamId = line[index + 7:index + 11]
+                    write("found stream %s" % streamId, False)
+                    streamIds.append(int(streamId, 16))
+                else:
+                    tokens = line.split()
+                    if len(tokens) > 0:
+                        write("found stream %s" % tokens[3], False)
+                        streamIds.append(int(tokens[3], 16))
+
+    # find files
+    streamFiles = []
+    for line in logdata:
+        if line.startswith("---> new File: "):
+            file = line[15:-1]
+            # strip any ' chars from start/end
+            if file.startswith("'"):
+                file = file[1: -1]
+            if file.endswith("'"):
+                file = file[0: -2]
+            write(file, False)
+            streamFiles.append(file)
+
+        if line.startswith("--> stream omitted"):
+            file = ""
+            write(line, False)
+            streamFiles.append(file)
+
+    # choose which streams we need
+    video, audio1, audio2 = selectStreams(folder)
+
+    if getFileType(folder) == "mpeg":
+        videoID  = video[VIDEO_ID] & 255
+        audio1ID = audio1[AUDIO_ID] & 255
+        audio2ID = audio2[AUDIO_ID] & 255
+    else:
+        videoID  = video[VIDEO_ID]
+        audio1ID = audio1[AUDIO_ID]
+        audio2ID = audio2[AUDIO_ID]
+
+    # loop thought the available streams looking for the ones we want
+    for stream in streamIds:
+        write("got stream: %d" % stream, False)
+        if stream == videoID:
+            write("found video streamID", False)
+            if os.path.exists(streamFiles[streamIds.index(stream)]):
+                write("found video stream file", False)
+                os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream.mv2"))
+
+        if stream == audio1ID:
+            write("found audio1 streamID", False)
+            if os.path.exists(streamFiles[streamIds.index(stream)]):
+                write("found audio1 stream file", False)
+                if audio1[AUDIO_CODEC] == "AC3":
+                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.ac3"))
+                else:
+                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.mp2"))
+
+        if stream == audio2ID:
+            write("found audio2 streamID", False)
+            if os.path.exists(streamFiles[streamIds.index(stream)]):
+                write("found audio2 stream file", False)
+                if audio2[AUDIO_CODEC] == "AC3":
+                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.ac3"))
+                else:
+                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.mp2"))
+
+    write("renameProjectXFiles end -----------------------------------------", False)
 
 #############################################################
 # Grabs a sequence of consecutive frames from a file
@@ -2266,6 +2453,7 @@ def BurnDVDISO():
 
 #############################################################
 # Splits a file into the separate audio and video streams
+# using mythreplex
 
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
 
@@ -2388,7 +2576,7 @@ def performMPEG2Shrink(files,dvdrsize):
     dvdrsize-=totalmenusize
 
     #Add a little bit for the multiplexing stream data
-    totalvideosize=totalvideosize*1.05
+    totalvideosize=totalvideosize*1.08
 
     if dvdrsize<0:
         fatalError("Audio and menu files are greater than the size of a recordable DVD disk.  Giving up!")
@@ -2412,7 +2600,7 @@ def performMPEG2Shrink(files,dvdrsize):
             os.remove(os.path.join(getItemTempPath(filecount),"stream.mv2"))
             os.rename(os.path.join(getItemTempPath(filecount),"video.small.m2v"),os.path.join(getItemTempPath(filecount),"stream.mv2"))
 
-        totalvideosize,totalaudiosize,totalmenusize=calculateFileSizes(files)        
+        totalvideosize,totalaudiosize,totalmenusize=calculateFileSizes(files)
         write( "Total DVD size AFTER TCREQUANT is %s MBytes" % (totalaudiosize + totalmenusize + (totalvideosize*1.05)))
 
     else:
@@ -3838,7 +4026,7 @@ def processAudio(folder):
     # process track 2
     if not encodetoac3 and doesFileExist(os.path.join(folder,'stream1.mp2')):
         #don't re-encode to ac3 if the user doesn't want it
-        write( "Audio track 1 is in mp2 format - NOT re-encoding to ac3")
+        write( "Audio track 2 is in mp2 format - NOT re-encoding to ac3")
     elif doesFileExist(os.path.join(folder,'stream1.mp2'))==True:
         write( "Audio track 2 is in mp2 format - re-encoding to ac3")
         encodeAudio("ac3",os.path.join(folder,'stream1.mp2'), os.path.join(folder,'stream1.ac3'),True)
@@ -4123,9 +4311,22 @@ def isFileOkayForDVD(file, folder):
     return True
 
 #############################################################
-# process a single file ready for burning
+# process a single file ready for burning using either
+# mythtranscode/mythreplex or ProjectX as the cutter/demuxer
 
 def processFile(file, folder):
+    """Process a single video/recording file ready for burning."""
+
+    if useprojectx:
+        doProcessFileProjectX(file, folder)
+    else:
+        doProcessFile(file, folder)
+
+#############################################################
+# process a single file ready for burning using mythtranscode/mythreplex
+# to cut and demux 
+
+def doProcessFile(file, folder):
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
@@ -4304,6 +4505,175 @@ def processFile(file, folder):
 
     if os.path.exists(os.path.join(folder, "newfile2.mpg")):
         os.remove(os.path.join(folder,'newfile2.mpg'))
+
+    # we now have a video stream and one or more audio streams
+    # check if we need to convert any of the audio streams to ac3
+    processAudio(folder)
+
+    # if we don't already have one find a title thumbnail image
+    titleImage = os.path.join(folder, "title.jpg")
+    if not os.path.exists(titleImage):
+        # if the file is a recording try to use its preview image for the thumb
+        if file.attributes["type"].value == "recording":
+            previewImage = file.attributes["filename"].value + ".png"
+            if usebookmark == True and os.path.exists(previewImage):
+                copy(previewImage, titleImage)
+            else:
+                extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
+        else:
+            extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
+
+    write( "*************************************************************")
+    write( "Finished processing file " + file.attributes["filename"].value)
+    write( "*************************************************************")
+
+
+#############################################################
+# process a single file ready for burning using projectX to
+# cut and demux
+
+def doProcessFileProjectX(file, folder):
+    """Process a single video/recording file ready for burning."""
+
+    write( "*************************************************************")
+    write( "Processing file " + file.attributes["filename"].value + " of type " + file.attributes["type"].value)
+    write( "*************************************************************")
+
+    #As part of this routine we need to pre-process the video this MAY mean:
+    #1. encoding to mpeg2 (if its an avi for instance or isn't DVD compatible)
+    #2. removing commercials/cleaning up mpeg2 stream 
+    #3. selecting audio track(s) to use and encoding audio from mp2 into ac3
+    #4. de-multiplexing into video and audio steams
+
+    mediafile=""
+
+    if file.hasAttribute("localfilename"):
+        mediafile=file.attributes["localfilename"].value
+    elif file.attributes["type"].value=="recording":
+        mediafile = file.attributes["filename"].value
+    elif file.attributes["type"].value=="video":
+        mediafile=os.path.join(videopath, file.attributes["filename"].value)
+    elif file.attributes["type"].value=="file":
+        mediafile=file.attributes["filename"].value
+    else:
+        fatalError("Unknown type of video file it must be 'recording', 'video' or 'file'.")
+
+    #Get the XML containing information about this item
+    infoDOM = xml.dom.minidom.parse( os.path.join(folder,"info.xml") )
+    #Error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "fileinfo":
+        fatalError("The info.xml file (%s) doesn't look right" % os.path.join(folder,"info.xml"))
+
+    #do we need to re-encode the file to make it DVD compliant?
+    if not isFileOkayForDVD(file, folder):
+        if getFileType(folder) == 'nuv':
+            #file is a nuv file which ffmpeg has problems reading so use mythtranscode to pass
+            #the video and audio streams to ffmpeg to do the reencode
+
+            #we need to re-encode the file, make sure we get the right video/audio streams
+            #would be good if we could also split the file at the same time
+            getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
+
+            #choose which streams we need
+            video, audio1, audio2 = selectStreams(folder)
+
+            #choose which aspect ratio we should use
+            aspectratio = selectAspectRatio(folder)
+
+            write("Re-encoding audio and video from nuv file")
+
+            # what encoding profile should we use
+            if file.hasAttribute("encodingprofile"):
+                profile = file.attributes["encodingprofile"].value
+            else:
+                profile = defaultEncodingProfile
+
+            if file.hasAttribute("localfilename"):
+                mediafile = file.attributes["localfilename"].value
+                chanid = -1
+                starttime = -1
+                usecutlist = -1
+            elif file.attributes["type"].value == "recording":
+                mediafile = -1
+                chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
+                starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
+                usecutlist = (file.attributes["usecutlist"].value == "1" and 
+                            getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
+            else:
+                chanid = -1
+                starttime = -1
+                usecutlist = -1
+
+            encodeNuvToMPEG2(chanid, starttime, mediafile, os.path.join(folder, "newfile2.mpg"), folder,
+                         profile, usecutlist)
+            mediafile = os.path.join(folder, 'newfile2.mpg')
+        else:
+            #we need to re-encode the file, make sure we get the right video/audio streams
+            #would be good if we could also split the file at the same time
+            getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
+
+            #choose which streams we need
+            video, audio1, audio2 = selectStreams(folder)
+
+            #choose which aspect ratio we should use
+            aspectratio = selectAspectRatio(folder)
+
+            write("Re-encoding audio and video")
+
+            # Run from local file?
+            if file.hasAttribute("localfilename"):
+                mediafile = file.attributes["localfilename"].value
+
+            # what encoding profile should we use
+            if file.hasAttribute("encodingprofile"):
+                profile = file.attributes["encodingprofile"].value
+            else:
+                profile = defaultEncodingProfile
+
+            #do the re-encode 
+            encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
+                            audio1, audio2, aspectratio, profile)
+            mediafile = os.path.join(folder, 'newfile2.mpg')
+
+    #remove an intermediate file
+    if os.path.exists(os.path.join(folder, "newfile1.mpg")):
+        os.remove(os.path.join(folder,'newfile1.mpg'))
+
+    # the file is now DVD compliant now we need to remove commercials
+    # and split it into video, audio, subtitle parts
+
+    # find out what streams we have available now
+    getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 1)
+
+    # choose which streams we need
+    video, audio1, audio2 = selectStreams(folder)
+
+    # now attempt to split the source file into video and audio parts
+    # using projectX
+
+    # If this is an mpeg2 myth recording and there is a cut list available and the 
+    # user wants to use it run projectx to cut out commercials etc
+    if file.attributes["type"].value == "recording":
+        if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
+            chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
+            starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
+            write("File has a cut list - running Project-X to remove unwanted segments")
+            if not runProjectX(chanid, starttime, folder, True, mediafile):
+                fatalError("Failed to run Project-X to remove unwanted segments and demux")
+        else:
+            # no cutlist so just demux this file
+            chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
+            starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
+            write("Using Project-X to demux file")
+            if not runProjectX(chanid, starttime, folder, False, mediafile):
+                fatalError("Failed to run Project-X to demux file")
+    else:
+        # just demux this file
+        chanid = -1
+        starttime = -1
+        write("Running Project-X to demux file")
+        if not runProjectX(chanid, starttime, folder, False, mediafile):
+            fatalError("Failed to run Project-X to demux file")
 
     # we now have a video stream and one or more audio streams
     # check if we need to convert any of the audio streams to ac3
@@ -4560,7 +4930,7 @@ def main():
     global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
     global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex, path_ffmpeg
     global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant
-    global path_jpeg2yuv, path_spumux, path_mpeg2enc, progresslog
+    global path_jpeg2yuv, path_spumux, path_mpeg2enc, path_projectx, useprojectx, progresslog
     global progressfile, jobfile
 
     write( "mythburn.py (%s) starting up..." % VERSION)
@@ -4659,6 +5029,13 @@ def main():
     path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
     path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
     path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]
+
+    path_projectx = [defaultsettings["MythArchiveProjectXCmd"], os.path.split(defaultsettings["MythArchiveProjectXCmd"])[1]]
+    useprojectx = (defaultsettings["MythArchiveUseProjectX"] == '1')
+
+    # sanity check
+    if path_projectx[0] == "":
+        useprojectx = False
 
     if nicelevel == '1':
         nicelevel = 10

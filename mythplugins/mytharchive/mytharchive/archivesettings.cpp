@@ -109,7 +109,18 @@ static HostCheckBox *MythArchiveAlwaysUseMythTranscode()
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If set mpeg2 files will always be passed"
             " though mythtranscode to clean up any errors. May help to fix"
-            " some audio problems."));
+            " some audio problems. Ignored if 'Use ProjectX' is set."));
+    return gc;
+};
+
+static HostCheckBox *MythArchiveUseProjectX()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveUseProjectX");
+    gc->setLabel(QObject::tr("Use ProjectX"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set ProjectX will be used to cut"
+            " commercials and split mpeg2 files instead of mythtranscode"
+            " and mythreplex."));
     return gc;
 };
 
@@ -120,8 +131,8 @@ static HostCheckBox *MythArchiveUseFIFO()
     gc->setValue(true);
     gc->setHelpText(QObject::tr("The script will use FIFOs to pass the output"
             " of mplex into dvdauthor rather than creating intermediate files."
-            " Saves time and disk space during multiplex operations but not supported"
-            " on Windows platform"));
+            " Saves time and disk space during multiplex operations but not " 
+            " supported on Windows platform"));
     return gc;
 };
 
@@ -293,6 +304,16 @@ static HostLineEdit *MythArchiveMpeg2encCmd()
     return gc;
 };
 
+static HostLineEdit *MythArchiveProjectXCmd()
+{
+    HostLineEdit *gc = new HostLineEdit("MythArchiveProjectXCmd");
+    gc->setLabel(QObject::tr("projectx command"));
+    gc->setValue("projectx");
+    gc->setHelpText(QObject::tr("Command to run ProjectX. Will be used to cut "
+            "commercials and split mpegs files instead of mythtranscode and mythreplex."));
+    return gc;
+};
+
 ArchiveSettings::ArchiveSettings()
 {
     VerticalConfigurationGroup* vcg1 = new VerticalConfigurationGroup(false);
@@ -311,28 +332,34 @@ ArchiveSettings::ArchiveSettings()
     vcg2->addChild(MythArchiveEncodeToAc3());
     vcg2->addChild(MythArchiveCopyRemoteFiles());
     vcg2->addChild(MythArchiveAlwaysUseMythTranscode());
+    vcg2->addChild(MythArchiveUseProjectX());
     vcg2->addChild(MythArchiveUseFIFO());
-    vcg2->addChild(MainMenuAspectRatio());
-    vcg2->addChild(ChapterMenuAspectRatio());
-    vcg2->addChild(MythArchiveDateFormat());
-    vcg2->addChild(MythArchiveTimeFormat());
     vcg2->addChild(MythArchiveDefaultEncProfile());
     addChild(vcg2);
 
     VerticalConfigurationGroup* vcg3 = new VerticalConfigurationGroup(false);
-    vcg3->setLabel(QObject::tr("MythArchive External Commands (1)"));
-    vcg3->addChild(MythArchiveFfmpegCmd());
-    vcg3->addChild(MythArchiveMplexCmd());
-    vcg3->addChild(MythArchiveDvdauthorCmd());
-    vcg3->addChild(MythArchiveSpumuxCmd());
-    vcg3->addChild(MythArchiveMpeg2encCmd());
+    vcg3->setLabel(QObject::tr("DVD Menu Settings"));
+    vcg3->addChild(MainMenuAspectRatio());
+    vcg3->addChild(ChapterMenuAspectRatio());
+    vcg3->addChild(MythArchiveDateFormat());
+    vcg3->addChild(MythArchiveTimeFormat());
     addChild(vcg3);
 
     VerticalConfigurationGroup* vcg4 = new VerticalConfigurationGroup(false);
-    vcg4->setLabel(QObject::tr("MythArchive External Commands (2)"));
-    vcg4->addChild(MythArchiveMkisofsCmd());
-    vcg4->addChild(MythArchiveGrowisofsCmd());
-    vcg4->addChild(MythArchiveTcrequantCmd());
-    vcg4->addChild(MythArchiveJpeg2yuvCmd());
+    vcg4->setLabel(QObject::tr("MythArchive External Commands (1)"));
+    vcg4->addChild(MythArchiveFfmpegCmd());
+    vcg4->addChild(MythArchiveMplexCmd());
+    vcg4->addChild(MythArchiveDvdauthorCmd());
+    vcg4->addChild(MythArchiveSpumuxCmd());
+    vcg4->addChild(MythArchiveMpeg2encCmd());
     addChild(vcg4);
+
+    VerticalConfigurationGroup* vcg5 = new VerticalConfigurationGroup(false);
+    vcg5->setLabel(QObject::tr("MythArchive External Commands (2)"));
+    vcg5->addChild(MythArchiveMkisofsCmd());
+    vcg5->addChild(MythArchiveGrowisofsCmd());
+    vcg5->addChild(MythArchiveTcrequantCmd());
+    vcg5->addChild(MythArchiveJpeg2yuvCmd());
+    vcg5->addChild(MythArchiveProjectXCmd());
+    addChild(vcg5);
 }
