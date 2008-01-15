@@ -2,6 +2,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <algorithm>
+
 #if defined(USING_V4L) || defined(USING_DVB)
 #include <sys/ioctl.h>
 #endif
