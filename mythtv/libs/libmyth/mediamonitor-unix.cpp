@@ -57,6 +57,23 @@ using namespace std;
 
 const QString MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
 
+
+// Some helpers for debugging:
+
+static const QString LOC = QString("MediaMonitorUnix:");
+
+static void fstabError(const QString &methodName)
+{
+    VERBOSE(VB_IMPORTANT, LOC + methodName + " Error: failed to open "
+                          + _PATH_FSTAB + " for reading, " + ENO);
+}
+
+static void statError(const QString &methodName, const QString devPath)
+{
+    VERBOSE(VB_IMPORTANT, LOC + methodName + " Error: failed to stat "
+                          + devPath + ", " + ENO);
+}
+
 ////////////////////////////////////////////////////////////////////////
 // MediaMonitor
 
@@ -68,7 +85,7 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
     CheckFileSystemTable();
     CheckMountable();
 
-    VERBOSE(VB_MEDIA, "Initial device list: " + listDevices());
+    VERBOSE(VB_MEDIA, "Initial device list...\n" + listDevices());
 }
 
 
@@ -86,27 +103,23 @@ MediaMonitorUnix::~MediaMonitorUnix()
 bool MediaMonitorUnix::CheckFileSystemTable(void)
 {
     struct fstab * mep = NULL;
-    
+
     // Attempt to open the file system descriptor entry.
-    if (!setfsent()) 
+    if (!setfsent())
     {
-        VERBOSE(VB_IMPORTANT, QString("MediaMonitorUnix") + 
-                "::CheckFileSystemTable - Failed to open " +
-                _PATH_FSTAB + " for reading." + ENO);
+        fstabError(":CheckFileSystemTable()");
         return false;
     }
-    else 
-    {
-        // Add all the entries
-        while ((mep = getfsent()) != NULL)
-            AddDevice(mep);
-        
-        endfsent();
-    }
+
+    // Add all the entries
+    while ((mep = getfsent()) != NULL)
+        AddDevice(mep);
+
+    endfsent();
 
     if (m_Devices.isEmpty())
         return false;
-    
+
     return true;
 }
 
@@ -183,8 +196,8 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     waitpid(udevinfo.processIdentifier(), &status, 0);
 
     if (udevinfo.canReadLineStderr())
-        VERBOSE(VB_MEDIA, QString("MediaMonitorUnix::GetDeviceFile -- %1")
-            .arg(udevinfo.readLineStderr()));
+        VERBOSE(VB_MEDIA, LOC + QString(":GetDeviceFile(%1) - ").arg(sysfs)
+                          + udevinfo.readLineStderr());
 
     QString ret = udevinfo.readLineStdout();
     if (ret != "device not found in database")
@@ -253,7 +266,7 @@ static void LookupModel(MythMediaDevice* device)
     }
 
     if (devname.startsWith("scd"))     // scd0 doesn't appear in /sys/block,
-        devname.replace("scd", "sr");  // use sr0 instead 
+        devname.replace("scd", "sr");  // use sr0 instead
 
     if (devname.startsWith("sd")       // SATA/USB/FireWire
         || devname.startsWith("sr"))   // SCSI CD-ROM?
@@ -301,15 +314,20 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     if (shouldIgnore(pDevice))
         return false;
 
+    QString path = pDevice->getDevicePath();
+    if (!path.length())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MediaMonitorUnix::AddDevice() - empty device path.");
+        return false;
+    }
+
     dev_t new_rdev;
     struct stat sb;
 
-    if (stat(pDevice->getDevicePath(), &sb) < 0)
+    if (stat(path, &sb) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "MediaMonitorUnix::AddDevice() -- " +
-                QString("Failed to stat '%1'")
-                .arg(pDevice->getDevicePath()) + ENO);
-
+        statError(":AddDevice()", path);
         return false;
     }
     new_rdev = sb.st_rdev;
@@ -322,19 +340,16 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     {
         if (stat((*itr)->getDevicePath(), &sb) < 0)
         {
-            VERBOSE(VB_IMPORTANT, "MediaMonitorUnix::AddDevice() -- " +
-                    QString("Failed to stat '%1'")
-                    .arg(pDevice->getDevicePath()) + ENO);
-
+            statError(":AddDevice()", (*itr)->getDevicePath());
             return false;
         }
 
         if (sb.st_rdev == new_rdev)
         {
-            VERBOSE(VB_MEDIA, "MediamonitorUnix::AddDevice() -- " +
-                    QString("Not adding '%1', it appears to be a duplicate.")
-                    .arg(pDevice->getDevicePath()));
-
+            VERBOSE(VB_MEDIA, LOC + ":AddDevice() - not adding " + path
+                              + "\n                        "
+                                "because it appears to be a duplicate of "
+                              + (*itr)->getDevicePath());
             return false;
         }
     }
@@ -343,16 +358,17 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 
     QMutexLocker locker(&m_DevicesLock);
 
-    connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)), 
+    connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
             this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
     m_Devices.push_back( pDevice );
     m_UseCount[pDevice] = 0;
+    VERBOSE(VB_MEDIA, LOC + ":AddDevice() - Added " + path);
 
     return true;
 }
 
-// Given a fstab entry to a media device determine what type of device it is 
-bool MediaMonitorUnix::AddDevice(struct fstab * mep) 
+// Given a fstab entry to a media device determine what type of device it is
+bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 {
     QString devicePath( mep->fs_spec );
     //cout << "AddDevice - " << devicePath << endl;
@@ -367,82 +383,80 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
        return false;
 
     if (stat(mep->fs_spec, &sbuf) < 0)
-       return false;   
+       return false;
 
-    //  Can it be mounted?  
-    if ( ! ( ((strstr(mep->fs_mntops, "owner") && 
-        (sbuf.st_mode & S_IRUSR)) || strstr(mep->fs_mntops, "user")) && 
-        (strstr(mep->fs_vfstype, MNTTYPE_ISO9660) || 
-         strstr(mep->fs_vfstype, MNTTYPE_UDF) || 
-         strstr(mep->fs_vfstype, MNTTYPE_AUTO)) ) ) 
+    //  Can it be mounted?
+    if ( ! ( ((strstr(mep->fs_mntops, "owner") &&
+        (sbuf.st_mode & S_IRUSR)) || strstr(mep->fs_mntops, "user")) &&
+        (strstr(mep->fs_vfstype, MNTTYPE_ISO9660) ||
+         strstr(mep->fs_vfstype, MNTTYPE_UDF) ||
+         strstr(mep->fs_vfstype, MNTTYPE_AUTO)) ) )
     {
-       if ( strstr(mep->fs_mntops, MNTTYPE_ISO9660) && 
-            strstr(mep->fs_vfstype, MNTTYPE_SUPERMOUNT) ) 
-          {
-             is_supermount = true;
-          }
-          else
-          {
-             return false;
-          }
-     }
+        if (strstr(mep->fs_mntops, MNTTYPE_ISO9660) &&
+            strstr(mep->fs_vfstype, MNTTYPE_SUPERMOUNT))
+        {
+            is_supermount = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-     if (strstr(mep->fs_mntops, MNTTYPE_ISO9660)  || 
-         strstr(mep->fs_vfstype, MNTTYPE_ISO9660) || 
-         strstr(mep->fs_vfstype, MNTTYPE_UDF)     || 
-         strstr(mep->fs_vfstype, MNTTYPE_AUTO)) 
-     {
-         is_cdrom = true;
-         //cout << "Device is a CDROM" << endl;
-     }
+    if (strstr(mep->fs_mntops, MNTTYPE_ISO9660)  ||
+        strstr(mep->fs_vfstype, MNTTYPE_ISO9660) ||
+        strstr(mep->fs_vfstype, MNTTYPE_UDF)     ||
+        strstr(mep->fs_vfstype, MNTTYPE_AUTO))
+    {
+        is_cdrom = true;
+        //cout << "Device is a CDROM" << endl;
+    }
 
-     if (!is_supermount) 
-     {
-         if (is_cdrom)
-             pDevice = MythCDROM::get(this, QString(mep->fs_spec),
+    if (!is_supermount)
+    {
+        if (is_cdrom)
+            pDevice = MythCDROM::get(this, QString(mep->fs_spec),
                                      is_supermount, m_AllowEject);
-     }
-     else 
-     {
-         char *dev;
-         int len = 0;
-         dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
-         dev += sizeof(SUPER_OPT_DEV)-1;
-         while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
-             len++;
+    }
+    else
+    {
+        char *dev;
+        int len = 0;
+        dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
+        dev += sizeof(SUPER_OPT_DEV)-1;
+        while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
+            len++;
 
-         if (dev[len] != 0) 
-         {
-             char devstr[256];
-             strncpy(devstr, dev, len);
-             devstr[len] = 0;
-             if (is_cdrom)
-                 pDevice = MythCDROM::get(this, QString(devstr),
-                                is_supermount, m_AllowEject);
-         }
-         else
-             return false;   
-     }
-        
-     if (pDevice) 
-     {
-         pDevice->setMountPath(mep->fs_file);
-         VERBOSE(VB_MEDIA, QString("Mediamonitor: Adding %1")
-                           .arg(pDevice->getDevicePath()));
-         if (pDevice->testMedia() == MEDIAERR_OK) 
-         {
-             if (AddDevice(pDevice))
+        if (dev[len] != 0)
+        {
+            char devstr[256];
+            strncpy(devstr, dev, len);
+            devstr[len] = 0;
+            if (is_cdrom)
+                pDevice = MythCDROM::get(this, QString(devstr),
+                                         is_supermount, m_AllowEject);
+        }
+        else
+            return false;
+    }
+
+    if (pDevice)
+    {
+        pDevice->setMountPath(mep->fs_file);
+        if (pDevice->testMedia() == MEDIAERR_OK)
+        {
+            if (AddDevice(pDevice))
                 return true;
-         }
-         pDevice->deleteLater();
-     }
+        }
+        pDevice->deleteLater();
+    }
 
-     return false;
+    return false;
 }
 
-// Given a path to a media device determine what type of device it is and 
+// Given a path to a media device determine what type of device it is and
 // add it to our collection.
-bool MediaMonitorUnix::AddDevice(const char* devPath ) 
+bool MediaMonitorUnix::AddDevice(const char* devPath)
 {
     QString devicePath( devPath );
     //cout << "AddDevice - " << devicePath << endl;
@@ -456,40 +470,38 @@ bool MediaMonitorUnix::AddDevice(const char* devPath )
         lpath[len] = 0;
 
     // Attempt to open the file system descriptor entry.
-    if (!setfsent()) 
+    if (!setfsent())
     {
-        perror("setfsent");
-        cerr << "MediaMonitorUnix::AddDevice - Failed to open "
-                _PATH_FSTAB
-                " for reading." << endl;
+        fstabError(QString(":AddDevice(%2)").arg(devPath));
         return false;
     }
-    else 
+
+    // Loop over the file system descriptor entry.
+    while ((mep = getfsent()) != NULL)
     {
-        // Loop over the file system descriptor entry.
-        while ((mep = getfsent()) != NULL)  
-        {
-//             cout << "***************************************************" << endl;
-//              cout << "devicePath == " << devicePath << endl;
-//              cout << "mep->fs_spec == " << mep->fs_spec << endl;
-//              cout << "lpath == " << lpath << endl; 
-//              cout << "strcmp(devicePath, mep->fs_spec) == " << strcmp(devicePath, mep->fs_spec) << endl;
-//              cout << "len ==" << len << endl;
-//              cout << "strcmp(lpath, mep->fs_spec)==" << strcmp(lpath, mep->fs_spec) << endl;
-//              cout <<endl << endl;
+#if 0
+        cout << "***************************************************" << endl;
+        cout << "devicePath == " << devicePath << endl;
+        cout << "mep->fs_spec == " << mep->fs_spec << endl;
+        cout << "lpath == " << lpath << endl;
+        cout << "strcmp(devicePath, mep->fs_spec) == "
+             << strcmp(devicePath, mep->fs_spec) << endl;
+        cout << "len ==" << len << endl;
+        cout << "strcmp(lpath, mep->fs_spec)=="
+             << strcmp(lpath, mep->fs_spec) << endl;
+        cout <<endl << endl;
+#endif
 
-            // Check to see if this is the same as our passed in device. 
-            if ((strcmp(devicePath, mep->fs_spec) != 0) && 
-                 (len && (strcmp(lpath, mep->fs_spec) != 0)))
-                continue;
-
-        }
-
-        endfsent();
+        // Check to see if this is the same as our passed in device.
+        if ((strcmp(devicePath, mep->fs_spec) != 0) &&
+             (len && (strcmp(lpath, mep->fs_spec) != 0)))
+            continue;
     }
 
-    if (mep) 
-       return AddDevice(mep); 
+    endfsent();
+
+    if (mep)
+        return AddDevice(mep);
 
     return false;
 }
@@ -604,7 +616,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         if ((*it).startsWith("add"))
         {
             QString dev = (*it).section(' ', 1, 1);
-            
+
             // check if removeable
             QFile removable(dev + "/removable");
             if (removable.exists())
