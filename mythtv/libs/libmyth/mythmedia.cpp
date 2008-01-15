@@ -342,12 +342,11 @@ bool MythMediaDevice::isMounted(bool Verify)
     {
         QString mountPoint;
         QString deviceName;
-        QStringList deviceNames;
-            
+
+
         // Extract the mount point and device name.
         stream >> deviceName >> mountPoint;
         stream.readLine(); // skip the rest of the line
-        deviceNames.push_back(deviceName);
 
         if (deviceName.isEmpty())
             continue;
@@ -355,11 +354,12 @@ bool MythMediaDevice::isMounted(bool Verify)
         if (!deviceName.startsWith("/dev/"))
             continue;
 
+        QStringList deviceNames = deviceName;
+
+
         // Get some basic info on the device name, if it looks like a path
-        QFileInfo *fi   = NULL;
+        QFileInfo *fi   = new QFileInfo(deviceName);
         QString    link = QString::null;
-        if (deviceName[0] == '/')
-            fi = new QFileInfo(deviceName);
 
         // If the device name in the mounts file is a symlink, follow it..
         if (fi && fi->isSymLink() && !(link = fi->readLink()).isEmpty())
@@ -370,16 +370,15 @@ bool MythMediaDevice::isMounted(bool Verify)
                 deviceNames.push_back(fi->dir(true).absPath() + "/" + link);
         }
 
-        if (deviceNames.contains(m_DevicePath))
-        {
-            // Deal with any escaped characters. At the moment, suspect
-            // whitespace is the only thing that would be escaped.
-            //
-            // TODO: Check linux kernel source for /proc/mounts escaping
-            //
-            if (mountPoint.contains("\\040"))
-                mountPoint.replace("\\040", " ");
 
+        // Deal with escaped spaces
+        if (mountPoint.contains("\\040"))
+            mountPoint.replace("\\040", " ");
+
+
+        if (deviceNames.contains(m_DevicePath) ||
+            deviceNames.contains(m_RealDevice)  )
+        {
             m_MountPath = mountPoint;
             mountFile.close();
             return true;
