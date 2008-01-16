@@ -73,6 +73,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
       frontend_name(QString::null), card_type(DTVTunerType::kTunerTypeUnknown),
       // Tuning
       tune_lock(false),             hw_lock(false),
+      last_lnb_dev_id(-1),
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
       // Misc
@@ -706,14 +707,10 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     // send DVB-S setup
     if (is_dvbs)
     {
-        // make sure we tune to frequency, no matter what happens..
-        // causes glitches after multirec merge
-        //reset = first_tune = true;
-
         // configure for new input
         if (!same_input)
             diseqc_settings.Load(inputid);
-            
+
         // execute diseqc commands
         if (!diseqc_tree->Execute(diseqc_settings, tuning))
         {
@@ -730,6 +727,14 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                     "No LNB for this configuration");
             return false;
         }
+
+        if (lnb->GetDeviceID() != last_lnb_dev_id)
+        {
+            last_lnb_dev_id = lnb->GetDeviceID();
+            // make sure we tune to frequency, if the lnb has changed
+            reset = first_tune = true;
+        }
+        
         params.frequency = lnb->GetIntermediateFrequency(
             diseqc_settings, tuning);
 

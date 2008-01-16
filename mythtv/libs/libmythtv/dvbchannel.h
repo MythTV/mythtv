@@ -131,6 +131,8 @@ class DVBChannel : public DTVChannel
     /// Last tuning options Tune() succesfully sent to hardware
     DTVMultiplex      prev_tuning;
 
+    uint              last_lnb_dev_id;
+
     uint              tuning_delay;///< Extra delay to add for broken drivers
     uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
     bool              first_tune;  ///< Used to force hardware reset
