@@ -1396,6 +1396,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     {
         DoPipResize(pipw, piph);
 
+        bzero(&pip_tmp_image, sizeof(pip_tmp_image));
+
         if (pip_tmp_buf && pip_scaling_context)
         {
             AVPicture img_in, img_out;
@@ -1413,6 +1415,11 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
             piph = pip_display_size.height();
 
             pipbuf = pip_tmp_buf;
+            init(&pip_tmp_image,
+                    FMT_YV12,
+                    pipbuf,
+                    pipw, piph,
+                    pipimage->bpp, sizeof(pipbuf));
         }
     }
 
@@ -1441,29 +1448,20 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
                 break;
     }
 
-    // Copy Y (intensity values)
-    for (int i = 0; i < piph; i++)
+    uint xoff2[3]  = { xoff, xoff>>1, xoff>>1 };
+    uint yoff2[3]  = { yoff, yoff>>1, yoff>>1 };
+    uint pip_height = pip_tmp_image.height;
+    uint height[3] = { pip_height, pip_height>>1, pip_height>>1 };
+    
+    for (int p = 0; p < 3; p++)
     {
-        memcpy(frame->buf + (i + yoff) * frame->width + xoff,
-               pipbuf + i * pipw, pipw);
-    }
-
-    // Copy U & V (half plane chroma values)
-    xoff /= 2;
-    yoff /= 2;
-
-    unsigned char *uptr = frame->buf + frame->width * frame->height;
-    unsigned char *vptr = frame->buf + frame->width * frame->height * 5 / 4;
-    int vidw = frame->width / 2;
-
-    unsigned char *pipuptr = pipbuf + pipw * piph;
-    unsigned char *pipvptr = pipbuf + pipw * piph * 5 / 4;
-    pipw /= 2;
-
-    for (int i = 0; i < piph / 2; i ++)
-    {
-        memcpy(uptr + (i + yoff) * vidw + xoff, pipuptr + i * pipw, pipw);
-        memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
+        for (uint h = 0; h < height[p]; h++)
+        {
+            memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) * 
+                    frame->pitches[p] + xoff2[p],
+                    (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
+                    pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+        }
     }
 
     // we're done with the frame, release it

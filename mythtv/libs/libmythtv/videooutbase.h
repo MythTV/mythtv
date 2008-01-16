@@ -297,6 +297,7 @@ class VideoOutput
     QSize   pip_video_size;
     unsigned char      *pip_tmp_buf;
     ImgReSampleContext *pip_scaling_context;
+    VideoFrame pip_tmp_image;
 
     // Video resizing (for ITV)
     bool    vsz_enabled;
