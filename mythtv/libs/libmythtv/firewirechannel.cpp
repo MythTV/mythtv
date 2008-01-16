@@ -209,6 +209,7 @@ bool FirewireChannel::Retune(void)
 
 bool FirewireChannel::SetChannelByNumber(int channel)
 {
+    VERBOSE(VB_CHANNEL, QString("SetChannelByNumber(%1)").arg(channel));
     current_channel = channel;
 
     if (FirewireDevice::kAVCPowerOff == GetPowerState())

@@ -934,6 +934,10 @@ bool ChannelUtil::IsOnSameMultiplex(uint srcid,
     if (!new_mplexid)
         return false;
 
+    VERBOSE(VB_CHANNEL, QString("IsOnSameMultiplex? %1==%2 -> %3")
+            .arg(old_mplexid).arg(new_mplexid)
+            .arg(old_mplexid == new_mplexid));
+
     return old_mplexid == new_mplexid;
 }
 

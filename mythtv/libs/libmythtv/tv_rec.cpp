@@ -3012,7 +3012,7 @@ QString TVRec::SetInput(QString input, uint requestType)
 void TVRec::SetChannel(QString name, uint requestType)
 {
     QMutexLocker lock(&stateChangeLock);
-    VERBOSE(VB_RECORD, LOC + "SetChannel()" + " -- begin");
+    VERBOSE(VB_CHANNEL, LOC + QString("SetChannel(%1) -- begin").arg(name));
 
     // Detect tuning request type if needed
     if (requestType & kFlagDetect)
@@ -3035,7 +3035,7 @@ void TVRec::SetChannel(QString name, uint requestType)
         while (!HasFlags(kFlagRingBufferReady))
             WaitForEventThreadSleep();
     }
-    VERBOSE(VB_RECORD, LOC + "SetChannel()" + " -- end");
+    VERBOSE(VB_CHANNEL, LOC + QString("SetChannel(%1) -- end").arg(name));
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3335,7 +3335,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 
     uint    sourceid   = channel->GetCurrentSourceID();
     QString oldchannum = channel->GetCurrentName();
-    QString newchannum = request.channel;
+    QString newchannum = QDeepCopy<QString>(request.channel);
 
     if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
     {
@@ -3401,9 +3401,16 @@ void TVRec::HandleTuning(void)
                              kFlagEITScan|kFlagAntennaAdjust))
         {
             if (!recorder)
+            {
+                VERBOSE(VB_RECORD, LOC +
+                        "No recorder yet, calling TuningFrequency");
                 TuningFrequency(request);
+            }
             else
+            {
+                VERBOSE(VB_RECORD, LOC + "Waiting for recorder pause..");
                 SetFlags(kFlagWaitingForRecPause);
+            }
         }
         lastTuningRequest = request;
     }
@@ -3423,6 +3430,7 @@ void TVRec::HandleTuning(void)
             GetHDHRRecorder()->SetRingBuffer(NULL);
         }
 #endif // USING_HDHOMERUN
+        VERBOSE(VB_RECORD, LOC + "Recorder paused, calling TuningFrequency");
         TuningFrequency(lastTuningRequest);
     }
 

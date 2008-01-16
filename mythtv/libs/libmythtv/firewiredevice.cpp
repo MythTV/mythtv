@@ -144,7 +144,11 @@ FirewireDevice::PowerState FirewireDevice::GetPowerState(void)
 bool FirewireDevice::SetChannel(const QString &panel_model,
                                 uint alt_method, uint channel)
 {
+    VERBOSE(VB_CHANNEL, QString("SetChannel(model %1, alt %2, chan %3)")
+            .arg(panel_model).arg(alt_method).arg(channel));
+
     QMutexLocker locker(&m_lock);
+    VERBOSE(VB_CHANNEL, "SetChannel() -- locked");
 
     if (!IsSTBSupported(panel_model))
     {
@@ -160,7 +164,12 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
     digit[2] = (channel % 10);
 
     if (m_subunitid >= kAVCSubunitIdExtended)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "SetChannel: Extended subunits are not supported.");
+
         return false;
+    }
 
     vector<uint8_t> cmd;
     vector<uint8_t> ret;
