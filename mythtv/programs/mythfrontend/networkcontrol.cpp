@@ -587,7 +587,8 @@ QString NetworkControl::processPlay(QStringList tokens)
             message = "NETWORK_CONTROL SEEK BEGINNING";
         else if (is_abbrev("forward", tokens[2]))
             message = "NETWORK_CONTROL SEEK FORWARD";
-        else if (is_abbrev("rewind", tokens[2]))
+        else if (is_abbrev("rewind",   tokens[2]) ||
+                 is_abbrev("backward", tokens[2]))
             message = "NETWORK_CONTROL SEEK BACKWARD";
         else if (tokens[2].contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
         {
