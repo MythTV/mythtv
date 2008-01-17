@@ -6308,7 +6308,7 @@ void TV::customEvent(QCustomEvent *e)
                 pbinfoLock.lock();
             }
         }
-        else if (playbackinfo && message.left(15) == "COMMFLAG_UPDATE")
+        else if (nvp && playbackinfo && message.left(15) == "COMMFLAG_UPDATE")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
