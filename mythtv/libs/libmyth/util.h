@@ -5,6 +5,7 @@
 #include <qdatetime.h>
 #include <qcolor.h>
 
+#include <stdint.h>
 #include <time.h>
 
 #include "mythexp.h"

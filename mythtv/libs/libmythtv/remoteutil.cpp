@@ -1,6 +1,7 @@
 #include <qdeepcopy.h>
 #include <qfile.h>
 #include <qstringlist.h>
+#include <unistd.h>
 
 #include "util.h"
 #include "remoteutil.h"

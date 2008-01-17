@@ -5,6 +5,7 @@
 #include <scsi/sg.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "mythconfig.h"      // for WORDS_BIGENDIAN
 #include "mythcontext.h"
