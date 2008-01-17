@@ -3255,7 +3255,11 @@ void SipNotify::Display(QString name, QString number)
 
         QHostAddress RemoteIP;
         RemoteIP.setAddress("127.0.0.1");
-        notifySocket->writeBlock(text.ascii(), text.length(), RemoteIP, 6948);
+
+        int udp_port = gContext->GetNumSetting("UDPNotifyPort", 6948);
+        if (udp_port > 0)
+            notifySocket->writeBlock(text.ascii(), text.length(), RemoteIP,
+                                     udp_port);
     }
 }
 
