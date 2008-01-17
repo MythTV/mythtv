@@ -1175,7 +1175,7 @@ void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
     QString input   = inputname;
     QString channum = startchannel;
 
-    channel->Init(input, channum);
+    channel->Init(input, channum, true);
 }
 
 void TVRec::CloseChannel(void)
@@ -3310,7 +3310,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
         }
     }
     if (request.flags & kFlagLiveTV)
-        channel->Init(input, channum);
+        channel->Init(input, channum, false);
 
     if (channel && !channum.isEmpty() && (channum.find("NextChannel") >= 0))
     {

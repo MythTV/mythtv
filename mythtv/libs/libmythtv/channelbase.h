@@ -28,7 +28,8 @@ class ChannelBase
     ChannelBase(TVRec *parent);
     virtual ~ChannelBase();
 
-    virtual bool Init(QString &inputname, QString &startchannel);
+    virtual bool Init(QString &inputname, QString &startchannel, bool setchan);
+    virtual bool IsTunable(const QString &input, const QString &channum) const;
 
     // Methods that must be implemented.
     /// \brief Opens the channel changing hardware for use.

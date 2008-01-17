@@ -31,7 +31,7 @@ class Channel : public DTVChannel
     Channel(TVRec *parent, const QString &videodevice);
     virtual ~Channel(void);
 
-    bool Init(QString &inputname, QString &startchannel);
+    bool Init(QString &inputname, QString &startchannel, bool setchan);
 
     bool Open(void);
     void Close(void);

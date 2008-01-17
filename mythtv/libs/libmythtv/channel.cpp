@@ -58,11 +58,14 @@ Channel::~Channel(void)
     Close();
 }
 
-bool Channel::Init(QString &inputname, QString &startchannel)
+bool Channel::Init(QString &inputname, QString &startchannel, bool setchan)
 {
-    SetFormat(gContext->GetSetting("TVFormat"));
-    SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
-    return ChannelBase::Init(inputname, startchannel);
+    if (setchan)
+    {
+        SetFormat(gContext->GetSetting("TVFormat"));
+        SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
+    }
+    return ChannelBase::Init(inputname, startchannel, setchan);
 }
 
 bool Channel::Open(void)

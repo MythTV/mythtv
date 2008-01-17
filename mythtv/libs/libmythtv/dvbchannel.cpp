@@ -297,11 +297,12 @@ bool DVBChannel::IsOpen(void) const
     return it != is_open.end();
 }
 
-bool DVBChannel::Init(QString &inputname, QString &startchannel)
+bool DVBChannel::Init(QString &inputname, QString &startchannel, bool setchan)
 {
-    if (!IsOpen())
+    if (setchan && !IsOpen())
         Open(this);
-    return ChannelBase::Init(inputname, startchannel);
+
+    return ChannelBase::Init(inputname, startchannel, setchan);
 }
 
 // documented in dtvchannel.h

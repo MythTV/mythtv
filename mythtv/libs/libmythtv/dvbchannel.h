@@ -34,7 +34,7 @@ class DVBChannel : public DTVChannel
     bool Open(void) { return Open(this); }
     void Close(void) { Close(this); }
 
-    bool Init(QString &inputname, QString &startchannel);
+    bool Init(QString &inputname, QString &startchannel, bool setchan);
 
     // Sets
     void SetPMT(const ProgramMapTable*);

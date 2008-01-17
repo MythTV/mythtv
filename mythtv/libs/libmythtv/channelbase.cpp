@@ -45,11 +45,13 @@ ChannelBase::~ChannelBase(void)
 {
 }
 
-bool ChannelBase::Init(QString &inputname, QString &startchannel)
+bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
 {
     bool ok;
 
-    if (inputname.isEmpty())
+    if (!setchan)
+        ok = IsTunable(inputname, startchannel);
+    else if (inputname.isEmpty())
         ok = SetChannelByString(startchannel);
     else
         ok = SwitchToInput(inputname, startchannel);
@@ -86,12 +88,16 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel)
 
             if (chanid && cit != channels.end())
             {
-                ok = SwitchToInput(*it, (*cit).channum);
+                if (!setchan)
+                    ok = IsTunable(inputname, startchannel);
+                else
+                    ok = SwitchToInput(*it, (*cit).channum);
+
                 if (ok)
                 {
                     inputname    = *it;
                     startchannel = QDeepCopy<QString>((*cit).channum);
-                    msg2 = QString("tuned to '%1' on input '%2' instead.")
+                    msg2 = QString("selected to '%1' on input '%2' instead.")
                         .arg(startchannel).arg(inputname);
                     msg_error = false;
                 }
@@ -109,6 +115,70 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel)
             msg1 + "\n\t\t\t" + msg2);
 
     return ok;
+}
+
+bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
+{
+    QString loc = LOC + QString("IsTunable(%1,%2)").arg(input).arg(channum);
+
+    int inputid = currentInputID;
+    if (!input.isEmpty())
+        inputid = GetInputByName(input);
+
+    InputMap::const_iterator it = inputs.find(inputid);
+    if (it == inputs.end())
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Requested non-existant input '%1':'%2' ")
+                .arg(input).arg(inputid));
+
+        return false;
+    }
+
+    uint mplexid_restriction;
+    if (!IsInputAvailable(inputid, mplexid_restriction))
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Requested channel is on input '%1' "
+                    "which is in a busy input group")
+                .arg(inputid));
+
+        return false;
+    }
+
+    // Fetch tuning data from the database.
+    QString tvformat, modulation, freqtable, freqid, dtv_si_std;
+    int finetune;
+    uint64_t frequency;
+    int mpeg_prog_num;
+    uint atsc_major, atsc_minor, mplexid, tsid, netid;
+    bool commfree;
+
+    if (!ChannelUtil::GetChannelData(
+        (*it)->sourceid, channum,
+        tvformat, modulation, freqtable, freqid,
+        finetune, frequency,
+        dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        mplexid, commfree))
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Failed to find channel in DB on input '%1' ")
+                .arg(inputid));
+
+        return false;
+    }
+
+    if (mplexid_restriction && (mplexid != mplexid_restriction))
+    {
+        VERBOSE(VB_IMPORTANT, loc + " " + QString(
+                    "Channel is valid, but tuner is busy "
+                    "on different multiplex (%1 != %2)")
+                .arg(mplexid).arg(mplexid_restriction));
+
+        return false;
+    }
+
+    return true;
 }
 
 uint ChannelBase::GetNextChannel(uint chanid, int direction) const
