@@ -40,7 +40,8 @@
 
 #include "mythflixqueue.h"
 
-MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
+MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name,
+                             QString queueName)
     : MythDialog(parent, name)
 {
     qInitNetworkProtocols ();
@@ -58,12 +59,14 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
         dir.mkdir(fileprefix);
     
     // Initialize variables
-	zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    zoom = QString("-z %1")
+                   .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
     m_UIArticles   = 0;
     expectingPopup = false;
+    m_queueName = queueName;
 
     setNoErase();
     loadTheme();
@@ -73,14 +76,26 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
     // Load sites from database
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (QString::compare("netflix queue",name)==0)
-        query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=1 ORDER BY name");
+
+    query.prepare("SELECT name, url, updated "
+                      "FROM netflix "
+                      "WHERE is_queue = :ISQUEUE "
+                          "AND queue = :QUEUENAME "
+                      "ORDER BY name");
 
     if (QString::compare("netflix history",name)==0)
-        query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=2 ORDER BY name");
+        query.bindValue(":ISQUEUE", 2);
+    else if (QString::compare("netflix queue",name)==0)
+        query.bindValue(":ISQUEUE", 1);
+    else
+        query.bindValue(":ISQUEUE", 1);
+
+    query.bindValue(":QUEUENAME", m_queueName);
+    query.exec();
 
     if (!query.isActive()) {
-        VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Error in loading queue from DB"));
+        VERBOSE(VB_IMPORTANT,
+                QString("MythFlixQueue: Error in loading queue from DB"));
     }
     else {
         QString name;
@@ -97,7 +112,6 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
     NewsSite* site = (NewsSite*) m_NewsSites.first();
     connect(site, SIGNAL(finished(NewsSite*)),
             this, SLOT(slotNewsRetrieved(NewsSite*)));
-    
 
     slotRetrieveNews();
 }
@@ -147,6 +161,16 @@ void MythFlixQueue::loadTheme()
     if (!container) {
         VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Failed to get articles container."));
         exit(-1);
+    }
+
+    UITextType *ttype = (UITextType *)container->GetType("queuename");
+    if (ttype)
+    {
+        QString myQueue = m_queueName != "" ? m_queueName : tr("Default");
+        if (QString::compare("netflix history",name())==0)
+            ttype->SetText(tr("History for Queue: ") + m_queueName);
+        else
+            ttype->SetText(tr("Items in Queue: ") + m_queueName);
     }
 
     m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
@@ -472,14 +496,21 @@ void MythFlixQueue::slotMoveToTop()
         if(article)
         {
 
-            QStringList args = QStringList::split(' ',
-                    gContext->GetSetting("NetFlixMoveToTopCommandLine", 
-                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -1"));
+            QStringList args =
+                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
 
             QString movieID(article->articleURL());
             int length = movieID.length();
             int index = movieID.findRev("/");
             movieID = movieID.mid(index+1,length);            
+
+            if (m_queueName != "")
+            {
+                args += "-q";
+                args += m_queueName;
+            }
+
+            args += "-1";
             args += movieID;
 
             // execute external command to obtain list of possible movie matches 
@@ -506,14 +537,21 @@ void MythFlixQueue::slotRemoveFromQueue()
         if(article)
         {
 
-            QStringList args = QStringList::split(' ',
-                    gContext->GetSetting("NetFlixRemoveFromQueueCommandLine", 
-                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -R"));
+            QStringList args =
+                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
 
             QString movieID(article->articleURL());
             int length = movieID.length();
             int index = movieID.findRev("/");
             movieID = movieID.mid(index+1,length);            
+
+            if (m_queueName != "")
+            {
+                args += "-q";
+                args += m_queueName;
+            }
+
+            args += "-R";
             args += movieID;
 
             // execute external command to obtain list of possible movie matches 
@@ -528,24 +566,23 @@ void MythFlixQueue::slotRemoveFromQueue()
 
 void MythFlixQueue::slotShowNetFlixPage()
 {
-	if (expectingPopup)
-	slotCancelPopup();
+    if (expectingPopup)
+        slotCancelPopup();
     
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-	if (articleUIItem && articleUIItem->getData())
+    if (articleUIItem && articleUIItem->getData())
     {
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
-			QString cmdUrl(article->articleURL());
-			cmdUrl.replace('\'', "%27");
-	
-			QString cmd = QString("%1 %2 '%3'")
-				 .arg(browser)
-				 .arg(zoom)
-				 .arg(cmdUrl);
-			VERBOSE(VB_GENERAL, QString("MythFlixQueue: Opening Neflix site: (%1)").arg(cmd));
-			myth_system(cmd);
+            QString cmdUrl(article->articleURL());
+            cmdUrl.replace('\'', "%27");
+
+            QString cmd = QString("%1 %2 '%3'")
+                                  .arg(browser).arg(zoom).arg(cmdUrl);
+            VERBOSE(VB_GENERAL,
+                  QString("MythFlixQueue: Opening Neflix site: (%1)").arg(cmd));
+            myth_system(cmd);
         }
     }
 }
@@ -698,5 +735,4 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
     return ret;
 }
 
-
-
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

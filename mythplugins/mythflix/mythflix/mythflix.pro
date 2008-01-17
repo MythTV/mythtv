@@ -21,8 +21,10 @@ installscripts.files = scripts/*.pl
 INSTALLS += installfiles installimages installmenus installscripts uifiles
 
 # Input
-HEADERS += mythflixqueue.h mythflix.h mythflixconfig.h newsengine.h
-SOURCES += main.cpp mythflixqueue.cpp mythflix.cpp mythflixconfig.cpp newsengine.cpp
+HEADERS += mythflixqueue.h mythflix.h mythflixconfig.h
+HEADERS += newsengine.h dbcheck.h flixutil.h
+SOURCES += main.cpp mythflixqueue.cpp mythflix.cpp mythflixconfig.cpp
+SOURCES += newsengine.cpp dbcheck.cpp flixutil.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

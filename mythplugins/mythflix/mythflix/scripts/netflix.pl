@@ -5,7 +5,7 @@ use LWP::UserAgent;
 use HTTP::Cookies;
 
 
-use vars qw($opt_h $opt_d $opt_v $opt_i $opt_A $opt_R $opt_L $opt_r $opt_1);
+use vars qw($opt_h $opt_d $opt_v $opt_i $opt_A $opt_R $opt_L $opt_r $opt_1 $opt_q);
 use Getopt::Std; 
 
 
@@ -21,6 +21,7 @@ print "usage: $0 -hviMPD [parameters]\n";
 print "       -h           help\n";
 print "       -v           display version\n";
 print "       -i           display info\n";
+print "       -q           queue name\n";
 print "       -d           debug\n";
 print "\n";
 print "       -L <userid> <password> login into Netflix. Only needed once, ever.\n";
@@ -58,7 +59,7 @@ sub userAgent
     $ua->agent('Mozilla/5.0 (compatible; Konqueror/3.4; Linux) KHTML/3.4.0 (like Gecko)');
 #   $ua->cookie_jar(HTTP::Cookies->new(file => "lwpcookies.txt",
 #                                        autosave => 1));
-    $ua->cookie_jar(HTTP::Cookies::Netscape->new(file => "$ENV{\"HOME\"}/.mythtv/MythFlix/netflix.cookies",
+    $ua->cookie_jar(HTTP::Cookies::Netscape->new(file => "$ENV{\"HOME\"}/.mythtv/MythFlix/netflix.cookies$opt_q",
                                         autosave => 1));
 
     push @{ $ua->requests_redirectable }, 'POST';
@@ -133,11 +134,17 @@ sub process
 #
 
 # parse command line arguments 
-getopts('hvidALR1');
+getopts('hvidALR1q:');
 
 # print out info 
 if (defined $opt_v) { version(); exit 1; }
 if (defined $opt_i) { info(); exit 1; }
+
+if (defined $opt_q) {
+    $opt_q = "." . $opt_q;
+} else {
+    $opt_q = "";
+}
 
 # print out usage if needed
 if (defined $opt_h || $#ARGV<0) { help(); }

@@ -35,6 +35,9 @@
 
 #include <mythtv/libmythui/myththemedmenu.h>
 
+#include "flixutil.h"
+#include "dbcheck.h"
+
 using namespace std;
 
 //void runNews(void);
@@ -48,15 +51,25 @@ void browse(void){
 
 void queue(void){
         gContext->addCurrentLocation("flixqueue");
-        MythFlixQueue flix(gContext->GetMainWindow(), "netflix queue");
-        flix.exec();
+        QString queue = chooseQueue();
+        if (queue != "__NONE__")
+        {
+            MythFlixQueue flix(gContext->GetMainWindow(), "netflix queue",
+                               queue);
+            flix.exec();
+        }
         gContext->removeCurrentLocation();
 }
 
 void history(void){
         gContext->addCurrentLocation("flixhistory");
-        MythFlixQueue flix(gContext->GetMainWindow(), "netflix history");
-        flix.exec();
+        QString queue = chooseQueue();
+        if (queue != "__NONE__")
+        {
+            MythFlixQueue flix(gContext->GetMainWindow(), "netflix history",
+                               queue);
+               flix.exec();
+        }
         gContext->removeCurrentLocation();
 }
 
@@ -138,10 +151,18 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    gContext->ActivateSettingsCache(false);
+    if (!UpgradeFlixDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
+    gContext->ActivateSettingsCache(true);
+
     setupKeys();
 
     return 0;
 }
 
-
-
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

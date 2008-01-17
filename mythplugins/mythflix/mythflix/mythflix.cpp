@@ -39,6 +39,7 @@
 #include "mythtv/httpcomms.h"
 
 #include "mythflix.h"
+#include "flixutil.h"
 
 MythFlix::MythFlix(MythMainWindow *parent, const char *name )
     : MythDialog(parent, name)
@@ -608,20 +609,27 @@ void MythFlix::slotArticleSelected(UIListBtnTypeItem*)
 
 void MythFlix::slotViewArticle()
 {
-    InsertMovieIntoQueue(false);
+    if (expectingPopup)
+        slotCancelPopup();
+
+    QString queueName = chooseQueue();
+    if (queueName != "__NONE__")
+        InsertMovieIntoQueue(queueName, false);
 }
 
 void MythFlix::slotViewArticleTop()
 {
-    InsertMovieIntoQueue(true);
-}
-
-void MythFlix::InsertMovieIntoQueue(bool atTop)
-{
-    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-
     if (expectingPopup)
         slotCancelPopup();
+
+    QString queueName = chooseQueue();
+    if (queueName != "__NONE__")
+        InsertMovieIntoQueue(queueName, true);
+}
+
+void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
+{
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
     if (!articleUIItem)
         return;
@@ -630,14 +638,20 @@ void MythFlix::InsertMovieIntoQueue(bool atTop)
     if(!article)
         return;
 
-    QStringList args = QStringList::split(' ',
-            gContext->GetSetting("NetFlixAddQueueCommandLine", 
-            gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
+    QStringList args = gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+
+    if (queueName != "")
+    {
+        args += "-q";
+        args += queueName;
+    }
 
     QString movieID(article->articleURL());
     int length = movieID.length();
     int index = movieID.findRev("/");
     movieID = movieID.mid(index+1,length);
+
+    args += "-A";
     args += movieID;
 
     QString results = executeExternal(args, "Add Movie");
@@ -645,9 +659,15 @@ void MythFlix::InsertMovieIntoQueue(bool atTop)
     if (atTop)
     {
         // Move to top of queue as well
-        args = QStringList::split(' ',
-                gContext->GetSetting("NetFlixMoveToTopCommandLine",
-                gContext->GetShareDir() + "mythflix/scripts/netflix.pl -1"));
+        args = gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+
+        if (queueName != "")
+        {
+            args += "-q";
+            args += queueName;
+        }
+
+        args += "-1";
         args += movieID;
 
         results = executeExternal(args, "Move To Top");

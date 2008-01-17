@@ -40,7 +40,8 @@ class MythFlixQueue : public MythDialog
 
 public:
 
-    MythFlixQueue(MythMainWindow *parent, const char *name = 0);
+    MythFlixQueue(MythMainWindow *parent, const char *name = 0,
+                  QString queueName = "");
     ~MythFlixQueue();
 
 private:
@@ -76,6 +77,8 @@ private:
 	QString        zoom;
     QString        browser;
     NewsSite::List m_NewsSites;
+
+    QString        m_queueName;
 
     QHttp         *http;
 

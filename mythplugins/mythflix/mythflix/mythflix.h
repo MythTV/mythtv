@@ -63,7 +63,7 @@ private:
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
-    void InsertMovieIntoQueue(bool atTop = false);
+    void InsertMovieIntoQueue(QString queueName = "", bool atTop = false);
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
@@ -98,3 +98,4 @@ private slots:
 
 #endif /* MYTHFLIX_H */
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

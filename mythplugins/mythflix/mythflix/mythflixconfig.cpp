@@ -107,20 +107,6 @@ MythFlixConfig::MythFlixConfig(MythMainWindow *parent,
     connect(m_updateFreqTimer, SIGNAL(timeout()),
             this, SLOT(slotUpdateFreqTimerTimeout()));
 
-    // Create the database if not exists
-    QString queryString( "CREATE TABLE IF NOT EXISTS netflix "
-                         "( name VARCHAR(100) NOT NULL PRIMARY KEY,"
-                         "  category  VARCHAR(255) NOT NULL,"
-                         "  url  VARCHAR(255) NOT NULL,"
-                         "  ico  VARCHAR(255),"
-                         "  updated INT UNSIGNED,"
-                         "  is_queue INT UNSIGNED);");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (!query.exec(queryString))
-        VERBOSE(VB_IMPORTANT, QString("MythFlixConfig: Error in creating sql table"));
-
     m_Theme       = 0;
     m_UICategory  = 0;
     m_UISite      = 0;

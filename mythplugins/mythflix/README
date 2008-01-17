@@ -23,25 +23,36 @@ Once the make is completed, do a 'make install' as root
   /usr/local/share/mythtv/mythflix directory
 - image files and ui file go to /usr/local/share/mythtv/themes/default
 
-Run mythfrontend and setup the Netflix RSS feeds to include when you browse for movies. 
-You MUST run the mythfrontend first to give the plugin a chance to intial the database
-before continuing. See CONFIGURATION/USAGE.
+Run mythfrontend and setup the Netflix RSS feeds to include when you browse
+for movies.  You MUST run the mythfrontend first to give the plugin a chance
+to intial the database before continuing. See CONFIGURATION/USAGE.
 
-Currenty, MythFlix plugin lacks a more rebust configuration UI.  So your netflix account settings need to be initilized manually.
-To do this run the following command.  For some reason to properly intialized the netflix cookie you must run script twice.
+Currenty, MythFlix plugin lacks a more rebust configuration UI.  So your
+netflix account settings need to be initilized manually.
+To do this run the following command.  For some reason to properly intialized
+the netflix cookie you must run script twice.  The '-q queueName' part is
+optional and if specified will allow MythFlix to support multiple NetFlix
+queues.  This queue name is an internal name Myth uses to show you what
+NetFlix queue you are currently viewing, it does not have to be the same as
+the user/queue name on the NetFlix website.
 
-/usr/local/share/mythtv/mythflix/scripts/netflix.pl -L <userid> <passwd>
-/usr/local/share/mythtv/mythflix/scripts/netflix.pl -L <userid> <passwd>
+/usr/local/share/mythtv/mythflix/scripts/netflix.pl <-q queueName> -L <userid> <passwd>
+/usr/local/share/mythtv/mythflix/scripts/netflix.pl <-q queueName> -L <userid> <passwd>
 
 FINAL INSTALLATION
 ---------------------------------------------------------------------
 
-After running the plugin once you must manually enter your NetFlix Queue RSS feed into the database.
-This can be found by going to NetFlix.com, login, click RSS feed at the bottom of the page. Cut
-and paste the url into netflix table with the is_queue flag set.
+After running the plugin once you must manually enter your NetFlix Queue RSS
+feed into the database.  This can be found by going to NetFlix.com, login,
+click RSS feed at the bottom of the page. Cut and paste the url into netflix
+table with the is_queue flag set.  If you specified a queueName above, you
+need to use that queueName in the SQL below, otherwise leave the queueName
+field empty (ie, '') in the SQL.  The RSS feeds are unique for each Queue
+you create on the NetFlix website, so be sure to specify the correct RSS feed
+URLs for your MythFlix queues.
   
-  insert into netflix values ("Queue","NetFlix", '[YOUR QUEUE RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 1);
-  insert into netflix values ("History","NetFlix", '[YOUR HISTORY RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 2);
+  insert into netflix values ("Queue","NetFlix", '[YOUR QUEUE RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 1, '[YOUR QUEUENAME SPECIFIED ABOVE]');
+  insert into netflix values ("History","NetFlix", '[YOUR HISTORY RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 2, '[YOUR QUEUENAME SPECIFIED ABOVE]');
 
 
 CONFIGURATION/USAGE:
