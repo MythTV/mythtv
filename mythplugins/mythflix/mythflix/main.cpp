@@ -75,8 +75,6 @@ void history(void){
 
 void NetFlixCallback(void *data, QString &selection)
 {
-    VERBOSE(VB_NONE, QString("MythFlix: NetFlixCallback %1").arg(selection));
-
     (void)data;
     QString sel = selection.lower();
 
