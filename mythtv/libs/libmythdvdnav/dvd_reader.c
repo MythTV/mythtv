@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h> /* For the timing of dvdcss_title crack. */
+#include <sys/param.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
