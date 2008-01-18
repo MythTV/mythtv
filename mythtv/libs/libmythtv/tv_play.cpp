@@ -8271,9 +8271,16 @@ void TV::DVDJumpForward(void)
  */
 bool TV::BookmarkAllowed(void)
 {
+    // Allow bookmark of "Record current LiveTV program"
+    if (StateIsLiveTV(GetState()) && playbackinfo &&
+        (playbackinfo->GetAutoExpireFromRecorded() == kLiveTVAutoExpire))
+        return false;
+
+    if (StateIsLiveTV(GetState()) && ! playbackinfo)
+        return false;
+
     if ((prbuffer->isDVD() && (!gContext->GetNumSetting("EnableDVDBookmark", 0)
-        || prbuffer->DVD()->GetTotalTimeOfTitle() < 120)) ||
-        StateIsLiveTV(GetState()))
+        || prbuffer->DVD()->GetTotalTimeOfTitle() < 120)))
         return false;
 
     return true;
