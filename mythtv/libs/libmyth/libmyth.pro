@@ -47,6 +47,8 @@ DEPENDPATH += ../libmythupnp
 
 LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}
+LIBS += -L../libmythui         -lmythui-$${LIBVERSION}
+LIBS += -L../libmythupnp       -lmythupnp-$${LIBVERSION}
 
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}

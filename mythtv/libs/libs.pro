@@ -8,9 +8,9 @@ CONFIG += ordered
 # Directories
 SUBDIRS += libavutil libavcodec libavformat libmythsamplerate 
 SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
-SUBDIRS += libmyth
 
 SUBDIRS += libmythupnp libmythui
+SUBDIRS += libmyth
 
 SUBDIRS += libmythfreemheg libmythlivemedia
 

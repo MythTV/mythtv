@@ -34,11 +34,12 @@ INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../..
 DEPENDPATH += ../libmyth
 
-LIBS += -L../libmyth
-LIBS += -lmyth-$$LIBVERSION
-LIBS += $$EXTRA_LIBS
+# There is a circular dependency here, and this lib may not be built yet:
+#LIBS += -L../libmyth
+#LIBS += -lmyth-$$LIBVERSION
+#TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 
-TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+LIBS += $$EXTRA_LIBS
 
 mingw {
     HEADERS += darwin-sendfile.h
