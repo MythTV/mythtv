@@ -37,6 +37,7 @@ inc.files = avcodec.h i386/mmx.h opt.h
 
 INSTALLS += inc
 
+LIBS += -lz
 LIBS += $$LOCAL_LIBDIR_X11
 LIBS += -L../libavutil -lmythavutil-$$LIBVERSION
 
@@ -469,7 +470,6 @@ contains( TARGET_ALTIVEC, yes ) {
 }
 
 macx {
-    LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC3000000
     QMAKE_LFLAGS_SHLIB += -read_only_relocs warning
