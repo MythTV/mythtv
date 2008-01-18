@@ -113,8 +113,6 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
-
-    streamHandler->SetRetuneAllowed(false, NULL, NULL);
     DVBStreamHandler::Return(streamHandler);
 }
 
@@ -154,6 +152,7 @@ void DVBSignalMonitor::Stop(void)
     if (GetStreamData())
         streamHandler->RemoveListener(GetStreamData());
     streamHandlerStarted = false;
+    streamHandler->SetRetuneAllowed(false, NULL, NULL);
     VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
 }
 
