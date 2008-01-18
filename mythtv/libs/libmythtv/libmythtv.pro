@@ -52,6 +52,7 @@ TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 
 DEFINES += _LARGEFILE_SOURCE
