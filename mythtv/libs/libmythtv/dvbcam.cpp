@@ -296,6 +296,8 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
     }
     else if (pmt && (PMTList.empty() || (it != PMTList.end())))
     {
+        if (it != PMTList.end())
+            delete it.data();
         PMTList[chan] = new ProgramMapTable(*pmt);
         have_pmt    = true;
         pmt_updated = true;
