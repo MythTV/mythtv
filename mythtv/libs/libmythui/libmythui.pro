@@ -12,7 +12,8 @@ INCLUDEPATH += ../.. ../
 
 DEPENDPATH += ../libmyth .
 
-LIBS += -L../libmyth -lmyth-$$LIBVERSION
+# There is a circular dependency here, and this lib may not be built yet:
+#LIBS += -L../libmyth -lmyth-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

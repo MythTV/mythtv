@@ -38,6 +38,7 @@ DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
 
 LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}
+LIBS += -L../libmythui         -lmythui-$${LIBVERSION}
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
@@ -48,6 +49,7 @@ isEmpty(QMAKE_EXTENSION_LIB) {
 
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+TARGETDEPS += ../libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h

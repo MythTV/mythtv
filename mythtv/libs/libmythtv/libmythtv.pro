@@ -29,9 +29,13 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
+LIBS += -L../libmythfreemheg -L../libmythlivemedia
+LIBS += -L../libmythui
 LIBS += -lmyth-$${LIBVERSION} -lmythavutil-$${LIBVERSION}
 LIBS += -lmythavcodec-$${LIBVERSION} -lmythdvdnav-$${LIBVERSION}
 LIBS += -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION}
+LIBS += -lmythfreemheg-$${LIBVERSION} -lmythlivemedia-$${LIBVERSION}
+LIBS += -lmythui-$${LIBVERSION}
 LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
@@ -46,6 +50,8 @@ TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHL
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 
 DEFINES += _LARGEFILE_SOURCE
