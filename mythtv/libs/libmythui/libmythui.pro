@@ -12,7 +12,8 @@ INCLUDEPATH += ../.. ../
 
 DEPENDPATH += ../libmyth .
 
-LIBS += -L../libmyth -lmyth-$$LIBVERSION
+# There is a circular dependency here, and this lib may not be built yet:
+#LIBS += -L../libmyth -lmyth-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -60,7 +61,8 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
 
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xCC000000
+    # This lib depends on libmyth which depends on some stuff in libmythupnp.
+    LIBS += -L../libmythupnp -lmythupnp-$$LIBVERSION
 }
 
 using_joystick_menu {
