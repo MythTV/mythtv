@@ -58,7 +58,11 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
         dir.mkdir(fileprefix);
     
     // Initialize variables
-
+	zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    browser = gContext->GetSetting("WebBrowserCommand",
+                                   gContext->GetInstallPrefix() +
+                                      "/bin/mythbrowser");
+	expectingPopup = false;
     m_InColumn     = 0;
     m_UISites      = 0;
     m_UIArticles   = 0;
@@ -280,9 +284,42 @@ void MythFlix::updateInfoView()
                 if (ttype)
                     ttype->SetText(article->description());
 
+                // removes html tags 
+                { 
+                    QString artText = article->description(); 
+                    // Replace paragraph and break HTML with newlines 
+                    if( artText.find(QRegExp("</(p|P)>")) ) 
+                    { 
+                        artText.replace( QRegExp("<(p|P)>"), ""); 
+                        artText.replace( QRegExp("</(p|P)>"), "\n\n"); 
+                    } 
+                    else 
+                    { 
+                        artText.replace( QRegExp("<(p|P)>"), "\n\n"); 
+                        artText.replace( QRegExp("</(p|P)>"), ""); 
+                    }                         
+                    artText.replace( QRegExp("<(br|BR|)/>"), "\n"); 
+                    artText.replace( QRegExp("<(br|BR|)>"), "\n"); 
+                    // These are done instead of simplifyWhitespace 
+                    // because that function also strips out newlines 
+                    // Replace tab characters with nothing 
+                    artText.replace( QRegExp("\t"), ""); 
+                    // Replace double space with single 
+                    artText.replace( QRegExp("  "), ""); 
+                    // Replace whitespace at beginning of lines with newline 
+                    artText.replace( QRegExp("\n "), "\n"); 
+                    // Remove any remaining HTML tags 
+                    QRegExp removeHTML(QRegExp("</?.+>")); 
+                    removeHTML.setMinimal(true); 
+                    artText.remove((const QRegExp&) removeHTML); 
+                    artText = artText.stripWhiteSpace(); 
+                    ttype->SetText(artText); 
+                }  
+
                 QString imageLoc = article->articleURL();
-                int index = imageLoc.find("movieid=");
-                imageLoc = imageLoc.mid(index+8,8) + ".jpg";
+                int length = imageLoc.length();
+                int index = imageLoc.findRev("/");
+                imageLoc = imageLoc.mid(index,length) + ".jpg";
 
                 QString fileprefix = MythContext::GetConfDir();
                 
@@ -397,7 +434,7 @@ void MythFlix::keyPressEvent(QKeyEvent *e)
         else if (action == "RIGHT")
             cursorRight();
         else if(action == "SELECT")
-            slotViewArticle();
+            displayOptions();
         else
             handled = false;
     }
@@ -510,6 +547,30 @@ void MythFlix::processAndShowNews(NewsSite* site)
     } 
 }
 
+void MythFlix::slotShowNetFlixPage()
+{
+	if (expectingPopup)
+	slotCancelPopup();
+    
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+	if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+			QString cmdUrl(article->articleURL());
+			cmdUrl.replace('\'', "%27");
+	
+			QString cmd = QString("%1 %2 '%3'")
+				 .arg(browser)
+				 .arg(zoom)
+				 .arg(cmdUrl);
+			VERBOSE(VB_GENERAL, QString("MythFlixBrowse: Opening Neflix site: (%1)").arg(cmd));
+			myth_system(cmd);
+        }
+    }
+}
+
 void MythFlix::slotSiteSelected(UIListBtnTypeItem *item)
 {
     if (!item || !item->getData())
@@ -538,21 +599,11 @@ void MythFlix::slotViewArticle()
                     gContext->GetSetting("NetFlixAddQueueCommandLine", 
                     gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
 
-            QString cmdUrl(article->articleURL());
-            cmdUrl.replace('\'', "%27");
-
-            QUrl url(cmdUrl);
-
-            QString query = url.query();
-            QStringList getArgs = QStringList::split('&', query);
-
-            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
-            {
-                QString name = (*it).section('=', 0, 0);
-                QString vale = (*it).section('=', 1);
-
-                args += vale;
-            }
+            QString movieID(article->articleURL());
+            int length = movieID.length();
+            int index = movieID.findRev("/");
+            movieID = movieID.mid(index+1,length);
+            args += movieID;
 		
 			// execute external command to obtain list of possible movie matches 
 			QString results = executeExternal(args, "Add Movie");
@@ -560,6 +611,43 @@ void MythFlix::slotViewArticle()
         }
     } 
 }
+
+void MythFlix::displayOptions()
+{
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), "menu popup");
+
+    QLabel *label = popup->addLabel(tr("Browse Options"),
+                                  MythPopupBox::Large, false);
+    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    QButton *topButton = popup->addButton(tr("Add To Queue"), this,
+                     SLOT(slotViewArticle()));
+                     
+    popup->addButton(tr("Show NetFlix Page"), this,
+                     SLOT(slotShowNetFlixPage()));
+
+    popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
+
+    popup->ShowPopup(this, SLOT(slotCancelPopup()));
+
+    topButton->setFocus();
+
+    expectingPopup = true;
+
+}
+
+void MythFlix::slotCancelPopup(void)
+{
+    popup->hide();
+    expectingPopup = false;
+
+    delete popup;
+    popup = NULL;
+
+    setActiveWindow();
+}
+
 
 // Execute an external command and return results in string
 //   probably should make this routing async vs polling like this

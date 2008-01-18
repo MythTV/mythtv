@@ -24,7 +24,7 @@ print "       -i           display info\n";
 print "       -d           debug\n";
 print "\n";
 print "       -L <userid> <password> login into Netflix. Only needed once, ever.\n";
-print "       -A <movieid> <trkid> adds movie to queue\n";
+print "       -A <movieid> adds movie to queue\n";
 print "       -R <movieid> removes movie to queue\n";
 print "       -1 <movieid> move movie to top of queue\n";
 exit(-1);
@@ -87,7 +87,7 @@ sub login
 sub addToQueue
 {
     
-    $url = "http://www.netflix.com/AddToQueue?movieid=$movieid&trkid=$trkid";
+    $url = "http://www.netflix.com/AddToQueue?movieid=$movieid";
     if (defined $opt_d) {printf("AddToQueue: $url\n");}
     
     $ua = &userAgent();
@@ -153,9 +153,8 @@ if (defined $opt_L)
 if (defined $opt_A)
 {
     # take movieid from cmdline arg
-    $movieid = shift || die "Usage : $0 -A <movieid> <trkid>\n";
-    $trkid = shift || die "Usage : $0 -A <movieid> <trkid>\n";
-    &addToQueue($movieid,$trkid);
+    $movieid = shift || die "Usage : $0 -A <movieid>\n";
+    &addToQueue($movieid);
 }
 
 if (defined $opt_R)

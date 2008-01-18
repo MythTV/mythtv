@@ -58,6 +58,7 @@ private:
     void cursorDown(bool page=false);
     void cursorRight();
     void cursorLeft();
+	void displayOptions();
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
@@ -72,7 +73,10 @@ private:
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
     unsigned int   m_InColumn;
-
+    MythPopupBox  *popup;
+	QString        zoom;
+    QString        browser;
+    bool           expectingPopup;
     NewsSite::List m_NewsSites;
 
 private slots:
@@ -82,7 +86,8 @@ private slots:
 
     void slotSiteSelected(UIListBtnTypeItem *item);
     void slotArticleSelected(UIListBtnTypeItem *item);
-
+    void slotShowNetFlixPage();
+    void slotCancelPopup();
 };
 
 #endif /* MYTHFLIX_H */
