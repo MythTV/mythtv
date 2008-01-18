@@ -32,14 +32,11 @@ SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp
 
 INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../..
-DEPENDPATH += ../libmythtv ../libmyth ../libavcodec
-DEPENDPATH += ../libavformat
+DEPENDPATH += ../libmyth
 
-LIBS += -L../libmyth -L../libmythtv -L../libavcodec
-LIBS += -L../libavformat
-
-LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION 
-LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -L../libmyth
+LIBS += -lmyth-$$LIBVERSION
+LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
@@ -53,9 +50,6 @@ cygwin {
 }
 
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
-TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
 
