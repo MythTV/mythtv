@@ -5606,7 +5606,7 @@ bool TV::IsTunable(uint chanid)
         }
     }
 
-    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1, %2) -> false\n").arg(chanid));
+    VERBOSE(VB_PLAYBACK, QString("IsTunable(%1) -> false\n").arg(chanid));
 
     return false;
 }
