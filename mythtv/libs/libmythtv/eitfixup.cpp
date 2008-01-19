@@ -74,6 +74,7 @@ EITFixUp::EITFixUp()
       m_mcaCC(",?\\s(HI|English) Subtitles\\.?"),
       m_mcaDD(",?\\sDD\\.?"),
       m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
+      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)"),
       m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
       m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
@@ -1013,7 +1014,8 @@ void EITFixUp::FixRTL(DBEvent &event) const
             event.description.remove(pos, length).stripWhiteSpace();
         event.originalairdate = event.starttime.addDays(-1).date();
     }
-    
+
+    QRegExp tmpExp1 = m_RTLSubtitle;
     QRegExp tmpExpSubtitle1 = m_RTLSubtitle1;
     tmpExpSubtitle1.setMinimal(true);
     QRegExp tmpExpSubtitle2 = m_RTLSubtitle2;
@@ -1077,6 +1079,21 @@ void EITFixUp::FixRTL(DBEvent &event) const
         event.subtitle    = tmpExpEpisodeNo2.cap(1);
         event.description =
             event.description.remove(0, tmpExpEpisodeNo2.matchedLength());
+    }
+
+    int position;
+    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
+    const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
+
+    if ((position = tmpExp1.search(event.description)) != -1)
+    {
+        if ((tmpExp1.cap(1).length() < SUBTITLE_MAX_LEN) &&
+            ((tmpExp1.cap(1).length()*100)/event.description.length() <
+             SUBTITLE_PCT))
+        {
+            event.subtitle    = tmpExp1.cap(1);
+            event.description = tmpExp1.cap(2);
+        }
     }
 }
 

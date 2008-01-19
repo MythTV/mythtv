@@ -132,6 +132,7 @@ class EITFixUp
     const QRegExp m_mcaCC;
     const QRegExp m_mcaDD;
     const QRegExp m_RTLrepeat;
+    const QRegExp m_RTLSubtitle;
     const QRegExp m_RTLSubtitle1;
     const QRegExp m_RTLSubtitle2;
     const QRegExp m_RTLSubtitle3;
