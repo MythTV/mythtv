@@ -5554,7 +5554,22 @@ bool TV::IsTunable(uint chanid)
         excluded_cards.push_back(recorder->GetRecorderNumber());
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-    vector<uint> cardids = CardUtil::GetCardIDs(sourceid);
+    vector<uint> connected   = RemoteRequestFreeRecorderList();
+    vector<uint> interesting = CardUtil::GetCardIDs(sourceid);
+
+    // filter disconnected cards
+    vector<uint> cardids;
+    for (uint i = 0; i < connected.size(); i++)
+    {
+        for (uint j = 0; j < interesting.size(); j++)
+        {
+            if (connected[i] == interesting[j])
+            {
+                cardids.push_back(interesting[j]);
+                break;
+            }
+        }
+    }
 
 #if 0
     cout << "cardids[" << sourceid << "]: ";
