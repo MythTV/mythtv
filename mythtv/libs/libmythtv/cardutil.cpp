@@ -1604,11 +1604,10 @@ void CardUtil::GetCardInputs(
 #ifdef USING_DVB
     if ("DVB" == cardtype)
     {
-        InputNames list;
-        list[0] = "DVBInput";
         bool needs_conf = IsInNeedOfExternalInputConf(cardid);
-        if (needs_conf)
-            list = GetConfiguredDVBInputs(cardid);
+        InputNames list = GetConfiguredDVBInputs(cardid);
+        if (list.empty())
+            list[0] = "DVBInput";
 
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
