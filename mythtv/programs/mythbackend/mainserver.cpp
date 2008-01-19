@@ -2824,11 +2824,20 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         return;
     }
 
-    EncoderLink *enc = iter.data();  
-
     QString command = slist[1];
 
     QStringList retlist;
+
+    EncoderLink *enc = iter.data();
+    if (!enc->IsConnected())
+    {
+        VERBOSE(VB_IMPORTANT," MainServer::HandleRecorderQuery() " +
+                QString("Command %1 for unconnected encoder %2")
+                .arg(command).arg(recnum));
+        retlist << "bad";
+        SendResponse(pbssock, retlist);    
+        return;
+    }
 
     if (command == "IS_RECORDING")
     {
