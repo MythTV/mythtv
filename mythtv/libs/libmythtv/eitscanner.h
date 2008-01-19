@@ -30,7 +30,7 @@ class EITSource
 class EITScanner
 {
   public:
-    EITScanner();
+    EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
 
     void StartPassiveScan(ChannelBase*, EITSource*, bool ignore_source);
@@ -64,6 +64,8 @@ class EITScanner
     QStringList::iterator activeScanNextChan;
 
     bool             ignore_source;
+
+    uint             cardnum;
 
     static QMutex    resched_lock;
     static QDateTime resched_next_time;

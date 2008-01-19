@@ -16,6 +16,7 @@
 #include "util.h"
 
 #define LOC QString("EITScanner: ")
+#define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
@@ -28,9 +29,9 @@ QMutex     EITScanner::resched_lock;
 QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
-EITScanner::EITScanner()
+EITScanner::EITScanner(uint _cardnum)
     : channel(NULL), eitSource(NULL), eitHelper(new EITHelper()),
-      exitThread(false), rec(NULL), activeScan(false)
+      exitThread(false), rec(NULL), activeScan(false), cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
@@ -111,7 +112,7 @@ void EITScanner::RunEventLoop(void)
         // seen any in a while, tell scheduler to run.
         if (eitCount && (t.elapsed() > 60 * 1000))
         {
-            VERBOSE(VB_EIT, LOC + "Added "<<eitCount<<" EIT Events");
+            VERBOSE(VB_EIT, LOC_ID + "Added "<<eitCount<<" EIT Events");
             eitCount = 0;
             RescheduleRecordings();
         }
@@ -121,7 +122,7 @@ void EITScanner::RunEventLoop(void)
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
             {
-                VERBOSE(VB_EIT, LOC + "Added "<<eitCount<<" EIT Events");
+                VERBOSE(VB_EIT, LOC_ID + "Added "<<eitCount<<" EIT Events");
                 eitCount = 0;
                 RescheduleRecordings();
             }
@@ -133,7 +134,7 @@ void EITScanner::RunEventLoop(void)
             {
                 eitHelper->WriteEITCache();
                 rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
-                VERBOSE(VB_EIT, LOC +
+                VERBOSE(VB_EIT, LOC_ID +
                         QString("Now looking for EIT data on "
                                 "multiplex of channel %1")
                         .arg(*activeScanNextChan));
@@ -192,7 +193,7 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
     ignore_source = _ignore_source;
 
     if (ignore_source)
-        VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
+        VERBOSE(VB_EIT, LOC_ID + "EIT scan ignoring sourceid..");
 
     eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
@@ -255,7 +256,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
         activeScanNextChan = activeScanChannels.begin();
     }
 
-    VERBOSE(VB_EIT, LOC +
+    VERBOSE(VB_EIT, LOC_ID +
             QString("StartActiveScan called with %1 multiplexes")
             .arg(activeScanChannels.size()));
 

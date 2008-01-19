@@ -1314,9 +1314,9 @@ void TVRec::RunTV(void)
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
         (!GetDVBChannel() || GetDVBChannel()->IsMaster()))
     {
-        scanner = new EITScanner();
+        scanner = new EITScanner(cardid);
         // Wait at least 15 seconds between starting EIT scanning
-	// on distinct cards
+        // on distinct cards
         uint timeout = eitCrawlIdleStart + cardid * 15;
         eitScanStartTime = eitScanStartTime.addSecs(timeout);
     }
