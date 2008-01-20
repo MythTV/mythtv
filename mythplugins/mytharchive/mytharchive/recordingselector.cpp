@@ -411,8 +411,8 @@ void RecordingSelector::getRecordingList(void)
                 continue;
             }
 
-            // ignore live tv recordings
-            if (p->recgroup == "LiveTV")
+            // ignore live tv and deleted recordings
+            if (p->recgroup == "LiveTV" || p->recgroup == "Deleted")
             {
                 recordingList->erase(i);
                 i--;
