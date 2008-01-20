@@ -1151,7 +1151,7 @@ void SmartPlaylistEditor::saveClicked(void)
     
     QString name = titleEdit->text();
     QString category = categoryCombo->currentText();
-    QString matchType = matchCombo->currentText();
+    QString matchType = (matchCombo->currentText() == tr("All") ? "All" : "Any");
     QString orderBy = orderByCombo->currentText();
     QString limit = limitSpinEdit->text();
     
@@ -1253,7 +1253,10 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
             ID = query.value(0).toInt();
             titleEdit->setText(name);
             categoryCombo->setCurrentText(category);
-            matchCombo->setCurrentText(query.value(3).toString());
+            if (query.value(3).toString() == "All")
+                matchCombo->setCurrentText(tr("All"));
+            else
+                matchCombo->setCurrentText(tr("Any"));
             orderByCombo->setCurrentText(QString::fromUtf8(query.value(4).toString()));
             limitSpinEdit->setValue(query.value(5).toInt());
         }
@@ -1481,7 +1484,7 @@ QString SmartPlaylistEditor::getWhereClause(void)
         }
         else
         {
-            if (matchCombo->currentText() == "Any")
+            if (matchCombo->currentText() == tr("Any"))
                 sql += " OR " + criteria;
             else
                 sql += " AND " + criteria;    
