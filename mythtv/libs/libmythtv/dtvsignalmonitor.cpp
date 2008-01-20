@@ -58,6 +58,7 @@ DTVSignalMonitor::~DTVSignalMonitor()
 void DTVSignalMonitor::deleteLater(void)
 {
     SetStreamData(NULL);
+    SignalMonitor::deleteLater();
 }
 
 DTVChannel *DTVSignalMonitor::GetDTVChannel(void)
