@@ -2000,7 +2000,7 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
     qfile = quoteFilename(file)
     qcutlist = os.path.join(folder, "cutlist_x.txt")
 
-    command = path_projectx[0]
+    command = path_projectx[0] + " -id %s" % getStreamList(folder)
     if usecutlist == True:
         command += " -cut %s -out %s -name %s %s" % (qcutlist, qdestdir, qpxbasename, qfile)
     else:
@@ -4277,6 +4277,25 @@ def getFileType(folder):
     node = nodes[0]
 
     return node.attributes["type"].value
+
+#############################################################
+# get the list of required stream ids for a file
+
+def getStreamList(folder):
+
+    # choose which streams we need
+    video, audio1, audio2 = selectStreams(folder)
+
+    streamList = "0x%x" % video[VIDEO_ID]
+
+    if audio1[AUDIO_ID] != -1:
+        streamList += ",0x%x" % audio1[AUDIO_ID]
+
+    if audio2[AUDIO_ID] != -1:
+        streamList += ",0x%x" % audio2[AUDIO_ID]
+
+    return streamList;
+
 
 #############################################################
 # check if file is DVD compliant
