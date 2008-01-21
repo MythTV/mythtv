@@ -97,6 +97,9 @@ class SIScan : public QObject,
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
     void HandleTDT(const TimeDateTable*) {}
 
+  public slots:
+    void deleteLater(void);
+
   private slots:
     void HandleAllGood(void);
 

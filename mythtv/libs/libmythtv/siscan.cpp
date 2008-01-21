@@ -133,10 +133,17 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
 
 SIScan::~SIScan(void)
 {
+    // Use deleteLater() instead
+    StopScanner();
+    VERBOSE(VB_SIPARSER, LOC + "SIScanner dtor");
+}
+
+void SIScan::deleteLater(void)
+{
+    disconnect();
     StopScanner();
     VERBOSE(VB_SIPARSER, LOC + "SIScanner Stopped");
-    if (signalMonitor)
-        delete signalMonitor;
+    QObject::deleteLater();
 }
 
 void SIScan::SetAnalog(bool is_analog)
@@ -769,7 +776,11 @@ void SIScan::StopScanner(void)
         pthread_join(scanner_thread, NULL);
 
     if (signalMonitor)
+    {
         signalMonitor->Stop();
+        signalMonitor->deleteLater();
+        signalMonitor = NULL;
+    }
 }
 
 /** \fn SIScan::ScanTransports(int,const QString,const QString,const QString)

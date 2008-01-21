@@ -116,7 +116,7 @@ void ScanWizardScanner::Teardown()
     // Join the thread and close the channel
     if (scanner)
     {
-        delete scanner; // TODO we should use deleteLater...
+        scanner->deleteLater();
         scanner = NULL;
     }
 
