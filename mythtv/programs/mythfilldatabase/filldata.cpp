@@ -689,7 +689,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
             // We'll keep grabbing until it returns nothing
             // Max days currently supported is 21
-            int grabdays = 21;
+            int grabdays = REFRESH_MAX;
 
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
@@ -699,7 +699,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
             grabdays = (only_update_channels) ? 1 : grabdays;
 
             if (grabdays == 1)
-                refresh_today = true;
+                refresh_request[0] = true;
 
             if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)
             {
@@ -730,31 +730,18 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
                 bool download_needed = false;
 
-                if (refresh_all)
+                if (refresh_request[i])
                 {
-                    VERBOSE(VB_GENERAL,
-                            "Data Refresh needed because of --refresh-all");
-                    download_needed = true;
-                }
-                else if ((i == 0 && refresh_today) || (i == 1 && refresh_tomorrow) ||
-                         (i == 2 && refresh_second))
-                {
-                    // Always refresh if the user specified today/tomorrow/second.
-                    if (refresh_today)
+		  if( i == 1 )
                     {
-                        VERBOSE(VB_GENERAL,
-                            "Data Refresh needed because user specified --refresh-today");
+		      VERBOSE(VB_GENERAL,
+			      "Data Refresh always needed for tomorrow");
                     }
-                    else if (refresh_second)
-                    {
-                        VERBOSE(VB_GENERAL,
-                            "Data Refresh needed because user specified --refresh-second");
-                    }
-                    else
-                    {
-                        VERBOSE(VB_GENERAL,
-                            "Data Refresh always needed for tomorrow");
-                    }
+		  else
+		    {
+		      VERBOSE(VB_GENERAL,
+			      "Data Refresh needed because of user request");
+		    }
                     download_needed = true;
                 }
                 else

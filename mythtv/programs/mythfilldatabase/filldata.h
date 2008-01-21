@@ -14,6 +14,8 @@
 #include "xmltvparser.h"
 #include "icondata.h"
 
+#define REFRESH_MAX 21
+
 struct Source
 {
     int id;
@@ -37,12 +39,13 @@ class FillData
         lastdduserid(QString::null),    graboptions(""),
         raw_lineup(0),                  maxDays(0),
         interrupted(false),             endofdata(false),
-        refresh_today(false),           refresh_tomorrow(true),
-        refresh_second(false),          refresh_all(false),
         refresh_tba(true),              dd_grab_all(false),
         dddataretrieved(false),
         need_post_grab_proc(true),      only_update_channels(false),
-        channel_update_run(false) {}
+        channel_update_run(false) {
+	    for( int i = 0; i < REFRESH_MAX; i++ ) refresh_request[i] = false;
+	    refresh_request[1] = true;
+	}
 
     void DataDirectStationUpdate(Source source, bool update_icons = true);
     bool DataDirectUpdateChannels(Source source);
@@ -71,10 +74,7 @@ class FillData
 
     bool    interrupted;
     bool    endofdata;
-    bool    refresh_today;
-    bool    refresh_tomorrow;
-    bool    refresh_second;
-    bool    refresh_all;
+    bool    refresh_request[REFRESH_MAX];
     bool    refresh_tba;
     bool    dd_grab_all;
     bool    dddataretrieved;

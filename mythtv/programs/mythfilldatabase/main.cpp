@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
 
             fill_data.maxDays = QString(a.argv()[++argpos]).toInt();
 
-            if (fill_data.maxDays < 1 || fill_data.maxDays > 21)
+            if (fill_data.maxDays < 1 || fill_data.maxDays > REFRESH_MAX)
             {
                 printf("ignoring invalid parameter for --max-days\n");
                 fill_data.maxDays = 0;
@@ -216,19 +216,39 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-today"))
         {
-            fill_data.refresh_today = true;
+            fill_data.refresh_request[0] = true;
         }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tomorrow"))
         {
-            fill_data.refresh_tomorrow = false;
+            fill_data.refresh_request[1] = false;
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-second"))
         {
-            fill_data.refresh_second = true;
+            fill_data.refresh_request[2] = true;
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-all"))
         {
-            fill_data.refresh_all = true;
+	  for( int i = 0; i < REFRESH_MAX; i++ )
+            fill_data.refresh_request[i] = true;
+        }
+	else if (!strcmp(a.argv()[argpos], "--refresh-day"))
+        {
+            if (((argpos + 1) >= a.argc()))
+            {
+                printf("missing parameter for --refresh-day option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            int day = QString(a.argv()[++argpos]).toInt();
+
+            if (day < 0 || day > REFRESH_MAX)
+            {
+                printf("ignoring invalid parameter for --refresh-day\n");
+            }
+	    else
+	    {
+	      fill_data.refresh_request[day] = true;
+	    }
         }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
         {
@@ -259,9 +279,8 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
         {
             fill_data.dd_grab_all = true;
-            fill_data.refresh_today = false;
-            fill_data.refresh_tomorrow = false;
-            fill_data.refresh_second = false;
+	    for( int i = 0; i < REFRESH_MAX; i++ )
+	      fill_data.refresh_request[i] = false;
         }
 #endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
@@ -417,8 +436,9 @@ int main(int argc, char *argv[])
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
             cout << "--refresh-all\n";
+	    cout << "--refresh-day <number>";
             cout << "   (Only valid for selected grabbers: e.g. DataDirect)\n";
-            cout << "   Force a refresh today or two days (or every day) from now,\n";
+            cout << "   Force a refresh today, two days, every day, or a specific day from now,\n";
             cout << "   to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will always be refreshed unless this argument is used\n";
