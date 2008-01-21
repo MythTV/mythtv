@@ -957,7 +957,8 @@ void Scheduler::RestoreRecStatus(void)
     }
 }
 
-bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool preserveLive)
+bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
+                                   bool preserveLive)
 {
     PrintRec(p, "     >");
 
@@ -983,12 +984,16 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool preserveLive)
         if (q == p)
             continue;
 
+        if (samePriority && (q->recpriority != p->recpriority))
+            continue;
+
         hasLaterShowing = false;
 
         if (q->recstatus != rsEarlierShowing &&
             q->recstatus != rsLaterShowing &&
             q->recstatus != rsUnknown)
             continue;
+
         if (!p->IsSameTimeslot(*q))
         {
             if (!IsSameProgram(p,q))
@@ -1001,8 +1006,11 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool preserveLive)
 
             hasLaterShowing |= preserveLive;
         }
-
-        PrintRec(q, "     #");
+ 
+        if (samePriority)
+            PrintRec(q, "     %");
+        else
+            PrintRec(q, "     #");
 
         if (preserveLive)
         {
@@ -1112,9 +1120,45 @@ void Scheduler::MoveHigherRecords(bool move_this)
         if (p->recstatus != rsUnknown)
             continue;
 
+        PrintRec(p, "  /");
+
+        BackupRecStatus();
+        p->recstatus = rsWillRecord;
+        MarkOtherShowings(p);
+
+        RecList cardlist;
+        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
+        for (; it != cardlistmap.end(); ++it)
+        {
+            RecConstIter it2 = (*it).begin();
+            for (; it2 != (*it).end(); ++it2)
+                cardlist.push_back(*it2);
+        }
+        RecConstIter k = cardlist.begin();
+        for ( ; FindNextConflict(cardlist, p, k ); k++)
+        {
+            if (p->recpriority != (*k)->recpriority ||
+                !TryAnotherShowing(*k, true))
+            {
+                RestoreRecStatus();
+                break;
+            }
+        }
+
+        if (p->recstatus == rsWillRecord)
+            PrintRec(p, "  +");
+    }
+
+    i = retrylist.begin();
+    for ( ; i != retrylist.end(); i++)
+    {
+        ProgramInfo *p = *i;
+        if (p->recstatus != rsUnknown)
+            continue;
+
         PrintRec(p, "  ?");
 
-        if (move_this && TryAnotherShowing(p))
+        if (move_this && TryAnotherShowing(p, false))
             continue;
 
         BackupRecStatus();
@@ -1135,7 +1179,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
         for ( ; FindNextConflict(cardlist, p, k); k++)
         {
             if ((p->recpriority < (*k)->recpriority && !schedMoveHigher &&
-                move_this) || !TryAnotherShowing(*k, !move_this))
+                move_this) || !TryAnotherShowing(*k, false, !move_this))
             {
                 RestoreRecStatus();
                 break;

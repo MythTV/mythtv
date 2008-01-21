@@ -108,7 +108,8 @@ class Scheduler : public QObject
     void MarkShowingsList(RecList &showinglist, ProgramInfo *p);
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
-    bool TryAnotherShowing(ProgramInfo *p, bool preserveLive = false);
+    bool TryAnotherShowing(ProgramInfo *p,  bool samePriority,
+                           bool preserveLive = false);
     void SchedNewRecords(void);
     void MoveHigherRecords(bool move_this = true);
     void SchedPreserveLiveTV(void);
