@@ -2247,6 +2247,27 @@ void Scheduler::UpdateMatches(int recordid) {
         return;
     }
 
+    // Make sure all FindOne rules have a valid findid before scheduling.
+    query.prepare("SELECT NULL from record "
+                  "WHERE type = :FINDONE AND findid <= 0;");
+    query.bindValue(":FINDONE", kFindOneRecord);
+    query.exec();
+    if (!query.isActive())
+    {
+        MythContext::DBError("UpdateMatches", query);
+        return;
+    }
+    else if (query.size())
+    {
+        QDate epoch = QDate::QDate (1970, 1, 1);
+        int findtoday =  epoch.daysTo(QDate::currentDate()) + 719528;
+        query.prepare("UPDATE record set findid = :FINDID "
+                      "WHERE type = :FINDONE AND findid <= 0;");
+        query.bindValue(":FINDID", findtoday);
+        query.bindValue(":FINDONE", kFindOneRecord);
+        query.exec();
+    }
+
     unsigned clause;
     QStringList fromclauses, whereclauses;
     MSqlBindings bindings;
