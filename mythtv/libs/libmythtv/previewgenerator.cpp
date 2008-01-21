@@ -458,7 +458,7 @@ bool PreviewGenerator::SavePreview(QString filename,
 
     QImage small_img = img.smoothScale((int) ppw, (int) pph);
 
-    if (small_img.save(filename.ascii(), "PNG"))
+    if (small_img.save(filename, "PNG"))
     {
         chmod(filename.ascii(), 0666); // Let anybody update it
 

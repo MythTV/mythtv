@@ -934,7 +934,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->playgroup = query.value(21).toString();
         proginfo->recpriority = query.value(22).toInt();
 
-        proginfo->pathname = query.value(25).toString();
+        proginfo->pathname = QString::fromUtf8(query.value(25).toString());
 
         return proginfo;
     }
@@ -4840,7 +4840,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
                     proginfo->hasAirDate  = false;
             }
 
-            proginfo->pathname = query.value(28).toString();
+            proginfo->pathname = QString::fromUtf8(query.value(28).toString());
 
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())

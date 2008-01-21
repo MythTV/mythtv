@@ -1208,7 +1208,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->hasAirDate  = false;
             }
 
-            proginfo->pathname = query.value(28).toString();
+            proginfo->pathname = QString::fromUtf8(query.value(28).toString());
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -2058,6 +2058,12 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
+    if (!fileExists) 
+    {
+        QFile checkFileUTF8(QString::fromUtf8(filename));
+        if (fileExists = checkFileUTF8.exists())
+            filename = QString::fromUtf8(filename);
+    }
 
     // Allow deleting of files where the recording failed meaning size == 0
     // But do not allow deleting of files that appear to be completely absent.
