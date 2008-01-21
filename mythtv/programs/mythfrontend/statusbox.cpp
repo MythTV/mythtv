@@ -858,7 +858,50 @@ void StatusBox::doScheduleStatus()
 
     QMap<RecStatusType, int> statusMatch;
     QMap<RecStatusType, QString> statusText;
+    QMap<int, int> sourceMatch;
+    QMap<int, QString> sourceText;
+    QMap<int, int> inputMatch;
+    QMap<int, QString> inputText;
     QString tmpstr;
+    int maxSource = 0;
+    int maxInput = 0;
+    int hdflag = 0;
+
+    query.prepare("SELECT MAX(sourceid) FROM videosource");
+    if (query.exec() && query.isActive() && query.size())
+    {
+        query.next();
+        maxSource = query.value(0).toInt();
+    }
+
+    query.prepare("SELECT sourceid,name FROM videosource");
+    if (query.exec() && query.isActive() && query.size())
+    {
+        while (query.next())
+            sourceText[query.value(0).toInt()] = query.value(1).toString();
+    }
+
+    query.prepare("SELECT MAX(cardinputid) FROM cardinput");
+    if (query.exec() && query.isActive() && query.size())
+    {
+        query.next();
+        maxInput = query.value(0).toInt();
+    }
+
+    query.prepare("SELECT cardinputid,cardid,inputname,displayname "
+                  "FROM cardinput");
+    if (query.exec() && query.isActive() && query.size())
+    {
+        while (query.next())
+        {
+            if (query.value(3).toString() > "")
+                inputText[query.value(0).toInt()] = query.value(3).toString();
+            else
+                inputText[query.value(0).toInt()] = QString("%1: %2")
+                                              .arg(query.value(1).toInt())
+                                              .arg(query.value(2).toString());
+        }
+    }
 
     ProgramList schedList;
     schedList.FromScheduler();
@@ -875,6 +918,14 @@ void StatusBox::doScheduleStatus()
             statusText[s->recstatus] = s->RecStatusText();
 
         ++statusMatch[s->recstatus];
+
+        if (s->recstatus == rsWillRecord || s->recstatus == rsRecording)
+        {
+            ++sourceMatch[s->sourceid];
+            ++inputMatch[s->inputid];
+            if (s->videoproperties & VID_HDTV)
+                ++hdflag;
+        }
     }
     QMap<int, RecStatusType> statusMap;
     int i = 0;
@@ -895,6 +946,41 @@ void StatusBox::doScheduleStatus()
         {
             tmpstr = QString("%1 %2").arg(statusMatch[type])
                                      .arg(statusText[type]);
+            contentLines[count]  = tmpstr;
+            contentDetail[count] = tmpstr;
+            count++;
+        }
+    }
+
+    QString willrec = statusText[rsWillRecord];
+
+    if (hdflag > 0)
+    {
+        tmpstr = QString("%1 %2 %3").arg(hdflag).arg(willrec)
+                                    .arg(tr("marked as HDTV"));
+        contentLines[count]  = tmpstr;
+        contentDetail[count] = tmpstr;
+        count++;
+    }
+    for (i = 1; i <= maxSource; i++)
+    {
+        if (sourceMatch[i] > 0)
+        {
+            tmpstr = QString("%1 %2 %3 %4 \"%5\"")
+                             .arg(sourceMatch[i]).arg(willrec)
+                             .arg(tr("from source")).arg(i).arg(sourceText[i]);
+            contentLines[count]  = tmpstr;
+            contentDetail[count] = tmpstr;
+            count++;
+        }
+    }
+    for (i = 1; i <= maxInput; i++)
+    {
+        if (inputMatch[i] > 0)
+        {
+            tmpstr = QString("%1 %2 %3 %4 \"%5\"")
+                             .arg(inputMatch[i]).arg(willrec)
+                             .arg(tr("on input")).arg(i).arg(inputText[i]);
             contentLines[count]  = tmpstr;
             contentDetail[count] = tmpstr;
             count++;
