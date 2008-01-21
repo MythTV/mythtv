@@ -111,6 +111,8 @@ long GetIPAddressList(QStringList &sStrList)
         //                 .arg(ifa->ifa_name).arg(address));
     }
 
+    freeifaddrs(list);
+
     return(sStrList.count());
 }
 
