@@ -35,6 +35,7 @@ class MythUIButton : public MythUIType
     void SetPaddingMargin(int margin);
 
     void SetText(const QString &msg, int textFlags = -1);
+    QString GetText() const { return m_Text->GetText(); }
 
     void SelectState(StateType newState);
     void SetCheckState(MythUIStateType::StateType state);
