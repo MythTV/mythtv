@@ -20,14 +20,16 @@ use strict;
 #use Cwd ();
 use LWP::UserAgent;
 use IO::File;
-use Data::Dumper qw(Dumper); 
+use Data::Dumper; 
 use File::Copy qw(cp);
 
 my $NOISY = 1; # set to 0 for less output to the screen
 
 $| = 1; # autoflush stdout;
 
-my $SVNRELEASE = '15433' ;# this scipt was last tested to work with this version, on other versions YMMV.
+my $SVNRELEASE = '15433' ;# this scipt was last tested to work with this 
+                          # developer version, on other versions YMMV.
+#my $SVNRELEASE = 'HEAD' ;# if you are game, go forth and test the latest release! 
 
 # We allow SourceForge to tell us which server to download from,
 # rather than assuming specific server/s
@@ -35,8 +37,7 @@ my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
                                                    # mirror of SF's choosing,
                                                    # hopefully close to you
 # alternatively you can choose your own mirror:
-#my $sourceforge = 'optusnet.dl.sourceforge.net';  # australia  <- the author
-#                                                  #            uses this one! 
+#my $sourceforge = 'optusnet.dl.sourceforge.net';  # australia 
 #my $sourceforge = 'internap.dl.sourceforge.net';  # USA,California
 #my $sourceforge = 'easynews.dl.sourceforge.net';  # USA,Arizona,Phoenix,
 #my $sourceforge = 'jaist.dl.sourceforge.net';     # Japan
@@ -50,7 +51,7 @@ my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
 my $proxy = '';
 #my $proxy = 'http://enter.your.proxy.here:8080';
 
-# TODO -  use this list to define the components to build - 
+# TODO -  use this list to define the components to build - only the first of these currently works well.
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 
 
@@ -60,7 +61,8 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #      unless $ENV{SOURCES};
 #  my $sources = $ENV{SOURCES};
 # TODO - although theoretically possible to change these paths,
-#        it has NOT been tested, and will with HIGH PROBABILITY fail somewhere
+#        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
+# TODO - Only $mingw is tested and most likely is safe to change.
 
 # perl compatible paths (single forward slashes in DOS style):
 my $msys = 'C:/MSys/1.0/'; # must end in slash, and use forward slashes /
@@ -119,7 +121,7 @@ my $unixmythtv  = perl2unix($mythtv);
 #  copy a new version of a file, set mtime to the original           [copy] 
 
 #TODO:
-#  copy a file or set of files (path/filespec,  destination)         not-yet-impl.  use exec => 'copy /Y xxx yyy'
+#  copy a set of files (path/filespec,  destination)                 not-yet-impl.  use exec => 'copy /Y xxx.* yyy'
 #  apply a diff                                                      not-yet-impl   use shell => 'patch -p0 < blah.patch'
 #  search-replace text in a file                                     not-yet-impl   use grep => ['pattern',subject], exec => shell 'patch < etc to replace it'
 
@@ -195,7 +197,7 @@ push @{$expect},
 [ dir => $sources.'svn-win32-1.4.6', extract => $sources.'svn-win32-1.4.6.zip' ],
 
 
-[ file => $msys.'bin/svn.exe', shell => ["cp -R $unixsources/svn-win32-1.4.6/* ".$unixmsys],comment => 'put the svn.exe executable into the path, so we can use it later!' ],
+[ file => $msys.'bin/svn.exe', shell => ["cp -R $unixsources/svn-win32-1.4.6/* ".$unixmsys],comment => 'put the svn.exe executable into the path, so we can use it easily later!' ],
 
 # :
 [ dir => $sources."zlib" ,  mkdirs => $sources.'zlib',comment => 'the zlib download is a bit messed-up, and needs some TLC to put everything in the right place' ],
@@ -203,10 +205,10 @@ push @{$expect},
 # install to /usr:
 [ file => $msys.'lib/libz.a',      exec => ["copy /Y ".$dossources.'zlib\usr\lib\* '.$dosmsys."lib"] ], 
 [ file => $msys.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\* '.$dosmsys."bin"] ],
-[ file => $msys.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\*', $dosmsys."include"] ],
+[ file => $msys.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\* '.$dosmsys."include"] ],
 # taglib also requires zlib in /mingw , so we'll put it there too, why not! 
 [ file => $msys.'lib/libz.a',      exec => ["copy /Y ".$dossources.'zlib\usr\lib\* '.$dosmingw."lib"] ],
-[ file => $msys.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\*', $dosmingw."bin"] ],
+[ file => $msys.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\* '. $dosmingw."bin"] ],
 [ file => $msys.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\* '.$dosmingw."include"] ],
 
 
@@ -452,36 +454,6 @@ export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
 export PATH=$QTDIR/bin:$PATH
 ' ],comment => 'write a script that we can source later when inside msys to setup the environment variables'],
 
-## 
-#[ file => $mythtv.'make_run.sh', write => [$mythtv.'make_run.sh',
-#'#!/bin/bash
-#source '.$unixmythtv.'qt_env.sh
-#cd '.$unixmythtv.'/mythtv
-## keep around just one earlier verion in run_old:
-#rm -rf run_old
-#mv run run_old
-#mkdir run
-## copy exes and dlls to the run folder:
-#find . -name \\*.exe  | grep -v run | xargs -n1 -i__ cp __ ./run/
-#find . -name \\*.dll  | grep -v run | xargs -n1 -i__ cp __ ./run/  
-## mythtv needs the qt dlls at runtime:
-#cp '.$unixmsys.'qt-3.3.x-p8/lib/*.dll '.$unixmythtv.'mythtv/run
-## qt mysql connection dll has to exist in a subfolder called sqldrivers:
-#mkdir '.$unixmythtv.'mythtv/run/sqldrivers
-#cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'mythtv/run/sqldrivers 
-## pthread dlls and mingwm10.dll are copied from here:
-#cp /mingw/bin/*.dll '.$unixmythtv.'mythtv/run
-#' ],comment => 'script that will copy all the files necessary for running mythtv out of the build folder into the ./run folder'],
-
-# 
-[ file => $mythtv.'build_plugins.sh', write => [$mythtv.'build_plugins.sh',
-'#!/bin/bash
-cd '.$unixmythtv.'mythplugins
-./configure --prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug && make && make install
-#make
-#make install
-#cd ..
-' ],comment => 'write a script to build mythtv plugins'],
 
 # chmod the shell scripts, everytime
 [ file => $mythtv.'_' , shell => ["cd $mythtv","chmod 755 *.sh",'nocheck'] ],
@@ -493,10 +465,16 @@ cd '.$unixmythtv.'mythplugins
 # SVN update every time, before patches, unless we are using a proxy
 foreach my $comp( @components ) {
 push @{$expect}, 
-[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['cd '.$dosmythtv."$comp && ".$dosmsys.'bin\svn.exe update','nocheck'],comment => 'getting SVN updates for:'.$comp ],
+[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['cd '.$dosmythtv."$comp && ".$dosmsys.'bin\svn.exe -r '.$SVNRELEASE.' update','nocheck'],comment => 'getting SVN updates for:'.$comp ],
 }
 push @{$expect}, 
 
+# always get svn num 
+[ file => $mythtv.'_', exec => ['cd '.$dosmythtv.'mythtv && '.$dosmsys.'bin\svn.exe info > '.$dosmythtv.'mythtv\svn_info.new','nocheck'], comment => 'fetching the SVN number to a text file, if we can'],
+[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'match the datetime of these files, so that the contents only can be compared next' ],
+
+# is svn num (ie file contents) changed since last run, if so, do a 'make clean' (overkill, I know, but safer)!
+[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch '.$unixmythtv.'mythtv/Makefile','cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt','touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ],
 
 # apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN:
 
@@ -525,13 +503,17 @@ push @{$expect},
 # config
 [ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
 # make
-[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
+[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
+[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
+[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
+[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
 
 # re-install to msys /usr/bin folders etc, if we have a newer mythtv build ready:
 [ newer => [$msys.'bin/mythfrontend.exe',$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make install'], comment => 'was the last configure successful? then install mythtv ' ],
+
+# it seems that mythverbose.h isn't installed as it should be.... (needed by the plugins compile)
+[ filesame => [$msys.'include/mythtv/mythverbose.h',$mythtv.'mythtv/libs/libmyth/mythverbose.h'], copy => [''=>''], comment => 'mythverbose.h ist installed properly yet...' ],
+
 
 # install some themes? does a 'make install' do that adequately (no, not if running outside msys)?
 
@@ -639,10 +621,33 @@ comment => 'writing a script to create the mysql user (mythtv/mythtv) without ne
 # this has the 'nocheck' flag because the creation of the DB doesn't instantly reflect in the .txt file we are looking at:
 [ grep => ['mythconverg',$mythtv.'_mysqlshow_err.txt'], exec => [ 'echo create database mythconverg; | "C:\Program Files\MySQL\MySQL Server 5.0\bin\mysql.exe" -u mythtv --password=mythtv','nocheck'], comment => ' does the mythconverg database exist? (and can this user see it?) '],
 
+#----------------------------------------
+
+#  build the mythplugins now:
+# 
+#[ file => $mythtv.'build_plugins.sh', write => [$mythtv.'build_plugins.sh',
+#'#!/bin/bash
+#source '.$unixmythtv.'qt_env.sh
+#cd '.$unixmythtv.'mythplugins
+#./configure --prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug && make && make install
+##make
+##make install
+##cd ..
+#' ],comment => 'write a script to build mythtv plugins'],
+
+# get mythtv sources, if we don't already have them
+# download all the files from the web, and save them here:
+[ dir => $mythtv.'mythplugins', mkdirs => $mythtv.'mythplugins' ],
+
+# config:
+[ file => $mythtv.'mythplugins/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','--prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug'], comment => 'do we already have a Makefile for myth plugins?' ],
+# make
+#[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/XXXXX',$mythtv.'mythplugins/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','make'], comment => 'plugins - redo make unless all these files exist, and are newer than the Makefile' ],
+
+# re-install to msys /usr/bin folders etc, if we have a newer mythtv build ready:
+#[ newer => [$msys.'bin/mythfrontend.exeXXXXX',$mythtv.'mythplugins/mythmovies/mythmovies/XXXXX'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','make install'], comment => 'plugins - was the last configure successful? then install mythtv ' ],
 
 
-# then we Can't connect to MySQL server is the message we get if the server is not even running! 
-#[ grep => ["Access denied for user",$mythtv.'_mysqlshow_err.txt'], exec => 'C:\Program Files\MySQL\MySQL Server 5.0\bin\MySQLInstanceConfig.exe', comment => 'We couldnt connect to server, please re-configure the MySQL server to start as a service.'],
 
 #----------------------------------------
 
@@ -657,13 +662,11 @@ sub _end {
 print << "END";    
 #
 # SCRIPT TODO/NOTES:  - further notes on this scripts direction....
-# if the build was successful then try running the 'mythfrontend.exe' and 'mythbackend.exe' from the 'C:\mythtv\mythtv\run' folder.
-# ok, how about the test-run process?  
-# create a vanilla mysql.txt file
-# check that the local mysql server is running, and configure it:
-# we should run: 'C:\\Program Files\\MySQL\\MySQL Server 5.0\\bin\\MySQLInstanceConfig.exe'
-# check that mythtv/mythtv/mythconverg will access the mysql database.
-# 
+# * if the build was successful then try running the 'mythfrontend.exe' and 'mythbackend.exe' from the 'C:\mythtv\mythtv\run' folder.
+# * ok, how about the test-run process?  
+# * check that mythtv/mythtv/mythconverg will access the mysql database
+# * mythplugins build isn't currently working, so disabled.
+# * myththemes build isn't tried at all
 END
 }
 
@@ -718,7 +721,7 @@ foreach my $dep ( @{$expect} ) {
         # a single array on passing to effect();
         effect($effecttype,$cause[0],@nocheckeffectparams);
         if ( ! -f $cause[0] && $nocheck == 0) {
-            die "archive -> EFFECT FAILED: $causetype,$cause[0],$effecttype\n";
+            die "EFFECT FAILED ($causetype -> $effecttype): unable to locate expected file ($cause[0]) that was to be fetched from $nocheckeffectparams[0]\n";
         }
 
     }   elsif ( $causetype eq 'dir' ) {
@@ -727,14 +730,14 @@ foreach my $dep ( @{$expect} ) {
         }
         effect($effecttype,@nocheckeffectparams);
         if ( ! -d $cause[0] && $nocheck == 0) {
-            die "dir -> EFFECT FAILED: $causetype,$cause[0],$effecttype\n";
+            die "EFFECT FAILED ($causetype -> $effecttype): unable to locate expected directory ($cause[0]).\n";
         }
 
     } elsif ( $causetype eq 'file' ) {
         if ( -f $cause[0] ) {print "file exists: $cause[0]\n"; next;}
         effect($effecttype,@nocheckeffectparams);
         if ( ! -f $cause[0] && $nocheck == 0) {
-            die "file -> EFFECT FAILED: $causetype,$cause[0],$effecttype\n";
+            die "EFFECT FAILED ($causetype -> $effecttype): unable to locate expected file ($cause[0]).\n";
         }
     } elsif ( $causetype eq 'filesame' ) {
         # TODO - currently we check file mtime, and byte size, but not MD5/CRC32 or contents,  this is "good enough" for most circumstances.
@@ -743,7 +746,7 @@ foreach my $dep ( @{$expect} ) {
           $size = (stat($cause[0]))[7];
           $mtime  = (stat($cause[0]))[9];
         }
-        if (! (-f $cause[1] ) ) {  die "cause: $causetype requires its SECOND filename to exist for comparison: $cause[1] \n"; }
+        if (! (-f $cause[1] ) ) {  die "cause: $causetype requires its SECOND filename to exist for comparison: ($cause[1]).\n"; }
         my $size2 = (stat($cause[1]))[7];
         my $mtime2  = (stat($cause[1]))[9];
         if ( $mtime != $mtime2 || $size != $size2) {
@@ -755,7 +758,7 @@ foreach my $dep ( @{$expect} ) {
             effect($effecttype,@nocheckeffectparams); # do something else if the files are not 100% identical?
           }  
         }else {
-           print "effect not requiredm files already up-to-date/identical: ($cause[0] => $cause[1]) \n";
+           print "effect not required files already up-to-date/identical: ($cause[0] => $cause[1]).\n";
         }
         undef $size; undef $mtime;
         undef $size2; undef $mtime2;
@@ -765,7 +768,7 @@ foreach my $dep ( @{$expect} ) {
         if ( -f $cause[0] ) {
           $mtime   = (stat($cause[0]))[9];
         }
-        if (! ( -f $cause[1]) ) {  die "cause: $causetype requires it's SECOND filename to exist for comparison: $cause[1]\n"; }
+        if (! ( -f $cause[1]) ) {  die "cause: $causetype requires it's SECOND filename to exist for comparison: $cause[1].\n"; }
         my $mtime2  = (stat($cause[1]))[9];
         if ( $mtime < $mtime2 ) {
           effect($effecttype,@nocheckeffectparams);
@@ -774,7 +777,7 @@ foreach my $dep ( @{$expect} ) {
             my $mtime3   = (stat($cause[0]))[9];
             my $mtime4  = (stat($cause[1]))[9];
             if ( $mtime3 < $mtime4  ) {
-                die "file -> EFFECT FAILED: $causetype,$cause[0],$cause[1],$effecttype\n";
+                die "EFFECT FAILED ($causetype -> $effecttype): mtime of file ($cause[0]) should be greater than file ($cause[1]).\n";
             }
           }
         } else {
@@ -790,12 +793,11 @@ foreach my $dep ( @{$expect} ) {
             print "grep - already matched source file($cause[1]), with pattern ($cause[0]) - no action reqd\n";
         }
         if ( (! _grep($cause[0],$cause[1])) && $nocheck == 0 ) { 
-           die "grep -> EFFECT FAILED: $causetype,$effecttype,$cause[0],$cause[1]\n";
+           die "EFFECT FAILED ($causetype -> $effecttype): unable to locate regex pattern ($cause[0]) in file ($cause[1])\n";
         }
 
     } else {
-        print Dumper(\@dep);
-        die " unknown causetype '$causetype' \n";
+        die " unknown causetype $causetype \n";
     }
 }
 
@@ -809,11 +811,11 @@ _end();
 sub effect {
     my ( $effecttype, @effectparams ) = @_;
 
-        if ( $effecttype =~ /\s*fetch\s*/i ) {
+        if ( $effecttype eq 'fetch') {
             # passing two parameters that came in via the array
             _fetch(@effectparams);
 
-        } elsif ( $effecttype =~ /\s*extract\s*/i ) {
+        } elsif ( $effecttype eq 'extract') {
             my $tarfile = $effectparams[0];
             my $destdir = $effectparams[1] || '';
             if ($destdir eq '') {
@@ -826,7 +828,7 @@ sub effect {
         print "extracttar($t,$destdir);\n";
         extracttar($t,$destdir);
 
-        } elsif ($effecttype =~ /\s*exec\s*/i ) { # execute a DOS command
+        } elsif ($effecttype eq 'exec') { # execute a DOS command
             my $cmd = shift @effectparams;
             #print `$cmd`;
             print "exec:$cmd\n";
@@ -835,20 +837,20 @@ sub effect {
                 print;
             }   
 
-        } elsif ($effecttype =~ /\s*shell\s*/i ) {
+        } elsif ($effecttype eq 'shell') {
             shell(@effectparams);
             
-        } elsif ($effecttype =~ /\s*copy\s*/i ) {
+        } elsif ($effecttype eq 'copy') {
             die "Can not copy non-existant file ($effectparams[0])\n" unless -f $effectparams[0];
             print "copying file ($effectparams[0] => $effectparams[1]) \n";
             cp($effectparams[0],$effectparams[1]);
             # make destn mtime the same as the original for ease of comparison:
             shell("touch --reference=".perl2unix($effectparams[0])." ".perl2unix($effectparams[1]));
 
-        } elsif ($effecttype =~ /\s*mkdirs\s*/i ) {
+        } elsif ($effecttype eq 'mkdirs') {
             mkdirs(shift @effectparams);
 
-        } elsif ($effecttype =~ /\s*write\s*/i ) {
+        } elsif ($effecttype eq 'write') {
             # just dump the requested content from the array to the file.
             my $filename = shift @effectparams;
             my $fh = new IO::File ("> $filename")
@@ -858,8 +860,7 @@ sub effect {
             $fh->close();
 
         } else {
-            print Dumper(\@effectparams);
-            die " unknown effecttype '$effecttype'\n";
+            die " unknown effecttype $effecttype from cause 'dir'\n";
         }
 }
 #------------------------------------------------------------------------------
@@ -976,12 +977,21 @@ sub _fetch {
 # (cause we are in the process of installing them)
 sub shell {
     my @cmds = @_;
-    my $cmd = $dosmsys.'bin\bash.exe -c "( export PATH=/bin:/mingw/bin:$PATH;'.join(';',@cmds).')"';
+    my $cmd = $dosmsys.'bin\bash.exe -c "( export PATH=/bin:/mingw/bin:$PATH;'.join(';',@cmds).') 2>&1 "';
     print "shell:$cmd\n";
     # execute the cmd, and capture the output!  this is a glorified version
     # of "print `$cmd`;" except it doesn't buffer the output if $|=1; is set.
     open F, "$cmd |"  || die "err: $!";
     while (<F>) {
+        if (! $NOISY )  {
+          # skip known spurious messages from going to the screen unnecessarily
+          next if /redeclared without dllimport attribute after being referenced with dllimpo/;
+          next if /warning: overriding commands for target `\.\'/;
+          next if /warning: ignoring old commands for target `\.\'/;
+          next if /Nothing to be done for `all\'/;
+          next if /^cd .* \&\& \\/;
+          next if /^make -f Makefile/;
+        }
         print;
     }
 }
