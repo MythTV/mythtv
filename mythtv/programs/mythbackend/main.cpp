@@ -540,11 +540,11 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--noupnp"))
         {
             noupnp = true;
-        } 
-	else if (!strcmp(a.argv()[argpos],"--upnprebuild"))
-	{
+        }
+        else if (!strcmp(a.argv()[argpos],"--upnprebuild"))
+        {
             wantupnprebuild = true;
-	}
+        }
         else if (!strcmp(a.argv()[argpos],"--nojobqueue"))
         {
             nojobqueue = true;
@@ -686,7 +686,7 @@ int main(int argc, char **argv)
                     "--clearcache                   Clear the settings cache on all myth servers" << endl <<
                     "--version                      Version information" << endl <<
                     "--generate-preview             Generate a preview image" << endl <<
-		    "--upnprebuild                  Force an update of UPNP media" << endl <<
+                    "--upnprebuild                  Force an update of UPNP media" << endl <<
                     "--infile                       Input file for preview generation" << endl <<
                     "--outfile                      Optional output file for preview generation" << endl <<
                     "--chanid                       Channel ID for preview generation" << endl <<
@@ -877,8 +877,8 @@ int main(int argc, char **argv)
             cerr << "********** The Scheduler has been DISABLED with "
                     "the --nosched option **********\n";
 
-	// kill -USR1 mythbackendpid will force a upnpmedia rebuild
-	signal(SIGUSR1, &upnp_rebuild);
+        // kill -USR1 mythbackendpid will force a upnpmedia rebuild
+        signal(SIGUSR1, &upnp_rebuild);
     }
     else
     {
