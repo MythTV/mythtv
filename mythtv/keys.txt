@@ -128,8 +128,9 @@ Watching TV only:
          info while watching current show FullScreen.
 - /      Change to the next "favorite" channel
 - ?      Mark/Unmark the current channel as a "favorite" channel
-- Y      Switch capture cards
-- C      Change inputs on current capture card
+- Y      Switch to the next available capture source
+- Ctrl-Y Switch to the previous capture source
+- C      Change to the next available tuner card input
 - F7     Monitor signal quality on a card capable of signal monitoring
 
 LiveTV while not in Browse Mode:
