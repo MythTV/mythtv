@@ -1731,8 +1731,9 @@ class InputGroup : public TransComboBoxSetting
         setLabel(QObject::tr("Input Group") +
                  QString(" %1").arg(groupnum + 1));
         setHelpText(QObject::tr(
-                        "Leave as 'Generic', unless this input is "
-                        "shared with another device."));
+                        "Leave as 'Generic' unless this input is shared with "
+                        "another device. Only one of the inputs in an input "
+                        "group will be allowed to record at any given time."));
     }
 
     virtual void load(void);
@@ -2018,23 +2019,20 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
                                           _cardid, isNewInput));
     }
 
-    ConfigurationGroup *group =
+    ConfigurationGroup *basic =
         new VerticalConfigurationGroup(false, false, true, true);
 
-    group->setLabel(QObject::tr("Connect source to input"));
+    basic->setLabel(QObject::tr("Connect source to input"));
 
-    HorizontalConfigurationGroup *ci;
-    ci = new HorizontalConfigurationGroup(false, false);
-    ci->addChild(cardid);
-    ci->addChild(inputname);
-    group->addChild(ci);
-    group->addChild(new InputDisplayName(*this));
-    group->addChild(sourceid);
+    basic->addChild(cardid);
+    basic->addChild(inputname);
+    basic->addChild(new InputDisplayName(*this));
+    basic->addChild(sourceid);
 
     if (!isDTVcard)
     {
-        group->addChild(new ExternalChannelCommand(*this));
-        group->addChild(new PresetTuner(*this));
+        basic->addChild(new ExternalChannelCommand(*this));
+        basic->addChild(new PresetTuner(*this));
     }
 
     if (isDTVcard)
@@ -2044,7 +2042,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
             new VerticalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new QuickTune(*this));
         chgroup->addChild(new FreeToAir(*this));
-        group->addChild(chgroup);
+        basic->addChild(chgroup);
     }
 
     if (isDVBcard)
@@ -2053,7 +2051,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
             new HorizontalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new RadioServices(*this));
         chgroup->addChild(new DishNetEIT(*this));
-        group->addChild(chgroup);
+        basic->addChild(chgroup);
     }
 
     scan->setLabel(tr("Scan for channels"));
@@ -2070,23 +2068,29 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
         new HorizontalConfigurationGroup(false, false, true, true);
     sgrp->addChild(scan);
     sgrp->addChild(srcfetch);
-    group->addChild(sgrp);
+    basic->addChild(sgrp);
 
-    group->addChild(startchan);
+    basic->addChild(startchan);
 
-    ConfigurationGroup *grp =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    grp->addChild(new InputPriority(*this));
-    grp->addChild(inputgrp0);
-    grp->addChild(inputgrp1);
+    addChild(basic);
+
+    ConfigurationGroup *interact =
+        new VerticalConfigurationGroup(false, false, true, true);
+
+    interact->setLabel(QObject::tr("Interactions between inputs"));
+    interact->addChild(new InputPriority(*this));
+
     TransButtonSetting *ingrpbtn = new TransButtonSetting("newgroup");
-    ingrpbtn->setLabel(QObject::tr("Create New Group"));
+    ingrpbtn->setLabel(QObject::tr("Create a New Input Group"));
     ingrpbtn->setHelpText(
-        QObject::tr("Use this button to create a new input group."));
-    grp->addChild(ingrpbtn);
-    group->addChild(grp);
+        QObject::tr("Input groups are only needed when two or more cards "
+                    "share the same resource such as a firewire card and "
+                    "an analog card input controlling the same set top box."));
+    interact->addChild(ingrpbtn);
+    interact->addChild(inputgrp0);
+    interact->addChild(inputgrp1);
 
-    addChild(group);
+    addChild(interact);
 
     setName("CardInput");
     SetSourceID("-1");
