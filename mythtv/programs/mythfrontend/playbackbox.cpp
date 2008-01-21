@@ -2957,6 +2957,8 @@ void PlaybackBox::showPlaylistPopup()
     popup->addButton(tr("Job Options"), this,
                      SLOT(showPlaylistJobPopup()));
     popup->addButton(tr("Delete"), this, SLOT(doPlaylistDelete()));
+    popup->addButton(tr("Delete, and allow re-record"), this,
+                     SLOT(doPlaylistDeleteForgetHistory()));
 
     playButton->setFocus();
 
@@ -3712,6 +3714,16 @@ void PlaybackBox::noDelete(void)
 
 void PlaybackBox::doPlaylistDelete(void)
 {
+    playlistDelete(false);
+}
+
+void PlaybackBox::doPlaylistDeleteForgetHistory(void)
+{
+    playlistDelete(true);
+}
+
+void PlaybackBox::playlistDelete(bool forgetHistory)
+{
     if (!expectingPopup)
         return;
 
@@ -3724,7 +3736,7 @@ void PlaybackBox::doPlaylistDelete(void)
     {
         tmpItem = findMatchingProg(*it);
         if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
-            RemoteDeleteRecording(tmpItem, false, false);
+            RemoteDeleteRecording(tmpItem, forgetHistory, false);
     }
 
     connected = FillList();

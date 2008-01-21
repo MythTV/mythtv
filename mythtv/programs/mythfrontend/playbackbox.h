@@ -246,6 +246,7 @@ class PlaybackBox : public MythDialog
     void stopPlaylistUserJob4()       { stopPlaylistJobQueueJob(JOB_USERJOB4); }
     void doClearPlaylist();
     void doPlaylistDelete();
+    void doPlaylistDeleteForgetHistory();
     void doPlaylistChangeRecGroup();
     void doPlaylistChangePlayGroup();
     void togglePlayListTitle(void);
@@ -284,7 +285,8 @@ class PlaybackBox : public MythDialog
     void remove(ProgramInfo *);
     void showActions(ProgramInfo *);
     ProgramInfo *getSelected(void){ return curitem; }
-        
+
+    void playlistDelete(bool forgetHistory = false);
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
