@@ -46,6 +46,7 @@ class ChannelRecPriority : public MythDialog
     void SortList();
     QMap<QString, ChannelInfo> channelData;
     QMap<QString, QString> origRecPriorityData;
+    QMap<int, bool> visMap;
 
     void updateBackground(void);
     void updateList(QPainter *);

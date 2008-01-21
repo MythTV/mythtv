@@ -420,25 +420,41 @@ void ChannelRecPriority::FillList(void)
 {
     int cnt = 999;
 
+    QMap<int, QString> srcMap;
+
     channelData.clear();
+    visMap.clear();
 
     MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT c.chanid, c.channum, c.sourceid, s.name, c.callsign, "
-                            "c.icon, c.recpriority, c.name FROM channel c, "
-                            "videosource s WHERE s.sourceid=c.sourceid;");
+    result.prepare("SELECT sourceid, name FROM videosource;");
 
     if (result.exec() && result.isActive() && result.size() > 0)
     {
-        while (result.next()) {
+        while (result.next())
+        {
+            srcMap[result.value(0).toInt()] =
+                QString::fromUtf8(result.value(1).toString());
+        }
+    }
+    result.prepare("SELECT chanid, channum, sourceid, callsign, "
+                   "icon, recpriority, name, visible FROM channel;");
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        while (result.next())
+        {
             ChannelInfo *chaninfo = new ChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
             chaninfo->chanstr = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
-            chaninfo->sourcename = QString::fromUtf8(result.value(3).toString());
-            chaninfo->callsign = QString::fromUtf8(result.value(4).toString());
-            chaninfo->iconpath = result.value(5).toString();
-            chaninfo->recpriority = result.value(6).toString();
-            chaninfo->channame = QString::fromUtf8(result.value(7).toString());
+            chaninfo->callsign = QString::fromUtf8(result.value(3).toString());
+            chaninfo->iconpath = result.value(4).toString();
+            chaninfo->recpriority = result.value(5).toString();
+            chaninfo->channame = QString::fromUtf8(result.value(6).toString());
+            if (result.value(7).toInt() > 0)
+                visMap[chaninfo->chanid] = true;
+            chaninfo->sourcename = srcMap[chaninfo->sourceid];
+
             channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save 
@@ -465,6 +481,8 @@ class channelSort
     public:
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
+            if (a.chan->chanstr.toInt() == b.chan->chanstr.toInt())
+                return(a.chan->sourceid > b.chan->sourceid);
             return(a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
         }
 };
@@ -597,7 +615,7 @@ void ChannelRecPriority::updateList(QPainter *p)
                         }
 
                         ltype->SetItemText(cnt, 1, 
-                                           chanInfo->Text(longchannelformat));
+                            chanInfo->Text(" <num>  <sign>  \"<name>\""));
 
                         if (chanInfo->recpriority.toInt() > 0)
                             ltype->SetItemText(cnt, 2, "+");
@@ -605,6 +623,9 @@ void ChannelRecPriority::updateList(QPainter *p)
                             ltype->SetItemText(cnt, 2, "-");
                         ltype->SetItemText(cnt, 3, 
                                            QString::number(abs(recPriority)));
+
+                        if (!visMap[chanInfo->chanid])
+                            ltype->EnableForcedFont(cnt, "inactive");
 
                         cnt++;
                         listCount++;
@@ -677,10 +698,8 @@ void ChannelRecPriority::updateInfo(QPainter *p)
             type = (UITextType *)container->GetType("source");
             if (type)
             {
-                if (!curitem->sourcename.isEmpty())
-                    type->SetText(QString("%1").arg(curitem->sourcename));
-                else
-                    type->SetText(QString("%1").arg(curitem->sourceid));
+                type->SetText(QString("%1 %2").arg(curitem->sourceid)
+                                              .arg(curitem->sourcename));
             }
 
             type = (UITextType *)container->GetType("recpriority");
@@ -737,7 +756,7 @@ void ChannelRecPriority::edit()
     // Make sure that any changes are reflected in channelData.
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                   "icon, recpriority, name FROM channel "
+                   "icon, recpriority, name, visible FROM channel "
                    "WHERE chanid = :CHANID;");
     result.bindValue(":CHANID", chanInfo->chanid);
 
@@ -751,6 +770,10 @@ void ChannelRecPriority::edit()
         chanInfo->iconpath = result.value(4).toString();
         chanInfo->recpriority = result.value(5).toString();
         chanInfo->channame = QString::fromUtf8(result.value(6).toString());
+        if (result.value(7).toInt() > 0)
+            visMap[chanInfo->chanid] = true;
+        else
+            visMap[chanInfo->chanid] = false;
     }
     else if (!result.isActive())
         MythContext::DBError("Get channel priorities update", result);
