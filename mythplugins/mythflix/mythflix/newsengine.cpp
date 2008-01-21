@@ -183,7 +183,7 @@ void NewsSite::slotFinished(QNetworkOperation* op)
         }
         else {
             m_state = NewsSite::WriteFailed;
-            cerr << "MythNews: NewsEngine: Write failed" << endl;
+            VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
         }
     }
     else {

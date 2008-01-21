@@ -804,7 +804,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
         if (tempPurpose == "")
             tempPurpose = "Command";
 
-        cerr << err << endl;
+        VERBOSE(VB_IMPORTANT, QString("%1").arg(err));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
         QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck NetFlix Settings"));
         ret = "#ERROR";
