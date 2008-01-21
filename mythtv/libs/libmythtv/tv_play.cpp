@@ -6123,6 +6123,7 @@ void TV::ChangeChannel(const DBChanList &options)
             queuedInput   = QDeepCopy<QString>(channum);
             queuedChanNum = QDeepCopy<QString>(channum);
             queuedChanID  = chanid;
+            break;
         }
     }
 }
