@@ -3235,7 +3235,7 @@ QString ProgramInfo::RecStatusDesc(void) const
             message += QObject::tr("the tuner card was already being used.");
             break;
         case rsFailed:
-            message += QObject::tr("the recording failed.");
+            message += QObject::tr("the recorder failed to record.");
             break;
         default:
             message = QObject::tr("The status of this showing is unknown.");
@@ -3284,11 +3284,11 @@ QString ProgramInfo::RecStatusDesc(void) const
             message += QObject::tr("this episode is a repeat.");
             break;            
         case rsInactive:
-            message += QObject::tr("this recording schedule is inactive.");
+            message += QObject::tr("this recording rule is inactive.");
             break;
         case rsNotListed:
-            message += QObject::tr("this show does not match the current "
-                                   "program listings.");
+            message += QObject::tr("this rule does not match any showings in "
+                                   "the current program listings.");
             break;            
         case rsNeverRecord:
             message += QObject::tr("it was marked to never be recorded.");
@@ -3298,7 +3298,7 @@ QString ProgramInfo::RecStatusDesc(void) const
             break;
         case rsOtherShowing:
             message += QObject::tr("this episode will be recorded on a "
-                                   "different channel at this time.");
+                                   "different channel in this time slot.");
             break;
         default:
             message += QObject::tr("you should never see this.");
@@ -3864,6 +3864,34 @@ void ProgramInfo::showDetails(void) const
                         QString("%1 %2").arg(query.value(2).toInt())
                                         .arg(QObject::tr("hours")), msg)
         }
+        if (recorded)
+        {
+            if (recpriority2 > 0)
+                ADD_PAR(QObject::tr("Watch List Score"),
+                        QString("%1").arg(recpriority2), msg)
+    
+            if (recpriority2 < 0)
+            {
+                QString st = "";
+    
+                switch(recpriority2)
+                {
+                case wlExpireOff:
+                    st = QObject::tr("Auto-expire off");
+                    break;
+                case wlWatched:
+                    st = QObject::tr("Marked as 'watched'");
+                    break;
+                case wlEarlier:
+                    st = QObject::tr("Not the earliest episode");
+                    break;
+                case wlDeleted:
+                    st = QObject::tr("Recently deleted episode");
+                    break;
+                }
+                ADD_PAR(QObject::tr("Watch List Status"), st, msg)
+            }
+        }
         if (record->getSearchType() &&
             record->getSearchType() != kManualSearch &&
             record->getRecordDescription() != description)
@@ -3880,32 +3908,8 @@ void ProgramInfo::showDetails(void) const
     }
     if (recorded)
     {
-        if (recpriority2 > 0)
-            ADD_PAR(QObject::tr("Watch List Score"),
-                    QString("%1").arg(recpriority2), msg)
-
-        if (recpriority2 < 0)
-        {
-            QString st = "";
-
-            switch(recpriority2)
-            {
-            case wlExpireOff:
-                st = QObject::tr("Auto-expire off");
-                break;
-            case wlWatched:
-                st = QObject::tr("Marked as 'watched'");
-                break;
-            case wlEarlier:
-                st = QObject::tr("Not the earliest episode");
-                break;
-            case wlDeleted:
-                st = QObject::tr("Recently deleted episode");
-                break;
-            }
-            ADD_PAR(QObject::tr("Watch List Status"), st, msg)
-        }
         ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
+        ADD_PAR(QObject::tr("Recorded File Name"), GetRecordBasename(), msg)
 
         QString tmpSize;
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
@@ -4694,7 +4698,8 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
                         p->chansign = s->chansign;
                         p->channame = s->channame;
                     }
-                    else if (p->chanid != s->chanid)
+                    else if ((p->chanid != s->chanid) &&
+                             (p->chanstr != s->chanstr))
                     {
                         p->recstatus = rsOtherShowing;
                     }
