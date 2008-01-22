@@ -56,7 +56,7 @@ MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
 MPUBLIC bool RemoteRecordPending(
-    uint cardid, const ProgramInfo *pginfo, uint secsleft, bool hasLater);
+    uint cardid, const ProgramInfo *pginfo, int secsleft, bool hasLater);
 MPUBLIC void RemoteStopRecording(ProgramInfo *pginfo);
 MPUBLIC bool RemoteStopLiveTV(uint cardid);
 MPUBLIC bool RemoteStopRecording(uint cardid);

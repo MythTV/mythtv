@@ -169,7 +169,7 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
 }
 
 bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
-                         uint secsleft, bool hasLater)
+                         int secsleft, bool hasLater)
 {
     if (gContext->IsBackend())
     {
