@@ -41,6 +41,7 @@ class MPUBLIC CustomEdit : public MythDialog
 
     QString seSuffix;
     QString exSuffix;
+    QString addString;
 
     QStringList m_recid;
     QStringList m_recsub;
@@ -52,7 +53,6 @@ class MPUBLIC CustomEdit : public MythDialog
     MythComboBox *m_rule;
     MythRemoteLineEdit *m_title;
     MythComboBox *m_clause;
-    MythRemoteLineEdit *m_preview;
     MythRemoteLineEdit *m_subtitle;
     MythRemoteLineEdit *m_description;
     MythPushButton *m_addButton;

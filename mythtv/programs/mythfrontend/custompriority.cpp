@@ -47,6 +47,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     quoteTitle.replace("\'","\'\'");
 
     prevItem = 0;
+    addString = tr("Add");
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -213,16 +214,10 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     vbox->addWidget(m_clause);
 
-    // Preview box
-    m_preview = new MythRemoteLineEdit( this, "preview" );
-    m_preview->setBackgroundOrigin(WindowOrigin);
-    m_preview->setEnabled(false);
-    vbox->addWidget(m_preview);
-
     //  Add Button
     m_addButton = new MythPushButton( this, "add" );
     m_addButton->setBackgroundOrigin(WindowOrigin);
-    m_addButton->setText( tr( "Add this example clause" ) );
+    m_addButton->setText(addString);
     m_addButton->setEnabled(true);
 
     vbox->addWidget(m_addButton);
@@ -344,7 +339,13 @@ void CustomPriority::clauseChanged(void)
     QString msg = m_csql[m_clause->currentItem()];
     msg.replace("\n", " ");
     msg.replace(QRegExp(" [ ]*"), " ");
-    m_preview->setText(msg);
+    msg = QString("%1: \"%2\"").arg(addString).arg(msg);
+    if (msg.length() > 50)
+    {
+        msg.truncate(48);
+        msg += "...\"";
+    }
+    m_addButton->setText(msg);
 }
 
 void CustomPriority::addClicked(void)

@@ -49,6 +49,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     maxex = 0;
     seSuffix = QString(" (%1)").arg(tr("stored search"));
     exSuffix = QString(" (%1)").arg(tr("stored example"));
+    addString = tr("Add");
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -126,7 +127,21 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Match words in the title"));
     m_cfrom << "";
-    m_csql << "program.title LIKE 'CSI: %' ";
+    if (p->title > "")
+        m_csql << QString("program.title LIKE '\%%1\%' ").arg(quoteTitle);
+    else
+        m_csql << "program.title LIKE 'CSI: %' ";
+
+    m_clause->insertItem(tr("Match words in the subtitle"));
+    m_cfrom << "";
+    if (p->subtitle > "")
+    {
+        QString subt = p->subtitle;
+        subt.replace("\'","\'\'");
+        m_csql << QString("program.subtitle LIKE '\%%1\%' ").arg(subt);
+    }
+    else
+        m_csql << "program.subtitle LIKE '%Las Vegas%' ";
 
     if (p->programid > "")
     {
@@ -332,16 +347,10 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     }
     vbox->addWidget(m_clause);
 
-    // Preview box
-    m_preview = new MythRemoteLineEdit( this, "preview" );
-    m_preview->setBackgroundOrigin(WindowOrigin);
-    m_preview->setEnabled(false);
-    vbox->addWidget(m_preview);
-
     //  Add Button
     m_addButton = new MythPushButton( this, "add" );
     m_addButton->setBackgroundOrigin(WindowOrigin);
-    m_addButton->setText( tr( "Add this example clause" ) );
+    m_addButton->setText(addString);
     m_addButton->setEnabled(true);
 
     vbox->addWidget(m_addButton);
@@ -477,7 +486,13 @@ void CustomEdit::clauseChanged(void)
     QString msg = m_csql[m_clause->currentItem()];
     msg.replace("\n", " ");
     msg.replace(QRegExp(" [ ]*"), " ");
-    m_preview->setText(msg);
+    msg = QString("%1: \"%2\"").arg(addString).arg(msg);
+    if (msg.length() > 50)
+    {
+        msg.truncate(48);
+        msg += "...\"";
+    }
+    m_addButton->setText(msg);
 
     bool hastitle = !m_title->text().isEmpty();
     bool hasdesc = !m_description->text().isEmpty();

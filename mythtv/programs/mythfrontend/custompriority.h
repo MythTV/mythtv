@@ -39,6 +39,8 @@ class MPUBLIC CustomPriority : public MythDialog
 
     int prevItem;
 
+    QString addString;
+
     QStringList m_recpri;
     QStringList m_recdesc;
 
@@ -47,7 +49,6 @@ class MPUBLIC CustomPriority : public MythDialog
     MythComboBox *m_rule;
     MythRemoteLineEdit *m_title;
     MythComboBox *m_clause;
-    MythRemoteLineEdit *m_preview;
     MythSpinBox *m_value;
     MythRemoteLineEdit *m_description;
     MythPushButton *m_addButton;
