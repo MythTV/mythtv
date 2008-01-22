@@ -8,10 +8,11 @@
             <bold>yes</bold>
         </font>
 
-        <textarea name="part" align="center">
+        <textarea name="part">
             <font>title</font>
             <area>20,20,800,40</area>
             <value>Appearance Wizard</value>
+            <align>center</align>
         </textarea>
 
         <imagetype name="topleft">
