@@ -2,6 +2,7 @@
 #include "mythfontproperties.h"
 #include <cassert>
 #include "mythimage.h"
+#include "compat.h"
 
 void MythPainter::SetClipRect(const QRect &)
 {

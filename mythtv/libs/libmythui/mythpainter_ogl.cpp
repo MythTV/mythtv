@@ -19,6 +19,8 @@ using namespace std;
 #include <GL/glext.h>
 #endif
 
+#include "compat.h"
+
 #include "mythcontext.h"
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
