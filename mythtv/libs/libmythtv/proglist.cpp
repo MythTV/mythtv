@@ -1559,11 +1559,9 @@ void ProgLister::fillItemList(void)
         if (qphrase == "premieres")
         {
             where += "  AND ( ";
-            where += "    ( program.previouslyshown = 0 ";
+            where += "    ( program.originalairdate=DATE(program.starttime) ";
             where += "      AND (program.category = 'Special' ";
-            where += "        OR program.programid LIKE 'EP%0001') ";
-            where += "      AND DAYOFYEAR(program.originalairdate) = "; 
-            where += "          DAYOFYEAR(program.starttime)) ";
+            where += "        OR program.programid LIKE 'EP%0001')) ";
             where += "    OR (program.category_type='movie' ";
             where += "      AND program.stars > 0.5 ";
             where += "      AND program.airdate >= YEAR(NOW()) - 2) ";
