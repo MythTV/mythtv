@@ -233,7 +233,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       groupDisplayName(tr("All Programs")),
       recGroup("All Programs"),
       recGroupPassword(""),             curGroupPassword(""),
-      watchGroup(" " + tr("Watch List")),
+      watchGroupName(" " + tr("Watch List")),
+      watchGroupLabel(watchGroupName.lower()),
       viewMask(VIEW_TITLES),
       // Theme parsing
       theme(new XMLParse()),
@@ -1935,9 +1936,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                         if (recidEpisodes[p->recordid] == 1 ||
                             p->recordid == 0 )
                         {
-                            sortedList[watchGroup.lower()] = watchGroup;
-                            progLists[watchGroup.lower()].prepend(p);
-                            progLists[watchGroup.lower()].setAutoDelete(false);
+                            sortedList[watchGroupLabel] = watchGroupName;
+                            progLists[watchGroupLabel].prepend(p);
+                            progLists[watchGroupLabel].setAutoDelete(false);
                         }
                         else
                         {
@@ -2008,10 +2009,10 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
     }
 
-    if (progLists[watchGroup].count() > 1)
+    if (progLists[watchGroupLabel].count() > 1)
     {
         QDateTime now = QDateTime::currentDateTime();
-        int maxAge = watchListMaxAge;
+        int baseValue = watchListMaxAge * 2 / 3;
 
         QMap<int, int> recType;
         QMap<int, int> maxEpisodes;
@@ -2055,7 +2056,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
 
         ProgramInfo *p;
-        p = progLists[watchGroup].first();
+        p = progLists[watchGroupLabel].first(); 
         while (p)
         {
             int recid = p->recordid;
@@ -2071,23 +2072,23 @@ bool PlaybackBox::FillList(bool useCachedData)
                 delHours[recid] = 1000;
             }
 
-            // add point equal to maxAge for each additional episode
+            // add point equal to baseValue for each additional episode
             if (p->recordid == 0 || maxEpisodes[recid] > 0)
                 p->recpriority2 = 0;
             else
-                p->recpriority2 = (recidEpisodes[p->recordid] - 1) * maxAge;
+                p->recpriority2 = (recidEpisodes[p->recordid] - 1) * baseValue;
 
-            // add a point every 2hr leading up to the next recording
-            if (nextHours[recid] > 0 && nextHours[recid] < maxAge * 2)
-                p->recpriority2 += (maxAge * 2 - nextHours[recid]) / 2;
+            // add points every 3hr leading up to the next recording
+            if (nextHours[recid] > 0 && nextHours[recid] < baseValue * 3)
+                p->recpriority2 += (baseValue * 3 - nextHours[recid]) / 3;
 
             int hrs = p->endts.secsTo(now) / 3600;
             if (hrs < 1)
                 hrs = 1;
 
             // add points for a new recording that decrease each hour
-            if (hrs < 36)
-                p->recpriority2 += 36 - hrs;
+            if (hrs < 42)
+                p->recpriority2 += 42 - hrs;
 
             // add points for how close the recorded time of day is to 'now'
             p->recpriority2 += abs((hrs % 24) - 12) * 2;
@@ -2102,8 +2103,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                     p->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted daily:  %1")
                                              .arg(p->title));
-                    progLists[watchGroup].remove();
-                    p = progLists[watchGroup].current();
+                    progLists[watchGroupLabel].remove();
+                    p = progLists[watchGroupLabel].current();
                     continue;
                 }
                 else
@@ -2112,9 +2113,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                                              .arg(p->title));
 
                     if (maxEpisodes[recid] > 0)
-                        p->recpriority2 += (maxAge / 2) + (hrs / 24);
+                        p->recpriority2 += (baseValue / 2) + (hrs / 24);
                     else
-                        p->recpriority2 += (maxAge / 5) + hrs;
+                        p->recpriority2 += (baseValue / 5) + hrs;
                 }
             }
             // Weekly
@@ -2128,8 +2129,8 @@ bool PlaybackBox::FillList(bool useCachedData)
                     p->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted weekly:  %1")
                                              .arg(p->title));
-                    progLists[watchGroup].remove();
-                    p = progLists[watchGroup].current();
+                    progLists[watchGroupLabel].remove();
+                    p = progLists[watchGroupLabel].current();
                     continue;
                 }
                 else
@@ -2138,10 +2139,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                                              .arg(p->title));
 
                     if (maxEpisodes[recid] > 0)
-                        p->recpriority2 += (maxAge / 2) + (hrs / 24);
+                        p->recpriority2 += (baseValue / 2) + (hrs / 24);
                     else
                         p->recpriority2 +=
-                            (maxAge / 3) + (maxAge * hrs / 24 / 4);
+                            (baseValue / 3) + (baseValue * hrs / 24 / 4);
                 }
             }
             // Not recurring
@@ -2150,47 +2151,47 @@ bool PlaybackBox::FillList(bool useCachedData)
                 if (delHours[recid] < (watchListBlackOut * 48) - 4)
                 {
                     p->recpriority2 = wlDeleted;
-                    progLists[watchGroup].remove();
-                    p = progLists[watchGroup].current();
+                    progLists[watchGroupLabel].remove();
+                    p = progLists[watchGroupLabel].current();
                     continue;
                 }
                 else
                 {
                     // add points for a new Single or final episode
                     if (hrs < 36)
-                        p->recpriority2 += maxAge * (36 - hrs) / 36;
+                        p->recpriority2 += baseValue * (36 - hrs) / 36;
 
 		    if (avgd != 100)
 		    {
 			if (maxEpisodes[recid] > 0)
-			    p->recpriority2 += (maxAge / 2) + (hrs / 24);
+			    p->recpriority2 += (baseValue / 2) + (hrs / 24);
 			else
 			    p->recpriority2 +=
-				(maxAge / 3) + (maxAge * hrs / 24 / 4);
+				(baseValue / 3) + (baseValue * hrs / 24 / 4);
 		    }
-                    else if ((hrs / 24) < maxAge)
+                    else if ((hrs / 24) < baseValue)
                         p->recpriority2 += hrs / 24;
                     else
-                        p->recpriority2 += maxAge;
+                        p->recpriority2 += baseValue;
                 }
             }
 
             // Factor based on the average time shift delay.
-            // Scale the range down from -100% thru +100% to -25% thru +25%
-            avgd = avgd / 4 + 75;
+            // Scale the avgd range of 0 thru 200 hours to 133% thru 67%
+            int delaypct = avgd / 3 + 67;
 
-            if (avgd <= 100)
-                p->recpriority2 = p->recpriority2 * (200 - avgd) / 100;
-            else
-                p->recpriority2 = p->recpriority2 * 100 / avgd;
+            if (avgd < 100)
+                p->recpriority2 = p->recpriority2 * (200 - delaypct) / 100;
+            else if (avgd > 100)
+                p->recpriority2 = p->recpriority2 * 100 / delaypct;
 
             VERBOSE(VB_FILE, QString(" %1  %2  %3")
                     .arg(p->startts.toString(formatShortDate))
                     .arg(p->recpriority2).arg(p->title));
 
-            p = progLists[watchGroup].next();
+            p = progLists[watchGroupLabel].next();
         }
-        progLists[watchGroup].Sort(comp_recpriority2);
+        progLists[watchGroupLabel].Sort(comp_recpriority2);
     }
 
     // Try to find our old place in the title list.  Scan the new
@@ -2206,7 +2207,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     titleIndex = titleList.count() - 1;
     for (titleIndex = titleList.count() - 1; titleIndex >= 0; titleIndex--)
     {
-        if (watchListStart && sTitleList[titleIndex] == watchGroup.lower())
+        if (watchListStart && sTitleList[titleIndex] == watchGroupLabel)
         {
             watchListStart = 0;
             break;
@@ -2238,7 +2239,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         {
             p = l->at(i);
 
-            if (oldtitle != watchGroup)
+            if (oldtitle != watchGroupName)
             {
                 if (titleIndex == 0)
                 {

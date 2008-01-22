@@ -377,7 +377,8 @@ class PlaybackBox : public MythDialog
     QString             recGroup;
     QString             recGroupPassword;
     QString             curGroupPassword;
-    QString             watchGroup;
+    QString             watchGroupName;
+    QString             watchGroupLabel;
     ViewMask            viewMask;
 
     // Theme parsing variables
