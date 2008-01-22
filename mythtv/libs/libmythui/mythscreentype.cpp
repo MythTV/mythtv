@@ -165,6 +165,16 @@ bool MythScreenType::Create(void)
     return true;
 }
 
+bool MythScreenType::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "area")
+        m_Area = parseRect(element);
+    else
+        return false;
+    
+    return true;
+}
+
 void MythScreenType::CopyFrom(MythUIType *base)
 {
     MythScreenType *st = dynamic_cast<MythScreenType *>(base);
