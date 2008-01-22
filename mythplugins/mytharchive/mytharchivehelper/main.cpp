@@ -2205,6 +2205,13 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.stripWhiteSpace());
+                if (strlen(st->language) > 0)
+                    stream.setAttribute("language", st->language);
+                else
+                    stream.setAttribute("language", "N/A");
+
+                stream.setAttribute("id", st->id);
+
                 streams.appendChild(stream);
 
                 break;
