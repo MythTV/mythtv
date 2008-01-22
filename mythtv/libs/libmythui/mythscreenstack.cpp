@@ -165,10 +165,9 @@ void MythScreenStack::RecalculateDrawOrder(void)
         MythScreenType *screen = (*it);
 
         if (screen->IsFullscreen())
-        {
             m_DrawOrder.clear();
-            m_DrawOrder.push_back(screen);
-        }
+
+        m_DrawOrder.push_back(screen);
     }
 
     if (m_DrawOrder.isEmpty())
