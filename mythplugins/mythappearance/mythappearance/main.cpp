@@ -8,6 +8,8 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/libmythui/mythscreenstack.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
 extern "C" {
     int mythplugin_init(const char *libversion);
@@ -26,8 +28,15 @@ int mythplugin_init(const char *libversion)
 int mythplugin_run (void)
 {
     gContext->addCurrentLocation("mythappearance");
-    MythAppearance appearance(gContext->GetMainWindow(), "appearance", "appear-");
-    appearance.exec();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythAppearance *mythappearance = new MythAppearance(mainStack, "mythappearance");
+
+    if (mythappearance->Create())
+        mainStack->AddScreen(mythappearance);
+
+    //GetMythMainWindow()->JumpTo("Reload Theme");
 
     gContext->removeCurrentLocation();
 

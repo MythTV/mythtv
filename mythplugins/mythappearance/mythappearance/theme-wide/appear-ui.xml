@@ -1,75 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
+    <window name="appearance">
 
-  <window name="appearance">
+        <font name="title" face="Bitstream Vera Sans">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
 
-    <font name="title" face="Bitstream Vera Sans">
-     <color>#ffffff</color>
-     <size>18</size>
-     <bold>yes</bold>
-    </font>
+        <textarea name="part" align="center">
+            <font>title</font>
+            <area>20,20,800,40</area>
+            <value>Appearance Wizard</value>
+        </textarea>
 
-    <container name="hello">
-      <area>20,20,760,450</area>
+        <imagetype name="topleft">
+            <position>0,0</position>
+            <filename>topleft.png</filename>
+        </imagetype>
 
-      <textarea name="part" draworder="1" align="center">
-        <font>title</font>
-        <area>0,0,800,40</area>
-        <value>Appearance Wizard</value>
-      </textarea>
+        <imagetype name="bottomright">
+            <filename>bottomright.png</filename>
+            <position>800,600</position>
+        </imagetype>
 
-    </container>
+        <textarea name="part1">
+            <font>title</font>
+            <area>100,140,600,170</area>
+            <value>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</value>
+            <multiline>yes</multiline>
+        </textarea>
 
-   <container name="arrows">
-    <area>0,0,1280,720</area>
-    <image name="topleft" draworder="5" fleximage="no">
-        <context>1</context>
-        <filename>topleft.png</filename>
-        <position>0,0</position>
-        <staticsize>100,100</staticsize>
-    </image>
+        <textarea name="size">
+            <font>title</font>
+            <area>100,270,500,50</area>
+            <value>1280 x 720</value>
+        </textarea>
 
-    <image name="bottomright" draworder="5" fleximage="no">
-        <context>2</context>
-        <filename>bottomright.png</filename>
-        <position>800,600</position>
-        <staticsize>100,100</staticsize>
-    </image>
+        <textarea name="offsets">
+            <font>title</font>
+            <area>100,320,500,140</area>
+            <value>0 x 0</value>
+        </textarea>
 
-      <textarea name="part1" draworder="1">
-        <context>1</context>
-        <font>title</font>
-        <area>100,140,600,170</area>
-        <value>Move the arrow to the top left edge of the TV screen.  Press SELECT to edit the bottom right arrow.  Press MENU for options and ESC to quit.</value>
-        <multiline>yes</multiline>
-      </textarea>
+        <textarea name="changeamount">
+            <font>title</font>
+            <area>100,520,500,140</area>
+            <value>1 pixel</value>
+        </textarea>
 
-      <textarea name="part2" draworder="1">
-        <context>2</context>
-        <font>title</font>
-        <area>100,140,600,170</area>
-        <value>Move the arrow to the bottom right edge of the TV screen.  Press SELECT to edit the top left arrow.  Press MENU for options and ESC to quit.</value>
-        <multiline>yes</multiline>
-      </textarea>
-
-      <textarea name="size" draworder="1">
-         <font>title</font>
-         <area>100,270,500,50</area>
-         <value>1280 x 720</value>
-      </textarea>
-
-      <textarea name="offsets" draworder="1">
-         <font>title</font>
-         <area>100,320,500,140</area>
-         <value>0 x 0</value>
-      </textarea>
-
-      <textarea name="changeamount" draworder="1">
-         <font>title</font>
-         <area>100,520,500,140</area>
-         <value>1 pixel</value>
-      </textarea>
-
-   </container>
-</window>
+    </window>
 </mythuitheme>

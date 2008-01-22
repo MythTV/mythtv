@@ -13,21 +13,17 @@
 
 /* MythTV includes */
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/myththemebase.h>
 
 using namespace std;
 
 #include "mythappearance.h"
 
 
-MythAppearance::MythAppearance(MythMainWindow *parent, QString windowName,
-                        QString themeFilename, const char *name)
-        : MythThemedDialog(parent, windowName, themeFilename, name)
+MythAppearance::MythAppearance(MythScreenStack *parent, const char *name)
+    : MythScreenType(parent, name)
 {
-
 
     // Initialise $stuff
     // Get UI size & offset settings from database
@@ -47,23 +43,78 @@ MythAppearance::MythAppearance(MythMainWindow *parent, QString windowName,
 
     getSettings();
     getScreenInfo();
-    wireUpTheme();
-    setContext(1);
     m_whicharrow = true;
-    updateScreen();
-    m_xsize = screenwidth;
-    m_ysize = screenheight;
-    // work out origin co-ordinates for arrows
 
-    m_topleftarrow_x = m_xoffset;
-    m_topleftarrow_y = m_yoffset;
-    m_bottomrightarrow_x = m_screenwidth - m_xoffset - m_arrowsize_x;
-    m_bottomrightarrow_y = m_screenheight - m_yoffset - m_arrowsize_y;
-    updateScreen();
+    m_xsize = GetMythMainWindow()->GetUIScreenRect().width();
+    m_ysize = GetMythMainWindow()->GetUIScreenRect().height();
 
 }
 
 MythAppearance::~MythAppearance() {}
+
+
+bool MythAppearance::Create()
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("appear-ui.xml", "appearance", this);
+
+    if (!foundtheme)
+        VERBOSE(VB_IMPORTANT, "Unable to window vodmenu from appear-ui.xml");
+
+    m_topleftarrow = dynamic_cast<MythUIImage *>
+                (GetChild("topleft"));
+
+    m_bottomrightarrow = dynamic_cast<MythUIImage *>
+                (GetChild("bottomright"));
+
+    m_size = dynamic_cast<MythUIText *>
+                (GetChild("size"));
+
+    m_offsets = dynamic_cast<MythUIText *>
+                (GetChild("offsets"));
+
+    m_changeamount = dynamic_cast<MythUIText *>
+                (GetChild("changeamount"));
+
+    m_offsets = dynamic_cast<MythUIText *>
+                (GetChild("offsets"));
+
+    m_changeamount = dynamic_cast<MythUIText *>
+                (GetChild("changeamount"));
+
+
+    m_arrowsize_x = m_topleftarrow->GetArea().width();
+    m_arrowsize_y = m_topleftarrow->GetArea().height();
+
+    // work out origin co-ordinates for arrows
+    m_topleftarrow_x = m_xoffset;
+    m_topleftarrow_y = m_yoffset;
+    m_bottomrightarrow_x = m_screenwidth - m_xoffset - m_arrowsize_x;
+    m_bottomrightarrow_y = m_screenheight - m_yoffset - m_arrowsize_y;
+
+    setContext(1);
+    updateScreen();
+
+    return true;
+}
+
+void MythAppearance::setContext(int context)
+{
+
+    if (context == 1)
+    {
+        m_topleftarrow->SetVisible(true);
+        m_bottomrightarrow->SetVisible(false);
+    }
+    else if (context == 2)
+    {
+        m_bottomrightarrow->SetVisible(true);
+        m_topleftarrow->SetVisible(false);
+    }
+
+}
 
 void MythAppearance::getSettings()
 {
@@ -80,11 +131,12 @@ void MythAppearance::getScreenInfo()
 }
 
 
-void MythAppearance::keyPressEvent(QKeyEvent *e)
+bool MythAppearance::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Game", e, actions);
+    bool handled = false;
+
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -103,11 +155,13 @@ void MythAppearance::keyPressEvent(QKeyEvent *e)
             moveRight();
         else if (action == "MENU")
             doMenu();
+        else if (action == "ESCAPE")
+            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+
+    return handled;
 }
 
 void MythAppearance::swapArrows()
@@ -137,7 +191,6 @@ void MythAppearance::moveUp()
         if (m_topleftarrow_y < 0)
             m_topleftarrow_y = 0;
     }
-
     else // do the bottom right arrow
     {
             m_bottomrightarrow_y -= m_change;
@@ -157,7 +210,6 @@ void MythAppearance::moveLeft()
         if (m_topleftarrow_x < 0)
             m_topleftarrow_x = 0;
     }
-
     else // do the bottom right arrow
     {
         m_bottomrightarrow_x -= m_change;
@@ -179,13 +231,13 @@ void MythAppearance::moveDown()
                 m_topleftarrow_y = int(m_screenheight * 0.25);
         }
     }
-
     else // do the bottom right arrow
     {
         m_bottomrightarrow_y += m_change;
         if (m_bottomrightarrow_y > m_screenheight - m_arrowsize_y)
             m_bottomrightarrow_y = m_screenheight - m_arrowsize_y;
     }
+
     updateScreen(); // now update the screen
     anythingChanged();
 }
@@ -195,30 +247,18 @@ void MythAppearance::moveRight()
     if (m_whicharrow) // do the top left arrow
     {
         m_topleftarrow_x += m_change;
-        if (m_topleftarrow_x > int (screenwidth * 0.25))
-            m_topleftarrow_x = int (screenwidth * 0.25);
+        if (m_topleftarrow_x > int (m_screenwidth * 0.25))
+            m_topleftarrow_x = int (m_screenwidth * 0.25);
     }
-
     else // do the bottom right arrow
     {
         m_bottomrightarrow_x += m_change;
         if (m_bottomrightarrow_x > m_screenwidth - m_arrowsize_x)
             m_bottomrightarrow_x = m_screenwidth - m_arrowsize_x;
     }
-        updateScreen(); // now update the screen
-    anythingChanged();
-}
 
-void MythAppearance::wireUpTheme()
-{
-    m_topleftarrow = getUIImageType("topleft");
-    m_arrowsize_x = m_topleftarrow->GetSize(true).width();
-    m_arrowsize_y = m_topleftarrow->GetSize(true).height();
-    m_bottomrightarrow = getUIImageType("bottomright");
-    m_size = getUITextType("size");
-    m_offsets = getUITextType("offsets");
-    m_changeamount = getUITextType("changeamount");
-    updateScreen();
+    updateScreen(); // now update the screen
+    anythingChanged();
 }
 
 void MythAppearance::updateScreen()
@@ -232,35 +272,36 @@ void MythAppearance::updateScreen()
     m_size->SetText(QString("Size: %1 x %2").arg(m_xsize).arg(m_ysize));
     m_offsets->SetText(QString("Offset: %1 x %2").arg(m_xoffset).arg(m_yoffset));
     m_changeamount->SetText(QString("Change amount: %1 pixel(s)").arg(m_change));
-    updateForeground();
+
 }
 
 void MythAppearance::doMenu()
 {
-
     if (menuPopup)
         return;
-    menuPopup = new MythPopupBox(gContext->GetMainWindow(), "menuPopup");
-    menuPopup->addLabel("MythAppearance Menu");
+
+    QString label = "MythAppearance Menu";
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    menuPopup = new MythDialogBox(label, mainStack, "menuPopup");
+
+    if (menuPopup->Create())
+        mainStack->AddScreen(menuPopup);
+
     if (m_changed)
     {
-        updateButton = menuPopup->addButton("Reset Screen Size Settings and Quit", this, SLOT(slotResetSettings()));
-        updateButton = menuPopup->addButton("Save and Quit", this, SLOT(slotSaveSettings()));
+        menuPopup->SetReturnEvent(this, "save");
+        menuPopup->AddButton("Save and Quit");
     }
-    updateButton = menuPopup->addButton("Coarse/Fine adjustment", this, SLOT(slotChangeCoarseFine()));
-    OKButton = menuPopup->addButton("Close Menu", this, SLOT(closeMenu()));
-    OKButton->setFocus();
-    menuPopup->ShowPopup(this, SLOT(closeMenu()));
-    updateScreen();
-}
+    else
+        menuPopup->SetReturnEvent(this, "nosave");
 
-void MythAppearance::closeMenu(void)
-{
-    if (menuPopup)
-    {
-        menuPopup->deleteLater();
-        menuPopup = NULL;
-    }
+    menuPopup->AddButton("Reset Screen Size Settings and Quit");
+    menuPopup->AddButton("Coarse/Fine adjustment");
+    menuPopup->AddButton("Close Menu");
+
+    updateScreen();
 }
 
 void MythAppearance::slotSaveSettings()
@@ -283,9 +324,6 @@ void MythAppearance::slotChangeCoarseFine()
         m_change = m_coarse;
     }
 
-    menuPopup->hide();
-    menuPopup->deleteLater();
-    menuPopup = NULL;
     updateScreen();
 }
 
@@ -296,8 +334,9 @@ void MythAppearance::updateSettings()
     gContext->SaveSetting("GuiWidth", m_xsize);
     gContext->SaveSetting("GuiHeight", m_ysize);
     VERBOSE(VB_IMPORTANT, "Updated screen size settings");
-    GetMythMainWindow()->JumpTo("Reload Theme");
-    updateScreen();
+    //updateScreen();
+    //GetMythMainWindow()->JumpTo("Reload Theme");
+    GetMythMainWindow()->GetMainStack()->PopScreen();
 }
 
 void MythAppearance::slotResetSettings()
@@ -307,10 +346,10 @@ void MythAppearance::slotResetSettings()
      gContext->SaveSetting("GuiWidth", 0);
      gContext->SaveSetting("GuiHeight", 0);
      m_changed = false;
-     GetMythMainWindow()->JumpTo("Reload Theme");
-     getSettings();
-     getScreenInfo();
-     updateScreen();
+     //getSettings();
+     //getScreenInfo();
+     //updateScreen();
+     GetMythMainWindow()->GetMainStack()->PopScreen();
 }
 
 void MythAppearance::anythingChanged()
@@ -324,4 +363,37 @@ void MythAppearance::anythingChanged()
     else if (m_yoffset != m_yoffset_old)
             m_changed = true;
     else m_changed = false;
+}
+
+void MythAppearance::customEvent(QCustomEvent *event)
+{
+
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "save")
+        {
+            if (buttonnum == 0)
+                slotSaveSettings();
+            else if (buttonnum == 1)
+                slotResetSettings();
+            else if (buttonnum == 2)
+                slotChangeCoarseFine();
+        }
+        else if (resultid == "nosave")
+        {
+            if (buttonnum == 0)
+                slotResetSettings();
+            if (buttonnum == 1)
+                slotChangeCoarseFine();
+        }
+
+        menuPopup = NULL;
+    }
+
 }

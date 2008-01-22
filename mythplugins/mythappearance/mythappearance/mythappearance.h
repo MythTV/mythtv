@@ -4,24 +4,31 @@
 #include <qstringlist.h>
 #include <qstring.h>
 #include <qptrlist.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+//#include <mythtv/libmythui/mythgesture.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 class XMLParse;
-class MythAppearance : public MythThemedDialog
+class MythAppearance : public MythScreenType
 {
-Q_OBJECT
-public:
+    Q_OBJECT
 
-    MythAppearance(MythMainWindow *parent, QString windowName,
-        QString themeFilename, const char *name = 0);
+  public:
+
+    MythAppearance(MythScreenStack *parent, const char *name);
     ~MythAppearance();
 
-protected: 
+    virtual bool Create(void);
+    virtual bool keyPressEvent(QKeyEvent *);
+    virtual void customEvent(QCustomEvent *event);
+
+  protected: 
     void doMenu();
-private:
+  private:
     int m_x_offset;
     int m_y_offset;
     bool m_whicharrow;
@@ -44,18 +51,21 @@ private:
     int m_yoffset;
     int m_xoffset_old;
     int m_yoffset_old;
-    
+
     void getSettings();
     void getScreenInfo();
 
     QRect m_menuRect;
     QRect m_arrowsRect;
 
-    UIImageType *m_topleftarrow;
-    UIImageType *m_bottomrightarrow;
-    UITextType *m_size;
-    UITextType *m_offsets;
-    UITextType *m_changeamount;
+    MythUIImage *m_topleftarrow;
+    MythUIImage *m_bottomrightarrow;
+    MythUIText *m_size;
+    MythUIText *m_offsets;
+    MythUIText *m_changeamount;
+    MythUIButton *OKButton;
+    MythUIButton *updateButton;
+    MythDialogBox *menuPopup;
 
     void moveUp();
     void moveDown();
@@ -65,13 +75,9 @@ private:
     void wireUpTheme();
     void updateScreen();
     void updateSettings();
-    void keyPressEvent(QKeyEvent *e);
     void anythingChanged();
-    MythPopupBox *menuPopup;
-    QButton *OKButton;
-    QButton *updateButton;
+    void setContext(int context);
 
-protected slots:
     void slotSaveSettings();
     void slotChangeCoarseFine();
     void closeMenu();
