@@ -11,7 +11,7 @@
 MythUIText::MythUIText(MythUIType *parent, const char *name)
           : MythUIType(parent, name)
 {
-    m_Message = m_DefaultMessage = " ";
+    m_Message = m_DefaultMessage = "";
 
     m_Font = new MythFontProperties();
 
@@ -224,8 +224,7 @@ bool MythUIText::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "value")
     {
-        if ((m_Message.isNull() || m_Message.isEmpty()) &&
-            element.attribute("lang","") == "")
+        if (m_Message.isEmpty() && element.attribute("lang","").isEmpty())
         {
             m_Message = qApp->translate("ThemeUI", getFirstText(element));
         }
