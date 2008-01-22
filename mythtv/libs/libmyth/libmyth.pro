@@ -123,6 +123,8 @@ macx {
     # Mac OS X Frameworks
     FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
 
+    darwin_da : FWKS += DiskArbitration
+
     # The following trick is tidier, and shortens the command line, but it
     # depends on the shell expanding Csh-style braces. Luckily, Bash & Zsh do.
     FC = $$join(FWKS,",","{","}")
@@ -130,9 +132,6 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
 
-    # There is a dependence on some stuff in libmythui and libmythupnp.
-    # It isn't built yet, so we have to ignore these for now:
-    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }

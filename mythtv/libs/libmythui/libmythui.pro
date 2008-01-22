@@ -61,8 +61,8 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
 
-    # This lib depends on libmyth which depends on some stuff in libmythupnp.
-    LIBS += -L../libmythupnp -lmythupnp-$$LIBVERSION
+    # This lib depends on libmyth, which may not have been built yet
+    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 }
 
 using_joystick_menu {
