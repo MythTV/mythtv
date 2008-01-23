@@ -1,5 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
+include ( ../libs-dephack.pro )
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
@@ -61,8 +62,7 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
 
-    # This lib depends on libmyth, which may not have been built yet
-    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
+    QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
 
 using_joystick_menu {
@@ -76,7 +76,6 @@ using_lirc {
 cygwin:DEFINES += _WIN32
 
 mingw {
-    target.path = $${PREFIX}/bin
     using_opengl {
         LIBS += -lopengl32
         DEFINES += USE_OPENGL_PAINTER
