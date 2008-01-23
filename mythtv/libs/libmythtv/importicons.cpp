@@ -8,6 +8,7 @@
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"
+#include <qdir.h>
 
 ImportIconsWizard::ImportIconsWizard(bool fRefresh, QString channelname)
 {
@@ -29,19 +30,35 @@ MythDialog *ImportIconsWizard::dialogWidget(MythMainWindow *parent,
 
 int ImportIconsWizard::exec()
 {
-    m_strChannelDir =  MythContext::GetConfDir()+ "/channels";
-    mkdir(MythContext::GetConfDir(),0776);
-    mkdir(m_strChannelDir,0776);
+    QString dirpath = MythContext::GetConfDir();
+    QDir configDir(dirpath);
+    if (!configDir.exists())
+    {
+        if (!configDir.mkdir(dirpath, true))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
+        }
+    }
+
+    m_strChannelDir = QString("%1/%2").arg(configDir.absPath()).arg("/channels");
+    QDir strChannelDir(m_strChannelDir);
+    if (!strChannelDir.exists())
+    {
+        if (!strChannelDir.mkdir(m_strChannelDir, true))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(m_strChannelDir));
+        }
+    }
     m_strChannelDir+="/";
 
-        if (initialLoad(m_strChannelname) > 0)
-        {
-            startDialog();
-            m_missingIter=m_missingEntries.begin();
-            doLoad();
-        }
-        else
-            m_closeDialog=true;
+    if (initialLoad(m_strChannelname) > 0)
+    {
+        startDialog();
+        m_missingIter=m_missingEntries.begin();
+        doLoad();
+    }
+    else
+        m_closeDialog=true;
 
     if (m_closeDialog==false) // Need this if line to exit if cancel button is pressed
         while ((ConfigurationDialog::exec() == QDialog::Accepted) && (m_closeDialog == false))  {}
