@@ -86,7 +86,7 @@ MPUBLIC double MythGetPixelAspectRatio(void);
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32
-typedef LONGLONG uint64_t
+#include "compat.h"
 inline void rdtsc(uint64_t &x)
 {
     QueryPerformanceCounter((LARGE_INTEGER*)(&x));
