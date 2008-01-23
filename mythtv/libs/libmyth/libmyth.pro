@@ -53,6 +53,7 @@ LIBS += -L../libmythupnp       -lmythupnp-$${LIBVERSION}
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 
+# Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h mythverbose.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
@@ -64,6 +65,13 @@ inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
 inc.files += mythexp.h mythpluginapi.h compat.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
+
+# Allow both #include <blah.h> and #include <libmyth/blah.h>
+inc2.path  = $${PREFIX}/include/mythtv/libmyth
+unix:inc2.extra = rmdir $$inc2.path ; ln -s $$inc.path $$inc2.path
+# On Windows, we have to have two copies of the files
+!unix:inc2.files = $${inc.files}
+
 
 using_oss {
     DEFINES += USING_OSS
@@ -146,7 +154,7 @@ freebsd {
     HEADERS += mythcdrom-freebsd.h
 }
 
-INSTALLS += inc
+INSTALLS += inc inc2
 
 using_alsa {
     DEFINES += USE_ALSA
