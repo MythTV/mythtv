@@ -339,6 +339,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(audioproperties)
     INT_TO_LIST(videoproperties)
     INT_TO_LIST(subtitleType)
+/* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
 /** \fn ProgramInfo::FromStringList(const QStringList&,uint)
