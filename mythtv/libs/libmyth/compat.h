@@ -205,7 +205,7 @@ inline const char *dlerror(void)
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                         errStr, DLERR_MAX - 1, NULL))
         snprintf(errStr, DLERR_MAX - 1,
-                 "dlopen()/dlsym() caused error %d", errCode);
+                 "dlopen()/dlsym() caused error %d", (int)errCode);
 
     return errStr;
 }
