@@ -381,14 +381,23 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         do_audmode_set = false;
     }
 
-    static const int v4l2_lang[3] =
+    switch (language)
     {
-        V4L2_TUNER_MODE_LANG1,
-        V4L2_TUNER_MODE_LANG2,
-        V4L2_TUNER_MODE_STEREO,
-    };
-    language = (language > 2) ? 0 : language;
-    vt.audmode = v4l2_lang[language];
+        case 0:
+            vt.audmode = V4L2_TUNER_MODE_LANG1;
+            break;
+        case 1:
+            vt.audmode = V4L2_TUNER_MODE_LANG2;
+            break;
+        case 2:
+            if (usingv4l2)
+                vt.audmode = V4L2_TUNER_MODE_LANG1_LANG2;
+            else
+                vt.audmode = V4L2_TUNER_MODE_STEREO;
+            break;
+        default:
+            vt.audmode = V4L2_TUNER_MODE_LANG1;
+    }
 
     int audio_layer = GetFilteredAudioLayer();
     if (do_audmode_set && (2 == language) && (1 == audio_layer))
