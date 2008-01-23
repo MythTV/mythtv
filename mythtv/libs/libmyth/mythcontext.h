@@ -125,7 +125,7 @@ class MPUBLIC MythPrivRequest
  *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (version number)
  *      mythplugins/mythvideo/mythvideo/scripts/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "37"
+#define MYTH_PROTO_VERSION "38"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.
