@@ -14,7 +14,7 @@ using namespace std;
 typedef QMap<long long, long long> frm_pos_map_t;
 typedef QMap<long long, int> frm_dir_map_t;
 
-#define NUMPROGRAMLINES 43
+#define NUMPROGRAMLINES 46
 
 typedef enum {
     MARK_UNSET = -10,
