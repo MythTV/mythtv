@@ -1,6 +1,7 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
 include ( ../../version.pro )
+include ( ../libs-dephack.pro )
  
 TEMPLATE = lib
 TARGET = mythupnp-$$LIBVERSION
@@ -44,7 +45,6 @@ LIBS += $$EXTRA_LIBS
 mingw {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
-    target.path = $${PREFIX}/bin
 }
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
@@ -68,7 +68,5 @@ macx {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
 
-    # This lib depends on libmyth which depends on some stuff in libmythui.
-    # It isn't built yet, so we have to ignore these for now:
-    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
+    QMAKE_LFLAGS_SHLIB += -flat_namespace
 }

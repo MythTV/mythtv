@@ -95,18 +95,7 @@ mingw {
     SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
     HEADERS += mediamonitor-windows.h   audiooutputwin.h
 
-    LIBS += -L. -lmythui-bootstrap -lmythupnp-bootstrap
     LIBS += -lpthread
-
-    target.path = $${PREFIX}/bin
-    implib.target = libmythui-bootstrap.a
-    implib.commands = test -e libmythui-bootstrap.a || dlltool --input-def ../libmythui/libmythui.def --dllname libmythui-$${LIBVERSION}.dll --output-lib libmythui-bootstrap.a -k
-    QMAKE_EXTRA_WIN_TARGETS += implib
-    POST_TARGETDEPS += libmythui-bootstrap.a
-    implib2.target = libmythupnp-bootstrap.a
-    implib2.commands = test -e libmythupnp-bootstrap.a || dlltool --input-def ../libmythupnp/libmythupnp.def --dllname libmythupnp-$${LIBVERSION}.dll --output-lib libmythupnp-bootstrap.a -k
-    QMAKE_EXTRA_WIN_TARGETS += implib2
-    POST_TARGETDEPS += libmythupnp-bootstrap.a
 }
 
 macx {
