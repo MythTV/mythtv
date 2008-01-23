@@ -1025,13 +1025,17 @@ firewire_deps="backend"
 iptv_deps="backend"
 ivtv_deps="backend v4l"
 hdhomerun_deps="backend"
+opengl_deps="x11 GL_gl_h"
+opengl_video_deps="opengl xv"
+opengl_vsync_deps="opengl"
 v4l_deps="backend"
 xrandr_deps="x11"
 xv_deps="x11"
-xvmc_deps="x11"
-xvmc_pro_deps="x11"
-xvmc_vld_deps="x11"
-xvmcw_deps="x11"
+xvmc_deps="xv X11_extensions_XvMClib_h"
+xvmc_opengl_deps="opengl xvmc"
+xvmc_pro_deps="xvmc X11_extensions_vldXvMC_h"
+xvmc_vld_deps="xvmc X11_extensions_vldXvMC_h"
+xvmcw_deps="xvmc"
 
 
 # set temporary file name
@@ -1151,6 +1155,7 @@ ivtv="yes"
 joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
+opengl="yes"
 v4l="yes"
 x11="yes"
 x11_include_path="/usr/X11R6/include"
@@ -2653,82 +2658,41 @@ if enabled firewire; then
 fi
 
 enabled x11 && has_library libX11 || disable x11
-
-if ! enabled x11; then
-    disable xrandr xv xvmc xvmc_vld xvmc_opengl opengl_video opengl
-fi
-
 enabled xrandr && has_header X11/extensions/Xrandr.h || disable xrandr
 enabled xv && has_library libXv || disable xv
 
-if ! enabled xv; then
-    disable xrandr xv xvmc xvmc_vld xvmc_opengl opengl_video
-fi
+check_header GL/gl.h
+has_library libGL || has_library libopengl32 || disable opengl
 
 VENDOR_XVMC_LIBS=""
-has_header X11/extensions/XvMClib.h || disable xvmc
-if enabled xvmc; then
-    disable xvmc
-    has_library libXvMCW || disable xvmcw
+check_header X11/extensions/XvMClib.h
+has_library libXvMCW || disable xvmcw
+check_header X11/extensions/vldXvMC.h
+has_library libviaXvMC || disable xvmc_vld
+has_library libviaXvMCPro || disable xvmc_pro
 
-    if test x"$xvmc_lib" != x""; then
-        VENDOR_XVMC_LIBS="-l"$xvmc_lib
-        enable xvmc
-        disable xvmcw
-    elif enabled xvmcw; then
-        VENDOR_XVMC_LIBS="-lXvMCW"
-        enable xvmc
-    elif enabled xvmc_pro; then
-        disable xvmc_pro
-        if has_library libviaXvMCPro ; then
-            VENDOR_XVMC_LIBS="-lviaXvMCPro"
-            enable xvmc xvmc_vld xvmc_pro
-        fi
-    elif enabled xvmc_vld; then
-        if has_library libviaXvMC ; then
-            VENDOR_XVMC_LIBS="-lviaXvMC"
-            enable xvmc
-        fi
-    elif has_library libXvMCNVIDIA ; then
-        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
-        enable xvmc
-        disable xvmc_vld xvmc_pro
-    elif has_library libviaXvMC ; then
-        VENDOR_XVMC_LIBS="-lviaXvMC"
-        enable xvmc xvmc_vld
-    elif has_library libI810XvMC ; then
-        VENDOR_XVMC_LIBS="-lI810XvMC"
-        enable xvmc
-        disable xvmc_vld xvmc_pro
-    fi
+if test x"$xvmc_lib" != x""; then
+    VENDOR_XVMC_LIBS="-l"$xvmc_lib
+    disable xvmcw
+elif enabled xvmcw; then
+    VENDOR_XVMC_LIBS="-lXvMCW"
+elif enabled xvmc_pro; then
+    VENDOR_XVMC_LIBS="-lviaXvMCPro"
+elif enabled xvmc_vld; then
+    VENDOR_XVMC_LIBS="-lviaXvMC"
+elif has_library libXvMCNVIDIA ; then
+    VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
+elif has_library libI810XvMC ; then
+    VENDOR_XVMC_LIBS="-lI810XvMC"
 else
-    disable xvmc_vld xvmc_pro xvmc_opengl
+    disable xvmc
 fi
 
-if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
-    disable xvmc_opengl
-fi
+test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" && disable xvmc_opengl
 
-if ! has_header X11/extensions/vldXvMC.h ; then
-    disable xvmc_vld xvmc_pro
-fi
+enabled xvmc_pro && enable xvmc_vld
+enabled xvmc_opengl && disable xvmc_vld xvmc_pro
 
-if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMC" ; then
-    if test x"$VENDOR_XVMC_LIBS" != x"-lviaXvMCPro" ; then
-        if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCW" ; then
-            disable xvmc_vld xvmc_pro
-        fi
-    fi
-fi
-
-disabled xvmc_pro || enable xvmc_vld
-disabled xvmc_opengl || (enable opengl && disable xvmc_vld xvmc_pro)
-disabled opengl_video || enable opengl
-disabled opengl_vsync || enable opengl
-disabled x11 || enable opengl
-has_library libGL || disable opengl_video xvmc_opengl opengl_vsync opengl
-has_library libopengl32 && enable opengl
-has_header GL/gl.h || disable opengl_video xvmc_opengl opengl_vsync opengl
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $targetos = darwin || disable dvdv
@@ -2821,7 +2785,7 @@ enabled_any $THREADS_LIST  && enable threads
 check_deps $CONFIG_LIST $HAVE_LIST $DECODER_LIST $ENCODER_LIST $PARSER_LIST \
     $BSF_LIST $DEMUXER_LIST $MUXER_LIST $PROTOCOL_LIST
 
-check_deps $MYTHTV_LIST $MYTHTV_CONFIG_LIST
+check_deps $MYTHTV_LIST $MYTHTV_CONFIG_LIST $USING_LIST
 
 enabled libdc1394 && append pkg_requires "libraw1394"
 enabled libtheora && append pkg_requires "theora"
