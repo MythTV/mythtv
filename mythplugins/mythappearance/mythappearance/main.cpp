@@ -35,6 +35,8 @@ int mythplugin_run (void)
 
     if (mythappearance->Create())
         mainStack->AddScreen(mythappearance);
+    else
+        return -1;
 
     //GetMythMainWindow()->JumpTo("Reload Theme");
 
