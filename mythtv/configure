@@ -3294,7 +3294,7 @@ if enabled xrandr; then
   echo "CONFIG_XRANDR_LIBS=-lXrandr" >> $MYTH_CONFIG_MAK
 fi
 
-if test x"$VENDOR_XVMC_LIBS" != x"" ; then
+if enabled xvmc; then
   echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> $MYTH_CONFIG_MAK
   if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
       CCONFIG="$CCONFIG using_xvmc_pbuffer"
