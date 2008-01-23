@@ -392,6 +392,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleDeleteRecording(listline, pbs, false);
     }
+    else if (command == "DELETE_FAILED_RECORDING")
+    {
+        HandleDeleteRecording(listline, pbs, true, true);
+    }
     else if (command == "FORCE_DELETE_RECORDING")
     {
         HandleDeleteRecording(listline, pbs, true);
@@ -674,7 +678,7 @@ void MainServer::customEvent(QCustomEvent *e)
                 {
                     pinfo->ForgetHistory();
                 }
-                DoHandleDeleteRecording(pinfo, NULL, false, true);
+                DoHandleDeleteRecording(pinfo, NULL, false, false, true);
             }
             else
             {
@@ -698,6 +702,7 @@ void MainServer::customEvent(QCustomEvent *e)
         }
 
         if ((me->Message().left(16) == "DELETE_RECORDING") ||
+            (me->Message().left(23) == "DELETE_FAILED_RECORDING") ||
             (me->Message().left(22) == "FORCE_DELETE_RECORDING"))
         {
             QStringList tokens = QStringList::split(" ", me->Message());
@@ -712,7 +717,9 @@ void MainServer::customEvent(QCustomEvent *e)
                                                                      startts);
             if (pinfo)
             {
-                if (tokens[0] == "FORCE_DELETE_RECORDING")
+                if (tokens[0] == "DELETE_FAILED_RECORDING")
+                    DoHandleDeleteRecording(pinfo, NULL, true, true);
+                else if (tokens[0] == "FORCE_DELETE_RECORDING")
                     DoHandleDeleteRecording(pinfo, NULL, true);
                 else
                     DoHandleDeleteRecording(pinfo, NULL, false);
@@ -1598,6 +1605,9 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         delete_file_immediately( sFileName, followLinks, true);
     }
 
+    if (ds->updateLastDelete)
+        pginfo->UpdateLastDelete(true);
+
     DoDeleteInDB(ds);
 
     if (pginfo->recgroup != "LiveTV")
@@ -1956,16 +1966,18 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 }
 
 void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
-                                       bool forceMetadataDelete)
+                                       bool forceMetadataDelete,
+                                       bool deleteFailedRec)
 {
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    DoHandleDeleteRecording(pginfo, pbs, forceMetadataDelete);
+    DoHandleDeleteRecording(pginfo, pbs, forceMetadataDelete, deleteFailedRec);
 }
 
 void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
-                                         bool forceMetadataDelete, bool expirer)
+                                         bool forceMetadataDelete,
+                                         bool deleteFailedRec, bool expirer)
 {
     int resultCode = -1;
     MythSocket *pbssock = NULL;
@@ -2005,7 +2017,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
         if (slave) 
         {
-            num = slave->DeleteRecording(pginfo, forceMetadataDelete);
+            num = slave->DeleteRecording(pginfo, forceMetadataDelete,
+                                         deleteFailedRec);
 
             if (num > 0)
             {
@@ -2079,6 +2092,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         ds->recstartts = pginfo->recstartts;
         ds->recendts = pginfo->recendts;
         ds->forceMetadataDelete = forceMetadataDelete;
+        ds->updateLastDelete =
+                (!deleteFailedRec && !forceMetadataDelete && !expirer);
 
         pginfo->SetDeleteFlag(true);
 

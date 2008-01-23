@@ -126,11 +126,15 @@ int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
     return strlist[0].toInt();
 }
 
-int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete)
+int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo,
+                                  bool forceMetadataDelete,
+                                  bool deleteFailedRec)
 {
     QStringList strlist;
 
-    if (forceMetadataDelete)
+    if (deleteFailedRec)
+        strlist = QString("DELETE_FAILED_RECORDING");
+    else if (forceMetadataDelete)
         strlist = QString("FORCE_DELETE_RECORDING");
     else
         strlist = QString("DELETE_RECORDING");

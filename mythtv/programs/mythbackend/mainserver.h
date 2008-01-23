@@ -64,6 +64,7 @@ class MainServer : public QObject, public MythSocketCBs
         QString filename;
         QString title;
         bool forceMetadataDelete;
+        bool updateLastDelete;
     } DeleteStruct;
 
     void ProcessRequestWork(MythSocket *sock);
@@ -77,9 +78,12 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
-                               bool forceMetadataDelete);
+                               bool forceMetadataDelete = false,
+                               bool deleteFailedRec = false);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
-                                 bool forceMetadataDelete, bool expirer=false);
+                                 bool forceMetadataDelete,
+                                 bool deleteFailedRec = false,
+                                 bool expirer = false);
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
@@ -204,3 +208,5 @@ class MainServer : public QObject, public MythSocketCBs
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
