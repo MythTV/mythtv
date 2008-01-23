@@ -1538,6 +1538,9 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
+    if (ds->updateLastDelete)
+        pginfo->UpdateLastDelete(true);
+
     LiveTVChain *tvchain = GetChainWithRecording(pginfo);
     if (tvchain)
         tvchain->DeleteProgram(pginfo);
@@ -1606,9 +1609,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
         delete_file_immediately( sFileName, followLinks, true);
     }
-
-    if (ds->updateLastDelete)
-        pginfo->UpdateLastDelete(true);
 
     DoDeleteInDB(ds);
 
@@ -1991,11 +1991,12 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
 
     
-    if (justexpire && !forceMetadataDelete && 
+    if (justexpire && !forceMetadataDelete && !deleteFailedRec &&
         pginfo->filesize > (1024 * 1024) )
     {
         pginfo->ApplyRecordRecGroupChange("Deleted");
         pginfo->SetAutoExpire(kDeletedAutoExpire);
+        pginfo->UpdateLastDelete(true);
         if (pginfo->recstatus == rsRecording)
             DoHandleStopRecording(pginfo, NULL);
         else
