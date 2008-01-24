@@ -64,6 +64,8 @@ void MythListButton::Const(void)
 
     arrowPix = checkNonePix = checkHalfPix = checkFullPix = NULL;
     itemRegPix = itemSelActPix = itemSelInactPix = NULL;
+
+    SetCanTakeFocus(true);
 }
 
 MythListButton::~MythListButton()
