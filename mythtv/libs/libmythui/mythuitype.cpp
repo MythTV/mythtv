@@ -463,7 +463,7 @@ void MythUIType::Show(void)
 
 void MythUIType::AddFocusableChildrenToList(QPtrList<MythUIType> &focusList)
 {
-    if (m_HasFocus)
+    if (m_CanHaveFocus)
         focusList.append(this);
 
     QValueVector<MythUIType *>::Iterator it;
