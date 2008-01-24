@@ -2486,7 +2486,73 @@ void Scheduler::AddNewRecords(void)
     if (hdtvpriority)
         pwrpri += QString(" + (program.hdtv > 0) * %1").arg(hdtvpriority);
 
+    QString schedTmpRecord = recordTable;
+
     MSqlQuery result(dbConn);
+
+    if (schedTmpRecord == "record")
+    {
+        schedTmpRecord = "sched_temp_record";
+
+        result.prepare("DROP TABLE IF EXISTS sched_temp_record;");
+        result.exec();
+
+        if (!result.isActive())
+        {
+            MythContext::DBError("Dropping sched_temp_record table", result);
+            return;
+        }
+
+        result.prepare("CREATE TEMPORARY TABLE sched_temp_record "
+                           "LIKE record;");
+        result.exec();
+
+        if (!result.isActive())
+        {
+            MythContext::DBError("Creating sched_temp_record table",
+                                 result);
+            return;
+        }
+
+        result.prepare("INSERT sched_temp_record SELECT * from record;");
+        result.exec();
+
+        if (!result.isActive())
+        {
+            MythContext::DBError("Populating sched_temp_record table",
+                                 result);
+            return;
+        }
+    }
+
+    result.prepare("DROP TABLE IF EXISTS sched_temp_recorded;");
+    result.exec();
+
+    if (!result.isActive())
+    {
+        MythContext::DBError("Dropping sched_temp_recorded table", result);
+        return;
+    }
+
+    result.prepare("CREATE TEMPORARY TABLE sched_temp_recorded "
+                       "LIKE recorded;");
+    result.exec();
+
+    if (!result.isActive())
+    {
+        MythContext::DBError("Creating sched_temp_recorded table", result);
+        return;
+    }
+
+    result.prepare("INSERT sched_temp_recorded SELECT * from recorded;");
+    result.exec();
+
+    if (!result.isActive())
+    {
+        MythContext::DBError("Populating sched_temp_recorded table", result);
+        return;
+    }
+
     result.prepare(QString("SELECT recpriority, selectclause FROM %1;")
                            .arg(priorityTable));
     result.exec();
@@ -2562,7 +2628,7 @@ void Scheduler::AddNewRecords(void)
 "      ) "
 "     ) "
 "  ) "
-" LEFT JOIN recorded ON "
+" LEFT JOIN sched_temp_recorded recorded ON "
 "  ( "
 "    RECTABLE.dupmethod > 1 AND "
 "    recorded.duplicate <> 0 AND "
@@ -2602,7 +2668,7 @@ void Scheduler::AddNewRecords(void)
 "      findduplicate = (oldfind.findid IS NOT NULL), "
 "      oldrecstatus = oldrecorded.recstatus "
 );
-    rmquery.replace("RECTABLE", recordTable);
+    rmquery.replace("RECTABLE", schedTmpRecord);
 
     QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
@@ -2641,7 +2707,7 @@ void Scheduler::AddNewRecords(void)
 "    oldrecstatus.title = program.title ) "
 " ORDER BY RECTABLE.recordid DESC "
 );
-    query.replace("RECTABLE", recordTable);
+    query.replace("RECTABLE", schedTmpRecord);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
