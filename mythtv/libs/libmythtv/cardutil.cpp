@@ -1606,7 +1606,7 @@ void CardUtil::GetCardInputs(
     {
         bool needs_conf = IsInNeedOfExternalInputConf(cardid);
         InputNames list = GetConfiguredDVBInputs(cardid);
-        if (list.empty())
+        if (!needs_conf && list.empty())
             list[0] = "DVBInput";
 
         InputNames::const_iterator it;
