@@ -44,6 +44,10 @@ class MythUIButton : public MythUIType
 
     void SetupPlacement(void);
 
+  public slots:
+    void Select() { SelectState(Selected); }
+    void Deselect() { SelectState(Normal); }
+
   signals:
     void buttonPressed();
 

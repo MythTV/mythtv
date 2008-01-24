@@ -20,6 +20,9 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name)
 
     m_PaddingMargin = 0;
 
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
+
     SetCanTakeFocus(true);
 }
 
