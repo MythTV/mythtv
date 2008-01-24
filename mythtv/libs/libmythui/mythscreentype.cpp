@@ -86,7 +86,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
  
 bool MythScreenType::NextPrevWidgetFocus(bool up)
 {
-    if (!m_CurrentFocusWidget)
+    if (!m_CurrentFocusWidget || m_FocusWidgetList.isEmpty())
         return SetFocusWidget(NULL);
 
     bool reachedCurrent = false;
@@ -109,7 +109,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 
     // fall back to first possible widget
     if (up)
-        return SetFocusWidget(NULL);
+        return SetFocusWidget(it.toFirst());
 
     // fall back to last possible widget
     if (reachedCurrent)
