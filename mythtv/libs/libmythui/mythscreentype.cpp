@@ -78,6 +78,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 
     if (m_CurrentFocusWidget)
         m_CurrentFocusWidget->LoseFocus();
+    m_CurrentFocusWidget = widget;
     m_CurrentFocusWidget->TakeFocus();
 
     return true;
