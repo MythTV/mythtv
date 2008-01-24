@@ -7,6 +7,8 @@ TARGET = mythappearance
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+INCLUDEPATH += $${PREFIX}/include/mythtv
+
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = appear-ui.xml
 
