@@ -5558,7 +5558,7 @@ bool TV::IsTunable(uint chanid)
     vector<uint> interesting = CardUtil::GetCardIDs(sourceid);
 
     // filter disconnected cards
-    vector<uint> cardids;
+    vector<uint> cardids = excluded_cards;
     for (uint i = 0; i < connected.size(); i++)
     {
         for (uint j = 0; j < interesting.size(); j++)
