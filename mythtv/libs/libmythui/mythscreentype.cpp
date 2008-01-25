@@ -90,38 +90,46 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         return SetFocusWidget(NULL);
 
     bool reachedCurrent = false;
+    // QPtrListIterator will always start at the beginning of the list
+    // in this function. It is not a traditional list iterator
     QPtrListIterator<MythUIType> it(m_FocusWidgetList);
     MythUIType *current;
 
-    while ((current = it.current()))
-    {
-        if (reachedCurrent && current->CanTakeFocus())
-            return SetFocusWidget(current);
-
-        if (current == m_CurrentFocusWidget)
-            reachedCurrent = true;
-
-        if (up)
-            ++it;
-        else
-           --it;
-    }
-
-    // fall back to first possible widget
+    // There is probably a more efficient way to do this, but the list
+    // is never going to be that big so it will do for now
     if (up)
-        return SetFocusWidget(it.toFirst());
+    {
+        while ((current = it.current()))
+        {
+            if (reachedCurrent)
+                return SetFocusWidget(current);
 
-    // fall back to last possible widget
-    if (reachedCurrent)
+            if (current == m_CurrentFocusWidget)
+                reachedCurrent = true;
+
+            ++it;
+        }
+    }
+    else
     {
         it.toLast();
         while ((current = it.current()))
         {
-            if (current->CanTakeFocus())
+            if (reachedCurrent)
                 return SetFocusWidget(current);
+
+            if (current == m_CurrentFocusWidget)
+                reachedCurrent = true;
+
             --it;
         }
     }
+
+    // fall back to first/last possible widget
+    if (up)
+        return SetFocusWidget(it.toFirst());
+    else
+        return SetFocusWidget(it.toLast());
 
     return false;
 }
