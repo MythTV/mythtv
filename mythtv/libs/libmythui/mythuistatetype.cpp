@@ -211,6 +211,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
 
          MythUIType *newtype = GetChild(other->name());
          AddObject(key, newtype);
+         newtype->SetVisible(other->IsVisible());
     }
 
     QMap<int, MythUIType *>::iterator j;
@@ -221,6 +222,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
 
          MythUIType *newtype = GetChild(other->name());
          AddObject((StateType)key, newtype);
+         newtype->SetVisible(other->IsVisible());
     }
 }
 
