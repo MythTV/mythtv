@@ -34,7 +34,6 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 
 // MythControls headers
 #include "mythcontrols.h"
@@ -48,43 +47,21 @@
 
 /** \fn MythControls::MythControls(MythMainWindow*, bool&)
  *  \brief Creates a new MythControls wizard
- *  \param parent The main myth window.
- *  \param ok Set if UI was correctly loaded, cleared otherwise.
+ *  \param parent Pointer to the screen stack
+ *  \param name The name of the window
  */
-MythControls::MythControls(MythMainWindow *parent, bool &ok)
-    : MythThemedDialog(parent, "controls", "controls-", "controls"),
-      m_currentView(kActionsByContext),
-      m_focusedUIElement(NULL),
-      m_leftList(NULL),        m_rightList(NULL),
-      m_description(NULL),
-      m_leftDescription(NULL), m_rightDescription(NULL),
-      m_bindings(NULL),     m_container(NULL)
+MythControls::MythControls(MythScreenStack *parent, const char *name)
+    : MythScreenType (parent, name)
 {
-    // MS Windows doesn't like bzero()
-    memset(m_actionButtons, 0,
-           sizeof(void*) * Action::kMaximumNumberOfBindings);
+    m_currentView = kActionsByContext;
+    m_leftList = m_rightList = NULL;
+    m_description = m_leftDescription = m_rightDescription = NULL;
+    m_bindings = NULL;
 
     m_contexts.setAutoDelete(true);
-    
-    // Load up the ui components
-    ok = LoadUI();
-    if (!ok)
-        return;
 
     m_leftListType  = kContextList;
     m_rightListType = kActionList;
-
-    LoadData(gContext->GetHostName());
-
-    /* start off with the actions by contexts view */
-    m_currentView = kActionsByContext;
-    SetListContents(m_leftList, m_bindings->GetContexts(), true);
-    UpdateRightList();
-
-    connect(m_leftList,  SIGNAL(itemSelected( UIListBtnTypeItem*)),
-            this,        SLOT(  LeftSelected( UIListBtnTypeItem*)));
-    connect(m_rightList, SIGNAL(itemSelected( UIListBtnTypeItem*)),
-            this,        SLOT(  RightSelected(UIListBtnTypeItem*)));
 }
 
 MythControls::~MythControls()
@@ -92,26 +69,8 @@ MythControls::~MythControls()
     Teardown();
 }
 
-void MythControls::deleteLater(void)
-{
-    Teardown();
-    MythThemedDialog::deleteLater();
-}
-
 void MythControls::Teardown(void)
 {
-    if (m_leftList)
-    {
-        m_leftList->disconnect();
-        m_leftList = NULL;
-    }
-
-    if (m_rightList)
-    {
-        m_rightList->disconnect();
-        m_rightList = NULL;
-    }
-
     if (m_bindings)
     {
         delete m_bindings;
@@ -121,87 +80,83 @@ void MythControls::Teardown(void)
     m_contexts.clear();
 }
 
-/** \fn MythControls::LoadUI(void)
+/** \fn MythControls::Create(void)
  *  \brief Loads UI elements from theme
  *
  *   This method grabs all of the UI elements that are needed by
  *   mythcontrols. If this method returns false the plugin must
  *   exit, otherwise the application will crash.
  *
- *  \return true iff all UI elements load successfully.
+ *  \return true if all UI elements load successfully.
  */
-bool MythControls::LoadUI(void)
+bool MythControls::Create(void)
 {
-    void *err_test[4];
-    err_test[0] = m_description = getUITextType("description");
-    err_test[1] = m_container   = getContainer("controls");
-    err_test[2] = m_leftList    = getUIListBtnType("leftlist");
-    err_test[3] = m_rightList   = getUIListBtnType("rightlist");
+    bool foundtheme = false;
 
-    QString err_msg[4] =
-    {
-        "Unable to load action_description",
-        "No controls container in theme",
-        "No leftlist in theme",
-        "No rightList in theme",
-    };
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("controls-ui.xml", "controls", this);
 
-    bool ok = true;
-    for (uint i = 0; i < 4; i++)
+    if (!foundtheme)
+        VERBOSE(VB_IMPORTANT, "Unable to load window 'controls' from "
+                              "controls-ui.xml");
+
+    m_description = dynamic_cast<MythUIText *>
+                (GetChild("description"));
+    m_leftList = dynamic_cast<MythListButton *>
+                (GetChild("leftlist"));
+    m_rightList = dynamic_cast<MythListButton *>
+                (GetChild("rightlist"));
+    m_leftDescription = dynamic_cast<MythUIText *>
+                (GetChild("leftdesc"));
+    m_rightDescription = dynamic_cast<MythUIText *>
+                (GetChild("rightdesc"));
+
+    if (!m_description || !m_leftList || !m_rightList ||
+            !m_leftDescription || !m_rightDescription)
     {
-        if (!err_test[i])
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + err_msg[i]);
-            ok = false;
-        }
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
     }
 
-    if (ok)
-    {
-        m_leftDescription  = getUITextType("leftdesc");
-        m_rightDescription = getUITextType("rightdesc");
-        m_focusedUIElement   = m_leftList;
+    connect(m_leftList,  SIGNAL(itemSelected( MythListButtonItem*)),
+            this, SLOT(  LeftSelected( MythListButtonItem*)));
 
-        m_leftList->calculateScreenArea();
-        m_leftList->SetActive(true);
-
-        m_rightList->calculateScreenArea();
-        m_rightList->SetActive(false);
-    }
-
-    static const QString numstr[Action::kMaximumNumberOfBindings] =
-        { "one", "two", "three", "four", };
+    connect(m_rightList, SIGNAL(itemSelected( MythListButtonItem*)),
+            this, SLOT(  RightSelected(MythListButtonItem*)));
+    connect(m_rightList, SIGNAL(TakingFocus()),
+            this, SLOT(RefreshKeyInformation()));
 
     for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
     {
-        m_actionButtons[i] = getUITextButtonType(
-            QString("action_%1").arg(numstr[i]));
+        m_actionButtons.append(dynamic_cast<MythUIButton *>
+                (GetChild(QString("action_%1").arg(i))));
 
-        if (!m_actionButtons[i])
+        if (!m_actionButtons.at(i))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Unable to load action button #%1").arg(i));
+                    QString("Unable to load action button action_%1").arg(i));
 
-            ok = false;
+            return false;
         }
     }
 
-    return ok;
-}
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
-/** \fn MythControls::GetCurrentButton(void) const
- *  \brief Returns the focused button, or 
- *         Action::kMaximumNumberOfBindings if no buttons are focued.
- */
-uint MythControls::GetCurrentButton(void) const
-{
-    for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
-    {
-        if (m_focusedUIElement == m_actionButtons[i])
-            return i;
-    }
+    SetFocusWidget(m_leftList);
+    m_leftList->SetCanTakeFocus();
+    m_leftList->SetActive(true);
+    m_rightList->SetCanTakeFocus();
+    m_rightList->SetActive(false);
 
-    return Action::kMaximumNumberOfBindings;
+    LoadData(gContext->GetHostName());
+
+    /* start off with the actions by contexts view */
+    m_currentView = kActionsByContext;
+    SetListContents(m_leftList, m_bindings->GetContexts(), true);
+    UpdateRightList();
+
+    return true;
 }
 
 /** \fn MythControls::ChangeButtonFocus(int)
@@ -216,42 +171,10 @@ void MythControls::ChangeButtonFocus(int direction)
 
     if (direction == 0)
     {
-        m_focusedUIElement = m_actionButtons[0];
-        m_actionButtons[0]->takeFocus();
-        m_rightList->looseFocus();
+        SetFocusWidget(m_actionButtons.at(0));
         m_rightList->SetActive(false);
         return;
     }
-
-    direction = (direction > 0) ? 1 : -1;
-
-    int newb = (GetCurrentButton() + direction);
-    newb %= Action::kMaximumNumberOfBindings;
-
-    m_focusedUIElement->looseFocus();
-    m_focusedUIElement = m_actionButtons[newb];
-    m_focusedUIElement->takeFocus();
-}
-
-/** \fn MythControls::ChangeListFocus(UIListBtnType*,UIListBtnType*)
- *  \brief Change list focus from "unfocus" list to "focus" list.
- *  \param focus The list to gain focus
- *  \param unfocus The list to loose focus
- */
-void MythControls::ChangeListFocus(UIListBtnType *focus,
-                                   UIListBtnType *unfocus)
-{
-    /* unfocus a list (setactive(false)) or a button (focused->looseFocus) */
-    if (unfocus)
-        unfocus->SetActive(false);
-
-    m_focusedUIElement->looseFocus();
-    m_focusedUIElement = focus;
-
-    focus->SetActive(true);
-    focus->takeFocus();
-
-    RefreshKeyInformation();
 }
 
 /// \brief Chagne the view.
@@ -302,20 +225,16 @@ void MythControls::ChangeView(void)
     RefreshKeyInformation();
     UpdateRightList();
 
-    if (m_focusedUIElement != m_leftList)
-    {
-        m_focusedUIElement->looseFocus();
-        m_focusedUIElement = m_leftList;
-        m_focusedUIElement->takeFocus();
-    }
+    if (GetFocusWidget() != m_leftList)
+        SetFocusWidget(m_leftList);
 }
 
-void MythControls::keyPressEvent(QKeyEvent *e)
+bool MythControls::keyPressEvent(QKeyEvent *event)
 {
     bool handled = false;
     bool escape = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Controls", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Controls", event, actions);
 
     for (uint i = 0; i < actions.size() && !handled; i++)
     {
@@ -324,8 +243,6 @@ void MythControls::keyPressEvent(QKeyEvent *e)
 
         if (action == "MENU" || action == "INFO")
         {
-            m_focusedUIElement->looseFocus();
-
             QStringList buttons;
             buttons += QObject::tr("Save");
             buttons += tr("Change View");
@@ -347,14 +264,12 @@ void MythControls::keyPressEvent(QKeyEvent *e)
                 default:
                     break;
             }
-
-            m_focusedUIElement->takeFocus();
         }
         else if (action == "SELECT")
         {
-            if (m_focusedUIElement == m_leftList)
-                ChangeListFocus(m_rightList, m_leftList);
-            else if (m_focusedUIElement == m_rightList)
+            if (GetFocusWidget() == m_leftList)
+                NextPrevWidgetFocus(true);
+            else if (GetFocusWidget() == m_rightList)
             {
                 if (m_currentView == kActionsByContext)
                     ChangeButtonFocus(0);
@@ -383,110 +298,66 @@ void MythControls::keyPressEvent(QKeyEvent *e)
                 else // for blank keys, no reason to ask what to do
                     AddKeyToAction();
             }
-            
+
         }
         else if (action == "ESCAPE")
         {
             escape = true;
-            if (m_focusedUIElement == m_leftList)
+
+            handled = false;
+
+            if (m_bindings->HasChanges())
             {
-                handled = false;
-                if (m_bindings->HasChanges())
-                {
-                    /* prompt user to save changes */
-                    QStringList buttons;
-                    buttons += tr("Exit without saving changes");
-                    buttons += tr("Save then Exit");
+                /* prompt user to save changes */
+                QStringList buttons;
+                buttons += tr("Exit without saving changes");
+                buttons += tr("Save then Exit");
 
-                    DialogCode code = MythPopupBox::ShowButtonPopup(
-                        gContext->GetMainWindow(), "exitmenu",
-                        tr("Exiting, but there are unsaved changes.")+"\n\n"+
-                        tr("Which would you prefer?") + "\n\n", buttons,
-                        kDialogCodeButton1);
+                DialogCode code = MythPopupBox::ShowButtonPopup(
+                    gContext->GetMainWindow(), "exitmenu",
+                    tr("Exiting, but there are unsaved changes.")+"\n\n"+
+                    tr("Which would you prefer?") + "\n\n", buttons,
+                    kDialogCodeButton1);
 
-                    if (kDialogCodeButton1 == code)
-                        Save();
-                    else if (kDialogCodeRejected == code)
-                        handled = true;
-                }
+                if (kDialogCodeButton1 == code)
+                    Save();
+                else if (kDialogCodeRejected == code)
+                    handled = true;
             }
-            else if (m_focusedUIElement == m_rightList)
-                ChangeListFocus(m_leftList, m_rightList);
-            else
-                ChangeListFocus(m_rightList, NULL);
-        }
-        else if (action == "UP")
-        {
-            if (m_focusedUIElement == m_leftList)
-                m_leftList->MoveUp();
-            else if (m_focusedUIElement == m_rightList)
-                m_rightList->MoveUp();
-        }
-        else if (action == "DOWN")
-        {
-            if (m_focusedUIElement == m_leftList)
-                m_leftList->MoveDown();
-            else if (m_focusedUIElement == m_rightList)
-                m_rightList->MoveDown();
+            GetMythMainWindow()->GetMainStack()->PopScreen();
         }
         else if (action == "LEFT")
         {
-            if (m_focusedUIElement==m_rightList)
-                ChangeListFocus(m_leftList, m_rightList);
-            else if (m_focusedUIElement != m_leftList)
-                ChangeButtonFocus(-1);
+            NextPrevWidgetFocus(false);
         }
         else if (action == "RIGHT")
         {
-            if (m_focusedUIElement == m_leftList)
-                ChangeListFocus(m_rightList, m_leftList);
-            else if (m_focusedUIElement != m_rightList)
-                ChangeButtonFocus(1);
+            NextPrevWidgetFocus(true);
         }
-        else if (action == "PAGEUP")
-        {
-            if (m_focusedUIElement == m_leftList)
-                m_leftList->MoveUp(UIListBtnType::MovePage);
-            else if (m_focusedUIElement == m_rightList)
-                m_rightList->MoveUp(UIListBtnType::MovePage);
-        }
-        else if (action == "PAGEDOWN")
-        {
-            if (m_focusedUIElement == m_leftList)
-                m_leftList->MoveDown(UIListBtnType::MovePage);
-            else if (m_focusedUIElement == m_rightList)
-                m_rightList->MoveDown(UIListBtnType::MovePage);
-        }
-        else
+        else if (GetFocusWidget()->keyPressEvent(event))
         {
             handled = false;
         }
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    return handled;
 }
 
-/** \fn MythControls::LeftSelected(UIListBtnTypeItem*)
+/** \fn MythControls::LeftSelected(MythListButtonItem*)
  *  \brief Refreshes the right list when an item in the
  *         left list is selected
  */
-void MythControls::LeftSelected(UIListBtnTypeItem*)
+void MythControls::LeftSelected(MythListButtonItem*)
 {
-    m_leftList->refresh();
-    m_rightList->blockSignals(true);
     UpdateRightList();
-    m_rightList->blockSignals(false);
-    m_rightList->refresh();
 }
 
-/** \fn MythControls::RightSelected(UIListBtnTypeItem*)
+/** \fn MythControls::RightSelected(MythListButtonItem*)
  *  \brief Refreshes key information when an item in the
  *         right list is selected
  */
-void MythControls::RightSelected(UIListBtnTypeItem*)
+void MythControls::RightSelected(MythListButtonItem*)
 {
-    m_rightList->refresh();
     RefreshKeyInformation();
 }
 
@@ -497,29 +368,24 @@ void MythControls::RightSelected(UIListBtnTypeItem*)
  *  \param arrows True to draw with arrows, otherwise arrows are not drawn.
  */
 void MythControls::SetListContents(
-    UIListBtnType *uilist, const QStringList &contents, bool arrows)
+    MythListButton *uilist, const QStringList &contents, bool arrows)
 {
-    uilist->blockSignals(true);
-
     // remove all strings from the current list
     uilist->Reset();
 
     // add each new string
     for (size_t i = 0; i < contents.size(); i++)
     {
-        UIListBtnTypeItem *item = new UIListBtnTypeItem(uilist, contents[i]);
+        MythListButtonItem *item = new MythListButtonItem(uilist, contents[i]);
         item->setDrawArrow(arrows);
     }
-
-    uilist->blockSignals(false);
-    uilist->refresh();
 }
 
 /** \brief Update the right list. */
 void MythControls::UpdateRightList(void)
 {
     // get the selected item in the right list.
-    UIListBtnTypeItem *item = m_leftList->GetItemCurrent();
+    MythListButtonItem *item = m_leftList->GetItemCurrent();
 
     if (item != NULL)
     {
@@ -549,9 +415,9 @@ void MythControls::UpdateRightList(void)
 void MythControls::RefreshKeyInformation(void)
 {
     for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
-        m_actionButtons[i]->setText("");
+        m_actionButtons.at(i)->SetText("");
 
-    if (m_focusedUIElement == m_leftList)
+    if (GetFocusWidget() == m_leftList)
     {
         m_description->SetText("");
         return;
@@ -567,24 +433,23 @@ void MythControls::RefreshKeyInformation(void)
     for (uint i = 0; (i < keys.count()) &&
              (i < Action::kMaximumNumberOfBindings); i++)
     {
-        m_actionButtons[i]->setText(keys[i]);
+        m_actionButtons.at(i)->SetText(keys[i]);
     }
 }
 
 
-/** \fn MythControls::GetCurrentContext(void) const
- *  \brief Get the currently selected context string.
+/** \brief Get the currently selected context string.
  *
  *   If no context is selected, an empty string is returned.
  *
  *  \return The currently selected context string.
  */
-QString MythControls::GetCurrentContext(void) const
+QString MythControls::GetCurrentContext(void)
 {
     if (m_leftListType == kContextList)
         return m_leftList->GetItemCurrent()->text();
 
-    if (m_focusedUIElement == m_leftList)
+    if (GetFocusWidget() == m_leftList)
         return QString::null;
 
     QString desc = m_rightList->GetItemCurrent()->text();
@@ -598,14 +463,13 @@ QString MythControls::GetCurrentContext(void) const
     return desc.mid(loc + 4);
 }
 
-/** \fn MythControls::GetCurrentAction(void) const
- *  \brief Get the currently selected action string.
+/** \brief Get the currently selected action string.
  *
  *   If no action is selected, an empty string is returned.
  *
  *  \return The currently selected action string.
  */
-QString MythControls::GetCurrentAction(void) const
+QString MythControls::GetCurrentAction(void)
 {
     if (m_leftListType == kActionList)
     {
@@ -614,7 +478,7 @@ QString MythControls::GetCurrentAction(void) const
         return QString::null;
     }
 
-    if (m_focusedUIElement == m_leftList)
+    if (GetFocusWidget() == m_leftList)
         return QString::null;
 
     if (!m_rightList || !m_rightList->GetItemCurrent())
@@ -638,19 +502,34 @@ QString MythControls::GetCurrentAction(void) const
     return rv;
 }
 
-/** \fn MythControls::GetCurrentKey(void) const
- *  \brief Get the currently selected key string
+/** \brief Returns the focused button, or
+ *         Action::kMaximumNumberOfBindings if no buttons are focued.
+ */
+uint MythControls::GetCurrentButton(void)
+{
+    for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
+    {
+        MythUIButton *button = m_actionButtons.at(i);
+        MythUIType *uitype = GetFocusWidget();
+        if (uitype == button)
+            return i;
+    }
+
+    return Action::kMaximumNumberOfBindings;
+}
+
+/** \brief Get the currently selected key string
  *
  *   If no key is selected, an empty string is returned.
  *
  *  \return The currently selected key string
  */
-QString MythControls::GetCurrentKey(void) const
+QString MythControls::GetCurrentKey(void)
 {
     if (m_leftListType == kKeyList)
         return m_leftList->GetItemCurrent()->text();
 
-    if (m_focusedUIElement == m_leftList)
+    if (GetFocusWidget() == m_leftList)
         return QString::null;
 
     if ((m_leftListType == kContextList) && (m_rightListType == kActionList))

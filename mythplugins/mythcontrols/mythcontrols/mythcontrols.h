@@ -24,8 +24,11 @@
 #ifndef MYTHCONTROLS_H
 #define MYTHCONTROLS_H
 
-#include <mythtv/mythdialogs.h>
-#include <mythtv/uilistbtntype.h>
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 #include "keybindings.h"
 
@@ -35,9 +38,17 @@ typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 /** \class MythControls
  *  \brief The myth controls configuration class.
  */
-class MythControls : public MythThemedDialog
+class MythControls : public MythScreenType
 {
     Q_OBJECT
+
+  public:
+
+    MythControls(MythScreenStack *parent, const char *name);
+    ~MythControls();
+
+    virtual bool Create(void);
+    virtual bool keyPressEvent(QKeyEvent *);
 
     typedef enum
     {
@@ -46,39 +57,26 @@ class MythControls : public MythThemedDialog
         kActionList
     } ListType;
 
-  public:
-    MythControls(MythMainWindow *parent, bool &ok);
-
     // Gets
-    QString GetCurrentContext(void) const;
-    QString GetCurrentAction(void) const;
-    QString GetCurrentKey(void) const;
-    
-
-  public slots:
-    virtual void deleteLater(void);
+    QString GetCurrentContext(void);
+    QString GetCurrentAction(void);
+    QString GetCurrentKey(void);
 
   protected:
     void Teardown(void);
-    ~MythControls(); // use deleteLater() instead for thread safety
-
-    // Event handlers
-    void keyPressEvent(QKeyEvent *e);
 
     // Commands
     bool    LoadUI(void);
-    void    RefreshKeyInformation(void);
     void    LoadData(const QString &hostname);
     void    ChangeButtonFocus(int direction);
-    void    ChangeListFocus(UIListBtnType *focus, UIListBtnType *unfocus);
     void    ChangeView(void);
-    void    SetListContents(UIListBtnType *uilist,
+    void    SetListContents(MythListButton *uilist,
                             const QStringList & contents,
                             bool arrows = false);
     void    UpdateRightList(void);
 
     // Gets
-    uint         GetCurrentButton(void) const;
+    uint         GetCurrentButton(void);
 
     // Functions
     static bool ResolveConflict(ActionID *conflict, int error_level);
@@ -87,24 +85,24 @@ class MythControls : public MythThemedDialog
   private slots:
     void AddKeyToAction(void);
     void DeleteKey(void);
-    void LeftSelected(UIListBtnTypeItem *item);
-    void RightSelected(UIListBtnTypeItem *item);
-    bool JumpTo(QKeyEvent *e) { return false; }
+    void LeftSelected(MythListButtonItem*);
+    void RightSelected(MythListButtonItem*);
+    bool JumpTo(QKeyEvent *event) { return false; }
     /// \brief Save the bindings to the Database.
     void Save(void) { m_bindings->CommitChanges(); }
+    void RefreshKeyInformation(void);
 
   private:
-    ViewType           m_currentView;
-    UIType            *m_focusedUIElement;
-    UIListBtnType     *m_leftList;
-    UIListBtnType     *m_rightList;
-    UITextType        *m_description;
-    UITextType        *m_leftDescription;
-    UITextType        *m_rightDescription;
-    UITextButtonType  *m_actionButtons[Action::kMaximumNumberOfBindings];
+    ViewType          m_currentView;
+    MythUIType        *m_focusedUIElement;
+    MythListButton    *m_leftList;
+    MythListButton    *m_rightList;
+    MythUIText        *m_description;
+    MythUIText        *m_leftDescription;
+    MythUIText        *m_rightDescription;
+    QPtrList<MythUIButton> m_actionButtons;
 
     KeyBindings       *m_bindings;
-    LayerSet          *m_container;
     QStringList        m_sortedContexts; ///< sorted list of contexts
     QDict<QStringList> m_contexts;       ///< actions for a given context
     ListType           m_leftListType;

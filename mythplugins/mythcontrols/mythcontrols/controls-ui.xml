@@ -1,120 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
- <window name="controls">
+    <window name="controls">
 
-  <font name="active" face="Bitstream Vera Sans">
-   <color>#ffffff</color>
-   <size>14</size>
-   <bold>yes</bold>
-  </font>
+        <font name="active" face="Bitstream Vera Sans">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
 
-  <font name="inactive" face="Bitstream Vera Sans">
-   <color>#9999cc</color>
-   <size>14</size>
-   <bold>yes</bold>
-  </font>
+        <font name="inactive" face="Bitstream Vera Sans">
+            <color>#9999cc</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
 
-  <font name="keys" face="Bitstream Vera Sans">
-   <color>#000000</color>
-   <size>18</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+        <font name="keys" face="Bitstream Vera Sans">
+            <color>#000000</color>
+            <size>18</size>
+            <shadow>1,1</shadow>
+            <bold>yes</bold>
+        </font>
 
-  <font name="info" face="Bitstream Vera Sans">
-   <color>#ffffff</color>
-   <size>18</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+        <font name="info" face="Bitstream Vera Sans">
+            <color>#ffffff</color>
+            <size>18</size>
+            <shadow>1,1</shadow>
+            <bold>yes</bold>
+        </font>
 
-  <font name="options" face="Bitstream Vera Sans">
-   <color>#ffffff</color>
-   <size>24</size>
-   <bold>yes</bold>
-  </font>
+        <font name="options" face="Bitstream Vera Sans">
+            <color>#ffffff</color>
+            <size>24</size>
+            <bold>yes</bold>
+        </font>
 
+        <font name="infotitle" face="Bitstream Vera Sans">
+            <color>#ffffff</color>
+            <size>20</size>
+            <shadow>10,10</shadow>
+            <bold>yes</bold>
+        </font>
 
-  <font name="infotitle" face="Bitstream Vera Sans">
-   <color>#ffffff</color>
-   <size>20</size>
-   <shadow>10,10</shadow>
-   <bold>yes</bold>
-  </font>
+        <textarea name="leftdesc">
+            <font>info</font>
+            <area>20,20,370,20</area>
+            <value>Contexts</value>
+            <align>center</align>
+        </textarea>
 
-  <container name="controls">
-   <area>20,20,780,450</area>
+        <buttonlist name="leftlist">
+            <area>20,50,370,410</area>
+            <activefont>active</activefont>
+            <inactivefont>inactive</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="255"/>
+            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
+            <spacing>5</spacing>
+            <margin>6</margin>
+        </buttonlist>
 
-   <textarea name="leftdesc" draworder="1" align="center">
-    <font>info</font>
-    <area>0,0,370,20</area>
-    <value>Contexts</value>
-   </textarea>
+        <textarea name="rightdesc">
+            <font>info</font>
+            <area>410,20,370,20</area>
+            <value>Actions</value>
+            <align>center</align>
+        </textarea>
 
-   <listbtnarea name="leftlist" draworder="0">
-    <area>0,30,370,410</area>
-    <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
-    <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
-    <fcnfont name="active" function="active"/>
-    <fcnfont name="inactive" function="inactive"/>
-    <showarrow>no</showarrow>
-   </listbtnarea>
+        <buttonlist name="rightlist">
+            <area>410,50,370,410</area>
+            <activefont>active</activefont>
+            <inactivefont>inactive</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="255"/>
+            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
+            <spacing>5</spacing>
+            <margin>6</margin>
+        </buttonlist>
 
-   <textarea name="rightdesc" draworder="1" align="center">
-    <font>info</font>
-    <area>390,0,370,20</area>
-    <value>Actions</value>
-   </textarea>
+        <button name="action_0">
+            <position>40,450</position>
+            <activefont>keys</activefont>
+            <inactivefont>keys</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background filename="kb-button-off.png" />
+            <selected-background filename="kb-button-on.png" />
+            <inactive-background filename="kb-button-off.png" />
+            <margin>6</margin>
+            <textflags>allcenter</textflags>
+        </button>
 
-   <listbtnarea name="rightlist" draworder="0">
-    <area>390,30,370,410</area>
-    <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
-    <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
-    <fcnfont name="active" function="active"/>
-    <fcnfont name="inactive" function="inactive"/>
-    <showarrow>no</showarrow>
-   </listbtnarea>
+        <button name="action_1">
+            <position>220,450</position>
+            <activefont>keys</activefont>
+            <inactivefont>keys</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background filename="kb-button-off.png" />
+            <selected-background filename="kb-button-on.png" />
+            <inactive-background filename="kb-button-off.png" />
+            <margin>6</margin>
+            <textflags>allcenter</textflags>
+        </button>
 
-  </container>
+        <button name="action_2">
+            <position>410,450</position>
+            <activefont>keys</activefont>
+            <inactivefont>keys</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background filename="kb-button-off.png" />
+            <selected-background filename="kb-button-on.png" />
+            <inactive-background filename="kb-button-off.png" />
+            <margin>6</margin>
+            <textflags>allcenter</textflags>
+        </button>
 
-  <container name="keys_layer">
-   <area>20,450,780,210</area>
-   <textbutton name="action_one" draworder="0">
-    <position>20,0</position>
-    <image function="on" filename="kb-button-on.png"/>
-    <image function="off" filename="kb-button-off.png"/>
-    <font>keys</font>
-   </textbutton>
+        <button name="action_3">
+            <position>600,450</position>
+            <activefont>keys</activefont>
+            <inactivefont>keys</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background filename="kb-button-off.png" />
+            <selected-background filename="kb-button-on.png" />
+            <inactive-background filename="kb-button-off.png" />
+            <margin>6</margin>
+            <textflags>allcenter</textflags>
+        </button>
 
-   <textbutton name="action_two" draworder="0">
-    <position>200,0</position>
-    <image function="on" filename="kb-button-on.png"/>
-    <image function="off" filename="kb-button-off.png"/>
-    <font>keys</font>
-   </textbutton>
+        <textarea name="description">
+            <font>info</font>
+            <area>30,490,740,110</area>
+            <multiline>yes</multiline>
+            <align>center</align>
+        </textarea>
 
-   <textbutton name="action_three" draworder="0">
-    <position>390,0</position>
-    <image function="on" filename="kb-button-on.png"/>
-    <image function="off" filename="kb-button-off.png"/>
-    <font>keys</font>
-   </textbutton>
-
-   <textbutton name="action_four" draworder="0">
-    <position>580,0</position>
-    <image function="on" filename="kb-button-on.png"/>
-    <image function="off" filename="kb-button-off.png"/>
-    <font>keys</font>
-   </textbutton>
-
-   <textarea name="description" draworder="1" allign="left">
-    <font>info</font>
-    <area>30,70,740,110</area>
-    <multiline>yes</multiline>
-   </textarea>
-
-  </container>
-
- </window>
+</window>
 </mythuitheme>

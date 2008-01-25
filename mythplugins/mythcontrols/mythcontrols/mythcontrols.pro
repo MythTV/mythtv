@@ -7,6 +7,8 @@ TARGET = mythcontrols
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+INCLUDEPATH += $${PREFIX}/include/mythtv
+
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = controls-ui.xml ../images/kb-button-on.png ../images/kb-button-off.png
 installfiles.path = $${PREFIX}/share/mythtv
