@@ -28,12 +28,14 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
+LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
 LIBS += -L../libmythfreemheg -L../libmythlivemedia
-LIBS += -lmyth-$${LIBVERSION} -lmythavutil-$${LIBVERSION}
-LIBS += -lmythavcodec-$${LIBVERSION} -lmythdvdnav-$${LIBVERSION}
-LIBS += -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION}
-LIBS += -lmythfreemheg-$${LIBVERSION} -lmythlivemedia-$${LIBVERSION}
+LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
+LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
+LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
@@ -78,11 +80,6 @@ macx {
         # DVDUtils uses Objective-C++, activated by .mm suffix
         QMAKE_EXT_CPP += .mm
     }
-
-    # There is a dependence on some stuff in libmythui.
-    # It isn't built yet, so we have to ignore these for now:
-    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
-    #LIBS += -lmythui-$${LIBVERSION} -L../libmythui
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
@@ -511,14 +508,6 @@ mingw {
     SOURCES += videoout_d3d.cpp
 
     LIBS += -lpthread
-    LIBS += -L../libmythfreemheg -lmythfreemheg-$${LIBVERSION}
-    LIBS += -L. -lmythui-bootstrap
-
-    target.path = $${PREFIX}/bin
-    implib.target = libmythui-bootstrap.a
-    implib.commands = test -e libmythui-bootstrap.a || dlltool --input-def ../libmythui/libmythui.def --dllname libmythui-$${LIBVERSION}.dll --output-lib libmythui-bootstrap.a -k
-    QMAKE_EXTRA_WIN_TARGETS += implib
-    POST_TARGETDEPS += libmythui-bootstrap.a
 }
 
 # install headers required by mytharchive
