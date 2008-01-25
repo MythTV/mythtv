@@ -210,7 +210,8 @@ bool PreviewGenerator::Run(void)
     else
     {
         // This is where we fork and run mythbackend to actually make preview
-        QString command = "mythbackend --generate-preview ";
+        QString command = gContext->GetInstallPrefix() +
+                                    "/bin/mythbackend --generate-preview ";
         command += QString("%1x%2")
             .arg(outSize.width()).arg(outSize.height());
         if (captureTime >= 0)
