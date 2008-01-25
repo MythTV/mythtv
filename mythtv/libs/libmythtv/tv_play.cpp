@@ -2442,7 +2442,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             ClearOSD();
         }
-        else if (action == "JUMPPREV")
+        else if (action == "JUMPPREV" && lastProgram)
         {
             nvp->SetBookmark();
             exitPlayer = true;
@@ -6138,7 +6138,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             DoQueueTranscode("Medium Quality");
         else if (action == "QUEUETRANSCODE_LOW")
             DoQueueTranscode("Low Quality");
-        else if (action == "JUMPPREV")
+        else if (action == "JUMPPREV" && lastProgram)
         {
             nvp->SetBookmark();
             exitPlayer = true;
