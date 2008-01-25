@@ -10,6 +10,8 @@ using namespace std;
 #include "mythdbcon.h"
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 
+#define MINIMUM_DBMS_VERSION 5
+
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1208";
 
@@ -423,6 +425,29 @@ bool UpgradeTVDatabaseSchema(void)
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT VERSION();");
+    if (!query.exec() || !query.next())
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to determine MySQL version");
+        return false;
+    }
+
+    QString dbmsversion = query.value(0).toString();
+    if (dbmsversion.isEmpty() ||
+        dbmsversion.section('.', 0, 0).toInt() < MINIMUM_DBMS_VERSION)
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: This version of MythTV requires "
+                                      "MySQL %1.0 or later.  You seem to be "
+                                      "running MySQL version %2.")
+                                      .arg(MINIMUM_DBMS_VERSION)
+                                      .arg(dbmsversion));
+        VERBOSE(VB_IMPORTANT, "Your database has not been changed. Please "
+                              "upgrade your MySQL server or use an older "
+                              "version of MythTV.");
+        return false;
+    }
+
     if (dbver == currentDatabaseVersion)
         return true;
 
@@ -434,23 +459,20 @@ bool UpgradeTVDatabaseSchema(void)
         case MYTH_SCHEMA_UPGRADE:      break;
     }
 
-    MSqlQuery chartype(MSqlQuery::InitCon());
-    chartype.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
-    chartype.exec();
+    query.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
+    query.exec();
 
     VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
                                   .arg(currentDatabaseVersion));
 
-    MSqlQuery lockquery(MSqlQuery::InitCon());
-
-    lockquery.prepare("CREATE TABLE IF NOT EXISTS "
+    query.prepare("CREATE TABLE IF NOT EXISTS "
                       "schemalock ( schemalock int(1));");
-    if (!lockquery.exec())
+    if (!query.exec())
     {
         VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to create database "
                                       "upgrade lock table: %1")
                                       .arg(MythContext::DBErrorMessage(
-                                           lockquery.lastError())));
+                                           query.lastError())));
         return false;
     }
 
@@ -459,13 +481,13 @@ bool UpgradeTVDatabaseSchema(void)
                           "already locked and is being upgraded by another "
                           "Myth process.");
 
-    lockquery.prepare("LOCK TABLE schemalock WRITE;");
-    if (!lockquery.exec())
+    query.prepare("LOCK TABLE schemalock WRITE;");
+    if (!query.exec())
     {
         VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to acquire database "
                                       "upgrade lock")
                                       .arg(MythContext::DBErrorMessage(
-                                           lockquery.lastError())));
+                                           query.lastError())));
         return false;
     }
 
@@ -476,8 +498,8 @@ bool UpgradeTVDatabaseSchema(void)
     else
         VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
 
-    lockquery.prepare("UNLOCK TABLES;");
-    lockquery.exec();
+    query.prepare("UNLOCK TABLES;");
+    query.exec();
 
     return ret;
 }

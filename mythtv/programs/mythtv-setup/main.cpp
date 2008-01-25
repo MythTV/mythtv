@@ -276,7 +276,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    UpgradeTVDatabaseSchema();
+    if (!UpgradeTVDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
+        return BACKEND_EXIT_DB_OUTOFDATE;
+    }
 
     gContext->SetSetting("Theme", "G.A.N.T");
     gContext->LoadQtConfig();
@@ -372,3 +376,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
