@@ -21,7 +21,7 @@ class UPnpMedia
 	QString GetTitleName(QString fPath, QString fName);
 	QString GetCoverArt(QString fPath);
 
-        int buildFileList(QString directory, int itemID, MSqlQuery &query);
+        int buildFileList(QString directory, int rootID, int itemID, MSqlQuery &query);
 
 	void RunRebuildLoop(void);
         static void *doUPnpMediaThread(void *param);

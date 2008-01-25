@@ -95,17 +95,21 @@ void UPnpMedia::FillMetaMaps(void)
 }
 
 
-int UPnpMedia::buildFileList(QString directory, int itemID, MSqlQuery &query)
+int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuery &query)
 {
 
     int parentid;
     QDir vidDir(directory);
     QString title;
                                 // If we can't read it's contents move on
+    //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID = %3").arg(directory).arg(rootID).arg(itemID));
     if (!vidDir.isReadable())
         return itemID;
 
-    parentid = itemID;
+    if (rootID > 0) 
+        parentid = rootID;
+    else
+        parentid = itemID;
 
     vidDir.setSorting( QDir:: DirsFirst | QDir::Name );
     const QFileInfoList* List = vidDir.entryInfoList();
@@ -142,7 +146,7 @@ int UPnpMedia::buildFileList(QString directory, int itemID, MSqlQuery &query)
 
 	    query.exec();
 			    
-	    itemID = buildFileList(Info.filePath(),itemID, query);
+	    itemID = buildFileList(Info.filePath(), 0, itemID, query);
 	    continue;
 
         }
@@ -163,9 +167,11 @@ int UPnpMedia::buildFileList(QString directory, int itemID, MSqlQuery &query)
 */
 
 	    itemID++;
+
 //            VERBOSE(VB_UPNP, QString("UPnpMedia Video File : (%1) (%2)")
 //			          .arg(itemID)
- //                                 .arg(fName));
+//                                .arg(fName));
+
             query.prepare("INSERT INTO upnpmedia "
                           "(intid, class, itemtype, parentid, itemproperties, "
                           "filepath, filename, title, coverart) "
@@ -195,6 +201,7 @@ void UPnpMedia::BuildMediaMap(void)
 
     QString RootVidDir;
     int filecount;
+    int nextID;
 
     // For now this class only does the video stuff, but eventually other media too
     sMediaType = "VIDEO";
@@ -203,7 +210,6 @@ void UPnpMedia::BuildMediaMap(void)
     {
 
         RootVidDir = gContext->GetSetting("VideoStartupDir");
-        filecount = 0;
 
         if ((!RootVidDir.isNull()) && (RootVidDir != ""))  
         {
@@ -216,14 +222,28 @@ void UPnpMedia::BuildMediaMap(void)
 
 	    query.exec("LOCK TABLES upnpmedia WRITE");
 
-            VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan starting in :%1:")
+            VERBOSE(VB_UPNP, LOC + QString("VideoStartupDir = %1")
+                                           .arg(RootVidDir));
+
+	    QStringList parts = QStringList::split( ":", RootVidDir );
+
+            nextID = STARTING_VIDEO_OBJECTID;
+
+	    for ( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it ) 
+	    {
+		filecount = nextID;
+
+                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan starting in :%1:")
     			            .arg(sMediaType)
-    			            .arg(RootVidDir));
+    			            .arg(*it));
 
-            filecount = buildFileList(RootVidDir,STARTING_VIDEO_OBJECTID, query);
-            filecount -= STARTING_VIDEO_OBJECTID;
+                
+                nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID, query);
+                filecount = (filecount - nextID) * -1;
 
-            VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found %1 objects").arg(filecount));
+                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found %1 objects").arg(filecount));
+
+	    }
 
 	    query.exec("UNLOCK TABLES");
 
