@@ -61,7 +61,8 @@ bool MythAppearance::Create()
     foundtheme = LoadWindowFromXML("appear-ui.xml", "appearance", this);
 
     if (!foundtheme)
-        VERBOSE(VB_IMPORTANT, "Unable to window appearance from appear-ui.xml");
+        VERBOSE(VB_IMPORTANT, "Unable to load window appearance from "
+                              "appear-ui.xml");
 
     m_topleftarrow = dynamic_cast<MythUIImage *>
                 (GetChild("topleft"));
