@@ -1723,7 +1723,7 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
                 button1->setFocus();
             }
             button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(outcallDialVoiceSelected()));
-            incallPopup->addButton(tr("Send an Instant Message"), this, SLOT(incallSendIMSelected()));
+            incallPopup->addButton(tr("Send an Instant Message"), this, SLOT(outcallSendIMSelected()));
         }
         else
         {
