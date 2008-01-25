@@ -1842,6 +1842,10 @@ bool PlaybackBox::FillList(bool useCachedData)
         {
             progsInDB++;
             p = *i;
+
+            if (p->title == "")
+                p->title = tr("_NO_TITLE_");
+
             if ((((p->recgroup == recGroup) ||
                   ((recGroup == "All Programs") &&
                    (p->recgroup != "Deleted") &&
