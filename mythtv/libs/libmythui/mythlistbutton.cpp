@@ -66,6 +66,9 @@ void MythListButton::Const(void)
     itemRegPix = itemSelActPix = itemSelInactPix = NULL;
 
     SetCanTakeFocus(true);
+
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
 }
 
 MythListButton::~MythListButton()

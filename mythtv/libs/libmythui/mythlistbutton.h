@@ -59,6 +59,10 @@ class MythListButton : public MythUIType
     void SetDrawOffset(QPoint off) { m_drawoffset = off; }
     QPoint GetDrawOffset(void) { return m_drawoffset; }
 
+  public slots:
+    void Select() { SetActive(true); }
+    void Deselect() { SetActive(false); }
+
   signals:
     void itemSelected(MythListButtonItem* item);
 
