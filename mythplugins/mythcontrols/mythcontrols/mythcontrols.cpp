@@ -62,6 +62,8 @@ MythControls::MythControls(MythScreenStack *parent, const char *name)
 
     m_leftListType  = kContextList;
     m_rightListType = kActionList;
+
+    m_menuPopup = NULL;
 }
 
 MythControls::~MythControls()
@@ -177,56 +179,27 @@ void MythControls::ChangeButtonFocus(int direction)
     }
 }
 
-/// \brief Chagne the view.
+/// \brief Change the view.
 void MythControls::ChangeView(void)
 {
-    QStringList buttons;
-    buttons += tr("Actions By Context");
-    buttons += tr("Contexts By Key");
-    buttons += tr("Keys By Context");
-    buttons += QObject::tr("Cancel");
+    QString label = tr("Change View");
 
-    DialogCode code = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(), "mcviewmenu", tr("Change View"),
-        buttons, kDialogCodeButton3);
+    MythScreenStack *mainStack =
+                            GetMythMainWindow()->GetMainStack();
 
-    QStringList contents;
-    QString leftcaption, rightcaption;
+    m_menuPopup =
+            new MythDialogBox(label, mainStack, "mcviewmenu");
 
-    switch (code)
-    {
-        case kDialogCodeButton0:
-            leftcaption = tr(CAPTION_CONTEXT);
-            rightcaption = tr(CAPTION_ACTION);
-            m_currentView = kActionsByContext;
-            contents = m_bindings->GetContexts();
-            break;
-        case kDialogCodeButton1:
-            leftcaption = tr(CAPTION_CONTEXT);
-            rightcaption = tr(CAPTION_KEY);
-            m_currentView = kKeysByContext;
-            contents = m_bindings->GetContexts();
-            break;
-        case kDialogCodeButton2:
-            leftcaption = tr(CAPTION_KEY);
-            rightcaption = tr(CAPTION_CONTEXT);
-            m_currentView = kContextsByKey;
-            contents = m_bindings->GetKeys();
-            break;
-        case kDialogCodeButton3:
-        default:
-            return;
-    }
+    if (m_menuPopup->Create())
+        mainStack->AddScreen(m_menuPopup);
 
-    m_leftDescription->SetText(leftcaption);
-    m_rightDescription->SetText(rightcaption);
+    m_menuPopup->SetReturnEvent(this, "view");
 
-    SetListContents(m_leftList, contents, true);
-    RefreshKeyInformation();
-    UpdateRightList();
+    m_menuPopup->AddButton(tr("Actions By Context"));
+    m_menuPopup->AddButton(tr("Contexts By Key"));
+    m_menuPopup->AddButton(tr("Keys By Context"));
+    m_menuPopup->AddButton(tr("Cancel"));
 
-    if (GetFocusWidget() != m_leftList)
-        SetFocusWidget(m_leftList);
 }
 
 bool MythControls::keyPressEvent(QKeyEvent *event)
@@ -243,27 +216,22 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU" || action == "INFO")
         {
-            QStringList buttons;
-            buttons += QObject::tr("Save");
-            buttons += tr("Change View");
-            buttons += QObject::tr("Cancel");
+                    QString label = tr("Options");
 
-            DialogCode code = MythPopupBox::ShowButtonPopup(
-                gContext->GetMainWindow(), "optionmenu", tr("Options"),
-                buttons, kDialogCodeButton2);
+                    MythScreenStack *mainStack =
+                                            GetMythMainWindow()->GetMainStack();
 
-            switch (code)
-            {
-                case kDialogCodeButton0:
-                    Save();
-                    break;
-                case kDialogCodeButton1:
-                    ChangeView();
-                    break;
-                case kDialogCodeButton2:
-                default:
-                    break;
-            }
+                    m_menuPopup =
+                            new MythDialogBox(label, mainStack, "optionmenu");
+
+                    if (m_menuPopup->Create())
+                        mainStack->AddScreen(m_menuPopup);
+
+                    m_menuPopup->SetReturnEvent(this, "option");
+
+                    m_menuPopup->AddButton(tr("Save"));
+                    m_menuPopup->AddButton(tr("Change View"));
+                    m_menuPopup->AddButton(tr("Cancel"));
         }
         else if (action == "SELECT")
         {
@@ -281,19 +249,22 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
                 QString key = GetCurrentKey();
                 if (!key.isEmpty())
                 {
-                    QStringList buttons;
-                    buttons += tr("Set Binding");
-                    buttons += tr("Remove Binding");
-                    buttons += QObject::tr("Cancel");
+                    QString label = tr("Modify Action");
 
-                    DialogCode code = MythPopupBox::ShowButtonPopup(
-                        gContext->GetMainWindow(), "actionmenu",
-                        tr("Modify Action"), buttons, kDialogCodeButton2);
+                    MythScreenStack *mainStack =
+                                            GetMythMainWindow()->GetMainStack();
 
-                    if (kDialogCodeButton0 == code)
-                        AddKeyToAction();
-                    else if (kDialogCodeButton1 == code)
-                        DeleteKey();
+                    m_menuPopup =
+                            new MythDialogBox(label, mainStack, "actionmenu");
+
+                    if (m_menuPopup->Create())
+                        mainStack->AddScreen(m_menuPopup);
+
+                    m_menuPopup->SetReturnEvent(this, "action");
+
+                    m_menuPopup->AddButton(tr("Set Binding"));
+                    m_menuPopup->AddButton(tr("Remove Binding"));
+                    m_menuPopup->AddButton(tr("Cancel"));
                 }
                 else // for blank keys, no reason to ask what to do
                     AddKeyToAction();
@@ -309,22 +280,25 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
             if (m_bindings->HasChanges())
             {
                 /* prompt user to save changes */
-                QStringList buttons;
-                buttons += tr("Exit without saving changes");
-                buttons += tr("Save then Exit");
+                QString label = tr("Exiting, but there are unsaved changes."
+                                   "Which would you prefer?");
 
-                DialogCode code = MythPopupBox::ShowButtonPopup(
-                    gContext->GetMainWindow(), "exitmenu",
-                    tr("Exiting, but there are unsaved changes.")+"\n\n"+
-                    tr("Which would you prefer?") + "\n\n", buttons,
-                    kDialogCodeButton1);
+                MythScreenStack *mainStack =
+                                        GetMythMainWindow()->GetMainStack();
 
-                if (kDialogCodeButton1 == code)
-                    Save();
-                else if (kDialogCodeRejected == code)
-                    handled = true;
+                m_menuPopup =
+                        new MythDialogBox(label, mainStack, "exitmenu");
+
+                if (m_menuPopup->Create())
+                    mainStack->AddScreen(m_menuPopup);
+
+                m_menuPopup->SetReturnEvent(this, "exit");
+
+                m_menuPopup->AddButton(tr("Save then Exit"));
+                m_menuPopup->AddButton(tr("Exit without saving changes"));
             }
-            GetMythMainWindow()->GetMainStack()->PopScreen();
+            else
+                GetMythMainWindow()->GetMainStack()->PopScreen();
         }
         else if (action == "LEFT")
         {
@@ -712,6 +686,81 @@ void MythControls::AddKeyToAction(void)
     }
 
     RefreshKeyInformation();
+}
+
+void MythControls::customEvent(QCustomEvent *event)
+{
+
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "action")
+        {
+            if (buttonnum == 0)
+                AddKeyToAction();
+            else if (buttonnum == 1)
+                DeleteKey();
+        }
+        else if (resultid == "option")
+        {
+            if (buttonnum == 0)
+                Save();
+            else if (buttonnum == 1)
+                ChangeView();
+        }
+        else if (resultid == "exit")
+        {
+            if (buttonnum == 0)
+                Save();
+
+            GetMythMainWindow()->GetMainStack()->PopScreen();
+        }
+        else if (resultid == "view")
+        {
+            QStringList contents;
+            QString leftcaption, rightcaption;
+
+            if (buttonnum == 0)
+            {
+                leftcaption = tr(CAPTION_CONTEXT);
+                rightcaption = tr(CAPTION_ACTION);
+                m_currentView = kActionsByContext;
+                contents = m_bindings->GetContexts();
+            }
+            else if (buttonnum == 1)
+            {
+                leftcaption = tr(CAPTION_CONTEXT);
+                rightcaption = tr(CAPTION_KEY);
+                m_currentView = kKeysByContext;
+                contents = m_bindings->GetContexts();
+            }
+            else if (buttonnum == 2)
+            {
+                leftcaption = tr(CAPTION_KEY);
+                rightcaption = tr(CAPTION_CONTEXT);
+                m_currentView = kContextsByKey;
+                contents = m_bindings->GetKeys();
+            }
+
+            m_leftDescription->SetText(leftcaption);
+            m_rightDescription->SetText(rightcaption);
+
+            SetListContents(m_leftList, contents, true);
+            RefreshKeyInformation();
+            UpdateRightList();
+
+            if (GetFocusWidget() != m_leftList)
+                SetFocusWidget(m_leftList);
+        }
+
+        m_menuPopup = NULL;
+    }
+
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -49,6 +49,7 @@ class MythControls : public MythScreenType
 
     virtual bool Create(void);
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual void customEvent(QCustomEvent*);
 
     typedef enum
     {
@@ -101,6 +102,7 @@ class MythControls : public MythScreenType
     MythUIText        *m_leftDescription;
     MythUIText        *m_rightDescription;
     QPtrList<MythUIButton> m_actionButtons;
+    MythDialogBox *m_menuPopup;
 
     KeyBindings       *m_bindings;
     QStringList        m_sortedContexts; ///< sorted list of contexts
