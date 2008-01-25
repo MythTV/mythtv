@@ -5,16 +5,12 @@
 macx:QMAKE_LFLAGS_SHLIB += -undefined warning
 
 mingw {
-    LIBS += -L. -lmyth-bootstrap
+    # Worked around by building libmyth first,
+    # with dlltool faking the symbols from the other two libs
+    LIBS += -L../libmyth -lmyth-$$LIBVERSION
 
-    implib.target   = libmyth-bootstrap.a
-    implib.depends  = ../libmyth/libmyth.def
-    implib.commands = dlltool --input-def $$implib.depends         \
-                              --dllname libmyth-$${LIBVERSION}.dll \
-                              --output-lib $$implib.target -k
-
-    QMAKE_EXTRA_WIN_TARGETS += implib
-    POST_TARGETDEPS         += libmyth-bootstrap.a
+    # For easier debugging, put lib in same place as mythfrontend.exe
+    target.path = $${PREFIX}/bin
 }
 
 #unix {
