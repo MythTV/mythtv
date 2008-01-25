@@ -51,33 +51,15 @@
 
         <buttonlist name="leftlist">
             <area>20,50,370,410</area>
-            <activefont>active</activefont>
-            <inactivefont>inactive</inactivefont>
-            <showarrow>no</showarrow>
-            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="255"/>
-            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
-            <spacing>5</spacing>
-            <margin>6</margin>
         </buttonlist>
 
-        <textarea name="rightdesc">
-            <font>info</font>
+        <textarea name="rightdesc" from="leftdesc">
             <area>410,20,370,20</area>
             <value>Actions</value>
-            <align>center</align>
         </textarea>
 
-        <buttonlist name="rightlist">
+        <buttonlist name="rightlist" from="leftlist">
             <area>410,50,370,410</area>
-            <activefont>active</activefont>
-            <inactivefont>inactive</inactivefont>
-            <showarrow>no</showarrow>
-            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="255"/>
-            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
-            <spacing>5</spacing>
-            <margin>6</margin>
         </buttonlist>
 
         <button name="action_0">
@@ -92,40 +74,16 @@
             <textflags>allcenter</textflags>
         </button>
 
-        <button name="action_1">
+        <button name="action_1" from="action_0">
             <position>220,450</position>
-            <activefont>keys</activefont>
-            <inactivefont>keys</inactivefont>
-            <showarrow>no</showarrow>
-            <regular-background filename="kb-button-off.png" />
-            <selected-background filename="kb-button-on.png" />
-            <inactive-background filename="kb-button-off.png" />
-            <margin>6</margin>
-            <textflags>allcenter</textflags>
         </button>
 
-        <button name="action_2">
+        <button name="action_2" from="action_0">
             <position>410,450</position>
-            <activefont>keys</activefont>
-            <inactivefont>keys</inactivefont>
-            <showarrow>no</showarrow>
-            <regular-background filename="kb-button-off.png" />
-            <selected-background filename="kb-button-on.png" />
-            <inactive-background filename="kb-button-off.png" />
-            <margin>6</margin>
-            <textflags>allcenter</textflags>
         </button>
 
-        <button name="action_3">
+        <button name="action_3" from="action_0">
             <position>600,450</position>
-            <activefont>keys</activefont>
-            <inactivefont>keys</inactivefont>
-            <showarrow>no</showarrow>
-            <regular-background filename="kb-button-off.png" />
-            <selected-background filename="kb-button-on.png" />
-            <inactive-background filename="kb-button-off.png" />
-            <margin>6</margin>
-            <textflags>allcenter</textflags>
         </button>
 
         <textarea name="description">
