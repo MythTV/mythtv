@@ -1159,12 +1159,7 @@ static int ac3_decode_frame(AVCodecContext * avctx, void *data, int *data_size, 
         }
         for (i = 0; i < 256; i++)
             for (ch = 0; ch < ctx->out_channels; ch++)
-                /* HACK: triple the sample values to raise the volume
-                 * levels closer to normal when ffmpeg is used to decode
-                 * 5.1 or two channel AC3 to stereo out. This is intended
-                 * to be temporary until a proper fix is found.
-                 */
-                *(out_samples++) = ctx->int_output[ch][i] * 3;
+                *(out_samples++) = ctx->int_output[ch][i];
     }
     *data_size = NB_BLOCKS * 256 * avctx->channels * sizeof (int16_t);
     return ctx->frame_size;
