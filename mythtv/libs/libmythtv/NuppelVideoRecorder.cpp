@@ -2117,7 +2117,6 @@ void NuppelVideoRecorder::Reset(void)
     for (int i = 0; i < text_buffer_count; i++)
     {
         txtbuffertype *txtbuf = textbuffer[i];
-        txtbuf->buffer = new unsigned char[text_buffer_size];
         txtbuf->freeToEncode = 0;
         txtbuf->freeToBuffer = 1;
     }
