@@ -68,7 +68,7 @@ inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
-unix:inc2.extra = rmdir $$inc2.path ; ln -s $$inc.path $$inc2.path
+unix:inc2.extra = rm -fr $$inc2.path; ln -s $$inc.path $$inc2.path
 # On Windows, we have to have two copies of the files
 !unix:inc2.files = $${inc.files}
 
