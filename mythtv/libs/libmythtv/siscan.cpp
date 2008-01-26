@@ -1316,6 +1316,10 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                 .arg(vct->MinorChannel(i));
         }
 
+        QString callsign = ChannelUtil::GetCallsign(chanid);
+        if (callsign.isEmpty() || renameChannels)
+            callsign = vct->ShortChannelName(i);
+
         // try to find an extended channel name, fallback to short name.
         QString longName = vct->GetExtendedChannelName(i);
         if (longName.isEmpty())
@@ -1329,7 +1333,6 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
         bool use_eit = !vct->IsHidden(i) ||
             (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
 
-        QString callsign = vct->ShortChannelName(i);
 
         if (!CheckImportedList(channels, vct->ProgramNumber(i),
                                longName, callsign, common_status_info))
