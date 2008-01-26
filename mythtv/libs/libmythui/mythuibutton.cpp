@@ -4,10 +4,29 @@ using namespace std;
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
 
-MythUIButton::MythUIButton(MythUIType *parent, const char *name)
+MythUIButton::MythUIButton(MythUIType *parent, const char *name, bool doInit)
             : MythUIType(parent, name)
 {
     m_State = None;
+
+    m_PaddingMargin = 0;
+
+    if (doInit)
+        Init();
+
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
+
+    SetCanTakeFocus(true);
+}
+
+MythUIButton::~MythUIButton()
+{
+}
+
+void MythUIButton::Init()
+{
+
     m_BackgroundImage = new MythUIStateType(this, "buttonback");
     m_CheckImage = new MythUIStateType(this, "buttoncheck");
     m_Text = new MythUIText(this, "buttontext");
@@ -18,16 +37,6 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name)
     m_ButtonImage->SetVisible(false);
     m_ArrowImage->SetVisible(false);
 
-    m_PaddingMargin = 0;
-
-    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
-    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
-
-    SetCanTakeFocus(true);
-}
-
-MythUIButton::~MythUIButton()
-{
 }
 
 bool MythUIButton::ParseElement(QDomElement &element)
@@ -315,6 +324,24 @@ void MythUIButton::CopyFrom(MythUIType *base)
     m_textFlags = button->m_textFlags;
 
     MythUIType::CopyFrom(base);
+
+    m_BackgroundImage = dynamic_cast<MythUIStateType *>
+                    (GetChild("buttonback"));
+    m_CheckImage = dynamic_cast<MythUIStateType *>
+                    (GetChild("buttoncheck"));
+    m_Text = dynamic_cast<MythUIText *>
+                    (GetChild("buttontext"));
+    m_ButtonImage = dynamic_cast<MythUIImage *>
+                    (GetChild("buttonimage"));
+    m_ArrowImage = dynamic_cast<MythUIImage *>
+                    (GetChild("arrowimage"));
+
+    m_CheckImage->SetVisible(false);
+    m_ButtonImage->SetVisible(false);
+    m_ArrowImage->SetVisible(false);
+
+    if (!m_BackgroundImage)
+        cerr << "Failed to get buttonback" << endl;
 
     SetupPlacement();
     SelectState(button->m_State);

@@ -214,7 +214,12 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     else if (type == "textarea")
         uitype = new MythUIText(parent, name);
     else if (type == "button")
-        uitype = new MythUIButton(parent, name);
+    {
+        if (base)
+            uitype = new MythUIButton(parent, name, false);
+        else
+            uitype = new MythUIButton(parent, name);
+    }
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
     else if (type == "horizontalbuttonlist")

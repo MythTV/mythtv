@@ -23,7 +23,7 @@ class MythUIButton : public MythUIType
     enum StateType { None = 0, Normal, Disabled, Active, Selected, 
                      SelectedInactive };
 
-    MythUIButton(MythUIType *parent, const char *name);
+    MythUIButton(MythUIType *parent, const char *name, bool doInit = true);
    ~MythUIButton();
 
     void SetBackgroundImage(StateType state, MythImage *image);
@@ -56,6 +56,8 @@ class MythUIButton : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual bool keyPressEvent(QKeyEvent *);
+
+    void Init(void);
 
     MythImage* LoadImage(QDomElement element);
 
