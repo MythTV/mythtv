@@ -2403,7 +2403,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     parameters = profileNode.getElementsByTagName("parameter")
 
     # default values - will be overriden by values from the profile 
-    outvideobitrate = 5000
+    outvideobitrate = "5000k"
     if videomode == "ntsc":
         outvideores = "720x480"
     else:
@@ -2413,6 +2413,14 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     outaudiobitrate = 384
     outaudiosamplerate = 48000
     outaudiocodec = "ac3"
+    deinterlace = 0
+    croptop = 0
+    cropright = 0
+    cropbottom = 0
+    cropleft = 0
+    qmin = 5
+    qmax = 31
+    qdiff = 31
 
     for param in parameters:
         name = param.attributes["name"].value
@@ -2431,6 +2439,22 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
             outvideobitrate = value
         if name == "-s":
             outvideores = value
+        if name == "-deinterlace":
+            deinterlace = 1
+        if name == "-croptop":
+            croptop = value
+        if name == "-cropright":
+            cropright = value
+        if name == "-cropbottom":
+            cropbottom = value
+        if name == "-cropleft":
+           cropleft = value
+        if name == "-qmin":
+           qmin = value
+        if name == "-qmax":
+           qmax = value
+        if name == "-qdiff":
+           qdiff = value
 
     if chanid != -1:
         if (usecutlist == True):
@@ -2470,8 +2494,12 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, os.path.join(folder, "audout")) 
     command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
     command += "-i %s " % os.path.join(folder, "vidout")
-    command += "-aspect %s -r %s -s %s -b %s " % (aspectratio, fps, outvideores, outvideobitrate)
-    command += "-vcodec mpeg2video -qmin 5 "
+    command += "-aspect %s -r %s " % (aspectratio, fps)
+    if (deinterlace == 1):
+        command += "-deinterlace "
+    command += "-croptop %s -cropright %s -cropbottom %s -cropleft %s " % (croptop, cropright, cropbottom, cropleft)
+    command += "-s %s -b %s -vcodec mpeg2video " % (outvideores, outvideobitrate)
+    command += "-qmin %s -qmax %s -qdiff %s " % (qmin, qmax, qdiff)
     command += "-ab %s -ar %s -acodec %s " % (outaudiobitrate, outaudiosamplerate, outaudiocodec)
     command += "-f dvd %s" % quoteFilename(destvideofile)
 
