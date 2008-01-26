@@ -37,7 +37,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080115-1"
+VERSION="0.1.20080126-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -809,6 +809,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveCopyRemoteFiles',
                         'MythArchiveAlwaysUseMythTranscode',
                         'MythArchiveUseProjectX',
+                        'MythArchiveAddSubtitles',
                         'MythArchiveUseFIFO',
                         'MythArchiveMainMenuAR',
                         'MythArchiveChapterMenuAR',
@@ -1833,7 +1834,14 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     elif doesFileExist(audio2 + ".mp2"):
         audio2 = audio2 + ".mp2"
 
-    if useFIFO==True:
+    # if subtitles exist, we need to run sequentially, so they can be
+    # multiplexed to the final file
+    if os.path.exists(os.path.dirname(destination) + "/stream.d/spumux.xml"):
+        localUseFIFO=False
+    else:
+        localUseFIFO=useFIFO
+
+    if localUseFIFO==True:
         os.mkfifo(destination)
         mode=os.P_NOWAIT
     else:
@@ -1861,12 +1869,32 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
                     audio1,
                     audio2)
 
-    if useFIFO==True:
+    if localUseFIFO == True:
         write( "Multiplex started PID=%s" % result)
         return result
     else:
         if result != 0:
             fatalError("mplex failed with result %d" % result)
+
+    # run spumux to add subtitles if they exist
+    if os.path.exists(os.path.dirname(destination) + "/stream.d/spumux.xml"):
+        #FIXME is this needed??
+        write("Checking integrity of subtitle pngs")
+        command = os.path.join(scriptpath, "testsubtitlepngs.sh") + " %s/stream.d/spumux.xml" % (os.path.dirname(destination))
+        result = runCommand(command)
+        if result<>0:
+            fatalError("Failed while running testsubtitlepngs.sh - %s" % command)
+
+        write("Running spumux to add subtitles")
+        command = path_spumux[0] + " -P %s/stream.d/spumux.xml <%s >%s" % (os.path.dirname(destination), destination, os.path.splitext(destination)[0] + "-sub.mpg")
+        result = runCommand(command)
+        if result<>0:
+            fatalError("Failed while running spumux - %s" % command)
+        else:
+            os.rename(os.path.splitext(destination)[0] + "-sub.mpg", destination)
+
+    return True
+
 
 #############################################################
 # Creates a stream xml file for a video file
@@ -2016,8 +2044,27 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
         return False;
 
 
-    # workout which streams we need and rename them
+    # workout which files we need and rename them
     renameProjectXFiles(folder, pxbasename)
+
+    # if we have some dvb subtitles and the user wants to add them to the DVD
+    # convert them to pngs and create the spumux xml file
+    if addSubtitles:
+        if (os.path.exists(os.path.join(folder, "stream.sup")) and
+            os.path.exists(os.path.join(folder, "stream.sup.IFO"))):
+            write("Found DVB subtitles converting to DVD subtitles")
+            command = "mytharchivehelper --sup2dast "
+            command += " %s %s 0" % (os.path.join(folder, "stream.sup"), os.path.join(folder, "stream.sup.IFO"))
+
+            result = runCommand(command)
+
+            if result != 0:
+                write("Failed while running mytharchivehelper to convert DVB subtitles to DVD subtitles.\n"
+                      "Result: %d, Command was %s" % (result, command))
+                return False
+
+            # sanity check the created spumux.xml
+            checkSubtitles(os.path.join(folder, "stream.d", "spumux.xml"))
 
     return True
 
@@ -2085,34 +2132,117 @@ def renameProjectXFiles(folder, pxbasename):
         audio1ID = audio1[AUDIO_ID]
         audio2ID = audio2[AUDIO_ID]
 
-    # loop thought the available streams looking for the ones we want
-    for stream in streamIds:
-        write("got stream: %d" % stream, False)
-        if stream == videoID:
-            write("found video streamID", False)
-            if os.path.exists(streamFiles[streamIds.index(stream)]):
-                write("found video stream file", False)
-                os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream.mv2"))
+    # sanity check - we should have a file for each ID
+    if len(streamIds) == len(streamFiles):
+        # loop thought the available streams looking for the ones we want
+        for stream in streamIds:
+            write("got stream: %d" % stream, False)
+            if stream == videoID:
+                write("found video streamID", False)
+                if os.path.exists(streamFiles[streamIds.index(stream)]):
+                    write("found video stream file", False)
+                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream.mv2"))
 
-        if stream == audio1ID:
-            write("found audio1 streamID", False)
-            if os.path.exists(streamFiles[streamIds.index(stream)]):
-                write("found audio1 stream file", False)
-                if audio1[AUDIO_CODEC] == "AC3":
-                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.ac3"))
-                else:
-                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.mp2"))
+            if stream == audio1ID:
+                write("found audio1 streamID", False)
+                if os.path.exists(streamFiles[streamIds.index(stream)]):
+                    write("found audio1 stream file", False)
+                    if audio1[AUDIO_CODEC] == "AC3":
+                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.ac3"))
+                    else:
+                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.mp2"))
 
-        if stream == audio2ID:
-            write("found audio2 streamID", False)
-            if os.path.exists(streamFiles[streamIds.index(stream)]):
-                write("found audio2 stream file", False)
-                if audio2[AUDIO_CODEC] == "AC3":
-                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.ac3"))
-                else:
-                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.mp2"))
+            if stream == audio2ID:
+                write("found audio2 streamID", False)
+                if os.path.exists(streamFiles[streamIds.index(stream)]):
+                    write("found audio2 stream file", False)
+                    if audio2[AUDIO_CODEC] == "AC3":
+                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.ac3"))
+                    else:
+                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.mp2"))
+
+    # final chance to find the correct stream files
+    if not os.path.exists(os.path.join(folder, "stream.mv2")):
+        if os.path.exists(os.path.join(folder, pxbasename + ".m2v")):
+            os.rename(os.path.join(folder, pxbasename + ".m2v"), os.path.join(folder, "stream.mv2"))
+
+    if not os.path.exists(os.path.join(folder, "stream0.mp2")) or not os.path.exists(os.path.join(folder, "stream0.ac3")):
+        if os.path.exists(os.path.join(folder, pxbasename + ".mp2")):
+            os.rename(os.path.join(folder, pxbasename + ".mp2"), os.path.join(folder, "stream0.mp2"))
+        if os.path.exists(os.path.join(folder, pxbasename + ".ac3")):
+            os.rename(os.path.join(folder, pxbasename + ".ac3"), os.path.join(folder, "stream0.ac3"))
+
+    if not os.path.exists(os.path.join(folder, "stream1.mp2")) or not os.path.exists(os.path.join(folder, "stream1.ac3")):
+        if os.path.exists(os.path.join(folder, pxbasename + "[1].mp2")):
+            os.rename(os.path.join(folder, pxbasename + "[1].mp2"), os.path.join(folder, "stream1.mp2"))
+        if os.path.exists(os.path.join(folder, pxbasename + "[1].ac3")):
+            os.rename(os.path.join(folder, pxbasename + "[1].ac3"), os.path.join(folder, "stream1.ac3"))
+
+    # do we have any subtitle files
+    if os.path.exists(os.path.join(folder, pxbasename + ".sup")):
+        os.rename(os.path.join(folder, pxbasename + ".sup"), os.path.join(folder, "stream.sup"))
+
+    if os.path.exists(os.path.join(folder, pxbasename + ".sup.IFO")):
+        os.rename(os.path.join(folder, pxbasename + ".sup.IFO"), os.path.join(folder, "stream.sup.IFO"))
 
     write("renameProjectXFiles end -----------------------------------------", False)
+
+#############################################################
+# convert time stamp to pts
+
+def ts2pts(time):
+    h = int(time[0:2]) * 3600 * 90000
+    m = int(time[3:5]) * 60 * 90000
+    s = int(time[6:8]) * 90000
+    ms = int(time[9:11])
+
+    return h + m + s + ms
+
+#############################################################
+# check the given spumux.xml file for consistancy
+
+def checkSubtitles(spumuxFile):
+
+    #open the XML containing information about this file
+    subDOM = xml.dom.minidom.parse(spumuxFile)
+
+    #error out if its the wrong XML
+    if subDOM.documentElement.tagName != "subpictures":
+        fatalError("This does not look like a spumux.xml file (%s)" % spumuxFile)
+
+    streamNodes = subDOM.getElementsByTagName("stream")
+    if streamNodes.length == 0:
+        write("Didn't find any stream elements in file.!!!")
+        return
+    streamNode = streamNodes[0]
+
+    nodes = subDOM.getElementsByTagName("spu")
+    if nodes.length == 0:
+        write("Didn't find any spu elements in file.!!!")
+        return
+
+    lastStart = -1
+    lastEnd = -1
+    for node in nodes:
+        errored = False
+        start = ts2pts(node.attributes["start"].value)
+        end = ts2pts(node.attributes["end"].value)
+        image = node.attributes["image"].value
+
+        if end <= start:
+            errored = True
+        if start <= lastEnd:
+            errored = True
+
+        if errored:
+            write("removing subtitle: %s to %s - (%d - %d (%d))" % (node.attributes["start"].value, node.attributes["end"].value, start, end, lastEnd), False)
+            streamNode.removeChild(node)
+            node.unlink()
+
+        lastStart = start
+        lastEnd = end
+
+    WriteXMLToFile(subDOM, spumuxFile)
 
 #############################################################
 # Grabs a sequence of consecutive frames from a file
@@ -4193,6 +4323,71 @@ def selectStreams(folder):
     return (video, audio1, audio2)
 
 #############################################################
+# chooses which subtitle stream from a file to include on the DVD
+
+# tuple index constants
+SUBTITLE_INDEX = 0
+SUBTITLE_CODEC = 1
+SUBTITLE_ID    = 2
+SUBTITLE_LANG  = 3
+
+def selectSubtitleStream(folder):
+    """Choose the subtitle stream we want from the source file"""
+
+    subtitle   = (-1, 'N/A', -1, 'N/A')  # index, codec, ID, lang
+
+    #open the XML containing information about this file
+    infoDOM = xml.dom.minidom.parse(os.path.join(folder, 'streaminfo.xml'))
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("This does not look like a stream info file (%s)" % os.path.join(folder, 'streaminfo.xml'))
+
+
+    #get subtitle nodes
+    nodes = infoDOM.getElementsByTagName("subtitle")
+    if nodes.length == 0:
+        write("Didn't find any subtitle elements in stream info file.")
+        return subtitle
+
+    write("Preferred languages %s and %s" % (preferredlang1, preferredlang2))
+
+    found = False
+    # first try to find a stream with preferred language 1
+    for node in nodes:
+        index = int(node.attributes["ffmpegindex"].value)
+        lang = node.attributes["language"].value
+        format = string.upper(node.attributes["codec"].value)
+        pid = int(node.attributes["id"].value)
+        if not found and lang == preferredlang1 and format == "dvbsub":
+            subtitle = (index, format, pid, lang)
+            found = True
+
+    # second try to find a stream with preferred language 2
+    if not found:
+        for node in nodes:
+            index = int(node.attributes["ffmpegindex"].value)
+            lang = node.attributes["language"].value
+            format = string.upper(node.attributes["codec"].value)
+            pid = int(node.attributes["id"].value)
+            if not found and lang == preferredlang2 and format == "dvbsub":
+                subtitle = (index, format, pid, lang)
+                found = True
+
+    # finally use the first subtitle stream
+    if not found:
+        for node in nodes:
+            index = int(node.attributes["ffmpegindex"].value)
+            format = string.upper(node.attributes["codec"].value)
+            pid = int(node.attributes["id"].value)
+            if not found:
+                subtitle = (index, format, pid, lang)
+                found = True
+
+    write("Subtitle id: 0x%x" % (subtitle[SUBTITLE_ID]))
+
+    return subtitle
+
+#############################################################
 # gets the video aspect ratio from the stream info xml file
 
 def selectAspectRatio(folder):
@@ -4293,6 +4488,12 @@ def getStreamList(folder):
 
     if audio2[AUDIO_ID] != -1:
         streamList += ",0x%x" % audio2[AUDIO_ID]
+
+    # add subtitle stream id if required
+    if addSubtitles:
+        subtitles = selectSubtitleStream(folder)
+        if subtitles[SUBTITLE_ID] != -1:
+            streamList += ",0x%x" % subtitles[SUBTITLE_ID]
 
     return streamList;
 
@@ -4832,6 +5033,10 @@ def processJob(job):
                     if os.path.exists(folder):
                         #Remove all the files first
                         deleteAllFilesInFolder(folder)
+                        subtitlefolder = os.path.join(folder, "stream.d")
+                        if os.path.exists(subtitlefolder):
+                            deleteAllFilesInFolder(subtitlefolder)
+                            os.rmdir(subtitlefolder)
                         previewfolder = os.path.join(folder, "preview")
                         if os.path.exists(previewfolder):
                             deleteAllFilesInFolder(previewfolder)
@@ -4948,7 +5153,7 @@ def main():
     global preferredlang2, useFIFO, encodetoac3, alwaysRunMythtranscode
     global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
     global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex, path_ffmpeg
-    global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant
+    global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant, addSubtitles
     global path_jpeg2yuv, path_spumux, path_mpeg2enc, path_projectx, useprojectx, progresslog
     global progressfile, jobfile
 
@@ -5051,6 +5256,7 @@ def main():
 
     path_projectx = [defaultsettings["MythArchiveProjectXCmd"], os.path.split(defaultsettings["MythArchiveProjectXCmd"])[1]]
     useprojectx = (defaultsettings["MythArchiveUseProjectX"] == '1')
+    addSubtitles = (defaultsettings["MythArchiveAddSubtitles"] == '1')
 
     # sanity check
     if path_projectx[0] == "":

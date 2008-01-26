@@ -136,6 +136,16 @@ static HostCheckBox *MythArchiveUseFIFO()
     return gc;
 };
 
+static HostCheckBox *MythArchiveAddSubtitles()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveAddSubtitles");
+    gc->setLabel(QObject::tr("Add Subtitles"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If available this option will add subtitles "
+            "to the final DVD. Requires 'Use ProjectX' to be on."));
+    return gc;
+};
+
 static HostComboBox *MainMenuAspectRatio()
 {
     HostComboBox *gc = new HostComboBox("MythArchiveMainMenuAR");
@@ -333,6 +343,7 @@ ArchiveSettings::ArchiveSettings()
     vcg2->addChild(MythArchiveCopyRemoteFiles());
     vcg2->addChild(MythArchiveAlwaysUseMythTranscode());
     vcg2->addChild(MythArchiveUseProjectX());
+    vcg2->addChild(MythArchiveAddSubtitles());
     vcg2->addChild(MythArchiveUseFIFO());
     vcg2->addChild(MythArchiveDefaultEncProfile());
     addChild(vcg2);
