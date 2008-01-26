@@ -766,14 +766,16 @@ def createVideoChaptersFixedLength(itemnum, segment, lengthofvideo):
     if lengthofvideo < segment:
         return "00:00:00"
 
-    numofchapters = lengthofvideo / segment;
-    chapters = ""
+    numofchapters = lengthofvideo / segment + 1;
+    chapters = "00:00:00"
     starttime = 0
-    count = 1
+    count = 2
     while count <= numofchapters:
-        chapters += time.strftime("%H:%M:%S", time.gmtime(starttime)) + ","
         starttime += segment
+        chapters += "," + time.strftime("%H:%M:%S", time.gmtime(starttime))
         count += 1
+
+    write("Fixed length chapters: %s" % chapters)
 
     return chapters
 
