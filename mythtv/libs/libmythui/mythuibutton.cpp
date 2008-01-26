@@ -340,9 +340,6 @@ void MythUIButton::CopyFrom(MythUIType *base)
     m_ButtonImage->SetVisible(false);
     m_ArrowImage->SetVisible(false);
 
-    if (!m_BackgroundImage)
-        cerr << "Failed to get buttonback" << endl;
-
     SetupPlacement();
     SelectState(button->m_State);
 }
