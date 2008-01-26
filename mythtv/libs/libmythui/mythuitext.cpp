@@ -224,7 +224,7 @@ bool MythUIText::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "value")
     {
-        if (m_Message.isEmpty() && element.attribute("lang","").isEmpty())
+        if (element.attribute("lang","").isEmpty())
         {
             m_Message = qApp->translate("ThemeUI", getFirstText(element));
         }
