@@ -32,6 +32,7 @@ using namespace std;
 extern "C" {
 #include <mythtv/ffmpeg/avcodec.h>
 #include <mythtv/ffmpeg/avformat.h>
+#include "pxsup2dast.h"
 }
 
 // mytharchive headers
@@ -2344,7 +2345,12 @@ void showUsage()
     cout << "       erasedvdrw - 0 = don't erase\n";
     cout << "                    1 = force erase\n";
     cout << "       native     - 0 = not a native archive\n";
-    cout << "                    1 = is a native archive\n\n"; 
+    cout << "                    1 = is a native archive\n\n";
+    cout << "-s/--sup2dast supfile ifofile delay\n";
+    cout << "       (convert projectX subtitles to dvd subtitles)\n";
+    cout << "       supfile    - input sup file\n";
+    cout << "       ifofile    - input sup file\n";
+    cout << "       delay      - delay to add to subtitles (default is 0ms)\n\n";
     cout << "-l/--log logfile\n"; 
     cout << "       (name of log file to send messages)\n\n";
     cout << "-v/--verbose debug-level\n";  
@@ -2381,14 +2387,16 @@ int main(int argc, char **argv)
     int  mediaType = AD_DVD_SL;
     bool bEraseDVDRW = false;
     bool bNativeFormat = false;
-
+    bool bSup2Dast = false;
     QString thumbList;
     QString inFile;
     QString outFile;
     QString logFile;
+    QString ifoFile;
     int lenMethod = 0;
     int chanID;
     int frameCount = 1;
+    int delay = 0;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -2642,6 +2650,45 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-s") ||
+                  !strcmp(a.argv()[argpos],"--sup2dast"))
+        {
+            bSup2Dast = true;
+
+            if (a.argc()-1 > argpos)
+            {
+                inFile = a.argv()[argpos+1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing supfile in -s/--sup2dast option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                ifoFile = a.argv()[argpos+1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing ifofile in -s/--sup2dast option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]);
+                delay = arg.toInt();
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing delay in -s/--sup2dast option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else
         {
             cout << "Invalid argument: " << a.argv()[argpos] << endl;
@@ -2666,6 +2713,8 @@ int main(int argc, char **argv)
         res = isRemote(inFile);
     else if (bDoBurn)
         res = doBurnDVD(mediaType, bEraseDVDRW, bNativeFormat);
+    else if (bSup2Dast)
+        res = sup2dast(inFile.ascii(), ifoFile.ascii(), delay);
     else 
         showUsage();
 
