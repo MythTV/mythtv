@@ -310,13 +310,14 @@ void MythUIButton::CopyFrom(MythUIType *base)
 
     m_FontProps = button->m_FontProps;
 
-    m_State = button->m_State;
-
     m_TextRect = button->m_TextRect;
     m_PaddingMargin = button->m_PaddingMargin;
     m_textFlags = button->m_textFlags;
 
     MythUIType::CopyFrom(base);
+
+    SetupPlacement();
+    SelectState(button->m_State);
 }
 
 void MythUIButton::CreateCopy(MythUIType *parent)
