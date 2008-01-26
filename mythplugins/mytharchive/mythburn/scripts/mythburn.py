@@ -2336,6 +2336,21 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
 
     #add second audio track if required
     if audio2[AUDIO_ID] != -1:
+        for param in parameters:
+            name = param.attributes["name"].value
+            value = param.attributes["value"].value
+
+            # only re-encode the audio if it is not already in AC3 format
+            if audio1[AUDIO_CODEC] == "AC3":
+                if name == "-acodec":
+                    value = "copy"
+                if name == "-ar" or name == "-ab" or name == "-ac":
+                    name = ""
+                    value = ""
+
+            if name == "-acodec" or name == "-ar" or name == "-ab" or name == "-ac":
+                    command += " " + name + " " + value
+
         command += " -newaudio" 
 
     #make sure we get the correct stream(s) that we want
