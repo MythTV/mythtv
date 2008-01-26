@@ -283,6 +283,26 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     }
 }
 
+QStringList StorageGroup::getRecordingsGroups(void)
+{
+    QStringList groups;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT DISTINCT groupname "
+                  "FROM storagegroup "
+                  ";");
+//                  "WHERE groupname NOT IN "
+//                      "('DB Backups', 'Thumbnails');");
+    if (query.exec() && query.isActive() && query.size() > 0)
+        while (query.next())
+            groups += QString::fromUtf8(query.value(0).toString());
+
+    groups.sort();
+
+    return QDeepCopy<QStringList>(groups);
+}
+
 /****************************************************************************/
 typedef enum {
     SGPopup_OK = 0,

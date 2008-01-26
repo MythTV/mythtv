@@ -30,6 +30,8 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
 
     static const char *kDefaultStorageDir;
 
+    static QStringList getRecordingsGroups(void);
+
   private:
     QString      m_groupname;
     QString      m_hostname;

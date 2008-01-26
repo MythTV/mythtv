@@ -7,6 +7,7 @@
 #include "scheduledrecording.h"
 #include "recordingprofile.h"
 #include "playgroup.h"
+#include "storagegroup.h"
 
 class SimpleSRStorage : public SimpleDBStorage
 {
@@ -896,25 +897,17 @@ class SRStorageGroup: public SRSelectSetting
 
         virtual void fillSelections()
         {
-            QStringList groups;
+            QStringList groups = StorageGroup::getRecordingsGroups();
             QStringList::Iterator it;
             QString value, dispValue;
             bool foundDefault = false;
 
-            MSqlQuery query(MSqlQuery::InitCon());
+            for (it = groups.begin(); it != groups.end(); ++it)
+            {
+                if (*it == "Default")
+                    foundDefault = true;
+            }
 
-            query.prepare("SELECT DISTINCT groupname FROM storagegroup;");
-            if (query.exec() && query.isActive() && query.size() > 0)
-                while (query.next())
-                {
-                    value = QString::fromUtf8(query.value(0).toString());
-                    groups += value;
-
-                    if (value == "Default")
-                        foundDefault = true;
-                }
-
-            groups.sort();
             for (it = groups.begin(); it != groups.end(); ++it)
             {
                 if (!foundDefault && *it > QObject::tr("Default"))
