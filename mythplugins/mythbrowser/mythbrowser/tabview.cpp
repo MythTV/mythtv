@@ -695,16 +695,40 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 view->scrollBy(0, view->visibleHeight() / 10);
                 return true;
             }
+            else if (action == "LEFT") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(-view->visibleWidth() / 10, 0);
+                return true;
+            }
+            else if (action == "RIGHT") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(view->visibleWidth() / 10, 0);
+                return true;
+            }
             else if (action == "PAGEUP")
             {
                 KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
-                view->scrollBy(0, -view->visibleHeight());
+                view->scrollBy(0, -view->visibleHeight() / 2);
                 return true;
             }
             else if (action == "PAGEDOWN")
             {
                 KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
-                view->scrollBy(0, view->visibleHeight());
+                view->scrollBy(0, view->visibleHeight() / 2);
+                return true;
+            }
+            else if (action == "PAGELEFT") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(-view->visibleWidth() / 2, 0);
+                return true;
+            }
+            else if (action == "PAGERIGHT") 
+            {
+                KHTMLView *view = ((WebPage*)mytab->currentPage())->browser->view();
+                view->scrollBy(view->visibleWidth() / 2, 0);
                 return true;
             }
         }

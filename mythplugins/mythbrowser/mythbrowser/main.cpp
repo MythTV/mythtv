@@ -52,6 +52,11 @@ void setupKeys(void)
     REG_KEY("Browser", "MOUSELEFT", "Move mouse pointer left", "4");
     REG_KEY("Browser", "MOUSERIGHT", "Move mouse pointer right", "6");
     REG_KEY("Browser", "MOUSELEFTBUTTON", "Mouse Left button click", "5");
+
+    REG_KEY("Browser", "PAGEDOWN", "Scroll down half a page", "9");
+    REG_KEY("Browser", "PAGEUP", "Scroll up half a page", "3");
+    REG_KEY("Browser", "PAGELEFT", "Scroll left half a page", "7");
+    REG_KEY("Browser", "PAGERIGHT", "Scroll right half a page", "1");
     
     REG_KEY("Browser", "NEXTLINK", "Move selection to next link", "Z");
     REG_KEY("Browser", "PREVIOUSLINK", "Move selection to previous link", "Q");
