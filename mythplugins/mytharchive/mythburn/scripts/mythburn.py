@@ -37,11 +37,16 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080126-1"
+VERSION="0.1.20080127-1"
 
+# keep all temporary files for debugging purposes
+# set this to True before a first run through when testing
+# out new themes (see below)
+debug_keeptempfiles = False
 
 ##You can use this debug flag when testing out new themes
 ##pick some small recordings, run them through as normal
+##with debug_keeptempfiles = True (see above)
 ##set this variable to True and then re-run the scripts
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
@@ -4639,8 +4644,8 @@ def doProcessFile(file, folder):
                 write("File has a cut list - running mythtrancode to remove unwanted segments")
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-                if runMythtranscode(chanid, starttime, os.path.join(folder,'tmp'), True, localfile):
-                    mediafile = os.path.join(folder,'tmp')
+                if runMythtranscode(chanid, starttime, os.path.join(folder,'newfile.mpg'), True, localfile):
+                    mediafile = os.path.join(folder,'newfile.mpg')
                 else:
                     write("Failed to run mythtranscode to remove unwanted segments")
             else:
@@ -4752,9 +4757,11 @@ def doProcessFile(file, folder):
                             audio1, audio2, aspectratio, profile)
             mediafile = os.path.join(folder, 'newfile2.mpg')
 
-    #remove an intermediate file
-    if os.path.exists(os.path.join(folder, "newfile1.mpg")):
-        os.remove(os.path.join(folder,'newfile1.mpg'))
+            #remove the old mediafile that was run through mythtranscode
+            #if it exists
+            if debug_keeptempfiles==False:
+                if os.path.exists(os.path.join(folder, "newfile.mpg")):
+                    os.remove(os.path.join(folder,'newfile.mpg'))
 
     # the file is now DVD compliant split it into video and audio parts
 
@@ -4768,8 +4775,12 @@ def doProcessFile(file, folder):
     write("Splitting MPEG stream into audio and video parts")
     deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2)
 
-    if os.path.exists(os.path.join(folder, "newfile2.mpg")):
-        os.remove(os.path.join(folder,'newfile2.mpg'))
+    # remove intermediate files
+    if debug_keeptempfiles==False:
+        if os.path.exists(os.path.join(folder, "newfile.mpg")):
+            os.remove(os.path.join(folder,'newfile.mpg'))
+        if os.path.exists(os.path.join(folder, "newfile2.mpg")):
+            os.remove(os.path.join(folder,'newfile2.mpg'))
 
     # we now have a video stream and one or more audio streams
     # check if we need to convert any of the audio streams to ac3
@@ -5148,6 +5159,23 @@ def processJob(job):
 
             #Now all the files are completed and ready to be burnt
             runDVDAuthor()
+
+            #Delete dvdauthor work files
+            if debug_keeptempfiles==False:
+                filecount=0
+                for node in files:
+                    filecount+=1
+                    folder=getItemTempPath(filecount)
+                    if os.path.exists(os.path.join(folder, "stream.mv2")):
+                        os.remove(os.path.join(folder,'stream.mv2'))
+                    if os.path.exists(os.path.join(folder, "stream0.mp2")):
+                        os.remove(os.path.join(folder,'stream0.mp2'))
+                    if os.path.exists(os.path.join(folder, "stream1.mp2")):
+                        os.remove(os.path.join(folder,'stream1.mp2'))
+                    if os.path.exists(os.path.join(folder, "stream0.ac3")):
+                        os.remove(os.path.join(folder,'stream0.ac3'))
+                    if os.path.exists(os.path.join(folder, "stream1.ac3")):
+                        os.remove(os.path.join(folder,'stream1.ac3'))
 
             #Get DVD title from first processed file
             #Get the XML containing information about this item
