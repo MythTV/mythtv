@@ -5539,7 +5539,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     infoMap["programid"]   = programid;
 }
 
-bool TV::IsTunable(uint chanid)
+bool TV::IsTunable(uint chanid, bool use_cache)
 {
     VERBOSE(VB_PLAYBACK, QString("IsTunable(%1)").arg(chanid));
 
@@ -5580,8 +5580,25 @@ bool TV::IsTunable(uint chanid)
 
     for (uint i = 0; i < cardids.size(); i++)
     {
-        vector<InputInfo> inputs = 
-            RemoteRequestFreeInputList(cardids[i], excluded_cards);
+        vector<InputInfo> inputs;
+
+        bool used_cache = false;
+        if (use_cache)
+        {
+            QMutexLocker locker(&is_tunable_cache_lock);
+            if (is_tunable_cache_inputs.contains(cardids[i]))
+            {
+                inputs = is_tunable_cache_inputs[cardids[i]];
+                used_cache = true;
+            }
+        }
+
+        if (!used_cache)
+        {
+            inputs = RemoteRequestFreeInputList(cardids[i], excluded_cards);
+            QMutexLocker locker(&is_tunable_cache_lock);
+            is_tunable_cache_inputs[cardids[i]] = inputs;
+        }
 
 #if 0
         cout << "inputs[" << cardids[i] << "]: ";
@@ -5609,6 +5626,12 @@ bool TV::IsTunable(uint chanid)
     VERBOSE(VB_PLAYBACK, QString("IsTunable(%1) -> false\n").arg(chanid));
 
     return false;
+}
+
+void TV::ClearTunableCache(void)
+{
+    QMutexLocker locker(&is_tunable_cache_lock);
+    is_tunable_cache_inputs.clear();
 }
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)

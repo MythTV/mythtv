@@ -638,7 +638,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (with_same_channum != same_channum)
             continue;
 
-        if (!ciinfo || !m_player->IsTunable(ciinfo->chanid))
+        if (!ciinfo || !m_player->IsTunable(ciinfo->chanid, true))
             continue;
 
         if (with_same_channum ||
@@ -1335,6 +1335,9 @@ bool GuideGrid::paintChannels(QPainter *p)
 
     PixmapChannel *chinfo = GetChannelInfo(m_currentStartChannel);
 
+    if (m_player)
+        m_player->ClearTunableCache();
+
     bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
     for (unsigned int y = 0; (y < (unsigned int)DISPLAY_CHANS) && chinfo; y++)
@@ -1348,7 +1351,7 @@ bool GuideGrid::paintChannels(QPainter *p)
         chinfo = GetChannelInfo(chanNumber);
 
         bool unavailable = false;
-        if (m_player && !m_player->IsTunable(chinfo->chanid))
+        if (m_player && !m_player->IsTunable(chinfo->chanid, true))
         {
             unavailable = true;
 

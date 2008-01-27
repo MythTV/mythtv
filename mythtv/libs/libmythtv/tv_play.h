@@ -19,6 +19,7 @@
 #include "programinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
+#include "inputinfo.h"
 
 #include <qobject.h>
 
@@ -138,7 +139,8 @@ class MPUBLIC TV : public QObject
     void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
     bool IsEmbedding(void);
-    bool IsTunable(uint chanid);
+    bool IsTunable(uint chanid, bool use_cache = false);
+    void ClearTunableCache(void);
     void ChangeChannel(const DBChanList &options);
 
     void DrawUnusedRects(bool sync);
@@ -642,6 +644,10 @@ class MPUBLIC TV : public QObject
     QRect player_bounds;
     ///< Prior GUI window bounds, for doEditSchedule() and player exit().
     QRect saved_gui_bounds;
+
+    // IsTunable() cache, used by embedded program guide
+    mutable QMutex                 is_tunable_cache_lock;
+    QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
     // Various threads
     /// Event processing thread, runs RunTV().
