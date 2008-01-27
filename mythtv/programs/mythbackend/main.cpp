@@ -400,12 +400,17 @@ bool parse_preview_info(const QString &param,
 
 int main(int argc, char **argv)
 {
+    bool need_gui = false;
 #ifndef _WIN32
     for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
+#else
+    // MINGW application needs a window to receive messages
+    // such as socket notifications :[
+    need_gui = true;
 #endif
 
-    QApplication a(argc, argv, false);
+    QApplication a(argc, argv, need_gui);
 
     QMap<QString, QString> settingsOverride;
     QString binname = basename(a.argv()[0]);

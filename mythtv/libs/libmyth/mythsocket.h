@@ -23,6 +23,8 @@ class MPUBLIC MythSocketCBs
 
 class MPUBLIC MythSocket : public QSocketDevice
 {
+    friend void readyReadThread_iffound(MythSocket*);
+
   public:
     MythSocket(int socket = -1, MythSocketCBs *cb = NULL);
 

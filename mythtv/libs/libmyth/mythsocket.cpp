@@ -722,6 +722,28 @@ void MythSocket::WakeReadyReadThread(void)
 #endif
 }
 
+void readyReadThread_iffound(MythSocket *sock)
+{
+    VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
+    if (sock->bytesAvailable() == 0)
+    {
+        VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
+        sock->close();
+
+        if (sock->m_cb)
+        {
+            VERBOSE(VB_SOCKET, SLOC(sock) + "cb->connectionClosed()");
+            sock->m_cb->connectionClosed(sock);
+        }
+    }
+    else if (sock->m_cb)
+    {
+        sock->m_notifyread = true;
+        VERBOSE(VB_SOCKET, SLOC(sock) + "cb->readyRead()");
+        sock->m_cb->readyRead(sock);
+    }
+}
+
 void *MythSocket::readyReadThread(void *)
 {
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
@@ -755,38 +777,93 @@ void *MythSocket::readyReadThread(void *)
         m_readyread_lock.unlock();
 
 #ifdef USING_MINGW
+
         int n = m_readyread_list.count() + 1;
-        HANDLE* hEvents = new HANDLE[n];
+        HANDLE *hEvents = new HANDLE[n];
         memset(hEvents, 0, sizeof(HANDLE) * n);
+        unsigned *idx = new unsigned[n];
         n = 0;
-        hEvents[n++] = readyreadevent;
-        for (unsigned i = 0; i < m_readyread_list.count(); i++) {
+
+        for (unsigned i = 0; i < m_readyread_list.count(); i++)
+        {
             sock = m_readyread_list.at(i);
-            if (sock->state() == Connected && !sock->m_notifyread && !sock->m_lock.locked()) {
+            if (sock->state() == Connected && !sock->m_notifyread &&
+                !sock->m_lock.locked())
+            {
                 HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
                 if (!hEvent)
+                {
                     VERBOSE(VB_IMPORTANT, "MythSocket: CreateEvent failed");
-                else {
-                    if (SOCKET_ERROR != ::WSAEventSelect(sock->socket(), hEvent, FD_READ | FD_WRITE | FD_CONNECT | FD_ACCEPT | FD_OOB | FD_CLOSE)) {
-                        hEvents[n++] = hEvent;
-                    } else {
-                        VERBOSE(VB_IMPORTANT, QString("MythSocket: CreateEvent, WSAEventSelect (%1, %2, failed)").arg(sock->socket()));
+                }
+                else
+                {
+                    if (SOCKET_ERROR != ::WSAEventSelect(
+                            sock->socket(), hEvent, 
+                            FD_READ | FD_CONNECT | FD_ACCEPT | 
+                            FD_OOB | FD_CLOSE))
+                    {
+                        hEvents[n] = hEvent;
+                        idx[n++] = i;
+                    }
+                    else
+                    {
+                        VERBOSE(VB_IMPORTANT, QString(
+                                    "MythSocket: CreateEvent, "
+                                    "WSAEventSelect(%1, %2) failed")
+                                .arg(sock->socket()));
                         ::CloseHandle(hEvent);
                     }
                 }
             }
         }
+
+        hEvents[n++] = readyreadevent;
         int rval = ::WaitForMultipleObjects(n, hEvents, FALSE, INFINITE);
-        for (int i = 1; i < n; i++)
+
+        for (int i = 0; i < (n - 1); i++)
             ::CloseHandle(hEvents[i]);
+
         delete[] hEvents;
+
         if (rval == WAIT_FAILED)
-            VERBOSE(VB_IMPORTANT, "MythSocket: WaitForMultipleObjects returned error");
-        else if (rval >= WAIT_OBJECT_0 && rval < WAIT_OBJECT_0 + n) {
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "MythSocket: WaitForMultipleObjects returned error");
+            delete[] idx;
+        }
+        else if (rval >= WAIT_OBJECT_0 && rval < (WAIT_OBJECT_0 + n))
+        {
             rval -= WAIT_OBJECT_0;
-            sock = m_readyread_list.at(rval);
-            found = sock->state() == Connected && !sock->m_lock.locked();
-#else
+
+            if (rval < (n - 1))
+            {
+                rval = idx[rval];
+                sock = m_readyread_list.at(rval);
+                found = (sock->state() == Connected) && !sock->m_lock.locked();
+            }
+            else
+            {
+                found = false;
+            }
+
+            delete[] idx;
+
+            if (found)
+                readyReadThread_iffound(sock);
+
+            ::ResetEvent(readyreadevent);
+        }
+        else if (rval >= WAIT_ABANDONED_0 && rval < (WAIT_ABANDONED_0 + n))
+        {
+            VERBOSE(VB_SOCKET, "MythSocket: abandoned");
+        }
+        else
+        {
+//          VERBOSE(VB_SOCKET, SLOC + "select timeout");
+        }
+
+#else /* if !USING_MINGW */
+
         // add check for bad fd?
         FD_ZERO(&rfds);
         maxfd = m_readyread_pipe[0];
@@ -826,45 +903,23 @@ void *MythSocket::readyReadThread(void *)
                 }
                 ++it;
             }
-#endif
 
             if (found)
-            {
-                VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
-                if (sock->bytesAvailable() == 0)
-                {
-                    VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
-                    sock->close();
+                readyReadThread_iffound(sock);
 
-                    if (sock->m_cb)
-                    {
-                        VERBOSE(VB_SOCKET, SLOC(sock) + "cb->connectionClosed()");
-                        sock->m_cb->connectionClosed(sock);
-                    }
-                }
-                else if (sock->m_cb)
-                {
-                    sock->m_notifyread = true;
-                    VERBOSE(VB_SOCKET, SLOC(sock) + "cb->readyRead()");
-                    sock->m_cb->readyRead(sock);
-                }
-            }
-#ifdef USING_MINGW
-            ::ResetEvent(readyreadevent);
-        } else if (rval >= WAIT_ABANDONED_0 && rval < WAIT_ABANDONED_0 + n) {
-            VERBOSE(VB_SOCKET, "MythSocket: abandoned");
-#else
             if (FD_ISSET(m_readyread_pipe[0], &rfds))
             {
                 char buf[128];
                 read(m_readyread_pipe[0], buf, 128);
             }
-#endif
         }
         else
         {
 //          VERBOSE(VB_SOCKET, SLOC + "select timeout");
         }
+
+#endif /* !USING_MINGW */
+
     }
 
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread exit");
