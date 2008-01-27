@@ -4078,7 +4078,7 @@ bool TV::DoNVPSeek(float time)
         res = activenvp->Rewind(-time);
 
     if (muted) 
-        muteTimer->start(kMuteTimeout, true);
+        SetMuteTimer(kMuteTimeout);
 
     return res;
 }
@@ -4332,7 +4332,7 @@ void TV::DoSkipCommercials(int direction)
         activenvp->SkipCommercials(direction);
 
     if (muted) 
-        muteTimer->start(kMuteTimeout, true);
+        SetMuteTimer(kMuteTimeout);
 }
 
 void TV::SwitchSource(uint source_direction)
@@ -4640,7 +4640,7 @@ void TV::ChangeChannel(int direction)
     ClearInputQueues(false);
 
     if (muted)
-        muteTimer->start(kMuteTimeout * 2, true);
+        SetMuteTimer(kMuteTimeout * 2);
 
     UnpauseLiveTV();
 }
@@ -4972,7 +4972,7 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
     activerecorder->SetChannel(channum);
 
     if (muted)
-        muteTimer->start(kMuteTimeout * 2, true);
+        SetMuteTimer(kMuteTimeout * 2);
 
     UnpauseLiveTV();
 }
@@ -5708,7 +5708,7 @@ void TV::doEditSchedule(int editType)
 
                 // Start up EPG
                 changeChannel = GuideGrid::Run(
-                    chanid, channum, true, this, allowsecondary);
+                    chanid, channum, false, this, allowsecondary);
 
                 break;
             }
@@ -5751,7 +5751,7 @@ void TV::doEditSchedule(int editType)
         {
             default:
             case kScheduleProgramGuide:
-                GuideGrid::Run(chanid, channum, true);
+                GuideGrid::Run(chanid, channum, false);
                 break;
             case kScheduleProgramFinder:
                 RunProgramFind(true, false);
@@ -5819,66 +5819,15 @@ void TV::doEditSchedule(int editType)
     menurunning = false;
 }
 
-void *TV::EPGMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kScheduleProgramGuide);
-
-    return NULL;
-}
-
-void *TV::FinderMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kScheduleProgramFinder);
-
-    return NULL;
-}
-
-void *TV::ScheduleMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kScheduledRecording);
-
-    return NULL;
-}
-
-void *TV::RecordedShowMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kPlaybackBox);
-
-    return NULL;
-}
-
 void TV::EditSchedule(int editType)
 {
-    if (menurunning == true)
-        return;
-    menurunning = true;
-    pthread_t tid;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-    switch (editType)
-    {
-        default:
-        case kScheduleProgramGuide:
-                pthread_create(&tid, &attr, TV::EPGMenuHandler, this);
-                break;
-        case kScheduleProgramFinder:
-                pthread_create(&tid, &attr, TV::FinderMenuHandler, this);
-                break;
-        case kScheduledRecording:
-                pthread_create(&tid, &attr, TV::ScheduleMenuHandler, this);
-                break;
-        case kPlaybackBox:
-                pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
-                break;
-    }
-
-    pthread_attr_destroy(&attr);
+    // post the request to the main UI thread
+    // it will be caught in eventFilter and processed as CustomEvent
+    // this will create the program guide window (widget)
+    // on the main thread and avoid a deadlock on Win32
+    QString message = QString("START_EPG %1").arg(editType);
+    MythEvent* me = new MythEvent(message);
+    qApp->postEvent(myWindow, me);
 }
 
 void TV::ChangeVolume(bool up)
@@ -6156,6 +6105,17 @@ void TV::KeyRepeatOK(void)
     keyRepeat = true;
 }
 
+void TV::SetMuteTimer(int timeout)
+{
+    // message to set the timer will be posted to the main UI thread
+    // where it will be caught in eventFilter and processed as CustomEvent
+    // this will properly set the mute timer
+    // otherwise it never fires on Win32
+    QString message = QString("UNMUTE %1").arg(timeout);
+    MythEvent* me = new MythEvent(message);
+    qApp->postEvent(myWindow, me);
+}
+
 /** \fn TV::UnMute(void)
  *  \brief If the player exists and sound is muted, this unmutes the sound.
  */
@@ -6327,6 +6287,20 @@ void TV::customEvent(QCustomEvent *e)
                 networkControlCommands.push_back(QDeepCopy<QString>(message));
                 ncLock.unlock();
             }
+        }
+        else if (message.left(6) == "UNMUTE")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int timeout = tokens[1].toInt();
+            muteTimer->start(timeout, true);
+        }
+        else if (message.left(9) == "START_EPG")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int editType = tokens[1].toInt();
+            doEditSchedule(editType);
         }
 
         pbinfoLock.lock();
@@ -7583,7 +7557,7 @@ void TV::FillMenuPlaying(OSDGenericTree *treeMenu)
 {
     OSDGenericTree *item, *subitem;
 
-    if (activerbuffer->isDVD())
+    if (activerbuffer && activerbuffer->isDVD())
     {
         item = new OSDGenericTree(
             treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");

@@ -238,13 +238,9 @@ class MPUBLIC TV : public QObject
 
   protected:
     void doEditSchedule(int editType = kScheduleProgramGuide);
-    static void *EPGMenuHandler(void *param);
-    static void *FinderMenuHandler(void *param);
-    static void *ScheduleMenuHandler(void *param);
-    static void *RecordedShowMenuHandler(void *param);
-
     void RunTV(void);
     static void *EventThread(void *param);
+    void SetMuteTimer(int timeout);
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
