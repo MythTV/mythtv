@@ -69,8 +69,9 @@ QMutex avcodeclock(true);
 
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-const QString kDefaultPIN = "UPnP/MythFrontend/DefaultBackend/SecurityPin";
-const QString kDefaultUSN = "UPnP/MythFrontend/DefaultBackend/USN";
+const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
+const QString kDefaultPIN = kDefaultBE + "SecurityPin";
+const QString kDefaultUSN = kDefaultBE + "USN";
 
 
 int parse_verbose_arg(QString arg)
@@ -1283,6 +1284,13 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             if (BEsel->m_PIN.length())
                 m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
             m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
+            // Store the current location of this backend as a last resort
+            // for future connections (e.g. Perl scripts, backend not running)
+            m_XML->SetValue(kDefaultBE + "dbHostName", m_DBparams.dbHostName);
+            m_XML->SetValue(kDefaultBE + "dbUserName", m_DBparams.dbUserName);
+            m_XML->SetValue(kDefaultBE + "dbPassword", m_DBparams.dbPassword);
+            m_XML->SetValue(kDefaultBE + "dbName",     m_DBparams.dbName);
+            m_XML->SetValue(kDefaultBE + "dbPort",     m_DBparams.dbPort);
             m_XML->Save();
             break;
     }
@@ -1378,6 +1386,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 { 
     XmlConfiguration *XML = new XmlConfiguration("config.xml");
     QString           loc = "MCP::DefaultUPnP() - ";
+    QString localHostName = XML->GetValue(kDefaultBE + "LocalHostName", "");
     QString           PIN = XML->GetValue(kDefaultPIN, "");
     QString           USN = XML->GetValue(kDefaultUSN, "");
 
@@ -1409,7 +1418,15 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     }
 
     if (UPnPconnect(pDevLoc, PIN))
+    {
+        if (localHostName.length())
+        {
+            m_DBparams.localHostName = localHostName;
+            m_DBparams.localEnabled  = true;
+        }
+
         return true;
+    }
     
     error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;
