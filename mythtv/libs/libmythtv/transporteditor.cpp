@@ -452,14 +452,24 @@ class Frequency : public LineEditSetting, public MuxDBStorage
     };
 };
 
-class DVBSymbolRate : public LineEditSetting, public MuxDBStorage
+class DVBSymbolRate : public ComboBoxSetting, public MuxDBStorage
 {
   public:
     DVBSymbolRate(const MultiplexID *id) :
-        LineEditSetting(this), MuxDBStorage(this, id, "symbolrate")
+        ComboBoxSetting(this, true), MuxDBStorage(this, id, "symbolrate")
     {
         setLabel(QObject::tr("Symbol Rate"));
-        setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
+        setHelpText(
+            QObject::tr(
+                "Symbol Rate (symbols/second).\n"
+                "Most dvb-s transponders transmit at 27.5 "
+                "million symbols per second."));
+        addSelection("3333000");
+        addSelection("22000000");
+        addSelection("27500000", "27500000", true);
+        addSelection("28000000");
+        addSelection("28500000");
+        addSelection("29900000");
     };
 };
 

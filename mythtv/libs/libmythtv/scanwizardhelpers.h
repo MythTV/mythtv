@@ -406,21 +406,34 @@ class ScanOldChannelTreatment: public ComboBoxSetting, public TransientStorage
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:
-    ScanFrequency() : LineEditSetting(this)
+    ScanFrequency(bool in_kHz = false) : LineEditSetting(this)
     {
-        setLabel(QObject::tr("Frequency"));
-        setHelpText(QObject::tr("Frequency (Option has no default)\n"
-                                "The frequency for this channel in Hz."));
+        QString units = (in_kHz) ? "kHz" : "Hz";
+        setLabel(QObject::tr("Frequency (%1)").arg(units));
+        setHelpText(
+            QObject::tr(
+                "Frequency (Option has no default).\n"
+                "The frequency for this channel in %1.").arg(units));
     };
 };
 
-class ScanSymbolRate: public LineEditSetting, public TransientStorage
+class ScanSymbolRate: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanSymbolRate() : LineEditSetting(this)
+    ScanSymbolRate() : ComboBoxSetting(this, true)
     {
         setLabel(QObject::tr("Symbol Rate"));
-        setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
+        setHelpText(
+             QObject::tr(
+                "Symbol Rate (symbols/second).\n"
+                "Most dvb-s transponders transmit at 27.5 "
+                "million symbols per second."));
+        addSelection("3333000");
+        addSelection("22000000");
+        addSelection("27500000", "27500000", true);
+        addSelection("28000000");
+        addSelection("28500000");
+        addSelection("29900000");
     };
 };
 
@@ -690,7 +703,7 @@ class QPSKPane : public HorizontalConfigurationGroup
             new VerticalConfigurationGroup(false,true);
         VerticalConfigurationGroup *right =
             new VerticalConfigurationGroup(false,true);
-        left->addChild(pfrequency  = new ScanFrequency());
+        left->addChild(pfrequency  = new ScanFrequency(true));
         left->addChild(ppolarity   = new ScanPolarity());
         left->addChild(psymbolrate = new ScanSymbolRate());
         right->addChild(pfec       = new ScanFec());
