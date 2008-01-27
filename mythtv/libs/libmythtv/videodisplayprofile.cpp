@@ -1052,6 +1052,11 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
     QString msg = "";
 
+    QString kDoubleRateMsg =
+        QObject::tr(
+            "This deinterlacer requires the display to be capable "
+            "of twice the frame rate as the source video.");
+
     QString kNoneMsg =
         QObject::tr("Perform no deinterlacing.") + " " +
         QObject::tr(
@@ -1066,9 +1071,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
     QString kBobMsg = QObject::tr(
         "Shows one field of the frame followed by the "
-        "other field displaced vertically. "
-        "This deinterlacer requires the display to be capable "
-        "of twice the frame rate as the source video.");
+        "other field displaced vertically.") + " " +
+        kDoubleRateMsg;
 
     QString kLinearBlendMsg = QObject::tr(
         "Blends the odd and even fields linearly into one frame.");
@@ -1081,6 +1085,14 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     QString kUsingOpenGLWorkaround =
         QObject::tr("With workaround for broken interlaced modelines.") + " " +
         kUsingOpenGL;
+
+    QString kGreedyHMsg = QObject::tr(
+        "This deinterlacer uses several fields to reduce motion blur. "
+        "It has increased CPU requirements.");
+
+    QString kYadifMsg = QObject::tr(
+        "This deinterlacer uses several fields to reduce motion blur. "
+        "It has increased CPU requirements.");
 
     if (deint == "none")
         msg = kNoneMsg;
@@ -1108,6 +1120,14 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kKernelMsg + " " + kUsingOpenGLWorkaround;
     else if (deint == "opengldoubleratefieldorder")
         msg = kNoneMsg  + " " + kUsingOpenGLWorkaround;
+    else if (deint == "greedyhdeint")
+        msg = kGreedyHMsg;
+    else if (deint == "greedyhdoubleprocessdeint")
+        msg = kGreedyHMsg + " " +  kDoubleRateMsg;
+    else if (deint == "yadifdeint")
+        msg = kYadifMsg;
+    else if (deint == "yadifdoubleprocessdeint")
+        msg = kYadifMsg + " " +  kDoubleRateMsg;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 
