@@ -2537,11 +2537,11 @@ def runDVDAuthor():
 #############################################################
 # Creates an ISO image from the contents of a directory
 
-def CreateDVDISO():
+def CreateDVDISO(title):
     write("Creating ISO image")
     checkCancelFlag()
     result = os.spawnlp(os.P_WAIT, path_mkisofs[0], path_mkisofs[1], '-dvd-video', \
-        '-V','MythTV BurnDVD','-o',os.path.join(getTempPath(),'mythburn.iso'), \
+        '-V',title,'-o',os.path.join(getTempPath(),'mythburn.iso'), \
         os.path.join(getTempPath(),'dvd'))
 
     if result<>0:
@@ -2552,7 +2552,7 @@ def CreateDVDISO():
 #############################################################
 # Burns the contents of a directory to create a DVD 
 
-def BurnDVDISO():
+def BurnDVDISO(title):
     write( "Burning ISO image to %s" % dvddrivepath)
     checkCancelFlag()
 
@@ -2569,13 +2569,13 @@ def BurnDVDISO():
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
                 command += " -use-the-force-luke -Z " + dvddrivepath 
-                command += " -dvd-video -V 'MythTV DVD' "
+                command += " -dvd-video -V " + title + " "
                 command += os.path.join(getTempPath(),'dvd')
             else:
                 command = path_growisofs[0] + " -dvd-compat "
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
-                command += " -Z " + dvddrivepath + " -dvd-video -V 'MythTV DVD' " 
+                command += " -Z " + dvddrivepath + " -dvd-video -V " + title + " "
                 command += os.path.join(getTempPath(),'dvd')
 
             write(command)
@@ -5149,13 +5149,22 @@ def processJob(job):
             #Now all the files are completed and ready to be burnt
             runDVDAuthor()
 
+            #Get DVD title from first processed file
+            #Get the XML containing information about this item
+            infoDOM = xml.dom.minidom.parse( os.path.join(getItemTempPath(1),"info.xml") )
+            #Error out if its the wrong XML
+            if infoDOM.documentElement.tagName != "fileinfo":
+                fatalError("The info.xml file (%s) doesn't look right" % os.path.join(folder,"info.xml"))
+            title = expandItemText(infoDOM,"%title",1,0,0,0,0)
+            title = title[:32]
+
             #Create the DVD ISO image
             if docreateiso == True or mediatype == FILE:
-                CreateDVDISO()
+                CreateDVDISO(title)
 
             #Burn the DVD ISO image
             if doburn == True and mediatype != FILE:
-                BurnDVDISO()
+                BurnDVDISO(title)
 
             #Move the created iso image to the given location
             if mediatype == FILE and savefilename != "":
