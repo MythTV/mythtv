@@ -111,7 +111,12 @@ void MythUIType::SetRedraw(void)
         return;
 
     m_NeedsRedraw = true;
-    m_DirtyRegion = QRegion(m_Area);
+
+    if (m_DirtyRegion.isEmpty())
+        m_DirtyRegion = QRegion(m_Area);
+    else
+        m_DirtyRegion = m_DirtyRegion.unite(QRegion(m_Area));
+
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);
 }
@@ -154,6 +159,7 @@ void MythUIType::HandleMovementPulse(void)
         return;
 
     QPoint curXY = m_Area.topLeft();
+    m_DirtyRegion = m_Area;
 
     int xdir = m_XYDestination.x() - curXY.x();
     int ydir = m_XYDestination.y() - curXY.y();
@@ -270,6 +276,8 @@ void MythUIType::SetPosition(const QPoint &pos)
     if (m_Area.topLeft() == pos)
         return;
 
+    m_DirtyRegion = m_Area;
+
     m_Area.moveTopLeft(pos);
     SetRedraw();
 }
@@ -278,6 +286,8 @@ void MythUIType::SetArea(const QRect &rect)
 {
     if (rect == m_Area)
         return;
+
+    m_DirtyRegion = m_Area;
 
     m_Area = rect;
     SetRedraw();
