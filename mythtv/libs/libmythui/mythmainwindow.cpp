@@ -454,6 +454,12 @@ void MythMainWindow::drawTimeout(void)
 
     if (!d->painter->SupportsClipping())
         d->repaintRegion = d->repaintRegion.unite(d->uiScreenRect);
+    else
+    {
+        // Ensure that the region is not larger than the screen which
+        // can happen with bad themes
+        d->repaintRegion = d->repaintRegion.intersect(d->uiScreenRect);
+    }
 
     d->painter->Begin(this);
 
