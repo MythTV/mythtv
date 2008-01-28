@@ -318,9 +318,11 @@ uint ImportIconsWizard::initialLoad(QString name)
                             m_listEntries.size(), true, this, SLOT(cancelPressed()));
     while (!m_closeDialog && (m_iter != m_listEntries.end()))
     {
-        progressDialog->setLabel(QString("Downloading %1 / %2 : ").arg(m_nCount+1)
-                                    .arg(m_listEntries.size()) + (*m_iter).strName +
-                                    QString("\nCould not find %1 icons.").arg(m_missingEntries.size()));
+        QString message = QString("Downloading %1 / %2 : ").arg(m_nCount+1)
+            .arg(m_listEntries.size()) + (*m_iter).strName;
+        if (m_missingEntries.size() > 0)
+            message.append(QString("\nCould not find %1 icons.").arg(m_missingEntries.size()));
+        progressDialog->setLabel(message);
         if (!findmissing((*m_iter).strIconCSV))
         {
             m_missingEntries.append((*m_iter));
