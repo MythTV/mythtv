@@ -1,0 +1,92 @@
+/*
+Copyright (C) 2007 Christian Kothe, Mark Spieth
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef FREESURROUND_H
+#define FREESURROUND_H
+
+class FreeSurround
+{
+public:
+    typedef enum 
+    {
+        SurroundModePassive,
+        SurroundModeActiveSimple,
+        SurroundModeActiveLinear
+    } SurroundMode;
+public:
+    FreeSurround(uint srate, bool moviemode, SurroundMode mode);
+    ~FreeSurround();
+
+    // put samples in buffer, returns number of samples used
+    uint putSamples(short* samples, uint numSamples, uint numChannels, int step);
+    uint putSamples(char* samples, uint numSamples, uint numChannels, int step);
+    // get a number of samples
+    uint receiveSamples(short *output, 
+                        uint maxSamples
+                        );
+    // flush unprocessed samples
+    void flush();
+    //void setSampleRate(uint srate);
+    uint numUnprocessedSamples();
+    uint numSamples();
+
+    long long getLatency();
+    uint sampleLatency();
+
+    uint samplesPerBlock();
+
+protected:
+    void process_block();
+    void open();
+    void close();
+    void SetParams();
+
+private:
+
+	// the changeable parameters
+    struct fsurround_params {
+        int32_t center_width;	    // presence of the center channel
+        int32_t dimension;		    // dimension
+        float coeff_a,coeff_b;  // surround mixing coefficients
+        int32_t phasemode;			// phase shifting mode
+        int32_t steering;			// steering mode (0=simple, 1=linear)
+        int32_t front_sep, rear_sep;// front/rear stereo separation
+
+        // (default) constructor
+        fsurround_params(int32_t center_width=100, int32_t dimension=0);
+    } params;
+
+	// additional settings
+	uint srate;
+
+	// info about the current setup
+	bool open_;					// whether a stream is currently open
+	bool initialized_;			// whether the thing is intialized	
+	//struct buffers *bufs;				// our buffers
+	struct int16buffers *int16bufs;		// our buffers
+	class fsurround_decoder *decoder;	// the surround decoder
+    int in_count;               // amount in lt,rt
+    int out_count;              // amount in output bufs
+    bool processed;             // whether processing is enabled or not for latency calc
+    int processed_size;         // amount processed
+    SurroundMode surround_mode; // 1 of 3 surround modes supported
+
+};
+
+#endif
+
