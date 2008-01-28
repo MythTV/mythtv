@@ -1398,12 +1398,14 @@ bool GuideGrid::paintChannels(QPainter *p)
         QString tmpChannelFormat = channelFormat;
         if (chinfo->favorite > 0)
         {
-            tmpChannelFormat.insert(tmpChannelFormat.find('<'), "* ");
-            tmpChannelFormat.insert(tmpChannelFormat.find('>') + 1, " *");
+            tmpChannelFormat.insert(tmpChannelFormat.find('<'), "<MARK:fav>");
         }
 
         if (unavailable)
-            tmpChannelFormat.insert(tmpChannelFormat.find('<'), "X ");
+        {
+            tmpChannelFormat.insert(tmpChannelFormat.find('<'),
+                                    "<MARK:unavail>");
+        }
 
         if (type)
         {

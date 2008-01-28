@@ -501,6 +501,26 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
                            iconData[i]);
         }
 
+        QColor clr = m_font->color;
+        int h,s,v;
+
+        int fav = msg.find("<MARK:fav>");
+        if (fav >= 0)
+        {
+            msg = msg.left(fav) + msg.mid(fav + 10);
+            clr.getHsv(&h, &s, &v);
+            clr.setHsv(60, 200, v);
+        }
+
+        int unavail = msg.find("<MARK:unavail>");
+        if (unavail >= 0)
+        {
+            msg = msg.left(unavail) + msg.mid(unavail + 14);
+            clr.getHsv(&h, &s, &v);
+            clr = (v >= 128) ? clr.dark() : clr.light();
+        }
+
+
         dr->setFont(m_font->face);
         if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
         {
@@ -524,8 +544,8 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
                            m_justification, msg);
         }
 
-        dr->setBrush(m_font->color);
-        dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+        dr->setBrush(clr);
+        dr->setPen(QPen(clr, (int)(2 * m_wmult)));
         if (m_orientation == 1)
         {
             drawx = m_displaysize.left() + (int)(i * xdrop);
