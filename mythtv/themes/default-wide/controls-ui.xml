@@ -51,6 +51,7 @@
 
         <buttonlist name="leftlist">
             <area>64,126,560,410</area>
+            <layout>vertical</layout>
             <activefont>active</activefont>
             <inactivefont>inactive</inactivefont>
             <showarrow>no</showarrow>

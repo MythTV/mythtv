@@ -51,6 +51,15 @@
 
         <buttonlist name="leftlist">
             <area>20,50,370,410</area>
+            <layout>vertical</layout>
+            <activefont>active</activefont>
+            <inactivefont>inactive</inactivefont>
+            <showarrow>no</showarrow>
+            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
+            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
+            <spacing>5</spacing>
+            <margin>6</margin>
         </buttonlist>
 
         <textarea name="rightdesc" from="leftdesc">
@@ -93,5 +102,5 @@
             <align>center</align>
         </textarea>
 
-</window>
+    </window>
 </mythuitheme>
