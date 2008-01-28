@@ -3959,6 +3959,9 @@ void TV::SwapPIP(void)
 
 void TV::DoPlay(void)
 {
+    if (!activenvp)
+        return; // TODO remove me as part of next mythtv-vid merge 1/08
+
     float time = 0.0;
 
     if (doing_ff_rew)
@@ -4005,6 +4008,9 @@ QString TV::PlayMesg()
 
 void TV::DoPause(bool showOSD)
 {
+    if (!activenvp)
+        return; // TODO remove me as part of next mythtv-vid merge 1/08
+
     if (activerbuffer && 
         activerbuffer->InDVDMenuOrStillFrame())
     {
