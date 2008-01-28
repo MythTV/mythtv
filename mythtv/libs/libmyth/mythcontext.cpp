@@ -1286,11 +1286,11 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
             // Store the current location of this backend as a last resort
             // for future connections (e.g. Perl scripts, backend not running)
-            m_XML->SetValue(kDefaultBE + "dbHostName", m_DBparams.dbHostName);
-            m_XML->SetValue(kDefaultBE + "dbUserName", m_DBparams.dbUserName);
-            m_XML->SetValue(kDefaultBE + "dbPassword", m_DBparams.dbPassword);
-            m_XML->SetValue(kDefaultBE + "dbName",     m_DBparams.dbName);
-            m_XML->SetValue(kDefaultBE + "dbPort",     m_DBparams.dbPort);
+            m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
+            m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
+            m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
+            m_XML->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
+            m_XML->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
             m_XML->Save();
             break;
     }

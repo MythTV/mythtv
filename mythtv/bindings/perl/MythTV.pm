@@ -133,13 +133,18 @@ package MythTV;
 # Read the mysql.txt file in use by MythTV.  It could be in a couple places,
 # so try the usual suspects in the same order that mythtv does in
 # libs/libmyth/mythcontext.cpp
-    our %mysql_conf = ('hostname' => hostname);
+    our %mysql_conf = ('hostname' => hostname,
+                       'db_host'  => 'localhost',
+                       'db_user'  => 'mythtv',
+                       'db_pass'  => 'mythtv',
+                       'db_name'  => 'mythconverg');
     my $found = 0;
     my @mysql = ('/usr/local/share/mythtv/mysql.txt',
                  '/usr/share/mythtv/mysql.txt',
                  '/usr/local/etc/mythtv/mysql.txt',
                  '/etc/mythtv/mysql.txt',
                  $homedir            ? "$homedir/.mythtv/mysql.txt"    : '',
+                 $homedir            ? "$homedir/.mythtv/config.xml"   : '',
                  'mysql.txt',
                  $ENV{'MYTHCONFDIR'} ? "$ENV{'MYTHCONFDIR'}/mysql.txt" : '',
                 );
@@ -154,6 +159,10 @@ package MythTV;
             chomp($line);
         # Split off the var=val pairs
             my ($var, $val) = split(/\=/, $line, 2);
+        # Also look for <var>val</var> from config.xml
+            if ($line =~ m/<(\w+)>(\w+)<\/(\w+)>$/ && $1 eq $3) {
+                $var = $1; $val = $2;
+            }
             next unless ($var && $var =~ /\w/);
             if ($var eq 'DBHostName') {
                 $mysql_conf{'db_host'} = $val;
@@ -210,12 +219,6 @@ package MythTV;
             if (defined $params->{'connect'}) {
                 $self->{'connect'} = $params->{'connect'};
             }
-        }
-
-    # No db config?
-        if (!$self->{'db_host'}) {
-            die "Unable to locate mysql.txt:  $!\n" unless ($mysql_conf{'db_host'});
-            die "No database host was configured.\n";
         }
 
     # Connect to the database
