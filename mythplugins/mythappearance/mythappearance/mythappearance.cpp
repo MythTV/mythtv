@@ -334,8 +334,7 @@ void MythAppearance::updateSettings()
     gContext->SaveSetting("GuiWidth", m_xsize);
     gContext->SaveSetting("GuiHeight", m_ysize);
     VERBOSE(VB_IMPORTANT, "Updated screen size settings");
-    //GetMythMainWindow()->JumpTo("Reload Theme");
-    GetMythMainWindow()->GetMainStack()->PopScreen();
+    GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
 void MythAppearance::slotResetSettings()
@@ -345,7 +344,7 @@ void MythAppearance::slotResetSettings()
      gContext->SaveSetting("GuiWidth", 0);
      gContext->SaveSetting("GuiHeight", 0);
      m_changed = false;
-     GetMythMainWindow()->GetMainStack()->PopScreen();
+     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
 void MythAppearance::anythingChanged()
