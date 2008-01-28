@@ -22,9 +22,9 @@ class MythAppearance : public MythScreenType
     MythAppearance(MythScreenStack *parent, const char *name);
     ~MythAppearance();
 
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual void customEvent(QCustomEvent *event);
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QCustomEvent *event);
 
   protected: 
     void doMenu();
@@ -65,7 +65,7 @@ class MythAppearance : public MythScreenType
     MythUIText *m_changeamount;
     MythUIButton *OKButton;
     MythUIButton *updateButton;
-    MythDialogBox *menuPopup;
+    MythDialogBox *m_menuPopup;
 
     void moveUp();
     void moveDown();

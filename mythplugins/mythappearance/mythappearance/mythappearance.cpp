@@ -38,7 +38,7 @@ MythAppearance::MythAppearance(MythScreenStack *parent, const char *name)
     m_topleftarrow_x = 0;
     m_topleftarrow_y = 0;
 
-    menuPopup = NULL;
+    m_menuPopup = NULL;
     m_changed = false;
 
     getSettings();
@@ -278,29 +278,29 @@ void MythAppearance::updateScreen()
 
 void MythAppearance::doMenu()
 {
-    if (menuPopup)
+    if (m_menuPopup)
         return;
 
     QString label = "MythAppearance Menu";
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    menuPopup = new MythDialogBox(label, mainStack, "menuPopup");
+    m_menuPopup = new MythDialogBox(label, mainStack, "menuPopup");
 
-    if (menuPopup->Create())
-        mainStack->AddScreen(menuPopup);
+    if (m_menuPopup->Create())
+        mainStack->AddScreen(m_menuPopup);
 
     if (m_changed)
     {
-        menuPopup->SetReturnEvent(this, "save");
-        menuPopup->AddButton("Save and Quit");
+        m_menuPopup->SetReturnEvent(this, "save");
+        m_menuPopup->AddButton("Save and Quit");
     }
     else
-        menuPopup->SetReturnEvent(this, "nosave");
+        m_menuPopup->SetReturnEvent(this, "nosave");
 
-    menuPopup->AddButton("Reset Screen Size Settings and Quit");
-    menuPopup->AddButton("Coarse/Fine adjustment");
-    menuPopup->AddButton("Close Menu");
+    m_menuPopup->AddButton("Reset Screen Size Settings and Quit");
+    m_menuPopup->AddButton("Coarse/Fine adjustment");
+    m_menuPopup->AddButton("Close Menu");
 
     updateScreen();
 }
@@ -309,7 +309,6 @@ void MythAppearance::slotSaveSettings()
 {
         VERBOSE(VB_IMPORTANT, "Updating screen size settings");
         updateSettings();
-        updateScreen();
 }
 
 void MythAppearance::slotChangeCoarseFine()
@@ -335,7 +334,6 @@ void MythAppearance::updateSettings()
     gContext->SaveSetting("GuiWidth", m_xsize);
     gContext->SaveSetting("GuiHeight", m_ysize);
     VERBOSE(VB_IMPORTANT, "Updated screen size settings");
-    //updateScreen();
     //GetMythMainWindow()->JumpTo("Reload Theme");
     GetMythMainWindow()->GetMainStack()->PopScreen();
 }
@@ -347,9 +345,6 @@ void MythAppearance::slotResetSettings()
      gContext->SaveSetting("GuiWidth", 0);
      gContext->SaveSetting("GuiHeight", 0);
      m_changed = false;
-     //getSettings();
-     //getScreenInfo();
-     //updateScreen();
      GetMythMainWindow()->GetMainStack()->PopScreen();
 }
 
@@ -394,7 +389,7 @@ void MythAppearance::customEvent(QCustomEvent *event)
                 slotChangeCoarseFine();
         }
 
-        menuPopup = NULL;
+        m_menuPopup = NULL;
     }
 
 }
