@@ -746,6 +746,8 @@ void MythControls::customEvent(QCustomEvent *event)
                 m_currentView = kContextsByKey;
                 contents = m_bindings->GetKeys();
             }
+            else
+                return;
 
             m_leftDescription->SetText(leftcaption);
             m_rightDescription->SetText(rightcaption);
