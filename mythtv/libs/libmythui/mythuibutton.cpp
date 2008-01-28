@@ -108,9 +108,20 @@ bool MythUIButton::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "margin")
         m_PaddingMargin = NormX(getFirstText(element).toInt());
+    else if (element.tagName() == "multiline")
+    {
+        if (parseBool(element))
+            m_textFlags |= Qt::WordBreak;
+        else
+            m_textFlags &= ~Qt::WordBreak;
+
+        m_Text->SetJustification(m_textFlags);
+    }
     else if (element.tagName() == "textflags")
     {
         QString align = getFirstText(element).lower();
+
+        m_textFlags = m_textFlags & Qt::WordBreak;
 
         if (align == "center")
             m_textFlags |= Qt::AlignCenter;
