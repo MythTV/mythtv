@@ -271,4 +271,11 @@ inline const char *dlerror(void)
     typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
 #endif
 
+// Libdvdnav now uses off64_t lseek64(), which Darwin doesn't have.
+// Luckily, its lseek() is already 64bit compatible
+#ifdef CONFIG_DARWIN
+    typedef off_t off64_t;
+    #define lseek64(f,o,w) lseek(f,o,w)
+#endif
+
 #endif // __COMPAT_H__
