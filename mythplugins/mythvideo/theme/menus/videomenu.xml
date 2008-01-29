@@ -45,6 +45,7 @@
      <text lang="DE">Galerie</text>
      <text lang="SI">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
+     <text lang="FR">Gallerie des vidéos</text>
      <text lang="DK">Film Galleri</text>
      <text lang="SV">Filmgalleri</text>
      <text lang="PT">Galeria de Filmes</text>
@@ -63,7 +64,7 @@
      <text lang="DE">Video-Manager</text>
      <text lang="PT">Gestor de Filmes</text>
      <text lang="SV">Filmhanterare</text>
-     <text lang="FR">Gestionnaire de vidéos</text>
+     <text lang="FR">Gestion des vidéos</text>
      <text lang="NL">Video's Beheren</text>
      <text lang="JA">ビデオマネージャー</text>
      <text lang="SI">Upravitelj filmov</text>
@@ -117,7 +118,7 @@
       <text lang="SV">Kopiera DVD</text>
       <text lang="ES">"Ripear" DVD</text>
       <text lang="CA">Volcar DVD</text>
-      <text lang="FR">Ripper un DVD</text>
+      <text lang="FR">Encoder un DVD</text>
       <text lang="NL">DVD Rip</text>
       <text lang="JA">DVDリッピング</text>
       <text lang="FI">Kopioi DVD</text>
@@ -131,6 +132,7 @@
       <text>Eject media</text>
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
+      <text lang="FR">Ejecter un média</text>
       <action>EJECT</action>
    </button>
 

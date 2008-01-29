@@ -5,6 +5,7 @@
     <text>View Queue</text>
     <text lang="FI">Näytä Listaus</text>
     <text lang="PT">Ver Fila de Espera</text>
+    <text lang="FR">Afficher la queue</text>
     <text lang="ES">Ver Cola</text>
     <text lang="ET">Järjekorra vaatamine</text>
     <text lang="RU">Просмотреть очередь</text>
@@ -18,6 +19,7 @@
     <text lang="PT">Navegar na Biblioteca de Filmes</text>
     <text lang="ES">Buscar Películas</text>
     <text lang="ET">Filmide brausimine</text>
+    <text lang="FR">Afficher les vidéos</text>
     <text lang="RU">Список фильмов</text>
     <action>NETFLIX_BROWSE</action>
   </button>
@@ -29,6 +31,7 @@
     <text lang="PT">Historial de Aluguer</text>
     <text lang="ES">Historial NetFlix</text>
     <text lang="ET">Rendiajalugu</text>
+    <text lang="FR">Historique de location</text>
     <text lang="RU">История платежей</text>
     <action>NETFLIX_HISTORY</action>
   </button>

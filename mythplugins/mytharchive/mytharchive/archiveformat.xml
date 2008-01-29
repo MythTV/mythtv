@@ -5,6 +5,7 @@
       <text>Create DVD</text>
       <text lang="es">Crear DVD</text>
       <text lang="et">DVD valmistamine</text>
+      <text lang="FR">Créer un DVD</text>
       <text lang="nl">Maak DVD</text>
       <text lang="nb">Lag DVD</text>
       <text lang="de">DVD erstellen</text>
@@ -18,6 +19,7 @@
       <text>Create Native Archive</text>
       <text lang="es">Crear Archivo Nativo</text>
       <text lang="et">Arhiivi valmistamine</text>
+      <text lang="FR">Créer une archive native</text>
       <text lang="nl">Maak Backup</text>
       <text lang="de">Natives Archiv erstellen</text>
       <text lang="nb">Lag naturlig arkiv</text>
@@ -31,6 +33,7 @@
        <text>Encode Video File</text>
        <text lang="es">Codificar Fichero Video</text>
        <text lang="et">Videofaili kodeerimine</text>
+       <text lang="FR">Encoder un fichier video</text>
        <text lang="de">Videodatei kodieren</text>
        <text lang="nl">Encodeer Video Bestanden</text>
        <text lang="nb">Konverter videofil</text>
