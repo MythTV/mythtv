@@ -1026,6 +1026,7 @@ iptv_deps="backend"
 ivtv_deps="backend v4l"
 hdhomerun_deps="backend"
 opengl_deps="GL_gl_h"
+opengl_deps_any="windows x11"
 opengl_video_deps="opengl xv"
 opengl_vsync_deps="opengl"
 v4l_deps="backend"
@@ -1592,6 +1593,7 @@ case $targetos in
   mingw32*)
     targetos=mingw32
     enable backend
+    enable windows
     shlibdir="$bindir"
     VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
     VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
@@ -1621,6 +1623,7 @@ case $targetos in
     ;;
   cygwin*)
     targetos=cygwin
+    enable windows
     shlibdir="$bindir"
     VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
     VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
