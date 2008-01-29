@@ -46,13 +46,13 @@ static bool FileDelete(const QFileInfo &file);
 bool GalleryUtil::isImage(const char* filePath)
 {
     QFileInfo fi(filePath);
-    return !fi.isDir() && IMAGE_FILENAMES.find(fi.extension()) != -1;
+    return !fi.isDir() && IMAGE_FILENAMES.find(fi.extension(FALSE)) != -1;
 }
 
 bool GalleryUtil::isMovie(const char* filePath)
 {
     QFileInfo fi(filePath);
-    return !fi.isDir() && MOVIE_FILENAMES.find(fi.extension()) != -1;
+    return !fi.isDir() && MOVIE_FILENAMES.find(fi.extension(FALSE)) != -1;
 }
 
 long GalleryUtil::GetNaturalRotation(const char* filePath)
