@@ -11,43 +11,43 @@
     </message>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi podatke o strani</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Vnesi podatke o strani</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikona:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Vredu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi stran z novicami</translation>
     </message>
     <message>
         <source>Add News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj stran z novicami</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani stran z novicami</translation>
     </message>
 </context>
 <context>
@@ -64,7 +64,7 @@ Minimalna dovoljena vrednost je 30 minut.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Pritisni MENU za vrnitev v selekcijo polnjenja.</translation>
+        <translation>Pritisni MENU za vrnitev v izbor virov.</translation>
     </message>
 </context>
 <context>
@@ -94,20 +94,22 @@ Minimalna dovoljena vrednost je 30 minut.</translation>
     <name>QObject</name>
     <message>
         <source>MythNews</source>
-        <translation type="unfinished"></translation>
+        <translation>MythNovice</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this news site
 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ali ste prepričani, da želite odstraniti to stran z novicami?
+
+%1</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Minutes</source>
-        <translation>Minute</translation>
+        <translation>Minut</translation>
     </message>
 </context>
 </TS>

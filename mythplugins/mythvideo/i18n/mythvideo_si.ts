@@ -3,7 +3,7 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation>Ni več povezave z transkodirnim Myth daemon-om. To ni vredu.</translation>
+        <translation>Povezava s transkodirnim Myth daemon-om je prekinjena. To ni vredu.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
@@ -11,11 +11,11 @@
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation>Poizkus povezave z mtd said gostiteljem ni uspel. To je nepopravljivo slabo.</translation>
+        <translation>Poizkus povezave z mtd je vrnil rezultat: ne najdem gostitelja. To je nepopravljivo slabo. </translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation>Napaka režne komunikacije. To je nepopravljivo slabo.</translation>
+        <translation>Napaka pri komunikaciji. To je nepopravljivo slabo. </translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Ni opravil in ni kaj drugega za delat. Lahko pritisnete 0 za začetek ripanja DVD-ja.</translation>
+        <translation>Ni opravil in ni kaj drugega za naredit. Lahko pritisnete 0 za začetek ripanja DVD-ja.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Ni opravil in ni kaj drugega za delat. Lahko pritisnete 0 za začetek zajemanja DVD-ja če želite.</translation>
+        <translation>Ni opravil in ni kaj drugega za naredit. Če želite, lahko za začetek ripanja pritisnete 0.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>0 nov Rip</translation>
+        <translation>0 Nov Rip</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>Done</source>
-        <translation>Končano</translation>
+        <translation>Končaj</translation>
     </message>
     <message>
         <source>New</source>
@@ -104,7 +104,7 @@
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation>Začenjam originalni nivo</translation>
+        <translation>Začenjam na osnovnem nivoju</translation>
     </message>
     <message>
         <source>4 - Highest</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>&apos;Nivo&apos; v kateren se MythVideo zažene. Vsi filmi, z tem ali nižjim nivojem,  bodo kot privzeto prikazani v seznamu ali med brskanjem. PIN naj bo nastavljen za limitiranje sprememb privzetega nivoja.</translation>
+        <translation>&apos;Nivo&apos; v katerem se MythVideo zažene. Vsi filmi na tem ali nižjim nivojem, bodo kot privzeto prikazani v seznamu ali med brskanjem. PIN naj bo nastavljen za omejevanje sprememb na osnovnem nivoju.</translation>
     </message>
     <message>
         <source>Default View</source>
@@ -132,47 +132,47 @@
     </message>
     <message>
         <source>Listings</source>
-        <translation>Seznami</translation>
+        <translation>Seznam</translation>
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation>Originalna PIN kontrola</translation>
+        <translation>PIN</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation>Ta PIN je uporabljen za kontrolo trenutnega nivoja. Če želite uporabljati to funkcijo, potem bo nastavitev vrednosti na vsa števila, vaše življenje poenostavila.</translation>
+        <translation>Ta PIN je uporabljen za kontrolo osnovnega nivoja. Če želite uporabljati to funkcijo, potem za PIN uporabite številke.</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation>Agresivna kontrola izvornika</translation>
+        <translation>Agresivna kontrola</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation>Če nastavljeno, vrnitev v ta zaslon ne bo mogoča, prav tako ne bo mogoča ponovna nastavitev PIN-a, dokler ne boste vtipkali trenutnega PIN-a. Bili ste opozorjeni.</translation>
+        <translation>Če nastavite, vrnitev v ta zaslon ne bo mogoča, prav tako ne bo mogoča ponovna nastavitev PIN-a, dokler ne boste vtipkali trenutnega PIN-a. Bili ste opozorjeni.</translation>
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Pokaži neznane tipe datotek</translation>
+        <translation>Prikaži neznane tipe datotek</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Če nastavljeno, bodo vse datoteke v, video mapi, prikazane, razen če je nastavljeno, da jih ne prikažem.</translation>
+        <translation>Če nastavite, bodo prikazane vse datoteke v video mapi, razen če imate nastavljen filter za določene končnice datotek. </translation>
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>Video seznam bere datoteke</translation>
+        <translation>Prikaz filmov z Video seznamom</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Če nastavljeno, bo video seznama prikazal vse datoteke, ki so v video mapi, ne glede na to ali so bile skenirane ali ne.</translation>
+        <translation>Video seznam bo prikazal vse datoteke, ki so v video mapi, ne glede na to ali so bile vnešene v bazo ali ne.</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation>Datoteke, ki so na novo skenirane, so kot privzeto, brskalne</translation>
+        <translation>Na novo prebrane datoteke, so prizveto vidne</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation>Če nastavljeno, bodo na novo skenirane datoteke označene kot brskalne in se bodo pojavile in menuju &apos;Brskaj&apos;.</translation>
+        <translation>Na novo prebrane datoteke bodo označene kot vidne in se bodo pojavile in menuju &apos;Brskaj&apos;.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -212,15 +212,15 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>Ta ukaz je uporabljen za datoteke, katerih končnice niso točno definirane. Lahko vnesete tudi ime katerega od predvajalnih dodatkov, kot je &apos;notranji&apos;.</translation>
+        <translation>Ta ukaz je uporabljen za datoteke, katerih končnice niso točno definirane. Lahko vnesete tudi ime katerega od predvajalnikov, kot je &apos;internal&apos;.</translation>
     </message>
     <message>
         <source>Rows to display</source>
-        <translation>Število vrstic za prikaz</translation>
+        <translation>Število prikazanih vrstic</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation>Rubrike za prikaz</translation>
+        <translation>Število prikazanih rubrik</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
@@ -228,7 +228,7 @@
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation>Če nastavljeno, bo dodaten tekst zmanjšal sličice.</translation>
+        <translation>Če nastavljeno, bo dodaten tekst zmanjšal velikost sličice.</translation>
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
@@ -236,7 +236,7 @@
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation>Če nastavljeno, bodo sličice obdržale originalno velikost. Če ne, pa se bo njihova velikost prilagodila ikonam ozadja.</translation>
+        <translation>Sličice bodo obdržale originalno velikost. Drugače pa se bo njihova velikost prilagodila ikonam ozadja.</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -252,15 +252,15 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Originalni PIN:</translation>
+        <translation>PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished">Ni ovitka</translation>
+        <translation>Ni ovitka</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Nepozano</translation>
+        <translation>Neznano</translation>
     </message>
     <message>
         <source>None</source>
@@ -272,7 +272,7 @@
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation>Nisem mogel sprejeti ovitka</translation>
+        <translation>Nisem uspel sprejeti ovitka</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
@@ -282,95 +282,95 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prizveti pogled MythVidea. Ostale poglede lahko spremenite preko menuja z tipko M.</translation>
     </message>
     <message>
         <source>Video Browser browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaz filmov z Video brskalnikom</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video brskalnik bo prikazal vse datoteke, ki so v video mapi, ne glede na to ali so bile vnešene v bazo ali ne.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaz filmov z Video galerijo</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video galerija bo prikazala vse datoteke, ki so v video mapi, ne glede na to ali so bile vnešene v bazo ali ne.</translation>
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Video seznam prikaže Meta podatke</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Če je ta možnost nastavljena skupaj z &apos;Prikaz filmov z Video seznamom&apos;, bodo skupaj z datoteko prikazani tudi Meta podatki o filmu. Ta možnost zelo upočasni prikaz seznama filmov</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
-        <translation type="unfinished"></translation>
+        <translation>Pri sortiranju ne upoštevaj primera</translation>
     </message>
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pri sortiranju izpisov se ne upoštevajo primeri.</translation>
     </message>
     <message>
         <source>Show folders for database views</source>
-        <translation type="unfinished"></translation>
+        <translation>Pri pregledu baze prikaži mape</translation>
     </message>
     <message>
         <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation type="unfinished"></translation>
+        <translation>V vseh pogledih bodo prikazane tudi podmape mape v kateri so filmi.</translation>
     </message>
     <message>
         <source>Image cache size</source>
-        <translation type="unfinished"></translation>
+        <translation>Prebrana količina slik</translation>
     </message>
     <message>
         <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta nastavitev določuje število slik, ki jih bo MythVideo prebral vnaprej.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation> </translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsi</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Da</translation>
+        <translation>Da</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Ne</translation>
+        <translation>Ne</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Naslov</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Leto</translation>
+        <translation>Leto</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished">Uporabnikova ocena</translation>
+        <translation>Uporabniška ocena</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished">Čas tečenja</translation>
+        <translation>Čas predvajanja</translation>
     </message>
     <message>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime datoteke</translation>
     </message>
     <message>
         <source>Video ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID videa</translation>
     </message>
     <message>
         <source>
@@ -378,11 +378,11 @@
 You have no VCD Player command defined.</source>
         <translation>
 
-Nimate definiranega ukaza VCD predvajalnika.</translation>
+Nimate definiranega ukaza za VCD predvajalnik.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>Vredu, bom pognal Setup</translation>
+        <translation>Vredu, sedaj bom pognal nastavitev</translation>
     </message>
     <message>
         <source>
@@ -390,7 +390,7 @@ Nimate definiranega ukaza VCD predvajalnika.</translation>
 You have no VCD Device defined.</source>
         <translation>
 
-Nimate definirane DVC naprave.</translation>
+Nimate definirane VCD naprave.</translation>
     </message>
     <message>
         <source>
@@ -414,7 +414,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation>Naprava mora obstajati ter uporabnik mora imeti nastavljene bralne pravice.</translation>
+        <translation>Naprava mora obstajati, uporabnik pa mora imeti nastavljene bralne pravice.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
@@ -442,7 +442,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation>Media nadzor funkcija naj bi bila vključena za uporabo te možnosti (Nastavitve -&gt; Splošno -&gt; CD/DVD Nadzor)</translation>
+        <translation>Za uporabo te možnosti, bi naj bila vključena funkcija za nadzor medijev (Nastavitve -&gt; Splošno -&gt; CD/DVD)</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -450,7 +450,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>Ukaz DVD predvajalnika</translation>
+        <translation>Ukaz za DVD predvajalnik</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
@@ -458,7 +458,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>Ukaz VCD predvajalnika</translation>
+        <translation>Ukaz za VCD predvajalnik</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
@@ -482,7 +482,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation>Ukaz za predvajanje naslova</translation>
+        <translation>Ukaz za predvajanje naslovov</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
@@ -494,11 +494,11 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Če boste izbrali za ripanje katerekoli podnapise, bo dodan ta ukaz na konec Ukaza za predvajanje naslova, da si boste lahko predogledali podnapise. Če je prisoten %s bo dodeljen k zapisu podnapisov.</translation>
+        <translation>Če boste pri ripanju izbrali katerekoli podnapise, bo ta ukaz dodan na konec &apos;Ukaz za predvajanje naslovov&apos;. S tem si boste lahko predogledali podnapise. Če je prisoten %s bo dodeljen k zapisu podnapisov.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation>Osnovni transkodirni ukaz</translation>
+        <translation>Ukaz za osnovno transkodiranje</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
@@ -506,11 +506,11 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation>MTD število porta</translation>
+        <translation>MTD število vrat</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation>Število porta, ki se uporablja za komunikacijo z MTD-jem (Myth Transkodirni Daemon)</translation>
+        <translation>Število vrat, ki se uporabljajo za komunikacijo z MTD-jem (Myth Transkodirni Daemon)</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
@@ -518,7 +518,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation>Če nastavljeno, bo MTD prikazoval dnevnik v terminalskem oknu iz katerega je bil zagnan. Drugače bo pisal v datoteko imenovano  mtd.log.</translation>
+        <translation>MTD bo prikazoval dnevnik v terminalnem oknu iz katerega je bil zagnan. Drugače bo pisal v datoteko imenovano  mtd.log.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
@@ -526,7 +526,7 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation>Če nastavljeno, bo MTD, kot privzeto, ohranil AC3 (Dolby Digital) zvok v transkodiranih datotekah.</translation>
+        <translation>MTD bo v transkodirnih datotekah, kot privzeto ohranil AC3 (Dolby Digital) zvok. </translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
@@ -534,15 +534,15 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Če nastavljeno, bo mythdvd, kjer je možno, raje uporabil (brezplačni) xvid kodek, kot divx.</translation>
+        <translation>Mythdvd bo kjer je možno, raje uporabil (brezplačni) xvid kodek, kot divx.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation>Nice nivo za MTD</translation>
+        <translation>Prijazni nivo za MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation>Določuje prioriteto MTD. Višja števila pomenijo nižjo prioriteto (ostalim opravilom na voljo več CPU-ja).</translation>
+        <translation>Določuje prioriteto MTD-ja. Višja števila pomenijo nižjo prioriteto (ostalim opravilom preostane na voljo več CPU-ja).</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
@@ -610,96 +610,97 @@ Nimate definirane DVD naprave.</translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO kopija %1</translation>
     </message>
     <message>
         <source>Waiting for access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Čakam na dostop do DVD-ja</translation>
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Privzeti video predvajalnik</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani DVD zaznamke starejše od (dnevi)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani DVD zaznamke, ki so starejši od določenega števila dni</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Omogoči podporo DVD zaznamkov</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>Javi za DVD zaznamke</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Ponudi možnost za predvajanje DVD-ja od začetka ali od zaznamka</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>To je lahko katerikoli ukaz za zagon DVD predvajalnika (npr. MPlayer, ogle, itd.). Če je prisoten, bo %d prikrojen DVD napravi (npr. /dev/dvd).</translation>
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Splošne nastavitve (%1/%2)</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished">NR</translation>
+        <translation>Ni ocene</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nisem najdel datotek</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Neznana predpona</translation>
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>filmi</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Iskanje video datotek</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne za vse</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Da za vse</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Datoteka manjka</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>Zgleda, da %1 manjka.
+Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Nadgrajevanje baze filmov</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Preverjanje video datotek</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Na voljo ni ocenjevanja.</translation>
+        <translation>Na voljo ni ocene.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minute</translation>
+        <translation>minut</translation>
     </message>
 </context>
 <context>
@@ -714,7 +715,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Rated:</source>
-        <translation>Ocenjeno:</translation>
+        <translation>Ocena:</translation>
     </message>
     <message>
         <source>Parental Level:</source>
@@ -726,23 +727,23 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Runtime:</source>
-        <translation>Čas tečenja:</translation>
+        <translation>Čas predv.:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation>Grafični prikaz:</translation>
+        <translation>Graf:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation>Ime datoteke:</translation>
+        <translation>Datoteka:</translation>
     </message>
     <message>
         <source>Cover File:</source>
-        <translation>Datoteka ovitka:</translation>
+        <translation>Ovitek:</translation>
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation>IMDB število:</translation>
+        <translation>IMDB:</translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
@@ -758,7 +759,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>[ looking for ]</source>
-        <translation>[ iščem ]</translation>
+        <translation>[ iskanje ]</translation>
     </message>
     <message>
         <source>Enter IMDB #</source>
@@ -770,7 +771,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>No Videos Found</source>
-        <translation>Ni najdenih videov</translation>
+        <translation>Najden ni nobeden film</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -794,11 +795,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Runtime</source>
-        <translation>Čas tečenja</translation>
+        <translation>Čas predvajanja</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation>Uporabnikova ocena</translation>
+        <translation>Uporabniška ocena</translation>
     </message>
     <message>
         <source>File:</source>
@@ -810,7 +811,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>PL </source>
-        <translation>PL</translation>
+        <translation>PL </translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -826,11 +827,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation>Uporabi privzeti predvajalnik:</translation>
+        <translation>Privzeti predvajalnik:</translation>
     </message>
     <message>
         <source>Ignore:</source>
-        <translation>Ignoriraj:</translation>
+        <translation>Prezri:</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
@@ -850,7 +851,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Datoteka za naslednje predvajanje:</translation>
+        <translation>Datoteka, ki se bo vedno predvajala naslednja:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
@@ -862,7 +863,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation>Unikatni ukaz predvaajlnika:</translation>
+        <translation>Ukaz predvajalnika:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
@@ -890,11 +891,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation>Čas tečenja :</translation>
+        <translation>Čas predv. :</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation>Uporabnikova ocena :</translation>
+        <translation>Uporabniška ocena :</translation>
     </message>
     <message>
         <source>Browse :</source>
@@ -902,7 +903,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation>Sortiraj po :</translation>
+        <translation>Razvrsti po :</translation>
     </message>
     <message>
         <source>Aucune video</source>
@@ -910,15 +911,15 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - menu</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Gor/Dol, PgUp/Pg/Dn: Iskanje   MENU: Možnosti   INFO: Menu</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Za tem predvajaj datoteko:</translation>
     </message>
     <message>
         <source>Rip/Transcode</source>
@@ -934,7 +935,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Select:</source>
-        <translation>Izberi:</translation>
+        <translation>Izbor:</translation>
     </message>
     <message>
         <source>Quality:</source>
@@ -997,22 +998,22 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO slika</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Nepozano</translation>
+        <translation>Neznan</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
     <message>
         <source>Watch This Video</source>
-        <translation>Glej ta video</translation>
+        <translation>Predvajaj ta video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Prikaži celotni prikaz</translation>
+        <translation>Prikaži celotni graf</translation>
     </message>
     <message>
         <source>Filter Display</source>
@@ -1028,7 +1029,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>No Videos</source>
-        <translation>Ni videov</translation>
+        <translation>Ni filmov</translation>
     </message>
     <message>
         <source>No rating available.</source>
@@ -1043,23 +1044,23 @@ Remove it from the database?</source>
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished">Preklopi v brskalni pogled</translation>
+        <translation>Preklopi v pogled brskalnika</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished">Preklopi v pogled galerije</translation>
+        <translation>Preklopi v pogled galerije</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Preklopi v pogled seznama</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">Izberite dejanje</translation>
+        <translation>Izberite dejanje</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Vredu</translation>
+        <translation>Vredu</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
@@ -1070,11 +1071,11 @@ Remove it from the database?</source>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Rezultati filtra : %1 film(ov)</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Rezultati filtra : Ni filmov</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -1082,38 +1083,38 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minute</translation>
+        <translation>minut</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrani kot privzeto</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Končano</translation>
+        <translation>Končaj</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">Zaslonski filtri</translation>
+        <translation>Zaslonski filtri</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished">Glej ta video</translation>
+        <translation>Predvajaj ta video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">Prikaži celotni prikaz</translation>
+        <translation>Prikaži celotni graf</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži podrobnosti</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Prekliči</translation>
+        <translation>Prekliči</translation>
     </message>
 </context>
 <context>
@@ -1214,11 +1215,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation>Glej ta video</translation>
+        <translation>Predvajaj ta video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Prikaži celotni prikaz</translation>
+        <translation>Prikaži celotni graf</translation>
     </message>
     <message>
         <source>Filter Display</source>
@@ -1226,7 +1227,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation>Preklopi v brskalni pogled</translation>
+        <translation>Preklopi v pogled brskalnika</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>

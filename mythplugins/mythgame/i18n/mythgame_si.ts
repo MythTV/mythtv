@@ -11,48 +11,50 @@
     </message>
     <message>
         <source>-   By Name</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Po imenu</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Po letu</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Po zvrsti</translation>
     </message>
     <message>
         <source>Players Available. 
 
  Please pick one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Igralci ki so na voljo.
+
+Prosim izberite soigralca.</translation>
     </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
     <message>
         <source>Game Player Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Igralski menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Uredi..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ali ste prepričani, da želite odstraniti to igro?</translation>
     </message>
     <message>
         <source>Yes, delete It</source>
-        <translation type="unfinished"></translation>
+        <translation>Da, odstrani jo</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne odstrani je</translation>
     </message>
 </context>
 <context>
@@ -85,7 +87,7 @@
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Vrstni red po katerem naj uredim igre - za vse sisteme. Možnosti: sistem, leto, zvrst in ime igre</translation>
+        <translation>Vrstni red sortiranja iger - za vse sisteme. Možna sortiranja: system, year, genre in gamename</translation>
     </message>
     <message>
         <source>Show Only Favorites</source>
@@ -379,7 +381,7 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Nepozano</translation>
+        <translation>Neznano</translation>
     </message>
     <message>
         <source>Loading game...</source>
@@ -887,198 +889,201 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
     </message>
     <message>
         <source>Favourite display order</source>
-        <translation>Priljubljen vrstni red</translation>
+        <translation>Priljubljen vrstni red prikaza</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Vrstni red sortiranja iger, označen kot priljubljene - za vse sisteme. Možno: sistem, leto, zvrst in ime igre</translation>
+        <translation type="unfinished">Vrstni red sortiranja priljubljenih iger - za vse sisteme. Možna sortiranja: system, year, genre in gamename</translation>
     </message>
     <message>
         <source>Indepth Game Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Razširjeno iskanje iger</translation>
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation type="unfinished"></translation>
+        <translation>To iskanje bo poiskalo crc zapis in poizkusilo poizkati podrobnejše informacije o igri. OPOMBA: lahko se poveča čas iskanja.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vprašaj pred odstranjevanjem rom-ov </translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation type="unfinished"></translation>
+        <translation>Med iskanjem iger, vpraša pred odstranjevanjem izbrisamih rom-ov iz baze</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaz imena datotek</translation>
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Namesto imen iger, bodo v drevesnem pogledu prikazana imena datotek (rom-ov)</translation>
     </message>
     <message>
         <source>Allow games to span multiple roms/disks</source>
-        <translation type="unfinished"></translation>
+        <translation>Dovoli igre na večih romih/ploščkih</translation>
     </message>
     <message>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pomeni, da bodo najdene igre, kot so igra.1.rom, igra.2.rom, tretirane kot ena igra.</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukaz</translation>
     </message>
     <message>
         <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation type="unfinished"></translation>
+        <translation>Pot+ime binarnih ter ostalih parametrov. %s se lahko uporabi za ime katerikoli rom, ki se bo zagnal. Če ime rom datoteke ni navedeno, se bo le to dodalo na koncu ukaza. Prav tako se lahko uporabi %d1, %d2, %d3 in %d4 za diske v primeru, ko je igra na večih romih</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip</translation>
     </message>
     <message>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tip Igra/Emulator. Prredvsem v informacijske namene. Ima zelo mali vpliv na funkcionalnost sistema.</translation>
     </message>
     <message>
         <source>Rom Path</source>
-        <translation type="unfinished"></translation>
+        <translation>ROM mapa</translation>
     </message>
     <message>
         <source>Location of the ROM files for this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokacija ROM datotek za ta emulator</translation>
     </message>
     <message>
         <source>Working Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Delovna mapa</translation>
     </message>
     <message>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprememba delovne mape prez zagonom emulatorja. Če pustite prazno, je ponavadi vredu</translation>
     </message>
     <message>
         <source>File Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Končnice datotek</translation>
     </message>
     <message>
         <source>ScreenShots</source>
-        <translation type="unfinished"></translation>
+        <translation>Zajem slik</translation>
     </message>
     <message>
         <source>Path to any screenshots for this player</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesto zajemov slik za tega igralca</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Igralske nastavitve</translation>
     </message>
     <message>
         <source>(New Game Player)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Novi igralec)</translation>
     </message>
     <message>
         <source>OTHER</source>
-        <translation type="unfinished"></translation>
+        <translation>OSTALI</translation>
     </message>
     <message>
         <source>MAME</source>
-        <translation type="unfinished"></translation>
+        <translation>MAME</translation>
     </message>
     <message>
         <source>NES</source>
-        <translation type="unfinished"></translation>
+        <translation>NES</translation>
     </message>
     <message>
         <source>SNES</source>
-        <translation type="unfinished"></translation>
+        <translation>SNES</translation>
     </message>
     <message>
         <source>N64</source>
-        <translation type="unfinished"></translation>
+        <translation>N64</translation>
     </message>
     <message>
         <source>PCE/TG16</source>
-        <translation type="unfinished"></translation>
+        <translation>PCE/TG16</translation>
     </message>
     <message>
         <source>GENESIS/MEGADRIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>GENESIS/MEGADRIVE</translation>
     </message>
     <message>
         <source>PC GAME</source>
-        <translation type="unfinished"></translation>
+        <translation>PC IGRA</translation>
     </message>
     <message>
         <source>AMIGA</source>
-        <translation type="unfinished"></translation>
+        <translation>AMIGA</translation>
     </message>
     <message>
         <source>ATARI</source>
-        <translation type="unfinished"></translation>
+        <translation>ATARI</translation>
     </message>
     <message>
         <source>Player Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime igralca</translation>
     </message>
     <message>
         <source>Name of this Game and or Emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Ime igre in/ali emulatorja</translation>
     </message>
     <message>
         <source>19xx</source>
-        <translation type="unfinished"></translation>
+        <translation>19xx</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne za vse</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Da</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Da za vse</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Datoteka manjka</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 manjka.
+Jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ste prepričani?</translation>
     </message>
     <message>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vsi podatki o igri bodo odstranjeni
+iz baze. Ali ste prepričani v
+svoje dejanje?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
-        <translation type="unfinished"></translation>
+        <translation>SEGA/MASTER SISTEM</translation>
     </message>
     <message>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Z vejico ločen seznam vseh končnic datotek za ta emulator. Če pustite prazno, pomeni da bodo vse datoteke v ROM MAPI uporabljene pri tem emulatorju</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>GAMEGEAR</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1098,7 @@ want to do this?</source>
     </message>
     <message>
         <source>Genre:</source>
-        <translation>Vrsta:</translation>
+        <translation>Zvrst:</translation>
     </message>
     <message>
         <source>Favorite:</source>

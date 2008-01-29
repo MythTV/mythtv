@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation>Zasuk CW</translation>
+        <translation>Desno</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation>Zasuk CCW</translation>
+        <translation>Levo</translation>
     </message>
     <message>
         <source>Import</source>
@@ -102,95 +102,95 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Odstrani</translation>
+        <translation>Izbriši</translation>
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGalerija mapa &apos;%1&apos; ne obstaja ali pa ni berljiva.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MathGalerija ni uspela naložiti téme. Za podrobnosti poglejte v konzolo.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbrana naprava ni več na voljo</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zasuk...</translation>
     </message>
     <message>
         <source>Marking...</source>
-        <translation type="unfinished"></translation>
+        <translation>Oznake...</translation>
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Slika...</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazaj</translation>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani označene</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Izberi vse</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Naprave</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiraj</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Premakni</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustvari mapo</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Izbriši trenutno mapo ali datoteko</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brisanje ene mape z vsemi podmapami in datotekami.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brisanje ene slike.</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Brisanje označenih datotek</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brisanje %1 slik in map, vključno z vsemi podmapami in datotekami.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nova mapa</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustvari novo mapo</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Premikanje označenih slik...</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiranje označenih slik...</translation>
     </message>
 </context>
 <context>
@@ -217,7 +217,7 @@
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation>Označi za omogočitev OpenGL baziranih prezentacijskih prehodov</translation>
+        <translation>Omogoči OpenGL prehode v prezentacijah</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
@@ -225,7 +225,7 @@
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Tip OpenGL prehoda uporabljenega med slikami in prezentacijo.</translation>
+        <translation>Tip OpenGL prehoda uporabljenega med slikami med prezentacijo.</translation>
     </message>
     <message>
         <source>Type of transition</source>
@@ -233,7 +233,7 @@
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Tip prehoda uporabljenega med slikami in prezentacijo.</translation>
+        <translation>Tip prehoda uporabljenega med slikami med prezentacijo.</translation>
     </message>
     <message>
         <source>Type of background</source>
@@ -241,7 +241,7 @@
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation>Tip ozadja za vsako sliko v načinu enojni pogled.</translation>
+        <translation>Tip ozadja za vsako sliko v enojnem pogledu.</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
@@ -265,11 +265,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation>Ukaz za prikaz filmov</translation>
+        <translation>Ukaz za prikaz video datotek</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Ta ukaz se bo izvedel ob izboru filma</translation>
+        <translation>Ta ukaz se bo izvedel kadarkoli bo izbrana video datoteka</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
@@ -277,7 +277,7 @@
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation>Ikone bodo shranjene v mapo &apos;.thumbcache&apos; znotraj zgornje mape. Drugače bodo ikone shranjene v vaši domači mapi.</translation>
+        <translation>Če je označeno, bodo ikone shranjene v &apos;.thumbcache&apos; mapah, znotraj zgornje mape. Drugače pa v vaši domači mapi.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
@@ -297,23 +297,23 @@
     </message>
     <message>
         <source>Sort order when browsing</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrstni red med brskanjem</translation>
     </message>
     <message>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrstni red prikaza slik.</translation>
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Trajanje OpenGL prehodov (milisekunde)</translation>
     </message>
     <message>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGalerija nastavitve (prezentacija)</translation>
     </message>
     <message>
         <source>MythGallery Settings (General)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGalerija nastavitve (splošno)</translation>
     </message>
 </context>
 <context>

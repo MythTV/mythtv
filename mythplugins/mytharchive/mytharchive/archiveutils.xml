@@ -3,18 +3,21 @@
    <button>
       <type>ARCHIVE_LAST_LOG</type>
       <text>Show Log Viewer</text>
+      <text lang="SI">Pregled dnevnika</text>
       <action>ARCHIVE_LAST_LOG</action>
    </button>
 
    <button>
        <type>ARCHIVE_TEST_DVD</type>
        <text>Play Created DVD</text>
+       <text lang="SI">Predvajaj ustvarjen DVD</text>
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
    <button>
        <type>ARCHIVE_BURN_DVD</type>
        <text>Burn DVD</text>
+       <text lang="SI">Zapeči DVD</text>
        <action>ARCHIVE_BURN_DVD</action>
    </button>
 
