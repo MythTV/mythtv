@@ -214,6 +214,7 @@ class MythContextPrivate
     void    DeleteUPnP(void);
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(const int milliSeconds = 2000);
+    void    StoreConnectionInfo(void);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
@@ -663,6 +664,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 
 DBfound:
     //VERBOSE(VB_GENERAL, "FindDatabase() - Success!");
+    StoreConnectionInfo();
     ResetDatabase();
     DeleteUPnP();
     return true;
@@ -1284,13 +1286,6 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             if (BEsel->m_PIN.length())
                 m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
             m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
-            // Store the current location of this backend as a last resort
-            // for future connections (e.g. Perl scripts, backend not running)
-            m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
-            m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
-            m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
-            m_XML->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
-            m_XML->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
             m_XML->Save();
             break;
     }
@@ -1300,6 +1295,24 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     return 1; 
 } 
+
+/**
+ * Try to store the current location of this backend in config.xml
+ *
+ * This is intended as a last resort for future connections
+ * (e.g. Perl scripts, backend not running).
+ *
+ * Note that the Save() may fail (e.g. non writable ~/.mythtv)
+ */
+void MythContextPrivate::StoreConnectionInfo(void)
+{
+    m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
+    m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
+    m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
+    m_XML->SetValue(kDefaultBE + "DBName",     m_DBparams.dbName);
+    m_XML->SetValue(kDefaultBE + "DBPort",     m_DBparams.dbPort);
+    m_XML->Save();
+}
 
 /**
  * If there is only a single UPnP backend, use it.
