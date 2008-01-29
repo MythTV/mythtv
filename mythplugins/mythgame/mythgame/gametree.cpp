@@ -58,28 +58,35 @@ QString GameTreeItem::getFillSql(QString layer) const
                     ? childLevel + ",system,year,genre,gamename"
                     : childLevel;
     }
+
     //  this whole section ought to be in rominfo.cpp really, but I've put it
     //  in here for now to minimise the number of files changed by this mod
     if (m_romInfo) {
     
         if (!m_romInfo->System().isEmpty())
         {
-            filter += conj + "trim(system)='" + m_romInfo->System() + "'";
+            filter += conj + "trim(system)=:SYSTEM";
             conj = " and ";
         }
         if (m_romInfo->Year() != "")
         {
-            filter += conj + "year='" + m_romInfo->Year() + "'";
+            filter += conj + "year=:YEAR";
             conj = " and ";
         }
         if (!m_romInfo->Genre().isEmpty())
         {
-            filter += conj + "trim(genre)='" + m_romInfo->Genre() + "'";
+            filter += conj + "trim(genre)=:GENRE";
             conj = " and ";
         }
+        if (!m_romInfo->Publisher().isEmpty())
+        {
+            filter += conj + "publisher=:PUBLISHER";
+            conj = " and ";
+        }
+
         if (!m_romInfo->Gamename().isEmpty())
         {
-            filter += conj + "trim(gamename)='" + m_romInfo->Gamename() + "'";
+            filter += conj + "trim(gamename)=:GAMENAME";
         }
 
     }
@@ -233,6 +240,12 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
+
+    root = new GameTreeRoot("publisher gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By Publisher"), m_gameTreeItems.size(), false);
+
 
     m_gameTreeUI->assignTreeData(m_gameTree);
     m_gameTreeUI->enter();
@@ -537,7 +550,24 @@ void GameTree::fillNode(GenericTree *node)
     QString layername = node->getString();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(curItem->getFillSql(layername));
+
+    query.prepare(curItem->getFillSql(layername));
+
+    if (curItem->m_romInfo)
+    {
+        if (!curItem->m_romInfo->System().isEmpty())
+            query.bindValue(":SYSTEM",  curItem->m_romInfo->System());
+        else if (curItem->m_romInfo->Year() != "")
+            query.bindValue(":YEAR", curItem->m_romInfo->Year());
+        else if (!curItem->m_romInfo->Genre().isEmpty())
+            query.bindValue(":GENRE", curItem->m_romInfo->Genre());
+        else if (!curItem->m_romInfo->Publisher().isEmpty())
+            query.bindValue(":PUBLISHER", curItem->m_romInfo->Publisher());
+        else if (!curItem->m_romInfo->Gamename().isEmpty())
+            query.bindValue(":GAMENAME", curItem->m_romInfo->Gamename());
+    }
+
+    query.exec();
 
     if (query.isActive() && query.size() > 0)
     {

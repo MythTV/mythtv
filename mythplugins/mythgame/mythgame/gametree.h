@@ -87,6 +87,8 @@ class GameTreeItem : public QObject
     GameTreeItem* createChild(QSqlQuery *query) const;
     void showGameInfo(RomInfo *rom);
 
+    RomInfo* m_romInfo;
+
   protected slots:
     void closeGameInfo(void);
     void edit(void);
@@ -95,7 +97,6 @@ class GameTreeItem : public QObject
     QButton *OKButton;
     MythPopupBox *info_popup;
     GameTreeRoot* m_root;
-    RomInfo* m_romInfo;
     unsigned m_depth;
     bool m_isFilled;
     int m_gameShowFileName;
