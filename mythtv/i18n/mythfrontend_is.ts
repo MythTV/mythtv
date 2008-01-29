@@ -102,15 +102,15 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ertu viss um að þú viljir eyða ÖLLUM upptökuspjöldum á %1?</translation>
     </message>
     <message>
         <source>Error getting list of cards for this host</source>
-        <translation type="unfinished"></translation>
+        <translation>Villa við að ná í lista spjalda frá þessum þjóni</translation>
     </message>
     <message>
         <source>Unable to delete capturecards for %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -140,7 +140,7 @@
     <name>CardInputEditor</name>
     <message>
         <source>Input connections</source>
-        <translation type="unfinished">Tengingar inntaks</translation>
+        <translation>Tengingar inntaks</translation>
     </message>
 </context>
 <context>
@@ -205,187 +205,187 @@
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
-        <translation type="unfinished"></translation>
+        <translation>Vistað dæmi</translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation type="unfinished">Breyta reglu</translation>
+        <translation>Breyta reglu</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation type="unfinished">&lt;Ný regla&gt;</translation>
+        <translation>&lt;Ný regla&gt;</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished">Heiti reglu</translation>
+        <translation>Heiti reglu</translation>
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished">Finna nákvæma samsvörun titils</translation>
+        <translation>Finna nákvæma samsvörun titils</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished">Finna nákvæmlega eftir þætti</translation>
+        <translation>Finna nákvæmlega eftir þætti</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished">Finna orð í titli</translation>
+        <translation>Finna orð í titli</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished">Finna í öllum lýsingareitum</translation>
+        <translation>Finna í öllum lýsingareitum</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished">Afmarka eftir flokki</translation>
+        <translation>Afmarka eftir flokki</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation type="unfinished">Öll samsvarandi fyrir tegund (Data Direct)</translation>
+        <translation>Öll samsvarandi eftir tegund (Data Direct)</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Afmarka eftir MPAA eða VCHIP einkunn (Data Direct)</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished">Eingöngu nýjir þættir</translation>
+        <translation>Eingöngu nýjir þættir</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleppa óþekktum þáttum</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished">Tegund flokks</translation>
+        <translation>Tegund flokks</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished">eða</translation>
+        <translation>eða</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished">Afmarka myndir eftir útgáfuári</translation>
+        <translation>Afmarka myndir eftir útgáfuári</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished">Lágmarks stjörnugjöf (Eingöngu 0.0 til 1.0 fyrir myndir)</translation>
+        <translation>Lágmarks stjörnugjöf (Eingöngu 0.0 til 1.0 fyrir myndir)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Manneskja í nafnalista (Data Direct)</translation>
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation type="unfinished">Aðeins á tiltekinni stöð</translation>
+        <translation>Aðeins á tiltekinni stöð</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished">Undanskilja eina stöð</translation>
+        <translation>Undanskilja eina stöð</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished">Finna samsvörun kallmerkja</translation>
+        <translation>Finna samsvarandi kallmerki</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation type="unfinished">Aðeins á stöðvum merktar sem uppáhald</translation>
+        <translation>Aðeins á uppáhaldsstöðvum</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished">Aðeins stöðvar frá tilgreindum vídeo uppruna</translation>
+        <translation>Aðeins stöðvar frá tilgreindum vídeo uppruna</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished">Aðeins stöðvar merktar án auglýsinga</translation>
+        <translation>Aðeins stöðvar merktar án auglýsinga</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished">Aðeins dagskrárliðir merktir sem HDTV</translation>
+        <translation>Aðeins dagskrárliðir merktir sem HDTV</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished">Hvenær sem er á tilgreindum vikudegi</translation>
+        <translation>Hvenær sem er á tilgreindum vikudegi</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished">Aðeins virka daga (Mánudag til föstudags)</translation>
+        <translation>Aðeins virka daga (Mánudag til föstudags)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished">Aðeins um helgar</translation>
+        <translation>Aðeins um helgar</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished">Aðeins á aðaltíma (primetime)</translation>
+        <translation>Aðeins á besta sýningatíma (primetime)</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished">Ekki á aðaltíma (primetime)</translation>
+        <translation>Ekki á á besta sýningatíma (primetime)</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished">Mörg íþróttalið (heilstætt dæmi)</translation>
+        <translation>Mörg íþróttalið (fullgert dæmi)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished">Sci-fi B myndir (heilstætt dæmi)</translation>
+        <translation>Sci-fi B myndir (fullgert dæmi)</translation>
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished">Íþróttamiðstöð yfir nótt (fullgert dæmi - -nota Finna Daglega)</translation>
+        <translation>Íþróttamiðstöð að nóttu (fullgert dæmi - -nota Finna Daglega)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished">Mynd vikunar (fullgert dæmi - nota Finna Daglega)</translation>
+        <translation>Mynd vikunar (fullgert dæmi - nota Finna Daglega)</translation>
     </message>
     <message>
         <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="unfinished">Fyrstu þættir (fullgert dæmi fyrir Data Direct)</translation>
+        <translation>Fyrstu þættir (fullgert dæmi fyrir Data Direct)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished">Bæta við þessari setningu</translation>
+        <translation>Bæta við þessari leit</translation>
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation type="unfinished">Frekari töflur</translation>
+        <translation>Frekari töflur</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished">Prufa</translation>
+        <translation>Prófa</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation>Taka upp</translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Geyma</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Hætta við</translation>
+        <translation>Hætta við</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished">Villa fannst þegar að var gáð</translation>
+        <translation>Villa fannst við athugun</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished">Gagnagrunns villan var</translation>
+        <translation>Gagnagrunnsvillan var</translation>
     </message>
     <message>
         <source>Match this episode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>First showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyrsta sýning á hverjum þætti</translation>
     </message>
     <message>
         <source>Last showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Síðasta sýning á hverjum þætti</translation>
     </message>
 </context>
 <context>
@@ -570,19 +570,19 @@
     </message>
     <message>
         <source>Analog Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Flaumstillingar (analog)</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar fyrir inntök og gervihnetti.</translation>
     </message>
     <message>
         <source>Could not open card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gat ekki opnað spjald #%1</translation>
     </message>
     <message>
         <source>Could not get card info for card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gatt ekki sótt upplýsingar um spjald #%1</translation>
     </message>
     <message>
         <source>Analog child card settings.
@@ -606,7 +606,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Rotor Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Framvinda þyrills</translation>
     </message>
 </context>
 <context>
@@ -644,11 +644,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>DVBUtilsImportPane</name>
     <message>
         <source>File location</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning skrár</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning channels.conf skráarinnar.</translation>
     </message>
 </context>
 <context>
@@ -663,34 +663,34 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Fetching lineups from %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sæki upplýsingar frá %1...</translation>
     </message>
 </context>
 <context>
     <name>DeviceTree</name>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartesian breiddargráðan þar sem þú ert staðsett(ur).</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Notaðu neikvæð númer fyrir hnit suðurs og vesturs.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartesian lengdargráðan þar sem þú ert staðsett(ur).</translation>
     </message>
     <message>
         <source>Device Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tegund tækis</translation>
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Þyrill</translation>
     </message>
     <message>
         <source>LNB</source>
@@ -698,27 +698,27 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Lýsing</translation>
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lýsandi nafn fyrir þetta tæki, gerir auðveldara að stilla síðar (valfrjálst).</translation>
     </message>
     <message>
         <source>Switch Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tegund deilis</translation>
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu tegund deilis úr listanum.</translation>
     </message>
     <message>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Litbrigði</translation>
     </message>
     <message>
         <source>DiSEqC</source>
-        <translation type="unfinished">DiSEqC</translation>
+        <translation>DiSEqC</translation>
     </message>
     <message>
         <source>DiSEqC (Uncommitted)</source>
@@ -738,23 +738,23 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Number of ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjöldi tengla</translation>
     </message>
     <message>
         <source>The number of ports this switch has.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjöldi tengja sem deilirinn hefur.</translation>
     </message>
     <message>
         <source>Switch Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar deilis</translation>
     </message>
     <message>
         <source>Rotor Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tegund þyrills</translation>
     </message>
     <message>
         <source>Select the type of rotor from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu tegund þyrills úr listanum.</translation>
     </message>
     <message>
         <source>DiSEqC 1.2</source>
@@ -766,73 +766,77 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lágur hraði þyrills (gráður/sek)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Til að leyfa áætlað eftirlit á hreyfingu þyrills, sláðu inn horn hraða þyrills þegar hann er keyrður á 13V.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hár hraði þyrills (gráður/sek)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Til að leyfa áætlað eftirlit á hreyfingu þyrills, sláðu inn horn hraða þyrills þegar hann er keyrður á 18V.</translation>
     </message>
     <message>
         <source>E</source>
         <comment>Eastern Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation>A
+
+Austara jarðarhvel</translation>
     </message>
     <message>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation>V
+
+Vestara jarðarhvel</translation>
     </message>
     <message>
         <source>Position Index %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetningarvísir %1</translation>
     </message>
     <message>
         <source>Orbital Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Sporbrautarstaðsetning</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">Engin</translation>
+        <translation>Engin</translation>
     </message>
     <message>
         <source>Position #%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning #%1 (%2)</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar þyrills</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetningar</translation>
     </message>
     <message>
         <source>Rotor position setup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppsetning staðsetningar þyrills.</translation>
     </message>
     <message>
         <source>Single (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stakur (Evrópa)</translation>
     </message>
     <message>
         <source>Universal (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alþjóðlegur (Evrópa)</translation>
     </message>
     <message>
         <source>Circular (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hringlaga (N. Ameríka)</translation>
     </message>
     <message>
         <source>Linear (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Línulegur (N. Ameríka)</translation>
     </message>
     <message>
         <source>C Band</source>
@@ -844,23 +848,23 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>LNB Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB forstilling</translation>
     </message>
     <message>
         <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu LNB forstillinguna úr listanum eða veldur &apos;Sérsniðið&apos; og settu veldu ítarlegar stillingar fyrir neðan.</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>Sérsniðið</translation>
     </message>
     <message>
         <source>LNB Type</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB tegund</translation>
     </message>
     <message>
         <source>Select the type of LNB from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu LNB tegund úr listanum.</translation>
     </message>
     <message>
         <source>Legacy (Fixed)</source>
@@ -868,11 +872,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Standard (Voltage)</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðlað (Spenna)</translation>
     </message>
     <message>
         <source>Universal (Voltage &amp; Tone)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alþjóðlegur (Spenna &amp; litblær)</translation>
     </message>
     <message>
         <source>Bandstacked</source>
@@ -967,14 +971,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>FirewireDesc</name>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Lýsing</translation>
     </message>
 </context>
 <context>
     <name>GuideGrid</name>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eyða &apos;%1&apos; %2 reglunni?</translation>
     </message>
 </context>
 <context>
@@ -1032,7 +1036,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>InputSelector</name>
     <message>
         <source>Input</source>
-        <translation type="unfinished">Inntak</translation>
+        <translation>Inntak</translation>
     </message>
 </context>
 <context>
@@ -1058,15 +1062,15 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>MPEGConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Skimaðar upplýsingar</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki tókst að opna</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki tókst að skima</translation>
     </message>
 </context>
 <context>
@@ -1148,18 +1152,18 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>5 weekdays if daily</source>
-        <translation type="unfinished"></translation>
+        <translation>5 vikudaga ef daglega</translation>
     </message>
     <message>
         <source>7 days per week if daily</source>
-        <translation type="unfinished"></translation>
+        <translation>7 daga vikunnar ef daglega</translation>
     </message>
 </context>
 <context>
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation type="unfinished">Flutningsleið</translation>
+        <translation>Flutningsleið</translation>
     </message>
 </context>
 <context>
@@ -1287,11 +1291,11 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Sláðu inn nafn hóps og ýtta á VELJA til að slá inn texta með sýndarlyklaborði</translation>
     </message>
     <message>
         <source>(Create new group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Búa til nýjan hóp)</translation>
     </message>
 </context>
 <context>
@@ -1690,91 +1694,91 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Show Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna nánari upplýsingar dagskrárliðs</translation>
     </message>
     <message>
         <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptakan hefur verið þjöppuð</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptakan er í víðóm</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptakan er í háupplausn (HD)</translation>
     </message>
     <message>
         <source>Recording is Closed Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptaka inniheldur textun</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Miklum gæðum</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Miðlungs gæðum</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Litlum gæðum</translation>
     </message>
     <message>
         <source>Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaktlisti</translation>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
-        <translation type="unfinished"></translation>
+        <translation>Það eru engar upptökur í núverandi sýn</translation>
     </message>
     <message>
         <source>There are no recordings available</source>
-        <translation type="unfinished"></translation>
+        <translation>Það eru engar upptökur tiltækar</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkja sem ekki skoðað</translation>
     </message>
     <message>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkja sem skoðað</translation>
     </message>
     <message>
         <source>Recording is preserved</source>
-        <translation type="unfinished"></translation>
+        <translation>Haldið er upp á upptöku</translation>
     </message>
     <message>
         <source>Show Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna titla</translation>
     </message>
     <message>
         <source>Show Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna flokka</translation>
     </message>
     <message>
         <source>Show Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna upptökuhópa</translation>
     </message>
     <message>
         <source>Show Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna vaktlista</translation>
     </message>
     <message>
         <source>Show Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýna leitir</translation>
     </message>
     <message>
         <source>Save Current View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista núverandi sýn</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Hætta við</translation>
+        <translation>Hætta við</translation>
     </message>
 </context>
 <context>
@@ -1817,22 +1821,22 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Í lagi</translation>
+        <translation>Í lagi</translation>
     </message>
     <message>
         <source>Allow this episode to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Leyfu endurupptöku þessa dagskrárliðs</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Aldrei taka upp þennan dagskrárlið</translation>
     </message>
 </context>
 <context>
     <name>ProgDetails</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Í lagi</translation>
+        <translation>Í lagi</translation>
     </message>
 </context>
 <context>
@@ -2030,15 +2034,15 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Rule Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Regluleit</translation>
     </message>
     <message>
         <source>(Any Genre)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Hvaða tegund sem er)</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eyða &apos;%1&apos; %2 reglunni?</translation>
     </message>
 </context>
 <context>
@@ -2113,7 +2117,7 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eyða &apos;%1&apos; %2 reglunni?</translation>
     </message>
 </context>
 <context>
@@ -2484,7 +2488,7 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Popup Background Shading Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðferð skyggingar á bakgrunn glugga</translation>
     </message>
     <message>
         <source>Fill</source>
@@ -2540,11 +2544,11 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>GUI X offset</source>
-        <translation type="unfinished"></translation>
+        <translation>X tilfærsla viðmóts</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Y tilfærsla viðmóts</translation>
     </message>
     <message>
         <source>The vertical offset the GUI will be displayed at.</source>
@@ -2916,11 +2920,11 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ef virkjað þá mun mythtv skoppa jafn langt áfram og afturábak strax eftir að spólað er til baka.</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="unfinished">Nota XV myndstýringar</translation>
+        <translation>Nota XV myndstýringar</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -2937,7 +2941,8 @@ Fer í fyrri valmynd.</translation>
     <message>
         <source>Advanced Filter configuration, format:
 [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar háþróðar síu, snið:
+[[&lt;sía&gt;=&lt;valkostir,]...]</translation>
     </message>
     <message>
         <source>Font size</source>
@@ -3001,7 +3006,7 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -3341,7 +3346,7 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkishraði</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -3385,7 +3390,7 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Constellation</source>
-        <translation type="unfinished"></translation>
+        <translation>Stjörnumerki</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -3401,11 +3406,11 @@ Fer í fyrri valmynd.</translation>
     </message>
     <message>
         <source>Guard Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Millibil varðar</translation>
     </message>
     <message>
         <source>Trans. Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Þjöppunar hamur</translation>
     </message>
     <message>
         <source>Hierarchy</source>
@@ -3554,7 +3559,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Capture device</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptökutæki</translation>
     </message>
     <message>
         <source>Video source</source>
@@ -3570,15 +3575,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Preset tuner to channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Forstilla stilli á stöð</translation>
     </message>
     <message>
         <source>Starting channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Upphafs stöð</translation>
     </message>
     <message>
         <source>Connect source to input</source>
-        <translation type="unfinished"></translation>
+        <translation>Tengja upptök við inntak</translation>
     </message>
     <message>
         <source>Input connections</source>
@@ -3590,35 +3595,35 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sláðu inn IP vistfang þessarar vélar.  Notaðu tölu sem er hægt að tengjast utan frá (þ.e. ekki 127.0.0.1) ef þú munt vera að keyra framenda á annari vél en þessari.</translation>
     </message>
     <message>
         <source>Port the server runs on</source>
-        <translation type="unfinished"></translation>
+        <translation>Gátt sem þessi þjónn keyrir á</translation>
     </message>
     <message>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki breyta þessu nema þú hafir góða ástæðu til.</translation>
     </message>
     <message>
         <source>Port the server shows status on</source>
-        <translation type="unfinished"></translation>
+        <translation>Gátt sem þjónninn sýnir stöðu á</translation>
     </message>
     <message>
         <source>Port which the server will listen to for HTTP requests.  Currently, it shows a little status information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gátt sem þjónninn mun hlusta eftir HTTP beiðnum á.  Þessa stundina sjást bara lágmarks upplýsingar um stöðu.</translation>
     </message>
     <message>
         <source>Master Server IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>IP vistfang aðal þjóns</translation>
     </message>
     <message>
         <source>The IP address of the master backend server. All frontend and non-master backend machines will connect to this server.  If you only have one backend, this should be the same IP address as above.</source>
-        <translation type="unfinished"></translation>
+        <translation>IP vistfang aðal bakendaþjóns. Allir framendar og biðlabakendar munu tengjast við þennan þjón.  Ef þú ert bara með einn bakenda ætti þetta að vera sama IP vistfang og að ofan.</translation>
     </message>
     <message>
         <source>Port the master server runs on</source>
-        <translation type="unfinished"></translation>
+        <translation>Gátt sem aðalþjónninn keyrir á</translation>
     </message>
     <message>
         <source>All recordings get stored in this directory.</source>
@@ -3630,11 +3635,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>The TV standard to use for viewing TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sjónvarpsstaðallinn sem notaður er við áhorf.</translation>
     </message>
     <message>
         <source>VBI format</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI snið</translation>
     </message>
     <message>
         <source>VBI stands for Vertical Blanking Interrupt.  VBI is used to carry Teletext and Closed Captioning data.</source>
@@ -3642,91 +3647,91 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu viðeigandi tíðnitöflu fyrir kerfið þitt.  Ef þú ert með loftnet, notaðu þá &quot;-bcast&quot; tíðni.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Tímafrávik fyrir XMLTV dagskrárupplýsingar</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Hunsa aðalbakenda</translation>
     </message>
     <message>
         <source>Reconnect wait time (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Biðtími endurtengingar (sekúndur)</translation>
     </message>
     <message>
         <source>Count of reconnect tries</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjöldi tilrauna við endurtengingu</translation>
     </message>
     <message>
         <source>Number of times the frontend will try to wake up the master backend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjöldi tilrauna sem framendinn mun reyna að vekja aðal bakenda.</translation>
     </message>
     <message>
         <source>Wake Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Vakningaskipun</translation>
     </message>
     <message>
         <source>The command used to wake up your master backend server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipunin sem notuð er til að vekja aðal bakendaþjón.</translation>
     </message>
     <message>
         <source>Wake command for slaves</source>
-        <translation type="unfinished"></translation>
+        <translation>Vakningaskipun fyrir biðlabakenda</translation>
     </message>
     <message>
         <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipunin sem notuð er til að vekja biðlarabakenda. Skildu eftir tómt ef þú vilt hafa þennan kost óvirkan.</translation>
     </message>
     <message>
         <source>Idle timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Biðtími aðgerðarleysis (sekúndur)</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tími sem aðal bakendaþjónn bíður áður en hann slekkur á öllum bakendum. Hafðu í 0 til að hafa þennan kost óvirkan.</translation>
     </message>
     <message>
         <source>Max. wait for recording (min)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hámarks biðtími eftir upptökum (mínútur)</translation>
     </message>
     <message>
         <source>The amount of time the master backend waits for a recording.  If it&apos;s idle but a recording starts within this time period, the backends won&apos;t shut down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tími sem aðal bakendaþjónn bíður eftir upptökum.  Ef að aðal bakendi er aðgerðarlaus en upptaka hefst innan þessa tímaramma, þá munu bakendar ekki slökkva á sér.</translation>
     </message>
     <message>
         <source>Startup before rec. (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ræsing fyrir upptöku (sekúndur)</translation>
     </message>
     <message>
         <source>The amount of time the master backend will be woken up before a recording starts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tími fyrir upphaf upptöku sem aðalbakendi mun vera vakinn upp.</translation>
     </message>
     <message>
         <source>Wakeup time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Tímasnið vakningar</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Snið tíma sem sendur er á &apos;setWakeuptime Command&apos; sem $time. Sjáðu QT::QDateTime.toString() til að fá frekari upplýsing. Settu í &apos;time_t&apos; ef þetta eiga að vera sekúndur síðan epoch.</translation>
     </message>
     <message>
         <source>Set wakeuptime command</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilla uppvakningarskipun</translation>
     </message>
     <message>
         <source>The command used to set the time (passed as $time) to wake up the masterbackend</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipunin sem nota skal til að setja biðtíma (send sem $time) við uppvakningu aðalbakenda</translation>
     </message>
     <message>
         <source>Server halt command</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipun til að slökkva á þjóni</translation>
     </message>
     <message>
         <source>The command used to halt the backends.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipun sem nota skal til að slökkva á bakendum.</translation>
     </message>
     <message>
         <source>Host Address Backend Setup</source>
@@ -3734,7 +3739,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Shutdown/Wakeup Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar uppvakningar og slökkvunar</translation>
     </message>
     <message>
         <source>WakeOnLan settings</source>
@@ -3742,15 +3747,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>MasterBackend</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðal bakendi</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bíða eftir upphafshaus SEQ.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
-        <translation type="unfinished"></translation>
+        <translation>Tímauppbót fyrir forsýningu smámynda</translation>
     </message>
     <message>
         <source>Find One Recordings Priority</source>
@@ -3758,15 +3763,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
-        <translation type="unfinished"></translation>
+        <translation>For-niðurkeyrslu athugunar-skipun</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Koma í veg fyrir að slökkt sé áður en biðill hefur tengst</translation>
     </message>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ef stillt, þá mun sjálfvirk slökkvun á þjónum vera óvirk þangað til að biðill hefur tengst.</translation>
     </message>
     <message>
         <source>(All)</source>
@@ -3774,31 +3779,31 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Position Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning vistuð</translation>
     </message>
     <message>
         <source>Position Cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning fjarlægð</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
-        <translation type="unfinished"></translation>
+        <translation>Opna DVB spjald þegar um er beðið</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Lykilorðs er krafist til að skoða allar upptökur</translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ef sett, þá mun lykilorð vera þarft til að sjá fullan lista allra upptaka.</translation>
     </message>
     <message>
         <source>View Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Skoða upptökur</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 af %2</translation>
     </message>
     <message>
         <source>All Programs</source>
@@ -3810,59 +3815,59 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa %1</translation>
     </message>
     <message>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Auglýsing: %1</translation>
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Myndmerkjauppgötvun</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gat ekki búið til hljóðútak.</translation>
     </message>
     <message>
         <source>Continue WITHOUT AUDIO!</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda áfram ÁN HLJÓÐS!</translation>
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fara aftur í valmynd.</translation>
     </message>
     <message>
         <source>Earlier Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyrri sýning</translation>
     </message>
     <message>
         <source>Later Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Seinni sýning</translation>
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>þessi dagskrárliður verður tekinn upp fyrr í staðinn.</translation>
     </message>
     <message>
         <source>Clear Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjarlægja hunsun</translation>
     </message>
     <message>
         <source>30m</source>
-        <translation type="unfinished"></translation>
+        <translation>30m</translation>
     </message>
     <message>
         <source>1h</source>
-        <translation type="unfinished"></translation>
+        <translation>1k</translation>
     </message>
     <message>
         <source>1h30m</source>
-        <translation type="unfinished"></translation>
+        <translation>1k30m</translation>
     </message>
     <message>
         <source>2h</source>
-        <translation type="unfinished"></translation>
+        <translation>2k</translation>
     </message>
     <message>
         <source>Input preference</source>
@@ -3870,11 +3875,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Independent Muting of Left and Right Audio Channels</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Sjálfvirk hljóðdeyfing á vinstri og hægri hljóðrásum</translation>
     </message>
     <message>
         <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
@@ -3882,15 +3887,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Use select to change the channel in the program guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Nota valtakka til að skipta um stöð í dagskrárupplýsingum</translation>
     </message>
     <message>
         <source>Visible</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýnileg</translation>
     </message>
     <message>
         <source>If set, the channel will be visible in the EPG.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ef sett þá mun stöðin vera sjáanleg í dagskrárupplýsingum.</translation>
     </message>
     <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
@@ -3902,7 +3907,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Log Cleanup Frequency (Days)</source>
-        <translation type="unfinished">Tíðni</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Number of days to keep acknowledged log entries</source>
@@ -3926,7 +3931,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>All Messages</source>
-        <translation type="unfinished">Allt</translation>
+        <translation>Öll skilaboð</translation>
     </message>
     <message>
         <source>Debug and Higher</source>
@@ -3978,7 +3983,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>mythfilldatabase Run Frequency (Days)</source>
-        <translation type="unfinished">Tíðni</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>mythfilldatabase Execution Start</source>
@@ -3994,7 +3999,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Any arguments you want passed to the mythfilldatabase program.</source>
-        <translation type="unfinished">Hvað sem er.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>mythfilldatabase Log Path</source>
@@ -4022,7 +4027,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
@@ -4142,19 +4147,19 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Default size is 25.</source>
-        <translation type="unfinished">Sjálfgefið.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default size is 16.</source>
-        <translation type="unfinished">Sjálfgefið.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Record Threshold</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View Recordings (Recording Groups)</source>
-        <translation type="unfinished">Upptaka Hópar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to get selector object</source>
@@ -4174,11 +4179,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Override Recording</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Don&apos;t Record</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation>Ekki taka upp</translation>
     </message>
     <message>
         <source>Reactivate</source>
@@ -4194,7 +4199,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Edit Options</source>
-        <translation type="unfinished">Breyta</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add Override</source>
@@ -4202,15 +4207,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Edit Override</source>
-        <translation type="unfinished">Breyta</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Record anyway</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
@@ -4254,7 +4259,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -4356,7 +4361,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4400,19 +4405,19 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Start in Title section</source>
-        <translation type="unfinished">Titill</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
-        <translation type="unfinished">sjálfgefin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show group summary</source>
-        <translation type="unfinished">Þáttur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CPU Usage</source>
@@ -4436,7 +4441,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, include blank frames following commercial breaks as part of the commercial break.</source>
-        <translation type="unfinished">Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Commercial Skip Notify Amount</source>
@@ -4448,19 +4453,19 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
-        <translation type="unfinished">Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation type="unfinished">eða eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, Browse mode will automatically be activated whenever you use Channel UP/DOWN while watching Live TV.</source>
@@ -4472,11 +4477,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Display thumbnail preview images of recordings</source>
@@ -4484,19 +4489,19 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished">Upptaka.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished">lítil Upptaka.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
-        <translation type="unfinished">Upptaka Eyða Upptaka.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
-        <translation type="unfinished">Fylla Mynd.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System Exit key</source>
@@ -4512,7 +4517,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
-        <translation type="unfinished">eða</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
@@ -4520,23 +4525,23 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
-        <translation type="unfinished">gripur.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Display Size - Width</source>
-        <translation type="unfinished">Breidd</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished">Lárétt eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Display Size - Height</source>
-        <translation type="unfinished">Hæð</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished">Lóðrétt eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
@@ -4560,7 +4565,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
@@ -4604,15 +4609,15 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If the option to use Select to change the channel is on, pressing Select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="unfinished">mínútur.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The program used to control the LED on the Xbox is dependant on which distribution is installed. &quot;led&quot; will be used on GentooX, &quot;blink&quot; on other Xbox distributions.</source>
-        <translation type="unfinished">Xbox Xbox.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default LED color</source>
-        <translation type="unfinished">Sjálfgefið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sets the LED color when it is not being used for status indication.</source>
@@ -4624,7 +4629,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>This specifies how frequently (in seconds) to check if a recording is in progress in order to update the Xbox LED.</source>
-        <translation type="unfinished">Xbox.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
@@ -4632,7 +4637,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Maximum Number of Entries per Module</source>
@@ -4840,7 +4845,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Acknowledge all log entries at this priority level or lower?</source>
-        <translation type="unfinished">eða?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Yes</source>
@@ -4920,7 +4925,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
-        <translation type="unfinished">gripir eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use 1-8 to change priority level.</source>
@@ -4936,7 +4941,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Default size is 12.</source>
-        <translation type="unfinished">Sjálfgefið.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Commercial Skip</source>
@@ -4972,7 +4977,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used which could cause problems on slower systems.</source>
-        <translation type="unfinished">Á.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Run Jobs only on original recording host</source>
@@ -5064,7 +5069,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Titill</translation>
+        <translation>Titill</translation>
     </message>
     <message>
         <source>Description</source>
@@ -5116,7 +5121,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished">Upptökuhópur</translation>
+        <translation>Upptökuhópur</translation>
     </message>
     <message>
         <source>Stop recording</source>
@@ -5124,7 +5129,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Power Search</source>
-        <translation type="unfinished">Krafleit</translation>
+        <translation>Kraftleit</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
@@ -5148,7 +5153,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Frames to skip in fullscreen mode</source>
@@ -5156,7 +5161,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="unfinished">eða eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Video in main window</source>
@@ -5164,7 +5169,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Frames to skip</source>
@@ -5240,7 +5245,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Delete Job?</source>
-        <translation type="unfinished">Eyða?</translation>
+        <translation>Eyða verki?</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -5308,7 +5313,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
-        <translation type="unfinished">Á</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Database Configuration</source>
@@ -5316,7 +5321,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished">Allt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
@@ -5328,7 +5333,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Database</source>
@@ -5376,11 +5381,11 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished">Á</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation type="unfinished">Á.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reconnect time</source>
@@ -5416,7 +5421,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Recording Host</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use on air guide</source>
@@ -5424,7 +5429,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished">Á.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
@@ -5564,7 +5569,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
-        <translation type="unfinished">Fylla Fylla.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>HD Ringbuffer size (KB)</source>
@@ -5713,7 +5718,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     </message>
     <message>
         <source>Default Input</source>
-        <translation type="unfinished">Sjálfgefið Inntak</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -5730,57 +5735,57 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation type="unfinished">Tíðni sjálfgefin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished">sjálfgefin</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished">Pólun sjálfgefin</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished">Andhverfa Sjálfgefið Sjálfvirkt Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation type="unfinished">Bandbreidd Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished">Tónstilling Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished">Stigveldi Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CPU friendly preview of recordings</source>
@@ -5872,7 +5877,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
@@ -5880,7 +5885,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
@@ -5916,7 +5921,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Bandwidth (Default: Auto)</source>
-        <translation type="unfinished">Bandbreidd Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>DVB Transport</source>
@@ -5924,7 +5929,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transport Options</source>
-        <translation type="unfinished">Flutningsleið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Skipping Back.</source>
@@ -5932,11 +5937,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished">sjálfgefin Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>In X</source>
@@ -5944,7 +5949,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished">Lárétt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>In Y</source>
@@ -5952,7 +5957,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished">Lóðrétt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>GUI</source>
@@ -5964,7 +5969,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default screen resolution when watching a video.</source>
-        <translation type="unfinished">Sjálfgefið.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Screen resolution when watching a video at a specific resolution.</source>
@@ -5980,7 +5985,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default refresh rate when watching a video.</source>
-        <translation type="unfinished">Sjálfgefið.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Refresh rate when watching a video at a specific resolution.</source>
@@ -6000,7 +6005,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation type="unfinished">Sjálfgefið eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Signal Lock</source>
@@ -6074,7 +6079,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished">Tegund</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -6118,7 +6123,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default group filter to apply</source>
-        <translation type="unfinished">Sjálfgefið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
@@ -6130,7 +6135,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation type="unfinished">sjálfgefin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default View</source>
@@ -6170,11 +6175,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
-        <translation type="unfinished">Þáttur Allt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="unfinished">Allt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Commercial Flag New Recordings</source>
@@ -6182,27 +6187,27 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default Auto Transcode setting</source>
-        <translation type="unfinished">Sjálfgefið Sjálfvirkt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
-        <translation type="unfinished">sjálfgefin Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default Transcoder</source>
-        <translation type="unfinished">Sjálfgefið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="unfinished">sjálfgefin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Run User Job #%1 On New Recordings</source>
-        <translation type="unfinished">Á</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #%1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished">sjálfgefin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Extra Disk Space (in Gigabytes)</source>
@@ -6222,11 +6227,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished">Íþróttir.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Record past end of show (in minutes)</source>
-        <translation type="unfinished">Taka upp mínútur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>For the specified category, an attempt will be made to extend the recording by the specified time.  It is ignored when two shows have been scheduled without enough time in between.</source>
@@ -6262,7 +6267,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Generate preview image from a bookmark if possible</source>
@@ -6278,7 +6283,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This enables support for Xbox specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation type="unfinished">Xbox.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
@@ -6310,15 +6315,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Artist - Title</source>
-        <translation type="unfinished">Titill</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Artist [Album] Title</source>
-        <translation type="unfinished">Titill</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Which items to show when playing music.</source>
-        <translation type="unfinished">gripir.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information.</source>
@@ -6326,19 +6331,19 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>General (Basic)</source>
-        <translation type="unfinished">Almennt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>General (Jobs)</source>
-        <translation type="unfinished">Almennt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>General (Advanced)</source>
-        <translation type="unfinished">Almennt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Theme Error</source>
-        <translation type="unfinished">Þema</translation>
+        <translation>Villa í þema</translation>
     </message>
     <message>
         <source>Your theme does not contain elements required to display the status screen.</source>
@@ -6353,7 +6358,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Recording Unavailable</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Upptaka ekki tiltæk</translation>
     </message>
     <message>
         <source>This recording is currently Available</source>
@@ -6369,15 +6374,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Adjust the relative timezone of the XMLTV EPG data read by mythfilldatabase.  &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
-        <translation type="unfinished">Sjálfvirkt Engin.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
-        <translation type="unfinished">Sjálfvirkt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
@@ -6437,7 +6442,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Re-Record</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation>Taka upp aftur</translation>
     </message>
     <message>
         <source>V</source>
@@ -6446,7 +6451,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Never Record</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation>Aldrei taka upp</translation>
     </message>
     <message>
         <source>it was marked to never be recorded.</source>
@@ -6482,7 +6487,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation type="unfinished">Sjálfvirkt Sjálfgefið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -6494,7 +6499,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="unfinished">Mynd.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
@@ -6568,7 +6573,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Guide Language #%1</source>
-        <translation type="unfinished">Tungumál</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Your #%1 preferred language for Program Guide Data and captions.</source>
@@ -6580,7 +6585,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Display Recording Status</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Sýna stöðu upptöka</translation>
     </message>
     <message>
         <source>Display current recordings information on LCD display.</source>
@@ -6592,7 +6597,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Display Music Artist and Title</source>
-        <translation type="unfinished">Titill</translation>
+        <translation>Sýna höfund tónlista og titills</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
@@ -6620,7 +6625,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Backlight Always On</source>
-        <translation type="unfinished">Á</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Turn on the backlight permanently on the LCD display.</source>
@@ -6628,7 +6633,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>HeartBeat Always On</source>
-        <translation type="unfinished">Á</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>LCD Key order</source>
@@ -6636,7 +6641,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="unfinished">eða</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
@@ -6652,7 +6657,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Channel Scanner</source>
@@ -6664,7 +6669,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Transport Editor</source>
-        <translation type="unfinished">Flutningsleið</translation>
+        <translation>Stillingar flutningsleiða</translation>
     </message>
     <message>
         <source>Allows you to edit the transports directly</source>
@@ -6692,7 +6697,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>(51) None</source>
-        <translation type="unfinished">Engin</translation>
+        <translation>(51) Engin</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
@@ -6700,7 +6705,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
-        <translation type="unfinished">Eyða</translation>
+        <translation>(Eyða öllum upptökuspjöldum)</translation>
     </message>
     <message>
         <source>Monitor Aspect Ratio</source>
@@ -6724,11 +6729,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Hætta</translation>
+        <translation>Hætta</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
-        <translation type="unfinished">Eyða</translation>
+        <translation>(Eyða öllum video upprunum)</translation>
     </message>
     <message>
         <source>Display volume level information on LCD display.</source>
@@ -6788,7 +6793,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
-        <translation type="unfinished">Lifandi Sjónvarp.</translation>
+        <translation>Hef Lifandi Sjónvarpstöð.</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
@@ -6804,11 +6809,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>MPEG-2 Parameters</source>
-        <translation type="unfinished">MPEG-2 valkostir</translation>
+        <translation>MPEG-2 viðföng</translation>
     </message>
     <message>
         <source>Preferred MPEG2 Decoder</source>
@@ -6852,11 +6857,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Frequency Table</source>
-        <translation type="unfinished">Tíðni</translation>
+        <translation>Tíðnitafla</translation>
     </message>
     <message>
         <source>Frequency table to use.</source>
-        <translation type="unfinished">Tíðni.</translation>
+        <translation>Tíðnitafla sem notast skal við.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
@@ -6864,7 +6869,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6880,7 +6885,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Connection Type</source>
-        <translation type="unfinished">Tegund</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Speed</source>
@@ -6896,11 +6901,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>General OSD time-out (sec)</source>
-        <translation type="unfinished">Almennt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active after it is first activated.</source>
@@ -6920,7 +6925,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
-        <translation type="unfinished">Í lagi.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatically Start Myth Frontend</source>
@@ -6976,7 +6981,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>EIT Transport Timeout (mins)</source>
-        <translation type="unfinished">Flutningsleið</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
@@ -6984,7 +6989,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished">eða</translation>
+        <translation>Þetta virkar venjulega með ATSC eða DVB rásum,</translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
@@ -7016,7 +7021,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Recording Available</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Upptaka tiltæk</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
@@ -7088,7 +7093,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="unfinished">eða.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Skip ahead (seconds)</source>
@@ -7108,11 +7113,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Playback Group</source>
-        <translation type="unfinished">Afspilunarhópur</translation>
+        <translation>Afspilunarhópur</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
-        <translation type="unfinished">Hópur</translation>
+        <translation>Veldu afspilunarhóp</translation>
     </message>
     <message>
         <source>Daily Wakeup/ShutDown Period</source>
@@ -7145,7 +7150,7 @@ Myth will now exit.</source>
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished">Tegund</translation>
+        <translation>Tegund</translation>
     </message>
     <message>
         <source>Producer</source>
@@ -7479,7 +7484,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Sports</source>
-        <translation type="unfinished">Íþróttir</translation>
+        <translation>Íþróttir</translation>
     </message>
     <message>
         <source>Action</source>
@@ -7875,11 +7880,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Audio track</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Hljóðrás</translation>
     </message>
     <message>
         <source>Subtitle track</source>
-        <translation type="unfinished">Texti númer</translation>
+        <translation>Textarás</translation>
     </message>
     <message>
         <source>CC</source>
@@ -8177,7 +8182,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished">^(The |A |An )</translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <source>Delete Now</source>
@@ -8288,7 +8293,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>(REC)</source>
-        <translation type="unfinished">(REC)</translation>
+        <translation>(Upptaka)</translation>
     </message>
     <message>
         <source>Adjust Playback</source>
@@ -8304,7 +8309,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">Hljóðstyrkur</translation>
+        <translation>Hljóðstyrkur</translation>
     </message>
     <message>
         <source>MAX</source>
@@ -8414,7 +8419,7 @@ The frequency for this channel in</source>
     <message>
         <source>Group</source>
         <comment>Play Group</comment>
-        <translation type="unfinished">Hópur</translation>
+        <translation>Hópur</translation>
     </message>
     <message>
         <source>f</source>
@@ -8540,7 +8545,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">Lifandi Sjónvarp</translation>
+        <translation>Lifandi Sjónvarp</translation>
     </message>
     <message>
         <source>Listings grabber</source>
@@ -8823,11 +8828,11 @@ The frequency for this channel in</source>
     <name>RecordingProfileEditor</name>
     <message>
         <source>Add Recording Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Bæta við upptökusniði</translation>
     </message>
     <message>
         <source>Enter the name of the new profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Sláðu inn nafn nýs upptökusniðs</translation>
     </message>
 </context>
 <context>
@@ -8845,80 +8850,80 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Staða leitar</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Staða</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilli</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Leita</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation type="unfinished"></translation>
+        <translation>Styrkur útsendingar</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation type="unfinished"></translation>
+        <translation>Styrkur/Hávaði</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Læst</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Enginn lás</translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Full leit</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation type="unfinished"></translation>
+        <translation>Full leit (Tuned)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation type="unfinished"></translation>
+        <translation>Færa inn channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation type="unfinished"></translation>
+        <translation>Full leit á tiltækum flutningsleiðum</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation type="unfinished">Flutningsleið</translation>
+        <translation>Leit á tiltækum flutningsleiðum</translation>
     </message>
     <message>
         <source>M3U Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Færa inn M3U</translation>
     </message>
 </context>
 <context>
     <name>ScanWizard</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Leitarálfur</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Villa við yfirferð viðfanga</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardConfig</name>
     <message>
         <source>Scan Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Sjálfvirk hreinsun annála virk</translation>
     </message>
 </context>
 <context>
@@ -8932,27 +8937,27 @@ The frequency for this channel in</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished">Skimun</translation>
+        <translation>Skimun</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Skimunarálfur</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Villa við stillingu á flutningsleið</translation>
     </message>
     <message>
         <source>Failed to open &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki tókst að opna &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki tókst að greina &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Villa við upphaf skimunar</translation>
     </message>
 </context>
 <context>
@@ -8966,78 +8971,82 @@ The frequency for this channel in</source>
     <name>StartingChannel</name>
     <message>
         <source>Please add channels to this source</source>
-        <translation type="unfinished"></translation>
+        <translation>Vinsamlegast bættu stöðvum við þessa dagskrárveitu</translation>
     </message>
 </context>
 <context>
     <name>StatusBox</name>
     <message>
         <source>Tuner %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>Upptökutæki %1 </translation>
     </message>
     <message>
         <source>is watching live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>er að horfa á Lifandi Sjónvarp</translation>
     </message>
     <message>
         <source>is recording</source>
-        <translation type="unfinished"></translation>
+        <translation>er að taka upp</translation>
     </message>
     <message>
         <source>is not recording</source>
-        <translation type="unfinished"></translation>
+        <translation>er ekki að taka upp</translation>
     </message>
     <message>
         <source>Job:</source>
-        <translation type="unfinished"></translation>
+        <translation>Verk:</translation>
     </message>
     <message>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>Staða: </translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
-        <translation type="unfinished">Á</translation>
+        <translation>Á %1 %2 frá %3.%4
+%5
+%6</translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
-        <translation type="unfinished">Á</translation>
+        <translation>Á %1 %2 frá %3.%4
+%5
+Engar frekari smáatriði</translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished"></translation>
+        <translation>Þemað sem þú ert að nota er með óþekktan lið (&apos;%1&apos;).  Það verður hunsað</translation>
     </message>
     <message>
         <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 upptökur sem taka %2 fá að renna út</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 að þeim er Lifandi Sjónvarp og taka %2</translation>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">Lifandi Sjónvarp</translation>
+        <translation>Lifandi Sjónvarp</translation>
     </message>
     <message>
         <source>is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>er ekki tiltækt</translation>
     </message>
     <message>
         <source>standard rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>staðlaðar reglur eru skilgreindar</translation>
     </message>
     <message>
         <source>search rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>leitarreglur eru skilgreindar</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Áætlaður keyrslutími:</translation>
     </message>
 </context>
 <context>
@@ -9048,31 +9057,31 @@ No other details</source>
     </message>
     <message>
         <source>Record and watch while it records</source>
-        <translation type="unfinished">Taka upp</translation>
+        <translation>Taka upp og horfa á meðan upptöku stendur</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Leyfa upptöku og fara aftur í aðalvalmynd</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki leyfa upptöku, ég vil horfa á sjónvarpið</translation>
     </message>
     <message>
         <source>Save this position and go to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista þessa staðsetningu og fara í valmynd</translation>
     </message>
     <message>
         <source>Do not save, just exit to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki vista, fara beint í valmynd</translation>
     </message>
     <message>
         <source>Keep watching</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda áfram að horfa</translation>
     </message>
     <message>
         <source>Delete this recording</source>
-        <translation type="unfinished">Eyða</translation>
+        <translation>Eyða þessari upptöku</translation>
     </message>
     <message>
         <source>Paused</source>
@@ -9080,19 +9089,19 @@ No other details</source>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Staðsetning</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa áfram</translation>
     </message>
     <message>
         <source>Jump Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa aftur</translation>
     </message>
     <message>
         <source>Searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>Leita...</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
@@ -9100,7 +9109,7 @@ No other details</source>
     </message>
     <message>
         <source>Adjust Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilla mynd</translation>
     </message>
     <message>
         <source>Contrast %1 %</source>
@@ -9108,19 +9117,19 @@ No other details</source>
     </message>
     <message>
         <source>Volume %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Hljóðstyrkur %1 %</translation>
     </message>
     <message>
         <source>Adjust Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Hljóð</translation>
     </message>
     <message>
         <source>Mute On</source>
-        <translation type="unfinished">Á</translation>
+        <translation>Hljóð af</translation>
     </message>
     <message>
         <source>Mute Off</source>
-        <translation type="unfinished">Slökkt</translation>
+        <translation>Hljóð á</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
@@ -9128,27 +9137,27 @@ No other details</source>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Stöðva þjöppun</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Þjappa</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Áfram</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa áfram</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Spóla til baka</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa til baka</translation>
     </message>
     <message>
         <source>Play</source>
@@ -9156,27 +9165,27 @@ No other details</source>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 3X</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 2X</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 1/3X</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 1/8X</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 1/16X</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleppa</translation>
     </message>
     <message>
         <source>16:9</source>
@@ -9188,15 +9197,15 @@ No other details</source>
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Það er verið að klippa þennan dagskrárlið</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda áfram klippingu</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki klippa</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -9212,23 +9221,23 @@ No other details</source>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirkt sleppa - Slökkt</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirkt sleppa - Kveikt</translation>
     </message>
     <message>
         <source>Auto-Skip Notify</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirkt sleppa - Láta vita</translation>
     </message>
     <message>
         <source>16:9 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 aðdráttur</translation>
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3 aðdráttur</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
@@ -9240,31 +9249,31 @@ No other details</source>
     </message>
     <message>
         <source>Jump To</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa á</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðdráttarhamur - Slökkt</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirk gildislok - Slökkt</translation>
     </message>
     <message>
         <source>Auto-Expire ON</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirk gildislok - Kveikt</translation>
     </message>
     <message>
         <source>Zoom Mode ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðdráttarhamur - Kveikt</translation>
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Vinstri hljóðrás slökkt</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Hægri hljóðrás slökkt</translation>
     </message>
     <message>
         <source>Sleep </source>
@@ -9272,55 +9281,55 @@ No other details</source>
     </message>
     <message>
         <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 teyging</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished">Dagskrár vísir</translation>
+        <translation>Dagskrár vísir</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Mynd í mynd</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kveikja/Slökkva</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Víxlun virks glugga</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Previous Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyrri stöð</translation>
     </message>
     <message>
         <source>Edit Recording</source>
-        <translation type="unfinished">Breyta Upptaka</translation>
+        <translation>Klippa upptöku</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Sjálfvirkt auglýsingaskopp</translation>
     </message>
     <message>
         <source>Turn Auto-Expire OFF</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Slökkva á sjálfvirkum gildislökum</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON</source>
-        <translation type="unfinished">Sjálfvirkt</translation>
+        <translation>Kveikja á sjálfvirkum gildislökum</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Hlutföll sýnar</translation>
     </message>
     <message>
         <source>Manual Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðdráttarhamur</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -9344,11 +9353,11 @@ No other details</source>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished">Mótsetning</translation>
+        <translation>Mótsetning</translation>
     </message>
     <message>
         <source>Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Litur</translation>
     </message>
     <message>
         <source>Hue</source>
@@ -9364,19 +9373,19 @@ No other details</source>
     </message>
     <message>
         <source>Jump to Beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa á byrjun</translation>
     </message>
     <message>
         <source>Try Again</source>
-        <translation type="unfinished"></translation>
+        <translation>Reyna aftur</translation>
     </message>
     <message>
         <source>Time Stretch %1X</source>
-        <translation type="unfinished"></translation>
+        <translation>Tímateyging %1X</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Tímateyging</translation>
     </message>
     <message>
         <source>Adjust</source>
@@ -9432,11 +9441,11 @@ No other details</source>
     </message>
     <message>
         <source>Previous Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyrri kafli</translation>
     </message>
     <message>
         <source>Next Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Næsti kafli</translation>
     </message>
     <message>
         <source>Forward %1X</source>
@@ -9448,39 +9457,39 @@ No other details</source>
     </message>
     <message>
         <source>Audio Resync</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Endursamhæfing hljóðs</translation>
     </message>
     <message>
         <source>Audio Sync</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Samhæfing hljóðs</translation>
     </message>
     <message>
         <source>Adjust Audio Sync</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Samhæfing hljóðs</translation>
     </message>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV er þegar að nota öll tiltæk inntök fyrir þá stöð sem þú valdir. Ef þú vilt horfa á upptöku sem gæti verið virk, veldur þá upptökur úr valmynd.  Ef þú vilt horfa á þessa stöð, farðu þá í upptökuvalmyndina og eyddu virkri upptöku.</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Enginn lás</translation>
     </message>
     <message>
         <source>Jump to Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa að bókamerki</translation>
     </message>
     <message>
         <source>Partial Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Hlut-lás</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Lás</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
-        <translation type="unfinished">eða eða.</translation>
+        <translation>Þú ættir að vera kominn með lás á stöðina núna. Þú getur haldið áfram að bíða eftir merki eða skipt um stöð með %1 eða %2, skipt um inntök (%3), upptökuspjöld (%4), o.sv.frv.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -9492,7 +9501,7 @@ No other details</source>
     </message>
     <message>
         <source>Select Audio Track</source>
-        <translation type="unfinished">Hljóð</translation>
+        <translation>Veldu hljóðrás</translation>
     </message>
     <message>
         <source>Subtitle track</source>
@@ -9500,11 +9509,11 @@ No other details</source>
     </message>
     <message>
         <source>Signal %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Merki %1%</translation>
     </message>
     <message>
         <source>Seek:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leita:</translation>
     </message>
     <message>
         <source>CC:</source>
@@ -9512,20 +9521,20 @@ No other details</source>
     </message>
     <message>
         <source>Cancel Record</source>
-        <translation type="unfinished">Hætta við Taka upp</translation>
+        <translation>Hætta við upptöku</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 stillingar</translation>
     </message>
     <message>
         <source>TXT:</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT:</translation>
     </message>
     <message>
         <source>Seek:</source>
         <comment>seek to location</comment>
-        <translation type="unfinished"></translation>
+        <translation>Leita:</translation>
     </message>
     <message>
         <source>S/N %1dB</source>
@@ -9538,254 +9547,261 @@ No other details</source>
     </message>
     <message>
         <source>Speed 16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 16X</translation>
     </message>
     <message>
         <source>Speed 8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hraði 8X</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipta MíM/Aðal</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleppa hreyfingalausum römmum</translation>
     </message>
     <message>
         <source>Next Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Næsti titill</translation>
     </message>
     <message>
         <source>DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD aðalvalmynd</translation>
     </message>
     <message>
         <source>Schedule Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilla upptökur</translation>
     </message>
     <message>
         <source>Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Dagskrár leit</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished">Breyta upptökuáætlun</translation>
+        <translation>Breyta upptökuáætlun</translation>
     </message>
     <message>
         <source>Previous Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyrri titill</translation>
     </message>
     <message>
         <source>Skip Back Not Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekki leyft að hoppa til baka</translation>
     </message>
     <message>
         <source>Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillingar stöðva</translation>
     </message>
     <message>
         <source>Callsign</source>
-        <translation type="unfinished">Kallmerki</translation>
+        <translation>Kallmerki</translation>
     </message>
     <message>
         <source>Channel #</source>
-        <translation type="unfinished"></translation>
+        <translation>Stöð #</translation>
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished">Nafn stöðvar</translation>
+        <translation>Nafn stöðvar</translation>
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV sérkenni</translation>
+        <translation>XMLTV sérkenni</translation>
     </message>
     <message>
         <source>[P]robe</source>
-        <translation type="unfinished"></translation>
+        <translation>[L]eita</translation>
     </message>
     <message>
         <source>[O]k</source>
-        <translation type="unfinished"></translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <source>Jump to Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa á útsendingu</translation>
     </message>
     <message>
         <source>Recorded Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptekin útsending</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">Sjálfgefið</translation>
+        <translation>Sjálfgefið</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished"></translation>
+        <translation>Finna sjálfvirkt</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Mikil gæði</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Miðlungs gæði</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lítil gæði</translation>
     </message>
     <message>
         <source>Toggle Teletext Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Víxla textun af/á</translation>
     </message>
     <message>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Víxla valmynd textunar (af/á)</translation>
     </message>
     <message>
         <source>Toggle</source>
-        <translation type="unfinished"></translation>
+        <translation>Víxla</translation>
     </message>
     <message>
         <source>(I)</source>
         <comment>Interlaced (Normal)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(I)
+
+Samfléttun (Venjuleg)</translation>
     </message>
     <message>
         <source>(i)</source>
         <comment>Interlaced (Reversed)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(i)
+
+Samfléttun (Öfug)</translation>
     </message>
     <message>
         <source>(P)</source>
         <comment>Progressive</comment>
-        <translation type="unfinished"></translation>
+        <translation>(P)
+
+Áframhaldandi</translation>
     </message>
     <message>
         <source>Video Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Vídeó skimun</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Skynja</translation>
     </message>
     <message>
         <source>Progressive</source>
-        <translation type="unfinished"></translation>
+        <translation>Áframhaldandi</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
-        <translation type="unfinished"></translation>
+        <translation>Samfléttun (Venjuleg)</translation>
     </message>
     <message>
         <source>Interlaced (Reversed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Samfléttun (Öfug)</translation>
     </message>
     <message>
         <source>Select Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu textun</translation>
     </message>
     <message>
         <source>Select VBI CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velja VBI CC</translation>
     </message>
     <message>
         <source>Select ATSC CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velja ATSC CC</translation>
     </message>
     <message>
         <source>Select DVB CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velja DVB CC</translation>
     </message>
     <message>
         <source>Toggle On/Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Skipta Á/af</translation>
     </message>
     <message>
         <source>Rotor %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Þyrill %1%</translation>
     </message>
     <message>
         <source>Chan %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Stöð %1: %2</translation>
     </message>
     <message>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Allir stillar eru uppteknir.
+Veldu núverandi upptöku</translation>
     </message>
     <message>
         <source>End Of Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Endi upptöku</translation>
     </message>
     <message>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Síðasti dagskrárliður: %2 Er ekki til</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eyða þessari upptöku?</translation>
     </message>
     <message>
         <source>DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Valmynd</translation>
     </message>
     <message>
         <source>Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Hreyfingarlaus rammi</translation>
     </message>
     <message>
         <source>Title: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Titill: %1 (%2)</translation>
     </message>
     <message>
         <source>Chapter: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kafli: %1/%2</translation>
     </message>
     <message>
         <source>DVD Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Kaflavalmynd</translation>
     </message>
     <message>
         <source>You are exiting this %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Þú ert að hætta í þessari %1</translation>
     </message>
     <message>
         <source>You are exiting this Video/DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Þú ert að hætta að horfa á þetta vídeo eða DVD</translation>
     </message>
     <message>
         <source>Keep Watching</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda áfram að horfa</translation>
     </message>
     <message>
         <source>Exit Video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&apos;%1&apos; Group Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; hóp lykilorð:</translation>
     </message>
     <message>
         <source>Password Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Rangt lykilorð</translation>
     </message>
     <message>
         <source>Screen Shot</source>
-        <translation type="unfinished"></translation>
+        <translation>Skjáskot</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Scheduled Recordings:</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilltar upptökur:</translation>
     </message>
     <message>
         <source>Channel:</source>
@@ -9793,47 +9809,47 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
-        <translation type="unfinished">Hvað sem er Upptekið</translation>
+        <translation>Þú hefur ekki stillt upptöku á neina dagskrárliði</translation>
     </message>
     <message>
         <source>To schedule a recording, exit this screen and</source>
-        <translation type="unfinished"></translation>
+        <translation>Til að stilla upptöku, farðu héðan og</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished">eða</translation>
+        <translation>Veldur &apos;Dagskrárvísi&apos; eða &apos;Dagskrárleit&apos;</translation>
     </message>
     <message>
         <source>(1) Channel    (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Raða eftir stöð    (2) Raða eftir forgangi</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Forgangur:</translation>
     </message>
     <message>
         <source>Record Type:</source>
-        <translation type="unfinished">Taka upp Tegund:</translation>
+        <translation>Upptökutegund:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Því miður eru engar upptökur tiltækar</translation>
     </message>
     <message>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Veldu &apos;Stilla upptöku&apos; úr aðal valmynd</translation>
     </message>
     <message>
         <source>(4) Program Guide   **(6) Program Finder **</source>
-        <translation type="unfinished"></translation>
+        <translation>(4) Dagskrárvísir   **(6) Dagskrár leit **</translation>
     </message>
     <message>
         <source>Select a letter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu staf...</translation>
     </message>
     <message>
         <source>Select a program...</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu dagskrárlið...</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -9849,27 +9865,27 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>(1) All  (2) Important</source>
-        <translation type="unfinished">Þáttur Allt</translation>
+        <translation>Sýna  (1) Allt  (2) Mikilvægt</translation>
     </message>
     <message>
         <source>Showing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sýni:</translation>
     </message>
     <message>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Forgangsröðun upptaka stöðva</translation>
     </message>
     <message>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished">Upptaka</translation>
+        <translation>Förgangsröðun upptaka útsendinga</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Forgangur</translation>
     </message>
     <message>
         <source>Final Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Forgangur</translation>
     </message>
     <message>
         <source>Program Listings</source>
@@ -9877,43 +9893,43 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppruni:</translation>
     </message>
     <message>
         <source>(1) Title    (2) Priority    (4) Type</source>
-        <translation type="unfinished">Titill Tegund</translation>
+        <translation>(1) Raða eftir titli    (2) Raða eftir forgangi    (4) Raða eftir tegund</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu upptöku sem á óafturkrefjanlega að eyða</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu á upptöku sem horfa skal á</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu upptöku sem á óafturkrefjanlega að eyða:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu á upptöku sem horfa skal á:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu upptöku sem á óafturkrefjanlega að eyða.</translation>
     </message>
     <message>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu á upptöku sem horfa skal á.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished">eða</translation>
+        <translation>Veldu staf sem nafn dagskrárliðs hefst á, ýttu svo á Velja eða hægri ör</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldu titill dagskrárliðs sem þú vilt finna. Þegar því er lokið ferðu til bara með vinstri ör. Veldu Velja til að stilla upptöku.</translation>
     </message>
     <message>
         <source>Airdate:</source>
@@ -9925,19 +9941,19 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished"></translation>
+        <translation>Staða kerfis - Veldu flokk til að skoða stöðu</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>Þessi skjár sýnir stöðu hinna ýmsu þátta kerfisins</translation>
     </message>
     <message>
         <source>Preview Schedule Changes:</source>
-        <translation type="unfinished"></translation>
+        <translation>Forsýnig breytinga á áætlun:</translation>
     </message>
     <message>
         <source>The recording schedule would not be affected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptökuáætlun mun ekki breytast.</translation>
     </message>
     <message>
         <source>(1)Time (2)Title</source>
@@ -9945,92 +9961,92 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Program Details:</source>
-        <translation type="unfinished"></translation>
+        <translation>Upplýsingar dagskrárliðs:</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Upplýsingar dagskrárliðs</translation>
     </message>
     <message>
         <source>Welcome to MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Velkomin í MythTV</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV er aðgerðarlaust og mun slökkva á sér fljótlega.</translation>
     </message>
     <message>
         <source>Current Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Núverandi upptökur</translation>
     </message>
     <message>
         <source>Retrieving Recording Status ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Næ í upptökustöðu ...</translation>
     </message>
     <message>
         <source>Next Scheduled Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Næstu upptökur á upptökuáætlun</translation>
     </message>
     <message>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sæki áætlaðar upptökur ...</translation>
     </message>
     <message>
         <source>WARNING: There are conflicting scheduled recordings!</source>
-        <translation type="unfinished"></translation>
+        <translation>Aðvörun: Það árekstur í áætluðum upptökum!</translation>
     </message>
 </context>
 <context>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Ný flutningsleið</translation>
     </message>
 </context>
 <context>
     <name>TransportListEditor</name>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished">Ertu viss um að þú viljir eyða þessari flutningsleið?</translation>
+        <translation>Ertu viss um að þú viljir eyða þessari flutningsleið?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished">Já, eyða flutningsleið</translation>
+        <translation>Já, eyða flutningsleið</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nei, sleppa</translation>
+        <translation>Nei, sleppa</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished">Valmynd flutningsleiða</translation>
+        <translation>Valmynd flutningsleiða</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Breyta..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished">Eyða..</translation>
+        <translation>Eyða..</translation>
     </message>
 </context>
 <context>
     <name>UIManagedTreeListType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Leita</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished"></translation>
+        <translation>Hefst með texta</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished"></translation>
+        <translation>Inniheldur texta</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Hætta við</translation>
+        <translation>Hætta við</translation>
     </message>
 </context>
 <context>
@@ -10091,14 +10107,14 @@ Select a Current Recording</source>
     <name>VideoSourceSelector</name>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished">Vídeó uppspretta</translation>
+        <translation>Vídeó uppspretta</translation>
     </message>
 </context>
 <context>
     <name>ViewScheduleDiff</name>
     <message>
         <source>All</source>
-        <translation>Allt</translation>
+        <translation>Öll</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;schdiff&apos; element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
