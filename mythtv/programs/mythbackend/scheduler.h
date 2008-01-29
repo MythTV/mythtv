@@ -93,7 +93,7 @@ class Scheduler : public QObject
     void findAllScheduledPrograms(list<ProgramInfo *> &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
-    void ShutdownServer(int prerollseconds);
+    void ShutdownServer(int prerollseconds, QDateTime &idleSince);
 
 
     QValueList<int> reschedQueue;

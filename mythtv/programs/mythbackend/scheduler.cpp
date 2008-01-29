@@ -1443,7 +1443,7 @@ void Scheduler::RunScheduler(void)
                                 CheckShutdownServer(prerollseconds, idleSince,
                                                     blockShutdown))
                             {
-                                ShutdownServer(prerollseconds);
+                                ShutdownServer(prerollseconds, idleSince);
                             }
 
                         }
@@ -1539,7 +1539,7 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     return retval;
 }
 
-void Scheduler::ShutdownServer(int prerollseconds)
+void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 {    
     m_isShuttingDown = true;
   
@@ -1596,6 +1596,11 @@ void Scheduler::ShutdownServer(int prerollseconds)
         // and now shutdown myself
         myth_system(halt_cmd.ascii());
     }
+
+    // If we make it here then either the shutdown failed
+    // OR we suspended or hibernated the OS instead
+    idleSince = QDateTime();
+    m_isShuttingDown = false;
 }
 
 void *Scheduler::SchedulerThread(void *param)
