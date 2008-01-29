@@ -121,7 +121,7 @@ class Scheduler : public QObject
     void findAllScheduledPrograms(RecList &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
-    void ShutdownServer(int prerollseconds);
+    void ShutdownServer(int prerollseconds, QDateTime &idleSince);
 
     bool WasStartedAutomatically();
 
