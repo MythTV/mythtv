@@ -1,45 +1,47 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS><TS version="1.1" language="de">
+<defaultcodec></defaultcodec>
 <context>
     <name>AlbumArtImages</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>Front Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorderseitencover</translation>
     </message>
     <message>
         <source>Back Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Rückseitencover</translation>
     </message>
     <message>
         <source>CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>Inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Inlay</translation>
     </message>
     <message>
         <source>front</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorderseite</translation>
     </message>
     <message>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>Rückseite</translation>
     </message>
     <message>
         <source>inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Inlay</translation>
     </message>
     <message>
         <source>cd</source>
-        <translation type="unfinished"></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover</translation>
     </message>
 </context>
 <context>
@@ -160,10 +162,6 @@
         <translation>Fertig</translation>
     </message>
     <message>
-        <source>DB Statistics</source>
-        <translation type="obsolete">Db Statistik</translation>
-    </message>
-    <message>
         <source>Select an Artist</source>
         <translation>Einen Interpreten wählen</translation>
     </message>
@@ -213,23 +211,23 @@
     </message>
     <message>
         <source>Track Info.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lied Information.</translation>
     </message>
     <message>
         <source>Album Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Album Cover</translation>
     </message>
     <message>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <source>Save Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen speichern</translation>
     </message>
     <message>
         <source>Change Image Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildtyp ändern</translation>
     </message>
 </context>
 <context>
@@ -412,31 +410,19 @@
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Zufallswiedergabe: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Zufallswiedergabe: Album</translation>
     </message>
     <message>
         <source>Visualization: </source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung:</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>Searching for music files</source>
-        <translation type="obsolete">Suche nach Musikdateien</translation>
-    </message>
-    <message>
-        <source>Updating music database</source>
-        <translation type="obsolete">Aktualisiere Musikdatenbank</translation>
-    </message>
-    <message>
-        <source>BumpScope</source>
-        <translation>BumpScope</translation>
-    </message>
     <message>
         <source>Various Artists</source>
         <translation>Versch. Interpreten</translation>
@@ -466,10 +452,6 @@
         <translation>Audio Gerät</translation>
     </message>
     <message>
-        <source>Audio Device used for playback.</source>
-        <translation type="obsolete">Audio Gerätedatei für die Wiedergabe.</translation>
-    </message>
-    <message>
         <source>CD device</source>
         <translation>CD Laufwerk</translation>
     </message>
@@ -492,10 +474,6 @@
     <message>
         <source>Filename Format</source>
         <translation>Maske für Dateinamen</translation>
-    </message>
-    <message>
-        <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation type="obsolete">Verzeichnis-/Dateinamenformat um Informationen auszulesen falls keine ID3 Marken vorhanden sind.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -540,18 +518,6 @@
     <message>
         <source>File storage location</source>
         <translation>Verzeichnis für Dateien</translation>
-    </message>
-    <message>
-        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="obsolete">Bestimmt das Verzeichnis/Name für neue Lieder. Möglich ist: &apos;GENRE&apos;, &apos;ARTIST&apos;, &apos;ALBUM&apos;, &apos;TRACK&apos;, &apos;TITLE&apos;, &apos;YEAR&apos;, &apos;/&apos; und &apos;-&apos;. &apos;-&apos; wird durch den Feldtrenner ersetzt</translation>
-    </message>
-    <message>
-        <source>Token separator</source>
-        <translation type="obsolete">Feldtrenner</translation>
-    </message>
-    <message>
-        <source>Filename tokens will be separated by this string.</source>
-        <translation type="obsolete">Felder werden durch diesen Text getrennt.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -658,10 +624,6 @@
         <translation>Intelligent</translation>
     </message>
     <message>
-        <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Gewünschter Mix-Modus bei der Wiedergabe. Möglich ist Aus, Normal, Zufall oder Intelligent (zufällig).</translation>
-    </message>
-    <message>
         <source>Delay before Visualizations start (seconds)</source>
         <translation>Verzögerung vor Visualisierung (in Sekunden)</translation>
     </message>
@@ -672,10 +634,6 @@
     <message>
         <source>Change Visualizer on each song</source>
         <translation>Visualisierung für jedes Lied ändern</translation>
-    </message>
-    <message>
-        <source>Change the visualizer when the song change.</source>
-        <translation>Visualisierung bei einem Liedwechsel ändern.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -692,38 +650,6 @@
     <message>
         <source>Visualizations</source>
         <translation>Visualisierungen</translation>
-    </message>
-    <message>
-        <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation>Liste der Visualisierungen für die Wiedergabe, durch Leerzeichen getrennt. Verfügbar sind </translation>
-    </message>
-    <message>
-        <source>MonoScope</source>
-        <translation>MonoScope</translation>
-    </message>
-    <message>
-        <source>StereoScope</source>
-        <translation>StereoScope</translation>
-    </message>
-    <message>
-        <source>Spectrum</source>
-        <translation>Spectrum</translation>
-    </message>
-    <message>
-        <source>Goom</source>
-        <translation>Goom</translation>
-    </message>
-    <message>
-        <source>Synaesthesia</source>
-        <translation>Synaesthesia</translation>
-    </message>
-    <message>
-        <source>Gears</source>
-        <translation>Gears</translation>
-    </message>
-    <message>
-        <source>Blank</source>
-        <translation>Blank</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -838,10 +764,6 @@
         <translation>Haben Sie configure ausgeführt?</translation>
     </message>
     <message>
-        <source>and</source>
-        <translation>und</translation>
-    </message>
-    <message>
         <source>Use variable bitrates</source>
         <translation>Nutze variable Bitraten</translation>
     </message>
@@ -918,10 +840,6 @@
         <translation>CDs Brennen</translation>
     </message>
     <message>
-        <source>Artists</source>
-        <translation type="obsolete">Interpreten</translation>
-    </message>
-    <message>
         <source>Creating CD File System</source>
         <translation>Erzeuge CD-Dateisystem</translation>
     </message>
@@ -954,20 +872,8 @@
         <translation>SCSI- oder IDE-Brenner auswählen.</translation>
     </message>
     <message>
-        <source>Scanning music files</source>
-        <translation type="obsolete">Durchsuche Musik-Dateien</translation>
-    </message>
-    <message>
         <source>Rebuilding music tree</source>
         <translation>Erneuere die Musik-Struktur</translation>
-    </message>
-    <message>
-        <source>Only Import new music.</source>
-        <translation type="obsolete">Nur neue Titel importieren.</translation>
-    </message>
-    <message>
-        <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation type="obsolete">Beim CD-Import die Datenbank auf Duplikate überprüfen.</translation>
     </message>
     <message>
         <source>Loading Music</source>
@@ -975,98 +881,142 @@
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>default</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Audiogerät für die Wiedergabe. &apos;default&apos; benutzt das Standardgerät von MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekanntes Lied</translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished">Importiere </translation>
+        <translation>Importiere </translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis- buw. Dateiformat, das benutzt wird, um Informationen zu sammeln, wenn kein ID3 Tags gefunden wurden. Akzeptiert GENRE, ARTIST, TITLE, ARTIST_TITLE und TRACK_TITLE.</translation>
     </message>
     <message>
         <source>Tag Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag Enkodierung</translation>
     </message>
     <message>
         <source>UTF-16</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-16</translation>
     </message>
     <message>
         <source>UTF-8</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-8</translation>
     </message>
     <message>
         <source>Ascii</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascii</translation>
     </message>
     <message>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige MP3 player können nicht mit UTF-8 oder UTF-16 enkodierten Tags umgehen. Diese Einstellung erlaubt das Ändern diese Formats. Zur Zeit nur für ID3 Tags verfügbar.</translation>
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>Definiert den Ort/Namen für neue Lieder. Erlaubte Ausdrücke sind: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     </message>
     <message>
         <source>Maximum Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximale Anzahl an Suchergebnissen</translation>
     </message>
     <message>
         <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiermit kann die Anzahl an Suchergebnissen reduziert werden.</translation>
     </message>
     <message>
         <source>Resume mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederaufnahmemodus</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Aus</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Lied</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>Exakt</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimmt die Wiedergabe entweder am Anfang der aktiven Playlist, am Anfang des letztgespielten Liedes oder am exakten Stoppunkt wieder auf.</translation>
     </message>
     <message>
         <source>Playback Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabe Einstellungen (2)</translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
+        <translation>Started den Zufallswiedergabemodus für den Player. Kann entweder normal, random, intelligent oder album sein.</translation>
+    </message>
+    <message>
+        <source>Change the visualizer when the song changes.</source>
+        <translation>Wechselt das Visualisierungsplugin, wenn der Song sich ändert.</translation>
+    </message>
+    <message>
+        <source>Show the type of visualizer on each song instead of song information</source>
+        <translation>Zeigt den Visualisierungstyp an jedem Lied anstatt der Liedinformation</translation>
+    </message>
+    <message>
+        <source>Show the changed visualizer when the song changes. Otherwise song information will be shown.</source>
+        <translation>Zeigt das geänderte Visualisierungsplugin, wenn der Song wechselt. Ansonsten wird die Song information gezeigt.</translation>
+    </message>
+    <message>
+        <source>Show Album Art at the start of each song</source>
+        <translation>Zeigt das Album Cover beim Start von jedem Lied</translation>
+    </message>
+    <message>
+        <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
+        <translation>Wenn ein Lied wechselt und es hat ein Album Cover, wird diese am Anfang kurz gezeigt.</translation>
+    </message>
+    <message>
+        <source>Randomize Visualizer order</source>
+        <translation>Zufällige Anordnung der Visualisierungsplugins</translation>
+    </message>
+    <message>
+        <source>On changing the visualizer pick a new one at random.</source>
+        <translation>Wenn das Visualisierungsplugin geändert wird, wird ein zufälliges ausgewählt.</translation>
+    </message>
+    <message>
+        <source>List of visualizations to use during playback. Click the button below to edit this list</source>
+        <translation>Liste an Visualisierungsplugins während der Wiedergabe. Klicke auf den Knopf unterhalb, um die Liste zu ändern</translation>
+    </message>
+    <message>
+        <source>Edit Visualizations</source>
+        <translation>Ändere die Visualisierungen</translation>
+    </message>
+    <message>
+        <source>Edit the list of visualizations to use during playback.</source>
+        <translation>Ändere die Liste an Visualisierungen, die während der Wiedergabe benutzt werden.</translation>
     </message>
 </context>
 <context>
     <name>RipStatus</name>
     <message>
         <source>Stop Rip?</source>
-        <translation type="unfinished"></translation>
+        <translation>Rip stoppen?</translation>
     </message>
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, daß die den Ripvorgang stoppen möchten?</translation>
     </message>
 </context>
 <context>
     <name>Ripper</name>
-    <message>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation type="obsolete">Bitte wählen Sie eine Qualitätsstufe und prüfen Sie die Albumdaten:</translation>
-    </message>
     <message>
         <source>Low</source>
         <translation>Niedrig</translation>
@@ -1084,74 +1034,16 @@
         <translation>Perfekt</translation>
     </message>
     <message>
-        <source>Artist: </source>
-        <translation type="obsolete">Interpret:</translation>
-    </message>
-    <message>
-        <source>Album: </source>
-        <translation type="obsolete">Album:</translation>
-    </message>
-    <message>
-        <source>Import this CD</source>
-        <translation type="obsolete">CD importieren</translation>
-    </message>
-    <message>
-        <source>Importing CD:
-</source>
-        <translation type="obsolete">Importiere CD:</translation>
-    </message>
-    <message>
-        <source>Copying from CD:
-</source>
-        <translation type="obsolete">Kopiere von CD:</translation>
-    </message>
-    <message>
-        <source>Genre: </source>
-        <translation type="obsolete">Genre:</translation>
-    </message>
-    <message>
-        <source>Ripping...</source>
-        <translation type="obsolete">Importiere...</translation>
-    </message>
-    <message>
-        <source>Multi-Artist?</source>
-        <translation type="obsolete">Mehrere Interpreten?</translation>
-    </message>
-    <message>
-        <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="obsolete">Titel &amp; Interpreten vertauschen</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Titel</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Interpret</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Länge</translation>
-    </message>
-    <message>
-        <source>Quality: </source>
-        <translation type="obsolete">Qualität: </translation>
-    </message>
-    <message>
-        <source>Importing </source>
-        <translation type="obsolete">Importiere </translation>
-    </message>
-    <message>
         <source>Switch Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel ändern</translation>
     </message>
     <message>
         <source>Scan CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD durchsuchen</translation>
     </message>
     <message>
         <source>Rip CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD rippen</translation>
     </message>
     <message>
         <source>Artist: %1
@@ -1160,39 +1052,43 @@ Track: %3
 
 This track is already in the database. 
 Do you want to remove the existing track?</source>
-        <translation type="unfinished"></translation>
+        <translation>Künstler: %1
+Album: %2
+Lied: %3
+Dieses Lied ist schon in der Datenbank. 
+Wollen Sie das existierende Lied löschen?</translation>
     </message>
     <message>
         <source>No tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Lieder</translation>
     </message>
     <message>
         <source>There are no tracks to rip?</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Lieder rippen?</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Erfolg</translation>
     </message>
     <message>
         <source>Rip completed successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripvorgang erfolgreich beendet.</translation>
     </message>
     <message>
         <source>Ejecting CD. Please Wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>CD wird ausgeworfen. Bitte warten ...</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished">Einen Interpreten wählen</translation>
+        <translation>Einen Interpreten wählen</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished">Ein Album wählen</translation>
+        <translation>Ein Album wählen</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished">Ein Genre wählen</translation>
+        <translation>Ein Genre wählen</translation>
     </message>
 </context>
 <context>
@@ -1449,10 +1345,6 @@ Do you want to remove the existing track?</source>
         <translation>Limit:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -1542,6 +1434,45 @@ Do you want to remove the existing track?</source>
     <message>
         <source>Filename:</source>
         <translation>Dateiname:</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationsEditor</name>
+    <message>
+        <source>Visualizations</source>
+        <translation>Visualisierungen</translation>
+    </message>
+    <message>
+        <source>Selected Visualizations</source>
+        <translation>Ausgewählte Visualisierungen</translation>
+    </message>
+    <message>
+        <source>Available Visualizations</source>
+        <translation>Verfügbare Visualisierungen</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation>Hersteler</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>Nach oben verschieben</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>Nach unten verschieben</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 </TS>
