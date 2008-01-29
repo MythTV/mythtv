@@ -3,6 +3,7 @@
    <button>
      <type>SETTINGS_WEATHER</type>
      <text>Weather Settings</text>
+     <text lang="IT">Impostazioni Meteo</text>
      <text lang="ES">El Tiempo</text>
      <text lang="FR">Configuration météo</text>
      <text lang="CA">Configurar El Temps</text>
@@ -34,6 +35,7 @@
    <button>
      <type>SETTINGS_NEWS</type>
      <text>News Settings</text>
+     <text lang="IT">Impostazioni Notizie</text>
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Noticias</text>
@@ -74,6 +76,7 @@
    <button>
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
+     <text lang="IT">Impostazioni NetFlix</text>
      <text lang="FI">MythFlix Asetukset</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
@@ -88,6 +91,7 @@
    <button>
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
+     <text lang="IT">Impostazioni Web</text>
      <text lang="DE">WWW</text>
      <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
@@ -111,6 +115,7 @@
    <button>
      <type>SETTINGS_RECIPE</type>
      <text>Recipe Settings</text>
+     <text lang="IT">Impostazioni Ricette</text>
      <text lang="SV">Recept</text>
      <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte</text>

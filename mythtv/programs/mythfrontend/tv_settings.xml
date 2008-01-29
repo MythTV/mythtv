@@ -27,7 +27,7 @@
    <button>
       <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
-      <text lang="IT">Guida programmi</text>
+      <text lang="IT">Guida Programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programmagids</text>
@@ -84,6 +84,7 @@
    <button>
       <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
       <text>Playback Groups</text>
+      <text lang="IT">Gruppi di Riproduzione</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="FR">Groupes de lecture</text>
       <text lang="PT">Grupos de Visualização</text>
@@ -100,7 +101,7 @@
    <button>
       <type>TV_SETTINGS_RECORDING_PROFILES</type>
       <text>Recording Profiles</text>
-      <text lang="IT">Registrazione</text>
+      <text lang="IT">Registrazioni</text>
       <text lang="ES">Grabación</text>
       <text lang="CA">Gravació</text>
       <text lang="NL">Opnameprofielen</text>
@@ -129,6 +130,7 @@
    <button>
       <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
+      <text lang="IT">Priorità Registrazioni</text>
       <text lang="FR">Priorités d'enregistrement</text>
       <text lang="DE">Prioritäten</text>
       <text lang="IS">Forgangur</text>

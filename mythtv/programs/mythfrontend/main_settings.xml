@@ -51,6 +51,7 @@
    <button>
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
+     <text lang="IT">Impostazioni TV</text>
      <text lang="DE">TV</text>
      <text lang="SV">TV</text>
      <text lang="NL">TV</text>    
@@ -73,6 +74,7 @@
    <button>
      <type>SETTINGS_MEDIA</type>
      <text>Media Settings</text>
+     <text lang="IT">Impostazioni Media</text>
      <text lang="DE">Medien</text>
      <text lang="SV">Media</text>
      <text lang="NL">Media</text>
@@ -96,6 +98,7 @@
    <button>
      <type>SETTINGS_INFO_CENTER</type>
      <text>Info Center Settings</text>
+     <text lang="IT">Impostazioni Centro Informazioni</text>
      <text lang="DE">Informationen</text>
      <text lang="NL">Informatiecentrale</text>     
      <text lang="FR">Configuration centre d'informations</text>
@@ -121,6 +124,7 @@
    <button>
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
+     <text lang="IT">Impostazioni Xbox</text>
      <text lang="PT">Configurar XBox</text>
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
@@ -145,6 +149,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone Settings</text>
+      <text lang="IT">Impostazioni Telefono</text>
       <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telefon</text>
       <text lang="IS">Stillingar síma</text>
@@ -167,6 +172,7 @@
    <button>
        <type>ZONEMINDER</type>
        <text>ZoneMinder Settings</text>
+       <text lang="IT">Impostazioni Videosorveglianza</text>
        <text lang="DK">ZoneMinder</text>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>

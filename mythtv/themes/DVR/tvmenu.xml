@@ -22,7 +22,7 @@
    <button>
       <type>TV_DELETE</type>
       <text>Delete Recordings</text>
-      <text lang="IT">Elimina una registrazione</text>
+      <text lang="IT">Elimina Registrazioni</text>
       <text lang="ES">Borrar Grabaciones</text>
       <text lang="CA">Esborrar Gravacions</text>
       <text lang="NL">Opnames Verwijderen</text>
@@ -63,6 +63,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="IT">Recentemente Registrati</text>
       <text lang="FR">Enregistré précedemment</text>
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>

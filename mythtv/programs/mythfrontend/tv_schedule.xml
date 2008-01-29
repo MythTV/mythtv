@@ -3,7 +3,7 @@
    <button>
       <type>TV_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
-      <text lang="IT">Guida programmi</text>
+      <text lang="IT">Guida Programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programmagids</text>
@@ -23,6 +23,7 @@
       <text lang="CZ">Programový průvodce</text>
       <text lang="RU">Программа передач</text>
       <alttext>Guide</alttext>
+      <alttext lang="IT">Guida</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Guía</alttext>
       <alttext lang="CA">Guia</alttext>
@@ -44,7 +45,7 @@
    <button>
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
-      <text lang="IT">Ricerca programmi</text>
+      <text lang="IT">Ricerca Programmi</text>
       <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma's Zoeken</text>
@@ -64,6 +65,7 @@
       <text lang="CZ">Vyhledávač programů</text>
       <text lang="RU">Поиск программы</text>
       <alttext>Finder</alttext>
+      <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
@@ -85,6 +87,7 @@
    <button>
       <type>TV_SEARCH_WORDS</type>
       <text>Search Words</text>
+      <text lang="IT">Ricerca Parole</text>
       <text lang="FR">Recherche textuelle</text>
       <text lang="DE">Volltextsuche</text>
       <text lang="IS">Leita að orðum</text>
@@ -102,6 +105,7 @@
       <text lang="CZ">Hledat slova</text>
       <text lang="RU">Поиск по словам</text>
       <alttext>Search</alttext>
+      <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
       <alttext lang="SV">Ord</alttext>
@@ -120,6 +124,7 @@
    <button>
       <type>TV_SEARCH_LISTS</type>
       <text>Search Lists</text>
+      <text lang="IT">Ricerca Liste</text>
       <text lang="SV">Sök listor</text>
       <text lang="NL">Overzichtslijsten</text>
       <text lang="FR">Listes prédéfinies</text>
@@ -136,6 +141,7 @@
       <text lang="CZ">Hledat seznamy</text>
       <text lang="RU">Поиск по спискам</text>
       <alttext>Lists</alttext>
+      <alttext lang="IT">Liste</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
       <alttext lang="SV">Listor</alttext>
@@ -187,6 +193,7 @@
    <button>
       <type>TV_CUSTOM_RECORD</type>
       <text>Custom Record</text>
+      <text lang="IT">Registrazione Personalizzata</text>
       <text lang="SV">Avancerad</text>
       <text lang="NL">Geavanceerd Opnameschema</text>
       <text lang="JA">カスタム録画</text>
@@ -209,6 +216,7 @@
    <button>
       <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
+      <text lang="IT">Pianificazione Manuale</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
@@ -228,6 +236,7 @@
       <text lang="CZ">Ruční plánování</text>
       <text lang="RU">Ручное планирование</text>
       <alttext>Man. Sched.</alttext>
+      <alttext lang="IT">Manuale</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>

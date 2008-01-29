@@ -3,6 +3,7 @@
    <button>
       <type>MUSIC_PLAYLIST</type>
       <text>Music Tools</text>
+      <text lang="IT">Opzioni Musica</text>
       <text lang="DE">Musik verwalten</text>
       <text lang="IS">Tónlistartól</text>
       <text lang="NL">Muziek Beheren</text>
@@ -26,6 +27,7 @@
    <button>
       <type>VIDEO_MANAGER</type>
       <text>Video Manager</text>
+      <text lang="IT">Gestione Video</text>
       <text lang="ES">Gestionar Videos</text>
       <text lang="CA">Gestionar vÃ­deos</text>
       <text lang="DK">Filmopsætning</text>
@@ -50,6 +52,7 @@
    <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="IT">Modifica Tasti</text>
       <text lang="FR">Configurer les touches</text>
       <text lang="IS">Stilla takka</text>
       <text lang="DE">Tastenbelegung ändern</text>

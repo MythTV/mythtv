@@ -3,7 +3,7 @@
    <button>
       <type>TV_WATCH_RECORDINGS</type>
       <text>Watch Recordings</text>
-      <text lang="IT">Guarda una registrazione</text>
+      <text lang="IT">Guarda Registrazioni</text>
       <text lang="ES">Ver Grabaciones</text>
       <text lang="CA">Veure Gravacions</text>
       <text lang="NL">Opnames Bekijken</text>
@@ -30,6 +30,7 @@
    <button>
      <type>VIDEO_BROWSER</type>
      <text>Watch Videos</text>
+     <text lang="IT">Guarda Video</text>
      <text lang="ES">Ver Videos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
@@ -57,7 +58,7 @@
    <button>
       <type>MUSIC_PLAY</type>
       <text>Listen to Music</text>
-      <text lang="IT">Esegui brani musicali</text>
+      <text lang="IT">Esegui Brani Musicali</text>
       <text lang="ES">Escuchar Música</text>
       <text lang="CA">Escoltar Música</text>
       <text lang="DE">Musik hören</text>
@@ -82,6 +83,7 @@
    <button>
      <type>FM</type>
      <text>Listen to the radio</text>
+     <text lang="IT">Ascolta la Radio</text>
      <text lang="SV">Lyssna på radio</text>
      <text lang="NL">Radio Luisteren</text>
      <text lang="JA">ラジオ放送</text>

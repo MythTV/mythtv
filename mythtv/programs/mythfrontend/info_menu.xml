@@ -3,6 +3,7 @@
    <button>
      <type>PHONE</type>
      <text>Phone</text>
+     <text lang="IT">Telefono</text>
      <text lang="JA">電話</text>
      <text lang="DE">Telefon</text>
      <text lang="IS">Sími</text>
@@ -25,6 +26,7 @@
    <button>
      <type>NEWS</type>
      <text>News Feeds</text>
+     <text lang="IT">Notizie</text>
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
@@ -49,6 +51,7 @@
    <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
+     <text lang="IT">Orari</text>
      <text lang="FI">Elokuvahaku</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
@@ -110,6 +113,7 @@
    <button>
       <type>WEBPAGE</type>
       <text>Web</text>
+      <text lang="IT">Web</text>
       <text lang="DE">WWW</text>
       <text lang="FR">Web</text>
       <text lang="IS">Vefurinn</text>
@@ -133,6 +137,7 @@
     <button>
      <type>RECIPE</type>
      <text>Recipes</text>
+     <text lang="IT">Ricette</text>
      <text lang="SV">Recept</text>
      <text lang="IS">Uppskriftir</text>
      <text lang="NL">Recepten</text>     
@@ -156,6 +161,7 @@
    <button>
       <type>TV_STATUS</type>
       <text>System Status</text>
+      <text lang="IT">Stato del Sistema</text>
       <text lang="DE">Systemstatus</text>
       <text lang="FR">Etat système</text>
       <text lang="IS">Staða kerfis</text>
@@ -178,6 +184,7 @@
    <button>
       <type>ZONEMINDER</type>
       <text>Zone Minder</text>
+      <text lang="IT">Videosorveglianza</text>
       <action>PLUGIN mythzoneminder</action>
       <depends>mythzoneminder</depends>
  </button>

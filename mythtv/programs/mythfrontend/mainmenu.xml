@@ -28,6 +28,7 @@
    <button>
      <type>MENU_MEDIA_LIBRARY</type>
      <text>Media Library</text>
+     <text lang="IT">Multimedia</text>
      <text lang="DE">Mediathek</text>
      <text lang="FR">Médiathèque</text>
      <text lang="IS">Margmiðlunarsafn</text>
@@ -55,7 +56,7 @@
     <button>
       <type>MENU_MANAGE_RECORDINGS</type>
       <text>Manage Recordings</text>
-      <text lang="IT">Programma una registrazione</text>
+      <text lang="IT">Programma Registrazioni</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="NL">Opnames Beheren</text>
@@ -86,6 +87,7 @@
    <button>
      <type>MENU_INFO_CENTER</type>
      <text>Information Center</text>
+     <text lang="IT">Centro Informazioni</text>
      <text lang="DE">Informationen</text>
      <text lang="FR">Centre d'informations</text>
      <text lang="IS">Upplýsinga miðstöð</text>
@@ -119,6 +121,7 @@
    <button>
      <type>MENU_OPTICAL_DISKS</type>
      <text>Optical Disks</text>
+     <text lang="IT">CD/DVD</text>
      <text lang="DE">CD/DVD</text>
      <text lang="FR">Disques optiques</text>
      <text lang="IS">Geisladiskar</text>

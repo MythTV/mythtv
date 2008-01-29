@@ -3,6 +3,7 @@
    <button>
       <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
+      <text lang="IT">Nuovi Titoli</text>
       <text lang="DE">Neue Sendungen</text>
       <text lang="IS">Nýjir titlar</text>
       <text lang="FR">Nouveaux titres</text>
@@ -25,6 +26,7 @@
    <button>
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
+      <text lang="IT">Films</text>
       <text lang="DE">Spielfilme</text>
       <text lang="IS">Myndir</text>
       <text lang="SV">Filmer</text>
@@ -48,6 +50,7 @@
    <button>
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
+      <text lang="IT">Categorie</text>
       <text lang="DE">Kategorien</text>
       <text lang="IS">Flokkar</text>
       <text lang="SV">Kategori</text>
@@ -70,6 +73,7 @@
    <button>
       <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
+      <text lang="IT">Canali</text>
       <text lang="DE">Sender</text>
       <text lang="IS">Stöðvar</text>
       <text lang="SV">Kanal</text>
@@ -92,6 +96,7 @@
    <button>
       <type>TV_SEARCH_TIMES</type>
       <text>Time</text>
+      <text lang="IT">Ora</text>
       <text lang="NL">Tijdstip</text>
       <text lang="SV">Tid</text>
       <text lang="FR">Durée</text>

@@ -43,6 +43,7 @@
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="IT">Modifica Tasti</text>
       <text lang="FR">Touches</text>
       <text lang="NL">Toetsen instellen</text>
       <text lang="SV">Ändra knappar</text>
@@ -61,6 +62,7 @@
    <button>
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
+     <text lang="IT">Impostazioni TV</text>
      <text lang="CA">Configuració de TV</text>
      <text lang="ES">Configuración de TV</text>
      <text lang="FR">TV</text>
@@ -80,6 +82,7 @@
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
+     <text lang="IT">Impostazioni Musica</text>
      <text lang="FR">Musique</text>
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
@@ -101,6 +104,7 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
+       <text lang="IT">Impostazioni Video</text>
        <text lang="ES">Configurar Videos</text>
        <text lang="FR">Vidéos</text>
        <text lang="CA">Configurar Videos</text>
@@ -121,6 +125,7 @@
    <button>
       <type>SETTINGS_FM</type>
       <text>Radio Settings</text>
+      <text lang="IT">Impostazioni Radio</text>
       <text lang="DE">Radio</text>
       <text lang="FR">Radio</text>
       <text lang="SI">Radio nastavitve</text>
@@ -147,6 +152,7 @@
    <button>
       <type>SETTINGS_IMAGES</type>
       <text>Images Settings</text>
+      <text lang="IT">Impostazioni Immagini</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
@@ -167,6 +173,7 @@
    <button>
      <type>SETTINGS_GAME</type>
      <text>Game Settings</text>
+     <text lang="IT">Impostazioni Giochi</text>
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
@@ -187,6 +194,7 @@
    <button>
      <type>SETTINGS_WEATHER</type>
      <text>Weather Settings</text>
+     <text lang="IT">Impostazioni Meteo</text>
      <text lang="ES">Configurar El Tiempo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
@@ -214,6 +222,7 @@
    <button>
      <type>SETTINGS_NEWS</type>
      <text>News Settings</text>
+     <text lang="IT">Impostazioni Notizie</text>
      <text lang="DE">Nachrichten</text>
      <text lang="FR">Nouvelles</text>
      <text lang="CA">Configurar Notícies</text>
@@ -234,6 +243,7 @@
    <button>
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
+     <text lang="IT">Impostazioni NetFlix</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="ET">NetFlix'i sätted</text>
      <text lang="ES">MythFlix</text>
@@ -247,6 +257,7 @@
    <button>
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
+     <text lang="IT">Impostazioni Web</text>
      <text lang="DE">WWW</text>
      <text lang="FR">WWW</text>
      <text lang="SV">Webb</text>
@@ -266,6 +277,7 @@
    <button>
       <type>SETTINGS_RECIPE</type>
       <text>Recipe Settings</text>
+      <text lang="IT">Impostazioni Ricette</text>
       <text lang="DE">Rezepte</text>
       <text lang="FR">Recettes</text>
       <text lang="SI">Nastavitve receptov</text>
@@ -284,6 +296,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone Settings</text>
+      <text lang="IT">Impostazioni Telefono</text>
       <text lang="DE">Telefon</text>
       <text lang="FR">Téléphone</text>
       <text lang="SI">Nastavitve telefona</text>
@@ -303,6 +316,7 @@
    <button>
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
+     <text lang="IT">Impostazione Orari</text>
      <text lang="EN_GB">Cinema Listings Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
      <text lang="FR">Movie Time</text>
@@ -321,6 +335,7 @@
    <button>
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
+     <text lang="IT">Impostazioni Xbox</text>
      <text lang="PT">Configurar XBox</text>
      <text lang="FR">XBox</text>
      <text lang="CA">Configurar XBox</text>
@@ -341,6 +356,7 @@
    <button>
      <type>SETTINGS_ARCHIVE</type>
      <text>Archive Files Settings</text>
+     <text lang="IT">Impostazioni Archivia Files</text>
      <text lang="ET">Arhiveerimise sätted</text>
      <text lang="SV">Filarkivering</text>
      <text lang="RU">Настройка архива</text>
@@ -352,6 +368,7 @@
    <button>
        <type>SETTINGS_ZONEMINDER</type>
        <text>ZoneMinder Settings</text>
+      <text lang="IT">Impostazioni Videosorveglianza</text>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>

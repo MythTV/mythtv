@@ -3,6 +3,7 @@
    <button>
      <type>TV</type>
      <text>TV</text>
+     <text lang="IT">TV</text>
      <text lang="PT">Televisão</text>
      <text lang="SV">TV</text>
      <text lang="DE">TV</text>
@@ -62,6 +63,7 @@
    <button>
       <type>FM</type>
       <text>Radio</text>
+      <text lang="IT">Radio</text>
       <text lang="DE">Radio</text>
       <text lang="FR">Radio</text>
       <text lang="SI">Radio</text>
@@ -157,6 +159,7 @@
    <button>
      <type>NEWS</type>
      <text>News Feeds</text>
+     <text lang="IT">Notizie</text>
      <text lang="DE">Nachrichten</text>
      <text lang="FR">Nouvelles</text>
      <text lang="CA">Notícies</text>
@@ -186,6 +189,7 @@
    <button>
       <type>WEBPAGE</type>
       <text>Web</text>
+      <text lang="IT">Web</text>
       <text lang="DE">WWW</text>
       <text lang="FR">Web</text>
       <text lang="SV">Webb</text>
@@ -205,6 +209,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone</text>
+      <text lang="IT">Telefono</text>
       <text lang="FR">Téléphone</text>
       <text lang="DE">Telefon</text>
       <text lang="SI">Telefon</text>
@@ -224,6 +229,7 @@
    <button>
       <type>RECIPE</type>
       <text>Recipes</text>
+      <text lang="IT">Ricette</text>
       <text lang="FR">Recettes</text>
       <text lang="DE">Rezepte</text>
       <text lang="SI">Recepti</text>
@@ -241,6 +247,7 @@
    <button>
        <type>ARCHIVE</type>
        <text>Archive Files</text>
+       <text lang="IT">Archivia Files</text>
        <text lang="ET">Arhiveerimine</text>
        <text lang="SV">Arkivera filer</text>
        <text lang="NL">Bestanden Archiveren</text>
@@ -253,6 +260,7 @@
    <button>
        <type>ZONEMINDER</type>
        <text>Zone Minder</text>
+       <text lang="IT">Videosorveglianza</text>
        <action>PLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
@@ -260,6 +268,7 @@
    <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
+     <text lang="IT">Orari</text>
      <text lang="EN_GB">Cinema Listings</text>
      <text lang="FI">Elokuvien Ajat</text>
      <text lang="SI">Čas filmov</text>

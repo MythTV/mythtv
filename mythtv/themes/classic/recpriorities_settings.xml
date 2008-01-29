@@ -3,6 +3,7 @@
    <button>
       <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
       <text>Set Recording Priorities</text>
+      <text lang="IT">Priorità Registrazione</text>
       <text lang="DE">Aufnahmen</text>
       <text lang="FR">Enregistrements</text>
       <text lang="SV">Inspelningsprioriteter</text>
@@ -14,6 +15,7 @@
       <text lang="NL">Opnameprioriteiten Instellen</text>
       <text lang="RU">Установить приоритет записей</text>
       <alttext>Recording Priorities</alttext>
+      <alttext lang="IT">Priorità</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="SI">Snemalne prioritete</alttext>
@@ -28,6 +30,7 @@
    <button>
       <type>TV_RECPRIORITIES_CHANNEL</type>
       <text>Set Channel Recording Priorities</text>
+      <text lang="IT">Priorità Canali</text>
       <text lang="DE">Sender</text>
       <text lang="FR">Chaînes</text>
       <text lang="SV">Kanalprioriteter</text>
@@ -40,6 +43,7 @@
       <text lang="NL">Opnameprioriteiten per Zender</text>
       <text lang="RU">Установить приоритет каналов</text>
       <alttext>Channel Priorities</alttext>
+      <alttext lang="IT">Canali</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <alttext lang="DE">Sender</alttext>
@@ -56,6 +60,7 @@
    <button>
       <type>TV_RECPRIORITIES_CUSTOM</type>
       <text>Custom Priority</text>
+      <text lang="IT">Personalizzate</text>
       <alttext>Custom Priority</alttext>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>

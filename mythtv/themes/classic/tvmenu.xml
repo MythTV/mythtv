@@ -22,7 +22,7 @@
    <button>
       <type>TV_SCHEDULE_RECORDINGS</type>
       <text>Schedule Recordings</text>
-      <text lang="IT">Programma una registrazione</text>
+      <text lang="IT">Pianifica Registrazioni</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="NL">Opnames Plannen</text>
@@ -36,6 +36,7 @@
       <text lang="ET">Salvestamise plaanimine</text>
       <text lang="RU">Расписание записи</text>
       <alttext>Schedule</alttext>
+      <alttext lang="IT">Pianifica</alttext>
       <alttext lang="FR">Planifier</alttext>
       <alttext lang="ES">Temporizadores</alttext>
       <alttext lang="CA">Temporitzadors</alttext>
@@ -44,7 +45,7 @@
       <alttext lang="PT">Programar</alttext>
       <alttext lang="SV">Schemalägg</alttext>
       <alttext lang="JA">予約</alttext>
-      <alttext lang="IT">Programmazione</alttext>
+      <alttext lang="IT">Pianifica</alttext>
       <alttext lang="DE">Planung</alttext>
       <alttext lang="SI">Planiranje</alttext>
       <alttext lang="ET">Plaanimine</alttext>
@@ -55,7 +56,7 @@
    <button>
       <type>TV_WATCH_RECORDINGS</type>
       <text>Watch Recordings</text>
-      <text lang="IT">Guarda una registrazione</text>
+      <text lang="IT">Guarda Registrazioni</text>
       <text lang="ES">Ver Grabaciones</text>
       <text lang="CA">Veure Gravacions</text>
       <text lang="NL">Opnames Bekijken</text>
@@ -77,7 +78,7 @@
    <button>
       <type>TV_DELETE</type>
       <text>Delete Recordings</text>
-      <text lang="IT">Elimina una registrazione</text>
+      <text lang="IT">Elimina Registrazioni</text>
       <text lang="ES">Borrar Grabaciones</text>
       <text lang="CA">Esborrar Gravacions</text>
       <text lang="NL">Opnames Verwijderen</text>
@@ -117,6 +118,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="IT">Recentemente Registrati</text>
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="SI">Že posneto</text>
@@ -134,6 +136,7 @@
    <button>
       <type>TV_STATUS</type>
       <text>System Status</text>
+      <text lang="IT">Stato del Sistema</text>
       <text lang="DE">Systemstatus</text>
       <text lang="FR">Etat système</text>
       <text lang="SV">Systemstatus</text>

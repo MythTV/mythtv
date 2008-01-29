@@ -3,6 +3,7 @@
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
+     <text lang="IT">Impostazioni Musica</text>
      <text lang="ES">Música</text>
      <text lang="FR">Musique</text>
      <text lang="CA">Configurar Música</text>
@@ -27,6 +28,7 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
+       <text lang="IT">Impostazioni Video</text>
        <text lang="ES">Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Vidéos</text>
@@ -51,6 +53,7 @@
    <button>
       <type>SETTINGS_IMAGES</type>
       <text>Images Settings</text>
+      <text lang="IT">Impostazioni Immagini</text>
       <text lang="ES">Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="FR">Images</text>
@@ -75,6 +78,7 @@
    <button>
      <type>SETTINGS_GAME</type>
      <text>Game Settings</text>
+     <text lang="IT">Impostazioni Giochi</text>
      <text lang="ES">Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
@@ -98,6 +102,7 @@
    <button>
      <type>SETTINGS_FM</type>
      <text>Radio Settings</text>
+     <text lang="IT">Impostazioni Radio</text>
      <text lang="SV">Radio</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
@@ -126,6 +131,7 @@
    <button>
       <type>SETTINGS_ARCHIVE</type>
       <text>Archive Files Settings</text>
+      <text lang="IT">Impostazioni Archivia Files</text>
       <text lang="ET">Arhiveerimise sätted</text>
       <text lang="SV">Filarkivering</text>
       <text lang="ES">Archivado Ficheros</text>

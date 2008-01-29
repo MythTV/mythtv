@@ -22,7 +22,7 @@
       <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="EN_GB">Programme Guide</text>
-      <text lang="IT">Guida programmi</text>
+      <text lang="IT">Guida Programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programmagids</text>
@@ -69,6 +69,7 @@
    <button>
       <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
       <text>Playback Groups</text>
+      <text lang="IT">Gruppi di Riproduzione</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="PT">Grupos de Visualização</text>
       <text lang="ET">Esitlusgrupid</text>
@@ -107,6 +108,7 @@
    <button>
       <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
+      <text lang="IT">Priorità</text>
       <text lang="FR">Priorités</text>
       <text lang="DE">Prioritäten</text>
       <text lang="PT">Prioridades de Gravação</text>
