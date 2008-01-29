@@ -755,7 +755,7 @@ void GuideGrid::timeCheckTimeout(void)
 
 void GuideGrid::repaintVideoTimeout(void)
 {
-    timeCheck->changeInterval(1000);
+    videoRepaintTimer->changeInterval(1000);
     update(videoRect);
 }
 
