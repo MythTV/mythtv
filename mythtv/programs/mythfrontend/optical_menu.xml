@@ -101,7 +101,7 @@
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD p/ Disco</text>
       <text lang="SV">Importera CD</text>
-      <text lang="FR">Importer un CD audio</text>
+      <text lang="FR">Importer un CD</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Kopioi CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>
@@ -120,6 +120,7 @@
       <text>Eject media</text>
       <text lang="IT">Espelli Media</text>
       <text lang="SV">Mata ut</text>
+      <text lang="FR">Ejecter le Média</text>
       <text lang="ES">Expulsar medios</text>
       <text lang="RU">Достать диск</text>
       <text lang="DK">Skub ud</text>

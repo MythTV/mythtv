@@ -7,7 +7,7 @@
       <text lang="ES">Ver Grabaciones</text>
       <text lang="CA">Veure Gravacions</text>
       <text lang="NL">Opnames Bekijken</text>
-      <text lang="FR">Visionner les enregistrements</text>
+      <text lang="FR">Voir un enregistrement</text>
       <text lang="DE">Aufnahmen ansehen</text>
       <text lang="DK">Afspil optagelser</text>
       <text lang="IS">Horfa á upptökur</text>
@@ -38,7 +38,7 @@
      <text lang="IS">Horfa á myndir</text>
      <text lang="PT">Ver Filmes</text>
      <text lang="SV">Visa filmer</text>
-     <text lang="FR">Regarder des vidéos</text>
+     <text lang="FR">Voir une vidéo</text>
      <text lang="NL">Films Bekijken</text>
      <text lang="JA">ビデオブラウズ</text>
      <text lang="FI">Katso Videoita</text>
@@ -121,7 +121,7 @@
      <text lang="ES">Fotos</text>
      <text lang="CA">Imatges</text>
      <text lang="NL">Foto's</text>
-     <text lang="FR">Images</text>
+     <text lang="FR">Gallerie photo</text>
      <text lang="DE">Bilder ansehen</text>
      <text lang="DK">Billeder</text>
      <text lang="IS">Ljósmyndir</text>

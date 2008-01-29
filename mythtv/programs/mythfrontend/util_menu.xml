@@ -8,7 +8,7 @@
       <text lang="IS">Tónlistartól</text>
       <text lang="NL">Muziek Beheren</text>
       <text lang="SV">Musikverktyg</text>
-      <text lang="FR">Musiques</text>
+      <text lang="FR">Gestion Musiques</text>
       <text lang="JA">ミュージックツール</text>
       <text lang="FI">Musiikkityökalut</text>
       <text lang="ZH_TW">音樂工具</text>
@@ -35,7 +35,7 @@
       <text lang="IS">Kvikmyndatól</text>
       <text lang="PT">Gerir Filmes</text>
       <text lang="SV">Filmhanterare</text>
-      <text lang="FR">Vidéos</text>
+      <text lang="FR">Gestion Vidéos</text>
       <text lang="NL">Films Beheren</text>
       <text lang="JA">ビデオマネージャー</text>
       <text lang="FI">Videonhallinta</text>
@@ -82,7 +82,7 @@
       <text lang="IT">Impostazioni</text>
       <text lang="ES">Configurar</text>
       <text lang="CA">Configurar</text>
-      <text lang="FR">Configuration</text>
+      <text lang="FR">Paramètres</text>
       <text lang="DE">Konfiguration</text>
       <text lang="DK">Indstillinger</text>
       <text lang="IS">Stillingar</text>

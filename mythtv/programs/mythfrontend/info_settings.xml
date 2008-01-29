@@ -5,7 +5,7 @@
      <text>Weather Settings</text>
      <text lang="IT">Impostazioni Meteo</text>
      <text lang="ES">El Tiempo</text>
-     <text lang="FR">Configuration météo</text>
+     <text lang="FR">Paramètres météo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejrindstillinger</text>
@@ -40,7 +40,7 @@
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
-     <text lang="FR">Configuration des nouvelles</text>
+     <text lang="FR">Paramètres des infos</text>
      <text lang="IS">Stillingar frétta</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース設定</text>
@@ -63,6 +63,7 @@
      <text lang="FI">Elokuvahaun Asetukset</text>
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade sätted</text>
+     <text lang="FR">Paramètres des films</text>
      <text lang="SV">Biotider</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
@@ -80,6 +81,7 @@
      <text lang="FI">MythFlix Asetukset</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
+     <text lang="FR">Paramètres Loc. films</text>
      <text lang="ES">MythFlix</text>
      <text lang="ET">MythFlix sätted</text>
      <text lang="NL">MythFlix Instellingen</text>
@@ -95,7 +97,7 @@
      <text lang="DE">WWW</text>
      <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
-     <text lang="FR">Configuration du web</text>
+     <text lang="FR">Paramètres du web</text>
      <text lang="IS">Stillingar vefs</text>
      <text lang="NL">Internet Instellingen</text>     
      <text lang="FI">Nettiasetukset</text>
@@ -119,7 +121,7 @@
      <text lang="SV">Recept</text>
      <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte</text>
-     <text lang="FR">Configuration des recettes</text>
+     <text lang="FR">Paramètres des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
      <text lang="IS">Stillingar uppskrifta</text>
      <text lang="NL">Recepten Instellingen</text>     

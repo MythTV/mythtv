@@ -55,6 +55,7 @@
      <text lang="FI">Elokuvahaku</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
+     <text lang="FR">Programme Télé</text>
      <text lang="SV">Biotider</text>
      <text lang="PT">Horário de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
@@ -106,6 +107,7 @@
      <text lang="DE">MythFlix</text>
      <text lang="NL">MythFlix</text>
      <text lang="ET">MythFlix</text>
+     <text lang="FR">Location Films</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

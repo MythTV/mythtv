@@ -5,7 +5,7 @@
      <text>Music Settings</text>
      <text lang="IT">Impostazioni Musica</text>
      <text lang="ES">Música</text>
-     <text lang="FR">Musique</text>
+     <text lang="FR">Paramètres Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musikindstillinger</text>
@@ -31,7 +31,7 @@
        <text lang="IT">Impostazioni Video</text>
        <text lang="ES">Videos</text>
        <text lang="CA">Configurar Videos</text>
-       <text lang="FR">Vidéos</text>
+       <text lang="FR">Paramètres Vidéos</text>
        <text lang="DE">Videos</text>
        <text lang="DK">Videoindstillinger</text>
        <text lang="IS">Stillingar kvikmynda</text>
@@ -56,7 +56,7 @@
       <text lang="IT">Impostazioni Immagini</text>
       <text lang="ES">Fotos</text>
       <text lang="CA">Configurar Imatges</text>
-      <text lang="FR">Images</text>
+      <text lang="FR">Paramètres Photos</text>
       <text lang="DE">Bilder</text>
       <text lang="DK">Billedindstillinger</text>
       <text lang="IS">Stillingar ljósmynda</text>
@@ -82,7 +82,7 @@
      <text lang="ES">Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
-     <text lang="FR">Jeux</text>
+     <text lang="FR">Paramètres Jeux</text>
      <text lang="DK">Spilindstillinger</text>
      <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
@@ -107,7 +107,7 @@
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
      <text lang="IS">Stillingar útvarps</text>
-     <text lang="FR">Radio</text>
+     <text lang="FR">Paramètres Radio</text>
      <text lang="FI">Radioasetukset</text>
      <text lang="SI">Radio nastavitve</text>
      <text lang="ET">Raadio sätted</text>
@@ -133,6 +133,7 @@
       <text>Archive Files Settings</text>
       <text lang="IT">Impostazioni Archivia Files</text>
       <text lang="ET">Arhiveerimise sätted</text>
+      <text lang="FR">Paramètres archivage</text>
       <text lang="SV">Filarkivering</text>
       <text lang="ES">Archivado Ficheros</text>
       <text lang="RU">Настройки архива</text>
