@@ -1313,6 +1313,10 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     if (monitor->shared_data->last_write_index == monitor->last_read)
         return 0;
 
+    // sanity check last_read
+    if (monitor->last_read < 0 || monitor->last_read >= monitor->image_buffer_count)
+        return 0;
+
     monitor->last_read = monitor->shared_data->last_write_index;
 
     switch (monitor->shared_data->state)
