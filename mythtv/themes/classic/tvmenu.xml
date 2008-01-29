@@ -16,6 +16,7 @@
       <text lang="SI">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
       <text lang="RU">Смотреть ТВ</text>
+      <text lang="PL">Oglądanie TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="SI">Planiranje snemanj</text>
       <text lang="ET">Salvestamise plaanimine</text>
       <text lang="RU">Расписание записи</text>
+      <text lang="PL">Harmonogram nagrywania</text>
       <alttext>Schedule</alttext>
       <alttext lang="IT">Pianifica</alttext>
       <alttext lang="FR">Planifier</alttext>
@@ -50,6 +52,7 @@
       <alttext lang="SI">Planiranje</alttext>
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="RU">Расписание</alttext>
+      <alttext lang="PL">Harmonogram</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -69,9 +72,11 @@
       <text lang="SI">Predvajanje snemanj</text>
       <text lang="ET">Salvestiste vaatamine</text>
       <text lang="RU">Смотреть записи</text>
+      <text lang="PL">Odtwarzanie nagrań</text>
       <alttext lang="DE">Wiedergabe</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="SV">Inspelningar</alttext>
+      <alttext lang="PL">Oglądanie</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -91,10 +96,12 @@
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Salvestiste kustutamine</text>
       <text lang="RU">Удалить записи</text>
+      <text lang="PL">Kasowanie nagrań</text>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="ET">Kustuta</alttext>
       <alttext lang="SV">Radera</alttext>
       <alttext lang="RU">Удалить</alttext>
+      <alttext lang="PL">Kasowanie</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -130,6 +137,7 @@
       <text lang="NL">Eerdere Opnames</text>
       <text lang="JA">録画履歴</text>
       <text lang="RU">Ранее записано</text>
+      <text lang="PL">Poprzednio nagrane</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -148,6 +156,7 @@
       <text lang="ES">Estado Sistema</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="RU">Состояние системы</text>
+      <text lang="PL">Status systemu</text>
       <action>TV_STATUS</action>
    </button>
 

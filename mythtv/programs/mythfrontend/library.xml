@@ -21,9 +21,11 @@
       <text lang="NB">Se på opptak</text>
       <text lang="CZ">Sledování nahrávek</text>
       <text lang="RU">Смотреть записи</text>
+      <text lang="PL">Oglądanie nagrań</text>
       <alttext lang="SV">Inspelningar</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="RU">Записи</alttext>
+      <alttext lang="PL">Nagrania</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -48,9 +50,11 @@
      <text lang="NB">Se på videoer</text>
      <text lang="CZ">Sledovat filmy</text>
      <text lang="RU">Смотреть фильмы</text>
+     <text lang="PL">Oglądanie filmów</text>
      <alttext lang="SV">Filmer</alttext>
      <alttext lang="ET">Video</alttext>
      <alttext lang="RU">Фильмы</alttext>
+     <alttext lang="PL">Filmy</alttext>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -76,6 +80,7 @@
       <text lang="NB">Hør på musikk</text>
       <text lang="CZ">Poslouchat muziku</text>
       <text lang="RU">Слушать музыку</text>
+      <text lang="PL">Odtwarzaj muzykę</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -99,6 +104,7 @@
      <text lang="PT">Ouvir Rádio</text>
      <text lang="CZ">Poslouchat rádio</text>
      <text lang="RU">Слушать радио</text>
+     <text lang="PL">Słuchaj radia</text>
      <alttext lang="SV">Radio</alttext>
      <alttext lang="PT">Rádio</alttext>
      <alttext lang="ET">Raadio</alttext>
@@ -135,6 +141,7 @@
      <text lang="NB">Bildegalleri</text>
      <text lang="CZ">Galerie fotek</text>
      <text lang="RU">Изображения</text>
+     <text lang="PL">Galeria zdjęć</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -160,6 +167,7 @@
      <text lang="NB">Spill</text>
      <text lang="CZ">Hrát hry</text>
      <text lang="RU">Играть в игры</text>
+     <text lang="PL">Graj w gry</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

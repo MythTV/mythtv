@@ -20,6 +20,7 @@
       <text lang="PT">Por Títulos</text>
       <text lang="CZ">dle názvu</text>
       <text lang="RU">Заголовки</text>
+      <text lang="PL">Tytuły</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -43,6 +44,7 @@
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="CZ">dle klíčových slov</text>
       <text lang="RU">Ключевые слова</text>
+      <text lang="PL">Słowa kluczowe</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -65,6 +67,7 @@
       <text lang="PT">Por Pessoas</text>
       <text lang="CZ">dle hereckého obsazení</text>
       <text lang="RU">Действующие лица</text>
+      <text lang="PL">Osoby</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -87,6 +90,7 @@
       <text lang="PT">Pesquisa Avançada</text>
       <text lang="CZ">Pokročilé</text>
       <text lang="RU">Дополнительно</text>
+      <text lang="PL">Zaawansowane</text>
       <alttext lang="DE">Erweitert</alttext>
       <alttext lang="ET">Muud</alttext>
       <alttext lang="PT">Avançada</alttext>

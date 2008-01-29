@@ -19,6 +19,7 @@
      <text lang="PT">Telefone</text>
      <text lang="CZ">Telefon</text>
      <text lang="RU">Телефон</text>
+     <text lang="PL">Telefon</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -44,6 +45,7 @@
      <text lang="PT">Notícias</text>
      <text lang="CZ">Novinky</text>
      <text lang="RU">Новости</text>
+     <text lang="PL">Wiadomości</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -63,6 +65,7 @@
      <text lang="CZ">Programy kin</text>
      <text lang="JA">ムービータイム</text>
      <text lang="RU">Афиша кино</text>
+     <text lang="PL">Repertuar kin</text>
      <action>PLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -88,6 +91,7 @@
      <text lang="NB">Været</text>
      <text lang="CZ">Počasí</text>
      <text lang="RU">Погода</text>
+     <text lang="PL">Pogoda</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -109,6 +113,7 @@
      <text lang="ET">MythFlix</text>
      <text lang="SI">MythFlix</text>
      <text lang="FR">Location Films</text>
+     <text lang="PL">Filmy z internetu</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -133,6 +138,7 @@
       <text lang="NL">Internet</text>
       <text lang="CZ">Prohlížení webu</text>
       <text lang="RU">WWW</text>
+      <text lang="PL">Internet WWW</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -157,6 +163,7 @@
      <text lang="PT">Receitas</text>
      <text lang="CZ">Recepty</text>
      <text lang="RU">Рецепты</text>
+     <text lang="PL">Przepisy</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -181,6 +188,7 @@
       <text lang="PT">Estado do Sistema</text>
       <text lang="CZ">Stav systému</text>
       <text lang="RU">Состояние системы</text>
+      <text lang="PL">Status systemu</text>
       <action>TV_STATUS</action>
    </button>
 
@@ -188,6 +196,7 @@
       <type>ZONEMINDER</type>
       <text>Zone Minder</text>
       <text lang="IT">Videosorveglianza</text>
+      <text lang="PL">Strażnik</text>
       <action>PLUGIN mythzoneminder</action>
       <depends>mythzoneminder</depends>
  </button>

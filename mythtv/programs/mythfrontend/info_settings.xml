@@ -21,6 +21,7 @@
      <text lang="NB">Innstillinger for vær</text>
      <text lang="CZ">Nastavení počasí</text>
      <text lang="RU">Настройки погоды</text>
+     <text lang="PL">Ustaw Pogodę</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -53,6 +54,7 @@
      <text lang="PT">Configurar Notícias</text>
      <text lang="CZ">Nastavení zpráv</text>
      <text lang="RU">Настройки новостей</text>
+     <text lang="PL">Ustaw wiadomości</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -70,6 +72,7 @@
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="CZ">Nastavení programů kin</text>
      <text lang="RU">Настройки афиши кино</text>
+     <text lang="PL">Ustaw repertuar kin</text>
      <action>CONFIGPLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -87,6 +90,7 @@
      <text lang="NL">MythFlix Instellingen</text>
      <text lang="RU">Настройки MythFlix</text>
      <text lang="SI">MythFlix nastavitve</text>
+     <text lang="PL">Ustaw Filmy z internetu</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -111,6 +115,7 @@
      <text lang="PT">Configurar Navegação Web</text>
      <text lang="CZ">Nastavení webu</text>
      <text lang="RU">Настройки браузера</text>
+     <text lang="PL">Ustaw zakładki WWW</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -134,6 +139,7 @@
      <text lang="PT">Configurar Receitas</text>
      <text lang="CZ">Nastavení receptů</text>
      <text lang="RU">Настройки рецептов</text>
+     <text lang="PL">Ustaw przepisy</text>
      <alttext lang="ET">Retseptid</alttext>
      <alttext lang="PT">Receitas</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

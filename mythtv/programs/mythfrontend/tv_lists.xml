@@ -20,6 +20,7 @@
       <text lang="PT">Por Novos Títulos</text>
       <text lang="CZ">Nové názvy</text>
       <text lang="RU">Новые заголовки</text>
+      <text lang="PL">Nowe tytuły</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -44,6 +45,7 @@
       <text lang="PT">Por Filme</text>
       <text lang="CZ">Filmy</text>
       <text lang="RU">Фильмы</text>
+      <text lang="PL">Filmy</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -67,6 +69,7 @@
       <text lang="PT">Por Categoria</text>
       <text lang="CZ">Kategorie</text>
       <text lang="RU">Категории</text>
+      <text lang="PL">Kategorie</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -90,6 +93,7 @@
       <text lang="PT">Por Canal</text>
       <text lang="CZ">Kanály</text>
       <text lang="RU">Каналы</text>
+      <text lang="PL">Kanały</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -113,6 +117,7 @@
       <text lang="PT">Por Data e Hora</text>
       <text lang="CZ">Čas</text>
       <text lang="RU">Время</text>
+      <text lang="PL">Czas</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

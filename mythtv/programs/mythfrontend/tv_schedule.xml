@@ -22,6 +22,7 @@
       <text lang="EN_GB">Programme Guide</text>
       <text lang="CZ">Programový průvodce</text>
       <text lang="RU">Программа передач</text>
+      <text lang="PL">Przewodnik programowy</text>
       <alttext>Guide</alttext>
       <alttext lang="IT">Guida</alttext>
       <alttext lang="FR">Grille</alttext>
@@ -39,6 +40,7 @@
       <alttext lang="NB">Oversikt</alttext>
       <alttext lang="PT">Guia</alttext>
       <alttext lang="RU">Программа</alttext>
+      <alttext lang="PL">Program TV</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -64,6 +66,7 @@
       <text lang="EN_GB">Programme Finder</text>
       <text lang="CZ">Vyhledávač programů</text>
       <text lang="RU">Поиск программы</text>
+      <text lang="PL">Znajdź program</text>
       <alttext>Finder</alttext>
       <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Recherche</alttext>
@@ -81,6 +84,7 @@
       <alttext lang="ET">Otsija</alttext>
       <alttext lang="NB">Finner</alttext>
       <alttext lang="RU">Поиск</alttext>
+      <alttext lang="PL">Znajdź</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -104,6 +108,7 @@
       <text lang="PT">Pesquisar Palavras</text>
       <text lang="CZ">Hledat slova</text>
       <text lang="RU">Поиск по словам</text>
+      <text lang="PL">Szukaj słów</text>
       <alttext>Search</alttext>
       <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Texte</alttext>
@@ -118,6 +123,7 @@
       <alttext lang="ES">Palabras</alttext>
       <alttext lang="PT">Palavras</alttext>
       <alttext lang="RU">Слова</alttext>
+      <alttext lang="PL">Słowa</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -140,6 +146,7 @@
       <text lang="PT">Pesquisar Listas</text>
       <text lang="CZ">Hledat seznamy</text>
       <text lang="RU">Поиск по спискам</text>
+      <text lang="PL">Szukaj***listy</text>
       <alttext>Lists</alttext>
       <alttext lang="IT">Liste</alttext>
       <alttext lang="DE">Listen</alttext>
@@ -210,6 +217,7 @@
       <text lang="PT">Regras de Gravação</text>
       <text lang="CZ">Volné nahrávání</text>
       <text lang="RU">Дополнительно</text>
+      <text lang="PL">Dostosuj nagrywanie</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -235,6 +243,7 @@
       <text lang="ES">Programación Manual</text>
       <text lang="CZ">Ruční plánování</text>
       <text lang="RU">Ручное планирование</text>
+      <text lang="PL">Dodaj ręcznie</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="IT">Manuale</alttext>
       <alttext lang="ES">Programar</alttext>
@@ -253,6 +262,7 @@
       <alttext lang="NB">Manuelt</alttext>
       <alttext lang="ES">Manual</alttext>
       <alttext lang="RU">Вручную</alttext>
+      <alttext lang="PL">Ręcznie</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

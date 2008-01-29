@@ -17,6 +17,7 @@
       <text lang="PT">Por Títulos</text>
       <text lang="ES">Títulos</text>
       <text lang="RU">Заголовки</text>
+      <text lang="PL">Tytuły</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -37,6 +38,7 @@
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="ES">Palabras</text>
       <text lang="RU">Ключевые слова</text>
+      <text lang="PL">Słowa kluczowe</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -55,6 +57,7 @@
       <text lang="ES">Personas</text>
       <text lang="NL">Personen</text>
       <text lang="RU">Действующие лица</text>
+      <text lang="PL">Osoby</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -74,6 +77,7 @@
       <text lang="ES">Avanzada</text>
       <text lang="NL">Geavanceerd</text>
       <text lang="RU">Дополнительно</text>
+      <text lang="PL">Zaawansowane</text>
       <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
@@ -95,6 +99,7 @@
       <text lang="ET">Uued saated</text>
       <text lang="ES">Nuevos Títulos</text>
       <text lang="RU">Новые заголовки</text>
+      <text lang="PL">Nowe tytuły</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -116,6 +121,7 @@
       <text lang="ET">Filmid</text>
       <text lang="ES">Películas</text>
       <text lang="RU">Фильмы</text>
+      <text lang="PL">Filmy</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -136,6 +142,7 @@
       <text lang="ET">Kategooriad</text>
       <text lang="ES">Categorías</text>
       <text lang="RU">Категории</text>
+      <text lang="PL">Kategorie</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -156,6 +163,7 @@
       <text lang="ET">Kanalid</text>
       <text lang="ES">Canales</text>
       <text lang="RU">Каналы</text>
+      <text lang="PL">Kanały</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -176,6 +184,7 @@
       <text lang="ET">Aeg</text>
       <text lang="ES">Horas</text>
       <text lang="RU">Время</text>
+      <text lang="PL">Czas</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 
@@ -183,6 +192,7 @@
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
       <text lang="SI">Shranjena iskanja</text>
+      <text lang="PL">Znaleziony zapamiętany</text>
       <action>TV_SEARCH_STORED</action>
    </button>
 

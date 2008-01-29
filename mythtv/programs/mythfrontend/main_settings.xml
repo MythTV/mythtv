@@ -21,6 +21,7 @@
       <text lang="NB">Generelt</text>
       <text lang="CZ">Obecné</text>
       <text lang="RU">Общие</text>
+      <text lang="PL">Ogólne</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -45,6 +46,7 @@
       <text lang="NB">Utseende</text>
       <text lang="CZ">Vzhled</text>
       <text lang="RU">Внешний вид</text>
+      <text lang="PL">Wygląd</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -68,6 +70,7 @@
      <text lang="PT">Configurar Televisão</text>
      <text lang="CZ">Nastavení televize</text>
      <text lang="RU">Настройки ТВ</text>
+     <text lang="PL">Telewizja</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -91,6 +94,7 @@
      <text lang="PT">Configurar Multimédia</text>
      <text lang="CZ">Nastavení multimédií</text>
      <text lang="RU">Настройки мультимедиа</text>
+     <text lang="PL">Media</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
    </button>
@@ -116,6 +120,7 @@
      <text lang="PT">Config. Centro de Info.</text>
      <text lang="CZ">Nastavení informačního centra</text>
      <text lang="RU">Настройки инфоцентра</text>
+     <text lang="PL">Centrum informacyjne</text>
      <alttext lang="DE">Infocenter</alttext>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
@@ -142,6 +147,7 @@
      <text lang="DK">Xbox</text>
      <text lang="CZ">Nastavení XBOXu</text>
      <text lang="RU">Настройки XBOX</text>
+     <text lang="PL">Xbox</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -165,6 +171,7 @@
       <text lang="CZ">Nastavení telefonu</text>
       <text lang="JA">電話設定</text>
       <text lang="RU">Настройки телефона</text>
+      <text lang="PL">Telefon</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -174,6 +181,7 @@
        <text>ZoneMinder Settings</text>
        <text lang="IT">Impostazioni Videosorveglianza</text>
        <text lang="DK">ZoneMinder</text>
+       <text lang="PL">Ustaw strażnika</text>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>

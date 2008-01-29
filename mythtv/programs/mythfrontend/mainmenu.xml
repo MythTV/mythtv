@@ -22,6 +22,7 @@
       <text lang="CZ">Sledovat TV</text>
       <text lang="RU">Смотреть ТВ</text>
       <text lang="AR">شاهد التلفاز</text>
+      <text lang="PL">Oglądanie TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -46,9 +47,11 @@
      <text lang="CZ">Multimediální katalog</text>
      <text lang="RU">Мультимедиа</text>
      <text lang="AR">مكتبة الوسائط</text>
+     <text lang="PL">Biblioteka media***</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <alttext lang="PT">Galeria</alttext>
+     <alttext lang="PL">Galeria</alttext>
      <alttext lang="AR">المكتبة</alttext>
      <action>MENU library.xml</action>
    </button>
@@ -75,6 +78,7 @@
       <text lang="CZ">Spravovat nahrávky</text>
       <text lang="RU">Управление записями</text>
       <text lang="AR">أدر التسجيلات</text>
+      <text lang="PL">Zarządzaj nagraniami</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ES">Programar</alttext>
@@ -103,6 +107,7 @@
      <text lang="ES">Centro de Información</text>
      <text lang="EN_GB">Information Centre</text>
      <text lang="PT">Centro de Informação</text>
+     <text lang="PL">Centrum informacyjne</text>
      <text lang="CZ">Centrum informací</text>
      <text lang="RU">Центр информации</text>
      <text lang="AR">مركز المعلومات</text>
@@ -112,6 +117,7 @@
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
      <alttext lang="PT">Informação</alttext>
+     <alttext lang="PL">Informacja</alttext>
      <alttext lang="NL">Infocenter</alttext>
      <alttext lang="RU">Информация</alttext>
      <alttext lang="AR">معلومات</alttext>
@@ -140,6 +146,7 @@
      <text lang="CZ">CD/DVD</text>
      <text lang="RU">CD/DVD</text>
      <text lang="AR">تشغيل إسطوانات</text>
+     <text lang="PL">Dyski optyczne</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythvideo mytharchive mythburn</depends>
    </button>
@@ -166,6 +173,7 @@
      <text lang="CZ">Pomůcky</text>
      <text lang="RU">Утилиты / Настройки</text>
      <text lang="AR">تضبيطات</text>
+     <text lang="PL">Narzędzia / ustawienia</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <alttext lang="ET">Sätted</alttext>
@@ -185,6 +193,7 @@
      <text lang="PT">Gravações</text>
      <text lang="NL">Afsluiten</text>
      <text lang="RU">Завершение работы</text>
+     <text lang="PL">Zamknij system</text>
      <action>SHUTDOWN</action>
    </button> -->
 

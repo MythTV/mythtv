@@ -14,6 +14,7 @@
       <text lang="ES">Ajustar Prioridades de Grabación</text>
       <text lang="NL">Opnameprioriteiten Instellen</text>
       <text lang="RU">Установить приоритет записей</text>
+      <text lang="PL">Ustaw priorytet nagrywania</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="IT">Priorità</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
@@ -24,6 +25,7 @@
       <alttext lang="ES">Prioridades Grabación</alttext>
       <alttext lang="NL">Opnameprioriteiten</alttext>
       <alttext lang="RU">Записи</alttext>
+      <alttext lang="PL">Priorytet nagrywania</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -42,6 +44,7 @@
       <text lang="ES">Ajustar Prioridades de Canales</text>
       <text lang="NL">Opnameprioriteiten per Zender</text>
       <text lang="RU">Установить приоритет каналов</text>
+      <text lang="PL">Ustaw priorytet kanałom</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="IT">Canali</alttext>
       <alttext lang="SV">Kanal</alttext>
@@ -54,6 +57,7 @@
       <alttext lang="ES">Prioridades Canales</alttext>
       <alttext lang="NL">Zenderprioriteiten</alttext>
       <alttext lang="RU">Каналы</alttext>
+      <alttext lang="PL">Priorytet kanałów</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
@@ -61,6 +65,7 @@
       <type>TV_RECPRIORITIES_CUSTOM</type>
       <text>Custom Priority</text>
       <text lang="IT">Personalizzate</text>
+      <text lang="PL">Dostosuj priorytety</text>
       <alttext>Custom Priority</alttext>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>

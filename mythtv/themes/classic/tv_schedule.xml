@@ -17,6 +17,7 @@
       <text lang="SI">Programski vodič</text>
       <text lang="ET">Telekava</text>
       <text lang="RU">Программа передач</text>
+      <text lang="PL">Przewodnik programowy</text>
       <alttext>Guide</alttext>
       <alttext lang="IT">Guida</alttext>
       <alttext lang="FR">Grille</alttext>
@@ -33,6 +34,7 @@
       <alttext lang="PT">Guia</alttext>
       <alttext lang="ET">Kava</alttext>
       <alttext lang="RU">Программа</alttext>
+      <alttext lang="PL">Program TV</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -53,6 +55,7 @@
       <text lang="SI">Iskalec programov</text>
       <text lang="ET">Programmiotsija</text>
       <text lang="RU">Поиск программы</text>
+      <text lang="PL">Znajdź program</text>
       <alttext>Finder</alttext>
       <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Recherche</alttext>
@@ -67,6 +70,7 @@
       <alttext lang="SI">Iskalec</alttext>
       <alttext lang="ET">Otsija</alttext>
       <alttext lang="RU">Поиск</alttext>
+      <alttext lang="PL">Znajdź</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -85,6 +89,7 @@
       <text lang="ET">Kavade otsing</text>
       <text lang="ES">Buscar Listados</text>
       <text lang="RU">Поиск по списку</text>
+      <text lang="PL">Listy wyszukiwania</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoeken Gids</alttext>      
@@ -93,6 +98,7 @@
       <alttext lang="PT">Pesquisar</alttext>
       <alttext lang="ET">Otsing</alttext>
       <alttext lang="RU">Списки</alttext>
+      <alttext lang="PL">Szukaj</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -112,6 +118,7 @@
       <text lang="JA">簡単録画</text>
       <text lang="ET">Kohene salvestamine</text>
       <text lang="RU">Немедленая запись</text>
+      <text lang="PL">Natychmiast nagraj</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -123,6 +130,7 @@
       <alttext lang="JA">簡単録画</alttext>
       <alttext lang="ET">Kohene salvestamine</alttext>
       <alttext lang="RU">Немедленно</alttext>
+      <alttext lang="PL">Natychmiastowe nagrywanie</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -142,6 +150,7 @@
       <text lang="NL">Geavanceerde Opname</text>
       <text lang="DK">Avanceret</text>
       <text lang="RU">Дополнительно</text>
+      <text lang="PL">Dostosuj nagrywanie</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -161,6 +170,7 @@
       <text lang="SI">Ročno snemanje</text>
       <text lang="ET">Käsitsi salvestamine</text>
       <text lang="RU">Ручная запись</text>
+      <text lang="PL">Dodaj ręcznie</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="IT">Manuale</alttext>
       <alttext lang="ES">Manual</alttext>
@@ -174,6 +184,7 @@
       <alttext lang="SI">Ročno</alttext>
       <alttext lang="ET">Käsitsi</alttext>
       <alttext lang="RU">Вручную</alttext>
+      <alttext lang="PL">Ręczny</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -191,6 +202,7 @@
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="ES">Prioridades Grabación</text>
       <text lang="RU">Приоритеты записей</text>
+      <text lang="PL">Priorytet nagrywania</text>
       <alttext>Priorities</alttext>
       <alttext lang="IT">Priorità</alttext>
       <alttext lang="SV">Prioriteter</alttext>
@@ -201,6 +213,7 @@
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="ES">Prioridades</alttext>
       <alttext lang="RU">Приоритеты</alttext>
+      <alttext lang="PL">Priorytet</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -222,9 +235,11 @@
       <text lang="SI">Prihajajoča snemanja</text>
       <text lang="ET">Tulevased salvestamised</text>
       <text lang="RU">Будущие записи</text>
+      <text lang="PL">Rozwiąż konflikty</text>
       <alttext lang="SV">Kommande</alttext>
       <alttext lang="ET">Tulevased</alttext>
       <alttext lang="ES">Conflictos</alttext>
+      <alttext lang="PL">Konflikty</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
