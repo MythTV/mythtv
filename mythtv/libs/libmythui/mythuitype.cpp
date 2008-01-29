@@ -91,7 +91,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
 
         /* check all children */
         QValueVector<MythUIType*>::iterator it;
-        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.end(); it--)
+        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
             if (child != NULL)
