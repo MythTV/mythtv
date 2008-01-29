@@ -61,7 +61,7 @@
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
      <text lang="FI">Elokuvahaun Asetukset</text>
-     <text lang="SI">Nastavitve čas filmov</text>
+     <text lang="SI">Nastavitve kino programa</text>
      <text lang="ET">Filmiaegade sätted</text>
      <text lang="FR">Paramètres des films</text>
      <text lang="SV">Biotider</text>
@@ -86,6 +86,7 @@
      <text lang="ET">MythFlix sätted</text>
      <text lang="NL">MythFlix Instellingen</text>
      <text lang="RU">Настройки MythFlix</text>
+     <text lang="SI">MythFlix nastavitve</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

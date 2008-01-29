@@ -124,6 +124,7 @@
    <button>
      <type>SETTINGS_STREAM</type>
      <text>MythStream Settings</text>
+     <text lang="SI">Nastavitve Mythstream</text>
      <action>CONFIGPLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
@@ -138,6 +139,7 @@
       <text lang="ES">Archivado Ficheros</text>
       <text lang="RU">Настройки архива</text>
       <text lang="DK">Filarkivering</text>
+      <text lang="SI">Nastavitve arhiviranja</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

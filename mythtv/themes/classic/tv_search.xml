@@ -182,6 +182,7 @@
    <button>
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
+      <text lang="SI">Shranjena iskanja</text>
       <action>TV_SEARCH_STORED</action>
    </button>
 

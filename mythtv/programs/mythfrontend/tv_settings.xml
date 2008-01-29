@@ -67,7 +67,7 @@
       <text lang="JA">再生</text>
       <text lang="FI">Toisto</text>
       <text lang="ZH_TW">重播</text>
-      <text lang="SI">Reprodukcija</text>
+      <text lang="SI">Predvajanje</text>
       <text lang="ET">Mahamängimine</text>
       <text lang="NB">Avspilling</text>
       <text lang="CZ">Přehrávání</text>
@@ -78,6 +78,7 @@
    <button>
       <type>TV_SETTINGS_PLAYBACK_OSD</type>
       <text>Playback OSD</text>
+      <text lang="SI">OSD</text>
       <action>SETTINGS OSD</action>
    </button>
 
@@ -95,6 +96,7 @@
       <text lang="CZ">Skupiny přehrávání</text>
       <text lang="JA">プレイバックグループ</text>
       <text lang="RU">Группы воспроизведения</text>
+      <text lang="SI">Predvajalne skupine</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
