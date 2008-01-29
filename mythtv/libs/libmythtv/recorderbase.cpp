@@ -252,6 +252,9 @@ void RecorderBase::SavePositionMap(bool force)
         positionMapLock.unlock();
 
         curRecording->SetPositionMapDelta(deltaCopy, positionMapType);
+
+        if (ringBuffer)
+            curRecording->SetFilesize(ringBuffer->GetWritePosition());
     }
     else
         positionMapLock.unlock();
