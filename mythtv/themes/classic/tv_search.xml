@@ -24,7 +24,7 @@
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
       <text lang="IT">Parole Chiavi</text>
-      <text lang="FR">Contenu</text>
+      <text lang="FR">Mots clés</text>
       <text lang="DE">nach Inhalt</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
@@ -62,7 +62,7 @@
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
       <text lang="IT">Avanzato</text>
-      <text lang="FR">Personnalisé</text>
+      <text lang="FR">Avancé</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>

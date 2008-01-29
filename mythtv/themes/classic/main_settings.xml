@@ -6,7 +6,7 @@
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
       <text lang="CA">General</text>
-      <text lang="FR">Général</text>
+      <text lang="FR">Généraux</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
@@ -26,7 +26,7 @@
       <text lang="IT">Aspetto</text>
       <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
-      <text lang="FR">Apparence</text>
+      <text lang="FR">Aspect</text>
       <text lang="DE">Erscheinungsbild</text>
       <text lang="DK">Udseende</text>
       <text lang="NL">Uiterlijk</text>
@@ -156,7 +156,7 @@
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
-      <text lang="FR">Images</text>
+      <text lang="FR">Photos</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Foto's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -319,7 +319,7 @@
      <text lang="IT">Impostazione Orari</text>
      <text lang="EN_GB">Cinema Listings Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
-     <text lang="FR">Movie Time</text>
+     <text lang="FR">Horaires films</text>
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade sätted</text>
      <text lang="SV">Biotider</text>

@@ -81,7 +81,7 @@
      <text lang="ES">Fotos</text>
      <text lang="CA">Imatges</text>
      <text lang="NL">Foto 's</text>
-     <text lang="FR">Images</text>
+     <text lang="FR">Photos</text>
      <text lang="DE">Bilder</text>
      <text lang="DK">Billeder</text>
      <text lang="PT">Fotos</text>
@@ -140,6 +140,7 @@
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
+     <text lang="FR">Nouvelles</text>
      <text lang="NL">Nieuws</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
@@ -161,6 +162,7 @@
       <text lang="SI">Splet</text>
       <text lang="ET">Veeb</text>
       <text lang="DK">Web</text>
+      <text lang="FR">Web</text>
       <text lang="PT">Navegação na Web</text>
       <text lang="ES">Web</text>
       <text lang="NL">Internet</text>
@@ -178,6 +180,7 @@
       <text lang="SV">Telefon</text>
       <text lang="DK">Telefon</text>
       <text lang="PT">Telefone</text>
+      <text lang="FR">Téléphone</text>
       <text lang="ES">Teléfono</text>
       <text lang="NL">Telefoon</text>
       <text lang="JA">電話</text>
@@ -191,6 +194,7 @@
        <text>Burn DVD</text>
        <text lang="PT">Gravar DVD</text>
        <text lang="ES">Grabar DVD</text>
+       <text lang="FR">Graver DVD</text>
        <text lang="NL">DVD Branden</text>
        <text lang="JA">DVD書込</text>
        <text lang="ET">DVD kirjutamine</text>
@@ -206,6 +210,7 @@
       <text lang="SI">Recepti</text>
       <text lang="ET">Retseptid</text>
       <text lang="SV">Recept</text>
+      <text lang="FR">Recette</text>
       <text lang="DK">Opskrifter</text>
       <text lang="PT">Receitas</text>
       <text lang="ES">Recetas</text>
@@ -218,8 +223,9 @@
 
    <button>
        <type>ARCHIVE</type>
-       <text lang="ET">Arhiveerimine</text>
        <text>Archive Files</text>
+       <text lang="ET">Arhiveerimine</text>
+       <text lang="FR">Archiver fichier</text>
        <text lang="SV">Arkivera filer</text>
        <text lang="RU">Архив файлов</text>
        <action>PLUGIN mytharchive</action>
@@ -240,6 +246,7 @@
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
+     <text lang="FR">Programme TV</text>
      <text lang="DK">Biograf</text>
      <text lang="PT">Horários de Cinema</text>
      <text lang="NL">Bioscoop Tijden</text>
@@ -254,6 +261,7 @@
      <text>NetFlix</text>
      <text lang="PT">Aluguer de Filmes</text>
      <text lang="ET">MythFlix</text>
+     <text lang="FR">Location Films</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -266,6 +274,7 @@
       <text lang="DK">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
       <text lang="ES">Configurar Teclas</text>
+      <text lang="FR">Configuration touches</text>
       <text lang="ET">Klahvide muutmine</text>
       <text lang="NL">Toetsen Instellen</text>
       <text lang="JA">キー設定</text>

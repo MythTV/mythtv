@@ -93,7 +93,7 @@
      <text lang="ES">Fotos</text>
      <text lang="CA">Imatges</text>
      <text lang="NL">Foto's</text>
-     <text lang="FR">Images</text>
+     <text lang="FR">Photos</text>
      <text lang="DE">Bilder</text>
      <text lang="DK">Billeder</text>
      <text lang="PT">Fotos</text>
@@ -249,6 +249,7 @@
        <text>Archive Files</text>
        <text lang="IT">Archivia Files</text>
        <text lang="ET">Arhiveerimine</text>
+       <text lang="FR">Archiver fichiers</text>
        <text lang="SV">Arkivera filer</text>
        <text lang="NL">Bestanden Archiveren</text>
        <text lang="RU">Архив файлов</text>
@@ -271,6 +272,7 @@
      <text lang="IT">Orari</text>
      <text lang="EN_GB">Cinema Listings</text>
      <text lang="FI">Elokuvien Ajat</text>
+     <text lang="FR">Programme TV</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
@@ -288,7 +290,7 @@
      <text lang="IT">Impostazioni</text>
      <text lang="ES">Configurar</text>
      <text lang="CA">Configurar</text>
-     <text lang="FR">Configuration</text>
+     <text lang="FR">Param�tres</text>
      <text lang="DE">Konfiguration</text>
      <text lang="DK">Konfiguration</text>
      <text lang="NL">Instellingen</text>

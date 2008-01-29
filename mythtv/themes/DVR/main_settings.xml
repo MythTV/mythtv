@@ -6,7 +6,7 @@
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
       <text lang="CA">General</text>
-      <text lang="FR">Général</text>
+      <text lang="FR">Généraux</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
@@ -25,7 +25,7 @@
       <text lang="IT">Aspetto</text>
       <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
-      <text lang="FR">Apparence</text>
+      <text lang="FR">Aspect</text>
       <text lang="DE">Erscheinungsbild</text>
       <text lang="DK">Udseende</text>
       <text lang="NL">Uiterlijk</text>
@@ -44,7 +44,7 @@
      <text lang="IT">Impostazioni TV</text>
      <text lang="CA">Configuració de TV</text>
      <text lang="ES">Configuración de TV</text>
-     <text lang="FR">Options TV</text>
+     <text lang="FR">Paramètres TV</text>
      <text lang="DE">TV</text>
      <text lang="DK">TV Indstillinger</text>
      <text lang="NL">TV Instellingen</text>
@@ -64,6 +64,7 @@
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
+     <text lang="FR">Paramètres musique</text>
      <text lang="DK">Musik indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
@@ -83,6 +84,7 @@
        <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="DE">Videos</text>
+       <text lang="FR">Paramètres Videos</text>
        <text lang="DK">Video Indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
@@ -103,6 +105,7 @@
       <text lang="SI">Radio nastavitve</text>
       <text lang="ET">Raadio sätted</text>
       <text lang="SV">Radio</text>
+      <text lang="FR">Paramètres Radio</text>
       <text lang="DK">Radio Indstillinger</text>
       <text lang="PT">Configurar Rádio</text>
       <text lang="NL">Radio Instellingen</text>
@@ -119,6 +122,7 @@
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
+      <text lang="FR">Paramètres photos</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Foto 's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -138,6 +142,7 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
+     <text lang="FR">Paramètres jeux</text>
      <text lang="DK">Spil Indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
@@ -157,6 +162,7 @@
      <text lang="ES">Configurar El Tiempo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
+     <text lang="FR">Paramètres Météo</text>
      <text lang="DK">Vejr indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
@@ -177,6 +183,7 @@
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
+     <text lang="FR">Paramètres infos</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース設定</text>
      <text lang="SI">Nastavitve novic</text>
@@ -198,6 +205,7 @@
      <text lang="SI">Spletne nastavitve</text>
      <text lang="ET">Veebi sätted</text>
      <text lang="DK">Web Indstillinger</text>
+     <text lang="FR">Paramètres Web</text>
      <text lang="PT">Config. Navegação Web</text>
      <text lang="ES">Configurar Web</text>
      <text lang="NL">Web Instellingen</text>
@@ -214,6 +222,7 @@
       <text lang="SI">Nastavitve receptov</text>
       <text lang="ET">Retseptide sätted</text>
       <text lang="SV">Recept</text>
+      <text lang="FR">Paramètres Recettes</text>
       <text lang="DK">Opskriftsindstillinger</text>
       <text lang="PT">Configurar Receitas</text>
       <text lang="ES">Configurar Recetas</text>
@@ -232,6 +241,7 @@
       <text lang="SI">Telefonske nastavitve</text>
       <text lang="ET">Telefoni sätted</text>
       <text lang="SV">Telefon</text>
+      <text lang="FR">Paramètres Téléphone</text>
       <text lang="DK">Telefon Indstillinger</text>
       <text lang="PT">Configurar Telefone</text>
       <text lang="ES">Configurar Teléfono</text>
@@ -250,6 +260,7 @@
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade sätted</text>
      <text lang="SV">Biotider</text>
+     <text lang="FR">Paramètres horaires films</text>
      <text lang="DK">Biograf Indstillinger</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="NL">Bioscoop Instellingen</text>
@@ -267,6 +278,7 @@
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox</text>
+     <text lang="FR">Paramètres Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">XBox</text>
      <text lang="JA">XBox設定</text>
@@ -284,6 +296,7 @@
      <text lang="IT">Impostazioni NetFlix</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="ES">MythFlix</text>
+     <text lang="FR">Paramètres Location films</text>
      <text lang="ET">NetFlix'i sätted</text>
      <text lang="NL">NetFlix Instellingen</text>
      <text lang="JA">NetFlix設定</text>
@@ -298,6 +311,7 @@
        <text lang="IT">Impostazioni Importa DVD</text>
        <text lang="PT">Configurar Gravação de DVDs</text>
        <text lang="ES">Configurar Grabación DVD</text>
+       <text lang="FR">Paramètres Gravure DVD</text>
        <text lang="ET">DVD-kirjutaja sätted</text>
        <text lang="NL">DVD Branden Instellingen</text>
        <text lang="JA">DVD書込設定</text>
@@ -312,6 +326,7 @@
        <text lang="IT">Impostazioni Archiva Files</text>
        <text lang="ET">Arhiveerimise sätted</text>
        <text lang="SV">Filarkivering</text>
+       <text lang="FR">Paramètres Archivage</text>
        <text lang="RU">Настройка архива</text>
        <action>CONFIGPLUGIN mytharchive</action>
        <depends>mytharchive</depends>

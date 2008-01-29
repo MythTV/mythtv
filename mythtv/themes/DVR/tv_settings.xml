@@ -7,7 +7,7 @@
       <text lang="ES">General</text>
       <text lang="CA">General</text>
       <text lang="NL">Algemeen</text>
-      <text lang="FR">Général</text>
+      <text lang="FR">Généraux</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
       <text lang="PT">Configurações Gerais</text>
@@ -78,6 +78,7 @@
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="PT">Grupos de Reprodução</text>
+      <text lang="FR">Groupes de lecture</text>
       <text lang="ES">Grupos de Reproducción</text>
       <text lang="ET">Mahamängimisgrupid</text>
       <text lang="NL">Afspeelgroepen</text>
