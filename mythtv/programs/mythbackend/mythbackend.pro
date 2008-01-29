@@ -24,7 +24,7 @@ HEADERS += mythxml.h upnpmedia.h
 
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
-SOURCES += housekeeper.cpp backendutil.h
+SOURCES += housekeeper.cpp backendutil.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += mythxml.cpp upnpmedia.cpp
 
