@@ -1497,8 +1497,10 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (playList.grep(tempInfo->MakeUniqueKey()).count())
                     ltype->EnableForcedFont(cnt, "tagged");
 
-                if (tempInfo->availableStatus != asAvailable ||
-                        (m_player && m_player->IsSameProgram(tempInfo)) && tempInfo->recstatus != rsRecording)
+                if (((tempInfo->recstatus != rsRecording) &&
+                     (tempInfo->availableStatus != asAvailable) &&
+                     (tempInfo->availableStatus != asNotYetAvailable)) ||
+                    (m_player && m_player->IsSameProgram(tempInfo)))
                     ltype->EnableForcedFont(cnt, "inactive");
             }
         }
@@ -2450,7 +2452,8 @@ void PlaybackBox::playSelectedPlaylist(bool random)
         if (tmpItem)
         {
             ProgramInfo *rec = new ProgramInfo(*tmpItem);
-            if (rec->availableStatus == asAvailable)
+            if ((rec->availableStatus == asAvailable) ||
+                (rec->availableStatus == asNotYetAvailable))
                 playNext = play(rec, true);
             delete rec;
         }
@@ -2468,10 +2471,11 @@ void PlaybackBox::playSelected()
     if (m_player && m_player->IsSameProgram(curitem))
         exitWin();
 
-    if (curitem && curitem->availableStatus != asAvailable)
-        showAvailablePopup(curitem);
-    else
+    if ((curitem->availableStatus == asAvailable) ||
+        (curitem->availableStatus == asNotYetAvailable))
         play(curitem);
+    else
+        showAvailablePopup(curitem);
 
     if (m_player)
     {
@@ -2653,6 +2657,7 @@ void PlaybackBox::showActionsSelected()
 bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 {
     bool playCompleted = false;
+    ProgramInfo *tmpItem = NULL;
 
     if (!rec)
         return false;
@@ -2662,6 +2667,13 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     rec->pathname = rec->GetPlaybackURL(true);
 
+    if (rec->availableStatus == asNotYetAvailable)
+    {
+        tmpItem = findMatchingProg(rec);
+        if (tmpItem)
+            tmpItem->availableStatus = asAvailable;
+    }
+
     if (fileExists(rec) == false)
     {
         QString msg =
@@ -2669,10 +2681,15 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
             .arg(rec->pathname);
         VERBOSE(VB_IMPORTANT, msg);
 
-        ProgramInfo *tmpItem = findMatchingProg(rec);
+        tmpItem = (tmpItem) ? tmpItem : findMatchingProg(rec);
+
         if (tmpItem)
         {
-            tmpItem->availableStatus = asFileNotFound;
+            if (tmpItem->recstatus == rsRecording)
+                tmpItem->availableStatus = asNotYetAvailable;
+            else
+                tmpItem->availableStatus = asFileNotFound;
+
             showAvailablePopup(tmpItem);
         }
 
@@ -2685,10 +2702,15 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
             QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
             .arg(rec->pathname));
 
-        ProgramInfo *tmpItem = findMatchingProg(rec);
+        tmpItem = (tmpItem) ? tmpItem : findMatchingProg(rec);
+
         if (tmpItem)
         {
-            tmpItem->availableStatus = asZeroByte;
+            if (tmpItem->recstatus == rsRecording)
+                tmpItem->availableStatus = asNotYetAvailable;
+            else
+                tmpItem->availableStatus = asZeroByte;
+
             showAvailablePopup(tmpItem);
         }
 
@@ -2905,6 +2927,11 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
                                QObject::tr("The file for this recording is "
                                            "empty."));
                  break;
+        case asNotYetAvailable:
+                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                               QObject::tr("Recording Unavailable"), msg +
+                               QObject::tr("This recording is not yet "
+                                           "available."));
     }
 }
 

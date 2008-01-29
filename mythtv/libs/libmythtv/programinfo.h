@@ -118,6 +118,7 @@ enum RecStatusType {
 
 enum AvailableStatusType {
     asAvailable = 0,
+    asNotYetAvailable,
     asPendingDelete,
     asFileNotFound,
     asZeroByte,
