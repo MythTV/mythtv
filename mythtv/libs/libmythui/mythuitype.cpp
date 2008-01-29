@@ -86,9 +86,12 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
         if (CanTakeFocus() && IsVisible()) 
             return this;
 
+        if (m_ChildrenList.isEmpty())
+            return NULL;
+
         /* check all children */
         QValueVector<MythUIType*>::iterator it;
-        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.end(); it--)
         {
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
             if (child != NULL)
