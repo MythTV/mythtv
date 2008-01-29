@@ -1306,6 +1306,9 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  */
 void MythContextPrivate::StoreConnectionInfo(void)
 {
+    if (!m_XML)
+        return;
+
     m_XML->SetValue(kDefaultBE + "DBHostName", m_DBparams.dbHostName);
     m_XML->SetValue(kDefaultBE + "DBUserName", m_DBparams.dbUserName);
     m_XML->SetValue(kDefaultBE + "DBPassword", m_DBparams.dbPassword);
