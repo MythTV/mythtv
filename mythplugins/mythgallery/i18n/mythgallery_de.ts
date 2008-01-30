@@ -106,19 +106,19 @@
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das MythGallery Verzeichnis existiert nicht oder konnte nicht gelesen werden.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery konnte das Theme nicht laden, weitere Details auf der Konsole verfügbar.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Gerät ist nicht länger verfügbar</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadaten...</translation>
     </message>
     <message>
         <source>Marking...</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei...</translation>
     </message>
     <message>
         <source>Return</source>
@@ -134,63 +134,63 @@
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Markierung aufheben</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle auswählen</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräte anzeigen</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierher kopieren</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierher verschieben</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis erstellen</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Datei oder Verzeichnis löschen</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche 1 Verzeichnis, einschliesslich Unterverzeichnissen und Dateien</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche 1 Bild</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Markierte Dateien löschen</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche %1 Bilder und Verzeichnisse, einschliesslich Unterverzeichnissen und Dateien.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Verzeichnis</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Verzeichnis erstellen</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschiebe ausgewählte Bilder...</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiere ausgewählte Bilder...</translation>
     </message>
 </context>
 <context>
@@ -297,23 +297,23 @@
     </message>
     <message>
         <source>Sort order when browsing</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung im Browse-Modus</translation>
     </message>
     <message>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies ist die Sortierungsreihenfolge für die Bilder im Browse-Modus.</translation>
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge der OpenGL Überblendungen (in Millisekunden)</translation>
     </message>
     <message>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery Einstellungen (Diashow)</translation>
     </message>
     <message>
         <source>MythGallery Settings (General)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery Einstellungen (Allgemein)</translation>
     </message>
 </context>
 <context>
