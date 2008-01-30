@@ -22,9 +22,9 @@
 #include <qfile.h>
 #include <qregexp.h>
 #include <qbuffer.h>
-#include <qprocess.h>
 #include <qlocale.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -411,34 +411,34 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QDomElement misc = pDoc->createElement("Miscellaneous");
         root.appendChild(misc);
 
-        QProcess miscellaneous_status_info_proc(info_script);
-        miscellaneous_status_info_proc.setCommunication(
-                                          QProcess::Stdout|QProcess::Stderr);
+        FILE *fp = popen(info_script.ascii(), "r");
 
-        if (miscellaneous_status_info_proc.start())
+        if (fp)
         {
-            int i = 0;
-            // Since the miscellaneous status information is not critical
-            // but creating the status document must wait for it, timeout
-            // if the script takes more than 10 seconds to execute.
-            while (miscellaneous_status_info_proc.isRunning() && i < 100)
+            char buffer[256];
+            int status;
+            QString input = "";
+
+            while (fgets(buffer, sizeof(buffer), fp))
             {
-                usleep(100000);
-                ++i;
+                input.append(QString::fromLocal8Bit(buffer));
             }
 
-            if (miscellaneous_status_info_proc.normalExit())
+            if (pclose(fp))
             {
-                QString input = "";
-                while (miscellaneous_status_info_proc.canReadLineStdout())
-                {
-                    input = miscellaneous_status_info_proc.readLineStdout();
-                    if (input.isEmpty())
-                        continue;
+                VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
+                        "status information script: %1").arg(info_script));
+            }
+            else
+            {
+                QStringList output = QStringList::split("\n", input, false);
 
+                QStringList::iterator iter = output.begin();
+                for (; iter != output.end(); iter++)
+                {
                     QDomElement info = pDoc->createElement("Information");
 
-                    QStringList list = QStringList::split("[]:[]", input, true);
+                    QStringList list = QStringList::split("[]:[]", *iter, true);
                     unsigned int size = list.size();
                     unsigned int hasAttributes = 0;
 
@@ -462,12 +462,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                     if (hasAttributes > 0)
                         misc.appendChild(info);
                 }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, QString("Error running miscellaneous "
-                        "status information script or execution timed out: %1")
-                        .arg(info_script));
             }
         }
         else

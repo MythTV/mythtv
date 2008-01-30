@@ -42,15 +42,13 @@ display
 If four (or more) fields are output on a line, the extra fields will be
 ignored.
 
-The script must provide output within 10 seconds or the Miscellaneous status
-information will not be included on the status page.  This timeout forces the
-status page to be returned in a reasonably short period of time regardless of
-the script specified.  If you would like to provide information that requires
-more than 10 seconds to compute (or that comes from a remote system whose
-response time is unknown), you may want to set up another script, i.e. in a
-cron job, and poll the data at appropriate intervals and write the output to a
-file, which could then be read (or simply cat'ed, if in the proper format) by
-the miscellaneous status script.
+The script should provide output quickly to ensure the status page is returned
+in a reasonably short period of time.  If you would like to provide information
+that requires a significant amount of time to compute (or that comes from a
+remote system whose response time is unknown), you may want to set up another
+script, i.e. in a cron job, and poll the data at appropriate intervals and
+write the output to a file, which could then be read (or simply cat'ed, if in
+the proper format) by the miscellaneous status script.
 
 Thermal Information
 -------------------
