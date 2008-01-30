@@ -13,7 +13,7 @@
      <text lang="DK">TV</text>
      <text lang="ES">TV</text>
      <text lang="NL">TV</text>
-     <text lang="PL">TV</text>
+     <text lang="PL">Telewizja</text>
      <text lang="RU">ТВ</text>
      <action>MENU tvmenu.xml</action>
    </button>
@@ -101,7 +101,7 @@
      <text lang="JA">イメージ</text>
      <text lang="SI">Slike</text>
      <text lang="ET">Galerii</text>
-     <text lang="PL">Zdj�ia</text>
+     <text lang="PL">Zdjęcia</text>
      <text lang="RU">Изображения</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
@@ -171,7 +171,7 @@
      <text lang="ET">Uudised</text>
      <text lang="DK">Nyheder</text>
      <text lang="PT">Notícias</text>
-     <text lang="PL">Wiadomoci</text>
+     <text lang="PL">Wiadomości</text>
      <text lang="RU">Новости</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -182,6 +182,7 @@
      <text>NetFlix</text>
      <text lang="PT">Aluguer de Filmes</text>
      <text lang="ET">MythFlix</text>
+     <text lang="PL">Filmy z internetu</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -200,7 +201,7 @@
       <text lang="PT">Navegação Web</text>
       <text lang="ES">Web</text>
       <text lang="NL">Internet</text>
-      <text lang="PL">Internet</text>
+      <text lang="PL">Internet WWW</text>
       <text lang="RU">WWW</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
@@ -254,6 +255,7 @@
        <text lang="NL">Bestanden Archiveren</text>
        <text lang="RU">Архив файлов</text>
        <text lang="DK">Arkivere filer</text>
+       <text lang="PL">Archiwizuj pliki</text>
        <action>PLUGIN mytharchive</action>
        <depends>mytharchive</depends>
    </button>
@@ -262,6 +264,7 @@
        <type>ZONEMINDER</type>
        <text>Zone Minder</text>
        <text lang="IT">Videosorveglianza</text>
+       <text lang="PL">Strażnik</text>
        <action>PLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
@@ -278,7 +281,7 @@
      <text lang="SV">Biotider</text>
      <text lang="PT">Horários de Cinema</text>
      <text lang="NL">Bioscoop Tijden</text>
-     <text lang="PL">Movie Times</text>
+     <text lang="PL">Repertuar Kin</text>
      <text lang="RU">Афиша кино</text>
      <action>PLUGIN mythmovies</action>
      <depends>mythmovies</depends>
@@ -314,7 +317,7 @@
      <text lang="DK">Afslut</text>
      <text lang="PT">Desligar</text>
      <text lang="NL">Afsluiten</text>
-     <text lang="PL">Wycz</text>
+     <text lang="PL">Zakończ pracę</text>
      <text lang="RU">Завершение работы</text>
      <action>SHUTDOWN</action>
    </button> -->
