@@ -11,6 +11,7 @@
       <text lang="nb">Eksporter videofiler</text>
       <text lang="RU">Экспортировать видео</text>
       <text lang="SI">Izvoz video datotek</text>
+      <text lang="PL">Eksportuj pliki wideo</text>
       <action>ARCHIVE_EXPORT_VIDEO</action>
    </button>
 
@@ -25,6 +26,7 @@
        <text lang="nb">Importer videofiler</text>
        <text lang="RU">Импортировать видео</text>
        <text lang="SI">Uvoz video datotek</text>
+       <text lang="PL">Importuj pliki wideo</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 

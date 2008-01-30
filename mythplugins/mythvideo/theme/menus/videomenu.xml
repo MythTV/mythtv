@@ -16,6 +16,7 @@
      <text lang="FI">Selaa Videoita</text>
      <text lang="ET">Filmide brausimine</text>
      <text lang="RU">Браузер фильмов</text>
+     <text lang="PL">Przeglądaj filmy</text>
      <action>BROWSER</action>
    </button>
 
@@ -35,6 +36,7 @@
      <text lang="FI">Videolistaus</text>
      <text lang="ET">Filmide nimekiri</text>
      <text lang="RU">Список фильмов</text>
+     <text lang="PL">Lista filmów</text>
      <action>LISTING</action>
    </button>
 
@@ -52,6 +54,7 @@
      <text lang="ES">Galería</text>
      <text lang="ET">Filmide galerii</text>
      <text lang="RU">Галерея фильмов</text>
+     <text lang="PL">Galeria filmów</text>
      <action>GALLERY</action>
    </button>
 
@@ -71,6 +74,7 @@
      <text lang="FI">Videohallinta</text>
      <text lang="ET">Filmihaldus</text>
      <text lang="RU">Менеджер фильмов</text>
+     <text lang="PL">Zarządzaj filmami</text>
      <action>MANAGER</action>
    </button>
 
@@ -91,6 +95,7 @@
       <text lang="FI">Toista DVD</text>
       <text lang="ET">DVD mängimine</text>
       <text lang="RU">Смотреть DVD</text>
+      <text lang="PL">Odtwarzaj DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -106,6 +111,7 @@
       <text lang="FI">Toista VCD</text>
       <text lang="ET">VCD mängimine</text>
       <text lang="RU">Смотреть VCD</text>
+      <text lang="PL">Odtwarzaj VCD</text>
       <action>VCD_PLAY</action>
    </button>
 
@@ -124,6 +130,7 @@
       <text lang="FI">Kopioi DVD</text>
       <text lang="ET">DVD rippimine</text>
       <text lang="RU">Импортировать DVD</text>
+      <text lang="PL">Zrzucaj DVD</text>
       <action>DVD_RIP</action>
    </button>
 
@@ -133,6 +140,7 @@
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
       <text lang="FR">Ejecter un média</text>
+      <text lang="PL">Wysuń tackę</text>
       <action>EJECT</action>
    </button>
 

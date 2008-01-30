@@ -9,6 +9,7 @@
     <text lang="ES">Ver Cola</text>
     <text lang="ET">Järjekorra vaatamine</text>
     <text lang="RU">Просмотреть очередь</text>
+    <text lang="PL">Zobacz kolejkę</text>
     <action>NETFLIX_QUEUE</action>
   </button>
 
@@ -21,6 +22,7 @@
     <text lang="ET">Filmide brausimine</text>
     <text lang="FR">Afficher les vidéos</text>
     <text lang="RU">Список фильмов</text>
+    <text lang="PL">Przeglądaj Filmy</text>
     <action>NETFLIX_BROWSE</action>
   </button>
 
@@ -33,6 +35,7 @@
     <text lang="ET">Rendiajalugu</text>
     <text lang="FR">Historique de location</text>
     <text lang="RU">История платежей</text>
+    <text lang="PL">Historia operacji</text>
     <action>NETFLIX_HISTORY</action>
   </button>
 

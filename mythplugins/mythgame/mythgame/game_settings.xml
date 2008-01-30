@@ -17,6 +17,7 @@
       <text lang="ET">Üldised sätted</text>
       <text lang="NB">Generelle innstillinger</text>
       <text lang="RU">Настройки игр</text>
+      <text lang="PL">Ustawienia ogólne</text>
       <action>GAME_SETTINGS</action>
    </button>
 
@@ -37,6 +38,7 @@
       <text lang="ET">Mängijad</text>
       <text lang="NB">Spillere</text>
       <text lang="RU">Игроки</text>
+      <text lang="PL">Gracze</text>
       <action>GAME_PLAYERS</action>
    </button>
 
@@ -54,6 +56,7 @@
       <text lang="FR">Rafraichir la liste</text>
       <text lang="NB">Leit etter spill</text>
       <text lang="RU">Искать игры</text>
+      <text lang="PL">Wyszukaj gry</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
@@ -73,6 +76,7 @@
       <text lang="ET">Mänguandmete puhastamine</text>
       <text lang="NB">Tøm spilldata</text>
       <text lang="RU">Очистить данные игр</text>
+      <text lang="PL">Wyczyść dane gry</text>
       <action>CLEAR_GAME_DATA</action>
    </button>
 

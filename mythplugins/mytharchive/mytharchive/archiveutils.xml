@@ -4,6 +4,7 @@
       <type>ARCHIVE_LAST_LOG</type>
       <text>Show Log Viewer</text>
       <text lang="SI">Pregled dnevnika</text>
+      <text lang="PL">Przeglądanie logów</text>
       <action>ARCHIVE_LAST_LOG</action>
    </button>
 
@@ -11,6 +12,7 @@
        <type>ARCHIVE_TEST_DVD</type>
        <text>Play Created DVD</text>
        <text lang="SI">Predvajaj ustvarjen DVD</text>
+       <text lang="PL">Testuj DVD</text>
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
@@ -18,6 +20,7 @@
        <type>ARCHIVE_BURN_DVD</type>
        <text>Burn DVD</text>
        <text lang="SI">Zapeči DVD</text>
+       <text lang="PL">Wypal DVD</text>
        <action>ARCHIVE_BURN_DVD</action>
    </button>
 

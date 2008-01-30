@@ -17,6 +17,7 @@
       <text lang="SI">Predvajaj glasbo</text>
       <text lang="ET">Muusika mängimine</text>
       <text lang="RU">Слушать музыку</text>
+      <text lang="PL">Odtwarzaj muzykę</text>
       <action>MUSIC_PLAY</action>
    </button>
 
@@ -37,6 +38,7 @@
       <text lang="SI">Izberi glasbo</text>
       <text lang="ET">Muusika valimine</text>
       <text lang="RU">Выбрать музыку</text>
+      <text lang="PL">Lista odtwarzania</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
@@ -57,6 +59,7 @@
       <text lang="SI">Uvozi CD</text>
       <text lang="ET">CD importimine</text>
       <text lang="RU">Импортировать CD</text>
+      <text lang="PL">Zrzucaj CD</text>
       <action>MUSIC_RIP</action>
    </button>
 
@@ -65,6 +68,7 @@
        <text>Import Files</text>
        <text lang="DK">Importér filer</text>
        <text lang="SI">Uvoz datotek</text>
+       <text lang="PL">Importuj muzykę</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
@@ -85,6 +89,7 @@
       <text lang="SI">Iskanje nove glasbe</text>
       <text lang="ET">Uue muusika skaneerimine</text>
       <text lang="RU">Искать новую музыку</text>
+      <text lang="PL">Wyszukaj nową muzykę</text>
       <action>SETTINGS_SCAN</action>
    </button>
 
@@ -95,6 +100,7 @@
       <text lang="RU">Достать диск</text>
       <text lang="FR">Ejecter le Média</text>
       <text lang="SI">Izvrzi medij</text>
+      <text lang="PL">Wysuń tackę</text>
       <action>EJECT</action>
    </button>
 

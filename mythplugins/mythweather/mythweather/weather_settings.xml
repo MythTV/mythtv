@@ -3,18 +3,21 @@
    <button>
       <type>WEATHER_SETTINGS_GENERAL</type>
       <text>Global Settings</text>
+      <text lang="PL">Ogólne</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
    <button>
       <type>WEATHER_SETTINGS_SCREEN</type>
       <text>Screen Settings</text>
+      <text lang="PL">Ustaw Ekran</text>
       <action>SETTINGS_SCREEN</action>
    </button>
 
    <button>
       <type>WEATHER_SETTINGS_SOURCE</type>
       <text>Source Settings</text>
+      <text lang="PL">Ustaw źródło</text>
       <action>SETTINGS_SOURCE</action>
    </button>
 
