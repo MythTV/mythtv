@@ -40,7 +40,7 @@ sub StartTag {
     if ($name eq 'entry') {
        $expat->{CurrEntry} = {};
        $expat->{MatchFound} = 0;
-	}
+    }
 }
 
 sub Text {
@@ -99,7 +99,7 @@ sub Text {
 
     elsif ($expat->in_element('animated_url')) {
         $expat->{CurrEntry}->{animated_url} = $text;
-	}
+    }
 }
 
 sub EndTag {

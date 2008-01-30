@@ -37,7 +37,7 @@ if (defined $opt_T) {
     exit 0;
 }
 if (defined $opt_l) {
-	my $search = shift;
+    my $search = shift;
     ENVCANMapSearch::AddSatSearch($search);
     ENVCANMapSearch::AddSatClassSearch($search);
     ENVCANMapSearch::AddImageTypeSearch($search);
@@ -79,10 +79,10 @@ my $path     = "$dir/$file-";
 
 # Get list of images (at most 10)
 foreach my $line (split(/\n/, $response)) {
-	if ($line =~ /theImagesComplete\[\d*\] \= \"(.*)\"\;/) {
-		push (@image_list, $1);
-		if ($#image_list >= 10) { shift @image_list; }
-	}
+    if ($line =~ /theImagesComplete\[\d*\] \= \"(.*)\"\;/) {
+        push (@image_list, $1);
+        if ($#image_list >= 10) { shift @image_list; }
+    }
 }
 
 # Download map files, if necessary (maps are stale after 15 minutes)
@@ -95,14 +95,14 @@ foreach my $image (@image_list) {
     } 
 
     getstore($base_url . $image, $path . $i);
-   	$i++;
+    $i++;
 }
 
 # Determine image size
 if (!$size) {
-	use Image::Size;
-	my ($x, $y) = imgsize("${path}0");
-	$size = "${x}x$y" if ($x && $y);
+    use Image::Size;
+    my ($x, $y) = imgsize("${path}0");
+    $size = "${x}x$y" if ($x && $y);
 }
 
 print  "amdesc::$desc\n";
