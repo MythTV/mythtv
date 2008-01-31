@@ -620,7 +620,7 @@ class RatingsToPL : public TriggeredConfigurationGroup
         HostCheckBox *r2pl =
                 new HostCheckBox("mythvideo.ParentalLevelFromRating");
         r2pl->setLabel(QObject::tr("Enable automatic Parental Level from "
-                                   "rating."));
+                                   "rating"));
         r2pl->setValue(false);
         r2pl->setHelpText(QObject::tr("If enabled, searches will automatically "
                                       "set the Parental Level to the one "
