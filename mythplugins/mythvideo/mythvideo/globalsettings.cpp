@@ -240,11 +240,11 @@ HostLineEdit *GetDataCommand()
 HostLineEdit *VideoStartupDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
-    gc->setLabel(QObject::tr("Directory that holds videos"));
+    gc->setLabel(QObject::tr("Directories that hold videos"));
     gc->setValue(DEFAULT_VIDEOSTARTUP_DIR);
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running MythVideo only needs to have read permission "
-                    "to the directory."));
+    gc->setHelpText(QObject::tr("Multiple directories can be separated by ':'. "
+                    "Each directory must exist and be readable by the user "
+                    "running MythVideo."));
     return gc;
 }
 
