@@ -593,12 +593,6 @@ void MythListButton::Init()
 
     m_initialized = true;
 
-    QFontMetrics fm(m_fontActive->face());
-    QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
-    fm = QFontMetrics(m_fontInactive->face());
-    QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
-    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
-
     QRect arrowsRect;
     if (m_showScrollArrows && m_upArrow) 
         arrowsRect = PlaceArrows(m_upArrow->GetArea().size());
@@ -611,6 +605,20 @@ void MythListButton::Init()
         m_downArrow->SetVisible(m_showScrollArrows);
 
     m_contentsRect = CalculateContentsRect(arrowsRect);
+
+    QFontMetrics fm(m_fontActive->face());
+    QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
+    fm = QFontMetrics(m_fontInactive->face());
+    QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
+    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
+    m_itemWidth = m_contentsRect.width();
+
+    // If we have a background image and it's not a 10x10 gradient,
+    // use it to define the button size
+    if (itemRegPix && (itemRegPix->height() > 10))
+        m_itemHeight = itemRegPix->height();
+    if (itemRegPix && (itemRegPix->width() > 10))
+        m_itemWidth = itemRegPix->width();
 
     CalculateVisibleItems();
 
