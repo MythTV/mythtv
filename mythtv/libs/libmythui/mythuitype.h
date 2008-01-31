@@ -29,7 +29,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const char *name, const char *inherits = 0);
-    MythUIType *GetChildAt(const QPoint &p);
+    virtual MythUIType *GetChildAt(const QPoint &p);
     QValueVector<MythUIType *> *GetAllChildren(void);
 
     void DeleteAllChildren(void);

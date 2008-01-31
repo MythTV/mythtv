@@ -77,6 +77,13 @@ void MythUIType::DeleteAllChildren(void)
     m_ChildrenList.clear();
 }
 
+/** \brief Return the first MythUIType which accepts focus found at the given
+ *         coordinates
+ *
+ *  \param p QPoint coordinates
+ *
+ *  \return The widget at these coordinates
+ */
 MythUIType *MythUIType::GetChildAt(const QPoint &p)
 {
     if (GetArea().contains(p)) 
