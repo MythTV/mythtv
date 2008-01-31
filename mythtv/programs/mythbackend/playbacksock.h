@@ -45,9 +45,7 @@ class PlaybackSock
     void GetDiskSpace(QStringList &o_strlist);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);
-    int DeleteRecording(const ProgramInfo *pginfo,
-                        bool forceMetadataDelete = false,
-                        bool deleteFailedRec = false);
+    int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
     QStringList GenPreviewPixmap(const ProgramInfo *pginfo);
     QStringList GenPreviewPixmap(const ProgramInfo *pginfo,

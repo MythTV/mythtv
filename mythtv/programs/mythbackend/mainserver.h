@@ -64,7 +64,6 @@ class MainServer : public QObject, public MythSocketCBs
         QString filename;
         QString title;
         bool forceMetadataDelete;
-        bool updateLastDelete;
     } DeleteStruct;
 
     void ProcessRequestWork(MythSocket *sock);
@@ -78,12 +77,9 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
-                               bool forceMetadataDelete = false,
-                               bool deleteFailedRec = false);
+                               bool forceMetadataDelete);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
-                                 bool forceMetadataDelete,
-                                 bool deleteFailedRec = false,
-                                 bool expirer = false);
+                                 bool forceMetadataDelete, bool expirer=false);
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);

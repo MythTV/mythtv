@@ -2752,6 +2752,9 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
     if (playList.grep(rec->MakeUniqueKey()).count())
         togglePlayListItem(rec);
 
+    if (!forceMetadataDelete)
+        rec->UpdateLastDelete(true);
+
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
 

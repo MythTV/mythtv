@@ -1796,7 +1796,7 @@ void Scheduler::RunScheduler(void)
 
             if (nextRecording->recstatus == rsFailed)
             {
-                MythEvent me(QString("DELETE_FAILED_RECORDING %1 %2")
+                MythEvent me(QString("FORCE_DELETE_RECORDING %1 %2")
                          .arg(nextRecording->chanid)
                          .arg(nextRecording->recstartts.toString(Qt::ISODate)));
                 gContext->dispatch(me);
