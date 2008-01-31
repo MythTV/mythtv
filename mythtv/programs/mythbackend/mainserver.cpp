@@ -1979,8 +1979,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
 
     
-    if (justexpire && !forceMetadataDelete && !deleteFailedRec &&
-        pginfo->filesize > (1024 * 1024) )
+    if (justexpire && !forceMetadataDelete && pginfo->filesize > (1024 * 1024) )
     {
         pginfo->ApplyRecordRecGroupChange("Deleted");
         pginfo->SetAutoExpire(kDeletedAutoExpire);
