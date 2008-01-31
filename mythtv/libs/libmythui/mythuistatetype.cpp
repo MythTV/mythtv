@@ -206,23 +206,23 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     QMap<QString, MythUIType *>::iterator i;
     for (i = st->m_ObjectsByName.begin(); i != st->m_ObjectsByName.end(); ++i)
     {
-         MythUIType *other = i.data();
-         QString key = i.key();
+        MythUIType *other = i.data();
+        QString key = i.key();
 
-         MythUIType *newtype = GetChild(other->name());
-         AddObject(key, newtype);
-         newtype->SetVisible(other->IsVisible());
+        MythUIType *newtype = GetChild(other->name());
+        AddObject(key, newtype);
+        newtype->SetVisible(other->IsVisible());
     }
 
     QMap<int, MythUIType *>::iterator j;
     for (j = st->m_ObjectsByState.begin(); j != st->m_ObjectsByState.end(); ++j)
     {
-         MythUIType *other = j.data();
-         int key = j.key();
+        MythUIType *other = j.data();
+        int key = j.key();
 
-         MythUIType *newtype = GetChild(other->name());
-         AddObject((StateType)key, newtype);
-         newtype->SetVisible(other->IsVisible());
+        MythUIType *newtype = GetChild(other->name());
+        AddObject((StateType)key, newtype);
+        newtype->SetVisible(other->IsVisible());
     }
 }
 
