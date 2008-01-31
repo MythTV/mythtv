@@ -3,41 +3,41 @@
     <name>ActionMenu</name>
     <message>
         <source>Modify Action</source>
-        <translation>Modifier Action</translation>
+        <translation type="obsolete">Modifier Action</translation>
     </message>
     <message>
         <source>Set Binding</source>
-        <translation>Définir le lien</translation>
+        <translation type="obsolete">Définir le lien</translation>
     </message>
     <message>
         <source>Remove Binding</source>
-        <translation>Supprimer le lien</translation>
+        <translation type="obsolete">Supprimer le lien</translation>
     </message>
 </context>
 <context>
     <name>ConfirmMenu</name>
     <message>
         <source>Confirm</source>
-        <translation>Confirmer</translation>
+        <translation type="obsolete">Confirmer</translation>
     </message>
 </context>
 <context>
     <name>InvalidBindingPopup</name>
     <message>
         <source>Manditory Action</source>
-        <translation>Action Obligatoire</translation>
+        <translation type="obsolete">Action Obligatoire</translation>
     </message>
     <message>
         <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
-        <translation>Cette action est obligatoire et nécessite au moins une touche associée. A la place essayez de la réassocier avec une autre touche.</translation>
+        <translation type="obsolete">Cette action est obligatoire et nécessite au moins une touche associée. A la place essayez de la réassocier avec une autre touche.</translation>
     </message>
     <message>
         <source>Conflicting Binding</source>
-        <translation>Liens en conflits</translation>
+        <translation type="obsolete">Liens en conflits</translation>
     </message>
     <message>
         <source>This key binding conflicts with %1 in the %2 context</source>
-        <translation>Cette touche ets en conflit avec %1 dans le contexte %2</translation>
+        <translation type="obsolete">Cette touche ets en conflit avec %1 dans le contexte %2</translation>
     </message>
 </context>
 <context>
@@ -63,11 +63,11 @@
     <name>MythControls</name>
     <message>
         <source>Binding comes from %1 context</source>
-        <translation>Le Lien provient du contexte %1</translation>
+        <translation type="obsolete">Le Lien provient du contexte %1</translation>
     </message>
     <message>
         <source>Delete this key binding from context %1?</source>
-        <translation>Effacer cette touche du contexte %1 ?</translation>
+        <translation type="obsolete">Effacer cette touche du contexte %1 ?</translation>
     </message>
     <message>
         <source>Delete this binding?</source>
@@ -75,11 +75,11 @@
     </message>
     <message>
         <source>This kebinding may conflict with %1 in the %2 context. Do you want to bind it anyways?</source>
-        <translation>Ce lien peut entrer en conflit avec %1 dans le contexte %2. Voulez vous associer la touche malgré tout ?</translation>
+        <translation type="obsolete">Ce lien peut entrer en conflit avec %1 dans le contexte %2. Voulez vous associer la touche malgré tout ?</translation>
     </message>
     <message>
         <source>Conflict Warning</source>
-        <translation>Avertissement de Conflit</translation>
+        <translation>Avertissement de conflit</translation>
     </message>
     <message>
         <source>Bind Key</source>
@@ -87,22 +87,90 @@
     </message>
     <message>
         <source>Contexts</source>
-        <translation>Contextes</translation>
+        <translation type="obsolete">Contextes</translation>
     </message>
     <message>
         <source>Keys</source>
-        <translation>Touches</translation>
+        <translation type="obsolete">Touches</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation>Actions</translation>
+        <translation type="obsolete">Actions</translation>
+    </message>
+    <message>
+        <source>Actions By Context</source>
+        <translation>Actions par contexte</translation>
+    </message>
+    <message>
+        <source>Contexts By Key</source>
+        <translation>Contextes par touche</translation>
+    </message>
+    <message>
+        <source>Keys By Context</source>
+        <translation>Touches par contexte</translation>
+    </message>
+    <message>
+        <source>Change View</source>
+        <translation>Changer la vue</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Set Binding</source>
+        <translation>Définir le lien</translation>
+    </message>
+    <message>
+        <source>Remove Binding</source>
+        <translation>Supprimer le lien</translation>
+    </message>
+    <message>
+        <source>Modify Action</source>
+        <translation>Modifier action</translation>
+    </message>
+    <message>
+        <source>Exit without saving changes</source>
+        <translation>Quitter sans enregistrer les modifications</translation>
+    </message>
+    <message>
+        <source>Save then Exit</source>
+        <translation>Enregistrer et quitter</translation>
+    </message>
+    <message>
+        <source>Exiting, but there are unsaved changes.</source>
+        <translation>Quitter, mais certains changements n&apos;ont pas été enregistrés.</translation>
+    </message>
+    <message>
+        <source>Which would you prefer?</source>
+        <translation>Que préférez-vous?</translation>
+    </message>
+    <message>
+        <source>Manditory Action</source>
+        <translation>Action obligatoire</translation>
+    </message>
+    <message>
+        <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
+        <translation>Cette action est obligatoire et une touche doit y être associée. Essayez de la réassocier avec une autre touche.</translation>
+    </message>
+    <message>
+        <source>This key binding conflicts with %1 in the %2 context.</source>
+        <translation>Ce lien est est en conflit avec %1 dans le contexte %2.</translation>
+    </message>
+    <message>
+        <source>Conflicting Binding</source>
+        <translation>Liens en conflits</translation>
+    </message>
+    <message>
+        <source>This key binding may conflict with %1 in the %2 context. Do you want to bind it anyway?</source>
+        <translation>Ce lien peut venir en conflit avec %1 dans le contexte %2. Désirez-vous le créer malgré tout?</translation>
     </message>
 </context>
 <context>
     <name>OptionsMenu</name>
     <message>
         <source>Options</source>
-        <translation>Options</translation>
+        <translation type="obsolete">Options</translation>
     </message>
 </context>
 <context>
@@ -121,34 +189,34 @@
     </message>
     <message>
         <source>Yes</source>
-        <translation>Oui</translation>
+        <translation type="obsolete">Oui</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Non</translation>
+        <translation type="obsolete">Non</translation>
     </message>
     <message>
         <source>Theme Error</source>
-        <translation>Erreur de Thème</translation>
+        <translation>Erreur de thème</translation>
     </message>
     <message>
         <source>Could not load the keybinding plugin&apos;s theme. See console for details.</source>
-        <translation>Ne peut pas charger les raccourcis clavier du theme du plugin. Voir la console pour les détails.</translation>
+        <translation>Impossible de charger les raccourcis clavier du thème du plugin. Voir la console pour les détails.</translation>
     </message>
 </context>
 <context>
     <name>UnsavedMenu</name>
     <message>
         <source>Unsaved Changes</source>
-        <translation>Modifications non enregistrées</translation>
+        <translation type="obsolete">Modifications non enregistrées</translation>
     </message>
     <message>
         <source>Exiting...</source>
-        <translation>Fermeture...</translation>
+        <translation type="obsolete">Fermeture...</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation>Enregistrer les modifications ?</translation>
+        <translation type="obsolete">Enregistrer les modifications ?</translation>
     </message>
 </context>
 </TS>

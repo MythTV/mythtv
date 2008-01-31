@@ -102,106 +102,126 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le dossier de MythGallery &apos;%1&apos; n&apos;existe pas ou il est illisible.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery n&apos;a pu charger le thème, voir la console pour les détails.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Le périphérique sélectionné n&apos;est plus disponible</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Métadonnées...</translation>
     </message>
     <message>
         <source>Marking...</source>
-        <translation type="unfinished"></translation>
+        <translation>Marquage...</translation>
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier...</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Retour</translation>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer les fichiers marqués</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout sélectionner</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les périphériques</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier ici</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer ici</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un répertoire</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer le fichier ou le répertoire actuel</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface un répertoire, incluant tous les sous-répertoires et fichiers.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface une image.</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface les fichiers marqués</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface %1 images et répertoires, incluant tous les sous-répertoires et fichiers.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau dossier</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un nouveau dossier</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacement des images marquées...</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Copie des images marquées...</translation>
+    </message>
+    <message>
+        <source>Failed to mount device: </source>
+        <translation>Impossible de monter le périphérique: </translation>
+    </message>
+    <message>
+        <source>Showing the default MythGallery directory.</source>
+        <translation>Afficher le répertoire par défaut de MythGallery.</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renommer</translation>
+    </message>
+    <message>
+        <source>Failed to rename directory</source>
+        <translation>Impossible de renommer le répertoire</translation>
+    </message>
+    <message>
+        <source>Failed to rename file</source>
+        <translation>Impossible de renommer le fichier</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Directory that holds images</source>
-        <translation>Répertoire pour stocker les images</translation>
+        <translation>Répertoire de stockage des images</translation>
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation>Ce répertoire doit exister et l&apos;utilisateur de MythGallery doit avoir la permission de lecture</translation>
+        <translation>Ce répertoire doit exister et l&apos;utilisateur de MythGallery doit avoir la permission de lecture.</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
@@ -225,19 +245,19 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Liste des chemins séparés par &apos;:&apos;. Si le chemin de la liste est un répertoire, son contenu sera copié. Si c&apos;est un exécutable. il sera exécuté.</translation>
+        <translation>Liste des chemins d&apos;accès séparés par &apos;:&apos;. Si le chemin est un répertoire, son contenu sera copié. S&apos;il s&apos;agit d&apos;un exécutable. il sera exécuté.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>C&apos;est le type de transition utilisé entre les images lors d&apos;un diaporama.</translation>
+        <translation>Le type de transition utilisé entre les images pendant un diaporama.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation>C&apos;est le type de fond d&apos;écran en mode &apos;une seule image&apos;.</translation>
+        <translation>Le type de fond d&apos;écran en mode &apos;une seule image&apos;.</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation>Délai diaporama</translation>
+        <translation>Délai du diaporama</translation>
     </message>
     <message>
         <source>Use OpenGL transitions</source>
@@ -253,7 +273,7 @@
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Ceci est le type de transition OpenGL utilisé entre chaque image en mode diaporama</translation>
+        <translation>Le type de transition OpenGL utilisé entre chaque image en mode diaporama.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
@@ -273,47 +293,47 @@
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Stocker les miniatures dans le répertoire des images</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si cette option est sélectionnée, les miniatures seront stockées dans des répertoires &apos;.thumbcache&apos; dans le répertoire en amont. Si l&apos;option n&apos;est pas sélectionnée, elles seront stockées dans votre répertoire personnel.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Récursion dans les répertoires</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cocher cette option afin de permettre la récursion du diaporama parmi les sous-répertoires.</translation>
     </message>
     <message>
         <source>Overlay caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Superposition des vignettes</translation>
     </message>
     <message>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de secondes pendant lesquelles la vignette sera affichée sur une image plein écran.</translation>
     </message>
     <message>
         <source>Sort order when browsing</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre de tri pendant la navigation</translation>
     </message>
     <message>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre de tri pour les miniatures des images affichées.</translation>
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée de la transition OpenGL (en millisecondes)</translation>
     </message>
     <message>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de MythGallery (diaporama)</translation>
     </message>
     <message>
         <source>MythGallery Settings (General)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de MythGallery (général)</translation>
     </message>
 </context>
 <context>

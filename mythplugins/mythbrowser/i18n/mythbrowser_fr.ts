@@ -10,13 +10,13 @@
     <name>BookmarksConfig</name>
     <message>
         <source>MythBrowser Bookmarks Settings</source>
-        <translation>Paramètres des signets de Mythbrowser</translation>
+        <translation>Paramètres des signets de MythBrowser</translation>
     </message>
     <message>
         <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
 Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>Appuyez sur le bouton &apos;Nouveau Signet&apos; pour ajouter un nouveau site/groupe 
-Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la liste</translation>
+        <translation>Appuyez sur le bouton &apos;Nouveau signet&apos; pour ajouter un nouveau site/groupe. 
+Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la liste.</translation>
     </message>
     <message>
         <source>Zoom [%]:</source>
@@ -28,7 +28,7 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     </message>
     <message>
         <source>Hide Scrollbars</source>
-        <translation>Efface les barres de défilement</translation>
+        <translation>Cacher les barres de défilement</translation>
     </message>
     <message>
         <source>Scroll Page</source>
@@ -40,7 +40,7 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     </message>
     <message>
         <source>&amp;New Bookmark</source>
-        <translation>&amp;Nouveau Signet</translation>
+        <translation>&amp;Nouveau signet</translation>
     </message>
     <message>
         <source>Add a new Website</source>
@@ -59,7 +59,7 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     </message>
     <message>
         <source>Add New Website</source>
-        <translation>Ajouter un nouveau site web</translation>
+        <translation>Ajouter un nouveau site Web</translation>
     </message>
     <message>
         <source>Group:</source>
@@ -118,43 +118,47 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Reculer</translation>
     </message>
     <message>
         <source>Next Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Prochain onglet</translation>
     </message>
     <message>
         <source>Prev Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Onglet précédent</translation>
     </message>
     <message>
         <source>Remove Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlever l&apos;onglet</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom arrière</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom avant</translation>
     </message>
     <message>
         <source>Add New Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter un signet</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="unfinished">Groupe:</translation>
+        <translation>Groupe:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
+        <translation>Description:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Chargement...</translation>
     </message>
 </context>
 </TS>
