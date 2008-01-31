@@ -98,6 +98,8 @@ int unlockShutdown()
         ++value;
     setGlobalSetting("MythShutdownLock", QString::number(--value));
 
+    RemoteSendMessage("RESET_IDLETIME");
+
     return 0;
 }
 

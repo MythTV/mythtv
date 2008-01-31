@@ -74,6 +74,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_mainServer = NULL;
 
     m_isShuttingDown = false;
+    resetIdleTime = false;
 
     verifyCards();
 
@@ -124,6 +125,13 @@ Scheduler::~Scheduler()
 void Scheduler::SetMainServer(MainServer *ms)
 {
     m_mainServer = ms;
+}
+
+void Scheduler::ResetIdleTime(void)
+{
+    resetIdleTime_lock.lock();
+    resetIdleTime = true;
+    resetIdleTime_lock.unlock();
 }
 
 void Scheduler::verifyCards(void)
@@ -1830,6 +1838,16 @@ void Scheduler::RunScheduler(void)
 
                 if (!(m_mainServer->isClientConnected()) && !recording)
                 {
+                    // have we received a RESET_IDLETIME message?
+                    resetIdleTime_lock.lock();
+                    if (resetIdleTime)
+                    {
+                        // yes - so reset the idleSince time
+                        idleSince = QDateTime();
+                        resetIdleTime = false;
+                    }
+                    resetIdleTime_lock.unlock();
+
                     if (!idleSince.isValid())
                     {
                         RecIter idleIter = reclist.begin();

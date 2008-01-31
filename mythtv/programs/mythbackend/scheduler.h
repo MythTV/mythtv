@@ -71,6 +71,7 @@ class Scheduler : public QObject
     void DisableScheduling(void) { schedulingEnabled = false; }
     void EnableScheduling(void) { schedulingEnabled = true; }
     void GetNextLiveTVDir(int cardid);
+    void ResetIdleTime(void);
 
   protected:
     void RunScheduler(void);
@@ -157,6 +158,9 @@ class Scheduler : public QObject
     bool threadrunning;
 
     MainServer *m_mainServer;
+
+    QMutex resetIdleTime_lock;
+    bool resetIdleTime;
 
     bool m_isShuttingDown;
     MSqlQueryInfo dbConn;

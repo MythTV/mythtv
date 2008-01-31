@@ -789,6 +789,9 @@ void MainServer::customEvent(QCustomEvent *e)
         if (me->Message() == "CLEAR_SETTINGS_CACHE")
             gContext->ClearSettingsCache();
 
+        if (me->Message().left(14) == "RESET_IDLETIME" && m_sched)
+            m_sched->ResetIdleTime();
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
