@@ -20,6 +20,7 @@
      <text lang="CZ">Telefon</text>
      <text lang="RU">Телефон</text>
      <text lang="PL">Telefon</text>
+     <text lang="HE">טלפון</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -46,6 +47,7 @@
      <text lang="CZ">Novinky</text>
      <text lang="RU">Новости</text>
      <text lang="PL">Wiadomości</text>
+     <text lang="HE">חדשות</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -92,6 +94,7 @@
      <text lang="CZ">Počasí</text>
      <text lang="RU">Погода</text>
      <text lang="PL">Pogoda</text>
+     <text lang="HE">מזג האיור</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -139,6 +142,7 @@
       <text lang="CZ">Prohlížení webu</text>
       <text lang="RU">WWW</text>
       <text lang="PL">Internet WWW</text>
+      <text lang="HE">אינטרנט</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -164,6 +168,7 @@
      <text lang="CZ">Recepty</text>
      <text lang="RU">Рецепты</text>
      <text lang="PL">Przepisy</text>
+     <text lang="HE">מתכונים</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -189,6 +194,7 @@
       <text lang="CZ">Stav systému</text>
       <text lang="RU">Состояние системы</text>
       <text lang="PL">Status systemu</text>
+      <text lang="HE">מצב מערכת</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -22,6 +22,7 @@
      <text lang="CZ">Nastavení muziky</text>
      <text lang="RU">Настройки музыки</text>
      <text lang="PL">Ustaw muzykę</text>
+     <text lang="HE">הגדרות מוסיקה</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -48,6 +49,7 @@
        <text lang="CZ">Nastavení videa</text>
        <text lang="RU">Настройки фильмов</text>
        <text lang="PL">Ustaw filmy</text>
+       <text lang="HE">הגדרות וידאו</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -74,6 +76,7 @@
       <text lang="CZ">Nastavení obrázků</text>
       <text lang="RU">Настройки изображений</text>
       <text lang="PL">Ustaw zdjęcia</text>
+      <text lang="HE">הגדרות תמונות</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -99,6 +102,7 @@
      <text lang="NB">Spillinnstillinger</text>
      <text lang="RU">Настройки игр</text>
      <text lang="PL">Ustaw gry</text>
+     <text lang="HE">הגדרות משחק</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -122,6 +126,7 @@
      <text lang="NL">Radio Instellingen</text>
      <text lang="RU">Настройки радио</text>
      <text lang="PL">Ustaw radio</text>
+     <text lang="HE">הגדרות רדיו</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>
@@ -130,6 +135,7 @@
      <type>SETTINGS_STREAM</type>
      <text>MythStream Settings</text>
      <text lang="SI">Nastavitve Mythstream</text>
+     <text lang="HE">הגדרות MythStream</text>
      <action>CONFIGPLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
@@ -146,6 +152,7 @@
       <text lang="DK">Filarkivering</text>
       <text lang="SI">Nastavitve arhiviranja</text>
       <text lang="PL">Ustaw pliki archiwum</text>
+      <text lang="HE">הגדרות ארכיון קבצים</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

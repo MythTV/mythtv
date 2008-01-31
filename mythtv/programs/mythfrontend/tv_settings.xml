@@ -22,6 +22,7 @@
       <text lang="CZ">Obecné</text>
       <text lang="RU">Общее</text>
       <text lang="PL">Ogólne</text>
+      <text lang="HE">כללי</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -48,6 +49,7 @@
       <text lang="CZ">Programový průvodce</text>
       <text lang="RU">Программа передач</text>
       <text lang="PL">Przewodnik programowy</text>
+      <text lang="HE">מדריך התכניות</text>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="ET">Kava</alttext>
       <alttext lang="PL">Program TV</alttext>
@@ -75,6 +77,7 @@
       <text lang="NB">Avspilling</text>
       <text lang="CZ">Přehrávání</text>
       <text lang="RU">Воспроизведение</text>
+      <text lang="HE">הסרטת</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -101,6 +104,7 @@
       <text lang="RU">Группы воспроизведения</text>
       <text lang="SI">Predvajalne skupine</text>
       <text lang="PL">Grupy odtwarzania</text>
+      <text lang="HE">קבוצות הסרטה</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -126,6 +130,7 @@
       <text lang="CZ">Nahrávací profily</text>
       <text lang="RU">Профили записей</text>
       <text lang="PL">Profil nagrywania</text>
+      <text lang="HE">פרופילים להקלטה</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <alttext lang="ET">Profiilid</alttext>
@@ -156,6 +161,7 @@
       <text lang="CZ">Priority nahrávání</text>
       <text lang="RU">Приоритеты записей</text>
       <text lang="PL">Priorytety nagrań</text>
+      <text lang="HE">קדימויות הקלטה</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="ES">Prioridades</alttext>

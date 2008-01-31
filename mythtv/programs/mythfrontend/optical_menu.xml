@@ -22,6 +22,7 @@
       <text lang="CZ">Přehrát DVD</text>
       <text lang="RU">Смотреть DVD</text>
       <text lang="PL">Oglądanie DVD</text>
+      <text lang="HE">נגן DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythvideo</depends>
    </button>
@@ -48,6 +49,7 @@
       <text lang="CZ">Přehrát VCD</text>
       <text lang="RU">Смотреть VCD</text>
       <text lang="PL">Oglądanie VCD</text>
+      <text lang="HE">נגן VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythvideo</depends>
    </button>
@@ -74,6 +76,7 @@
       <text lang="CZ">Načíst DVD</text>
       <text lang="RU">Импортировать DVD</text>
       <text lang="PL">Importowanie DVD</text>
+      <text lang="HE">יבא DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythvideo</depends>
    </button>
@@ -86,10 +89,12 @@
       <text lang="DK">Arkivér filer</text>
       <text lang="ES">Archivar Ficheros</text>
       <text lang="RU">Архивировать файлы</text>
+      <text lang="HE">ארכב קבצים</text>
       <text lang="ET">Arhiveerimine</text>
       <text lang="DE">Dateien archivieren</text>
       <text lang="SI">Arhiviranje datotek</text>
       <text lang="PL">Archiwalne pliki</text>
+      <text lang="HE">צרוב CD/DVD</text>
       <action>PLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>
@@ -115,6 +120,7 @@
       <text lang="NB">Importer CD</text>
       <text lang="CZ">Načíst CD</text>
       <text lang="RU">Импортировать CD</text>
+      <text lang="HE">יבא CD</text>
       <text lang="ET">Meedia väljastamine</text>
       <text lang="PL">Importowanie CD</text>
       <action>JUMP Rip CD</action>
@@ -132,6 +138,7 @@
       <text lang="DK">Skub ud</text>
       <text lang="SI">Izvrzi plošček</text>
       <text lang="PL">Wysuń tackę</text>
+      <text lang="HE">הוצא מדיה</text>
       <action>EJECT</action>
    </button>
 

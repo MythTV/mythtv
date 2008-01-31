@@ -22,6 +22,7 @@
       <text lang="CZ">Sledovat TV</text>
       <text lang="RU">Смотреть ТВ</text>
       <text lang="PL">Oglądanie TV</text>
+      <text lang="HE">צפיה בטלויזיה</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -47,6 +48,7 @@
       <text lang="CZ">Plánovat nahrávky</text>
       <text lang="RU">Расписание записей</text>
       <text lang="PL">Harmonogram</text>
+      <text lang="HE">תזמון הקלטות</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Planification</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -88,6 +90,7 @@
       <text lang="CZ">Sledovat nahrávky</text>
       <text lang="RU">Смотреть записи</text>
       <text lang="PL">Oglądanie nagrań</text>
+      <text lang="HE">צפיה בהקלטות</text>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="PL">Oglądanie</alttext>
       <action>TV_WATCH_RECORDING</action>
@@ -115,6 +118,7 @@
       <text lang="CZ">Mazat nahrávky</text>
       <text lang="RU">Удалить записи</text>
       <text lang="PL">Kasowanie nagrań</text>
+      <text lang="HE">מחיקת הקלטות</text>
       <alttext lang="ET">Kustutamine</alttext>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="PL">Kasowanie</alttext>
@@ -159,7 +163,8 @@
       <text lang="PT">Estado do Sistema</text>
       <text lang="CZ">Stav systému</text>
       <text lang="RU">Состояние системы</text>
-      <text lang="PL">Status systemu</text>      
+      <text lang="PL">Status systemu</text>
+      <text lang="HE">מצב מערכת</text>      
       <action>TV_STATUS</action>
    </button>
 

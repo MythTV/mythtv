@@ -15,6 +15,7 @@
       <text lang="NL">Opnameprioriteiten Instellen</text>
       <text lang="RU">Установить приоритет записей</text>
       <text lang="PL">Ustaw priorytet nagrywania</text>
+      <text lang="HE">הגדרת קדימיות ההקלטות</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="IT">Priorità</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
@@ -26,6 +27,7 @@
       <alttext lang="NL">Opnameprioriteiten</alttext>
       <alttext lang="RU">Записи</alttext>
       <alttext lang="PL">Priorytet nagrywania</alttext>
+      <alttext lang="HE">קדימיות ההקלטות</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -45,6 +47,7 @@
       <text lang="NL">Opnameprioriteiten per Zender</text>
       <text lang="RU">Установить приоритет каналов</text>
       <text lang="PL">Ustaw priorytet kanałom</text>
+      <text lang="HE">הגדרת קדימיות ההקלטות לערוץ</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="IT">Canali</alttext>
       <alttext lang="SV">Kanal</alttext>
@@ -58,6 +61,7 @@
       <alttext lang="NL">Zenderprioriteiten</alttext>
       <alttext lang="RU">Каналы</alttext>
       <alttext lang="PL">Priorytet kanałów</alttext>
+      <alttext lang="HE">קדימיות ההקלטות לערוץ</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

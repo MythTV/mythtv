@@ -22,6 +22,7 @@
       <text lang="CZ">Sledování nahrávek</text>
       <text lang="RU">Смотреть записи</text>
       <text lang="PL">Oglądanie nagrań</text>
+      <text lang="HE">צפיה בהקלטות</text>
       <alttext lang="SV">Inspelningar</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="RU">Записи</alttext>
@@ -51,6 +52,7 @@
      <text lang="CZ">Sledovat filmy</text>
      <text lang="RU">Смотреть фильмы</text>
      <text lang="PL">Oglądanie filmów</text>
+     <text lang="HE">צפיה בוידאו</text>
      <alttext lang="SV">Filmer</alttext>
      <alttext lang="ET">Video</alttext>
      <alttext lang="RU">Фильмы</alttext>
@@ -81,6 +83,7 @@
       <text lang="CZ">Poslouchat muziku</text>
       <text lang="RU">Слушать музыку</text>
       <text lang="PL">Odtwarzaj muzykę</text>
+      <text lang="HE">האזנה למוסיקה</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -105,6 +108,7 @@
      <text lang="CZ">Poslouchat rádio</text>
      <text lang="RU">Слушать радио</text>
      <text lang="PL">Słuchaj radia</text>
+     <text lang="HE">האזנה לרדיו</text>
      <alttext lang="SV">Radio</alttext>
      <alttext lang="PT">Rádio</alttext>
      <alttext lang="ET">Raadio</alttext>
@@ -116,6 +120,7 @@
    <button>
      <type>STREAM</type>
      <text>Play online streams</text>
+     <text lang="HE">נגן רצף מכוון</text>
      <action>PLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
@@ -142,6 +147,7 @@
      <text lang="CZ">Galerie fotek</text>
      <text lang="RU">Изображения</text>
      <text lang="PL">Galeria zdjęć</text>
+     <text lang="HE">גלרית תמונות</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -168,6 +174,7 @@
      <text lang="CZ">Hrát hry</text>
      <text lang="RU">Играть в игры</text>
      <text lang="PL">Graj w gry</text>
+     <text lang="HE">לשחק משחקים</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

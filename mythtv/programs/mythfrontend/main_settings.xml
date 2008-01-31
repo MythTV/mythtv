@@ -22,6 +22,7 @@
       <text lang="CZ">Obecné</text>
       <text lang="RU">Общие</text>
       <text lang="PL">Ogólne</text>
+      <text lang="HE">כללי</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -47,6 +48,7 @@
       <text lang="CZ">Vzhled</text>
       <text lang="RU">Внешний вид</text>
       <text lang="PL">Wygląd</text>
+      <text lang="HE">מראה</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -71,6 +73,7 @@
      <text lang="CZ">Nastavení televize</text>
      <text lang="RU">Настройки ТВ</text>
      <text lang="PL">Telewizja</text>
+     <text lang="HE">הגדרות טלויזיה</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -95,6 +98,7 @@
      <text lang="CZ">Nastavení multimédií</text>
      <text lang="RU">Настройки мультимедиа</text>
      <text lang="PL">Media</text>
+     <text lang="HE">הגדרות מדיה</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
    </button>
@@ -121,6 +125,7 @@
      <text lang="CZ">Nastavení informačního centra</text>
      <text lang="RU">Настройки инфоцентра</text>
      <text lang="PL">Centrum informacyjne</text>
+     <text lang="HE">הגדרות מרכז מידע</text>
      <alttext lang="DE">Infocenter</alttext>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
@@ -148,6 +153,7 @@
      <text lang="CZ">Nastavení XBOXu</text>
      <text lang="RU">Настройки XBOX</text>
      <text lang="PL">Xbox</text>
+     <text lang="HE">הגדרות Xbox</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -172,6 +178,7 @@
       <text lang="JA">電話設定</text>
       <text lang="RU">Настройки телефона</text>
       <text lang="PL">Telefon</text>
+      <text lang="HE">הגדרות טלפון</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

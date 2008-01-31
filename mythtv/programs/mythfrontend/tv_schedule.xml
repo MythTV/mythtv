@@ -23,6 +23,7 @@
       <text lang="CZ">Programový průvodce</text>
       <text lang="RU">Программа передач</text>
       <text lang="PL">Przewodnik programowy</text>
+      <text lang="HE">מדריך תכניות</text>
       <alttext>Guide</alttext>
       <alttext lang="IT">Guida</alttext>
       <alttext lang="FR">Grille</alttext>
@@ -41,6 +42,7 @@
       <alttext lang="PT">Guia</alttext>
       <alttext lang="RU">Программа</alttext>
       <alttext lang="PL">Program TV</alttext>
+      <alttext lang="HE">מדריך</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -67,6 +69,7 @@
       <text lang="CZ">Vyhledávač programů</text>
       <text lang="RU">Поиск программы</text>
       <text lang="PL">Znajdź program</text>
+      <text lang="HE">מציאת תכניות</text>
       <alttext>Finder</alttext>
       <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Recherche</alttext>
@@ -85,6 +88,7 @@
       <alttext lang="NB">Finner</alttext>
       <alttext lang="RU">Поиск</alttext>
       <alttext lang="PL">Znajdź</alttext>
+      <alttext lang="HE">מציאה</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -109,6 +113,7 @@
       <text lang="CZ">Hledat slova</text>
       <text lang="RU">Поиск по словам</text>
       <text lang="PL">Szukaj słów</text>
+      <text lang="HE">חיפוש מילים</text>
       <alttext>Search</alttext>
       <alttext lang="IT">Ricerca</alttext>
       <alttext lang="FR">Texte</alttext>
@@ -124,6 +129,7 @@
       <alttext lang="PT">Palavras</alttext>
       <alttext lang="RU">Слова</alttext>
       <alttext lang="PL">Słowa</alttext>
+      <alttext lang="HE">חיפוש</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -147,6 +153,7 @@
       <text lang="CZ">Hledat seznamy</text>
       <text lang="RU">Поиск по спискам</text>
       <text lang="PL">Szukaj***listy</text>
+      <text lang="HE">חיפוש רשימות</text>
       <alttext>Lists</alttext>
       <alttext lang="IT">Liste</alttext>
       <alttext lang="DE">Listen</alttext>
@@ -161,6 +168,7 @@
       <alttext lang="ES">Listas</alttext>
       <alttext lang="PT">Listas</alttext>
       <alttext lang="RU">Списки</alttext>
+      <alttext lang="HE">חיפוש</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -218,6 +226,7 @@
       <text lang="CZ">Volné nahrávání</text>
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Dostosuj nagrywanie</text>
+      <text lang="HE">תפירת הקלטה</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -244,6 +253,7 @@
       <text lang="CZ">Ruční plánování</text>
       <text lang="RU">Ручное планирование</text>
       <text lang="PL">Dodaj ręcznie</text>
+      <text lang="HE">הקלטה ידנית</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="IT">Manuale</alttext>
       <alttext lang="ES">Programar</alttext>
@@ -263,6 +273,7 @@
       <alttext lang="ES">Manual</alttext>
       <alttext lang="RU">Вручную</alttext>
       <alttext lang="PL">Ręcznie</alttext>
+      <alttext lang="HE">הקלטה ידנית</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

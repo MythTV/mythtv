@@ -21,6 +21,7 @@
       <text lang="CZ">dle názvu</text>
       <text lang="RU">Заголовки</text>
       <text lang="PL">Tytuły</text>
+      <text lang="HE">כותרים</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -45,6 +46,7 @@
       <text lang="CZ">dle klíčových slov</text>
       <text lang="RU">Ключевые слова</text>
       <text lang="PL">Słowa kluczowe</text>
+      <text lang="HE">מילות מפתח</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -68,6 +70,7 @@
       <text lang="CZ">dle hereckého obsazení</text>
       <text lang="RU">Действующие лица</text>
       <text lang="PL">Osoby</text>
+      <text lang="HE">אנשים</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -91,6 +94,7 @@
       <text lang="CZ">Pokročilé</text>
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Zaawansowane</text>
+      <text lang="HE">מתקדם</text>
       <alttext lang="DE">Erweitert</alttext>
       <alttext lang="ET">Muud</alttext>
       <alttext lang="PT">Avançada</alttext>

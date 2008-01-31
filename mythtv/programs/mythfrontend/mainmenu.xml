@@ -23,6 +23,7 @@
       <text lang="RU">Смотреть ТВ</text>
       <text lang="AR">شاهد التلفاز</text>
       <text lang="PL">Oglądanie TV</text>
+      <text lang="HE">צפיה בטלויזיה</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -48,6 +49,7 @@
      <text lang="RU">Мультимедиа</text>
      <text lang="AR">مكتبة الوسائط</text>
      <text lang="PL">Biblioteka media***</text>
+     <text lang="HE">ספרית המדיה</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <alttext lang="PT">Galeria</alttext>
@@ -79,6 +81,7 @@
       <text lang="RU">Управление записями</text>
       <text lang="AR">أدر التسجيلات</text>
       <text lang="PL">Zarządzaj nagraniami</text>
+      <text lang="HE">ניהול הקלטות</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ES">Programar</alttext>
@@ -111,6 +114,7 @@
      <text lang="CZ">Centrum informací</text>
      <text lang="RU">Центр информации</text>
      <text lang="AR">مركز المعلومات</text>
+     <text lang="HE">מרכז מידע</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="DK">Infocenter</alttext>
@@ -147,6 +151,7 @@
      <text lang="RU">CD/DVD</text>
      <text lang="AR">تشغيل إسطوانات</text>
      <text lang="PL">Dyski optyczne</text>
+     <text lang="HE">דיסקים אופטים</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythvideo mytharchive mythburn</depends>
    </button>
@@ -174,6 +179,7 @@
      <text lang="RU">Утилиты / Настройки</text>
      <text lang="AR">تضبيطات</text>
      <text lang="PL">Narzędzia / ustawienia</text>
+     <text lang="HE">עזרים / הגדרות</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <alttext lang="ET">Sätted</alttext>

@@ -315,5 +315,80 @@
   <catcolor category="Vestlussaated" color="MediumTurquoise"></catcolor>
   <catcolor category="Õudus" color="firebrick3"></catcolor>
 
-</categorycolors>
+  <!-- Categories introduced by JavaGrabber for YES Israel -->
 
+  <catcolor category="אופנה" color="#a8cdea"></catcolor>
+  <catcolor category="אופרת סבון, טלנובלה" color="DarkOrchid"></catcolor>
+  <catcolor category="אימה" color="firebrick3"></catcolor>
+  <catcolor category="אנימציה" color="#3333aa"></catcolor>
+  <catcolor category="אקטואליה" color="DarkOrange3"></catcolor>
+  <catcolor category="אקשן" color="maroon"></catcolor>
+  <catcolor category="בורסה" color="DarkOrange3"></catcolor>
+  <catcolor category="בורקס" color="Blue"></catcolor>
+  <catcolor category="בידור ואירוח, כללי" color="DarkOrchid"></catcolor>
+  <catcolor category="בישול" color="tan3"></catcolor>
+  <catcolor category="בריאות" color="#00ffaa"></catcolor>
+  <catcolor category="גינון" color="Red"></catcolor>
+  <catcolor category="דוקומנטרי" color="goldenrod"></catcolor>
+  <catcolor category="דוקו סדרות" color="goldenrod"></catcolor>
+  <catcolor category="דיון" color="MediumTurquoise"></catcolor>
+  <catcolor category="דרמה" color="rosybrown3"></catcolor>
+  <catcolor category="דרמה קומית" color="#880099"></catcolor>
+  <catcolor category="דת ואמונה" color="goldenrod"></catcolor>
+  <catcolor category="הגיל הרך, ילדי הגן" color="MediumSlateBlue"></catcolor>
+  <catcolor category="הסטוריה וארכיאולוגיה" color="goldenrod"></catcolor>
+  <catcolor category="הרפתקאות" color="maroon"></catcolor>
+  <catcolor category="התעמלות, אירובי" color="#00dd99"></catcolor>
+  <catcolor category="טבע, בעלי חיים" color="#00ff44"></catcolor>
+  <catcolor category="טיולים, מסעות" color="#aa00aa"></catcolor>
+  <catcolor category="טכנולוגיה וחידושים" color="#33ff99"></catcolor>
+  <catcolor category="ייעוץ" color="CornflowerBlue"></catcolor>
+  <catcolor category="ילדים" color="MediumSlateBlue"></catcolor>
+  <catcolor category="ילדים ונוער, כללי" color="MediumSlateBlue"></catcolor>
+  <catcolor category="כדורגל" color="DarkCyan"></catcolor>
+  <catcolor category="כדורסל" color="DarkCyan"></catcolor>
+  <catcolor category="כלכלה" color="goldenrod"></catcolor>
+  <catcolor category="לייט נייט" color="sienna"></catcolor>
+  <catcolor category="מגזין" color="MediumTurquoise"></catcolor>
+  <catcolor category="מגזין ספורט" color="MediumTurquoise"></catcolor>
+  <catcolor category="מדע בדיוני, פנטזיה" color="DarkBlue"></catcolor>
+  <catcolor category="מהדורת חדשות" color="DarkOrange3"></catcolor>
+  <catcolor category="מוסיקה, כללי" color="DarkRed"></catcolor>
+  <catcolor category="מוסיקלי" color="#aa0000"></catcolor>
+  <catcolor category="מופע בידור" color="sienna"></catcolor>
+  <catcolor category="מופע מוסיקלי" color="#aa0000"></catcolor>
+  <catcolor category="מיוחד" color="#ee0000"></catcolor>
+  <catcolor category="מלחמה" color="#dddd00"></catcolor>
+  <catcolor category="מערבון" color="#bbbb00"></catcolor>
+  <catcolor category="מערכונים" color="sienna"></catcolor>
+  <catcolor category="משפחה" color="#222200"></catcolor>
+  <catcolor category="מתח" color="firebrick3"></catcolor>
+  <catcolor category="סאטירה" color="#222200"></catcolor>
+  <catcolor category="סדרה קומית" color="#880088"></catcolor>
+  <catcolor category="סדרות ילדים" color="MediumSlateBlue"></catcolor>
+  <catcolor category="סדרות, כללי" color="DarkOrchid"></catcolor>
+  <catcolor category="ספורט מוטורי" color="DarkCyan"></catcolor>
+  <catcolor category="ספיישל" color="#ee0000"></catcolor>
+  <catcolor category="ספרות" color="goldenrod"></catcolor>
+  <catcolor category="סרטים מצוירים" color="MediumSlateBlue"></catcolor>
+  <catcolor category="סרטים קצרים" color="Blue"></catcolor>
+  <catcolor category="עיצוב" color="#00ee00"></catcolor>
+  <catcolor category="עמים ותרבויות" color="goldenrod"></catcolor>
+  <catcolor category="עסקים" color="DarkOrange3"></catcolor>
+  <catcolor category="פנאי וסגנון חיים, כללי" color="#a8cdea"></catcolor>
+  <catcolor category="פשע" color="MediumVioletRed"></catcolor>
+  <catcolor category="קולנוע" color="Blue"></catcolor>
+  <catcolor category="קולנוע, אומנות" color="goldenrod"></catcolor>
+  <catcolor category="קומדיה" color="DarkOrchid"></catcolor>
+  <catcolor category="קומדיה רומנטית" color="#bbaa00"></catcolor>
+  <catcolor category="ראיונות" color="#e9ecf3"></catcolor>
+  <catcolor category="ריהוט ועתיקות" color="#00ee00"></catcolor>
+  <catcolor category="רפואה, רפואה משלימה" color="#00ffaa"></catcolor>
+  <catcolor category="תכנית אירוח" color="sienna"></catcolor>
+  <catcolor category="תכנית אירוח, טוק שואו" color="sienna"></catcolor>
+  <catcolor category="תכנית בוקר" color="sienna"></catcolor>
+  <catcolor category="תכנית לימודית" color="CornflowerBlue"></catcolor>
+  <catcolor category="תעודה, טבע ומדע, כללי" color="#33ff99"></catcolor>
+  <catcolor category="תרבות ואמנות, כללי" color="goldenrod"></catcolor>
+
+</categorycolors>

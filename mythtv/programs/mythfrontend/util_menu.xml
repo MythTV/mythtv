@@ -21,6 +21,7 @@
       <text lang="CZ">Hudební nástroje</text>
       <text lang="RU">Работа с музыкой</text>
       <text lang="PL">Narzędzia muzyczne</text>
+      <text lang="HE">כלי מוסיקה</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -47,6 +48,7 @@
       <text lang="CZ">Manažer filmů</text>
       <text lang="RU">Управление фильмами</text>
       <text lang="PL">Zarządca Filmów</text>
+      <text lang="HE">מנהל וידאו</text>
       <action>JUMP Video Manager</action>
       <depends>mythvideo</depends>
    </button>
@@ -70,6 +72,7 @@
       <text lang="RU">Редактировать клавиши</text>
       <text lang="SI">Urejanje tipk</text>
       <text lang="PL">Edytuj klawisze</text>
+      <text lang="HE">עריכת מקשים</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>
@@ -102,6 +105,7 @@
       <text lang="CZ">Nastavení</text>
       <text lang="RU">Настройки</text>
       <text lang="PL">Ustawienia</text>
+      <text lang="HE">הגדרה</text>
       <action>MENU main_settings.xml</action>
    </button>
 

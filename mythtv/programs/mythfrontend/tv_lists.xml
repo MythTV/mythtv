@@ -21,6 +21,7 @@
       <text lang="CZ">Nové názvy</text>
       <text lang="RU">Новые заголовки</text>
       <text lang="PL">Nowe tytuły</text>
+      <text lang="HE">כותרים חדשים</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -46,6 +47,7 @@
       <text lang="CZ">Filmy</text>
       <text lang="RU">Фильмы</text>
       <text lang="PL">Filmy</text>
+      <text lang="HE">סרטים</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -70,6 +72,7 @@
       <text lang="CZ">Kategorie</text>
       <text lang="RU">Категории</text>
       <text lang="PL">Kategorie</text>
+      <text lang="HE">קטגוריות</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -94,6 +97,7 @@
       <text lang="CZ">Kanály</text>
       <text lang="RU">Каналы</text>
       <text lang="PL">Kanały</text>
+      <text lang="HE">ערוצים</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -118,6 +122,7 @@
       <text lang="CZ">Čas</text>
       <text lang="RU">Время</text>
       <text lang="PL">Czas</text>
+      <text lang="HE">זמן</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 
