@@ -5,6 +5,7 @@
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuibutton.h"
+#include "mythgesture.h"
 
 class MythListButtonItem;
 class MythFontProperties;
@@ -21,6 +22,8 @@ class MythListButton : public MythUIType
     ~MythListButton();
 
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual MythUIType *GetChildAt(const QPoint &p);
 
     void SetFontActive(const MythFontProperties &font);
     void SetFontInactive(const MythFontProperties &font);
@@ -65,6 +68,7 @@ class MythListButton : public MythUIType
 
   signals:
     void itemSelected(MythListButtonItem* item);
+    void itemClicked(MythListButtonItem* item);
 
   protected:
     void Const();

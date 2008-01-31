@@ -4,7 +4,9 @@
 #include "qevent.h"
 
 #include "mythscreentype.h"
+#include "mythlistbutton.h"
 
+class MythListButtonItem;
 class MythListButton;
 
 const int kMythDialogBoxCompletionEventType = 34111;
@@ -39,6 +41,9 @@ class MythDialogBox : public MythScreenType
     void AddButton(const QString &title);
 
     virtual bool keyPressEvent(QKeyEvent *e);
+
+  public slots:
+    void Select(MythListButtonItem* item);
 
   signals:
     void Selected(int selection);

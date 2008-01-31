@@ -33,7 +33,16 @@ bool MythDialogBox::Create(void)
     textarea->SetText(m_text);
     buttonList->SetActive(true);
 
+    connect(buttonList, SIGNAL(itemClicked(MythListButtonItem*)),
+            this, SLOT(Select(MythListButtonItem*)));
+
     return true;
+}
+
+void MythDialogBox::Select(MythListButtonItem* item)
+{
+    SendEvent(buttonList->GetItemPos(item));
+    m_ScreenStack->PopScreen();
 }
 
 void MythDialogBox::SetReturnEvent(MythScreenType *retscreen, 
@@ -71,8 +80,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *e)
             else if (action == "SELECT" || action == "RIGHT")
             {
                 MythListButtonItem *item = buttonList->GetItemCurrent();
-                SendEvent(buttonList->GetItemPos(item));
-                m_ScreenStack->PopScreen();
+                Select(item);
             }
             else
                 handled = false;
