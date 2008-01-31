@@ -13,6 +13,12 @@
 
 const char *StorageGroup::kDefaultStorageDir = "/mnt/store";
 
+const QStringList StorageGroup::kSpecialGroups = QStringList()
+    << "LiveTV"
+//    << "Thumbnails"
+//    << "DB Backups"
+    ;
+
 /****************************************************************************/
 
 /** \brief StorageGroup constructor.
@@ -289,11 +295,16 @@ QStringList StorageGroup::getRecordingsGroups(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT DISTINCT groupname "
+    QString sql = "SELECT DISTINCT groupname "
                   "FROM storagegroup "
-                  ";");
-//                  "WHERE groupname NOT IN "
-//                      "('DB Backups', 'Thumbnails');");
+                  "WHERE groupname NOT IN (";
+    for (QStringList::const_iterator it = StorageGroup::kSpecialGroups.begin();
+         it != StorageGroup::kSpecialGroups.end(); ++it)
+        sql.append(QString(" '%1',").arg(*it));
+    sql = sql.left(sql.length() - 1);
+    sql.append(" );");
+
+    query.prepare(sql);
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
             groups += QString::fromUtf8(query.value(0).toString());
@@ -351,8 +362,8 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
 
     if (group == "Default")
         dispGroup = QObject::tr("Default");
-    else if (group == "LiveTV")
-        dispGroup = QObject::tr("LiveTV");
+    else if (StorageGroup::kSpecialGroups.contains(group))
+        dispGroup = QObject::tr(group);
 
     if (gContext->GetSetting("MasterServerIP","master") ==
             gContext->GetSetting("BackendServerIP","me"))
@@ -577,8 +588,8 @@ void StorageGroupListEditor::doDelete(void)
     QString dispGroup = name;
     if (name == "Default")
         dispGroup = QObject::tr("Default");
-    else if (name == "LiveTV")
-        dispGroup = QObject::tr("LiveTV");
+    else if (StorageGroup::kSpecialGroups.contains(name))
+        dispGroup = QObject::tr(name);
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
 
@@ -612,7 +623,7 @@ void StorageGroupListEditor::load(void)
     QStringList names;
     QStringList masterNames;
     bool createAddDefaultButton = false;
-    bool createAddLiveTVButton = false;
+    bool createAddSpecialGroupButton[StorageGroup::kSpecialGroups.size()];
     bool isMaster = (gContext->GetSetting("MasterServerIP","master") ==
                      gContext->GetSetting("BackendServerIP","me"));
 
@@ -653,16 +664,26 @@ void StorageGroupListEditor::load(void)
     else
         createAddDefaultButton = true;
 
-    if (names.contains("LiveTV"))
-        listbox->addSelection(QObject::tr("LiveTV"), "LiveTV");
-    else
-        createAddLiveTVButton = true;
+    unsigned int curGroup = 0;
+    QString groupName;
+    while (curGroup < StorageGroup::kSpecialGroups.size())
+    {
+        groupName = StorageGroup::kSpecialGroups[curGroup];
+        if (names.contains(groupName))
+        {
+            listbox->addSelection(QObject::tr(groupName), groupName);
+            createAddSpecialGroupButton[curGroup] = false;
+        }
+        else
+            createAddSpecialGroupButton[curGroup] = true;
+        curGroup++;
+    }
 
     unsigned int curName = 0;
     while (curName < names.size())
     {
         if ((names[curName] != "Default") &&
-            (names[curName] != "LiveTV"))
+            (!StorageGroup::kSpecialGroups.contains(names[curName])))
             listbox->addSelection(names[curName]);
         curName++;
     }
@@ -674,9 +695,15 @@ void StorageGroupListEditor::load(void)
         lastValue = "Default";
     }
 
-    if (createAddLiveTVButton)
-        listbox->addSelection(tr("(Create %1 group)").arg("LiveTV"),
-            "__CREATE_NEW_STORAGE_GROUP__LiveTV");
+    curGroup = 0;
+    while (curGroup < StorageGroup::kSpecialGroups.size())
+    {
+        groupName = StorageGroup::kSpecialGroups[curGroup];
+        if (createAddSpecialGroupButton[curGroup])
+            listbox->addSelection(tr("(Create %1 group)").arg(groupName),
+                QString("__CREATE_NEW_STORAGE_GROUP__%1").arg(groupName));
+        curGroup++;
+    }
 
     if (isMaster)
         listbox->addSelection(tr("(Create %1 group)").arg("new"),
@@ -687,7 +714,7 @@ void StorageGroupListEditor::load(void)
         while (curName < masterNames.size())
         {
             if ((masterNames[curName] != "Default") &&
-                (masterNames[curName] != "LiveTV") &&
+                (!StorageGroup::kSpecialGroups.contains(masterNames[curName])) &&
                 (!names.contains(masterNames[curName])))
                 listbox->addSelection(tr("(Create %1 group)")
                                          .arg(masterNames[curName]),

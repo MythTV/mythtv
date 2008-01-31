@@ -29,6 +29,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     static void CheckAllStorageGroupDirs(void);
 
     static const char *kDefaultStorageDir;
+    static const QStringList kSpecialGroups;
 
     static QStringList getRecordingsGroups(void);
 
