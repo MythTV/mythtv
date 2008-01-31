@@ -123,7 +123,7 @@ sub getMovieData {
 
    # parse title and year
    my $title = parseBetween($response, "<title>", "</title>");
-   my $original_title = parseBetween($response, "<h4>Titre original : ","</h4><br />");
+   my $original_title = parseBetween($response, "<h4>Titre original : <i>","</i></h4></div>");
    $original_title = removeTag($original_title);
    if (defined $opt_originaltitle){
       if ($original_title  ne  ""){
@@ -146,7 +146,7 @@ sub getMovieData {
 
    # parse plot
    my $plot = parseBetween($response,"<td valign=\"top\" style=\"padding:10 0 0 0\"><div align=\"justify\"><h4>","</h4></div></td>");
-   #$plot.replace("<BR>","\n");
+   $plot =~ s/\n//g;
    $plot = removeTag($plot);
   
    # parse user rating
