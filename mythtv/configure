@@ -746,6 +746,10 @@ Darwin)
 cc="cc"
 v4l="no"
 ivtv="no"
+osxver=$(uname -r | cut -c 1) 
+if [ ${osxver} = "9" ]; then
+    disable mmx  
+fi
 dvb="no"
 x11="no"
 lirc="no"
