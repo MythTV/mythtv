@@ -13,3 +13,4 @@ TRANSLATIONS += mythgallery_nl.ts mythgallery_de.ts mythgallery_dk.ts
 TRANSLATIONS += mythgallery_pt.ts mythgallery_sv.ts mythgallery_fr.ts
 TRANSLATIONS += mythgallery_ja.ts mythgallery_si.ts mythgallery_nb.ts
 TRANSLATIONS += mythgallery_fi.ts mythgallery_et.ts mythgallery_ru.ts
+TRANSLATIONS += mythgallery_cz.ts
