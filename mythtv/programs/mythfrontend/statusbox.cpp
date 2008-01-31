@@ -662,9 +662,14 @@ void StatusBox::clicked()
                 QStringList msgs;
 
                 msgs << QObject::tr("Delete Now");
-                msgs << QObject::tr("Disable AutoExpire");
+                if ((rec)->recgroup == "LiveTV")
+                    msgs << QObject::tr("Move to Default group");
+                else if ((rec)->recgroup == "Deleted")
+                    msgs << QObject::tr("Undelete");
+                else
+                    msgs << QObject::tr("Disable AutoExpire");
                 msgs << QObject::tr("No Change");
-                
+
                 DialogCode retval = MythPopupBox::ShowButtonPopup(
                     my_parent,
                     QString("AutoExpirePopup"),
@@ -677,9 +682,15 @@ void StatusBox::clicked()
                 }
                 else if (kDialogCodeButton1 == retval)
                 {
-                    rec->SetAutoExpire(0);
-                    if ((rec)->recgroup == "LiveTV")
-                        rec->ApplyRecordRecGroupChange("Default");
+                    if ((rec)->recgroup == "Deleted")
+                        RemoteUndeleteRecording(rec);
+                    else
+                    {
+                        rec->SetAutoExpire(0);
+
+                        if ((rec)->recgroup == "LiveTV")
+                            rec->ApplyRecordRecGroupChange("Default");
+                    }
                 }
 
                 // Update list, prevent selected item going off bottom
@@ -1601,6 +1612,8 @@ void StatusBox::doAutoExpireList()
     long long             totalSize(0);
     long long             liveTVSize(0);
     int                   liveTVCount(0);
+    long long             deletedGroupSize(0);
+    int                   deletedGroupCount(0);
 
     contentLines.clear();
     contentDetail.clear();
@@ -1624,6 +1637,11 @@ void StatusBox::doAutoExpireList()
             liveTVSize += pginfo->filesize;
             liveTVCount++;
         }
+        else if (pginfo->recgroup == "Deleted")
+        {
+            deletedGroupSize += pginfo->filesize;
+            deletedGroupCount++;
+        }
     }
 
     staticInfo = tr("%1 recordings consuming %2 are allowed to expire")
@@ -1632,16 +1650,21 @@ void StatusBox::doAutoExpireList()
     if (liveTVCount)
         staticInfo += tr("%1 of these are LiveTV and consume %2")
                         .arg(liveTVCount).arg(sm_str(liveTVSize / 1024)) + "\n";
-    else
-        staticInfo += "\n";
+
+    if (deletedGroupCount)
+        staticInfo += tr("%1 of these are Deleted and consume %2")
+                .arg(deletedGroupCount).arg(sm_str(deletedGroupSize / 1024)) + "\n";
 
     for (it = expList.begin(); it != expList.end(); it++)
     {
         pginfo = *it;
         contentLine = pginfo->recstartts.toString(dateFormat) + " - ";
 
-        if (pginfo->recgroup == "LiveTV")
-            contentLine += "(" + tr("LiveTV") + ") ";
+        if ((pginfo->recgroup == "LiveTV") ||
+            (pginfo->recgroup == "Deleted"))
+            contentLine += "(" + tr(pginfo->recgroup) + ") ";
+        else
+            contentLine += "(" + pginfo->recgroup + ") ";
 
         contentLine += pginfo->title +
                        " (" + sm_str(pginfo->filesize / 1024) + ")";
@@ -1652,8 +1675,11 @@ void StatusBox::doAutoExpireList()
 
         detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
 
-        if (pginfo->recgroup == "LiveTV")
-            detailInfo += " (" + tr("LiveTV") + ")";
+        if ((pginfo->recgroup == "LiveTV") ||
+            (pginfo->recgroup == "Deleted"))
+            detailInfo += " (" + tr(pginfo->recgroup) + ")";
+        else
+            detailInfo += " (" + pginfo->recgroup + ")";
 
         detailInfo += "\n" + pginfo->title;
 
