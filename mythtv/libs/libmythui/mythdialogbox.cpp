@@ -57,14 +57,14 @@ void MythDialogBox::AddButton(const QString &title)
     new MythListButtonItem(buttonList, title);
 }
 
-bool MythDialogBox::keyPressEvent(QKeyEvent *e)
+bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
     bool handled = false;
     QStringList actions;
-    if (GetMythMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (GetMythMainWindow()->TranslateKeyPress("qt", event, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {

@@ -40,7 +40,7 @@ class MythDialogBox : public MythScreenType
 
     void AddButton(const QString &title);
 
-    virtual bool keyPressEvent(QKeyEvent *e);
+    virtual bool keyPressEvent(QKeyEvent *event);
 
   public slots:
     void Select(MythListButtonItem* item);
