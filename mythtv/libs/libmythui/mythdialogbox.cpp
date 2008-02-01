@@ -59,6 +59,9 @@ void MythDialogBox::AddButton(const QString &title)
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *e)
 {
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     bool handled = false;
     QStringList actions;
     if (GetMythMainWindow()->TranslateKeyPress("qt", e, actions))
@@ -68,16 +71,12 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (action == "UP")
-                buttonList->MoveUp();
-            else if (action == "DOWN")
-                buttonList->MoveDown();
-            else if (action == "ESCAPE" || action == "LEFT")
+            if (action == "ESCAPE" || action == "LEFT")
             {
                 SendEvent(-1);
                 m_ScreenStack->PopScreen();
             }
-            else if (action == "SELECT" || action == "RIGHT")
+            else if (action == "RIGHT")
             {
                 MythListButtonItem *item = buttonList->GetItemCurrent();
                 Select(item);
