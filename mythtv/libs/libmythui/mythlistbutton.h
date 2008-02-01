@@ -54,7 +54,8 @@ class MythListButton : public MythUIType
     int GetCount();
     bool IsEmpty();
 
-    enum MovementUnit { MoveItem, MovePage, MoveMax };
+    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
+    enum LayoutType { LayoutVertical, LayoutHorizontal, LayoutGrid };
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
@@ -81,11 +82,11 @@ class MythListButton : public MythUIType
     void SetPositionArrowStates(void);
 
     /* methods for subclasses to override */
-    virtual uint ItemWidth() const { return m_contentsRect.width(); }
+    virtual uint ItemWidth(void) const { return m_itemWidth; }
     virtual QRect CalculateContentsRect(const QRect &arrowsRect) const;
     virtual void CalculateVisibleItems(void);
     virtual const QRect PlaceArrows(const QSize &arrowSize);
-    virtual QPoint GetButtonPosition(uint i) const;
+    virtual QPoint GetButtonPosition(int column, int row) const;
 
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
@@ -94,14 +95,20 @@ class MythListButton : public MythUIType
 
     /**/
 
+    LayoutType m_layout;
+
     int m_order;
     QRect m_rect;
     QRect m_contentsRect;
 
     int m_itemHeight;
-    int m_itemSpacing;
+    int m_itemHorizSpacing;
+    int m_itemVertSpacing;
     int m_itemMargin;
     uint m_itemsVisible;
+    int m_rows;
+    int m_columns;
+    int m_itemWidth;
 
     bool m_active;
     bool m_showScrollArrows;
@@ -139,33 +146,6 @@ class MythListButton : public MythUIType
     MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
 
     friend class MythListButtonItem;
-};
-
-class MythHorizListButton : public MythListButton
-{
-  public:
-    MythHorizListButton(MythUIType *parent, const char *name);
-    MythHorizListButton(MythUIType *parent, const char *name, 
-                        const QRect &area, bool showArrow = true, 
-                        bool showScrollArrows = false,
-                        uint horizontalItems = 3);
-
-  protected:
-    inline void CalculateVisibleItems(void) { return; }
-
-    const QRect PlaceArrows(const QSize & arrowSize);
-
-    QRect CalculateContentsRect(const QRect & arrowsRect) const;
-    inline uint ItemWidth(void) const { return m_itemWidth; }
-    QPoint GetButtonPosition(uint i) const;
-
-    virtual bool ParseElement(QDomElement &element);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Init(void);
-    virtual bool keyPressEvent(QKeyEvent *);
-
-    int m_itemWidth;
 };
 
 class MythListButtonItem

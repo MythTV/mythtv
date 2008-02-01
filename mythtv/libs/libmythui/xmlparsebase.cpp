@@ -147,7 +147,6 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
                      type == "textarea" ||
                      type == "button" ||
                      type == "buttonlist" ||
-                     type == "horizontalbuttonlist" ||
                      type == "statetype" ||
                      type == "clock")
             {
@@ -222,8 +221,6 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     }
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
-    else if (type == "horizontalbuttonlist")
-        uitype = new MythHorizListButton(parent, name);
     else if (type == "statetype")
         uitype = new MythUIStateType(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
@@ -275,7 +272,6 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "textarea" ||
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
-                     info.tagName() == "horizontalbuttonlist" ||
                      info.tagName() == "statetype" ||
                      info.tagName() == "clock")
             {
@@ -377,7 +373,6 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "textarea" ||
                          type == "button" ||
                          type == "buttonlist" ||
-                         type == "horizontalbuttonlist" ||
                          type == "statetype" ||
                          type == "window" ||
                          type == "clock")

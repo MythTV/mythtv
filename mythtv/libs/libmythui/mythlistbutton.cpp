@@ -36,6 +36,8 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
 
 void MythListButton::Const(void)
 {
+    m_layout = LayoutVertical;
+
     m_active           = false;
     m_drawFromBottom   = false;
 
@@ -48,12 +50,15 @@ void MythListButton::Const(void)
     m_topPosition = 0;
     m_itemCount = 0;
 
-    m_initialized     = false;
-    m_clearing        = false;
-    m_itemSpacing     = 0;
-    m_itemMargin      = 0;
-    m_itemHeight      = 0;
-    m_itemsVisible    = 0;
+    m_initialized      = false;
+    m_clearing         = false;
+    m_itemHorizSpacing = 0;
+    m_itemVertSpacing  = 0;
+    m_itemMargin       = 0;
+    m_itemHeight       = 0;
+    m_itemsVisible     = 0;
+    m_columns          = 0;
+    m_rows             = 0;
 
     m_upArrow = m_downArrow = NULL;
 
@@ -115,7 +120,8 @@ void MythListButton::SetFontInactive(const MythFontProperties &font)
 
 void MythListButton::SetSpacing(int spacing)
 {
-    m_itemSpacing = spacing;    
+    m_itemHorizSpacing = NormX(spacing);
+    m_itemVertSpacing = NormY(spacing);
 }
 
 void MythListButton::SetMargin(int margin)
@@ -403,6 +409,23 @@ void MythListButton::MoveUp(MovementUnit unit)
                 --m_selPosition;
             }
             break;
+        case MoveColumn:
+            if ((pos+1) - (((pos+1)/m_columns)*m_columns) != 1)
+            {
+                --(*m_selIterator);
+                --m_selPosition;
+            }
+            break;
+        case MoveRow:
+            if ((pos - m_columns) >= 0)
+            {
+                for (int i = 0; i < m_columns; i++)
+                {
+                    --(*m_selIterator);
+                    --m_selPosition;
+                }
+            }
+            break;
         case MovePage:
             if (pos > (int)m_itemsVisible)
             {
@@ -452,8 +475,26 @@ void MythListButton::MoveDown(MovementUnit unit)
                 ++m_selPosition;
             }
             break;
+        case MoveColumn:
+            if ((pos+1) - (((pos+1)/m_columns)*m_columns) > 0)
+            {
+                ++(*m_selIterator);
+                ++m_selPosition;
+            }
+            break;
+        case MoveRow:
+            if ((pos + m_columns) < m_itemCount)
+            {
+                for (int i = 0; i < m_columns; i++)
+                {
+                    ++(*m_selIterator);
+                    ++m_selPosition;
+                }
+            }
+            break;
         case MovePage:
-            if ((pos + (int)m_itemsVisible) < m_itemCount - 1)
+            //m_selPosition = m_topPosition;
+            if ((pos + (int)m_itemsVisible) <= m_itemCount - 1)
             {
                 for (int i = 0; i < (int)m_itemsVisible; i++)
                 {
@@ -462,24 +503,28 @@ void MythListButton::MoveDown(MovementUnit unit)
                 }
                 break;
             }
-            // fall through
+            break;
         case MoveMax:
             m_selIterator->toLast();
             m_selPosition = m_itemCount - 1;
             break;
     }
 
-    if (!m_selIterator->current()) 
+    if (!m_selIterator->current())
+    {
+        VERBOSE(VB_IMPORTANT, "m_selIterator has left the building.");
         return;
+    }
 
     m_selItem = m_selIterator->current();
 
-    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1) 
+    // while (m_topPosition < m_selPosition)
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
     {
         ++(*m_topIterator);
         ++m_topPosition;
     }
-   
+
     m_topItem = m_topIterator->current();
 
     SetPositionArrowStates();
@@ -499,7 +544,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
         return false;
     }
     m_selPosition = 0;
-    
+
     bool found_it = false;
     while(m_selIterator->current())
     {
@@ -611,11 +656,14 @@ void MythListButton::Init()
     fm = QFontMetrics(m_fontInactive->face());
     QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
+    m_itemWidth = m_contentsRect.width();
 
     // If we have a background image and it's not a 10x10 gradient,
     // use it to define the button size
     if (itemRegPix && (itemRegPix->height() > 10))
         m_itemHeight = itemRegPix->height();
+    if (itemRegPix && (itemRegPix->width() > 10))
+        m_itemWidth = itemRegPix->width();
 
     CalculateVisibleItems();
 
@@ -625,6 +673,9 @@ void MythListButton::Init()
         itemSelActPix->Resize(QSize(ItemWidth(), m_itemHeight));
     if (itemSelInactPix)
         itemSelInactPix->Resize(QSize(ItemWidth(), m_itemHeight));
+
+    int col = 1;
+    int row = 1;
 
     for (int i = 0; i < (int)m_itemsVisible; i++)
     {
@@ -658,7 +709,16 @@ void MythListButton::Init()
         button->SetFont(MythUIButton::Normal, *m_fontActive);
         button->SetFont(MythUIButton::Disabled, *m_fontInactive);
 
-        button->SetPosition(GetButtonPosition(i));
+        if (col > m_columns)
+        {
+            col = 1;
+            row++;
+        }
+
+        button->SetPosition(GetButtonPosition(col, row));
+
+        col++;
+
         m_ButtonList.push_back(button);
     }
 
@@ -678,13 +738,37 @@ bool MythListButton::keyPressEvent(QKeyEvent *e)
 
         if (action == "UP")
         {
-            MoveUp(MoveItem);
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                MoveUp(MoveRow);
+            else
+                handled = false;
         }
         else if (action == "DOWN")
         {
-            MoveDown(MoveItem);
+            if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                MoveDown(MoveRow);
+            else
+                handled = false;
         }
-        if (action == "PAGEUP")
+        else if (action == "RIGHT")
+        {
+            if (m_layout == LayoutHorizontal)
+                MoveDown(MoveItem);
+            else if (m_layout == LayoutGrid)
+                MoveDown(MoveColumn);
+            else
+                handled = false;
+        }
+        else if (action == "LEFT")
+        {
+            if (m_layout == LayoutHorizontal)
+                MoveUp(MoveItem);
+            else if (m_layout == LayoutGrid)
+                MoveUp(MoveColumn);
+            else
+                handled = false;
+        }
+        else if (action == "PAGEUP")
         {
             MoveUp(MovePage);
         }
@@ -694,6 +778,7 @@ bool MythListButton::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
+            emit itemSelected(GetItemCurrent());
             emit itemClicked(GetItemCurrent());
         }
         else
@@ -750,9 +835,26 @@ MythUIType *MythListButton::GetChildAt(const QPoint &p)
     return NULL;
 }
 
-QPoint MythListButton::GetButtonPosition(uint i) const
+QPoint MythListButton::GetButtonPosition(int column, int row) const
 {
-    return QPoint(0, i * (m_itemHeight + m_itemSpacing));
+    QPoint position;
+
+    if (m_layout == LayoutHorizontal)
+    {
+        position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
+                    GetArea().height() / 2 - m_itemHeight / 2);
+    }
+    else if (m_layout == LayoutVertical)
+    {
+        position = QPoint(0, (row - 1) * (m_itemHeight + m_itemVertSpacing));
+    }
+    else if (m_layout == LayoutGrid)
+    {
+        position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
+                    (row - 1) * (m_itemHeight + m_itemVertSpacing));
+    }
+
+    return position;
 }
 
 void MythListButton::LoadPixmap(MythImage **pix, QDomElement &element)
@@ -778,6 +880,21 @@ void MythListButton::LoadPixmap(MythImage **pix, QDomElement &element)
 
 const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 {
+    if (m_layout == LayoutHorizontal)
+    {
+        int x = GetArea().width() - arrowSize.width() - 1;
+        int ytop = GetArea().height() / 2 - m_itemMargin / 2 - arrowSize.height();
+        int ybottom = GetArea().height() / 2 + m_itemMargin / 2;
+
+        m_upArrow->SetPosition(QPoint(x, ybottom));
+        m_downArrow->SetPosition(QPoint(x, ytop));
+
+        /* rightmost rectangle (full height) */
+        QRect arrowsRect(x, 0, arrowSize.width() + 1, m_Area.height());
+
+        return QRect(x, 0, arrowSize.width() + 1, m_Area.height());
+    }
+
     int y = m_Area.height() - arrowSize.height() - 1;
     m_upArrow->SetPosition(QPoint(0, y));
     m_downArrow->SetPosition(QPoint(arrowSize.width() + m_itemMargin, y));
@@ -787,25 +904,73 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 
 QRect MythListButton::CalculateContentsRect(const QRect &arrowsRect) const
 {
-    return QRect(0, 0, GetArea().width(), GetArea().height() -
-                 arrowsRect.height() - 2 * m_itemMargin);
+    QRect contectRect;
+
+    if (m_layout == LayoutVertical)
+    {
+        contectRect = QRect(0, 0,
+                    GetArea().width() - arrowsRect.width() - 2 * m_itemMargin,
+                    GetArea().height());
+    }
+    else if ((m_layout == LayoutHorizontal) || (m_layout == LayoutGrid))
+    {
+        contectRect = QRect(0, 0, GetArea().width(), GetArea().height() -
+                    arrowsRect.height() - 2 * m_itemMargin);
+    }
+
+    return contectRect;
 }
 
 void MythListButton::CalculateVisibleItems(void)
 {
     int y = 0;
+    int x = 0;
     m_itemsVisible = 0;
-    while (y <= m_contentsRect.height() - m_itemHeight) 
+    m_rows = 0;
+    m_columns = 0;
+
+    if ((m_layout == LayoutHorizontal) || (m_layout == LayoutGrid))
     {
-        y += m_itemHeight + m_itemSpacing;
-        m_itemsVisible++;
+        while (x <= m_contentsRect.width() - m_itemWidth)
+        {
+            x += m_itemWidth + m_itemHorizSpacing;
+            m_columns++;
+        }
     }
+
+    if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+    {
+        while (y <= m_contentsRect.height() - m_itemHeight) 
+        {
+            y += m_itemHeight + m_itemVertSpacing;
+            m_rows++;
+        }
+    }
+
+    if (m_rows == 0)
+        m_rows = 1;
+
+    if (m_columns == 0)
+        m_columns = 1;
+
+    m_itemsVisible = m_columns * m_rows;
 }
 
 bool MythListButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
         m_Area = parseRect(element);
+    else if (element.tagName() == "layout")
+    {
+        QString layout = getFirstText(element).lower();
+
+        if (layout == "grid")
+            m_layout = LayoutGrid;
+        else if (layout == "horizontal")
+            m_layout = LayoutHorizontal;
+        else
+            m_layout = LayoutVertical;
+    }
     else if (element.tagName() == "inactivefont")
     {
         QString fontname = getFirstText(element);
@@ -852,7 +1017,10 @@ bool MythListButton::ParseElement(QDomElement &element)
     else if (element.tagName() == "inactive-background")
         LoadPixmap(&itemSelInactPix, element);
     else if (element.tagName() == "spacing")
-        m_itemSpacing = NormY(getFirstText(element).toInt());
+    {
+        m_itemHorizSpacing = NormX(getFirstText(element).toInt());
+        m_itemVertSpacing = NormY(getFirstText(element).toInt());
+    }
     else if (element.tagName() == "margin")
         m_itemMargin = NormX(getFirstText(element).toInt());
     else if (element.tagName() == "drawfrombottom")
@@ -907,14 +1075,17 @@ void MythListButton::CopyFrom(MythUIType *base)
         return;
     }
 
+    m_layout = lb->m_layout;
     m_order = lb->m_order;
     m_rect = lb->m_rect;
     m_contentsRect = lb->m_contentsRect;
 
     m_itemHeight = lb->m_itemHeight;
-    m_itemSpacing = lb->m_itemSpacing;
+    m_itemHorizSpacing = lb->m_itemHorizSpacing;
+    m_itemVertSpacing = lb->m_itemVertSpacing;
     m_itemMargin = lb->m_itemMargin;
     m_itemsVisible = lb->m_itemsVisible;
+    m_itemWidth = lb->m_itemWidth;
 
     arrowPix = lb->arrowPix;
     checkNonePix = lb->checkNonePix;
@@ -977,141 +1148,6 @@ void MythListButton::CopyFrom(MythUIType *base)
 void MythListButton::Finalize(void)
 {
     MythUIType::Finalize();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-MythHorizListButton::MythHorizListButton(MythUIType *parent,
-                                         const char *name)
-                   : MythListButton(parent, name)
-{
-    m_itemsVisible = 3;
-}
-
-MythHorizListButton::MythHorizListButton(MythUIType *parent,
-                                         const char *name, const QRect &area,
-                                         bool showArrow, bool showScrollArrows,
-                                         uint horizontalItems)
-    : MythListButton(parent, name, area, showArrow, showScrollArrows)
-{
-    m_itemsVisible = horizontalItems;
-}
-
-void MythHorizListButton::Init(void)
-{
-    int dx = GetArea().width() - 1 - 2 * m_itemMargin -
-            (m_itemsVisible - 1) * m_itemSpacing;
-    m_itemWidth = dx / m_itemsVisible;
-
-    MythListButton::Init();
-}
-
-bool MythHorizListButton::keyPressEvent(QKeyEvent *e)
-{
-    QStringList actions;
-    bool handled = false;
-    GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
-
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "RIGHT")
-        {
-            MoveUp(MoveItem);
-        }
-        else if (action == "LEFT")
-        {
-            MoveDown(MoveItem);
-        }
-        if (action == "PAGEUP")
-        {
-            MoveUp(MovePage);
-        }
-        else if (action == "PAGEDOWN")
-        {
-            MoveDown(MovePage);
-        }
-        else
-            handled = false;
-    }
-
-    return handled;
-}
-
-const QRect MythHorizListButton::PlaceArrows(const QSize &arrowSize)
-{
-    int x = GetArea().width() - arrowSize.width() - 1;
-    int ytop = GetArea().height() / 2 - m_itemMargin / 2 - arrowSize.height();
-    int ybottom = GetArea().height() / 2 + m_itemMargin / 2;
-
-    m_upArrow->SetPosition(QPoint(x, ybottom));
-    m_downArrow->SetPosition(QPoint(x, ytop));
-
-    /* rightmost rectangle (full height) */
-    QRect arrowsRect(x, 0, arrowSize.width() + 1, m_Area.height());
-
-    /* now calculate the item width */
-    int dx = GetArea().width() - arrowSize.width() - 1 - 2 * m_itemMargin -
-             (m_itemsVisible - 1) * m_itemSpacing;
- 
-    /* set the item width */
-    m_itemWidth = dx / m_itemsVisible;
-
-    return QRect(x, 0, arrowSize.width() + 1, m_Area.height());
-}
-
-QRect MythHorizListButton::CalculateContentsRect(const QRect &arrowsRect) const
-{
-    return QRect(0, 0,
-                 GetArea().width() - arrowsRect.width() - 2 * m_itemMargin,
-                 GetArea().height());
-}
-
-QPoint MythHorizListButton::GetButtonPosition(uint i) const
-{
-    return QPoint(i * (ItemWidth() + m_itemSpacing),
-                  GetArea().height() / 2 - m_itemHeight / 2);
-}
-
-bool MythHorizListButton::ParseElement(QDomElement &element)
-{
-    if (element.tagName() == "items")
-        m_itemsVisible = getFirstText(element).toInt();
-    else
-        return MythListButton::ParseElement(element);
-
-    return true;
-}
-
-void MythHorizListButton::CreateCopy(MythUIType *parent)
-{
-    MythHorizListButton *hlb = new MythHorizListButton(parent, name());
-    hlb->CopyFrom(this);
-}
-
-void MythHorizListButton::CopyFrom(MythUIType *base)
-{
-    MythHorizListButton *hlb = dynamic_cast<MythHorizListButton *>(base);
-    if (!hlb)
-    {
-        MythListButton *lb = dynamic_cast<MythListButton *>(base);
-        if (!lb)
-        {
-            VERBOSE(VB_IMPORTANT, QString("MythHorizListButton CopyFrom ERR: "
-                                        "Copy Failed "
-                                        "base '%1' is not a mythlistbutton or "
-                                        "mythhorizlistbutton")
-                                        .arg(base->name()));
-            return;
-        }
-    }
-
-    MythListButton::CopyFrom(base);
-
-    if (hlb)
-        m_itemWidth = hlb->m_itemWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
