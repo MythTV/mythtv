@@ -1472,6 +1472,7 @@ void TV::HandleStateChange(void)
         activerecorder = recorder;
         recorder->Setup();
         
+        QDateTime timerOffTime = QDateTime::currentDateTime();
         lockTimerOn = false;
 
         SET_NEXT();
@@ -1520,7 +1521,8 @@ void TV::HandleStateChange(void)
 
             SET_LAST();
         }
-        else
+        else if (!lastLockSeenTime.isValid() ||
+                 (lastLockSeenTime < timerOffTime))
         {
             lockTimer.start();
             lockTimerOn = true;
@@ -5347,7 +5349,10 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 
     // Turn off lock timer if we have an "All Good" or good PMT
     if (allGood || (pmt == "M"))
+    {
         lockTimerOn = false;
+        lastLockSeenTime = QDateTime::currentDateTime();
+    }
 }
 
 void TV::UpdateOSDTimeoutMessage(void)
@@ -5386,13 +5391,13 @@ void TV::UpdateOSDTimeoutMessage(void)
     static QString chan_up   = GET_KEY("TV Playback", "CHANNELUP");
     static QString chan_down = GET_KEY("TV Playback", "CHANNELDOWN");
     static QString next_src  = GET_KEY("TV Playback", "NEXTSOURCE");
-    static QString tog_cards = GET_KEY("TV Playback", "NEXTCARD");
+    static QString tog_cards = GET_KEY("TV Playback", "NEXTINPUT");
 
     QString message = tr(
         "You should have gotten a channel lock by now. "
         "You can continue to wait for a signal, or you "
         "can change the channels with %1 or %2, change "
-        "video source (%3), change cards  (%4), etc.")
+        "video source (%3), inputs (%4), etc.")
         .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
 
     QStringList options;

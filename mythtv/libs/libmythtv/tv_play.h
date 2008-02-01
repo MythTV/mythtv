@@ -556,6 +556,7 @@ class MPUBLIC TV : public QObject
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;
+    QDateTime lastLockSeenTime;
 
     // Previous channel functionality state variables
     str_vec_t prevChan;       ///< Previous channels
