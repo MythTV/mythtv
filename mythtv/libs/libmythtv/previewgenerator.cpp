@@ -222,7 +222,7 @@ bool PreviewGenerator::Run(void)
         command += QString("--starttime %1 ")
             .arg(programInfo.recstartts.toString("yyyyMMddhhmmss"));
         if (!outFileName.isEmpty())
-            command += QString("--outfile %1 ").arg(outFileName);
+            command += QString("--outfile \"%1\" ").arg(outFileName);
 
         int ret = myth_system(command);
         if (ret)
