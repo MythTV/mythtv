@@ -84,7 +84,8 @@ int ff_ac3_parse_header(const uint8_t buf[7], AC3HeaderInfo *hdr)
     return 0;
 }
 
-static int ac3_sync(const uint8_t *buf, int *channels, int *sample_rate,
+/* Made public for MythTV ac3 remixing */
+/*static*/ int ac3_sync(const uint8_t *buf, int *channels, int *sample_rate,
                     int *bit_rate, int *samples)
 {
     int err;
