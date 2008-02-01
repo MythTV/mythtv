@@ -27,9 +27,12 @@ my $NOISY = 1; # set to 0 for less output to the screen
 
 $| = 1; # autoflush stdout;
 
-my $SVNRELEASE = '15433' ;# this scipt was last tested to work with this 
-                          # developer version, on other versions YMMV.
+# this scipt was last tested to work with this version, on other versions YMMV.
+#my $SVNRELEASE = '15528'; #builds and runs with 3x patches commented out below
+#my $SVNRELEASE = '15586'; # builds and runs without patches except backend.gz
+my $SVNRELEASE = '15699'; # latest build that runs without any additional patches
 #my $SVNRELEASE = 'HEAD' ;# if you are game, go forth and test the latest release! 
+
 
 # We allow SourceForge to tell us which server to download from,
 # rather than assuming specific server/s
@@ -106,7 +109,7 @@ my $unixmythtv  = perl2unix($mythtv);
 #  missing a file (given an expected path)                                 [file]
 #  missing folder                                                          [dir]
 #  missing source archive (fancy version of 'file' to fetch from the web)  [archive]
-#  apply a perl pattern match and if it DOESNT match execute the action    [grep]  - this 'cause' actually needs two parameters in an array [ pattern, file]
+#  apply a perl pattern match and if it DOESNT match execute the action    [grep]  - this 'cause' actually needs two parameters in an array [ pattern, file].  If the file is absent, the pattern is assumed to not match (and emits a warning).
 #  test the file/s are totally the same (by size and mtime)                [filesame] - if first file is non-existant then that's permitted, it causes the action to trigger.
 #  test the first file is newer(mtime) than the second one                 [newer] - if given 2 existing files, not necessarily same size/content, and the first one isn't newer, execute the action!.  If the first file is ABSENT, run the action too.
 
@@ -183,6 +186,10 @@ push @{$expect},
 
 [ dir => $msys."lib" ,  mkdirs => $msys.'lib' ],
 [ dir => $msys."include" ,  mkdirs => $msys.'include' ],
+
+#get gdb
+[ archive => $sources.'gdb-6.7.50.20071127-mingw.tar.bz2', 'fetch' => 'http://'.$sourceforge.'/sourceforge/mingw/gdb-6.7.50.20071127-mingw.tar.bz2',comment => 'Get gdb for possible debugging later' ],
+[ file => $msys.'bin/gdb.exe',  extract => [$sources.'gdb-6.7.50.20071127-mingw.tar.bz2', $msys] ],
 
 
 # (alternate would be from the gnuwin32 project, which is actually from same source)
@@ -474,39 +481,50 @@ push @{$expect},
 [ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'match the datetime of these files, so that the contents only can be compared next' ],
 
 # is svn num (ie file contents) changed since last run, if so, do a 'make clean' (overkill, I know, but safer)!
-[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch '.$unixmythtv.'mythtv/Makefile','cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt','touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ],
+[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch '.$unixmythtv.'mythtv/last_build.txt','cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt','touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ],
 
 # apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN:
 
-#fixed/closed:
-[ archive => $sources.'backend.patch.gz' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4392/backend.patch.gz', comment => 'backend.patch.gz - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
-[ filesame => [$mythtv.'mythtv/backend.patch.gz',$sources."backend.patch.gz"], copy => [''=>'',comment => '4392: - backend connections being accepted patch '] ],
-[ grep => ['unsigned\* Indexes = new unsigned\[n\]\;',$mythtv.'mythtv/libs/libmyth/mythsocket.cpp'], shell => ["cd ".$unixmythtv."mythtv/","gunzip -f backend.patch.gz","patch -p0 < backend.patch"] ],
+# 15586 and earlier need this patch:
+#[ archive => $sources.'backend.patch.gz' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4392/backend.patch.gz', comment => 'backend.patch.gz - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/backend.patch.gz',$sources."backend.patch.gz"], copy => [''=>'',comment => '4392: - backend connections being accepted patch '] ],
+#[ grep => ['unsigned\* Indexes = new unsigned\[n\]\;',$mythtv.'mythtv/libs/libmyth/mythsocket.cpp'], shell => ["cd ".$unixmythtv."mythtv/","gunzip -f backend.patch.gz","patch -p0 < backend.patch"] ],
 
+# these next 3 patches are needed for 15528 (and earlier)
+#[ archive => $sources.'importicons_windows_2.diff' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/3334/importicons_windows_2.diff', comment => 'importicons_windows_2.diff - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/importicons_windows_2.diff',$sources."importicons_windows_2.diff"], copy => [''=>'',comment => '3334 fixes error with mkdir() unknown.'] ],
+#
+#[ grep => ['\#include <qdir\.h>',$mythtv.'mythtv/libs/libmythtv/importicons.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < importicons_windows_2.diff"] ],
+#[ archive => $sources.'mingw.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4516/mingw.patch', comment => 'mingw.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/mingw.patch',$sources."mingw.patch"], copy => [''=>'',comment => '4516 fixes build'] ],
+#[ grep => ['LIBS \+= -lmyth-\$\$LIBVERSION',$mythtv.'mythtv/libs/libmythui/libmythui.pro'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < mingw.patch"] ]
+#
+# (fixed in 15547)
+#[ archive => $sources.'util_win32.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4497/util_win32.patch', comment => 'util_win32.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/util_win32.patch',$sources."util_win32.patch"], copy => [''=>'',comment => '4497 fixes build'] ],
+#[ grep => ['\#include "compat.h"',$mythtv.'mythtv/libs/libmyth/util.h'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth/","patch -p0 < ".$unixmythtv."mythtv/util_win32.patch"] ],
 
-[ archive => $sources.'importicons_windows_2.diff' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/3334/importicons_windows_2.diff', comment => 'importicons_windows_2.diff - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
-[ filesame => [$mythtv.'mythtv/importicons_windows_2.diff',$sources."importicons_windows_2.diff"], copy => [''=>'',comment => '3334 fixes error with mkdir() unknown.'] ],
-[ grep => ['\#include <qdir\.h>',$mythtv.'mythtv/libs/libmythtv/importicons.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < importicons_windows_2.diff"] ],
+# post 15528, pre 15568  needs this: equivalent to: svn merge -r 15541:15540 .
+#[ archive => $sources.'15541_undo.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/XXXX/15541_undo.patch', comment => 'util_win32.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/15541_undo.patch',$sources."15541_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  => ['\#include \"compat.h\"',$mythtv.'mythtv/libs/libmythui/mythpainter.cpp'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth/","patch -p2 < ".$unixmythtv."mythtv/15541_undo.patch"] , comment => 'currently need this patch too, equivalemnt of: svn merge -r 15541:15540 .'],
 
 
 [ file => $mythtv.'mythtv/config/config.pro', shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], comment => 'create an empty config.pro or the mythtv build will fail'],
 
-# next the build process: 
-# the old way:
-#[ file => $mythtv.'no_rebuild_mythtv.txt', shell => ["cd ".$unixmythtv,'./build_myth.sh','touch no_rebuild_mythtv.txt'],comment => 'execute the mythtv build script (we wrote it earlier), unless its already been built once before ( ie the no_rebuild_mythtv.txt file exists! )' ],
+# do a make clean before?
+[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make clean','make distclean','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary, and the build will be MUCH faster without it, but it is safer with it...'],
 
-# the new way, with a bit better dependancy resolution: 
-# total cleanup:
-#[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make distclean','nocheck'], comment => 'do a "make clean" first? not strictly necessary, and the build will be MUCH faster without it, but it is safer with it...'],
-# minor cleanup (keep the configuration)
-#[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make clean','make distclean','nocheck'], comment => 'do a "make clean" first? not strictly necessary, and the build will be MUCH faster without it, but it is safer with it...'],
-# config
+#broken Makefile, delete it
+[ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
+
+# configure
 [ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
 # make
-[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.20.dll - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
-[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the Makefile' ],
+[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.20.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.20.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.20.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 
 # re-install to msys /usr/bin folders etc, if we have a newer mythtv build ready:
 [ newer => [$msys.'bin/mythfrontend.exe',$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make install'], comment => 'was the last configure successful? then install mythtv ' ],
@@ -516,7 +534,9 @@ push @{$expect},
 
 
 # install some themes? does a 'make install' do that adequately (no, not if running outside msys)?
-
+# copy the basic themes somewhere that mythtv can get at it.
+# TODO this should really be independant of the msys folders, but it's not at present?
+[ dir => $msys.'share\mythtv\themes\G.A.N.T', shell => ['mkdir /usr/share/mythtv','mkdir /usr/share/mythtv/themes','cp -r /c/mythtv/mythtv/themes/* /usr/share/mythtv/themes/'], comment => 'copy the basic themes somewhere that mythtv can get at it.' ],
 
 # 
 [ file => $mythtv.'make_run.sh_', write => [$mythtv.'make_run.sh',
@@ -625,24 +645,16 @@ comment => 'writing a script to create the mysql user (mythtv/mythtv) without ne
 
 #  build the mythplugins now:
 # 
-#[ file => $mythtv.'build_plugins.sh', write => [$mythtv.'build_plugins.sh',
-#'#!/bin/bash
-#source '.$unixmythtv.'qt_env.sh
-#cd '.$unixmythtv.'mythplugins
-#./configure --prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug && make && make install
-##make
-##make install
-##cd ..
-#' ],comment => 'write a script to build mythtv plugins'],
 
 # get mythtv sources, if we don't already have them
 # download all the files from the web, and save them here:
-[ dir => $mythtv.'mythplugins', mkdirs => $mythtv.'mythplugins' ],
+#[ dir => $mythtv.'mythplugins', mkdirs => $mythtv.'mythplugins' ],
+#
+## config:
+#[ file => $mythtv.'mythplugins/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','./configure --prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug'], comment => 'do we already have a Makefile for myth plugins?' ],
+## make
+#[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','make'], comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
 
-# config:
-[ file => $mythtv.'mythplugins/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','--prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type=debug'], comment => 'do we already have a Makefile for myth plugins?' ],
-# make
-#[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/XXXXX',$mythtv.'mythplugins/Makefile'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','make'], comment => 'plugins - redo make unless all these files exist, and are newer than the Makefile' ],
 
 # re-install to msys /usr/bin folders etc, if we have a newer mythtv build ready:
 #[ newer => [$msys.'bin/mythfrontend.exeXXXXX',$mythtv.'mythplugins/mythmovies/mythmovies/XXXXX'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythplugins','make install'], comment => 'plugins - was the last configure successful? then install mythtv ' ],
@@ -659,10 +671,10 @@ sub _end {
 	
 	comment("This verson of the Win32 Build script last was last tested on: $SVNRELEASE");
 
-print << "END";    
+print << 'END';    
 #
 # SCRIPT TODO/NOTES:  - further notes on this scripts direction....
-# * if the build was successful then try running the 'mythfrontend.exe' and 'mythbackend.exe' from the 'C:\mythtv\mythtv\run' folder.
+# * if the build was successful then try running the 'mythfrontend.exe' and 'mythbackend.exe' from the 'C:/mythtv/mythtv/run' folder.
 # * ok, how about the test-run process?  
 # * check that mythtv/mythtv/mythconverg will access the mysql database
 # * mythplugins build isn't currently working, so disabled.
@@ -774,7 +786,10 @@ foreach my $dep ( @{$expect} ) {
           effect($effecttype,@nocheckeffectparams);
           if ( $nocheck == 0 ) {
             # confirm it worked, mtimes should have changed now: 
-            my $mtime3   = (stat($cause[0]))[9];
+            my $mtime3 = 0;
+            if ( -f $cause[0] ) {
+              $mtime3   = (stat($cause[0]))[9];
+            }
             my $mtime4  = (stat($cause[1]))[9];
             if ( $mtime3 < $mtime4  ) {
                 die "EFFECT FAILED ($causetype -> $effecttype): mtime of file ($cause[0]) should be greater than file ($cause[1]).\n";
@@ -1032,8 +1047,9 @@ sub perl2dos {
 sub _grep {
     my ($pattern,$file) = @_;
     #$pattern = qw($pattern);
-    print "grep-ing for pattern($pattern) in file($file\n";
-    my $fh = IO::File->new("< $file") || die "unable to read file: $file\n";
+    print "grep-ing for pattern($pattern) in file($file)\n";
+    my $fh = IO::File->new("< $file");
+    unless ( $fh) { print "WARNING: Unable to read file ($file) when searching for pattern:($pattern), assumed to NOT match pattern\n";  return 0; }
     my $found = 0;
     while ( my $contents = <$fh> ) {
         if ( $contents =~ m/$pattern/ ) { $found= 1; }
