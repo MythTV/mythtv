@@ -801,7 +801,7 @@ void InitJumpPoints(void)
 
     TV::InitKeys();
 
-    TV::SetEmbedPbbFunc(PlaybackBox::RunPlaybackBox);
+    TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);
 }
 
 

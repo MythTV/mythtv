@@ -215,7 +215,7 @@ class MPUBLIC TV : public QObject
     static void InitKeys(void);
     static bool StartTV(ProgramInfo *tvrec = NULL, bool startInGuide = false,
                         bool inPlaylist = false, bool initByNetworkCommand = false);
-    static void SetEmbedPbbFunc(RUNPLAYBACKBOX lptr);
+    static void SetFuncPtr(const char *, void *);
 
     void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
 
@@ -238,6 +238,8 @@ class MPUBLIC TV : public QObject
 
   protected:
     void doEditSchedule(int editType = kScheduleProgramGuide);
+    static void *RecordedShowMenuHandler(void *param);
+
     void RunTV(void);
     static void *EventThread(void *param);
     void SetMuteTimer(int timeout);
@@ -356,6 +358,7 @@ class MPUBLIC TV : public QObject
     void HandleOSDAskAllowResponse(void);
 
     void EditSchedule(int editType = kScheduleProgramGuide);
+    void EmbedWithNewThread(int editType);
 
     void SetupPlayer(bool isWatchingRecording);
     void TeardownPlayer(void);

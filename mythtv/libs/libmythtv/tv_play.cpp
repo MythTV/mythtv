@@ -252,10 +252,16 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
     return playCompleted;
 }
-       
-void TV::SetEmbedPbbFunc(RUNPLAYBACKBOX lptr)
+
+/**
+ * \brief Import pointers to functions used to embed the TV
+ * window into other containers e.g. playbackbox
+ */
+void TV::SetFuncPtr(const char *string, void *lptr)
 {
-    RunPlaybackBoxPtr = lptr;
+    QString name(string);
+    if (name == "playbackbox")
+        RunPlaybackBoxPtr = (RUNPLAYBACKBOX)lptr;
 }
 
 void TV::InitKeys(void)
@@ -3153,7 +3159,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DisplayJumpMenuSoon();
             }
             else if (RunPlaybackBoxPtr)
-                EditSchedule(kPlaybackBox);
+                EmbedWithNewThread(kPlaybackBox);
         }
         else if (action == "SIGNALMON")
         {
@@ -5669,6 +5675,14 @@ void TV::DrawUnusedRects(bool sync)
         nvp->DrawUnusedRects(sync);
 }
 
+void *TV::RecordedShowMenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doEditSchedule(kPlaybackBox);
+
+    return NULL;
+}
+
 void TV::doEditSchedule(int editType)
 {
     if (!playbackinfo)
@@ -5823,6 +5837,29 @@ void TV::doEditSchedule(int editType)
         nvp->DiscardVideoFrames(true);
 
     menurunning = false;
+}
+
+/**
+ * \brief create new thread to invoke function pointers used for
+ * embedding the tv player in other containers. Example: playbackbox 
+ */
+void TV::EmbedWithNewThread(int editType)
+{
+    (void) editType;
+
+    if (menurunning != true)
+    {
+        menurunning = true;
+        pthread_t tid;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+        pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
+        pthread_attr_destroy(&attr);
+
+        return;
+    }
 }
 
 void TV::EditSchedule(int editType)
@@ -7199,7 +7236,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             DisplayJumpMenuSoon();
         }
          else if (RunPlaybackBoxPtr)
-            EditSchedule(kPlaybackBox);
+            EmbedWithNewThread(kPlaybackBox);
     }
     else if (StateIsLiveTV(GetState()))
     {
