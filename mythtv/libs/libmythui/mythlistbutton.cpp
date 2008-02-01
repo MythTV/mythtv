@@ -857,9 +857,18 @@ bool MythListButton::ParseElement(QDomElement &element)
         m_itemMargin = NormX(getFirstText(element).toInt());
     else if (element.tagName() == "drawfrombottom")
         m_drawFromBottom = parseBool(element);
+    else if (element.tagName() == "multiline")
+    {
+        if (parseBool(element))
+            m_textFlags |= Qt::WordBreak;
+        else
+            m_textFlags &= ~Qt::WordBreak;
+    }
     else if (element.tagName() == "textflags")
     {
         QString align = getFirstText(element).lower();
+
+        m_textFlags = m_textFlags & Qt::WordBreak;
 
         if (align == "center")
             m_textFlags |= Qt::AlignCenter;
