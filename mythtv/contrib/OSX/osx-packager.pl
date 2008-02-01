@@ -927,12 +927,6 @@ foreach my $comp (@comps)
     next;
   }
   
-  if ($comp eq 'mythtv')
-  {
-    # MythTV has an empty subdirectory 'config' that causes problems for me:
-    &Syscall('touch config/config.pro');
-  }
-
   if ($OPT{'clean'} && -e 'Makefile')
   {
     &Verbose("Cleaning $comp");
@@ -1171,7 +1165,7 @@ exit 0;
 ## directories and properly managing static libraries.
 ######################################
 
-sub RecursiveCopy
+sub RecursiveCopy($$)
 {
     my ($src, $dst) = @_;
 
@@ -1194,20 +1188,17 @@ sub RecursiveCopy
 }
 
 ######################################
-## CleanMakefiles removes every
-## Makefile from our MythTV build.
+## CleanMakefiles removes every Makefile
+## from our MythTV build that contains PREFIX.
 ## Necessary when we change the
 ## PREFIX variable.
 ######################################
 
 sub CleanMakefiles
 {
-  &Verbose("Cleaning MythTV makefiles");
-  my @files = map { chomp $_; $_ } `find . -name Makefile`;
-  if (scalar @files)
-  {
-    &Syscall([ '/bin/rm', @files ]) or die;
-  }
+  &Verbose("Cleaning MythTV makefiles containing PREFIX");
+  &Syscall([ 'find', '.', '-name', 'Makefile', '-exec',
+             'egrep', '-q', 'PREFIX', '{}', ';', '-delete' ]) or die;
 } # end CleanMakefiles
 
 
@@ -1217,7 +1208,7 @@ sub CleanMakefiles
 ## checking.
 ######################################
 
-sub Syscall
+sub Syscall($%)
 {
   my ($arglist, %opts) = @_;
   
