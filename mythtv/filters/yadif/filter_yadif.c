@@ -498,9 +498,11 @@ static int YadifDeint (VideoFilter * f, VideoFrame * frame)
     {
         second_field = 1;
     }
-    //only deinterlace interlaced frames, currently there is no override from frontend.
-    if (frame->interlaced_frame)
-      filter_func(filter, frame->buf, frame->offsets, frame->pitches, frame->width, frame->height, second_field, frame->top_field_first);
+
+    /* filter all frames, even if frame->interlaced_frame is not set */
+    filter_func(
+        filter, frame->buf, frame->offsets, frame->pitches,
+        frame->width, frame->height, second_field, frame->top_field_first);
 
     filter->last_framenr = frame->frameNumber;
 

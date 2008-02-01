@@ -229,38 +229,48 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
     if (!filter->got_frames[last_frame])
         last_frame = cur_frame;
 
-    if (frame->interlaced_frame)
-    {
 #ifdef MMX
-
-        //SSE Version has best quality. 3DNOW and MMX a litte bit impure
-        if (filter->mm_flags & MM_SSE) 
-        {
-            greedyh_filter_sse(filter->deint_frame, 2 * frame->width, filter->frames[cur_frame], filter->frames[last_frame], bottom_field, second_field, frame->width, frame->height);
-        }
-        else
-            if (filter->mm_flags & MM_3DNOW)
-            {
-                greedyh_filter_3dnow(filter->deint_frame, 2 * frame->width, filter->frames[cur_frame], filter->frames[last_frame], bottom_field, second_field,frame->width, frame->height);
-            }
-            else
-                if (filter->mm_flags & MM_MMX) 
-                {
-                    greedyh_filter_mmx(filter->deint_frame, 2 * frame->width, filter->frames[cur_frame], filter->frames[last_frame], bottom_field, second_field, frame->width, frame->height);
-                }
-                else
-#endif
-                {
-                    //sad. what to do now?
-                }
-        /*apply_chroma_filter( filter->deint_frame, frame->width * 2, frame->width, frame->height );*/
-        //convert back to yv12, cause myth only works with this format
-        yuy2_to_yv12(filter->deint_frame, 2 * frame->width,
-                frame->buf + frame->offsets[0], frame->pitches[0],
-                frame->buf + frame->offsets[1], frame->pitches[1],
-                frame->buf + frame->offsets[2], frame->pitches[2],
-                frame->width, frame->height);
+    /* SSE Version has best quality. 3DNOW and MMX a litte bit impure */
+    if (filter->mm_flags & MM_SSE) 
+    {
+        greedyh_filter_sse(
+            filter->deint_frame, 2 * frame->width,
+            filter->frames[cur_frame], filter->frames[last_frame],
+            bottom_field, second_field, frame->width, frame->height);
     }
+    else if (filter->mm_flags & MM_3DNOW)
+    {
+        greedyh_filter_3dnow(
+            filter->deint_frame, 2 * frame->width,
+            filter->frames[cur_frame], filter->frames[last_frame],
+            bottom_field, second_field, frame->width, frame->height);
+    }
+    else if (filter->mm_flags & MM_MMX) 
+    {
+        greedyh_filter_mmx(
+            filter->deint_frame, 2 * frame->width,
+            filter->frames[cur_frame], filter->frames[last_frame],
+            bottom_field, second_field, frame->width, frame->height);
+    }
+    else
+#endif
+    {
+        /* TODO plain old C implementation */
+    }
+
+#if 0
+      apply_chroma_filter(filter->deint_frame, frame->width * 2,
+                          frame->width, frame->height );
+#endif
+
+    /* convert back to yv12, cause myth only works with this format */
+    yuy2_to_yv12(
+        filter->deint_frame, 2 * frame->width,
+        frame->buf + frame->offsets[0], frame->pitches[0],
+        frame->buf + frame->offsets[1], frame->pitches[1],
+        frame->buf + frame->offsets[2], frame->pitches[2],
+        frame->width, frame->height);
+
     filter->last_framenr = frame->frameNumber;
 
     return 0;
