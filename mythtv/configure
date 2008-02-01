@@ -3374,8 +3374,12 @@ clean:
 	\$(NONE)
 
 install:
-uninstall:
 	\$(NONE)
+
+# Hack to remove some empty directories that qmake doesn't create rules for
+uninstall:
+	-rmdir \$(INSTALL_ROOT)/$PREFIX/include/mythtv
+	-rmdir \$(INSTALL_ROOT)/$PREFIX/lib/mythtv
 
 distclean: clean
 	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak 
