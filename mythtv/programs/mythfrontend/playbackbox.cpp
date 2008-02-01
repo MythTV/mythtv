@@ -4584,6 +4584,46 @@ bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
     return true;
 }
 
+static QSize calc_preview_size(const QSize &bounds, const QSize &imageSize)
+{
+    if ((bounds.width() == imageSize.width()) &&
+        (imageSize.height() <= bounds.height()))
+    {
+        return imageSize;
+    }
+
+    float boundsaspect  = 4.0f / 3.0f;
+    float imageaspect   = 4.0f / 3.0f;
+    QSize previewSize   = bounds;
+
+    if ((bounds.width() > 0) && (bounds.height() > 0))
+        boundsaspect = ((float)bounds.width()) / ((float)bounds.height());
+
+    if ((imageSize.width() > 0) && (imageSize.height() > 0))
+        imageaspect = ((float)imageSize.width()) / ((float)imageSize.height());
+
+    // Calculate new height or width according to relative aspect ratio
+    if ((int)((boundsaspect + 0.05f) * 10) >
+        (int)((imageaspect  + 0.05f) * 10))
+    {
+        float scaleratio = imageaspect / boundsaspect;
+        previewSize.setWidth((int)(previewSize.width() * scaleratio));
+    }
+    else if ((int)((boundsaspect + 0.05f) * 10) <
+             (int)((imageaspect + 0.05f) * 10))
+    {
+        float scaleratio = boundsaspect / imageaspect;
+        previewSize.setHeight((int)(previewSize.height() * scaleratio));
+    }
+
+    // Ensure preview width/height are multiples of 8 to match
+    // the preview video
+    //previewwidth = ((previewwidth + 7) / 8) * 8;
+    //previewheight = ((previewheight + 7) / 8) * 8;
+
+    return previewSize;
+}
+
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
@@ -4678,6 +4718,10 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         previewStartts = pginfo->recstartts;
         previewChanid = pginfo->chanid;
         previewFilets = previewLastModified;
+        QSize previewSize = calc_preview_size(
+            blackholeBounds.size(), previewPixmap->size());
+        if (previewSize != previewPixmap->size())
+            previewPixmap->resize(previewSize);
         retpixmap = *previewPixmap;
         return retpixmap;
     }
@@ -4714,40 +4758,15 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap();
 
-        if (blackholeBounds.width() != image->width())
-        {
-            float blackholeaspect = ((float)blackholeBounds.width())
-                                    / ((float)blackholeBounds.height());
-            float videoaspect = ((float)image->width())
-                                    / ((float)image->height());
+        QSize previewSize = calc_preview_size(
+            blackholeBounds.size(), image->size());
 
-            float scaleratio = 1;
-            int previewwidth = blackholeBounds.width();
-            int previewheight = blackholeBounds.height();
-
-            // Calculate new height or width according to relative aspect ratio
-            if ((int)((blackholeaspect + 0.05) * 10) > (int)((videoaspect + 0.05) * 10))
-            {
-                scaleratio = (videoaspect / blackholeaspect);
-                previewwidth = (int)(previewwidth * scaleratio);
-            }
-            else if ((int)((blackholeaspect + 0.05) * 10) < (int)((videoaspect + 0.05) * 10))
-            {
-                scaleratio = (blackholeaspect / videoaspect);
-                previewheight = (int)(previewheight * scaleratio);
-            }
-
-            // Ensure preview width/height are multiples of 8 to match
-            // the preview video
-            //previewwidth = ((previewwidth + 7) / 8) * 8;
-            //previewheight = ((previewheight + 7) / 8) * 8;
-
-            QImage tmp2 = image->smoothScale(previewwidth, previewheight);
-            previewPixmap->convertFromImage(tmp2);
-        }
+        if (previewSize == previewPixmap->size())
+            previewPixmap->convertFromImage(*image);
         else
         {
-            previewPixmap->convertFromImage(*image);
+            QImage tmp2 = image->smoothScale(previewSize);
+            previewPixmap->convertFromImage(tmp2);
         }
     }
 
