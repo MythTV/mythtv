@@ -994,13 +994,16 @@ bool MythListButton::ParseElement(QDomElement &element)
     else if (element.tagName() == "scrollarrows")
     {
         m_showScrollArrows = parseBool(element.attribute("show", ""));
-        if (m_upArrow)
-            delete m_upArrow;
-        if (m_downArrow)
-            delete m_downArrow;
-        ParseChildren(element, this);
-        m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
-        m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+        if (m_showScrollArrows)
+        {
+            if (m_upArrow)
+                delete m_upArrow;
+            if (m_downArrow)
+                delete m_downArrow;
+            ParseChildren(element, this);
+            m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
+            m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+        }
     }
     else if (element.tagName() == "showarrow")
         m_showArrow = parseBool(element);
