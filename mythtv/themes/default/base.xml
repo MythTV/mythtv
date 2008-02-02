@@ -52,21 +52,28 @@
     <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
     <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
     <spacing>10</spacing>
-    <margin>6</margin>
+    <margin>5</margin>
   </buttonlist>
 
   <window name="MythDialogBox">
+    <area>150,50,500,500</area>
+    <imagetype name="backimg">
+        <filename>mythdialogbox-background.png</filename>
+    </imagetype>
+
     <textarea name="messagearea">
-      <area>60,60,680,240</area>
+      <area>12,20,470,210</area>
       <font>bigboldwhite</font>
       <multiline>yes</multiline>
-      <align>left</align>
+      <align>center</align>
     </textarea>
 
     <buttonlist name="list" from="basebuttonlist">
-      <area>60,335,680,210</area>
+      <area>12,250,470,250</area>
       <drawfrombottom>yes</drawfrombottom>
       <textflags>center</textflags>
+      <showarrow>no</showarrow>
+      <scrollarrows show="no"></scrollarrows>
     </buttonlist>
   </window>
 
