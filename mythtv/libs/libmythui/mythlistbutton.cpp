@@ -575,6 +575,8 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
     SetPositionArrowStates();
 
+    emit itemSelected(m_selItem);
+
     return true;
 }
 
@@ -906,13 +908,13 @@ QRect MythListButton::CalculateContentsRect(const QRect &arrowsRect) const
 {
     QRect contectRect;
 
-    if (m_layout == LayoutVertical)
+    if (m_layout == LayoutHorizontal)
     {
         contectRect = QRect(0, 0,
                     GetArea().width() - arrowsRect.width() - 2 * m_itemMargin,
                     GetArea().height());
     }
-    else if ((m_layout == LayoutHorizontal) || (m_layout == LayoutGrid))
+    else if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
     {
         contectRect = QRect(0, 0, GetArea().width(), GetArea().height() -
                     arrowsRect.height() - 2 * m_itemMargin);
