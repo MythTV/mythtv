@@ -30,6 +30,7 @@ class MpegRecorder : public RecorderBase
     void Reset(void);
 
     void Pause(bool clear = true);
+    bool PauseAndWait(int timeout = 100);
 
     bool IsRecording(void) { return recording; }
     bool IsErrored(void) { return errored; }
@@ -72,6 +73,7 @@ class MpegRecorder : public RecorderBase
     bool     usingv4l2;
     bool     has_buggy_vbi;
     bool     has_v4l2_vbi;
+    bool     requires_special_pause;
 
     // State
     bool recording;

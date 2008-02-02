@@ -87,6 +87,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     card(QString::null),      driver(QString::null),
     version(0),               usingv4l2(false),
     has_buggy_vbi(true),      has_v4l2_vbi(false),
+    requires_special_pause(false),
     // State
     recording(false),         encoding(false),
     errored(false),
@@ -337,13 +338,15 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         {
             usingv4l2     = (version >= IVTV_KERNEL_VERSION(0, 8, 0));
             has_v4l2_vbi  = (version >= IVTV_KERNEL_VERSION(0, 3, 8));
-            has_buggy_vbi = (version <  IVTV_KERNEL_VERSION(0, 10, 0));
+            has_buggy_vbi = true;
+            requires_special_pause =
+                (version >= IVTV_KERNEL_VERSION(0, 10, 0));
         }
         else
         {
             VERBOSE(VB_IMPORTANT, "\n\nNot ivtv driver??\n\n");
             usingv4l2 = has_v4l2_vbi = true;
-            has_buggy_vbi = false;
+            has_buggy_vbi = requires_special_pause = false;
         }
     }
 
@@ -688,8 +691,11 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 
     if (has_buggy_vbi)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "VBI recording with broken drivers."
-                "\n\t\t\tUpgrade to ivtv 0.10.0 if you experience problems.");
+        cout<<" *********************** WARNING ***********************"<<endl;
+        cout<<" ivtv drivers prior to 0.10.0 can cause lockups when    "<<endl;
+        cout<<" reading VBI. Drivers between 0.10.5 and 1.0.3+ do not  "<<endl;
+        cout<<" properly capture VBI data on PVR-250 and PVR-350 cards."<<endl;
+        cout<<endl;
     }
 
     /****************************************************************/
@@ -1054,6 +1060,47 @@ void MpegRecorder::Pause(bool clear)
     cleartimeonpause = clear;
     paused = false;
     request_pause = true;
+}
+
+bool MpegRecorder::PauseAndWait(int timeout)
+{
+    if (request_pause)
+    {
+        if (!paused)
+        {
+            if (requires_special_pause)
+            {
+                // Some ivtv drivers require streaming to be disabled before
+                // an input switch and other channel format setting.
+                struct v4l2_encoder_cmd command;
+                memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
+                command.cmd = V4L2_ENC_CMD_STOP;
+                ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
+            }
+
+            paused = true;
+            pauseWait.wakeAll();
+            if (tvrec)
+                tvrec->RecorderPaused();
+        }
+        unpauseWait.wait(timeout);
+    }
+    if (!request_pause)
+    {
+        if (paused)
+        {
+            if (requires_special_pause)
+            {
+                // Some ivtv drivers require streaming to be disabled before
+                // an input switch and other channel format setting.
+                struct v4l2_encoder_cmd command;
+                command.cmd = V4L2_ENC_CMD_START;
+                ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
+            }
+        }
+        paused = false;
+    }
+    return paused;
 }
 
 long long MpegRecorder::GetKeyframePosition(long long desired)
