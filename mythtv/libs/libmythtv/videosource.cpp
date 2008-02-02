@@ -1052,6 +1052,22 @@ class DVBOnDemand : public CheckBoxSetting, public CaptureCardDBStorage
     };
 };
 
+class DVBEITScan : public CheckBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    DVBEITScan(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "dvb_eitscan")
+    {
+        setLabel(QObject::tr("Use DVB Card for active EIT scan"));
+        setValue(true);
+        setHelpText(
+            QObject::tr("This option activates the active scan for "
+                        "program data (EIT). With this option enabled "
+                        "the DVB card is constantly in-use."));
+    };
+};
+
 class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
@@ -2952,6 +2968,7 @@ RecorderOptions::RecorderOptions(CaptureCard &parent)
     rec->addChild(count);
     rec->addChild(new DVBNoSeqStart(parent));
     rec->addChild(new DVBOnDemand(parent));
+    rec->addChild(new DVBEITScan(parent));
     rec->addChild(new DVBTuningDelay(parent));
 
     addChild(rec);

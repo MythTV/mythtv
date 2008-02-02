@@ -1447,7 +1447,12 @@ void TVRec::RunTV(void)
         if (channel && scanner &&
             QDateTime::currentDateTime() > eitScanStartTime)
         {
-            if (!get_use_eit(GetCaptureCardNum()))
+            if (!dvbOpt.dvb_eitscan)
+            {
+                VERBOSE(VB_EIT, LOC + "EIT scanning disabled for this card.");
+                eitScanStartTime = eitScanStartTime.addYears(1);
+            }
+            else if (!get_use_eit(GetCaptureCardNum()))
             {
                 VERBOSE(VB_EIT, LOC + "EIT scanning disabled "
                         "for all sources on this card.");
@@ -1590,7 +1595,7 @@ bool TVRec::GetDevices(int cardid,
         "       skipbtaudio,      signal_timeout,      channel_timeout, "
         "       dvb_wait_for_seqstart, "
         ""
-        "       dvb_on_demand,    dvb_tuning_delay, "
+        "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan"
         ""
         "       firewire_speed,   firewire_model,      firewire_connection, "
         ""
@@ -1649,9 +1654,10 @@ bool TVRec::GetDevices(int cardid,
     uint dvboff = 10;
     dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
     dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
+    dvb_opts.dvb_eitscan      = query.value(dvboff + 2).toUInt();
 
     // Firewire options
-    uint fireoff = dvboff + 2;
+    uint fireoff = dvboff + 3;
     firewire_opts.speed       = query.value(fireoff + 0).toUInt();
 
     test = query.value(fireoff + 1).toString();

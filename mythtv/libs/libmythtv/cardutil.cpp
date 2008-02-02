@@ -468,7 +468,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "SELECT videodevice,           cardtype,       defaultinput,     "
         "       hostname,              signal_timeout, channel_timeout,  "
         "       dvb_wait_for_seqstart, dvb_on_demand,  dvb_tuning_delay, "
-        "       dvb_diseqc_type,       diseqcid "
+        "       dvb_diseqc_type,       diseqcid,       dvb_eitscan "
         "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", src_cardid);
@@ -497,9 +497,10 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "    dvb_on_demand         = :V7, "
         "    dvb_tuning_delay      = :V8, "
         "    dvb_diseqc_type       = :V9, "
-        "    diseqcid              = :V10 "
+        "    diseqcid              = :V10,"
+        "    dvb_eitscan           = :V11 "
         "WHERE cardid = :CARDID");
-    for (uint i = 0; i < 11; i++)
+    for (uint i = 0; i < 12; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":CARDID", dst_cardid);
 
