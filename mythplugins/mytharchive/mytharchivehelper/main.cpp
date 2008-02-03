@@ -145,7 +145,7 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
     return true;
 }
 
-void createISOImage(QString &sourceDirectory)
+bool createISOImage(QString &sourceDirectory)
 {
     VERBOSE(VB_JOBQUEUE, "Creating ISO image");
 
@@ -160,11 +160,15 @@ void createISOImage(QString &sourceDirectory)
     int res = system(command);
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
-    if (res == 0)
-        VERBOSE(VB_JOBQUEUE, "Finished creating ISO image");
-    else
+    if (res != 0)
+    {
         VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
                 .arg(res));
+        return false;
+    }
+
+    VERBOSE(VB_JOBQUEUE, "Finished creating ISO image");
+    return true;
 }
 
 int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
@@ -329,13 +333,25 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         }
     }
 
-    // create an iso image if needed
-    if (mediaType == AD_FILE && bCreateISO)
-        createISOImage(saveDirectory);
-
-    // burn the iso if needed
+    // burn the dvd if needed
     if (mediaType != AD_FILE && bDoBurn)
-        burnISOImage(mediaType, bEraseDVDRW, true);
+    {
+        if (!burnISOImage(mediaType, bEraseDVDRW, true))
+        {
+            VERBOSE(VB_JOBQUEUE, "Native archive job failed to completed");
+            return 1;
+        }
+    }
+
+    // create an iso image if needed
+    if (bCreateISO)
+    {
+        if (!createISOImage(saveDirectory))
+        {
+            VERBOSE(VB_JOBQUEUE, "Native archive job failed to completed");
+            return 1;
+        }
+    }
 
     // make sure the files we created are read/writable by all 
     //system("chmod -R a+rw-x+X " + saveDirectory);
