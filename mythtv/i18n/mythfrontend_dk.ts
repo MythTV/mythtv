@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Analog Options for</source>
-        <translation>Analog opsætning for</translation>
+        <translation type="obsolete">Analog opsætning for</translation>
     </message>
 </context>
 <context>
@@ -173,6 +173,26 @@
         <source>Input and satellite settings.</source>
         <translation type="obsolete">Indgang og satellit opsætninger.</translation>
     </message>
+    <message>
+        <source>Create Input Group</source>
+        <translation>Opret input gruppe</translation>
+    </message>
+    <message>
+        <source>Enter new group name</source>
+        <translation>Skriv nyt gruppenavn</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Fejl</translation>
+    </message>
+    <message>
+        <source>Sorry, this Input Group name can not be blank.</source>
+        <translation>Beklager, navnet for denne input gruppe må ikke være blank.</translation>
+    </message>
+    <message>
+        <source>Sorry, this Input Group name is already in use.</source>
+        <translation>Beklager, navnet for denne input gruppe er allerede i brug.</translation>
+    </message>
 </context>
 <context>
     <name>CardInputEditor</name>
@@ -239,6 +259,26 @@
         <source>Are you sure you would like to delete the channels on %1?</source>
         <translation>Er du sikker på at du vil slette kanalerne på %1?</translation>
     </message>
+    <message>
+        <source>Add some for channels first!</source>
+        <translation>Tilføj først nogle kanaler!</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Afbryd</translation>
+    </message>
+    <message>
+        <source>Download all icons..</source>
+        <translation>Download alle ikoner..</translation>
+    </message>
+    <message>
+        <source>Rescan for missing icons..</source>
+        <translation>Scan igen efter manglende ikoner..</translation>
+    </message>
+    <message>
+        <source>Download icon for </source>
+        <translation>Download ikon for</translation>
+    </message>
 </context>
 <context>
     <name>ChannelRecPriority</name>
@@ -271,23 +311,23 @@
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation>finde en bestemt titel</translation>
+        <translation>Find en bestemt titel</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation>Finde ord i titlen</translation>
+        <translation>Find ord i titlen</translation>
     </message>
     <message>
         <source>Match this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Find denne episode</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation>finde en bestemt episode</translation>
+        <translation>Find en bestemt episode</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation>Finde i beskrivelses felt</translation>
+        <translation>Find i ethvert beskrivelses felt</translation>
     </message>
     <message>
         <source>New episodes only</source>
@@ -359,7 +399,7 @@
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt som matcher for en bestemt genre (Data Direct)</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
@@ -375,7 +415,7 @@
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation>Begræns film af udgivelses år</translation>
+        <translation>Begræns film ved udgivelses år</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
@@ -407,7 +447,7 @@
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation>Tilføj dette eksempel</translation>
+        <translation type="obsolete">Tilføj dette eksempel</translation>
     </message>
     <message>
         <source>Additional Tables</source>
@@ -440,6 +480,14 @@
     <message>
         <source>stored search</source>
         <translation>gemt søgning</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Tilføj</translation>
+    </message>
+    <message>
+        <source>Match words in the subtitle</source>
+        <translation>Find ord i underteksterne</translation>
     </message>
 </context>
 <context>
@@ -628,7 +676,7 @@
     </message>
     <message>
         <source>Analog Options</source>
-        <translation>Analoge opsætninger</translation>
+        <translation type="obsolete">Analoge opsætninger</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
@@ -646,11 +694,6 @@
         <source>Could not get card info for card #%1</source>
         <translation>Kunne ikke hente info for kort #%1</translation>
     </message>
-    <message>
-        <source>Analog child card settings.
-WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A180 card. These cards do not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
@@ -660,15 +703,15 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>Bit Fejl rate</translation>
+        <translation>Bit fejl rate</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Ukorregerede Blokke</translation>
+        <translation>Ukorrigerede blokke</translation>
     </message>
     <message>
         <source>Rotor Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor fremdrift</translation>
     </message>
 </context>
 <context>
@@ -748,15 +791,15 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch</translation>
     </message>
     <message>
         <source>Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor</translation>
     </message>
     <message>
         <source>LNB</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB</translation>
     </message>
     <message>
         <source>Description</source>
@@ -764,11 +807,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valgfrit navn for denne enhed, for at gøre det nemmere at ændre indstillinger i fremtiden.</translation>
     </message>
     <message>
         <source>Switch Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch type</translation>
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
@@ -808,7 +851,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Switch Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch konfiguration</translation>
     </message>
     <message>
         <source>Rotor Type</source>
@@ -820,11 +863,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>DiSEqC 1.2</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC 1.2</translation>
     </message>
     <message>
         <source>DiSEqC 1.3 (GotoX/USALS)</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC 1.3 (GotoX/USALS)</translation>
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
@@ -832,7 +875,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
-        <translation type="unfinished"></translation>
+        <translation>For at tillade overvågning af rotorens bevægelse, indtast da den fastsatte vinkelhastighed for rotoren ved 13V.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
@@ -840,7 +883,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
-        <translation type="unfinished"></translation>
+        <translation>For at tillade overvågning af rotorens bevægelse, indtast da den fastsatte vinkelhastighed for rotoren ved 18V.</translation>
     </message>
     <message>
         <source>E</source>
@@ -858,7 +901,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Orbital Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Orbital position</translation>
     </message>
     <message>
         <source>None</source>
@@ -966,11 +1009,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>LNB Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB konfiguration</translation>
     </message>
     <message>
         <source>Select Type of Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg enhedstype</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
@@ -1010,7 +1053,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Longitude (degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation>Længdegrad (grader)</translation>
     </message>
     <message>
         <source>Hemisphere</source>
@@ -1030,7 +1073,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC enhedstræ</translation>
     </message>
 </context>
 <context>
@@ -1128,7 +1171,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>MPEGConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Indsamlet information</translation>
     </message>
     <message>
         <source>Failed to open</source>
@@ -1233,7 +1276,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Select removable media to eject</source>
-        <translation>Vælg hvilket flytbart medie der skal skubbes ud</translation>
+        <translation type="obsolete">Vælg hvilket flytbart medie der skal skubbes ud</translation>
     </message>
     <message>
         <source>No devices to eject</source>
@@ -1267,12 +1310,16 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <source>Select a DVD writer</source>
         <translation>Vælg en DVD-brænder</translation>
     </message>
+    <message>
+        <source>Select removable media to eject or insert</source>
+        <translation>Vælg flytbart medie som skal skubbes ud eller indsættes</translation>
+    </message>
 </context>
 <context>
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation type="unfinished">Transport</translation>
+        <translation>Transport</translation>
     </message>
 </context>
 <context>
@@ -1716,7 +1763,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Password:</translation>
+        <translation>Kodeord:</translation>
     </message>
     <message>
         <source>Change Group Filter</source>
@@ -1856,15 +1903,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>High Quality</source>
-        <translation>Høj Kvalitet</translation>
+        <translation>Høj kvalitet</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation>Mellem Kvalitet</translation>
+        <translation>Mellem kvalitet</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation>Lav Kvalitet</translation>
+        <translation>Lav kvalitet</translation>
     </message>
     <message>
         <source>Watch List</source>
@@ -1872,11 +1919,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
-        <translation type="unfinished"></translation>
+        <translation>Der er ingen tilgængelige optagelser i din nuværende visning</translation>
     </message>
     <message>
         <source>There are no recordings available</source>
-        <translation type="unfinished"></translation>
+        <translation>Der er ingen tilgængelige optagelser</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
@@ -1912,7 +1959,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Save Current View</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem nuværende visning</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1966,6 +2013,18 @@ Returning to the previous menu.</source>
         <source>Show LiveTV as a Group</source>
         <translation>Vis LiveTV som en gruppe</translation>
     </message>
+    <message>
+        <source>_NO_TITLE_</source>
+        <translation>_INGEN_TITEL_</translation>
+    </message>
+    <message>
+        <source>Delete, and allow re-record</source>
+        <translation>Slet og tillad genoptagelse</translation>
+    </message>
+    <message>
+        <source>Deleted</source>
+        <translation>Slettet</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2011,11 +2070,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved fjernelse af markering vil OSD ikke fade væk men vil i stedet forsvinde øjeblikkeligt.</translation>
     </message>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern denne markering hvis video hakker mens OSD fader væk.</translation>
     </message>
 </context>
 <context>
@@ -2299,11 +2358,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Custom Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Brugerdefineret optagelse</translation>
     </message>
     <message>
         <source>Unrated</source>
-        <translation type="unfinished"></translation>
+        <translation>Uvurderet</translation>
     </message>
     <message>
         <source>At least ***/</source>
@@ -2332,6 +2391,10 @@ Returning to the previous menu.</source>
     <message>
         <source>At least /</source>
         <translation>Mindst /</translation>
+    </message>
+    <message>
+        <source>0 .. 9 moves to Nx10 percent in list</source>
+        <translation>0 .. 9 går til Nx10 procent i listen</translation>
     </message>
 </context>
 <context>
@@ -3823,7 +3886,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>DVB Card Number</source>
-        <translation>DVB kort nummer</translation>
+        <translation type="obsolete">DVB kort nummer</translation>
     </message>
     <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
@@ -4063,7 +4126,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Find prioritet for en optagelse</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -4355,7 +4418,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
-        <translation>MythTV skal optage &quot;%1&quot; på %2 om %3 sekunder. Vil du:</translation>
+        <translation type="obsolete">MythTV skal optage &quot;%1&quot; på %2 om %3 sekunder. Vil du:</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
@@ -4371,7 +4434,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivér interlaced bevægelsesestimering</translation>
     </message>
     <message>
         <source>Keypress Application</source>
@@ -4411,7 +4474,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved valg af gruppe, vis da en gruppeopsummering fremfor at vise information om den første episode i gruppen.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -4910,7 +4973,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows.</source>
-        <translation>Undgå konflikter mellem live TV og planlagte optagelser.</translation>
+        <translation type="obsolete">Undgå konflikter mellem live TV og planlagte optagelser.</translation>
     </message>
     <message>
         <source>If enabled, live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
@@ -5330,7 +5393,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>User Job #1 Description</source>
-        <translation>Beskrivelse af Bruger Job #1</translation>
+        <translation type="obsolete">Beskrivelse af Bruger Job #1</translation>
     </message>
     <message>
         <source>The Description for this User Job.</source>
@@ -5338,7 +5401,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>User Job #1 Command</source>
-        <translation>Bruger Job #1 kommando</translation>
+        <translation type="obsolete">Bruger Job #1 kommando</translation>
     </message>
     <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
@@ -5346,27 +5409,27 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>User Job #2 Description</source>
-        <translation>Beskrivelse af Bruger Job #2</translation>
+        <translation type="obsolete">Beskrivelse af Bruger Job #2</translation>
     </message>
     <message>
         <source>User Job #2 Command</source>
-        <translation>Bruger Job #2 kommando</translation>
+        <translation type="obsolete">Bruger Job #2 kommando</translation>
     </message>
     <message>
         <source>User Job #3 Description</source>
-        <translation>Beskrivelse af Bruger Job #3</translation>
+        <translation type="obsolete">Beskrivelse af Bruger Job #3</translation>
     </message>
     <message>
         <source>User Job #3 Command</source>
-        <translation>Bruger Job #3 kommando</translation>
+        <translation type="obsolete">Bruger Job #3 kommando</translation>
     </message>
     <message>
         <source>User Job #4 Description</source>
-        <translation>Beskrivelse af Bruger Job #4</translation>
+        <translation type="obsolete">Beskrivelse af Bruger Job #4</translation>
     </message>
     <message>
         <source>User Job #4 Command</source>
-        <translation>Bruger Job #4 kommando</translation>
+        <translation type="obsolete">Bruger Job #4 kommando</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
@@ -5378,19 +5441,19 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Allow &apos;User Job #1&apos; jobs</source>
-        <translation>Tillad &apos;Bruger Job #1&apos; jobs</translation>
+        <translation type="obsolete">Tillad &apos;Bruger Job #1&apos; jobs</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #2&apos; jobs</source>
-        <translation>Tillad &apos;Bruger Job #2&apos; jobs</translation>
+        <translation type="obsolete">Tillad &apos;Bruger Job #2&apos; jobs</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #3&apos; jobs</source>
-        <translation>Tillad &apos;Bruger Job #3&apos; jobs</translation>
+        <translation type="obsolete">Tillad &apos;Bruger Job #3&apos; jobs</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #4&apos; jobs</source>
-        <translation>Tillad &apos;Bruger Job #4&apos; jobs</translation>
+        <translation type="obsolete">Tillad &apos;Bruger Job #4&apos; jobs</translation>
     </message>
     <message>
         <source>Job Queue (Host-Specific)</source>
@@ -5840,7 +5903,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>this recording rule is inactive.</source>
-        <translation type="obsolete">denne optagelse er ikke aktiv.</translation>
+        <translation type="unfinished">denne optagelse er ikke aktiv.</translation>
     </message>
     <message>
         <source>Find ID</source>
@@ -6102,12 +6165,8 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation>Frekvens
+        <translation type="obsolete">Frekvens
 Frekvensen er for denne kanal er i Hz.</translation>
-    </message>
-    <message>
-        <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
@@ -6434,7 +6493,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>this show does not match the current program listings.</source>
-        <translation>denne udsendelse passer ikke til program listen.</translation>
+        <translation type="obsolete">denne udsendelse passer ikke til program listen.</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -8254,7 +8313,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Western</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vestlig</translation>
     </message>
     <message>
         <source>DataDirect</source>
@@ -8822,14 +8881,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>the recording failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>this episode will be recorded on a different channel at this time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Last Recorded</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9246,10 +9297,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>this recording schedule is inactive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9605,10 +9652,6 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Removable Media</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Miscellaneous</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9814,10 +9857,6 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>On same multiplex...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>PVR-350 decoder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9926,10 +9965,6 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This is the only video renderer available on Microsoft Windows systems.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This is the standard video render for Macintosh OS X systems.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9955,10 +9990,6 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shows one field of the frame followed by the other field displaced vertically. This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10386,12 +10417,204 @@ name can not be blank.</source>
         <source>Miscellaneous Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Icon Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts the icon downloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the recorder failed to record.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this rule does not match any showings in the current program listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded on a different channel in this time slot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio for Hearing Impaired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio for Visually Impaired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AVC/H.264</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded File Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default).
+The frequency for this channel in %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (symbols/second).
+Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV wants to record these programs in %d seconds:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On known multiplex...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows one field of the frame followed by the other field displaced vertically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Device Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: already in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interactions between inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a New Input Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avoid conflicts between live TV and scheduled shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow live TV to move scheduled shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use new media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMediaMonitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is not yet available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to Default group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undelete</source>
+        <translation type="unfinished">Fortryd sletning</translation>
+    </message>
+    <message>
+        <source>User Job #%1 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #%1 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow %1 jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is recording:
+</source>
+        <translation type="unfinished">Tuner %1 optager:
+</translation>
+    </message>
+    <message>
+        <source>Tuner %1 is not recording</source>
+        <translation type="unfinished">Tuner %1 optager ikke</translation>
+    </message>
+    <message>
+        <source>Date Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
     <message>
         <source>Missing Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Manglende element</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
@@ -10399,113 +10622,113 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Unknown Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt element</translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished">Det tema du bruger indeholder et ukendt element (%1). Det bliver ignoreret</translation>
+        <translation type="unfinished">Det tema du bruger indeholder et ukendt element (%1). Dette vil blive ignoreret</translation>
     </message>
 </context>
 <context>
     <name>RecordingProfileEditor</name>
     <message>
         <source>Add Recording Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj optagelsesprofil</translation>
     </message>
     <message>
         <source>Enter the name of the new profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast navnet på den nye profil</translation>
     </message>
 </context>
 <context>
     <name>SIScan</name>
     <message>
         <source>Updated Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdateret kanal %1</translation>
     </message>
     <message>
         <source>Added Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføjet kanal %1</translation>
     </message>
     <message>
         <source>Failed to add channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejlede under tilføjelsen af kanal %1</translation>
     </message>
     <message>
         <source>Network %1 Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Netværk %1 i gang</translation>
     </message>
     <message>
         <source>Finished processing Transport List</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig med transportliste</translation>
     </message>
     <message>
         <source>Updating Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdaterer services</translation>
     </message>
     <message>
         <source>Finished processing Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig med at opdatere services</translation>
     </message>
     <message>
         <source>Frequency %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens %1</translation>
     </message>
     <message>
         <source>as</source>
-        <translation type="unfinished"></translation>
+        <translation>som</translation>
     </message>
     <message>
         <source>Skipping %1, not in imported channel map</source>
-        <translation type="unfinished"></translation>
+        <translation>Dropper %1, er ikke i importeret kanalliste</translation>
     </message>
     <message>
         <source>%1%2%3 on %4 (%5)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%2%3 på %4 (%5)</translation>
     </message>
     <message>
         <source>Adding %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføjer %1</translation>
     </message>
     <message>
         <source>Updating %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdaterer %1</translation>
     </message>
     <message>
         <source>Skipping %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dropper %1</translation>
     </message>
     <message>
         <source>on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>på %1</translation>
     </message>
     <message>
         <source>Data Only Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun datakanal (off-air?)</translation>
     </message>
     <message>
         <source>Empty Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tom kanal (off-air?)</translation>
     </message>
     <message>
         <source>Audio Only Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun lydkanal</translation>
     </message>
     <message>
         <source>Encrypted Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Krypteret kanal</translation>
     </message>
     <message>
         <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2-%3 som %4 på %5 (%6)</translation>
     </message>
     <message>
         <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fandt kanal, men den passer ikke til det eksisterende tsid. Du er formentlig interesseret i at slette eksisterende kanal og lave en fuld scanning.</translation>
     </message>
     <message>
         <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dropper %1 - allerede i database og indeholder ikke bedre data.</translation>
     </message>
 </context>
 <context>
@@ -10547,7 +10770,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanningsfremgang</translation>
     </message>
     <message>
         <source>Tuning</source>
@@ -10585,18 +10808,18 @@ name can not be blank.</source>
     <name>ScanWizard</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanningsguide</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl i videregivning af parametre</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardConfig</name>
     <message>
         <source>Scan Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Scannings konfiguration</translation>
     </message>
 </context>
 <context>
@@ -10610,7 +10833,7 @@ name can not be blank.</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished">Scanner</translation>
+        <translation>Scanner</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -10618,23 +10841,23 @@ name can not be blank.</source>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanningsguide</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl under tuning til transport</translation>
     </message>
     <message>
         <source>Failed to open &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbne &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke videregive &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl under start af scanning</translation>
     </message>
 </context>
 <context>
@@ -10711,7 +10934,7 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation>LiveTV</translation>
+        <translation type="obsolete">LiveTV</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
@@ -10723,90 +10946,107 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>standard rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>standardregler er definerede</translation>
     </message>
     <message>
         <source>search rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>søgeregler er definerede</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Scheduleret kørselstid:</translation>
+    </message>
+    <message>
+        <source>marked as HDTV</source>
+        <translation>markeret som HDTV</translation>
+    </message>
+    <message>
+        <source>from source</source>
+        <translation>fra kilde</translation>
+    </message>
+    <message>
+        <source>on input</source>
+        <translation>på input</translation>
+    </message>
+    <message>
+        <source>%1 of these are Deleted and consume %2</source>
+        <translation>%1 af disse er slettede og forbruger %2</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupEditor</name>
     <message>
         <source>&apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; opbevaringsgruppemapper</translation>
     </message>
     <message>
         <source>Local &apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokale &apos;%1&apos; opbevaringsgruppemapper</translation>
     </message>
     <message>
         <source>Add Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj opbevaringsgruppemappe</translation>
     </message>
     <message>
         <source>Enter directory name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast mappenavn eller tryk SELECT for at indtaste teksten vha. On-Screen-Tastaturet</translation>
     </message>
     <message>
         <source>Edit Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger opbevaringsgruppemappe</translation>
     </message>
     <message>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern &apos;%1&apos;
+mappen fra opbevaringsgruppen?</translation>
     </message>
     <message>
         <source>Yes, remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slet mappe</translation>
     </message>
     <message>
         <source>No, Don&apos;t remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, slet ikke mappe</translation>
     </message>
     <message>
         <source>(Add New Directory)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Tilføj ny mappe)</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupListEditor</name>
     <message>
         <source>Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Opbevaringsgrupper (mapper for nye optagelser)</translation>
     </message>
     <message>
         <source>Local Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokale opbevaringsgrupper (mapper for nye optagelser)</translation>
     </message>
     <message>
         <source>Create New Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Opret ny opbevaringsmappe</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast gruppenavn eller tryk SELECT for at indtaste teksten vha. On-Screen-Tastaturet</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet &apos;%1&apos; opbevaringsgruppen?</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Ja, slet gruppen</translation>
+        <translation>Ja, slet gruppen</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nej, behold gruppen</translation>
+        <translation>Nej, behold gruppen</translation>
     </message>
     <message>
         <source>(Create %1 group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Opret %1 gruppe)</translation>
     </message>
 </context>
 <context>
@@ -11293,7 +11533,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
-        <translation>Du burde have låst på en kanal nu. Du kan forsat vente på et signal eller du kan skifte kanal med %1 eller %2, ændre indgang %3, optage kort %4, osv.</translation>
+        <translation type="obsolete">Du burde have låst på en kanal nu. Du kan forsat vente på et signal eller du kan skifte kanal med %1 eller %2, ændre indgang %3, optage kort %4, osv.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -11483,15 +11723,15 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Toggle Teletext Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivér/deaktiver undertekster</translation>
     </message>
     <message>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivér/deaktiver menu for undertekster</translation>
     </message>
     <message>
         <source>Toggle</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift</translation>
     </message>
     <message>
         <source>(I)</source>
@@ -11550,84 +11790,127 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Chan %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal %1: %2</translation>
     </message>
     <message>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle tunere er optagede.
+Vælg en aktuel optagelse</translation>
     </message>
     <message>
         <source>End Of Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Slutning på optagelse</translation>
     </message>
     <message>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Sidste program: %1 eksisterer ikke</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet denne optagelse?</translation>
     </message>
     <message>
         <source>DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished">Menu</translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillestående frame</translation>
     </message>
     <message>
         <source>Title: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel: %1 (%2)</translation>
     </message>
     <message>
         <source>Chapter: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapitel: %1/%2</translation>
     </message>
     <message>
         <source>DVD Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD kapitelmenu</translation>
     </message>
     <message>
         <source>&apos;%1&apos; Group Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; gruppekodeord:</translation>
     </message>
     <message>
         <source>Password Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl i kodeord</translation>
     </message>
     <message>
         <source>Screen Shot</source>
-        <translation type="unfinished"></translation>
+        <translation>Screen Shot</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>Adjust Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Juster udfyldning</translation>
     </message>
     <message>
         <source>You are exiting %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Du afslutter %1</translation>
     </message>
     <message>
         <source>Exit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Afslut %1</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Afslut</translation>
+        <translation>Afslut</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl</translation>
+    </message>
+    <message>
+        <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
+        <translation>MythTV vil gerne optage &quot;%1&quot; på %2 om %d sekunder. Vil du gerne:</translation>
+    </message>
+    <message>
+        <source>Let them record and go back to the Main Menu</source>
+        <translation>Optag dem og vend tilbage til hovedmenuen</translation>
+    </message>
+    <message>
+        <source>Record it later, I want to watch TV</source>
+        <translation>Optag den senere, jeg vil hellere se TV</translation>
+    </message>
+    <message>
+        <source>Record them later, I want to watch TV</source>
+        <translation>Optag dem senere, jeg vil hellere se TV</translation>
+    </message>
+    <message>
+        <source>Don&apos;t let them record, I want to watch TV</source>
+        <translation>Undlad at optage dem, jeg vil hellere se TV</translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
+        <translation>Du burde have fået en kanal nu. Du kan enten fortsætte med at vente på et signal eller skifte kanaler med %1 eller %2, skifte video kilde (%3), inputs (%4), etc.</translation>
+    </message>
+    <message>
+        <source>Switch Input</source>
+        <translation>Skift input</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>Card</comment>
+        <translation>C</translation>
+    </message>
+    <message>
+        <source>I</source>
+        <comment>Input</comment>
+        <translation>I</translation>
+    </message>
+    <message>
+        <source>Switch Source</source>
+        <translation>Skift kilde</translation>
     </message>
 </context>
 <context>
@@ -11833,57 +12116,57 @@ Select a Current Recording</source>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny transport</translation>
     </message>
 </context>
 <context>
     <name>TransportListEditor</name>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished">Er du sikker på at du vil slette denne transport?</translation>
+        <translation>Er du sikker på at du vil slette denne transport?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished">Ja, slet denne transport</translation>
+        <translation>Ja, slet denne transport</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, lad være</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished">Transport Menu</translation>
+        <translation>Transport menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Ændre..</translation>
+        <translation>Ændre..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet..</translation>
     </message>
     <message>
         <source>Multiplex Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplex editor</translation>
     </message>
 </context>
 <context>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Søg</translation>
+        <translation>Søg</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished">Start med tekst</translation>
+        <translation>Start med tekst</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished">Indeholder tekst</translation>
+        <translation>Indeholder tekst</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
@@ -11909,7 +12192,7 @@ Select a Current Recording</source>
     <name>V4LConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Indsamlet information</translation>
     </message>
     <message>
         <source>Failed to open</source>
@@ -11963,7 +12246,7 @@ Select a Current Recording</source>
     <name>VideoSourceSelector</name>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished">Video kilder</translation>
+        <translation>Videokilde</translation>
     </message>
 </context>
 <context>
@@ -12001,15 +12284,15 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished">Slet &apos;%1&apos; %2 regel?</translation>
+        <translation>Slet &apos;%1&apos; %2 regel?</translation>
     </message>
     <message>
         <source>Conflict Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfilkt i dag</translation>
     </message>
     <message>
         <source>Conflict </source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt</translation>
     </message>
 </context>
 <context>
@@ -12025,12 +12308,12 @@ Select a Current Recording</source>
     <message>
         <source>Tuner %1 is recording:
 </source>
-        <translation>Tuner %1 optager:
+        <translation type="obsolete">Tuner %1 optager:
 </translation>
     </message>
     <message>
         <source>Tuner %1 is not recording</source>
-        <translation>Tuner %1 optager ikke</translation>
+        <translation type="obsolete">Tuner %1 optager ikke</translation>
     </message>
     <message>
         <source>There are no recordings currently taking place</source>
