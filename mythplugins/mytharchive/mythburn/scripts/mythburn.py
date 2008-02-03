@@ -2580,7 +2580,7 @@ def BurnDVDISO(title):
                 command = path_growisofs[0] + " -dvd-compat "
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
-                command += " -Z " + dvddrivepath + " -dvd-video -V " + title + " "
+                command += " -Z " + dvddrivepath + " -dvd-video -V " + quoteFilename(title) + " "
                 command += os.path.join(getTempPath(),'dvd')
 
             write(command)
