@@ -16,6 +16,7 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += ../mytharchive/archiveutil.h pxsup2dast.h
 SOURCES += main.cpp ../mytharchive/archiveutil.cpp pxsup2dast.c
 
+LIBS += -lz
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION
