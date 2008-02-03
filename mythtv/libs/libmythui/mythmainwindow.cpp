@@ -125,6 +125,7 @@ struct JumpData
     QString destination;
     QString description;
     bool exittomain;
+    QString localAction;
 };
 
 struct MHData
@@ -755,6 +756,16 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     actions.clear();
     int keynum = d->TranslateKeyNum(e);
 
+    QStringList localActions;
+    if (allowJumps && (d->jumpMap.count(keynum) > 0) && 
+        (d->jumpMap[keynum]->localAction != "") &&
+        (d->keyContexts[context]) &&
+        (d->keyContexts[context]->GetMapping(keynum, localActions)))
+    {
+        if (localActions.contains(d->jumpMap[keynum]->localAction))
+            allowJumps = false;
+    }
+
     if (allowJumps && d->jumpMap.count(keynum) > 0 && 
             !d->jumpMap[keynum]->exittomain && d->exitmenucallback == NULL)
     {
@@ -973,7 +984,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 void MythMainWindow::RegisterJump(const QString &destination, 
                                   const QString &description,
                                   const QString &key, void (*callback)(void),
-                                  bool exittomain)
+                                  bool exittomain, QString localAction)
 {
     QString keybind = key;
 
@@ -1009,7 +1020,8 @@ void MythMainWindow::RegisterJump(const QString &destination,
         }
     }
 
-    JumpData jd = { callback, destination, description, exittomain };
+    JumpData jd =
+        { callback, destination, description, exittomain, localAction };
     d->destinationMap[destination] = jd;
 
     BindJump(destination, keybind); 
@@ -1607,3 +1619,4 @@ QRect MythMainWindow::GetUIScreenRect(void)
     return d->uiScreenRect;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

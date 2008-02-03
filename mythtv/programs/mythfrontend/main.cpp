@@ -782,8 +782,8 @@ void InitJumpPoints(void)
 {
     REG_JUMP("Reload Theme", "", "", reloadTheme);
     REG_JUMP("Main Menu", "", "", gotoMainMenu);
-    REG_JUMP("Program Guide", "", "", startGuide);
-    REG_JUMP("Program Finder", "", "", startFinder);
+    REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
+    REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
     //REG_JUMP("Search Listings", "", "", startSearch);
     REG_JUMP("Manage Recordings / Fix Conflicts", "", "", startManaged);
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
