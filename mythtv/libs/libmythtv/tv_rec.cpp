@@ -1595,7 +1595,7 @@ bool TVRec::GetDevices(int cardid,
         "       skipbtaudio,      signal_timeout,      channel_timeout, "
         "       dvb_wait_for_seqstart, "
         ""
-        "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan"
+        "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan,"
         ""
         "       firewire_speed,   firewire_model,      firewire_connection, "
         ""
