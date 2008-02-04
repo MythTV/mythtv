@@ -2170,9 +2170,8 @@ int MPEG2fixup::Start()
                             discard = true;
                         }
                     }
-
-                    if (! discard)
-                        expectedDTS += dtsExtra;
+                        
+                    expectedDTS += dtsExtra;
                 }
                 else
                 {
