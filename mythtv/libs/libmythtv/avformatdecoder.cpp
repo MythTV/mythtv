@@ -3423,6 +3423,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         uint fill, total;
                         GetNVP()->GetAudioBufferStatus(fill, total);
+                        total /= 6; // HACK needed for some audio files
                         allowedquit =
                             (fill == 0) || (fill > (total>>1)) ||
                             ((total - fill) < (uint) data_size) ||
