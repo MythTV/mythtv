@@ -205,7 +205,7 @@ class AvFormatDecoder : public DecoderBase
     void HandleGopStart(AVPacket *pkt);
 
     bool GenerateDummyVideoFrame(void);
-    static bool HasVideo(const AVFormatContext *ic);
+    bool HasVideo(const AVFormatContext *ic);
 
   private:
     class AvFormatDecoderPrivate *d;

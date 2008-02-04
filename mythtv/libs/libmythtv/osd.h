@@ -168,6 +168,8 @@ class OSD : public QObject
 
     float GetThemeAspect(void) { return m_themeaspect; }
 
+    bool HasChanged(void) const { return changed; }
+
  private:
     bool InitDefaults(void);
     bool InitCC608(void);

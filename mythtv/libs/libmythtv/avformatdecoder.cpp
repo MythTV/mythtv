@@ -3233,6 +3233,17 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             ProcessDSMCCPacket(curstream, pkt);
 
             av_free_packet(pkt);
+
+            // Have to return regularly to ensure that the OSD is updated.
+            // This applies both to MHEG and also channel browsing.
+            if (onlyvideo < 0)
+            {
+                allowedquit |= (itv && itv->ImageHasChanged());
+                OSD *osd = NULL;
+                if (!allowedquit && GetNVP() && (osd = GetNVP()->GetOSD()))
+                    allowedquit |=  osd->HasChanged();
+            }
+
             continue;
         }
 
@@ -3705,6 +3716,10 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         // so "dvb" is the safest choice for system info type, since this
         // will ignore other uses of the same stream id in DVB countries.
         has_video |= pmt.IsVideo(i, "dvb");
+
+        // MHEG may explictly select a private stream as video
+        has_video |= ((i == selectedVideoIndex) &&
+                      (pmt.StreamType(i) == StreamID::PrivData));
     }
 
     return has_video;
