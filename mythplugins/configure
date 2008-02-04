@@ -10,7 +10,6 @@
 prefix="/usr/local"
 libdir_name="lib"
 
-appearance="yes"
 music="yes"
 video="yes"
 weather="yes"
@@ -114,8 +113,6 @@ MythZoneMinder related options:
 MythMovies related options:
   --enable-mythmovies      build the mythmovies plugin [$movies]
 
-MythAppearance related options:
-  --enable-mythappearance  build the mythappearance plugin [$appearance]
 EOF
 exit 1
 fi
@@ -255,10 +252,6 @@ for opt do
   ;;
   --disable-festival) festival="no"
   ;;
-  --enable-mythappearance) appearance="yes"
-  ;;
-  --disable-mythappearance) appearance="no"
-  ;;
   --enable-all)  music="yes"; 
                  video="yes";
                  weather="yes";
@@ -282,7 +275,6 @@ for opt do
                  createdvd="yes";
                  createarchive="yes";
                  encodevideo="yes";
-                 appearance="yes";
   ;;
   --disable-all) music="no";  
                  video="no";  
@@ -307,7 +299,6 @@ for opt do
                  createdvd="no";
                  createarchive="no";
                  encodevideo="no";
-                 appearance="no";
   esac
 done
 
@@ -708,12 +699,6 @@ else
   echo "        MythMovies     plugin will not be built"
 fi
 
-if test "$appearance" = "yes" ; then
-  echo "        MythAppearance plugin will be built"
-  echo "SUBDIRS += mythappearance" >> ./config.pro
-else
-  echo "        MythAppearance plugin will not be built"
-fi
 ###########################################################
 #                                                         #
 #   MythArchive related configuration options             #
