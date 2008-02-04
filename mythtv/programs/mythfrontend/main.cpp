@@ -823,6 +823,7 @@ void InitJumpPoints(void)
     TV::InitKeys();
 
     TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);
+    TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
 }
 
 

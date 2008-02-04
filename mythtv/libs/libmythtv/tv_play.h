@@ -43,7 +43,7 @@ typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*RUNPLAYBACKBOX)(void *);
-
+typedef void (*RUNVIEWSCHEDULED) (void *);
 
 class VBIMode
 {
@@ -75,7 +75,8 @@ enum scheduleEditTypes {
     kScheduleProgramGuide = 0,
     kScheduleProgramFinder,
     kScheduledRecording,
-    kPlaybackBox,
+    kViewSchedule,
+    kPlaybackBox
 };
 
 typedef enum
@@ -197,7 +198,9 @@ class MPUBLIC TV : public QObject
     /// true if dialog is either videoplayexit, playexit or askdelete dialog
     bool IsVideoExitDialog(void);
     /// true if NVP is near the end
-    bool IsNearEnd(void) { return isnearend; }
+    bool IsNearEnd(void) const { return isnearend; }
+    /// true if tv player is paused
+    bool IsPaused(void) const { return paused; }
 
     // Other queries
     int GetLastRecorderNum(void) const;
@@ -239,6 +242,8 @@ class MPUBLIC TV : public QObject
   protected:
     void doEditSchedule(int editType = kScheduleProgramGuide);
     static void *RecordedShowMenuHandler(void *param);
+    static void *ViewScheduledMenuHandler(void *param);
+    void VideoThemeCheck(QString str, bool stayPaused = false);
 
     void RunTV(void);
     static void *EventThread(void *param);
@@ -247,6 +252,7 @@ class MPUBLIC TV : public QObject
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
     static RUNPLAYBACKBOX RunPlaybackBoxPtr;
+    static RUNVIEWSCHEDULED RunViewScheduledPtr;
 
   private:
     bool RequestNextRecorder(bool showDialogs);

@@ -38,8 +38,7 @@ class MPUBLIC GuideGrid : public MythDialog
     static DBChanList Run(uint           startChanId,
                           const QString &startChanNum,
                           bool           thread = false,
-                          TV            *player = NULL,
-                          bool           allowsecondaryepg = true);
+                          TV            *player = NULL);
 
     DBChanList GetSelection(void) const;
 
@@ -85,7 +84,7 @@ class MPUBLIC GuideGrid : public MythDialog
   protected:
     GuideGrid(MythMainWindow *parent,
               uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool allowsecondaryepg = true,
+              TV *player = NULL, 
               const char *name = "GuideGrid");
    ~GuideGrid();
 

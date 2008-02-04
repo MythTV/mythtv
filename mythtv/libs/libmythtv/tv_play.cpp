@@ -78,6 +78,10 @@ QStringList TV::lastProgramStringList = QStringList();
  */
 RUNPLAYBACKBOX TV::RunPlaybackBoxPtr = NULL;
 
+/**\ brief function pointer for RunViewScheduled in viewscheduled.cpp
+ */
+RUNVIEWSCHEDULED TV::RunViewScheduledPtr = NULL;
+
 /*
  \brief returns true if the recording completed when exiting.
  */
@@ -262,6 +266,8 @@ void TV::SetFuncPtr(const char *string, void *lptr)
     QString name(string);
     if (name == "playbackbox")
         RunPlaybackBoxPtr = (RUNPLAYBACKBOX)lptr;
+    else if (name == "viewscheduled")
+        RunViewScheduledPtr = (RUNVIEWSCHEDULED)lptr;
 }
 
 void TV::InitKeys(void)
@@ -406,6 +412,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
+    REG_KEY("TV Playback", "VIEWSCHEDULED", "Display scheduled recording list", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
     REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "");
@@ -3153,6 +3160,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 jumpToProgram = true;
             }
         }
+        else if (action == "VIEWSCHEDULED")
+            EmbedWithNewThread(kViewSchedule);
         else if (action == "JUMPREC")
         {
             if (gContext->GetNumSetting("JumpToProgramOSD", 1) 
@@ -5680,12 +5689,48 @@ void TV::DrawUnusedRects(bool sync)
         nvp->DrawUnusedRects(sync);
 }
 
+void *TV::ViewScheduledMenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doEditSchedule(kViewSchedule);
+    return NULL;
+}
+
 void *TV::RecordedShowMenuHandler(void *param)
 {
     TV *obj = (TV *)param;
     obj->doEditSchedule(kPlaybackBox);
-
     return NULL;
+}
+
+/**
+ * \brief Used by EditSchedule(). Unpauses embedded tv based on whether theme 
+    exists and/or if knob to continued playback is enabled
+ */
+void TV::VideoThemeCheck(QString str, bool stayPaused)
+{   
+    // see if embedded window is allowed
+    bool allowembed = false;
+    if (gContext->GetNumSetting("ContinueEmbeddedTVPlay", 0) ||
+        StateIsLiveTV(GetState()))
+    {
+        allowembed = (nvp && nvp->getVideoOutput() && 
+                nvp->getVideoOutput()->AllowEmbedding());
+    }
+
+    long long margin = (long long)(nvp->GetFrameRate() *
+                        nvp->GetAudioStretchFactor());
+    margin = margin * 5;
+    QDomElement xmldata;
+    XMLParse *theme = new XMLParse();
+    if (allowembed && theme->LoadTheme(xmldata, str) && 
+        !nvp->IsNearEnd(margin) && !stayPaused)
+    {
+        DoPause(false);
+    }
+
+    if (theme)
+        delete theme;
 }
 
 void TV::doEditSchedule(int editType)
@@ -5719,113 +5764,55 @@ void TV::doEditSchedule(int editType)
     DBChanList changeChannel;
     ProgramInfo *nextProgram = NULL;
 
-    if (StateIsLiveTV(GetState()))
+    bool stayPaused = paused;
+    if (!paused)
+        DoPause(false);
+
+    switch (editType)
     {
-        switch (editType)
+        default:
+        case kScheduleProgramGuide:
+            VideoThemeCheck("programguide-video", stayPaused);
+            GuideGrid::Run(chanid, channum, false, this);
+            break;
+        case kScheduleProgramFinder:
+            RunProgramFind(false, false);
+            break;
+        case kScheduledRecording:
         {
-            default:
-            case kScheduleProgramGuide:
-            {
-                // See if we can provide a channel preview in EPG
-                bool allowsecondary = true;
-                if (nvp && nvp->getVideoOutput())
-                    allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
-
-                // Start up EPG
-                changeChannel = GuideGrid::Run(
-                    chanid, channum, false, this, allowsecondary);
-
-                break;
-            }
-            case kPlaybackBox:
-            {
-                bool stayPaused = false;
-                QDomElement pbbxmldata;
-                XMLParse    *theme = new XMLParse();
-                if (!theme->LoadTheme(pbbxmldata, "playback-video"))
-                {
-                    stayPaused = paused;
-                    if (!paused)
-                        DoPause(false);
-                }
-                if (theme)
-                    delete theme;
-                nextProgram = RunPlaybackBoxPtr((void *)this);
-                if (nextProgram)
-                {
-                    setLastProgram(nextProgram);
-                    jumpToProgram = true;
-                    exitPlayer = true;
-                    delete nextProgram;
-                }
-                if (paused && !stayPaused)
-                    DoPause(false);
-                break;
-            }
+            QMutexLocker locker(&pbinfoLock);
+            ScheduledRecording *record = new ScheduledRecording();
+            record->loadByProgram(playbackinfo);
+            record->exec();
+            record->deleteLater();
+            break;
         }
-        if (IsEmbedding())
-            StopEmbeddingOutput();
-    }
-    else
-    {
-        bool stayPaused = paused;
-        if (!paused)
-            DoPause();
-
-        switch (editType)
+        case kViewSchedule:
         {
-            default:
-            case kScheduleProgramGuide:
-                GuideGrid::Run(chanid, channum, false);
-                break;
-            case kScheduleProgramFinder:
-                RunProgramFind(false, false);
-                break;
-            case kScheduledRecording:
-            {
-                QMutexLocker locker(&pbinfoLock);
-                ScheduledRecording *record = new ScheduledRecording();
-                record->loadByProgram(playbackinfo);
-                record->exec();
-                record->deleteLater();
-                break;
-            }
-            case kPlaybackBox:
-            {
-                long long margin = 
-                    (long long)(nvp->GetFrameRate() * nvp->GetAudioStretchFactor());
-                // keep video paused if only 5 seconds left in recording
-                margin = margin * 5; 
-                QDomElement pbbxmldata;
-                XMLParse *theme = new XMLParse();
-                if (theme->LoadTheme(pbbxmldata, "playback-video"))
-                {
-                    if (!stayPaused && paused && !nvp->IsNearEnd(margin))
-                    {
-                        DoPause(false);
-                        stayPaused = true;
-                    }
-                }
-                if (theme)
-                    delete theme;
-                nextProgram = RunPlaybackBoxPtr((void *)this);
-                if (IsEmbedding())
-                    StopEmbeddingOutput();
-                if (nextProgram)
-                {
-                    setLastProgram(nextProgram);
-                    jumpToProgram = true;
-                    exitPlayer = true;
-                    delete nextProgram;
-                }
-                break;
-            }
+            VideoThemeCheck("conflict-video", stayPaused);
+            RunViewScheduledPtr((void *)this);
+            break;
         }
-
-        if (!stayPaused)
-            DoPause();
+        case kPlaybackBox:
+        {
+            VideoThemeCheck("playback-video", stayPaused);
+            nextProgram = RunPlaybackBoxPtr((void *)this);
+        }
     }
 
+    if (!stayPaused && paused)
+        DoPause(false);
+
+    if (IsEmbedding())
+        StopEmbeddingOutput();
+
+    if (nextProgram)
+    {
+        setLastProgram(nextProgram);
+        jumpToProgram = true;
+        exitPlayer = true;
+        delete nextProgram;
+    }
     // Resize the window back to the MythTV Player size
     if (!using_gui_size_for_tv)
     {
@@ -5850,8 +5837,6 @@ void TV::doEditSchedule(int editType)
  */
 void TV::EmbedWithNewThread(int editType)
 {
-    (void) editType;
-
     if (menurunning != true)
     {
         menurunning = true;
@@ -5860,7 +5845,16 @@ void TV::EmbedWithNewThread(int editType)
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-        pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
+        switch (editType)
+        {
+            case kViewSchedule:
+                pthread_create(&tid, &attr, TV::ViewScheduledMenuHandler, this);
+                break;
+            case kPlaybackBox:
+                pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
+                break;
+        }
+
         pthread_attr_destroy(&attr);
 
         return;
@@ -7233,6 +7227,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             jumpToProgram = true;
         }
     }
+    else if (action == "VIEWSCHEDULED")
+        EmbedWithNewThread(kViewSchedule);
     else if (action == "JUMPREC")
     {
         if (gContext->GetNumSetting("JumpToProgramOSD", 1)
@@ -7675,6 +7671,8 @@ void TV::FillMenuPlaying(OSDGenericTree *treeMenu)
 
     item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
     subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
+    subitem = new OSDGenericTree(item, tr("Upcoming Recordings"), 
+                                "VIEWSCHEDULED");
     subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
     subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
                                  "SCHEDULE");

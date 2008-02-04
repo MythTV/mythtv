@@ -348,7 +348,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // theme stuff
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && theme->LoadTheme(xmldata,"playback-video"))
+    if (m_player && !m_player->IsPaused() &&
+        theme->LoadTheme(xmldata,"playback-video"))
     {
         playbackVideoContainer = true;
         previewPixmapEnabled = false;

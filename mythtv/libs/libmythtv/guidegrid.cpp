@@ -40,8 +40,7 @@ DBChanList GuideGrid::Run(
     uint           chanid,
     const QString &channum,
     bool           thread,
-    TV            *player,
-    bool           allowsecondaryepg)
+    TV            *player)
 {
     DBChanList channel_changed;
 
@@ -52,7 +51,7 @@ DBChanList GuideGrid::Run(
 
     GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(),
                                   chanid, channum,
-                                  player, allowsecondaryepg, "guidegrid");
+                                  player, "guidegrid");
 
     gg->Show();
 
@@ -91,8 +90,7 @@ DBChanList GuideGrid::Run(
 
 GuideGrid::GuideGrid(MythMainWindow *parent,
                      uint chanid, QString channum,
-                     TV *player, bool allowsecondaryepg,
-                     const char *name)
+                     TV *player, const char *name)
          : MythDialog(parent, name)
 {
     desiredDisplayChans = DISPLAY_CHANS = 6;
@@ -123,14 +121,14 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && m_player->IsRunning() && allowsecondaryepg)
+    if (m_player && m_player->IsRunning() && !m_player->IsPaused())
         theme->LoadTheme(xmldata, "programguide-video");
     else 
         theme->LoadTheme(xmldata, "programguide");
 
     LoadWindow(xmldata);
 
-    if (m_player && m_player->IsRunning() && !allowsecondaryepg)
+    if (m_player && m_player->IsRunning() && m_player->IsPaused())
         videoRect = QRect(0, 0, 1, 1);
 
     showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
@@ -202,7 +200,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
 
     int dNum = gContext->GetNumSetting("chanPerPage", 8);
 
-    if (m_player && m_player->IsRunning() && allowsecondaryepg)
+    if (m_player && m_player->IsRunning() && !m_player->IsPaused())
         dNum = dNum * 2 / 3 + 1;
 
     desiredDisplayChans = DISPLAY_CHANS = dNum;

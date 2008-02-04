@@ -18,14 +18,31 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "proglist.h"
-#include "tv.h"
+#include "tv_play.h"
 
 #include "exitcodes.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
+QWaitCondition vsbIsVisibleCond;
+
+void *ViewScheduled::RunViewScheduled(void *player)
+{
+    qApp->lock();
+
+    ViewScheduled *vsb = new ViewScheduled(gContext->GetMainWindow(),
+                            "view scheduled", (TV*)player);
+    vsb->Show();
+    qApp->unlock();
+    vsbIsVisibleCond.wait();
+    delete vsb;
+
+    return NULL;
+}
+
+ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
+                            TV* player)
              : MythDialog(parent, name)
 {
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -40,11 +57,26 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
     showLevelRect = QRect(0, 0, 0, 0);
     recStatusRect = QRect(0, 0, 0, 0);
 
+    m_player = player;
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    theme->LoadTheme(xmldata, "conflict");
+    if (m_player && m_player->IsRunning() && !m_player->IsPaused())
+    {
+        if (!theme->LoadTheme(xmldata, "conflict-video"))
+            theme->LoadTheme(xmldata, "conflict");
+    }
+    else
+        theme->LoadTheme(xmldata, "conflict");
     LoadWindow(xmldata);
+
+    if (m_player)
+    {
+        timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
+        timer->start(500);
+        EmbedTVWindow();
+    }
 
     LayerSet *container = theme->GetSet("selector");
     if (container)
@@ -84,7 +116,20 @@ ViewScheduled::~ViewScheduled()
     gContext->SaveSetting("ViewSchedShowLevel", !showAll);
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
+
+    if (timer)
+    {
+        timer->deleteLater();
+        timer = NULL;
+    }
+
     delete theme;
+}
+
+void ViewScheduled::timeout(void)
+{
+    if (m_player)
+        EmbedTVWindow();
 }
 
 void ViewScheduled::keyPressEvent(QKeyEvent *e)
@@ -116,7 +161,10 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
             else if (action == "DETAILS")
                 details();
             else if (action == "ESCAPE" || action == "LEFT")
+            {
+                vsbIsVisibleCond.wakeAll();
                 done(MythDialog::Accepted);
+            }
             else if (action == "UP")
                 cursorUp();
             else if (action == "DOWN")
@@ -196,6 +244,8 @@ void ViewScheduled::parseContainer(QDomElement &element)
         showLevelRect = area;
     if (name.lower() == "status_info")
         recStatusRect = area;
+    if (name.lower() == "tv_video")
+        tvRect = area;
 }
 
 void ViewScheduled::updateBackground(void)
@@ -736,3 +786,13 @@ void ViewScheduled::viewInputs()
     }
     curinput = 0;
 }
+
+void ViewScheduled::EmbedTVWindow(void)
+{
+    if (m_player)
+    {
+        m_player->EmbedOutput(this->winId(), tvRect.x(), tvRect.y(),
+                            tvRect.width(), tvRect.height());
+    }
+}
+        

@@ -614,6 +614,9 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     (void)wid;
 
+    if (!allowpreviewepg)
+        return;
+
     bool save_visible_rect = !embedding;
 
     embedding = true;

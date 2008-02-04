@@ -1907,6 +1907,19 @@ static HostCheckBox *JumpToProgramOSD()
     return gc;
 }
 
+static HostCheckBox *ContinueEmbeddedTVPlay()
+{
+    HostCheckBox *gc = new HostCheckBox("ContinueEmbeddedTVPlay");
+    gc->setLabel(QObject::tr("Continue Playback When Embedded"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr(
+                    "This option, continues TV playback, when the TV window "
+                    "is embedded in the upcoming program list or recorded "
+                    "list. The default is to pause the recorded show when "
+                    "embedded"));
+    return gc;
+}
+
 static HostCheckBox *AutomaticSetWatched()
 {
     HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
@@ -4410,6 +4423,7 @@ PlaybackSettings::PlaybackSettings()
     column2->addChild(ClearSavedPosition());
     column2->addChild(AltClearSavedPosition());
     column2->addChild(JumpToProgramOSD());
+    column2->addChild(ContinueEmbeddedTVPlay());
     column2->addChild(AutomaticSetWatched());
     columns->addChild(column2);
 

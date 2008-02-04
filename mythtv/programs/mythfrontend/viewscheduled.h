@@ -9,13 +9,17 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 
+class TV;
+class Timer;
 
 class ViewScheduled : public MythDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythMainWindow *parent, const char *name = 0);
+    ViewScheduled(MythMainWindow *parent, const char *name = 0,
+                    TV *player = NULL);
     ~ViewScheduled();
+    static void * RunViewScheduled(void *player);
 
   protected slots:
     void edit();
@@ -28,6 +32,7 @@ class ViewScheduled : public MythDialog
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
+    void timeout(void);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -49,6 +54,7 @@ class ViewScheduled : public MythDialog
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
+    void EmbedTVWindow(void);
     XMLParse *theme;
     QDomElement xmldata;
 
@@ -66,6 +72,7 @@ class ViewScheduled : public MythDialog
     QRect showLevelRect;
     QRect recStatusRect;
     QRect fullRect;
+    QRect tvRect;
 
     int listsize;
 
@@ -85,6 +92,9 @@ class ViewScheduled : public MythDialog
     QMap<int, int> inputref;
     int maxinput;
     int curinput;
+
+    TV *m_player;
+    QTimer *timer;
 };
 
 #endif
