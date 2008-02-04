@@ -39,6 +39,12 @@
    </button>
 
    <button>
+       <type>SCREENSETUPWIZARD</type>
+       <text>Screen Setup Wizards</text>
+       <action>SCREENSETUPWIZARD</action>
+   </button>
+   
+   <button>
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
      <text lang="IT">Impostazioni TV</text>
@@ -340,10 +346,4 @@
        <depends>mythzoneminder</depends>
    </button>
 
-   <button>
-       <type>MYTHAPPEARANCE</type>
-       <text>Screen Setup Wizard</text>
-       <action>PLUGIN mythappearance</action>
-       <depends>mythappearance</depends>
-   </button>
 </mythmenu>

@@ -78,12 +78,6 @@
    </button>
       
    <button>
-       <type>MYTHAPPEARANCE</type>
-       <text>Screen Setup Wizards</text>
-       <action>PLUGIN mythappearance</action>
-       <depends>mythappearance</depends>
-   </button>
-   <button>
       <type>SETUP_MENU</type>
       <text>Setup</text>
       <text lang="IT">Impostazioni</text>

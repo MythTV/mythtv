@@ -38,8 +38,14 @@
       <text lang="PL">Ustaw wyglądy</text>
       <text lang="RU">Внешний вид</text>
       <action>SETTINGS APPEARANCE</action>
-   </button>
+    </button>
 
+    <button>
+      <type>SCREENSETUPWIZARD</type>
+      <text>Screen Setup Wizards</text>
+      <action>SCREENSETUPWIZARD</action>
+    </button>
+    
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
@@ -374,11 +380,4 @@
        <depends>mythzoneminder</depends>
    </button>
    
-   <button>
-       <type>MYTHAPPEARANCE</type>
-       <text>Screen Setup Wizard</text>
-       <action>PLUGIN mythappearance</action>
-       <depends>mythappearance</depends>
-   </button>
-
 </mythmenu>
