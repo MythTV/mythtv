@@ -5,12 +5,12 @@
 #include <qstring.h>
 #include <qptrlist.h>
 
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuiimage.h>
-//#include <mythtv/libmythui/mythgesture.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include mythscreentype.h>
+#include mythuitext.h>
+#include mythuibutton.h>
+#include mythuiimage.h>
+//#include mythgesture.h>
+#include mythdialogbox.h>
 
 class XMLParse;
 class MythAppearance : public MythScreenType
