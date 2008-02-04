@@ -71,7 +71,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
             QString action = actions[i];
             handled = true;
 
-            if (action == "ESCAPE" || action == "LEFT")
+            if (action == "ESCAPE" || action == "LEFT" || action == "MENU")
             {
                 SendEvent(-1);
                 m_ScreenStack->PopScreen();

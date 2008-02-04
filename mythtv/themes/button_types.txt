@@ -148,3 +148,4 @@ util_menu.xml
       2. VIDEO_MANAGER
       3. SETUP_KEYS
       4. SETUP_MENU
+      5. SCREENSETUPWIZARD // new appearance settings helper

@@ -51,9 +51,12 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 
-#include "libmythui/myththemedmenu.h"
-#include "libmythui/myththemebase.h"
+#include "myththemedmenu.h"
+#include "myththemebase.h"
 #include "mediarenderer.h"
+#include "mythscreenstack.h"
+#include "mythmainwindow.h"
+#include "mythappearance.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -62,10 +65,22 @@ using namespace std;
 
 static MythThemedMenu *menu;
 static MythThemeBase *themeBase;
+
 XBox *xbox = NULL;
 QString logfile = "";
 
 MediaRenderer   *g_pUPnp       = NULL;
+
+void startAppearWiz(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythAppearance *mythappearance = new MythAppearance(mainStack, "mythappearance");
+
+    if (mythappearance->Create())
+        mainStack->AddScreen(mythappearance);
+}
+
 
 void startGuide(void)
 {
@@ -368,6 +383,12 @@ void TVMenuCallback(void *data, QString &selection)
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     } 
+
+    else if (sel == "screensetupwizard")
+    {
+       startAppearWiz();
+    }
+
     else if (sel == "settings recording") 
     {
         ProfileGroupEditor editor;
@@ -1460,6 +1481,6 @@ int main(int argc, char **argv)
     delete g_pUPnp;
 
     return FRONTEND_EXIT_OK;
-}
 
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

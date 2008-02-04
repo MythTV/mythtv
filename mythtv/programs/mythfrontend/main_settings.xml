@@ -51,6 +51,11 @@
       <text lang="HE">מראה</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
+   <button>
+       <type>SCREENSETUPWIZARD</type>
+       <text>Screen Setup Wizards</text>
+       <action>SCREENSETUPWIZARD</action>
+   </button>
 
    <button>
      <type>SETTINGS_TV</type>
