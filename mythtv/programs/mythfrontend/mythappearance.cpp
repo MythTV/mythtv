@@ -12,9 +12,9 @@
 #include <qstring.h>
 
 /* MythTV includes */
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/myththemebase.h>
+#include "mythcontext.h"
+#include "mythmainwindow.h"
+#include "myththemebase.h"
 
 using namespace std;
 
