@@ -1780,7 +1780,7 @@ void GuideGrid::scrollRight()
 
 void GuideGrid::setStartChannel(int newStartChannel)
 {
-    if (newStartChannel <= 0)
+    if (newStartChannel < 0)
         m_currentStartChannel = newStartChannel + GetChannelCount();
     else if (newStartChannel >= (int) GetChannelCount())
         m_currentStartChannel = newStartChannel - GetChannelCount();
