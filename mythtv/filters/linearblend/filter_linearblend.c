@@ -10,6 +10,9 @@
 #include "config.h"
 #include "dsputil.h"
 #include "../mm_arch.h"
+#ifdef HAVE_ALTIVEC_H
+    #include <altivec.h>
+#endif
 
 #define PAVGB(a,b)   "pavgb " #a ", " #b " \n\t"
 #define PAVGUSB(a,b) "pavgusb " #a ", " #b " \n\t"
