@@ -5779,7 +5779,7 @@ void TV::doEditSchedule(int editType)
                 GuideGrid::Run(chanid, channum, false);
                 break;
             case kScheduleProgramFinder:
-                RunProgramFind(true, false);
+                RunProgramFind(false, false);
                 break;
             case kScheduledRecording:
             {
