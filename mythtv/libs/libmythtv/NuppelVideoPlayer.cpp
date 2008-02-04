@@ -709,6 +709,9 @@ void NuppelVideoPlayer::ReinitVideo(void)
     }
 
     InitFilters();
+
+    if (ringBuffer->isDVD())
+        ringBuffer->DVD()->SeekCellStart();
 }
 
 QString NuppelVideoPlayer::ReinitAudio(void)
