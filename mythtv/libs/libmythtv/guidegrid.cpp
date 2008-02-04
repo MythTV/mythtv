@@ -1417,7 +1417,7 @@ bool GuideGrid::paintChannels(QPainter *p)
                 if (!chinfo->iconLoaded)
                     chinfo->LoadChannelIcon(iconsize);
                 if (chinfo->iconLoaded)
-                    type->SetIcon(y, chinfo->icon);
+                    type->SetIcon(y, chinfo->iconPixmap);
                 else
                 {
                     chinfo->icon = QString::null;
