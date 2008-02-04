@@ -50,7 +50,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     bool ok;
 
     if (!setchan)
-        ok = IsTunable(inputname, startchannel);
+        ok = inputname.isEmpty() ? false : IsTunable(inputname, startchannel);
     else if (inputname.isEmpty())
         ok = SetChannelByString(startchannel);
     else
@@ -70,14 +70,47 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
         find(inputs.begin(), inputs.end(), inputname);
     start = (start == inputs.end()) ?  inputs.begin() : start;
 
+    if (start != inputs.end())
+    {
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("Looking for startchannel '%1' on input '%2'")
+                .arg(startchannel).arg(*start));
+    }
+
+    // Attempt to find an input for the requested startchannel
     QStringList::const_iterator it = start;
+    while (it != inputs.end())
+    {
+        DBChanList channels = GetChannels(*it);
+
+        DBChanList::const_iterator cit = channels.begin();
+        for (; cit != channels.end(); cit++)
+        {
+            if ((*cit).channum == startchannel &&
+                IsTunable(*it, startchannel))
+            {
+                inputname = *it;
+                VERBOSE(VB_CHANNEL, LOC +
+                        QString("Found startchannel '%1' on input '%2'")
+                        .arg(startchannel).arg(inputname));
+                return true;
+            }
+        }
+
+        it++;
+        it = (it == inputs.end()) ? inputs.begin() : it;
+        if (it == start)
+            break;
+    }
+
+    it = start;
     while (it != inputs.end() && !ok)
     {
         uint mplexid_restriction = 0;
 
         DBChanList channels = GetChannels(*it);
-        if (IsInputAvailable(GetInputByName(*it), mplexid_restriction) &&
-            channels.size())
+        if (channels.size() &&
+            IsInputAvailable(GetInputByName(*it), mplexid_restriction))
         {
             uint chanid = ChannelUtil::GetNextChannel(
                 channels, channels[0].chanid,
@@ -89,14 +122,18 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             if (chanid && cit != channels.end())
             {
                 if (!setchan)
-                    ok = IsTunable(inputname, startchannel);
+                {
+                    ok = IsTunable(*it, (mplexid_restriction) ?
+                                   (*cit).channum : startchannel);
+                }
                 else
                     ok = SwitchToInput(*it, (*cit).channum);
 
                 if (ok)
                 {
-                    inputname    = *it;
-                    startchannel = QDeepCopy<QString>((*cit).channum);
+                    inputname = *it;
+                    if (mplexid_restriction)
+                        startchannel = QDeepCopy<QString>((*cit).channum);
                     msg2 = QString("selected to '%1' on input '%2' instead.")
                         .arg(startchannel).arg(inputname);
                     msg_error = false;
