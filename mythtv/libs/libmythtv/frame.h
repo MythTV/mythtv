@@ -166,6 +166,33 @@ static inline bool compatible(const VideoFrame *a, const VideoFrame *b)
         (a->pitches[2] == b->pitches[2]);
 }
 
+static inline void copy(VideoFrame *dst, const VideoFrame *src)
+{
+    VideoFrameType codec = dst->codec;
+    if (dst->codec != src->codec)
+        return;
+
+    if (FMT_YV12 == codec)
+    {
+        int height0 = (dst->height < src->height) ? dst->height : src->height;
+        int height1 = height0 >> 1;
+        int height2 = height0 >> 1;
+        int pitch0  = ((dst->pitches[0] < src->pitches[0]) ?
+                       dst->pitches[0] : src->pitches[0]);
+        int pitch1  = ((dst->pitches[1] < src->pitches[1]) ?
+                       dst->pitches[1] : src->pitches[1]);
+        int pitch2  = ((dst->pitches[2] < src->pitches[2]) ?
+                       dst->pitches[2] : src->pitches[2]);
+
+        memcpy(dst->buf + dst->offsets[0],
+               src->buf + src->offsets[0], pitch0 * height0);
+        memcpy(dst->buf + dst->offsets[1],
+               src->buf + src->offsets[1], pitch1 * height1);
+        memcpy(dst->buf + dst->offsets[2],
+               src->buf + src->offsets[2], pitch2 * height2);
+    }
+}
+
 #endif /* __cplusplus */
 
 #endif

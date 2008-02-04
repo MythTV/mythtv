@@ -3719,7 +3719,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         has_video |= pmt.IsVideo(i, "dvb");
 
         // MHEG may explictly select a private stream as video
-        has_video |= ((i == selectedVideoIndex) &&
+        has_video |= ((i == (uint)selectedVideoIndex) &&
                       (pmt.StreamType(i) == StreamID::PrivData));
     }
 
@@ -3759,7 +3759,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
         dummy_frame->repeat_pict      = 0; // not a repeated picture
     }
 
-    memcpy(frame->buf, dummy_frame->buf, dummy_frame->size);
+    copy(frame, dummy_frame);
 
     frame->frameNumber = framesPlayed;
 
