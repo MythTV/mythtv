@@ -1703,6 +1703,7 @@ void GuideGrid::cursorDown()
         else
         {
             fillProgramRowInfos(m_currentRow);
+            repaint(channelRect, false);
             repaint(programRect, false);
             repaint(infoRect, false);
         }
@@ -1725,6 +1726,7 @@ void GuideGrid::cursorUp()
         else
         {
             fillProgramRowInfos(m_currentRow);
+            repaint(channelRect, false);
             repaint(programRect, false);
             repaint(infoRect, false);
         }
@@ -1794,9 +1796,9 @@ void GuideGrid::scrollDown()
 
     fillProgramInfos();
 
+    repaint(channelRect, false);
     repaint(programRect, false);
     repaint(infoRect, false);
-    repaint(channelRect, false);
 }
 
 void GuideGrid::scrollUp()
@@ -1805,9 +1807,9 @@ void GuideGrid::scrollUp()
 
     fillProgramInfos();
 
+    repaint(channelRect, false);
     repaint(programRect, false);
     repaint(infoRect, false);
-    repaint(channelRect, false);
 }
 
 void GuideGrid::dayLeft()
