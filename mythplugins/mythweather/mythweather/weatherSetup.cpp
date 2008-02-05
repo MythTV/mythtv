@@ -510,7 +510,16 @@ void ScreenSetup::loadData()
             si = new ScreenListInfo;
             si->units = units;
             si->types.setAutoDelete(true);
-            si->types.insert(dataitem, ti);
+
+            // Only insert types meant for this container
+            for (QStringList::Iterator type_i = types.begin(); type_i != types.end(); ++type_i )
+            {
+                if(*type_i == dataitem)
+                {
+                    si->types.insert(dataitem, ti);
+                }
+            }
+
             si->hasUnits = !(bool) set->GetType("nounits");
             si->multiLoc = (bool) set->GetType("multilocation");
             itm->setData(si);
@@ -519,7 +528,13 @@ void ScreenSetup::loadData()
         else
         {
             si = active_screens[draworder];
-            si->types.insert(dataitem, ti);
+            for (QStringList::Iterator type_i = types.begin(); type_i != types.end(); ++type_i )
+            {
+                if(*type_i == dataitem)
+                {
+                    si->types.insert(dataitem, ti);
+                }
+            }
         }
     }
 }
