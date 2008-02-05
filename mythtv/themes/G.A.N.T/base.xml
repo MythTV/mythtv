@@ -12,6 +12,30 @@
       <alphapulse min="0" max="255" change="1"/>
     </imagetype>
 
+    <font name="small" face="Arial">
+      <color>#FFFFFF</color>
+      <size>14</size>
+      <size:small>12</size:small>
+      <size:big>16</size:big>
+      <bold>yes</bold>
+    </font>
+
+    <font name="medium" face="Arial">
+      <color>#FFFFFF</color>
+      <size>16</size>
+      <size:small>14</size:small>
+      <size:big>20</size:big>
+      <bold>yes</bold>
+    </font>
+
+    <font name="large" face="Arial">
+      <color>#FFFFFF</color>
+      <size>20</size>
+      <size:small>18</size:small>
+      <size:big>22</size:big>
+      <bold>yes</bold>
+    </font>
+
     <font name="clock" face="Arial">
        <color>#FFFFFF</color>
        <size>16</size>
