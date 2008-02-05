@@ -247,7 +247,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
     resetTimer();
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions, false);
+    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions, true);
 
     int scrollAmt = 1;
 
@@ -375,7 +375,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 showEditMetadataDialog();
         else if (action == "ESCAPE" && visualizer_status != 2)
         {
-            if (!gPlayer->isPlaying())
+            if (!gPlayer->isPlaying() || m_parent->IsExitingToMain())
             {
                 gPlayer->savePosition();
                 stopAll();
