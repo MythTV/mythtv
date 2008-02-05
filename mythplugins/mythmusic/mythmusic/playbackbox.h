@@ -78,6 +78,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void toggleFullBlankVisualizer();
     void end();
     void resetScrollCount();
+    void showAlbumArtImage(Metadata *mdata);
+    void wipeAlbumArt();
 
     void handlePush(QString buttonname);
 
@@ -204,6 +206,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     UIPushButtonType      *next_button;
 
     UIPushButtonType      *m_pushedButton;
+
+    UIImageType           *albumart_image;
 
     UITextButtonType      *shuffle_button;
     UITextButtonType      *repeat_button;

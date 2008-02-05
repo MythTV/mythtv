@@ -307,6 +307,13 @@
                 <area>125,10,142,144</area>
             </blackhole>
 
+            <!-- this is an optional image that shows the current tracks album art
+            <image name="albumart" draworder="2" fleximage="no">
+                <position>125,10</position>
+                <staticsize>142,144</staticsize>
+            </image>
+            -->
+
             <statusbar name="progress_bar" draworder="2" whitespace="5">
                 <container fleximage="no">mm_progress-bg.png</container>
                 <fill>mm_progress-fg.png</fill>

@@ -2029,6 +2029,9 @@ void PlaybackBoxMusic::wipeTrackInfo()
             ratings_image->setRepeat(0);
         if (current_visualization_text)
             current_visualization_text->SetText("");
+
+        if (albumart_image)
+            wipeAlbumArt();
 }
 
 void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
@@ -2039,6 +2042,8 @@ void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
         artist_text->SetText(mdata->FormatArtist());
     if (album_text)
         album_text->SetText(mdata->Album());
+    if (albumart_image)
+        showAlbumArtImage(mdata);
 
     if (showrating)
     {
@@ -2047,6 +2052,36 @@ void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
     }
 
     setTrackOnLCD(mdata);
+}
+
+void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
+{
+    if (!albumart_image || !mdata)
+       return;
+
+    QSize img_size = albumart_image->GetSize(true);
+
+    QImage albumArt = mdata->getAlbumArt();
+
+    if (!albumArt.isNull())
+    {
+       // draw the albumArt image
+       albumArt = albumArt.smoothScale(img_size.width(), img_size.height(), QImage::ScaleMin);
+       QPixmap img(albumArt);
+       albumart_image->SetImage(img);
+       albumart_image->refresh();
+    }
+    else
+    {
+      albumart_image->SetImage("mm_nothumb.png");
+      albumart_image->LoadImage();
+    }
+}
+
+void PlaybackBoxMusic::wipeAlbumArt()
+{
+    if (albumart_image)
+       albumart_image->ResetImage();
 }
 
 void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes)
@@ -2216,7 +2251,10 @@ void PlaybackBoxMusic::wireUpTheme()
         speed_status->SetText("");
         speed_status->SetOrder(-1);
     }
+
     visual_blackhole = getUIBlackHoleType("visual_blackhole");
+
+    albumart_image = getUIImageType("albumart");
 
     //  Buttons
     prev_button = getUIPushButtonType("prev_button");
