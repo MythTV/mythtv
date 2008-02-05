@@ -1587,7 +1587,7 @@ static VerticalConfigurationGroup *OSDCC708Settings(void)
 {
     VerticalConfigurationGroup *grp =
         new VerticalConfigurationGroup(false, true, true, true);
-    grp->setLabel(QObject::tr("ATSC caption settings"));
+    grp->setLabel(QObject::tr("ATSC Caption Settings"));
 
 // default text zoom 1.0
     grp->addChild(OSDCC708TextZoomPercentage());
@@ -1604,7 +1604,9 @@ static VerticalConfigurationGroup *OSDCC708Settings(void)
     return grp;
 }
 
-static HostComboBox *OSDCC708Font(QString subtype, QString subtypeName)
+static HostComboBox *OSDCC708Font(
+    const QString &subtype, const QString &subtypeName,
+    const QString &subtypeNameForHelp)
 {
     HostComboBox *gc = new HostComboBox(
         QString("OSDCC708%1Font").arg(subtype));
@@ -1612,7 +1614,8 @@ static HostComboBox *OSDCC708Font(QString subtype, QString subtypeName)
     gc->setLabel(subtypeName);
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
-    gc->setHelpText(QObject::tr("ATSC closed caption font"));
+    gc->setHelpText(
+        QObject::tr("ATSC %1 closed caption font.").arg(subtypeNameForHelp));
 
     return gc;
 }
@@ -1621,7 +1624,7 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
 {
     HorizontalConfigurationGroup *grpmain =
         new HorizontalConfigurationGroup(false, true, true, true);
-    grpmain->setLabel(QObject::tr("ATSC caption fonts"));
+    grpmain->setLabel(QObject::tr("ATSC Caption Fonts"));
     VerticalConfigurationGroup *col[] =
     {
         new VerticalConfigurationGroup(false, false, true, true),
@@ -1634,27 +1637,41 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
     };
     QString typeNames[] =
     {
-        QObject::tr("Monospaced serif"),
-        QObject::tr("Proportional serif"),
-        QObject::tr("Monospaced sans serif"),
-        QObject::tr("Proportional sans serif"),
+        QObject::tr("Monospaced Serif"),
+        QObject::tr("Proportional Serif"),
+        QObject::tr("Monospaced Sans Serif"),
+        QObject::tr("Proportional Sans Serif"),
         QObject::tr("Casual"),
         QObject::tr("Cursive"),
         QObject::tr("Capitals"),
     };
     QString subtypes[] = { "%1", "%1Italic", };
 
+    TransLabelSetting *col0 = new TransLabelSetting();
+    col0->setValue(QObject::tr("Regular Font"));
+
+    TransLabelSetting *col1 = new TransLabelSetting();
+    col1->setValue(QObject::tr("Italic Font"));
+
+    col[0]->addChild(col0);
+    col[1]->addChild(col1);
+
     uint i = 0;
     for (uint j = 0; j < 7; j++)
     {
         col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
-                                      typeNames[j]));
+                                      typeNames[j], typeNames[j]));
     }
     grpmain->addChild(col[i]);
 
     i = 1;
     for (uint j = 0; j < 7; j++)
-        col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]), "(italic)"));
+    {
+        col[i]->addChild(OSDCC708Font(
+                             subtypes[i].arg(types[j]), "",
+                             QObject::tr("Italic") + " " + typeNames[j]));
+    }
+
     grpmain->addChild(col[i]);
 
     return grpmain;
@@ -1765,6 +1782,22 @@ static HostCheckBox *DefaultCCMode()
                         "when playing back recordings or watching "
                         "live TV.  Closed Captioning can be turned on or off "
                         "by pressing \"T\" during playback."));
+    return gc;
+}
+
+static HostCheckBox *PreferCC708()
+{
+    HostCheckBox *gc = new HostCheckBox("Prefer708Captions");
+    gc->setLabel(QObject::tr("Prefer EIA-708 over EIA-608 captions"));
+    gc->setValue(true);
+    gc->setHelpText(
+        QObject::tr(
+            "When enabled the new EIA-708 captions will be preferred over "
+            "the old EIA-608 captions in ATSC streams.") + " " +
+        QObject::tr(
+            "This is the default, but as of early 2008 most stations are "
+            "not broadcasting usable EIA-708 captions."));
+
     return gc;
 }
 
@@ -4552,31 +4585,29 @@ OSDSettings::OSDSettings()
 {
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen display"));
+
     osd->addChild(new ThemeSelector("OSDTheme"));
-
-    HorizontalConfigurationGroup* osdhg =
-        new HorizontalConfigurationGroup(false, false);
-    VerticalConfigurationGroup* osdvg1 =
-        new VerticalConfigurationGroup(false, false);
-    osdvg1->addChild(OSDGeneralTimeout());
-    osdvg1->addChild(OSDProgramInfoTimeout());
-    osdvg1->addChild(OSDNotifyTimeout());
-    osdvg1->addChild(UDPNotifyPort());
-    osdhg->addChild(osdvg1);
-
-    VerticalConfigurationGroup* osdvg2 =
-        new VerticalConfigurationGroup(false, false);
-    osdvg2->addChild(OSDFont());
-    osdvg2->addChild(OSDCCFont());
-    osdvg2->addChild(OSDThemeFontSizeType());
-    osdvg2->addChild(EnableMHEG());
-    osdhg->addChild(osdvg2);
-    osd->addChild(osdhg);
-
-    osd->addChild(CCBackground());
-    osd->addChild(DefaultCCMode());
+    osd->addChild(OSDGeneralTimeout());
+    osd->addChild(OSDProgramInfoTimeout());
+    osd->addChild(OSDFont());
+    osd->addChild(OSDThemeFontSizeType());
+    osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     addChild(osd);
+
+    VerticalConfigurationGroup *udp = new VerticalConfigurationGroup(false);
+    udp->setLabel(QObject::tr("UDP OSD Notifications"));
+    udp->addChild(OSDNotifyTimeout());
+    udp->addChild(UDPNotifyPort());
+    addChild(udp);
+
+    VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
+    cc->setLabel(QObject::tr("Analog Closed Captions"));
+    cc->addChild(OSDCCFont());
+    cc->addChild(CCBackground());
+    cc->addChild(DefaultCCMode());
+    cc->addChild(PreferCC708());
+    addChild(cc);
 
     addChild(OSDCC708Settings());
     addChild(OSDCC708Fonts());

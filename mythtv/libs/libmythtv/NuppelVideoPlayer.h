@@ -617,6 +617,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     int        prebuffer_tries; ///< Number of times prebuf wait attempted
 
     // General Caption/Teletext/Subtitle support
+    bool     db_prefer708;
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
 

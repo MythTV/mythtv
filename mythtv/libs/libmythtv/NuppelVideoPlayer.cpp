@@ -182,6 +182,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       prebuffering(false), prebuffer_tries(0),
 
       // General Caption/Teletext/Subtitle support
+      db_prefer708(true),
       textDisplayMode(kDisplayNone),
       prevTextDisplayMode(kDisplayNone),
       // Support for analog captions and teletext
@@ -270,6 +271,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
     decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled       = gContext->GetNumSetting("EnableMHEG", 0);
+    db_prefer708     = gContext->GetNumSetting("Prefer708Captions", 1);
 
     lastIgnoredManualSkip = QDateTime::currentDateTime().addSecs(-10);
 
@@ -1811,7 +1813,7 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         EnableCaptions(kDisplayAVSubtitle, osd_msg);
     else if (textSubtitles.GetSubtitleCount() > 0)
         EnableCaptions(kDisplayTextSubtitle, osd_msg);
-    else if (decoder->GetTrackCount(kTrackTypeCC708))
+    else if (db_prefer708 && decoder->GetTrackCount(kTrackTypeCC708))
         EnableCaptions(kDisplayCC708, osd_msg);
     else if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
         EnableCaptions(kDisplayTeletextCaptions, osd_msg);
@@ -1824,6 +1826,8 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         else
             captions_found = false;
     }
+    else if (!db_prefer708 && decoder->GetTrackCount(kTrackTypeCC708))
+        EnableCaptions(kDisplayCC708, osd_msg);
     else 
         captions_found = false;
 
