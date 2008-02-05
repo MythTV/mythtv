@@ -137,4 +137,12 @@ public:
     ChannelOptionsV4L(const ChannelID& id);
 };
 
+class ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
+{
+  public:
+    ChannelTVFormat(const ChannelID &id);
+
+    static QStringList GetFormats(void);
+};
+
 #endif //CHANNELEDITOR_H

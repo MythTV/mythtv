@@ -113,26 +113,40 @@ class Callsign : public LineEditSetting, public ChannelDBStorage
     }
 };
 
-class ChannelTVFormat : public ComboBoxSetting, public ChannelDBStorage
+ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
+    ComboBoxSetting(this), ChannelDBStorage(this, id, "tvformat")
 {
-  public:
-    ChannelTVFormat(const ChannelID &id) :
-       ComboBoxSetting(this), ChannelDBStorage(this, id, "tvformat")
-    {
-       setLabel(QObject::tr("TV Format"));
-       setHelpText(QObject::tr("If this channel uses a format other than TV "
-                   "Format in the General Backend Setup screen, set it here."));
-       addSelection("Default");
-       addSelection("NTSC");
-       addSelection("ATSC");
-       addSelection("PAL");
-       addSelection("SECAM");
-       addSelection("PAL-NC");
-       addSelection("PAL-M");
-       addSelection("PAL-N");
-       addSelection("NTSC-JP");
-    }
-};
+    setLabel(QObject::tr("TV Format"));
+    setHelpText(
+        QObject::tr(
+            "If this channel uses a format other than TV "
+            "Format in the General Backend Setup screen, set it here."));
+
+    addSelection(QObject::tr("Default"), "Default");
+
+    QStringList list = GetFormats();
+    for (uint i = 0; i < list.size(); i++)
+        addSelection(list[i]);
+}
+
+QStringList ChannelTVFormat::GetFormats(void)
+{
+    QStringList list;
+
+    list.push_back("NTSC");
+    list.push_back("NTSC-JP");
+    list.push_back("PAL");
+    list.push_back("PAL-60");
+    list.push_back("PAL-BG");
+    list.push_back("PAL-DK");
+    list.push_back("PAL-I");
+    list.push_back("PAL-M");
+    list.push_back("PAL-NC");
+    list.push_back("PAL-N");
+    list.push_back("SECAM");
+
+    return list;
+}
 
 class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
 {

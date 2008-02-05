@@ -4,6 +4,7 @@
 #include "frequencies.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
+#include "channelsettings.h" // for ChannelTVFormat::GetFormats()
 #include <unistd.h>
 
 
@@ -79,18 +80,11 @@ static GlobalComboBox *TVFormat()
 {
     GlobalComboBox *gc = new GlobalComboBox("TVFormat");
     gc->setLabel(QObject::tr("TV format"));
-    gc->addSelection("NTSC");
-    gc->addSelection("ATSC");
-    gc->addSelection("PAL");
-    gc->addSelection("SECAM");
-    gc->addSelection("PAL-NC");
-    gc->addSelection("PAL-M");
-    gc->addSelection("PAL-N");
-    gc->addSelection("PAL-BG");
-    gc->addSelection("PAL-DK");
-    gc->addSelection("PAL-I");
-    gc->addSelection("PAL-60");
-    gc->addSelection("NTSC-JP");
+
+    QStringList list = ChannelTVFormat::GetFormats();
+    for (uint i = 0; i < list.size(); i++)
+        gc->addSelection(list[i]);
+
     gc->setHelpText(QObject::tr("The TV standard to use for viewing TV."));
     return gc;
 };
