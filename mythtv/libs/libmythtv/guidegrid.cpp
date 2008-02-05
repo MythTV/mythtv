@@ -1378,7 +1378,7 @@ bool GuideGrid::paintChannels(QPainter *p)
             {
                 int iconsize = 0;
                 if (itype)
-                    iconsize = itype->GetSize().width();
+                    iconsize = itype->GetSize(true).width();
                 else if (type)
                     iconsize = type->GetSize();
                 if (!chinfo->iconLoaded)
@@ -1411,7 +1411,7 @@ bool GuideGrid::paintChannels(QPainter *p)
             {
                 int iconsize = 0;
                 if (itype)
-                    iconsize = itype->GetSize().width();
+                    iconsize = itype->GetSize(true).width();
                 else if (type)
                     iconsize = type->GetSize();
                 if (!chinfo->iconLoaded)
