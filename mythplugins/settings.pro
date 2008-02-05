@@ -1,6 +1,6 @@
 CONFIG += $$CCONFIG
 
-LIBVERSION = 0.20
+LIBVERSION = 0.21
 
 INCLUDEPATH += $${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
@@ -10,8 +10,8 @@ LIBS *= -L$${PREFIX}/lib
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
-    LIBS += -L/bin -lmyth-0.20 -lmythui-0.20 -lmythtv-0.20
-    LIBS += -lmythavformat-0.20 -lmythavcodec-0.20 -lmythavutil-0.20
+    LIBS += -L/bin -lmyth-0.21 -lmythui-0.21 -lmythtv-0.21
+    LIBS += -lmythavformat-0.21 -lmythavcodec-0.21 -lmythavutil-0.21
 }
 
 DEFINES += _GNU_SOURCE

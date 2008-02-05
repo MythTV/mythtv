@@ -4,8 +4,8 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-LIBVERSION = 0.20
-VERSION = 0.20.0
+LIBVERSION = 0.21
+VERSION = 0.21.0
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
