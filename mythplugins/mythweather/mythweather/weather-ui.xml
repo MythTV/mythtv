@@ -241,7 +241,7 @@
       </image>
 
       <textarea name="+observation_time" draworder="5">
-        <area>39,540,450,35</area>
+        <area>39,540,700,35</area>
         <font>footer</font>
       </textarea>
 
@@ -278,7 +278,7 @@
       </textarea>
       <image name="background-0" draworder="0">
         <filename>mw_shading.png</filename>
-        <position>40,150</position>
+        <position>40,220</position>
         <staticsize>230,305</staticsize>
       </image>
       <image name="background-1" draworder="0">
@@ -288,15 +288,15 @@
       </image>
       <image name="background-2" draworder="0">
         <filename>mw_shading.png</filename>
-        <position>530,150</position>
+        <position>530,220</position>
         <staticsize>230,305</staticsize>
       </image>
       <textarea name="+date-0" draworder="5" align="center">
-        <area>40,160,230,32</area>
+        <area>40,180,230,32</area>
         <font>weatherdata</font>
       </textarea>
       <image name="+icon-0" draworder="6">
-        <position>55,195</position>
+        <position>55,235</position>
         <staticsize>200,150</staticsize>
       </image>
       <!--textarea name="+desc1" draworder="5" align="allcenter">
@@ -305,31 +305,31 @@
         <multiline>yes</multiline>
       </textarea-->
       <textarea name="lolbl0" draworder="5" align="center">
-        <area>50,395,100,32</area>
+        <area>50,465,100,32</area>
         <font>lohifont</font>
         <value>Low</value>
       </textarea>
       <textarea name="hilbl0" draworder="5" align="center">
-        <area>50,350,100,32</area>
+        <area>50,420,100,32</area>
         <font>lohifont</font>
         <value>High</value>
       </textarea>
       <textarea name="+low-0" draworder="5" align="center">
-        <area>160,395,100,32</area>
+        <area>160,465,100,32</area>
         <cutdown>no</cutdown>
         <font>tempdata</font>
       </textarea>
       <textarea name="+high-0" draworder="5" align="center">
-        <area>160,350,100,32</area>
+        <area>160,420,100,32</area>
         <cutdown>no</cutdown>
         <font>tempdata</font>
       </textarea>
       <textarea name="+date-1" draworder="5" align="center">
-        <area>285,230,235,32</area>
+        <area>285,180,235,32</area>
         <font>weatherdata</font>
       </textarea>
       <image name="+icon-1" draworder="6">
-        <position>300,265</position>
+        <position>300,235</position>
         <staticsize>200,150</staticsize>
       </image>
       <!--textarea name="+desc2" draworder="5" align="allcenter">
@@ -358,11 +358,11 @@
         <cutdown>no</cutdown>
       </textarea>
       <textarea name="+date-2" draworder="5" align="center">
-        <area>530,160,235,32</area>
+        <area>530,180,235,32</area>
         <font>weatherdata</font>
       </textarea>
       <image name="+icon-2" draworder="6">
-        <position>545,195</position>
+        <position>545,235</position>
         <staticsize>200,150</staticsize>
       </image>
       <!--textarea name="+desc3" draworder="5" align="allcenter">
@@ -371,22 +371,22 @@
         <multiline>yes</multiline>
       </textarea-->
       <textarea name="lolbl2" draworder="5" align="center">
-        <area>540,395,100,32</area>
+        <area>540,465,100,32</area>
         <font>lohifont</font>
         <value>Low</value>
       </textarea>
       <textarea name="hilbl2" draworder="5" align="center">
-        <area>540,350,100,32</area>
+        <area>540,420,100,32</area>
         <font>lohifont</font>
         <value>High</value>
       </textarea>
       <textarea name="+low-2" draworder="5" align="center">
-        <area>650,395,100,32</area>
+        <area>650,465,100,32</area>
         <font>tempdata</font>
         <cutdown>no</cutdown>
       </textarea>
       <textarea name="+high-2" draworder="5" align="center">
-        <area>650,350,100,32</area>
+        <area>650,420,100,32</area>
         <font>tempdata</font>
         <cutdown>no</cutdown>
       </textarea>
