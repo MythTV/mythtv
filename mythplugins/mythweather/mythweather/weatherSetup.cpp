@@ -438,7 +438,8 @@ void ScreenSetup::loadData()
         else if (e.tagName() == "container")
         {
             QString name = e.attribute("name");
-            if (!name.isNull() && !name.isEmpty() && name != "startup")
+            if (!name.isNull() && !name.isEmpty() && name != "startup"
+                    && name != "background")
             {
                 m_weather_screens.parseContainer(e, tmpname, context, area);
                 types = WeatherScreen::getAllDynamicTypes(m_weather_screens.GetSet(name));
