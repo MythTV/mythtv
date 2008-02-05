@@ -24,6 +24,16 @@ package MythTV;
     use HTTP::Request;
     use LWP::UserAgent;
 
+# Load the UPNP libraries if we have them, but die nicely if we don't.
+    BEGIN {
+        our $has_upnp = 1;
+        eval 'use Net::UPnP::ControlPoint;';
+        if ($@) {
+            $has_upnp = 0;
+            print STDERR "Net::UPnP::ControlPoint is not installed!\n";
+        }
+    }
+
 # Necessary constants for sysopen
     use Fcntl;
 
@@ -128,6 +138,118 @@ package MythTV;
     $homedir  = $ENV{'HOME'} if ($ENV{'HOME'});
     if ($username && !$homedir) {
         $homedir = "/home/$username";
+        if (!-e $homedir && -e "/Users/$username") {
+            $homedir = "/Users/$username";
+        }
+    }
+
+# Config file?
+    my $conf = $ENV{'MYTHCONFDIR'}
+        ? $ENV{'MYTHCONFDIR'}
+        : "$homedir/.mythtv"
+        ;
+    unless (-T "$conf/config.xml") {
+        unless ($has_upnp) {
+            die "Please install Net::UPnP or copy ~/.mythtv/config.xml\n"
+               ."from a working MythTV installation to $conf/config.xml.\n";
+        }
+    # Try to create the config directory first, so we can die sooner if it fails.
+        unless (-d $conf) {
+            mkdir $conf or die "Can't create config directory $conf:  $!\n";
+        }
+    # Alert the user
+        print STDERR "No config found; attempting to find mythbackend via UPnP.\n";
+    # @todo:  prompt for a security pin
+        my $pin = '';
+    # Try to detect things via upnp
+        my (%seen, @devices);
+        my $obj = Net::UPnP::ControlPoint->new();
+        my @dev_list = $obj->search(
+            #st => 'urn:schemas-upnp-org:device:MediaServer:1',
+            st => 'urn:schemas-mythtv-org:device:MasterMediaServer:1',
+            mx => 2
+            );
+        foreach $dev (@dev_list) {
+            $device_type = $dev->getdevicetype();
+            if  ($device_type ne 'urn:schemas-upnp-org:device:MediaServer:1') {
+                next;
+            }
+        # Skip non-mythtv
+            my $mfg = $dev->getdescription(name=>'manufacturer');
+            next unless ($mfg eq 'MythTV');
+        # Skip duplicate scan entries
+            my $urlbase = $dev->getdescription(name=>'URLBase');
+            my $hash = join(';',
+                $dev->getudn(),
+                $urlbase,
+                );
+            next if ($seen{$hash});
+            $seen{$hash} = 1;
+        # Try to connect to the host to get
+            my $req = HTTP::Request->new('GET', "${urlbase}Myth/GetConnectionInfo?Pin=$pin");
+            my $ua  = LWP::UserAgent->new(keep_alive => 1);
+            my $response = $ua->request($req);
+        # Return the results
+            next unless ($response->is_success);
+            next unless ($response->content =~ m#<Database>(.+?)</Database>#s);
+            my $info = $1;
+            ($dev->{db_host}) = ($info =~ m#<Host>(.+?)</Host>#);
+            ($dev->{db_port}) = ($info =~ m#<Port>(\d*?)</Port>#);
+            ($dev->{db_user}) = ($info =~ m#<UserName>(.+?)</UserName>#);
+            ($dev->{db_pass}) = ($info =~ m#<Password>(.+?)</Password>#);
+            ($dev->{db_name}) = ($info =~ m#<Name>(.+?)</Name>#);
+            $dev->{db_port} ||= 3306;
+        # Skip duplicate db connections, too
+            $hash = "mysql:$dev->{db_user}:$dev->{db_pass}\@$dev->{db_host}:$dev->{db_port}::$dev->{db_name}";
+            next if ($seen{$hash});
+            $seen{$hash} = 1;
+        # Add some more data to the device, while we're here
+            $dev->{udn} = $dev->getudn();
+            $dev->{usn} = join('::',
+                $dev->{udn},
+                $dev->getdevicetype(),
+                );
+        # Success
+            push @devices, $dev;
+        }
+        if (@devices < 1) {
+            die "No backends found.  Please copy $conf/config.xml from a"
+               ."working MythTV installation instead.\n";
+        }
+        my $upnp = $devices[0];
+        if (@devices > 1) {
+            die "Multiple devices found via UPnP.  This configuration not yet\n"
+               ."supported.  Please copy $conf/config.xml from a working"
+               ."MythTV installation instead.\n";
+            #print $dev->getfriendlyname(), "\n";
+        }
+    # This should really point to a different UDN, but leaving this as-is won't
+    # hurt the perl code.
+        my $m_udn = $upnp->{udn};
+        $m_udn =~ s/^uuid\W+//;
+    # Save the config.xml
+        open CONF, ">$conf/config.xml" or die "Can't write to $conf/config.xml:  $!\n";
+        print CONF <<EOF;
+<Configuration>
+  <UPnP>
+    <UDN>
+      <MediaRenderer>$m_udn</MediaRenderer>
+    </UDN>
+    <MythFrontend>
+      <DefaultBackend>
+        <USN>$upnp->{usn}</USN>
+        <SecurityPin>$pin</SecurityPin>
+        <DBHostName>$upnp->{db_host}</DBHostName>
+        <DBUserName>$upnp->{db_user}</DBUserName>
+        <DBPassword>$upnp->{db_pass}</DBPassword>
+        <DBName>$upnp->{db_name}</DBName>
+        <DBPort>$upnp->{db_port}</DBPort>
+      </DefaultBackend>
+    </MythFrontend>
+  </UPnP>
+</Configuration>
+EOF
+        close CONF;
     }
 
 # Read the mysql.txt file in use by MythTV.  It could be in a couple places,
@@ -135,54 +257,42 @@ package MythTV;
 # libs/libmyth/mythcontext.cpp
     our %mysql_conf = ('hostname' => hostname,
                        'db_host'  => 'localhost',
+                       'db_port'  => '',
                        'db_user'  => 'mythtv',
                        'db_pass'  => 'mythtv',
-                       'db_name'  => 'mythconverg');
-    my $found = 0;
-    my @mysql = ('/usr/local/share/mythtv/mysql.txt',
-                 '/usr/share/mythtv/mysql.txt',
-                 '/usr/local/etc/mythtv/mysql.txt',
-                 '/etc/mythtv/mysql.txt',
-                 $homedir            ? "$homedir/.mythtv/mysql.txt"    : '',
-                 $homedir            ? "$homedir/.mythtv/config.xml"   : '',
-                 'mysql.txt',
-                 $ENV{'MYTHCONFDIR'} ? "$ENV{'MYTHCONFDIR'}/mysql.txt" : '',
-                );
-    foreach my $file (@mysql) {
-        next unless ($file && -e $file);
-        $found = 1;
-        open(CONF, $file) or die "Unable to read $file:  $!\n";
-        while (my $line = <CONF>) {
-        # Cleanup
-            next if ($line =~ /^\s*#/);
-            $line =~ s/^str //;
-            chomp($line);
-        # Split off the var=val pairs
-            my ($var, $val) = split(/\=/, $line, 2);
-        # Also look for <var>val</var> from config.xml
-            if ($line =~ m/<(\w+)>(\w+)<\/(\w+)>$/ && $1 eq $3) {
-                $var = $1; $val = $2;
-            }
-            next unless ($var && $var =~ /\w/);
-            if ($var eq 'DBHostName') {
-                $mysql_conf{'db_host'} = $val;
-            }
-            elsif ($var eq 'DBUserName') {
-                $mysql_conf{'db_user'} = $val;
-            }
-            elsif ($var eq 'DBPassword') {
-                $mysql_conf{'db_pass'} = $val;
-            }
-            elsif ($var eq 'DBName') {
-                $mysql_conf{'db_name'} = $val;
-            }
-        # Hostname override
-            elsif ($var eq 'LocalHostName') {
-                $mysql_conf{'hostname'} = $val;
-            }
+                       'db_name'  => 'mythconverg',
+                       'upnp_pin' => '',
+                      );
+    open(CONF, "$conf/config.xml") or die "Unable to read $conf/config.xml:  $!\n";
+    while (my $line = <CONF>) {
+    # Search through the XML data
+        if ($line =~ m#<SecurityPin>(.*?)</SecurityPin>#) {
+            $mysql_conf{'upnp_pin'} = $1;
         }
-        close CONF;
+        elsif ($line =~ m#<DBHostName>(.*?)</DBHostName>#) {
+            $mysql_conf{'db_host'}  = $1;
+        }
+        elsif ($line =~ m#<DBUserName>(.*?)</DBUserName>#) {
+            $mysql_conf{'db_user'}  = $1;
+        }
+        elsif ($line =~ m#<DBPassword>(.*?)</DBPassword>#) {
+            $mysql_conf{'db_pass'}  = $1;
+        }
+        elsif ($line =~ m#<DBName>(.*?)</DBName>#) {
+            $mysql_conf{'db_name'}  = $1;
+        }
+        elsif ($line =~ m#<DBPort>(\d*?)</DBPort>#) {
+            $mysql_conf{'db_port'}  = $1;
+        }
+    # Hostname override.  Not sure if this is still valid or not
+        elsif ($line =~ m#<LocalHostName>(.*?)</LocalHostName>#) {
+            $mysql_conf{'hostname'} = $1;
+        }
     }
+    close CONF;
+
+# Cleanup
+    $mysql_conf{'db_port'} ||= 3306;
 
 # Constructor
     sub new {
@@ -199,6 +309,7 @@ package MythTV;
 
                     # The following options can be overridden via $opts
                      'db_host'     => $mysql_conf{'db_host'},
+                     'db_port'     => $mysql_conf{'db_port'},
                      'db_user'     => $mysql_conf{'db_user'},
                      'db_pass'     => $mysql_conf{'db_pass'},
                      'db_name'     => $mysql_conf{'db_name'},
@@ -212,6 +323,7 @@ package MythTV;
         my $params = shift;
         if (ref $params eq 'HASH') {
             $self->{'db_host'}  = $params->{'db_host'}  if ($params->{'db_host'});
+            $self->{'db_port'}  = $params->{'db_port'}  if ($params->{'db_port'});
             $self->{'db_user'}  = $params->{'db_user'}  if ($params->{'db_user'});
             $self->{'db_pass'}  = $params->{'db_pass'}  if ($params->{'db_pass'});
             $self->{'db_name'}  = $params->{'db_name'}  if ($params->{'db_name'});
@@ -222,7 +334,7 @@ package MythTV;
         }
 
     # Connect to the database
-        $self->{'dbh'} = DBI->connect("dbi:mysql:database=$self->{'db_name'}:host=$self->{'db_host'}",
+        $self->{'dbh'} = DBI->connect("dbi:mysql:database=$self->{'db_name'}:host=$self->{'db_host'};port=$self->{'db_port'}",
                                       $self->{'db_user'},
                                       $self->{'db_pass'})
             or die "Cannot connect to database: $!\n\n";
