@@ -70,6 +70,8 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
         theme->LoadTheme(xmldata, "conflict");
     LoadWindow(xmldata);
 
+    timer = NULL;
+
     if (m_player)
     {
         timer = new QTimer(this);
