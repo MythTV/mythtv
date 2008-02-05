@@ -1035,6 +1035,7 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
             video_output_subtype = XVideoIDCT;
         if (XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD))
             video_output_subtype = XVideoVLD;
+        allowpreviewepg = true;
     }
     else
     {
@@ -1163,7 +1164,10 @@ bool VideoOutputXv::InitXVideo()
         ok = false;
     }
     else
+    {
         video_output_subtype = XVideo;
+        allowpreviewepg = true;
+    }
 
     return ok;
 }
@@ -1195,7 +1199,10 @@ bool VideoOutputXv::InitXShm()
         ok = false;
     }
     else
+    {
         video_output_subtype = XShm;
+        allowpreviewepg = false;
+    }
 
     return ok;
 }
@@ -1227,7 +1234,10 @@ bool VideoOutputXv::InitXlib()
         ok = false;
     }
     else
+    {
         video_output_subtype = Xlib;
+        allowpreviewepg = false;
+    }
 
     return ok;
 }
