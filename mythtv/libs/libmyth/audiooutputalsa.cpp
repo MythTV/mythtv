@@ -572,6 +572,34 @@ void AudioOutputALSA::SetCurrentVolume(QString control, int channel, int volume)
         VERBOSE(VB_AUDIO, QString("channel %1 vol set to %2")
                 .arg(channel).arg(set_vol));
     }
+
+    if (snd_mixer_selem_has_playback_switch(elem))
+    {
+        int unmute = (0 != set_vol);
+        if (snd_mixer_selem_has_playback_switch_joined(elem))
+        {
+            // Only mute if all the channels should be muted.
+            for (int i = 0; i < audio_channels; i++)
+            {
+                if (0 != GetVolumeChannel(i))
+                    unmute = 1;
+            }
+        }
+
+        err = snd_mixer_selem_set_playback_switch(elem, chan, unmute);
+        if (err < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Mixer set playback switch %1 err %2: %3")
+                    .arg(channel).arg(err).arg(snd_strerror(err)));
+        }
+        else
+        {
+            VERBOSE(VB_AUDIO, LOC +
+                    QString("channel %1 playback switch set to %2")
+                    .arg(channel).arg(unmute));
+        }
+    }
 }
 
 void AudioOutputALSA::OpenMixer(bool setstartingvolume)
