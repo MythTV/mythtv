@@ -293,41 +293,68 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
 {
     if (audioOutput)
+    {
         delete audioOutput;
+        audioOutput = NULL;
+    }
 
     SetPlaybackInfo(NULL);
 
-    if (weMadeBuffer)
+    if (weMadeBuffer && ringBuffer)
+    {
         delete ringBuffer;
+        ringBuffer = NULL;
+    }
 
     if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
         ClearSubtitles();
 
     if (osd)
+    {
         delete osd;
+        osd = NULL;
+    }
     
     for (int i = 0; i < MAXTBUFFER; i++)
     {
         if (txtbuffers[i].buffer)
+        {
             delete [] txtbuffers[i].buffer;
+            txtbuffers[i].buffer = NULL;
+        }
     }
 
     SetDecoder(NULL);
 
     if (interactiveTV)
+    {
         delete interactiveTV;
+        interactiveTV = NULL;
+    }
 
     if (FiltMan)
+    {
         delete FiltMan;
+        FiltMan = NULL;
+    }
 
     if (videoFilters)
+    {
         delete videoFilters;
+        videoFilters = NULL;
+    }
 
     if (videosync)
+    {
         delete videosync;
+        videosync = NULL;
+    }
 
     if (videoOutput)
+    {
         delete videoOutput;
+        videoOutput = NULL;
+    }
 
     if (argb_buf)
     {
@@ -336,7 +363,10 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     }
 
     if (output_jmeter)
+    {
         delete output_jmeter;
+        output_jmeter = NULL;
+    }
 
     ShutdownYUVResize();
 }

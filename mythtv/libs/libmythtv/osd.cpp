@@ -62,31 +62,59 @@ OSD::OSD()
 
 OSD::~OSD(void)
 {
+    QMutexLocker locker(&osdlock);
+
     QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
     for (; fonts != fontMap.end(); ++fonts)
     {
-        TTFFont *font = (*fonts);
-        if (font)
-            delete font;
+        if (*fonts)
+        {
+            delete *fonts;
+            *fonts = NULL;
+        }
     }
+    fontMap.clear();
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
     for (; sets != setMap.end(); ++sets)
     { 
-        OSDSet *set = (*sets);
-        if (set)
-            delete set;
+        if (*sets)
+        {
+            delete *sets;
+            *sets = NULL;
+        }
+    }
+    setMap.clear();
+
+    if (m_themeinfo)
+    {
+        delete m_themeinfo;
+        m_themeinfo = NULL;
     }
 
-    delete m_themeinfo;
-
     if (editarrowleft)
+    {
         delete editarrowleft;
-    if (editarrowright)
-        delete editarrowright;
+        editarrowleft = NULL;
+    }
 
-    delete setList;
-    delete drawSurface;
+    if (editarrowright)
+    {
+        delete editarrowright;
+        editarrowright = NULL;
+    }
+
+    if (setList)
+    {
+        delete setList;
+        setList = NULL;
+    }
+
+    if (drawSurface)
+    {
+        delete drawSurface;
+        drawSurface = NULL;
+    }
 }
 
 void OSD::Init(const QRect &osd_bounds, int   frameRate,
@@ -235,15 +263,17 @@ bool OSD::InitCC708(void)
         if (!ccfont)
         {
             QString name = QString("cc708_font%1").arg(i);
-                int fontsize = fontsizes[i%3];
+            int fontsize = fontsizes[i%3];
+
             ccfont = LoadFont(cc708fontnames[i/3], fontsize);
             if (ccfont)
-            fontMap[name] = ccfont;
+                fontMap[name] = ccfont;
+
             if (!ccfont)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "A CC708 font is missing");
-            return false;
-                }
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "A CC708 font is missing");
+                return false;
+            }
         }
         ccfonts[i] = ccfont;
     }
