@@ -171,6 +171,7 @@ class Scheduler : public QObject
     // Try to avoid LiveTV sessions until this time
     QDateTime livetvTime;
     int livetvpriority;
+    int prefinputpri;
     QMap<QString, bool> hasLaterList;
 
     // cache IsSameProgram()

@@ -1020,12 +1020,15 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
         else
             PrintRec(q, "     #");
 
+        bool failedLiveCheck = false;
         if (preserveLive)
         {
-            if (p->recpriority > q->recpriority - livetvpriority)
-                continue;
+            failedLiveCheck |=
+                (!livetvpriority ||
+                 p->recpriority - prefinputpri > q->recpriority);
 
-            // retrylist contains dummy livetv pginfo's
+            // It is pointless to preempt another livetv session.
+            // (the retrylist contains dummy livetv pginfo's)
             RecConstIter k = retrylist.begin();
             if (FindNextConflict(retrylist, q, k))
             {
@@ -1046,6 +1049,19 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
             QString id = p->schedulerid;
             hasLaterList[id] = true;
             continue;
+        }
+
+        if (failedLiveCheck)
+        {
+            // Failed the priority check or "Move scheduled shows to
+            // avoid LiveTV feature" is turned off.
+            // However, there is no conflict so if this alternate showing
+            // is on an equivalent virtual card, allow the move.
+            bool equiv = (p->sourceid == q->sourceid &&
+                          igrp.GetSharedInputGroup(p->inputid, q->inputid));
+
+            if (!equiv)
+                continue;
         }
 
         if (preserveLive)
@@ -2497,7 +2513,7 @@ void Scheduler::AddNewRecords(void)
     }
 
     int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
-    int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
+    prefinputpri        = gContext->GetNumSetting("PrefInputPriority", 2);
     int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
 
     QString pwrpri = "channel.recpriority + cardinput.recpriority";
@@ -3577,7 +3593,7 @@ void Scheduler::SchedPreserveLiveTV(void)
         return;
     }
     
-    livetvpriority = gContext->GetNumSetting("LiveTVPriority");
+    livetvpriority = gContext->GetNumSetting("LiveTVPriority", 0);
 
     // Build a list of active livetv programs
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
