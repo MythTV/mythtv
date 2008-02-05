@@ -155,7 +155,8 @@ elsif ($weather_string =~ /^light snow$/i ||
     $weather_string =~ /^light snow showers$/i) { 
     printf "weather_icon::flurries.png\n"; 
 }
-elsif ($weather_string =~ /^sleet$/i) { 
+elsif ($weather_string =~ /^sleet$/i ||
+    $weather_string =~ /^sleet showers$/i) { 
     printf "weather_icon::rainsnow.png\n"; 
 }
 elsif ($weather_string =~ /^clear$/i) { 
