@@ -3205,6 +3205,9 @@ void PlaybackBox::showRecordingPopup()
     QButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
 
+    popup->addButton(tr("Allow this program to re-record"), this,
+                     SLOT(doAllowRerecord()));
+
     popup->addButton(tr("Show Program Details"), this,
                      SLOT(showProgramDetails()));
 
@@ -3629,6 +3632,25 @@ void PlaybackBox::doEditScheduled()
 
     EmbedTVWindow();
 }
+
+/** \fn doAllowRerecord
+ *  \brief Callback function when Allow Re-record is pressed in Watch Recordings
+ *
+ * Hide the current program from the scheduler by calling ForgetHistory
+ * This will allow it to re-record without deleting
+ */
+void PlaybackBox::doAllowRerecord()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    if (!curitem)
+        return;
+
+    curitem->ForgetHistory();
+}    
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 {

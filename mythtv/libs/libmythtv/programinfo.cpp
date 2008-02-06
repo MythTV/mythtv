@@ -2937,10 +2937,27 @@ void ProgramInfo::DeleteHistory(void)
 
 /** \fn ProgramInfo::ForgetHistory(void)
  *  \brief Forget the recording of a program so it will be recorded again.
+ *
+ * The duplicate flags in both the recorded and old recorded tables are set
+ * to 0. This causes these records to be skipped in the left join in the BUSQ
+ * In addition, any "Never Record" fake entries are removed from the oldrecorded 
+ * table and any entries in the oldfind table are removed.
  */
 void ProgramInfo::ForgetHistory(void)
 {
     MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("UPDATE recorded SET duplicate = 0 "
+                   "WHERE chanid = :CHANID "
+                       "AND starttime = :STARTTIME "
+                       "AND title = :TITLE;");
+    result.bindValue(":STARTTIME", recstartts);
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":CHANID", chanid);
+
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("forgetRecorded", result);
 
     result.prepare("UPDATE oldrecorded SET duplicate = 0 "
                    "WHERE duplicate = 1 "

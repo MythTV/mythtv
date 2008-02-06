@@ -611,7 +611,8 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                            "profile using max episodes");
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
     {
-        query.prepare("SELECT chanid, starttime, title, progstart, progend, filesize "
+        query.prepare("SELECT chanid, starttime, title, progstart, progend, "
+                          "filesize, duplicate "
                       "FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
                       "AND recgroup <> 'LiveTV' "
@@ -637,6 +638,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                 QString title = QString::fromUtf8(query.value(2).toString());
                 QDateTime progstart = query.value(3).toDateTime();
                 QDateTime progend = query.value(4).toDateTime();
+                int duplicate = query.value(6).toInt();
 
                 episodeKey = QString("%1_%2_%3")
                              .arg(chanid)
@@ -683,7 +685,8 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     else
                     {
                         episodeParts[episodeKey] = 1;
-                        found++;
+                        if( duplicate )
+                            found++;
                     }
                 }
             }

@@ -184,6 +184,7 @@ class PlaybackBox : public MythDialog
     void noStop();
 
     void doEditScheduled();
+    void doAllowRerecord();
 
     void askDelete();
     void doUndelete();

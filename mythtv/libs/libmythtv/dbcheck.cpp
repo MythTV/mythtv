@@ -54,6 +54,7 @@ The schema contains the following tables:
 <tr><td>networkiconmap             <td>pk(id) uk(network)
 <tr><td>oldprogram                 <td>pk(oldtitle)
 <tr><td>oldrecorded                <td>k(endtime) k(title) k(seriesid) k(programid)
+                                       pk(station,starttime,title)
 <tr><td>people                     <td>pk(person) uk(name)
 <tr><td>pidcache                   <td>
 <tr><td>profilegroups              <td>pk(id) uk(name,hostname)
@@ -77,6 +78,7 @@ The schema contains the following tables:
 \endhtmlonly
 
 Where pk means PRIMARY KEY, uk means "UNIQUE KEY", and k means "KEY".
+BUSQ refers to the Big Ugly SQL Query in scheduler.cpp
 
 \section capturecard_table Capure Card Table (capturecard)
 This table describes the attributes of a capture card used by MythTV.
@@ -306,6 +308,36 @@ usually in the same order as the original air dates for the episodes.
 Detailed information can be found in the Data Direct documentation
 at http://labs.zap2it.com/ .
 
+\section oldrecorded_table Old Recorded Table (oldrecorded)
+
+oldrecorded imposes the restriction of one entry per
+title, starttime and callsign.  The scheduler relies on this when
+restoring any previous status for programs that aren't currently
+recording and for catching reactivation requests.
+
+The duplicate field is used to indicate if this record should be used
+to check for duplicates in the BUSQ
+
+\section oldfind_table Old Find Table (oldfind)
+
+If a matching entry exists in
+the oldfind table, the program is considered a duplicate regarless of
+the duplicate setting in recorded and oldrecorded.  oldfind is an
+imperfect optimization to avoid greatly increasing the time needed for
+the big scheduler query.
+
+But the real reason for oldfind is that a search
+rule may not be able to match by title. For instance, a FindWeekly
+"Bill Murray (People Search)" needs to know that "Meatballs" is a
+dup for this week if "Stripes" has already been recorded. Oldfind
+tracks if the rule (recordid) has recorded in the current time
+interval (findid). When a recording has a findid, ForgetHistory()
+and DeleteHistory() update oldfind while updating oldrecorded.
+
+\section recorded_table Recorded Table (recorded
+
+The duplicate field is used to indicate if this record should be used
+to check for duplicates in the BUSQ
  */
 
 /** \fn UpdateDBVersionNumber(const QString&)
