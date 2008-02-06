@@ -354,7 +354,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,
-            -1,                   -1,
+            -1,                   'a',
             -1,
             cd.FECInnerString(),  QString::null,
             -1,                   QString::null,
