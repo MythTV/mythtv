@@ -23,11 +23,13 @@ typedef vector<ProgramInfo*> pginfolist_t;
 typedef vector<EncoderLink*> enclinklist_t;
 
 enum ExpireMethodType {
-    emOldestFirst          = 1,
-    emLowestPriorityFirst  = 2,
-    emWeightedTimePriority = 3,
-    emShortLiveTVPrograms  = 10000,
-    emNormalLiveTVPrograms = 10001
+    emOldestFirst           = 1,
+    emLowestPriorityFirst   = 2,
+    emWeightedTimePriority  = 3,
+    emShortLiveTVPrograms   = 10000,
+    emNormalLiveTVPrograms  = 10001,
+    emOldDeletedPrograms    = 10002,
+    emNormalDeletedPrograms = 10003
 };
 
 class AutoExpire : public QObject
@@ -58,6 +60,7 @@ class AutoExpire : public QObject
     void Init(void);
 
     void ExpireLiveTV(int type);
+    void ExpireOldDeleted(void);
     void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 

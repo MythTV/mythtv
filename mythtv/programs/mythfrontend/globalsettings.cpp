@@ -562,12 +562,11 @@ static GlobalSpinBox *MergeShortCommBreaks()
 static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
-    bs->setLabel(QObject::tr("Extra Disk Space (in Gigabytes)"));
+    bs->setLabel(QObject::tr("Extra Disk Space"));
     bs->setHelpText(QObject::tr(
-                        "Extra disk space you want on the recording "
-                        "file system beyond what MythTV requires. "
-                        "This is useful if you use the recording file system "
-                        "for data other than MythTV recordings."));
+                        "Extra disk space (in Gigabytes) that you want to "
+                        "keep free on the recording file systems beyond what "
+                        "MythTV requires."));
     bs->setValue(1);
     return bs;
 };
@@ -582,6 +581,51 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
                                 "and turn on autoexpire."));
     return cb;
 }
+
+static GlobalSpinBox *DeletedMaxAge()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", 0, 365, 1);
+    bs->setLabel(QObject::tr("Deleted Max Age"));
+    bs->setHelpText(QObject::tr(
+                    "When set to a number greater than zero, AutoExpire will "
+                    "force expiration of Deleted recordings when they are "
+                    "this many days old."));
+    bs->setValue(0);
+    return bs;
+};
+
+static GlobalCheckBox *DeletedFifoOrder()
+{
+    GlobalCheckBox *cb = new GlobalCheckBox("DeletedFifoOrder");
+    cb->setLabel(QObject::tr("Expire in deleted order"));
+    cb->setValue(false);
+    cb->setHelpText(QObject::tr(
+                    "Expire Deleted recordings in the order which they were "
+                    "originally deleted."));
+    return cb;
+};
+
+class DeletedExpireOptions : public TriggeredConfigurationGroup
+{
+    public:
+     DeletedExpireOptions() :
+         TriggeredConfigurationGroup(false, false, false, false)
+         {
+             setLabel(QObject::tr("DeletedExpireOptions"));
+             Setting* enabled = AutoExpireInsteadOfDelete();
+             addChild(enabled);
+             setTrigger(enabled);
+
+             HorizontalConfigurationGroup* settings =
+                 new HorizontalConfigurationGroup(false);
+             settings->addChild(DeletedFifoOrder());
+             settings->addChild(DeletedMaxAge());
+             addTarget("1", settings);
+
+             // show nothing if fillEnabled is off
+             addTarget("0", new HorizontalConfigurationGroup(true));
+         };
+};
 
 static GlobalComboBox *AutoExpireMethod()
 {
@@ -601,17 +645,18 @@ static GlobalComboBox *AutoExpireMethod()
 static GlobalCheckBox *AutoExpireWatchedPriority() 
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority"); 
-    bc->setLabel(QObject::tr("Auto Expire watched programs before unwatched")); 
+    bc->setLabel(QObject::tr("Watched before UNwatched")); 
     bc->setValue(false); 
     bc->setHelpText(QObject::tr("If set, programs that have been marked as "
-                    "watched will be expired first"));
+                    "watched will be expired first, before programs that "
+                    "have not been watched."));
     return bc;
 }
 
 static GlobalSpinBox *AutoExpireDayPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDayPriority", 1, 400, 1);
-    bs->setLabel(QObject::tr("Auto Expire Priority Weight"));
+    bs->setLabel(QObject::tr("Priority Weight"));
     bs->setHelpText(QObject::tr("The number of days bonus a program gets for "
                     "each priority point. This is only used when the Weighted "
                     "Time/Priority Auto Expire Method is selected."));
@@ -624,16 +669,16 @@ static GlobalCheckBox *AutoExpireDefault()
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
     bc->setLabel(QObject::tr("Auto Expire Default"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("When enabled, any newly recorded programs "
+    bc->setHelpText(QObject::tr("When enabled, any new recording schedules "
                     "will be marked as eligible for Auto-Expiration. "
-                    "Existing recordings will keep their current value."));
+                    "Existing schedules will keep their current value."));
     return bc;
 }
 
 static GlobalSpinBox *AutoExpireLiveTVMaxAge()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireLiveTVMaxAge", 1, 365, 1);
-    bs->setLabel(QObject::tr("LiveTV recordings Max Age"));
+    bs->setLabel(QObject::tr("LiveTV Max Age"));
     bs->setHelpText(QObject::tr(
                         "AutoExpire will force expiration of LiveTV "
                         "recordings when they are this many days old.  "
@@ -661,7 +706,7 @@ static GlobalSpinBox *MinRecordDiskThreshold()
 static GlobalCheckBox *RerecordWatched() 
 {
     GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched"); 
-    bc->setLabel(QObject::tr("Re-record watched programs")); 
+    bc->setLabel(QObject::tr("Re-record Watched")); 
     bc->setValue(true); 
     bc->setHelpText(QObject::tr("If set, programs that have been marked as "
                     "watched and are auto-expired will be re-recorded if "
@@ -4643,13 +4688,27 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("General (AutoExpire)"));
     autoexp->addChild(AutoExpireMethod());
-    autoexp->addChild(AutoExpireWatchedPriority());
-    autoexp->addChild(AutoExpireDayPriority());
-    autoexp->addChild(AutoExpireDefault());
-    autoexp->addChild(AutoExpireLiveTVMaxAge());
-    autoexp->addChild(RerecordWatched());
-    autoexp->addChild(AutoExpireExtraSpace());
-    autoexp->addChild(AutoExpireInsteadOfDelete());
+
+    VerticalConfigurationGroup *expgrp0 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    expgrp0->addChild(AutoExpireDefault());
+    expgrp0->addChild(RerecordWatched());
+    expgrp0->addChild(AutoExpireWatchedPriority());
+
+    VerticalConfigurationGroup *expgrp1 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    expgrp1->addChild(AutoExpireLiveTVMaxAge());
+    expgrp1->addChild(AutoExpireDayPriority());
+    expgrp1->addChild(AutoExpireExtraSpace());
+
+    HorizontalConfigurationGroup *expgrp =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    expgrp->addChild(expgrp0);
+    expgrp->addChild(expgrp1);
+
+    autoexp->addChild(expgrp);
+    autoexp->addChild(new DeletedExpireOptions());
+
     addChild(autoexp);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);

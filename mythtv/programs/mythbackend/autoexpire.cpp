@@ -295,6 +295,9 @@ void AutoExpire::RunExpirer(void)
 
             ExpireLiveTV(emNormalLiveTVPrograms);
 
+            if (gContext->GetNumSetting("DeletedMaxAge", 0))
+                ExpireOldDeleted();
+
             ExpireEpisodesOverMax();
 
             ExpireRecordings();
@@ -330,6 +333,19 @@ void AutoExpire::ExpireLiveTV(int type)
 
     VERBOSE(VB_FILE, LOC + QString("ExpireLiveTV(%1)").arg(type));
     FillDBOrdered(expireList, type);
+    SendDeleteMessages(expireList);
+    ClearExpireList(expireList);
+}
+
+/** \fn AutoExpire::ExpireOldDeleted(void)
+ *  \brief This expires deleted programs older than DeletedMaxAge.
+ */
+void AutoExpire::ExpireOldDeleted(void)
+{
+    pginfolist_t expireList;
+
+    VERBOSE(VB_FILE, LOC + QString("ExpireOldDeleted()"));
+    FillDBOrdered(expireList, emOldDeletedPrograms);
     SendDeleteMessages(expireList);
     ClearExpireList(expireList);
 }
@@ -697,14 +713,14 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 /** \fn AutoExpire::FillExpireList(pginfolist_t&)
  *  \brief Uses the "AutoExpireMethod" setting in the database to
  *         fill the list of files that are deletable.
- *
- *   At the moment "Delete Oldest First" is the only available method.
  */
 void AutoExpire::FillExpireList(pginfolist_t &expireList)
 {
     int expMethod = gContext->GetNumSetting("AutoExpireMethod", 1);
 
     ClearExpireList(expireList);
+
+    FillDBOrdered(expireList, emNormalDeletedPrograms);
 
     switch(expMethod)
     {
@@ -768,6 +784,7 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
 
     FillDBOrdered(expireList, emShortLiveTVPrograms);
     FillDBOrdered(expireList, emNormalLiveTVPrograms);
+    FillDBOrdered(expireList, emNormalDeletedPrograms);
     FillDBOrdered(expireList, gContext->GetNumSetting("AutoExpireMethod",
                   emOldestFirst));
 
@@ -792,6 +809,7 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
 
     FillDBOrdered(expireList, emShortLiveTVPrograms);
     FillDBOrdered(expireList, emNormalLiveTVPrograms);
+    FillDBOrdered(expireList, emNormalDeletedPrograms);
     FillDBOrdered(expireList, gContext->GetNumSetting("AutoExpireMethod",
                   emOldestFirst));
 
@@ -829,6 +847,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     QString where;
     QString orderby;
     QString msg;
+    int maxAge;
 
     switch (expMethod)
     {
@@ -869,6 +888,23 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
                     "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
                     .arg(gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 1));
             orderby = "starttime ASC";
+            break;
+        case emOldDeletedPrograms:
+            if ((maxAge = gContext->GetNumSetting("DeletedMaxAge", 0)) == 0)
+                return;
+            msg = QString("Adding programs deleted more than %1 days ago")
+                          .arg(maxAge);
+            where = QString("recgroup = 'Deleted' "
+                    "AND lastmodified <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
+                    .arg(maxAge);
+            orderby = "starttime ASC";
+            break;
+        case emNormalDeletedPrograms:
+            if (gContext->GetNumSetting("DeletedFifoOrder", 0) == 0)
+                return;
+            msg = "Adding deleted programs in FIFO order";
+            where = "recgroup = 'Deleted'";
+            orderby = "lastmodified ASC";
             break;
     }
 
