@@ -3,6 +3,7 @@
 
 #include <qobject.h>
 #include <qtimer.h>
+#include <qstringlist.h>
 
 #include "mythexp.h"
 
@@ -26,6 +27,7 @@ class MPUBLIC XBox : public QObject
     QString DefaultLED;
     QString PhaseCache;
     QString BlinkBIN;
+    int     LEDNonLiveTV;
 };
 
 #endif

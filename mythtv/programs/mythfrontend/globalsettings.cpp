@@ -3368,6 +3368,16 @@ static HostComboBox *XboxLEDRecording()
     return gc;
 }
 
+static HostCheckBox *XboxLEDNonLiveTV()
+{
+    HostCheckBox *gc = new HostCheckBox("XboxLEDNonLiveTV");
+    gc->setLabel(QObject::tr("Ignore LiveTV Recordings"));
+    gc->setHelpText(QObject::tr("Recording monitoring will "
+                    "ignore LiveTV recordings."));
+    gc->setValue(false);
+    return gc;
+}
+
 static HostSpinBox *XboxCheckRec()
 {
     HostSpinBox *gs = new HostSpinBox("XboxCheckRec", 1, 600, 2);
@@ -4824,6 +4834,7 @@ XboxSettings::XboxSettings()
     xboxset->addChild(XboxBlinkBIN());
     xboxset->addChild(XboxLEDDefault());
     xboxset->addChild(XboxLEDRecording());
+    xboxset->addChild(XboxLEDNonLiveTV());
     xboxset->addChild(XboxCheckRec());
     addChild(xboxset);
 }

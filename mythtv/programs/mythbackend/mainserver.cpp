@@ -3720,15 +3720,26 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
 
     MythSocket *pbssock = pbs->getSocket();
     int RecordingsInProgress = 0;
+    int LiveTVRecordingsInProgress = 0;
+    QStringList retlist;
+
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
-        if (elink->IsBusyRecording())
+        if (elink->IsBusyRecording()) {
             RecordingsInProgress++;
+
+            ProgramInfo *info = elink->GetRecording();
+            if (info && info->recgroup == "LiveTV")
+                LiveTVRecordingsInProgress++;
+
+            delete info;
+        }
     }
 
-    QStringList retlist = QString::number(RecordingsInProgress);
+    retlist << QString::number(RecordingsInProgress);
+    retlist << QString::number(LiveTVRecordingsInProgress);
 
     SendResponse(pbssock, retlist);
 }

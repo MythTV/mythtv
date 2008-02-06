@@ -23,6 +23,7 @@ void XBox::GetSettings(void)
     RecordingLED = gContext->GetSetting("XboxLEDRecording","rrrr");
     DefaultLED = gContext->GetSetting("XboxLEDDefault","gggg");
     BlinkBIN = gContext->GetSetting("XboxBlinkBIN");
+    LEDNonLiveTV = gContext->GetNumSetting("XboxLEDNonLiveTV", 0);
 
     if (!BlinkBIN)
         return;
@@ -37,9 +38,16 @@ void XBox::GetSettings(void)
 
 void XBox::CheckRec(void)
 {
-    bool recording = RemoteIsRecording();
+    QStringList recording = RemoteRecordings();
 
-    QString color = (recording) ? RecordingLED : DefaultLED;
+    int all = recording[0].toInt();
+    int livetv = recording[1].toInt();
+    int numrec = all;
+
+    if (LEDNonLiveTV)
+        numrec -= livetv;
+
+    QString color = (numrec) ? RecordingLED : DefaultLED;
 
     if (color != PhaseCache)
     {

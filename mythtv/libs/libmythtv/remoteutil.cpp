@@ -568,14 +568,17 @@ bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
     return state;
 }
 
-int RemoteIsRecording(void)
+QStringList RemoteRecordings(void)
 {
     QStringList strlist = "QUERY_ISRECORDING";
+    QStringList empty;
+
+    empty << "0" << "0";
 
     if (!gContext->SendReceiveStringList(strlist, false, false))
-        return -1;
+        return empty;
 
-    return strlist[0].toInt();
+    return strlist;
 }
 
 int RemoteGetRecordingMask(void)

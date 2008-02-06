@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <qstring.h>
+#include <qstringlist.h>
 using namespace std;
 
 #include "mythexp.h"
@@ -89,7 +90,7 @@ MPUBLIC QString RemoteGetPreviewLastModified(ProgramInfo *pginfo);
 MPUBLIC void RemoteFillProginfo(ProgramInfo *pginfo,
                                 const QString &playbackhostname);
 MPUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
-MPUBLIC int RemoteIsRecording(void);
+MPUBLIC QStringList RemoteRecordings(void);
 MPUBLIC int RemoteGetRecordingMask(void);
 MPUBLIC int RemoteGetFreeRecorderCount(void);
 
