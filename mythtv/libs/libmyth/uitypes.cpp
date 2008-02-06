@@ -3943,16 +3943,13 @@ QStringList UIManagedTreeListType::getRouteToCurrent()
 
 bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
 {
-    if (&route)
+    GenericTree *a_node = my_tree_data->findNode(route);
+    if (a_node && a_node->isSelectable())
     {
-        GenericTree *a_node = my_tree_data->findNode(route);
-        if (a_node && a_node->isSelectable())
-        {
-            active_node = a_node;
-            current_node = a_node;
-            active_parent = active_node->getParent();
-            return true;
-        }
+        active_node = a_node;
+        current_node = a_node;
+        active_parent = active_node->getParent();
+        return true;
     }
     return false;
 }
