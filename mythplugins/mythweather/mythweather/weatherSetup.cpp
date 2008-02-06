@@ -504,6 +504,7 @@ void ScreenSetup::loadData()
         ti->name = dataitem;
         ti->location = location;
         ti->src = m_src_man->getSourceByName(src);
+        types = WeatherScreen::getAllDynamicTypes(m_weather_screens.GetSet(name));
 
         if (!active_screens.find(draworder))
         {
