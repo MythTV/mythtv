@@ -3151,7 +3151,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             ClearOSD();
         }
-        else if (action == "JUMPPREV")
+        else if ((action == "JUMPPREV") ||
+                 ((action == "PREVCHAN") && (!StateIsLiveTV(GetState()))))
         {
             if (PromptRecGroupPassword())
             {
@@ -7218,7 +7219,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         EditSchedule(kScheduleProgramFinder);
     else if (action == "SCHEDULE")
         EditSchedule(kScheduledRecording);
-    else if (action == "JUMPPREV")
+    else if ((action == "JUMPPREV") ||
+             ((action == "PREVCHAN") && (!StateIsLiveTV(GetState()))))
     {
         if (PromptRecGroupPassword())
         {
