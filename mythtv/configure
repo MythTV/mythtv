@@ -3380,6 +3380,7 @@ install:
 uninstall:
 	-rmdir \$(INSTALL_ROOT)/$PREFIX/include/mythtv
 	-rmdir \$(INSTALL_ROOT)/$PREFIX/lib/mythtv
+	-rmdir \$(INSTALL_ROOT)/$PREFIX/share/mythtv
 
 distclean: clean
 	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak 
