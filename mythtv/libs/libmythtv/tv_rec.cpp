@@ -2730,6 +2730,7 @@ void TVRec::SetLiveRecording(int recording)
         VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording() -- cancel");
         // cancel -- 'recording' should be 0 or -1
         SetFlags(kFlagCancelNextRecording);
+        curRecording->recgroup = "LiveTV";
     }
     else if (!was_rec && pseudoLiveTVRecording)
     {
@@ -2742,6 +2743,7 @@ void TVRec::SetLiveRecording(int recording)
         recordEndTime = GetRecordEndTime(pseudoLiveTVRecording);
         NotifySchedulerOfRecording(curRecording);
         recstat = curRecording->recstatus;
+        curRecording->recgroup = "Default";
     }
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
