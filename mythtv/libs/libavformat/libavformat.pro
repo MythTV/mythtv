@@ -13,8 +13,6 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
 LIBS += $$LOCAL_LIBDIR_X11 $$EXTRALIBS
 
-cygwin :LIBS += -lz
-
 mingw:  target.path = $${PREFIX}/bin
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -190,13 +188,13 @@ inc.files = avformat.h avio.h rtp.h rtsp.h rtspcodes.h
 INSTALLS += inc
 
 LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION -L../libavutil -lmythavutil-$$LIBVERSION
+LIBS += -lz
+using_xvmc:LIBS += $$CONFIG_XVMC_LIBS
 
 macx {
-    LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC4000000
     SOURCES            -= audio.c
-#    SOURCES            += audio-darwin.c
 }
 
 mingw:SOURCES -= audio.c

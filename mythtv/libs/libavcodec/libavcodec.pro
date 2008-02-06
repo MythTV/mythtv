@@ -27,7 +27,6 @@ contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
 	QMAKE_CFLAGS_SHLIB =
 }
 
-cygwin:LIBS += -lz
 mingw:target.path = $${PREFIX}/bin
 
 !profile:QMAKE_CFLAGS_DEBUG += -O
@@ -49,6 +48,7 @@ INSTALLS += inc
 
 LIBS += $$LOCAL_LIBDIR_X11
 LIBS += -L../libavutil -lmythavutil-$$LIBVERSION $$EXTRALIBS
+LIBS += -lz
 
 contains( CONFIG_AASC_DECODER, yes )            { SOURCES *= aasc.c }
 contains( CONFIG_AC3_DECODER, yes )             { SOURCES *= ac3dec.c ac3tab.c ac3.c }
@@ -361,6 +361,7 @@ contains( HAVE_BEOSTHREADS, yes )               { SOURCES *= beosthread.c }
 using_xvmc {
     SOURCES *= xvmcvideo.c
     DEFINES += HAVE_XVMC
+    LIBS    += $$CONFIG_XVMC_LIBS
 }
 
 using_xvmc_vld {
@@ -455,7 +456,6 @@ contains( HAVE_ALTIVEC, yes ) {
 }
 
 macx {
-    LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC3000000
     QMAKE_LFLAGS_SHLIB += -read_only_relocs warning
