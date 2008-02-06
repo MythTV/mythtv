@@ -2235,6 +2235,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         {
         case kPowerSearch:
             qphrase.remove(QRegExp("^\\s*AND\\s+", false));
+            qphrase.remove(";", false);
             from << result.value(2).toString();
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       QString(" AND program.manualid = 0 AND ( %2 )")

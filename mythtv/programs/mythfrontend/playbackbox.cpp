@@ -2168,18 +2168,18 @@ bool PlaybackBox::FillList(bool useCachedData)
                     if (hrs < 36)
                         p->recpriority2 += baseValue * (36 - hrs) / 36;
 
-		    if (avgd != 100)
-		    {
-			if (maxEpisodes[recid] > 0)
-			    p->recpriority2 += (baseValue / 2) + (hrs / 24);
-			else
-			    p->recpriority2 +=
-				(baseValue / 3) + (baseValue * hrs / 24 / 4);
-		    }
-                    else if ((hrs / 24) < baseValue)
+                    if (avgd != 100)
+                    {
+                        if (maxEpisodes[recid] > 0)
+                            p->recpriority2 += (baseValue / 2) + (hrs / 24);
+                        else
+                            p->recpriority2 +=
+                                (baseValue / 3) + (baseValue * hrs / 24 / 4);
+                    }
+                    else if ((hrs / 24) < watchListMaxAge)
                         p->recpriority2 += hrs / 24;
                     else
-                        p->recpriority2 += baseValue;
+                        p->recpriority2 += watchListMaxAge;
                 }
             }
 

@@ -699,7 +699,12 @@ bool CustomEdit::checkSyntax(void)
     QString from = m_subtitle->text();
     if (desc.contains(QRegExp("^\\s*AND\\s", false)))
     {
-        msg = "Power Search rules no longer reqiure a leading \"AND\"";
+        msg = "Power Search rules no longer reqiure a leading \"AND\".";
+    }
+    else if (desc.contains(";", false))
+    {
+        msg  = "Power Search rules can not include semicolon ( ; ) ";
+        msg += "statement terminators.";
     }
     else
     {

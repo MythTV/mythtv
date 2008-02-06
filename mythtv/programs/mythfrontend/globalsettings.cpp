@@ -3576,7 +3576,7 @@ static HostSpinBox *PlaybackWLMaxAge()
 
 static HostSpinBox *PlaybackWLBlackOut()
 {
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 1, 3, 1);
+    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 1, 5, 1);
     gs->setLabel(QObject::tr("Days to exclude weekly episodes after delete"));
     gs->setValue(2);
     gs->setHelpText(QObject::tr("When an episode is deleted or marked as "
