@@ -108,6 +108,7 @@ OSDSet::OSDSet(const OSDSet &other)
     for (;iter != other.allTypes->end(); iter++)
     {
         OSDType *type = (*iter);
+
         if (OSDTypeText *item = dynamic_cast<OSDTypeText*>(type))
         {
             OSDTypeText *newtext = new OSDTypeText(*item);
@@ -143,7 +144,7 @@ OSDSet::OSDSet(const OSDSet &other)
         }
         else
         {
-            cerr << "Unknown conversion\n";
+            VERBOSE(VB_IMPORTANT, "Unknown conversion in OSDSet copy");
         }
     }
 }
@@ -508,6 +509,7 @@ QString OSDSet::HandleHotKey(const QKeyEvent *e)
 
 void OSDSet::Display(bool onoff, int osdFunctionalType)
 {
+
     if (onoff)
     {
         m_notimeout = true;
