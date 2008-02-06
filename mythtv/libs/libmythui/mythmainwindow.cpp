@@ -862,23 +862,48 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
 void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                                  const QString &description, const QString &key)
 {
+    VERBOSE(VB_IMPORTANT, "RegisterKey...");
     QString keybind = key;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (d->m_useDB && query.isConnected())
     {
-        query.prepare("SELECT keylist FROM keybindings WHERE "
+        query.prepare("SELECT keylist, description FROM keybindings WHERE "
                       "context = :CONTEXT AND action = :ACTION AND "
                       "hostname = :HOSTNAME ;");
         query.bindValue(":CONTEXT", context);
         query.bindValue(":ACTION", action);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        bool ok = query.exec() && query.isActive();
+
+        if (ok && query.next())
         {
-            query.next();
             keybind = query.value(0).toString();
+            QString db_description = query.value(1).toString();
+
+            // Update keybinding description if changed
+            if (db_description != description)
+            {
+                VERBOSE(VB_IMPORTANT, "Updating description...");
+                query.prepare(
+                    "UPDATE keybindings "
+                    "SET description = :DESCRIPTION "
+                    "WHERE context   = :CONTEXT AND "
+                    "      action    = :ACTION  AND "
+                    "      hostname  = :HOSTNAME");
+
+                query.bindValue(":DESCRIPTION", description);
+                query.bindValue(":CONTEXT",     context);
+                query.bindValue(":ACTION",      action);
+                query.bindValue(":HOSTNAME",    gContext->GetHostName());
+
+                if (!query.exec())
+                {
+                    MythContext::DBError("Update Keybinding", query);
+                }
+            }
         }
         else
         {
