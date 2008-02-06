@@ -3748,6 +3748,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             {
                 GetDTVSignalMonitor()->GetStreamData()->
                     SetVideoStreamsRequired(0);
+                GetDTVSignalMonitor()->IgnoreEncrypted(true);
             }
 
             SetFlags(kFlagSignalMonitorRunning);

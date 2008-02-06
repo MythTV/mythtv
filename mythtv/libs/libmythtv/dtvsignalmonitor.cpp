@@ -46,7 +46,8 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
       last_pat_crc(-1),
-      error("")
+      error(""),
+      ignore_encrypted(false)
 {
 }
 
@@ -350,7 +351,7 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&
         (hasAudio >= GetStreamData()->GetAudioStreamsRequired()))
     {
-        if (pmt->IsEncrypted())
+        if (pmt->IsEncrypted() && !ignore_encrypted)
             AddFlags(kDTVSigMon_WaitForCrypt);
 
         AddFlags(kDTVSigMon_PMTMatch);

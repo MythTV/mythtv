@@ -106,6 +106,8 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint, const ServiceDescriptionTable*);
 
+    void IgnoreEncrypted(bool ignore) { ignore_encrypted = ignore; }
+
   protected:
     DTVChannel *GetDTVChannel(void);
     void UpdateMonitorValues(void);
@@ -144,6 +146,8 @@ class DTVSignalMonitor : public SignalMonitor,
     int64_t           last_pat_crc;
 
     QString            error;
+
+    bool ignore_encrypted;
 };
 
 #endif // DTVSIGNALMONITOR_H
