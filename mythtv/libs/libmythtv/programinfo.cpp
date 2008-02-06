@@ -4109,6 +4109,9 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
     }
 
+    if (pathname.left(7) == "myth://")
+        pathname = GetPlaybackURL();
+
     if (pathname.right(1) == "/")
         pathname.remove(pathname.length() - 1, 1);
 
