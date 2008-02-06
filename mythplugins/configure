@@ -959,6 +959,34 @@ if test "$zoneminder" = "yes" ; then
     fi
 fi
 
+###########################################################
+#                                                         #
+#   An extra directory and Makefile for cleanup rules     #
+#                                                         #
+###########################################################
+
+mkdir -p cleanup
+cat << END_CLEANUP > cleanup/Makefile
+all:
+clean:
+distclean:
+install:
+qmake_all:
+	\$(NONE)
+
+# Hack to remove some empty directories that qmake doesn't create rules for
+uninstall:
+	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv/*
+	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv
+
+END_CLEANUP
+
+echo >> ./config.pro
+echo "# clean up for 'make uninstall'. This must be last" >> ./config.pro
+echo "SUBDIRS += cleanup " >> ./config.pro
+
+###########################################################
+
 echo ""
 
 if test -x $QTDIR/bin/qmake; then
