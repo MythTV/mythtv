@@ -1519,7 +1519,20 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
             d->TempMainWindow(false);
             MythPopupBox::showOkPopup(d->mainWindow,
                                       "Library version error", warning);
-            d->EndTempWindow();
+        }
+        VERBOSE(VB_IMPORTANT, QString("%1").arg(warning));
+
+        return false;
+    }
+
+    if (QDir::homeDirPath() == "/")
+    {
+        QString warning = "Cannot locate your home directory."
+                          " Please set the environment variable HOME";
+        if (gui)
+        {
+            d->TempMainWindow(false);
+            MythPopupBox::showOkPopup(d->mainWindow, "HOME error", warning);
         }
         VERBOSE(VB_IMPORTANT, QString("%1").arg(warning));
 
