@@ -169,6 +169,7 @@ QString ProfileItem::toString(void) const
     QString cmp0      = Get("pref_cmp0");
     QString cmp1      = Get("pref_cmp1");
     QString decoder   = Get("pref_decoder");
+    uint    max_cpus  = Get("pref_max_cpus").toUInt();
     QString renderer  = Get("pref_videorenderer");
     QString osd       = Get("pref_osdrenderer");
     QString deint0    = Get("pref_deint0");
@@ -176,10 +177,10 @@ QString ProfileItem::toString(void) const
     QString filter    = Get("pref_filters");
     bool    osdfade   = Get("pref_osdfade").toInt();
 
-    return QString("cmp(%1%2) dec(%3) rend(%4) osd(%5) osdfade(%6) "
-                   "deint(%7,%8) filt(%9)")
+    return QString("cmp(%1%2) dec(%3) cpus(%4) rend(%5) osd(%6) osdfade(%7) "
+                   "deint(%8,%9) filt(%10)")
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
-        .arg(decoder).arg(renderer)
+        .arg(decoder).arg(max_cpus).arg(renderer)
         .arg(osd).arg((osdfade) ? "enabled" : "disabled")
         .arg(deint0).arg(deint1).arg(filter);
 }
@@ -369,6 +370,14 @@ void VideoDisplayProfile::LoadBestPreferences(const QSize &size,
     item_list_t::const_iterator it = FindMatch(size, framerate);
     if (it != all_pref.end())
         pref = (*it).GetAll();
+}
+
+uint VideoDisplayProfile::GetMaxCPUs(void) const
+{
+    QString cpus = GetPreference("pref_max_cpus");
+    if (cpus.isEmpty())
+        return 1;
+    return cpus.toUInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -762,7 +771,7 @@ void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
     QString cmp0, uint width0, uint height0,
     QString cmp1, uint width1, uint height1,
-    QString decoder, QString videorenderer,
+    QString decoder, uint max_cpus, QString videorenderer,
     QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
 {
@@ -804,6 +813,9 @@ void VideoDisplayProfile::CreateProfile(
 
     queryValue += "pref_decoder";
     queryData  += decoder;
+
+    queryValue += "pref_max_cpus";
+    queryData  += QString::number(max_cpus);
 
     queryValue += "pref_videorenderer";
     queryData  += videorenderer;
@@ -886,44 +898,44 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 
     uint groupid = CreateProfileGroup("CPU++", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", "xv-blit", "softblend", true,
+                  "ffmpeg", 1, "xv-blit", "softblend", true,
                   "bobdeint", "linearblend", "");
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                  "ffmpeg", "quartz-blit", "softblend", true,
+                  "ffmpeg", 1, "quartz-blit", "softblend", true,
                   "linearblend", "linearblend", "");
 
     groupid = CreateProfileGroup("CPU+", hostname);
     CreateProfile(groupid, 1, "<=", 720, 576, ">", 0, 0,
-                  "ffmpeg", "xv-blit", "softblend", true,
+                  "ffmpeg", 1, "xv-blit", "softblend", true,
                   "bobdeint", "linearblend", "");
     CreateProfile(groupid, 2, "<=", 1280, 720, ">", 720, 576,
-                  "xvmc", "xvmc-blit", "opengl", true,
+                  "xvmc", 1, "xvmc-blit", "opengl", true,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 3, "<=", 1280, 720, ">", 720, 576,
-                  "libmpeg2", "xv-blit", "softblend", true,
+                  "libmpeg2", 1, "xv-blit", "softblend", true,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "xvmc", "xvmc-blit", "ia44blend", false,
+                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 5, ">", 0, 0, "", 0, 0,
-                  "libmpeg2", "xv-blit", "chromakey", false,
+                  "libmpeg2", 1, "xv-blit", "chromakey", false,
                   "bobdeint", "onefield", "");
 
     groupid = CreateProfileGroup("CPU--", hostname);
     CreateProfile(groupid, 1, "<=", 720, 576, ">", 0, 0,
-                  "ivtv", "ivtv", "ivtv", true,
+                  "ivtv", 1, "ivtv", "ivtv", true,
                   "none", "none", "");
     CreateProfile(groupid, 2, "<=", 720, 576, ">", 0, 0,
-                  "xvmc", "xvmc-blit", "ia44blend", false,
+                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 3, "<=", 1280, 720, ">", 720, 576,
-                  "xvmc", "xvmc-blit", "ia44blend", false,
+                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "xvmc", "xvmc-blit", "ia44blend", false,
+                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 5, ">", 0, 0, "", 0, 0,
-                  "libmpeg2", "xv-blit", "chromakey", false,
+                  "libmpeg2", 1, "xv-blit", "chromakey", false,
                   "none", "none", "");
 }
 

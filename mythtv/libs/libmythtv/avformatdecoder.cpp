@@ -1446,6 +1446,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 VideoDisplayProfile vdp;
                 vdp.SetInput(QSize(width, height));
                 QString dec = vdp.GetDecoder();
+                uint thread_count = vdp.GetMaxCPUs();
+                VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
+                        .arg(ENABLE_THREADS ? thread_count : 1));
+
+                if (ENABLE_THREADS && thread_count > 1)
+                {
+                    avcodec_thread_init(enc, thread_count);
+                    enc->thread_count = thread_count;
+                }
 
                 bool handled = false;
 #ifdef USING_XVMC
