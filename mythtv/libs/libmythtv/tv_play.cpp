@@ -5707,31 +5707,37 @@ void *TV::RecordedShowMenuHandler(void *param)
 /**
  * \brief Used by EditSchedule(). Unpauses embedded tv based on whether theme 
     exists and/or if knob to continued playback is enabled
+    \returns true if player should be embedded
  */
-void TV::VideoThemeCheck(QString str, bool stayPaused)
+bool TV::VideoThemeCheck(QString str, bool stayPaused)
 {   
-    // see if embedded window is allowed
-    bool allowembed = false;
-    if (gContext->GetNumSetting("ContinueEmbeddedTVPlay", 0) ||
-        StateIsLiveTV(GetState()))
-    {
-        allowembed = (nvp && nvp->getVideoOutput() && 
-                nvp->getVideoOutput()->AllowEmbedding());
-    }
+    if (StateIsLiveTV(GetState()))
+        return true;
+
+    bool ret = true;
+    bool allowembed = (nvp && nvp->getVideoOutput() && 
+                    nvp->getVideoOutput()->AllowPreviewEPG());
 
     long long margin = (long long)(nvp->GetFrameRate() *
                         nvp->GetAudioStretchFactor());
     margin = margin * 5;
     QDomElement xmldata;
     XMLParse *theme = new XMLParse();
-    if (allowembed && theme->LoadTheme(xmldata, str) && 
-        !nvp->IsNearEnd(margin) && !stayPaused)
+    if (!allowembed ||
+        !theme->LoadTheme(xmldata, str) ||
+        !gContext->GetNumSetting("ContinueEmbeddedTVPlay", 0) ||
+        nvp->IsNearEnd(margin) ||
+        paused)
     {
-        DoPause(false);
+        if (!stayPaused)
+            DoPause(false);
+        ret = false;
     }
 
     if (theme)
         delete theme;
+
+    return ret;
 }
 
 void TV::doEditSchedule(int editType)
@@ -5766,16 +5772,22 @@ void TV::doEditSchedule(int editType)
     ProgramInfo *nextProgram = NULL;
 
     bool stayPaused = paused;
-    if (!paused)
-        DoPause(false);
+    TV *player = NULL;
+    bool showvideo = false;
 
     switch (editType)
     {
         default:
         case kScheduleProgramGuide:
-            VideoThemeCheck("programguide-video", stayPaused);
-            GuideGrid::Run(chanid, channum, false, this);
+        {
+            bool allowsecondary = true;
+            if (nvp && nvp->getVideoOutput())
+                allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
+            if (VideoThemeCheck("programguide-video", stayPaused))
+                player = this;
+            GuideGrid::Run(chanid, channum, false, player, allowsecondary);
             break;
+        }
         case kScheduleProgramFinder:
             RunProgramFind(false, false);
             break;
@@ -5790,22 +5802,22 @@ void TV::doEditSchedule(int editType)
         }
         case kViewSchedule:
         {
-            VideoThemeCheck("conflict-video", stayPaused);
-            RunViewScheduledPtr((void *)this);
+            showvideo = VideoThemeCheck("conflict-video", stayPaused);
+            RunViewScheduledPtr((void *)this, showvideo);
             break;
         }
         case kPlaybackBox:
         {
-            VideoThemeCheck("playback-video", stayPaused);
-            nextProgram = RunPlaybackBoxPtr((void *)this);
+            showvideo = VideoThemeCheck("playback-video", stayPaused);
+            nextProgram = RunPlaybackBoxPtr((void *)this, showvideo);
         }
     }
 
-    if (!stayPaused && paused)
-        DoPause(false);
-
     if (IsEmbedding())
         StopEmbeddingOutput();
+
+    if (StateIsPlaying(GetState()) && !stayPaused && paused)
+        DoPause();
 
     if (nextProgram)
     {

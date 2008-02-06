@@ -42,8 +42,8 @@ typedef QValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
-typedef ProgramInfo * (*RUNPLAYBACKBOX)(void *);
-typedef void (*RUNVIEWSCHEDULED) (void *);
+typedef ProgramInfo * (*RUNPLAYBACKBOX)(void *, bool);
+typedef void (*RUNVIEWSCHEDULED) (void *, bool);
 
 class VBIMode
 {
@@ -199,8 +199,6 @@ class MPUBLIC TV : public QObject
     bool IsVideoExitDialog(void);
     /// true if NVP is near the end
     bool IsNearEnd(void) const { return isnearend; }
-    /// true if tv player is paused
-    bool IsPaused(void) const { return paused; }
 
     // Other queries
     int GetLastRecorderNum(void) const;
@@ -243,7 +241,6 @@ class MPUBLIC TV : public QObject
     void doEditSchedule(int editType = kScheduleProgramGuide);
     static void *RecordedShowMenuHandler(void *param);
     static void *ViewScheduledMenuHandler(void *param);
-    void VideoThemeCheck(QString str, bool stayPaused = false);
 
     void RunTV(void);
     static void *EventThread(void *param);
@@ -413,6 +410,8 @@ class MPUBLIC TV : public QObject
     void ITVRestart(bool isLive);
 
     bool ScreenShot(long long frameNumber);
+
+    bool VideoThemeCheck(QString str, bool stayPaused = false);
 
     //dvd functions
     void DVDJumpBack(void);

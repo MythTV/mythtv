@@ -115,7 +115,7 @@ class VideoOutput
     int         GetPictureAttribute(PictureAttribute) const;
     virtual void InitPictureAttributes(void);
 
-    bool AllowEmbedding(void) { return allowpreviewepg; }
+    bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
     /// \brief Returns true iff Motion Compensation acceleration is available.
     virtual bool hasMCAcceleration(void) const { return false; }

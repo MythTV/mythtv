@@ -196,13 +196,13 @@ static int comp_recordDate_rev(ProgramInfo *a, ProgramInfo *b)
 }
 
 
-ProgramInfo *PlaybackBox::RunPlaybackBox(void * player)
+ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
     ProgramInfo *nextProgram = NULL;
     qApp->lock();
 
     PlaybackBox *pbb = new PlaybackBox(PlaybackBox::Play,
-            gContext->GetMainWindow(), "tvplayselect", (TV *)player);
+            gContext->GetMainWindow(), "tvplayselect", (TV *)player, showTV);
     pbb->Show();
 
     qApp->unlock();
@@ -217,7 +217,7 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player)
 }
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
-                         const char *name, TV *player)
+                         const char *name, TV *player, bool showTV)
     : MythDialog(parent, name),
       // Settings
       type(ltype),
@@ -348,7 +348,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // theme stuff
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && !m_player->IsPaused() &&
+    if (m_player && m_player->IsRunning() && showTV &&
         theme->LoadTheme(xmldata,"playback-video"))
     {
         playbackVideoContainer = true;

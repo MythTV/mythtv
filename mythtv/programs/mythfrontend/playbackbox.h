@@ -120,11 +120,12 @@ class PlaybackBox : public MythDialog
     } killStateType;
      
 
-    PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0, TV *player = NULL);
+    PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0, 
+                TV *player = NULL, bool showTV = false);
    ~PlaybackBox(void);
    
     void customEvent(QCustomEvent *e);
-    static ProgramInfo *RunPlaybackBox(void *player);
+    static ProgramInfo *RunPlaybackBox(void *player, bool);
 
   public slots:
     DialogCode exec();

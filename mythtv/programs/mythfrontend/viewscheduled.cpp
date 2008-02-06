@@ -27,12 +27,12 @@ using namespace std;
 
 QWaitCondition vsbIsVisibleCond;
 
-void *ViewScheduled::RunViewScheduled(void *player)
+void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
     qApp->lock();
 
     ViewScheduled *vsb = new ViewScheduled(gContext->GetMainWindow(),
-                            "view scheduled", (TV*)player);
+                            "view scheduled", (TV*)player, showTV);
     vsb->Show();
     qApp->unlock();
     vsbIsVisibleCond.wait();
@@ -42,7 +42,7 @@ void *ViewScheduled::RunViewScheduled(void *player)
 }
 
 ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
-                            TV* player)
+                            TV* player, bool showTV)
              : MythDialog(parent, name)
 {
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -61,7 +61,7 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && m_player->IsRunning() && !m_player->IsPaused())
+    if (m_player && m_player->IsRunning() && showTV)
     {
         if (!theme->LoadTheme(xmldata, "conflict-video"))
             theme->LoadTheme(xmldata, "conflict");

@@ -17,9 +17,9 @@ class ViewScheduled : public MythDialog
     Q_OBJECT
   public:
     ViewScheduled(MythMainWindow *parent, const char *name = 0,
-                    TV *player = NULL);
+                    TV *player = NULL, bool showTV = false);
     ~ViewScheduled();
-    static void * RunViewScheduled(void *player);
+    static void * RunViewScheduled(void *player, bool);
 
   protected slots:
     void edit();
