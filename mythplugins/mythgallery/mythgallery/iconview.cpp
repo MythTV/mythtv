@@ -1055,9 +1055,6 @@ void IconView::LoadThumbnail(ThumbItem *item)
 
     if (!image.isNull())
     {
-        image = image.smoothScale((int)(m_thumbW - 10 * wmult),
-                                  (int)(m_thumbH - 10 * hmult),
-                                  QImage::ScaleMin);
         int rotateAngle = 0;
 
         rotateAngle = item->GetRotationAngle();
