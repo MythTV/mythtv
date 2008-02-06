@@ -862,7 +862,6 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
 void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                                  const QString &description, const QString &key)
 {
-    VERBOSE(VB_IMPORTANT, "RegisterKey...");
     QString keybind = key;
 
     MSqlQuery query(MSqlQuery::InitCon());
