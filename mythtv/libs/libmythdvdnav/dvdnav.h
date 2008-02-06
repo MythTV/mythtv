@@ -541,7 +541,7 @@ dvdnav_status_t dvdnav_get_serial_number(dvdnav_t *self, const char **serial_str
  * The aspect code does only change on VTS boundaries.
  * See the DVDNAV_VTS_CHANGE event.
  * 
- * 0 -- 4:3, 2 -- 16:9
+ * 0 -- 4:3, 3 -- 16:9
  */
 uint8_t dvdnav_get_video_aspect(dvdnav_t *self);
 

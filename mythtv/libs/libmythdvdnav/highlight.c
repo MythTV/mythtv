@@ -289,7 +289,8 @@ dvdnav_status_t dvdnav_left_button_select(dvdnav_t *this, pci_t *pci) {
 
 dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32_t mode, 
 					  dvdnav_highlight_area_t *highlight) {
-  btni_t *button_ptr;
+  btni_t *button_ptr = NULL;
+  unsigned int btns_per_group;
 
 #ifdef BUTTON_TESTING
   fprintf(MSG_OUT, "libdvdnav: Button get_highlight_area %i\n", button);
@@ -300,8 +301,34 @@ dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32
   if((button <= 0) || (button > nav_pci->hli.hl_gi.btn_ns))
     return DVDNAV_STATUS_ERR;
 
+/* code obtained from xine spu.c */
+/* choose button group: we can always use a normal 4:3 or 
+   widescreen button group */
 
-  button_ptr = &nav_pci->hli.btnit[button-1];
+  btns_per_group = 36 / nav_pci->hli.hl_gi.btngr_ns;
+
+  if (!button_ptr && nav_pci->hli.hl_gi.btngr_ns >= 1 && 
+      !(nav_pci->hli.hl_gi.btngr1_dsp_ty & 6))
+  {
+    button_ptr = &nav_pci->hli.btnit[0 * btns_per_group + button - 1];
+  }
+   
+  if (!button_ptr && nav_pci->hli.hl_gi.btngr_ns >= 2 && 
+      !(nav_pci->hli.hl_gi.btngr2_dsp_ty & 6))
+  {
+    button_ptr = &nav_pci->hli.btnit[1 * btns_per_group + button - 1];
+  }
+  
+  if (!button_ptr && nav_pci->hli.hl_gi.btngr_ns >= 3 && 
+      !(nav_pci->hli.hl_gi.btngr3_dsp_ty & 6))
+  {
+    button_ptr = &nav_pci->hli.btnit[2 * btns_per_group + button - 1];
+  }
+  
+  if (!button_ptr) {
+    button_ptr = &nav_pci->hli.btnit[button - 1];
+  }
+
 
   highlight->sx = button_ptr->x_start;
   highlight->sy = button_ptr->y_start;

@@ -782,8 +782,12 @@ AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
 {
     menuBtnLock.lock();
 
-    if ((menuBuflength > 4) && buttonExists)
+    if ((menuBuflength > 4) && buttonExists &&
+        (dvdMenuButton.rects[0].h > hl_height) && 
+        (dvdMenuButton.rects[0].w > hl_width))
+    {
         return &(dvdMenuButton.rects[0]);
+    }
 
     return NULL;
 }
@@ -1005,10 +1009,14 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
 
     int32_t button;
     pci_t *pci;
+    dvdnav_status_t dvdRet;
     dvdnav_highlight_area_t hl;
     dvdnav_get_current_highlight(dvdnav, &button);
     pci = dvdnav_get_current_nav_pci(dvdnav);
-    dvdnav_get_highlight_area(pci, button, b_mode, &hl);
+    dvdRet = dvdnav_get_highlight_area(pci, button, b_mode, &hl);
+
+    if (dvdRet == DVDNAV_STATUS_ERR)
+        return false;
 
     for (int i = 0 ; i < 4 ; i++)
     {
