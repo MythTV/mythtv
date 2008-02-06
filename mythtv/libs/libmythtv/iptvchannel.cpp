@@ -107,6 +107,9 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
+    if (!(*it)->externalChanger.isEmpty() && !ChangeExternalChannel(channum))
+        return false;
+
     // Set the current channum to the new channel's channum
     curchannelname = QDeepCopy<QString>(channum);
 
