@@ -2283,11 +2283,13 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 
     if (recordid == -1 || from.count() == 0)
     {
-        from << "";
-        QString s("RECTABLE.search = :NRST AND "
-                 "(RECTABLE.recordid = :NRRECORDID OR :NRRECORDID = -1) AND "
-                 "program.manualid = 0 AND "
-                 "program.title = RECTABLE.title ");
+        QString recidmatch = "";
+        if (recordid != -1)
+            recidmatch = "RECTABLE.recordid = :NRRECORDID AND ";
+        QString s = recidmatch + 
+            "RECTABLE.search = :NRST AND "
+            "program.manualid = 0 AND "
+            "program.title = RECTABLE.title ";
 
         while (1)
         {
@@ -2296,6 +2298,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
             s = s.replace(i, strlen("RECTABLE"), recordTable);
         }
 
+        from << "";
         where << s;
         bindings[":NRST"] = kNoSearch;
         bindings[":NRRECORDID"] = recordid;
@@ -2309,10 +2312,15 @@ void Scheduler::UpdateMatches(int recordid) {
         return;
 
     MSqlQuery query(dbConn);
-    query.prepare("DELETE FROM recordmatch "
-                  "WHERE recordid = :RECORDID OR :RECORDID = -1;");
 
-    query.bindValue(":RECORDID", recordid);
+    if (recordid == -1)
+        query.prepare("DELETE FROM recordmatch");
+    else
+    {
+        query.prepare("DELETE FROM recordmatch WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
+    }
+
     query.exec();
     if (!query.isActive())
     {
@@ -2320,10 +2328,13 @@ void Scheduler::UpdateMatches(int recordid) {
         return;
     }
 
-    query.prepare("DELETE FROM program "
-                  "WHERE manualid = :RECORDID OR "
-                  " (manualid <> 0 AND :RECORDID = -1)");
-    query.bindValue(":RECORDID", recordid);
+    if (recordid == -1)
+        query.prepare("DELETE FROM program WHERE manualid <> 0");
+    else
+    {
+        query.prepare("DELETE FROM program WHERE manualid = :RECORDID");
+        query.bindValue(":RECORDID", recordid);
+    }
     query.exec();
     if (!query.isActive())
     {
