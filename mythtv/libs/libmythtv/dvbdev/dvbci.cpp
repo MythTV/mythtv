@@ -415,7 +415,7 @@ int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Dat
   return TPDU.Write(fd);
 }
 
-#define CAM_READ_TIMEOUT  3500 // ms
+#define CAM_READ_TIMEOUT  5000 // ms
 
 int cCiTransportConnection::RecvTPDU(void)
 {
@@ -503,7 +503,7 @@ const uint8_t *cCiTransportConnection::Data(int &Length)
   return tpdu->Data(Length);
 }
 
-#define MAX_CONNECT_RETRIES  20
+#define MAX_CONNECT_RETRIES  25
 
 int cCiTransportConnection::CreateConnection(void)
 {
@@ -959,7 +959,7 @@ bool cCiApplicationInformation::EnterMenu(void)
 }
 
 // --- cCiConditionalAccessSupport -------------------------------------------
-#define MAXCASYSTEMIDS 16
+#define MAXCASYSTEMIDS 64
 
 class cCiConditionalAccessSupport : public cCiSession {
 private:
