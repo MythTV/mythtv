@@ -5785,7 +5785,13 @@ void TV::doEditSchedule(int editType)
                 allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
             if (VideoThemeCheck("programguide-video", stayPaused))
                 player = this;
-            GuideGrid::Run(chanid, channum, false, player, allowsecondary);
+            if (StateIsLiveTV(GetState()))
+            {
+                changeChannel = GuideGrid::Run(chanid, channum, false, 
+                                            player, allowsecondary);
+            }
+            else
+                GuideGrid::Run(chanid, channum, false, player);
             break;
         }
         case kScheduleProgramFinder:
