@@ -32,7 +32,6 @@ class ViewScheduled : public MythDialog
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
-    void timeout(void);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -94,7 +93,6 @@ class ViewScheduled : public MythDialog
     int curinput;
 
     TV *m_player;
-    QTimer *timer;
 };
 
 #endif

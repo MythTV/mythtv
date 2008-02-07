@@ -43,7 +43,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 
 ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
                             TV* player, bool showTV)
-             : MythDialog(parent, name), timer(NULL)
+             : MythDialog(parent, name)
 {
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -71,12 +71,7 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
     LoadWindow(xmldata);
 
     if (m_player)
-    {
-        timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-        timer->start(500);
         EmbedTVWindow();
-    }
 
     LayerSet *container = theme->GetSet("selector");
     if (container)
@@ -118,12 +113,6 @@ ViewScheduled::~ViewScheduled()
     gContext->removeCurrentLocation();
 
     delete theme;
-}
-
-void ViewScheduled::timeout(void)
-{
-    if (m_player)
-        EmbedTVWindow();
 }
 
 void ViewScheduled::keyPressEvent(QKeyEvent *e)
@@ -683,6 +672,8 @@ void ViewScheduled::remove()
         ScheduledRecording::signalChange(recid);
     }
     record->deleteLater();
+
+    EmbedTVWindow();
 }
 
 void ViewScheduled::upcoming()
@@ -696,6 +687,8 @@ void ViewScheduled::upcoming()
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+
+    EmbedTVWindow();
 }
 
 void ViewScheduled::details()
@@ -704,6 +697,8 @@ void ViewScheduled::details()
 
     if (p)
         p->showDetails();
+ 
+    EmbedTVWindow();
 }
 
 void ViewScheduled::selected()
@@ -713,6 +708,8 @@ void ViewScheduled::selected()
         return;
 
     p->EditRecording();
+
+    EmbedTVWindow();
 }
 
 void ViewScheduled::customEvent(QCustomEvent *e)
