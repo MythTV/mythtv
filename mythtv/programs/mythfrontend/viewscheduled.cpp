@@ -43,7 +43,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 
 ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
                             TV* player, bool showTV)
-             : MythDialog(parent, name)
+             : MythDialog(parent, name), timer(NULL)
 {
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -69,8 +69,6 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
     else
         theme->LoadTheme(xmldata, "conflict");
     LoadWindow(xmldata);
-
-    timer = NULL;
 
     if (m_player)
     {
@@ -118,12 +116,6 @@ ViewScheduled::~ViewScheduled()
     gContext->SaveSetting("ViewSchedShowLevel", !showAll);
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
-
-    if (timer)
-    {
-        timer->deleteLater();
-        timer = NULL;
-    }
 
     delete theme;
 }
