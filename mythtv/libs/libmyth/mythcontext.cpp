@@ -1520,12 +1520,28 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
             MythPopupBox::showOkPopup(d->mainWindow,
                                       "Library version error", warning);
         }
-        VERBOSE(VB_IMPORTANT, QString("%1").arg(warning));
+        VERBOSE(VB_IMPORTANT, warning);
 
         return false;
     }
 
-    if (QDir::homeDirPath() == "/")
+#ifdef _WIN32 
+    // HOME environment variable might not be defined 
+    // some libraries will fail without it 
+    char *home = getenv("HOME"); 
+    if (!home) 
+    { 
+        home = getenv("LOCALAPPDATA");      // Vista
+        if (!home)
+            home = getenv("LOCALAPPDATA");  // XP
+        if (!home)
+            home = ".";  // getenv("TEMP")?
+
+        _putenv(QString("HOME=%1").arg(home)); 
+    } 
+#endif
+
+    if (QDir::homeDirPath() == "/" && ! getenv("MYTHCONFDIR"))
     {
         QString warning = "Cannot locate your home directory."
                           " Please set the environment variable HOME";
@@ -1534,7 +1550,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
             d->TempMainWindow(false);
             MythPopupBox::showOkPopup(d->mainWindow, "HOME error", warning);
         }
-        VERBOSE(VB_IMPORTANT, QString("%1").arg(warning));
+        VERBOSE(VB_IMPORTANT, warning + " or MYTHCONFDIR");
 
         return false;
     }
