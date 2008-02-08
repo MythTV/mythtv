@@ -5,14 +5,19 @@
 
 #include "flixutil.h"
 
-QString chooseQueue(void)
+QString chooseQueue(QString excludedQueue)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString queueName = "";
 
-    query.exec("SELECT DISTINCT queue "
+    QString sql ="SELECT DISTINCT queue "
                     "FROM netflix "
-                    "WHERE queue <> ''");
+                    "WHERE queue <> ''";
+
+    if (excludedQueue != "")
+        sql += QString(" AND queue <> '%1'").arg(excludedQueue);
+
+    query.exec(sql);
 
     if (!query.isActive())
     {
@@ -27,7 +32,7 @@ QString chooseQueue(void)
             queues += query.value(0).toString();
         }
 
-        if (queues.size() > 1)
+        if (queues.size() > 1 || excludedQueue != "")
         {
             MythPopupBox *queuePopup;
             queuePopup = new MythPopupBox(gContext->GetMainWindow(),

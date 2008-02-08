@@ -39,6 +39,7 @@
 #include "mythtv/httpcomms.h"
 
 #include "mythflixqueue.h"
+#include "flixutil.h"
 
 MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name,
                              QString queueName)
@@ -564,6 +565,69 @@ void MythFlixQueue::slotRemoveFromQueue()
 
 }
 
+void MythFlixQueue::slotMoveToQueue()
+{
+    if (expectingPopup)
+        slotCancelPopup();
+
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+
+    if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+
+            QString newQueue = chooseQueue(m_queueName);
+
+            if (newQueue == "__NONE__")
+            {
+                MythPopupBox::showOkPopup(
+                    gContext->GetMainWindow(), tr("Move Canceled"),
+                    tr("Item not moved."));
+                return;
+            }
+
+            QStringList base =
+                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+
+            QString movieID(article->articleURL());
+            int length = movieID.length();
+            int index = movieID.findRev("/");
+            movieID = movieID.mid(index+1,length);            
+
+            QStringList args = base;
+            QString results;
+
+            if (newQueue != "")
+            {
+                args += "-q";
+                args += newQueue;
+            }
+
+            args += "-A";
+            args += movieID;
+
+            results = executeExternal(args, "Add To Queue");
+
+            args = base;
+
+            if (m_queueName != "")
+            {
+                args += "-q";
+                args += m_queueName;
+            }
+
+            args += "-R";
+            args += movieID;
+            
+            results = executeExternal(args, "Remove From Queue");
+
+            slotRetrieveNews();
+        }
+    } 
+}
+
 void MythFlixQueue::slotShowNetFlixPage()
 {
     if (expectingPopup)
@@ -607,7 +671,11 @@ void MythFlixQueue::displayOptions()
 
     popup->addButton(tr("Remove From Queue"), this,
                      SLOT(slotRemoveFromQueue()));
-                     
+
+    if (m_queueName != "")
+        popup->addButton(tr("Move To Another Queue"), this,
+                         SLOT(slotMoveToQueue()));
+
     popup->addButton(tr("Show NetFlix Page"), this,
                      SLOT(slotShowNetFlixPage()));
 

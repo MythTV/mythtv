@@ -95,6 +95,7 @@ private slots:
 
     void slotMoveToTop();
     void slotRemoveFromQueue();
+    void slotMoveToQueue();
     void slotShowNetFlixPage();
     void slotCancelPopup();
 
