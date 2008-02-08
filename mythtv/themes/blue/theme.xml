@@ -349,6 +349,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="SCREENSETUPWIZARD">
+    <image>APPEARANCE.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
   <buttondef name="SETTINGS_TV">
     <image>watch_tv.png</image>
     <offset>20,10</offset>
