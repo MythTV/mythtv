@@ -1533,7 +1533,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
     { 
         home = getenv("LOCALAPPDATA");      // Vista
         if (!home)
-            home = getenv("LOCALAPPDATA");  // XP
+            home = getenv("APPDATA");       // XP
         if (!home)
             home = ".";  // getenv("TEMP")?
 
