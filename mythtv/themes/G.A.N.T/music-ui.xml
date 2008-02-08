@@ -181,12 +181,12 @@
                 <!--
                     An image to show the current navigation node
                 -->
-                <image function="selectionbar" filename="selectionbar.png"></image>
+                <image function="selectionbar" filename="rk-selectbar.png"></image>
                 <!--
                     Some arrow images
                 -->
-                <image function="uparrow" filename="mm_up_arrow.png"></image>
-                <image function="downarrow" filename="mm_down_arrow.png"></image>
+                <image function="uparrow" filename="gantup.png" location="5,5"></image>
+                <image function="downarrow" filename="gantdown.png" location="5,5"></image>
                 <image function="leftarrow" filename="mm_left_arrow.png"></image>
                 <image function="rightarrow" filename="mm_right_arrow.png"></image>
                 <!-- 
