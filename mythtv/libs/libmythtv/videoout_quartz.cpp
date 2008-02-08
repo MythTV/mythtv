@@ -94,7 +94,7 @@ class QuartzData
         scaleUpVideo(false),        correctGamma(false),
         convertI420to2VUY(NULL),
 
-        ZoomedIn(0),
+	ZoomedH(1.0f), ZoomedV(1.0f),
         ZoomedUp(0),                ZoomedRight(0),
 
         embeddedView(NULL),         dvdv(NULL)
@@ -126,7 +126,8 @@ class QuartzData
     conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
     
     // Zoom preferences:
-    int                ZoomedIn;          // VideoOutputBase::mz_scale
+    float              ZoomedH;           // VideoOutputBase::mz_scale_h
+    float              ZoomedV;           // VideoOutputBase::mz_scale_v
     int                ZoomedUp;          // VideoOutputBase::mz_move.y()
     int                ZoomedRight;       // VideoOutputBase::mz_move.x()
 
@@ -394,10 +395,10 @@ void VideoOutputQuartzView::Transform(void)
             hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
             break;
     }
-    if (parentData->ZoomedIn)
+    if ((parentData->ZoomedH != 1.0f) || (parentData->ZoomedV != 1.0f))
     {
-        hscale *= 1 + (parentData->ZoomedIn * .01);
-        vscale *= 1 + (parentData->ZoomedIn * .01);
+        hscale *= 1 + (parentData->ZoomedH);
+        vscale *= 1 + (parentData->ZoomedV);
     }
 
     // cap zooming if we requested it
@@ -478,11 +479,11 @@ void VideoOutputQuartzView::Transform(void)
     }
     
     // apply zoomed offsets
-    if (parentData->ZoomedIn)
+    if ((parentData->ZoomedH != 1.0f) || (parentData->ZoomedV != 1.0f))
     { 
         // calculate original vs. zoomed dimensions
-        int zw = (int)(sw / (1.0 + (parentData->ZoomedIn * .01)));
-        int zh = (int)(sh / (1.0 + (parentData->ZoomedIn * .01)));
+        int zw = (int)(sw / (1.0 + (parentData->ZoomedH)));
+        int zh = (int)(sh / (1.0 + (parentData->ZoomedV)));
                 
         int zoomx = (int)((sw - zw) * parentData->ZoomedRight * .005);
         int zoomy = (int)((sh - zh) * parentData->ZoomedUp    * .005);
@@ -1246,7 +1247,8 @@ void VideoOutputQuartz::Zoom(ZoomDirection direction)
 
     VideoOutput::Zoom(direction);
     MoveResize();
-    data->ZoomedIn    = mz_scale;
+    data->ZoomedH     = mz_scale_h;
+    data->ZoomedV     = mz_scale_v;
     data->ZoomedUp    = mz_move.y();
     data->ZoomedRight = mz_move.x();
 
@@ -1361,8 +1363,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->srcHeight = height;
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
-    
-    data->ZoomedIn = 0;
+
+    data->ZoomedH = 1.0f;
+    data->ZoomedV = 1.0f;
     data->ZoomedUp = 0;
     data->ZoomedRight = 0;
 
