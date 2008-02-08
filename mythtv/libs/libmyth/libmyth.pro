@@ -23,7 +23,7 @@ HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
 HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
 HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
 HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
-HEADERS += mythhdd.h mythcdrom.h
+HEADERS += mythhdd.h mythcdrom.h storagegroup.h
 HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
@@ -39,7 +39,7 @@ SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
 SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
-SOURCES += mythhdd.cpp mythcdrom.cpp
+SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../ ./
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
@@ -63,7 +63,7 @@ inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
-inc.files += mythexp.h mythpluginapi.h compat.h
+inc.files += mythexp.h mythpluginapi.h storagegroup.h compat.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>

@@ -23,6 +23,7 @@
 #include "libmyth/dialogbox.h"
 #include "libmyth/exitcodes.h"
 #include "libmyth/util.h"
+#include "libmyth/storagegroup.h"
 #include "libmythui/myththemedmenu.h"
 #include "libmythui/myththemebase.h"
 
@@ -30,7 +31,6 @@
 #include "libmythtv/videosource.h"
 #include "libmythtv/channeleditor.h"
 #include "libmythtv/remoteutil.h"
-#include "libmythtv/storagegroup.h"
 #include "backendsettings.h"
 #include "checksetup.h"
 

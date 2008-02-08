@@ -32,9 +32,9 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/compat.h"
+#include "libmyth/storagegroup.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
-#include "libmythtv/storagegroup.h"
 #include "libmythtv/cardutil.h"
 
 #define LOC QString("Scheduler: ")
