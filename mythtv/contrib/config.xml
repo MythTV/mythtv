@@ -1,0 +1,14 @@
+<Configuration>
+  <UPnP>
+    <MythFrontend>
+      <DefaultBackend>
+        <LocalHostName>my-unique-identifier-goes-here</LocalHostName>
+        <DBHostName>127.0.0.1</DBHostName>
+        <DBUserName>mythtv</DBUserName>
+        <DBPassword>mythtv</DBPassword>
+        <DBName>mythconverg</DBName>
+        <DBPort>0</DBPort>
+      </DefaultBackend>
+    </MythFrontend>
+  </UPnP>
+</Configuration>
