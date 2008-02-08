@@ -50,6 +50,12 @@ static QSize fix_1080i(QSize raw);
 static float fix_aspect(float raw);
 static QString to_comma_list(const QStringList &list);
 
+const float VideoOutput::kManualZoomMaxHorizontalZoom = 2.0f;
+const float VideoOutput::kManualZoomMaxVerticalZoom   = 2.0f;
+const float VideoOutput::kManualZoomMinHorizontalZoom = 0.5f;
+const float VideoOutput::kManualZoomMinVerticalZoom   = 0.5f;
+const int   VideoOutput::kManualZoomMaxMove = 50;
+
 /**
  * \fn VideoOutput::Create(const QString&, MythCodecID, const QSize&,
                            float, WId, const QRect&, Wid, PIPType)
@@ -261,7 +267,8 @@ VideoOutput::VideoOutput() :
     db_vdisp_profile(new VideoDisplayProfile()),
 
     // Manual Zoom
-    mz_scale(0),                        mz_move(0,0),
+    mz_scale_v(1.0f),                   mz_scale_h(1.0f),
+    mz_move(0,0),
 
     // Physical dimensions
     display_dim(400,300),               display_aspect(1.3333f),
@@ -756,9 +763,11 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
  */
 void VideoOutput::ApplyManualScaleAndMove(void)
 {
-    if (mz_scale)
+    if ((mz_scale_v != 1.0f) || (mz_scale_h != 1.0f))
     {
-        QSize  newsz  = display_video_rect.size() * (1.0f + (mz_scale*0.01f));
+        QSize  newsz  = 
+            QSize((int) (display_video_rect.width()  * mz_scale_h),
+                  (int) (display_video_rect.height() * mz_scale_v));
         QSize  tmp    = (display_video_rect.size() - newsz) / 2;
         QPoint chgloc = QPoint(tmp.width(), tmp.height());
         QPoint newloc = display_video_rect.topLeft() + chgloc;
@@ -1100,11 +1109,21 @@ void VideoOutput::MoveResize(void)
     ApplyDBScaleAndMove();
     ApplyLetterboxing();
     ApplyManualScaleAndMove();
-    if ((db_scale_vert == 0) && (db_scale_horiz == 0) && (mz_scale == 0))
+    if ((db_scale_vert == 0) && (db_scale_horiz == 0) &&
+        (mz_scale_v == 1.0f) && (mz_scale_h == 1.0f))
+    {
         ApplySnapToVideoRect();
+    }
 
     PrintMoveResizeDebug();
     needrepaint = true;
+}
+
+static float snap(float value, float snapto, float diff)
+{
+    if ((value + diff > snapto) && (value - diff < snapto))
+        return snapto;
+    return value;
 }
 
 /**
@@ -1117,31 +1136,69 @@ void VideoOutput::Zoom(ZoomDirection direction)
 {
     if (kZoomHome == direction)
     {
-        mz_scale = 0;
+        mz_scale_v = 1.0f;
+        mz_scale_h = 1.0f;
         mz_move = QPoint(0,0);
     }        
     else if (kZoomIn == direction)
     {
-        if (mz_scale < 200)
-            mz_scale += 10;
+        if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
+            (mz_scale_v < kManualZoomMaxVerticalZoom))
+        {
+            mz_scale_h *= 1.1f;
+            mz_scale_v *= 1.1f;
+        }
         else
-            mz_scale = 0;
+        {
+            float ratio = mz_scale_v / mz_scale_h;
+            mz_scale_h = 1.0f;
+            mz_scale_v = ratio * mz_scale_h;
+        }
     }
     else if (kZoomOut == direction)
     {
-        if (mz_scale > -50)
-            mz_scale -= 10;
+        if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
+            (mz_scale_v > kManualZoomMinVerticalZoom))
+        {
+            mz_scale_h *= 1.0f/1.1f;
+            mz_scale_v *= 1.0f/1.1f;
+        }
         else
-            mz_scale = 0;
+        {
+            float ratio = mz_scale_v / mz_scale_h;
+            mz_scale_h = 1.0f;
+            mz_scale_v = ratio * mz_scale_h;
+        }
     }
-    else if (kZoomUp == direction && (mz_move.y() <= 50))
+    else if (kZoomAspectUp == direction)
+    {
+        if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
+            (mz_scale_v > kManualZoomMinVerticalZoom))
+        {
+            mz_scale_h *= 1.1f;
+            mz_scale_v *= 1.0/1.1f;
+        }
+    }
+    else if (kZoomAspectDown == direction)
+    {
+        if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
+            (mz_scale_v < kManualZoomMaxVerticalZoom))
+        {
+            mz_scale_h *= 1.0/1.1f;
+            mz_scale_v *= 1.1f;
+        }
+    }
+    else if (kZoomUp == direction    && (mz_move.y() <= +kManualZoomMaxMove))
         mz_move.setY(mz_move.y() + 2);
-    else if (kZoomDown == direction && (mz_move.y() >= -50))
+    else if (kZoomDown == direction  && (mz_move.y() >= -kManualZoomMaxMove))
         mz_move.setY(mz_move.y() - 2);
-    else if (kZoomLeft == direction && (mz_move.x() <= 50))
+    else if (kZoomLeft == direction  && (mz_move.x() <= +kManualZoomMaxMove))
         mz_move.setX(mz_move.x() + 2);
-    else if (kZoomRight == direction && (mz_move.x() >= -50))
+    else if (kZoomRight == direction && (mz_move.x() >= -kManualZoomMaxMove))
         mz_move.setX(mz_move.x() - 2);
+
+    mz_scale_v = snap(mz_scale_v, 1.0f, 0.05f);
+    mz_scale_h = snap(mz_scale_h, 1.0f, 0.05f);
 }
 
 /**

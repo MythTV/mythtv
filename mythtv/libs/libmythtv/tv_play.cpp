@@ -2700,6 +2700,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 nvp->Zoom(kZoomLeft);
             else if (action == "RIGHT")
                 nvp->Zoom(kZoomRight);
+            else if (action == "VOLUMEUP")
+                nvp->Zoom(kZoomAspectUp);
+            else if (action == "VOLUMEDOWN")
+                nvp->Zoom(kZoomAspectDown);
             else if (action == "ESCAPE")
             {
                 nvp->Zoom(kZoomHome);

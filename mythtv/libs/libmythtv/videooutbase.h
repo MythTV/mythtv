@@ -261,7 +261,8 @@ class VideoOutput
     VideoDisplayProfile *db_vdisp_profile;
 
     // Manual Zoom
-    int     mz_scale;         ///< Manually applied percentage scaling.
+    float   mz_scale_v;       ///< Manually applied vertical scaling.
+    float   mz_scale_h;       ///< Manually applied horizontal scaling.
     QPoint  mz_move;          ///< Manually applied percentage move.
 
     // Physical dimensions
@@ -325,6 +326,13 @@ class VideoOutput
     long long framesPlayed;
     bool    db_scaling_allowed; ///< disable this to prevent overscan/underscan
     PictureAttributeSupported supported_attributes;
+
+    // Constants
+    static const float kManualZoomMaxHorizontalZoom;
+    static const float kManualZoomMaxVerticalZoom;
+    static const float kManualZoomMinHorizontalZoom;
+    static const float kManualZoomMinVerticalZoom;
+    static const int   kManualZoomMaxMove;
 };
 
 #endif
