@@ -3723,16 +3723,40 @@ void TV::ProcessNetworkControlCommand(const QString &command)
             }
             else
             {
-                infoStr = "Recorded";
+
+		if (activerbuffer->isDVD())
+                    infoStr = "DVD";
+                else if (playbackinfo->isVideo)
+                    infoStr = "Video";
+                else
+                    infoStr = "Recorded";
+
                 if (playbackinfo)
                     respDate = playbackinfo->recstartts;
             }
 
-            infoStr +=
-                QString(" %1 %2 %3 %4 %5").arg(posInfo.desc).arg(speedStr)
-                        .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
-                        .arg(respDate.toString(Qt::ISODate))
-                        .arg((long)nvp->GetFramesPlayed());
+	    if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
+            {
+                infoStr += QString(" %1 %2 %3 %4 %5 %6 %7")
+		            .arg(posInfo.desc)
+    		            .arg(speedStr)
+                            .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
+                            .arg(respDate.toString(Qt::ISODate))
+                            .arg((long)nvp->GetFramesPlayed())
+			    .arg(activerbuffer->GetFilename())
+			    .arg(frameRate);
+	    }
+	    else
+            {
+                QString position = posInfo.desc.section(" ",0,0);
+                infoStr += QString(" %1 %2 %3 %4 %5")
+                            .arg(position)
+                            .arg(speedStr)
+                            .arg(activerbuffer->GetFilename())
+                            .arg((long)nvp->GetFramesPlayed())
+                            .arg(frameRate);
+
+            }
 
             pbinfoLock.unlock();
 
