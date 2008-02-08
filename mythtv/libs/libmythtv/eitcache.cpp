@@ -323,6 +323,9 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
         prunedHitCnt++;
         return false;
     }
+    // validity check, reject events with endtime over 7 weeks in the future
+    if (endtime > lastPruneTime + 50 * 86400)
+        return false;
 
     QMutexLocker locker(&eventMapLock);
     if (!channelMap.contains(chanid))
