@@ -571,6 +571,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_WAIT:
             {
+                if (!dvdWaiting)
+                    VERBOSE(VB_PLAYBACK, LOC + "Entering DVDNAV_WAIT");
+
                 if (skipstillorwait)
                     WaitSkip();
                 else 
@@ -651,6 +654,7 @@ void DVDRingBufferPriv::WaitSkip(void)
     QMutexLocker locker(&seekLock);
     dvdnav_wait_skip(dvdnav);
     dvdWaiting = false;
+    VERBOSE(VB_PLAYBACK, LOC + "Exiting DVDNAV_WAIT status");
 }
 
 /** \brief jump to a dvd root or chapter menu
