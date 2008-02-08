@@ -3961,7 +3961,9 @@ void NuppelVideoPlayer::SetBookmark(void)
         else
             SetDVDBookmark(framesPlayed);
     }
-    m_playbackinfo->SetBookmark(framesPlayed);
+    else
+        m_playbackinfo->SetBookmark(framesPlayed);
+
     if (osd)
     {
         osd->SetSettingsText(QObject::tr("Position Saved"), 1);
