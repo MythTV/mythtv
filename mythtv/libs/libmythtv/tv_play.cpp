@@ -4501,6 +4501,11 @@ void TV::SwitchCards(uint chanid, QString channum, uint inputid)
 
     if (testrec && testrec->IsValidRecorder())
     {
+        // pause the decoder first, so we're not reading to close to the end.
+        prbuffer->IgnoreLiveEOF(true); 
+        prbuffer->StopReads(); 
+        nvp->PauseDecoder(); 
+
         // shutdown stuff
         prbuffer->Pause();
         prbuffer->WaitForPause();
