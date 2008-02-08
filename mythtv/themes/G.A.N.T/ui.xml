@@ -340,43 +340,55 @@
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="record_font" face="Arial">
       <color>#F7862B</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="recording_font" face="Arial">
       <color>#FF33FF</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="norecordfnt" face="Arial">
       <color>#999999</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="conflict_font" face="Arial">
       <color>#ffff33</color>
+      <dropcolor>#000000</dropcolor>
       <size>16</size>
       <size:small>11</size:small>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
@@ -491,9 +503,9 @@
         <column number="3" width="400" context="-1"></column>
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="gantup.png" location="745,10"></image>
+        <image function="downarrow" filename="gantdown.png" location="745,240"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -567,7 +579,7 @@
     </font>
 
     <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -684,8 +696,8 @@
         <column number="5" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
+        <image function="uparrow" filename="gantup.png" location="760,20"></image>
+        <image function="downarrow" filename="gantdown.png" location="760,220"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -745,7 +757,7 @@
     </font>
 
     <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>16</size>
       <size:small>10</size:small>
       <bold>yes</bold>
@@ -813,8 +825,8 @@
         <column number="3" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
+        <image function="uparrow" filename="gantup.png" location="760,20"></image>
+        <image function="downarrow" filename="gantdown.png" location="760,290"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
@@ -883,7 +895,7 @@
     </font>
 
     <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1012,8 +1024,8 @@
         <column number="6" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
+        <image function="uparrow" filename="gantup.png" location="740,10"></image>
+        <image function="downarrow" filename="gantdown.png" location="740,310"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
@@ -1125,7 +1137,7 @@
     </font>
 
     <font name="inactive" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1237,9 +1249,9 @@
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
+        <image function="selectionbar" filename="bar.png" location="-20,-2"></image>
+        <image function="uparrow" filename="gantup.png" location="740,20"></image>
+        <image function="downarrow" filename="gantdown.png" location="740,240"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>showings.png</filename>
@@ -1459,7 +1471,7 @@
    </font>
 
    <font name="inactive_font" face="Arial">
-     <color>#9999cc</color>
+     <color>#bbbbcc</color>
      <size>16</size>
      <size:small>10</size:small>
      <bold>yes</bold>
@@ -1581,9 +1593,9 @@
        <column number="4" width="110" context="1"></column>
        
        <items>7</items>
-       <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
-       <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-       <image function="downarrow" filename="downarrow.png" location="760,220"></image>
+       <image function="selectionbar" filename="bar.png" location="-20,-2"></image>
+       <image function="uparrow" filename="gantup.png" location="740,20"></image>
+       <image function="downarrow" filename="gantdown.png" location="740,240"></image>
      </listarea>
      <image name="showinglines" draworder="5" fleximage="yes">
        <filename>showings.png</filename>
@@ -1910,7 +1922,7 @@
 
   </window>
 
-  <window name="programlist">
+  <window name="programlist">  <!-- previously recorded -->
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
@@ -1920,7 +1932,7 @@
     </font>
 
     <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -2022,8 +2034,8 @@
         <column number="4" width="20" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
-        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
+        <image function="uparrow" filename="gantup.png" location="740,10"></image>
+        <image function="downarrow" filename="gantdown.png" location="740,310"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
@@ -2083,7 +2095,7 @@
     </font>
 
     <font name="inactive" face="Arial">
-      <color>#9999cc</color>
+      <color>#bbbbcc</color>
       <size>18</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -2160,10 +2172,10 @@
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-8,3"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,15"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="rightarrow.png" location="-10,9"></image>
-        <image function="leftarrow" filename="leftarrow.png" location="-5,9"></image>
+        <image function="uparrow" filename="gantup.png" location="740,15"></image>
+        <image function="downarrow" filename="gantdown.png" location="740,235"></image>
+        <image function="rightarrow" filename="gantright.png" location="0,0"></image>
+        <image function="leftarrow" filename="gantleft.png" location="-5,0"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>def-ro-lines.png</filename>
@@ -2265,8 +2277,8 @@
         <value>Program Details</value>
         <image function="uparrow-reg" filename="blank.png" location="725,90"></image>
         <image function="downarrow-reg" filename="blank.png" location="725,480"></image>
-        <image function="uparrow-sel" filename="uparrow.png" location="725,90"></image>
-        <image function="downarrow-sel" filename="downarrow.png" location="725,480"></image>
+        <image function="uparrow-sel" filename="gantup.png" location="725,90"></image>
+        <image function="downarrow-sel" filename="gantdown.png" location="725,480"></image>
         <backgroundreg>pd-background.png</backgroundreg>
         <backgroundsel>pd-background.png</backgroundsel>
       </richtextarea>
