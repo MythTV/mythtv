@@ -2536,8 +2536,7 @@ void Scheduler::AddNewRecords(void)
         "(cardinput.cardinputid = RECTABLE.prefinput) * %1").arg(prefinputpri);
 
     if (hdtvpriority)
-        pwrpri += QString(" + (program.hdtv = %1) * %2").arg(VID_HDTV)
-            .arg(hdtvpriority);
+        pwrpri += QString(" + (program.hdtv > 0) * %1").arg(hdtvpriority);
 
     QString schedTmpRecord = recordTable;
 
