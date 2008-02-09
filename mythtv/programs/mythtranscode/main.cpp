@@ -688,6 +688,95 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
     return 0;
 }
 
+int slowDelete(QString filename)
+{
+    bool inBackground = true;
+    int increment =
+        gContext->GetNumSetting("TruncateIncrement", 10 * 1024 * 1024);
+    QString msg = QString("Error Truncating '%1'").arg(filename.local8Bit());
+
+
+    struct stat st;
+    if (stat(filename.ascii(), &st) != 0)
+    {
+        VERBOSE(VB_IMPORTANT, msg + " could not stat " + ENO +
+                ", unlinking immediately.");
+        return unlink(filename.local8Bit());
+    }
+    off_t fsize = st.st_size;
+
+    int fd = open(filename.local8Bit(), O_WRONLY);
+    if (fd == -1)
+    {
+        VERBOSE(VB_IMPORTANT, msg + " could not open " + ENO +
+                ", unlinking immediately.");
+        return unlink(filename.local8Bit());
+    }
+
+    if (unlink(filename.local8Bit()))
+    {
+        close(fd);
+        VERBOSE(VB_IMPORTANT, msg + " could not unlink " + ENO);
+        return unlink(filename.local8Bit());
+    }
+
+    VERBOSE(VB_FILE, QString("Truncating %1.").arg(filename));
+
+#ifndef USING_MINGW
+    pid_t child = fork();
+
+    if (child > 0)
+    {
+        VERBOSE(VB_FILE,
+                QString("Truncating %1 in the background.").arg(filename));
+        close(fd);
+        return 0;
+    }
+    else if (child < 0)
+    {
+        inBackground = false;
+        VERBOSE(VB_IMPORTANT,
+                QString("Fork() failed, truncating %1 in the foreground.")
+                        .arg(filename));
+    }
+#else
+    inBackground = false;
+#endif
+
+    while (fsize > 0) {
+        int err = ftruncate(fd, fsize);
+
+        if (err) {
+            if (inBackground)
+                exit(1);
+            else
+                VERBOSE(VB_IMPORTANT, QString("ERROR truncating %1, file "
+                                      "immediately removed.").arg(filename));
+            return 0;
+        }
+
+        fsize -= increment;
+
+        usleep(500000);
+    }
+
+    if (inBackground)
+        exit(0);
+    else
+        VERBOSE(VB_IMPORTANT,
+                QString("Finished truncating %1.").arg(filename));
+
+    return 0;
+}
+
+int transUnlink(QString filename)
+{
+    if (gContext->GetNumSetting("TruncateDeletesSlowly", 0))
+        return slowDelete(filename);
+
+    return unlink(filename);
+}
+
 void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode)
 {
     int status = JobQueue::GetJobStatus(jobID);
@@ -735,24 +824,32 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
             VERBOSE(VB_FILE, QString("mythtranscode: About to unlink/delete "
                                      "file: %1").arg(oldfile));
-            if (followLinks)
+            QFileInfo finfo(oldfile);
+            if (followLinks && finfo.isSymLink())
             {
-                QFileInfo finfo(oldfile);
-                if ((finfo.isSymLink()) &&
-                    (err = unlink(finfo.readLink().local8Bit())))
+                if (err = transUnlink(finfo.readLink().local8Bit()))
                 {
-                     VERBOSE(VB_IMPORTANT,
-                             QString("Error deleting '%1' link pointing to "
-                                     "'%2', %3").arg(oldfile)
-                                     .arg(finfo.readLink().local8Bit())
-                                     .arg(strerror(errno)));
+                    VERBOSE(VB_IMPORTANT, QString(
+                            "mythtranscode: Error deleting '%1' pointed to by "
+                            "%2, %3")
+                            .arg(finfo.readLink().local8Bit())
+                            .arg(oldfile).arg(strerror(errno)));
                 }
+
+                if (err = unlink(oldfile.local8Bit()))
+                    VERBOSE(VB_IMPORTANT,
+                            QString("mythtranscode: Error deleting '%1' link "
+                                    "pointing to '%2', %3").arg(oldfile)
+                                    .arg(finfo.readLink().local8Bit())
+                                    .arg(strerror(errno)));
             }
- 
-            if ((err = unlink(oldfile.local8Bit())))
-                VERBOSE(VB_IMPORTANT, QString("mythtranscode: Error deleting "
-                                              "'%1', %2").arg(oldfile)
-                                              .arg(strerror(errno)));
+            else
+            {
+                if ((err = transUnlink(oldfile.local8Bit())))
+                    VERBOSE(VB_IMPORTANT, QString(
+                            "mythtranscode: Error deleting '%1', %2")
+                            .arg(oldfile).arg(strerror(errno)));
+            }
         }
 
         // Delete previews if cutlist was applied.  They will be re-created as
@@ -776,7 +873,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                 // If unlink fails, keeping the old preview is not a problem.
                 // The RENAME_TO_NUV check below will attempt to rename the
                 // file, if required.
-                unlink(oldfile.local8Bit());
+                transUnlink(oldfile.local8Bit());
             }
         }
 
@@ -864,7 +961,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         // Not a successful run, so remove the files we created
         filename += ".tmp";
         VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename));
-        unlink(filename.local8Bit());
+        transUnlink(filename.local8Bit());
 
         filename += ".map";
         unlink(filename.local8Bit());

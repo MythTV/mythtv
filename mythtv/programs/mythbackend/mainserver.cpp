@@ -1788,6 +1788,9 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     const size_t min_tps    = (size_t) (cards * 1.2 * (19400000LL / 8));
     const size_t increment  = (size_t) (min_tps * (sleep_time * 0.001f));
 
+    // Save this for mythtranscode's use
+    gContext->SaveSetting("TruncateIncrement", increment);
+
     VERBOSE(VB_FILE,
             QString("Truncating '%1' by %2 MB every %3 milliseconds")
             .arg(filename)
