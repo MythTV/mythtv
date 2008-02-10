@@ -437,6 +437,11 @@ bool CustomPriority::checkSyntax(void)
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }
+    else if (desc.contains(";", false))
+    {
+        msg  = "Power Priority rules can not include semicolon ( ; ) ";
+        msg += "statement terminators.";
+    }
     else
     {
         QString qstr = QString("SELECT (%1)\nFROM (recordmatch, record, "

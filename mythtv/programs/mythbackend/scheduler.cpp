@@ -2619,8 +2619,13 @@ void Scheduler::AddNewRecords(void)
     while (result.next())
     {
         if (result.value(0).toInt())
-            pwrpri += QString(" + (%1) * %2").arg(result.value(1).toString())
+        {
+            QString sclause = result.value(1).toString();
+            sclause.remove(QRegExp("^\\s*AND\\s+", false));
+            sclause.remove(";", false);
+            pwrpri += QString(" + (%1) * %2").arg(sclause)
                                              .arg(result.value(0).toInt());
+        }
     }
     pwrpri += QString(" AS powerpriority ");
 
