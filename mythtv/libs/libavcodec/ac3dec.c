@@ -1132,6 +1132,12 @@ static int ac3_decode_frame(AVCodecContext * avctx, void *data, int *data_size, 
 
     /* channel config */
     ctx->out_channels = ctx->nchans;
+    if (avctx->request_channels > 0)
+    {
+        avctx->channels = ctx->out_channels;
+        if (avctx->channels > avctx->request_channels)
+            avctx->channels = avctx->request_channels;
+    }
     if (avctx->channels == 0) {
         avctx->channels = ctx->out_channels;
     } else if(ctx->out_channels < avctx->channels) {

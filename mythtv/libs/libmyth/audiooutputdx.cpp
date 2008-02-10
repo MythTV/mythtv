@@ -130,8 +130,11 @@ void AudioOutputDX::SetBlocking(bool blocking)
     // FIXME: kedl: not sure what else could be required here?
 }
 
-void AudioOutputDX::Reconfigure(int audio_bits, int audio_channels,
-                                int audio_samplerate, int audio_passthru)
+void AudioOutputDX::Reconfigure(int audio_bits, 
+                                int audio_channels, 
+                                int audio_samplerate,
+                                int audio_passthru,
+                                AudioCodecMode laom)
 {
     if (dsbuffer)
         DestroyDSBuffer();

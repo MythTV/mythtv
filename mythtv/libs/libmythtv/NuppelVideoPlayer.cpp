@@ -207,6 +207,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       audio_passthru_device(QString::null),
       audio_channels(2),            audio_bits(-1),
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
+      audio_codec(NULL),
       // Picture-in-Picture
       pipplayer(NULL), setpipplayer(NULL), needsetpipplayer(false),
       // Preview window support
@@ -799,7 +800,8 @@ QString NuppelVideoPlayer::ReinitAudio(void)
     if (audioOutput)
     {
         audioOutput->Reconfigure(audio_bits, audio_channels,
-                                 audio_samplerate, audio_passthru);
+                                 audio_samplerate, audio_passthru,
+                                 audio_codec);
         errMsg = audioOutput->GetError();
         if (!errMsg.isEmpty())
             audioOutput->SetStretchFactor(audio_stretchfactor);
@@ -3682,6 +3684,11 @@ void NuppelVideoPlayer::SetAudioParams(int bps, int channels,
     audio_channels = channels;
     audio_samplerate = samplerate;
     audio_passthru = passthru;
+}
+
+void NuppelVideoPlayer::SetAudioCodec(void *ac)
+{
+    audio_codec = ac;
 }
 
 void NuppelVideoPlayer::SetEffDsp(int dsprate)

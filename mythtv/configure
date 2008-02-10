@@ -752,6 +752,7 @@ CONFIG_LIST="
     libfaac
     libfaad
     libfaadbin
+    libfftw3
     libgsm
     libmp3lame
     libnut
@@ -2886,6 +2887,7 @@ echo "libdc1394 support         ${libdc1394-no}"
 echo "libfaac enabled           ${libfaac-no}"
 echo "libfaad enabled           ${libfaad-no}"
 echo "libfaad dlopened          ${libfaadbin-no}"
+echo "libfftw3 support          ${liba52-no}"
 echo "libgsm enabled            ${libgsm-no}"
 echo "libmp3lame enabled        ${libmp3lame-no}"
 echo "libnut enabled            ${libnut-no}"

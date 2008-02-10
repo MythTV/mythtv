@@ -55,13 +55,19 @@ class AudioReencodeBuffer : public AudioOutput
 
     // reconfigure sound out for new params
     virtual void Reconfigure(int audio_bits, int audio_channels,
-                             int audio_samplerate, bool audio_passthru)
+                             int audio_samplerate, bool audio_passthru,
+                             void *audio_codec = NULL)
     {
         (void)audio_samplerate;
         (void)audio_passthru;
+        (void)audio_codec;
+
+        ClearError();
         bits = audio_bits;
         channels = audio_channels;
         bytes_per_sample = bits * channels / 8;
+        if ((uint)audio_channels > 2)
+            Error(QString("Invalid channel count %1").arg(channels));
     }
 
     // dsprate is in 100 * samples/second

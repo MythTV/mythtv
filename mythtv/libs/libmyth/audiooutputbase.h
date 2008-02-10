@@ -16,12 +16,22 @@ using namespace std;
 // MythTV headers
 #include "audiooutput.h"
 #include "samplerate.h"
-#include "SoundTouch.h"
 
-#define AUDBUFSIZE 768000
+namespace soundtouch {
+class SoundTouch;
+};
+class FreeSurround;
+class AudioOutputDigitalEncoder;
+struct AVCodecContext;
+
 #define AUDIO_SRC_IN_SIZE   16384
 #define AUDIO_SRC_OUT_SIZE (16384*6)
 #define AUDIO_TMP_BUF_SIZE (16384*6)
+
+//#define AUDBUFSIZE 768000
+//divisible by 12,10,8,6,4,2 and around 1024000
+//#define AUDBUFSIZE 1024080
+#define AUDBUFSIZE 1536000
 
 class AudioOutputBase : public AudioOutput
 {
@@ -35,8 +45,11 @@ class AudioOutputBase : public AudioOutput
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits, int audio_channels,
-                             int audio_samplerate, bool audio_passthru);
+    virtual void Reconfigure(int   audio_bits, 
+                             int   audio_channels, 
+                             int   audio_samplerate,
+                             bool  audio_passthru,
+                             void *audio_codec = NULL);
     
     // do AddSamples calls block?
     virtual void SetBlocking(bool blocking);
@@ -45,6 +58,7 @@ class AudioOutputBase : public AudioOutput
     virtual void SetEffDsp(int dsprate);
 
     virtual void SetStretchFactor(float factor);
+    virtual float GetStretchFactor(void);
 
     virtual void Reset(void);
 
@@ -127,6 +141,7 @@ class AudioOutputBase : public AudioOutput
     bool audio_passthru;
 
     float audio_stretchfactor;
+    AVCodecContext *audio_codec;
     AudioOutputSource source;
 
     bool killaudio;
@@ -135,6 +150,8 @@ class AudioOutputBase : public AudioOutput
     bool set_initial_vol;
     bool buffer_output_data_for_use; //  used by AudioOutputNULL
     
+    int configured_audio_channels;
+
  private:
     // resampler
     bool need_resampler;
@@ -145,7 +162,14 @@ class AudioOutputBase : public AudioOutput
     short tmp_buff[AUDIO_TMP_BUF_SIZE];
 
     // timestretch
-    soundtouch::SoundTouch * pSoundStretch;
+    soundtouch::SoundTouch    *pSoundStretch;
+    AudioOutputDigitalEncoder *encoder;
+    FreeSurround              *upmixer;
+
+    int source_audio_channels;
+    int source_audio_bytes_per_sample;
+    bool needs_upmix;
+    int surround_mode;
 
     bool blocking; // do AddSamples calls block?
 
@@ -164,15 +188,15 @@ class AudioOutputBase : public AudioOutput
 
     pthread_mutex_t avsync_lock; /* must hold avsync_lock to read or write
                                     'audiotime' and 'audiotime_updated' */
-    int audiotime; // timecode of audio leaving the soundcard (same units as
-                   //                                          timecodes) ...
+    /// timecode of audio leaving the soundcard (same units as timecodes)
+    long long audiotime;
     struct timeval audiotime_updated; // ... which was last updated at this time
 
     /* Audio circular buffer */
     unsigned char audiobuffer[AUDBUFSIZE];  /* buffer */
     int raud, waud;     /* read and write positions */
-    int audbuf_timecode;    /* timecode of audio most recently placed into
-                   buffer */
+    /// timecode of audio most recently placed into buffer
+    long long audbuf_timecode;
 
     int numlowbuffer;
 

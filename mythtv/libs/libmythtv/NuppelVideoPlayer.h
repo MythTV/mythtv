@@ -127,6 +127,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
     void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
     void SetEffDsp(int dsprate);
+    void SetAudioCodec(void *ac);
 
     // Sets
     void SetParentWidget(QWidget *widget)     { parentWidget = widget; }
@@ -684,6 +685,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     int      audio_bits;
     int      audio_samplerate;
     float    audio_stretchfactor;
+    void    *audio_codec;
     bool     audio_passthru;
 
     // Picture-in-Picture

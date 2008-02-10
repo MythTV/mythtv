@@ -35,8 +35,11 @@ public:
     /// END HACK HACK HACK HACK
 	
     virtual void Reset(void);
-    virtual void Reconfigure(int audio_bits,       int audio_channels,
-                             int audio_samplerate, int audio_passthru);
+    virtual void Reconfigure(int audio_bits, 
+                             int audio_channels, 
+                             int audio_samplerate,
+                             bool audio_passthru,
+                             AudioCodecMode aom = AUDIOCODECMODE_NORMAL);
     virtual void SetBlocking(bool blocking);
 
     virtual bool AddSamples(char *buffer, int samples, long long timecode);

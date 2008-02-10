@@ -209,6 +209,50 @@ static int dts_syncinfo(uint8_t *indata_ptr, int *flags,
 extern "C" int ac3_sync(const uint8_t *buf, int *channels, int *sample_rate,
                         int *bit_rate, int *samples);
 
+// from http://www.ebu.ch/CMSimages/en/tec_AES-EBU_eg_tcm6-11890.pdf
+// http://en.wikipedia.org/wiki/S/PDIF
+typedef struct {
+    // byte 0
+    unsigned professional_consumer:1;
+    unsigned non_data:1;
+    // 4 - no emphasis
+    // 6 - 50/15us
+    // 7 - CCITT J17
+    unsigned audio_signal_emphasis:3;
+    unsigned SSFL:1;
+    // 0
+    // 1 - 48k
+    // 2 - 44.1k
+    // 3 - 32k
+    unsigned sample_frequency:2;    
+    // byte 1
+    // 0
+    // 1 - 2 ch
+    // 2 - mono
+    // 3 - prim/sec
+    // 4 - stereo
+    unsigned channel_mode:4;
+    // 0
+    // 1 - 192 bit block
+    // 2 - AES18
+    // 3 - user def
+    unsigned user_bit_management:4;
+    // byte 2
+    // 1 - audio data
+    // 2 - co-ordn
+    unsigned auxiliary_bits:3;
+    // 4 - 16 bits
+    // 5-7 - redither to 16 bits
+    unsigned source_word_length:3;
+    unsigned reserved:2;
+    // byte 3
+    unsigned multi_channel_function_description:8;
+    // byte 4
+    unsigned digital_audio_reference_signal:2;
+    unsigned reserved2:6;
+
+} AESHeader;
+
 static int encode_frame(
         bool dts, 
         unsigned char *data,
@@ -239,6 +283,7 @@ static int encode_frame(
 #ifdef ENABLE_AC3_DECODER
         enc_len = ac3_sync(
             data + 8, &flags, &sample_rate, &bit_rate, (int*)&block_len);
+        block_len *= 2 * 2;
 #else
         enc_len = a52_syncinfo(data + 8, &flags, &sample_rate, &bit_rate);
         block_len = MAX_AC3_FRAME_SIZE;
@@ -272,6 +317,10 @@ static int encode_frame(
     {
         switch(nr_samples)
         {
+            case 256:
+                data[4] = 0x0A;      /* DTS-? (256-sample bursts) */
+                break;
+
             case 512:
                 data[4] = 0x0B;      /* DTS-1 (512-sample bursts) */
                 break;
@@ -282,6 +331,10 @@ static int encode_frame(
 
             case 2048:
                 data[4] = 0x0D;      /* DTS-3 (2048-sample bursts) */
+                break;
+
+            case 4096:
+                data[4] = 0x0E;      /* DTS-? (4096-sample bursts) */
                 break;
 
             default:

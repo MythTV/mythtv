@@ -192,10 +192,14 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     {
         params.phasemode = 1;
         params.center_width = 0;
+        params.gain = 1.0;
     }
     else
     {
-        params.center_width = 50;
+        params.center_width = 70;
+        // for 50, gain should be about 1.9, c/lr about 2.7
+        // for 70, gain should be about 3.1, c/lr about 1.5
+        params.gain = 3.1;
     }
     switch (surround_mode)
     {
@@ -231,6 +235,7 @@ void FreeSurround::SetParams()
         decoder->phase_mode(params.phasemode);
         decoder->surround_coefficients(params.coeff_a, params.coeff_b);				
         decoder->separation(params.front_sep/100.0,params.rear_sep/100.0);
+        decoder->gain(params.gain);
     }
 }
 
@@ -244,7 +249,8 @@ FreeSurround::fsurround_params::fsurround_params(
     phasemode(0),
     steering(1),
     front_sep(100),
-    rear_sep(100) 
+    rear_sep(100), 
+    gain(1.0)
 {
 }
 
@@ -265,50 +271,6 @@ FreeSurround::~FreeSurround()
         int16bufs = NULL;
     }
     VERBOSE(QString("FreeSurround::~FreeSurround done"));
-}
-
-void get_peak_i(short* data, int count, int* maxv, int* minv)
-{
-    int _maxv = *data++;
-    int _minv = _maxv;
-    for(int i=1;i<count;i++)
-    {
-        int v = *data++;
-        if (v > _maxv) _maxv = v;
-        if (v < _minv) _minv = v;
-    }
-    *maxv = _maxv;
-    *minv = _minv;
-}
-
-void get_peak_i2(short* data, int count, int* maxv, int* minv)
-{
-    int _maxv = *data;
-    data += 2;
-    int _minv = _maxv;
-    for(int i=1;i<count;i++)
-    {
-        int v = *data;
-        if (v > _maxv) _maxv = v;
-        if (v < _minv) _minv = v;
-        data  += 2;
-    }
-    *maxv = _maxv;
-    *minv = _minv;
-}
-
-void get_peak(float* data, int count, int* maxv, int* minv)
-{
-    int _maxv = lrintf(*data++);
-    int _minv = _maxv;
-    for(int i=1;i<count;i++)
-    {
-        int v = lrintf(*data++);
-        if (v > _maxv) _maxv = v;
-        if (v < _minv) _minv = v;
-    }
-    *maxv = _maxv;
-    *minv = _minv;
 }
 
 uint FreeSurround::putSamples(short* samples, uint numSamples, uint numChannels, int step)

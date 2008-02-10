@@ -134,6 +134,181 @@ static inline void float_to_int (float * _f, int16_t * s16, int nchannels)
     }
 }
 
+static inline int16_t convert(int32_t i)
+{
+    return av_clip_int16(i - 0x43c00000);
+}
+
+void float2s16_2 (float * _f, int16_t * s16)
+{
+    int i;
+    int32_t * f = (int32_t *) _f;
+
+    for (i = 0; i < 256; i++) {
+	s16[2*i] = convert (f[i]);
+	s16[2*i+1] = convert (f[i+256]);
+    }
+}
+
+void float2s16_4 (float * _f, int16_t * s16)
+{
+    int i;
+    int32_t * f = (int32_t *) _f;
+
+    for (i = 0; i < 256; i++) {
+	s16[4*i] = convert (f[i]);
+	s16[4*i+1] = convert (f[i+256]);
+	s16[4*i+2] = convert (f[i+512]);
+	s16[4*i+3] = convert (f[i+768]);
+    }
+}
+
+void float2s16_5 (float * _f, int16_t * s16)
+{
+    int i;
+    int32_t * f = (int32_t *) _f;
+
+    for (i = 0; i < 256; i++) {
+	s16[5*i] = convert (f[i]);
+	s16[5*i+1] = convert (f[i+256]);
+	s16[5*i+2] = convert (f[i+512]);
+	s16[5*i+3] = convert (f[i+768]);
+	s16[5*i+4] = convert (f[i+1024]);
+    }
+}
+
+#define LIKEAC3DEC 1
+int channels_multi (int flags)
+{
+    if (flags & A52_LFE)
+	return 6;
+    else if (flags & 1)	/* center channel */
+	return 5;
+    else if ((flags & A52_CHANNEL_MASK) == A52_2F2R)
+	return 4;
+    else
+	return 2;
+}
+
+void float2s16_multi (float * _f, int16_t * s16, int flags)
+{
+    int i;
+    int32_t * f = (int32_t *) _f;
+
+    switch (flags) {
+    case A52_MONO:
+	for (i = 0; i < 256; i++) {
+	    s16[5*i] = s16[5*i+1] = s16[5*i+2] = s16[5*i+3] = 0;
+	    s16[5*i+4] = convert (f[i]);
+	}
+	break;
+    case A52_CHANNEL:
+    case A52_STEREO:
+    case A52_DOLBY:
+	float2s16_2 (_f, s16);
+	break;
+    case A52_3F:
+	for (i = 0; i < 256; i++) {
+	    s16[5*i] = convert (f[i]);
+	    s16[5*i+1] = convert (f[i+512]);
+	    s16[5*i+2] = s16[5*i+3] = 0;
+	    s16[5*i+4] = convert (f[i+256]);
+	}
+	break;
+    case A52_2F2R:
+	float2s16_4 (_f, s16);
+	break;
+    case A52_3F2R:
+	float2s16_5 (_f, s16);
+	break;
+    case A52_MONO | A52_LFE:
+	for (i = 0; i < 256; i++) {
+#if LIKEAC3DEC
+	    s16[6*i] = s16[6*i+2] = s16[6*i+3] = s16[6*i+4] = 0;
+	    s16[6*i+1] = convert (f[i+256]);
+	    s16[6*i+5] = convert (f[i]);
+#else
+	    s16[6*i] = s16[6*i+1] = s16[6*i+2] = s16[6*i+3] = 0;
+	    s16[6*i+4] = convert (f[i+256]);
+	    s16[6*i+5] = convert (f[i]);
+#endif
+	}
+	break;
+    case A52_CHANNEL | A52_LFE:
+    case A52_STEREO | A52_LFE:
+    case A52_DOLBY | A52_LFE:
+	for (i = 0; i < 256; i++) {
+#if LIKEAC3DEC
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+2] = convert (f[i+512]);
+	    s16[6*i+1] = s16[6*i+3] = s16[6*i+4] = 0;
+	    s16[6*i+5] = convert (f[i]);
+#else
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = convert (f[i+512]);
+	    s16[6*i+2] = s16[6*i+3] = s16[6*i+4] = 0;
+	    s16[6*i+5] = convert (f[i]);
+#endif
+	}
+	break;
+    case A52_3F | A52_LFE:
+	for (i = 0; i < 256; i++) {
+#if LIKEAC3DEC
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+2] = convert (f[i+768]);
+	    s16[6*i+3] = s16[6*i+4] = 0;
+	    s16[6*i+1] = convert (f[i+512]);
+	    s16[6*i+5] = convert (f[i]);
+#else
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = convert (f[i+768]);
+	    s16[6*i+2] = s16[6*i+3] = 0;
+	    s16[6*i+4] = convert (f[i+512]);
+	    s16[6*i+5] = convert (f[i]);
+#endif
+	}
+	break;
+    case A52_2F2R | A52_LFE:
+	for (i = 0; i < 256; i++) {
+#if LIKEAC3DEC
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = 0;
+	    s16[6*i+2] = convert (f[i+512]);
+	    s16[6*i+3] = convert (f[i+768]);
+	    s16[6*i+4] = convert (f[i+1024]);
+	    s16[6*i+5] = convert (f[i]);
+#else
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = convert (f[i+512]);
+	    s16[6*i+2] = convert (f[i+768]);
+	    s16[6*i+3] = convert (f[i+1024]);
+	    s16[6*i+4] = 0;
+	    s16[6*i+5] = convert (f[i]);
+#endif
+	}
+	break;
+    case A52_3F2R | A52_LFE:
+	for (i = 0; i < 256; i++) {
+#if LIKEAC3DEC
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = convert (f[i+512]);
+	    s16[6*i+2] = convert (f[i+768]);
+	    s16[6*i+3] = convert (f[i+1024]);
+	    s16[6*i+4] = convert (f[i+1280]);
+	    s16[6*i+5] = convert (f[i]);
+#else
+	    s16[6*i] = convert (f[i+256]);
+	    s16[6*i+1] = convert (f[i+768]);
+	    s16[6*i+2] = convert (f[i+1024]);
+	    s16[6*i+3] = convert (f[i+1280]);
+	    s16[6*i+4] = convert (f[i+512]);
+	    s16[6*i+5] = convert (f[i]);
+#endif
+	}
+	break;
+    }
+}
+
 /**** end */
 
 #define HEADER_SIZE 7
@@ -179,6 +354,12 @@ static int a52_decode_frame(AVCodecContext *avctx,
                     s->channels = ac3_channels[s->flags & 7];
                     if (s->flags & A52_LFE)
                         s->channels++;
+                    if (avctx->request_channels > 0)
+                    {
+                        avctx->channels = s->channels;
+                        if (s->channels > avctx->channels)
+                            avctx->channels = avctx->request_channels;
+                    }
                     if (avctx->channels == 0)
                         /* No specific number of channel requested */
                         avctx->channels = s->channels;
@@ -199,14 +380,20 @@ static int a52_decode_frame(AVCodecContext *avctx,
             s->inbuf_ptr += len;
             buf_size -= len;
         } else {
+            int chans;
             flags = s->flags;
             if (avctx->channels == 1)
                 flags = A52_MONO;
-            else if (avctx->channels == 2)
-                flags = A52_STEREO;
+            else if (avctx->channels == 2) {
+                if (s->channels>2)
+                    flags = A52_DOLBY;
+                else
+                    flags = A52_STEREO;
+            }
             else
                 flags |= A52_ADJUST_LEVEL;
             level = 1;
+            chans = channels_multi(flags);
             if (s->a52_frame(s->state, s->inbuf, &flags, &level, 384)) {
             fail:
                 av_log(avctx, AV_LOG_ERROR, "Error decoding frame\n");
@@ -217,7 +404,7 @@ static int a52_decode_frame(AVCodecContext *avctx,
             for (i = 0; i < 6; i++) {
                 if (s->a52_block(s->state))
                     goto fail;
-                float_to_int(s->samples, out_samples + i * 256 * avctx->channels, avctx->channels);
+                float2s16_multi(s->samples, out_samples + i * 256 * chans, flags);
             }
             s->inbuf_ptr = s->inbuf;
             s->frame_size = 0;

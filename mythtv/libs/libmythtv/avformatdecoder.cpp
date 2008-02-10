@@ -51,9 +51,6 @@ extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8
 
 #define MAX_AC3_FRAME_SIZE 6144
 
-/** Set to zero to allow any number of AC3 channels. */
-#define MAX_OUTPUT_CHANNELS 2
-
 static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
 static void cc608_build_parity_table(int *parity_table);
@@ -400,7 +397,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
-      disable_passthru(false),      dummy_frame(NULL),
+      disable_passthru(false),      max_channels(2),
+      dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
       dvdmenupktseen(false), indvdstill(false),
@@ -417,6 +415,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
     allow_dts_passthru = gContext->GetNumSetting("DTSPassThru", false);
+    max_channels = (uint) gContext->GetNumSetting("MaxChannels", 2);
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
     itv = GetNVP()->GetInteractiveTV();
@@ -1596,7 +1595,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open, leaving it alone.");
                 }
                 //assert(enc->codec_id);
+                VERBOSE(VB_GENERAL, LOC + QString("codec %1 has %2 channels")
+                        .arg(codec_id_string(enc->codec_id))
+                        .arg(enc->channels));
 
+#if 0
+                // HACK MULTICHANNEL DTS passthru disabled for multichannel,
+                // dont know how to handle this
                 // HACK BEGIN REALLY UGLY HACK FOR DTS PASSTHRU
                 if (enc->codec_id == CODEC_ID_DTS)
                 {
@@ -1605,6 +1610,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     // enc->bit_rate = what??;
                 }
                 // HACK END REALLY UGLY HACK FOR DTS PASSTHRU
+#endif
 
                 bitrate += enc->bit_rate;
                 break;
@@ -3303,15 +3309,41 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         reselectAudioTrack = true;
                     }                            
 
+                    bool do_ac3_passthru =
+                        (allow_ac3_passthru && !transcoding &&
+                         (curstream->codec->codec_id == CODEC_ID_AC3));
+                    bool do_dts_passthru =
+                        (allow_dts_passthru && !transcoding &&
+                         (curstream->codec->codec_id == CODEC_ID_DTS));
+                    bool using_passthru = do_ac3_passthru || do_dts_passthru;
+
                     // detect channels on streams that need
                     // to be decoded before we can know this
+                    bool already_decoded = false;
                     if (!curstream->codec->channels)
                     {
                         QMutexLocker locker(&avcodeclock);
-                        curstream->codec->channels = MAX_OUTPUT_CHANNELS;
+                        VERBOSE(VB_IMPORTANT, LOC +
+                                QString("Setting channels to %1")
+                                .arg(audioOut.channels));
+
+                        if (using_passthru)
+                        {
+                            // for passthru let it select the max number
+                            // of channels
+                            curstream->codec->channels = 0;
+                            curstream->codec->request_channels = 0;
+                        }
+                        else
+                        {
+                            curstream->codec->channels = audioOut.channels;
+                            curstream->codec->request_channels =
+                                audioOut.channels;
+                        }
                         ret = avcodec_decode_audio(
                             curstream->codec, audioSamples,
                             &data_size, ptr, len);
+                        already_decoded = true;
 
                         reselectAudioTrack |= curstream->codec->channels;
                     }
@@ -3369,11 +3401,18 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         AVCodecContext *ctx = curstream->codec;
 
                         if ((ctx->channels == 0) ||
-                            (ctx->channels > MAX_OUTPUT_CHANNELS))
-                            ctx->channels = MAX_OUTPUT_CHANNELS;
+                            (ctx->channels > audioOut.channels))
+                        {
+                            ctx->channels = audioOut.channels;
+                        }
 
-                        ret = avcodec_decode_audio(
-                            ctx, audioSamples, &data_size, ptr, len);
+                        if (!already_decoded)
+                        {
+                            curstream->codec->request_channels =
+                                audioOut.channels;
+                            ret = avcodec_decode_audio(
+                                ctx, audioSamples, &data_size, ptr, len);
+                        }
 
                         // When decoding some audio streams the number of
                         // channels, etc isn't known until we try decoding it.
@@ -3808,6 +3847,11 @@ void *AvFormatDecoder::GetVideoCodecPrivate(void)
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
 {
+    // can only disable never reenable as once
+    // timestretch is on its on for the session
+    if (disable_passthru)
+        return;
+
     if (selectedTrack[kTrackTypeAudio].av_stream_index < 0)
     {
         disable_passthru = disable;
@@ -3840,6 +3884,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AVCodecContext *codec_ctx = NULL;
     AudioInfo old_in  = audioIn;
     AudioInfo old_out = audioOut;
+    bool using_passthru = false;
 
     if ((currentTrack[kTrackTypeAudio] >= 0) &&
         (selectedTrack[kTrackTypeAudio].av_stream_index <=
@@ -3851,37 +3896,62 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream->codec);
         codec_ctx = curstream->codec;        
         bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
-                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_AC3));
         bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
-                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_DTS));
+        using_passthru = do_ac3_passthru || do_dts_passthru;
         info = AudioInfo(codec_ctx->codec_id,
                          codec_ctx->sample_rate, codec_ctx->channels,
-                         do_ac3_passthru || do_dts_passthru);
+                         using_passthru && !disable_passthru);
     }
 
     if (info == audioIn)
         return false; // no change
 
+    QString ptmsg = (using_passthru) ? " using passthru" : "";
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));
 
     audioOut = audioIn = info;
-    if (audioIn.do_passthru)
+    if (using_passthru)
     {
         // A passthru stream looks like a 48KHz 2ch (@ 16bit) to the sound card
-        audioOut.channels    = 2;
-        audioOut.sample_rate = 48000;
-        audioOut.sample_size = 4;
+        AudioInfo digInfo = audioOut;
+        if (!disable_passthru)
+        {
+            digInfo.channels    = 2;
+            digInfo.sample_rate = 48000;
+            digInfo.sample_size = 4;
+        }
+        if (audioOut.channels > (int) max_channels)
+        {
+            audioOut.channels = (int) max_channels;
+            audioOut.sample_size = audioOut.channels * 2;
+            codec_ctx->channels = audioOut.channels;
+        }
+        VERBOSE(VB_AUDIO, LOC + "Audio format changed digital passthrough " +
+                QString("%1\n\t\t\tfrom %2 ; %3\n\t\t\tto   %4 ; %5")
+                .arg(digInfo.toString())
+                .arg(old_in.toString()).arg(old_out.toString())
+                .arg(audioIn.toString()).arg(audioOut.toString()));
+
+        if (digInfo.sample_rate > 0)
+            GetNVP()->SetEffDsp(digInfo.sample_rate * 100);
+
+        GetNVP()->SetAudioParams(digInfo.bps(), digInfo.channels,
+                                 digInfo.sample_rate, audioIn.do_passthru);
+        // allow the audio stuff to reencode
+        GetNVP()->SetAudioCodec(codec_ctx);
+        GetNVP()->ReinitAudio();
+        return true;
     }
     else
     {
-        if (audioOut.channels > MAX_OUTPUT_CHANNELS)
+        if (audioOut.channels > (int) max_channels)
         {
-            audioOut.channels = MAX_OUTPUT_CHANNELS;
+            audioOut.channels = (int) max_channels;
             audioOut.sample_size = audioOut.channels * 2;
-            codec_ctx->channels = MAX_OUTPUT_CHANNELS;
+            codec_ctx->channels = audioOut.channels;
         }
     }
 
@@ -3896,7 +3966,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
     GetNVP()->SetAudioParams(audioOut.bps(), audioOut.channels,
                              audioOut.sample_rate,
                              audioIn.do_passthru);
-    GetNVP()->ReinitAudio();
+
+    // allow the audio stuff to reencode
+    GetNVP()->SetAudioCodec(using_passthru?codec_ctx:NULL);
+    QString errMsg = GetNVP()->ReinitAudio();
+    bool audiook = errMsg.isEmpty();
 
     return true;
 }

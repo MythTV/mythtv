@@ -261,6 +261,8 @@ class AvFormatDecoder : public DecoderBase
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
     bool              disable_passthru;
+    uint              max_channels;
+
     VideoFrame       *dummy_frame;
 
     AudioInfo         audioIn;

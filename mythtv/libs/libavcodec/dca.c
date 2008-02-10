@@ -1159,7 +1159,13 @@ static int dca_decode_frame(AVCodecContext * avctx,
     avctx->bit_rate = s->bit_rate;
 
     channels = s->prim_channels + !!s->lfe;
-    avctx->channels = avctx->request_channels;
+    //avctx->channels = avctx->request_channels;
+    if (avctx->request_channels > 0)
+    {
+        avctx->channels = channels;
+        if (avctx->channels > avctx->request_channels)
+            avctx->channels = avctx->request_channels;
+    }
     if(avctx->channels == 0) {
         avctx->channels = channels;
     } else if(channels < avctx->channels) {

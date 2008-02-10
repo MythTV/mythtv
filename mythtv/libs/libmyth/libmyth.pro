@@ -11,6 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
+HEADERS += audiooutputdigitalencoder.h
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += DisplayRes.h DisplayResScreen.h exitcodes.h
 HEADERS += generictree.h httpcomms.h langsettings.h lcddevice.h
@@ -27,6 +28,7 @@ HEADERS += mythhdd.h mythcdrom.h storagegroup.h
 HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
+SOURCES += audiooutputdigitalencoder.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += generictree.cpp httpcomms.cpp langsettings.cpp lcddevice.cpp
@@ -41,17 +43,26 @@ SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
 SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp
 
-INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../ ./
-DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
+INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
+INCLUDEPATH += ../libavcodec ../libavutil
+INCLUDEPATH += ../.. ../ ./
+DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
+DEPENDPATH += ../libavcodec ../libavutil
+DEPENDPATH += ../ ../libmythui
 DEPENDPATH += ../libmythupnp
 
-LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
-LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}
-LIBS += -L../libmythui         -lmythui-$${LIBVERSION}
-LIBS += -L../libmythupnp       -lmythupnp-$${LIBVERSION}
+
+LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
+LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
+LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
+LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
+LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
+LIBS += -L../libavcodec          -lmythavcodec-$${LIBVERSION}
+LIBS += -L../libavutil           -lmythavutil-$${LIBVERSION}
 
 TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
+TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
@@ -220,4 +231,12 @@ contains( HAVE_MMX, yes ) {
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
+contains( CONFIG_LIBA52, yes ) {
+    LIBS += -la52
+}
+
+contains( CONFIG_LIBFFTW3, yes ) {
+    LIBS += -lfftw3f
 }

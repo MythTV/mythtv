@@ -19,7 +19,12 @@ HEADERS += freesurround.h
 SOURCES += el_processor.cpp
 SOURCES += freesurround.cpp
 
-#required until its rewritten to use avcodec fft lib
-#LIBS += -lfftw3
-LIBS += -lfftw3f
-
+contains( CONFIG_LIBFFTW3, yes ) {
+    #required until its rewritten to use avcodec fft lib
+    LIBS += -lfftw3f
+    DEFINES += USE_FFTW3
+} else {
+    DEPENDPATH += ../libavcodec
+    LIBS += -L../libavcodec -lavcodec
+    INCLUDEPATH += ../../libs/libavutil
+}

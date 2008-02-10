@@ -31,10 +31,14 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits, int audio_channels,
-                             int audio_samplerate, bool audio_passthru) = 0;
+    virtual void Reconfigure(int audio_bits, 
+                             int audio_channels, 
+                             int audio_samplerate,
+                             bool audio_passthru,
+                             void* audio_codec = NULL) = 0;
     
     virtual void SetStretchFactor(float factor);
+    virtual float GetStretchFactor(void) { return 1.0f; }
 
     // do AddSamples calls block?
     virtual void SetBlocking(bool blocking) = 0;
@@ -76,6 +80,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         lastError = msg;
         VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
     }
+    void ClearError(void) { lastError = QString::null; }
 
     void Warn(QString msg)
     {

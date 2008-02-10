@@ -89,8 +89,9 @@ bool AudioOutputALSA::OpenDevice()
     }
     else
     {
-        fragment_size = 6144; // nicely divisible by 2,4,6,8 channels @ 16-bits
-        buffer_time = 500000;  // .5 seconds
+        fragment_size =
+            (audio_bits * audio_channels * audio_samplerate) / (8*30);
+        buffer_time = 100000;
         period_time = buffer_time / 4;  // 4 interrupts per buffer
     }
 
@@ -162,7 +163,8 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
     
     tmpbuf = aubuf;
 
-    VERBOSE(VB_AUDIO, QString("WriteAudio: Preparing %1 bytes (%2 frames)")
+    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+            QString("WriteAudio: Preparing %1 bytes (%2 frames)")
             .arg(size).arg(frames));
     
     while (frames > 0) 

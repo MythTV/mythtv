@@ -56,7 +56,13 @@ static HostComboBox *AudioOutputDevice()
     }
 #endif
 #ifdef USING_ALSA
-    gc->addSelection("ALSA:default", "ALSA:default");
+    gc->addSelection("ALSA:default",       "ALSA:default");
+    gc->addSelection("ALSA:spdif",         "ALSA:spdif");
+    gc->addSelection("ALSA:surround51",    "ALSA:surround51");
+    gc->addSelection("ALSA:analog",        "ALSA:analog");
+    gc->addSelection("ALSA:digital",       "ALSA:digital");
+    gc->addSelection("ALSA:mixed-analog",  "ALSA:mixed-analog");
+    gc->addSelection("ALSA:mixed-digital", "ALSA:mixed-digital");
 #endif
 #ifdef USING_ARTS
     gc->addSelection("ARTS:", "ARTS:");
@@ -75,6 +81,33 @@ static HostComboBox *AudioOutputDevice()
 #endif
     gc->addSelection("NULL", "NULL");
 
+    return gc;
+}
+
+static HostComboBox *MaxAudioChannels()
+{
+    HostComboBox *gc = new HostComboBox("MaxChannels",false);
+    gc->setLabel(QObject::tr("Max Audio Channels"));
+    gc->addSelection(QObject::tr("Stereo"), "2", true); // default
+    gc->addSelection(QObject::tr("5.1"), "6");
+    gc->setHelpText(
+            QObject::tr(
+                "Set the maximum number of audio channels to be decoded. "
+                "This is for multi-channel/surround audio playback."));
+    return gc;
+}
+
+static HostComboBox *AudioUpmixType()
+{
+    HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
+    gc->setLabel(QObject::tr("Upmix"));
+    gc->addSelection(QObject::tr("Passive"), "0");
+    gc->addSelection(QObject::tr("Active Simple"), "1");
+    gc->addSelection(QObject::tr("Active Linear"), "2", true); // default
+    gc->setHelpText(
+            QObject::tr(
+                "Set the audio upmix type for 2ch to 6ch conversion. "
+                "This is for multi-channel/surround audio playback."));
     return gc;
 }
 
@@ -3254,6 +3287,12 @@ class AudioSettings : public TriggeredConfigurationGroup
              new VerticalConfigurationGroup(false, false, true, true);
          vgrp0->addChild(AC3PassThrough());
          vgrp0->addChild(DTSPassThrough());
+
+         HorizontalConfigurationGroup *agrp =
+             new HorizontalConfigurationGroup(false, false, true, true);
+         agrp->addChild(MaxAudioChannels());
+         agrp->addChild(AudioUpmixType());
+         addChild(agrp);
 
          VerticalConfigurationGroup *vgrp1 =
              new VerticalConfigurationGroup(false, false, true, true);
