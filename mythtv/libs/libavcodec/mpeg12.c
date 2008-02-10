@@ -2464,18 +2464,11 @@ int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size)
                 pc->frame_start_found=1;
                 break;
             }
-        }
-    }
-
-    /* look for SEQ_END_CODE at the last data in this buffer*/
-    /* dvd's won't send the next frame start on still images*/
-    /* state should hold the last startcode if one was found above*/
-    /* i will point to the position after that startcode */
-    if(!pc->frame_start_found){
             if(state == SEQ_END_CODE){
                 pc->state=-1;
                 return i+1;
             }
+        }
     }
 
     if(pc->frame_start_found){
