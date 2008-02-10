@@ -752,7 +752,6 @@ CONFIG_LIST="
     libfaac
     libfaad
     libfaadbin
-    libfftw3
     libgsm
     libmp3lame
     libnut
@@ -872,6 +871,7 @@ MYTHTV_CONFIG_LIST='
     iptv
     ivtv
     joystick_menu
+    libfftw3
     lirc
     opengl_vsync
     opengl_video
@@ -2887,7 +2887,6 @@ echo "libdc1394 support         ${libdc1394-no}"
 echo "libfaac enabled           ${libfaac-no}"
 echo "libfaad enabled           ${libfaad-no}"
 echo "libfaad dlopened          ${libfaadbin-no}"
-echo "libfftw3 support          ${liba52-no}"
 echo "libgsm enabled            ${libgsm-no}"
 echo "libmp3lame enabled        ${libmp3lame-no}"
 echo "libnut enabled            ${libnut-no}"
@@ -2942,6 +2941,7 @@ if enabled frontend; then
   if test x"$targetos" = x"mingw32" ; then
     echo "Windows support           yes"
   fi
+  echo "libfftw3 support          ${libfftw3-no}"
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
