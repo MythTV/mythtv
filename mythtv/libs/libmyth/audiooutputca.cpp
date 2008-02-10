@@ -29,6 +29,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputca.h"
 #include "config.h"
+#include "SoundTouch.h" 
 
 /** \class CoreAudioData
  *  \brief This holds Core Audio member variables and low-level audio IO methods
