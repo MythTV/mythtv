@@ -1,6 +1,8 @@
 // Std C headers
 #include <cstdio>
 
+#include "config.h"
+
 // libav headers
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -12,7 +14,6 @@ extern "C" {
 }
 
 // MythTV headers
-#include "config.h"
 #include "mythcontext.h"
 #include "audiooutputdigitalencoder.h"
 #include "compat.h"
