@@ -608,6 +608,8 @@ void PlaybackBoxMusic::showMenu()
                                   SLOT(byGenre()));
         playlist_popup->addButton(tr("Tracks from current Year"), this,
                                   SLOT(byYear()));
+        playlist_popup->addButton(tr("Tracks with same Title"), this,
+                                  SLOT(byTitle()));
     }
     
     playlist_popup->ShowPopup(this, SLOT(closePlaylistPopup()));
@@ -728,6 +730,18 @@ void PlaybackBoxMusic::byYear()
 
     QString value = formattedFieldValue(curMeta->Year()); 
     QString whereClause = "WHERE music_songs.year = " + value + 
+                          " ORDER BY music_artists.artist_name, album_name, track";
+    closePlaylistPopup();
+    updatePlaylistFromQuickPlaylist(whereClause);
+}
+
+void PlaybackBoxMusic::byTitle()
+{
+   if (!playlist_popup || !curMeta)
+        return;
+
+    QString value = formattedFieldValue(curMeta->Title().utf8()); 
+    QString whereClause = "WHERE music_songs.name = " + value + 
                           " ORDER BY music_artists.artist_name, album_name, track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);

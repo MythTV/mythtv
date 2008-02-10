@@ -93,6 +93,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void byAlbum();
     void byGenre();
     void byYear();
+    void byTitle();
     void fromCD();
     void showSmartPlaylistDialog();
     void showSearchDialog();
