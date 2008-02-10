@@ -177,12 +177,14 @@ QString ProfileItem::toString(void) const
     QString filter    = Get("pref_filters");
     bool    osdfade   = Get("pref_osdfade").toInt();
 
-    return QString("cmp(%1%2) dec(%3) cpus(%4) rend(%5) osd(%6) osdfade(%7) "
-                   "deint(%8,%9) filt(%10)")
+    QString str =  QString("cmp(%1%2) dec(%3) cpus(%4) rend(%5) ")
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
-        .arg(decoder).arg(max_cpus).arg(renderer)
+        .arg(decoder).arg(max_cpus).arg(renderer);
+    str += QString("osd(%1) osdfade(%2) deint(%3,%4) filt(%5)")
         .arg(osd).arg((osdfade) ? "enabled" : "disabled")
         .arg(deint0).arg(deint1).arg(filter);
+
+    return str;
 }
 
 //////////////////////////////////////////////////////////////////////////////
