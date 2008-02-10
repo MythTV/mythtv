@@ -115,18 +115,14 @@ void Channel::SetFd(int fd)
     videofd = (fd >= 0) ? fd : -1;
 }
 
-static int format_to_mode(const QString& fmt, int v4l_version)
+static int format_to_mode(const QString &fmt, int v4l_version)
 {
-    if (v4l_version==2)
+    if (2 == v4l_version)
     {
-        if (fmt == "NTSC")
-            return V4L2_STD_NTSC;
-        else if (fmt == "ATSC")
-            return V4L2_STD_ATSC_8_VSB;
-        else if (fmt == "PAL")
-            return V4L2_STD_PAL;
-        else if (fmt == "PAL-BG")
+        if (fmt == "PAL-BG")
             return V4L2_STD_PAL_BG;
+        else if (fmt == "PAL-D")
+            return V4L2_STD_PAL_D;
         else if (fmt == "PAL-DK")
             return V4L2_STD_PAL_DK;
         else if (fmt == "PAL-I")
@@ -135,6 +131,8 @@ static int format_to_mode(const QString& fmt, int v4l_version)
             return V4L2_STD_PAL_60;
         else if (fmt == "SECAM")
             return V4L2_STD_SECAM;
+        else if (fmt == "SECAM-D")
+            return V4L2_STD_SECAM_D;
         else if (fmt == "PAL-NC")
             return V4L2_STD_PAL_Nc;
         else if (fmt == "PAL-M")
@@ -143,25 +141,20 @@ static int format_to_mode(const QString& fmt, int v4l_version)
             return V4L2_STD_PAL_N;
         else if (fmt == "NTSC-JP")
             return V4L2_STD_NTSC_M_JP;
+        // generics...
+        else if (fmt.left(4) == "NTSC")
+            return V4L2_STD_NTSC;
+        else if (fmt.left(4) == "ATSC")
+            return V4L2_STD_NTSC; // We've dropped V4L ATSC support...
+        else if (fmt.left(3) == "PAL")
+            return V4L2_STD_PAL;
         return V4L2_STD_NTSC;
     }
-    if (v4l_version==1)
+    else if (1 == v4l_version)
     {
-        if (fmt == "NTSC")
-            return VIDEO_MODE_NTSC;
-        else if (fmt == "ATSC")
-            return VIDEO_MODE_ATSC;
-        else if (fmt == "PAL")
-            return VIDEO_MODE_PAL;
-        else if (fmt == "PAL-BG")
-            return VIDEO_MODE_PAL;
-        else if (fmt == "PAL-DK")
-            return VIDEO_MODE_PAL;
-        else if (fmt == "PAL-I")
-            return VIDEO_MODE_PAL;
-        else if (fmt == "PAL-60")
-            return VIDEO_MODE_PAL;
-        else if (fmt == "SECAM")
+        if (fmt == "NTSC-JP")
+            return 6;
+        else if (fmt.left(5) == "SECAM")
             return VIDEO_MODE_SECAM;
         else if (fmt == "PAL-NC")
             return 3;
@@ -169,43 +162,84 @@ static int format_to_mode(const QString& fmt, int v4l_version)
             return 4;
         else if (fmt == "PAL-N")
             return 5;
-        else if (fmt == "NTSC-JP")
-            return 6;
+        // generics...
+        else if (fmt.left(3) == "PAL")
+            return VIDEO_MODE_PAL;
+        else if (fmt.left(4) == "NTSC")
+            return VIDEO_MODE_NTSC;
+        else if (fmt.left(4) == "ATSC")
+            return VIDEO_MODE_NTSC; // We've dropped V4L ATSC support...
+        return VIDEO_MODE_NTSC;
     }
-    return VIDEO_MODE_NTSC;
+
+    VERBOSE(VB_IMPORTANT,
+            "format_to_mode() does not recognize V4L" << v4l_version);
+
+    return V4L2_STD_NTSC; // assume V4L version 2
 }
 
 static QString mode_to_format(int mode, int v4l_version)
 {
-    if (v4l_version==2)
+    if (2 == v4l_version)
     {
         if (mode == V4L2_STD_NTSC)
             return "NTSC";
-        else if (mode == V4L2_STD_ATSC_8_VSB)
-            return "ATSC";
+        else if (mode == V4L2_STD_NTSC_M_JP)
+            return "NTSC-JP";
         else if (mode == V4L2_STD_PAL)
             return "PAL";
+        else if (mode == V4L2_STD_PAL_60)
+            return "PAL-60";
         else if (mode == V4L2_STD_PAL_BG)
             return "PAL-BG";
+        else if (mode == V4L2_STD_PAL_D)
+            return "PAL-D";
         else if (mode == V4L2_STD_PAL_DK)
             return "PAL-DK";
         else if (mode == V4L2_STD_PAL_I)
             return "PAL-I";
-        else if (mode == V4L2_STD_PAL_60)
-            return "PAL-60";
-        else if (mode == V4L2_STD_SECAM)
-            return "SECAM";
-        else if (mode == V4L2_STD_PAL_Nc)
-            return "PAL-NC";
         else if (mode == V4L2_STD_PAL_M)
             return "PAL-M";
         else if (mode == V4L2_STD_PAL_N)
             return "PAL-N";
-        else if (mode == V4L2_STD_NTSC_M_JP)
-            return "NTSC-JP";
-        return "Unknown";
+        else if (mode == V4L2_STD_PAL_Nc)
+            return "PAL-NC";
+        else if (mode == V4L2_STD_SECAM)
+            return "SECAM";
+        else if (mode == V4L2_STD_SECAM_D)
+            return "SECAM-D";
+        // generic..
+        else if ((V4L2_STD_NTSC_M      == mode) ||
+                 (V4L2_STD_NTSC_443    == mode) ||
+                 (V4L2_STD_NTSC_M_KR   == mode))
+            return "NTSC";
+        else if ((V4L2_STD_PAL_B       == mode) ||
+                 (V4L2_STD_PAL_B1      == mode) ||
+                 (V4L2_STD_PAL_G       == mode) ||
+                 (V4L2_STD_PAL_H       == mode) ||
+                 (V4L2_STD_PAL_D1      == mode) ||
+                 (V4L2_STD_PAL_K       == mode))
+            return "PAL";
+        else if ((V4L2_STD_SECAM_B     == mode) ||
+                 (V4L2_STD_SECAM_DK    == mode) ||
+                 (V4L2_STD_SECAM_G     == mode) ||
+                 (V4L2_STD_SECAM_H     == mode) ||
+                 (V4L2_STD_SECAM_K     == mode) ||
+                 (V4L2_STD_SECAM_K1    == mode) ||
+                 (V4L2_STD_SECAM_L     == mode) ||
+                 (V4L2_STD_SECAM_LC    == mode))
+            return "SECAM";
+        else if ((V4L2_STD_ATSC        == mode) ||
+                 (V4L2_STD_ATSC_8_VSB  == mode) ||
+                 (V4L2_STD_ATSC_16_VSB == mode))
+        {
+            // We've dropped V4L ATSC support, but this still needs to be
+            // returned here so we will change the mode if the device is
+            // in ATSC mode already.
+            return "ATSC";
+        }
     }
-    if (v4l_version==1)
+    else if (1 == v4l_version)
     {
         if (mode == VIDEO_MODE_NTSC)
             return "NTSC";
@@ -224,6 +258,12 @@ static QString mode_to_format(int mode, int v4l_version)
         else if (mode == 6)
             return "NTSC-JP";
     }
+    else
+    {
+        VERBOSE(VB_IMPORTANT,
+                "mode_to_format() does not recognize V4L" << v4l_version);
+    }
+
     return "Unknown";
 }
 

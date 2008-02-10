@@ -139,11 +139,13 @@ QStringList ChannelTVFormat::GetFormats(void)
     list.push_back("PAL-60");
     list.push_back("PAL-BG");
     list.push_back("PAL-DK");
+    list.push_back("PAL-D");
     list.push_back("PAL-I");
     list.push_back("PAL-M");
-    list.push_back("PAL-NC");
     list.push_back("PAL-N");
+    list.push_back("PAL-NC");
     list.push_back("SECAM");
+    list.push_back("SECAM-D");
 
     return list;
 }
