@@ -889,10 +889,10 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     filters->setLabel(tr("Custom Filters"));
 
     max_cpus->setHelpText(tr("Maximal number of CPU cores used for decoding.") +
-                          ENABLE_THREADS ? "" :
+                          (ENABLE_THREADS ? "" :
                           tr(" Multithreaded decoding disabled only one CPU "
                              "will be used, please recompile with "
-                             "--enable-ffmpeg-pthreads to enable."));
+                             "--enable-ffmpeg-pthreads to enable.")));
     filters->setHelpText(
         QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
 
