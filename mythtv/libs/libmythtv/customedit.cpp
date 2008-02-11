@@ -247,7 +247,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.hdtv > 0 ";
 
-    m_clause->insertItem(tr("Only shows marked as widescreen (EIT only)"));
+    m_clause->insertItem(tr("Only shows marked as widescreen"));
     m_cfrom << "";
     m_csql << "program.videoprop & 2 ";
 
