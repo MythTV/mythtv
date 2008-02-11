@@ -33,12 +33,16 @@ struct DVDVideoContext
 };
 
 typedef UInt64 uint64;
+#ifndef _UINT32
 typedef UInt32 uint32;
+#endif
 typedef UInt16 uint16;
 typedef unsigned char uint8;
 
 typedef SInt64 sint64;
+#ifndef _SINT32
 typedef SInt32 sint32;
+#endif
 typedef SInt16 sint16;
 typedef signed char sint8;
 
