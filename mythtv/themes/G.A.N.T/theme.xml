@@ -435,6 +435,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="SETUP_STORAGE_GROUPS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/wrench.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="SETUP_CAPTURE_CARDS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/wrench.png</watermarkimage>

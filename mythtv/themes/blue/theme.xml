@@ -485,6 +485,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="SETUP_STORAGE_GROUPS">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
   <buttondef name="SETUP_CAPTURE_CARDS">
     <image>setup.png</image>
     <offset>20,10</offset>

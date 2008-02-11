@@ -149,3 +149,12 @@ util_menu.xml
       3. SETUP_KEYS
       4. SETUP_MENU
       5. SCREENSETUPWIZARD // new appearance settings helper
+
+setup.xml
+
+      1. SETUP_GENERAL
+      2. SETUP_CAPTURE_CARDS
+      3. SETUP_VIDEO_SOURCES
+      4. SETUP_INPUT_CONNECTIONS
+      5. SETUP_CHANNEL_EDITOR
+      6. SETUP_STORAGE_GROUPS
