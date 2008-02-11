@@ -1149,6 +1149,7 @@ directfb="yes"
 dvb_path="/usr/include"
 dvb="yes"
 dvdv="no"
+ffmpeg_pthreads="yes"
 firewire="yes"
 frontend="yes"
 hdhomerun="yes"
@@ -2301,7 +2302,7 @@ if enabled pthreads; then
         add_cflags -pthreads
         add_ldflags -pthreads
     elif ! check_lib pthread.h pthread_create -lpthread; then
-        die "ERROR: can't find pthreads library"
+        disable ffmpeg_pthreads pthreads
     fi
 fi
 
@@ -2969,6 +2970,7 @@ fi
 fi
 
 echo "# Misc Features"
+echo "multi threaded libavcodec ${threads-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo
