@@ -129,7 +129,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     {
         m_clause->insertItem(tr("Match this series"));
         m_cfrom << "";
-        m_csql << QString("program.seruesid = '%1' ").arg(p->seriesid);
+        m_csql << QString("program.seriesid = '%1' ").arg(p->seriesid);
     }
     m_clause->insertItem(tr("Match words in the title"));
     m_cfrom << "";
