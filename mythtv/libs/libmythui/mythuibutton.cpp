@@ -26,7 +26,6 @@ MythUIButton::~MythUIButton()
 
 void MythUIButton::Init()
 {
-
     m_BackgroundImage = new MythUIStateType(this, "buttonback");
     m_CheckImage = new MythUIStateType(this, "buttoncheck");
     m_Text = new MythUIText(this, "buttontext");
@@ -107,7 +106,10 @@ bool MythUIButton::ParseElement(QDomElement &element)
                                 tmp);
     }
     else if (element.tagName() == "margin")
-        m_PaddingMargin = NormX(getFirstText(element).toInt());
+    {
+        int paddingMargin = NormX(getFirstText(element).toInt());
+        SetPaddingMargin(paddingMargin);
+    }
     else if (element.tagName() == "multiline")
     {
         if (parseBool(element))
@@ -357,7 +359,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
 
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
-    MythUIButton *button = new MythUIButton(parent, name());
+    MythUIButton *button = new MythUIButton(parent, name(), false);
     button->CopyFrom(this);
 }
 
