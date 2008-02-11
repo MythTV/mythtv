@@ -113,7 +113,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, int match_threshold) const
 
     if ((match < match_threshold) && (i >= 0))
     {
-        VERBOSE(VB_IMPORTANT, QString("match[%1]: %2 '%3' vs. '%4'")
+        VERBOSE(VB_EIT, QString("match[%1]: %2 '%3' vs. '%4'")
                 .arg(i).arg(match).arg(title).arg(programs[i].title));
     }
 
