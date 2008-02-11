@@ -3620,15 +3620,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     long long temppts = pts;
 
-                    if (temppts != 0)
-                        lastvpts = temppts;
-                    else
+                    // validate the pts against the last
+                    // if it's smaller, compute the next
+                    if (temppts <= lastvpts)
+                    {
                         temppts = lastvpts;
+                        temppts += (long long)(1000 * av_q2d(context->time_base));
+                        // MPEG2 frames can be repeated, update pts accordingly
+                        temppts += (long long)(mpa_pic.repeat_pict * 500
+                                      * av_q2d(curstream->codec->time_base));
+                    }
 
-                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
-					        LOC + QString("video timecode %1 %2 %3 %4") 
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
+                            QString("video timecode %1 %2 %3 %4")
                             .arg(pkt->pts).arg(pkt->dts).arg(temppts)
-							.arg(lastapts)); 
+                            .arg(lastvpts));
 
 /* XXX: Broken.
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
