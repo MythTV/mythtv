@@ -222,6 +222,7 @@ MP3ADUdeinterleaver::MP3ADUdeinterleaver(UsageEnvironment& env,
 }
 
 MP3ADUdeinterleaver::~MP3ADUdeinterleaver() {
+    delete fFrames;
 }
 
 MP3ADUdeinterleaver* MP3ADUdeinterleaver::createNew(UsageEnvironment& env,
