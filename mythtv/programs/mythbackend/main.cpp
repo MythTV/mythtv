@@ -781,8 +781,6 @@ int main(int argc, char **argv)
         }
     }
 
-    close(0);
-
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
@@ -812,6 +810,8 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_DB_OUTOFDATE;
     }    
     gContext->ActivateSettingsCache(true);
+
+    close(0);
 
     if (printsched || testsched)
     {
