@@ -4596,8 +4596,10 @@ void TV::SwitchCards(uint chanid, QString channum, uint inputid)
 
     // If activenvp is main nvp, show input in on-screen-display
     if (nvp && activenvp == nvp)
+    {
         UpdateOSDInput();
-
+        UnpauseLiveTV();
+    }
     ITVRestart(true);
 }
 
