@@ -125,6 +125,12 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     else
         m_csql << "program.title = 'Nova' ";
 
+    if (p->seriesid > "")
+    {
+        m_clause->insertItem(tr("Match this series"));
+        m_cfrom << "";
+        m_csql << QString("program.seruesid = '%1' ").arg(p->seriesid);
+    }
     m_clause->insertItem(tr("Match words in the title"));
     m_cfrom << "";
     if (p->title > "")
@@ -240,6 +246,10 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_clause->insertItem(tr("Only shows marked as HDTV"));
     m_cfrom << "";
     m_csql << "program.hdtv > 0 ";
+
+    m_clause->insertItem(tr("Only shows marked as widescreen (EIT only)"));
+    m_cfrom << "";
+    m_csql << "program.videoprop & 2 ";
 
     m_clause->insertItem(tr("Limit by category"));
     m_cfrom << "";
