@@ -233,7 +233,7 @@ void VideoGallery::updateText(QPainter *p)
 
         Metadata *meta =
                 m_video_list->getVideoListMetadata(where_we_are->getInt());
-        checkedSetText((UITextType*)container->GetType("text"),
+        checkedSetText(container, "text",
                        meta ? meta->Title() : where_we_are->getString());
 
         container->Draw(&tmp, 0, 0);
@@ -500,6 +500,7 @@ void VideoGallery::doMenu(bool info)
             focusButton = popup->addButton(tr("Watch This Video"), this,
                                            SLOT(slotWatchVideo()));
             popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+            popup->addButton(tr("View Cast"), this, SLOT(slotViewCast()));
             popup->addButton(tr("View Details"), this,
                              SLOT(handleVideoSelect()));
 

@@ -214,10 +214,8 @@ void VideoSelected::updateInfo(QPainter *p)
        LayerSet *container = theme->GetSet("info");
        if (container)
        {
-           checkedSetText((UITextType *)container->GetType("title"),
-                          m_item->Title());
-           checkedSetText((UITextType *)container->GetType("filename"),
-                          m_item->Filename());
+           checkedSetText(container, "title", m_item->Title());
+           checkedSetText(container, "filename", m_item->Filename());
 
            QString coverfile = m_item->CoverFile();
            UIImageType *itype = (UIImageType *)container->GetType("coverart");
@@ -255,31 +253,26 @@ void VideoSelected::updateInfo(QPainter *p)
                }
            }
 
-           checkedSetText((UITextType *)container->GetType("video_player"),
+           checkedSetText(container, "video_player",
                           Metadata::getPlayer(m_item));
-           checkedSetText((UITextType *)container->GetType("director"),
-                          m_item->Director());
-           checkedSetText((UITextType *)container->GetType("plot"),
-                          m_item->Plot());
-           checkedSetText((UITextType *)container->GetType("rating"),
+           checkedSetText(container, "director", m_item->Director());
+           checkedSetText(container, "plot", m_item->Plot());
+           checkedSetText(container, "cast", GetCast(*m_item));
+           checkedSetText(container, "rating",
                           getDisplayRating(m_item->Rating()));
-           checkedSetText((UITextType *)container->GetType("inetref"),
-                          m_item->InetRef());
-           checkedSetText((UITextType *)container->GetType("year"),
-                          getDisplayYear(m_item->Year()));
-           checkedSetText((UITextType *)container->GetType("userrating"),
+           checkedSetText(container, "inetref", m_item->InetRef());
+           checkedSetText(container, "year", getDisplayYear(m_item->Year()));
+           checkedSetText(container, "userrating",
                           getDisplayUserRating(m_item->UserRating()));
-           checkedSetText((UITextType *)container->GetType("length"),
+           checkedSetText(container, "length",
                           getDisplayLength(m_item->Length()));
-           checkedSetText((UITextType *)container->GetType("coverfile"),
-                          m_item->CoverFile());
-           checkedSetText((UITextType *)container->GetType("child_id"),
+           checkedSetText(container, "coverfile", m_item->CoverFile());
+           checkedSetText(container, "child_id",
                           QString::number(m_item->ChildID()));
-           checkedSetText((UITextType *)container->GetType("browseable"),
+           checkedSetText(container, "browseable",
                           getDisplayBrowse(m_item->Browse()));
-           checkedSetText((UITextType *)container->GetType("category"),
-                          m_item->Category());
-           checkedSetText((UITextType *)container->GetType("level"),
+           checkedSetText(container, "category", m_item->Category());
+           checkedSetText(container, "level",
                           QString::number(m_item->ShowLevel()));
 
            for (int i = 1; i < 9; ++i)
@@ -351,8 +344,7 @@ void VideoSelected::startPlayItem()
     LayerSet *container = theme->GetSet("playwait");
     if (container)
     {
-        checkedSetText((UITextType *)container->GetType("title"),
-                       m_item->Title());
+        checkedSetText(container, "title", m_item->Title());
     }
     m_state = 1;
     update(fullRect);

@@ -12,6 +12,7 @@
 #include "videolist.h"
 #include "videoutils.h"
 #include "parentalcontrols.h"
+#include "videoui-common.h"
 
 bool VideoDialog::IsValidDialogType(int num)
 {
@@ -171,6 +172,21 @@ void VideoDialog::slotViewPlot()
     }
 }
 
+void VideoDialog::slotViewCast()
+{
+    cancelPopup();
+
+    if (curitem)
+    {
+        allowPaint = false;
+        ShowCastDialog(gContext->GetMainWindow(), *curitem);
+        allowPaint = true;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("no item to view"));
+    }
+}
 
 void VideoDialog::slotWatchVideo()
 {
@@ -188,8 +204,7 @@ void VideoDialog::playVideo(Metadata *someItem)
     LayerSet *container = theme->GetSet("playwait");
     if (container)
     {
-        checkedSetText((UITextType *)container->GetType("title"),
-                       someItem->Title());
+        checkedSetText(container, "title", someItem->Title());
     }
     update(fullRect);
     allowPaint = false;

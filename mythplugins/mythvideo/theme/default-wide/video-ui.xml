@@ -1350,44 +1350,50 @@
             <value>Country :</value>
          </textarea>
 
-         <textarea name="year_text" draworder="0" align="right">
+         <textarea name="cast_text" draworder="0" align="right">
             <area>0,220,572,40</area>
+            <font>display</font>
+            <value>Actor/Actress :</value>
+         </textarea>
+
+         <textarea name="year_text" draworder="0" align="right">
+            <area>0,260,572,40</area>
             <font>display</font>
             <value>Year :</value>
          </textarea>
 
          <textarea name="runtime_text" draworder="0" align="right">
-            <area>0,260,572,40</area>
+            <area>0,300,572,40</area>
             <font>display</font>
             <value>Runtime :</value>
          </textarea>
 
          <textarea name="userrating_text" draworder="0" align="right">
-            <area>0,300,572,40</area>
+            <area>0,340,572,40</area>
             <font>display</font>
             <value>User Rating :</value>
          </textarea>
 
          <textarea name="browse_text" draworder="0" align="right">
-            <area>0,340,572,40</area>
+            <area>0,380,572,40</area>
             <font>display</font>
             <value>Browse :</value>
          </textarea>
 
          <textarea name="inetref_text" draworder="0" align="right">
-            <area>0,380,572,40</area>
+            <area>0,420,572,40</area>
             <font>display</font>
             <value>InetRef :</value>
          </textarea>
 
          <textarea name="coverfile_text" draworder="0" align="right">
-            <area>0,420,572,40</area>
+            <area>0,460,572,40</area>
             <font>display</font>
             <value>Cover File :</value>
          </textarea>
 
          <textarea name="orderby_text" draworder="0" align="right">
-            <area>0,460,572,40</area>
+            <area>0,500,572,40</area>
             <font>display</font>
             <value>Sort by :</value>
          </textarea>
@@ -1395,7 +1401,7 @@
          <!-- Widgets -->
 
          <selector name="category_select" draworder="0">
-            <area>580,95,300,40</area>
+            <area>580,100,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1403,7 +1409,7 @@
          </selector>
 
          <selector name="genre_select" draworder="0">
-            <area>580,135,300,40</area>
+            <area>580,140,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1411,7 +1417,15 @@
          </selector>
 
          <selector name="country_select" draworder="0">
-            <area>580,175,300,40</area>
+            <area>580,180,300,40</area>
+            <font>display</font>
+            <image function="on" filename="leftright_on.png"></image>
+            <image function="off" filename="leftright_off.png"></image>
+            <image function="pushed" filename="leftright_pushed.png"></image>
+         </selector>
+
+         <selector name="cast_select" draworder="0">
+            <area>580,220,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1419,7 +1433,7 @@
          </selector>
 
          <selector name="year_select" draworder="0">
-            <area>580,215,300,40</area>
+            <area>580,260,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1427,7 +1441,7 @@
          </selector>
 
          <selector name="runtime_select" draworder="0">
-            <area>580,255,300,40</area>
+            <area>580,300,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1435,7 +1449,7 @@
          </selector>
 
          <selector name="userrating_select" draworder="0">
-            <area>580,295,300,40</area>
+            <area>580,340,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1443,7 +1457,7 @@
          </selector>
 
          <selector name="browse_select" draworder="0">
-            <area>580,335,300,40</area>
+            <area>580,380,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1451,7 +1465,7 @@
          </selector>
 
          <selector name="inetref_select" draworder="0">
-            <area>580,375,300,40</area>
+            <area>580,420,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1459,7 +1473,7 @@
          </selector>
 
          <selector name="coverfile_select" draworder="0">
-            <area>580,415,300,40</area>
+            <area>580,460,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1467,7 +1481,7 @@
          </selector>
 
          <selector name="orderby_select" draworder="0">
-            <area>580,455,300,40</area>
+            <area>580,500,300,40</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
             <image function="off" filename="leftright_off.png"></image>
@@ -1475,7 +1489,7 @@
          </selector>
 
          <textbutton name="done_button" draworder="0">
-            <position>426,495</position>
+            <position>426,540</position>
             <font>display</font>
             <image function="on" filename="mv_large_text_button_on.png"></image>
             <image function="off" filename="mv_large_text_button_off.png"></image>
@@ -1483,7 +1497,7 @@
          </textbutton>
 
          <textbutton name="save_button" draworder="0">
-            <position>426,559</position>
+            <position>426,604</position>
             <font>display</font>
             <image function="on" filename="mv_large_text_button_on.png"></image>
             <image function="off" filename="mv_large_text_button_off.png"></image>

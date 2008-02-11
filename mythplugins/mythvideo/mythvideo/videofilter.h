@@ -34,7 +34,8 @@ class VideoFilterSettings
         kFilterBrowseChanged = (1 << 7),
         kFilterInetRefChanged = (1 << 8),
         kFilterCoverFileChanged = (1 << 9),
-        kFilterParentalLevelChanged = (1 << 8)
+        kFilterParentalLevelChanged = (1 << 10),
+        kFilterCastChanged = (1 << 11)
     };
 
   public:
@@ -73,6 +74,13 @@ class VideoFilterSettings
     {
         m_changed_state |= kFilterGenreChanged;
         genre = lgenre;
+    }
+
+    int getCast() const { return cast; }
+    void setCast(int lcast)
+    {
+        m_changed_state |= kFilterCastChanged;
+        cast = lcast;
     }
 
     int getCountry() const { return country; }
@@ -149,6 +157,7 @@ class VideoFilterSettings
     int category;
     int genre;
     int country;
+    int cast;
     int year;
     int runtime;
     int userrating;
@@ -221,6 +230,7 @@ class VideoFilterDialog : public MythThemedDialog
     void setCategory(int new_category);
     void setCountry(int new_country);
     void setGenre(int new_genre);
+    void setCast(int new_cast);
     void setRunTime(int new_runtime);
     void setBrowse(int new_browse);
     void setInetRef(int new_inetref);
@@ -240,6 +250,7 @@ class VideoFilterDialog : public MythThemedDialog
     UISelectorType  *category_select;
     UISelectorType  *country_select;
     UISelectorType  *genre_select;
+    UISelectorType  *cast_select;
     UISelectorType  *runtime_select;
     UITextButtonType    *save_button;
     UITextButtonType    *done_button;

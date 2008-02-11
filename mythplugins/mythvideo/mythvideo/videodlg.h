@@ -40,6 +40,7 @@ class VideoDialog : public MythDialog
     void slotVideoGallery();
     void slotVideoBrowser();
     void slotViewPlot();
+    void slotViewCast();
     void slotDoFilter();
     void exitWin();
     virtual void slotParentalLevelChanged();

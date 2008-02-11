@@ -30,6 +30,7 @@ class VideoTree : public MythThemedDialog
     void slotVideoGallery();
     void slotVideoBrowser();
     void slotViewPlot();
+    void slotViewCast();
     void slotDoFilter();
     void slotWatchVideo();
 

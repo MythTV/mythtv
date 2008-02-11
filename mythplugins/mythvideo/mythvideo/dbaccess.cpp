@@ -549,6 +549,24 @@ VideoGenre &VideoGenre::getGenre()
 
 ////////////////////////////////////////////
 
+VideoCast::VideoCast() :
+    SingleValue(new SingleValueImp("videocast", "intid", "cast"))
+{
+}
+
+VideoCast::~VideoCast()
+{
+}
+
+VideoCast &VideoCast::getCast()
+{
+    static VideoCast vc;
+    vc.load_data();
+    return vc;
+}
+
+////////////////////////////////////////////
+
 VideoGenreMap::VideoGenreMap() :
     MultiValue(new MultiValueImp("videometadatagenre", "idvideo", "idgenre"))
 {
@@ -580,6 +598,25 @@ VideoCountryMap::~VideoCountryMap()
 VideoCountryMap &VideoCountryMap::getCountryMap()
 {
     static VideoCountryMap vcm;
+    vcm.load_data();
+    return vcm;
+}
+
+////////////////////////////////////////////
+
+VideoCastMap::VideoCastMap() :
+    MultiValue(new MultiValueImp("videometadatacast", "idvideo",
+                                 "idcast"))
+{
+}
+
+VideoCastMap::~VideoCastMap()
+{
+}
+
+VideoCastMap &VideoCastMap::getCastMap()
+{
+    static VideoCastMap vcm;
     vcm.load_data();
     return vcm;
 }

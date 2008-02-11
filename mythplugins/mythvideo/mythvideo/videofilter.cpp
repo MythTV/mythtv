@@ -27,6 +27,11 @@ enum CountryFilter {
     kCountryFilterUnknown = 0
 };
 
+enum CastFilter {
+    kCastFilterAll = -1,
+    kCastFilterUnknown = 0
+};
+
 enum CategoryFilter {
     kCategoryFilterAll = -1,
     kCategoryFilterUnknown = 0
@@ -66,11 +71,12 @@ const unsigned int VideoFilterSettings::SORT_MASK;
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                          const QString& _prefix) :
     category(kCategoryFilterAll), genre(kGenreFilterAll),
-    country(kCountryFilterAll), year(kYearFilterAll),
-    runtime(kRuntimeFilterAll), userrating(kUserRatingFilterAll),
-    browse(kBrowseFilterAll), m_inetref(kInetRefFilterAll),
-    m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle),
-    m_parental_level(ParentalLevel::plNone), m_changed_state(0)
+    country(kCountryFilterAll), cast(kCastFilterAll),
+    year(kYearFilterAll), runtime(kRuntimeFilterAll), 
+    userrating(kUserRatingFilterAll), browse(kBrowseFilterAll), 
+    m_inetref(kInetRefFilterAll), m_coverfile(kCoverFileFilterAll), 
+    orderby(kOrderByTitle), m_parental_level(ParentalLevel::plNone), 
+    m_changed_state(0)
 {
     if (!_prefix)
         prefix = "VideoDefault";
@@ -86,6 +92,8 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                         kGenreFilterAll);
         country = gContext->GetNumSetting(QString("%1Country").arg(prefix),
                                           kCountryFilterAll);
+        cast = gContext->GetNumSetting(QString("%1Cast").arg(prefix),
+                                        kCastFilterAll);
         year = gContext->GetNumSetting(QString("%1Year").arg(prefix),
                                        kYearFilterAll);
         runtime = gContext->GetNumSetting(QString("%1Runtime").arg(prefix),
@@ -132,6 +140,12 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
     {
         m_changed_state |= kFilterCountryChanged;
         country = rhs.country;
+    }
+
+    if (cast != rhs.cast)
+    {
+        m_changed_state |= kFilterCastChanged;
+        cast = rhs.cast;
     }
 
     if (year != rhs.year)
@@ -189,6 +203,7 @@ void VideoFilterSettings::saveAsDefault()
 {
     gContext->SaveSetting(QString("%1Category").arg(prefix), category);
     gContext->SaveSetting(QString("%1Genre").arg(prefix), genre);
+    gContext->SaveSetting(QString("%1Cast").arg(prefix), cast);
     gContext->SaveSetting(QString("%1Country").arg(prefix), country);
     gContext->SaveSetting(QString("%1Year").arg(prefix), year);
     gContext->SaveSetting(QString("%1Runtime").arg(prefix), runtime);
@@ -229,6 +244,29 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
             if ((matches = p->first == country))
             {
                 break;
+            }
+        }
+    }
+
+    if (matches && cast != kCastFilterAll)
+    {
+        const Metadata::cast_list &cl = mdata.getCast();
+
+        if (cast == kCastFilterUnknown && cl.size() == 0)
+        {
+            matches = true;
+        }
+        else
+        {
+            matches = false;
+
+            for (Metadata::cast_list::const_iterator p = cl.begin();
+                 p != cl.end(); ++p)
+            {
+                if ((matches = p->first == cast))
+                {
+                    break;
+                }
             }
         }
     }
@@ -369,9 +407,10 @@ VideoFilterDialog::VideoFilterDialog(FilterSettingsProxy *fsp,
                                  const char *name_) :
     MythThemedDialog(parent_, window_name, theme_filename, name_),
     browse_select(0), orderby_select(0), year_select(0), userrating_select(0),
-    category_select(0), country_select(0), genre_select(0), runtime_select(0),
-    save_button(0), done_button(0), numvideos_text(0), m_intetref_select(0),
-    m_coverfile_select(0), m_fsp(fsp), m_video_list(video_list)
+    category_select(0), country_select(0), genre_select(0), cast_select(0), 
+    runtime_select(0), save_button(0), done_button(0), numvideos_text(0), 
+    m_intetref_select(0), m_coverfile_select(0), m_fsp(fsp), 
+    m_video_list(video_list)
 {
     //
     //  The only thing this screen does is let the
@@ -467,6 +506,21 @@ void VideoFilterDialog::fillWidgets()
 
         genre_select->addItem(kGenreFilterUnknown, VIDEO_GENRE_UNKNOWN);
         genre_select->setToItem(m_settings.getGenre());
+    }
+
+    if (cast_select)
+    {
+        cast_select->addItem(kCastFilterAll, QObject::tr("All"));
+
+        const VideoCast::entry_list &cl = VideoCast::getCast().getList();
+        for (VideoCast::entry_list::const_iterator p = cl.begin();
+             p != cl.end(); ++p)
+        {
+            cast_select->addItem(p->first, p->second);
+        }
+
+        cast_select->addItem(kCastFilterUnknown, VIDEO_CAST_UNKNOWN);
+        cast_select->setToItem(m_settings.getCast());
     }
 
     if (country_select)
@@ -612,17 +666,18 @@ void VideoFilterDialog::keyPressEvent(QKeyEvent *e)
             something_pushed = false;
 
             UISelectorType *currentSelector = NULL;
-            UIType *focued = getCurrentFocusWidget();
-            widget_testset(currentSelector, focued, category_select);
-            widget_testset(currentSelector, focued, genre_select);
-            widget_testset(currentSelector, focued, country_select);
-            widget_testset(currentSelector, focued, year_select);
-            widget_testset(currentSelector, focued, runtime_select);
-            widget_testset(currentSelector, focued, userrating_select);
-            widget_testset(currentSelector, focued, browse_select);
-            widget_testset(currentSelector, focued, m_intetref_select);
-            widget_testset(currentSelector, focued, m_coverfile_select);
-            widget_testset(currentSelector, focued, orderby_select);
+            UIType *focused = getCurrentFocusWidget();
+            widget_testset(currentSelector, focused, category_select);
+            widget_testset(currentSelector, focused, genre_select);
+            widget_testset(currentSelector, focused, country_select);
+            widget_testset(currentSelector, focused, cast_select);
+            widget_testset(currentSelector, focused, year_select);
+            widget_testset(currentSelector, focused, runtime_select);
+            widget_testset(currentSelector, focused, userrating_select);
+            widget_testset(currentSelector, focused, browse_select);
+            widget_testset(currentSelector, focused, m_intetref_select);
+            widget_testset(currentSelector, focused, m_coverfile_select);
+            widget_testset(currentSelector, focused, orderby_select);
 
             if (currentSelector)
             {
@@ -704,6 +759,12 @@ void VideoFilterDialog::setGenre(int new_genre)
         update_numvideo();
 }
 
+void VideoFilterDialog::setCast(int new_cast)
+{
+        m_settings.setCast(new_cast);
+        update_numvideo();
+}
+
 void VideoFilterDialog::setRunTime(int new_runtime)
 {
         m_settings.setRuntime(new_runtime);
@@ -761,6 +822,11 @@ void VideoFilterDialog::wireUpTheme()
     if (genre_select)
         connect(genre_select,SIGNAL(pushed(int)),
                 this, SLOT(setGenre(int)));
+
+    cast_select = getUISelectorType("cast_select");
+    if (cast_select)
+        connect(cast_select,SIGNAL(pushed(int)),
+                this, SLOT(setCast(int)));
 
     runtime_select = getUISelectorType("runtime_select");
     if (runtime_select)

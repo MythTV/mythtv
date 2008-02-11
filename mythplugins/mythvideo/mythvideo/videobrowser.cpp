@@ -51,7 +51,7 @@ void VideoBrowser::slotParentalLevelChanged()
     LayerSet *container = theme->GetSet("browsing");
     if (container)
     {
-        checkedSetText((UITextType *)container->GetType("pl_value"),
+        checkedSetText(container, "pl_value",
                        QString::number(currentParentalLevel->GetLevel()));
     }
 }
@@ -131,6 +131,7 @@ void VideoBrowser::doMenu(bool info)
             focusButton = popup->addButton(tr("Watch This Video"), this,
                                            SLOT(slotWatchVideo()));
             popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+            popup->addButton(tr("View Cast"), this, SLOT(slotViewCast()));
         }
         else
         {
@@ -240,10 +241,9 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     LayerSet *container = theme->GetSet("browsing");
     if (container)
     {
-        checkedSetText((UITextType *)container->GetType("currentvideo"),
-                       vidnum);
+        checkedSetText(container, "currentvideo", vidnum);
 
-        checkedSetText((UITextType *)container->GetType("pl_value"),
+        checkedSetText(container, "pl_value",
                        QString::number(currentParentalLevel->GetLevel()));
 
         for (int i = 1; i < 9; ++i)
@@ -265,12 +265,10 @@ void VideoBrowser::updateInfo(QPainter *p)
             pix.fill(this, pr.topLeft());
             QPainter tmp(&pix);
 
-            checkedSetText((UITextType *)container->GetType("title"),
-                            curitem->Title());
-            checkedSetText((UITextType *)container->GetType("filename"),
-                            curitem->Filename());
-            checkedSetText((UITextType *)container->GetType("video_player"),
-                            Metadata::getPlayer(curitem));
+            checkedSetText(container, "title", curitem->Title());
+            checkedSetText(container, "filename", curitem->Filename());
+            checkedSetText(container, "video_player",
+                           Metadata::getPlayer(curitem));
 
             QString coverfile = curitem->CoverFile();
             UIImageType *itype = (UIImageType *)container->GetType("coverart");
@@ -307,30 +305,25 @@ void VideoBrowser::updateInfo(QPainter *p)
                 }
             }
 
-            checkedSetText((UITextType *)container->GetType("director"),
-                            curitem->Director());
-            checkedSetText((UITextType *)container->GetType("plot"),
-                            curitem->Plot());
-            checkedSetText((UITextType *)container->GetType("rating"),
-                            getDisplayRating(curitem->Rating()));
-            checkedSetText((UITextType *)container->GetType("inetref"),
-                            curitem->InetRef());
-            checkedSetText((UITextType *)container->GetType("year"),
-                            getDisplayYear(curitem->Year()));
-            checkedSetText((UITextType *)container->GetType("userrating"),
-                            getDisplayUserRating(curitem->UserRating()));
-            checkedSetText((UITextType *)container->GetType("length"),
-                            getDisplayLength(curitem->Length()));
-            checkedSetText((UITextType *)container->GetType("coverfile"),
-                            coverfile);
-            checkedSetText((UITextType *)container->GetType("child_id"),
-                            QString::number(curitem->ChildID()));
-            checkedSetText((UITextType *)container->GetType("browseable"),
-                            getDisplayBrowse(curitem->Browse()));
-            checkedSetText((UITextType *)container->GetType("category"),
-                            curitem->Category());
-            checkedSetText((UITextType *)container->GetType("level"),
-                            QString::number(curitem->ShowLevel()));
+            checkedSetText(container, "director", curitem->Director());
+            checkedSetText(container, "plot", curitem->Plot());
+            checkedSetText(container, "cast", GetCast(*curitem));
+            checkedSetText(container, "rating",
+                           getDisplayRating(curitem->Rating()));
+            checkedSetText(container, "inetref", curitem->InetRef());
+            checkedSetText(container, "year", getDisplayYear(curitem->Year()));
+            checkedSetText(container, "userrating",
+                           getDisplayUserRating(curitem->UserRating()));
+            checkedSetText(container, "length",
+                           getDisplayLength(curitem->Length()));
+            checkedSetText(container, "coverfile", coverfile);
+            checkedSetText(container, "child_id",
+                           QString::number(curitem->ChildID()));
+            checkedSetText(container, "browseable",
+                           getDisplayBrowse(curitem->Browse()));
+            checkedSetText(container, "category", curitem->Category());
+            checkedSetText(container, "level",
+                           QString::number(curitem->ShowLevel()));
 
             for (int i = 1; i < 9; ++i)
                 container->Draw(&tmp, i, 0);

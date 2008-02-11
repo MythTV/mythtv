@@ -20,8 +20,10 @@ class Metadata
   public:
     typedef std::pair<int, QString> genre_entry;
     typedef std::pair<int, QString> country_entry;
+    typedef std::pair<int, QString> cast_entry;
     typedef std::vector<genre_entry> genre_list;
     typedef std::vector<country_entry> country_list;
+    typedef std::vector<cast_entry> cast_list;
 
   public:
     class SortKey
@@ -62,7 +64,8 @@ class Metadata
              int childID = -1, bool browse = true,
              const QString &playcommand = "", const QString &category = "",
              const genre_list &genres = genre_list(),
-             const country_list &countries = country_list());
+             const country_list &countries = country_list(),
+             const cast_list &cast = cast_list());
     ~Metadata();
     Metadata(MSqlQuery &query);
     Metadata(const Metadata &rhs);
@@ -132,6 +135,9 @@ class Metadata
 
     const genre_list &Genres() const;
     void setGenres(const genre_list &genres);
+
+    const cast_list &getCast() const;
+    void setCast(const cast_list &cast);
 
     const country_list &Countries() const;
     void setCountries(const country_list &countries);

@@ -113,3 +113,25 @@ bool isDefaultCoverFile(const QString &coverfile)
     return coverfile == VIDEO_COVERFILE_DEFAULT ||
             coverfile == VIDEO_COVERFILE_DEFAULT_OLD;
 }
+
+QStringList GetCastList(const Metadata &item)
+{
+    QStringList al;
+
+    const Metadata::cast_list &cast = item.getCast();
+    for (Metadata::cast_list::const_iterator p = cast.begin();
+         p != cast.end(); ++p)
+    {
+        al.push_back(p->second);
+    }
+
+    if (!al.count())
+        al << QObject::tr("None defined");
+
+    return al;
+}
+
+QString GetCast(const Metadata &item, const QString &sep /*= ", "*/)
+{
+    return GetCastList(item).join(sep);
+}

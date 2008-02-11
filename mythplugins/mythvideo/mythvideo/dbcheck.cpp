@@ -13,7 +13,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1014";
+    const QString currentDatabaseVersion = "1015";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -621,6 +621,22 @@ namespace
             QStringList updates;
             updates += "ALTER TABLE filemarkup ADD INDEX (filename(255));";
             performActualUpdate(updates, "1014", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1014")
+        {
+            // Add Cast tables
+            const QString updates[] = {
+"CREATE TABLE videocast ("
+    "intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+    "cast VARCHAR(128) NOT NULL);",
+"CREATE TABLE videometadatacast ("
+        "idvideo INT UNSIGNED NOT NULL,"
+        "idcast INT UNSIGNED NOT NULL);",
+""
+            };
+
+            performActualUpdate(updates, "1015", dbver, MythVideoVersionName);
         }
     }
 }

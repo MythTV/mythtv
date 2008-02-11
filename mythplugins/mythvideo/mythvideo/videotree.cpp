@@ -13,6 +13,7 @@
 #include "videoutils.h"
 #include "imagecache.h"
 #include "parentalcontrols.h"
+#include "videoui-common.h"
 
 class VideoTreeImp
 {
@@ -21,6 +22,7 @@ class VideoTreeImp
     UITextType *video_title;
     UITextType *video_file;
     UITextType *video_plot;
+    UITextType *video_cast;
     UITextType *video_player;
     UITextType *pl_value;
     UIImageType *video_poster;
@@ -43,7 +45,7 @@ class VideoTreeImp
   public:
     VideoTreeImp() :
         video_tree_list(NULL), video_title(NULL),
-        video_file(NULL), video_plot(NULL), video_player(NULL),
+        video_file(NULL), video_plot(NULL), video_cast(NULL), video_player(NULL),
         pl_value(NULL), video_poster(NULL), m_director(NULL), m_rating(NULL),
         m_inetref(NULL), m_year(NULL), m_userrating(NULL), m_length(NULL),
         m_coverfile(NULL), m_child_id(NULL), m_browseable(NULL),
@@ -88,6 +90,7 @@ class VideoTreeImp
         // Optional
         assign(vt, m_director, "director", false);
         assign(vt, video_plot, "plot", false);
+        assign(vt, video_cast, "cast", false);
         assign(vt, m_rating, "rating", false);
         assign(vt, m_inetref, "inetref", false);
         assign(vt, m_year, "year", false);
@@ -112,6 +115,7 @@ class VideoTreeImp
 
         checkedSetText(m_director, "");
         checkedSetText(video_plot, "");
+        checkedSetText(video_cast, "");
         checkedSetText(m_rating, "");
         checkedSetText(m_inetref, "");
         checkedSetText(m_year, "");
@@ -129,6 +133,7 @@ class VideoTreeImp
         checkedSetText(video_title, item->Title());
         checkedSetText(video_file, item->Filename().section("/", -1));
         checkedSetText(video_plot, item->Plot());
+        checkedSetText(video_cast, GetCast(*item));
         checkedSetText(video_player, Metadata::getPlayer(item));
 
         if (!isDefaultCoverFile(item->CoverFile()))
@@ -454,6 +459,7 @@ void VideoTree::doMenu(bool info)
             focusButton = popup->addButton(tr("Watch This Video"), this,
                                            SLOT(slotWatchVideo()));
             popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+            popup->addButton(tr("View Cast"), this, SLOT(slotViewCast()));
         }
         else
         {
@@ -532,6 +538,20 @@ void VideoTree::slotViewPlot()
     else
     {
         VERBOSE(VB_IMPORTANT, QString("no Item to view"));
+    }
+}
+
+void VideoTree::slotViewCast()
+{
+    cancelPopup();
+
+    if (curitem)
+    {
+        ShowCastDialog(gContext->GetMainWindow(), *curitem);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("no item to view"));
     }
 }
 

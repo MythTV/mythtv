@@ -107,6 +107,26 @@ class VideoCountryMap : public MultiValue
     ~VideoCountryMap();
 };
 
+class VideoCast : public SingleValue
+{
+  public:
+    static VideoCast &getCast();
+
+  private:
+    VideoCast();
+    ~VideoCast();
+};
+
+class VideoCastMap : public MultiValue
+{
+  public:
+    static VideoCastMap &getCastMap();
+
+  private:
+    VideoCastMap();
+    ~VideoCastMap();
+};
+
 class FileAssociations
 {
   public:

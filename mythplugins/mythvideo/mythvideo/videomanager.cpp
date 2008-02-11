@@ -17,6 +17,7 @@
 #include <set>
 #include <cmath>
 #include <functional>
+#include <algorithm>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -1205,6 +1206,7 @@ namespace mythvideo_videomanager
                 checkedSetText(m_container, "video_player",
                                Metadata::getPlayer(item));
                 checkedSetText(m_container, "director", item->Director());
+                checkedSetText(m_container, "cast", GetCast(*item));
                 checkedSetText(m_container, "plot", item->Plot());
                 checkedSetText(m_container, "rating", item->Rating());
                 checkedSetText(m_container, "inetref", item->InetRef());
@@ -2590,6 +2592,23 @@ namespace mythvideo_videomanager
             item->setLength(data["Runtime"].toInt());
 
             AutomaticParentalAdjustment(item);
+
+            // Cast
+            Metadata::cast_list cast;
+            QStringList cl = QStringList::split(",", data["Cast"]);
+
+            for (QStringList::const_iterator p = cl.begin();
+                 p != cl.end(); ++p)
+            {
+                QString cn = (*p).stripWhiteSpace();
+                if (cn.length())
+                {
+                    cast.push_back(Metadata::cast_list::
+                                   value_type(-1, cn));
+                }
+            }
+
+            item->setCast(cast);
 
             // Genres
             Metadata::genre_list video_genres;

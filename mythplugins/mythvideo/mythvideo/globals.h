@@ -5,6 +5,7 @@ extern const QString VIDEO_CATEGORY_UNKNOWN;
 extern const QString VIDEO_DIRECTOR_UNKNOWN;
 extern const QString VIDEO_GENRE_UNKNOWN;
 extern const QString VIDEO_COUNTRY_UNKNOWN;
+extern const QString VIDEO_CAST_UNKNOWN;
 extern const QString VIDEO_YEAR_UNKNOWN;
 extern const QString VIDEO_RUNTIME_UNKNOWN;
 
@@ -14,6 +15,7 @@ extern const QString VIDEO_INETREF_DEFAULT;
 extern const QString VIDEO_COVERFILE_DEFAULT;
 extern const QString VIDEO_RATING_DEFAULT;
 extern const QString VIDEO_PLOT_DEFAULT;
+extern const QString VIDEO_CAST_DEFAULT;
 
 extern const QString JUMP_VIDEO_MANAGER;
 extern const QString JUMP_VIDEO_BROWSER;

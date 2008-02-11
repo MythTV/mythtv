@@ -9,6 +9,7 @@ const QString VIDEO_GENRE_UNKNOWN = QObject::tr("Unknown");
 const QString VIDEO_COUNTRY_UNKNOWN = QObject::tr("Unknown");
 const QString VIDEO_YEAR_UNKNOWN = QObject::tr("Unknown");
 const QString VIDEO_RUNTIME_UNKNOWN = QObject::tr("Unknown");
+const QString VIDEO_CAST_UNKNOWN = QObject::tr("Unknown");
 
 const QString VIDEO_CATEGORY_DEFAULT = VIDEO_CATEGORY_UNKNOWN;
 const QString VIDEO_DIRECTOR_DEFAULT = VIDEO_DIRECTOR_UNKNOWN;
@@ -16,6 +17,7 @@ const QString VIDEO_INETREF_DEFAULT = "00000000";
 const QString VIDEO_COVERFILE_DEFAULT = QObject::tr("No Cover");
 const QString VIDEO_RATING_DEFAULT = QObject::tr("NR");
 const QString VIDEO_PLOT_DEFAULT = QObject::tr("None");
+const QString VIDEO_CAST_DEFAULT = VIDEO_CAST_UNKNOWN;
 
 const QString JUMP_VIDEO_MANAGER = "Video Manager";
 const QString JUMP_VIDEO_BROWSER = "Video Browser";

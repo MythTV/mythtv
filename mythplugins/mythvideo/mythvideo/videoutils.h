@@ -25,4 +25,7 @@ QString getDisplayBrowse(bool browse);
 
 bool isDefaultCoverFile(const QString &coverfile);
 
+QStringList GetCastList(const Metadata &item);
+QString GetCast(const Metadata &item, const QString &sep = ", ");
+
 #endif // VIDEOUTILS_H_

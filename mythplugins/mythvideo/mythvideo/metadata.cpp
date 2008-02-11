@@ -86,6 +86,7 @@ class MetadataImp
   public:
     typedef Metadata::genre_list genre_list;
     typedef Metadata::country_list country_list;
+    typedef Metadata::cast_list cast_list;
 
   public:
     MetadataImp(const QString &filename, const QString &coverfile,
@@ -97,11 +98,12 @@ class MetadataImp
              int childID, bool browse,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
-             const country_list &countries) :
+             const country_list &countries,
+             const cast_list &cast) :
         m_title(title),
         m_inetref(inetref), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
-        m_genres(genres), m_countries(countries),
+        m_genres(genres), m_countries(countries), m_cast(cast),
         m_filename(filename), m_coverfile(coverfile),
         m_categoryID(categoryID), m_childID(childID), m_year(year),
         m_length(length), m_showlevel(showlevel), m_browse(browse), m_id(id),
@@ -134,6 +136,7 @@ class MetadataImp
         m_category = rhs.m_category;
         m_genres = rhs.m_genres;
         m_countries = rhs.m_countries;
+        m_cast = rhs.m_cast;
         m_filename = rhs.m_filename;
         m_coverfile = rhs.m_coverfile;
 
@@ -205,6 +208,9 @@ class MetadataImp
         m_countries = countries;
     }
 
+    const cast_list &GetCast() const { return m_cast; }
+    void SetCast(const cast_list &cast) { m_cast = cast; }
+
     const QString &getFilename() const { return m_filename; }
     void setFilename(const QString &filename) { m_filename = filename; }
 
@@ -270,7 +276,9 @@ class MetadataImp
     void fillCountries();
     void updateCountries();
     void fillGenres();
+    void fillCast();
     void updateGenres();
+    void updateCast();
     bool removeDir(const QString &dirName);
     void fromDBRow(MSqlQuery &query);
     void saveToDatabase();
@@ -285,6 +293,7 @@ class MetadataImp
     QString m_category;
     genre_list m_genres;
     country_list m_countries;
+    cast_list m_cast;
     QString m_filename;
     QString m_coverfile;
 
@@ -369,6 +378,7 @@ bool MetadataImp::dropFromDB()
 {
     VideoGenreMap::getGenreMap().remove(m_id);
     VideoCountryMap::getCountryMap().remove(m_id);
+    VideoCastMap::getCastMap().remove(m_id);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM videometadata WHERE intid = :ID");
@@ -395,7 +405,7 @@ void MetadataImp::Reset()
                     VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                     VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0, m_id,
                     ParentalLevel::plLowest, 0, -1, true, "", "",
-                    Metadata::genre_list(), Metadata::country_list());
+                    Metadata::genre_list(), Metadata::country_list(), Metadata::cast_list());
     tmp.m_prefix = m_prefix;
     tmp.m_flat_index = m_flat_index;
 
@@ -410,7 +420,7 @@ void MetadataImp::fillGenres()
     if (vgm.get(m_id, genres))
     {
         VideoGenre &vg = VideoGenre::getGenre();
-        for (VideoGenreMap::entry::values_type::iterator p =
+        for (VideoGenreMap::entry::values_type::const_iterator p =
              genres.values.begin(); p != genres.values.end(); ++p)
         {
             // Just add empty string for no-name genres
@@ -429,13 +439,32 @@ void MetadataImp::fillCountries()
     if (vcm.get(m_id, countries))
     {
         VideoCountry &vc = VideoCountry::getCountry();
-        for (VideoCountryMap::entry::values_type::iterator p =
+        for (VideoCountryMap::entry::values_type::const_iterator p =
              countries.values.begin(); p != countries.values.end(); ++p)
         {
             // Just add empty string for no-name countries
             QString name;
             vc.get(*p, name);
             m_countries.push_back(country_list::value_type(*p, name));
+        }
+    }
+}
+
+void MetadataImp::fillCast()
+{
+    m_cast.clear();
+    VideoCastMap &vcm = VideoCastMap::getCastMap();
+    VideoCastMap::entry cast;
+    if (vcm.get(m_id, cast))
+    {
+        VideoCast &vc = VideoCast::getCast();
+        for (VideoCastMap::entry::values_type::const_iterator p =
+             cast.values.begin(); p != cast.values.end(); ++p)
+        {
+            // Just add empty string for no-name cast
+            QString name;
+            vc.get(*p, name);
+            m_cast.push_back(cast_list::value_type(*p, name));
         }
     }
 }
@@ -471,6 +500,9 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
 
     //Countries
     fillCountries();
+
+    // Cast
+    fillCast();
 }
 
 void MetadataImp::saveToDatabase()
@@ -570,6 +602,7 @@ void MetadataImp::saveToDatabase()
 
     updateGenres();
     updateCountries();
+    updateCast();
 }
 
 void MetadataImp::dumpToDatabase()
@@ -645,6 +678,27 @@ void MetadataImp::updateCountries()
         else
         {
             country = m_countries.erase(country);
+        }
+    }
+}
+
+void MetadataImp::updateCast()
+{
+    VideoCastMap::getCastMap().remove(m_id);
+
+    // ensure that all cast we have are in the DB
+    cast_list::iterator cast = m_cast.begin();
+    while (cast != m_cast.end())
+    {
+        if (cast->second.stripWhiteSpace().length())
+        {
+            cast->first = VideoCast::getCast().add(cast->second);
+            VideoCastMap::getCastMap().add(m_id, cast->first);
+            ++cast;
+        }
+        else
+        {
+            cast = m_cast.erase(cast);
         }
     }
 }
@@ -854,12 +908,13 @@ Metadata::Metadata(const QString &filename, const QString &coverfile,
              int childID, bool browse,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
-             const country_list &countries)
+             const country_list &countries,
+             const cast_list &cast)
 {
     m_imp = new MetadataImp(filename, coverfile, title, year, inetref, director,
                             plot, userrating, rating, length, id, showlevel,
                             categoryID, childID, browse, playcommand, category,
-                            genres, countries);
+                            genres, countries, cast);
 }
 
 Metadata::~Metadata()
@@ -1096,6 +1151,16 @@ const Metadata::genre_list &Metadata::Genres() const
 void Metadata::setGenres(const genre_list &genres)
 {
     m_imp->setGenres(genres);
+}
+
+const Metadata::cast_list &Metadata::getCast() const
+{
+    return m_imp->GetCast();
+}
+
+void Metadata::setCast(const cast_list &cast)
+{
+    m_imp->SetCast(cast);
 }
 
 const Metadata::country_list &Metadata::Countries() const

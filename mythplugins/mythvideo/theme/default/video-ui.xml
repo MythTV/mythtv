@@ -1350,44 +1350,50 @@
             <value>Country :</value>
          </textarea>
 
-         <textarea name="year_text" draworder="0" align="right">
+         <textarea name="cast_text" draworder="0" align="right">
             <area>50,174,320,34</area>
+            <font>display</font>
+            <value>Actor/Actress :</value>
+         </textarea>
+
+         <textarea name="year_text" draworder="0" align="right">
+            <area>50,208,320,34</area>
             <font>display</font>
             <value>Year :</value>
          </textarea>
 
          <textarea name="runtime_text" draworder="0" align="right">
-            <area>50,208,320,34</area>
+            <area>50,242,320,34</area>
             <font>display</font>
             <value>Runtime :</value>
          </textarea>
 
          <textarea name="userrating_text" draworder="0" align="right">
-            <area>50,242,320,34</area>
+            <area>50,276,320,34</area>
             <font>display</font>
             <value>User Rating :</value>
          </textarea>
 
          <textarea name="browse_text" draworder="0" align="right">
-            <area>50,276,320,34</area>
+            <area>50,310,320,34</area>
             <font>display</font>
             <value>Browse :</value>
          </textarea>
 
          <textarea name="inetref_text" draworder="0" align="right">
-            <area>50,310,320,34</area>
+            <area>50,344,320,34</area>
             <font>display</font>
             <value>InetRef :</value>
          </textarea>
 
          <textarea name="coverfile_text" draworder="0" align="right">
-            <area>50,344,320,34</area>
+            <area>50,378,320,34</area>
             <font>display</font>
             <value>Cover File :</value>
          </textarea>
 
          <textarea name="orderby_text" draworder="0" align="right">
-            <area>50,378,320,34</area>
+            <area>50,416,320,34</area>
             <font>display</font>
             <value>Sort by :</value>
          </textarea>
@@ -1418,7 +1424,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="year_select" draworder="0">
+         <selector name="cast_select" draworder="0">
             <area>380,172,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1426,7 +1432,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="runtime_select" draworder="0">
+         <selector name="year_select" draworder="0">
             <area>380,206,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1434,7 +1440,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="userrating_select" draworder="0">
+         <selector name="runtime_select" draworder="0">
             <area>380,240,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1442,7 +1448,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="browse_select" draworder="0">
+         <selector name="userrating_select" draworder="0">
             <area>380,274,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1450,7 +1456,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="inetref_select" draworder="0">
+         <selector name="browse_select" draworder="0">
             <area>380,308,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1458,7 +1464,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="coverfile_select" draworder="0">
+         <selector name="inetref_select" draworder="0">
             <area>380,342,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1466,7 +1472,7 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
-         <selector name="orderby_select" draworder="0">
+         <selector name="coverfile_select" draworder="0">
             <area>380,376,300,34</area>
             <font>display</font>
             <image function="on" filename="leftright_on.png"></image>
@@ -1474,8 +1480,16 @@
             <image function="pushed" filename="leftright_pushed.png"></image>
          </selector>
 
+         <selector name="orderby_select" draworder="0">
+            <area>380,414,300,34</area>
+            <font>display</font>
+            <image function="on" filename="leftright_on.png"></image>
+            <image function="off" filename="leftright_off.png"></image>
+            <image function="pushed" filename="leftright_pushed.png"></image>
+         </selector>
+
          <textbutton name="done_button" draworder="0">
-            <position>250,430</position>
+            <position>250,448</position>
             <font>display</font>
             <image function="on" filename="mv_large_text_button_on.png"></image>
             <image function="off" filename="mv_large_text_button_off.png"></image>

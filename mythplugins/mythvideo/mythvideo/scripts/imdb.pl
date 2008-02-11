@@ -214,9 +214,20 @@ sub getMovieData {
    #    www.imdb.com/title/<movieid>/fullcredits
    my $cast = "";
    $data = parseBetween($response, "Cast overview, first billed only",
-                               "/table>"); 
+                               "/table>");
+   if (!$data) {
+       $data = parseBetween($response, "Series Cast Summary",
+                               "/table>");
+   } 
+
+   if (!$data) {
+       $data = parseBetween($response, "Complete credited cast",
+                               "/table>");
+   } 
+
    if ($data) {
       $cast = join(',', ($data =~ m/$name_link_pat/g));
+      $cast = trim($cast);
    }
    
    
@@ -243,7 +254,7 @@ sub getMovieData {
    print "MovieRating:$movierating\n";
    print "Runtime:$runtime\n";
    print "Writers: $writer\n";
-   print "Cast: $cast\n";
+   print "Cast:$cast\n";
    print "Genres: $lgenres\n";
    print "Countries: $lcountries\n";
 }
