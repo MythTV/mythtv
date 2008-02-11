@@ -240,9 +240,9 @@ void ProgramData::handlePrograms(
                               "stars >= (:STARS - 0.001) AND stars <= (:STARS + 0.001) AND "
                               "previouslyshown=:PREVIOUSLYSHOWN AND "
                               "title_pronounce=:TITLE_PRONOUNCE AND "
-                              "stereo=:STEREO AND "
-                              "hdtv=:HDTV AND "
-                              "closecaptioned=:CLOSECAPTIONED AND "
+                              "audioprop=:AUDIOPROP AND "
+                              "videoprop=:VIDEOPROP AND "
+                              "subtitletypes=:SUBTYPES AND "
                               "partnumber=:PARTNUMBER AND "
                               "parttotal=:PARTTOTAL AND "
                               "seriesid=:SERIESID AND "
@@ -262,9 +262,9 @@ void ProgramData::handlePrograms(
                 query.bindValue(":STARS", (*i).stars.utf8());
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
                 query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-                query.bindValue(":STEREO", (*i).audioproperties);
-                query.bindValue(":HDTV", (*i).videoproperties);
-                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype);
+                query.bindValue(":AUDIOPROP", (*i).audioproperties);
+                query.bindValue(":VIDEOPROP", (*i).videoproperties);
+                query.bindValue(":SUBTYPES", (*i).subtitletype);
                 query.bindValue(":PARTNUMBER", (*i).partnumber);
                 query.bindValue(":PARTTOTAL", (*i).parttotal);
                 query.bindValue(":SERIESID", (*i).seriesid);
@@ -341,6 +341,7 @@ void ProgramData::handlePrograms(
                               "title,subtitle,description,category,"
                               "category_type,airdate,stars,previouslyshown,"
                               "title_pronounce,stereo,hdtv,"
+                              "audioprop,videoprop,subtitletypes,subtitled,"
                               "closecaptioned,partnumber,parttotal,"
                               "seriesid,originalairdate,showtype,colorcode,"
                               "syndicatedepisodenumber,programid) "
@@ -348,6 +349,7 @@ void ProgramData::handlePrograms(
                               ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,"
                               ":AIRDATE,:STARS,:PREVIOUSLYSHOWN,"
                               ":TITLE_PRONOUNCE,:STEREO,:HDTV,"
+                              ":AUDIOPROP,:VIDEOPROP,:SUBTYPES,:SUBTITLED,"
                               ":CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,"
                               ":SERIESID,:ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,"
                               ":SYNDICATEDEPISODENUMBER,:PROGRAMID);");
@@ -363,9 +365,13 @@ void ProgramData::handlePrograms(
                 query.bindValue(":STARS", (*i).stars.utf8());
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
                 query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-                query.bindValue(":STEREO", (*i).audioproperties);
-                query.bindValue(":HDTV", (*i).videoproperties);
-                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype);
+                query.bindValue(":AUDIOPROP", (*i).audioproperties);
+                query.bindValue(":VIDEOPROP", (*i).videoproperties);
+                query.bindValue(":SUBTYPES", (*i).subtitletype);
+                query.bindValue(":HDTV", (*i).videoproperties        & VID_HDTV     ? true : false);
+                query.bindValue(":STEREO", (*i).audioproperties      & AUD_STEREO   ? true : false);
+                query.bindValue(":SUBTITLED", (*i).subtitletype      & SUB_NORMAL   ? true : false);
+                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype & SUB_HARDHEAR ? true : false);
                 query.bindValue(":PARTNUMBER", (*i).partnumber);
                 query.bindValue(":PARTTOTAL", (*i).parttotal);
                 query.bindValue(":SERIESID", (*i).seriesid);
