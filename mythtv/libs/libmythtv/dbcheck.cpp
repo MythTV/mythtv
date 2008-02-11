@@ -9,6 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
+#include "dbutil.h"
 
 #define MINIMUM_DBMS_VERSION 5
 
@@ -457,23 +458,21 @@ bool UpgradeTVDatabaseSchema(void)
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT VERSION();");
-    if (!query.exec() || !query.next())
+    DBUtil dbutil;
+    int dbmsVersionCheck = dbutil.CompareDBMSVersion(MINIMUM_DBMS_VERSION);
+    if (dbmsVersionCheck == DBUtil::kUnknownVersionNumber)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR: Unable to determine MySQL version");
+        VERBOSE(VB_IMPORTANT, "ERROR: Unable to determine MySQL version.");
         return false;
     }
 
-    QString dbmsversion = query.value(0).toString();
-    if (dbmsversion.isEmpty() ||
-        dbmsversion.section('.', 0, 0).toInt() < MINIMUM_DBMS_VERSION)
+    if (dbmsVersionCheck < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("ERROR: This version of MythTV requires "
                                       "MySQL %1.0 or later.  You seem to be "
                                       "running MySQL version %2.")
                                       .arg(MINIMUM_DBMS_VERSION)
-                                      .arg(dbmsversion));
+                                      .arg(dbutil.GetDBMSVersion()));
         VERBOSE(VB_IMPORTANT, "Your database has not been changed. Please "
                               "upgrade your MySQL server or use an older "
                               "version of MythTV.");
@@ -483,6 +482,13 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
+#ifndef USING_MINGW
+    if (!dbutil.BackupDB())
+        VERBOSE(VB_IMPORTANT, "Unable to backup your database.  If you have "
+                "not already created a backup, you may want to exit before "
+                "the database upgrade and backup your database.");
+#endif
+
     switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion))
     {
         case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
@@ -491,6 +497,7 @@ bool UpgradeTVDatabaseSchema(void)
         case MYTH_SCHEMA_UPGRADE:      break;
     }
 
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
     query.exec();
 

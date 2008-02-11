@@ -16,7 +16,7 @@ const char *StorageGroup::kDefaultStorageDir = "/mnt/store";
 const QStringList StorageGroup::kSpecialGroups = QStringList()
     << "LiveTV"
 //    << "Thumbnails"
-//    << "DB Backups"
+    << "DB Backups"
     ;
 
 /****************************************************************************/

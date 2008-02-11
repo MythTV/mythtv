@@ -24,7 +24,7 @@ HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
 HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
 HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
 HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
-HEADERS += mythhdd.h mythcdrom.h storagegroup.h
+HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
@@ -41,7 +41,7 @@ SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
 SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
-SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp
+SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libavcodec ../libavutil
