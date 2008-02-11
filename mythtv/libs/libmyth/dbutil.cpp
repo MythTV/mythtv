@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <qdir.h>
 #include <qfile.h>
 #include <qregexp.h>
 #include <qdatetime.h>
@@ -166,7 +167,7 @@ QString DBUtil::CreateBackupFilename(QString prefix, QString extension)
     return QString("%1-%2%3").arg(prefix).arg(time).arg(extension);
 }
 
-/** \fn DBUtil::GetBackupPath(void)
+/** \fn DBUtil::GetBackupDirectory(void)
  *  \brief Determines the appropriate path for the database backup.
  *
  *   The function requests the special "DB Backups" storage group.  In the
@@ -181,8 +182,18 @@ QString DBUtil::GetBackupDirectory()
     StorageGroup sgroup("DB Backups", gContext->GetHostName());
     QStringList dirList = sgroup.GetDirList();
     if (dirList.size())
+    {
         directory = sgroup.FindNextDirMostFree();
-    else
+
+        if (!QDir(directory).exists())
+        {
+            VERBOSE(VB_FILE, "GetBackupDirectory() - ignoring "
+                             + directory + ", using /tmp");
+            directory = QString::null;
+        }
+    }
+
+    if (!directory)
         // Rather than use kDefaultStorageDir, the default for
         // FindNextDirMostFree() when no dirs are defined for the StorageGroup,
         // use /tmp as it's possible that kDefaultStorageDir doesn't exist
@@ -198,7 +209,7 @@ QString DBUtil::GetBackupDirectory()
 bool DBUtil::DoBackup(void)
 {
     DatabaseParams dbParams = gContext->GetDatabaseParams();
-    QString dbSchemaVer = gContext->GetSetting("DBSchemaVer");
+    QString     dbSchemaVer = gContext->GetSetting("DBSchemaVer");
     QString backupDirectory = GetBackupDirectory();
 
     /* So we don't have to specify the password on the command line, use
