@@ -34,6 +34,7 @@
 #include "libmyth/uitypes.h"
 #include "libmythtv/cardutil.h"
 #include "libmyth/themeinfo.h"
+#include "libmyth/mythconfig.h"
 
 static HostComboBox *AudioOutputDevice()
 {
@@ -846,7 +847,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     width[1]  = new TransSpinBoxSetting(0, 1920, 64, true);
     height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
     decoder   = new TransComboBoxSetting();
-    max_cpus  = new TransSpinBoxSetting(1, 4, 1, true);
+    max_cpus  = new TransSpinBoxSetting(1, ENABLE_THREADS ? 4 : 1, 1, true);
     vidrend   = new TransComboBoxSetting();
     osdrend   = new TransComboBoxSetting();
     osdfade   = new TransCheckBoxSetting();
@@ -887,7 +888,11 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     deint1->setLabel(tr("Fallback"));
     filters->setLabel(tr("Custom Filters"));
 
-    max_cpus->setHelpText(tr("Maximal number of CPU cores used for decoding"));
+    max_cpus->setHelpText(tr("Maximal number of CPU cores used for decoding.") +
+                          ENABLE_THREADS ? "" :
+                          tr(" Multithreaded decoding disabled only one CPU "
+                             "will be used, please recompile with "
+                             "--enable-ffmpeg-pthreads to enable."));
     filters->setHelpText(
         QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
 
