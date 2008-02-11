@@ -934,6 +934,7 @@ void PrintHelp(void)
             "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
             "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
 
+            "-u or --upgrade-schema         Allow mythfrontend to upgrade the database schema" << endl <<
             "--version                      Version information" << endl <<
             "<plugin>                       Initialize and run this plugin" << endl <<
             endl <<
@@ -978,6 +979,7 @@ int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
+    bool upgradeAllowed = false;
 
     QString geometry = QString::null;
     QString display  = QString::null;
@@ -1231,6 +1233,11 @@ int main(int argc, char **argv)
                  !strcmp(a.argv()[argpos],"-d" ))
         {
         }
+        else if (!strcmp(a.argv()[argpos],"--upgrade-schema") ||
+                 !strcmp(a.argv()[argpos],"-u" ))
+        {
+            upgradeAllowed = true;
+        }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
         {
@@ -1314,7 +1321,25 @@ int main(int argc, char **argv)
     setuid(getuid());
 
     gContext->ActivateSettingsCache(false);
-    if (!UpgradeTVDatabaseSchema())
+    int versionCheck = CompareTVDatabaseSchemaVersion();
+    bool expertMode = (gContext->GetNumSetting("DBSchemaAutoUpgrade") == -1);
+    if (versionCheck < 0 && !upgradeAllowed && !expertMode)
+    {
+        VERBOSE(VB_IMPORTANT, "This version of MythTV requires an updated "
+                "database schema. Please run mythtv-setup or mythbackend "
+                "to update your database.");
+        return FRONTEND_EXIT_DB_OUTOFDATE;
+    }
+    else if ((versionCheck > 0) && !expertMode)
+    {
+        VERBOSE(VB_IMPORTANT, "The schema version of your existing database "
+                "is newer than this version of MythTV understands. Please "
+                "ensure that you have selected the proper database server or "
+                "upgrade this and all other frontends and backends to the "
+                "same MythTV version and revision.");
+        return FRONTEND_EXIT_DB_OUTOFDATE;
+    }
+    if ((upgradeAllowed || expertMode) && !UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");

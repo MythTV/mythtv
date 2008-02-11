@@ -436,6 +436,29 @@ static bool performActualUpdate(const QString updates[], QString version,
     return true;
 }
 
+/** \fn CompareTVDatabaseSchemaVersion(void)
+ *  \brief Called from outside dbcheck.cpp to compare the database schema
+ *         version with the expected version.
+ *
+ *   If the "DBSchemaVer" property is not found (i.e. the schema has not been
+ *   initialized, the function returns negative, as if the schema simply needed
+ *   upgrading, so InitializeDatabase() can do its job.
+ *
+ *  \return negative, 0, or positive if the schema version is less than, equal
+ *          to, or greater than the expected version
+ */
+int CompareTVDatabaseSchemaVersion(void)
+{
+    bool ok;
+    int databaseVersion = gContext->GetNumSetting("DBSchemaVer");
+    int expectedVersion = currentDatabaseVersion.toInt(&ok);
+
+    if (!ok)
+        return -1;
+
+    return databaseVersion - expectedVersion;
+}
+
 /** \fn UpgradeTVDatabaseSchema(void)
  *  \brief Called from outside dbcheck.cpp to update the schema.
  *
