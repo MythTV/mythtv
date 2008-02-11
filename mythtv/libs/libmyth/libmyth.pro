@@ -47,6 +47,7 @@ INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libavcodec ../libavutil
 INCLUDEPATH += ../.. ../ ./
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
+DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../libavcodec ../libavutil
 DEPENDPATH += ../ ../libmythui
 DEPENDPATH += ../libmythupnp
