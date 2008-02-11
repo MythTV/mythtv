@@ -45,7 +45,8 @@ using namespace std;
 #error Native LIRC support requires Qt 3.1 or greater.
 #endif
 
-
+#define LOC QString("JoystickMenuClient: ")
+#define LOC_ERROR QString("JoystickMenuClient Error: ");
 
 /*----------------------------------------------------------------------------
 ** JoystickMenuClient Constructor
@@ -97,8 +98,8 @@ int JoystickMenuClient::Init(QString &config_file)
     rc = ReadConfig(config_file);
     if (rc)
     {
-        VERBOSE(VB_FILE, QString("%1 not found.").arg(config_file));
-        VERBOSE(VB_GENERAL, "Joystick disabled.");
+        VERBOSE(VB_GENERAL, LOC_ERROR + QString("Joystick disabled - Failed to read %1")
+			          .arg(config_file));
         return(rc);
     }
 
@@ -108,21 +109,22 @@ int JoystickMenuClient::Init(QString &config_file)
     fd = open((const char *) devicename, O_RDONLY);
     if (fd == -1)
     {
-        cerr << "Could not initialize " << devicename << "\n";
-        perror("open");
+        VERBOSE(VB_IMPORTANT, LOC_ERROR + QString("Joystick disabled - Failed to open device %1")
+			            .arg(devicename));
+	return -1;
     }
     
     rc = ioctl(fd, JSIOCGAXES, &axes_count);
     if (rc == -1)
     {
-        perror("ioctl JSIOCGAXES");
+        VERBOSE(VB_IMPORTANT, LOC_ERROR + "Joystick disabled - ioctl JSIOCGAXES failed");
         return(rc);
     }
 
     ioctl(fd, JSIOCGBUTTONS, &button_count);
     if (rc == -1)
     {
-        perror("ioctl JSIOCGBUTTONS");
+        VERBOSE(VB_IMPORTANT, LOC_ERROR + "Joystick disabled - ioctl JSIOCGBUTTONS failed");
         return(rc);
     }
 
@@ -135,7 +137,9 @@ int JoystickMenuClient::Init(QString &config_file)
     axes = new int[axes_count];
     memset(axes, '\0', sizeof(*axes * axes_count));
 
-
+    VERBOSE(VB_GENERAL, LOC + QString("Initialization of %1 succeded using config file %2")
+                              .arg(devicename)
+                              .arg(config_file));
     return 0;
 }
 
@@ -182,7 +186,10 @@ int JoystickMenuClient::ReadConfig(QString config_file)
         else if (firstTok.startsWith("chord") && tokens.count() == 4)
             map.AddButton(tokens[2].toInt(), tokens[3], tokens[1].toInt());
         else
-            cerr << config_file << "(" << line << "): unrecognized or malformed line: '" << rawline << "'\n";
+            VERBOSE(VB_IMPORTANT, LOC_ERROR + QString("ReadConfig(%1) unrecognized or "
+                                                "malformed line \"%2\" ")
+                                        .arg(line)
+                                        .arg(rawline));
 
     }
 
