@@ -2794,7 +2794,10 @@ ThemeSelector::ThemeSelector(QString label):
         preview = QFileInfo(themeinfo->PreviewPath());
 
         if (name.isEmpty() || !(themeinfo->Type() & themetype))
+        {
+            delete themeinfo;
             continue;
+        }
 
         if ((themeinfo->Type() & THEME_UI) & themeinfo->IsWide())
             name += QString(" (%1)").arg(QObject::tr("Widescreen"));

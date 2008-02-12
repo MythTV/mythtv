@@ -129,6 +129,7 @@ public:
     MythGesture(size_t max_points = 10000, size_t min_points = 50,
                 size_t max_sequence = 20, size_t scale_ratio = 4,
                 float bin_percent = 0.07);
+   ~MythGesture();
 
     /**
      * @brief Start recording.

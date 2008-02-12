@@ -92,6 +92,12 @@ MythGesture::MythGesture(size_t max_points, size_t min_points,
     p->sequences.insert("78963",MythGestureEvent::RightThenUp);
 }
 
+MythGesture::~MythGesture()
+{
+    if (p)
+        delete p;
+}
+
 /* comments in header */
 void MythGesture::adjustExtremes(int x, int y)
 {
