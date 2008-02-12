@@ -1,27 +1,24 @@
 #!/usr/bin/python
 
-import logging
+"""
+Provides classes for connecting to a MythTV backend.
 
-log = logging.getLogger('mythtv')
-log.setLevel(logging.WARNING)
-ch = logging.StreamHandler()
-ch.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
-log.addHandler(ch)
-
+The MythTV class to handle connection to and querying of a MythTV backend.
+The Recorder class representing and storing details of a tuner card.
+The Program class for storing details of a TV program.
+"""
 import os
 import sys
 import socket
 import shlex
 import socket
 import code
-
 from datetime import datetime
 
-try:
-	import MySQLdb
-except:
-	log.critical("MySQLdb (python-mysqldb) is required but is not found.")
-	sys.exit(1)
+import MythDB
+from MythLog import *
+
+log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythTV')
 
 RECSTATUS = {
 	'TunerBusy': -8,
@@ -50,113 +47,38 @@ BACKEND_SEP = '[]:[]'
 PROTO_VERSION = 39
 PROGRAM_FIELDS = 46
 
-class MythDB:
-	def __init__(self):
-		"""
-		A connection to the mythtv database.
-		"""
-		config_files = [
-			'/usr/local/share/mythtv/mysql.txt',
-			'/usr/share/mythtv/mysql.txt',
-			'/usr/local/etc/mythtv/mysql.txt',
-			'/etc/mythtv/mysql.txt',
-			os.path.expanduser('~/.mythtv/mysql.txt'),
-		]
-		if 'MYTHCONFDIR' in os.environ:
-			config_locations.append('%s/mysql.txt' % os.environ['MYTHCONFDIR'])
-	
-		found_config = False
-		for config_file in config_files:
-			try:
-				config = shlex.shlex(open(config_file))
-				config.wordchars += "."
-			except:
-				continue
-	
-			token = config.get_token()
-			db_host = db_user = db_password = db_name = None
-			while  token != config.eof and (db_host == None or db_user == None or db_password == None or db_name == None):
-				if token == "DBHostName":
-					if config.get_token() == "=":
-						db_host = config.get_token()
-				elif token == "DBUserName":
-					if config.get_token() == "=":
-						db_user = config.get_token()
-				elif token == "DBPassword":
-					if config.get_token() == "=":
-						db_password = config.get_token()
-				elif token == "DBName":
-					if config.get_token() == "=":
-						db_name = config.get_token()
-	
-				token = config.get_token()
-			log.debug('Using config %s' % config_file)
-			found_config = True
-			break
-	
-		if not found_config:
-			raise "Unable to find MythTV configuration file"
-		self.db = MySQLdb.connect(user=db_user, host=db_host, passwd=db_password, db=db_name)
-	
-	def getSetting(self, value, hostname=None):
-		"""
-		Returns the value for the given MythTV setting.
-		
-		Returns None if the setting was not found. If multiple rows are
-		found (multiple hostnames), returns the value of the first one.
-		"""
-		log.debug('Looking for setting %s for host %s', value, hostname)
-		c = self.db.cursor()
-  		if hostname is None:
-			c.execute("""
-				SELECT data
-				FROM settings
-				WHERE value LIKE(%s) AND hostname IS NULL LIMIT 1""",
-				(value,))
-		else:
-			c.execute("""
-				SELECT data
-				FROM settings
-				WHERE value LIKE(%s) AND hostname LIKE(%s) LIMIT 1""",
-				(value, hostname))
-		row = c.fetchone()
-		c.close()
-		
-		if row:
-			return row[0]
-		else:
-			return None
-	
-	def cursor(self):
-		return self.db.cursor()
-	
-
 class MythTV:
 	"""
-	A connection to MythTV backend.
+	A connection to a MythTV backend.
 	"""
 	def __init__(self, conn_type='Monitor'):
-		self.db = MythDB()
+		self.db = MythDB.MythDB(sys.argv[1:])
 		self.master_host = self.db.getSetting('MasterServerIP')
 		self.master_port = int(self.db.getSetting('MasterServerPort'))
 		
 		if not self.master_host:
-			log.critical('Unable to find MasterServerIP in database')
+			log.Msg(CRITICAL, 'Unable to find MasterServerIP in database')
 			sys.exit(1)
 		if not self.master_port:
-			log.critical('Unable to find MasterServerPort in database')
+			log.Msg(CRITICAL, 'Unable to find MasterServerPort in database')
 			sys.exit(1)
 		
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.socket.settimeout(10)
-		self.socket.connect((self.master_host, self.master_port))
-		res = self.backendCommand('MYTH_PROTO_VERSION %s' % PROTO_VERSION).split(BACKEND_SEP)
-		if res[0] == 'REJECT':
-			log.critical('Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
+		try:
+			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.socket.settimeout(10)
+			self.socket.connect((self.master_host, self.master_port))
+			res = self.backendCommand('MYTH_PROTO_VERSION %s' % PROTO_VERSION).split(BACKEND_SEP)
+			if res[0] == 'REJECT':
+				log.Msg(CRITICAL, 'Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
+				sys.exit(1)
+			res = self.backendCommand('ANN %s %s 0' % (conn_type, socket.gethostname()))
+			if res != 'OK':
+				log.Msg(CRITICAL, 'Unexpected answer to ANN command: %s', res)
+			else:
+				log.Msg(INFO, 'Successfully connected mythbackend at %s:%d', self.master_host, self.master_port)
+		except socket.error, e:
+			log.Msg(CRITICAL, 'Couldn\'t connect to %s:%d (is the backend running)', self.master_host, self.master_port)
 			sys.exit(1)
-		res = self.backendCommand('ANN %s %s 0' % (conn_type, socket.gethostname()))
-		if res != 'OK':
-			log.critical('Unexpected answer to ANN command: %s', res)
 
 	def backendCommand(self, data):
 		"""
@@ -182,7 +104,7 @@ class MythTV:
 			return ''.join(data)
 		
 		command = '%-8d%s' % (len(data), data)
-		log.debug('Sending command: %s' % command)
+		log.Msg(DEBUG, 'Sending command: %s', command)
 		self.socket.send(command)
 		return recv()
 
@@ -194,7 +116,7 @@ class MythTV:
 		res = self.backendCommand('QUERY_GETALLPENDING').split(BACKEND_SEP)
 		has_conflict = int(res.pop(0))
 		num_progs = int(res.pop(0))
-		log.debug('%s pending recordings', num_progs)
+		log.Msg(DEBUG, '%s pending recordings', num_progs)
 		for i in range(num_progs):
 			programs.append(
 				Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
@@ -207,7 +129,7 @@ class MythTV:
 		programs = []
 		res = self.backendCommand('QUERY_GETALLSCHEDULED').split(BACKEND_SEP)
 		num_progs = int(res.pop(0))
-		log.debug('%s scheduled recordings', num_progs)
+		log.Msg(DEBUG, '%s scheduled recordings', num_progs)
 		for i in range(num_progs):
 			programs.append(
 				Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
@@ -248,7 +170,7 @@ class MythTV:
 			row = c.fetchone()
 		c.close()
 		return recorders
-	
+
 	def getFreeRecorderList(self):
 		"""
 		Returns a list of free recorders, or an empty list if none.
@@ -298,136 +220,10 @@ class MythTV:
 		else:
 			return False
 
-class MythVideo:
-	def __init__(self):
-		self.db = MythDB()
-
-	def pruneMetadata(self):
-		"""
-		Removes metadata from the database for files that no longer exist.
-		"""
-		c = self.db.cursor()
-		c.execute("""
-			SELECT intid, filename
-			FROM videometadata""")
-		
-		row = c.fetchone()
-		while row is not None:
-			intid = row[0]
-			filename = row[1]
-			if not os.path.exists(filename):
-				log.info("%s not exist, removing metadata..." % filename)
-				c2 = self.db.cursor()
-				c2.execute("""DELETE FROM videometadata WHERE intid = %s""", (intid,))
-				c2.close()
-			row = c.fetchone()
-		c.close()
-
-	def getGenreId(self, genre_name):
-		"""
-		Find the id of the given genre from MythDB.
-		
-		If the genre does not exist, insert it and return its id.
-		"""
-		c = self.db.cursor()
-		c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (genre_name,))
-		row = c.fetchone()
-		c.close()
-		
-		if row is not None:
-			return row[0]
-		
-		# Insert a new genre.
-		c = self.db.cursor()
-		c.execute("INSERT INTO videocategory(category) VALUES (%s)", (genre_name.capitalize(),))
-		newid = c.lastrowid
-		c.close()
-		
-		return newid
-
-	def getMetadataId(self, videopath):
-		"""
-		Finds the MythVideo metadata id for the given video path from the MythDB, if any.
-		
-		Returns None if no metadata was found.
-		"""
-		c = self.db.cursor()
-		c.execute("""
-			SELECT intid
-			FROM videometadata
-			WHERE filename = %s""", (videopath,))
-		row = c.fetchone()
-		c.close()
-		
-		if row is not None:
-			return row[0]
-		else:
-			return None
-
-	def hasMetadata(self, videopath):
-		"""
-		Determines if the given videopath has any metadata in the DB
-		
-		Returns False if no metadata was found.
-		"""
-		c = self.db.cursor()
-		c.execute("""
-			SELECT category, year 
-			FROM videometadata
-			WHERE filename = %s""", (videopath,))
-		row = c.fetchone()
-		c.close()
-		
-		if row is not None:
-			# If category is 0 and year is 1895, we can safely assume no metadata
-			if (row[0] == 0) and (row[1] == 1895):
-				return False
-			else:
-				return True
-		else:
-			return False
-	def getMetadata(self, id):
-		"""
-		Finds the MythVideo metadata for the given id from the MythDB, if any.
-		
-		Returns None if no metadata was found.
-		"""
-		c = self.db.cursor()
-		c.execute("""
-			SELECT *
-			FROM videometadata
-			WHERE intid = %s""", (id,))
-		row = c.fetchone()
-		c.close()
-		
-		if row is not None:
-			return row
-		else:
-			return None
-
-	def setMetadata(self, data, id=None):
-		"""
-		Adds or updates the metadata in the database for a video item.
-		"""
-		c = self.db.cursor()
-		if id is None:
-			fields = ', '.join(data.keys())
-			format_string = ', '.join(['%s' for d in data.values()])
-			sql = "INSERT INTO videometadata(%s) VALUES(%s)" % (fields, format_string)
-			c.execute(sql, data.values())
-			intid = c.lastrowid
-			c.close()
-			return intid
-		else:
-			log.debug('Updating metadata for %s' % id)
-			format_string = ', '.join(['%s = %%s' % d for d in data])
-			sql = "UPDATE videometadata SET %s WHERE intid = %%s" % format_string
-			sql_values = data.values()
-			sql_values.append(id)
-			c.execute(sql, sql_values)
-			c.close()
-
 class Recorder:
+	"""
+	Represents a MythTV capture card.
+	"""
 	def __str__(self):
 		return "Recorder %s (%s)" % (self.cardid, self.cardtype)
 	
@@ -444,12 +240,15 @@ class Recorder:
 		self.hostname = data[3]
 
 class Program:
+	"""
+	Represents a program with all the detail known.
+	"""
 	def __str__(self):
 		return "%s (%s)" % (self.title, self.starttime.strftime('%Y-%m-%d %H:%M:%S'))
-	
+
 	def __repr__(self):
 		return "%s (%s)" % (self.title, self.starttime.strftime('%Y-%m-%d %H:%M:%S'))
-	
+
 	def __init__(self, data):
 		"""
 		Load the list of data into the object.
@@ -505,7 +304,7 @@ class Program:
 		self.subtitle_type = data[45]
 
 if __name__ == '__main__':
-	banner = "'m' is a MythTV instance."
+	banner = '\'m\' is a MythTV instance.'
 	try:
 		import readline, rlcompleter
 	except:
@@ -517,3 +316,5 @@ if __name__ == '__main__':
 	namespace = globals().copy()
 	namespace.update(locals())
 	code.InteractiveConsole(namespace).interact(banner)
+
+# vim: ts=4 sw=4:

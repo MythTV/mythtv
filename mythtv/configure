@@ -181,7 +181,7 @@ BLOCK_QUOTE
   echo ""
   echo "  --with-bindings=LIST     install the bindings specified in the"
   echo "                           comma-separated list"
-  echo "                           Supported bindings: perl"
+  echo "                           Supported bindings: perl, python"
 <<BLOCK_QUOTE
   echo "  --disable-network        disable network support [default=no]"
   echo "  --disable-ipv6           disable ipv6 support [default=no]"
@@ -903,6 +903,7 @@ MYTHTV_LIST='
 USING_LIST='
     appleremote
     bindings_perl
+    bindings_python
     darwin_da
     dvdv
     opengl
@@ -1144,6 +1145,7 @@ audio_jack="default"
 audio_jack_libs="-ljack"
 enable audio_oss
 bindings_perl="yes"
+bindings_python="yes"
 dbox2="yes"
 directfb="yes"
 dvb_path="/usr/include"
@@ -1371,6 +1373,9 @@ for opt do
           if test x"${binding}" = x"perl"; then
               bindings_perl="yes"
           fi
+          if test x"${binding}" = x"python"; then
+              bindings_python="yes"
+          fi
       done
   ;;
   --without-bindings=*)
@@ -1378,6 +1383,9 @@ for opt do
       for binding in ${tmp_bindings} ; do
           if test x"${binding}" = x"perl"; then
               bindings_perl="no"
+          fi
+          if test x"${binding}" = x"python"; then
+              bindings_python="no"
           fi
       done
   ;;
@@ -1613,6 +1621,7 @@ case $targetos in
     disable ffserver
     disable v4l
     disable bindings_perl
+    disable bindings_python
     SLIBPREF="lib"
     SLIBSUF=".dll"
     EXESUF=".exe"
@@ -2977,6 +2986,7 @@ echo
 
 echo "# Bindings"
 echo "bindings_perl             ${bindings_perl-no}"
+echo "bindings_python           ${bindings_python-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmyth/mythconfig.h
