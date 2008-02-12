@@ -744,14 +744,14 @@ bool ping(const QString &host, int timeout)
     VERBOSE(VB_SOCKET, "Ping: done");
     return true;
 #else
-    QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null")
+    QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
 
     if (myth_system(cmd))
     {
         // ping command may not like -t argument. Simplify:
 
-        cmd = QString("ping -c 1  %2  >/dev/null").arg(host);
+        cmd = QString("ping -c 1  %2  >/dev/null 2>&1").arg(host);
 
         if (myth_system(cmd))
             return false;
