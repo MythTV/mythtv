@@ -251,6 +251,10 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.videoprop & 2 ";
 
+    m_clause->insertItem(tr("Exclude H.264 encoded streams (EIT only)"));
+    m_cfrom << "";
+    m_csql << "NOT (program.videoprop & 4) ";
+
     m_clause->insertItem(tr("Limit by category"));
     m_cfrom << "";
     if (p->category > "")
