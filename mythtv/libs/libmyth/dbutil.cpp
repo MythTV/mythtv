@@ -69,13 +69,13 @@ int DBUtil::CompareDBMSVersion(int major, int minor, int point)
     return result;
 }
 
-/** \fn DBUtil::BackupDB(void)
+/** \fn DBUtil::BackupDB(QString)
  *  \brief Requests a backup of the database.
  *
  *   Care should be taken in calling this function.  It has the potential to
  *   corrupt in-progress recordings or interfere with playback.
  */
-bool DBUtil::BackupDB(void)
+bool DBUtil::BackupDB(QString &filename)
 {
     bool result = false;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -84,7 +84,7 @@ bool DBUtil::BackupDB(void)
                                 QDateTime::currentDateTime()
                                 .toString("yyyy-MM-dd hh:mm:ss"), NULL);
 
-    result = DoBackup();
+    result = DoBackup(filename);
 
     gContext->SaveSettingOnHost("BackupDBLastRunEnd",
                                 QDateTime::currentDateTime()
@@ -203,10 +203,10 @@ QString DBUtil::GetBackupDirectory()
     return directory;
 }
 
-/** \fn DBUtil::DoBackup(void)
+/** \fn DBUtil::DoBackup(QString)
  *  \brief Creates a backup of the database.
  */
-bool DBUtil::DoBackup(void)
+bool DBUtil::DoBackup(QString &filename)
 {
     DatabaseParams dbParams = gContext->GetDatabaseParams();
     QString     dbSchemaVer = gContext->GetSetting("DBSchemaVer");
@@ -245,15 +245,9 @@ bool DBUtil::DoBackup(void)
     QString compressCommand("");
     QString extension = ".sql";
     if (QFile::exists("/bin/gzip"))
-    {
-        compressCommand = "| /bin/gzip";
-        extension = ".sql.gz";
-    }
+        compressCommand = "/bin/gzip";
     else if (QFile::exists("/usr/bin/gzip"))
-    {
-        compressCommand = "| /usr/bin/gzip";
-        extension = ".sql.gz";
-    }
+        compressCommand = "/usr/bin/gzip";
     else
         VERBOSE(VB_IMPORTANT, "Neither /bin/gzip nor /usr/bin/gzip exist. "
                               "The database backup will be uncompressed.");
@@ -265,17 +259,15 @@ bool DBUtil::DoBackup(void)
                       " --user='%3' --add-drop-table --add-locks"
                       " --allow-keywords --complete-insert"
                       " --extended-insert --lock-tables --no-create-db --quick"
-                      " '%4' %5 > '%6' 2>/dev/null")
+                      " '%4' > '%5' 2>/dev/null")
                       .arg(tempExtraConfFile).arg(dbParams.dbHostName)
                       .arg(dbParams.dbUserName).arg(dbParams.dbName)
-                      .arg(compressCommand).arg(backupPathname);
+                      .arg(backupPathname);
     VERBOSE(VB_FILE, QString("Backing up database with command: %1")
                              .arg(command.ascii()));
     VERBOSE(VB_IMPORTANT, QString("Backing up database to file: %1")
             .arg(backupPathname.ascii()));
-    uint status;
-    status = myth_system(command.ascii(), MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                         MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    uint status = system(command.ascii());
 
     unlink(tempExtraConfFile.ascii());
 
@@ -284,11 +276,33 @@ bool DBUtil::DoBackup(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Error backing up database: %1 (%2)")
                 .arg(command.ascii()).arg(status));
+        filename = "__FAILED__";
         return false;
+    }
+
+    if (compressCommand != "")
+    {
+        VERBOSE(VB_IMPORTANT, "Compressing database backup file.");
+        compressCommand += " " + backupPathname;
+        status = system(compressCommand.ascii());
+
+        if (status)
+        {
+            VERBOSE(VB_IMPORTANT,
+                   "Compression failed, backup file will remain uncompressed.");
+        }
+        else
+        {
+            backupPathname += ".gz";
+
+            VERBOSE(VB_IMPORTANT, QString("Database Backup filename: %1")
+                    .arg(backupPathname.ascii()));
+        }
     }
 
     VERBOSE(VB_IMPORTANT, "Database Backup complete.");
 
+    filename = backupPathname;
     return true;
 }
 
