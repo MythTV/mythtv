@@ -991,25 +991,6 @@ void PlaybackBoxMusic::showEditMetadataDialog()
                       "edit_metadata", "music-", "edit metadata");
     if (kDialogCodeRejected != editDialog.exec())
     {
-        // update the metadata copy stored in all_music
-        if (gMusicData->all_music->updateMetadata(editMeta->ID(), editMeta))
-        {
-            // update the displayed track info
-            if (node)
-            {
-                bool errorFlag;
-                node->setString(gMusicData->all_music->getLabel(editMeta->ID(), &errorFlag));
-                music_tree_list->refresh();
-
-                // make sure the track hasn't changed
-                if (curMeta->ID() == editMeta->ID())
-                {
-                    *curMeta = editMeta;
-                    updateTrackInfo(curMeta);
-                }
-            }
-        }
-
         MythBusyDialog *busy = new MythBusyDialog(
             QObject::tr("Rebuilding music tree"));
         busy->start();
@@ -1051,6 +1032,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
         GenericTree *node = music_tree_list->getCurrentNode();
         curMeta = gMusicData->all_music->getMetadata(node->getInt());
+        updateTrackInfo(curMeta);
 
         setShuffleMode(gPlayer->getShuffleMode());
 
