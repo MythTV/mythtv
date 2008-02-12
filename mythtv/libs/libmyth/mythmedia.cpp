@@ -63,9 +63,9 @@ MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
     m_Status = MEDIASTAT_UNKNOWN;
     m_MediaType = MEDIATYPE_UNKNOWN;
 
-    QFileInfo *fi = new QFileInfo(DevicePath); 
-    if (fi && fi->isSymLink()) 
-        m_RealDevice = m_DevicePath.section('/', 0, -2) + "/" + fi->readLink();
+    QFileInfo fi(DevicePath);
+    if (fi.isSymLink())
+        m_RealDevice = m_DevicePath.section('/', 0, -2) + "/" + fi.readLink();
     else
         m_RealDevice = QString::null;
 }
@@ -358,16 +358,16 @@ bool MythMediaDevice::isMounted(bool Verify)
 
 
         // Get some basic info on the device name, if it looks like a path
-        QFileInfo *fi   = new QFileInfo(deviceName);
+        QFileInfo fi(deviceName);
         QString    link = QString::null;
 
         // If the device name in the mounts file is a symlink, follow it..
-        if (fi && fi->isSymLink() && !(link = fi->readLink()).isEmpty())
+        if (fi.isSymLink() && !(link = fi.readLink()).isEmpty())
         {
             if (link[0] == '/') // absolute link
                 deviceNames.push_back(link);
             else // relative link..
-                deviceNames.push_back(fi->dir(true).absPath() + "/" + link);
+                deviceNames.push_back(fi.dir(true).absPath() + "/" + link);
         }
 
 
