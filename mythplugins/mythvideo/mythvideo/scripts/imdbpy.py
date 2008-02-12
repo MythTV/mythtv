@@ -198,6 +198,7 @@ class VideoMetadata:
 	year = None
 	directors = None
 	plot = None
+	cast = None
 	rating = None
 	mpaa_rating = None
 	genres = None
@@ -236,6 +237,7 @@ class VideoMetadata:
 		if self.directors is not None and len(self.directors) > 0:
 			metadata += createMetadataLine("Director", unicode(self.directors[0]))
 		metadata += createMetadataLine("Plot", self.plot)
+		metadata += createMetadataLine("Cast", unicode(self.cast))
 		metadata += createMetadataLine('UserRating', self.rating)
 		metadata += createMetadataLine('MovieRating', self.mpaa_rating)
 		metadata += createMetadataLine('Genres', self.genres)
@@ -330,6 +332,17 @@ def fetch_metadata(imdb_id):
 				shortest_found = text
 		metadata.plot = shortest_found
 
+	cast = movie.get('cast') 
+	cast_str = "" 
+	if cast: 
+		cl = []
+		for name in cast: 
+			cl.append(name['name'])
+
+		cast_str = ", ".join(cl)
+
+	metadata.cast = cast_str 
+
 	metadata.rating = metadataFromField('rating', metadata.rating)
 	metadata.mpaa_rating = metadataFromField('mpaa', metadata.mpaa_rating)
 	metadata.runtime = metadataFromFirst('runtimes', metadata.runtime)
@@ -344,7 +357,6 @@ def metadata_search(imdb_id):
 	meta = fetch_metadata(imdb_id)
 	if meta is not None:
 		return meta.toMetadataString()
-
 
 def parse_meta(meta, key):
 	for line in meta.split("\n"):
