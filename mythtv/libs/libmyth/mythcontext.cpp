@@ -3470,7 +3470,8 @@ MythMainWindow *MythContext::GetMainWindow(void)
  * Non-interactive shells default to old behaviour (upgrading)
  */
 int MythContext::PromptForSchemaUpgrade(const QString &dbver,
-                                        const QString &current)
+                                        const QString &current,
+                                        const QString &backupResult)
 {
     bool    autoUpgrade = false;
     bool    connections = false;  // Are (other) FE/BEs connected?
@@ -3544,6 +3545,9 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         }
     }
 
+    if (backupResult == "__FAILED__")
+        message += "\n" + tr("MythTV was unable to backup your database.");
+
     if (message.contains("%1"))
         message = message.arg(dbver).arg(current);
 
@@ -3580,8 +3584,24 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
             // The annoying extra confirmation:
             if (kDialogCodeButton1 == selected)
             {
-                message = tr("This cannot be un-done, so having a"
-                             " database backup would be a good idea.");
+                if ((backupResult != "__FAILED__") &&
+                    (backupResult != ""))
+                {
+                    int dirPos = backupResult.findRev(QChar('/'));
+                    QString dirName;
+                    QString fileName;
+                    if (dirPos > 0)
+                    {
+                        fileName = backupResult.mid(dirPos + 1);
+                        dirName  = backupResult.left(dirPos);
+                    }
+                    message = tr("If your system becomes unstable, a database "
+                                 "backup file called %1 is located in %2.")
+                                 .arg(fileName).arg(dirName);
+                }
+                else
+                    message = tr("This cannot be un-done, so having a"
+                                 " database backup would be a good idea.");
                 if (connections)
                     message += "\n\n" + warnOtherCl;
 
@@ -3633,6 +3653,13 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
     cout << endl << message << endl << endl;
 
+    if (backupResult == "__FAILED__")
+        cout << "WARNING: MythTV was unable to backup your database."
+             << endl << endl;
+    else if (backupResult != "")
+        cout << "If your system becomes unstable, a database backup is "
+                "located in " << backupResult << endl << endl;
+
     if (expertMode)
     {
         resp = d->getResponse("Would you like to use the existing schema?",
@@ -3648,10 +3675,14 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
     if (connections)
         cout << endl << warnOtherCl <<endl;
 
-    resp = d->getResponse("\nA database backup might be a good idea"
-                          "\nAre you sure you want to upgrade?", "no");
-    if (!resp || resp.left(1).lower() == "n")
-        return MYTH_SCHEMA_EXIT;
+    if ((backupResult == "__FAILED__") ||
+        (backupResult == ""))
+    {
+        resp = d->getResponse("\nA database backup might be a good idea"
+                              "\nAre you sure you want to upgrade?", "no");
+        if (!resp || resp.left(1).lower() == "n")
+            return MYTH_SCHEMA_EXIT;
+    }
 
     return MYTH_SCHEMA_UPGRADE;
 }

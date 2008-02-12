@@ -106,7 +106,7 @@ class MPUBLIC MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.21.20080210-1"
+#define MYTH_BINARY_VERSION "0.21.20080211-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -282,7 +282,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
 
-    int  PromptForSchemaUpgrade(const QString &dbver, const QString &current);
+    int  PromptForSchemaUpgrade(const QString &dbver, const QString &current,
+                                const QString &backupResult);
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 

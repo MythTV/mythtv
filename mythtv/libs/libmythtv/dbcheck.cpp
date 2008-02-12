@@ -505,14 +505,16 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
+    QString backupResult = "";
 #ifndef USING_MINGW
-    if (!dbutil.BackupDB())
+    if (!dbver.isEmpty() && !dbutil.BackupDB(backupResult))
         VERBOSE(VB_IMPORTANT, "Unable to backup your database.  If you have "
                 "not already created a backup, you may want to exit before "
                 "the database upgrade and backup your database.");
 #endif
 
-    switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion))
+    switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion,
+                                             backupResult))
     {
         case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
         case MYTH_SCHEMA_ERROR:

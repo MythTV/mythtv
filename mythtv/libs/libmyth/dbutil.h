@@ -26,7 +26,7 @@ class MPUBLIC DBUtil
     QString GetDBMSVersion(void);
     int CompareDBMSVersion(int major, int minor=0, int point=0);
 
-    bool BackupDB(void);
+    bool BackupDB(QString &filename);
 
     static const int kUnknownVersionNumber;
 
@@ -40,7 +40,7 @@ class MPUBLIC DBUtil
                                  QString extension = ".sql");
     QString GetBackupDirectory();
 
-    bool DoBackup(void);
+    bool DoBackup(QString &filename);
 
     QString m_versionString;
 
