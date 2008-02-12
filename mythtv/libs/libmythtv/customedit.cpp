@@ -249,11 +249,11 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Only shows marked as widescreen"));
     m_cfrom << "";
-    m_csql << "program.videoprop & 2 ";
+    m_csql << "FIND_IN_SET('WIDESCREEN', program.videoprop) > 0 ";
 
     m_clause->insertItem(tr("Exclude H.264 encoded streams (EIT only)"));
     m_cfrom << "";
-    m_csql << "NOT (program.videoprop & 4) ";
+    m_csql << "FIND_IN_SET('AVC', program.videoprop) = 0 ";
 
     m_clause->insertItem(tr("Limit by category"));
     m_cfrom << "";
