@@ -17,6 +17,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "el_processor.h"
+#include <cstdlib>
+#include <cstring>
 #include <complex>
 #include <cmath>
 #include <vector>
