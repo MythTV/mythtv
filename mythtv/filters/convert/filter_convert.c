@@ -106,12 +106,12 @@ newConvertFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     ThisFilter *filter;
 
     (void) options;
-    filter = malloc (sizeof (ThisFilter));
     if ((inpixfmt != FMT_YUV422P || outpixfmt != FMT_YV12) &&
         (inpixfmt != FMT_YV12 || outpixfmt != FMT_YUV422P) &&
         (inpixfmt != outpixfmt))
         return NULL;
 
+    filter = malloc (sizeof (ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "Convert: failed to allocate memory for filter\n");
