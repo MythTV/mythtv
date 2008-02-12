@@ -296,6 +296,7 @@ SubstreamDescriptor::SubstreamDescriptor(RTPSink* rtpSink,
           ++lastTrackId); // a=control:<track-id>
   fSDPLines = strDup(sdpLines);
   delete[] sdpLines;
+  delete[] rtpmapLine;
 }
 
 SubstreamDescriptor::~SubstreamDescriptor() {
