@@ -507,10 +507,7 @@ bool UpgradeTVDatabaseSchema(void)
 
     QString backupResult = "";
 #ifndef USING_MINGW
-    if (!dbutil.BackupDB(backupResult))
-        VERBOSE(VB_IMPORTANT, "Unable to backup your database.  If you have "
-                "not already created a backup, you may want to exit before "
-                "the database upgrade and backup your database.");
+    dbutil.BackupDB(backupResult);
 #endif
 
     switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion,
