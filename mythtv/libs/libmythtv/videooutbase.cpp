@@ -352,6 +352,8 @@ VideoOutput::~VideoOutput()
         delete m_deintFilter;
     if (m_deintFiltMan)
         delete m_deintFiltMan;
+    if (db_vdisp_profile)
+        delete db_vdisp_profile;
 }
 
 /**

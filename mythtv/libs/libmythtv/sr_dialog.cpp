@@ -41,7 +41,8 @@ RecOptDialog::RecOptDialog(ScheduledRecording* sr, MythMainWindow *parent, const
 
 RecOptDialog::~RecOptDialog()
 {
-
+    if (theme)
+        delete theme;
 }
 
 void RecOptDialog::constructList(void)
