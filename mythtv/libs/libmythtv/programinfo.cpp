@@ -3542,8 +3542,8 @@ void ProgramInfo::showDetails(void) const
             ptable = "recordedprogram";
 
         query.prepare(QString("SELECT category_type, airdate, stars,"
-                      " partnumber, parttotal, audioprop, videoprop,"
-                      " subtitletypes, syndicatedepisodenumber, generic,"
+                      " partnumber, parttotal, audioprop+0, videoprop+0,"
+                      " subtitletypes+0, syndicatedepisodenumber, generic,"
                       " showtype, colorcode, title_pronounce"
                       " FROM %1 WHERE chanid = :CHANID AND"
                       " starttime = :STARTTIME ;").arg(ptable));
@@ -4003,7 +4003,7 @@ void ProgramInfo::getProgramProperties(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT audioprop, videoprop, subtitletypes "
+    query.prepare("SELECT audioprop+0, videoprop+0, subtitletypes+0 "
                   "FROM recorded LEFT JOIN recordedprogram ON "
                   "(recorded.chanid = recordedprogram.chanid AND "
                   "recorded.progstart = recordedprogram.starttime) "
@@ -4793,8 +4793,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "recorded.originalairdate, recorded.playgroup, "
         "recorded.basename, recorded.progstart, "
         "recorded.progend, recorded.stars, "
-        "recordedprogram.audioprop, recordedprogram.videoprop, "
-        "recordedprogram.subtitletypes, recorded.watched, "
+        "recordedprogram.audioprop+0, recordedprogram.videoprop+0, "
+        "recordedprogram.subtitletypes+0, recorded.watched, "
         "recorded.storagegroup "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "

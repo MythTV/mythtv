@@ -133,7 +133,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "SELECT title,          subtitle,      description, "
         "       category,       category_type, "
         "       starttime,      endtime, "
-        "       subtitletypes,  audioprop,     videoprop, "
+        "       subtitletypes+0,audioprop+0,   videoprop+0, "
         "       seriesid,       programid, "
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "

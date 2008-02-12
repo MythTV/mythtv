@@ -14,7 +14,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1210";
+const QString currentDatabaseVersion = "1211";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3497,6 +3497,28 @@ thequery,
 ""
 };
         if (!performActualUpdate(updates, "1210", dbver))
+	    return false;
+    }
+
+    if (dbver == "1210")
+    {
+        const QString updates[] = {
+"ALTER TABLE program CHANGE COLUMN audioprop audioprop "
+"    SET('STEREO', 'MONO', 'SURROUND', 'DOLBY', 'HARDHEAR', 'VISUALIMPAIR') NOT NULL; ",
+"ALTER TABLE program CHANGE COLUMN videoprop videoprop "
+"    SET('HDTV', 'WIDESCREEN', 'AVC') NOT NULL; ",
+"ALTER TABLE program CHANGE COLUMN subtitletypes subtitletypes "
+"    SET('HARDHEAR', 'NORMAL', 'ONSCREEN', 'SIGNED') NOT NULL; ",
+
+"ALTER TABLE recordedprogram CHANGE COLUMN audioprop audioprop "
+"    SET('STEREO', 'MONO', 'SURROUND', 'DOLBY', 'HARDHEAR', 'VISUALIMPAIR') NOT NULL; ",
+"ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "
+"    SET('HDTV', 'WIDESCREEN', 'AVC') NOT NULL; ",
+"ALTER TABLE recordedprogram CHANGE COLUMN subtitletypes subtitletypes "
+"    SET('HARDHEAR', 'NORMAL', 'ONSCREEN', 'SIGNED') NOT NULL; ",
+""
+};
+        if (!performActualUpdate(updates, "1211", dbver))
 	    return false;
     }
 

@@ -2747,7 +2747,7 @@ void Scheduler::AddNewRecords(void)
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"program.videoprop, program.subtitletypes, program.audioprop, "
+"program.videoprop+0, program.subtitletypes+0, program.audioprop+0, "
 "RECTABLE.storagegroup, capturecard.hostname, recordmatch.oldrecstatus, " + 
     pwrpri + QString(
 "FROM recordmatch "

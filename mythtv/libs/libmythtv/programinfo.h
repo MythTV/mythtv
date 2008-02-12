@@ -65,6 +65,8 @@ enum FlagMask {
     FL_PRESERVED      = 0x1000,
 };
 
+// if AudioProps changes, the audioprop column in program and
+// recordedprogram has to changed accordingly 
 enum AudioProps {
     AUD_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     AUD_STEREO        = 0x01,
@@ -75,6 +77,8 @@ enum AudioProps {
     AUD_VISUALIMPAIR  = 0x20,
 };
 
+// if VideoProps changes, the audioprop column in program and
+// recordedprogram has to changed accordingly 
 enum VideoProps {
     VID_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     VID_HDTV          = 0x01,
@@ -82,6 +86,8 @@ enum VideoProps {
     VID_AVC           = 0x04,
 };
 
+// if SubtitleTypes changes, the audioprop column in program and
+// recordedprogram has to changed accordingly 
 enum SubtitleTypes {
     SUB_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     SUB_HARDHEAR      = 0x01,
