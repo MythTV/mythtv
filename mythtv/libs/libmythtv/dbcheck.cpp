@@ -507,7 +507,7 @@ bool UpgradeTVDatabaseSchema(void)
 
     QString backupResult = "";
 #ifndef USING_MINGW
-    if (!dbver.isEmpty() && !dbutil.BackupDB(backupResult))
+    if (!dbutil.BackupDB(backupResult))
         VERBOSE(VB_IMPORTANT, "Unable to backup your database.  If you have "
                 "not already created a backup, you may want to exit before "
                 "the database upgrade and backup your database.");
