@@ -995,6 +995,8 @@ void PlaybackBoxMusic::showEditMetadataDialog()
             QObject::tr("Rebuilding music tree"));
         busy->start();
 
+        mainvisual->deleteMetadata();
+
         // Get a reference to the current track
         QValueList <int> branches_to_current_node;
 
@@ -1033,6 +1035,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         GenericTree *node = music_tree_list->getCurrentNode();
         curMeta = gMusicData->all_music->getMetadata(node->getInt());
         updateTrackInfo(curMeta);
+        mainvisual->setMetadata(curMeta);
 
         setShuffleMode(gPlayer->getShuffleMode());
 
