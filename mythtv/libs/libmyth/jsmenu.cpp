@@ -46,7 +46,7 @@ using namespace std;
 #endif
 
 #define LOC QString("JoystickMenuClient: ")
-#define LOC_ERROR QString("JoystickMenuClient Error: ");
+#define LOC_ERROR QString("JoystickMenuClient Error: ")
 
 /*----------------------------------------------------------------------------
 ** JoystickMenuClient Constructor
