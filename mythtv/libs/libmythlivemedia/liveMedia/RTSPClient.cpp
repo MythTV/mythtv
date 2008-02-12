@@ -307,7 +307,8 @@ char* RTSPClient::describeURL(char const* url, Authenticator* authenticator,
 	  char* result = describeURL(redirectionURL);
 	  delete[] redirectionURL;
 	  delete[] serverType;
-	  return result;
+	  delete[] cmd;
+          return result;
 	}
       }
     } 

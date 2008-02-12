@@ -286,6 +286,7 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     { // old PAT must be in single TS for this create function
         VERBOSE(VB_IMPORTANT, "PAT::Create: Error, old "
                 "PAT size exceeds maximum PAT size.");
+        delete pat;
         return 0;
     }
 

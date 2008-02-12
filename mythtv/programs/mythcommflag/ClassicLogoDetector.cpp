@@ -120,6 +120,7 @@ bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
             if (commDetector->m_bStop)
             {
                 nvp->DiscardVideoFrame(vf);
+                delete[] edgeCounts;
                 return false;
             }
 

@@ -587,10 +587,12 @@ static int findDirFile( const char *path, const char *file, char *filename )
             sprintf( filename, "%s%s%s", path,
                      ( ( path[ strlen( path ) - 1 ] == '/' ) ? "" : "/" ),
                      ent->d_name );
+            closedir( dir );
             return 0;
         }
     }
 
+    closedir( dir );
     return -1;
 }
 
