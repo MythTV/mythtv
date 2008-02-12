@@ -188,6 +188,9 @@ VideoOutputXv::~VideoOutputXv()
         X11U;
     }
 
+    if (xvmc_buf_attr)
+        delete xvmc_buf_attr;
+
     // Switch back to desired resolution for GUI
     if (display_res)
         display_res->SwitchToGUI();
