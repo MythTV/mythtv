@@ -4,6 +4,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// C++ headers
+#include <algorithm>
+
 // Qt headers
 #include <qdeepcopy.h>
 
