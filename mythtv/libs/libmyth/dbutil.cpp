@@ -70,6 +70,90 @@ int DBUtil::CompareDBMSVersion(int major, int minor, int point)
     return result;
 }
 
+/** \fn DBUtil::BackupInProgress(void)
+ *  \brief Test to see if a DB backup is in progress
+ *
+ */
+bool DBUtil::IsBackupInProgress(void)
+{
+    QString backupStartTimeStr = gContext->GetSetting("BackupDBLastRunStart");
+    QString backupEndTimeStr = gContext->GetSetting("BackupDBLastRunEnd");
+
+    if (backupStartTimeStr.isEmpty())
+    {
+        VERBOSE(VB_DATABASE, "DBUtil::BackupInProgress(): No start time found, "
+                "database backup is not in progress.");
+        return false;
+    }
+
+    backupStartTimeStr.replace(" ", "T");
+
+    QDateTime backupStartTime =
+        QDateTime::fromString(backupStartTimeStr, Qt::ISODate);
+
+    // No end time set
+    if (backupEndTimeStr.isEmpty())
+    {
+        // If DB Backup started less then 10 minutes ago, assume still running
+        if (backupStartTime.secsTo(QDateTime::currentDateTime()) < 600)
+        {
+            VERBOSE(VB_DATABASE, QString("DBUtil::BackupInProgress(): Found "
+                    "database backup start time of %1 which was %2 seconds "
+                    "ago, therefore it appears the backup is still running.")
+                    .arg(backupStartTimeStr)
+                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+            return true;
+        }
+        else
+        {
+            VERBOSE(VB_DATABASE, QString("DBUtil::BackupInProgress(): "
+                    "Database backup started at %1, but no end time was found. "
+                    "The backup started %2 seconds ago and should have "
+                    "finished by now therefore it appears it is not running .")
+                    .arg(backupStartTimeStr)
+                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+            return false;
+        }
+    }
+    else
+    {
+        backupEndTimeStr.replace(" ", "T");
+
+        QDateTime backupEndTime =
+            QDateTime::fromString(backupEndTimeStr, Qt::ISODate);
+
+        if (backupEndTime >= backupStartTime)
+        {
+            VERBOSE(VB_DATABASE, QString("DBUtil::BackupInProgress(): Found "
+                    "database backup end time of %1 later than start time "
+                    "of %2, therefore backup is not running.")
+                    .arg(backupEndTimeStr).arg(backupStartTimeStr));
+            return false;
+        }
+        else if (backupStartTime.secsTo(QDateTime::currentDateTime()) > 600)
+        {
+            VERBOSE(VB_DATABASE, QString("DBUtil::BackupInProgress(): "
+                    "Database backup started at %1, but has not ended yet.  "
+                    "The backup started %2 seconds ago and should have "
+                    "finished by now therefore it appears it is not running")
+                    .arg(backupStartTimeStr)
+                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+            return false;
+        }
+        else
+        {
+            // start > end and started less than 10 minutes ago
+            VERBOSE(VB_DATABASE, QString("DBUtil::BackupInProgress(): "
+                    "Database backup started at %1, and is still running.")
+                    .arg(backupStartTimeStr));
+            return true;
+        }
+    }
+
+    // Shouldn't get here
+    return false;
+}
+
 /** \fn DBUtil::BackupDB(QString)
  *  \brief Requests a backup of the database.
  *

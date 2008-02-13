@@ -28,6 +28,8 @@ class MPUBLIC DBUtil
 
     bool BackupDB(QString &filename);
 
+    static bool IsBackupInProgress(void);
+
     static const int kUnknownVersionNumber;
 
   private:

@@ -436,6 +436,44 @@ static bool performActualUpdate(const QString updates[], QString version,
     return true;
 }
 
+/** \fn lockSchema(MSqlQuery&)
+ *  \brief Get a lock on the schemalock table
+ *
+ */
+bool lockSchema(MSqlQuery &query)
+{
+    query.prepare("CREATE TABLE IF NOT EXISTS "
+                      "schemalock ( schemalock int(1));");
+    if (!query.exec())
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR: Unable to create schemalock table: %1")
+                        .arg(MythContext::DBErrorMessage(query.lastError())));
+        return false;
+    }
+
+    query.prepare("LOCK TABLE schemalock WRITE;");
+    if (!query.exec())
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR: Unable to acquire database upgrade lock")
+                        .arg(MythContext::DBErrorMessage(query.lastError())));
+        return false;
+    }
+
+    return true;
+}
+
+/** \fn unlockSchema(MSqlQuery&)
+ *  \brief Release the lock on the schemalock table
+ *
+ */
+void unlockSchema(MSqlQuery &query)
+{
+    query.prepare("UNLOCK TABLES;");
+    query.exec();
+}
+
 /** \fn CompareTVDatabaseSchemaVersion(void)
  *  \brief Called from outside dbcheck.cpp to compare the database schema
  *         version with the expected version.
@@ -444,14 +482,26 @@ static bool performActualUpdate(const QString updates[], QString version,
  *   initialized, the function returns negative, as if the schema simply needed
  *   upgrading, so InitializeDatabase() can do its job.
  *
+ *   We lock the schemalock table for write so that we block if there are any
+ *   DB schema updates in progress.  This will make sure that we get the
+ *   correct schema version number after the updates are completed and the
+ *   update process unlocks the schemalock table.
+ *
  *  \return negative, 0, or positive if the schema version is less than, equal
  *          to, or greater than the expected version
  */
 int CompareTVDatabaseSchemaVersion(void)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!lockSchema(query))
+        return -1;
+
     bool ok;
     int databaseVersion = gContext->GetNumSetting("DBSchemaVer");
     int expectedVersion = currentDatabaseVersion.toInt(&ok);
+
+    unlockSchema(query);
 
     if (!ok)
         return -1;
@@ -526,31 +576,8 @@ bool UpgradeTVDatabaseSchema(void)
     VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
                                   .arg(currentDatabaseVersion));
 
-    query.prepare("CREATE TABLE IF NOT EXISTS "
-                      "schemalock ( schemalock int(1));");
-    if (!query.exec())
-    {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to create database "
-                                      "upgrade lock table: %1")
-                                      .arg(MythContext::DBErrorMessage(
-                                           query.lastError())));
+    if (!lockSchema(query))
         return false;
-    }
-
-    VERBOSE(VB_IMPORTANT, "Setting Lock for Database Schema upgrade. If you "
-                          "see a long pause here it means the Schema is "
-                          "already locked and is being upgraded by another "
-                          "Myth process.");
-
-    query.prepare("LOCK TABLE schemalock WRITE;");
-    if (!query.exec())
-    {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to acquire database "
-                                      "upgrade lock")
-                                      .arg(MythContext::DBErrorMessage(
-                                           query.lastError())));
-        return false;
-    }
 
     bool ret = doUpgradeTVDatabaseSchema();
 
@@ -559,8 +586,7 @@ bool UpgradeTVDatabaseSchema(void)
     else
         VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
 
-    query.prepare("UNLOCK TABLES;");
-    query.exec();
+    unlockSchema(query);
 
     return ret;
 }
