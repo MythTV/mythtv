@@ -681,6 +681,7 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
     first_cell_nr = 0;
     last_cell_nr = state->pgc->nr_of_cells - 1;
   } else { 
+    pthread_mutex_unlock(&this->vm_lock);
     printerr("dvdnav_time_search_within_cell: works only if pgc_based is enabled");
     return DVDNAV_STATUS_ERR;
   }
@@ -731,7 +732,10 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
   if (scan_admap)
   {
     if (dvdnav_scan_admap(this, state->domain, offset, &new_vobu) == DVDNAV_STATUS_ERR)
+    {
+      pthread_mutex_unlock(&this->vm_lock);
       return DVDNAV_STATUS_ERR;
+    }
   }
   start =  state->pgc->cell_playback[cell_nr].first_sector;
   if (vm_jump_cell_block(this->vm, cell_nr+1, new_vobu - start)) {
