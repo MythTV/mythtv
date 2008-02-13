@@ -13,7 +13,7 @@ from datetime import datetime
 from MythLog import *
 
 # create logging object
-log = MythLog(INFO, '%(levelname)s - %(message)s', 'MythDB')
+log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythDB')
 
 # check for dependency
 try:
@@ -81,7 +81,7 @@ class MythDB:
 
 		# Overrides from command line parameters
  		try:
-        	opts, args = getopt.getopt(args, '', ['dbhost=', 'user=', 'pass=', 'database='])
+			opts, args = getopt.getopt(args, '', ['dbhost=', 'user=', 'pass=', 'database='])
 			for o, a in opts:
 				if o == '--dbhost':
 					dbconn['host'] = a
@@ -91,7 +91,7 @@ class MythDB:
 					dbconn['pass'] = a
 				if o == '--database':
 					dbconn['name'] = a
-    	except:
+		except:
 			pass
 
 		if not dbconn['host'] and not found_config:

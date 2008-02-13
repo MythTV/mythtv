@@ -6,7 +6,7 @@ MythVideo database.
 import MythDB
 from MythLog import *
 
-log = MythLog(INFO, '%(levelname)s - %(message)s', 'MythVideo')
+log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythVideo')
 
 class MythVideo:
 	"""
