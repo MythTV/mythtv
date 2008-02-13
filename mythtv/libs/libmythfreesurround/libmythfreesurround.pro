@@ -5,7 +5,7 @@ TEMPLATE = lib
 TARGET = mythfreesurround-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 
-INCLUDEPATH += ../../libs/libavcodec ../..
+INCLUDEPATH += ../libavcodec ../libmyth
 
 #build position independent code since the library is linked into a shared library
 QMAKE_CXXFLAGS += -fPIC -DPIC
@@ -26,5 +26,5 @@ contains( CONFIG_LIBFFTW3, yes ) {
 } else {
     DEPENDPATH += ../libavcodec
     LIBS += -L../libavcodec -lavcodec
-    INCLUDEPATH += ../../libs/libavutil
+    INCLUDEPATH += ../libavutil
 }

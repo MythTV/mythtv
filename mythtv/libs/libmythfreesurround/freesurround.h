@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef FREESURROUND_H
 #define FREESURROUND_H
 
-#include <sys/types.h>
+#include "compat.h"  // instead of sys/types.h, for MinGW compatibility
 
 class FreeSurround
 {
