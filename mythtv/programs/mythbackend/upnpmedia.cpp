@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include "util.h"
 
+#include <cstdlib>
+
 #include "upnpmedia.h"
 
 #define LOC QString("UPnpMedia: ")
