@@ -40,9 +40,11 @@ do the following:
 <LI>You may pause, fast-forward and rewind live Television.</LI>
 <LI>You may install multiple video capture cards to record more than one
 program at a time.</LI>
-<LI>You can have multiple servers, each with multiple capture cards in
-them.  All servers are centrally managed and all programs are scheduled by the
-Master backend.</LI>
+<LI>You can have multiple servers (called "backends"), each with multiple
+capture cards in them.  All scheduling is performed by the Master backend,
+which arbitrates which recording will be performed by each device.  All
+recording requests are managed by the Master backend, so you can schedule a
+recording from any client.</LI>
 <LI>You can have multiple clients (called "frontends" in MythTV parlance),
 each with a common view of all available programs.  Any client can watch any
 program that was recorded by any of the servers, assuming that they have the
@@ -69,7 +71,6 @@ Other modules in MythTV include:
 <LI>MythArchive, a tool to create DVDs</LI>
 <LI>MythBrowser, a web browser</LI>
 <LI>MythControls, an application to configure your remote control</LI>
-<LI>MythDVD, a DVD viewer / ripper</LI>
 <LI>MythFlix, a Netflix module</LI>
 <LI>MythGallery, a picture-viewing application</LI>
 <LI>MythGame</LI>
@@ -77,12 +78,12 @@ Other modules in MythTV include:
 and FLAC</LI>
 <LI>MythNews, a RSS news grabber</LI>
 <LI>MythPhone, phone and videophone using SIP.</LI>
-<LI>MythVideo, a media-viewer for content not created within MythTV</LI>
+<LI>MythVideo, DVD ripper and a media-viewer for content not created within MythTV</LI>
 <LI>MythWeather</LI>
 <LI>MythWeb, which allows you to control your MythTV system using a web
 browser.  With MythWeb, you can schedule and delete recordings, change
 keybindings and more.  With proper security, you may even schedule a program
-over the Internet and have it immediately acted on by the scheduler.</LI>
+over the Internet and have it immediately acted on by the Master backend.</LI>
 </UL>
 </P>
 <H2><A NAME="ss1.2">1.2</A> <A HREF="mythtv-HOWTO.html#toc1.2">QuickStart</A>
@@ -131,9 +132,9 @@ Kulagowski
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.20.2</P>
+<P>This HOWTO is for MythTV v0.21</P>
 <P>Release notes for this version may be found in the MythTV Wiki at 
-<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2</A></P>
+<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21</A></P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="mythtv-HOWTO.html#toc1.5">Books about MythTV</A>
 </H2>

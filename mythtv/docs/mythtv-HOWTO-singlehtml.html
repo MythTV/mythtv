@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2007-12-27, v0.20.27
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2008-02-13, v0.21.00pre
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -265,9 +265,11 @@ do the following:
 <LI>You may pause, fast-forward and rewind live Television.</LI>
 <LI>You may install multiple video capture cards to record more than one
 program at a time.</LI>
-<LI>You can have multiple servers, each with multiple capture cards in
-them.  All servers are centrally managed and all programs are scheduled by the
-Master backend.</LI>
+<LI>You can have multiple servers (called "backends"), each with multiple
+capture cards in them.  All scheduling is performed by the Master backend,
+which arbitrates which recording will be performed by each device.  All
+recording requests are managed by the Master backend, so you can schedule a
+recording from any client.</LI>
 <LI>You can have multiple clients (called "frontends" in MythTV parlance),
 each with a common view of all available programs.  Any client can watch any
 program that was recorded by any of the servers, assuming that they have the
@@ -294,7 +296,6 @@ Other modules in MythTV include:
 <LI>MythArchive, a tool to create DVDs</LI>
 <LI>MythBrowser, a web browser</LI>
 <LI>MythControls, an application to configure your remote control</LI>
-<LI>MythDVD, a DVD viewer / ripper</LI>
 <LI>MythFlix, a Netflix module</LI>
 <LI>MythGallery, a picture-viewing application</LI>
 <LI>MythGame</LI>
@@ -302,12 +303,12 @@ Other modules in MythTV include:
 and FLAC</LI>
 <LI>MythNews, a RSS news grabber</LI>
 <LI>MythPhone, phone and videophone using SIP.</LI>
-<LI>MythVideo, a media-viewer for content not created within MythTV</LI>
+<LI>MythVideo, DVD ripper and a media-viewer for content not created within MythTV</LI>
 <LI>MythWeather</LI>
 <LI>MythWeb, which allows you to control your MythTV system using a web
 browser.  With MythWeb, you can schedule and delete recordings, change
 keybindings and more.  With proper security, you may even schedule a program
-over the Internet and have it immediately acted on by the scheduler.</LI>
+over the Internet and have it immediately acted on by the Master backend.</LI>
 </UL>
 </P>
 <H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">QuickStart</A>
@@ -356,9 +357,9 @@ Kulagowski
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.20.2</P>
+<P>This HOWTO is for MythTV v0.21</P>
 <P>Release notes for this version may be found in the MythTV Wiki at 
-<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2</A></P>
+<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21</A></P>
 
 <H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Books about MythTV</A>
 </H2>
@@ -617,14 +618,13 @@ information.</P>
 <P>MythTV creates large files, many in excess of 4GB.  You <EM>must</EM> 
 use a 64 or 128 bit filesystem. These will allow you to create large files.
 Filesystems known to have problems with large files are FAT (all versions),
-and ReiserFS (versions 3 and 4). The ext3 filesystem can be made to work
-but requires great care in how you format and mount the volume.</P>
+and ReiserFS (versions 3 and 4). </P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <EM>strongly</EM> encouraged to
 consider one of these for your MythTV filesystem.  JFS is the absolute best
 at deletion, so you may want to try it if XFS gives you problems.  MythTV
-.20 and above also incorporates a "slow delete" feature, which progressively shrinks
+.21 incorporates a "slow delete" feature, which progressively shrinks
 the file rather than attempting to delete it all at once, so if you're more
 comfortable with a filesystem such as ext3 (whose delete performance for
 large files isn't that good) you may use it rather than one of the
@@ -7992,12 +7992,11 @@ done with LVM, so check the LVM HOWTO
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you are running a trunk version of MythTV after r12151,
-and you are using LVM to create one large filesystem to store your
-recordings, it's no longer recommended that you go the LVM route. the
-preferred solution is to use 
-<A HREF="#storagegroups">Storage Groups</A>. They're more flexible and less likely to lose all of your recordings if you
-have a drive failure.</CAPTION>
+<CAPTION><B>NOTE</B>:  If you are running MythTV 0.21 and you are using LVM to
+create one large filesystem to store your recordings, it's no longer
+recommended that you go the LVM route. The preferred solution is to use 
+<A HREF="#storagegroups">Storage Groups</A>.  They're more flexible and less
+likely to lose all of your recordings if you have a drive failure.</CAPTION>
 </FIGURE>
 </P>
 <P>If you don't understand how to partition a drive, or how to change the

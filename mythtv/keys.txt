@@ -221,7 +221,7 @@ EPG
   "favorites".
 
 Set Program Recording Priorities and Set Channel Recording Priorities
----------------------------------------------
+---------------------------------------------------------------------
 
 - Right increases priority value.
 - Left decreases priority value.
