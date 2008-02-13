@@ -637,7 +637,7 @@ void DVBChannel::SetTimeOffset(double offset)
 
 bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 {
-    uint inputid = inputname.isEmpty() ? currentInputID : GetInputByName(inputname);
+    int inputid = inputname.isEmpty() ? currentInputID : GetInputByName(inputname);
     if (inputid < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Tune(): Invalid input '%1'.")
