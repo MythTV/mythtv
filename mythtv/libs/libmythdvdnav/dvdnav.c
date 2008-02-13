@@ -406,6 +406,7 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
   if(!this->started) {
     /* Start the VM */
     if (!vm_start(this->vm)) {
+      pthread_mutex_unlock(&this->vm_lock);
       printerr("Encrypted or faulty DVD");
       return DVDNAV_STATUS_ERR;
     }
