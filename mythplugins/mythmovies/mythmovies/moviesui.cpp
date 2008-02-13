@@ -344,12 +344,14 @@ void MoviesUI::showMenu()
 void MoviesUI::slotUpdateMovieTimes()
 {
     VERBOSE(VB_IMPORTANT, "Doing Manual Movie Times Update");
-    updateMovieTimes();
-    updateDataTrees();
-    drawDisplayTree();
+
     menuPopup->hide();
     menuPopup->deleteLater();
     menuPopup = NULL;
+
+    updateMovieTimes();
+    updateDataTrees();
+    drawDisplayTree();
 }
 
 void MoviesUI::closeMenu(void)
