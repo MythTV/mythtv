@@ -3573,7 +3573,8 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
             QStringList buttonNames;
 
             buttonNames += QObject::tr("Exit");
-            buttonNames += QObject::tr("Upgrade");
+            if (upgradable)
+                buttonNames += QObject::tr("Upgrade");
             if (expertMode)
                 buttonNames += QObject::tr("Use current schema");
 
@@ -3582,7 +3583,8 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
                 buttonNames, kDialogCodeButton0);
 
             // The annoying extra confirmation:
-            if (kDialogCodeButton1 == selected)
+            if (kDialogCodeButton1 == selected ||
+                kDialogCodeButton2 == selected)
             {
                 if ((backupResult != "__FAILED__") &&
                     (backupResult != ""))
@@ -3616,7 +3618,9 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
                 case kDialogCodeButton0:
                     returnValue = MYTH_SCHEMA_EXIT;         break;
                 case kDialogCodeButton1:
-                    returnValue = MYTH_SCHEMA_UPGRADE;      break;
+                    returnValue = upgradable ?
+                                  MYTH_SCHEMA_UPGRADE:
+                                  MYTH_SCHEMA_USE_EXISTING; break;
                 case kDialogCodeButton2:
                     returnValue = MYTH_SCHEMA_USE_EXISTING; break;
                 default:
