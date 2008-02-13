@@ -4,8 +4,8 @@
 ### win32-packager.pl
 ###
 ### =description
-### Tool for automating frontend builds on MS WIndows XP (and compatible)
-### based loosely on osx-packager.pl
+### Tool for automating frontend builds on MS Windows XP (and compatible)
+### originally based loosely on osx-packager.pl, but now is its own beast.
 ###
 ### =revision
 ### $Id$
@@ -15,9 +15,6 @@
 ##############################################################################
 
 use strict;
-#use Getopt::Long qw(:config auto_abbrev);
-#use Pod::Usage ();
-#use Cwd ();
 use LWP::UserAgent;
 use IO::File;
 use Data::Dumper; 
@@ -30,9 +27,8 @@ $| = 1; # autoflush stdout;
 # this scipt was last tested to work with this version, on other versions YMMV.
 #my $SVNRELEASE = '15528'; #builds and runs with 3x patches commented out below
 #my $SVNRELEASE = '15586'; # builds and runs without patches except backend.gz
-my $SVNRELEASE = '15699'; # latest build that runs without any additional patches
+my $SVNRELEASE = '15699'; # latest build that seemed to run without any additional patches, YMMV.
 #my $SVNRELEASE = 'HEAD' ;# if you are game, go forth and test the latest release! 
-
 
 # We allow SourceForge to tell us which server to download from,
 # rather than assuming specific server/s
@@ -51,6 +47,8 @@ my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
 #        however downloads/etc will still work fine.
 # TODO using the proxy here WILL cause any Subversion (SVN) commands to fail,
 #      you will need to do that by hand.
+# TIP if you want to get a 'tarball' of a specific SVN version of the sourcecode, from behind a non-SVN friendly proxy, TRAC can do it for you like this: (eg.is for SVN version 16599)
+#      http://svn.mythtv.org/trac/changeset?format=zip&new=15699&old=2&new_path=trunk%2Fmythtv&old_path=trunk%2Fmythtv
 my $proxy = '';
 #my $proxy = 'http://enter.your.proxy.here:8080';
 
@@ -214,9 +212,9 @@ push @{$expect},
 [ file => $msys.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\* '.$dosmsys."bin"] ],
 [ file => $msys.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\* '.$dosmsys."include"] ],
 # taglib also requires zlib in /mingw , so we'll put it there too, why not! 
-[ file => $msys.'lib/libz.a',      exec => ["copy /Y ".$dossources.'zlib\usr\lib\* '.$dosmingw."lib"] ],
-[ file => $msys.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\* '. $dosmingw."bin"] ],
-[ file => $msys.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\* '.$dosmingw."include"] ],
+[ file => $mingw.'lib/libz.a',      exec => ["copy /Y ".$dossources.'zlib\usr\lib\* '.$dosmingw."lib"] ],
+[ file => $mingw.'bin/msys-z.dll',  exec => ["copy /Y ".$dossources.'zlib\usr\bin\* '. $dosmingw."bin"] ],
+[ file => $mingw.'include/zlib.h',  exec => ["copy /Y ".$dossources.'zlib\usr\include\* '.$dosmingw."include"] ],
 
 
 
@@ -521,8 +519,8 @@ push @{$expect},
 # configure
 [ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
 # make
-[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.20.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.20.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
-[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.20.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.20.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 [ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 [ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 
@@ -981,6 +979,9 @@ sub _fetch {
         $f->binmode();
         $f->print($res->content);
         $f->close();
+    }
+    if ( ! -s $file ) {
+      die ("ERR: Unable to automatically fetch file!\nPerhaps manually downloading from the URL to the filename (both listed above) might work, or you might want to choose your own SF mirror (edit this script for instructions), or perhaps this version of the file is no longer available.");
     }
 }
 #------------------------------------------------------------------------------
