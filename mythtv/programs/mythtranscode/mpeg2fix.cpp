@@ -679,6 +679,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         }
         if (! ok)
         {
+            pthread_mutex_unlock( &rx.mutex );
             //deadlock
             VERBOSE(MPF_IMPORTANT,
                     "Deadlock detected.  One buffer is full when\n"
