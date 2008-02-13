@@ -41,6 +41,15 @@ static HostComboBox *AudioOutputDevice()
     HostComboBox *gc = new HostComboBox("AudioOutputDevice", true);
     gc->setLabel(QObject::tr("Audio output device"));
 
+#ifdef USING_ALSA
+    gc->addSelection("ALSA:default",       "ALSA:default");
+    gc->addSelection("ALSA:spdif",         "ALSA:spdif");
+    gc->addSelection("ALSA:surround51",    "ALSA:surround51");
+    gc->addSelection("ALSA:analog",        "ALSA:analog");
+    gc->addSelection("ALSA:digital",       "ALSA:digital");
+    gc->addSelection("ALSA:mixed-analog",  "ALSA:mixed-analog");
+    gc->addSelection("ALSA:mixed-digital", "ALSA:mixed-digital");
+#endif
 #ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
@@ -55,15 +64,6 @@ static HostComboBox *AudioOutputDevice()
         dev.setNameFilter("adsp*");
         gc->fillSelectionsFromDir(dev);
     }
-#endif
-#ifdef USING_ALSA
-    gc->addSelection("ALSA:default",       "ALSA:default");
-    gc->addSelection("ALSA:spdif",         "ALSA:spdif");
-    gc->addSelection("ALSA:surround51",    "ALSA:surround51");
-    gc->addSelection("ALSA:analog",        "ALSA:analog");
-    gc->addSelection("ALSA:digital",       "ALSA:digital");
-    gc->addSelection("ALSA:mixed-analog",  "ALSA:mixed-analog");
-    gc->addSelection("ALSA:mixed-digital", "ALSA:mixed-digital");
 #endif
 #ifdef USING_ARTS
     gc->addSelection("ARTS:", "ARTS:");
