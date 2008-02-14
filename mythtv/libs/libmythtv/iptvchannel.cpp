@@ -70,7 +70,7 @@ void IPTVChannel::Close(void)
     VERBOSE(VB_CHANNEL, LOC + "Close() -- begin");
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "Close() -- locked");
-    m_freeboxchannels.clear();
+    //m_freeboxchannels.clear();
     VERBOSE(VB_CHANNEL, LOC + "Close() -- end");
 }
 
