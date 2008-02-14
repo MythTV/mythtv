@@ -34,7 +34,7 @@ int UPnpCDSVideo::GetBaseCount(void)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT COUNT(*) FROM upnpmedia WHERE class = 'VIDEO' "
-		  "AND parentid = :ROOTID");
+                    "AND parentid = :ROOTID");
 
     query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
     query.exec();
@@ -53,7 +53,7 @@ int UPnpCDSVideo::g_nRootCount = 1;
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpCDSRootInfo *UPnpCDSVideo::GetRootInfo( int nIdx )
-{ 
+{
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
         return &(g_RootNodes[ nIdx ]); 
 
@@ -85,7 +85,7 @@ QString UPnpCDSVideo::GetTableName( QString sColumn )
 QString UPnpCDSVideo::GetItemListSQL( QString sColumn )
 {
     return "SELECT intid, title, filepath, " \
-	   "itemtype, itemproperties, parentid, "\
+       "itemtype, itemproperties, parentid, "\
            "coverart FROM upnpmedia WHERE class = 'VIDEO'";
 }
 
@@ -97,7 +97,8 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 {
     int nVideoID = mapParams[ "Id" ].toInt();
 
-    QString sSQL = QString( "%1 WHERE class = 'VIDEO' AND intid=:VIDEOID " ).arg( GetItemListSQL( ) );
+    QString sSQL = QString( "%1 WHERE class = 'VIDEO' AND intid=:VIDEOID " )
+                                                    .arg( GetItemListSQL( ) );
 
     query.prepare( sSQL );
 
@@ -122,7 +123,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     QString        sCoverArt    = query.value( 6).toString();
 
     // VERBOSE(VB_UPNP,QString("ID = %1, Title = %2, fname = %3 sObjectId = %4").arg(nVidID).arg(sTitle).arg(sFileName).arg(sObjectId));
-    
+
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
     // ----------------------------------------------------------------------
@@ -147,28 +148,21 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sURIParams );
 
     QString sAlbumArtURI= QString( "%1GetVideoArt%2")
-	                    .arg( sURIBase   )
-	                    .arg( sURIParams );
+                        .arg( sURIBase   )
+                        .arg( sURIParams );
 
     CDSObject *pItem;
 
     if (sItemType == "FILE") 
     {
-	sURIParams = QString( "/Id%1" )
-		         .arg( nVidID );
-	sId        = QString( "%1/item%2")
-		         .arg( sObjectId )
-			 .arg( sURIParams );
+        sURIParams = QString( "/Id%1" ).arg( nVidID );
+        sId        = QString( "%1/item%2").arg( sObjectId ).arg( sURIParams );
 
-        pItem   = CDSObject::CreateVideoItem( sId, 
-                                                         sName, 
-                                                        sParentID );
+        pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
     }
     else if (sItemType == "FOLDER") 
     {
-	pItem   = CDSObject::CreateStorageFolder( sId,
-	                                                     sName,
-							     sParentID);
+        pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
     }
 
     pItem->m_bRestricted  = false;
@@ -185,9 +179,8 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
 
     if ( bAddRef )
     {
-        QString sRefId = QString( "%1/0/item%2")
-                            .arg( m_sExtensionId )
-                            .arg( sURIParams     );
+        QString sRefId = QString( "%1/0/item%2").arg( m_sExtensionId )
+                                                .arg( sURIParams     );
 
         pItem->SetPropValue( "refID", sRefId );
     }
@@ -195,17 +188,19 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     QFileInfo fInfo( sFileName );
     QDateTime fDate = fInfo.lastModified();
 
-    pItem->SetPropValue( "date"          , fDate.toString( "yyyy-MM-dd"));
+    pItem->SetPropValue( "date", fDate.toString( "yyyy-MM-dd"));
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
     // Add Video Resource Element based on File extension (HTTP)
     // ----------------------------------------------------------------------
-    
+
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
-    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
+    QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
+                                 "DLNA.ORG_FLAGS=0150000000000000000000000000"
+                                 "0000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetVideo%2").arg( sURIBase   )
-                                                    .arg( sURIParams ); 
+                                                .arg( sURIParams );
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
