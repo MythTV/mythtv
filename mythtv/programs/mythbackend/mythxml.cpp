@@ -1028,9 +1028,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId, dtStart );
 
     if (pInfo==NULL)
-    {
         return;
-    }
 
     if ( pInfo->hostname != gContext->GetHostName())
     {
@@ -1078,6 +1076,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
             pRequest->m_eResponseType   = ResponseTypeFile;
             pRequest->m_nResponseStatus = 404;
             previewgen->deleteLater();
+            delete pInfo;
             return;
         }
         previewgen->deleteLater();
