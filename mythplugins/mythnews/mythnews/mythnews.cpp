@@ -922,11 +922,21 @@ void MythNews::slotViewArticle()
                     QString mediaPage = HttpComms::getHttp(cmdURL);
                     if (mediaPage)
                     {
-                        int playerPos = mediaPage.find("player2.swf?") + 12;
-                        int playerEndPos = mediaPage.find("\"", playerPos);
-                        QString videoURL = mediaPage.mid(playerPos, playerEndPos - playerPos);
-                        // VERBOSE(VB_GENERAL, QString("MythNews: VideoURL %1").arg(videoURL));
-                        cmdURL = QString("http://youtube.com/get_video.php?%1").arg(videoURL);
+                        // If this breaks in the future, we are building the URL to download
+                        // a video.  At this time, this requires the video_id and the t argument
+                        // from the source HTML of the page
+                        int playerPos = mediaPage.find("swfArgs") + 7;
+
+                        int tArgStart = mediaPage.find("\"t\": \"", playerPos) + 6;
+                        int tArgEnd = mediaPage.find("\"", tArgStart);
+                        QString tArgString = mediaPage.mid(tArgStart, tArgEnd - tArgStart);
+
+                        int vidStart = mediaPage.find("\"video_id\": \"", playerPos) + 13;
+                        int vidEnd = mediaPage.find("\"", vidStart);
+                        QString vidString = mediaPage.mid(vidStart, vidEnd - vidStart);
+ 
+                        cmdURL = QString("http://youtube.com/get_video.php?video_id=%2&t=%1").arg(tArgString).arg(vidString);
+                        VERBOSE(VB_GENERAL, QString("MythNews: VideoURL %1").arg(cmdURL));
                     }
                 }
 
