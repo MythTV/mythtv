@@ -47,7 +47,7 @@ void *UPnpMedia::doUPnpMediaThread(void *param)
 {
     UPnpMedia *upnpmedia = (UPnpMedia*)param;
     upnpmedia->RunRebuildLoop();
- 
+
     return NULL;
 }
 
@@ -88,10 +88,12 @@ void UPnpMedia::FillMetaMaps(void)
     if (query.isActive() && query.size() > 0)
     {
         while(query.next())
-	{
-            m_mapTitleNames[query.value(0).toString()] = query.value(1).toString();
-	    m_mapCoverArt[query.value(0).toString()] = query.value(2).toString();
-	}
+        {
+            m_mapTitleNames[query.value(0).toString()] = query.value(1)
+                                                                .toString();
+            m_mapCoverArt[query.value(0).toString()] = query.value(2)
+                                                                .toString();
+        }
     }
 
 }
@@ -103,8 +105,9 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
     int parentid;
     QDir vidDir(directory);
     QString title;
-                                // If we can't read it's contents move on
-    //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID = %3").arg(directory).arg(rootID).arg(itemID));
+    // If we can't read it's contents move on
+    //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID =
+    //%3").arg(directory).arg(rootID).arg(itemID));
     if (!vidDir.isReadable())
         return itemID;
 
@@ -129,27 +132,27 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
 
         if (Info.isDir())
         {
-	    itemID++;
+            itemID++;
 
-	    query.prepare("INSERT INTO upnpmedia "
-                          "(intid, class, itemtype, parentid, itemproperties, "
-			  "filepath, filename, title, coverart) "
-			  "VALUES (:ITEMID, :ITEMCLASS, 'FOLDER', :PARENTID, '', "
-			  ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
+            query.prepare("INSERT INTO upnpmedia "
+                        "(intid, class, itemtype, parentid, itemproperties, "
+            "filepath, filename, title, coverart) "
+            "VALUES (:ITEMID, :ITEMCLASS, 'FOLDER', :PARENTID, '', "
+            ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
 
-	    query.bindValue(":ITEMCLASS", sMediaType);
-	    query.bindValue(":ITEMID", itemID);
-	    query.bindValue(":PARENTID", parentid);
-	    query.bindValue(":FILEPATH", fPath);
-	    query.bindValue(":FILENAME", fName);
+            query.bindValue(":ITEMCLASS", sMediaType);
+            query.bindValue(":ITEMID", itemID);
+            query.bindValue(":PARENTID", parentid);
+            query.bindValue(":FILEPATH", fPath);
+            query.bindValue(":FILENAME", fName);
 
-	    query.bindValue(":TITLE", GetTitleName(fPath,fName));
-	    query.bindValue(":COVERART", GetCoverArt(fPath));
+            query.bindValue(":TITLE", GetTitleName(fPath,fName));
+            query.bindValue(":COVERART", GetCoverArt(fPath));
 
-	    query.exec();
-			    
-	    itemID = buildFileList(Info.filePath(), 0, itemID, query);
-	    continue;
+            query.exec();
+
+            itemID = buildFileList(Info.filePath(), 0, itemID, query);
+            continue;
 
         }
         else
@@ -168,28 +171,28 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
             }
 */
 
-	    itemID++;
+            itemID++;
 
 //            VERBOSE(VB_UPNP, QString("UPnpMedia Video File : (%1) (%2)")
-//			          .arg(itemID)
+//                      .arg(itemID)
 //                                .arg(fName));
 
             query.prepare("INSERT INTO upnpmedia "
-                          "(intid, class, itemtype, parentid, itemproperties, "
-                          "filepath, filename, title, coverart) "
-                          "VALUES (:ITEMID, :ITEMCLASS, 'FILE', :PARENTID, '', "
-                          ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
+                        "(intid, class, itemtype, parentid, itemproperties, "
+                        "filepath, filename, title, coverart) "
+                        "VALUES (:ITEMID, :ITEMCLASS, 'FILE', :PARENTID, '', "
+                        ":FILEPATH, :FILENAME, :TITLE, :COVERART)");
 
-	    query.bindValue(":ITEMCLASS", sMediaType);
+            query.bindValue(":ITEMCLASS", sMediaType);
             query.bindValue(":ITEMID", itemID);
             query.bindValue(":PARENTID", parentid);
             query.bindValue(":FILEPATH", fPath);
             query.bindValue(":FILENAME", fName);
 
-	    query.bindValue(":TITLE", GetTitleName(fPath,fName));
-	    query.bindValue(":COVERART", GetCoverArt(fPath));
+            query.bindValue(":TITLE", GetTitleName(fPath,fName));
+            query.bindValue(":COVERART", GetCoverArt(fPath));
 
-	    query.exec();
+            query.exec();
 
         }
     }
@@ -220,46 +223,50 @@ void UPnpMedia::BuildMediaMap(void)
 
             query.prepare("DELETE FROM upnpmedia WHERE class = :ITEMCLASS");
             query.bindValue(":ITEMCLASS", sMediaType);
-       	    query.exec();
+            query.exec();
 
-	    query.exec("LOCK TABLES upnpmedia WRITE");
+            query.exec("LOCK TABLES upnpmedia WRITE");
 
             VERBOSE(VB_UPNP, LOC + QString("VideoStartupDir = %1")
-                                           .arg(RootVidDir));
+                                            .arg(RootVidDir));
 
-	    QStringList parts = QStringList::split( ":", RootVidDir );
+            QStringList parts = QStringList::split( ":", RootVidDir );
 
             nextID = STARTING_VIDEO_OBJECTID;
 
-	    for ( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it ) 
-	    {
-		filecount = nextID;
+            for ( QStringList::Iterator it = parts.begin(); it != parts.end();
+                                                                        ++it )
+            {
+                filecount = nextID;
 
-                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan starting in :%1:")
-    			            .arg(sMediaType)
-    			            .arg(*it));
+                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan "
+                                                "starting in :%1:")
+                                                    .arg(sMediaType)
+                                                    .arg(*it));
 
-                
-                nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID, query);
+                nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID,
+                                                                        query);
                 filecount = (filecount - nextID) * -1;
 
-                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found %1 objects").arg(filecount));
+                VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found "
+                                                "%1 objects").arg(filecount));
 
-	    }
+            }
 
-	    query.exec("UNLOCK TABLES");
+            query.exec("UNLOCK TABLES");
 
         }
         else
         {
-            VERBOSE(VB_GENERAL, LOC + "BuildMediaMap - no VideoStartupDir set, skipping scan.");
+            VERBOSE(VB_GENERAL, LOC + "BuildMediaMap - no VideoStartupDir set, "
+                                " skipping scan.");
         }
 
     }
     else
     {
-        VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap UNKNOWN MediaType %1 , skipping scan.")
-			               .arg(sMediaType));	    
+        VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap UNKNOWN MediaType %1 "
+                            ", skipping scan.").arg(sMediaType));
     }
 
 }
