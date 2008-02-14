@@ -117,6 +117,25 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     string_lock.unlock();
 }
 
+static int get_canonical_lang(const char *lang_cstr)
+{
+    if (lang_cstr[0] == '\0' || lang_cstr[1] == '\0')
+    {
+        return iso639_str3_to_key("und");
+    }
+    else if (lang_cstr[2] == '\0')
+    {
+        QString tmp2 = lang_cstr;
+        QString tmp3 = iso639_str2_to_str3(tmp2);
+        int lang = iso639_str3_to_key(tmp3.ascii());
+        return iso639_key_to_canonical_key(lang);
+    }
+    else
+    {
+        int lang = iso639_str3_to_key(lang_cstr);
+        return iso639_key_to_canonical_key(lang);
+    }
+}
 
 typedef MythDeque<AVFrame*> avframe_q;
 
@@ -1706,14 +1725,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            int lang = -1, lang_indx = 0;
-            if (ic->streams[i]->language)
-            {
-                lang = iso639_str3_to_key(ic->streams[i]->language);
-                lang = iso639_key_to_canonical_key(lang);
-                lang_indx = lang_sub_cnt[lang];
-                lang_sub_cnt[lang]++;
-            }
+            int lang = get_canonical_lang(ic->streams[i]->language);
+            int lang_indx = lang_aud_cnt[lang];
+            lang_indx = lang_sub_cnt[lang];
+            lang_sub_cnt[lang]++;
+
             tracks[kTrackTypeSubtitle].push_back(
                 StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
 
@@ -1726,14 +1742,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
-            int lang = -1, lang_indx = 0;
-            if (ic->streams[i]->language)
-            {
-                lang = iso639_str3_to_key(ic->streams[i]->language);
-                lang = iso639_key_to_canonical_key(lang);
-                lang_indx = lang_aud_cnt[lang];
-                lang_aud_cnt[lang]++;
-            }
+            int lang = get_canonical_lang(ic->streams[i]->language);
+            int lang_indx = lang_aud_cnt[lang];
+            lang_aud_cnt[lang]++;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
