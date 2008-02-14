@@ -723,7 +723,10 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
            fAspect = (float)(pImage->width()) / pImage->height();
 
     if (fAspect == 0)
+    {
+        delete pImage;
         return;
+    }
 
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
