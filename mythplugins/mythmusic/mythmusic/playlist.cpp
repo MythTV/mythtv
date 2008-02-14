@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <inttypes.h>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 using namespace std;

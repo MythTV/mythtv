@@ -6,6 +6,7 @@
 #include <cmath>
 
 // C++ headers
+#include <cstdlib>
 #include <iostream>
 using namespace std;
 
