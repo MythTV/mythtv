@@ -133,8 +133,7 @@ void AudioOutputDX::SetBlocking(bool blocking)
 void AudioOutputDX::Reconfigure(int audio_bits, 
                                 int audio_channels, 
                                 int audio_samplerate,
-                                int audio_passthru,
-                                AudioCodecMode laom)
+                                int audio_passthru)
 {
     if (dsbuffer)
         DestroyDSBuffer();
