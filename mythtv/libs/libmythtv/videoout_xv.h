@@ -84,6 +84,8 @@ class VideoOutputXv : public VideoOutput
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
+    void ResizeForGui(void); 
+    void ResizeForVideo(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);

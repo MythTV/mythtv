@@ -66,6 +66,8 @@ class VideoOutput
 
     virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);
     virtual void StopEmbedding(void);
+    virtual void ResizeForGui(void) {;} 
+    virtual void ResizeForVideo(void) {;}
 
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
