@@ -1028,11 +1028,13 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId, dtStart );
 
     if (pInfo==NULL)
+    {
         return;
+    }
 
     if ( pInfo->hostname != gContext->GetHostName())
     {
-        // We only handle requests for local resources   
+        // We only handle requests for local resources
 
         delete pInfo;
 
@@ -1075,10 +1077,13 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         {
             pRequest->m_eResponseType   = ResponseTypeFile;
             pRequest->m_nResponseStatus = 404;
+            previewgen->deleteLater();
             return;
         }
         previewgen->deleteLater();
     }
+
+    delete pInfo;
 
     pRequest->m_eResponseType   = ResponseTypeFile;
     pRequest->m_nResponseStatus = 200;
@@ -1094,7 +1099,10 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         fAspect = (float)(pImage->width()) / pImage->height();
 
     if (fAspect == 0)
+    {
+        delete pImage;
         return;
+    }
 
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
@@ -1114,8 +1122,13 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     // check to see if scaled preview image is already created.
     // ----------------------------------------------------------------------
 
+    
+
     if (QFile::exists( pRequest->m_sFileName ))
+    {
+        delete pImage;
         return;
+    }
 
     QImage img = pImage->smoothScale( nWidth, nHeight);
 
