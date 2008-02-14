@@ -304,7 +304,7 @@ static int encode_frame(
 
     //uint32_t x = *(uint32_t*)(data+8);
     // in place swab
-    swab((const unsigned char*)(data + 8), data + 8, enc_len);
+    swab((const char *)data + 8, (char *)data + 8, enc_len);
     //VERBOSE(VB_AUDIO|VB_TIMESTAMP, 
     //        QString("DigitalEncoder::Encode swab test %1 %2")
     //        .arg(x,0,16).arg(*(uint32_t*)(data+8),0,16));
