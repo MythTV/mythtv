@@ -17,8 +17,14 @@ class EITFixUp
   protected:
      // max length of subtitle field in db.
      static const uint SUBTITLE_MAX_LEN = 128;
+     // max number of words included in a subtitle
+     static const uint kMaxToTitle = 14;
      // max number of words up to a period, question mark
-     static const uint kDotToTitle = 8;
+     static const uint kDotToTitle = 9;
+     // max number of question/exclamation marks
+     static const uint kMaxQuestionExclamation = 2;
+     // max number of difference in words between a period and a colon
+     static const uint kMaxDotToColon = 5;
 
   public:
     enum FixUpType
@@ -79,32 +85,29 @@ class EITFixUp
     const QRegExp m_bellPPVDescriptionAllDay;
     const QRegExp m_bellPPVDescriptionAllDay2;
     const QRegExp m_bellPPVDescriptionEventId;
-    const QRegExp m_ukSubtitle;
     const QRegExp m_ukThen;
     const QRegExp m_ukNew;
-    const QRegExp m_ukT4;
-    const QRegExp m_ukEQ;
-    const QRegExp m_ukEPQ;
-    const QRegExp m_ukPStart;
-    const QRegExp m_ukPEnd;
-    const QRegExp m_ukSeries1;
-    const QRegExp m_ukSeries2;
-    const QRegExp m_ukSeries3;
+    const QRegExp m_ukCEPQ;
+    const QRegExp m_ukColonPeriod;
+    const QRegExp m_ukDotSpaceStart;
+    const QRegExp m_ukDotEnd;
+    const QRegExp m_ukSpaceColonStart;
+    const QRegExp m_ukSpaceStart;
+    const QRegExp m_ukSeries;
     const QRegExp m_ukCC;
     const QRegExp m_ukYear;
     const QRegExp m_uk24ep;
     const QRegExp m_ukStarring;
     const QRegExp m_ukBBC7rpt;
-    const QRegExp m_ukCBBC;
-    const QRegExp m_ukCBeebies;
-    const QRegExp m_ukStarring1;
+    const QRegExp m_ukDescriptionRemove;
+    const QRegExp m_ukTitleRemove;
     const QRegExp m_ukDoubleDotEnd;
     const QRegExp m_ukDoubleDotStart;
-    const QRegExp m_ukDotSpaceStart;
     const QRegExp m_ukTime;
     const QRegExp m_ukBBC34;
-    const QRegExp m_ukBBCSwitch;
     const QRegExp m_ukYearColon;
+    const QRegExp m_ukExclusionFromSubtitle;
+    const QRegExp m_ukCompleteDots;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
