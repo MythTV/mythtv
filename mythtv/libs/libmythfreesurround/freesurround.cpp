@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <cerrno>
 #include <iostream>
 #include <sstream>
-//#include "compat.h"
+#include "compat.h"
 #include "freesurround.h"
 #include "el_processor.h"
 #include <vector>

@@ -14,11 +14,11 @@
 #include <qdeepcopy.h>
 
 // MythTV headers
+#include "compat.h"
 #include "audiooutputbase.h"
 #include "audiooutputdigitalencoder.h"
 #include "SoundTouch.h"
 #include "freesurround.h"
-#include "compat.h"
 
 #define LOC QString("AO: ")
 #define LOC_ERR QString("AO, ERROR: ")
