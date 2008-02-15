@@ -56,7 +56,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
     }
 
     query.prepare(sql);
-    query.bindValue(":GROUP", m_groupname);
+    query.bindValue(":GROUP", m_groupname.utf8());
     query.bindValue(":HOSTNAME", m_hostname);
 
     if (!query.exec() || !query.isActive())
@@ -85,7 +85,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
     {
         do
         {
-            dirname = query.value(0).toString();
+            dirname = QString::fromUtf8(query.value(0).toString());
             dirname.replace(QRegExp("^\\s*"), "");
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
@@ -255,8 +255,8 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     QDir testDir("");
     while (query.next())
     {
-        m_groupname = query.value(0).toString();
-        dirname = query.value(1).toString();
+        m_groupname = QString::fromUtf8(query.value(0).toString());
+        dirname = QString::fromUtf8(query.value(1).toString());
 
         dirname.replace(QRegExp("^\\s*"), "");
         dirname.replace(QRegExp("\\s*$"), "");

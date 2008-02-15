@@ -931,8 +931,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->getProgramProperties();
 
         proginfo->recgroup = QString::fromUtf8(query.value(26).toString());
-        proginfo->storagegroup = query.value(27).toString();
-        proginfo->playgroup = query.value(21).toString();
+        proginfo->storagegroup = QString::fromUtf8(query.value(27).toString());
+        proginfo->playgroup = QString::fromUtf8(query.value(21).toString());
         proginfo->recpriority = query.value(22).toInt();
 
         proginfo->pathname = QString::fromUtf8(query.value(25).toString());
@@ -1764,10 +1764,10 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->repeat);
     query.bindValue(":TRANSCODER",  schd->GetTranscoder());
-    query.bindValue(":PLAYGROUP",   pg->playgroup);
+    query.bindValue(":PLAYGROUP",   pg->playgroup.utf8());
     query.bindValue(":RECPRIORITY", schd->getRecPriority());
     query.bindValue(":BASENAME",    pg->pathname);
-    query.bindValue(":STORGROUP",   pg->storagegroup);
+    query.bindValue(":STORGROUP",   pg->storagegroup.utf8());
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     schd->getProfileName());
@@ -4919,8 +4919,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
             proginfo->category     = QString::fromUtf8(query.value(15).toString());
             proginfo->recgroup     = QString::fromUtf8(query.value(16).toString());
-            proginfo->playgroup    = query.value(27).toString();
-            proginfo->storagegroup = query.value(36).toString();
+            proginfo->playgroup    = QString::fromUtf8(query.value(27).toString());
+            proginfo->storagegroup = QString::fromUtf8(query.value(36).toString());
             proginfo->recstatus    = rsRecorded;
 
             if ((pSchedList != NULL) && (proginfo->recendts > rectime))
