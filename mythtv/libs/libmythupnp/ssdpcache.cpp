@@ -198,7 +198,8 @@ SSDPCache::SSDPCache()
 
 SSDPCache::~SSDPCache()
 {
-    VERBOSE( VB_UPNP, "SSDPCache - Destructor" );
+    // FIXME: Using this causes crashes
+    //VERBOSE( VB_UPNP, "SSDPCache - Destructor" );
 
     Clear();
 }      

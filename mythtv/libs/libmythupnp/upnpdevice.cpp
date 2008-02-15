@@ -41,7 +41,8 @@ UPnpDeviceDesc::UPnpDeviceDesc()
 
 UPnpDeviceDesc::~UPnpDeviceDesc()
 {
-    VERBOSE( VB_UPNP, "UPnpDeviceDesc - Destructor" );
+    // FIXME: Using this causes crashes
+    //VERBOSE( VB_UPNP, "UPnpDeviceDesc - Destructor" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
