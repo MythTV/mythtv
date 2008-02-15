@@ -41,10 +41,14 @@ MediaRenderer::MediaRenderer()
 
     m_pHttpServer = new HttpServer( nPort ); 
 
+    if (!m_pHttpServer)
+        return;
+
     if (!m_pHttpServer->ok())
-    { 
+    {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
+        delete m_pHttpServer;
         return;
     }
 
