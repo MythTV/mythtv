@@ -271,12 +271,13 @@ class AvFormatDecoder : public DecoderBase
     // DVD
     int  lastdvdtitle;
     uint lastcellstart;
-    bool dvdmenupktseen;
-    bool indvdstill;
+    bool decodeStillFrame;
     bool dvd_xvmc_enabled;
     bool dvd_video_codec_changed;
     bool dvdTitleChanged;
-
+    bool mpeg_seq_end_seen;
+    /// \brief contains last dvd still frame decoded
+    AVPacket *lastDVDStillFrame;
 };
 
 #endif

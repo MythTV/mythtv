@@ -789,9 +789,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool isDummy;
 
     // DVD
-    bool indvdstillframe;
+    /// \brief true if dvd button is hidden
     bool hidedvdbutton;
     int need_change_dvd_track;
+    bool dvd_stillframe_showing;
 
     // Debugging variables
     Jitterometer *output_jmeter;
