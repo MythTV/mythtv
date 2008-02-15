@@ -56,7 +56,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     m_pHttpServer = new HttpServer( nPort ); 
 
     if (!m_pHttpServer->ok())
-    { 
+    {
         VERBOSE(VB_IMPORTANT, "MediaServer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
@@ -67,6 +67,39 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     m_sSharePath = gContext->GetShareDir();
     m_pHttpServer->m_sSharePath = m_sSharePath;
 
+    QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
+                                                m_sSharePath );
+    QString sDeviceType;
+
+    if ( bIsMaster )
+    {
+        sFileName  += "devicemaster.xml";
+        sDeviceType = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
+    }
+    else
+    {
+        sFileName += "deviceslave.xml";
+        sDeviceType = "urn:schemas-mythtv-org:device:SlaveMediaServer:1";
+    }
+
+    // ------------------------------------------------------------------
+    // Make sure our device Description is loaded.
+    // ------------------------------------------------------------------
+
+    VERBOSE(VB_UPNP, "MediaServer::Loading UPnp Description " + sFileName );
+
+    g_UPnpDeviceDesc.Load( sFileName );
+
+    UPnpDevice *pMythDevice = UPnpDeviceDesc::FindDevice( RootDevice(),
+                                                            sDeviceType );
+
+    // ------------------------------------------------------------------
+    // Register the MythXML protocol...
+    // ------------------------------------------------------------------
+
+    VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
+
+    m_pHttpServer->RegisterExtension( new MythXML( pMythDevice ));
 
     if (sIP == "localhost" || sIP == "127.0.0.1")
     {
@@ -77,8 +110,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     if (bDisableUPnp)
     {
-        cerr << "********* The UPNP service has been DISABLED with the "
-                "--noupnp option *********\n";
+        VERBOSE(VB_IMPORTANT, "*** The UPNP service has been DISABLED with the "
+                                "--noupnp option ***\n";
         return;
     }
 
@@ -94,39 +127,6 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     if (Initialize( sIPAddrList, nPort, m_pHttpServer ))
     {
-        QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
-                                                 m_sSharePath );
-        QString sDeviceType;
-
-        if ( bIsMaster )
-        {
-            sFileName  += "devicemaster.xml";
-            sDeviceType = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-        }
-        else
-        {
-            sFileName += "deviceslave.xml";
-            sDeviceType = "urn:schemas-mythtv-org:device:SlaveMediaServer:1";
-        }
-
-        // ------------------------------------------------------------------
-        // Make sure our device Description is loaded.
-        // ------------------------------------------------------------------
-
-        VERBOSE(VB_UPNP, "MediaServer::Loading UPnp Description " + sFileName );
-
-        g_UPnpDeviceDesc.Load( sFileName );
-
-        UPnpDevice *pMythDevice = UPnpDeviceDesc::FindDevice( RootDevice(), 
-                                                              sDeviceType );
-
-        // ------------------------------------------------------------------
-        // Register the MythXML protocol... 
-        // ------------------------------------------------------------------
-
-        VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
-
-        m_pHttpServer->RegisterExtension( new MythXML( pMythDevice ));
 
         // ------------------------------------------------------------------
         // Register any HttpServerExtensions... Only The Master Backend 
@@ -146,8 +146,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering MSRR Service." );
 
-	    m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice(), 
-				                             m_sSharePath ) );
+            m_pHttpServer->RegisterExtension( new UPnpMSRR( RootDevice(),
+                                                m_sSharePath ) );
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CMGR Service." );
 
@@ -157,9 +157,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             VERBOSE(VB_UPNP, "MediaServer::Registering CDS Service." );
 
-	    m_pUPnpCDS = new UPnpCDS ( RootDevice(), m_sSharePath );
-	    m_pHttpServer->RegisterExtension( m_pUPnpCDS );
-
+            m_pUPnpCDS = new UPnpCDS ( RootDevice(), m_sSharePath );
+            m_pHttpServer->RegisterExtension( m_pUPnpCDS );
 
             // ----------------------------------------------------------------
             // Register CDS Extensions
@@ -177,8 +176,8 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
             RegisterExtension(new UPnpCDSVideo());
 
-	    upnpMedia = new UPnpMedia(true,true);
-	    //upnpMedia->BuildMediaMap();
+            upnpMedia = new UPnpMedia(true,true);
+            //upnpMedia->BuildMediaMap();
         }
 
         // VERBOSE(VB_UPNP, QString( "MediaServer::Adding Context Listener" ));
