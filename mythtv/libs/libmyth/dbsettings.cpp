@@ -146,13 +146,13 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
                                         "This information is required."));
     dbServer->addChild(dbPassword);
 
-    dbType = new TransComboBoxSetting(false);
-    dbType->setLabel(QObject::tr("Database type"));
-    dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
-    dbType->setValue(0);
-    dbType->setHelpText(QObject::tr("The database implementation used "
-                                    "for your server."));
-    dbType->setEnabled(false);
+//     dbType = new TransComboBoxSetting(false);
+//     dbType->setLabel(QObject::tr("Database type"));
+//     dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
+//     dbType->setValue(0);
+//     dbType->setHelpText(QObject::tr("The database implementation used "
+//                                     "for your server."));
+//     dbType->setEnabled(false);
     //dbServer->addChild(dbType);
 
     addChild(dbServer);
