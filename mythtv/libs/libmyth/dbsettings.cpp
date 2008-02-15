@@ -19,7 +19,7 @@ protected:
     TransLineEditSetting *dbName;
     TransLineEditSetting *dbUserName;
     TransLineEditSetting *dbPassword;
-    TransComboBoxSetting *dbType;
+//    TransComboBoxSetting *dbType;
 
     QString              m_DBhostOverride;
 }; 
@@ -264,10 +264,10 @@ void MythDbSettings1::load()
     if (params.dbName.isEmpty())
         dbName->setLabel("* " + dbName->getLabel());
 
-    if (params.dbType == "QMYSQL3")
-        dbType->setValue(0);
-    else if (params.dbType == "QPSQL7")
-        dbType->setValue(1);
+//     if (params.dbType == "QMYSQL3")
+//         dbType->setValue(0);
+//     else if (params.dbType == "QPSQL7")
+//         dbType->setValue(1);
 }
 
 void MythDbSettings2::load()
@@ -293,7 +293,8 @@ void MythDbSettings1::save()
     params.dbUserName    = dbUserName->getValue();
     params.dbPassword    = dbPassword->getValue();
     params.dbName        = dbName->getValue();
-    params.dbType        = dbType->getValue();
+//    params.dbType        = dbType->getValue();
+    params.dbType        = "QMYSQL3";
 
     gContext->SaveDatabaseParams(params);
 }
