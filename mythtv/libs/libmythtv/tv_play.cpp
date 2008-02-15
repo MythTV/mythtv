@@ -5612,8 +5612,8 @@ bool TV::IsTunable(uint chanid, bool use_cache)
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
     vector<uint> excluded_cards;
-    if (recorder)
-        excluded_cards.push_back(recorder->GetRecorderNumber());
+    if (activerecorder)
+        excluded_cards.push_back(activerecorder->GetRecorderNumber());
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
     vector<uint> connected   = RemoteRequestFreeRecorderList();
