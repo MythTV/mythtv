@@ -368,6 +368,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                         QString name = e.attribute("name");
                         parent->AddFont(name, font);
                     }
+                    if (font)
+                        delete font;
                 }
                 else if (type == "imagetype" ||
                          type == "textarea" ||

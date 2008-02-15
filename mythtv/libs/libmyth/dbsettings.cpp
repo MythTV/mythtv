@@ -19,7 +19,7 @@ protected:
     TransLineEditSetting *dbName;
     TransLineEditSetting *dbUserName;
     TransLineEditSetting *dbPassword;
-    TransComboBoxSetting *dbType;
+//    TransComboBoxSetting *dbType;
 
     QString              m_DBhostOverride;
 }; 
@@ -146,13 +146,13 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
                                         "This information is required."));
     dbServer->addChild(dbPassword);
 
-    dbType = new TransComboBoxSetting(false);
-    dbType->setLabel(QObject::tr("Database type"));
-    dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
-    dbType->setValue(0);
-    dbType->setHelpText(QObject::tr("The database implementation used "
-                                    "for your server."));
-    dbType->setEnabled(false);
+//     dbType = new TransComboBoxSetting(false);
+//     dbType->setLabel(QObject::tr("Database type"));
+//     dbType->addSelection(QObject::tr("MySQL"), "QMYSQL3");
+//     dbType->setValue(0);
+//     dbType->setHelpText(QObject::tr("The database implementation used "
+//                                     "for your server."));
+//     dbType->setEnabled(false);
     //dbServer->addChild(dbType);
 
     addChild(dbServer);
@@ -264,10 +264,10 @@ void MythDbSettings1::load()
     if (params.dbName.isEmpty())
         dbName->setLabel("* " + dbName->getLabel());
 
-    if (params.dbType == "QMYSQL3")
-        dbType->setValue(0);
-    else if (params.dbType == "QPSQL7")
-        dbType->setValue(1);
+//     if (params.dbType == "QMYSQL3")
+//         dbType->setValue(0);
+//     else if (params.dbType == "QPSQL7")
+//         dbType->setValue(1);
 }
 
 void MythDbSettings2::load()
@@ -293,7 +293,8 @@ void MythDbSettings1::save()
     params.dbUserName    = dbUserName->getValue();
     params.dbPassword    = dbPassword->getValue();
     params.dbName        = dbName->getValue();
-    params.dbType        = dbType->getValue();
+//    params.dbType        = dbType->getValue();
+    params.dbType        = "QMYSQL3";
 
     gContext->SaveDatabaseParams(params);
 }

@@ -4284,6 +4284,8 @@ QString MainServer::LocalFilePath(QUrl &url)
                                 .arg(lpath).arg(pburl));
                 lpath = "";
             }
+
+            delete pginfo;
         }
         else if (!lpath.isEmpty())
         {
