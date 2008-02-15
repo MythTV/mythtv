@@ -3362,7 +3362,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", "");
 
-    QButton *playButton = new QButton();
+    QButton *playButton;
 
     if (!(m_player && m_player->IsSameProgram(curitem)))
     {
@@ -3425,7 +3425,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     popup->ShowPopup(this, SLOT(PopupDone(int)));
 
-    playButton->setFocus();
+    if (playButton)
+        playButton->setFocus();
 
     expectingPopup = true;
 }
