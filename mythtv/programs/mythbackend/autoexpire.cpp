@@ -978,8 +978,8 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         proginfo->programid = query.value(11).toString();
         proginfo->recpriority = query.value(12).toInt();
         proginfo->filesize = stringToLongLong(query.value(15).toString());
-        proginfo->recgroup = query.value(16).toString();
-        proginfo->storagegroup = query.value(17).toString();
+        proginfo->recgroup = QString::fromUtf8(query.value(16).toString());
+        proginfo->storagegroup = QString::fromUtf8(query.value(17).toString());
         proginfo->pathname = query.value(18).toString();
 
         VERBOSE(VB_FILE, LOC + QString("    Adding   "

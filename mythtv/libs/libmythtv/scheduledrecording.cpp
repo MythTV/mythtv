@@ -483,7 +483,7 @@ void ScheduledRecording::save(bool sendSig)
                 "WHERE recordid = :RECORDID ;");
         query.bindValue(":RECPRIORITY", getRecPriority());
         query.bindValue(":TRANSCODER", transcoder->getValue().toInt());
-        query.bindValue(":PLAYGROUP", playgroup->getValue());
+        query.bindValue(":PLAYGROUP", playgroup->getValue().utf8());
         query.bindValue(":RECORDID", getRecordID());
 
         if (!query.exec())

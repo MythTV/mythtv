@@ -2820,9 +2820,9 @@ void Scheduler::AddNewRecords(void)
         p->recstartts = result.value(18).toDateTime();
         p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
-        p->recgroup = result.value(21).toString();
-        p->storagegroup = result.value(42).toString();
-        p->playgroup = result.value(36).toString();
+        p->recgroup = QString::fromUtf8(result.value(21).toString());
+        p->storagegroup = QString::fromUtf8(result.value(42).toString());
+        p->playgroup = QString::fromUtf8(result.value(36).toString());
         p->chancommfree = (result.value(23).toInt() == -2);
         p->hostname = result.value(43).toString();
         p->cardid = result.value(24).toInt();
@@ -3158,13 +3158,13 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
                 QString::fromUtf8(result.value(7).toString());
 
             proginfo->recpriority = result.value(8).toInt();
-            proginfo->channame = 
+            proginfo->channame =
                 QString::fromUtf8(result.value(10).toString());
             if (proginfo->channame.isNull())
                 proginfo->channame = "";
-            proginfo->recgroup = 
+            proginfo->recgroup =
                 QString::fromUtf8(result.value(12).toString());
-            proginfo->playgroup = 
+            proginfo->playgroup =
                 QString::fromUtf8(result.value(22).toString());
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
