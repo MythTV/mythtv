@@ -111,7 +111,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     if (bDisableUPnp)
     {
         VERBOSE(VB_IMPORTANT, "*** The UPNP service has been DISABLED with the "
-                                "--noupnp option ***\n";
+                                "--noupnp option ***");
         return;
     }
 
