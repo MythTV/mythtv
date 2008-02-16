@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2007-12-27, v0.20.27
+  2008-02-13, v0.21.00pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -371,9 +371,11 @@
   +o  You may install multiple video capture cards to record more than
      one program at a time.
 
-  +o  You can have multiple servers, each with multiple capture cards in
-     them.  All servers are centrally managed and all programs are
-     scheduled by the Master backend.
+  +o  You can have multiple servers (called "backends"), each with
+     multiple capture cards in them.  All scheduling is performed by the
+     Master backend, which arbitrates which recording will be performed
+     by each device.  All recording requests are managed by the Master
+     backend, so you can schedule a recording from any client.
 
   +o  You can have multiple clients (called "frontends" in MythTV
      parlance), each with a common view of all available programs.  Any
@@ -407,8 +409,6 @@
 
   +o  MythControls, an application to configure your remote control
 
-  +o  MythDVD, a DVD viewer / ripper
-
   +o  MythFlix, a Netflix module
 
   +o  MythGallery, a picture-viewing application
@@ -422,7 +422,8 @@
 
   +o  MythPhone, phone and videophone using SIP.
 
-  +o  MythVideo, a media-viewer for content not created within MythTV
+  +o  MythVideo, DVD ripper and a media-viewer for content not created
+     within MythTV
 
   +o  MythWeather
 
@@ -430,7 +431,7 @@
      browser.  With MythWeb, you can schedule and delete recordings,
      change keybindings and more.  With proper security, you may even
      schedule a program over the Internet and have it immediately acted
-     on by the scheduler.
+     on by the Master backend.
 
   [1m1.2.  QuickStart[0m
 
@@ -483,11 +484,11 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
-  This HOWTO is for MythTV v0.20.2
+  This HOWTO is for MythTV v0.21
 
   Release notes for this version may be found in the MythTV Wiki at
-  http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2
-  <http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.20.2>
+  http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21
+  <http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21>
 
 
   [1m1.5.  Books about MythTV[0m
@@ -771,24 +772,20 @@
   MythTV creates large files, many in excess of 4GB.  You [4mmust[24m use a 64
   or 128 bit filesystem. These will allow you to create large files.
   Filesystems known to have problems with large files are FAT (all
-  versions), and ReiserFS (versions 3 and 4). The ext3 filesystem can be
-  made to work but requires great care in how you format and mount the
-  volume.
+  versions), and ReiserFS (versions 3 and 4).
 
   Because MythTV creates very large files, a filesystem that does well
   at deleting large files is important.  Numerous benchmarks show that
   XFS and JFS do very well at this task.  You are [4mstrongly[24m encouraged to
   consider one of these for your MythTV filesystem.  JFS is the absolute
   best at deletion, so you may want to try it if XFS gives you problems.
-  MythTV .20 and above also incorporates a "slow delete" feature, which
-  progressively shrinks the file rather than attempting to delete it all
-  at once, so if you're more comfortable with a filesystem such as ext3
-  (whose delete performance for large files isn't that good) you may use
-  it rather than one of the known-good high-performance file systems.
+  MythTV .21 incorporates a "slow delete" feature, which progressively
+  shrinks the file rather than attempting to delete it all at once, so
+  if you're more comfortable with a filesystem such as ext3 (whose
+  delete performance for large files isn't that good) you may use it
+  rather than one of the known-good high-performance file systems.
   There are other ramifications to using XFS and JFS - neither offer the
   opportunity to shrink a filesystem; they may only be expanded.
-
-
 
                  [1mNOTE[22m:  You [4mmust[24m [4mnot[24m use ReiserFS v3 for
   your recordings. You will get corrupted recordings if you do.
@@ -904,6 +901,7 @@
   http://www.linuxtv.org/wiki/index.php/Main_Page
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
+
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels.  See
   http://www.lyngsat.com/ <http://www.lyngsat.com/> for the types of
@@ -967,7 +965,6 @@
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
   hardware acceleration.  If you enable the hardware acceleration, you
   may be able to use a 1.8GHz processor.
-
 
 
   [1m3.1.5.5.  Firewire.[0m
@@ -1036,6 +1033,7 @@
 
   +o  ATI All-in-Wonder series
 
+
   [1m3.1.7.  Sound card[0m
 
   The system needs a sound card or an on-board equivalent on the
@@ -1095,6 +1093,7 @@
 
   Note that with some video cards and X drivers, XVideo extensions are
   only supported on the VGA output, and not on the TV output.
+
 
   [1m3.1.9.  Cards with TV-out[0m
 
@@ -1162,6 +1161,7 @@
   The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it
   also supports audio output, but you need to connect that audio output
   to something.  There are two courses of action you may take:
+
   1. Take the audio output from the PVR-350 and plug it into an input on
      a sound card on your machine.  You may then use MythTV's internal
      audio controls.
@@ -1224,6 +1224,8 @@
 
   A number of people have created pre-compiled packages for MythTV that
   may make your installation easier.
+
+
 
           [1mBIG FAT WARNING[22m:  This HOWTO assumes that you have [4mnot[0m
   installed MythTV from a package.  All example command lines and file
@@ -8620,12 +8622,11 @@
 
 
 
-    [1mNOTE[22m:  If you are running a trunk version of MythTV after r12151,
-  and you are using LVM to create one large filesystem to store your
-  recordings, it's no longer recommended that you go the LVM route. the
-  preferred solution is to use ``Storage Groups''. They're more flexible
-  and less likely to lose all of your recordings if you have a drive
-  failure.
+      [1mNOTE[22m:  If you are running MythTV 0.21 and you are using LVM to
+  create one large filesystem to store your recordings, it's no longer
+  recommended that you go the LVM route. The preferred solution is to
+  use ``Storage Groups''.  They're more flexible and less likely to lose
+  all of your recordings if you have a drive failure.
 
   If you don't understand how to partition a drive, or how to change the
   partition type you should stop and look at documentation on how to
