@@ -200,6 +200,8 @@ void DVBStreamHandler::Stop(void)
 
     if (IsRunning())
     {
+        if (_device_read_buffer)
+            _device_read_buffer->Stop();
         SetRunning(false);
         pthread_join(_reader_thread, NULL);
     }
