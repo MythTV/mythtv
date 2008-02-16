@@ -819,6 +819,13 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     // Premiere and Pro7/Sat.1
     fix[133 << 16] = EITFixUp::kEFixForceISO8859_15;
+
+    // DVB-T Spain
+    fix[       10LL << 32 | 8916 << 16 ] = // national multiplex
+        fix[   12LL << 32 | 8916 << 16 ] = // national multiplex
+        fix[   13LL << 32 | 8916 << 16 ] = // national multiplex
+        fix[ 6200LL << 32 | 8916 << 16 ] = // Madrid (TeleMadrid)
+        EITFixUp::kEFixForceISO8859_15;
 }
 
 static int calc_eit_utc_offset(void)
