@@ -377,6 +377,17 @@ int VideoOutputXv::GetRefreshRate(void)
     return (int)rate;
 }
 
+void VideoOutputXv::ResizeForVideo(void) 
+{
+    ResizeForVideo(video_dim.width(), video_dim.height());
+}
+
+void VideoOutputXv::ResizeForGui(void)
+{
+    if (display_res)
+        display_res->SwitchToGUI();
+}
+
 /**
  * \fn VideoOutputXv::ResizeForVideo(uint width, uint height)
  * Sets display parameters based on video resolution.
@@ -2376,10 +2387,6 @@ void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
     XJ_curwin = wid;
 
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
-
-    // Switch to GUI size
-    if (display_res)
-        display_res->SwitchToGUI();
 }
 
 void VideoOutputXv::StopEmbedding(void)
@@ -2391,10 +2398,6 @@ void VideoOutputXv::StopEmbedding(void)
 
     XJ_curwin = XJ_win;
     VideoOutput::StopEmbedding();
-
-    // Switch back to resolution for full screen video
-    if (display_res)
-        display_res->SwitchToVideo(video_dim.width(), video_dim.height());
 }
 
 VideoFrame *VideoOutputXv::GetNextFreeFrame(bool /*allow_unsafe*/)

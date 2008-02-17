@@ -117,6 +117,25 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     string_lock.unlock();
 }
 
+static int get_canonical_lang(const char *lang_cstr)
+{
+    if (lang_cstr[0] == '\0' || lang_cstr[1] == '\0')
+    {
+        return iso639_str3_to_key("und");
+    }
+    else if (lang_cstr[2] == '\0')
+    {
+        QString tmp2 = lang_cstr;
+        QString tmp3 = iso639_str2_to_str3(tmp2);
+        int lang = iso639_str3_to_key(tmp3.ascii());
+        return iso639_key_to_canonical_key(lang);
+    }
+    else
+    {
+        int lang = iso639_str3_to_key(lang_cstr);
+        return iso639_key_to_canonical_key(lang);
+    }
+}
 
 typedef MythDeque<AVFrame*> avframe_q;
 
@@ -401,9 +420,10 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
-      dvdmenupktseen(false), indvdstill(false),
+      decodeStillFrame(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      dvdTitleChanged(false) 
+      dvdTitleChanged(false), mpeg_seq_end_seen(false),
+      lastDVDStillFrame(NULL)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
@@ -432,6 +452,9 @@ AvFormatDecoder::~AvFormatDecoder()
         av_free_packet(pkt);
         delete pkt;
     }
+
+    if (lastDVDStillFrame)
+        av_free_packet(lastDVDStillFrame);
 
     CloseContext();
     delete ccd608;
@@ -1706,14 +1729,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            int lang = -1, lang_indx = 0;
-            if (ic->streams[i]->language)
-            {
-                lang = iso639_str3_to_key(ic->streams[i]->language);
-                lang = iso639_key_to_canonical_key(lang);
-                lang_indx = lang_sub_cnt[lang];
-                lang_sub_cnt[lang]++;
-            }
+            int lang = get_canonical_lang(ic->streams[i]->language);
+            int lang_indx = lang_aud_cnt[lang];
+            lang_indx = lang_sub_cnt[lang];
+            lang_sub_cnt[lang]++;
+
             tracks[kTrackTypeSubtitle].push_back(
                 StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
 
@@ -1726,14 +1746,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
-            int lang = -1, lang_indx = 0;
-            if (ic->streams[i]->language)
-            {
-                lang = iso639_str3_to_key(ic->streams[i]->language);
-                lang = iso639_key_to_canonical_key(lang);
-                lang_indx = lang_aud_cnt[lang];
-                lang_aud_cnt[lang]++;
-            }
+            int lang = get_canonical_lang(ic->streams[i]->language);
+            int lang_indx = lang_aud_cnt[lang];
+            lang_aud_cnt[lang]++;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
@@ -2261,16 +2276,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     while (bufptr < bufend)
     {
         bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
-        
-        if (ringBuffer->isDVD() &&
-            start_code_state == SEQ_END_CODE && !indvdstill)
+       
+        if (ringBuffer->isDVD() && start_code_state == SEQ_END_CODE)
         {
-            ringBuffer->DVD()->InStillFrame(true);
-            gContext->RestoreScreensaver();
-            indvdstill = true;
-            d->ResetMPEG2();
-            if (storedPackets.isEmpty())
-                ringBuffer->DVD()->SeekCellStart();
+            mpeg_seq_end_seen = true;
             return;
         }
 
@@ -2978,8 +2987,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             selectedVideoIndex = 0;
             if (dvdTitleChanged)
             {
-                if ((storedPackets.count() > 10 && !indvdstill) ||
-                    indvdstill)
+                if ((storedPackets.count() > 10 && !decodeStillFrame) ||
+                    decodeStillFrame)
                 {
                     RemoveAudioStreams();
                     storevideoframes = false;
@@ -2990,12 +2999,26 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
             else
             {
-                if (storedPackets.count() < 2 && !indvdstill)
-                    storevideoframes = true;
+                storevideoframes = false;
+                int numVidFrames = 0;
+                if (GetNVP() && GetNVP()->getVideoOutput())
+                    numVidFrames = GetNVP()->getVideoOutput()->ValidVideoFrames();
+             
+                if (numVidFrames == 0 && lastDVDStillFrame &&
+                    ringBuffer->DVD()->InStillFrame())
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + "DVD: in still frame but "
+                        "there is no picture. Using last stored still frame");
+                    storedPackets.append(lastDVDStillFrame);
+                    lastDVDStillFrame = NULL;
+                    decodeStillFrame = true;
+                }
                 else
-                    storevideoframes = false;
-            }
-                
+                {   
+                    if (storedPackets.count() < 2 && !decodeStillFrame)
+                        storevideoframes = true;
+                }
+            }          
             if (GetNVP()->AtNormalSpeed() &&
                 ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
             {
@@ -3096,16 +3119,32 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         if (ringBuffer->isDVD() && 
             curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            if (ringBuffer->DVD()->InStillFrame() &&
-                !indvdstill)
+            MpegPreProcessPkt(curstream, pkt);
+
+            if (mpeg_seq_end_seen)
             {
-                ringBuffer->DVD()->InStillFrame(false);
-                gContext->DisableScreensaver();
+                mpeg_seq_end_seen = false;
+               
+                if (storevideoframes)
+                    ringBuffer->DVD()->InStillFrame(true);
+                else
+                {
+                    av_free_packet(pkt);
+                    pkt = NULL;
+                    continue;
+                }
             }
-            
-            if (pkt->size < 10)
-                MpegPreProcessPkt(curstream, pkt);
-            else if (!d->HasMPEG2Dec())
+
+            bool inDVDStill = ringBuffer->DVD()->InStillFrame();
+
+            if (!decodeStillFrame && inDVDStill)
+            {
+                decodeStillFrame = true;
+                gContext->RestoreScreensaver();
+                d->ResetMPEG2();
+            }
+
+            if (!d->HasMPEG2Dec())
             {
                 int current_width = curstream->codec->width;
                 int video_width = GetNVP()->GetVideoWidth();
@@ -3167,7 +3206,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
             {
-                MpegPreProcessPkt(curstream, pkt);
+                if (!ringBuffer->isDVD())
+                    MpegPreProcessPkt(curstream, pkt);
             }
             else if (context->codec_id == CODEC_ID_H264)
             {
@@ -3188,13 +3228,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         HandleGopStart(pkt);
                     }
                 }
-            }
-
-            if (len < 10 && indvdstill)
-            {
-                indvdstill = false;
-                av_free_packet(pkt);
-                continue;
             }
 
             if (framesRead == 0 && !justAfterChange &&
@@ -3513,7 +3546,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     avcodeclock.lock();
                     if (d->HasDecoder())
                     {
-                        if (indvdstill)
+                        if (decodeStillFrame)
                         {
                             int count = 0;
                             // HACK
@@ -3535,7 +3568,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ret = avcodec_decode_video(context, &mpa_pic,
                                                    &gotpicture, ptr, len);
                         // Reparse it to not drop the DVD still frame
-                        if (indvdstill)
+                        if (decodeStillFrame)
                             ret = avcodec_decode_video(context, &mpa_pic,
                                                         &gotpicture, ptr, len);
                     }
@@ -3671,10 +3704,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     gotvideo = 1;
                     framesPlayed++;
 
-                    if (dvdmenupktseen && !dvdTitleChanged)
+                    if (ringBuffer->InDVDMenuOrStillFrame() && decodeStillFrame)
                     {
-                        ringBuffer->DVD()->SetMenuPktPts(pts);
-                        dvdmenupktseen = false;
+                        if (lastDVDStillFrame)
+                            av_free_packet(lastDVDStillFrame);
+                        av_dup_packet(pkt);
+                        lastDVDStillFrame = pkt;
+                        pkt = NULL;
+                        decodeStillFrame = false;
                     }
 
                     lastvpts = temppts;
@@ -3690,7 +3727,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         if (ringBuffer->DVD()->IsInMenu())
                         {
-                            dvdmenupktseen = true;
                             ringBuffer->DVD()->GetMenuSPUPkt(ptr, len,
                                                              curstream->id);
                         }

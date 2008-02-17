@@ -362,8 +362,8 @@ static HostComboBox *DefaultView()
     gc->addSelection(QObject::tr("Show Recording Groups only"),
             QString::number(PlaybackBox::RecGroups));
 
-    gc->setHelpText(QObject::tr("Select what type of grouping to show on the Watch Recordings screen "
-                    "by default."));
+    gc->setHelpText(QObject::tr("Select what type of grouping to show on the "
+                    "Watch Recordings screen by default."));
 
     return gc;
 }
@@ -386,8 +386,8 @@ static HostCheckBox *LiveTVInAllPrograms()
                              "\"All Programs\" filter"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If this setting is disabled, LiveTV "
-                   "recordings will only be visible via the special \"LiveTV\" "
-                   "Recording Group."));
+                    "recordings will only be visible via the special "
+                    "\"LiveTV\" Recording Group."));
     return gc;
 }
 
@@ -597,10 +597,9 @@ static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
     bs->setLabel(QObject::tr("Extra Disk Space"));
-    bs->setHelpText(QObject::tr(
-                        "Extra disk space (in Gigabytes) that you want to "
-                        "keep free on the recording file systems beyond what "
-                        "MythTV requires."));
+    bs->setHelpText(QObject::tr("Extra disk space (in Gigabytes) that you want " 
+                    "to keep free on the recording file systems beyond what "
+                    "MythTV requires."));
     bs->setValue(1);
     return bs;
 };
@@ -611,8 +610,8 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
     cb->setLabel(QObject::tr("Auto Expire Instead of Delete Recording"));
     cb->setValue(false);
     cb->setHelpText(QObject::tr("Instead of deleting a recording, "
-                                "move recording to the 'Deleted' recgroup "
-                                "and turn on autoexpire."));
+                    "move recording to the 'Deleted' recgroup and turn on "
+                    "autoexpire."));
     return cb;
 }
 
@@ -620,10 +619,9 @@ static GlobalSpinBox *DeletedMaxAge()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", 0, 365, 1);
     bs->setLabel(QObject::tr("Deleted Max Age"));
-    bs->setHelpText(QObject::tr(
-                    "When set to a number greater than zero, AutoExpire will "
-                    "force expiration of Deleted recordings when they are "
-                    "this many days old."));
+    bs->setHelpText(QObject::tr("When set to a number greater than zero, "
+                    "AutoExpire will force expiration of Deleted recordings "
+                    "when they are this many days old."));
     bs->setValue(0);
     return bs;
 };
@@ -669,9 +667,8 @@ static GlobalComboBox *AutoExpireMethod()
     bc->addSelection(QObject::tr("Lowest Priority First"), "2");
     bc->addSelection(QObject::tr("Weighted Time/Priority Combination"), "3");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
-                                "shows to delete first.  LiveTV recordings "
-                                "will always expire before normal "
-                                "recordings."));
+                    "shows to delete first.  LiveTV recordings will always "
+                    "expire before normal recordings."));
     bc->setValue(1);
     return bc;
 }
@@ -682,8 +679,8 @@ static GlobalCheckBox *AutoExpireWatchedPriority()
     bc->setLabel(QObject::tr("Watched before UNwatched")); 
     bc->setValue(false); 
     bc->setHelpText(QObject::tr("If set, programs that have been marked as "
-                    "watched will be expired first, before programs that "
-                    "have not been watched."));
+                    "watched will be expired before programs that have not "
+                    "been watched."));
     return bc;
 }
 
@@ -713,11 +710,10 @@ static GlobalSpinBox *AutoExpireLiveTVMaxAge()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireLiveTVMaxAge", 1, 365, 1);
     bs->setLabel(QObject::tr("LiveTV Max Age"));
-    bs->setHelpText(QObject::tr(
-                        "AutoExpire will force expiration of LiveTV "
-                        "recordings when they are this many days old.  "
-                        "LiveTV recordings may also be expired early if "
-                        "necessary to free up disk space."));
+    bs->setHelpText(QObject::tr("AutoExpire will force expiration of LiveTV "
+                    "recordings when they are this many days old. LiveTV "
+                    "recordings may also be expired early if necessary to "
+                    "free up disk space."));
     bs->setValue(1);
     return bs;
 };
@@ -779,9 +775,8 @@ static GlobalLineEdit *OverTimeCategory()
     ge->setLabel(QObject::tr("Category of shows to be extended"));
     ge->setValue(QObject::tr("category name"));
     ge->setHelpText(QObject::tr("For a specific category (e.g. "
-                                "\"Sports event\"), request that shows "
-                                "be autoextended.  Only works if a "
-                                "show's category can be determined."));
+                    "\"Sports event\"), request that shows be autoextended. "
+                    "Only works if a show's category can be determined."));
     return ge;
 }
 
@@ -792,10 +787,9 @@ static GlobalSpinBox *CategoryOverTime()
     bs->setLabel(QObject::tr("Record past end of show (in minutes)"));
     bs->setValue(30);
     bs->setHelpText(QObject::tr("For the specified category, an attempt "
-                                "will be made to extend the recording "
-                                "by the specified time.  It is ignored "
-                                "when two shows have been scheduled "
-                                "without enough time in between."));
+                    "will be made to extend the recording by the specified "
+                    "time.  It is ignored when two shows have been scheduled "
+                    "without enough time in between."));
     return bs;
 }
 
@@ -888,9 +882,9 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     deint1->setLabel(tr("Fallback"));
     filters->setLabel(tr("Custom Filters"));
 
-    max_cpus->setHelpText(tr("Maximal number of CPU cores used for decoding.") +
+    max_cpus->setHelpText(tr("Maximum number of CPU cores used for decoding.") +
                           (ENABLE_THREADS ? "" :
-                          tr(" Multithreaded decoding disabled only one CPU "
+                          tr(" Multithreaded decoding disabled-only one CPU "
                              "will be used, please recompile with "
                              "--enable-ffmpeg-pthreads to enable.")));
     filters->setHelpText(
@@ -1548,9 +1542,8 @@ static HostSpinBox *OSDGeneralTimeout()
     HostSpinBox *gs = new HostSpinBox("OSDGeneralTimeout", 1, 30, 1);
     gs->setLabel(QObject::tr("General OSD time-out (sec)"));
     gs->setValue(2);
-    gs->setHelpText(QObject::tr(
-                        "How many seconds an on-screen display "
-                        "will be active after it is first activated."));
+    gs->setHelpText(QObject::tr("Length of time an on-screen display "
+                    "window will be visible."));
     return gs;
 }
 
@@ -1559,10 +1552,8 @@ static HostSpinBox *OSDProgramInfoTimeout()
     HostSpinBox *gs = new HostSpinBox("OSDProgramInfoTimeout", 1, 30, 1);
     gs->setLabel(QObject::tr("Program Info OSD time-out"));
     gs->setValue(3);
-    gs->setHelpText(QObject::tr(
-                        "How many seconds the on-screen display "
-                        "will display the program information "
-                        "after it is first displayed."));
+    gs->setHelpText(QObject::tr("Length of time the on-screen display "
+                    "will display program information."));
     return gs;
 }
 
@@ -1571,9 +1562,8 @@ static HostSpinBox *OSDNotifyTimeout()
     HostSpinBox *gs = new HostSpinBox("OSDNotifyTimeout", 1, 30, 1);
     gs->setLabel(QObject::tr("UDP Notify OSD time-out"));
     gs->setValue(5);
-    gs->setHelpText(QObject::tr(
-                        "How many seconds an on-screen display "
-                        "will be active for UDP Notify events."));
+    gs->setHelpText(QObject::tr("How many seconds an on-screen display "
+                    "will be active for UDP Notify events."));
     return gs;
 }
 
@@ -1641,7 +1631,7 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
     gs->setLabel(QObject::tr("Text zoom percentage"));
     gs->setValue(100);
-    gs->setHelpText(QObject::tr("Use this to enlage or shrink captions."));
+    gs->setHelpText(QObject::tr("Use this to enlarge or shrink captions."));
 
     return gs;
 }
@@ -1887,7 +1877,7 @@ static HostCheckBox *PreferCC708()
             "the old EIA-608 captions in ATSC streams.") + " " +
         QObject::tr(
             "This is the default, but as of early 2008 most stations are "
-            "not broadcasting usable EIA-708 captions."));
+            "not broadcasting useable EIA-708 captions."));
 
     return gc;
 }
@@ -1973,8 +1963,7 @@ static HostCheckBox *AudioNagSetting()
     gc->setLabel(QObject::tr("Warn on no audio output"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, MythTV will warn you "
-                                "whenever you try to watch a something "
-                                "and MythTV can't access the soundcard."));
+                    "if it can't access the soundcard."));
     return gc;
 }
 
@@ -2037,17 +2026,17 @@ static HostCheckBox *ContinueEmbeddedTVPlay()
     gc->setLabel(QObject::tr("Continue Playback When Embedded"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                    "This option, continues TV playback, when the TV window "
+                    "This option continues TV playback when the TV window "
                     "is embedded in the upcoming program list or recorded "
                     "list. The default is to pause the recorded show when "
-                    "embedded"));
+                    "embedded."));
     return gc;
 }
 
 static HostCheckBox *AutomaticSetWatched()
 {
     HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
-    gc->setLabel(QObject::tr("Automatically mark a record watched"));
+    gc->setLabel(QObject::tr("Automatically mark a recording as watched"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, when you exit near the end of a "
                     "recording it will be marked as watched. The automatic "
@@ -2277,7 +2266,7 @@ static HostComboBox *XineramaMonitorAspectRatio()
     gc->addSelection(QObject::tr("16:10"), "1.6");
     gc->setHelpText(QObject::tr(
                         "The aspect ratio of a Xinerama display can not be "
-                        "queried from the display, so you must specify it."));
+                        "queried from the display, so it must be specified."));
     return gc;
 }
 
@@ -2371,7 +2360,7 @@ static HostSpinBox *DisplaySizeWidth()
     HostSpinBox *gs = new HostSpinBox("DisplaySizeWidth", 0, 10000, 1);
     gs->setLabel(QObject::tr("Display Size - Width"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Horizontal size of the monitor or TV, is used "
+    gs->setHelpText(QObject::tr("Horizontal size of the monitor or TV. Used "
                     "to calculate the actual aspect ratio of the display. This "
                     "will override the DisplaySize from the system."));
     return gs;
@@ -2382,7 +2371,7 @@ static HostSpinBox *DisplaySizeHeight()
     HostSpinBox *gs = new HostSpinBox("DisplaySizeHeight", 0, 10000, 1);
     gs->setLabel(QObject::tr("Display Size - Height"));
     gs->setValue(0);
-    gs->setHelpText(QObject::tr("Vertical size of the monitor or TV, is used "
+    gs->setHelpText(QObject::tr("Vertical size of the monitor or TV. Used "
                     "to calculate the actual aspect ratio of the display. This "
                     "will override the DisplaySize from the system."));
     return gs;
@@ -2591,11 +2580,11 @@ class VideoModeSettings : public TriggeredConfigurationGroup
 static HostCheckBox *HideMouseCursor()
 {
     HostCheckBox *gc = new HostCheckBox("HideMouseCursor");
-    gc->setLabel(QObject::tr("Hide Mouse Cursor in Myth"));
+    gc->setLabel(QObject::tr("Hide Mouse Cursor in MythTV"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Toggles mouse cursor visibility. "
-                    "Most of the Myth GUI does not respond "
-                    "to mouse clicks, this is only to avoid "
+                    "Most of the MythTV GUI does not respond "
+                    "to mouse clicks. Use this option to avoid "
                     "\"losing\" your mouse cursor."));
     return gc;
 };
@@ -2738,7 +2727,9 @@ static HostComboBox *ThemePainter()
     gc->setLabel(QObject::tr("Paint Engine"));
     gc->addSelection(QObject::tr("Qt"), "qt");
     gc->addSelection(QObject::tr("OpenGL"), "opengl");
-    gc->setHelpText(QObject::tr("This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart."));
+    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw.  If "
+                    "you have decent hardware, select OpenGL. Changing this "
+                    "requires a restart."));
     return gc;
 }
 

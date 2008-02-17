@@ -258,8 +258,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       livetvchain(NULL),            m_tv(NULL), 
       isDummy(false),               
       // DVD stuff
-      indvdstillframe(false), hidedvdbutton(true),
-      need_change_dvd_track(0),
+      hidedvdbutton(true), need_change_dvd_track(0),
+      dvd_stillframe_showing(false),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -2823,9 +2823,12 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (ringBuffer->isDVD())
         {
             int nbframes = videoOutput->ValidVideoFrames();
+
             if (nbframes < 2) 
             {
-                if (ringBuffer->DVD()->IsWaiting())
+                bool isWaiting  = ringBuffer->DVD()->IsWaiting();
+
+                if (isWaiting)
                 {
                     ringBuffer->DVD()->WaitSkip();
                     continue;
@@ -2838,27 +2841,28 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
                     if (nbframes == 0)
                     {
-                        ringBuffer->DVD()->IgnoreStillOrWait(true);
+                        VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                                "In DVD Menu: No video frames in queue");
                         if (pausevideo)
                             UnpauseVideo();
                         usleep(10000);
-                        ringBuffer->DVD()->IgnoreStillOrWait(false);
                         continue;
                     }
+
                     if (!pausevideo && nbframes == 1)
                     {
-                        indvdstillframe = true;
+                        dvd_stillframe_showing = true;
                         PauseVideo(false);
                     }
                 }
             }
-
-            if (indvdstillframe && nbframes > 1)
+                
+            if (dvd_stillframe_showing && nbframes > 1)
             {
                 UnpauseVideo();
-                indvdstillframe = false;
+                dvd_stillframe_showing = false;
                 continue;
-            } 
+            }
         }
 
         if (pausevideo || isDummy)
@@ -6973,16 +6977,14 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
     int numbuttons = ringBuffer->DVD()->NumMenuButtons();
     bool osdshown = osd->IsSetDisplaying("subtitles");
-    long long menupktpts = ringBuffer->DVD()->GetMenuPktPts();
 
     if ((numbuttons == 0) || 
         (osdshown) ||
-        (indvdstillframe && buffer->timecode > 0) ||
+        (dvd_stillframe_showing && buffer->timecode > 0) ||
         ((!osdshown) && 
-            (!indvdstillframe) &&
+            (!pausevideo) &&
             (hidedvdbutton) &&
-            (buffer->timecode > 0) && 
-            (menupktpts != buffer->timecode)))
+            (buffer->timecode > 0))) 
     {
         return; 
     }

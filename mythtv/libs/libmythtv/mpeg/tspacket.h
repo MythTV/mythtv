@@ -131,7 +131,7 @@ class TSPacket : public TSHeader
     
     inline TSPacket* CreateClone() const {
         TSPacket *pkt = new TSPacket();
-        memcpy(&pkt, this, SIZE);
+        memcpy(pkt, this, SIZE);
         return pkt;
     }
 

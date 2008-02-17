@@ -714,14 +714,6 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv, false);
 
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
-    {
-        cout << "mythshutdown: Could not initialize myth context. "
-                "Exiting." << endl;
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
-    }
 
     bool bLockShutdown = false;
     bool bUnlockShutdown = false;
@@ -846,6 +838,16 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
+
+
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init(false))
+    {
+        cout << "mythshutdown: Could not initialize myth context. "
+                "Exiting." << endl;
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
 
     int res = 0;
 

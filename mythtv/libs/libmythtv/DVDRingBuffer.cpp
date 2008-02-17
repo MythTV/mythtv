@@ -321,6 +321,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 cellid = 0;
                 cellRepeated = false;
                 menupktpts = 0;
+                if (cellHasStillFrame)
+                    gContext->DisableScreensaver();
+                cellHasStillFrame = false;
 
                 if (parent && IsInMenu())
                 {
@@ -540,6 +543,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 menuBtnLock.unlock();
 
                 ClearSubtitlesOSD();
+
+                if (parent && buttonExists)
+                    parent->HideDVDButton(false);
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
@@ -548,6 +555,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_STILL_FRAME:
             {
+                cellHasStillFrame = true;
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
                 usleep(10000);

@@ -5788,6 +5788,8 @@ void TV::doEditSchedule(int editType)
         return;
 
     // Resize window to the MythTV GUI size
+    if (nvp && nvp->getVideoOutput()) 
+        nvp->getVideoOutput()->ResizeForGui(); 
     MythMainWindow *mwnd = gContext->GetMainWindow();
     bool using_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
     if (!using_gui_size_for_tv)
@@ -5874,6 +5876,8 @@ void TV::doEditSchedule(int editType)
                           player_bounds.width(), player_bounds.height());
         mwnd->setFixedSize(player_bounds.size());
     }
+    if (nvp && nvp->getVideoOutput()) 
+        nvp->getVideoOutput()->ResizeForVideo(); 
 
     // If user selected a new channel in the EPG, change to that channel
     if (changeChannel.size())

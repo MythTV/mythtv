@@ -469,14 +469,23 @@ enum mad_flow MadDecoder::madOutput()
     left = synth.pcm.samples[0];
     right = synth.pcm.samples[1];
 
-    freq = frame.header.samplerate;
-    channels = MAD_NCHANNELS(&frame.header);
-    bitrate = frame.header.bitrate / 1000;
+    long newfreq = frame.header.samplerate;
+    long newchannels = MAD_NCHANNELS(&frame.header);
+    long newbitrate = frame.header.bitrate / 1000;
 
     if (output())
     {
-        output()->Reconfigure(16, channels, freq, false /*AC3/DTS passthru*/);
-        output()->SetSourceBitrate(bitrate);
+        if ((newfreq != freq) || (newchannels != channels))
+        {
+            freq = newfreq;
+            channels = newchannels;
+            output()->Reconfigure(16, channels, freq, false /*AC3/DTS passthru*/);
+        }
+        if (newbitrate != bitrate)
+        {
+            bitrate = newbitrate;
+            output()->SetSourceBitrate(bitrate);
+        }
     }
 
     while (samples--)
