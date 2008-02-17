@@ -277,8 +277,6 @@ EOF
         next unless (defined($live) || $show->{'recgroup'} ne 'LiveTV');
     # File doesn't exist locally
         next unless (-e $show->{'local_path'});
-    # Load info about the file so we can determine the file type
-        $show->load_file_info();
     # Format the name
         my $name = $show->format_name($format,$separator,$replacement,$dest,$underscores);
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
@@ -286,7 +284,7 @@ EOF
         $safe_file =~ s/'/'\\''/sg;
         $safe_file = "'$safe_file'";
     # Figure out the suffix
-        my $suffix = ($show->{'finfo'}->{'is_mpeg'}) ? '.mpg' : '.nuv';
+        my ($suffix) = ($show->{'basename'} =~ /(\.\w+)$/);
     # Link destination
         if ($dest) {
         # Check for duplicates
@@ -331,6 +329,21 @@ EOF
                     die "Couldn't restore original basename in database for ".$show->{'basename'}.":  ($q)\n" unless ($rows == 1);
                 }
                 vprint($show->{'basename'}."\t-> $name");
+            # Rename previews
+                opendir DIR, $video_dir;
+                foreach my $thumb (grep /\.png$/, readdir DIR) {
+                    next unless ($thumb =~ /^$show->{'basename'}((?:\.\d+)?(?:\.\d+x\d+)?\.png)$/);
+                    my $dim = $1;
+                    $ret = rename "$video_dir/$thumb", "$video_dir/$name$dim.png";
+                # If the rename fails, try to delete the preview from the
+                # cache (it will automatically be re-created with the
+                # proper name, when necessary)
+                    if (!$ret) {
+                        unlink "$video_dir/$thumb"
+                            or vprint("Unable to rename preview image: '$video_dir/$thumb'.");
+                    }
+                }
+                closedir DIR;
             }
         }
     }
