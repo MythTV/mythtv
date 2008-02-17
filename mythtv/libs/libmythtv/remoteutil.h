@@ -86,7 +86,7 @@ MPUBLIC vector<InputInfo> RemoteRequestFreeInputList(
 MPUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
 MPUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
 MPUBLIC void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
-MPUBLIC QString RemoteGetPreviewLastModified(ProgramInfo *pginfo);
+MPUBLIC QDateTime RemoteGetPreviewLastModified(ProgramInfo *pginfo);
 MPUBLIC void RemoteFillProginfo(ProgramInfo *pginfo,
                                 const QString &playbackhostname);
 MPUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);

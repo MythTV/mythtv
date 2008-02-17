@@ -182,14 +182,20 @@ QStringList PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo,
     return strlist;
 }
 
-QString PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
+QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 {
     QStringList strlist = QString("QUERY_PIXMAP_LASTMODIFIED");
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
 
-    return strlist[0];
+    QDateTime datetime;
+    if (!strlist.empty() && strlist[0] != "BAD")
+    {
+        uint timet = strlist[0].toUInt();
+        datetime.setTime_t(timet);
+    }
+    return datetime;
 }
 
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)

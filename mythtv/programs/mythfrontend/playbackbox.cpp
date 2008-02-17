@@ -4436,9 +4436,7 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
     }
     else
     {
-        QString filetime = RemoteGetPreviewLastModified(pginfo);
-        if (!filetime.isEmpty() && filetime.upper() != "BAD")
-            datetime = QDateTime::fromString(filetime, Qt::TextDate);
+        datetime = RemoteGetPreviewLastModified(pginfo);
     }
 
     return datetime;
