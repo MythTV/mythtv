@@ -43,7 +43,8 @@ MythXML::MythXML( UPnpDevice *pDevice ) : Eventing( "MythXML", "MYTHTV_Event" )
 
     //  --- none at this time.
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
+                                                                m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MXML_scpd.xml";
     m_sControlUrl          = "/Myth";
@@ -101,46 +102,80 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
     {
         if (pRequest)
         {
-	    if (pRequest->m_sBaseUrl == "/Myth/GetVideo")
-	    {
-	        pRequest->m_sBaseUrl = m_sControlUrl;
-		pRequest->m_sMethod = "GetVideo";
-	    }
+            if (pRequest->m_sBaseUrl == "/Myth/GetVideo")
+            {
+                pRequest->m_sBaseUrl = m_sControlUrl;
+                pRequest->m_sMethod = "GetVideo";
+            }
 
             if (pRequest->m_sBaseUrl != m_sControlUrl)
                 return( false );
 
             VERBOSE(VB_UPNP, QString("MythXML::ProcessRequest: %1 : %2")
-			             .arg(pRequest->m_sMethod)
-				     .arg(pRequest->m_sRawRequest));
+                    .arg(pRequest->m_sMethod)
+                    .arg(pRequest->m_sRawRequest));
 
             switch( GetMethod( pRequest->m_sMethod ))
             {
-                case MXML_GetServiceDescription: pRequest->FormatFileResponse( m_sServiceDescFileName ); return true;
+                case MXML_GetServiceDescription:
+                    pRequest->FormatFileResponse( m_sServiceDescFileName );
+                    return true;
 
-                case MXML_GetProgramGuide      : GetProgramGuide( pRequest ); return true;
-                case MXML_GetProgramDetails    : GetProgramDetails( pRequest ); return true;
+                case MXML_GetProgramGuide      :
+                    GetProgramGuide( pRequest );
+                    return true;
+                case MXML_GetProgramDetails    :
+                    GetProgramDetails( pRequest );
+                    return true;
 
-                case MXML_GetHosts             : GetHosts       ( pRequest ); return true;
-                case MXML_GetKeys              : GetKeys        ( pRequest ); return true;
-                case MXML_GetSetting           : GetSetting     ( pRequest ); return true;
-                case MXML_PutSetting           : PutSetting     ( pRequest ); return true;
-                                                                              
-                case MXML_GetChannelIcon       : GetChannelIcon ( pRequest ); return true;
-                case MXML_GetRecorded          : GetRecorded    ( pRequest ); return true;
-                case MXML_GetExpiring          : GetExpiring    ( pRequest ); return true;
-                case MXML_GetPreviewImage      : GetPreviewImage( pRequest ); return true;
+                case MXML_GetHosts             :
+                    GetHosts       ( pRequest );
+                    return true;
+                case MXML_GetKeys              :
+                    GetKeys        ( pRequest );
+                    return true;
+                case MXML_GetSetting           :
+                    GetSetting     ( pRequest );
+                    return true;
+                case MXML_PutSetting           :
+                    PutSetting     ( pRequest );
+                    return true;
 
-                case MXML_GetRecording         : GetRecording   ( pThread, pRequest ); return true;
-                case MXML_GetMusic             : GetMusic       ( pThread, pRequest ); return true;
-                case MXML_GetVideo             : GetVideo       ( pThread, pRequest ); return true;
+                case MXML_GetChannelIcon       :
+                    GetChannelIcon ( pRequest );
+                    return true;
+                case MXML_GetRecorded          :
+                    GetRecorded    ( pRequest );
+                    return true;
+                case MXML_GetExpiring          :
+                    GetExpiring    ( pRequest );
+                    return true;
+                case MXML_GetPreviewImage      :
+                    GetPreviewImage( pRequest );
+                    return true;
 
-                case MXML_GetConnectionInfo    : GetConnectionInfo( pRequest ); return true;
-                case MXML_GetAlbumArt          : GetAlbumArt    ( pRequest ); return true;
-		case MXML_GetVideoArt          : GetVideoArt    ( pRequest ); return true;
+                case MXML_GetRecording         :
+                    GetRecording   ( pThread, pRequest );
+                    return true;
+                case MXML_GetMusic             :
+                    GetMusic       ( pThread, pRequest );
+                    return true;
+                case MXML_GetVideo             :
+                    GetVideo       ( pThread, pRequest );
+                    return true;
+
+                case MXML_GetConnectionInfo    :
+                    GetConnectionInfo( pRequest );
+                    return true;
+                case MXML_GetAlbumArt          :
+                    GetAlbumArt    ( pRequest );
+                    return true;
+                case MXML_GetVideoArt          :
+                    GetVideoArt    ( pRequest );
+                    return true;
 
 
-                default: 
+                default:
                 {
                     UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
 
@@ -151,11 +186,12 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
     }
     catch( ... )
     {
-        VERBOSE( VB_IMPORTANT, "MythXML::ProcessRequest() - Unexpected Exception" );
+        VERBOSE( VB_IMPORTANT, "MythXML::ProcessRequest() - Unexpected "
+                               "Exception" );
     }
 
     return( false );
-}           
+}
 
 // ==========================================================================
 // Request handler Methods
@@ -167,7 +203,8 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
 
 void MythXML::GetHosts( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -201,7 +238,8 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
         }
     }
     else
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Database not open while trying to load list of hosts" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed,
+                    "Database not open while trying to load list of hosts" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -210,7 +248,8 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
 
 void MythXML::GetKeys( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -244,7 +283,8 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
     else
         UPnp::FormatErrorResponse( pRequest, 
                                    UPnPResult_ActionFailed, 
-                                   QString("Database not open while trying to load setting: %1")
+                                   QString("Database not open while trying to "
+                                           "load setting: %1")
                                       .arg( pRequest->m_mapParams[ "Key" ] ));
 }
 
@@ -254,7 +294,8 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
 
 void MythXML::GetSetting( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     QString sKey      = pRequest->m_mapParams[ "Key"      ];
     QString sHostName = pRequest->m_mapParams[ "HostName" ];
@@ -372,7 +413,8 @@ void MythXML::GetSetting( HTTPRequest *pRequest )
     else
         UPnp::FormatErrorResponse( pRequest, 
                                    UPnPResult_ActionFailed, 
-                                   QString("Database not open while trying to load setting: %1")
+                                   QString("Database not open while trying to "
+                                           "load setting: %1")
                                       .arg( pRequest->m_mapParams[ "Key" ] ));
 }
 
@@ -382,7 +424,8 @@ void MythXML::GetSetting( HTTPRequest *pRequest )
 
 void MythXML::PutSetting( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     QString sHostName = pRequest->m_mapParams[ "HostName" ];
     QString sKey      = pRequest->m_mapParams[ "Key"      ];
@@ -400,7 +443,8 @@ void MythXML::PutSetting( HTTPRequest *pRequest )
         pRequest->FormatActionResponse( &list );
     }
     else
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidArgs, "Key Required" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidArgs,
+                                                            "Key Required" );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -409,7 +453,8 @@ void MythXML::PutSetting( HTTPRequest *pRequest )
 
 void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     QString sStartTime     = pRequest->m_mapParams[ "StartTime"    ];
     QString sEndTime       = pRequest->m_mapParams[ "EndTime"      ];
@@ -423,19 +468,22 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     if (!dtStart.isValid()) 
     { 
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "StartTime is invalid" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid,
+                                                    "StartTime is invalid" );
         return;
     }
-        
+
     if (!dtEnd.isValid()) 
     { 
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "EndTime is invalid" );
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid,
+                                                        "EndTime is invalid" );
         return;
     }
 
     if (dtEnd < dtStart) 
-    { 
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "EndTime is before StartTime");
+    {
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid,
+                                                "EndTime is before StartTime");
         return;
     }
 
@@ -451,7 +499,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     query.prepare( "SELECT chanid FROM channel WHERE (chanid >= :STARTCHANID )"
                    " ORDER BY chanid LIMIT :NUMCHAN" );
-    
+
     query.bindValue(":STARTCHANID", iStartChanId );
     query.bindValue(":NUMCHAN"    , iNumOfChannels );
 
@@ -460,8 +508,8 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     query.first();  iStartChanId = query.value(0).toInt();
     query.last();   iEndChanId   = query.value(0).toInt();
-        
-    // Build add'l SQL statement for Program Listing
+
+    // Build SQL statement for Program Listing
 
     MSqlBindings bindings;
     QString      sSQL = "WHERE program.chanid >= :StartChanId "
@@ -486,7 +534,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
         m_pSched->getAllPending( &recList);
 
     // ----------------------------------------------------------------------
-    // We need to convert from a RecList to a ProgramList  
+    // We need to convert from a RecList to a ProgramList
     // (ProgramList will autodelete ProgramInfo pointers)
     // ----------------------------------------------------------------------
 
@@ -504,7 +552,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     // Build Response
 
-    QDomDocument doc;                        
+    QDomDocument doc;
 
     QDomElement channels = doc.createElement("Channels");
     doc.appendChild( channels );
@@ -548,7 +596,8 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     list.append( new NameValue( "Details"      , bDetails     ));
 
     list.append( new NameValue( "Count"        , (int)progList.count() ));
-    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime().toString( Qt::ISODate )));
+    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime()
+                                            .toString( Qt::ISODate )));
     list.append( new NameValue( "Version"      , MYTH_BINARY_VERSION ));
     list.append( new NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
     list.append( new NameValue( "ProgramGuide" , doc.toString()      ));
@@ -559,12 +608,13 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
 
 /////////////////////////////////////////////////////////////////////////////
-//                  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
 
     QString sStartTime = pRequest->m_mapParams[ "StartTime" ];
     QString sChanId    = pRequest->m_mapParams[ "ChanId"    ];
@@ -572,15 +622,16 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
 
     if (!dtStart.isValid()) 
-    { 
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid, "StartTime is invalid" );
+    {
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ArgumentValueInvalid,
+                                                    "StartTime is invalid" );
         return;
     }
 
     // ----------------------------------------------------------------------
     // -=>TODO: Add support for getting Recorded Program Info
     // ----------------------------------------------------------------------
-    
+
     // Build add'l SQL statement for Program Listing
 
     MSqlBindings bindings;
@@ -618,8 +669,9 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     ProgramInfo *pInfo = progList.first();
 
     if (pInfo==NULL)
-    { 
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Error Reading Program Info" );
+    {
+        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed,
+                                                "Error Reading Program Info" );
         return;
     }
 
@@ -640,7 +692,8 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     list.append( new NameValue( "ChanId"       , sChanId      ));
 
     list.append( new NameValue( "Count"        , 1  ));
-    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime().toString( Qt::ISODate )));
+    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime()
+                                                    .toString( Qt::ISODate )));
     list.append( new NameValue( "Version"      , MYTH_BINARY_VERSION ));
     list.append( new NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
 
@@ -650,7 +703,7 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//                  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 void MythXML::GetChannelIcon( HTTPRequest *pRequest )
@@ -759,9 +812,9 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     //
     int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
     int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
-    
+
     // Read Video poster file path from database
-    
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT coverart FROM upnpmedia WHERE intid = :ITEMID");
@@ -787,15 +840,15 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
     // check to see if albumart image is already created.
     // ----------------------------------------------------------------------
-	
+
     if (QFile::exists( sFileName ))
     {
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
-	pRequest->m_sFileName = sFileName;
-	return;
+        pRequest->m_sFileName = sFileName;
+        return;
     }
-	
+
 }
 
 void MythXML::GetAlbumArt( HTTPRequest *pRequest )
@@ -830,7 +883,9 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
     {
         query.first();
 
-        pRequest->m_sFileName       = musicbasepath + query.value(0).toString();
+        pRequest->m_sFileName = QString( "%1/%2" )
+                        .arg( musicbasepath )
+                        .arg( QString::fromUtf8(query.value(0).toString()) );
     }
 
     if ((nWidth == 0) && (nHeight == 0))
@@ -945,7 +1000,8 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
     NameValueList list;
 
     list.append( new NameValue( "Count"    , (int)progList.count()));
-    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime().toString( Qt::ISODate )));
+    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime()
+                                                    .toString( Qt::ISODate )));
     list.append( new NameValue( "Version"  , MYTH_BINARY_VERSION ));
     list.append( new NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
 
@@ -989,7 +1045,8 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
     NameValueList list;
 
     list.append( new NameValue( "Count"    , (int)infoList.size()));
-    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime().toString( Qt::ISODate )));
+    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime()
+                                                    .toString( Qt::ISODate )));
     list.append( new NameValue( "Version"  , MYTH_BINARY_VERSION ));
     list.append( new NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
 
@@ -1053,6 +1110,10 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 
     QString sFileName     = GetPlaybackURL(pInfo);
     int defaultOffset = gContext->GetNumSetting("PreviewPixmapOffset", 64);
+    int preRoll = gContext->GetNumSetting("RecordPreRoll", 0);
+
+    if (preRoll > 0)
+        defaultOffset += preRoll;
 
     if (nSecsIn <= 0 || nSecsIn == defaultOffset)
     {
@@ -1124,7 +1185,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     // check to see if scaled preview image is already created.
     // ----------------------------------------------------------------------
 
-    
+
 
     if (QFile::exists( pRequest->m_sFileName ))
     {
@@ -1149,7 +1210,8 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
     bool bIndexFile = false;
 
     pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
     pRequest->m_nResponseStatus = 404;
 
     QString sChanId   = pRequest->m_mapParams[ "ChanId"    ];
@@ -1220,9 +1282,11 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
 
         if (pInfo==NULL)
         {
-            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - GetProgramFromRecorded( %1, %2 ) returned NULL" )
-                                 .arg( sChanId )
-                                 .arg( sStartTime ));
+            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - "
+                                       "GetProgramFromRecorded( %1, %2 ) "
+                                       "returned NULL" )
+                                        .arg( sChanId )
+                                        .arg( sStartTime ));
             return;
         }
 
@@ -1230,12 +1294,13 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
         {
             // We only handle requests for local resources   
 
-            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - To access this recording, send request to %1." )
-                                 .arg( pInfo->hostname ));
+            VERBOSE( VB_UPNP, QString( "MythXML::GetRecording - To access this "
+                                       "recording, send request to %1." )
+                                        .arg( pInfo->hostname ));
 
             delete pInfo;
 
-            return;     
+            return;
         }
 
         pRequest->m_sFileName = GetPlaybackURL(pInfo);
@@ -1277,7 +1342,8 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
                         HTTPRequest      *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
     pRequest->m_nResponseStatus = 404;
 
     QString sId   = pRequest->m_mapParams[ "Id"    ];
@@ -1334,8 +1400,8 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
             {
                 query.first();  
                 pRequest->m_sFileName = QString( "%1/%2" )
-                                           .arg( sBasePath )
-                                           .arg( query.value(0).toString() );
+                        .arg( sBasePath )
+                        .arg( QString::fromUtf8(query.value(0).toString()) );
             }
         }
 
@@ -1367,7 +1433,8 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
                         HTTPRequest      *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
+                                                    "max-age = 5000";
     pRequest->m_nResponseStatus = 404;
 
     QString sId   = pRequest->m_mapParams[ "Id" ];
@@ -1376,19 +1443,19 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
     {
         QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
 
-	idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-	idPath = QStringList::split( "?", idPath[0] );
+        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+        idPath = QStringList::split( "?", idPath[0] );
 
         sId = idPath[0];
 
-	if (sId.startsWith("Id"))
-	    sId = sId.right(sId.length() - 2);
-        else 
+        if (sId.startsWith("Id"))
+            sId = sId.right(sId.length() - 2);
+        else
             return;
 
-	//VERBOSE(VB_UPNP, QString("MythXML::GetVideo : %1 ").arg(sId));
-	
-	pRequest->m_mapParams[ "Id" ] = sId;
+        //VERBOSE(VB_UPNP, QString("MythXML::GetVideo : %1 ").arg(sId));
+
+        pRequest->m_mapParams[ "Id" ] = sId;
     }
 
     bool wantCoverArt = (pRequest->m_mapParams[ "albumArt" ] == "true");
@@ -1396,7 +1463,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
     if (wantCoverArt)
     {
         GetVideoArt(pRequest);
-	return;
+        return;
     }
 
     // ----------------------------------------------------------------------
@@ -1441,7 +1508,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
                 query.first();
                 pRequest->m_sFileName = QString( "%1/%2" )
                                            .arg( sBasePath )
-                                           .arg( query.value(0).toString() );
+                            .arg( QString::fromUtf8(query.value(0).toString()) );
             }
         }
 
@@ -1575,7 +1642,8 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
         program.setAttribute( "hostname"    , pInfo->hostname     );
 
         if (pInfo->hasAirDate)
-            program.setAttribute( "airdate"  , pInfo->originalAirDate.toString(Qt::ISODate) );
+            program.setAttribute( "airdate"  , pInfo->originalAirDate
+                                                    .toString(Qt::ISODate) );
 
         QDomText textNode = pDoc->createTextNode( pInfo->description );
         program.appendChild( textNode );
@@ -1585,7 +1653,7 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
     if ( bIncChannel )
     {
         // Build Channel Child Element
-        
+
         QDomElement channel = pDoc->createElement( "Channel" );
         program.appendChild( channel );
 
@@ -1595,14 +1663,16 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
     // Build Recording Child Element
 
     if ( pInfo->recstatus != rsUnknown )
-    { 
+    {
         QDomElement recording = pDoc->createElement( "Recording" );
         program.appendChild( recording );
 
         recording.setAttribute( "recStatus"     , pInfo->recstatus   );
         recording.setAttribute( "recPriority"   , pInfo->recpriority );
-        recording.setAttribute( "recStartTs"    , pInfo->recstartts.toString(Qt::ISODate));
-        recording.setAttribute( "recEndTs"      , pInfo->recendts.toString(Qt::ISODate));
+        recording.setAttribute( "recStartTs"    , pInfo->recstartts
+                                                    .toString(Qt::ISODate));
+        recording.setAttribute( "recEndTs"      , pInfo->recendts
+                                                    .toString(Qt::ISODate));
 
         if (bDetails)
         {
