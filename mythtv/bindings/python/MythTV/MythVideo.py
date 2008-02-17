@@ -24,9 +24,9 @@ class MythVideo:
 		"""
 		c = self.db.cursor()
 		c.execute("""
-			SELECT intid, filename
-			FROM videometadata""")
-		
+				SELECT intid, filename
+				FROM videometadata""")
+
 		row = c.fetchone()
 		while row is not None:
 			intid = row[0]
@@ -42,89 +42,89 @@ class MythVideo:
 	def getGenreId(self, genre_name):
 		"""
 		Find the id of the given genre from MythDB.
-		
+
 		If the genre does not exist, insert it and return its id.
 		"""
 		c = self.db.cursor()
 		c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (genre_name,))
 		row = c.fetchone()
 		c.close()
-		
+
 		if row is not None:
 			return row[0]
-		
+
 		# Insert a new genre.
 		c = self.db.cursor()
 		c.execute("INSERT INTO videocategory(category) VALUES (%s)", (genre_name.capitalize(),))
 		newid = c.lastrowid
 		c.close()
-		
+
 		return newid
 
-	def getCastId(self, cast_name): 
-		""" 
-		Find the id of the given cast from MythDB. 
+	def getCastId(self, cast_name):
+		"""
+		Find the id of the given cast from MythDB.
 
-		If the cast does not exist, insert it and return its id. 
-		""" 
-		c = self.db.cursor() 
-		# print "SELECT intid FROM videocast WHERE lower(cast) = '%s'" % (cast_name,) 
-		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,)) 
-		row = c.fetchone() 
-		c.close() 
+		If the cast does not exist, insert it and return its id.
+		"""
+		c = self.db.cursor()
+		# print "SELECT intid FROM videocast WHERE lower(cast) = '%s'" % (cast_name,)
+		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,))
+		row = c.fetchone()
+		c.close()
 
-		if row is not None: 
-			# print "getCastId %s %s" % (cast_name, row[0]) 
-			return row[0] 
+		if row is not None:
+			# print "getCastId %s %s" % (cast_name, row[0])
+			return row[0]
 
-		# Insert a new cast. 
-		c = self.db.cursor() 
-		c.execute("INSERT INTO videocast(cast) VALUES (%s)", (cast_name,)) 
-		#print "INSERT INTO videocast(cast) VALUES ('%s')" % (cast_name,) 
-		c.close() 
+		# Insert a new cast.
+		c = self.db.cursor()
+		c.execute("INSERT INTO videocast(cast) VALUES (%s)", (cast_name,))
+		#print "INSERT INTO videocast(cast) VALUES ('%s')" % (cast_name,)
+		c.close()
 
-		c = self.db.cursor() 
-		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,)) 
-		row = c.fetchone() 
-		c.close() 
+		c = self.db.cursor()
+		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,))
+		row = c.fetchone()
+		c.close()
 
-		return row[0] 
+		return row[0]
 
-	def setCast(self, cast_name, idvideo): 
-		""" 
-		Insert the cast_name into videometadatacast if it does already exist. 
+	def setCast(self, cast_name, idvideo):
+		"""
+		Insert the cast_name into videometadatacast if it does already exist.
 
-		If the cast does not exist, insert it and return its id. 
-		""" 
+		If the cast does not exist, insert it and return its id.
+		"""
 
-		idcast = self.getCastId(cast_name); 
+		idcast = self.getCastId(cast_name);
 
-		c = self.db.cursor() 
-		c.execute("SELECT * FROM videometadatacast WHERE idvideo = %s AND idcast = %s", (idvideo,idcast)) 
-		row = c.fetchone() 
-		c.close() 
+		c = self.db.cursor()
+		c.execute("SELECT * FROM videometadatacast WHERE idvideo = %s AND idcast = %s", (idvideo,idcast))
+		row = c.fetchone()
+		c.close()
 
-		if row is None: 
-			# Insert a new cast. 
-				c = self.db.cursor() 
-				c.execute("INSERT INTO videometadatacast VALUES (%s,%s)", (idvideo,idcast)) 
-				#print "INSERT INTO videometadatacast VALUES (%s,%s)" % (idvideo,idcast) 
-				c.close() 
+		if row is None:
+			# Insert a new cast.
+				c = self.db.cursor()
+				c.execute("INSERT INTO videometadatacast VALUES (%s,%s)", (idvideo,idcast))
+				#print "INSERT INTO videometadatacast VALUES (%s,%s)" % (idvideo,idcast)
+				c.close()
 
 	def getMetadataId(self, videopath):
 		"""
 		Finds the MythVideo metadata id for the given video path from the MythDB, if any.
-		
+
 		Returns None if no metadata was found.
 		"""
 		c = self.db.cursor()
 		c.execute("""
-			SELECT intid
-			FROM videometadata
-			WHERE filename = %s""", (videopath,))
+				SELECT intid
+				FROM videometadata
+				WHERE filename = %s""", (videopath,))
 		row = c.fetchone()
 		c.close()
-		
+
 		if row is not None:
 			return row[0]
 		else:
@@ -133,17 +133,17 @@ class MythVideo:
 	def hasMetadata(self, videopath):
 		"""
 		Determines if the given videopath has any metadata in the DB
-		
+
 		Returns False if no metadata was found.
 		"""
 		c = self.db.cursor()
 		c.execute("""
-			SELECT category, year 
-			FROM videometadata
-			WHERE filename = %s""", (videopath,))
+				SELECT category, year
+				FROM videometadata
+				WHERE filename = %s""", (videopath,))
 		row = c.fetchone()
 		c.close()
-		
+
 		if row is not None:
 			# If category is 0 and year is 1895, we can safely assume no metadata
 			if (row[0] == 0) and (row[1] == 1895):
@@ -156,17 +156,17 @@ class MythVideo:
 	def getMetadata(self, id):
 		"""
 		Finds the MythVideo metadata for the given id from the MythDB, if any.
-		
+
 		Returns None if no metadata was found.
 		"""
 		c = self.db.cursor()
 		c.execute("""
-			SELECT *
-			FROM videometadata
-			WHERE intid = %s""", (id,))
+				SELECT *
+				FROM videometadata
+				WHERE intid = %s""", (id,))
 		row = c.fetchone()
 		c.close()
-		
+
 		if row is not None:
 			return row
 		else:
