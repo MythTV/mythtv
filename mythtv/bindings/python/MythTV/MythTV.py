@@ -21,27 +21,27 @@ from MythLog import *
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythTV')
 
 RECSTATUS = {
-	'TunerBusy': -8,
-	'LowDiskSpace': -7,
-	'Cancelled': -6,
-	'Deleted': -5,
-	'Aborted': -4,
-	'Recorded': -3,
-	'Recording': -2,
-	'WillRecord': -1,
-	'Unknown': 0,
-	'DontRecord': 1,
-	'PreviousRecording': 2,
-	'CurrentRecording': 3,
-	'EarlierShowing': 4,
-	'TooManyRecordings': 5,
-	'NotListed': 6,
-	'Conflict': 7,
-	'LaterShowing': 8,
-	'Repeat': 9,
-	'Inactive': 10,
-	'NeverRecord': 11,
-}
+		'TunerBusy': -8,
+		'LowDiskSpace': -7,
+		'Cancelled': -6,
+		'Deleted': -5,
+		'Aborted': -4,
+		'Recorded': -3,
+		'Recording': -2,
+		'WillRecord': -1,
+		'Unknown': 0,
+		'DontRecord': 1,
+		'PreviousRecording': 2,
+		'CurrentRecording': 3,
+		'EarlierShowing': 4,
+		'TooManyRecordings': 5,
+		'NotListed': 6,
+		'Conflict': 7,
+		'LaterShowing': 8,
+		'Repeat': 9,
+		'Inactive': 10,
+		'NeverRecord': 11,
+		}
 
 BACKEND_SEP = '[]:[]'
 PROTO_VERSION = 39
@@ -55,14 +55,14 @@ class MythTV:
 		self.db = MythDB.MythDB(sys.argv[1:])
 		self.master_host = self.db.getSetting('MasterServerIP')
 		self.master_port = int(self.db.getSetting('MasterServerPort'))
-		
+
 		if not self.master_host:
 			log.Msg(CRITICAL, 'Unable to find MasterServerIP in database')
 			sys.exit(1)
 		if not self.master_port:
 			log.Msg(CRITICAL, 'Unable to find MasterServerPort in database')
 			sys.exit(1)
-		
+
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.settimeout(10)
@@ -102,7 +102,7 @@ class MythTV:
 				length = length - len(chunk)
 				data.append(chunk)
 			return ''.join(data)
-		
+
 		command = '%-8d%s' % (len(data), data)
 		log.Msg(DEBUG, 'Sending command: %s', command)
 		self.socket.send(command)
@@ -119,8 +119,8 @@ class MythTV:
 		log.Msg(DEBUG, '%s pending recordings', num_progs)
 		for i in range(num_progs):
 			programs.append(
-				Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
-		return programs
+					Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
+			return programs
 
 	def getScheduledRecordings(self):
 		"""
@@ -132,8 +132,8 @@ class MythTV:
 		log.Msg(DEBUG, '%s scheduled recordings', num_progs)
 		for i in range(num_progs):
 			programs.append(
-				Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
-		return programs
+					Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
+			return programs
 
 	def getUpcomingRecordings(self):
 		"""
@@ -185,7 +185,7 @@ class MythTV:
 		"""
 		c = self.db.cursor()
 		c.execute("""SELECT cardid, cardtype, videodevice, hostname
-			FROM capturecard WHERE cardid = %s""", recorder_id)
+				FROM capturecard WHERE cardid = %s""", recorder_id)
 		row = c.fetchone()
 		if row:
 			recorder = Recorder(row)
@@ -226,7 +226,7 @@ class Recorder:
 	"""
 	def __str__(self):
 		return "Recorder %s (%s)" % (self.cardid, self.cardtype)
-	
+
 	def __repr__(self):
 		return "Recorder %s (%s)" % (self.cardid, self.cardtype)
 
