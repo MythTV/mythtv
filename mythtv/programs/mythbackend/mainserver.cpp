@@ -3890,10 +3890,12 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
         if (slave) 
         {
-             QString slavetime = slave->PixmapLastModified(pginfo);
+             QDateTime slavetime = slave->PixmapLastModified(pginfo);
              slave->DownRef();
 
-             strlist += slavetime;
+             strlist = (slavetime.isValid()) ?
+                 QString::number(slavetime.toTime_t()) : "BAD";
+
              SendResponse(pbssock, strlist);
              delete pginfo;
              return;
@@ -3923,7 +3925,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     if (finfo.exists())
     {
         lastmodified = finfo.lastModified();
-        strlist = lastmodified.toString(f);
+        strlist = QString::number(lastmodified.toTime_t());
     }
     else
         strlist = "BAD";   

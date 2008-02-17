@@ -518,9 +518,9 @@ void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
     gContext->SendReceiveStringList(strlist);
 }
     
-QString RemoteGetPreviewLastModified(ProgramInfo *pginfo)
+QDateTime RemoteGetPreviewLastModified(ProgramInfo *pginfo)
 {
-    QString retdatetime;
+    QDateTime retdatetime;
 
     QStringList strlist = "QUERY_PIXMAP_LASTMODIFIED"; 
     pginfo->ToStringList(strlist);
@@ -528,7 +528,13 @@ QString RemoteGetPreviewLastModified(ProgramInfo *pginfo)
     if (!gContext->SendReceiveStringList(strlist))
         return retdatetime;
 
-    return strlist[0];
+    if (!strlist.empty() && strlist[0] != "BAD")
+    {
+        uint timet = strlist[0].toUInt();
+        retdatetime.setTime_t(timet);
+    }
+        
+    return retdatetime;
 }
 
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)

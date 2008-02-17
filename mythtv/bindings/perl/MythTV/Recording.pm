@@ -413,7 +413,7 @@ package MythTV::Recording;
         if ($mod eq 'BAD') {
             return 0;
         }
-        return myth_to_unix_time($mod);
+        return $mod;
     }
 
 # Generate a pixmap for this recording

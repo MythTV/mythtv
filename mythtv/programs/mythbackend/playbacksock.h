@@ -53,7 +53,7 @@ class PlaybackSock
                                  long long          time,
                                  const QString     &outputFile,
                                  const QSize       &outputSize);
-    QString PixmapLastModified(const ProgramInfo *pginfo);
+    QDateTime PixmapLastModified(const ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 
     bool IsBusy(int        capturecardnum,
