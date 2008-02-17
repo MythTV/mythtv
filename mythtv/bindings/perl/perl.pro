@@ -1,6 +1,6 @@
 include ( ../../config.mak )
 
-QMAKE_CLEAN += filethatdoesntexist ; [ -f Makefile.perl ] && make -f Makefile.perl clean
+QMAKE_CLEAN += filethatdoesntexist ; [ -f Makefile.perl ] && $(MAKE) -f Makefile.perl clean
 
 mythperlbindings.target = Makefile.perl
 mythperlbindings.depends = Makefile.PL
@@ -13,14 +13,14 @@ else {
 
 mythperbindingsbuild.target = perl_build
 mythperbindingsbuild.depends = Makefile.perl
-mythperbindingsbuild.commands = @-make -f Makefile.perl
+mythperbindingsbuild.commands = @-$(MAKE) -f Makefile.perl
 
 phony.target = .PHONY
 phony.depends = perl_build
 
 perl_install.target = install
 perl_install.depends = all
-perl_install.commands = make -f Makefile.perl pure_install PERL_INSTALL_ROOT="$(INSTALL_ROOT)"
+perl_install.commands = $(MAKE) -f Makefile.perl pure_install PERL_INSTALL_ROOT="$(INSTALL_ROOT)"
 
 QMAKE_LINK=@-echo
 PRE_TARGETDEPS += perl_build
