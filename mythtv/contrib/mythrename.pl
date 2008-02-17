@@ -332,7 +332,7 @@ EOF
             # Rename previews
                 opendir DIR, $video_dir;
                 foreach my $thumb (grep /\.png$/, readdir DIR) {
-                    next unless ($thumb =~ /^$show->{'basename'}((?:\.\d+)?(?:\.\d+x\d+)?\.png)$/);
+                    next unless ($thumb =~ /^$show->{'basename'}((?:\.\d+)?(?:\.\d+x\d+(?:x\d+)?)?\.png)$/);
                     my $dim = $1;
                     $ret = rename "$video_dir/$thumb", "$video_dir/$name$dim.png";
                 # If the rename fails, try to delete the preview from the
