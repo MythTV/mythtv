@@ -36,7 +36,7 @@ LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
-LIBS += $$EXTRA_LIBS
+LIBS += -lz $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
@@ -54,7 +54,7 @@ QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa OpenGL QuickTime
+    FWKS = AGL ApplicationServices Carbon Cocoa OpenGL QuickTime IOKit
     PFWKS = DVD
 
     # The following trick shortens the command line, but depends on
