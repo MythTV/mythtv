@@ -36,7 +36,7 @@ LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
-LIBS += $$EXTRA_LIBS
+LIBS += -lz $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
