@@ -57,6 +57,8 @@ macx {
     FWKS = AGL ApplicationServices Carbon Cocoa OpenGL QuickTime IOKit
     PFWKS = DVD
 
+    using_firewire:using_backend: FWKS += IOKit
+
     # The following trick shortens the command line, but depends on
     # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
     FC = $$join(FWKS,",","{","}")
