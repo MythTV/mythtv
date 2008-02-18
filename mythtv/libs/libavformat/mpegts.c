@@ -1492,7 +1492,7 @@ static AVStream *new_section_av_stream(SectionContext *sect, uint32_t code)
     sect->st->codec = avcodec_alloc_context();
     init_stream(sect->st, sect->stream_type, code);  /* sets codec type and id */
     sect->st->priv_data = sect;
-    sect->st->need_parsing = AVSTREAM_PARSE_FULL;
+    sect->st->need_parsing = AVSTREAM_PARSE_NONE;
 
     sect->st = av_add_stream(sect->stream, sect->st, sect->pid);
 fail: /*for the CHECKED_ALLOCZ macro*/
