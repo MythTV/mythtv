@@ -740,6 +740,49 @@ bool TV::Init(bool createWindow)
 TV::~TV(void)
 {
     QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal from continuing.
+
+    if (sleepTimer)
+    {
+        sleepTimer->disconnect();
+        sleepTimer->deleteLater();
+        sleepTimer = NULL;
+    }
+
+    if (idleTimer)
+    {
+        idleTimer->disconnect();
+        idleTimer->deleteLater();
+        idleTimer = NULL;
+    }
+
+    if (keyrepeatTimer)
+    {
+        keyrepeatTimer->disconnect();
+        keyrepeatTimer->deleteLater();
+        keyrepeatTimer = NULL;
+    }
+
+    if (muteTimer)
+    {
+        muteTimer->disconnect();
+        muteTimer->deleteLater();
+        muteTimer = NULL;
+    }
+
+    if (prevChanTimer)
+    {
+        prevChanTimer->disconnect();
+        prevChanTimer->deleteLater();
+        prevChanTimer = NULL;
+    }
+
+    if (browseTimer)
+    {
+        browseTimer->disconnect();
+        browseTimer->deleteLater();
+        browseTimer = NULL;
+    }
+
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 
