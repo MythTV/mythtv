@@ -198,7 +198,7 @@ inline const char *dlerror(void)
     static char errStr[DLERR_MAX];
     DWORD       errCode = GetLastError();
 
-    if (!FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
+    if (!FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM |
                         FORMAT_MESSAGE_IGNORE_INSERTS |
                         FORMAT_MESSAGE_MAX_WIDTH_MASK,
                         NULL, errCode,
