@@ -195,12 +195,12 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
 
 int AudioOutputWin::getSpaceOnSoundcard(void)
 {
-    return (kPacketCnt - m_nPkts) * 1152 * 4;
+    return (kPacketCnt - m_nPkts) * 1536 * 4;
 }
 
 int AudioOutputWin::getBufferedOnSoundcard(void)
 {
-    return m_nPkts * 1600 * 4;
+    return m_nPkts * 1536 * 4;
 }
 
 int AudioOutputWin::GetVolumeChannel(int channel)
