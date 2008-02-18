@@ -1329,6 +1329,31 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 }
 
 #ifdef USING_DVB
+static bool set_tone(int fd, fe_sec_tone_mode tone)
+{
+    (void) fd;
+    (void) tone;
+
+    bool success = false;
+
+    for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
+    {
+        if (ioctl(fd, FE_SET_TONE, tone) == 0)
+            success = true;
+        else
+            usleep(TIMEOUT_WAIT);
+    }
+
+    if (!success)
+    {
+        VERBOSE(VB_IMPORTANT, "set_tone failed" + ENO);
+    }
+
+    return success;
+}
+#endif // USING_DVB
+
+#ifdef USING_DVB
 static bool set_voltage(int fd, fe_sec_voltage volt)
 {
     (void) fd;
@@ -1386,7 +1411,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
             QString("%1/2").arg(pos + 1));
 
 #ifdef USING_DVB
-    if (mini_diseqc(m_tree.GetFD(), pos == 0 ? SEC_MINI_A : SEC_MINI_B))
+    if (set_tone(m_tree.GetFD(), (0 == pos) ? SEC_TONE_OFF : SEC_TONE_ON))
         return true;
 #endif // USING_DVB
 
