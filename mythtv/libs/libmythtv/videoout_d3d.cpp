@@ -708,17 +708,19 @@ RenderError:
 
 void VideoOutputD3D::DrawUnusedRects(bool sync)
 {
+    if (embedding)
+        return;
+
     needrepaint = false;
-    HWND hwnd = (embedding) ? m_hEmbedWnd : m_hWnd;
-    HDC hdc = GetDC(hwnd);
+    HDC hdc = GetDC(m_hWnd);
     if (hdc)
     {
         RECT rc;
-        if (GetClientRect(hwnd, &rc))
+        if (GetClientRect(m_hWnd, &rc))
         {
             FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
         }
-        ReleaseDC(hwnd, hdc);
+        ReleaseDC(m_hWnd, hdc);
     }
 }
 
