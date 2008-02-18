@@ -20,6 +20,7 @@ BackendSelect::BackendSelect(MythMainWindow *parent, DatabaseParams *params)
 
     CreateUI();
 
+    UPnp::PerformSearch(gBackendURI);
     UPnp::AddListener(this);
 
     FillListBox();
