@@ -103,6 +103,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _pid_lock(true),
       _input_pat(NULL),
       _input_pmt(NULL),
+      _has_no_av(false),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0)
 {
@@ -283,6 +284,17 @@ void DVBRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
         VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
         ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
+
+        QString sistandard = dvbchannel->GetSIStandard();
+
+        bool has_no_av = true;
+        for (uint i = 0; i < _input_pmt->StreamCount() && has_no_av; i++)
+        {
+            has_no_av &= !_input_pmt->IsVideo(i, sistandard);
+            has_no_av &= !_input_pmt->IsAudio(i, sistandard);
+        }
+        _has_no_av = has_no_av;
+
         dvbchannel->SetPMT(_input_pmt);
         delete oldpmt;
     }
@@ -491,16 +503,17 @@ bool DVBRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
         _buffer_packets = !FindMPEG2Keyframes(&tspacket);
     }
 
-    return ProcessTSPacket(tspacket);
+    return ProcessAVTSPacket(tspacket);
 }
 
 bool DVBRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
 {
     _buffer_packets = !FindAudioKeyframes(&tspacket);
-    return ProcessTSPacket(tspacket);
+    return ProcessAVTSPacket(tspacket);
 }
 
-bool DVBRecorder::ProcessTSPacket(const TSPacket &tspacket)
+/// Common code for processing either audio or video packets
+bool DVBRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
 {
     const uint pid = tspacket.PID();
 
@@ -532,4 +545,61 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket &tspacket)
     BufferedWrite(tspacket);
 
     return true;
+}
+
+bool DVBRecorder::ProcessTSPacket(const TSPacket &tspacket)
+{
+    const uint pid = tspacket.PID();
+
+    // Check continuity counter
+    if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
+    {
+        VERBOSE(VB_RECORD, LOC +
+                QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
+        _continuity_error_count++;
+    }
+
+    // Only create fake keyframe[s] if there are no audio/video streams
+    if (_input_pmt && _has_no_av)
+    {
+        _buffer_packets = !FindOtherKeyframes(&tspacket);
+    }
+    else
+    {
+        // There are audio/video streams. Only write the packet
+        // if audio/video key-frames have been found
+        if (_wait_for_keyframe_option && _first_keyframe < 0)
+            return true;
+
+        _buffer_packets = true;
+    }
+
+    BufferedWrite(tspacket);
+}
+
+void DVBRecorder::BufferedWrite(const TSPacket &tspacket)
+{
+    // Care must be taken to make sure that the packet actually gets written
+    // as the decision to actually write it has already been made
+
+    // Do we have to buffer the packet for exact keyframe detection?
+    if (_buffer_packets)
+    {
+        int idx = _payload_buffer.size();
+        _payload_buffer.resize(idx + TSPacket::SIZE);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        return;
+    }
+
+    // We are free to write the packet, but if we have buffered packet[s]
+    // we have to write them first...
+    if (!_payload_buffer.empty())
+    {
+        if (ringBuffer)
+            ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
+        _payload_buffer.clear();
+    }
+
+    if (ringBuffer)
+        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
 }

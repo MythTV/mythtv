@@ -65,6 +65,9 @@ class DTVRecorder: public RecorderBase
     bool FindH264Keyframes(const TSPacket* tspacket);
     void HandleH264Keyframe(void);
 
+    // For handling other (non audio/video) packets
+    bool FindOtherKeyframes(const TSPacket *tspacket);
+
     // file handle for stream
     int _stream_fd;
 
@@ -87,6 +90,8 @@ class DTVRecorder: public RecorderBase
     bool _request_recording;
     /// Wait for the a GOP/SEQ-start before sending data
     bool _wait_for_keyframe_option;
+
+    bool _has_written_other_keyframe;
 
     // state tracking variables
     /// True iff recording is actually being performed

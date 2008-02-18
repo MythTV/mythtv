@@ -90,8 +90,13 @@ class DVBRecorder :
     bool ProcessVideoTSPacket(const TSPacket& tspacket);
     bool ProcessAudioTSPacket(const TSPacket& tspacket);
 
+    // Common audio/visual processing
+    bool ProcessAVTSPacket(const TSPacket &tspacket);
+
     void SetStreamData(MPEGStreamData*);
     MPEGStreamData* GetStreamData(void) { return _stream_data; }
+
+    void BufferedWrite(const TSPacket &tspacket);
 
   private:
     void TeardownAll(void);
@@ -114,6 +119,7 @@ class DVBRecorder :
     mutable QMutex  _pid_lock;
     ProgramAssociationTable *_input_pat; ///< PAT on input side
     ProgramMapTable         *_input_pmt; ///< PMT on input side
+    bool                     _has_no_av;
 
     // TS recorder stuff
     unsigned char   _stream_id[0x1fff];
