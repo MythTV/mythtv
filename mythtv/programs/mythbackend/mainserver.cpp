@@ -3879,7 +3879,6 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     QDateTime lastmodified;
     QStringList strlist;
-    Qt::DateFormat f = Qt::TextDate;
 
     if ((ismaster) &&
         (pginfo->hostname != gContext->GetHostName()) &&
