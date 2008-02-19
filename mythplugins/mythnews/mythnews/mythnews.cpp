@@ -978,7 +978,9 @@ void MythNews::slotViewArticle()
                      .arg(geometry)
                      .arg(zoom)
                      .arg(cmdUrl);
-                myth_system(cmd);
+                gContext->GetMainWindow()->AllowInput(false);
+                myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+                gContext->GetMainWindow()->AllowInput(true);
             }
         }
     }

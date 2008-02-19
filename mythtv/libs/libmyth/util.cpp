@@ -277,15 +277,41 @@ uint myth_system(const QString &command, int flags)
         /* Parent */
         int status;
 
-        if (waitpid(child, &status, 0) < 0)
+        if (flags & MYTH_SYSTEM_DONT_BLOCK_PARENT)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("myth_system(): Error, waitpid() failed because %1")
-                    .arg(strerror(errno)));
-            return GENERIC_EXIT_NOT_OK;
+            int res = 0;
+
+            while (res == 0)
+            {
+                res = waitpid(child, &status, WNOHANG);
+                if (res == -1)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            QString("myth_system(): Error, waitpid() failed because %1")
+                            .arg(strerror(errno)));
+                    return GENERIC_EXIT_NOT_OK;
+                }
+
+                if (res > 0)
+                    return WEXITSTATUS(status);
+
+                qApp->processEvents();
+                usleep(100000);
+            }
         }
-        return WEXITSTATUS(status);
+        else
+        {
+            if (waitpid(child, &status, 0) < 0)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("myth_system(): Error, waitpid() failed because %1")
+                        .arg(strerror(errno)));
+                return GENERIC_EXIT_NOT_OK;
+            }
+            return WEXITSTATUS(status);
+        }
     }
+
     return GENERIC_EXIT_NOT_OK;
 }
 #else

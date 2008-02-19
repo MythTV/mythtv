@@ -12,6 +12,7 @@
 
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking
 #define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU 0x2 //< myth_system() flag to avoid blocking
+#define MYTH_SYSTEM_DONT_BLOCK_PARENT        0x4 //< myth_system() flag to avoid blocking
 
 class QPixmap;
 class QImage;
