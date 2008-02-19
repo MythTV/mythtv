@@ -69,7 +69,7 @@ QString iso639_str2_to_str3(const QString &str2)
         key3 = _iso639_key2_to_key3[key2];
     if (key3)
         return iso639_key_to_str3(key3);
-    return QString::null;
+    return "und";
 }
 
 QString iso639_Alpha3_toName(const unsigned char *iso639_2)
