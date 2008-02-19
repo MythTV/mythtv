@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2008-02-13, v0.21.00pre
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2008-02-19, v0.21.00pre
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2646,14 +2646,14 @@ $ su -
 <H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1">Configuring the Master backend system</A>
 </H2>
 
-<P>Open a shell and decide where you will store your video files.  This may be
-one directory or multiple directories on the same or different filesystems.
-There is no default directory used for new recordings, you <B>must</B> create
-at least one storage directory and configure Myth to use it by running
-mythtv-setup.  If you do not do this, then MythTV will be unable to record
-anything.  The following example is specific for <CODE>/var/video</CODE>, but the
-same instructions would apply for any directory name you choose to use.
-See the 
+<P>Open a shell and decide where you will store your video files.  This may
+be one directory or multiple directories on the same or different
+filesystems. There is no default directory used for new recordings, you
+<B>must</B> create at least one storage directory and configure Myth to
+use it by running <B>mythtv-setup</B>.  If you do not do this, then MythTV
+will be unable to record anything.  The following example is specific for
+<CODE>/var/video</CODE>, but the same instructions would apply for any directory
+name you choose to use. See the 
 <A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> section for hints on creating a
 partition for MythTV.</P>
 <P>
@@ -2667,9 +2667,42 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  The last slash "/" is not required.</P>
+<P>
+<A NAME="storagegrouptip"></A> 
+<B>TIP</B>:  Try not to have your video mount point on the same partition
+as your root partition, which could lead to the filling up of your root
+partition with video data if the mount fails.  For example:</P>
+<P>If <CODE>/var/video</CODE> is created on your root partition and you then
+perform a mount of another drive to this directory there won't be any
+problems if everything is working the way it should. However, if the mount
+fails for some reason, <CODE>/var/video</CODE> still exists, so MythTV will find
+the directory and write files to it.  If your <CODE>/</CODE> mount point is
+space limited, <CODE>/var/video</CODE> will <B>also</B> be space limited, and
+it won't take long to fill the partition.  This will cause a number of
+side-effects, most of them bad.  Instead, create subdirectories as the
+destination for the storage group.</P>
+<P>Your directory structure could then look something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+/mnt/video/drive1/video
+/mnt/video/drive2/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Your <CODE>/etc/fstab</CODE> would look like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+/dev/hdb1 /mnt/video/drive1
+/dev/hdc1 /mnt/video/drive2
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Because the Storage Group path is <CODE>/mnt/video/drive1/video</CODE>, if the
+mythbackend can only find <CODE>/mnt/video/drive1</CODE> it will <EM>not</EM>
+write files to that share.</P>
 <P>After you create the desired directory or directories for storing your video
 files, you will need to add them to the proper Storage Group using
-mythtv-setup.  This procedure is described below in the
+<B>mythtv-setup</B>.  This procedure is described below in the 
 <A HREF="#storagegroups">Storage Groups</A> section.</P>
 <P>The first thing to configure is the Master backend system.  If you are
 running multiple backend systems, the Master backend will make all
@@ -2950,8 +2983,13 @@ could be your "boot" drive, and the remaining four could be dedicated to
 media storage. You could format the drives and mount them as
 <CODE>/mnt/store/d2</CODE>, <CODE>/mnt/store/d3</CODE>, <CODE>/mnt/store/d4</CODE> and
 <CODE>/mnt/store/d5</CODE>.</P>
-<P>You would then add the four directories specified above into the "Default"
-Storage Group.</P>
+<P>Within each mount point, it's <EM>strongly</EM> recommended that you use a
+sub-directory and make that the destination path for the Storage Group.  See
+the 
+<A HREF="#storagegrouptip">Tip</A> in the "Configuring the Master
+backend" section for additional information.</P>
+<P>You would then add the four subdirectories you created under the mount
+points (<CODE>/mnt/store/d1/video</CODE>, etc) into the "Default" Storage Group.</P>
 <P>At recording time, if there were four simultaneous recordings, MythTV would
 put one recording onto each drive.</P>
 <P>Or, say that you originally installed MythTV to a 80GB hard drive, and that
