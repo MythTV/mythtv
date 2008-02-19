@@ -119,13 +119,12 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
     while (!quitAll)
     {
-        int freeRecorders = RemoteGetFreeRecorderCount();
         if (curProgram)
         {
             if (!tv->Playback(curProgram))
                 quitAll = true;
         }
-        else if (!freeRecorders)
+        else if (!RemoteGetFreeRecorderCount())
         {
             vector<ProgramInfo *> *reclist;
             reclist = RemoteGetCurrentlyRecordingList();
