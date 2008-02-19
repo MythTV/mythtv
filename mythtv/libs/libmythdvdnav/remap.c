@@ -219,6 +219,8 @@ remap_t* remap_loadmap( char *title) {
 	}
     }
 
+    fclose( fp);
+
     if (map->nblocks == 0 && map->debug == 0) return NULL;
     return map;
 }
