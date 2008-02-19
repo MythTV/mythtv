@@ -45,6 +45,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     // settings
     _request_recording(false),
     _wait_for_keyframe_option(true),
+    _has_written_other_keyframe(false),
     // state
     _recording(false),
     _error(false),
@@ -146,6 +147,7 @@ void DTVRecorder::ResetForNewFile(void)
 
     //_start_code
     _first_keyframe             =-1;
+    _has_written_other_keyframe = false;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
     _last_seq_seen              = 0;
@@ -342,6 +344,30 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
     }
 
     return hasKeyFrame;
+}
+
+/// Non-Audio/Video data. For streams which contain no audio/video,
+/// write just 1 key-frame at the start.
+bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
+{
+    if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
+        return true;
+
+    if (_has_written_other_keyframe)
+        return true;
+
+    VERBOSE(VB_RECORD, LOC + "DSMCC - FindOtherKeyframes() - "
+            "generating initial key-frame");
+
+    _frames_seen_count++;
+    _frames_written_count++;
+    _last_keyframe_seen = _frames_seen_count;
+
+    HandleKeyframe();
+
+    _has_written_other_keyframe = true;
+
+    return true;
 }
 
 // documented in recorderbase.h

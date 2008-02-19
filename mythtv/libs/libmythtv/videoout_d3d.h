@@ -36,8 +36,10 @@ class VideoOutputD3D : public VideoOutput
                       void        *codec_private);
     int GetRefreshRate(void);
     void UpdatePauseFrame(void);
-    void DrawUnusedRects(bool) {};
+    void DrawUnusedRects(bool);
     void Zoom(ZoomDirection direction);
+    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    virtual void StopEmbedding(void);
 
     float GetDisplayAspect(void) const;
 
@@ -50,13 +52,13 @@ class VideoOutputD3D : public VideoOutput
   private:
     int                     m_InputCX;
     int                     m_InputCY;
-    RECT                    m_rcDest;
 
     VideoFrame              m_pauseFrame;
     QMutex                  m_lock;
 
     int                     m_RefreshRate;
     HWND                    m_hWnd;
+    HWND                    m_hEmbedWnd;
     D3DFORMAT               m_ddFormat;
     IDirect3D9             *m_pD3D;
     IDirect3DDevice9       *m_pd3dDevice;

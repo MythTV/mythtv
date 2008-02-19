@@ -11,6 +11,7 @@ using namespace std;
 #include "filtermanager.h"
 #include "fourcc.h"
 #include "videodisplayprofile.h"
+#include "libmythui/mythmainwindow.h"
 
 #include "mmsystem.h"
 #include "tv.h"
@@ -48,7 +49,8 @@ const int kKeepPrebuffer = 2;
 
 VideoOutputD3D::VideoOutputD3D(void)
     : VideoOutput(), m_InputCX(0), m_InputCY(0),
-      m_lock(true), m_RefreshRate(60), m_hWnd(NULL),
+      m_lock(true), m_RefreshRate(60),
+      m_hWnd(NULL), m_hEmbedWnd(NULL),
       m_ddFormat(D3DFMT_UNKNOWN), m_pD3D(NULL), m_pd3dDevice(NULL),
       m_pSurface(NULL), m_pTexture(NULL), m_pVertexBuffer(NULL)
 {
@@ -236,21 +238,19 @@ bool VideoOutputD3D::InitD3D()
 
     /* Set up the structure used to create the D3DDevice. */
     ZeroMemory(&d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-    d3dpp.Flags                  = D3DPRESENTFLAG_VIDEO;
-    d3dpp.Windowed               = TRUE;
     d3dpp.hDeviceWindow          = m_hWnd;
+    d3dpp.Windowed               = TRUE;
     d3dpp.BackBufferWidth        = m_InputCX;
-    d3dpp.BackBufferHeight       = m_InputCY;
-    d3dpp.SwapEffect             = D3DSWAPEFFECT_COPY;
-    d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
-    d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_ONE;
-    d3dpp.BackBufferFormat       = d3ddm.Format;
+    d3dpp.BackBufferHeight       = m_InputCX;
     d3dpp.BackBufferCount        = 1;
-    d3dpp.EnableAutoDepthStencil = FALSE;
+    d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
+    d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
+    d3dpp.Flags                  = D3DPRESENTFLAG_VIDEO;
+    d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_ONE;
 
     // Create the D3DDevice
     if (D3D_OK != m_pD3D->CreateDevice(D3DADAPTER_DEFAULT,
-                                       D3DDEVTYPE_HAL, m_hWnd,
+                                       D3DDEVTYPE_HAL, d3dpp.hDeviceWindow,
                                        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
                                        &d3dpp, &m_pd3dDevice))
     {
@@ -260,7 +260,7 @@ bool VideoOutputD3D::InitD3D()
 
     //input seems to always be PIX_FMT_YUV420P
     //MAKEFOURCC('I','4','2','0');
-    //D3DFMT_G8R8_G8B8???
+    //IYUV I420
 
     D3DFORMAT format = D3DFMT_X8R8G8B8;
     /* test whether device can create a surface of that format */
@@ -280,14 +280,16 @@ bool VideoOutputD3D::InitD3D()
         if (FAILED(hr))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "CheckDeviceFormatConversion failed");
+                    "Device does not support conversion to RGB format");
 
             return false;
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "CheckDeviceFormat failed");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Device does not support surfaces in RGB format");
+
         return false;
     }
 
@@ -453,7 +455,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw,
                           int winh, WId embedid)
 {
-    VERBOSE(VB_PLAYBACK, LOC_ERR +
+    VERBOSE(VB_PLAYBACK, LOC +
             "Init w=" << width << " h=" << height);
 
     db_vdisp_profile->SetVideoRenderer("direct3d");
@@ -523,19 +525,6 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     img_convert(&image_out, PIX_FMT_RGBA32, &image_in,
                 PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 
-#if 0
-    static int c = 0;
-    for (int y = 0; y < m_InputCY; y++)
-    {
-        for (int x = 0; x < m_InputCX; x++)
-        {
-            ((int*)d3drect.pBits)[y * d3drect.Pitch / 4 + x] =
-                ((x + c) & 0xff) << 8;
-        }
-    }
-    c += 5;
-#endif
-
     hr = m_pSurface->UnlockRect();
     if (FAILED(hr))
     {
@@ -554,20 +543,38 @@ void VideoOutputD3D::Show(FrameScanType )
         return;
     }
 
+    if (needrepaint)
+        DrawUnusedRects(false);
+
     if (m_pd3dDevice)
     {
-        LPDIRECT3DSURFACE9      p_d3ddest;
-        HRESULT hr;
-
         // check if device is still available
-        hr = m_pd3dDevice->TestCooperativeLevel();
+        HRESULT hr = m_pd3dDevice->TestCooperativeLevel();
         if (FAILED(hr))
         {
-            if (D3DERR_DEVICENOTRESET != hr)
+            switch (hr)
             {
-                // device is not usable at present
-                // (lost device, out of video mem ?)
-                goto RenderError;
+                case D3DERR_DEVICENOTRESET:
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "The device has been lost but can be reset "
+                            "at this time. TODO: implement device reset");
+                    // TODO: instead of goto renderError, reset the device
+                    //m_pd3dDevice->Reset(...
+                    goto RenderError;
+                case D3DERR_DEVICELOST:
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "The device has been lost and cannot be reset "
+                            "at this time.");
+                    goto RenderError;
+                case D3DERR_DRIVERINTERNALERROR:
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "Internal driver error. "
+                            "Please shut down the application.");
+                    goto RenderError;
+                default:
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "TestCooperativeLevel() failed.");
+                    goto RenderError;
             }
         }
 
@@ -575,25 +582,38 @@ void VideoOutputD3D::Show(FrameScanType )
         hr = m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET,
                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
         if (FAILED(hr))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Clear() failed.");
             goto RenderError;
+        }
 
         /* retrieve texture top-level surface */
+        LPDIRECT3DSURFACE9      p_d3ddest;
         hr = m_pTexture->GetSurfaceLevel(0, &p_d3ddest);
         if (FAILED(hr))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "GetSurfaceLevel() failed");
             goto RenderError;
+        }
 
         /* Copy picture surface into texture surface,
-           color space conversion happens here */
+           color space conversion could happen here */
         hr = m_pd3dDevice->StretchRect(m_pSurface, NULL, p_d3ddest,
-                                       NULL, D3DTEXF_NONE);
+                                       NULL, D3DTEXF_LINEAR);
         p_d3ddest->Release();
         if (FAILED(hr))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "StretchRect() failed");
             goto RenderError;
+        }
 
         // Begin the scene
         hr = m_pd3dDevice->BeginScene();
         if (FAILED(hr))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "BeginScene() failed");
             goto RenderError;
+        }
 
         // Setup our texture. Using textures introduces the texture
         // stage states, which govern how textures get blended together
@@ -604,6 +624,8 @@ void VideoOutputD3D::Show(FrameScanType )
         if (FAILED(hr))
         {
             m_pd3dDevice->EndScene();
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "SetTexture() failed");
             goto RenderError;
         }
 
@@ -613,21 +635,21 @@ void VideoOutputD3D::Show(FrameScanType )
         if (FAILED(hr))
         {
             m_pd3dDevice->EndScene();
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "SetStreamSource() failed");
             goto RenderError;
         }
 
         // we use FVF instead of vertex shader
         hr = m_pd3dDevice->SetVertexShader(NULL);
-        if (FAILED(hr))
-        {
-            m_pd3dDevice->EndScene();
-            goto RenderError;
-        }
+        //if (FAILED(hr)) // we don't need to know
 
         hr = m_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
         if (FAILED(hr))
         {
             m_pd3dDevice->EndScene();
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "SetFVF() failed");
             goto RenderError;
         }
 
@@ -636,6 +658,8 @@ void VideoOutputD3D::Show(FrameScanType )
         if (FAILED(hr))
         {
             m_pd3dDevice->EndScene();
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "DrawPrimitive() failed");
             goto RenderError;
         }
 
@@ -643,62 +667,78 @@ void VideoOutputD3D::Show(FrameScanType )
         hr = m_pd3dDevice->EndScene();
         if (FAILED(hr))
         {
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "EndScene() failed");
             goto RenderError;
         }
 
         {
-            RECT rc_dest;
-            if (!embedding)
-            {
-                ::GetClientRect(m_hWnd, &rc_dest);
-                rc_dest.right--;
-                rc_dest.bottom--;
-            }
-            else
-            {
-                rc_dest.left = display_visible_rect.left();
-                rc_dest.top = display_visible_rect.top();
-                rc_dest.right = display_visible_rect.right();
-                rc_dest.bottom = display_visible_rect.bottom();
-            }
-
             RECT rc_src =
-                {0, 0, m_InputCX-1, m_InputCY-1};
-
-            // A
-            if (display_video_rect.height() < rc_dest.bottom - rc_dest.top)
             {
-                rc_dest.top    = display_video_rect.top();
-                rc_dest.bottom = display_video_rect.bottom();
-                rc_src.left    = (display_video_rect.width() -
-                                  (rc_dest.right - rc_dest.left)) / 2;
-                rc_src.right  -= rc_src.left;
-            }
-            // B
-            if (display_video_rect.width() < rc_dest.right - rc_dest.left)
-            {
-                rc_dest.left   = display_video_rect.left();
-                rc_dest.right  = display_video_rect.right();
-                rc_src.top     = (display_video_rect.height() -
-                                  (rc_dest.bottom - rc_dest.top)) / 2;
-                rc_src.bottom -= rc_src.top;
-            }
+                video_rect.left(),  video_rect.top(),
+                video_rect.right(), video_rect.bottom(),
+            };
 
-            m_rcDest = rc_dest;
-            hr = m_pd3dDevice->Present(&rc_src, &rc_dest, NULL, NULL);
+            RECT rc_dest =
+            {
+                display_video_rect.left(), display_video_rect.top(),
+                display_video_rect.right(), display_video_rect.bottom(),
+            };
+
+            hr = m_pd3dDevice->Present(
+                &rc_src, &rc_dest,
+                (embedding) ? m_hEmbedWnd : NULL, NULL);
         }
 
         if (FAILED(hr))
-            RenderError:
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Present() failed)");
 
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Video rendering failed");
+RenderError:
 
         qApp->wakeUpGuiThread();
+
+        // reset system idle timeout
+        SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     }
     else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Direct3D device not initialized");
     }
+}
+
+void VideoOutputD3D::DrawUnusedRects(bool sync)
+{
+    if (embedding)
+        return;
+
+    needrepaint = false;
+    HDC hdc = GetDC(m_hWnd);
+    if (hdc)
+    {
+        RECT rc;
+        if (GetClientRect(m_hWnd, &rc))
+        {
+            FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+        }
+        ReleaseDC(m_hWnd, hdc);
+    }
+}
+
+void VideoOutputD3D::EmbedInWidget(WId wid, int x, int y, int w, int h)
+{
+    if (embedding)
+        return;
+
+    VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    m_hEmbedWnd = wid;
+}
+
+void VideoOutputD3D::StopEmbedding(void)
+{
+    if (!embedding)
+        return;
+
+    VideoOutput::StopEmbedding();
 }
 
 void VideoOutputD3D::Zoom(ZoomDirection direction)
@@ -754,8 +794,6 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 float VideoOutputD3D::GetDisplayAspect(void) const
 {
-    VERBOSE(VB_PLAYBACK, LOC + "GetDisplayAspect");
-
     float width  = display_visible_rect.width();
     float height = display_visible_rect.height();
 

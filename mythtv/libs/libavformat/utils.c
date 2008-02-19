@@ -1885,7 +1885,7 @@ int av_find_stream_info(AVFormatContext *ic)
                 break;
             if(st->parser && st->parser->parser->split && !st->codec->extradata)
                 break;
-            if(st->first_dts == AV_NOPTS_VALUE)
+            if(st->first_dts == AV_NOPTS_VALUE && st->codec->codec_id != CODEC_ID_DSMCC_B)
                 break;
             if (st->codec->codec_type == CODEC_TYPE_VIDEO)
                 hasvideo = 1;
