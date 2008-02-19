@@ -49,6 +49,7 @@ MediaRenderer::MediaRenderer()
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
         delete m_pHttpServer;
+        m_pHttpServer = NULL;
         return;
     }
 
