@@ -555,9 +555,13 @@ void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
                 break;
             ++it;
         }
-        myth_system(cmd);
+        gContext->GetMainWindow()->AllowInput(false);
+        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        gContext->GetMainWindow()->AllowInput(true);        
     } else {
         cmd += geometry + zoom + viewItem->myBookmarkSite->url;
-        myth_system(cmd);
+        gContext->GetMainWindow()->AllowInput(false);
+        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        gContext->GetMainWindow()->AllowInput(true);
     }
 }
