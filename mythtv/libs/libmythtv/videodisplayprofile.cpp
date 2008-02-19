@@ -37,7 +37,7 @@ bool ProfileItem::IsMatch(const QSize &size, float rate) const
         else if (cmp == ">=")
             match &= (size.width() >= width) && (size.height() >= height);
         else if (cmp == ">")
-            match &= (size.width() >  width) && (size.height() >  height);
+            match &= (size.width() >  width) || (size.height() >  height);
         else
             match = false;
     }
