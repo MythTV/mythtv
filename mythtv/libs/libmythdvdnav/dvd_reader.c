@@ -1097,6 +1097,7 @@ int DVDDiscID( dvd_reader_t *dvd, unsigned char *discid )
 	    if( buffer_base == NULL ) {
 		fprintf( stderr, "libdvdread: DVDDiscId, failed to "
 			 "allocate memory for file read!\n" );
+		DVDCloseFile( dvd_file );
 		return -1;
 	    }
 	    bytes_read = DVDReadBytes( dvd_file, buffer, file_size );
