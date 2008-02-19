@@ -1178,6 +1178,7 @@ void PlaybackProfileConfig::InitUI(void)
         editProf[i]->setLabel(QObject::tr("Edit"));
         delProf[i]->setLabel(QObject::tr("Delete"));
         priority[i]->setValue(i + 1);
+        items[i].Set("pref_priority", QString::number(i + 1));
 
         grp->addChild(editProf[i]);
         grp->addChild(delProf[i]);
