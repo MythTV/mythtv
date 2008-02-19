@@ -374,14 +374,6 @@ void VideoDisplayProfile::LoadBestPreferences(const QSize &size,
         pref = (*it).GetAll();
 }
 
-uint VideoDisplayProfile::GetMaxCPUs(void) const
-{
-    QString cpus = GetPreference("pref_max_cpus");
-    if (cpus.isEmpty())
-        return 1;
-    return cpus.toUInt();
-}
-
 ////////////////////////////////////////////////////////////////////////////
 // static methods
 

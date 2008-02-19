@@ -81,7 +81,8 @@ class MPUBLIC VideoDisplayProfile
         { return GetPreference("pref_decoder"); }
     bool    IsDecoderCompatible(const QString &decoder);
 
-    uint GetMaxCPUs(void) const;
+    uint GetMaxCPUs(void) const
+        { return GetPreference("pref_max_cpus").toUInt(); }
 
     QString GetVideoRenderer(void) const
         { return GetPreference("pref_videorenderer"); }
