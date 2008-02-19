@@ -2176,15 +2176,36 @@ void av_close_input_file(AVFormatContext *s)
 
 AVStream *av_new_stream(AVFormatContext *s, int id)
 {
-    AVStream *st = av_mallocz(sizeof(AVStream));
-    if (st) {
-        st->codec = avcodec_alloc_context();
-        AVStream *stream = av_add_stream(s, st, id);
-        if (!stream)
-            av_free(st);
-        return stream;
+    AVStream *st;
+    int i;
+
+    if (s->nb_streams >= MAX_STREAMS)
+        return NULL;
+
+    st = av_mallocz(sizeof(AVStream));
+    if (!st)
+        return NULL;
+
+    st->codec= avcodec_alloc_context();
+    if (s->iformat) {
+        /* no default bitrate if decoding */
+        st->codec->bit_rate = 0;
     }
-    return NULL;
+    st->index = s->nb_streams;
+    st->id = id;
+    st->start_time = AV_NOPTS_VALUE;
+    st->duration = AV_NOPTS_VALUE;
+    st->cur_dts = AV_NOPTS_VALUE;
+    st->first_dts = AV_NOPTS_VALUE;
+
+    /* default pts settings is MPEG like */
+    av_set_pts_info(st, 33, 1, 90000);
+    st->last_IP_pts = AV_NOPTS_VALUE;
+    for(i=0; i<MAX_REORDER_DELAY+1; i++)
+        st->pts_buffer[i]= AV_NOPTS_VALUE;
+
+    s->streams[s->nb_streams++] = st;
+    return st;
 }
 
 /**
