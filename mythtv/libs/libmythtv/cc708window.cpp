@@ -217,6 +217,8 @@ CC708Character &CC708Window::GetCCChar(void) const
 
 vector<CC708String*> CC708Window::GetStrings(void) const
 {
+    QMutexLocker locker(&lock);
+
     vector<CC708String*> list;
 
     CC708String *cur = NULL;
