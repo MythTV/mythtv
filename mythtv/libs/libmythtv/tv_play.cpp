@@ -83,6 +83,24 @@ RUNPLAYBACKBOX TV::RunPlaybackBoxPtr = NULL;
  */
 RUNVIEWSCHEDULED TV::RunViewScheduledPtr = NULL;
 
+
+/**
+ * \brief If any cards are configured, return the number.
+ */
+static int ConfiguredTunerCards(void)
+{
+    int count = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT COUNT(cardid) FROM capturecard;");
+    if (query.exec() && query.isActive() && query.size() && query.next())
+        count = query.value(0).toInt();
+
+    VERBOSE(VB_RECORD, "ConfiguredTunerCards() = " + QString::number(count));
+
+    return count;
+}
+
 /**
  * \brief returns true if the recording completed when exiting.
  */
@@ -125,7 +143,22 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             if (!tv->Playback(curProgram))
                 quitAll = true;
         }
-        else if (!RemoteGetFreeRecorderCount())
+        else if (RemoteGetFreeRecorderCount())
+        {
+            if (!tv->LiveTV(showDialogs, startInGuide))
+            {
+                tv->StopLiveTV();
+                quitAll = true;
+            }
+        }
+        else if (!ConfiguredTunerCards())
+        {
+            // (cannot watch Live TV without a card :-)
+            tv->ShowNoRecorderDialog();
+            quitAll = true;
+            continue;
+        }
+        else
         {
             vector<ProgramInfo *> *reclist;
             reclist = RemoteGetCurrentlyRecordingList();
@@ -133,7 +166,9 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             {
                 VERBOSE(VB_PLAYBACK, LOC_ERR + 
                         "Failed to get recording show list");
+                tv->ShowNoRecorderDialog();
                 quitAll = true;
+                continue;
             }
 
             int numrecordings = reclist->size();
@@ -175,15 +210,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
                 delete reclist;
             continue;
         }
-        else
-        {
-            if (!tv->LiveTV(showDialogs, startInGuide))
-            {
-                tv->StopLiveTV();
-                quitAll = true;
-            }
-        }
-        
+
         tv->setInPlayList(inPlaylist);
         tv->setUnderNetworkControl(initByNetworkCommand);
         
