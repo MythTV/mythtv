@@ -86,6 +86,17 @@ typedef enum
     kAskAllowMultiRec,
 } AskAllowType;
 
+/**
+ * Type of message displayed in ShowNoRecorderDialog()
+ */
+typedef enum
+{
+    kNoRecorders = 0,  ///< No free recorders
+    kNoCurrRec = 1,    ///< No current recordings
+    kNoTuners = 2,     ///< No capture cards configured
+} NoRecorderMsg;
+
+
 class AskProgramInfo
 {
   public:
@@ -158,7 +169,7 @@ class MPUBLIC TV : public QObject
     void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
     bool IsSameProgram(ProgramInfo *p);
 
-    void ShowNoRecorderDialog(void);
+    void ShowNoRecorderDialog(NoRecorderMsg msgType = kNoRecorders);
     void FinishRecording(void);
     void AskAllowRecording(const QStringList&, int, bool, bool);
     void PromptStopWatchingRecording(void);

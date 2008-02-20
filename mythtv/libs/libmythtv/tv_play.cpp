@@ -154,7 +154,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
         else if (!ConfiguredTunerCards())
         {
             // (cannot watch Live TV without a card :-)
-            tv->ShowNoRecorderDialog();
+            tv->ShowNoRecorderDialog(kNoTuners);
             quitAll = true;
             continue;
         }
@@ -166,7 +166,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             {
                 VERBOSE(VB_PLAYBACK, LOC_ERR + 
                         "Failed to get recording show list");
-                tv->ShowNoRecorderDialog();
+                tv->ShowNoRecorderDialog(kNoCurrRec);
                 quitAll = true;
                 continue;
             }
@@ -8145,15 +8145,30 @@ QStringList TV::GetValidRecorderList(uint chanid, const QString &channum)
     return QStringList();
 }
 
-void TV::ShowNoRecorderDialog(void)
+void TV::ShowNoRecorderDialog(NoRecorderMsg msgType)
 {
-    QString errorText = tr("MythTV is already using all available "
+    QString errorText;
+ 
+    switch (msgType)
+    {
+        case kNoRecorders:
+            errorText = tr("MythTV is already using all available "
                            "inputs for the channel you selected. "
                            "If you want to watch an in-progress recording, "
                            "select one from the playback menu.  If you "
                            "want to watch live TV, cancel one of the "
                            "in-progress recordings from the delete "
                            "menu.");
+            break;
+        case kNoCurrRec:
+            errorText = tr("MythTV is using all inputs for Live TV?");
+            break;
+        case kNoTuners:
+            errorText = tr("MythTV has no capture cards defined. "
+                           "Please run the mythtv-setup program.");
+            break;
+    }
+
     if (embedWinID)
     {
         VERBOSE(VB_IMPORTANT, errorText);
