@@ -469,6 +469,7 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
                 .arg(FiltInfo->symbol)
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));
+        dlclose(handle);
         return NULL;
     }
 
@@ -476,6 +477,7 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
 
     if (Filter == NULL)
     {
+        dlclose(handle);
         return NULL;
     }
 
