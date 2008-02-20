@@ -67,23 +67,24 @@ const uint TV::kPreviousSource= 2;
 #define LOC_WARN QString("TV Warning: ")
 #define LOC_ERR QString("TV Error: ")
 
-/*
+/**
  * \brief stores last program info. maintains info so long as
  * mythfrontend is active
  */
 QStringList TV::lastProgramStringList = QStringList();
 
-/*
+/**
  * \brief function pointer for RunPlaybackBox in playbackbox.cpp
  */
 RUNPLAYBACKBOX TV::RunPlaybackBoxPtr = NULL;
 
-/**\ brief function pointer for RunViewScheduled in viewscheduled.cpp
+/**
+ * \brief function pointer for RunViewScheduled in viewscheduled.cpp
  */
 RUNVIEWSCHEDULED TV::RunViewScheduledPtr = NULL;
 
-/*
- \brief returns true if the recording completed when exiting.
+/**
+ * \brief returns true if the recording completed when exiting.
  */
 bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide, 
                 bool inPlaylist, bool initByNetworkCommand)
@@ -3770,7 +3771,7 @@ void TV::ProcessNetworkControlCommand(const QString &command)
             else
             {
 
-		if (activerbuffer->isDVD())
+                if (activerbuffer->isDVD())
                     infoStr = "DVD";
                 else if (playbackinfo->isVideo)
                     infoStr = "Video";
@@ -3781,18 +3782,19 @@ void TV::ProcessNetworkControlCommand(const QString &command)
                     respDate = playbackinfo->recstartts;
             }
 
-	    if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
+            if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
             {
                 infoStr += QString(" %1 %2 %3 %4 %5 %6 %7")
-		            .arg(posInfo.desc)
-    		            .arg(speedStr)
-                            .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
+                            .arg(posInfo.desc)
+                            .arg(speedStr)
+                            .arg(playbackinfo != NULL ?
+                                 playbackinfo->chanid : "-1")
                             .arg(respDate.toString(Qt::ISODate))
                             .arg((long)nvp->GetFramesPlayed())
-			    .arg(activerbuffer->GetFilename())
-			    .arg(frameRate);
-	    }
-	    else
+                            .arg(activerbuffer->GetFilename())
+                            .arg(frameRate);
+            }
+            else
             {
                 QString position = posInfo.desc.section(" ",0,0);
                 infoStr += QString(" %1 %2 %3 %4 %5")
@@ -7469,7 +7471,7 @@ void TV::BuildOSDTreeMenu(void)
         int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
                  ((kAspect_16_9 == j) ? kAspect_14_9 : j));
 
- 	bool sel = (i != kAspect_Off) ? (aspectoverride == i) :
+        bool sel = (i != kAspect_Off) ? (aspectoverride == i) :
             (aspectoverride <= kAspect_Off) || (aspectoverride >= kAspect_END);
         subitem = new OSDGenericTree(item, toString((AspectOverrideMode) i),
                                      QString("TOGGLEASPECT%1").arg(i),
@@ -7480,7 +7482,7 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
     for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
     {
- 	bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :
+        bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :
             (adjustfill <= kAdjustFill_Off) || (adjustfill >= kAdjustFill_END);
         subitem = new OSDGenericTree(item, toString((AdjustFillMode) i),
                                      QString("TOGGLEFILL%1").arg(i),
