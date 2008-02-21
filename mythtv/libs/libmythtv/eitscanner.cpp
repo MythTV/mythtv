@@ -18,6 +18,16 @@
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
 
+
+/** \fn EITThread::run(void)
+ *  \brief Thunk that allows scanner Qthread to
+ *         call EITScanner::RunEventLoop().
+ */
+void EITThread::run(void)
+{
+    scanner->RunEventLoop();
+}
+
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
  *
@@ -36,7 +46,9 @@ EITScanner::EITScanner(uint _cardnum)
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
 
-    pthread_create(&eventThread, NULL, SpawnEventLoop, this);
+    // Start scanner with Idle scheduling priority, to avoid problems with recordings.
+    eventThread.scanner = this;
+    eventThread.start(QThread::IdlePriority);
 }
 
 void EITScanner::TeardownAll(void)
@@ -46,7 +58,7 @@ void EITScanner::TeardownAll(void)
     {
         exitThread = true;
         exitThreadCond.wakeAll();
-        pthread_join(eventThread, NULL);
+        eventThread.wait();
     }
 
     if (eitHelper)
@@ -54,20 +66,6 @@ void EITScanner::TeardownAll(void)
         delete eitHelper;
         eitHelper = NULL;
     }
-}
-
-/** \fn EITScanner::SpawnEventLoop(void*)
- *  \brief Thunk that allows scanner_thread pthread to
- *         call EITScanner::RunScanner().
- */
-void *EITScanner::SpawnEventLoop(void *param)
-{
-    // Lower scheduling priority, to avoid problems with recordings.
-    if (setpriority(PRIO_PROCESS, 0, 19))
-        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
-    EITScanner *scanner = (EITScanner*) param;
-    scanner->RunEventLoop();
-    return NULL;
 }
 
 /** \fn EITScanner::RunEventLoop()
