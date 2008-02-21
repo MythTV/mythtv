@@ -3010,6 +3010,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     VERBOSE(VB_PLAYBACK, LOC + "DVD: in still frame but "
                         "there is no picture. Using last stored still frame");
                     storedPackets.append(lastDVDStillFrame);
+                    ringBuffer->DVD()->SeekCellStart();
                     lastDVDStillFrame = NULL;
                     decodeStillFrame = true;
                 }
@@ -3121,18 +3122,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         {
             MpegPreProcessPkt(curstream, pkt);
 
-            if (mpeg_seq_end_seen)
+            if (mpeg_seq_end_seen && storevideoframes)
             {
-                mpeg_seq_end_seen = false;
-               
-                if (storevideoframes)
-                    ringBuffer->DVD()->InStillFrame(true);
-                else
-                {
-                    av_free_packet(pkt);
-                    pkt = NULL;
-                    continue;
-                }
+                ringBuffer->DVD()->InStillFrame(true);
             }
 
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
@@ -3142,6 +3134,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 decodeStillFrame = true;
                 gContext->RestoreScreensaver();
                 d->ResetMPEG2();
+            }
+            
+            if (mpeg_seq_end_seen)
+            {
+                mpeg_seq_end_seen = false;
+                av_free_packet(pkt);
+                pkt = NULL;
+                continue;
             }
 
             if (!d->HasMPEG2Dec())
@@ -3656,7 +3656,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     // Validate the video pts against the last pts. If it's
                     // a little bit smaller or equal, compute it from the last.
                     // Otherwise assume a wraparound.
-                    if (temppts <= lastvpts && temppts + 10000 > lastvpts)
+                    if (!ringBuffer->isDVD() && 
+                        temppts <= lastvpts && temppts + 10000 > lastvpts)
                     {
                         temppts = lastvpts;
                         temppts += (long long)(1000 * av_q2d(context->time_base));
@@ -3697,6 +3698,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
+                    /* HACK remove from root of still frame display issue is fixed */
+                    if (decodeStillFrame)
+                        GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
                     if (d->HasMPEG2Dec() && mpa_pic.data[3])
                         context->release_buffer(context, &mpa_pic);
 
