@@ -1138,7 +1138,7 @@ void Scheduler::SchedNewRecords(void)
 void Scheduler::MoveHigherRecords(bool move_this)
 {
     RecIter i = retrylist.begin();
-    for ( ; i != retrylist.end(); i++)
+    for ( ; move_this && i != retrylist.end(); i++)
     {
         ProgramInfo *p = *i;
         if (p->recstatus != rsUnknown)
