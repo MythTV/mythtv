@@ -278,7 +278,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         deviceIsMpegFile = true;
         bufferSize = 64000;
         QString newVideoDev = videodev;
-        if (newVideoDev.startsWith("file:", false)
+        if (newVideoDev.startsWith("file:", false))
             newVideoDev = newVideoDev.remove(0,5);
         SetOption("videodevice", newVideoDev);
     }
