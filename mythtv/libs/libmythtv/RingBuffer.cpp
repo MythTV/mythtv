@@ -15,7 +15,6 @@
 // Qt headers
 #include <qsocket.h>
 #include <qfile.h>
-#include <qregexp.h>
 #include <qapplication.h>
 #include <qdatetime.h>
 #include <qfileinfo.h>
@@ -182,7 +181,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         is_dvd = true;
         dvdPriv = new DVDRingBufferPriv();
         startreadahead = false;
-        int pathLen = filename.find(QRegExp("/"), 4);
+        int pathLen = filename.find("/", 4);
         if (pathLen != -1)
         {
             QString tempFilename = filename.right(filename.length() -  pathLen);

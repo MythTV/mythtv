@@ -18,9 +18,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt headers
-#include <qregexp.h>
-
 // avlib headers
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -281,7 +278,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         deviceIsMpegFile = true;
         bufferSize = 64000;
         QString newVideoDev = videodev;
-        newVideoDev.replace(QRegExp("^file:", false), QString(""));
+        if (newVideoDev.startsWith("file:", false)
+            newVideoDev = newVideoDev.remove(0,5);
         SetOption("videodevice", newVideoDev);
     }
     else
