@@ -3333,6 +3333,10 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
+    if ((!ringBuffer->isDVD()) && m_playbackinfo)
+        if (m_playbackinfo->isVideo)
+            GetDecoder()->DoFastForward(0);
+
     ClearAfterSeek();
 
     /* This thread will fill the video and audio buffers, it does all CPU
