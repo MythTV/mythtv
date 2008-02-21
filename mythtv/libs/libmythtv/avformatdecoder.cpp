@@ -906,12 +906,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (!ringBuffer->isDVD() && !livetv)
         av_estimate_timings(ic, 0);
 
-    av_read_frame_flush(ic);
-
     // Scan for the initial A/V streams
     ret = ScanStreams(novideo);
     if (-1 == ret)
         return ret;
+
+    av_read_frame_flush(ic);
 
     AutoSelectTracks(); // This is needed for transcoder
 
