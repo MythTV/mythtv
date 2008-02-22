@@ -2255,7 +2255,7 @@ void CardInput::sourceFetch(void)
 
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
-    if (cardid && srcid)
+    if (crdid && srcid)
     {
         save(); // save info for fetch..
 

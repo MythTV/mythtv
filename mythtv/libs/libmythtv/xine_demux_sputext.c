@@ -213,8 +213,11 @@ static char *sub_readtext(char *source, char **dest) {
     p++,len++;
   }
   
-  *dest= (char *)malloc (len+1);
   if (!dest) 
+    return ERR;
+
+  *dest= (char *)malloc (len+1);
+  if (!(*dest)) 
     return ERR;
   
   strncpy(*dest, source, len);
