@@ -230,7 +230,10 @@ void ChannelRecPriority::updateBackground(void)
     QPainter tmp(&bground);
 
     LayerSet *container = theme->GetSet("background");
-        container->Draw(&tmp, 0, 0);
+    if (!container)
+        return;
+
+    container->Draw(&tmp, 0, 0);
 
     tmp.end();
     myBackground = bground;
