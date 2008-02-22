@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <queue>
+#include <cassert>
 
 #include "config.h"
 #include "mythcontext.h"
@@ -1499,6 +1500,7 @@ MythContext::MythContext(const QString &binversion)
     qInitNetworkProtocols();
 
     d = new MythContextPrivate(this);
+    assert(d);
 }
 
 bool MythContext::Init(const bool gui, UPnp *UPnPclient,
@@ -1565,8 +1567,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 
 MythContext::~MythContext()
 {
-    if (d)
-        delete d;
+    delete d;
 }
 
 bool MythContext::ConnectToMasterServer(bool blockingClient)
@@ -1789,9 +1790,9 @@ bool MythContext::IsMasterBackend(void)
 bool MythContext::BackendIsRunning(void)
 {
 #if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
-    char *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
+    const char *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
 #else
-    char *command = "ps -ae | grep mythbackend > /dev/null";
+    const char *command = "ps -ae | grep mythbackend > /dev/null";
 #endif
     bool res = myth_system(command,
                            MYTH_SYSTEM_DONT_BLOCK_LIRC |
@@ -1837,9 +1838,6 @@ QString MythContext::GetMasterHostPrefix(void)
 
 void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 {
-    if (!d)
-        return;
-
     d->settingsCacheLock.lock();
     if (myKey != "" && d->settingsCache.contains(myKey))
     {
@@ -1858,9 +1856,6 @@ void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 
 void MythContext::ActivateSettingsCache(bool activate)
 {
-    if (!d)
-        return;
-
     if (activate)
         VERBOSE(VB_DATABASE, "Enabling Settings Cache.");
     else
@@ -2163,7 +2158,7 @@ void MythContext::RemoveCacheDir(const QString &dirname)
 void MythContext::CacheThemeImages(void)
 {
     if (d->m_screenwidth == d->m_baseWidth &&
-            d->m_screenheight == d->m_baseHeight)
+        d->m_screenheight == d->m_baseHeight)
         return;
 
     CacheThemeImagesDirectory(d->m_themepathname);
@@ -2399,13 +2394,6 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
     }
 
     bool parsed;
-
-    if (!d)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "MythContextPrivate not initted, can't store geometry.");
-        return false;
-    }
 
     d->m_geometry_w = geo[1].toInt(&parsed);
     if (!parsed)
@@ -2662,12 +2650,12 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     bool found = false;
     QString value;
 
-    if (d && d->overriddenSettings.contains(key)) {
+    if (d->overriddenSettings.contains(key)) {
         value = d->overriddenSettings[key];
         return value;
     }
 
-    if (d && d->useSettingsCache)
+    if (d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         if (d->settingsCache.contains(key))
@@ -2719,7 +2707,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     if (!found)
         value = d->m_settings->GetSetting(key, defaultval); 
 
-    if (!value.isNull() && d && d->useSettingsCache)
+    if (!value.isNull() && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         d->settingsCache[key] = value;
@@ -2752,23 +2740,20 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     QString value = defaultval;
     QString myKey = host + " " + key;
 
-    if (d)
+    if (d->overriddenSettings.contains(myKey))
     {
-        if (d->overriddenSettings.contains(myKey))
-        {
-            value = d->overriddenSettings[myKey];
-            return value;
-        }
-
-        if ((host == d->m_localhostname) &&
-            (d->overriddenSettings.contains(key)))
-        {
-            value = d->overriddenSettings[key];
-            return value;
-        }
+        value = d->overriddenSettings[myKey];
+        return value;
     }
 
-    if (d && d->useSettingsCache)
+    if ((host == d->m_localhostname) &&
+        (d->overriddenSettings.contains(key)))
+    {
+        value = d->overriddenSettings[key];
+        return value;
+    }
+
+    if (d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         if (d->settingsCache.contains(myKey))
@@ -2802,7 +2787,7 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
                                 .arg(key));
     }
 
-    if (found && d && d->useSettingsCache)
+    if (found && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         d->settingsCache[host + " " + key] = value;
@@ -3454,8 +3439,6 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 
 MythMainWindow *MythContext::GetMainWindow(void)
 {
-    if (!d)
-        return NULL;
     return d->mainWindow;
 }
 
@@ -3751,7 +3734,7 @@ void MythContext::ResetScreensaver(void)
 
 void MythContext::DoDisableScreensaver(void)
 {
-    if (d && d->screensaver)
+    if (d->screensaver)
     {
         d->screensaver->Disable();
         d->screensaverEnabled = false;
@@ -3760,7 +3743,7 @@ void MythContext::DoDisableScreensaver(void)
 
 void MythContext::DoRestoreScreensaver(void)
 {
-    if (d && d->screensaver)
+    if (d->screensaver)
     {
         d->screensaver->Restore();
         d->screensaverEnabled = true;
@@ -3769,7 +3752,7 @@ void MythContext::DoRestoreScreensaver(void)
 
 void MythContext::DoResetScreensaver(void)
 {
-    if (d && d->screensaver)
+    if (d->screensaver)
     {
         d->screensaver->Reset();
         d->screensaverEnabled = false;
@@ -3778,8 +3761,6 @@ void MythContext::DoResetScreensaver(void)
 
 bool MythContext::GetScreensaverEnabled(void)
 {
-    if (!d)
-        return false;
     return d->screensaverEnabled;
 }
 
@@ -3993,16 +3974,14 @@ QString MythContext::GetX11Display(void)
 
 void MythContext::dispatch(MythEvent &event)
 {
-    if (print_verbose_messages & VB_NETWORK)
-        VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
 
     MythObservable::dispatch(event);
 }
 
 void MythContext::dispatchNow(MythEvent &event)
 {
-    if (print_verbose_messages & VB_NETWORK)
-        VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
+    VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
 
     MythObservable::dispatchNow(event);
 }
