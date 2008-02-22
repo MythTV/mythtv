@@ -1,3 +1,4 @@
+
 // -*- Mode: c++ -*-
 
 // Standard UNIX C headers
@@ -870,8 +871,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
         new HorizontalConfigurationGroup(false, false, true, true);
     HorizontalConfigurationGroup *osd_row =
         new HorizontalConfigurationGroup(false, false, true, true);
-    HorizontalConfigurationGroup *deint_row =
-        new HorizontalConfigurationGroup(false, false, true, true);
 
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
@@ -879,14 +878,16 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     osdrend->setLabel(tr("OSD Renderer"));
     osdfade->setLabel(tr("OSD Fade"));
     deint0->setLabel(tr("Primary Deinterlacer"));
-    deint1->setLabel(tr("Fallback"));
+    deint1->setLabel(tr("Fallback Deinterlacer"));
     filters->setLabel(tr("Custom Filters"));
 
-    max_cpus->setHelpText(tr("Maximum number of CPU cores used for decoding.") +
-                          (ENABLE_THREADS ? "" :
-                          tr(" Multithreaded decoding disabled-only one CPU "
-                             "will be used, please recompile with "
-                             "--enable-ffmpeg-pthreads to enable.")));
+    max_cpus->setHelpText(
+        tr("Maximum number of CPU cores used for decoding.") +
+        (ENABLE_THREADS ? "" :
+         tr(" Multithreaded decoding disabled-only one CPU "
+            "will be used, please recompile with "
+            "--enable-ffmpeg-pthreads to enable.")));
+
     filters->setHelpText(
         QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
 
@@ -898,13 +899,10 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
     vid_row->addChild(decoder);
     vid_row->addChild(max_cpus);
-    vid_row->addChild(vidrend);
 
+    osd_row->addChild(vidrend);
     osd_row->addChild(osdrend);
     osd_row->addChild(osdfade);
-
-    deint_row->addChild(deint0);
-    deint_row->addChild(deint1);
 
     VerticalConfigurationGroup *grp =
         new VerticalConfigurationGroup(false, false, true, true);
@@ -912,9 +910,14 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     grp->addChild(row[1]);
     grp->addChild(vid_row);
     grp->addChild(osd_row);
-    grp->addChild(deint_row);
-    grp->addChild(filters);
     addChild(grp);
+
+    VerticalConfigurationGroup *page2 =
+        new VerticalConfigurationGroup(false, false, true, true);
+    page2->addChild(deint0);
+    page2->addChild(deint1);
+    page2->addChild(filters);
+    addChild(page2);
 
     connect(decoder, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(decoderChanged(const QString&)));\
@@ -1175,6 +1178,7 @@ void PlaybackProfileConfig::InitUI(void)
         editProf[i]->setLabel(QObject::tr("Edit"));
         delProf[i]->setLabel(QObject::tr("Delete"));
         priority[i]->setValue(i + 1);
+        items[i].Set("pref_priority", QString::number(i + 1));
 
         grp->addChild(editProf[i]);
         grp->addChild(delProf[i]);

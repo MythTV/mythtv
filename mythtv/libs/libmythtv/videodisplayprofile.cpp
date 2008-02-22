@@ -449,6 +449,8 @@ bool VideoDisplayProfile::DeleteDB(uint groupid, const item_list_t &items)
 
 bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     MSqlQuery update(MSqlQuery::InitCon());
     update.prepare(
         "UPDATE displayprofiles "
@@ -458,6 +460,12 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
         "      value          = :VALUE");
 
     MSqlQuery insert(MSqlQuery::InitCon());
+    insert.prepare(
+        "INSERT INTO displayprofiles "
+        " ( profilegroupid,  profileid,  value,  data) "
+        "VALUES "
+        " (:GROUPID,        :PROFILEID, :VALUE, :DATA) ");
+
 
     bool ok = true;
     item_list_t::iterator it = items.begin();
@@ -472,22 +480,16 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
         if (!(*it).GetProfileID())
         {
             // create new profileid
-            if (!insert.exec("SELECT MAX(profileid) FROM displayprofiles"))
+            if (!query.exec("SELECT MAX(profileid) FROM displayprofiles"))
             {
-                MythContext::DBError("save_profile 1", insert);
+                MythContext::DBError("save_profile 1", query);
                 ok = false;
                 continue;
             }
-            else if (insert.next())
+            else if (query.next())
             {
-                (*it).SetProfileID(insert.value(0).toUInt() + 1);
+                (*it).SetProfileID(query.value(0).toUInt() + 1);
             }
-
-            insert.prepare(
-                "INSERT INTO displayprofiles "
-                " ( profilegroupid,  profileid,  value,  data) "
-                "VALUES "
-                " (:GROUPID,        :PROFILEID, :VALUE, :DATA) ");
 
             for (; lit != list.end(); ++lit)
             {
@@ -510,15 +512,47 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 
         for (; lit != list.end(); ++lit)
         {
-            update.bindValue(":GROUPID",   groupid);
-            update.bindValue(":PROFILEID", (*it).GetProfileID());
-            update.bindValue(":VALUE",     lit.key());
-            update.bindValue(":DATA",      (*lit));
-            if (!update.exec())
+            query.prepare(
+                "SELECT count(*) "
+                "FROM displayprofiles "
+                "WHERE  profilegroupid = :GROUPID AND "
+                "       profileid      = :PROFILEID AND "
+                "       value          = :VALUE");
+            query.bindValue(":GROUPID",   groupid);
+            query.bindValue(":PROFILEID", (*it).GetProfileID());
+            query.bindValue(":VALUE",     lit.key());
+            
+            if (!query.exec())
             {
-                MythContext::DBError("save_profile 3", update);
+                MythContext::DBError("save_profile 3", query);
                 ok = false;
                 continue;
+            }
+            else if (query.next() && (1 == query.value(0).toUInt()))
+            {
+                update.bindValue(":GROUPID",   groupid);
+                update.bindValue(":PROFILEID", (*it).GetProfileID());
+                update.bindValue(":VALUE",     lit.key());
+                update.bindValue(":DATA",      (*lit));
+                if (!update.exec())
+                {
+                    MythContext::DBError("save_profile 5", update);
+                    ok = false;
+                    continue;
+                }
+            }
+            else
+            {
+                insert.bindValue(":GROUPID",   groupid);
+                insert.bindValue(":PROFILEID", (*it).GetProfileID());
+                insert.bindValue(":VALUE",     lit.key());
+                insert.bindValue(":DATA",      (*lit));
+                if (!insert.exec())
+                {
+                    MythContext::DBError("save_profile 4", insert);
+                    ok = false;
+                    continue;
+                }
             }
         }
     }

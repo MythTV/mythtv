@@ -934,7 +934,7 @@ void MythNews::slotViewArticle()
                         int vidStart = mediaPage.find("\"video_id\": \"", playerPos) + 13;
                         int vidEnd = mediaPage.find("\"", vidStart);
                         QString vidString = mediaPage.mid(vidStart, vidEnd - vidStart);
- 
+
                         cmdURL = QString("http://youtube.com/get_video.php?video_id=%2&t=%1").arg(tArgString).arg(vidString);
                         VERBOSE(VB_GENERAL, QString("MythNews: VideoURL %1").arg(cmdURL));
                     }

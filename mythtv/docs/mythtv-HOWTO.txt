@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-02-13, v0.21.00pre
+  2008-02-19, v0.21.00pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2863,12 +2863,12 @@
 
   Open a shell and decide where you will store your video files.  This
   may be one directory or multiple directories on the same or different
-  filesystems.  There is no default directory used for new recordings,
+  filesystems. There is no default directory used for new recordings,
   you [1mmust [22mcreate at least one storage directory and configure Myth to
-  use it by running mythtv-setup.  If you do not do this, then MythTV
+  use it by running [1mmythtv-setup[22m.  If you do not do this, then MythTV
   will be unable to record anything.  The following example is specific
   for /var/video, but the same instructions would apply for any
-  directory name you choose to use.  See the ``Advanced Partition
+  directory name you choose to use. See the ``Advanced Partition
   Formatting'' section for hints on creating a partition for MythTV.
 
 
@@ -2882,15 +2882,51 @@
 
   [1mNOTE[22m:  The last slash "/" is not required.
 
+
+  [1mTIP[22m:  Try not to have your video mount point on the same partition as
+  your root partition, which could lead to the filling up of your root
+  partition with video data if the mount fails.  For example:
+
+  If /var/video is created on your root partition and you then perform a
+  mount of another drive to this directory there won't be any problems
+  if everything is working the way it should. However, if the mount
+  fails for some reason, /var/video still exists, so MythTV will find
+  the directory and write files to it.  If your / mount point is space
+  limited, /var/video will [1malso [22mbe space limited, and it won't take long
+  to fill the partition.  This will cause a number of side-effects, most
+  of them bad.  Instead, create subdirectories as the destination for
+  the storage group.
+
+  Your directory structure could then look something like this:
+
+
+       /mnt/video/drive1/video
+       /mnt/video/drive2/video
+
+
+
+  Your /etc/fstab would look like this:
+
+
+       /dev/hdb1 /mnt/video/drive1
+       /dev/hdc1 /mnt/video/drive2
+
+
+
+  Because the Storage Group path is /mnt/video/drive1/video, if the
+  mythbackend can only find /mnt/video/drive1 it will [4mnot[24m write files to
+  that share.
+
   After you create the desired directory or directories for storing your
   video files, you will need to add them to the proper Storage Group
-  using mythtv-setup.  This procedure is described below in the
+  using [1mmythtv-setup[22m.  This procedure is described below in the
   ``Storage Groups'' section.
 
   The first thing to configure is the Master backend system.  If you are
   running multiple backend systems, the Master backend will make all
   decisions about which programs will be recorded on which tuners.  If
   you have only one backend, then it will be its own master.
+
 
   The Master backend will always choose the first available tuner in the
   same order as you add cards through "mythtv-setup". In other words,
@@ -2924,6 +2960,8 @@
   remote access to the MySQL database.  The following instructions may
   or may not work.  Add the following to /etc/my.cnf on the backend
   machine and restart MySQL.
+
+
        skip-innodb
        set-variable=thread_stack=256k
 
@@ -2946,6 +2984,7 @@
 
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
+
 
   Once the graphical setup starts, you'll see that there are six choices
 
@@ -2983,7 +3022,6 @@
   If you will be deploying multiple backends, or if your backend is on
   one system and you're running the frontend on another machine then [4mdo[0m
   [4mnot[24m use the "127.0.0.1" IP address.
-
 
   [1mNOTE[22m: If you modify the 127.0.0.1 address and use a "real" IP address,
   you must use real IP addresses in both fields, otherwise your frontend
@@ -3072,6 +3110,7 @@
   screen may blank for a few seconds to several minutes, depending on
   the load of the listings provider and the speed of your connection to
   the Internet.  Be patient!
+
 
   You will then be returned to the Video Sources screen.  If you have
   multiple video sources available, such as Antenna, Cable, etc, go
@@ -3187,8 +3226,14 @@
   dedicated to media storage. You could format the drives and mount them
   as /mnt/store/d2, /mnt/store/d3, /mnt/store/d4 and /mnt/store/d5.
 
-  You would then add the four directories specified above into the
-  "Default" Storage Group.
+  Within each mount point, it's [4mstrongly[24m recommended that you use a sub-
+  directory and make that the destination path for the Storage Group.
+  See the ``Tip'' in the "Configuring the Master backend" section for
+  additional information.
+
+
+  You would then add the four subdirectories you created under the mount
+  points (/mnt/store/d1/video, etc) into the "Default" Storage Group.
 
   At recording time, if there were four simultaneous recordings, MythTV
   would put one recording onto each drive.
@@ -3250,6 +3295,7 @@
   Unix command line to arrange files however you'd like.
 
 
+
   [1m9.1.6.4.  Advanced: Algorithm used by the Storage Group[0m
 
   This section details the logic of the Storage Group allocation engine.
@@ -3290,34 +3336,31 @@
   Schedules Direct is being established.
 
 
+       From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
+       --02:58:01--
+       http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
+                  => -'
+       Resolving datadirect.webservices.zap2it.com... 206.18.98.160
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 401 Unauthorized
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 200 OK
+       Length: unspecified [text/xml]
 
-  From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
-  --02:58:01--
-  http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
-             => -'
-  Resolving datadirect.webservices.zap2it.com... 206.18.98.160
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 401 Unauthorized
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 200 OK
-  Length: unspecified [text/xml]
+           [    <=>                              ] 114,125       63.57K/s
 
-      [    <=>                              ] 114,125       63.57K/s
+       02:58:03 (63.53 KB/s) - -' saved [114125]
 
-  02:58:03 (63.53 KB/s) - -' saved [114125]
-
-  Your subscription expires on 08/20/2004 12:00:00 AM
-  Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
-  00:00:00 2004 (UTC)
+       Your subscription expires on 08/20/2004 12:00:00 AM
+       Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
+       00:00:00 2004 (UTC)
 
 
 
   Once mythfilldatabase has finished, start the master server before
   continuing.
-
-
        $ mythbackend
 
 
@@ -3436,6 +3479,7 @@
   fit.  The [1mmythbackend [22mprogram will now run [1mmythfilldatabase [22mfor you.
 
 
+
   [1m9.5.  Grabbing channel icons for Schedules Direct users[0m
 
   While the Schedules Direct TV listings service has several advantages,
@@ -3497,7 +3541,6 @@
         [1mNOTE[22m:  You should go through the various setup screens in
   mythfrontend before using any other modules to ensure that the the
   database is correctly initialized.
-
   [1m10.1.  General[0m
 
   The General screen has configuration items that don't really fit
@@ -3533,7 +3576,6 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
-
 
 
   [1m10.4.  Playback[0m
@@ -3629,6 +3671,7 @@
   by blending adjacent lines.  It replaces combing in interlaced video
   with a less distracting "ghost" image.
 
+
   o The "bobdeint" filter
 
   This filter splits the interlaced image into two separate fields that
@@ -3663,7 +3706,6 @@
 
   o The "onefield" filter
 
-
   This is a simple one-field deinterlacing filter that uses only one
   field of the interlaced video.  By default it keeps the top field,
   though passing the parameter "bottom" will cause it to keep the bottom
@@ -3693,7 +3735,6 @@
 
   [1mNOTE[22m: If it is not already specified in the filter chain, this filter
   will be automatically applied when recording with the "bttv" driver.
-
   o The "quickdnr" filter
 
   A fast temporal denoiser. This can take 1, 2 or 4 parameters, each
@@ -3757,6 +3798,7 @@
   recommended for use.
 
 
+
   [1m10.4.4.  Usage Considerations[0m
 
   There are trade-offs to consider when deciding if it would be wise to
@@ -3796,6 +3838,7 @@
 
   +o  DVB - cards supporting DVB; see http://linuxtv.org
      <http://linuxtv.org>
+
      For cards without hardware encoding capabilities (all cards
      supported by V4L not listed above), Myth includes two methods for
      software encoding: RTjpeg and MPEG-4.  RTjpeg has significantly
@@ -3883,6 +3926,7 @@
   <http://xbox-linux.sf.net/>. The program you need is part of the
   eds_i2c_staff module in CVS.  Note the spelling.
 
+
   Once you have installed [1mblink [22myou will need to set permissions.  [1mblink[0m
   needs write permission to the i2c device to function properly.  There
   are three methods to accomplish this.  First, you could run
@@ -3948,43 +3992,6 @@
   [1m11.1.2.  Watching TV or a recording[0m
 
 
-  [1m11.1.3.  Watching TV only[0m
-
-
-  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H           Channel history. Each repeat steps back through the previous channels.
-  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
-
-
-  [1m11.1.4.  LiveTV Browse Mode[0m
-
-
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
-
-
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
-
-
-             Left     Move video to Left
-            Right     Move video to Right
-               Up     Move video Up
-             Down     Move video Down
-           PageUp     Zoom In
-  PageDown            Zoom Out
-  Space/Enter         Exit Zoom mode leaving picture at current size and position
-              ESC     Exit Zoom mode and return to original size
-
-
-
   Up or down          keys change the channel
           num pad     Type a number to enter a channel number or jump amount (HHMM format)
                 P     pause / play. You may also add an explicit keybinding for 'Play' through MythWeb, returning you to normal speed if you are in slow motion, rewind fast forward or pause mode.
@@ -4041,13 +4048,49 @@
             Right     advance 1 frame
                 >     advance 1 second
 
+
+  [1m11.1.3.  Watching TV only[0m
+
+
+
+  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H           Channel history. Each repeat steps back through the previous channels.
+  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+
+  [1m11.1.4.  LiveTV Browse Mode[0m
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
+
+
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
+             Left     Move video to Left
+            Right     Move video to Right
+               Up     Move video Up
+             Down     Move video Down
+           PageUp     Zoom In
+  PageDown            Zoom Out
+  Space/Enter         Exit Zoom mode leaving picture at current size and position
+              ESC     Exit Zoom mode and return to original size
+
+
   [1m11.1.6.  If you have two or more tuner cards[0m
 
 
   V           toggle Picture-in-picture on or off
   B           toggles the window focus (lets you change channels on the PiP window)
   N           swaps the two channels by changing channels on both cards
-
 
 
   [1m11.1.7.  Watching a recording only[0m
@@ -4074,6 +4117,7 @@
   [1m11.1.8.  EPG[0m
 
 
+
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -4089,7 +4133,6 @@
                 X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
-
 
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
@@ -4111,7 +4154,6 @@
         Home/End            toggle show showing all/important
                       I     edit recording options
         Space/Enter         resolve conflict or override
-
 
 
   [1m11.1.11.  Viewing Search Listings[0m
@@ -4137,6 +4179,7 @@
 
     M           change the view or to set a group password
     I           move a program from one Recording Group to another
+
 
 
   [1m11.1.14.  Watch Recordings Screen[0m
@@ -4199,6 +4242,7 @@
 
   The theme will now be available in the mythfrontend Appearance
   section.
+
 
 
   [1m11.3.  Adding DishTV information to the database[0m
@@ -4265,6 +4309,7 @@
   determine whether or not the MythTV system is idle, the following
   conditions must be met for a period of time defined in the "Idle
   timeout (secs)" parameter.
+
 
   +o  no client is connected to the server
 
@@ -4458,6 +4503,7 @@
   the same as discussed in "The WakeOnLan settings" above.
 
 
+
   [1m11.5.4.  Tips/Tricks:[0m
 
   If, for example, one of the Slave backends is also your desktop
@@ -4480,38 +4526,38 @@
 
 
 
-  $ telnet basement 6546
-  Connected to basement.
-  Escape character is '^]'.
-  MythFrontend Network Control
-  Type 'help' for usage information
-  ---------------------------------
-  # help
-  Valid Commands:
-  ---------------
-  jump               - Jump to a specified location in Myth
-  key                - Send a keypress to the program
-  play               - Playback related commands
-  query              - Queries
-  exit               - Exit Network Control
+       $ telnet basement 6546
+       Connected to basement.
+       Escape character is '^]'.
+       MythFrontend Network Control
+       Type 'help' for usage information
+       ---------------------------------
+       # help
+       Valid Commands:
+       ---------------
+       jump               - Jump to a specified location in Myth
+       key                - Send a keypress to the program
+       play               - Playback related commands
+       query              - Queries
+       exit               - Exit Network Control
 
-  Type 'help COMMANDNAME' for help on any specific command.
+       Type 'help COMMANDNAME' for help on any specific command.
 
-  # help jump
-  Usage: jump JUMPPOINT
+       # help jump
+       Usage: jump JUMPPOINT
 
-  Where JUMPPOINT is one of the following:
-  channelpriorities    - Channel Recording Priorities
-  channelrecpriority   - Channel Recording Priorities
-  deletebox            - TV Recording Deletion
-  deleterecordings     - TV Recording Deletion
-  guidegrid            - Program Guide
-  livetv               - Live TV
-  livetvinguide        - Live TV In Guide
-  mainmenu             - Main Menu
-  ...snip...
-  # exit
-  $
+       Where JUMPPOINT is one of the following:
+       channelpriorities    - Channel Recording Priorities
+       channelrecpriority   - Channel Recording Priorities
+       deletebox            - TV Recording Deletion
+       deleterecordings     - TV Recording Deletion
+       guidegrid            - Program Guide
+       livetv               - Live TV
+       livetvinguide        - Live TV In Guide
+       mainmenu             - Main Menu
+       ...snip...
+       # exit
+       $
 
 
 
@@ -4589,8 +4635,6 @@
      can be useful if a station has sister stations where shows are
      rebroadcast allowing the scheduler to record rebroadcasts on the
      other station when the original airing cannot be recorded.
-
-
   [1m12.2.  Scheduling Options[0m
 
   [1m12.2.1.  Priority[0m
@@ -4723,7 +4767,6 @@
      Single or Override do not match the current listings because the
      listings have changed, they are added to the schedule and marked to
      indicate that they will not record.
-
   +o  Other record statuses beat Inactive or Repeat -- If two rules match
      the same showing of a program, a rule marked as inactive or a
      showing marked as a repeat yield to the other rule.
@@ -4808,7 +4851,6 @@
   gives you all of the information and tools you need to see all of your
   alternatives and make whatever adjustments you desire.
 
-
   The upper half of the screen has a scrollable box listing items that
   match your record rules sorted by time. The lower half shows the
   details for the highlighted item. There are two 'views' available.
@@ -4875,6 +4917,7 @@
   set, you will also see a "Clear Override" to undo your changes. This
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
+
   For a recording in progress, there will be a "Change Ending Time"
   button.  This will take you to the options page for a Single or
   Override or create an Override if it is a recurring rule. Here you can
@@ -4938,7 +4981,6 @@
   usage. If this is set, you can further decide what to do when this
   limit is reached; either stop recording that series, or to delete the
   oldest episodes in favor of the new ones.
-
 
 
   [1m12.4.  Post Recording Processing[0m
@@ -5005,8 +5047,6 @@
 
   [1m12.5.  Advanced Recording Options[0m
 
-
-
   [1m12.5.1.  Creating Power Search rules with Custom Record[0m
 
   MythTV's "Custom Record" feature gives you unlimited control for
@@ -5056,7 +5096,6 @@
   key is the "X" in the grouping for "1", zero is grouped with "9" and
   "0" acts as the "Caps Lock" key. You can press ENTER in the text box
   to popup a virtual keyboard.
-
   Note: the text box honors many familiar Emacs control keys. It is also
   possible to cut and paste text into the text box so you can edit with
   a favorite editor or insert a rule sent in email or from other
@@ -5072,9 +5111,9 @@
   primetime". Click "Add this example clause". You should now see:
 
 
-              program.title = 'Nova'
-              AND HOUR(program.starttime) >= 19
-              AND HOUR(program.starttime) < 23
+                   program.title = 'Nova'
+                   AND HOUR(program.starttime) >= 19
+                   AND HOUR(program.starttime) < 23
 
 
 
@@ -5136,7 +5175,6 @@
   simple idioms that you may find useful for many of the shows you would
   like to record.
 
-
   Wait for a known title -- If there is a movie that you anticipate will
   be televised in the coming months but is not yet in the listings, you
   can select "Match an exact title", edit the movie title, click
@@ -5185,6 +5223,7 @@
   Brother%" or "The Amazing Race%".
 
 
+
   [1m12.5.5.  Working with SQL[0m
 
   As you experiment, it is possible that you may misplace a quote or
@@ -5201,6 +5240,8 @@
   While the example clauses demonstrate how to use many of the data
   fields, you can get a more complete list of all the fields that are
   available by using a MySQL client program:
+
+
        $ mysql -u mythtv -pmythtv mythconverg
        mysql> describe program;
        mysql> describe channel;
@@ -5266,6 +5307,8 @@
   the MythTV source code to see exactly how a field is used. The open
   source for MythTV is available from http://www.mythtv.org/
   <http://www.mythtv.org/> .
+
+
   [1m12.6.  Scheduling with more than one Input[0m
 
 
@@ -5327,7 +5370,6 @@
   the "Cable" source could be recorded by either card from the card's
   tuner input.
 
-
   You need to create a different video source for each provider or
   service that has a different set of channels. Each input with a
   connection to that service should be associated with the video source
@@ -5373,6 +5415,7 @@
   HDTV card. If NBC is on a cable channel and "The Apprentice" is shown
   in HDTV on an NBC HD channel, the scheduler would still prefer analog
   inputs 1 and 2 over the new HD input 3.
+
 
   Therefore, if you add a new source which you will prefer, it is wise
   to run mythtv-setup and "Delete all capture cards" then enter your
@@ -5440,7 +5483,6 @@
   be added to the "total priority" for showings on that input. This can
   be used to influence using favored cards or not using less favored
   cards unless necessary.
-
   Let's say the "The Apprentice" is on at 8:00pm with a priority of 3.
   "Who Cares" is -2 and an episode is shown at 8:00pm then repeated at
   11:00pm. The scheduler would assign "The Apprentice" to card 1 and
@@ -5608,9 +5650,9 @@
 
 
 
-       Priority Rule Name: Don't wait for the last
-       Priority Value: -1
-       program.last > 0  AND program.first = 0
+  Priority Rule Name: Don't wait for the last
+  Priority Value: -1
+  program.last > 0  AND program.first = 0
 
 
 
@@ -5629,52 +5671,55 @@
 
   MythTV has a rich set of plugins available.  Once you have downloaded
   the tarball, untar it and run the [1mconfigure [22mscript:
-       $ tar -xjf mythplugins-0.20.2.tar.bz2
-       $ cd mythplugins-0.20.2
-       $ ./configure --help
 
-       Usage:   configure [options]
-       Options: [defaults in brackets after descriptions]
-       NB:      all --enable-* options can be reversed with --disable-*
 
-       Generic options:
-         --help                   print this message
-         --enable-all             Enable all options
-         --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
 
-       MythBrowser related options:
-         --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+  $ tar -xjf mythplugins-0.20.2.tar.bz2
+  $ cd mythplugins-0.20.2
+  $ ./configure --help
 
-       MythDVD related options:
-         --enable-mythdvd         build the mythdvd plugin [default=yes]
-         --enable-transcode       enable DVD ripping and transcoding [default=no]
-         --enable-vcd             enable VCD playing [default=no]
+  Usage:   configure [options]
+  Options: [defaults in brackets after descriptions]
+  NB:      all --enable-* options can be reversed with --disable-*
 
-       MythGallery related options:
-         --enable-mythgallery     build the mythgallery plugin [default=yes]
-         --enable-exif            enable reading of EXIF headers [default=no]
+  Generic options:
+    --help                   print this message
+    --enable-all             Enable all options
+    --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
 
-       MythGame related options:
-         --enable-mythgame        build the mythgame plugin [default=yes]
+  MythBrowser related options:
+    --enable-mythbrowser     build the mythbrowser plugin [default=yes]
 
-       MythMusic related options:
-         --enable-mythmusic       build the mythmusic plugin [default=yes]
-         --enable-fftw            enable fftw visualizers [default=no]
-         --enable-sdl             use SDL for the synaesthesia output [default=no]
-         --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+  MythDVD related options:
+    --enable-mythdvd         build the mythdvd plugin [default=yes]
+    --enable-transcode       enable DVD ripping and transcoding [default=no]
+    --enable-vcd             enable VCD playing [default=no]
 
-       MythNews related options:
-         --enable-mythnews        build the mythnews plugin [default=yes]
+  MythGallery related options:
+    --enable-mythgallery     build the mythgallery plugin [default=yes]
+    --enable-exif            enable reading of EXIF headers [default=no]
 
-       MythPhone related options:
-         --enable-mythphone       build the mythphone plugin [default=yes]
-         --enable-festival        enable festival TTS Engine [default=no]
+  MythGame related options:
+    --enable-mythgame        build the mythgame plugin [default=yes]
 
-       MythVideo related options:
-         --enable-mythvideo       build the mythvideo plugin [default=yes]
+  MythMusic related options:
+    --enable-mythmusic       build the mythmusic plugin [default=yes]
+    --enable-fftw            enable fftw visualizers [default=no]
+    --enable-sdl             use SDL for the synaesthesia output [default=no]
+    --enable-aac             enable AAC/MP4 audio file decompression [default=no]
 
-       MythWeather related options:
-         --enable-mythweather     build the mythweather plugin [default=yes]
+  MythNews related options:
+    --enable-mythnews        build the mythnews plugin [default=yes]
+
+  MythPhone related options:
+    --enable-mythphone       build the mythphone plugin [default=yes]
+    --enable-festival        enable festival TTS Engine [default=no]
+
+  MythVideo related options:
+    --enable-mythvideo       build the mythvideo plugin [default=yes]
+
+  MythWeather related options:
+    --enable-mythweather     build the mythweather plugin [default=yes]
 
 
 
