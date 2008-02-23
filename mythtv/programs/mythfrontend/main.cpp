@@ -1056,7 +1056,7 @@ int main(int argc, char **argv)
             extern const char *myth_source_version;
             extern const char *myth_source_path;
             cout << "Please include all output in bug reports." << endl;
-            cout << "MythTV Version  : " << myth_source_version << endl;
+            cout << "MythTV Version   : " << myth_source_version << endl;
             cout << "MythTV Branch    : " << myth_source_path << endl;
             cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
             cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
