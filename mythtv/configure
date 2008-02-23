@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# FFmpeg configure script
+# MythTV configure script, based on the FFmpeg configure script
 #
 # Copyright (c) 2000, 2001, 2002 Fabrice Bellard
 # Copyright (c) 2005-2006 Diego Biurrun
@@ -1555,7 +1555,7 @@ case $targetos in
     oss_muxer_extralibs="-lossaudio"
     ;;
   openbsd)
-    CCONFIG = "$CCONFIG openbsd"
+    append CCONFIG "openbsd"
     disable need_memalign
     LIBOBJFLAGS='$(PIC)'
     LDCONFIG='ldconfig -m $(SHLIBDIR)'
@@ -1567,7 +1567,7 @@ case $targetos in
     oss_muxer_extralibs="-lossaudio"
     ;;
   freebsd)
-    CCONFIG = "$CCONFIG freebsd"
+    append CCONFIG "freebsd"
     disable need_memalign
     backend="yes"
     ;;
@@ -1650,7 +1650,7 @@ case $targetos in
     SHFLAGS='-shared -Wl,--enable-auto-image-base'
     ;;
   linux)
-    CCONFIG="$CCONFIG linux"
+    append CCONFIG "linux"
     backend="yes"
     ! disabled joystick_menu && enable joystick_menu
     LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
@@ -1715,7 +1715,7 @@ has_header()
     expr $HAS_IT : "yes" > /dev/null
 }
 
-CCONFIG="$CCONFIG $compile_type"
+append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-DNDEBUG"
     enable debug
@@ -2594,7 +2594,7 @@ fi
 if enabled symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
         check_cppflags -fvisibility-inlines-hidden
-        CCONFIG="$CCONFIG use_hidesyms"
+        append CCONFIG "use_hidesyms"
     else
         echo "Warning: --enable-symbol-visibility requires gcc 4.x"
     fi
@@ -3123,35 +3123,35 @@ fi
 echo "" >>$MYTH_CONFIG_MAK
 
 if enabled audio_oss; then
-    CCONFIG="$CCONFIG using_oss"
+    append CCONFIG "using_oss"
 fi
 if enabled audio_alsa; then
-    CCONFIG="$CCONFIG using_alsa"
+    append CCONFIG "using_alsa"
   echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled audio_arts; then
-    CCONFIG="$CCONFIG using_arts"
+    append CCONFIG "using_arts"
   echo "CONFIG_AUDIO_ARTS_LIBS=$audio_arts_libs" >> $MYTH_CONFIG_MAK
   echo "CONFIG_AUDIO_ARTS_CFLAGS=$audio_arts_cflags" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled audio_jack; then
-    CCONFIG="$CCONFIG using_jack"
+    append CCONFIG "using_jack"
   echo "CONFIG_AUDIO_JACK_LIBS=$audio_jack_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled darwin_da; then
-  CCONFIG="$CCONFIG darwin_da"
+  append CCONFIG "darwin_da"
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled mac_bundle; then
-  CCONFIG="$CCONFIG mac_bundle"
+  append CCONFIG "mac_bundle"
 fi
 
 if enabled mac_corevideo; then
-  CCONFIG="$CCONFIG using_corevideo"
+  append CCONFIG "using_corevideo"
 fi
 
 if test x"$targetos" = x"cygwin" ; then
@@ -3287,13 +3287,13 @@ if enabled firewire; then
   else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394 -lrom1394" >>  $MYTH_CONFIG_MAK
       if enabled libavc_5_3; then
-        CCONFIG="$CCONFIG using_libavc_5_3"
+        append CCONFIG "using_libavc_5_3"
       fi
   fi
 fi
 
 if enabled iptv; then
-    CCONFIG="$CCONFIG using_live"
+    append CCONFIG "using_live"
 fi
 
 if enabled lirc; then
@@ -3301,16 +3301,16 @@ if enabled lirc; then
 fi
 
 if enabled appleremote; then
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_APPLEREMOTE"
+  append CONFIG_DEFINES "USING_APPLEREMOTE"
 fi
 
 if enabled dvb; then
-  CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $dvb_path"
+  append CONFIG_INCLUDEPATH "$dvb_path"
 fi
 
 if enabled x11; then
   if [ -d $x11_include_path ] ; then
-    CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $x11_include_path"
+    append CONFIG_INCLUDEPATH "$x11_include_path"
   fi
 fi
 
@@ -3325,7 +3325,7 @@ fi
 if enabled xvmc; then
   echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> $MYTH_CONFIG_MAK
   if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
-      CCONFIG="$CCONFIG using_xvmc_pbuffer"
+      append CCONFIG "using_xvmc_pbuffer"
   fi
 fi
 
@@ -3335,7 +3335,7 @@ if enabled directfb; then
 fi
 
 if enabled directx; then
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_DIRECTX"
+  append CONFIG_DEFINES "USING_DIRECTX"
 fi
 
 if enabled opengl; then
