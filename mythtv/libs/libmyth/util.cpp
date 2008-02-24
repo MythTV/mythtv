@@ -39,6 +39,7 @@ using namespace std;
 #include <qpixmap.h>
 #include <qfont.h>
 #include <qfile.h>
+#include <qdeepcopy.h>
 
 // Myth headers
 #include "mythconfig.h"

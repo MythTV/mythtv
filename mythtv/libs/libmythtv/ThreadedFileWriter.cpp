@@ -10,6 +10,10 @@
 #include <signal.h>
 #include <fcntl.h>
 
+// Qt headers
+#include <qstring.h>
+#include <qdeepcopy.h>
+
 // MythTV headers
 #include "ThreadedFileWriter.h"
 #include "mythcontext.h"

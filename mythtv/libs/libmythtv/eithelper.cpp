@@ -7,6 +7,9 @@
 #include <algorithm>
 using namespace std;
 
+// Qt headers
+#include <qdeepcopy.h>
+
 // MythTV includes
 #include "eit.h"
 #include "eithelper.h"

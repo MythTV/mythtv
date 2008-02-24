@@ -12,6 +12,7 @@
 #include <qsqldatabase.h>
 #include <qobjectlist.h> 
 #include <qeventloop.h>
+#include <qdeepcopy.h>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>

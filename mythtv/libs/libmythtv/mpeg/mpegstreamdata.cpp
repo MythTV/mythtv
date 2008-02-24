@@ -7,6 +7,11 @@ using namespace std;
 // POSIX headers
 #include <sys/time.h> // for gettimeofday
 
+// Qt headers
+#include <qstring.h>
+#include <qdeepcopy.h>
+
+// MythTV headers
 #include "mpegstreamdata.h"
 #include "mpegtables.h"
 #include "RingBuffer.h"

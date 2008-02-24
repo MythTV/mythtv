@@ -12,6 +12,10 @@
 // POSIX headers
 #include <sys/time.h>
 
+// Qt headers
+#include <qstring.h>
+#include <qdeepcopy.h>
+
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"

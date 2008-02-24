@@ -7,6 +7,7 @@ using namespace std;
 #include <qstringlist.h>
 #include <qtextstream.h>
 #include <qdir.h>
+#include <qdeepcopy.h>
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdialogs.h"

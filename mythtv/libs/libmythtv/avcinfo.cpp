@@ -1,3 +1,8 @@
+// -*- Mode: c++ -*-
+
+// Qt headers
+#include <qdeepcopy.h>
+
 // MythTV headers
 #include "avcinfo.h"
 #include "firewiredevice.h"

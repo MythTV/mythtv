@@ -3,8 +3,15 @@
  *  Copyright (c) 2006 by Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
-#include <algorithm>
 
+// C++ headers
+#include <algorithm>
+using namespace std;
+
+// Qt headers
+#include <qdeepcopy.h>
+
+// MythTV headers
 #include "iptvfeederwrapper.h"
 
 #include "iptvfeeder.h"
