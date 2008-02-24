@@ -1,5 +1,6 @@
 #include "signalmonitorvalue.h"
 #include <qobject.h>
+#include <qdeepcopy.h>
 
 bool SignalMonitorValue::run_static_init = true;
 QStringList SignalMonitorValue::ERROR_NO_CHANNEL;
@@ -34,7 +35,8 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout) :
-    name(_name), noSpaceName(_noSpaceName),
+    name(QDeepCopy<QString>(_name)),
+    noSpaceName(QDeepCopy<QString>(_noSpaceName)),
     value(0),
     threshold(_threshold),
     minval(_min), maxval(_max), timeout(_timeout),
@@ -54,7 +56,8 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout, bool _set) :
-    name(_name), noSpaceName(_noSpaceName),
+    name(QDeepCopy<QString>(_name)),
+    noSpaceName(QDeepCopy<QString>(_noSpaceName)),
     value(_value),
     threshold(_threshold),
     minval(_min), maxval(_max), timeout(_timeout),
@@ -66,6 +69,22 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
         <<threshold<<", "<<minval<<", "<<maxval<<", "<<timeout<<", "
         <<high_threshold<<", "<< ((set) ? "true" : "false") <<")"<<endl;
 #endif
+}
+
+QString SignalMonitorValue::GetName(void) const
+{
+    if (name.isNull())
+        return QString::null;
+
+    return QDeepCopy<QString>(name);
+}
+
+QString SignalMonitorValue::GetShortName(void) const
+{
+    if (noSpaceName.isNull())
+        return QString::null;
+
+    return QDeepCopy<QString>(noSpaceName);
 }
 
 bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)

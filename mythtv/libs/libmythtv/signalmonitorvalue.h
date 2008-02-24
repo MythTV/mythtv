@@ -18,9 +18,9 @@ class SignalMonitorValue
     // Gets  // // // // // // // // // // // // // // // // // // // // //
 
     /// \brief Returns the long name of this value.
-    QString GetName() const { return name; }
+    QString GetName(void) const;
     /// \brief Returns a space free name of the value. Used by GetStatus().
-    QString GetShortName() const { return noSpaceName; }
+    QString GetShortName(void) const;
     /// \brief Returns a signal monitor value as one long string.
     QString GetStatus() const 
     {
