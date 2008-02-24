@@ -808,11 +808,6 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
 
     int  iId   = pRequest->m_mapParams[ "Id"  ].toInt();
 
-    // Optional Parameters
-    //
-    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
-    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
-
     // Read Video poster file path from database
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -823,7 +818,13 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     if (!query.exec() || !query.isActive())
         MythContext::DBError("GetVideoArt ", query);
 
-/*    if ((nWidth == 0) && (nHeight == 0))
+/*
+    // Optional Parameters
+    //
+    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
+    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
+
+    if ((nWidth == 0) && (nHeight == 0))
     {
          bDefaultPixmap = true;
     }
