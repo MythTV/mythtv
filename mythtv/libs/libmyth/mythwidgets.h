@@ -20,6 +20,7 @@
 #include <qimage.h>
 #include <qlabel.h>
 #include <qtimer.h> 
+#include <qdeepcopy.h>
 
 #include <vector>
 
