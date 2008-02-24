@@ -147,6 +147,10 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sObjectId )
                             .arg( sURIParams );
 
+    sParentID          = QString( "%1/item%2")
+	                    .arg( sObjectId )
+			    .arg( sParentID );
+
     QString sAlbumArtURI= QString( "%1GetVideoArt%2")
                         .arg( sURIBase   )
                         .arg( sURIParams );
