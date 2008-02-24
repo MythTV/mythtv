@@ -807,7 +807,8 @@ void InitJumpPoints(void)
     REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
     REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
     //REG_JUMP("Search Listings", "", "", startSearch);
-    REG_JUMP("Manage Recordings / Fix Conflicts", "", "", startManaged);
+    REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "", 
+                startManaged, "VIEWSCHEDULED");
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
     REG_JUMP("TV Recording Playback", "", "", startPlayback);
