@@ -417,7 +417,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         if (fp)
         {
             char buffer[256];
-            int status;
             QString input = "";
 
             while (fgets(buffer, sizeof(buffer), fp))
