@@ -1407,7 +1407,7 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
 {
     bool stopFFREW = false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
         GetDecoder()->UpdateDVDFramesPlayed();
 
     if (ffrew_skip > 0)
@@ -2964,7 +2964,7 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
         GetDecoder()->UpdateDVDFramesPlayed();
 
     if (fftime <= 0)
@@ -2981,7 +2981,7 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
        GetDecoder()->UpdateDVDFramesPlayed();
 
     if (rewindtime <= 0)
