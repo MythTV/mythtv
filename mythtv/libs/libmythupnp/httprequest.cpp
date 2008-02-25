@@ -67,11 +67,14 @@ static MIMETypes g_MIMETypes[] =
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
-    { "vob",  "video/mpeg"                 },
+    { "ts"  , "video/mpegts"               },
+    { "vob" ,  "video/mpeg"                },
     { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
+    { "mkv" , "video/x-matroska"           },
+    { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             }
 };
 
