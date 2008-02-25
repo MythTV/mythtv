@@ -742,7 +742,7 @@ void PhoneUIBox::TransmitLocalWebcamImage()
                         cout << "SIP: Encoded H.323 frame size is " << encLen << "; too big for buffer\n";
                         rtpVideo->freeVideoBuffer(vb);
                     }
-                    else
+                    else if (encFrame && encLen >= 0)
                     {
                         memcpy(vb->video, encFrame, encLen); // Optimisation to get rid of this copy may be possible, check H.263 stack
                         vb->len = encLen;
@@ -753,6 +753,11 @@ void PhoneUIBox::TransmitLocalWebcamImage()
                             cout << "Could not queue RTP Video frame for transmission\n";
                             rtpVideo->freeVideoBuffer(vb);
                         }
+                    }
+                    else
+                    {
+                        cout << "H263EncodeFrame returned -1\n";
+                        rtpVideo->freeVideoBuffer(vb);
                     }
                 }
             }
