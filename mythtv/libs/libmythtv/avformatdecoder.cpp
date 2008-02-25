@@ -2993,6 +2993,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
+                    ScanStreams(true);
                 }
                 else
                     storevideoframes = true;
@@ -3029,7 +3030,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     m_positionMap.clear();
                     SyncPositionMap();
                     VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
-                    ScanStreams(true);
                     lastdvdtitle = dvdtitle;
                     if (lastdvdtitle != -1 )
                         dvdTitleChanged = true;
