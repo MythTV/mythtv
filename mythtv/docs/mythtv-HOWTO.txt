@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-02-19, v0.21.00pre
+  2008-02-25, v0.21.00pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1838,19 +1838,32 @@
 
 
   $ mkdir mythtv
-  $ cd mythtv
-  $ svn co http://svn.mythtv.org/svn/trunk/mythtv
-  $ svn co http://svn.mythtv.org/svn/trunk/mythplugins
-  $ svn co http://svn.mythtv.org/svn/trunk/myththemes
+  $ svn co http://svn.mythtv.org/svn/trunk/ mythtv
   $ cd mythtv
 
 
+
+  To use a release version, you can execute:
+
+
+       $ mkdir mythtv-release-0.21
+       $ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
+       $ cd mythtv-release-0.21
+
+
+
+  [1mNOTE[22m:  Using a svn version of the code allows you to stay up-to-date
+  with changes.  So, if there's an update to the 0.21 release and you
+  originally obtained it using svn, you could enter the mythtv-
+  release-0.21 directory and type "svn up", which will update your copy
+  with the fixed version from the website.  You would then recompile and
+  install the updated 0.21 code.
 
   If you are using the tarball, then unpack it:
 
 
-       $ tar -xjf mythtv-0.20.2.tar.bz2
-       $ cd mythtv-0.20.2
+       $ tar -xjf mythtv-0.21.tar.bz2
+       $ cd mythtv-0.21
        $ ./configure
 
 
@@ -1858,14 +1871,6 @@
   If you wish to change options, run [1m./configure --help [22mto see what is
   available and to override and automatically detected options.  See the
   config.log file after running [1mconfigure [22mto see previous runs.
-
-  If you're going to use the various perl scripts that are in the
-  contrib directory, make sure you add --with-bindings=perl to the
-  [1mconfigure [22mcommand.
-
-
-
-                 This is now the default in MythTV 0.21.
 
   To compile:
 
@@ -1954,8 +1959,8 @@
   the distribution kernel you must configure your kernel with:
 
 
-  Security options : [*] Enable different security models
-  Security options : [M] Default Linux Capabilties
+       Security options : [*] Enable different security models
+       Security options : [M] Default Linux Capabilties
 
 
 
