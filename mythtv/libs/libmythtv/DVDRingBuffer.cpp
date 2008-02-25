@@ -322,7 +322,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 cellRepeated = false;
                 menupktpts = 0;
                 if (cellHasStillFrame)
+                {
                     gContext->DisableScreensaver();
+                    VERBOSE(VB_PLAYBACK, LOC + "Leaving DVDNAV_STILL_FRAME");
+                }
                 cellHasStillFrame = false;
 
                 if (parent && IsInMenu())
@@ -555,6 +558,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_STILL_FRAME:
             {
+                if (!cellHasStillFrame)
+                    VERBOSE(VB_PLAYBACK, LOC + "Entering DVDNAV_STILL_FRAME");
                 cellHasStillFrame = true;
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
