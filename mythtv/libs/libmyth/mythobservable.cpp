@@ -52,7 +52,9 @@ void MythObservable::dispatchNow(MythEvent &event)
     QObject *listener = firstListener();
     while (listener)
     {
-        QApplication::sendEvent(listener, event.clone());
+        // Note: unlike postEvent, send event does not take
+        // ownership of pointer and will not delete it.
+        QApplication::sendEvent(listener, &event);
         listener = nextListener();
     }
 }
