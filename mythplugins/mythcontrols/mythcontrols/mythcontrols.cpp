@@ -31,6 +31,7 @@
 #include <qstringlist.h>
 #include <qapplication.h>
 #include <qbuttongroup.h>
+#include <qdeepcopy.h>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>

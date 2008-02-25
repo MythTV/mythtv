@@ -244,11 +244,11 @@ bool OSD::InitCC608(void)
 bool OSD::InitCC708(void)
 {
     VERBOSE(VB_VBI, LOC + "InitCC708() -- begin");
-    // Check if cc708 osd already exits, exit early if it does
+    // Check if cc708 osd already exists, exit early if it does
     QString name = "cc708_page";
     if (GetSet(name))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "InitCC708() -- end (already exits)");
+        VERBOSE(VB_IMPORTANT, LOC + "InitCC708() -- end (already exists)");
         return true;
     }
 

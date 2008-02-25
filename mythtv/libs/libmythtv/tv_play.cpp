@@ -3863,8 +3863,8 @@ void TV::TogglePIPView(void)
         piptvchain->InitializeNewChain("PIP"+gContext->GetHostName());
         testrec->SpawnLiveTV(piptvchain->GetID(), true, "");
         piptvchain->ReloadAll();
-        playbackinfo = piptvchain->GetProgramAt(-1);
-        if (!playbackinfo)
+        ProgramInfo *tmppginfo = piptvchain->GetProgramAt(-1);
+        if (!tmppginfo)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP not successfully started");
             delete testrec;
@@ -3874,11 +3874,12 @@ void TV::TogglePIPView(void)
         }
         else
         {
-            QString playbackURL = playbackinfo->GetPlaybackURL();
+            QString playbackURL = tmppginfo->GetPlaybackURL();
 
-            piptvchain->SetProgram(playbackinfo);
+            piptvchain->SetProgram(tmppginfo);
             piprbuffer = new RingBuffer(playbackURL, false);
             piprbuffer->SetLiveMode(piptvchain);
+            delete tmppginfo;
         }
 
         piprecorder = testrec;

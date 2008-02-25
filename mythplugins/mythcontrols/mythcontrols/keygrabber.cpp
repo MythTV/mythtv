@@ -22,6 +22,10 @@
  * 02111-1307, USA
  */
 
+// Qt headers
+#include <qstring.h>
+#include <qdeepcopy.h>
+
 // MythTV headers
 #include <mythtv/mythcontext.h>
 

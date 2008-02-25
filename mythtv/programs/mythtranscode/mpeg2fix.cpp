@@ -1140,6 +1140,9 @@ MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 MPEG2frame *MPEG2fixup::GetPoolFrame(MPEG2frame *f)
 {
     MPEG2frame *tmpFrame = GetPoolFrame(&f->pkt);
+    if (!tmpFrame)
+        return tmpFrame;
+
     tmpFrame->isSequence = f->isSequence;
     tmpFrame->isGop      = f->isGop;
     tmpFrame->mpeg2_seq  = f->mpeg2_seq;

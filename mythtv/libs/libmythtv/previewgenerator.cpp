@@ -252,7 +252,7 @@ bool PreviewGenerator::Run(void)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Preview process not ok." +
                         QString("\n\t\t\tfileinfo(%1)").arg(outname)
-                        <<" exits: "<<fi.exists()
+                        <<" exists: "<<fi.exists()
                         <<" readable: "<<fi.isReadable()
                         <<" size: "<<fi.size());
             }

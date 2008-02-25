@@ -17,6 +17,7 @@
 
 // Qt headers
 #include <qstringlist.h>
+#include <qdeepcopy.h>
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>

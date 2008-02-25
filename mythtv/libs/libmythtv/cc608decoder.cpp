@@ -3,6 +3,7 @@
 // Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
 
 #include <qstringlist.h>
+#include <qdeepcopy.h>
 
 #include "format.h"
 #include "cc608decoder.h"

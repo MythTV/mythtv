@@ -13,6 +13,10 @@
 #include <limits.h>
 #include "util.h"
 
+#define LOC QString("UPnpCDSVideo: ")
+#define LOC_WARN QString("UPnpCDSVideo, Warning: ")
+#define LOC_ERR QString("UPnpCDSVideo, Error: ")
+
 UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
 {
     {   "VideoRoot", 
@@ -155,7 +159,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                         .arg( sURIBase   )
                         .arg( sURIParams );
 
-    CDSObject *pItem;
+    CDSObject *pItem = NULL;
 
     if (sItemType == "FILE") 
     {
@@ -167,6 +171,14 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     else if (sItemType == "FOLDER") 
     {
         pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
+    }
+
+    if (!pItem)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " +
+                QString("sItemType has unknown type '%1'").arg(sItemType));
+
+        return;
     }
 
     pItem->m_bRestricted  = false;

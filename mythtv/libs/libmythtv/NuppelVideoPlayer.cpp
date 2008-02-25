@@ -6974,7 +6974,7 @@ void NuppelVideoPlayer::DoChangeDVDTrack(void)
 
 void NuppelVideoPlayer::DisplayDVDButton(void)
 {
-    if (!ringBuffer->InDVDMenuOrStillFrame())
+    if (!ringBuffer->InDVDMenuOrStillFrame() || !osd)
         return;
 
     VideoFrame *buffer = videoOutput->GetLastShownFrame();

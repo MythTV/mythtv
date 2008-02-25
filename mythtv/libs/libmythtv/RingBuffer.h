@@ -147,7 +147,7 @@ class MPUBLIC RingBuffer
     long long internalreadpos;
     bool ateof;
     bool readsallowed;
-    bool wantseek;
+    volatile bool wantseek;
     bool setswitchtonext;
 
     mutable QMutex bitratelock;

@@ -239,6 +239,9 @@ void ViewScheduled::updateBackground(void)
     QPainter tmp(&bground);
 
     LayerSet *container = theme->GetSet("background");
+    if (!container)
+        return;
+
     container->Draw(&tmp, 0, 0);
 
     tmp.end();

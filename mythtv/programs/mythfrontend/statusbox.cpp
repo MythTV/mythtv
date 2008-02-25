@@ -35,7 +35,7 @@ using namespace std;
  *  \brief Reports on various status items.
  *
  *  StatusBox reports on the listing status, that is how far
- *  into the future program listings exits. It also reports
+ *  into the future program listings exists. It also reports
  *  on the status of each tuner, the log entries, the status
  *  of the job queue, and the machine status.
  */

@@ -371,6 +371,9 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
 // Given a fstab entry to a media device determine what type of device it is
 bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 {
+    if (!mep)
+        return false;
+
     QString devicePath( mep->fs_spec );
     //cout << "AddDevice - " << devicePath << endl;
 
@@ -379,9 +382,6 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 
     bool is_supermount = false;
     bool is_cdrom = false;
-
-    if (mep == NULL)
-       return false;
 
     if (stat(mep->fs_spec, &sbuf) < 0)
        return false;

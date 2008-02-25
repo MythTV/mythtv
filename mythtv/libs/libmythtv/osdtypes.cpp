@@ -1,6 +1,7 @@
 #include <qimage.h>
 #include <qmap.h>
 #include <qregexp.h>
+#include <qdeepcopy.h>
 
 #include <iostream>
 #include <algorithm>

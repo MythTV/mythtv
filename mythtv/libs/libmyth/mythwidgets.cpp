@@ -1573,9 +1573,9 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
             else if (action == "NEXTVIEW")
             {
                 int nextItem = currentItem();
-                if (nextItem < count() - 1)
+                if (nextItem < (int)count() - 1)
                     nextItem++;
-                while (nextItem < count() - 1 && text(nextItem)[0] == ' ')
+                while (nextItem < (int)count() - 1 && text(nextItem)[0] == ' ')
                     nextItem++;
                 if (!itemVisible(nextItem))
                     setTopItem(nextItem);
