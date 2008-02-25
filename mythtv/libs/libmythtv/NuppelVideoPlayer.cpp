@@ -1188,7 +1188,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
   
 
     if (ringBuffer->isDVD())
-        ringBuffer->DVD()->JumpToTitle(false);
+        ringBuffer->DVD()->JumpToTitle(true);
 
     bookmarkseek = GetBookmark();
 
@@ -7123,10 +7123,11 @@ long long NuppelVideoPlayer::GetDVDBookmark(void) const
                 int subtitletrack = atoi((*++it).ascii());
                 ringBuffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
                 ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
+                ringBuffer->DVD()->JumpToTitle(false);
             }
-            ringBuffer->DVD()->JumpToTitle(true);
         }
     }
+    
     return frames;
 }
 
