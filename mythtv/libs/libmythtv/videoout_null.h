@@ -1,6 +1,8 @@
 #ifndef VIDEOOUT_NULL_H_
 #define VIDEOOUT_NULL_H_
 
+#include <qmutex.h>
+
 #include "videooutbase.h"
 
 class VideoOutputNull : public VideoOutput
@@ -18,6 +20,7 @@ class VideoOutputNull : public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
+    void CreatePauseFrame(void);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
@@ -40,11 +43,8 @@ class VideoOutputNull : public VideoOutput
                                            const QSize &video_dim);
 
   private:
-    void Exit(void);
-
-    bool XJ_started;
-
-    VideoFrame pauseFrame;
+    QMutex     global_lock;
+    VideoFrame av_pause_frame;
 };
 
 #endif
