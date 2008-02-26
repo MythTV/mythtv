@@ -2,15 +2,13 @@
 #ifndef EITSCANNER_H
 #define EITSCANNER_H
 
-// C includes
-#include <pthread.h>
-
 // Qt includes
 #include <qmutex.h>
 #include <qobject.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
 #include <qwaitcondition.h>
+#include <qthread.h>
 
 class TVRec;
 class ChannelBase;
@@ -27,8 +25,19 @@ class EITSource
     virtual void SetEITRate(float rate) = 0;
 };
 
+class EITScanner;
+
+class EITThread : public QThread
+{
+  public:
+    virtual void run();
+    EITScanner   *scanner;
+};
+
 class EITScanner
 {
+  friend class EITThread;
+
   public:
     EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
@@ -39,11 +48,13 @@ class EITScanner
     void StartActiveScan(TVRec*, uint max_seconds_per_source,
                          bool ignore_source);
 
-    void StopActiveScan(void);        
+    void StopActiveScan(void);
+
+  protected:
+    void RunEventLoop(void);
 
   private:
     void TeardownAll(void);
-    void RunEventLoop(void);
     static void *SpawnEventLoop(void*);
     static void RescheduleRecordings(void);
 
@@ -52,7 +63,7 @@ class EITScanner
     EITSource       *eitSource;
 
     EITHelper       *eitHelper;
-    pthread_t        eventThread;
+    EITThread        eventThread;
     bool             exitThread;
     QWaitCondition   exitThreadCond;
 
