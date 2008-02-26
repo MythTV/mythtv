@@ -18,7 +18,7 @@ single XML tag, <Information>, with any of 3 attributes, "display", "name", and
 </Miscellaneous>
 
 The value of the display attribute is inserted directly into the HTML backend
-status page.  If the display value does not contain any "<p>" or "<br" HTML
+status page.  If the display value does not contain any "<p>" or "<br>" HTML
 breaks, a line break tag (<br />) will be written after the display value.  If
 the display value provides any HTML breaks, no line breaks will be appended to
 the value (so the display value must provide all the breaks).  The name and
