@@ -178,6 +178,8 @@ void DVBStreamHandler::Start(void)
 {
     QMutexLocker locker(&_start_stop_lock);
 
+    _eit_pids.clear(); 
+
     if (IsRunning() && _using_section_reader && !_allow_section_reader)
         Stop();
 
