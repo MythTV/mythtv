@@ -249,7 +249,7 @@ int MythCDROMLinux::SCSIstatus()
     cgc.buflen = sizeof(buffer);
     cgc.data_direction = CGC_DATA_READ;
 
-    es = (CDROMeventHdr *) buffer;
+    es = (CDROMeventStatus *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
         || es->nea                           // drive does not support request
