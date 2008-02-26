@@ -191,11 +191,13 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
     ignore_source = _ignore_source;
 
     if (ignore_source)
-        VERBOSE(VB_EIT, LOC_ID + "EIT scan ignoring sourceid..");
+        VERBOSE(VB_EIT, LOC_ID + "EIT scan ignoring sourceid.");
 
     eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
     eitSource->SetEITRate(1.0f);
+
+    VERBOSE(VB_EIT, LOC_ID + "Started passive scan.");
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
