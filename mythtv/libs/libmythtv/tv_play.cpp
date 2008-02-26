@@ -5309,7 +5309,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     if (!GetOSD() || browsemode || !queuedChanNum.isEmpty())
     {
         if (&lastSignalMsg != &strlist)
-            lastSignalMsg = strlist;
+            lastSignalMsg = QDeepCopy<QStringList>(strlist);
         return;
     }
 
