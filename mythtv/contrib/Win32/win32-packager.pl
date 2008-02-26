@@ -3,6 +3,9 @@
 ### =file
 ### win32-packager.pl
 ###
+### =location
+### http://svn.mythtv.org/svn/trunk/mythtv/contrib/Win32/win32-packager.pl
+###
 ### =description
 ### Tool for automating frontend builds on MS Windows XP (and compatible)
 ### originally based loosely on osx-packager.pl, but now is its own beast.

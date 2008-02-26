@@ -1,6 +1,15 @@
 #!/usr/bin/perl
 
-### osx-packager.pl $Id$
+### = file
+### osx-packager.pl
+###
+### = revision
+### $Id$
+###
+### = location
+### http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/osx-packager.pl
+###
+### = description
 ### Tool for automating frontend builds on Mac OS X.
 ### Run "osx-packager.pl -man" for full documentation.
 
