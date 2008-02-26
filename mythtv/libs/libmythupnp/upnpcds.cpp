@@ -316,9 +316,13 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 	else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
             request.m_sObjectId = request.m_sContainerID;
 
-	// WMP11 compatibility code
-	if (request.m_sObjectId == "13")
-	    request.m_sObjectId = "Videos/0";
+        if (request.m_sObjectId == "13")
+        {
+            if (gContext->GetSetting("UPnP/WMPSource") == "1")
+                request.m_sObjectId = "Videos/0";
+            else
+                request.m_sObjectId = "RecTv/0";
+        }
 
         UPnpCDSExtension *pExtension = m_extensions.first();
 
@@ -415,7 +419,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     // WMP11 compatibility code
     if (request.m_sObjectId == "0")
     {
-	request.m_sObjectId = "Videos/0";
+        if (gContext->GetSetting("UPnP/WMPSource") == "1")
+             request.m_sObjectId = "Videos/0";
+        else
+             request.m_sObjectId = "RecTv/0";
+
 	request.m_sParentId = "8";
     }
 
