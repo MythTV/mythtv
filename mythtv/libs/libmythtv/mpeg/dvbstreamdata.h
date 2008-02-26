@@ -97,12 +97,13 @@ class DVBStreamData : virtual public MPEGStreamData
         return *it;
     }
 
-    void SetVersionEIT(uint tableid, uint serviceid, int version)
+    void SetVersionEIT(uint tableid, uint serviceid, int version, uint last_section)
     {
         if (VersionEIT(tableid, serviceid) == version)
             return;
         uint key = (tableid << 16) | serviceid;
         _eit_version[key] = version;
+        init_sections(_eit_section_seen[key], last_section);
     }
 
     int VersionEIT(uint tableid, uint serviceid) const
