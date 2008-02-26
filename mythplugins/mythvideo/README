@@ -1,5 +1,5 @@
                                    MythVideo
-                                 Version 0.20
+                                 Version 0.21
 
 
 GENERAL INFO
@@ -19,7 +19,7 @@ BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-    MythTV 0.20 or higher installed and working
+    MythTV 0.21 or higher installed and working
 
 Compiling note: If you get an error on building this, that says
                 something about 'mkspecs', then you don't have the
