@@ -148,7 +148,7 @@ void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
                     }
                 }
             }
-            if (encoder)
+            if (audio_codec && encoder)
             {
                 pSoundStretch->setSampleRate(audio_codec->sample_rate);
                 pSoundStretch->setChannels(audio_codec->channels);
@@ -397,7 +397,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
                     }
                 }
             }
-            if (encoder)
+            if (audio_codec && encoder)
             {
                 pSoundStretch->setSampleRate(audio_codec->sample_rate);
                 pSoundStretch->setChannels(audio_codec->channels);
