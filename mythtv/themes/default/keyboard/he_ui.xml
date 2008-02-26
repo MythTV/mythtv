@@ -2,25 +2,25 @@
 
   <window name="keyboard">
 
-    <font name="normal" face="Arial">
+    <font name="normal" face="Nachlieli CLM">
       <color>#ffffff</color>
       <size>14</size>
       <bold>yes</bold>
     </font>
 
-    <font name="focused" face="Arial">
+    <font name="focused" face="Nachlieli CLM">
       <color>#ffffff</color>
       <size>14</size>
       <bold>yes</bold>
     </font>
 
-    <font name="down" face="Arial">
+    <font name="down" face="Nachlieli CLM">
       <color>#ffffff</color>
       <size>14</size>
       <bold>yes</bold>
     </font>
 
-    <font name="downfocused" face="Arial">
+    <font name="downfocused" face="Nachlieli CLM">
       <color>#ffffff</color>
       <size>14</size>
       <bold>yes</bold>
