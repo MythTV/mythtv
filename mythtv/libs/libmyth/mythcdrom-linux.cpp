@@ -28,40 +28,39 @@
 
 typedef struct cdrom_generic_command CDROMgenericCmd;
 
-// Some structures which contain the result of a low-level SCSI CDROM query
-struct event_header
-{
-    unsigned char data_len[2];
-#ifdef WORDS_BIGENDIAN
-    unsigned char nea                : 1;
-    unsigned char reserved1          : 4;
-    unsigned char notification_class : 3;
-#else
-    unsigned char notification_class : 3;
-    unsigned char reserved1          : 4;
-    unsigned char nea                : 1;
-#endif
-    unsigned char supp_event_class;
-};
+// Some structures stolen from the __KERNEL__ section of linux/cdrom.h.
 
-struct media_event_desc
+// This contains the result of a GPCMD_GET_EVENT_STATUS_NOTIFICATION.
+// It is the joining of a struct event_header and a struct media_event_desc
+typedef struct
 {
+    uint16_t data_len[2];
 #ifdef WORDS_BIGENDIAN
-    unsigned char reserved1          : 4;
-    unsigned char media_event_code   : 4;
-    unsigned char reserved2          : 6;
-    unsigned char media_present      : 1;
-    unsigned char door_open          : 1;
+    uint8_t  nea                : 1;
+    uint8_t  reserved1          : 4;
+    uint8_t  notification_class : 3;
 #else
-    unsigned char media_event_code   : 4;
-    unsigned char reserved1          : 4;
-    unsigned char door_open          : 1;
-    unsigned char media_present      : 1;
-    unsigned char reserved2          : 6;
+    uint8_t  notification_class : 3;
+    uint8_t  reserved1          : 4;
+    uint8_t  nea                : 1;
 #endif
-    unsigned char start_slot;
-    unsigned char end_slot;
-};
+    uint8_t  supp_event_class;
+#ifdef WORDS_BIGENDIAN
+    uint8_t  reserved2          : 4;
+    uint8_t  media_event_code   : 4;
+    uint8_t  reserved3          : 6;
+    uint8_t  media_present      : 1;
+    uint8_t  door_open          : 1;
+#else
+    uint8_t  media_event_code   : 4;
+    uint8_t  reserved2          : 4;
+    uint8_t  door_open          : 1;
+    uint8_t  media_present      : 1;
+    uint8_t  reserved3          : 6;
+#endif
+    uint8_t  start_slot;
+    uint8_t  end_slot;
+} CDROMeventStatus;
 
 // and this is returned by GPCMD_READ_DISC_INFO
 typedef struct {
@@ -162,6 +161,12 @@ int MythCDROMLinux::driveStatus()
 {
     int drive_status = ioctl(m_DeviceHandle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
 
+    if (drive_status == -1)   // Very unlikely, but we should check
+    {
+        VERBOSE(VB_MEDIA, LOC + ":driveStatus() - ioctl() failed: " + ENO);
+        return CDS_NO_INFO;
+    }
+
     if (drive_status == CDS_TRAY_OPEN && getDevicePath().contains("/dev/scd"))
         return SCSIstatus();
 
@@ -193,7 +198,7 @@ bool MythCDROMLinux::hasWritableMedia()
         VERBOSE(VB_MEDIA,
                 LOC + ":hasWritableMedia() - failed to send packet to "
                     + m_DevicePath);
-        return 0;
+        return false;
     }
 
     di = (CDROMdiscInfo *) buffer;
@@ -227,29 +232,28 @@ bool MythCDROMLinux::hasWritableMedia()
 
 int MythCDROMLinux::SCSIstatus()
 {
-    unsigned char                buffer[8];
-    struct cdrom_generic_command cgc;
-    struct event_header         *eh;
-    struct media_event_desc     *med;
+    unsigned char    buffer[8];
+    CDROMgenericCmd  cgc;
+    CDROMeventStatus *es;
 
 
     memset(buffer, 0, sizeof(buffer));
     memset(&cgc,   0, sizeof(cgc));
 
     cgc.cmd[0] = GPCMD_GET_EVENT_STATUS_NOTIFICATION;
-    cgc.cmd[1] = 1;
-    cgc.cmd[4] = 1 << 4;
+    cgc.cmd[1] = 1;       // Tell us immediately
+    cgc.cmd[4] = 1 << 4;  // notification class of media
     cgc.cmd[8] = sizeof(buffer);
     cgc.quiet  = 1;
     cgc.buffer = buffer;
     cgc.buflen = sizeof(buffer);
     cgc.data_direction = CGC_DATA_READ;
 
-    eh  = (struct event_header     *)  buffer;
-    med = (struct media_event_desc *) (buffer + sizeof(struct event_header));
+    es = (CDROMeventHdr *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
-        || eh->nea || (eh->notification_class != 0x4))
+        || es->nea                           // drive does not support request
+        || (es->notification_class != 0x4))  // notification class mismatch
     {
         VERBOSE(VB_MEDIA,
                 LOC + ":SCSIstatus() - failed to send SCSI packet to "
@@ -257,7 +261,7 @@ int MythCDROMLinux::SCSIstatus()
         return CDS_TRAY_OPEN;
     }
 
-    if (med->media_present)
+    if (es->media_present)
     {
 #ifdef EXTRA_VERBOSITY
         VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - ioctl() said tray was open,"
@@ -265,7 +269,7 @@ int MythCDROMLinux::SCSIstatus()
 #endif
         return CDS_DISC_OK;
     }
-    else if (med->door_open)
+    else if (es->door_open)
     {
 #ifdef EXTRA_VERBOSITY
         VERBOSE(VB_MEDIA, LOC + ":SCSIstatus() - tray is definitely open");
