@@ -2470,7 +2470,10 @@ void PlaybackBox::playSelected()
         return;
 
     if (m_player && m_player->IsSameProgram(curitem))
+    {
         exitWin();
+        return;
+    }
 
     if ((curitem->availableStatus == asAvailable) ||
         (curitem->availableStatus == asNotYetAvailable))
@@ -3425,8 +3428,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     popup->ShowPopup(this, SLOT(PopupDone(int)));
 
-    if (playButton)
-        playButton->setFocus();
+    if (!m_player || !m_player->IsSameProgram(curitem))
+    {
+        if (playButton)
+            playButton->setFocus();
+    }
 
     expectingPopup = true;
 }
