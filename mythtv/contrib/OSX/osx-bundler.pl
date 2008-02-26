@@ -3,6 +3,9 @@
 # = NAME
 # osx-bundler.pl - General purpose application bundling utility
 #
+# = LOCATION
+# http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/osx-bundler.pl
+#
 # = USAGE
 my $usage = '
 osx-bundler.pl executable [lib-dir] [lib-dir...]

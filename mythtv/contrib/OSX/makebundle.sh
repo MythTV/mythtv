@@ -3,6 +3,9 @@
 # = NAME
 # makebundle
 #
+# = LOCATION
+# http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/makebundle.sh
+#
 # = USAGE
 # makebundle mythfrontend[.app]
 # makebundle mythtv-setup[.app]
