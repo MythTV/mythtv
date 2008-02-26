@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # mythburn.py
 # The ported MythBurn scripts which feature:
 
