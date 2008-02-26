@@ -236,7 +236,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       decoder_lock(true),
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
-      frame_interval(30),           ffrew_skip(1),
+      frame_interval((int)(1000000.0f / 30)), ffrew_skip(1),
       // Audio and video synchronization stuff
       videosync(NULL),              delay(0),
       vsynctol(30/4),               avsync_delay(0),
