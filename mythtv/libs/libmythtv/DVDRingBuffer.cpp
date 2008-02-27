@@ -547,7 +547,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 ClearSubtitlesOSD();
 
-                if (parent && buttonExists)
+                if (parent && buttonExists && NumMenuButtons() > 0)
                     parent->HideDVDButton(false);
 
                 if (blockBuf != dvdBlockWriteBuf)
