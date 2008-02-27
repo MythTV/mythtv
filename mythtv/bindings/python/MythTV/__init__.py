@@ -1,3 +1,4 @@
+#!/usr/bin/python
 __all__ = ['MythTV', 'MythLog', 'MythDB', 'MythVideo']
 
 from MythLog import *

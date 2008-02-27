@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Provides the MythVideo class with convinience methods to access the MythTV
 MythVideo database.
