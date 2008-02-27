@@ -361,6 +361,8 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     if(groupStr.isEmpty() || urlStr.isEmpty())
         return;
 
+    urlStr.replace("&amp;","&");
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr.utf8());
