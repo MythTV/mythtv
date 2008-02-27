@@ -1897,13 +1897,15 @@ class QuickTune : public ComboBoxSetting, public CardInputDBStorage
     {
         setLabel(QObject::tr("Use quick tuning"));
         addSelection(QObject::tr("Never"),        "0", true);
-        //addSelection(QObject::tr("Live TV only"), "1", true);
+        addSelection(QObject::tr("Live TV only"), "1", true);
         addSelection(QObject::tr("Always"),       "2", false);
         setHelpText(QObject::tr(
                         "If enabled MythTV will tune using only the "
                         "MPEG program number. The program numbers "
                         "change more often than DVB or ATSC tuning "
-                        "parameters, so this is slightly less reliable."));
+                        "parameters, so this is slightly less reliable. "
+                        "This will also inhibit EIT gathering during "
+                        "Live TV and recording."));
     };
 };
 
