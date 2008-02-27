@@ -2938,7 +2938,9 @@ if enabled frontend; then
   echo "# Input Support"
   echo "Joystick menu             ${joystick_menu-no}"
   echo "lirc support              ${lirc-no}"
-  echo "Apple Remote              ${appleremote-no}"
+  if test x"$targetos" = x"darwin" ; then
+    echo "Apple Remote              ${appleremote-no}"
+  fi
 fi
 
 if enabled backend; then
@@ -2975,7 +2977,9 @@ if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
   echo "OpenGL video              ${opengl_video-no}"
-  echo "Mac acceleration          ${dvdv-no}"
+  if test x"$targetos" = x"darwin" ; then
+    echo "Mac acceleration          ${dvdv-no}"
+  fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
   echo "DirectFB                  ${directfb-no}"
   if test x"$mingw32" = x"yes" -o x"$targetos" = x"cygwin" ; then
