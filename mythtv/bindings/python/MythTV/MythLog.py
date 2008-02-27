@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Provides simple logging and exception classes.
 """
