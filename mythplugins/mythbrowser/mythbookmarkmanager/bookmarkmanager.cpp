@@ -405,6 +405,8 @@ void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, cons
     if (groupStr->isEmpty() || urlStr->isEmpty())
         return;
 
+    urlStr->replace("&amp;","&");
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr->utf8());
