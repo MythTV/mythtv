@@ -3004,7 +3004,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 int numVidFrames = 0;
                 if (GetNVP() && GetNVP()->getVideoOutput())
                     numVidFrames = GetNVP()->getVideoOutput()->ValidVideoFrames();
-                if (numVidFrames == 0 && ringBuffer->DVD()->InStillFrame())
+                bool inDVDStill = ringBuffer->DVD()->InStillFrame();
+
+                if (decodeStillFrame && !inDVDStill)
+                {
+                    decodeStillFrame = false;
+                }
+
+                if (numVidFrames == 0 && inDVDStill)
                 {
                     if (lastDVDStillFrame)
                     {
