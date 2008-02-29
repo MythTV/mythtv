@@ -13,9 +13,9 @@
 #include <limits.h>
 #include "util.h"
 
-#define LOC QString("UPnpCDSVideo: ")
-#define LOC_WARN QString("UPnpCDSVideo, Warning: ")
-#define LOC_ERR QString("UPnpCDSVideo, Error: ")
+#define LOC QString("UPnpCDSVideo: "); 
+#define LOC_WARN QString("UPnpCDSVideo, Warning: "); 
+#define LOC_ERR QString("UPnpCDSVideo, Error: "); 
 
 UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
 {
@@ -151,9 +151,19 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sObjectId )
                             .arg( sURIParams );
 
-    sParentID          = QString( "%1/item%2")
-	                    .arg( sObjectId )
-			    .arg( sParentID );
+    sURIParams = QString( "/Id%1" ).arg( nVidID );
+    sId        = QString( "%1/item%2").arg( sObjectId ).arg( sURIParams );
+
+    if (sParentID == QString("%1").arg(STARTING_VIDEO_OBJECTID))
+    {
+        sParentID          = sObjectId;
+    }
+    else
+    {
+        sParentID          = QString( "%1/item/Id%2")
+                            .arg( sObjectId )
+                            .arg( sParentID );
+    }
 
     QString sAlbumArtURI= QString( "%1GetVideoArt%2")
                         .arg( sURIBase   )
@@ -161,24 +171,17 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
 
     CDSObject *pItem = NULL;
 
-    if (sItemType == "FILE") 
-    {
-        sURIParams = QString( "/Id%1" ).arg( nVidID );
-        sId        = QString( "%1/item%2").arg( sObjectId ).arg( sURIParams );
-
-        pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
-    }
-    else if (sItemType == "FOLDER") 
-    {
+    if (sItemType == "FOLDER") 
         pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
-    }
+    else if (sItemType == "FILE" )
+        pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
 
-    if (!pItem)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " +
-                QString("sItemType has unknown type '%1'").arg(sItemType));
-
-        return;
+    if (!pItem) 
+    { 
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " + 
+        QString("sItemType has unknown type '%1'").arg(sItemType)); 
+ 
+        return; 
     }
 
     pItem->m_bRestricted  = false;
