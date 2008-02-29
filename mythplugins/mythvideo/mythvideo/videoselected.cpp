@@ -161,16 +161,25 @@ void VideoSelected::updatePlayWait(QPainter *p)
         if (container)
         {
             QRect area = container->GetAreaRect();
-            QPixmap pix(area.size());
-            pix.fill(this, area.topLeft());
-            QPainter tmp(&pix);
+            if (area.isValid())
+            {
+                QPixmap pix(area.size());
+                pix.fill(this, area.topLeft());
+                QPainter tmp(&pix);
 
-            for (int i = 0; i < 4; ++i)
-                container->Draw(&tmp, i, 0);
+                for (int i = 0; i < 4; ++i)
+                    container->Draw(&tmp, i, 0);
 
-            tmp.end();
+                tmp.end();
 
-            p->drawPixmap(area.topLeft(), pix);
+                p->drawPixmap(area.topLeft(), pix);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QObject::tr("Theme Error: selected/playwait "
+                                    "has an invalid area."));
+            }
         }
 
         m_state++;
@@ -283,6 +292,7 @@ void VideoSelected::updateInfo(QPainter *p)
     }
     else
     {
+       // TODO: This seems to be nonsense.
        LayerSet *norec = theme->GetSet("novideos_info");
        if (norec)
        {

@@ -567,6 +567,7 @@
       </container>
 
       <container name="novideos_info">
+         <area>0,0,1280,720</area>
          <textarea name="msg" draworder="8" align="allcenter">
             <area>400,170,824,145</area>
             <font>info</font>

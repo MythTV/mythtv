@@ -189,16 +189,25 @@ void VideoBrowser::updatePlayWait(QPainter *p)
         if (container)
         {
             QRect area = container->GetAreaRect();
-            QPixmap pix(area.size());
-            pix.fill(this, area.topLeft());
-            QPainter tmp(&pix);
+            if (area.isValid())
+            {
+                QPixmap pix(area.size());
+                pix.fill(this, area.topLeft());
+                QPainter tmp(&pix);
 
-            for (int i = 0; i < 4; ++i)
-                container->Draw(&tmp, i, 0);
+                for (int i = 0; i < 4; ++i)
+                    container->Draw(&tmp, i, 0);
 
-            tmp.end();
+                tmp.end();
 
-            p->drawPixmap(area.topLeft(), pix);
+                p->drawPixmap(area.topLeft(), pix);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QObject::tr("Theme Error: browser/playwait "
+                                    "has an invalid area."));
+            }
         }
 
         m_state++;
@@ -338,18 +347,27 @@ void VideoBrowser::updateInfo(QPainter *p)
         if (norec)
         {
             QRect pr = norec->GetAreaRect();
-            QPixmap pix(pr.size());
-            pix.fill(this, pr.topLeft());
-            QPainter tmp(&pix);
-
-            for (int i = 1; i <= 9; ++i)
+            if (pr.isValid())
             {
-                norec->Draw(&tmp, i, 0);
+                QPixmap pix(pr.size());
+                pix.fill(this, pr.topLeft());
+                QPainter tmp(&pix);
+
+                for (int i = 1; i <= 9; ++i)
+                {
+                    norec->Draw(&tmp, i, 0);
+                }
+
+                tmp.end();
+
+                p->drawPixmap(pr.topLeft(), pix);
             }
-
-            tmp.end();
-
-            p->drawPixmap(pr.topLeft(), pix);
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QObject::tr("Theme Error: browser/novideos_info "
+                                    "has an invalid area."));
+            }
         }
     }
 }

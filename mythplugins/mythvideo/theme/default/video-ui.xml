@@ -567,8 +567,9 @@
       </container>
 
       <container name="novideos_info">
+         <area>0,130,800,70</area>
          <textarea name="msg" align="center" draworder="8">
-            <area>0,110,800,70</area>
+            <area>240,0,540,70</area>
             <font>info</font>
             <value>No Videos Found</value>
             <multiline>yes</multiline>
@@ -837,15 +838,6 @@
          <textarea name="title" draworder="0" align="center">
             <area>0,320,800,60</area>
             <font>titlefnt</font>
-         </textarea>
-      </container>
-
-      <container name="novideos_info">
-         <textarea name="msg" align="center" draworder="8">
-            <area>0,110,800,70</area>
-            <font>info</font>
-            <value>No Videos Found</value>
-            <multiline>yes</multiline>
          </textarea>
       </container>
    </window>
