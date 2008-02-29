@@ -316,6 +316,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 	else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
             request.m_sObjectId = request.m_sContainerID;
 
+	// WMP11 compatibility code
         if (request.m_sObjectId == "13")
         {
             if (gContext->GetSetting("UPnP/WMPSource") == "1")
@@ -639,8 +640,19 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     if (pResults != NULL)
     {
+
         if (key)  
             idPath.last().append(QString("=%1").arg(key)); 
+	else if (pRequest->m_sObjectId.contains("item"))
+	{
+            idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+	    idPath = QStringList::split( "?", idPath[0] );
+
+            idPath = idPath[0];
+	    if (idPath[0].startsWith("Id"))
+	        idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
+
+	}
 
         QString sLast = idPath.last();
 
@@ -896,9 +908,24 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem( UPnpCDSRequest          
 
 	    QStringList tokens;
 
-	    tokens = QStringList::split( "=", pRequest->m_sObjectId );
-            pRequest->m_sParentId = tokens.last();
+	    if (pRequest->m_sObjectId.length() > 0)
+            {
+                if (pRequest->m_sObjectId.contains("="))
+                    tokens = QStringList::split( "=", pRequest->m_sObjectId );
+	        else 
+	        {
+	             tokens =  QStringList::split( "/", pRequest->m_sObjectId );
 
+	             tokens = QStringList::split( " ", tokens[tokens.count() - 1] );
+                     tokens = QStringList::split( "?", tokens[0] );
+
+                     if (tokens[0].startsWith("Id"))
+                         tokens[0] = tokens[0].right(tokens[0].length() - 2);
+
+	        }	
+            }
+
+            pRequest->m_sParentId = tokens.last();
             CreateItems( pRequest, pResults, 0, "", false );
             break;
         }
@@ -1259,6 +1286,11 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
 				     .arg(pRequest->m_sObjectId)
 				     .arg(sKey)); 
 				     */
+	    if ((pRequest->m_sParentId != "") && (pRequest->m_sParentId != "8"))
+            {
+                pResults->m_nTotalMatches = GetCount( "parentid", pRequest->m_sParentId );
+	    }
+
         }
 
         QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
@@ -1268,7 +1300,7 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
                           .arg( pRequest->m_nRequestedCount );
 
         query.prepare  ( sSQL );
-	VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
+	//VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
         query.bindValue(":KEY", sKey );
         query.exec();
 

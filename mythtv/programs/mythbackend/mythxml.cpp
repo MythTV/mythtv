@@ -107,6 +107,11 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                 pRequest->m_sBaseUrl = m_sControlUrl;
                 pRequest->m_sMethod = "GetVideo";
             }
+	    else if (pRequest->m_sBaseUrl == "/Myth/GetVideoArt")
+            {   
+	        pRequest->m_sBaseUrl = m_sControlUrl;
+	        pRequest->m_sMethod = "GetVideoArt";
+            }
 
             if (pRequest->m_sBaseUrl != m_sControlUrl)
                 return( false );
@@ -805,33 +810,49 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     bool bDefaultPixmap = false;
 
     pRequest->m_eResponseType   = ResponseTypeFile;
+    
+    QString sId =  pRequest->m_mapParams[ "Id"  ];
 
-    int  iId   = pRequest->m_mapParams[ "Id"  ].toInt();
+    if (sId == 0)
+    {
+        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
+
+        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+        idPath = QStringList::split( "?", idPath[0] );
+
+        sId = idPath[0];
+
+        if (sId.startsWith("Id"))
+            sId = sId.right(sId.length() - 2);
+        else
+            return;
+
+        pRequest->m_mapParams[ "Id" ] = sId;
+
+    }
+
+    VERBOSE(VB_UPNP, QString("GetVideoArt ID = %1").arg(sId));
 
     // Read Video poster file path from database
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT coverart FROM upnpmedia WHERE intid = :ITEMID");
-    query.bindValue(":ITEMID", iId);
+    query.bindValue(":ITEMID", sId);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("GetVideoArt ", query);
 
-/*
-    // Optional Parameters
-    //
-    int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
-    int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
+    QString sFileName;
 
-    if ((nWidth == 0) && (nHeight == 0))
+    if (query.size() > 0)
     {
-         bDefaultPixmap = true;
-    }
-*/
-    query.next();
+        query.first();
 
-    QString sFileName = query.value(0).toString();
+        sFileName = query.value(0).toString();
+    }
+    else
+        return;
 
     if (bDefaultPixmap)
     {
@@ -858,7 +879,25 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
     pRequest->m_eResponseType   = ResponseTypeFile;
 
-    int  iId   = pRequest->m_mapParams[ "Id"  ].toInt();
+    QString sId =  pRequest->m_mapParams[ "Id"  ];
+
+    if (sId == 0)
+    {
+        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
+
+        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+        idPath = QStringList::split( "?", idPath[0] );
+
+        sId = idPath[0];
+
+        if (sId.startsWith("Id"))
+            sId = sId.right(sId.length() - 2);
+        else
+            return;
+
+        pRequest->m_mapParams[ "Id" ] = sId;
+
+    }
 
     // Optional Parameters
 
@@ -873,7 +912,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
                   "LEFT JOIN music_directories ON "
                   "music_directories.directory_id=music_albumart.directory_id "
                   "WHERE music_albumart.albumart_id = :ARTID;");
-    query.bindValue(":ARTID", iId );
+    query.bindValue(":ARTID", sId );
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Select ArtId", query);
