@@ -428,7 +428,7 @@ void StaticImageScreen::prepareWidget(UIType *widget)
          * Scaling the image down and centering it
          */
         UIImageType *img = (UIImageType *) widget;
-        QSize max = img->GetSize(true);
+        QSize max = img->GetSize();
 
         if (imgsize.width() > -1 && imgsize.height() > -1)
         {
@@ -440,7 +440,7 @@ void StaticImageScreen::prepareWidget(UIType *widget)
 
                 int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
                 int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
-                img->SetPosition(gContext->GetMainWindow()->NormPoint(QPoint(newx, newy)));
+                img->SetPosition(QPoint(newx, newy));
             }
             img->SetSize(imgsize.width(), imgsize.height());
         }
@@ -492,7 +492,7 @@ void AnimatedImageScreen::prepareWidget(UIType *widget)
          * Scaling the image down and centering it
          */
         UIAnimatedImageType *img = (UIAnimatedImageType *) widget;
-        QSize max = img->GetSize(true);
+        QSize max = img->GetSize();
 
         if (imgsize.width() > -1 && imgsize.height() > -1)
         {
@@ -504,7 +504,7 @@ void AnimatedImageScreen::prepareWidget(UIType *widget)
 
                 int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
                 int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
-                img->SetPosition(gContext->GetMainWindow()->NormPoint(QPoint(newx, newy)));
+                img->SetPosition(QPoint(newx, newy));
             }
             img->SetSize(imgsize.width(), imgsize.height());
         }

@@ -660,7 +660,7 @@
                 <font>footer</font>
             </textarea>
             <image name="+map" draworder="0" >
-                <position>80,150</position>
+                <position>160,225</position>
                 <staticsize>485,300</staticsize>
             </image>
         </container>
@@ -688,7 +688,7 @@
                 <font>footer</font>
             </textarea>
             <animatedimage name="+animatedimage" draworder="6">
-                <position>80,150</position>
+                <position>160,225</position>
                 <staticsize>485,300</staticsize>
                 <interval>200</interval>
                 <startinterval>1000</startinterval>
