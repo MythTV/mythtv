@@ -455,6 +455,10 @@ add_optflags(){
     append OPTFLAGS "$@"
 }
 
+add_archflags(){
+    append ARCHFLAGS "$@"
+}
+
 add_cppflags(){
     append ECXXFLAGS "$@"
 }
@@ -528,6 +532,20 @@ check_optflags(){
     check_cc "$@" <<EOF && add_optflags "$@"
 int x;
 EOF
+}
+
+check_archflags(){
+    log check_archflags "$@"
+    check_cc "$@" <<EOF && add_archflags "$@"
+int x;
+EOF
+}
+
+check_mtune_mcpu(){
+    log check_mtune_mcpu "$@"
+    cpu_type="$1"
+    shift
+    check_archflags "-mtune=$cpu_type" "$@" || check_archflags "-mcpu=$cpu_type" "$@"
 }
 
 check_cppflags(){
@@ -1478,7 +1496,7 @@ case "$arch" in
   ;;
   sun4u|sparc64)
     arch="sparc64"
-    disabled cpu_override && ARCHFLAGS="-mcpu=ultrasparc -mvis"
+    disabled cpu_override && check_mtune_mcpu "ultrasparc" "-mvis"
     enable fast_64bit
   ;;
   sparc)
@@ -1853,57 +1871,57 @@ if test $tune != "generic"; then
     }
     case $tune in
         601|ppc601|PowerPC601)
-            ARCHFLAGS="-mcpu=601"
+            check_mtune_mcpu "601"
             warn_altivec enabled PPC601
         ;;
         603*|ppc603*|PowerPC603*)
-            ARCHFLAGS="-mcpu=603"
+            check_mtune_mcpu "603"
             warn_altivec enabled PPC603
         ;;
         604*|ppc604*|PowerPC604*)
-            ARCHFLAGS="-mcpu=604"
+            check_mtune_mcpu "604"
             warn_altivec enabled PPC604
         ;;
         G3|g3|75*|ppc75*|PowerPC75*)
-            ARCHFLAGS="-mcpu=750 -mpowerpc-gfxopt"
+            check_mtune_mcpu "750" "-mpowerpc-gfxopt"
             warn_altivec enabled PPC75x
         ;;
         G4|g4|745*|ppc745*|PowerPC745*)
-            ARCHFLAGS="-mcpu=7450 -mpowerpc-gfxopt"
+            check_mtune_mcpu "7450" "-mpowerpc-gfxopt"
             warn_altivec disabled PPC745x
         ;;
         74*|ppc74*|PowerPC74*)
-            ARCHFLAGS="-mcpu=7400 -mpowerpc-gfxopt"
+            check_mtune_mcpu "7400" "-mpowerpc-gfxopt"
             warn_altivec disabled PPC74xx
         ;;
         G5|g5|970|ppc970|PowerPC970|power4*|Power4*)
-            ARCHFLAGS="-mcpu=970 -mpowerpc-gfxopt -mpowerpc64"
+            check_mtune_mcpu "970" "-mpowerpc-gfxopt -mpowerpc64"
             warn_altivec disabled PPC970
             enable ppc64
         ;;
         Cell|CELL|cell)
-            add_cflags "-mcpu=cell"
+            check_mtune_mcpu "cell"
             warn_altivec disabled Cell
             enable ppc64
         ;;
         sparc64)
-            ARCHFLAGS="-mcpu=v9"
+            check_mtune_mcpu "v9"
         ;;
         bf*) #bf531 bf532 bf533 bf561 bf5xx all get this config
             add_cflags "-mfdpic"
             add_ldflags "-mfdpic"
         ;;
         arm*)
-            add_cflags "-mcpu=$cpu"
+            check_mtune_mcpu "$cpu"
         ;;
         *)
-            ARCHFLAGS="$ARCHFLAGS -mcpu=$tune"
+            check_mtune_mcpu "$tune"
         ;;
     esac
 fi
 
 if test x"$cpu" != x"generic"; then
-    ARCHFLAGS="-march=$cpu $ARCHFLAGS"
+    add_archflags "-march=$cpu"
 fi
 
 gnu_make(){
@@ -2006,7 +2024,9 @@ enabled armv5te && check_asm armv5te '"qadd r0, r0, r0"'
 enabled armv6   && check_asm armv6   '"sadd16 r0, r0, r0"'
 enabled iwmmxt  && check_asm iwmmxt  '"wunpckelub wr6, wr4"'
 enabled mmi     && check_asm mmi     '"lq $2, 0($2)"'
-enabled vis     && check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc
+enabled vis     && 
+                  (check_asm vis     '"pdist %f0, %f0, %f0"' -mtune=ultrasparc ||
+                   check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc)
 
 # if no tune setting and we know cpu class look at $processor 
 if disabled cpu_override && enabled proc_opt; then
@@ -2167,6 +2187,8 @@ if enabled proc_error_msg; then
     echo ""
 fi
 
+enabled vis && check_mtune_mcpu "ultrasparc"
+
 # if architecture specific flags don't work blank them
 echo "int main( void ) { return 0; }" > $TMPC
 TMP_ARCHFLAGS=$ARCHFLAGS
@@ -2178,9 +2200,6 @@ if test x"$ARCHFLAGS" = x""; then
         echo ""
     fi
 fi
-
-
-enabled vis && add_cflags "-mcpu=ultrasparc -mtune=ultrasparc"
 
 # "CPU_CLIP" test for SRC / libsamplerate
 # test positive wrap
