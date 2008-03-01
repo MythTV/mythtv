@@ -570,6 +570,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         return false;
     }
 
+    // If seeking to start of stream force a DTS and start_time of zero as
+    // libav sometimes returns the end of the stream instead.
+    if (desiredFrame <= 1)
+    {
+        av_update_cur_dts(ic, st, 0);
+        ic->start_time = 0;
+    }
+
     int64_t adj_cur_dts = st->cur_dts;
 
     if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
