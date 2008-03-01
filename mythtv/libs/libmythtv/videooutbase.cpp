@@ -545,6 +545,11 @@ bool VideoOutput::NeedsDoubleFramerate() const
             m_deinterlacing);
 }
 
+bool VideoOutput::IsBobDeint(void) const
+{
+    return (m_deinterlacing && m_deintfiltername == "bobdeint");
+}
+
 /**
  * \fn VideoOutput::ApproveDeintFilter(const QString& filtername) const
  * \brief Approves all deinterlace filters, except ones which
