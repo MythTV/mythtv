@@ -173,6 +173,14 @@ void WeatherScreen::draw(QPainter *p)
     if (m_container)
     {
         QRect area = m_container->GetAreaRect();
+        if (area.isNull())
+        {
+            VERBOSE(VB_IMPORTANT, QString("Container %1 has NULL area, "
+                                          "bad theme.")
+                                          .arg(m_container->GetName()));
+            area.setWidth(800);
+            area.setHeight(600);
+        }
         QPixmap pix(area.size());
         pix.fill(m_parent, area.topLeft());
         QPainter tmp(&pix);
