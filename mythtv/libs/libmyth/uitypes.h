@@ -700,7 +700,13 @@ class MPUBLIC UIAnimatedImageType : public UIType
     void NextImage();
     void PreviousImage();
     void GotoFirstImage() { m_currentimage = 1; }
-     
+    QSize GetSize(bool scaled = false)
+    {
+        return scaled ?
+                QSize(int(m_force_x * m_wmult), int(m_force_y * m_hmult)) :
+                QSize(m_force_x, m_force_y);
+    }
+
     virtual void Draw(QPainter *, int, int);
 
   public slots:

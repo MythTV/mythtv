@@ -15,7 +15,7 @@ WeatherScreen *WeatherScreen::loadScreen(Weather *parent, LayerSet *container,
     if (key == "Three Day Forecast")
         return new ThreeDayForecastScreen(parent, container, id);
     if (key == "Six Day Forecast")
-        return new SixDayForecastScreen(parent, container, id);        
+        return new SixDayForecastScreen(parent, container, id);
     if (key == "Severe Weather Alerts")
         return new SevereWeatherScreen(parent, container, id);
     if (key == "Static Map")
@@ -45,6 +45,7 @@ WeatherScreen::WeatherScreen(Weather *parent, LayerSet *container, int id)
     m_container = container;
     m_parent = parent;
     m_id = id;
+    m_prepared = false;
 
     m_inuse = false;
     vector<UIType *> *types = m_container->getAllTypes();
@@ -136,6 +137,8 @@ void WeatherScreen::prepareScreen()
         prepareWidget(widget);
         ++itr;
     }
+
+    m_prepared = true;
 }
 
 void WeatherScreen::prepareWidget(UIType *widget)
@@ -173,6 +176,14 @@ void WeatherScreen::draw(QPainter *p)
     if (m_container)
     {
         QRect area = m_container->GetAreaRect();
+        if (area.isNull())
+        {
+            VERBOSE(VB_IMPORTANT, QString("Container %1 has NULL area, "
+                                          "bad theme.")
+                                          .arg(m_container->GetName()));
+            area.setWidth(800);
+            area.setHeight(600);
+        }
         QPixmap pix(area.size());
         pix.fill(m_parent, area.topLeft());
         QPainter tmp(&pix);
@@ -194,7 +205,8 @@ void WeatherScreen::hiding()
 
 void WeatherScreen::showing()
 {
-    prepareScreen();
+    if (!m_prepared)
+        prepareScreen();
     unpause_animation();
 }
 
@@ -379,7 +391,7 @@ bool SevereWeatherScreen::handleKey(QKeyEvent *e)
 
 StaticImageScreen::StaticImageScreen(Weather *parent, LayerSet *container,
                                      int id) :
-    WeatherScreen(parent, container, id), max(730, 450), orgPos(35, 100)
+    WeatherScreen(parent, container, id)
 {
 }
 
@@ -402,11 +414,6 @@ QString StaticImageScreen::prepareDataItem(const QString &key,
             ret = value.left(value.findRev('-'));
             imgsize.setWidth(dim[0].toInt());
             imgsize.setHeight(dim[1].toInt());
-            imgsize.scale(max, QSize::ScaleMin);
-        }
-        else
-        {
-            imgsize = max;
         }
     }
 
@@ -421,18 +428,29 @@ void StaticImageScreen::prepareWidget(UIType *widget)
          * Scaling the image down and centering it
          */
         UIImageType *img = (UIImageType *) widget;
-        int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
-        int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+        QSize max = img->GetSize();
 
-        img->SetSize(imgsize.width(), imgsize.height());
-        img->SetPosition(gContext->GetMainWindow()->NormPoint(QPoint(newx, newy)));
+        if (imgsize.width() > -1 && imgsize.height() > -1)
+        {
+            if (max.width() > -1 && max.height() > -1)
+            {
+                imgsize.scale(max, QSize::ScaleMin);
+
+                QPoint orgPos = img->DisplayPos();
+
+                int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
+                int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+                img->SetPosition(QPoint(newx, newy));
+            }
+            img->SetSize(imgsize.width(), imgsize.height());
+        }
         img->LoadImage();
     }
 }
 
 AnimatedImageScreen::AnimatedImageScreen(Weather *parent, LayerSet *container,
                                          int id) :
-    WeatherScreen(parent, container, id), max(730, 450), orgPos(35, 100)
+    WeatherScreen(parent, container, id)
 {
 }
 
@@ -456,11 +474,6 @@ QString AnimatedImageScreen::prepareDataItem(const QString &key,
             ret = value.left(value.findRev('-'));
             imgsize.setWidth(dim[0].toInt());
             imgsize.setHeight(dim[1].toInt());
-            imgsize.scale(max, QSize::ScaleMin);
-        }
-        else
-        {
-            imgsize = max;
         }
 
         QString cnt = ret.right(ret.length() - ret.findRev('-') - 1);
@@ -479,11 +492,23 @@ void AnimatedImageScreen::prepareWidget(UIType *widget)
          * Scaling the image down and centering it
          */
         UIAnimatedImageType *img = (UIAnimatedImageType *) widget;
-        int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
-        int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+        QSize max = img->GetSize();
 
-        img->SetSize(imgsize.width(), imgsize.height());
-        img->SetPosition(gContext->GetMainWindow()->NormPoint(QPoint(newx, newy)));
+        if (imgsize.width() > -1 && imgsize.height() > -1)
+        {
+            if (max.width() > -1 && max.height() > -1)
+            {
+                imgsize.scale(max, QSize::ScaleMin);
+
+                QPoint orgPos = img->DisplayPos();
+
+                int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
+                int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+                img->SetPosition(QPoint(newx, newy));
+            }
+            img->SetSize(imgsize.width(), imgsize.height());
+        }
+
         img->SetImageCount(m_count);
         // TODO this slows things down A LOT!!
         img->LoadImages();
