@@ -656,12 +656,12 @@
                 <font>header</font>
             </textarea>
             <textarea name="+updatetime" draworder="5">
-                <area>39,560,700,35</area>
+                <area>39,540,700,35</area>
                 <font>footer</font>
             </textarea>
             <image name="+map" draworder="0" >
-                <position>35,100</position>
-                <staticsize>730,450</staticsize>
+                <position>80,150</position>
+                <staticsize>485,300</staticsize>
             </image>
         </container>
 
@@ -684,12 +684,12 @@
                 <font>header</font>
             </textarea>
             <textarea name="+updatetime" draworder="5">
-                <area>39,560,700,35</area>
+                <area>39,540,700,35</area>
                 <font>footer</font>
             </textarea>
             <animatedimage name="+animatedimage" draworder="6">
-                <position>35,100</position>
-                <staticsize>730,450</staticsize>
+                <position>80,150</position>
+                <staticsize>485,300</staticsize>
                 <interval>200</interval>
                 <startinterval>1000</startinterval>
             </animatedimage>

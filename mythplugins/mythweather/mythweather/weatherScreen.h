@@ -68,6 +68,7 @@ class WeatherScreen : public QObject
     QMap<QString, QString> map;
     UIAnimatedImageType *m_ai;
     bool m_inuse;
+    bool m_prepared;
     int m_id;
 };
 
@@ -134,8 +135,6 @@ class StaticImageScreen : public WeatherScreen
 
   private:
     QSize imgsize;
-    QSize max; // should match staticsize in weather-ui.xml
-    QPoint orgPos; //so the image doesn't walk across the screen
 };
 
 class AnimatedImageScreen : public WeatherScreen
@@ -152,8 +151,6 @@ class AnimatedImageScreen : public WeatherScreen
   private:
     int m_count;
     QSize imgsize;
-    QSize max; // should match staticsize in weather-ui.xml
-    QPoint orgPos; //so the image doesn't walk across the screen
 };
 
 #endif
