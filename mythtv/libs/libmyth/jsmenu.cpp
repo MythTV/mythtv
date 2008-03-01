@@ -137,7 +137,7 @@ int JoystickMenuClient::Init(QString &config_file)
     axes = new int[axes_count];
     memset(axes, '\0', sizeof(*axes * axes_count));
 
-    VERBOSE(VB_GENERAL, LOC + QString("Initialization of %1 succeded using config file %2")
+    VERBOSE(VB_GENERAL, LOC + QString("Initialization of %1 succeeded using config file %2")
                               .arg(devicename)
                               .arg(config_file));
     return 0;
