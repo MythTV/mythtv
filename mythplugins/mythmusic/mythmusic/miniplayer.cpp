@@ -299,6 +299,8 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
 
 void MiniPlayer::customEvent(QCustomEvent *event)
 {
+    if (isHidden())
+        return;
 
     switch ((int)event->type()) 
     {
