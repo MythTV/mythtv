@@ -5212,8 +5212,8 @@ void TV::ToggleOSD(bool includeStatusOSD)
         return;
 
     // DVD toggles between status and nothing
-    if (activerbuffer->isDVD() && playbackinfo->description.isEmpty() &&
-        playbackinfo->title.isEmpty())
+    if (activerbuffer && activerbuffer->isDVD() &&
+        playbackinfo->description.isEmpty() && playbackinfo->title.isEmpty())
     {
         if (osd->IsSetDisplaying("status"))
             osd->HideAll();
