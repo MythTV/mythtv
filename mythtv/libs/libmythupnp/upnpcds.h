@@ -19,8 +19,6 @@
 #include "eventing.h"
 #include "mythdbcon.h"
 
-#define STARTING_VIDEO_OBJECTID 100000
-
 class UPnpCDS;
 
 typedef enum 
@@ -124,9 +122,6 @@ class UPnpCDSExtension
 
     protected:
 
-        int  GetDistinctCount      ( const QString &sColumn );
-        int  GetCount              ( const QString &sColumn, const QString &sKey );
-
         QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
 
         UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
@@ -146,11 +141,19 @@ class UPnpCDSExtension
                                                    int                      nNodeIdx,
                                                    QStringList             &idPath );
 
-        void                     CreateItems     ( UPnpCDSRequest          *pRequest,
+        // ------------------------------------------------------------------
+
+        virtual void             CreateItems     ( UPnpCDSRequest          *pRequest,
                                                    UPnpCDSExtensionResults *pResults,
                                                    int                      nNodeIdx,
                                                    const QString           &sKey, 
                                                    bool                     bAddRef );
+
+        virtual bool IsBrowseRequestForUs  ( UPnpCDSRequest *pRequest );
+        virtual bool IsSearchRequestForUs  ( UPnpCDSRequest *pRequest );
+
+        virtual int  GetDistinctCount      ( UPnpCDSRootInfo *pInfo );
+        virtual int  GetCount              ( const QString &sColumn, const QString &sKey );
 
         // ------------------------------------------------------------------
 

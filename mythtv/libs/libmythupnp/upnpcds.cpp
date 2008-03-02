@@ -238,7 +238,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 // ----------------------------------------------------------------------
                 // Return Root Object Only
                 // ----------------------------------------------------------------------
-        
+
                 eErrorCode      = UPnPResult_Success;
                 nNumberReturned = 1;
                 nTotalMatches   = 1;
@@ -308,30 +308,12 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         // Look for a CDS Extension that knows how to handle this ObjectID
         // ------------------------------------------------------------------
 
-	// Xbox360 compatibility code.
-	if (request.m_sContainerID == "15") 
-	    request.m_sObjectId = "Videos/0";
-	else if (request.m_sContainerID == "7")
-            request.m_sObjectId = "Music";
-	else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
-            request.m_sObjectId = request.m_sContainerID;
-
-	// WMP11 compatibility code
-        if (request.m_sObjectId == "13")
-        {
-            if (gContext->GetSetting("UPnP/WMPSource") == "1")
-                request.m_sObjectId = "Videos/0";
-            else
-                request.m_sObjectId = "RecTv/0";
-        }
-
         UPnpCDSExtension *pExtension = m_extensions.first();
 
         while (( pExtension != NULL ) && (pResult == NULL))
         {
-	    //VERBOSE(VB_UPNP, QString("UPNP Browse : Searching for : %1  / ObjectID : %2").arg(pExtension->m_sExtensionId).arg(request.m_sObjectId));
-            if ( request.m_sObjectId.startsWith( pExtension->m_sExtensionId, true ))
-               pResult = pExtension->Browse(  &request );
+            VERBOSE(VB_UPNP, QString("UPNP Browse : Searching for : %1  / ObjectID : %2").arg(pExtension->m_sExtensionId).arg(request.m_sObjectId));
+            pResult = pExtension->Browse( &request );
 
             pExtension = m_extensions.next();
         }
@@ -401,36 +383,9 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
     request.m_sSearchCriteria   = pRequest->m_mapParams[ "SearchCriteria"];
 
-    // XBox 360 compatibility code
-    if (request.m_sContainerID == "15")
-        request.m_sObjectId = "Videos/0";
-    else if (request.m_sContainerID == "7")
-    {
-        request.m_sObjectId = "Music/1";
-	request.m_sSearchCriteria = "object.container.album.musicAlbum";
-    }
-    else if (request.m_sContainerID == "4") 
-    {
-	request.m_sObjectId = "Music";
-	request.m_sSearchCriteria = "object.item.audioItem.musicTrack";
-    }
-    else if ((request.m_sObjectId == "") && (request.m_sContainerID != ""))
-        request.m_sObjectId = request.m_sContainerID;
-
-    // WMP11 compatibility code
-    if (request.m_sObjectId == "0")
-    {
-        if (gContext->GetSetting("UPnP/WMPSource") == "1")
-             request.m_sObjectId = "Videos/0";
-        else
-             request.m_sObjectId = "RecTv/0";
-
-	request.m_sParentId = "8";
-    }
-
     VERBOSE(VB_UPNP, QString("UPnpCDS::HandleSearch ObjectID=%1, ContainerId=%2")
-		                                 .arg(request.m_sObjectId)
-				                 .arg(request.m_sContainerID));
+                        .arg(request.m_sObjectId)
+                        .arg(request.m_sContainerID));
 
     // ----------------------------------------------------------------------
     // Break the SearchCriteria into it's parts 
@@ -496,13 +451,12 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
     while (( pExtension != NULL ) && (pResult == NULL))
     {
-
         //VERBOSE(VB_UPNP, QString("UPNP Search : Searching for : %1  / ObjectID : %2").arg(pExtension->m_sExtensionId).arg(request.m_sObjectId));
-        if ( request.m_sObjectId.startsWith( pExtension->m_sExtensionId, true ))
-            pResult = pExtension->Search( &request );
+        pResult = pExtension->Search( &request );
 
-	pExtension = m_extensions.next();
+    	pExtension = m_extensions.next();
     }
+
     if (pResult != NULL)
     {
         eErrorCode  = pResult->m_eErrorCode;
@@ -613,12 +567,24 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool UPnpCDSExtension::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
+{
+    if (!pRequest->m_sObjectId.startsWith( m_sExtensionId, true ))
+        return false;
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 {
-
     // -=>TODO: Need to add Filter & Sorting Support.
     // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
-    if (! pRequest->m_sObjectId.startsWith( m_sExtensionId, true ))
+
+    if (!IsBrowseRequestForUs( pRequest ))
         return( NULL );
 
     // ----------------------------------------------------------------------
@@ -643,16 +609,19 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
         if (key)  
             idPath.last().append(QString("=%1").arg(key)); 
-	else if (pRequest->m_sObjectId.contains("item"))
-	{
-            idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-	    idPath = QStringList::split( "?", idPath[0] );
+        else 
+        {
+            if (pRequest->m_sObjectId.contains("item"))
+            {
+                idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
+                idPath = QStringList::split( "?", idPath[0] );
 
-            idPath = idPath[0];
-	    if (idPath[0].startsWith("Id"))
-	        idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
+                idPath = idPath[0];
 
-	}
+                if (idPath[0].startsWith("Id"))
+                    idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
+            }
+        }
 
         QString sLast = idPath.last();
 
@@ -679,15 +648,31 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool UPnpCDSExtension::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
+{
+    if ( !m_sClass.startsWith( pRequest->m_sSearchClass ))
+        return false;
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
 {
     // -=>TODO: Need to add Filter & Sorting Support.
     // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
 
     QStringList sEmptyList;
-VERBOSE(VB_UPNP, QString("UPnpCDSExtension::Search : m_sClass = %1 : m_sSearchClass = %2").arg(m_sClass).arg(pRequest->m_sSearchClass));
-     if ( !m_sClass.startsWith( pRequest->m_sSearchClass ))
+    VERBOSE(VB_UPNP, QString("UPnpCDSExtension::Search : m_sClass = %1 : m_sSearchClass = %2").arg(m_sClass).arg(pRequest->m_sSearchClass));
+
+    if ( !IsSearchRequestForUs( pRequest ))
+    {
+        VERBOSE( VB_UPNP, QString("UPnpCDSExtension::Search - Not For Us : m_sClass = %1 : m_sSearchClass = %2").arg(m_sClass).arg(pRequest->m_sSearchClass));
         return NULL;
+    }
 
     UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
 
@@ -777,7 +762,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessRoot( UPnpCDSRequest          
                                                             QObject::tr( pInfo->title ), 
                                                             m_sExtensionId );
 
-                        pItem->SetChildCount( GetDistinctCount( pInfo->column ) );
+                        pItem->SetChildCount( GetDistinctCount( pInfo ) );
 
                         pResults->Add( pItem );
                     }
@@ -828,7 +813,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessAll ( UPnpCDSRequest          
                                                     QObject::tr( pInfo->title ), 
                                                     m_sExtensionId );
 
-                pItem->SetChildCount( GetDistinctCount( pInfo->column ) );
+                pItem->SetChildCount( GetDistinctCount( pInfo ) );
 
                 pResults->Add( pItem ); 
             }
@@ -1003,7 +988,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
                                                                 query.value(1).toString(), 
                                                                 pRequest->m_sParentId );
 
-                            pItem->SetChildCount( GetDistinctCount( pInfo->column  ));
+                            pItem->SetChildCount( GetDistinctCount( pInfo ));
 
                             pResults->Add( pItem ); 
                         }
@@ -1062,7 +1047,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
                                                 QObject::tr( pInfo->title ), 
                                                 m_sExtensionId );
 
-            pItem->SetChildCount( GetDistinctCount( pInfo->column ));
+            pItem->SetChildCount( GetDistinctCount( pInfo ));
 
             pResults->Add( pItem ); 
 
@@ -1071,7 +1056,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
 
         case CDS_BrowseDirectChildren:
         {
-            pResults->m_nTotalMatches = GetDistinctCount( pInfo->column );
+            pResults->m_nTotalMatches = GetDistinctCount( pInfo );
             pResults->m_nUpdateID     = 1;
 
             if (pRequest->m_nRequestedCount == 0) 
@@ -1134,9 +1119,12 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int UPnpCDSExtension::GetDistinctCount( const QString &sColumn )
+int UPnpCDSExtension::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 {
     int nCount = 0;
+
+    if ((pInfo == NULL) || (pInfo->column == NULL))
+        return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1147,17 +1135,17 @@ int UPnpCDSExtension::GetDistinctCount( const QString &sColumn )
 
         QString sSQL;
         
-        if (sColumn == "*")
+        if (strncmp( pInfo->column, "*", 1) == 0)
         {
             sSQL = QString( "SELECT count( %1 ) FROM %2" )
-                      .arg( sColumn )
-                      .arg( GetTableName( sColumn ));
+                      .arg( pInfo->column )
+                      .arg( GetTableName( pInfo->column ));
         }
         else
         {
             sSQL = QString( "SELECT count( DISTINCT %1 ) FROM %2" )
-                      .arg( sColumn )
-                      .arg( GetTableName( sColumn ) );
+                      .arg( pInfo->column )
+                      .arg( GetTableName( pInfo->column ) );
         }
 
         query.prepare( sSQL );
@@ -1227,7 +1215,6 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
 {
     pResults->m_nTotalMatches = 0;
     pResults->m_nUpdateID     = 1;
-    QString ParentClause;
 
     UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
 
@@ -1252,55 +1239,13 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
                        .arg( pInfo->column );
         }
 
-        if (pRequest->m_sObjectId.startsWith("Videos", true))
-	{
-            if (pRequest->m_sParentId != "") 
-            {
-                if (pRequest->m_sParentId == "Videos/0")
-		{
-	            pRequest->m_sParentId = QString("%1")
-			                    .arg(STARTING_VIDEO_OBJECTID);
-		}
-	
-            }
-            else 
-            {
-	        QStringList tokens = QStringList::split( "=", pRequest->m_sObjectId );
-	        pRequest->m_sParentId = tokens.last();
-            }
-
-	    if (pRequest->m_sSearchClass == "")
-                ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
-	    else
-		pRequest->m_sParentId = "8";
-
-            if (pRequest->m_sObjectId.startsWith("Videos/0", true))
-            {
-                pRequest->m_sObjectId = "Videos/0";
-            }
-
-	    /*
-            VERBOSE(VB_UPNP, QString("pRequest->m_sParentId=:%1: , "
-				     "pRequest->m_sObjectId=:%2:, sKey=:%3:")
-			             .arg(pRequest->m_sParentId)
-				     .arg(pRequest->m_sObjectId)
-				     .arg(sKey)); 
-				     */
-	    if ((pRequest->m_sParentId != "") && (pRequest->m_sParentId != "8"))
-            {
-                pResults->m_nTotalMatches = GetCount( "parentid", pRequest->m_sParentId );
-	    }
-
-        }
-
         QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
                           .arg( GetItemListSQL( pInfo->column )  )
-                          .arg( sWhere + ParentClause )
+                          .arg( sWhere )
                           .arg( pRequest->m_nStartingIndex  )
                           .arg( pRequest->m_nRequestedCount );
 
         query.prepare  ( sSQL );
-	//VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
         query.bindValue(":KEY", sKey );
         query.exec();
 

@@ -170,6 +170,71 @@ void UPnpCDSTv::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // WMP11 compatibility code
+
+    if (( pRequest->m_sObjectId                  == "13") && 
+        ( gContext->GetSetting("UPnP/WMPSource") !=  "1") )
+    {
+        pRequest->m_sObjectId = "RecTv/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSTv::IsBrowseRequestForUs - Yes, ObjectId == 13" );
+        return true;
+    }
+
+    VERBOSE( VB_UPNP, "UPnpCDSTv::IsBrowseRequestForUs - Not sure... Calling base class." );
+
+    return UPnpCDSExtension::IsBrowseRequestForUs( pRequest );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // XBox 360 compatibility code
+    // ----------------------------------------------------------------------
+
+    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+        pRequest->m_sObjectId = pRequest->m_sContainerID;
+
+    // ----------------------------------------------------------------------
+
+    bool bOurs = UPnpCDSExtension::IsSearchRequestForUs( pRequest );
+
+    // ----------------------------------------------------------------------
+    // WMP11 compatibility code
+    // ----------------------------------------------------------------------
+
+    if ( bOurs && ( pRequest->m_sObjectId == "0" ))
+    {
+        if ( gContext->GetSetting("UPnP/WMPSource") != "1")
+        {
+            pRequest->m_sObjectId = "RecTv/0";
+            pRequest->m_sParentId = "8";        // -=>TODO: Not sure why this was added
+        }
+        else
+            bOurs = false;
+    }
+
+    return bOurs;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void UPnpCDSTv::AddItem( const QString           &sObjectId,
                          UPnpCDSExtensionResults *pResults,
                          bool                     bAddRef,

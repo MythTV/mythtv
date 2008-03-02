@@ -3,6 +3,8 @@
 
 #include "mainserver.h"
 #include "upnpcds.h"
+
+#define STARTING_VIDEO_OBJECTID 100000
               
 //////////////////////////////////////////////////////////////////////////////
 //

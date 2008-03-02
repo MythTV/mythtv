@@ -30,6 +30,9 @@ class UPnpCDSTv : public UPnpCDSExtension
 
     protected:
 
+        virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
+        virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
+
         virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
         virtual int              GetRootCount  ( );
         virtual QString          GetTableName  ( QString sColumn );

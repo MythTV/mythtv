@@ -171,6 +171,77 @@ void UPnpCDSMusic::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // Xbox360 compatibility code.
+
+    if (pRequest->m_sContainerID == "7")
+    {
+        pRequest->m_sObjectId = "Music";
+
+        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Yes, ContainerId == 7" );
+
+        return true;
+    }
+
+    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+        pRequest->m_sObjectId = pRequest->m_sContainerID;
+
+    VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Not sure... Calling base class." );
+
+    return UPnpCDSExtension::IsBrowseRequestForUs( pRequest );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // XBox 360 compatibility code
+
+    if (pRequest->m_sContainerID == "7")
+    {
+        pRequest->m_sObjectId       = "Music/1";
+        pRequest->m_sSearchCriteria = "object.container.album.musicAlbum";
+        pRequest->m_sSearchList.append( pRequest->m_sSearchCriteria );
+
+        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Yes." );
+
+        return true;
+    }
+
+    if (pRequest->m_sContainerID == "4") 
+    {
+        pRequest->m_sObjectId       = "Music";
+        pRequest->m_sSearchCriteria = "object.item.audioItem.musicTrack";
+        pRequest->m_sSearchList.append( pRequest->m_sSearchCriteria );
+
+        VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Yes." );
+
+        return true;
+    }
+
+    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+        pRequest->m_sObjectId = pRequest->m_sContainerID;
+
+    VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Don't know, calling base class." );
+
+    return UPnpCDSExtension::IsSearchRequestForUs( pRequest );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void UPnpCDSMusic::AddItem( const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
                             bool                     bAddRef, 
