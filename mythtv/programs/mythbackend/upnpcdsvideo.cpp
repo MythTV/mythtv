@@ -6,6 +6,8 @@
 
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
+#include "upnpmedia.h"
+
 #include <qfileinfo.h>
 #include <qregexp.h>
 #include <qurl.h>
@@ -31,22 +33,6 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
 
 };
 
-int UPnpCDSVideo::GetBaseCount(void)
-{
-    int res;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT COUNT(*) FROM upnpmedia WHERE class = 'VIDEO' "
-                    "AND parentid = :ROOTID");
-
-    query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
-    query.exec();
-
-    res = query.value(0).toInt();
-
-    return res;
-}
 int UPnpCDSVideo::g_nRootCount = 1;
 
 //int UPnpCDSVideo::g_nRootCount;
@@ -109,6 +95,216 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
     query.bindValue( ":VIDEOID", (int)nVideoID    );
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // Xbox360 compatibility code.
+    // ----------------------------------------------------------------------
+
+    if (pRequest->m_sContainerID == "15") 
+    {
+        pRequest->m_sObjectId = "Videos/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 15" );
+        return true;
+    }
+
+    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+        pRequest->m_sObjectId = pRequest->m_sContainerID;
+
+    // ----------------------------------------------------------------------
+    // WMP11 compatibility code
+    // ----------------------------------------------------------------------
+
+    if (( pRequest->m_sObjectId                  == "13") &&
+        ( gContext->GetSetting("UPnP/WMPSource") ==  "1"))
+    {
+        pRequest->m_sObjectId = "Videos/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Yes ContainerID == 13" );
+        return true;
+    }
+
+    VERBOSE( VB_UPNP, "UPnpCDSVideo::IsBrowseRequestForUs - Not sure... Calling base class." );
+
+    return UPnpCDSExtension::IsBrowseRequestForUs( pRequest );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
+{
+    // ----------------------------------------------------------------------
+    // See if we need to modify the request for compatibility
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // XBox 360 compatibility code
+    // ----------------------------------------------------------------------
+
+    if (pRequest->m_sContainerID == "15")
+    {
+        pRequest->m_sObjectId = "Videos/0";
+
+        VERBOSE( VB_UPNP, "UPnpCDSVideo::IsSearchRequestForUs... Yes." );
+
+        return true;
+    }
+
+    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+        pRequest->m_sObjectId = pRequest->m_sContainerID;
+
+    // ----------------------------------------------------------------------
+
+    bool bOurs = UPnpCDSExtension::IsSearchRequestForUs( pRequest );
+
+    // ----------------------------------------------------------------------
+    // WMP11 compatibility code
+    // ----------------------------------------------------------------------
+
+    if (  bOurs && ( pRequest->m_sObjectId == "0"))
+    {
+
+        if ( gContext->GetSetting("UPnP/WMPSource") == "1")
+        {
+            pRequest->m_sObjectId = "Videos/0";
+            pRequest->m_sParentId = "8";        // -=>TODO: Not sure why this was added.
+        }
+        else
+            bOurs = false;
+    }
+
+    return bOurs;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
+{
+    int nCount = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT COUNT(*) FROM upnpmedia WHERE class = 'VIDEO' "
+                    "AND parentid = :ROOTID");
+
+    query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
+    query.exec();
+
+    if (query.size() > 0)
+    {
+        query.next();
+        nCount = query.value(0).toInt();
+    }
+
+    return nCount;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
+                                UPnpCDSExtensionResults *pResults,
+                                int                      nNodeIdx,
+                                const QString           &sKey, 
+                                bool                     bAddRef )
+{
+    pResults->m_nTotalMatches = 0;
+    pResults->m_nUpdateID     = 1;
+    QString ParentClause;
+
+    UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
+
+    if (pInfo == NULL)
+        return;
+
+    if (pRequest->m_nRequestedCount == 0) 
+        pRequest->m_nRequestedCount = SHRT_MAX;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (query.isConnected())
+    {
+        QString sWhere( "" );
+
+        if ( sKey.length() > 0)
+        {
+           sWhere = QString( "WHERE %1=:KEY " )
+                       .arg( pInfo->column );
+        }
+
+        if (pRequest->m_sObjectId.startsWith("Videos", true))
+        {
+            if (pRequest->m_sParentId != "") 
+            {
+                if (pRequest->m_sParentId == "Videos/0")
+                {
+                    pRequest->m_sParentId = QString("%1")
+                                .arg(STARTING_VIDEO_OBJECTID);
+                }
+            }
+            else 
+            {
+                QStringList tokens = QStringList::split( "=", pRequest->m_sObjectId );
+                pRequest->m_sParentId = tokens.last();
+            }
+
+            if (pRequest->m_sSearchClass == "")
+                ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
+            else
+                pRequest->m_sParentId = "8";
+
+            if (pRequest->m_sObjectId.startsWith( "Videos/0", true))
+            {
+                pRequest->m_sObjectId = "Videos/0";
+            }
+
+            /*
+            VERBOSE(VB_UPNP, QString("pRequest->m_sParentId=:%1: , "
+                                     "pRequest->m_sObjectId=:%2:, sKey=:%3:")
+                                                 .arg(pRequest->m_sParentId)
+                                                 .arg(pRequest->m_sObjectId)
+                                                 .arg(sKey)); 
+             */
+
+            if ((pRequest->m_sParentId != "") && (pRequest->m_sParentId != "8"))
+                pResults->m_nTotalMatches = GetCount( "parentid", pRequest->m_sParentId );
+        }
+        else
+            VERBOSE( VB_UPNP, QString( "UPnpCDSVideo::CreateItems: ******* ParentID Does NOT Start with 'Videos' ParentId = {0}" )
+                                  .arg( pRequest->m_sParentId ));
+
+        QString sSQL = QString( "%1 %2 LIMIT %3, %4" )
+                          .arg( GetItemListSQL( pInfo->column )  )
+                          .arg( sWhere + ParentClause )
+                          .arg( pRequest->m_nStartingIndex  )
+                          .arg( pRequest->m_nRequestedCount );
+
+        query.prepare  ( sSQL );
+        //VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
+        query.bindValue(":KEY", sKey );
+        query.exec();
+
+        if (query.isActive() && query.size() > 0)
+        {
+            while(query.next()) 
+                AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
+
+        }
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -172,7 +368,10 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     CDSObject *pItem = NULL;
 
     if (sItemType == "FOLDER") 
+    {
         pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
+        pItem->SetChildCount( GetCount( "parentid",QString( "%1" ).arg( nVidID )) );
+    }
     else if (sItemType == "FILE" )
         pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
 

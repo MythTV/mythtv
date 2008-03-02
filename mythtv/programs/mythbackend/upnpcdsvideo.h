@@ -32,6 +32,17 @@ class UPnpCDSVideo : public UPnpCDSExtension
 
     protected:
 
+        virtual void             CreateItems   ( UPnpCDSRequest          *pRequest,
+                                                 UPnpCDSExtensionResults *pResults,
+                                                 int                      nNodeIdx,
+                                                 const QString           &sKey, 
+                                                 bool                     bAddRef );
+
+        virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
+        virtual bool             IsSearchRequestForUs( UPnpCDSRequest *pRequest );
+
+        virtual int              GetDistinctCount( UPnpCDSRootInfo *pInfo );
+
         virtual UPnpCDSRootInfo *GetRootInfo   (int nIdx);
         virtual int              GetRootCount  ( );
         virtual QString          GetTableName  ( QString sColumn );
@@ -44,10 +55,6 @@ class UPnpCDSVideo : public UPnpCDSExtension
                                           UPnpCDSExtensionResults *pResults,
                                           bool                     bAddRef, 
                                           MSqlQuery               &query );
-
-    private:
-
-	int GetBaseCount(void);
 
     public:
 
