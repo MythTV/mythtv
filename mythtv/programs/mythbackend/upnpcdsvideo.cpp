@@ -13,9 +13,9 @@
 #include <limits.h>
 #include "util.h"
 
-#define LOC QString("UPnpCDSVideo: "); 
-#define LOC_WARN QString("UPnpCDSVideo, Warning: "); 
-#define LOC_ERR QString("UPnpCDSVideo, Error: "); 
+#define LOC QString("UPnpCDSVideo: ")
+#define LOC_WARN QString("UPnpCDSVideo, Warning: ")
+#define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
 UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
 {
