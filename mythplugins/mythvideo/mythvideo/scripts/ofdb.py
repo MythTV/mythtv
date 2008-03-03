@@ -19,6 +19,7 @@ import re
 import urlparse
 import urllib
 import urllib2
+import cgi
 import traceback
 import codecs
 from optparse import OptionParser
@@ -31,6 +32,10 @@ from xml import xpath
 
 VERBOSE=False
 URL_BASE="http://www.ofdb.de"
+DUMP_RESPONSE=False
+
+ofdb_version = "0.2"
+mythtv_version = "0.21"
 
 def comment_out(str):
 	print("# %s" % (str,))
@@ -39,9 +44,71 @@ def debug_out(str):
 	if VERBOSE:
 		comment_out(str)
 
+def response_out(str):
+	if DUMP_RESPONSE:
+		print(str)
+
 def print_exception(str):
 	for line in str.splitlines():
 		comment_out(line)
+
+def _myth_url_get(url, data = None, as_post = False):
+	extras = ['ofdb', ofdb_version]
+
+	debug_out("_myth_url_get(%s, %s, %s)" % (url, data, as_post))
+	send_data = {}
+	if data:
+		send_data.update(data)
+	dest_url = url
+
+	if not as_post:
+		# TODO: cgi.parse_qs does not handle valueless entries
+		# so things like ?foo will fail, ?foo=val works.
+		(scheme, netloc, path, query, frag) = urlparse.urlsplit(dest_url)
+		send_data = {}
+
+		old_qa = cgi.parse_qs(query)
+		if old_qa:
+			send_data.update(old_qa)
+
+		if data:
+			send_data.update(data)
+
+		query = urllib.urlencode(send_data)
+		send_data = None
+		dest_url = urlparse.urlunsplit((scheme, netloc, path, query, frag))
+
+	req = urllib2.Request(url = dest_url, headers =
+			{ 'User-Agent' : "MythTV/%s (%s)" %
+				(mythtv_version, "; ".join(extras))})
+
+	if send_data:
+		req.add_data(urllib.urlencode(send_data))
+
+	try:
+		debug_out("Get URL '%s:%s'" % (req.get_full_url(), req.get_data()))
+		res = urllib2.urlopen(req)
+		content = res.read()
+		res.close()
+		return (res, content)
+	except:
+		print_exception(traceback.format_exc())
+		return (None, None)
+
+def ofdb_url_get(url, data = None, as_post = False):
+	(rc, content) = _myth_url_get(url, data, as_post)
+
+	m = re.search(r'<\s*meta[^>]*charset\s*=\s*([^" ]+)', content, re.I)
+	if m:
+		charset = m.group(1)
+		debug_out("Page charset reported as %s" % (charset))
+		content = unicode(content, charset)
+	else:
+		# hope it is ascii
+		content = unicode(content)
+
+	response_out(content)
+	return (rc, content)
 
 def search_title(title):
 	def clean_title(t):
@@ -51,31 +118,28 @@ def search_title(title):
 		ret = t
 		if m:
 			ret = m.group(1)
-		return urllib.quote(ret.strip())
+		return ret.strip()
 
 	try:
-		req = urllib2.Request(urlparse.urljoin(URL_BASE, "view.php"))
 		data = {
 				"page" : "suchergebnis",
 				"Kat" : "DTitel",
 				"SText" : clean_title(title)
 				}
-		req.add_data(urllib.urlencode(data))
 
 		debug_out("Starting search for title '%s'" % (title,))
-		debug_out("Search query '%s:%s'" % (req.get_full_url(), req.get_data()))
 
-		res = urllib.urlopen(req)
-		content = res.read()
-		res.close()
+		(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE, "view.php"),
+			data, True)
 
 		reader = HtmlLib.Reader()
 		doc = reader.fromString(content)
 
-		nodes = xpath.Evaluate("//A[starts-with(@href, 'view.php?page=film&fid=')]", doc.documentElement)
+		nodes = xpath.Evaluate("//A[starts-with(@href, 'film/')]",
+				doc.documentElement)
 
 		title_matches = []
-		uid_match = re.compile('fid=(\d+)', re.I)
+		uid_match = re.compile('/(\d+,.*)', re.I)
 		for title in nodes:
 			rm = uid_match.search(title.getAttributeNS(EMPTY_NAMESPACE, 'href'))
 			if rm:
@@ -87,16 +151,10 @@ def search_title(title):
 		print_exception(traceback.format_exc())
 
 def get_ofdb_doc(uid, context):
-	req = urllib2.Request(urlparse.urljoin(URL_BASE, "view.php"))
-	data = { "page" : "film", "fid" : uid }
-	req.add_data(urllib.urlencode(data))
-
+	"""Returns the OFDb film page as an XML document."""
 	debug_out("Starting search for %s '%s'" % (context, uid))
-	debug_out("Search query '%s:%s'" % (req.get_full_url(), req.get_data()))
 
-	res = urllib2.urlopen(req)
-	content = res.read()
-	res.close()
+	(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE, "film/%s" % (uid)))
 
 	reader = HtmlLib.Reader()
 	return reader.fromString(content)
@@ -104,7 +162,7 @@ def get_ofdb_doc(uid, context):
 class NoIMDBURL(Exception):
 	pass
 
-def get_imdb_url(doc):
+def extract_imdb_url(doc):
 	nodes = xpath.Evaluate("//A[contains(@href, 'imdb.com/Title')]",
 			doc.documentElement)
 	if len(nodes):
@@ -168,8 +226,11 @@ def search_data(uid, rating_country):
 		doc = get_ofdb_doc(uid, "data")
 		alturl = None
 		try:
-			(url, id) = get_imdb_url(doc)
+			(url, id) = extract_imdb_url(doc)
 			alturl = url
+		except NoIMDBURL:
+			if VERBOSE:
+				print_exception(traceback.format_exc())
 		except:
 			print_exception(traceback.format_exc())
 
@@ -180,13 +241,15 @@ def search_data(uid, rating_country):
 				'cast' : '',
 				'genre' : '',
 				'user_rating' : '',
+				'movie_rating' : '',
 				'plot' : '',
 				'release_date' : '',
 				'runtime' : '',
+				'writers' : '',
 				}
 
 		data['title'] = single_value(doc.documentElement,
-				"//TD[@width='99%']/FONT[@size='3']/B")
+				"//TD[@width='99%']/H2/FONT[@size='3']/B")
 		data['countries'] = ",".join(multi_value(doc.documentElement,
 			"//A[starts-with(@href, 'view.php?page=blaettern&Kat=Land&')]"))
 		data['year'] = single_value(doc.documentElement,
@@ -203,21 +266,16 @@ def search_data(uid, rating_country):
 				"//IMG[@src='images/notenspalte.gif']", "alt")
 
 		tmp_sid = attr_value(doc.documentElement,
-				"//A[starts-with(@href, 'view.php?page=inhalt&fid=')]", "href")
+				"//A[starts-with(@href, 'plot/')]", "href")
 
-		sid_match = re.search("sid=(\d+)", tmp_sid, re.I)
+		sid_match = re.search("/(\d+,\d+,.*)", tmp_sid, re.I)
 		sid = None
 		if sid_match:
 			sid = sid_match.group(1)
 
-			req_data = {'page' : 'inhalt', 'sid' : sid, 'fid' : uid}
-			req = urllib2.Request(urlparse.urljoin(URL_BASE,
-				"view.php?%s" % (urllib.urlencode(req_data),)))
-			debug_out("Looking for plot here '%s'" %
-					(req.get_full_url(),))
-			res = urllib2.urlopen(req)
-			content = res.read()
-			res.close()
+			debug_out("Looking for plot...")
+			(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE,
+				"plot/%s" % sid))
 
 			reader = HtmlLib.Reader()
 			doc = reader.fromString(content)
@@ -226,20 +284,19 @@ def search_data(uid, rating_country):
 					"//FONT[@class='Blocksatz']"))
 
 		if alturl:
-			req = urllib2.Request(alturl)
-			debug_out("Looking for other info here '%s'" %
-					(req.get_full_url(),))
-			res = urllib2.urlopen(req)
-			content = res.read()
-			res.close()
-
+			# They now give a "bad" query string, just use the id
+			(scheme, netloc, path, query, frag) = urlparse.urlsplit(alturl)
+			path = "title/tt%s/" % (id)
+			alturl = urlparse.urlunsplit((scheme, netloc, path, None, None))
+			debug_out("Looking for other info %s..." % (alturl))
+			(rc, content) = ofdb_url_get(alturl)
 			reader = HtmlLib.Reader()
 			doc = reader.fromString(content)
 
 			data['release_date'] = direct_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Premierendatum')]/../child::text()[2]")
 			data['runtime'] = direct_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'L\u00E4nge')]/../child::text()[2]").split()[0]
 
-			movie_ratings = multi_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'Altersfreigabe')]/../A")
+			movie_ratings = multi_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Altersfreigabe')]/../A")
 
 			if len(movie_ratings):
 				found = False
@@ -258,7 +315,7 @@ def search_data(uid, rating_country):
 				if not found:
 					data['movie_rating'] = ",".join(movie_ratings)
 
-			writers = multi_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'Drehbuchautoren')]/../A")
+			writers = multi_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Drehbuchautoren')]/../A")
 			if len(writers):
 				data['writers'] = writers[0]
 
@@ -282,53 +339,55 @@ Countries:%(countries)s
 
 def search_poster(uid):
 	try:
-		doc = get_ofdb_doc(uid, "poster")
-
-		(url, id) = get_imdb_url(doc)
-
-		req = urllib2.Request(urlparse.urljoin("http://www.imdb.com",
-			"title/tt%s/posters" % (id)))
-
-		debug_out("Looking at %s for posters" % (req.get_full_url()))
-		res = urllib2.urlopen(req)
-		content = res.read()
-		res.close()
-
-		reader = HtmlLib.Reader()
-		doc = reader.fromString(content)
-
+		debug_out("Looking for posters...")
 		poster_urls = []
+		ofdoc = get_ofdb_doc(uid, "poster")
 
-		nodes = xpath.Evaluate("//TABLE[starts-with(@background, 'http://posters.imdb.com/posters/')]", doc.documentElement)
-		for i in nodes:
-			poster_urls.append(i.getAttributeNS(EMPTY_NAMESPACE,
-				'background'))
+		try:
+			(url, id) = extract_imdb_url(ofdoc)
 
-		nodes = xpath.Evaluate("//A[contains(@href, 'impawards.com')]",
-				doc.documentElement)
-		if len(nodes):
-			try:
-				base = nodes[0].getAttributeNS(EMPTY_NAMESPACE, 'href')
-				req = urllib2.Request(base)
-				res = urllib2.urlopen(req)
-				content = res.read()
-				res.close()
+			(rc, content) = ofdb_url_get(urlparse.urljoin("http://www.imdb.com",
+				"title/tt%s/posters" % (id)))
 
-				reader = HtmlLib.Reader()
-				doc = reader.fromString(content)
-				nodes = xpath.Evaluate(
-						"//IMG[starts-with(@SRC, 'posters/')]",
-						doc.documentElement)
-				for i in nodes:
-					(scheme, netloc, path, query, frag) = \
-							urlparse.urlsplit(base)
-					np = path.split('/')[:-1]
-					np = "/".join(np)
-					poster_urls.insert(0, urlparse.urljoin(base,
-						"%s/%s" % (np, i.getAttributeNS(EMPTY_NAMESPACE,
-							'SRC'))))
-			except:
+			reader = HtmlLib.Reader()
+			doc = reader.fromString(content)
+
+			nodes = xpath.Evaluate("//TABLE[starts-with(@background, 'http://posters.imdb.com/posters/')]", doc.documentElement)
+			for i in nodes:
+				poster_urls.append(i.getAttributeNS(EMPTY_NAMESPACE,
+					'background'))
+
+			nodes = xpath.Evaluate("//A[contains(@href, 'impawards.com')]",
+					doc.documentElement)
+			if len(nodes):
+				try:
+					base = nodes[0].getAttributeNS(EMPTY_NAMESPACE, 'href')
+					(rc, content) = ofdb_url_get(base)
+					reader = HtmlLib.Reader()
+					doc = reader.fromString(content)
+					nodes = xpath.Evaluate(
+							"//IMG[starts-with(@SRC, 'posters/')]",
+							doc.documentElement)
+					for i in nodes:
+						(scheme, netloc, path, query, frag) = \
+								urlparse.urlsplit(base)
+						np = path.split('/')[:-1]
+						np = "/".join(np)
+						poster_urls.insert(0, urlparse.urljoin(base,
+							"%s/%s" % (np, i.getAttributeNS(EMPTY_NAMESPACE,
+								'SRC'))))
+				except:
+					print_exception(traceback.format_exc())
+		except NoIMDBURL:
+			if VERBOSE:
 				print_exception(traceback.format_exc())
+		except:
+			print_exception(traceback.format_exc())
+
+		nodes = xpath.Evaluate("//IMG[starts-with(@src, 'http://www.ofdb.de:81/film/')]",
+				ofdoc.documentElement)
+		for node in nodes:
+			poster_urls.append(node.getAttributeNS(EMPTY_NAMESPACE, 'src'))
 
 		for p in poster_urls:
 			print(p)
@@ -337,24 +396,28 @@ def search_poster(uid):
 
 def main():
 	parser = OptionParser(usage="""\
-Usage: %prog [-M TITLE | -D UID [-r COUNTRY[,COUNTRY]] | -P UID]
-""", version="%prog 0.1")
+Usage: %prog [-M TITLE | -D UID [-R COUNTRY[,COUNTRY]] | -P UID]
+""", version="%%prog %s" % (ofdb_version))
 	parser.add_option("-M", "--title", type="string", dest="title_search",
 			metavar="TITLE", help="Search for TITLE")
 	parser.add_option("-D", "--data", type="string", dest="data_search",
 			metavar="UID", help="Search for video data for UID")
-	parser.add_option("-r", "--rating-country", type="string",
+	parser.add_option("-R", "--rating-country", type="string",
 			dest="ratings_from", metavar="COUNTRY",
 			help="When retrieving data, use ratings from COUNTRY")
 	parser.add_option("-P", "--poster", type="string", dest="poster_search",
 			metavar="UID", help="Search for images associated with UID")
 	parser.add_option("-d", "--debug", action="store_true", dest="verbose",
 			default=False, help="Display debug information")
+	parser.add_option("-r", "--dump-response", action="store_true",
+			dest="dump_response", default=False,
+			help="Output the raw response")
 
 	(options, args) = parser.parse_args()
 
-	global VERBOSE
+	global VERBOSE, DUMP_RESPONSE
 	VERBOSE = options.verbose
+	DUMP_RESPONSE = options.dump_response
 
 	if options.title_search:
 		search_title(options.title_search)
@@ -374,5 +437,9 @@ if __name__ == '__main__':
 		sys.stdout = u2utf8
 
 		main()
+	except SystemExit:
+		pass
 	except:
 		print_exception(traceback.format_exc())
+
+# vim: ts=4 sw=4:
