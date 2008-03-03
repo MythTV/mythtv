@@ -17,6 +17,8 @@ using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::String;
 using TagLib::MPEG::Properties;
 
+typedef QValueList<struct AlbumArtImage> AlbumArtList;
+
 class MetaIOTagLib : public MetaIO
 {
 public:
@@ -32,7 +34,7 @@ private:
 
     int getTrackLength(QString filename);
 
-    QValueList<struct AlbumArtImage> readAlbumArt(TagLib::ID3v2::Tag *tag);
+    AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
     UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
 };
 

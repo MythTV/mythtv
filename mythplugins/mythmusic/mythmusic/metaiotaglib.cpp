@@ -230,9 +230,14 @@ Metadata* MetaIOTagLib::read(QString filename)
  */
 int MetaIOTagLib::getTrackLength(QString filename)
 {
+    int seconds = 0;
     File *taglib = new TagLib::MPEG::File(filename.local8Bit());
 
-    int seconds = taglib->audioProperties()->length();
+    if (taglib)
+    {
+        seconds = taglib->audioProperties()->length();
+        delete taglib;
+    }
 
     return seconds;
 }
@@ -274,19 +279,30 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
 
     File *taglib = new TagLib::MPEG::File(filename.local8Bit());
 
-    if (taglib->isOpen() && !taglib->ID3v2Tag()->frameListMap()["APIC"].isEmpty())
+    if (taglib)
     {
-        TagLib::ID3v2::FrameList apicframes = taglib->ID3v2Tag()->frameListMap()["APIC"];
+        if (taglib->isOpen()
+            && !taglib->ID3v2Tag()->frameListMap()["APIC"].isEmpty())
+        {
+            TagLib::ID3v2::FrameList apicframes =
+                                    taglib->ID3v2Tag()->frameListMap()["APIC"];
 
-        for(TagLib::ID3v2::FrameList::Iterator it = apicframes.begin(); it != apicframes.end(); ++it) {
-            AttachedPictureFrame *frame = static_cast<AttachedPictureFrame *>(*it);
-            if(frame && frame->type() == apicType)
+            for(TagLib::ID3v2::FrameList::Iterator it = apicframes.begin();
+                it != apicframes.end(); ++it)
             {
-                QImage picture;
-                picture.loadFromData((const uchar *)frame->picture().data(), frame->picture().size());
-                return picture;
+                AttachedPictureFrame *frame =
+                                    static_cast<AttachedPictureFrame *>(*it);
+                if(frame && frame->type() == apicType)
+                {
+                    QImage picture;
+                    picture.loadFromData((const uchar *)frame->picture().data(),
+                                         frame->picture().size());
+                    return picture;
+                }
             }
         }
+
+        delete taglib;
     }
 
     return picture;
@@ -299,7 +315,7 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
  * \returns A QValueList containing a list of AlbumArtImage structs
  *          with the type and description of the APIC tag.
  */
-QValueList<struct AlbumArtImage> MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *tag)
+AlbumArtList MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *tag)
 {
 
     QValueList<struct AlbumArtImage> artlist;
@@ -376,11 +392,14 @@ QValueList<struct AlbumArtImage> MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *
  * \param description Description of tag to search for
  * \returns Pointer to frame
  */
-UserTextIdentificationFrame* MetaIOTagLib::find(TagLib::ID3v2::Tag *tag, const String &description)
+UserTextIdentificationFrame* MetaIOTagLib::find(TagLib::ID3v2::Tag *tag,
+                                                const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("TXXX");
-  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it) {
-    UserTextIdentificationFrame *f = static_cast<UserTextIdentificationFrame *>(*it);
+  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  {
+    UserTextIdentificationFrame *f =
+                                static_cast<UserTextIdentificationFrame *>(*it);
     if(f && f->description() == description)
       return f;
   }
