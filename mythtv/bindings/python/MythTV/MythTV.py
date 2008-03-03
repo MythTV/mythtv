@@ -15,7 +15,7 @@ import socket
 import code
 from datetime import datetime
 
-import MythDB
+from MythDB import *
 from MythLog import *
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythTV')
@@ -52,7 +52,7 @@ class MythTV:
 	A connection to a MythTV backend.
 	"""
 	def __init__(self, conn_type='Monitor'):
-		self.db = MythDB.MythDB(sys.argv[1:])
+		self.db = MythDB(sys.argv[1:])
 		self.master_host = self.db.getSetting('MasterServerIP')
 		self.master_port = int(self.db.getSetting('MasterServerPort'))
 
@@ -118,9 +118,9 @@ class MythTV:
 		num_progs = int(res.pop(0))
 		log.Msg(DEBUG, '%s pending recordings', num_progs)
 		for i in range(num_progs):
-			programs.append(
-					Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
-			return programs
+			programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
+				+ PROGRAM_FIELDS]))
+		return programs
 
 	def getScheduledRecordings(self):
 		"""
@@ -131,9 +131,9 @@ class MythTV:
 		num_progs = int(res.pop(0))
 		log.Msg(DEBUG, '%s scheduled recordings', num_progs)
 		for i in range(num_progs):
-			programs.append(
-					Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS) + PROGRAM_FIELDS]))
-			return programs
+			programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
+				+ PROGRAM_FIELDS]))
+		return programs
 
 	def getUpcomingRecordings(self):
 		"""

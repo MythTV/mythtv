@@ -3,7 +3,7 @@ Provides the MythVideo class with convinience methods to access the MythTV
 MythVideo database.
 """
 
-import MythDB
+from MythDB import *
 from MythLog import *
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythVideo')
@@ -16,7 +16,7 @@ class MythVideo:
 		"""
 		Initialise the MythDB connection.
 		"""
-		self.db = MythDB.MythDB()
+		self.db = MythDB()
 
 	def pruneMetadata(self):
 		"""
@@ -106,10 +106,10 @@ class MythVideo:
 
 		if row is None:
 			# Insert a new cast.
-				c = self.db.cursor()
-				c.execute("INSERT INTO videometadatacast VALUES (%s,%s)", (idvideo,idcast))
-				#print "INSERT INTO videometadatacast VALUES (%s,%s)" % (idvideo,idcast)
-				c.close()
+			c = self.db.cursor()
+			c.execute("INSERT INTO videometadatacast VALUES (%s,%s)", (idvideo,idcast))
+			#print "INSERT INTO videometadatacast VALUES (%s,%s)" % (idvideo,idcast)
+			c.close()
 
 	def getMetadataId(self, videopath):
 		"""
