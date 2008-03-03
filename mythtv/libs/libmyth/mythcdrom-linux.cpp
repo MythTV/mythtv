@@ -641,8 +641,15 @@ void MythCDROMLinux::setSpeed(int speed)
     memset(cmd, 0, sizeof(cmd));
     memset(&st, 0, sizeof(st));
 
-    if (stat(m_DevicePath, &st) == -1)
+    if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
     {
+        VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
+        return;
+    }
+
+    if (fstat(fd, &st) == -1)
+    {
+        close(fd);
         VERBOSE(VB_MEDIA, LOC_ERR +
                 QString("setSpeed() Failed. device %1 not found")
                 .arg(m_DevicePath));
@@ -651,13 +658,8 @@ void MythCDROMLinux::setSpeed(int speed)
 
     if (!S_ISBLK(st.st_mode))
     {
+        close(fd);
         VERBOSE(VB_MEDIA, LOC_ERR + "setSpeed() Failed. Not a block device");
-        return;
-    }
-
-    if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
-    {
-        VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
         return;
     }
 
