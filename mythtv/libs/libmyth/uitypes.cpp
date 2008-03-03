@@ -3489,13 +3489,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             menuItems.setAutoDelete(true);
 
             if (pos > (int)lcddev->getLCDHeight())
-                lnode = nodes->at(pos - lcddev->getLCDHeight());
+                nodes->at(pos - lcddev->getLCDHeight());
             else
-                lnode = nodes->first();
+                nodes->first();
 
             uint count = 0;
 
-            while ((lnode = nodes->current()) != 0 && count < lcddev->getLCDHeight() * 2)
+            while ((lnode = nodes->current()) != 0
+                   && count < lcddev->getLCDHeight() * 2)
             {
                 if (lnode == current_node)
                     selected = true;
