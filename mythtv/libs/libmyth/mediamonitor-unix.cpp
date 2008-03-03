@@ -620,9 +620,9 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
 
             // check if removeable
             QFile removable(dev + "/removable");
-            if (removable.exists())
+            if (removable.exists() &&
+                removable.open(IO_ReadOnly))
             {
-                removable.open(IO_ReadOnly);
                 int c = removable.getch();
                 removable.close();
 
