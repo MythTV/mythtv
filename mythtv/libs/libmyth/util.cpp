@@ -946,7 +946,9 @@ unsigned long long myth_get_approximate_large_file_size(const QString &fname)
     return status.st_size;
 #else
     struct stat status;
-    stat(filename.local8Bit(), &status);
+    if (stat(filename.local8Bit(), &status) == -1)
+        return 0;
+
     // Using off_t requires a lot of 32/64 bit checking.
     // So just get the size in blocks.
     unsigned long long bsize = status.st_blksize;
