@@ -489,6 +489,18 @@
         <source>Match words in the subtitle</source>
         <translation>Find ord i underteksterne</translation>
     </message>
+    <message>
+        <source>Match this series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only shows marked as widescreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude H.264 encoded streams (EIT only)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomRecord</name>
@@ -1364,6 +1376,14 @@ Vær venlig at lukke dem før opgradering.</translation>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation>Dette kan ikke fortrydes, så det er en god idé at tage en sikkerhedskopi af databasen først.</translation>
     </message>
+    <message>
+        <source>MythTV was unable to backup your database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythImageFileDialog</name>
@@ -2025,6 +2045,10 @@ Returning to the previous menu.</source>
         <source>Deleted</source>
         <translation>Slettet</translation>
     </message>
+    <message>
+        <source>Allow this program to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2061,10 +2085,6 @@ Returning to the previous menu.</source>
         <translation>Primær deinterlacer</translation>
     </message>
     <message>
-        <source>Fallback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Custom Filters</source>
         <translation>Brugerfiltre</translation>
     </message>
@@ -2075,6 +2095,22 @@ Returning to the previous menu.</source>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
         <translation>Fjern denne markering hvis video hakker mens OSD fader væk.</translation>
+    </message>
+    <message>
+        <source>Max CPUs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fallback Deinterlacer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of CPU cores used for decoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4857,7 +4893,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
-        <translation>Hvis aktiv, vil alle nye optagelser blive sat til AutoUdløb. Eksisterende optagelser berøres ikke.</translation>
+        <translation type="obsolete">Hvis aktiv, vil alle nye optagelser blive sat til AutoUdløb. Eksisterende optagelser berøres ikke.</translation>
     </message>
     <message>
         <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
@@ -4940,16 +4976,8 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
         <translation>Skærm størrelse - Bredde</translation>
     </message>
     <message>
-        <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display Size - Height</source>
         <translation>Skærm størrelse - Højde</translation>
-    </message>
-    <message>
-        <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
@@ -5771,15 +5799,15 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Database type</source>
-        <translation>Database-type</translation>
+        <translation type="obsolete">Database-type</translation>
     </message>
     <message>
         <source>MySQL</source>
-        <translation>MySQL</translation>
+        <translation type="obsolete">MySQL</translation>
     </message>
     <message>
         <source>The database implementation used for your server.</source>
-        <translation>Databasetypen som bruges på din server.</translation>
+        <translation type="obsolete">Databasetypen som bruges på din server.</translation>
     </message>
     <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
@@ -6285,11 +6313,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
-        <translation>Skjul musepil i Myth</translation>
-    </message>
-    <message>
-        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Skjul musepil i Myth</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
@@ -6665,11 +6689,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Extra Disk Space (in Gigabytes)</source>
-        <translation>Ekstra disk plads (i Gigabytes)</translation>
+        <translation type="obsolete">Ekstra disk plads (i Gigabytes)</translation>
     </message>
     <message>
         <source>Extra disk space you want on the recording file system beyond what MythTV requires. This is useful if you use the recording file system for data other than MythTV recordings.</source>
-        <translation>Ekstra diskplads som du ønsker udover det MythTV kræver. Dette er brugbart hvis du har andre data på dette drev end Myth optagelser.</translation>
+        <translation type="obsolete">Ekstra diskplads som du ønsker udover det MythTV kræver. Dette er brugbart hvis du har andre data på dette drev end Myth optagelser.</translation>
     </message>
     <message>
         <source>Category of shows to be extended</source>
@@ -6678,10 +6702,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>category name</source>
         <translation>kategori navn</translation>
-    </message>
-    <message>
-        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Record past end of show (in minutes)</source>
@@ -6714,10 +6734,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Enable warning about missing audio output</source>
         <translation type="obsolete">Aktivér advarsler hvis lyden mangler</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will warn you whenever you try to watch a something and MythTV can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
@@ -7206,10 +7222,6 @@ Myth will now exit.</source>
         <translation>Vis volume information i LCD displayet.</translation>
     </message>
     <message>
-        <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Minimal Updates</source>
         <translation>Minimale opdateringer</translation>
     </message>
@@ -7383,7 +7395,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active after it is first activated.</source>
-        <translation>Hvor mange sekunder at on-screen displayet vises efter aktivering.</translation>
+        <translation type="obsolete">Hvor mange sekunder at on-screen displayet vises efter aktivering.</translation>
     </message>
     <message>
         <source>Program Info OSD time-out</source>
@@ -7391,7 +7403,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
-        <translation>Hvor mange sekunder at on-screen displayet viser program informationer efter at være aktiveret.</translation>
+        <translation type="obsolete">Hvor mange sekunder at on-screen displayet viser program informationer efter at være aktiveret.</translation>
     </message>
     <message>
         <source>Use line edit virtual keyboards</source>
@@ -7711,11 +7723,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>LiveTV recordings Max Age</source>
-        <translation>Max alder for LiveTV optagelser</translation>
+        <translation type="obsolete">Max alder for LiveTV optagelser</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation>Autoudløb tvinger udløb af LiveTV optagelser efter dette antal dage. LiveTV optagelser kan også udløbe tidligere hvis der mangler disk plads.</translation>
+        <translation type="obsolete">Autoudløb tvinger udløb af LiveTV optagelser efter dette antal dage. LiveTV optagelser kan også udløbe tidligere hvis der mangler disk plads.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
@@ -7879,7 +7891,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto Expire Priority Weight</source>
-        <translation>Auto udløbs prioritets vægtning</translation>
+        <translation type="obsolete">Auto udløbs prioritets vægtning</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
@@ -8531,10 +8543,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use this to enlage or shrink captions.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Default Caption Font Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8571,18 +8579,6 @@ Myth will now exit.</source>
         <translation>Store bogstaver</translation>
     </message>
     <message>
-        <source>ATSC caption settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC closed caption font</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC caption fonts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>channel number</source>
         <translation>kanal nummer</translation>
     </message>
@@ -8617,10 +8613,6 @@ Myth will now exit.</source>
     <message>
         <source>OpenGL</source>
         <translation>OpenGL</translation>
-    </message>
-    <message>
-        <source>This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
@@ -9041,22 +9033,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Expire watched programs before unwatched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, programs that have been marked as watched will be expired first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Re-record watched programs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9106,10 +9082,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatically mark a record watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9493,7 +9465,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fejl</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
@@ -10607,6 +10579,234 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DVB Card for active EIT scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Audio Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5.1</source>
+        <translation type="unfinished">5.1</translation>
+    </message>
+    <message>
+        <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upmix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active Simple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra Disk Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleted Max Age</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expire in deleted order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expire Deleted recordings in the order which they were originally deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DeletedExpireOptions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watched before UNwatched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV Max Age</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-record Watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time an on-screen display window will be visible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time the on-screen display will display program information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use this to enlarge or shrink captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Caption Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC %1 closed caption font.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Caption Fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced Sans Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional Sans Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regular Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italic Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prefer EIA-708 over EIA-608 captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue Playback When Embedded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically mark a recording as watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore LiveTV Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording monitoring will ignore LiveTV recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP OSD Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Closed Captions</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11911,6 +12111,10 @@ Vælg en aktuel optagelse</translation>
     <message>
         <source>Switch Source</source>
         <translation>Skift kilde</translation>
+    </message>
+    <message>
+        <source>Upcoming Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

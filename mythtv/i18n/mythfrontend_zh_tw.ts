@@ -63,6 +63,25 @@
     </message>
 </context>
 <context>
+    <name>BackendSelect</name>
+    <message>
+        <source>Please select default Myth Backend Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure Manually</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -135,6 +154,26 @@
         <source>This can take a long time to run.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Create Input Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter new group name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, this Input Group name can not be blank.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, this Input Group name is already in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CardInputEditor</name>
@@ -178,22 +217,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you would like to delete these channels?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Yes, delete the channels</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ChannelRecPriority</name>
     <message>
-        <source>The theme you are using does not contain a &apos;recprioritychannels&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <source>Channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OK</source>
+        <source>Are you sure you would like to delete ALL channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete all unassigned channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete the channels on %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add some for channels first!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download all icons..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan for missing icons..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download icon for </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -340,10 +400,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add this example clause</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additional Tables</source>
         <translation type="unfinished"></translation>
     </message>
@@ -383,6 +439,30 @@
         <source>Last showing of each episode</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>stored search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match this series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match words in the subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only shows marked as widescreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude H.264 encoded streams (EIT only)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
@@ -406,10 +486,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Analog Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input and satellite settings.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -419,11 +495,6 @@
     </message>
     <message>
         <source>Could not get card info for card #%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Analog child card settings.
-WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A180 card. These cards do not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -760,6 +831,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <source>Western</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rotor Position Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Device Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FirewireDesc</name>
@@ -954,6 +1033,49 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
 </context>
 <context>
+    <name>MediaMonitor</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select removable media to eject or insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices to eject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to unmount %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You may safely remove %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to eject %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a CD drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a VCD drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a DVD drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a DVD writer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
@@ -968,6 +1090,44 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are also other clients using this database. They should be shut down first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
+
+Please shut them down before upgrading.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: MythTV wants to upgrade your database schema, from %1 to %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can try using the old schema, but that may cause problems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: MythTV database has newer schema (%1) than expected (%2).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: MythTV database has newer schema (%1) than expected (%2).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV was unable to backup your database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1203,10 +1363,6 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1497,6 +1653,133 @@ Returning to the previous menu.</source>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>_NO_TITLE_</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help (Status Icons)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete, and allow re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow this program to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undelete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Forever</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in Mono</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in Surround Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in Dolby Surround Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording has Subtitles Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Subtitled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in WideScreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording has been watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show LiveTV as a Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackProfileItemConfig</name>
+    <message>
+        <source>Match Criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max CPUs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Renderer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD Renderer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD Fade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Deinterlacer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fallback Deinterlacer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of CPU cores used for decoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uncheck this if the video studders while the OSD is fading away.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousList</name>
@@ -1509,15 +1792,7 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sort by Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reverse Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1546,6 +1821,14 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Never record this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1714,22 +1997,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>4 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 3 1/2 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 3 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 2 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Power Recording Rule</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1757,13 +2024,57 @@ Returning to the previous menu.</source>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Stored Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a search stored from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 .. 9 moves to Nx10 percent in list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unrated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least ***/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least **/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least **</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least */</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At least /</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
-    <message>
-        <source>The theme you are using does not contain a &apos;recpriorityprograms&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>OK</source>
         <translation type="unfinished"></translation>
@@ -2418,10 +2729,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ProfileGroup</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2547,10 +2854,6 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Scale bitrate for frame size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, the MPEG4 bitrate will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2952,10 +3255,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DVB Card Number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3100,27 +3399,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Deinterlace playback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Algorithm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Linear blend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Kernel (less motion blur)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bob (2x framerate)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3128,16 +3407,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Deinterlace settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Custom Filters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced Filter configuration, format:
-[[&lt;filter&gt;=&lt;options&gt;,]...]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3301,10 +3571,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3341,10 +3607,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OSD theme</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OSD font</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3378,22 +3640,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>channel name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vertical over/underscan percentage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen vertically.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Horizontal over/underscan percentage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen horizontally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3466,10 +3712,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Save position and exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always prompt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3569,10 +3811,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Keypress Application</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3606,18 +3844,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Xinerama screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aspect Override</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16/9 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4/3 Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3657,15 +3883,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display Size - Height</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3729,10 +3947,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Problem reading theme preview image </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Qt Style</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3781,27 +3995,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Time limit for ATSC signal lock (msec)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Change channels immediately without select</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>When a complete channel number is entered MythTV will switch to that channel immediately without requiring you to hit the select button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Avoid conflicts between live TV and scheduled shows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3877,10 +4075,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display the channel icon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Only display &apos;favorite&apos; channels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3938,10 +4132,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>All Recordings Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Recording types will receive this additional recording priority value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4062,10 +4252,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>How much to blend the program guide over the live TV image.  Higher numbers mean more guide and less TV.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hardware Decoding Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4201,10 +4387,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Myth Database Logging</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4305,19 +4487,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>General playback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>General playback (part 2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>View Recordings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>View Recordings (Recording Groups)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4326,10 +4496,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Commercial Skip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overscan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4529,15 +4695,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IP address for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port the server runs on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4545,23 +4703,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port the server shows status on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Port which the server will listen to for HTTP requests.  Currently, it shows a little status information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Master Server IP address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The IP address of the master backend server. All frontend and non-master backend machines will connect to this server.  If you only have one backend, this should be the same IP address as above.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port the master server runs on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4589,23 +4735,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Time offset for XMLTV listings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Master Backend Override</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reconnect wait time (secs)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Count of reconnect tries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4617,19 +4751,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The command used to wake up your master backend server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wake command for slaves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Idle timeout (secs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4658,14 +4780,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set wakeuptime command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The command used to set the time (passed as $time) to wake up the masterbackend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4733,15 +4847,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Run Jobs only on original recording host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #1 Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4749,35 +4855,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User Job #1 Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #2 Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #2 Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #3 Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #3 Command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #4 Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Job #4 Command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4789,39 +4867,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow &apos;User Job #1&apos; jobs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow &apos;User Job #2&apos; jobs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow &apos;User Job #3&apos; jobs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow &apos;User Job #4&apos; jobs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Host Address Backend Setup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Shutdown/Wakeup Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>WakeOnLan settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MasterBackend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job Queue (Host-Specific)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4942,10 +4992,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Wake-On-LAN settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Database Configuration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4958,15 +5004,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Host name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4986,18 +5024,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Database type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MySQL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The database implementation used for your server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5007,14 +5033,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5035,10 +5053,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Wake command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The command executed on this frontend to wake up the database server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5163,22 +5177,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4/3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16/9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16/9 Stretch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5343,15 +5341,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Polarity (Option has no default)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5395,14 +5384,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CPU friendly preview of recordings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5459,14 +5440,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5640,10 +5613,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>this show does not match the current program listings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ATSC Channel %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5740,14 +5709,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Commercial Flag New Recordings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default Auto Transcode setting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5760,31 +5721,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Run User Job #%1 On New Recordings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #%1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Extra Disk Space (in Gigabytes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Extra disk space you want on the recording file system beyond what MythTV requires. This is useful if you use the recording file system for data other than MythTV recordings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Category of shows to be extended</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>category name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5816,14 +5757,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable warning about missing audio output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will warn you whenever you try to watch a something and MythTV can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5833,10 +5766,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>If enabled, MythTV will ignore the above time offset, and use the bookmark inside the recording as the offset for creating a thumbnail image. As with the above, MythTV will honour cutlists and increase this offset if necessary.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC Signal Threshold (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5932,10 +5861,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust the relative timezone of the XMLTV EPG data read by mythfilldatabase.  &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6290,10 +6215,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Minimal Updates</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6323,10 +6244,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>DVB DTV capture card (v3.x)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pcHDTV DTV capture card (w/V4L drivers)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6366,10 +6283,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preferred MPEG2 Decoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>libmpeg2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6387,10 +6300,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Standard will use ffmpeg library.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>libmpeg2 will use mpeg2 library; this is faster on some AMD processors.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6438,31 +6347,11 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Deinterlace algorithm.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>General OSD time-out (sec)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>How many seconds an on-screen display will be active after it is first activated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Program Info OSD time-out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6778,14 +6667,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LiveTV recordings Max Age</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Samples are shown using today&apos;s date.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6799,10 +6680,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6935,10 +6812,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Weighted Time/Priority Combination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Expire Priority Weight</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7562,10 +7435,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use this to enlage or shrink captions.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Default Caption Font Type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7602,18 +7471,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ATSC caption settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC closed caption font</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC caption fonts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Black background for analog closed captioning</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7643,10 +7500,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>OpenGL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7687,14 +7540,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close Captioned Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as Close Captioned in the TV listings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7795,14 +7640,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Priority When Shown Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display Large Clock</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7841,15 +7678,7 @@ Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Colour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MAX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7869,27 +7698,11 @@ Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use Xv picture controls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>General (AutoExpire)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Delete files slowly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Host Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The port number the database is running on, if it&apos;s not the default database port.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7946,14 +7759,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(%3 behind)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>(%3 remaining)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Menu Not Available</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7978,14 +7783,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>the recording failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>this episode will be recorded on a different channel at this time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8149,26 +7946,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default group filter to apply on the Watch Recordings screen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Expire watched programs before unwatched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, programs that have been marked as watched will be expired first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Re-record watched programs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8218,10 +7995,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatically mark a record watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8281,14 +8054,6 @@ The frequency for this channel in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>View Recordings (Views)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decoder Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Schedule Status</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8314,10 +8079,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Backend Setup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8364,6 +8125,1661 @@ The frequency for this channel in</source>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Backend Server Wakeup settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Server Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ping test server?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Database Server Wakeup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, the frontend will use database wakeup parameters to reconnect to the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Required fields are marked with an asterisk (*).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot find (ping) database host %1 on the network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to port %1 on database host %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save database details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save backend details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save that backend or database as the default?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upgrade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use current schema</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts the icon downloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>as a search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>as an example</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title %1 chapter %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2 (%3 behind)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2 (%3 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the recorder failed to record.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this rule does not match any showings in the current program listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded on a different channel in this time slot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Surround Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dolby Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio for Hearing Impaired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio for Visually Impaired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Widescreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AVC/H.264</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deaf Signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Time Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded File Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default).
+The frequency for this channel in %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (symbols/second).
+Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open tuner device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad connection to backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> offset %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeout Scanning %1 -- no tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeout Scanning %1 -- no signal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning to %1 mplexid(%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new episode first showings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV wants to record these programs in %d seconds:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On known multiplex...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PVR-350 decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: Closed caption decoding will not work with libmpeg2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kernel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Greedy HighMotion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Greedy HighMotion (2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yadif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yadif (2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bob (2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear blend (HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kernel (HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bob (2x, HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One field (HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One Field (2x, HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kernel (2x, HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear blend (2x, HW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (2x, Hw)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video rendering method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render video offscreen. Used internally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the standard video render for Macintosh OS X systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the only video renderer for the MacAccel decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is only video renderer for the PVR-350 decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perform no deinterlacing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shows one field of the frame followed by the other field displaced vertically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blends the odd and even fields linearly into one frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Hardware Accelerated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With workaround for broken interlaced modelines.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; has not been documented yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD rendering method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend. But it is the fastest OSD renderer; and is particularly efficient compared to the ia44blend OSD renderer for XvMC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uses hardware support for 16 color alpha-blend surfaces for rendering the OSD. Because of the limited color range, MythTV renders the OSD in 16 level grayscale.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: Not recommended for nVidia or Intel chipsets. This removes two of the limited XvMC buffers from decoding duty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Renders the OSD using the PVR-350 chromakey feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uses OpenGL to alpha blend the OSD onto the video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for installed XMLTV grabbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Device Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: already in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DVB Card for active EIT scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interactions between inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a New Input Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (Normal)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (Reversed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Progressive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>14:9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gray</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Half</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Reserved]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SCTE mode 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SCTE mode 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC 8-VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC 16-VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detective/Thriller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adventure/Western/War</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Science Fiction/Fantasy/Horror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soap/melodrama/folkloric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Serious/Classical/Religious/Historical Movie/Drama</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adult</source>
+        <comment>Adult Movie</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News/weather report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News magazine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intelligent Programmes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Variety Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Talk Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Special Events (World Cup, World Series..)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sports Magazines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Football (Soccer)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tennis/Squash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Misc. Team Sports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Athletics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motor Sport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Water Sport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Winter Sports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Equestrian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Martial Sports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kids</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-School Children&apos;s Programmes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entertainment Programmes for 6 to 14</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entertainment Programmes for 10 to 16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Informational/Educational</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cartoons/Puppets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music/Ballet/Dance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rock/Pop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classical Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folk Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jazz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Musical/Opera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ballet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arts/Culture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Performing Arts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fine Arts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Religion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Popular Culture/Traditional Arts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Literature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Film/Cinema</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental Film/Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Broadcasting/Press</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Arts/Culture Magazines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Social/Policical/Economics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Magazines/Reports/Documentary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Economics/Social Advisory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remarkable People</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Education/Science/Factual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nature/animals/Environment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Technology/Natural Sciences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medicine/Physiology/Psychology</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Foreign Countries/Expeditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Social/Spiritual Sciences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Further Education</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leisure/Hobbies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tourism/Travel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Handicraft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motoring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fitness &amp; Health</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cooking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advertizement/Shopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gardening</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black &amp; White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Unpublished&quot; Programmes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FAILED: xmltv ran but was interrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FAILED: xmltv returned error code %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Audio Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upmix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active Simple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply on the View Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles, Categories, and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run commercial flagger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run transcoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deferral days for Auto-Transcode jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge short commercial breaks (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra Disk Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Instead of Delete Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleted Max Age</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expire in deleted order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expire Deleted recordings in the order which they were originally deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DeletedExpireOptions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watched before UNwatched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV Max Age</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-record Watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profile Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Example Custom filter list: &apos;ivtc,denoise3d&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main deinterlacing method.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fallback deinterlacing method.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;</source>
+        <comment>and</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>if rez</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Profiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Video Playback Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Playback Group Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, playback group
+name can not be blank.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, playback group name
+&apos;%1&apos; is already being used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time an on-screen display window will be visible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time the on-screen display will display program information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use this to enlarge or shrink captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Caption Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC %1 closed caption font.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Caption Fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced Sans Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional Sans Serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regular Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italic Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical scaling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal scaling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prefer EIA-708 over EIA-608 captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable picture controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warn on no audio output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt (excluding Live TV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt (including Live TV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prompt for Live TV only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue Playback When Embedded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically mark a recording as watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customise exit menu options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show quit and shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show quit, reboot and shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show reboot and shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command or script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command or script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Letterboxing Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently only works with XVideo video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Aspect Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UI Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avoid conflicts between live TV and scheduled shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow live TV to move scheduled shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fine tune font size (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fine tune all font sizes by this percentage. Font sizes should be the correct relative size if the X11 DPI (dots per inch) is set to 100.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display the channel icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display the icons/logos for the channels in the guide.  See section 9.5 of the Installation Guide for how to grab icons.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avoid back to back recordings from different channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &apos;All&apos; Recording type will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore LiveTV Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording monitoring will ignore LiveTV recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (and other removable devices)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use new media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMediaMonitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PVR-350 Hardware Decoder Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File or directory to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings Access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown/Reboot Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP OSD Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Closed Captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default JobQueue settings for new scheduled recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, Exit and Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD contains a bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play from bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play from beginning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file for this recording is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is not yet available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to Default group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undelete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security Pin (Required)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin code required for a frontend to connect to the backend. Blank prevents all connections, 0000 allows any client to connect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Firewire Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By default MythTV will reset the firewire bus when a firewire recorder stops responding to commands. But if this causes problems you can disable this here for Linux firewire recorders.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miscellaneous Status Application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your Local Timezone (for XMLTV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used if the XMLTV data comes from a different timezone than your own. This adjust the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delay between wake attempts (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake Attempts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to wake up your master backend server
+(eg. sudo /etc/init.d/mythtv-backend restart).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle shutdown timeout (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to set Wakeup Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to set the wakeup time (passed as $time) for the Master Backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Jobs only on original recording backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #%1 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #%1 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow %1 jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locale Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miscellaneous Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Management Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Wakeup settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slave Backends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue (Backend-Specific)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is recording:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is not recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecOptDialog</name>
+    <message>
+        <source>Missing Element</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Element</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingProfileEditor</name>
@@ -8373,6 +9789,97 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Enter the name of the new profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SIScan</name>
+    <message>
+        <source>Updated Channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added Channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to add channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network %1 Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished processing Transport List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating Services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished processing Services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping %1, not in imported channel map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1%2%3 on %4 (%5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adding %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Only Channel (off-air?)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty Channel (off-air?)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Only Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encrypted Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2-%3 as %4 on %5 (%6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8555,10 +10062,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LiveTV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 of these are LiveTV and consume %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8576,6 +10079,97 @@ No other details</source>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>marked as HDTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>from source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of these are Deleted and consume %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StorageGroupEditor</name>
+    <message>
+        <source>&apos;%1&apos; Storage Group Directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local &apos;%1&apos; Storage Group Directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Storage Group Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter directory name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Storage Group Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove &apos;%1&apos;
+Directory From Storage Group?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, remove directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t remove directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Add New Directory)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StorageGroupListEditor</name>
+    <message>
+        <source>Storage Groups (directories for new recordings)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Storage Groups (directories for new recordings)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Storage Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; Storage Group?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Create %1 group)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8730,43 +10324,7 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>4:3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16:9 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Brightness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Contrast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Colour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8906,14 +10464,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fill</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>1.2X</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8971,10 +10521,6 @@ No other details</source>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9240,22 +10786,6 @@ Select a Current Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are exiting this %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are exiting this Video/DVD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Keep Watching</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&apos;%1&apos; Group Password:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9265,6 +10795,76 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Screen Shot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let them record and go back to the Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record it later, I want to watch TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record them later, I want to watch TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t let them record, I want to watch TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>Card</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I</source>
+        <comment>Input</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are exiting %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9500,6 +11100,29 @@ Select a Current Recording</source>
         <source>Delete..</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Multiplex Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UIListBtnType</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts with text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contains text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UIManagedTreeListType</name>
@@ -9588,10 +11211,6 @@ Select a Current Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using does not contain a &apos;schdiff&apos; element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9618,6 +11237,14 @@ Select a Current Recording</source>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Conflict Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>WelcomeDialog</name>
@@ -9627,15 +11254,6 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Cannot connect to server!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tuner %1 is recording:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tuner %1 is not recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9730,15 +11348,12 @@ Select a Current Recording</source>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>pcHDTVConfigurationGroup</name>
     <message>
-        <source>Failed to open</source>
+        <source>to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to probe</source>
+        <source>MythTV has running or pending jobs.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
