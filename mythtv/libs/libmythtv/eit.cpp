@@ -493,7 +493,7 @@ bool DBEvent::MoveOutOfTheWayDB(MSqlQuery &query, const DBEvent &prog) const
         return change_program(query, chanid, prog.starttime,
                               prog.starttime, starttime);
     }
-    else if (prog.starttime > starttime && prog.endtime > starttime)
+    else if (prog.starttime < endtime && prog.endtime > endtime)
     {
         // starts during, but ends after our program
         return change_program(query, chanid, prog.starttime,
