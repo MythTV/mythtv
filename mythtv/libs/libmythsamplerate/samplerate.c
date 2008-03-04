@@ -428,7 +428,7 @@ src_simple (SRC_DATA *src_data, int converter, int channels)
 
 	error = src_process (src_state, src_data) ;
 
-	src_state = src_delete (src_state) ;
+	src_delete (src_state) ;
 
 	return error ;
 } /* src_simple */
