@@ -154,7 +154,7 @@ public:
     void clear();
 
     /// Returns nonzero if there aren't any samples available for outputting.
-    uint isEmpty();
+    int isEmpty() const;
 };
 
 }
