@@ -441,6 +441,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     itv = GetNVP()->GetInteractiveTV();
 
     cc608_build_parity_table(cc608_parity_table);
+
+    no_dts_hack = false;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -578,27 +580,44 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         ic->start_time = 0;
     }
 
-    int64_t adj_cur_dts = st->cur_dts;
+    int normalframes = 0;
 
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (st->cur_dts != (int64_t)AV_NOPTS_VALUE)
     {
-        int64_t st1 = av_rescale(ic->start_time,
-                                st->time_base.den,
-                                AV_TIME_BASE * (int64_t)st->time_base.num);
-        adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
+
+        int64_t adj_cur_dts = st->cur_dts;
+
+        if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+        {
+            int64_t st1 = av_rescale(ic->start_time,
+                                    st->time_base.den,
+                                    AV_TIME_BASE * (int64_t)st->time_base.num);
+            adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
+        VERBOSE(VB_GENERAL,QString("PRESEEK DT new DTS = %1").arg(adj_cur_dts));
+
+        }
+
+        long long newts = av_rescale(adj_cur_dts,
+                                (int64_t)AV_TIME_BASE * (int64_t)st->time_base.num,
+                                st->time_base.den);
+
+        lastKey = (long long)((newts*(long double)fps)/AV_TIME_BASE);
+        framesPlayed = lastKey;
+        framesRead = lastKey;
+
+        normalframes = desiredFrame - framesPlayed;
+        normalframes = max(normalframes, 0);
+        no_dts_hack = false;
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, "No DTS Seeking Hack!");
+        no_dts_hack = true;
+        framesPlayed = desiredFrame;
+        framesRead = desiredFrame;
+        normalframes = 0;
     }
 
-    long long newts = av_rescale(adj_cur_dts,
-                            (int64_t)AV_TIME_BASE * (int64_t)st->time_base.num,
-                            st->time_base.den);
-
-    // convert current timestamp to frame number
-    lastKey = (long long)((newts*(long double)fps)/AV_TIME_BASE);
-    framesPlayed = lastKey;
-    framesRead = lastKey;
-
-    int normalframes = desiredFrame - framesPlayed;
-    normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, discardFrames, discardFrames);
 
     if (discardFrames)
@@ -677,8 +696,13 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         gopset = false;
         if (!ringBuffer->isDVD())
         {
-            framesPlayed = lastKey;
-            framesRead = lastKey;
+            if (!no_dts_hack)
+            {
+                framesPlayed = lastKey;
+                framesRead = lastKey;
+            }
+
+            no_dts_hack = false;
         }
     }
 
