@@ -13,7 +13,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1015";
+    const QString currentDatabaseVersion = "1016";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -637,6 +637,14 @@ namespace
             };
 
             performActualUpdate(updates, "1015", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1015")
+        {
+            QStringList updates;
+            updates +=
+            "ALTER TABLE videometadata MODIFY inetref VARCHAR(255) NOT NULL;";
+            performActualUpdate(updates, "1016", dbver, MythVideoVersionName);
         }
     }
 }
