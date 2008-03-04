@@ -136,5 +136,9 @@ Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

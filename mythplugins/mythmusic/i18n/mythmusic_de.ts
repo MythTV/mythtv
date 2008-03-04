@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="de">
+<!DOCTYPE TS><TS>
 <defaultcodec></defaultcodec>
 <context>
     <name>AlbumArtImages</name>
@@ -96,7 +95,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Ihr aktuelles Layout enthält kein &apos;musictree&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
+        <translation type="obsolete">Ihr aktuelles Layout enthält kein &apos;musictree&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -128,7 +127,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Ihr aktuelles Layout enthält keinerlei &apos;info&apos; Einträge im &apos;music&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
+        <translation type="obsolete">Ihr aktuelles Layout enthält keinerlei &apos;info&apos; Einträge im &apos;music&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
@@ -153,6 +152,10 @@
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
         <translation>Kompilations-Künstler: </translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -250,55 +253,55 @@
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Mix: Smart</translation>
+        <translation type="obsolete">1 Mix: Smart</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Mix: Smart</translation>
+        <translation type="obsolete">Mix: Smart</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Mix: Zufall</translation>
+        <translation type="obsolete">1 Mix: Zufall</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Mix: Zufall</translation>
+        <translation type="obsolete">Mix: Zufall</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Mix: Aus</translation>
+        <translation type="obsolete">1 Mix: Aus</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Mix: Aus</translation>
+        <translation type="obsolete">Mix: Aus</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Wdhg: Alle</translation>
+        <translation type="obsolete">2 Wdhg: Alle</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Wdhg: Alle</translation>
+        <translation type="obsolete">Wdhg: Alle</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Wdhg: Lied</translation>
+        <translation type="obsolete">2 Wdhg: Lied</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Wdhg: Lied</translation>
+        <translation type="obsolete">Wdhg: Lied</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Wdhg: Aus</translation>
+        <translation type="obsolete">2 Wdhg: Aus</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Wdhg: Aus</translation>
+        <translation type="obsolete">Wdhg: Aus</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>Playlist-Start</translation>
+        <translation type="obsolete">Playlist-Start</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -410,15 +413,76 @@
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation>1 Zufallswiedergabe: Album</translation>
+        <translation type="obsolete">1 Zufallswiedergabe: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation>Zufallswiedergabe: Album</translation>
+        <translation type="obsolete">Zufallswiedergabe: Album</translation>
     </message>
     <message>
         <source>Visualization: </source>
         <translation>Visualisierung:</translation>
+    </message>
+    <message>
+        <source>Exiting Music Player
+Do you want to continue playing in the background?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No - Exit, Stop Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes - Exit, Continue Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <source>Tracks with same Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished">Album</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished">Interpret</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished">Lied</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -605,7 +669,7 @@
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation>Falls gesetzt, können Sie im Wiedergabebildschirm auf Ihre Musiksammlung zugreifen.</translation>
+        <translation type="obsolete">Falls gesetzt, können Sie im Wiedergabebildschirm auf Ihre Musiksammlung zugreifen.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -677,7 +741,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Grundeinstellungen</translation>
+        <translation type="obsolete">Grundeinstellungen</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -969,11 +1033,11 @@
     </message>
     <message>
         <source>Show the type of visualizer on each song instead of song information</source>
-        <translation>Zeigt den Visualisierungstyp an jedem Lied anstatt der Liedinformation</translation>
+        <translation type="obsolete">Zeigt den Visualisierungstyp an jedem Lied anstatt der Liedinformation</translation>
     </message>
     <message>
         <source>Show the changed visualizer when the song changes. Otherwise song information will be shown.</source>
-        <translation>Zeigt das geänderte Visualisierungsplugin, wenn der Song wechselt. Ansonsten wird die Song information gezeigt.</translation>
+        <translation type="obsolete">Zeigt das geänderte Visualisierungsplugin, wenn der Song wechselt. Ansonsten wird die Song information gezeigt.</translation>
     </message>
     <message>
         <source>Show Album Art at the start of each song</source>
@@ -1003,6 +1067,42 @@
         <source>Edit the list of visualizations to use during playback.</source>
         <translation>Ändere die Liste an Visualisierungen, die während der Wiedergabe benutzt werden.</translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of Artists Tree Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Many</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
@@ -1013,6 +1113,15 @@
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
         <translation>Sind Sie sicher, daß die den Ripvorgang stoppen möchten?</translation>
+    </message>
+    <message>
+        <source>Cancelled by the user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The encoder failed to create the file.
+Do you have write permissions for the music directory?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1089,6 +1198,16 @@ Wollen Sie das existierende Lied löschen?</translation>
     <message>
         <source>Select a Genre</source>
         <translation>Ein Genre wählen</translation>
+    </message>
+    <message>
+        <source>Encoding Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoding failed with the following error:-
+
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

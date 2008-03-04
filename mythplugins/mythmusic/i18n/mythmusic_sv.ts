@@ -94,7 +94,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Temat du använder innehåller inte &apos;musictree&apos;-elementet. Vänligen kontakta upphovsmannen till temat och be dem uppdatera det.
+        <translation type="obsolete">Temat du använder innehåller inte &apos;musictree&apos;-elementet. Vänligen kontakta upphovsmannen till temat och be dem uppdatera det.
 
 Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till menyn.</translation>
     </message>
@@ -128,7 +128,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Temat du använder innehåller inga informationsrader i music-elementet.&lt;br&gt;&lt;br&gt;Nästa skärm kommer att vara tom. Använd ESC för att återvända till menyn.</translation>
+        <translation type="obsolete">Temat du använder innehåller inga informationsrader i music-elementet.&lt;br&gt;&lt;br&gt;Nästa skärm kommer att vara tom. Använd ESC för att återvända till menyn.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
@@ -153,6 +153,10 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
         <translation>Kompileringsartist:<byte value="x9"/></translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -254,55 +258,55 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Ordning: Intelligent</translation>
+        <translation type="obsolete">1 Ordning: Intelligent</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Ordning: Intelligent</translation>
+        <translation type="obsolete">Ordning: Intelligent</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Ordning: Slump</translation>
+        <translation type="obsolete">1 Ordning: Slump</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Ordning: Slump</translation>
+        <translation type="obsolete">Ordning: Slump</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Ordning: Rak</translation>
+        <translation type="obsolete">1 Ordning: Rak</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Ordning: Rak</translation>
+        <translation type="obsolete">Ordning: Rak</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Repetera: Alla</translation>
+        <translation type="obsolete">2 Repetera: Alla</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Repetera: Alla</translation>
+        <translation type="obsolete">Repetera: Alla</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Repetera: Spår</translation>
+        <translation type="obsolete">2 Repetera: Spår</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Repetera: Spår</translation>
+        <translation type="obsolete">Repetera: Spår</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Repetera: Ej</translation>
+        <translation type="obsolete">2 Repetera: Ej</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Repetera: Inte</translation>
+        <translation type="obsolete">Repetera: Inte</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>rot för spellistor</translation>
+        <translation type="obsolete">rot för spellistor</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -414,22 +418,83 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation>1 Ordning: Album</translation>
+        <translation type="obsolete">1 Ordning: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation>Ordning: Album</translation>
+        <translation type="obsolete">Ordning: Album</translation>
     </message>
     <message>
         <source>Visualization: </source>
         <translation>Visualisering: </translation>
+    </message>
+    <message>
+        <source>Exiting Music Player
+Do you want to continue playing in the background?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No - Exit, Stop Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes - Exit, Continue Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
+    </message>
+    <message>
+        <source>Tracks with same Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished">Album</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished">Artist</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alla</translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>BumpScope</source>
-        <translation>BumpScope</translation>
+        <translation type="obsolete">BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -613,7 +678,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation>Om denna funktion är aktiverad kan hela musikträdet navigeras från avspelningsvyn. Om den inte är aktiverad syns bara färdiga spellistor.</translation>
+        <translation type="obsolete">Om denna funktion är aktiverad kan hela musikträdet navigeras från avspelningsvyn. Om den inte är aktiverad syns bara färdiga spellistor.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -633,7 +698,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Anger vilket avspelningsläge Musikspelaren startar i. Kan vara normal, slump eller intelligent. Se inställning för de olika vikningsparametrarna för att förstå hur det intelligenta läget fungerar.</translation>
+        <translation type="obsolete">Anger vilket avspelningsläge Musikspelaren startar i. Kan vara normal, slump eller intelligent. Se inställning för de olika vikningsparametrarna för att förstå hur det intelligenta läget fungerar.</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -649,7 +714,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation>Byt visualisering när låten byts.</translation>
+        <translation type="obsolete">Byt visualisering när låten byts.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -669,35 +734,35 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation>Lista med visualiseringar som skall användas vid avspelning. Möjliga värden är en mellanslagseparerad lista av </translation>
+        <translation type="obsolete">Lista med visualiseringar som skall användas vid avspelning. Möjliga värden är en mellanslagseparerad lista av </translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation>MonoScope</translation>
+        <translation type="obsolete">MonoScope</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation>StereoScope</translation>
+        <translation type="obsolete">StereoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation>Spectrum</translation>
+        <translation type="obsolete">Spectrum</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation>Goom</translation>
+        <translation type="obsolete">Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation>Synaesthesia</translation>
+        <translation type="obsolete">Synaesthesia</translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation>Gears</translation>
+        <translation type="obsolete">Gears</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation>Blank</translation>
+        <translation type="obsolete">Blank</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -725,7 +790,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Generella inställningar</translation>
+        <translation type="obsolete">Generella inställningar</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -813,7 +878,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>and</source>
-        <translation>och</translation>
+        <translation type="obsolete">och</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
@@ -1009,6 +1074,82 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Playback Settings (2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of Artists Tree Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Many</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished">Album</translation>
+    </message>
+    <message>
+        <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change the visualizer when the song changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Album Art at the start of each song</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomize Visualizer order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On changing the visualizer pick a new one at random.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List of visualizations to use during playback. Click the button below to edit this list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit the list of visualizations to use during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
@@ -1019,6 +1160,15 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
         <translation>Är du säker på att du vill avbryta CD-kopieringen?</translation>
+    </message>
+    <message>
+        <source>Cancelled by the user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The encoder failed to create the file.
+Do you have write permissions for the music directory?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1096,6 +1246,16 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <source>Select a Genre</source>
         <translation>Byt titlar</translation>
+    </message>
+    <message>
+        <source>Encoding Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoding failed with the following error:-
+
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1445,6 +1605,45 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <source>Filename:</source>
         <translation>Filnamn:</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationsEditor</name>
+    <message>
+        <source>Visualizations</source>
+        <translation type="unfinished">Visualiseringar</translation>
+    </message>
+    <message>
+        <source>Selected Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished">Flytta upp</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished">Flytta ned</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
     </message>
 </context>
 </TS>

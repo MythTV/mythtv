@@ -136,5 +136,9 @@ Tühiku või enteri vajutamine kustutab valitud kirje nimekirjast.</translation>
         <source>Enter URL</source>
         <translation>Sisesta URL</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

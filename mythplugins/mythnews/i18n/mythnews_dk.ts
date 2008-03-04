@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Sæt opdaterings frekvensen med pil op/ned.     
+        <translation type="obsolete">Sæt opdaterings frekvensen med pil op/ned.     
 Minimum tilladte værdi er 30 minutter.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Tryke MENU for at vende tilbage til menuen.</translation>
+        <translation type="obsolete">Tryke MENU for at vende tilbage til menuen.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ Minimum tilladte værdi er 30 minutter.</translation>
         <translation>Er du sikker på at du vil slette denne site
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

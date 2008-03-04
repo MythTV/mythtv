@@ -651,243 +651,247 @@
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation> не корректно)</translation>
+        <translation type="obsolete"> не корректно)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>   Не настроено местоположение, Пожалуйста прочтите README</translation>
+        <translation type="obsolete">   Не настроено местоположение, Пожалуйста прочтите README</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Настраиваем MythWeather...</translation>
+        <translation type="obsolete">Настраиваем MythWeather...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Используйте стрелку вправо для настройки единиц измерения...</translation>
+        <translation type="obsolete">Используйте стрелку вправо для настройки единиц измерения...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Единицы измерения</translation>
+        <translation type="obsolete">Единицы измерения</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Местоположение</translation>
+        <translation type="obsolete">Местоположение</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Агрессивность</translation>
+        <translation type="obsolete">Агрессивность</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Настройки сохранены...</translation>
+        <translation type="obsolete">Настройки сохранены...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Получаем данные погоды...</translation>
+        <translation type="obsolete">Получаем данные погоды...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Используйте стрелку вправо для выбора своего местоположения...</translation>
+        <translation type="obsolete">Используйте стрелку вправо для выбора своего местоположения...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Используйте стрелку вправо для выбора уровня агрессивности...</translation>
+        <translation type="obsolete">Используйте стрелку вправо для выбора уровня агрессивности...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation> 1  Высокоскоростное соединение</translation>
+        <translation type="obsolete"> 1  Высокоскоростное соединение</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation> 8  Соединение со средней скоростью</translation>
+        <translation type="obsolete"> 8  Соединение со средней скоростью</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation> 15 Низкоскоростное соединение</translation>
+        <translation type="obsolete"> 15 Низкоскоростное соединение</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Получаем начальные данные погоды...</translation>
+        <translation type="obsolete">Получаем начальные данные погоды...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Обновляем данные погоды...</translation>
+        <translation type="obsolete">Обновляем данные погоды...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Безветрено</translation>
+        <translation type="obsolete">Безветрено</translation>
     </message>
     <message>
         <source> at </source>
-        <translation> в </translation>
+        <translation type="obsolete"> в </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>Не ограниченно</translation>
+        <translation type="obsolete">Не ограниченно</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation> (минимальное)</translation>
+        <translation type="obsolete"> (минимальное)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation> (умереное)</translation>
+        <translation type="obsolete"> (умереное)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation> (высокое)</translation>
+        <translation type="obsolete"> (высокое)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation> (чрезмерное)</translation>
+        <translation type="obsolete"> (чрезмерное)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Сегодня максимум </translation>
+        <translation type="obsolete">Сегодня максимум </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation>° и минимум </translation>
+        <translation type="obsolete">° и минимум </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>°. Текущая влажность </translation>
+        <translation type="obsolete">°. Текущая влажность </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% и ветер </translation>
+        <translation type="obsolete">% и ветер </translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation> отсутствует.</translation>
+        <translation type="obsolete"> отсутствует.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> силой </translation>
+        <translation type="obsolete"> силой </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation> миль/ч с </translation>
+        <translation type="obsolete"> миль/ч с </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> км/ч с </translation>
+        <translation type="obsolete"> км/ч с </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> Видимость не ограничена сегодня.</translation>
+        <translation type="obsolete"> Видимость не ограничена сегодня.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> Видимость неизвестна сегодня.</translation>
+        <translation type="obsolete"> Видимость неизвестна сегодня.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Видимость </translation>
+        <translation type="obsolete"> Видимость </translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation> миль.</translation>
+        <translation type="obsolete"> миль.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation> км.</translation>
+        <translation type="obsolete"> км.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Воскресенье</translation>
+        <translation type="obsolete">Воскресенье</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Понедельник</translation>
+        <translation type="obsolete">Понедельник</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Вторник</translation>
+        <translation type="obsolete">Вторник</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Среда</translation>
+        <translation type="obsolete">Среда</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Четверг</translation>
+        <translation type="obsolete">Четверг</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Пятница</translation>
+        <translation type="obsolete">Пятница</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Субота</translation>
+        <translation type="obsolete">Субота</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Ошибка данных</translation>
+        <translation type="obsolete">Ошибка данных</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Завтра ожидается максимум </translation>
+        <translation type="obsolete">Завтра ожидается максимум </translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Ожидаемые условия: </translation>
+        <translation type="obsolete">Ожидаемые условия: </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Данные погоды из: </translation>
+        <translation type="obsolete">Данные погоды из: </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Обновляем...</translation>
+        <translation type="obsolete">Обновляем...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation> (Не вся информация доступна)</translation>
+        <translation type="obsolete"> (Не вся информация доступна)</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** Некорректный код местоположения или ошибка сервера ***</translation>
+        <translation type="obsolete">*** Некорректный код местоположения или ошибка сервера ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>Английские (Фаренгейт, дюйм и т.д)</translation>
+        <translation type="obsolete">Английские (Фаренгейт, дюйм и т.д)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation>Метрические (Цельсий, кПа и т.д.)</translation>
+        <translation type="obsolete">Метрические (Цельсий, кПа и т.д.)</translation>
     </message>
     <message>
         <source> F</source>
-        <translation>°F</translation>
+        <translation type="obsolete">°F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation>°C</translation>
+        <translation type="obsolete">°C</translation>
     </message>
     <message>
         <source>.</source>
-        <translation>.</translation>
+        <translation type="obsolete">.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Неизвестно</translation>
+        <translation type="obsolete">Неизвестно</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation> - ПАУЗА -</translation>
+        <translation type="obsolete"> - ПАУЗА -</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation>MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
+        <translation type="obsolete">MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
 Нажмите &apos;OK&apos; для повторный попытки с большим значением таймаута. Нажмите &apos;Отмена&apos; для попытки снова без анимированной карты.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation>MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
+        <translation type="obsolete">MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
 Нажмите &apos;OK&apos; для повторный попытки с большим значением таймаута. Нажмите &apos;Отмена&apos; для отмены.</translation>
+    </message>
+    <message>
+        <source>No Screens defined; Entering Screen Setup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

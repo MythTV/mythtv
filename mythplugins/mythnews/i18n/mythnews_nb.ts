@@ -59,11 +59,19 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Sett oppdateringshyppigheten ved hjelp av opp/ned-pilene. Minste verdi er 30 minutter.</translation>
+        <translation type="obsolete">Sett oppdateringshyppigheten ved hjelp av opp/ned-pilene. Minste verdi er 30 minutter.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Trykk MENY for å gå tilbake til strømvelgeren.</translation>
+        <translation type="obsolete">Trykk MENY for å gå tilbake til strømvelgeren.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -102,6 +110,10 @@ The minimum allowed value is 30 Minutes.</source>
         <translation>Virkelig slette denne nyhetssiden 
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

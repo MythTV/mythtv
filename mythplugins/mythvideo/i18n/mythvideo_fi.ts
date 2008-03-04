@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name></name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
@@ -27,7 +50,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Ei töitä. Voit painaa &apos;0&apos; aloittaaksesi DVD:n kopioinnin.</translation>
+        <translation type="obsolete">Ei töitä. Voit painaa &apos;0&apos; aloittaaksesi DVD:n kopioinnin.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +58,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Ei töitä. Voit painaa &apos;0&apos; aloittaaksesi levyn kopioinnin.</translation>
+        <translation type="obsolete">Ei töitä. Voit painaa &apos;0&apos; aloittaaksesi levyn kopioinnin.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,11 +66,27 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>0 Uusi Kopiointi</translation>
+        <translation type="obsolete">0 Uusi Kopiointi</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>9 Peruuta Työ</translation>
+        <translation type="obsolete">9 Peruuta Työ</translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Rip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Job</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -100,11 +139,7 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Kansio videoille</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Kansio videoille</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -124,7 +159,7 @@
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation>Ikälukon PIN</translation>
+        <translation type="obsolete">Ikälukon PIN</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -156,7 +191,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">PIN-koodi (Ikäluokitus):</translation>
+        <translation type="obsolete">PIN-koodi (Ikäluokitus):</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -219,15 +254,6 @@
         <translation>Julistetta ei saatu</translation>
     </message>
     <message>
-        <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Aggressive Parental Control</source>
         <translation>Aggressiivinen Ikälukko</translation>
     </message>
@@ -269,11 +295,7 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Säilytä esikatselukuvien kuvasuhde</translation>
-    </message>
-    <message>
-        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Säilytä esikatselukuvien kuvasuhde</translation>
     </message>
     <message>
         <source>Video Gallery</source>
@@ -394,7 +416,7 @@ VCD Toisto-komentoa ei ole määritelty.</translation>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 VCD-asemaa ei ole määritelty.</translation>
     </message>
@@ -402,7 +424,7 @@ VCD-asemaa ei ole määritelty.</translation>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 DVD-asemaa ei ole määritelty.</translation>
     </message>
@@ -690,6 +712,141 @@ Remove it from the database?</source>
     <message>
         <source>minutes</source>
         <translation type="unfinished">minuuttia</translation>
+    </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 4 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 3 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 2 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Tree remembers last selected position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the current position in the Video Tree is persistent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories that hold videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Drive Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let transcode determine frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable automatic Parental Level from rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level %1</source>
+        <translation type="unfinished">Taso %1</translation>
+    </message>
+    <message>
+        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/novideos_info has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Check VideoManager Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetching poster for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: selected/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None defined</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -979,11 +1136,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0 Käsittele Valittu Nimike</translation>
+        <translation type="obsolete">0 Käsittele Valittu Nimike</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0 Käsittele Valitut Nimikkeet</translation>
+        <translation type="obsolete">0 Käsittele Valitut Nimikkeet</translation>
     </message>
     <message>
         <source>ISO Image</source>
@@ -992,6 +1149,10 @@ Remove it from the database?</source>
     <message>
         <source>Unknown</source>
         <translation type="unfinished">Tuntematon</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1028,6 +1189,10 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoDialog</name>
@@ -1049,11 +1214,15 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
         <translation type="obsolete">PIN-koodi (Ikäluokitus):</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1109,16 +1278,20 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Anna IMDB-tunnus Käsin</translation>
+        <translation type="obsolete">Anna IMDB-tunnus Käsin</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation type="obsolete">Peruuta</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -1150,39 +1323,39 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>virhe poistossa</translation>
+        <translation type="obsolete">virhe poistossa</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation>Valitse toiminto:</translation>
+        <translation type="obsolete">Valitse toiminto:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Muokkaa Yksityiskohtia</translation>
+        <translation type="obsolete">Muokkaa Yksityiskohtia</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Etsi IMDB:sta</translation>
+        <translation type="obsolete">Etsi IMDB:sta</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Tyhjää Yksityiskohdat</translation>
+        <translation type="obsolete">Tyhjää Yksityiskohdat</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation>Vaihda Selaustila</translation>
+        <translation type="obsolete">Vaihda Selaustila</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Poista Video</translation>
+        <translation type="obsolete">Poista Video</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Suodata Näkymä</translation>
+        <translation type="obsolete">Suodata Näkymä</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation>Poista tämä tiedosto?</translation>
+        <translation type="obsolete">Poista tämä tiedosto?</translation>
     </message>
 </context>
 <context>
@@ -1232,7 +1405,62 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mythvideo_videomanager::VideoManagerImp</name>
+    <message>
+        <source>Select action:</source>
+        <translation type="unfinished">Valitse toiminto:</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished">Muokkaa Yksityiskohtia</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation type="unfinished">Tyhjää Yksityiskohdat</translation>
+    </message>
+    <message>
+        <source>Toggle Browseable</source>
+        <translation type="unfinished">Vaihda Selaustila</translation>
+    </message>
+    <message>
+        <source>Remove Video</source>
+        <translation type="unfinished">Poista Video</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">Suodata Näkymä</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Delete this file?</source>
+        <translation type="unfinished">Poista tämä tiedosto?</translation>
+    </message>
+    <message>
+        <source>delete failed</source>
+        <translation type="unfinished">virhe poistossa</translation>
     </message>
 </context>
 </TS>

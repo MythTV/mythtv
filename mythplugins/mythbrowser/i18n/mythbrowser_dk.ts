@@ -136,5 +136,9 @@ Tryk Space/enter på en linie valgt for at fjerne den fra listen.</translation>
         <source>Enter URL</source>
         <translation>Indtast URL</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

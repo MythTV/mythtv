@@ -57,12 +57,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press MENU to return to feed selection.</source>
+        <source>Press Escape or Menu to exit.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -99,6 +98,10 @@ The minimum allowed value is 30 Minutes.</source>
         <source>Are you sure you want to delete this news site
 
 %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

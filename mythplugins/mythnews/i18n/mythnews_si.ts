@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Nastavi pogostost posodabljanja z uporabo smernih tipk gor/dol.
+        <translation type="obsolete">Nastavi pogostost posodabljanja z uporabo smernih tipk gor/dol.
 Minimalna dovoljena vrednost je 30 minut.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Pritisni MENU za vrnitev v izbor virov.</translation>
+        <translation type="obsolete">Pritisni MENU za vrnitev v izbor virov.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ Minimalna dovoljena vrednost je 30 minut.</translation>
         <translation>Ali ste prepričani, da želite odstraniti to stran z novicami?
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -10,6 +10,7 @@ trans.files += mythvideo_nl.qm mythvideo_de.qm mythvideo_dk.qm
 trans.files += mythvideo_pt.qm mythvideo_sv.qm mythvideo_ja.qm
 trans.files += mythvideo_fr.qm mythvideo_si.qm mythvideo_nb.qm
 trans.files += mythvideo_fi.qm mythvideo_et.qm mythvideo_ru.qm
+trans.files += mythvideo_cz.qm
 
 INSTALLS += trans
 

@@ -94,7 +94,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Teema ei tue &apos;musiikkipuu&apos; elementtiä. Seuraava ikkuna tulee olemaan tyhjä.</translation>
+        <translation type="obsolete">Teema ei tue &apos;musiikkipuu&apos; elementtiä. Seuraava ikkuna tulee olemaan tyhjä.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation>Teema ei sisällä tukea musiikin tiedoille. Seuraava ikkuna avautuu tyhjänä.</translation>
+        <translation type="obsolete">Teema ei sisällä tukea musiikin tiedoille. Seuraava ikkuna avautuu tyhjänä.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
@@ -151,6 +151,10 @@
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
         <translation>Kokoelman Esittäjä:</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -252,55 +256,55 @@
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Satunnaist: Älykäs</translation>
+        <translation type="obsolete">1 Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Satunnaist: Älykäs</translation>
+        <translation type="obsolete">Satunnaist: Älykäs</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Satunnaist: Joku</translation>
+        <translation type="obsolete">1 Satunnaist: Joku</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Satunnaist: Joku</translation>
+        <translation type="obsolete">Satunnaist: Joku</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Satunnaist: Ei Mitään</translation>
+        <translation type="obsolete">1 Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Satunnaist: Ei Mitään</translation>
+        <translation type="obsolete">Satunnaist: Ei Mitään</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Toista: Kaikki</translation>
+        <translation type="obsolete">2 Toista: Kaikki</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Toista: Kaikki</translation>
+        <translation type="obsolete">Toista: Kaikki</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Toista: Kappale</translation>
+        <translation type="obsolete">2 Toista: Kappale</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Toista: Kappale</translation>
+        <translation type="obsolete">Toista: Kappale</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Toista: -</translation>
+        <translation type="obsolete">2 Toista: -</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Toista: -</translation>
+        <translation type="obsolete">Toista: -</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation>soittolistan juuri</translation>
+        <translation type="obsolete">soittolistan juuri</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -411,15 +415,68 @@
         <translation>Poista Kaksoiskappaleet</translation>
     </message>
     <message>
-        <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Visualization: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exiting Music Player
+Do you want to continue playing in the background?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No - Exit, Stop Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes - Exit, Continue Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Tracks with same Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished">Albumi</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished">Esittäjä</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Kaikki</translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -427,7 +484,7 @@
     <name>QObject</name>
     <message>
         <source>BumpScope</source>
-        <translation>BumpScope</translation>
+        <translation type="obsolete">BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -631,7 +688,7 @@
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation>Valittuna soittoikkunassa näkyy koko musiikkipuu.</translation>
+        <translation type="obsolete">Valittuna soittoikkunassa näkyy koko musiikkipuu.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -651,7 +708,7 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Satunnaistoiston tapa.</translation>
+        <translation type="obsolete">Satunnaistoiston tapa.</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -667,7 +724,7 @@
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation>Vaihtaa visualisoinnin kun kappale vaihtuu.</translation>
+        <translation type="obsolete">Vaihtaa visualisoinnin kun kappale vaihtuu.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -687,35 +744,35 @@
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation>Lista visualisoinneista joita käytetään toistossa. Välilyönti erottaa</translation>
+        <translation type="obsolete">Lista visualisoinneista joita käytetään toistossa. Välilyönti erottaa</translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation>MonoScope</translation>
+        <translation type="obsolete">MonoScope</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation>StereoScope</translation>
+        <translation type="obsolete">StereoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation>Spectrum</translation>
+        <translation type="obsolete">Spectrum</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation>Goom</translation>
+        <translation type="obsolete">Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation>Synaesthesia</translation>
+        <translation type="obsolete">Synaesthesia</translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation>Rattaat</translation>
+        <translation type="obsolete">Rattaat</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation>Tyhjä</translation>
+        <translation type="obsolete">Tyhjä</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -743,7 +800,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Yleiset Asetukset</translation>
+        <translation type="obsolete">Yleiset Asetukset</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -839,7 +896,7 @@
     </message>
     <message>
         <source>and</source>
-        <translation>ja</translation>
+        <translation type="obsolete">ja</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
@@ -1049,6 +1106,82 @@
         <source>Playback Settings (2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of Artists Tree Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Many</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished">Albumi</translation>
+    </message>
+    <message>
+        <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change the visualizer when the song changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Album Art at the start of each song</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomize Visualizer order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On changing the visualizer pick a new one at random.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List of visualizations to use during playback. Click the button below to edit this list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit the list of visualizations to use during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
@@ -1058,6 +1191,15 @@
     </message>
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled by the user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The encoder failed to create the file.
+Do you have write permissions for the music directory?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1195,6 +1337,16 @@ Do you want to remove the existing track?</source>
     <message>
         <source>Select a Genre</source>
         <translation type="unfinished">Valitse Laji</translation>
+    </message>
+    <message>
+        <source>Encoding Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoding failed with the following error:-
+
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1544,6 +1696,45 @@ Do you want to remove the existing track?</source>
     <message>
         <source>Filename:</source>
         <translation>Tiedostonimi:</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizationsEditor</name>
+    <message>
+        <source>Visualizations</source>
+        <translation type="unfinished">Visualisoinnit</translation>
+    </message>
+    <message>
+        <source>Selected Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Visualizations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished">Ylös</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished">Alas</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
     </message>
 </context>
 </TS>

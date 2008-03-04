@@ -651,231 +651,231 @@
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation> est invalide)</translation>
+        <translation type="obsolete"> est invalide)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>  Lieu non précisé. Merci de lire le fichier README</translation>
+        <translation type="obsolete">  Lieu non précisé. Merci de lire le fichier README</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Configuration de MythWeather...</translation>
+        <translation type="obsolete">Configuration de MythWeather...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Utilisez la flèche de droite pour choisir l&apos;unité...</translation>
+        <translation type="obsolete">Utilisez la flèche de droite pour choisir l&apos;unité...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Unités</translation>
+        <translation type="obsolete">Unités</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Lieu</translation>
+        <translation type="obsolete">Lieu</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Type de connexion</translation>
+        <translation type="obsolete">Type de connexion</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Configuration enregistrée...</translation>
+        <translation type="obsolete">Configuration enregistrée...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Acquisition des données météo...</translation>
+        <translation type="obsolete">Acquisition des données météo...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Choix du lieu avec la flèche de droite...</translation>
+        <translation type="obsolete">Choix du lieu avec la flèche de droite...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Choix du type de connexion avec la flèche de droite...</translation>
+        <translation type="obsolete">Choix du type de connexion avec la flèche de droite...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation>1 Connexion Haut Débit</translation>
+        <translation type="obsolete">1 Connexion Haut Débit</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation>8 Connexion Débit Moyen</translation>
+        <translation type="obsolete">8 Connexion Débit Moyen</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation>15 Connexion Bas Débit</translation>
+        <translation type="obsolete">15 Connexion Bas Débit</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Acquisition des données météo...</translation>
+        <translation type="obsolete">Acquisition des données météo...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Mise à jour des données météo...</translation>
+        <translation type="obsolete">Mise à jour des données météo...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Calme </translation>
+        <translation type="obsolete">Calme </translation>
     </message>
     <message>
         <source> at </source>
-        <translation> à </translation>
+        <translation type="obsolete"> à </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>illimité</translation>
+        <translation type="obsolete">illimité</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation> (minimal)</translation>
+        <translation type="obsolete"> (minimal)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation> (modéré)</translation>
+        <translation type="obsolete"> (modéré)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation> (élevé)</translation>
+        <translation type="obsolete"> (élevé)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation> (extrême)</translation>
+        <translation type="obsolete"> (extrême)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Aujourd&apos;hui, les maximales seront de </translation>
+        <translation type="obsolete">Aujourd&apos;hui, les maximales seront de </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> °C et la minimale de </translation>
+        <translation type="obsolete"> °C et la minimale de </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>°C. Le taux d&apos;humidité actuel est de </translation>
+        <translation type="obsolete">°C. Le taux d&apos;humidité actuel est de </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% et le vent </translation>
+        <translation type="obsolete">% et le vent </translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>est calme. </translation>
+        <translation type="obsolete">est calme. </translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> souffle à </translation>
+        <translation type="obsolete"> souffle à </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation>mph de secteur </translation>
+        <translation type="obsolete">mph de secteur </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> km/h de secteur </translation>
+        <translation type="obsolete"> km/h de secteur </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> La visibilité du jour est illimitée.</translation>
+        <translation type="obsolete"> La visibilité du jour est illimitée.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> Les conditions de visibilité sont inconnues.</translation>
+        <translation type="obsolete"> Les conditions de visibilité sont inconnues.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> La visibilité sera de </translation>
+        <translation type="obsolete"> La visibilité sera de </translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation> miles.</translation>
+        <translation type="obsolete"> miles.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation> km.</translation>
+        <translation type="obsolete"> km.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Dimanche</translation>
+        <translation type="obsolete">Dimanche</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Lundi</translation>
+        <translation type="obsolete">Lundi</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Mardi</translation>
+        <translation type="obsolete">Mardi</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Mercredi</translation>
+        <translation type="obsolete">Mercredi</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Jeudi</translation>
+        <translation type="obsolete">Jeudi</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Vendredi</translation>
+        <translation type="obsolete">Vendredi</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Samedi</translation>
+        <translation type="obsolete">Samedi</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Erreur de date</translation>
+        <translation type="obsolete">Erreur de date</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Demain, la maximale sera de </translation>
+        <translation type="obsolete">Demain, la maximale sera de </translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Prévision : </translation>
+        <translation type="obsolete">Prévision : </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Bulletin météo du </translation>
+        <translation type="obsolete">Bulletin météo du </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Mise à jour...</translation>
+        <translation type="obsolete">Mise à jour...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(Certaines informations sont indisponibles)</translation>
+        <translation type="obsolete">(Certaines informations sont indisponibles)</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** Code Inconnu ou Erreur du Serveur ***</translation>
+        <translation type="obsolete">*** Code Inconnu ou Erreur du Serveur ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>Impérial (Fahrenheit, in, etc)</translation>
+        <translation type="obsolete">Impérial (Fahrenheit, in, etc)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation>Métrique (Celsius, kPA, etc)</translation>
+        <translation type="obsolete">Métrique (Celsius, kPA, etc)</translation>
     </message>
     <message>
         <source> F</source>
-        <translation> °F</translation>
+        <translation type="obsolete"> °F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation> °C</translation>
+        <translation type="obsolete"> °C</translation>
     </message>
     <message>
         <source>.</source>
-        <translation>.</translation>
+        <translation type="obsolete">.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Inconnu</translation>
+        <translation type="obsolete">Inconnu</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation>- EN PAUSE -</translation>
+        <translation type="obsolete">- EN PAUSE -</translation>
     </message>
     <message>
         <source>doppler radar</source>
@@ -888,16 +888,20 @@
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation>Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
+        <translation type="obsolete">Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
 Presser OK pour essayer encore avec un délai plus grand. 
 Presser sur Annuler pour réessayer sans les données radar animées.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation>Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
+        <translation type="obsolete">Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
 Presser OK pour essayer encore avec un délai plus grand. 
 Presser sur Annuler pour arrêter.</translation>
+    </message>
+    <message>
+        <source>No Screens defined; Entering Screen Setup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -38,7 +38,7 @@
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Za arhiv morate izbrati vsaj eno datoteko!</translation>
+        <translation type="obsolete">Za arhiv morate izbrati vsaj eno datoteko!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -46,23 +46,35 @@
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Vse arhivske datoteke</translation>
+        <translation type="obsolete">Vse arhivske datoteke</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Peka</translation>
+        <translation type="obsolete">Myth Peka</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Za arhiv nimate nobenih datotek!
+        <translation type="obsolete">Za arhiv nimate nobenih datotek!
 
 Kliknite Vredu </translation>
     </message>
     <message>
         <source>Remove Item</source>
         <translation>Odstrani datoteko</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -89,7 +101,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
-        <translation>Izbrati morate vsaj eno datoteko!</translation>
+        <translation type="obsolete">Izbrati morate vsaj eno datoteko!</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -173,6 +185,22 @@ Kliknite Vredu </translation>
         <source>Exit</source>
         <translation>Izhod</translation>
     </message>
+    <message>
+        <source>Increase Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Progress Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Full Log</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythburnWizard</name>
@@ -194,7 +222,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Za arhiv morate izbrati vsaj eno datoteko!</translation>
+        <translation type="obsolete">Za arhiv morate izbrati vsaj eno datoteko!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -202,17 +230,17 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Vse arhivske datoteke</translation>
+        <translation type="obsolete">Vse arhivske datoteke</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Peka</translation>
+        <translation type="obsolete">Myth Peka</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Za arhiv nimate nobenih datotek!
+        <translation type="obsolete">Za arhiv nimate nobenih datotek!
 
 Kliknite Vredu </translation>
     </message>
@@ -239,6 +267,22 @@ Kliknite Vredu </translation>
     <message>
         <source>Original Size </source>
         <translation>Izvorna velikost </translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -329,11 +373,11 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>png2yuv command</source>
-        <translation>png2yuv ukaz</translation>
+        <translation type="obsolete">png2yuv ukaz</translation>
     </message>
     <message>
         <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation>Ukaz za zagon png2yuv. Del paketa mjpegtools</translation>
+        <translation type="obsolete">Ukaz za zagon png2yuv. Del paketa mjpegtools</translation>
     </message>
     <message>
         <source>spumux command</source>
@@ -407,7 +451,7 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation>Za zmanjšanje količine napak, bo mpeg2 datoteke pretvoril mythtranscode. Lahko pomaga pri odpravljanju nekaterih napak pri zvoku.</translation>
+        <translation type="obsolete">Za zmanjšanje količine napak, bo mpeg2 datoteke pretvoril mythtranscode. Lahko pomaga pri odpravljanju nekaterih napak pri zvoku.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -415,7 +459,7 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation>Namesto, da bi se ustvarile začasne datoteke, bodo skripte uporabile FIFO način za posredovanje rezultatov iz mplex-a v dvdauthor. Prihrani prosti disk med multiplex-ovimi operacijami. Ni prodprto na Windows platformi</translation>
+        <translation type="obsolete">Namesto, da bi se ustvarile začasne datoteke, bodo skripte uporabile FIFO način za posredovanje rezultatov iz mplex-a v dvdauthor. Prihrani prosti disk med multiplex-ovimi operacijami. Ni prodprto na Windows platformi</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -441,6 +485,106 @@ Lahko traja nekaj minut.</translation>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Uvoz arhiva ni bil mogoč.  Med izvajanjem &apos;mytharchivehelper&apos; je prišlo do napake</translation>
     </message>
+    <message>
+        <source>DVD Drive Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use ProjectX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred date format to use on DVD menus.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Encoder Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default encoding profile to use if a file needs re-encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>jpeg2yuv command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>projectx command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Selector</source>
+        <translation type="unfinished">Izbor filma</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -462,11 +606,11 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>Izbrati morate vsaj en posnetek!</translation>
+        <translation type="obsolete">Izbrati morate vsaj en posnetek!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -474,15 +618,25 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Peka</translation>
+        <translation type="obsolete">Myth Peka</translation>
     </message>
     <message>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
-        <translation>Nimate nobenih posnetkov!
+        <translation type="obsolete">Nimate nobenih posnetkov!
 
 Kliknite Vredu</translation>
+    </message>
+    <message>
+        <source>MythArchive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -505,11 +659,11 @@ Kliknite Vredu</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation>Izbrati morate vsaj eno video datoteko!</translation>
+        <translation type="obsolete">Izbrati morate vsaj eno video datoteko!</translation>
     </message>
     <message>
         <source>All Videos</source>

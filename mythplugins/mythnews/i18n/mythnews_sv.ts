@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Ställ in uppdateringsfrekvensen med knapparna upp och ner.
+        <translation type="obsolete">Ställ in uppdateringsfrekvensen med knapparna upp och ner.
 Minsta tillåtna värdet är 30 minuter.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Tryck på MENY för att återvända till val av nyhetskällor.</translation>
+        <translation type="obsolete">Tryck på MENY för att återvända till val av nyhetskällor.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

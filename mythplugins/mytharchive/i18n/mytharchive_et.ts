@@ -38,7 +38,7 @@
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
+        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -46,23 +46,35 @@
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Kõik arhiivielemendid</translation>
+        <translation type="obsolete">Kõik arhiivielemendid</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth kirjutaja</translation>
+        <translation type="obsolete">Myth kirjutaja</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Sa pole midagi arhiveerimiseks valinud!
+        <translation type="obsolete">Sa pole midagi arhiveerimiseks valinud!
 
 Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>Remove Item</source>
         <translation>Eemalda element</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -89,7 +101,7 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
-        <translation>Arhiveerimiseks tuleb valida vähemalt üks fail!</translation>
+        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks fail!</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -173,6 +185,22 @@ Vajuta &quot;Valmis&quot;</translation>
         <source>Exit</source>
         <translation>Välju</translation>
     </message>
+    <message>
+        <source>Increase Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Progress Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Full Log</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythburnWizard</name>
@@ -210,7 +238,7 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
+        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -218,17 +246,17 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Kõik arhiivielemendid</translation>
+        <translation type="obsolete">Kõik arhiivielemendid</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth kirjutaja</translation>
+        <translation type="obsolete">Myth kirjutaja</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Sa pole midagi arhiveerimiseks valinud!
+        <translation type="obsolete">Sa pole midagi arhiveerimiseks valinud!
 
 Vajuta &quot;Valmis&quot;</translation>
     </message>
@@ -239,6 +267,22 @@ Vajuta &quot;Valmis&quot;</translation>
     <message>
         <source>Remove Item</source>
         <translation>Eemalda element</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -305,7 +349,7 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation>Määramisel lastakse MPEG2 failid võimalike vigade parandamiseks alati läbi mythtranscode. See aitab parandada mõningaid heliga seotud probleeme.</translation>
+        <translation type="obsolete">Määramisel lastakse MPEG2 failid võimalike vigade parandamiseks alati läbi mythtranscode. See aitab parandada mõningaid heliga seotud probleeme.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -313,7 +357,7 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation>Skript kasutab mplex-i väljundi dvdauthor-i sisendisse suunaiseks ajutiste failide asemel FIFO puhvreid. See säästab aega ning kettamahtu kuid pole Windowsis kasutatav</translation>
+        <translation type="obsolete">Skript kasutab mplex-i väljundi dvdauthor-i sisendisse suunaiseks ajutiste failide asemel FIFO puhvreid. See säästab aega ning kettamahtu kuid pole Windowsis kasutatav</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -381,11 +425,11 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>png2yuv command</source>
-        <translation>png2yuv käsk</translation>
+        <translation type="obsolete">png2yuv käsk</translation>
     </message>
     <message>
         <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation>Käsk png2yuv-i käivitamiseks (mjpegtools pakist)</translation>
+        <translation type="obsolete">Käsk png2yuv-i käivitamiseks (mjpegtools pakist)</translation>
     </message>
     <message>
         <source>spumux command</source>
@@ -465,6 +509,82 @@ Selleks võib kuluda mõni minut.</translation>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>DVD menüüdes kasutatav ajaformaat. Valida on 12-tunnise AM/PM ja 24-tunnise formaadi vahel.</translation>
     </message>
+    <message>
+        <source>DVD Drive Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use ProjectX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Encoder Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default encoding profile to use if a file needs re-encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>jpeg2yuv command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>projectx command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Selector</source>
+        <translation type="unfinished">Videovalija</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -486,11 +606,11 @@ Selleks võib kuluda mõni minut.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth arhiveerija</translation>
+        <translation type="obsolete">Myth arhiveerija</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>Sa pead valima vähemalt ühe salvestise!</translation>
+        <translation type="obsolete">Sa pead valima vähemalt ühe salvestise!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -498,14 +618,24 @@ Selleks võib kuluda mõni minut.</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth kirjutaja</translation>
+        <translation type="obsolete">Myth kirjutaja</translation>
     </message>
     <message>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
-        <translation>Sul pole ühtegi salvestist!
+        <translation type="obsolete">Sul pole ühtegi salvestist!
 Vali &quot;Valmis&quot;</translation>
+    </message>
+    <message>
+        <source>MythArchive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -528,11 +658,11 @@ Vali &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth arhiveerija</translation>
+        <translation type="obsolete">Myth arhiveerija</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation>Sa pead valima vähemalt ühe videofaili!</translation>
+        <translation type="obsolete">Sa pead valima vähemalt ühe videofaili!</translation>
     </message>
     <message>
         <source>All Videos</source>

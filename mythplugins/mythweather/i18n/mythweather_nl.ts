@@ -651,244 +651,206 @@
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation> is ongeldig)</translation>
+        <translation type="obsolete"> is ongeldig)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>   Locatie niet ingesteld, lees de README</translation>
+        <translation type="obsolete">   Locatie niet ingesteld, lees de README</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Bezig configureren MythWeather...</translation>
+        <translation type="obsolete">Bezig configureren MythWeather...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Gebruik de rechterpijl om uw conversie-eenheid te kiezen</translation>
+        <translation type="obsolete">Gebruik de rechterpijl om uw conversie-eenheid te kiezen</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Eenheden</translation>
+        <translation type="obsolete">Eenheden</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Locatie</translation>
+        <translation type="obsolete">Locatie</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Aggressiviteit</translation>
+        <translation type="obsolete">Aggressiviteit</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Configuratie opgeslaan...</translation>
+        <translation type="obsolete">Configuratie opgeslaan...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Bezig ophalen weerbericht...</translation>
+        <translation type="obsolete">Bezig ophalen weerbericht...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Locatie kiezen met de rechterpijl...</translation>
+        <translation type="obsolete">Locatie kiezen met de rechterpijl...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Agressiviteit kiezen met de rechterpijl...</translation>
+        <translation type="obsolete">Agressiviteit kiezen met de rechterpijl...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation> 1  Hoge snelheid verbinding</translation>
+        <translation type="obsolete"> 1  Hoge snelheid verbinding</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation> 8  Gemiddelde snelheid verbinding</translation>
+        <translation type="obsolete"> 8  Gemiddelde snelheid verbinding</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation> 15 Lage snelheid verbinding</translation>
+        <translation type="obsolete"> 15 Lage snelheid verbinding</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Eerste weerbericht ophalen...</translation>
+        <translation type="obsolete">Eerste weerbericht ophalen...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Weerbericht bijwerken...</translation>
+        <translation type="obsolete">Weerbericht bijwerken...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Kalm</translation>
+        <translation type="obsolete">Kalm</translation>
     </message>
     <message>
         <source> at </source>
-        <translation> aan </translation>
+        <translation type="obsolete"> aan </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>Ongelimiteerd</translation>
+        <translation type="obsolete">Ongelimiteerd</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation> (minimaal)</translation>
+        <translation type="obsolete"> (minimaal)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation> (gematigd)</translation>
+        <translation type="obsolete"> (gematigd)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation> (hoog)</translation>
+        <translation type="obsolete"> (hoog)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation> (extreem)</translation>
+        <translation type="obsolete"> (extreem)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Vandaag maximaal </translation>
+        <translation type="obsolete">Vandaag maximaal </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> en minimaal </translation>
+        <translation type="obsolete"> en minimaal </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. De vochtigheid bedraagt </translation>
+        <translation type="obsolete">. De vochtigheid bedraagt </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% en de wind</translation>
+        <translation type="obsolete">% en de wind</translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>kalm.</translation>
+        <translation type="obsolete">kalm.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> komt aan </translation>
+        <translation type="obsolete"> komt aan </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation> mph uit het </translation>
+        <translation type="obsolete"> mph uit het </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> km/h uit het </translation>
+        <translation type="obsolete"> km/h uit het </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> De zichtbaarheid is vandaag ongelimiteerd. </translation>
+        <translation type="obsolete"> De zichtbaarheid is vandaag ongelimiteerd. </translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> De zichtbaarheid is niet gekend.</translation>
+        <translation type="obsolete"> De zichtbaarheid is niet gekend.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> De zichtbaarheid bedraagt </translation>
+        <translation type="obsolete"> De zichtbaarheid bedraagt </translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation> mijl.</translation>
+        <translation type="obsolete"> mijl.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation> km.</translation>
+        <translation type="obsolete"> km.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Zondag</translation>
+        <translation type="obsolete">Zondag</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Maandag</translation>
+        <translation type="obsolete">Maandag</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Dinsdag</translation>
+        <translation type="obsolete">Dinsdag</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Woensdag</translation>
+        <translation type="obsolete">Woensdag</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Donderdag</translation>
+        <translation type="obsolete">Donderdag</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Vrijdag</translation>
+        <translation type="obsolete">Vrijdag</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Zaterdag</translation>
+        <translation type="obsolete">Zaterdag</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Fout in datum</translation>
+        <translation type="obsolete">Fout in datum</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Morgen is het maximaal </translation>
+        <translation type="obsolete">Morgen is het maximaal </translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Verwachtingen: </translation>
+        <translation type="obsolete">Verwachtingen: </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Voorspelling van: </translation>
+        <translation type="obsolete">Voorspelling van: </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Bezig Bijwerken...</translation>
+        <translation type="obsolete">Bezig Bijwerken...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(Niet alle informatie is beschikbaar)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">(Niet alle informatie is beschikbaar)</translation>
     </message>
     <message>
         <source>doppler radar</source>
         <translation type="obsolete">Doppler Radar</translation>
     </message>
     <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
+        <source>No Screens defined; Entering Screen Setup.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

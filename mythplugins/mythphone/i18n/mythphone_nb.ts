@@ -301,6 +301,22 @@
         <source>Dial</source>
         <translation>Ring</translation>
     </message>
+    <message>
+        <source>Loopback Audio and video at ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Socket on this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NAT Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -374,7 +390,7 @@
     </message>
     <message>
         <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
-        <translation>Tiden i sekunder det skal ringe før samtalen svares automatisk og settes over til et VXML-skript.</translation>
+        <translation type="obsolete">Tiden i sekunder det skal ringe før samtalen svares automatisk og settes over til et VXML-skript.</translation>
     </message>
     <message>
         <source>Default VXML URL</source>
@@ -559,6 +575,10 @@
     <message>
         <source>VXML Settings</source>
         <translation>VXML-innstillinger</translation>
+    </message>
+    <message>
+        <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.  Set to 0 to disable this feature.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

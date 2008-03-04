@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name></name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
@@ -27,7 +50,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Ni opravil in ni kaj drugega za naredit. Lahko pritisnete 0 za začetek ripanja DVD-ja.</translation>
+        <translation type="obsolete">Ni opravil in ni kaj drugega za naredit. Lahko pritisnete 0 za začetek ripanja DVD-ja.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +58,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Ni opravil in ni kaj drugega za naredit. Če želite, lahko za začetek ripanja pritisnete 0.</translation>
+        <translation type="obsolete">Ni opravil in ni kaj drugega za naredit. Če želite, lahko za začetek ripanja pritisnete 0.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,11 +66,27 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>0 Nov Rip</translation>
+        <translation type="obsolete">0 Nov Rip</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>9 Prekliči opravilo</translation>
+        <translation type="obsolete">9 Prekliči opravilo</translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Rip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Job</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -136,11 +175,11 @@
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation>PIN</translation>
+        <translation type="obsolete">PIN</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation>Ta PIN je uporabljen za kontrolo osnovnega nivoja. Če želite uporabljati to funkcijo, potem za PIN uporabite številke.</translation>
+        <translation type="obsolete">Ta PIN je uporabljen za kontrolo osnovnega nivoja. Če želite uporabljati to funkcijo, potem za PIN uporabite številke.</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
@@ -192,11 +231,11 @@
     </message>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Mapa v kateri so shranjeni filmi</translation>
+        <translation type="obsolete">Mapa v kateri so shranjeni filmi</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Mapa mora obstajati in uporabnik potrebuje samo bralne pravice.</translation>
+        <translation type="obsolete">Mapa mora obstajati in uporabnik potrebuje samo bralne pravice.</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
@@ -232,11 +271,11 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Obdrži originalno velikost sličic</translation>
+        <translation type="obsolete">Obdrži originalno velikost sličic</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation>Sličice bodo obdržale originalno velikost. Drugače pa se bo njihova velikost prilagodila ikonam ozadja.</translation>
+        <translation type="obsolete">Sličice bodo obdržale originalno velikost. Drugače pa se bo njihova velikost prilagodila ikonam ozadja.</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -252,7 +291,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>PIN:</translation>
+        <translation type="obsolete">PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -277,7 +316,7 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation>Ovitek filma obstaja, vendar ga Myth ni uspel pridobiti v sprejemljivem času.
+        <translation type="obsolete">Ovitek filma obstaja, vendar ga Myth ni uspel pridobiti v sprejemljivem času.
 </translation>
     </message>
     <message>
@@ -388,7 +427,7 @@ Nimate definiranega ukaza za VCD predvajalnik.</translation>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 Nimate definirane VCD naprave.</translation>
     </message>
@@ -404,7 +443,7 @@ Nimate definiranega ukaza DVD predvajalnika.</translation>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 Nimate definirane DVD naprave.</translation>
     </message>
@@ -702,6 +741,141 @@ Ali jo odstranim iz baze?</translation>
         <source>minutes</source>
         <translation>minut</translation>
     </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 4 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 3 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 2 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Tree remembers last selected position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the current position in the Video Tree is persistent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories that hold videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Drive Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let transcode determine frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable automatic Parental Level from rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level %1</source>
+        <translation type="unfinished">Nivo %1</translation>
+    </message>
+    <message>
+        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/novideos_info has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Check VideoManager Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetching poster for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: selected/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None defined</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -990,11 +1164,11 @@ Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0  Procesiraj izbrani naslov </translation>
+        <translation type="obsolete">0  Procesiraj izbrani naslov </translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0  Procesiraj izbrane naslove</translation>
+        <translation type="obsolete">0  Procesiraj izbrane naslove</translation>
     </message>
     <message>
         <source>ISO Image</source>
@@ -1003,6 +1177,10 @@ Ali jo odstranim iz baze?</translation>
     <message>
         <source>Unknown</source>
         <translation>Neznan</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1039,6 +1217,10 @@ Ali jo odstranim iz baze?</translation>
         <source>minutes</source>
         <translation type="obsolete">minute</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoDialog</name>
@@ -1060,11 +1242,15 @@ Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Vredu</translation>
+        <translation type="obsolete">Vredu</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
         <translation type="obsolete">Originalni PIN:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1116,6 +1302,10 @@ Ali jo odstranim iz baze?</translation>
         <source>Cancel</source>
         <translation>Prekliči</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
@@ -1133,39 +1323,39 @@ Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation>Izberite dejanje:</translation>
+        <translation type="obsolete">Izberite dejanje:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Uredi Meta podatke</translation>
+        <translation type="obsolete">Uredi Meta podatke</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Išči IMDB</translation>
+        <translation type="obsolete">Išči IMDB</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Ročno vnesi IMDB #</translation>
+        <translation type="obsolete">Ročno vnesi IMDB #</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Ponastavi Meta podatke</translation>
+        <translation type="obsolete">Ponastavi Meta podatke</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation>Zakleni dostopnost</translation>
+        <translation type="obsolete">Zakleni dostopnost</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Odstrani video</translation>
+        <translation type="obsolete">Odstrani video</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Zaslonski filtri</translation>
+        <translation type="obsolete">Zaslonski filtri</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="obsolete">Prekliči</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -1185,11 +1375,11 @@ Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation>Izbrišem to datoteko?</translation>
+        <translation type="obsolete">Izbrišem to datoteko?</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>brisanje je spodletelo</translation>
+        <translation type="obsolete">brisanje je spodletelo</translation>
     </message>
 </context>
 <context>
@@ -1239,7 +1429,62 @@ Ali jo odstranim iz baze?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Vredu</translation>
+        <translation type="obsolete">Vredu</translation>
+    </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mythvideo_videomanager::VideoManagerImp</name>
+    <message>
+        <source>Select action:</source>
+        <translation type="unfinished">Izberite dejanje:</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished">Uredi Meta podatke</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation type="unfinished">Ponastavi Meta podatke</translation>
+    </message>
+    <message>
+        <source>Toggle Browseable</source>
+        <translation type="unfinished">Zakleni dostopnost</translation>
+    </message>
+    <message>
+        <source>Remove Video</source>
+        <translation type="unfinished">Odstrani video</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">Zaslonski filtri</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Delete this file?</source>
+        <translation type="unfinished">Izbrišem to datoteko?</translation>
+    </message>
+    <message>
+        <source>delete failed</source>
+        <translation type="unfinished">brisanje je spodletelo</translation>
     </message>
 </context>
 </TS>

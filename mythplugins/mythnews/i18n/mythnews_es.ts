@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Ajuste la frecuencia de actualización usando las flechas arriba/abajo.
+        <translation type="obsolete">Ajuste la frecuencia de actualización usando las flechas arriba/abajo.
 El valor mínimo permitido es de 30 minutos.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Pulse MENU para volver a la selección de feeds.</translation>
+        <translation type="obsolete">Pulse MENU para volver a la selección de feeds.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ El valor mínimo permitido es de 30 minutos.</translation>
         <translation>¿Seguro que quiere borrar esta fuente de noticias?
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

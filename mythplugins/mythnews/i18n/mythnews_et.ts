@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Muuda uuendussagedust üles-alla nooltega.
+        <translation type="obsolete">Muuda uuendussagedust üles-alla nooltega.
 Vähim lubatud väärtus on 30 minutit.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Kanalite juurde naasmiseks vali MENÜÜ.</translation>
+        <translation type="obsolete">Kanalite juurde naasmiseks vali MENÜÜ.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ Vähim lubatud väärtus on 30 minutit.</translation>
         <translation>Oled sa kindel, et soovid kustutada selle uudistesaidi
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

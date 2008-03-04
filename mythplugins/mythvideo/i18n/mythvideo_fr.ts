@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name></name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
@@ -116,11 +139,11 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Répertoire contenant des vidéos</translation>
+        <translation type="obsolete">Répertoire contenant des vidéos</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Ce répertoire doit exister et l&apos;utilisateur de MythVideo doit avoir la permission en lecture sur ce répertoire.</translation>
+        <translation type="obsolete">Ce répertoire doit exister et l&apos;utilisateur de MythVideo doit avoir la permission en lecture sur ce répertoire.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -241,7 +264,7 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation>Il existe une affiche pour cette vidéo, mais Myth n&apos;a pu la télécharger en un temps raisonnable.</translation>
+        <translation type="obsolete">Il existe une affiche pour cette vidéo, mais Myth n&apos;a pu la télécharger en un temps raisonnable.</translation>
     </message>
     <message>
         <source>Default View</source>
@@ -285,11 +308,11 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Maintienir les proportions des miniatures</translation>
+        <translation type="obsolete">Maintienir les proportions des miniatures</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation>Si forcé, l&apos;échelle des miniatures est maintenue avec le ratio d&apos;origine. Sinon, l&apos;échelle est redimensionnée avec d&apos;obtenir la taille de l&apos;icône d&apos;arrière plan du thème.</translation>
+        <translation type="obsolete">Si forcé, l&apos;échelle des miniatures est maintenue avec le ratio d&apos;origine. Sinon, l&apos;échelle est redimensionnée avec d&apos;obtenir la taille de l&apos;icône d&apos;arrière plan du thème.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
@@ -785,6 +808,73 @@ Désirez-vous le retirer de la base de données?</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Directories that hold videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable automatic Parental Level from rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level %1</source>
+        <translation type="unfinished">Niveau %1</translation>
+    </message>
+    <message>
+        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/novideos_info has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Check VideoManager Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetching poster for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: selected/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None defined</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -1126,6 +1216,10 @@ Désirez-vous le retirer de la base de données?</translation>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoDialog</name>
@@ -1210,6 +1304,10 @@ Désirez-vous le retirer de la base de données?</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1336,6 +1434,10 @@ Désirez-vous le retirer de la base de données?</translation>
         <source>Ok</source>
         <translation type="obsolete">Ok</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>mythvideo_videomanager::VideoManagerImp</name>
@@ -1382,6 +1484,10 @@ Désirez-vous le retirer de la base de données?</translation>
     <message>
         <source>delete failed</source>
         <translation>Impossible d&apos;effacer</translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

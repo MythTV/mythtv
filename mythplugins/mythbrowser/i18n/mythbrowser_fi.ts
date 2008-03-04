@@ -160,5 +160,9 @@ SPACE/Enter valitulla osoitteella poistaa sen.</translation>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
