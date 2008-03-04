@@ -236,7 +236,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       decoder_lock(true),
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
-      frame_interval(30),           ffrew_skip(1),
+      frame_interval((int)(1000000.0f / 30)), ffrew_skip(1),
       // Audio and video synchronization stuff
       videosync(NULL),              delay(0),
       vsynctol(30/4),               avsync_delay(0),
@@ -1188,7 +1188,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
   
 
     if (ringBuffer->isDVD())
-        ringBuffer->DVD()->JumpToTitle(false);
+        ringBuffer->DVD()->JumpToTitle(true);
 
     bookmarkseek = GetBookmark();
 
@@ -1407,7 +1407,7 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
 {
     bool stopFFREW = false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
         GetDecoder()->UpdateDVDFramesPlayed();
 
     if (ffrew_skip > 0)
@@ -2964,7 +2964,7 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
         GetDecoder()->UpdateDVDFramesPlayed();
 
     if (fftime <= 0)
@@ -2981,7 +2981,7 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->isDVD() && GetDecoder())
        GetDecoder()->UpdateDVDFramesPlayed();
 
     if (rewindtime <= 0)
@@ -7123,10 +7123,11 @@ long long NuppelVideoPlayer::GetDVDBookmark(void) const
                 int subtitletrack = atoi((*++it).ascii());
                 ringBuffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
                 ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
+                ringBuffer->DVD()->JumpToTitle(false);
             }
-            ringBuffer->DVD()->JumpToTitle(true);
         }
     }
+    
     return frames;
 }
 

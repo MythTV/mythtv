@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-02-19, v0.21.00pre
+<date>2008-02-25, v0.21.00pre
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1331,17 +1331,28 @@ instructions to obtain the latest version of MythTV:
 
 <tscreen><verb>
 $ mkdir mythtv
-$ cd mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/mythplugins
-$ svn co http://svn.mythtv.org/svn/trunk/myththemes
+$ svn co http://svn.mythtv.org/svn/trunk/ mythtv
 $ cd mythtv
 </verb></tscreen>
 
+To use a release version, you can execute:
+<tscreen><verb>
+$ mkdir mythtv-release-0.21
+$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
+$ cd mythtv-release-0.21
+</verb></tscreen>
+
+<bf>NOTE</bf>:  Using a svn version of the code allows you to stay
+up-to-date with changes.  So, if there's an update to the 0.21 release and
+you originally obtained it using svn, you could enter the
+mythtv-release-0.21 directory and type "svn up", which will update your copy
+with the fixed version from the website.  You would then recompile and
+install the updated 0.21 code.
+
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.20.2.tar.bz2
-$ cd mythtv-0.20.2
+$ tar -xjf mythtv-0.21.tar.bz2
+$ cd mythtv-0.21
 $ ./configure
 </verb></tscreen>
 
@@ -1349,18 +1360,6 @@ If you wish to change options, run <bf>./configure --help</bf> to
 see what is available and to override and automatically detected options. 
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
-
-If you're going to use the various perl scripts that are in the contrib
-directory, make sure you add <tt>--with-bindings=perl</tt> to the
-<bf>configure</bf> command.
-
-<figure loc="here">
-<eps file="add.eps" height="1cm">
-<img src="add.png">
-<caption>
-This is now the default in MythTV 0.21.
-</caption>
-</figure>
 
 To compile:
 <tscreen><verb>
@@ -7863,9 +7862,12 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.21.00, 2008-02-13.  Start prepping for 0.21.  Add a tip for using a
+v0.21.00, 2008-02-25.  Start prepping for 0.21.  Add a tip for using a
 subdirectory as the target of a storage group in case of mount failure to
-prevent root partition fillup.
+prevent root partition fillup.  Update SVN download instructions to grab the
+entire tree, so that you don't end up with versions of code / themes that
+are incompatible.
+
 
 -->
 

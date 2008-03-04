@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2008-02-19, v0.21.00pre
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2008-02-25, v0.21.00pre
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1635,19 +1635,31 @@ instructions to obtain the latest version of MythTV:</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mkdir mythtv
-$ cd mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/mythplugins
-$ svn co http://svn.mythtv.org/svn/trunk/myththemes
+$ svn co http://svn.mythtv.org/svn/trunk/ mythtv
 $ cd mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>To use a release version, you can execute:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir mythtv-release-0.21
+$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
+$ cd mythtv-release-0.21
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  Using a svn version of the code allows you to stay
+up-to-date with changes.  So, if there's an update to the 0.21 release and
+you originally obtained it using svn, you could enter the
+mythtv-release-0.21 directory and type "svn up", which will update your copy
+with the fixed version from the website.  You would then recompile and
+install the updated 0.21 code.</P>
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.20.2.tar.bz2
-$ cd mythtv-0.20.2
+$ tar -xjf mythtv-0.21.tar.bz2
+$ cd mythtv-0.21
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1656,16 +1668,6 @@ $ ./configure
 see what is available and to override and automatically detected options. 
 See the <CODE>config.log</CODE> file after running <B>configure</B> to see
 previous runs.</P>
-<P>If you're going to use the various perl scripts that are in the contrib
-directory, make sure you add <CODE>--with-bindings=perl</CODE> to the
-<B>configure</B> command.</P>
-<P>
-<FIGURE>
-<EPS FILE="add.eps">
-<IMG SRC="add.png">
-<CAPTION>This is now the default in MythTV 0.21.</CAPTION>
-</FIGURE>
-</P>
 <P>To compile:
 <BLOCKQUOTE><CODE>
 <PRE>

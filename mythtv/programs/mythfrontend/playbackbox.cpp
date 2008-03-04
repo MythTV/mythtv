@@ -1686,6 +1686,7 @@ void PlaybackBox::pageTop()
         paintSkipUpdate = false;
         update(drawListBounds);
         update(drawInfoBounds);
+        update(blackholeBounds);
     }
 }
 
@@ -1702,7 +1703,7 @@ void PlaybackBox::pageMiddle()
     }
     else 
     {
-        int progCount = progLists[titleList[titleIndex]].count();
+        int progCount = progLists[titleList[titleIndex].lower()].count();
 
         if (progCount > 0)
         {
@@ -1711,6 +1712,7 @@ void PlaybackBox::pageMiddle()
             paintSkipUpdate = false;
             update(drawListBounds);
             update(drawInfoBounds);
+            update(blackholeBounds);
         }
     }
 }
@@ -1721,11 +1723,12 @@ void PlaybackBox::pageBottom()
         pageTop();
     else 
     {
-        progIndex = progLists[titleList[titleIndex]].count() - 1;
+        progIndex = progLists[titleList[titleIndex].lower()].count() - 1;
 
         paintSkipUpdate = false;
         update(drawListBounds);
         update(drawInfoBounds);
+        update(blackholeBounds);
     }
 }
 
@@ -2470,7 +2473,10 @@ void PlaybackBox::playSelected()
         return;
 
     if (m_player && m_player->IsSameProgram(curitem))
+    {
         exitWin();
+        return;
+    }
 
     if ((curitem->availableStatus == asAvailable) ||
         (curitem->availableStatus == asNotYetAvailable))
@@ -3425,8 +3431,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     popup->ShowPopup(this, SLOT(PopupDone(int)));
 
-    if (playButton)
-        playButton->setFocus();
+    if (!m_player || !m_player->IsSameProgram(curitem))
+    {
+        if (playButton)
+            playButton->setFocus();
+    }
 
     expectingPopup = true;
 }

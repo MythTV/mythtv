@@ -1377,7 +1377,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 /**
  * \addingroup myth_network_protocol
  * \par        QUERY_RECORDING BASENAME \e basename
- * \par        QUERY_RECORDING TIMESLOT \e time1 \e time2
+ * \par        QUERY_RECORDING TIMESLOT \e chanid \e starttime
  */
 void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
 {

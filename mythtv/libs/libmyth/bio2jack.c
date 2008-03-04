@@ -1218,6 +1218,8 @@ long JACK_Write(int deviceID, unsigned char *data, unsigned long bytes)
   if (!newWaveHeader)
   {
     ERR("error allocating memory for newWaveHeader\n");
+    releaseDriver(drv);
+    return 0;
   }
 
   newWaveHeader->pData = (unsigned char*)malloc(sizeof(unsigned char) * bytes); /* allocate memory for the data */

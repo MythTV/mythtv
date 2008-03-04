@@ -3025,6 +3025,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
+                    ScanStreams(true);
                 }
                 else
                     storevideoframes = true;
@@ -3035,18 +3036,29 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 int numVidFrames = 0;
                 if (GetNVP() && GetNVP()->getVideoOutput())
                     numVidFrames = GetNVP()->getVideoOutput()->ValidVideoFrames();
-             
-                if (numVidFrames == 0 && lastDVDStillFrame &&
-                    ringBuffer->DVD()->InStillFrame())
+                bool inDVDStill = ringBuffer->DVD()->InStillFrame();
+
+                if (decodeStillFrame && !inDVDStill)
                 {
-                    VERBOSE(VB_PLAYBACK, LOC + "DVD: in still frame but "
-                        "there is no picture. Using last stored still frame");
-                    storedPackets.append(lastDVDStillFrame);
-                    ringBuffer->DVD()->SeekCellStart();
-                    lastDVDStillFrame = NULL;
-                    decodeStillFrame = true;
+                    decodeStillFrame = false;
                 }
-                else
+
+                if (numVidFrames == 0 && inDVDStill)
+                {
+                    if (lastDVDStillFrame)
+                    {
+                        VERBOSE(VB_PLAYBACK, LOC + "DVD: in still frame but "
+                                "there is no picture. Using last stored still "
+                                "frame");
+                        storedPackets.append(lastDVDStillFrame);
+                        ringBuffer->DVD()->SeekCellStart();
+                        lastDVDStillFrame = NULL;
+                        decodeStillFrame = true;
+                    }
+                    else
+                        ringBuffer->DVD()->SeekCellStart();
+                }
+                else    
                 {   
                     if (storedPackets.count() < 2 && !decodeStillFrame)
                         storevideoframes = true;
@@ -3061,7 +3073,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     m_positionMap.clear();
                     SyncPositionMap();
                     VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
-                    ScanStreams(true);
                     lastdvdtitle = dvdtitle;
                     if (lastdvdtitle != -1 )
                         dvdTitleChanged = true;

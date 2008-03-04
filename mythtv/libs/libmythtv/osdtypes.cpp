@@ -707,14 +707,47 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_linespacing(1.5f),
 
     m_draw_info_str(""),
-    m_draw_info_len(0)
+    m_draw_info_len(0),
+
+    codeci(NULL)
 {
 }
 
 OSDTypeText::OSDTypeText(const OSDTypeText &other) :
     OSDType(other.m_name),
+
+    m_displaysize(QRect(0,0,0,0)),
+    m_screensize(QRect(0,0,0,0)),
+    m_unbiasedsize(QRect(0,0,0,0)),
+    m_message(QString::null),
+    m_default_msg(QString::null),
+
+    m_font(NULL),
+    m_altfont(NULL),
+
+    m_centered(false),
+    m_right(false),
+
+    m_multiline(false),
+    m_usingalt(false),
+
+    m_selected(false),
+    m_button(false),
+    m_entrynum(-1),
+    m_cursorpos(0),
+
+    m_scroller(false),
+    m_scrollx(0),
+    m_scrolly(0),
+
+    m_scrollinit(false),
+
+    m_linespacing(1.5f),
+
     m_draw_info_str(""),
-    m_draw_info_len(0)
+    m_draw_info_len(0),
+
+    codeci(NULL)
 {
     QMutexLocker locker(&other.m_lock);
 

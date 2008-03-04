@@ -12,29 +12,59 @@ const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
-VideoOutputNull::VideoOutputNull(void)
-               : VideoOutput()
+VideoOutputNull::VideoOutputNull(void) :
+    VideoOutput(), global_lock(true)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputNull()");
-    XJ_started = 0; 
-
-    pauseFrame.buf = NULL;
+    memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 }
 
 VideoOutputNull::~VideoOutputNull()
 {
     VERBOSE(VB_PLAYBACK, "~VideoOutputNull()");
-    if (pauseFrame.buf)
-        delete [] pauseFrame.buf;
+    QMutexLocker locker(&global_lock);
 
-    Exit();
+    vbuffers.LockFrame(&av_pause_frame, "DeletePauseFrame");
+    if (av_pause_frame.buf)
+    {
+        delete [] av_pause_frame.buf;
+        memset(&av_pause_frame, 0, sizeof(av_pause_frame));
+    }
+    vbuffers.UnlockFrame(&av_pause_frame, "DeletePauseFrame");
+
+    vbuffers.DeleteBuffers();
 }
 
 // this is documented in videooutbase.cpp
 void VideoOutputNull::Zoom(ZoomDirection direction)
 {
+    QMutexLocker locker(&global_lock);
     VideoOutput::Zoom(direction);
     MoveResize();
+}
+
+void VideoOutputNull::CreatePauseFrame(void)
+{
+    vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
+
+    if (av_pause_frame.buf)
+    {
+        delete [] av_pause_frame.buf;
+        av_pause_frame.buf = NULL;
+    }
+
+    init(&av_pause_frame, FMT_YV12,
+         new unsigned char[vbuffers.GetScratchFrame()->size + 128],
+         vbuffers.GetScratchFrame()->width,
+         vbuffers.GetScratchFrame()->height,
+         vbuffers.GetScratchFrame()->bpp,
+         vbuffers.GetScratchFrame()->size);
+
+    av_pause_frame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+
+    clear(&av_pause_frame, GUID_I420_PLANAR);
+
+    vbuffers.UnlockFrame(&av_pause_frame, "CreatePauseFrame");
 }
 
 bool VideoOutputNull::InputChanged(const QSize &input_size,
@@ -47,17 +77,21 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
+    QMutexLocker locker(&global_lock);
+
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
     if (input_size.width()  == vbuffers.GetScratchFrame()->width &&
         input_size.height() == vbuffers.GetScratchFrame()->height)
     {
+        vbuffers.Clear(GUID_I420_PLANAR);
         MoveResize();
         return true;
     }
 
     video_dim = input_size;
 
+    vbuffers.DiscardFrames(true);
     vbuffers.DeleteBuffers();
 
     MoveResize();
@@ -68,18 +102,9 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
                 "Failed to recreate buffers");
         errored = true;
     }
+    CreatePauseFrame();
 
     db_vdisp_profile->SetVideoRenderer("null");
-
-    if (pauseFrame.buf)
-        delete [] pauseFrame.buf;
-
-    pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    pauseFrame.buf    = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     return true;
 }
@@ -96,6 +121,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     if ((width <= 0) || (height <= 0))
         return false;
 
+    QMutexLocker locker(&global_lock);
+
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
                   kPrebufferFramesNormal, kPrebufferFramesSmall, 
                   kKeepPrebuffer);
@@ -106,46 +133,27 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
 
     if (!vbuffers.CreateBuffers(width, height))
         return false;
+    CreatePauseFrame();
 
     db_vdisp_profile->SetVideoRenderer("null");
 
-    pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    pauseFrame.buf    = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-
     MoveResize();
-    XJ_started = true;
 
     return true;
 }
 
-void VideoOutputNull::Exit(void)
-{
-    if (XJ_started) 
-    {
-        XJ_started = false;
-
-        vbuffers.DeleteBuffers();
-    }
-}
-
 void VideoOutputNull::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
-    if (embedding)
-        return;
-
-    VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    QMutexLocker locker(&global_lock);
+    if (!embedding)
+        VideoOutput::EmbedInWidget(wid, x, y, w, h);
 }
  
 void VideoOutputNull::StopEmbedding(void)
 {
-    if (!embedding)
-        return;
-
-    VideoOutput::StopEmbedding();
+    QMutexLocker locker(&global_lock);
+    if (embedding)
+        VideoOutput::StopEmbedding();
 }
 
 void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
@@ -155,7 +163,9 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     if (!buffer)
         buffer = vbuffers.GetScratchFrame();
 
+    vbuffers.LockFrame(buffer, "PrepareFrame");
     framesPlayed = buffer->frameNumber + 1;
+    vbuffers.UnlockFrame(buffer, "PrepareFrame");
 }
 
 void VideoOutputNull::Show(FrameScanType )
@@ -168,12 +178,36 @@ void VideoOutputNull::DrawUnusedRects(bool)
 
 void VideoOutputNull::UpdatePauseFrame(void)
 {
-    VideoFrame *pauseb = vbuffers.GetScratchFrame();
-    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
-    if (pauseu)
-        memcpy(pauseFrame.buf, pauseu->buf, pauseu->size);
-    else
-        memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+    QMutexLocker locker(&global_lock);
+
+    // Try used frame first, then fall back to scratch frame.
+    vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
+
+    vbuffers.begin_lock(kVideoBuffer_used);
+    VideoFrame *used_frame = NULL;
+    if (vbuffers.size(kVideoBuffer_used) > 0)
+    {
+        used_frame = vbuffers.head(kVideoBuffer_used);
+        if (!vbuffers.TryLockFrame(used_frame, "UpdatePauseFrame -- used"))
+            used_frame = NULL;
+    }
+    if (used_frame)
+    {
+        CopyFrame(&av_pause_frame, used_frame);
+        vbuffers.UnlockFrame(used_frame, "UpdatePauseFrame -- used");
+    }
+    vbuffers.end_lock();
+
+    if (!used_frame &&
+        vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
+                              "UpdatePauseFrame -- scratch"))
+    {
+        vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
+        CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
+        vbuffers.UnlockFrame(vbuffers.GetScratchFrame(),
+                             "UpdatePauseFrame -- scratch");
+    }
+    vbuffers.UnlockFrame(&av_pause_frame, "UpdatePauseFrame - used");
 }
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,
