@@ -335,14 +335,29 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
         if (sRange.length() > 0)
         {
-            if ( bRange = ParseRange( sRange, llSize, &llStart, &llEnd ) )
+            bRange = ParseRange( sRange, llSize, &llStart, &llEnd );
+            if ((llSize >= llStart) && (llSize >= llEnd) && (llEnd >= llStart))
             {
-                m_nResponseStatus = 206;
-                m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
+                if (bRange)
+                {
+                    m_nResponseStatus = 206;
+                    m_mapRespHeaders[ "Content-Range" ] = QString("bytes %1-%2/%3")
                                                               .arg( llStart )
                                                               .arg( llEnd   )
                                                               .arg( llSize  );
-                llSize = (llEnd - llStart) + 1;
+                    llSize = (llEnd - llStart) + 1;
+                }
+            }
+            else
+            {
+                m_nResponseStatus = 416;
+                llSize = 0;
+                VERBOSE(VB_UPNP, 
+                    QString("HTTPRequest::SendResponseFile(%1) - invalid byte range %2-%3/%4")
+                            .arg(sFileName)
+                            .arg(llStart)
+                            .arg(llEnd)
+                            .arg(llSize));
             }
         }
         
