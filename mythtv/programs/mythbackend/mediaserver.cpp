@@ -101,9 +101,9 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     m_pHttpServer->RegisterExtension( new MythXML( pMythDevice ));
 
-    if (sIP == "localhost" || sIP == "127.0.0.1")
+    if (sIP == "localhost" || sIP.startsWith("127."))
     {
-        VERBOSE(VB_IMPORTANT, "MediaServer:: Bad BackendServerIP Address - "
+        VERBOSE(VB_IMPORTANT, "MediaServer:: Loopback address specified - "
                               + sIP + ". Disabling UPnP");
         return;
     }
