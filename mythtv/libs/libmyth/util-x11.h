@@ -30,4 +30,8 @@ MPUBLIC extern QMutex x11_lock;
 #define X11U x11_lock.unlock()
 #define X11S(arg) do { X11L; arg; X11U; } while (0)
 
+// These X11 defines conflict with the QT key event enum values
+#undef KeyPress
+#undef KeyRelease
+
 #endif // __UTIL_X11_H__
