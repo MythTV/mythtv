@@ -212,6 +212,10 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
                       "AND program.category = 'Sports event' \n"
                       "AND capturecard.hostname = 'mythbox' ");
 
+    m_clause->insertItem(tr("Avoid poor signal quality (complete example)"));
+    m_csql << QString("cardinput.cardinputid = 1 AND \n"
+                      "channel.channum IN (3, 5, 39, 66) ");
+
     vbox->addWidget(m_clause);
 
     //  Add Button
