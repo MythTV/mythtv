@@ -4,8 +4,7 @@
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qevent.h>
-
-#include "mythexp.h" // for MPUBLIC
+#include <qdeepcopy.h>
 
 /** \class MythEvent
     \brief This class is used as a container for messages.
@@ -18,14 +17,26 @@ class MPUBLIC MythEvent : public QCustomEvent
   public:
     enum Type { MythEventMessage = (User + 1000) };
 
-    MythEvent(int t);
-    MythEvent(const QString &lmessage);
-    MythEvent(const QString &lmessage, const QStringList &lextradata);
+    MythEvent(int t) : QCustomEvent(t)
+    { }
+
+    MythEvent(const QString lmessage) : QCustomEvent(MythEventMessage)
+    {
+        message = QDeepCopy<QString>(lmessage);
+        extradata = "empty";
+    }
+
+    MythEvent(const QString lmessage, const QStringList &lextradata)
+           : QCustomEvent(MythEventMessage)
+    {
+        message = QDeepCopy<QString>(lmessage);
+        extradata = lextradata;
+    }
     
-    virtual ~MythEvent();
+    virtual ~MythEvent() {}
 
     const QString& Message() const { return message; }
-    const QString& ExtraData(int idx = 0) const;
+    const QString& ExtraData(int idx = 0) const { return extradata[idx]; } 
     const QStringList& ExtraDataList() const { return extradata; } 
     int ExtraDataCount() const { return extradata.size(); }
 
