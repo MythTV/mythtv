@@ -343,7 +343,7 @@ int dvdinput_setup(void)
     fprintf(stderr, "DVDCSS_VERBOSE %s\n", psz_verbose);
     */
     fprintf(stderr, "libdvdread: Using libdvdcss version %s for DVD access\n",
-	    *dvdcss_version);
+	    dvdcss_version ? *dvdcss_version : "unknown");
     
     /* libdvdcss wrapper functions */
     dvdinput_open  = css_open;
