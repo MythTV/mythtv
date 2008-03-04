@@ -305,6 +305,18 @@
         <source>Answer</source>
         <translation>Svar</translation>
     </message>
+    <message>
+        <source>Loopback Audio and video at ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Socket on this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NAT Device</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

@@ -651,244 +651,238 @@
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation>は無効)</translation>
+        <translation type="obsolete">は無効)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>地域が設定されていません。READMEを読んでください。</translation>
+        <translation type="obsolete">地域が設定されていません。READMEを読んでください。</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>MythWeatherを設定中...</translation>
+        <translation type="obsolete">MythWeatherを設定中...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>右矢印キーで単位を変更...</translation>
+        <translation type="obsolete">右矢印キーで単位を変更...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>単位</translation>
+        <translation type="obsolete">単位</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>地域</translation>
+        <translation type="obsolete">地域</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>接続</translation>
+        <translation type="obsolete">接続</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>保存されました...</translation>
+        <translation type="obsolete">保存されました...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>気象データを受信中...</translation>
+        <translation type="obsolete">気象データを受信中...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>右矢印キーで地域を選択...</translation>
+        <translation type="obsolete">右矢印キーで地域を選択...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>右矢印キーで接続レベル選択...</translation>
+        <translation type="obsolete">右矢印キーで接続レベル選択...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation>1  高速接続</translation>
+        <translation type="obsolete">1  高速接続</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation>8  中速接続</translation>
+        <translation type="obsolete">8  中速接続</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation>15 低速接続</translation>
+        <translation type="obsolete">15 低速接続</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>初期気象データを取得中...</translation>
+        <translation type="obsolete">初期気象データを取得中...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>気象データを更新中...</translation>
+        <translation type="obsolete">気象データを更新中...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>無風</translation>
+        <translation type="obsolete">無風</translation>
     </message>
     <message>
         <source> at </source>
-        <translation>の風 </translation>
+        <translation type="obsolete">の風 </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>良好</translation>
+        <translation type="obsolete">良好</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation>(最小)</translation>
+        <translation type="obsolete">(最小)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation>(普通)</translation>
+        <translation type="obsolete">(普通)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation>(高い)</translation>
+        <translation type="obsolete">(高い)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation>(最大)</translation>
+        <translation type="obsolete">(最大)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>今日の最高気温は</translation>
+        <translation type="obsolete">今日の最高気温は</translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation>°C、最低は</translation>
+        <translation type="obsolete">°C、最低は</translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. 現在の湿度は</translation>
+        <translation type="obsolete">. 現在の湿度は</translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% 風は</translation>
+        <translation type="obsolete">% 風は</translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>無風.</translation>
+        <translation type="obsolete">無風.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation>から</translation>
+        <translation type="obsolete">から</translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation>mph から</translation>
+        <translation type="obsolete">mph から</translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation>Km/h から</translation>
+        <translation type="obsolete">Km/h から</translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation>本日の視界は明瞭.</translation>
+        <translation type="obsolete">本日の視界は明瞭.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation>視界の状態は不明.</translation>
+        <translation type="obsolete">視界の状態は不明.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation>視界の状態は</translation>
+        <translation type="obsolete">視界の状態は</translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation>マイル.</translation>
+        <translation type="obsolete">マイル.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation>キロメートル.</translation>
+        <translation type="obsolete">キロメートル.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>日曜日</translation>
+        <translation type="obsolete">日曜日</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>月曜日</translation>
+        <translation type="obsolete">月曜日</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>火曜日</translation>
+        <translation type="obsolete">火曜日</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>水曜日</translation>
+        <translation type="obsolete">水曜日</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>木曜日</translation>
+        <translation type="obsolete">木曜日</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>金曜日</translation>
+        <translation type="obsolete">金曜日</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>土曜日</translation>
+        <translation type="obsolete">土曜日</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>日付エラー</translation>
+        <translation type="obsolete">日付エラー</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>予想気温は最高で</translation>
+        <translation type="obsolete">予想気温は最高で</translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>お天気は </translation>
+        <translation type="obsolete">お天気は </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>気象データ: </translation>
+        <translation type="obsolete">気象データ: </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>更新中...</translation>
+        <translation type="obsolete">更新中...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(一部の情報は取得できません)</translation>
+        <translation type="obsolete">(一部の情報は取得できません)</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** 不正な地域IDまたはサーバーエラー ***</translation>
+        <translation type="obsolete">*** 不正な地域IDまたはサーバーエラー ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>華氏、インチ等</translation>
+        <translation type="obsolete">華氏、インチ等</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation>摂氏、キロパスカル等</translation>
+        <translation type="obsolete">摂氏、キロパスカル等</translation>
     </message>
     <message>
         <source> F</source>
-        <translation>°F</translation>
+        <translation type="obsolete">°F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation>°C</translation>
+        <translation type="obsolete">°C</translation>
     </message>
     <message>
         <source>.</source>
-        <translation>°C.</translation>
+        <translation type="obsolete">°C.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>不明</translation>
+        <translation type="obsolete">不明</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation>- 一時停止 -</translation>
+        <translation type="obsolete">- 一時停止 -</translation>
     </message>
     <message>
         <source>doppler radar</source>
         <translation type="obsolete">レーダー画像</translation>
     </message>
     <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
+        <source>No Screens defined; Entering Screen Setup.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

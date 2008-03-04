@@ -651,231 +651,231 @@
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation>on sopimaton)</translation>
+        <translation type="obsolete">on sopimaton)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>Sijaintia ei annettu, lue README</translation>
+        <translation type="obsolete">Sijaintia ei annettu, lue README</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation> - TAUKO -</translation>
+        <translation type="obsolete"> - TAUKO -</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Asetetaan MythWeather ...</translation>
+        <translation type="obsolete">Asetetaan MythWeather ...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Oikea nuolinäppäin valitsee mittayksikön...</translation>
+        <translation type="obsolete">Oikea nuolinäppäin valitsee mittayksikön...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Säätilan Yksiköt</translation>
+        <translation type="obsolete">Säätilan Yksiköt</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Sijainti</translation>
+        <translation type="obsolete">Sijainti</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Aggressiivisuus</translation>
+        <translation type="obsolete">Aggressiivisuus</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>Imperiaalinen (Fahrenheit jne)</translation>
+        <translation type="obsolete">Imperiaalinen (Fahrenheit jne)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation>Metrinen (Celsius, kPa jne)</translation>
+        <translation type="obsolete">Metrinen (Celsius, kPa jne)</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Asetukset Talletettu...</translation>
+        <translation type="obsolete">Asetukset Talletettu...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Haetaan Säätietoja ...</translation>
+        <translation type="obsolete">Haetaan Säätietoja ...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Oikea nuolinäppäin valitsee sijainnin ...</translation>
+        <translation type="obsolete">Oikea nuolinäppäin valitsee sijainnin ...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Oikea nuolinäppäin valitsee aggressiivisuuden tason ...</translation>
+        <translation type="obsolete">Oikea nuolinäppäin valitsee aggressiivisuuden tason ...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation>1 Nopea yhteys</translation>
+        <translation type="obsolete">1 Nopea yhteys</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation>8 Keskinopea yhteys</translation>
+        <translation type="obsolete">8 Keskinopea yhteys</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation>15 Hidas yhteys</translation>
+        <translation type="obsolete">15 Hidas yhteys</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Haetaan sääennustetta ...</translation>
+        <translation type="obsolete">Haetaan sääennustetta ...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Päivitetään sääennustetta ...</translation>
+        <translation type="obsolete">Päivitetään sääennustetta ...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Tyyni</translation>
+        <translation type="obsolete">Tyyni</translation>
     </message>
     <message>
         <source> at </source>
-        <translation> &gt; </translation>
+        <translation type="obsolete"> &gt; </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>Rajaton</translation>
+        <translation type="obsolete">Rajaton</translation>
     </message>
     <message>
         <source> F</source>
-        <translation> F</translation>
+        <translation type="obsolete"> F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation> C</translation>
+        <translation type="obsolete"> C</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation> (minimaalinen)</translation>
+        <translation type="obsolete"> (minimaalinen)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation> (keskimääräinen)</translation>
+        <translation type="obsolete"> (keskimääräinen)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation> (korkea)</translation>
+        <translation type="obsolete"> (korkea)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation> (hyvin korkea)</translation>
+        <translation type="obsolete"> (hyvin korkea)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Päivän korkein lämpötila on </translation>
+        <translation type="obsolete">Päivän korkein lämpötila on </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> ja alhaisin lämpötila on </translation>
+        <translation type="obsolete"> ja alhaisin lämpötila on </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation> astetta. Ilmankosteus on  </translation>
+        <translation type="obsolete"> astetta. Ilmankosteus on  </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation> % ja tuuli </translation>
+        <translation type="obsolete"> % ja tuuli </translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>on tyyni.</translation>
+        <translation type="obsolete">on tyyni.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> puhaltaa </translation>
+        <translation type="obsolete"> puhaltaa </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation>mph  </translation>
+        <translation type="obsolete">mph  </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> km/h </translation>
+        <translation type="obsolete"> km/h </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation>Näkyvyys on ylitse horisontin tänään.</translation>
+        <translation type="obsolete">Näkyvyys on ylitse horisontin tänään.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation>Näkyvyystietoja ei ole.</translation>
+        <translation type="obsolete">Näkyvyystietoja ei ole.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Näkyvyys on </translation>
+        <translation type="obsolete"> Näkyvyys on </translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation>mailia.</translation>
+        <translation type="obsolete">mailia.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation> km.</translation>
+        <translation type="obsolete"> km.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Sunnuntai</translation>
+        <translation type="obsolete">Sunnuntai</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Maanantai</translation>
+        <translation type="obsolete">Maanantai</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Tiistai</translation>
+        <translation type="obsolete">Tiistai</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Keskiviikko</translation>
+        <translation type="obsolete">Keskiviikko</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Torstai</translation>
+        <translation type="obsolete">Torstai</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Perjantai</translation>
+        <translation type="obsolete">Perjantai</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Lauantai</translation>
+        <translation type="obsolete">Lauantai</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Virhe Päivämäärässä</translation>
+        <translation type="obsolete">Virhe Päivämäärässä</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Huomisen korkein lämpötila on </translation>
+        <translation type="obsolete">Huomisen korkein lämpötila on </translation>
     </message>
     <message>
         <source>.</source>
-        <translation>.</translation>
+        <translation type="obsolete">.</translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Ennuste: </translation>
+        <translation type="obsolete">Ennuste: </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Sääennusteen toimitusaika:  </translation>
+        <translation type="obsolete">Sääennusteen toimitusaika:  </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Päivitetään...</translation>
+        <translation type="obsolete">Päivitetään...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(Kaikki Tieto Ei Saatavilla)</translation>
+        <translation type="obsolete">(Kaikki Tieto Ei Saatavilla)</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Tuntematon</translation>
+        <translation type="obsolete">Tuntematon</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** Väärä Aluekoodi tai Palvelinvirhe ***</translation>
+        <translation type="obsolete">*** Väärä Aluekoodi tai Palvelinvirhe ***</translation>
     </message>
     <message>
         <source>doppler radar</source>
@@ -888,14 +888,18 @@
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation>Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
+        <translation type="obsolete">Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
 Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta hakeaksesi tiedot ilman liikkuvaa kuvaa.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation>Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
+        <translation type="obsolete">Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
 Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta jos haluat peruuttaa toiminnon.</translation>
+    </message>
+    <message>
+        <source>No Screens defined; Entering Screen Setup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

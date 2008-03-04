@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Verversingsfrequentie kiezen met pijltoetsen. 
+        <translation type="obsolete">Verversingsfrequentie kiezen met pijltoetsen. 
 De minimumwaarde is 30 minuten.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>MENU kiezen om terug te keren.</translation>
+        <translation type="obsolete">MENU kiezen om terug te keren.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ De minimumwaarde is 30 minuten.</translation>
         <translation>Weet u zeker dat u onderstaande nieuws site wilt verwijderen?
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -27,6 +27,10 @@
  Please pick one.</source>
         <translation>Valitse sopivin emulaattori.</translation>
     </message>
+    <message>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
@@ -53,6 +57,10 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Ei</translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -100,10 +108,6 @@
     <message>
         <source>Command</source>
         <translation>Komento</translation>
-    </message>
-    <message>
-        <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Type</source>
@@ -274,6 +278,34 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating %1(%2) ROM database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Verifying %1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning for %1 game(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hash filenames in display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -136,5 +136,9 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

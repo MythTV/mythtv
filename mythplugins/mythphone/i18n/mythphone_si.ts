@@ -309,6 +309,22 @@
         <source>Playout Delay Min/Avg/Max: </source>
         <translation>Zakasnitev Min/Povpr/Max: </translation>
     </message>
+    <message>
+        <source>Loopback Audio and video at ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Socket on this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NAT Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -350,7 +366,7 @@
     </message>
     <message>
         <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
-        <translation>Čas zvonjenja pred avtomatskim javljanjem in divertacijo v VXML skripto.</translation>
+        <translation type="obsolete">Čas zvonjenja pred avtomatskim javljanjem in divertacijo v VXML skripto.</translation>
     </message>
     <message>
         <source>Default VXML URL</source>
@@ -571,6 +587,10 @@
     <message>
         <source>AUDIO Settings</source>
         <translation>ZVOČNE nastavitve</translation>
+    </message>
+    <message>
+        <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.  Set to 0 to disable this feature.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

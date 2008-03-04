@@ -443,7 +443,7 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation>Si activé, les fichiers mpeg2 seront toujours envoyés à mythtranscode pour supprimer les erreurs. Peut supprimer quelques problèmes audio.</translation>
+        <translation type="obsolete">Si activé, les fichiers mpeg2 seront toujours envoyés à mythtranscode pour supprimer les erreurs. Peut supprimer quelques problèmes audio.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -451,7 +451,7 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation>Le script utilisera des FIFO pour fournir la sortie de mplex à dvdauthor au lieu de créer des fichiers intermédiaires. Gagne du temps de l&apos;espace disque pendant les opération de multiplexage. Non supporté sous Windows !</translation>
+        <translation type="obsolete">Le script utilisera des FIFO pour fournir la sortie de mplex à dvdauthor au lieu de créer des fichiers intermédiaires. Gagne du temps de l&apos;espace disque pendant les opération de multiplexage. Non supporté sous Windows !</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -540,6 +540,42 @@ Cette opération peut prendre quelques minutes.</translation>
     <message>
         <source>You don&apos;t have any videos!</source>
         <translation>Vous n&apos;avez aucune vidéo!</translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use ProjectX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>projectx command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

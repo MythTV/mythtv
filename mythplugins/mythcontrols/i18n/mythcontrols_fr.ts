@@ -139,11 +139,11 @@
     </message>
     <message>
         <source>Exiting, but there are unsaved changes.</source>
-        <translation>Quitter, mais certains changements n&apos;ont pas été enregistrés.</translation>
+        <translation type="obsolete">Quitter, mais certains changements n&apos;ont pas été enregistrés.</translation>
     </message>
     <message>
         <source>Which would you prefer?</source>
-        <translation>Que préférez-vous?</translation>
+        <translation type="obsolete">Que préférez-vous?</translation>
     </message>
     <message>
         <source>Manditory Action</source>
@@ -165,6 +165,18 @@
         <source>This key binding may conflict with %1 in the %2 context. Do you want to bind it anyway?</source>
         <translation>Ce lien peut venir en conflit avec %1 dans le contexte %2. Désirez-vous le créer malgré tout?</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+    <message>
+        <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OptionsMenu</name>
@@ -185,7 +197,7 @@
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="obsolete">Enregistrer</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -197,11 +209,11 @@
     </message>
     <message>
         <source>Theme Error</source>
-        <translation>Erreur de thème</translation>
+        <translation type="obsolete">Erreur de thème</translation>
     </message>
     <message>
         <source>Could not load the keybinding plugin&apos;s theme. See console for details.</source>
-        <translation>Impossible de charger les raccourcis clavier du thème du plugin. Voir la console pour les détails.</translation>
+        <translation type="obsolete">Impossible de charger les raccourcis clavier du thème du plugin. Voir la console pour les détails.</translation>
     </message>
 </context>
 <context>

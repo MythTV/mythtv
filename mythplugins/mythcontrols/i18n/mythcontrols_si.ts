@@ -3,15 +3,15 @@
     <name>ActionMenu</name>
     <message>
         <source>Modify Action</source>
-        <translation>Uredi dejanje</translation>
+        <translation type="obsolete">Uredi dejanje</translation>
     </message>
     <message>
         <source>Set Binding</source>
-        <translation>Ustvari povezavo</translation>
+        <translation type="obsolete">Ustvari povezavo</translation>
     </message>
     <message>
         <source>Remove Binding</source>
-        <translation>Odstrani povezavo</translation>
+        <translation type="obsolete">Odstrani povezavo</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -22,7 +22,7 @@
     <name>ConfirmMenu</name>
     <message>
         <source>Confirm</source>
-        <translation>Potrdi</translation>
+        <translation type="obsolete">Potrdi</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -33,19 +33,19 @@
     <name>InvalidBindingPopup</name>
     <message>
         <source>Manditory Action</source>
-        <translation>Pomembno dejanje</translation>
+        <translation type="obsolete">Pomembno dejanje</translation>
     </message>
     <message>
         <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
-        <translation>To dejanje je pomembno in potrebuje vsaj eno povezavo na tipko. Poizkusite ga ponovno povezati z kakšno drugo tipko. </translation>
+        <translation type="obsolete">To dejanje je pomembno in potrebuje vsaj eno povezavo na tipko. Poizkusite ga ponovno povezati z kakšno drugo tipko. </translation>
     </message>
     <message>
         <source>Conflicting Binding</source>
-        <translation>Povezava v konfliktu</translation>
+        <translation type="obsolete">Povezava v konfliktu</translation>
     </message>
     <message>
         <source>This key binding conflicts with %1 in the %2 context</source>
-        <translation>Ta povezava je v konfliktu z %1 v %2 sklopu</translation>
+        <translation type="obsolete">Ta povezava je v konfliktu z %1 v %2 sklopu</translation>
     </message>
 </context>
 <context>
@@ -79,11 +79,11 @@
     <name>MythControls</name>
     <message>
         <source>Binding comes from %1 context</source>
-        <translation>Povezava je iz %1 sklopa</translation>
+        <translation type="obsolete">Povezava je iz %1 sklopa</translation>
     </message>
     <message>
         <source>Delete this key binding from context %1?</source>
-        <translation>Odstranim to povezavo tipke iz sklopa %1?</translation>
+        <translation type="obsolete">Odstranim to povezavo tipke iz sklopa %1?</translation>
     </message>
     <message>
         <source>Delete this binding?</source>
@@ -91,19 +91,19 @@
     </message>
     <message>
         <source>Contexts</source>
-        <translation>Sklop</translation>
+        <translation type="obsolete">Sklop</translation>
     </message>
     <message>
         <source>Keys</source>
-        <translation>Tipke</translation>
+        <translation type="obsolete">Tipke</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation>Dejanja</translation>
+        <translation type="obsolete">Dejanja</translation>
     </message>
     <message>
         <source>This kebinding may conflict with %1 in the %2 context. Do you want to bind it anyways?</source>
-        <translation>Ta povezava tipke je v konfliktu z %1 v %2 sklopu. Jo želite kljub temu ustvariti?</translation>
+        <translation type="obsolete">Ta povezava tipke je v konfliktu z %1 v %2 sklopu. Jo želite kljub temu ustvariti?</translation>
     </message>
     <message>
         <source>Conflict Warning</source>
@@ -113,12 +113,84 @@
         <source>Bind Key</source>
         <translation>Poveži tipko</translation>
     </message>
+    <message>
+        <source>Change View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions By Context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts By Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys By Context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Možnosti</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Shrani</translation>
+    </message>
+    <message>
+        <source>Modify Action</source>
+        <translation type="unfinished">Uredi dejanje</translation>
+    </message>
+    <message>
+        <source>Set Binding</source>
+        <translation type="unfinished">Ustvari povezavo</translation>
+    </message>
+    <message>
+        <source>Remove Binding</source>
+        <translation type="unfinished">Odstrani povezavo</translation>
+    </message>
+    <message>
+        <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save then Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit without saving changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manditory Action</source>
+        <translation type="unfinished">Pomembno dejanje</translation>
+    </message>
+    <message>
+        <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
+        <translation type="unfinished">To dejanje je pomembno in potrebuje vsaj eno povezavo na tipko. Poizkusite ga ponovno povezati z kakšno drugo tipko. </translation>
+    </message>
+    <message>
+        <source>This key binding conflicts with %1 in the %2 context.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Binding</source>
+        <translation type="unfinished">Povezava v konfliktu</translation>
+    </message>
+    <message>
+        <source>This key binding may conflict with %1 in the %2 context. Do you want to bind it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OptionsMenu</name>
     <message>
         <source>Options</source>
-        <translation>Možnosti</translation>
+        <translation type="obsolete">Možnosti</translation>
     </message>
     <message>
         <source>Save</source>
@@ -133,11 +205,11 @@
     <name>QObject</name>
     <message>
         <source>Theme Error</source>
-        <translation>Napaka v témi</translation>
+        <translation type="obsolete">Napaka v témi</translation>
     </message>
     <message>
         <source>Could not load the keybinding plugin&apos;s theme. See console for details.</source>
-        <translation>Nisem mogel naložiti téme dodatka za povezave tipk. Za podrobnosti poglejte v konzolo. </translation>
+        <translation type="obsolete">Nisem mogel naložiti téme dodatka za povezave tipk. Za podrobnosti poglejte v konzolo. </translation>
     </message>
     <message>
         <source>OK</source>
@@ -149,22 +221,22 @@
     </message>
     <message>
         <source>Save</source>
-        <translation>Shrani</translation>
+        <translation type="obsolete">Shrani</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Da</translation>
+        <translation type="obsolete">Da</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation type="obsolete">Ne</translation>
     </message>
 </context>
 <context>
     <name>UnsavedMenu</name>
     <message>
         <source>Unsaved Changes</source>
-        <translation>Neshranjene spremembe</translation>
+        <translation type="obsolete">Neshranjene spremembe</translation>
     </message>
     <message>
         <source>Would you like to save now?</source>
@@ -180,11 +252,11 @@
     </message>
     <message>
         <source>Exiting...</source>
-        <translation>Končujem...</translation>
+        <translation type="obsolete">Končujem...</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation>Shranim spremembe?</translation>
+        <translation type="obsolete">Shranim spremembe?</translation>
     </message>
 </context>
 </TS>

@@ -145,6 +145,26 @@
         <source>Copying marked images...</source>
         <translation>Kopier markerte bilder . . .</translation>
     </message>
+    <message>
+        <source>Failed to mount device: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing the default MythGallery directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to rename directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to rename file</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

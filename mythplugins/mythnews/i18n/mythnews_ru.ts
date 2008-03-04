@@ -59,12 +59,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Установите частоту обновления используя стрелки вверх/вниз.
+        <translation type="obsolete">Установите частоту обновления используя стрелки вверх/вниз.
 Минимальное значение 30 минут.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Нажмите &apos;МЕНЮ&apos; для возврата к выбору ленты.</translation>
+        <translation type="obsolete">Нажмите &apos;МЕНЮ&apos; для возврата к выбору ленты.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -103,6 +111,10 @@ The minimum allowed value is 30 Minutes.</source>
         <translation>Вы действительно хотите удалить сайт
 
 %1</translation>
+    </message>
+    <message>
+        <source>Downloading media...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -29,6 +29,10 @@
 
 Välj en.</translation>
     </message>
+    <message>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
@@ -284,6 +288,22 @@ att du vill göra detta?</translation>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
         <translation>Binära och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för rom-namnet. %d1, %d2, %d3 och %d4 representerar skivor i flerskivespel. %s läggs till automatiskt om det inte anges</translation>
+    </message>
+    <message>
+        <source>Updating %1(%2) ROM database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Verifying %1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning for %1 game(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

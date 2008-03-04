@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>MythFlix</name>
+    <message>
+        <source>Browse Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Top of Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Bottom of Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show NetFlix Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отменить</translation>
+    </message>
+</context>
+<context>
     <name>MythFlixConfig</name>
     <message>
         <source>Press MENU to set the update frequency.</source>
@@ -8,12 +31,20 @@
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation>Установит е частоту обновления используя стрелки вверх/вниз.
+        <translation type="obsolete">Установит е частоту обновления используя стрелки вверх/вниз.
 Минимальное значение 30 минут.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation>Нажмите МЕНЮ дл явозврата к выбору ленты.</translation>
+        <translation type="obsolete">Нажмите МЕНЮ дл явозврата к выбору ленты.</translation>
+    </message>
+    <message>
+        <source>Set update frequency by using the up/down arrows.The minimum allowed value is 30 Minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Escape or Menu to exit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -33,6 +64,34 @@ The minimum allowed value is 30 Minutes.</source>
     <message>
         <source>Cancel</source>
         <translation>Отменить</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History for Queue: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Items in Queue: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item not moved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move To Another Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show NetFlix Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Add To Queue</source>
-        <translation>Ajouter à la file d&apos;attente</translation>
+        <translation type="obsolete">Ajouter à la file d&apos;attente</translation>
     </message>
     <message>
         <source>Show NetFlix Page</source>
@@ -16,6 +16,14 @@
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Add to Top of Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Bottom of Queue</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -54,6 +62,30 @@
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History for Queue: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Items in Queue: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item not moved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move To Another Queue</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

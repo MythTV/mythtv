@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name></name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
@@ -27,7 +50,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Нет заданий и нечего больше делать. Вы можете нажать 0 для импорта DVD.</translation>
+        <translation type="obsolete">Нет заданий и нечего больше делать. Вы можете нажать 0 для импорта DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +58,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>&gt;Нет заданий и нечего больше делать. Вы можете нажать 0 для импорта диска, если хотите.</translation>
+        <translation type="obsolete">&gt;Нет заданий и нечего больше делать. Вы можете нажать 0 для импорта диска, если хотите.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,11 +66,27 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>&apos;0&apos; Новый импорт</translation>
+        <translation type="obsolete">&apos;0&apos; Новый импорт</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>&apos;9&apos; Отменить задание</translation>
+        <translation type="obsolete">&apos;9&apos; Отменить задание</translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Rip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Job</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -100,11 +139,11 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Каталог с фильмами</translation>
+        <translation type="obsolete">Каталог с фильмами</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Этот каталог должен существовать и пользователь, запустивший MythVideo, должен иметь права чтения в нем.</translation>
+        <translation type="obsolete">Этот каталог должен существовать и пользователь, запустивший MythVideo, должен иметь права чтения в нем.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -124,7 +163,7 @@
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation>Родительский ПИН</translation>
+        <translation type="obsolete">Родительский ПИН</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -152,7 +191,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Родительский PIN:</translation>
+        <translation type="obsolete">Родительский PIN:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -188,7 +227,7 @@
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation>Этот PIN используется для контроля текущего Родительского уровня. Если Вы хотите использовать эту опцию используейте в качестве значения только цифры для упрощения жизни.</translation>
+        <translation type="obsolete">Этот PIN используется для контроля текущего Родительского уровня. Если Вы хотите использовать эту опцию используейте в качестве значения только цифры для упрощения жизни.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -225,7 +264,7 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation>Обложка существует для данного фильма, но MythVideo не может получить ее за разумное время.
+        <translation type="obsolete">Обложка существует для данного фильма, но MythVideo не может получить ее за разумное время.
 </translation>
     </message>
     <message>
@@ -270,11 +309,11 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Сохранять соотношения сторон значков</translation>
+        <translation type="obsolete">Сохранять соотношения сторон значков</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation>Если установлено, масшабированные значки будут сохранять исходное соотношение сторон. Иначе они будут растянуты до размера элемента.</translation>
+        <translation type="obsolete">Если установлено, масшабированные значки будут сохранять исходное соотношение сторон. Иначе они будут растянуты до размера элемента.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
@@ -396,13 +435,13 @@ You have no VCD Player command defined.</source>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation>Вы не задали VCD устройство.</translation>
+        <translation type="obsolete">Вы не задали VCD устройство.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation>Вы не задали DVD устройство.</translation>
+        <translation type="obsolete">Вы не задали DVD устройство.</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
@@ -693,6 +732,141 @@ Remove it from the database?</source>
         <source>minutes</source>
         <translation type="unfinished">минут</translation>
     </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 4 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 3 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 2 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Tree remembers last selected position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the current position in the Video Tree is persistent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories that hold videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Drive Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let transcode determine frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable automatic Parental Level from rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level %1</source>
+        <translation type="unfinished">Уровень %1</translation>
+    </message>
+    <message>
+        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/novideos_info has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отменить</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Check VideoManager Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetching poster for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: selected/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None defined</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -977,11 +1151,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0 Verarbeite gewählten Titel</translation>
+        <translation type="obsolete">0 Verarbeite gewählten Titel</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0 Verarbeite gewählte Titel</translation>
+        <translation type="obsolete">0 Verarbeite gewählte Titel</translation>
     </message>
     <message>
         <source>ISO Image</source>
@@ -990,6 +1164,10 @@ Remove it from the database?</source>
     <message>
         <source>Unknown</source>
         <translation>Неизвестный</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1026,6 +1204,10 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Отменить</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoDialog</name>
@@ -1047,11 +1229,15 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
         <translation type="obsolete">Родительский ПИН:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1107,16 +1293,20 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Отменить</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Вручную ввести IMDB №.</translation>
+        <translation type="obsolete">Вручную ввести IMDB №.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Отменить</translation>
+        <translation type="obsolete">Отменить</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -1148,39 +1338,39 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>удаление не удалось</translation>
+        <translation type="obsolete">удаление не удалось</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation>Выберите действие:</translation>
+        <translation type="obsolete">Выберите действие:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Редактировать метаданные</translation>
+        <translation type="obsolete">Редактировать метаданные</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Искать в IMDB</translation>
+        <translation type="obsolete">Искать в IMDB</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Сбросить метаданные</translation>
+        <translation type="obsolete">Сбросить метаданные</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation>Сменить просматриваемость</translation>
+        <translation type="obsolete">Сменить просматриваемость</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Удалить фильм</translation>
+        <translation type="obsolete">Удалить фильм</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Фильтровать вывод</translation>
+        <translation type="obsolete">Фильтровать вывод</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation>Удалить этот файл?</translation>
+        <translation type="obsolete">Удалить этот файл?</translation>
     </message>
 </context>
 <context>
@@ -1230,7 +1420,62 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mythvideo_videomanager::VideoManagerImp</name>
+    <message>
+        <source>Select action:</source>
+        <translation type="unfinished">Выберите действие:</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished">Редактировать метаданные</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation type="unfinished">Сбросить метаданные</translation>
+    </message>
+    <message>
+        <source>Toggle Browseable</source>
+        <translation type="unfinished">Сменить просматриваемость</translation>
+    </message>
+    <message>
+        <source>Remove Video</source>
+        <translation type="unfinished">Удалить фильм</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Отменить</translation>
+    </message>
+    <message>
+        <source>Delete this file?</source>
+        <translation type="unfinished">Удалить этот файл?</translation>
+    </message>
+    <message>
+        <source>delete failed</source>
+        <translation type="unfinished">удаление не удалось</translation>
     </message>
 </context>
 </TS>

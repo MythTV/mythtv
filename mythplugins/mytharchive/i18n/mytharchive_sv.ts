@@ -38,7 +38,7 @@
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du måste välja någonting att arkivera!</translation>
+        <translation type="obsolete">Du måste välja någonting att arkivera!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -46,23 +46,35 @@
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Alla arkivposter</translation>
+        <translation type="obsolete">Alla arkivposter</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Mythbränn</translation>
+        <translation type="obsolete">Mythbränn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Du har inte valt något att arkivera!
+        <translation type="obsolete">Du har inte valt något att arkivera!
 
 Klicka på OK</translation>
     </message>
     <message>
         <source>Remove Item</source>
         <translation>Ta bort post</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -89,7 +101,7 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
-        <translation>Du måste välja åtminstone en fil!</translation>
+        <translation type="obsolete">Du måste välja åtminstone en fil!</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -210,7 +222,7 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>Du måste välja någonting att arkivera!</translation>
+        <translation type="obsolete">Du måste välja någonting att arkivera!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -218,17 +230,17 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Alla arkivposter</translation>
+        <translation type="obsolete">Alla arkivposter</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Mythbränn</translation>
+        <translation type="obsolete">Mythbränn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>Du har inte valt något att arkivera!
+        <translation type="obsolete">Du har inte valt något att arkivera!
 
 Klicka på OK</translation>
     </message>
@@ -255,6 +267,22 @@ Klicka på OK</translation>
     <message>
         <source>Original Size </source>
         <translation>Ursprunglig storlek </translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -415,7 +443,7 @@ Detta kan ta ett par minuter.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation>Kör alltid mpeg2-filer genom mythtranscode för att rensa bort fel. Kan hjälpa till att fixa en del ljudproblem.</translation>
+        <translation type="obsolete">Kör alltid mpeg2-filer genom mythtranscode för att rensa bort fel. Kan hjälpa till att fixa en del ljudproblem.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -423,7 +451,7 @@ Detta kan ta ett par minuter.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation>Använd FIFOs för att skicka utmatningen från mplex till dvdauthor instället för temporära filer. Sparar tid och diskutrymme vid omkodning men fungerar inte i Windows</translation>
+        <translation type="obsolete">Använd FIFOs för att skicka utmatningen från mplex till dvdauthor instället för temporära filer. Sparar tid och diskutrymme vid omkodning men fungerar inte i Windows</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -489,6 +517,66 @@ Detta kan ta ett par minuter.</translation>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
         <translation>Kommando för att köra jpeg2yuv (en del av mjpegtools-paketet)</translation>
     </message>
+    <message>
+        <source>DVD Drive Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use ProjectX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Encoder Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default encoding profile to use if a file needs re-encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>projectx command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Selector</source>
+        <translation type="unfinished">Videoväljare</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -510,11 +598,11 @@ Detta kan ta ett par minuter.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Mytharkiv</translation>
+        <translation type="obsolete">Mytharkiv</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>Du måste välja åtminstone en inspelning!</translation>
+        <translation type="obsolete">Du måste välja åtminstone en inspelning!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -524,13 +612,19 @@ Detta kan ta ett par minuter.</translation>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
-        <translation>Du har inga inspelningar!
+        <translation type="obsolete">Du har inga inspelningar!
 
 Klicka på OK</translation>
     </message>
     <message>
         <source>MythArchive</source>
         <translation>MythArchive</translation>
+    </message>
+    <message>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -553,11 +647,11 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Mytharkiv</translation>
+        <translation type="obsolete">Mytharkiv</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation>Du måste välja åtminstone en videofil!</translation>
+        <translation type="obsolete">Du måste välja åtminstone en videofil!</translation>
     </message>
     <message>
         <source>All Videos</source>

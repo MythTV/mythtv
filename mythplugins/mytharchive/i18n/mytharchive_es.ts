@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>¡Necesita seleccionar al menos un elemento a archivar!</translation>
+        <translation type="obsolete">¡Necesita seleccionar al menos un elemento a archivar!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -57,23 +57,35 @@
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Todos los elementos</translation>
+        <translation type="obsolete">Todos los elementos</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation type="obsolete">Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>¡No tiene ningún elemento a archivar!
+        <translation type="obsolete">¡No tiene ningún elemento a archivar!
 
 Pulse OK</translation>
     </message>
     <message>
         <source>Remove Item</source>
         <translation>Eliminar Elemento</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -100,7 +112,7 @@ Pulse OK</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
-        <translation>¡Necesita seleccionar al menos un fichero!</translation>
+        <translation type="obsolete">¡Necesita seleccionar al menos un fichero!</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -183,6 +195,22 @@ Pulse OK</translation>
     <message>
         <source>Exit</source>
         <translation>Salir</translation>
+    </message>
+    <message>
+        <source>Increase Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Font Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Progress Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Full Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -295,7 +323,7 @@ Pulse OK</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation>¡Necesita seleccionar al menos un elemento a archivar!</translation>
+        <translation type="obsolete">¡Necesita seleccionar al menos un elemento a archivar!</translation>
     </message>
     <message>
         <source>Finish</source>
@@ -303,17 +331,17 @@ Pulse OK</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation>Todos los elementos</translation>
+        <translation type="obsolete">Todos los elementos</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation type="obsolete">Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation>¡No tiene ningún elemento a archivar!
+        <translation type="obsolete">¡No tiene ningún elemento a archivar!
 
 Pulse OK</translation>
     </message>
@@ -348,6 +376,22 @@ Pulse OK</translation>
     <message>
         <source>Original Size </source>
         <translation>Tamaño Original</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -442,11 +486,11 @@ Pulse OK</translation>
     </message>
     <message>
         <source>png2yuv command</source>
-        <translation>Comando png2yuv</translation>
+        <translation type="obsolete">Comando png2yuv</translation>
     </message>
     <message>
         <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation>Comando para ejecutar png2yuv. Parte del paquete mjpegtools</translation>
+        <translation type="obsolete">Comando para ejecutar png2yuv. Parte del paquete mjpegtools</translation>
     </message>
     <message>
         <source>spumux command</source>
@@ -523,7 +567,7 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation>Si está activado los ficheros mpeg2 siempre se pasarán a través de mythtranscode para evitar errores. Puede ayudar a arreglar algunos errores de sonido.</translation>
+        <translation type="obsolete">Si está activado los ficheros mpeg2 siempre se pasarán a través de mythtranscode para evitar errores. Puede ayudar a arreglar algunos errores de sonido.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -531,7 +575,7 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation>El script usará FIFOs para pasar la salida de mplex a dvdauthor en ves de crear ficheros intermedios. Ahorra tiempo y espacio durante las operaciones de multiplexado pero no está soportado en plataforma Windows</translation>
+        <translation type="obsolete">El script usará FIFOs para pasar la salida de mplex a dvdauthor en ves de crear ficheros intermedios. Ahorra tiempo y espacio durante las operaciones de multiplexado pero no está soportado en plataforma Windows</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -557,6 +601,106 @@ This may take a few minutes.</source>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>No fue posible importar el Archivo.  Un error ocurrió al ejecutar &apos;mytharchivehelper&apos;</translation>
     </message>
+    <message>
+        <source>DVD Drive Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use ProjectX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred date format to use on DVD menus.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Encoder Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default encoding profile to use if a file needs re-encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>jpeg2yuv command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>projectx command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Selector</source>
+        <translation type="unfinished">Selector Videos</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -578,11 +722,11 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation>¡Necesita seleccionar al menos una grabación!</translation>
+        <translation type="obsolete">¡Necesita seleccionar al menos una grabación!</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -590,15 +734,25 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation type="obsolete">Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
-        <translation>¡No tiene ninguna grabación!
+        <translation type="obsolete">¡No tiene ninguna grabación!
 
 Pulse OK</translation>
+    </message>
+    <message>
+        <source>MythArchive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -621,11 +775,11 @@ Pulse OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation>¡Necesita seleccionar al menos un fichero de video!</translation>
+        <translation type="obsolete">¡Necesita seleccionar al menos un fichero de video!</translation>
     </message>
     <message>
         <source>All Videos</source>

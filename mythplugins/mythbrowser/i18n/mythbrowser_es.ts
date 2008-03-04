@@ -168,5 +168,9 @@ Pulsar ESPACIO/Enter en una entrada seleccionada la borra de la lista.</translat
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

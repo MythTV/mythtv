@@ -29,6 +29,10 @@
 
 Vali siit.</translation>
     </message>
+    <message>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
@@ -55,6 +59,10 @@ Vali siit.</translation>
     <message>
         <source>No, don&apos;t</source>
         <translation>Ei, ära kustuta</translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -300,6 +308,22 @@ Oled sa ikka kindel, et soovid seda?</translation>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
         <translation>Binaari ning valikulised parameetrid. Mitme käsu puhul on eraldajaks &quot;;&quot;. %s on rom nimi, %d1, %d2, %d3 ja %d4 esindavad diske multidisk mängude korral. Kui midagi pole määratud, lisatakse automaatselt %s</translation>
+    </message>
+    <message>
+        <source>Updating %1(%2) ROM database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Verifying %1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning for %1 game(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name></name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
@@ -27,7 +50,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>No hay tareas ni nada más que hacer. Puede pulsar 0 para ripear un DVD.</translation>
+        <translation type="obsolete">No hay tareas ni nada más que hacer. Puede pulsar 0 para ripear un DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +58,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Sin tareas ni nada más que hacer. Puede pulsar 0 si desea ripear un nuevo DVD.</translation>
+        <translation type="obsolete">Sin tareas ni nada más que hacer. Puede pulsar 0 si desea ripear un nuevo DVD.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,11 +66,27 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>0 Nuevo Rip</translation>
+        <translation type="obsolete">0 Nuevo Rip</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>9 Cancelar Tarea</translation>
+        <translation type="obsolete">9 Cancelar Tarea</translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Rip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Job</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -100,11 +139,11 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Directorio que contiene los vídeos</translation>
+        <translation type="obsolete">Directorio que contiene los vídeos</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Este directorio debe de existir, y el usuario de MythVideo debe de tener permiso de lectura en él.</translation>
+        <translation type="obsolete">Este directorio debe de existir, y el usuario de MythVideo debe de tener permiso de lectura en él.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -124,7 +163,7 @@
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation>PIN de control de acceso</translation>
+        <translation type="obsolete">PIN de control de acceso</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -152,7 +191,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">PIN de acceso:</translation>
+        <translation type="obsolete">PIN de acceso:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -188,7 +227,7 @@
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation>Este PIN es usado para controlar el nivel de control de acceso. Si desea usar esta función, ajustar el valor a  todos los números le hará la vida mucho más fácil.</translation>
+        <translation type="obsolete">Este PIN es usado para controlar el nivel de control de acceso. Si desea usar esta función, ajustar el valor a  todos los números le hará la vida mucho más fácil.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -225,7 +264,7 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation>Un poster existe para esta película pero Myhn no ha podido descargarlo en un tiempo razonable.
+        <translation type="obsolete">Un poster existe para esta película pero Myhn no ha podido descargarlo en un tiempo razonable.
 </translation>
     </message>
     <message>
@@ -270,11 +309,11 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation>Mantener relación de aspecto de las miniaturas</translation>
+        <translation type="obsolete">Mantener relación de aspecto de las miniaturas</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation>Si está activado, las miniaturas mantendrán la relación de aspecto original. Si no está activado, se escalarán para ajustarse al tamaño del icono de fondo.</translation>
+        <translation type="obsolete">Si está activado, las miniaturas mantendrán la relación de aspecto original. Si no está activado, se escalarán para ajustarse al tamaño del icono de fondo.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
@@ -396,7 +435,7 @@ No se dispone de comando definido para reproducir VCD.</translation>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 No tiene definido dispositivo de VCD.</translation>
     </message>
@@ -412,7 +451,7 @@ No se dispone de comando definido para reproducir DVD.</translation>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
@@ -705,6 +744,141 @@ Remove it from the database?</source>
         <source>minutes</source>
         <translation type="unfinished">minutos</translation>
     </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 4 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 3 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level 2 PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to enter Parental Control Level 2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Tree remembers last selected position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the current position in the Video Tree is persistent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directories that hold videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Drive Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Let transcode determine frame rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable automatic Parental Level from rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level %1</source>
+        <translation type="unfinished">Nivel %1</translation>
+    </message>
+    <message>
+        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: browser/novideos_info has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Check VideoManager Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetching poster for %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error: selected/playwait has an invalid area.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None defined</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -993,11 +1167,11 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0 Procesar el título seleccionado</translation>
+        <translation type="obsolete">0 Procesar el título seleccionado</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0 Procesar los títulos seleccionados</translation>
+        <translation type="obsolete">0 Procesar los títulos seleccionados</translation>
     </message>
     <message>
         <source>ISO Image</source>
@@ -1006,6 +1180,10 @@ Remove it from the database?</source>
     <message>
         <source>Unknown</source>
         <translation>Desconocido</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1042,6 +1220,10 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoDialog</name>
@@ -1062,12 +1244,12 @@ Remove it from the database?</source>
         <translation>Seleccione acción</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Parental Pin:</source>
         <translation type="obsolete">PIN Acceso:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1123,16 +1305,20 @@ Remove it from the database?</source>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
+    <message>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Especificar manualmente el IMDB#</translation>
+        <translation type="obsolete">Especificar manualmente el IMDB#</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="obsolete">Cancelar</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -1156,39 +1342,39 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>borrado fallido</translation>
+        <translation type="obsolete">borrado fallido</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation>Seleccione acción:</translation>
+        <translation type="obsolete">Seleccione acción:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Editar Metadatos</translation>
+        <translation type="obsolete">Editar Metadatos</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Buscar IMDB</translation>
+        <translation type="obsolete">Buscar IMDB</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Borrar Metadatos</translation>
+        <translation type="obsolete">Borrar Metadatos</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation>No listar</translation>
+        <translation type="obsolete">No listar</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Borrar Vídeo</translation>
+        <translation type="obsolete">Borrar Vídeo</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrar</translation>
+        <translation type="obsolete">Filtrar</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation>¿Borrar este fichero?</translation>
+        <translation type="obsolete">¿Borrar este fichero?</translation>
     </message>
 </context>
 <context>
@@ -1237,8 +1423,59 @@ Remove it from the database?</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation></translation>
+        <source>View Cast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mythvideo_videomanager::VideoManagerImp</name>
+    <message>
+        <source>Select action:</source>
+        <translation type="unfinished">Seleccione acción:</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished">Editar Metadatos</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation type="unfinished">Borrar Metadatos</translation>
+    </message>
+    <message>
+        <source>Toggle Browseable</source>
+        <translation type="unfinished">No listar</translation>
+    </message>
+    <message>
+        <source>Remove Video</source>
+        <translation type="unfinished">Borrar Vídeo</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <source>Delete this file?</source>
+        <translation type="unfinished">¿Borrar este fichero?</translation>
+    </message>
+    <message>
+        <source>delete failed</source>
+        <translation type="unfinished">borrado fallido</translation>
     </message>
 </context>
 </TS>

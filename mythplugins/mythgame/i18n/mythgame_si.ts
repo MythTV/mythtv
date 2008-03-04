@@ -29,6 +29,10 @@
 
 Prosim izberite soigralca.</translation>
     </message>
+    <message>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
@@ -55,6 +59,10 @@ Prosim izberite soigralca.</translation>
     <message>
         <source>No, don&apos;t</source>
         <translation>Ne odstrani je</translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -933,7 +941,7 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
     </message>
     <message>
         <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation>Pot+ime binarnih ter ostalih parametrov. %s se lahko uporabi za ime katerikoli rom, ki se bo zagnal. Če ime rom datoteke ni navedeno, se bo le to dodalo na koncu ukaza. Prav tako se lahko uporabi %d1, %d2, %d3 in %d4 za diske v primeru, ko je igra na večih romih</translation>
+        <translation type="obsolete">Pot+ime binarnih ter ostalih parametrov. %s se lahko uporabi za ime katerikoli rom, ki se bo zagnal. Če ime rom datoteke ni navedeno, se bo le to dodalo na koncu ukaza. Prav tako se lahko uporabi %d1, %d2, %d3 in %d4 za diske v primeru, ko je igra na večih romih</translation>
     </message>
     <message>
         <source>Type</source>
@@ -1084,6 +1092,34 @@ svoje dejanje?</translation>
     <message>
         <source>GAMEGEAR</source>
         <translation>GAMEGEAR</translation>
+    </message>
+    <message>
+        <source>Updating %1(%2) ROM database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Verifying %1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning for %1 game(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hash filenames in display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

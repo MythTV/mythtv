@@ -484,6 +484,14 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan?</translation>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
+    <message>
+        <source>Tracks with same Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

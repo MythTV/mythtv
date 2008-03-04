@@ -659,243 +659,247 @@
     </message>
     <message>
         <source> is invalid)</source>
-        <translation>je napačna)</translation>
+        <translation type="obsolete">je napačna)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>   Ni nastavljenega mesta, prosim preberite README</translation>
+        <translation type="obsolete">   Ni nastavljenega mesta, prosim preberite README</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation>- PAVZIRANO -</translation>
+        <translation type="obsolete">- PAVZIRANO -</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Nastavljam MythWeather...</translation>
+        <translation type="obsolete">Nastavljam MythWeather...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Uporabite desno smerno tipko za izbiro pretvornika merskih enot...</translation>
+        <translation type="obsolete">Uporabite desno smerno tipko za izbiro pretvornika merskih enot...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Vremenske enote</translation>
+        <translation type="obsolete">Vremenske enote</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Mesto</translation>
+        <translation type="obsolete">Mesto</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Agresivnost</translation>
+        <translation type="obsolete">Agresivnost</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation>Imperial (Fahrenheit, v, ipd.)</translation>
+        <translation type="obsolete">Imperial (Fahrenheit, v, ipd.)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation>Metrični (Celzije, kPa, ipd.)</translation>
+        <translation type="obsolete">Metrični (Celzije, kPa, ipd.)</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Nastavitve shranjene...</translation>
+        <translation type="obsolete">Nastavitve shranjene...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Sprejemnje vremenskih podatkov ...</translation>
+        <translation type="obsolete">Sprejemnje vremenskih podatkov ...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Uporabite desno smerno tipko za izbiro vaše lokacije...</translation>
+        <translation type="obsolete">Uporabite desno smerno tipko za izbiro vaše lokacije...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Uporabite desno smerno tipko za nastavitev nivoja agresivnosti...</translation>
+        <translation type="obsolete">Uporabite desno smerno tipko za nastavitev nivoja agresivnosti...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation>1  Povezava z visoko hitrostjo</translation>
+        <translation type="obsolete">1  Povezava z visoko hitrostjo</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation>8  Povezava s srednjo hitrostjo</translation>
+        <translation type="obsolete">8  Povezava s srednjo hitrostjo</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation>15 Povezava z nizko hitrostjo</translation>
+        <translation type="obsolete">15 Povezava z nizko hitrostjo</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Pridobivam začetne vremenske podatke...</translation>
+        <translation type="obsolete">Pridobivam začetne vremenske podatke...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Nadgrajevanje vremenskih podatkov ...</translation>
+        <translation type="obsolete">Nadgrajevanje vremenskih podatkov ...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Mrzlo</translation>
+        <translation type="obsolete">Mrzlo</translation>
     </message>
     <message>
         <source> at </source>
-        <translation> pri </translation>
+        <translation type="obsolete"> pri </translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>Neomejena</translation>
+        <translation type="obsolete">Neomejena</translation>
     </message>
     <message>
         <source> F</source>
-        <translation>F</translation>
+        <translation type="obsolete">F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation>C</translation>
+        <translation type="obsolete">C</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation>(minimalno)</translation>
+        <translation type="obsolete">(minimalno)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation>(srednje)</translation>
+        <translation type="obsolete">(srednje)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation>(visok)</translation>
+        <translation type="obsolete">(visok)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation>(ekstremno)</translation>
+        <translation type="obsolete">(ekstremno)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Danes bo najvišja temperatura </translation>
+        <translation type="obsolete">Danes bo najvišja temperatura </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation>, najnižja pa  </translation>
+        <translation type="obsolete">, najnižja pa  </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. Trenutna vlažnost je  </translation>
+        <translation type="obsolete">. Trenutna vlažnost je  </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>%. Veter piha</translation>
+        <translation type="obsolete">%. Veter piha</translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>mrzlo.</translation>
+        <translation type="obsolete">mrzlo.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> z močjo </translation>
+        <translation type="obsolete"> z močjo </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation>mph iz </translation>
+        <translation type="obsolete">mph iz </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation>Km/h iz  </translation>
+        <translation type="obsolete">Km/h iz  </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation>Vidljivost bo danes visoka.</translation>
+        <translation type="obsolete">Vidljivost bo danes visoka.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation>Pogoji o vidljivosti niso znani.</translation>
+        <translation type="obsolete">Pogoji o vidljivosti niso znani.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation>Vidljivost bo</translation>
+        <translation type="obsolete">Vidljivost bo</translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation>milje.</translation>
+        <translation type="obsolete">milje.</translation>
     </message>
     <message>
         <source> km.</source>
-        <translation>km.</translation>
+        <translation type="obsolete">km.</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Nedelja</translation>
+        <translation type="obsolete">Nedelja</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Ponedeljek</translation>
+        <translation type="obsolete">Ponedeljek</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Torek</translation>
+        <translation type="obsolete">Torek</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Sreda</translation>
+        <translation type="obsolete">Sreda</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Četrtek</translation>
+        <translation type="obsolete">Četrtek</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Petek</translation>
+        <translation type="obsolete">Petek</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Sobota</translation>
+        <translation type="obsolete">Sobota</translation>
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Napaka datuma</translation>
+        <translation type="obsolete">Napaka datuma</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Jutri se pričakuje visoka</translation>
+        <translation type="obsolete">Jutri se pričakuje visoka</translation>
     </message>
     <message>
         <source>.</source>
-        <translation>.</translation>
+        <translation type="obsolete">.</translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Pričakovani pogoji:</translation>
+        <translation type="obsolete">Pričakovani pogoji:</translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Vremenski podatki:  </translation>
+        <translation type="obsolete">Vremenski podatki:  </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Nadgrajevanje...</translation>
+        <translation type="obsolete">Nadgrajevanje...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(Ni na voljo vseh informacij)</translation>
+        <translation type="obsolete">(Ni na voljo vseh informacij)</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Neznano</translation>
+        <translation type="obsolete">Neznano</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** Napačna oznaka področja ali napaka serverja ***</translation>
+        <translation type="obsolete">*** Napačna oznaka področja ali napaka serverja ***</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation>Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
+        <translation type="obsolete">Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
 Pritisnite VREDU ali poizkušajte z daljšim časovnim intervalom. Pritisnite PREKLIČI za poizkus brez radarskih posnetkov.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation>Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
+        <translation type="obsolete">Myth ni mogel, znotraj časovnega intervala (%1 sekund), sprejeti vremenskih podatkov.
 Pritisnite VREDU ali poizkušajte z daljšim časovnim intervalom. Pritisnite PREKLIČI za preklic.</translation>
+    </message>
+    <message>
+        <source>No Screens defined; Entering Screen Setup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
