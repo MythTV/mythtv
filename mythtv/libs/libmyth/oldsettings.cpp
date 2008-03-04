@@ -123,6 +123,8 @@ bool Settings::ReadSettings(QString pszFile)
     fstream fin(pszFile.ascii(), ios::in);
     if (!fin.is_open()) return false;
 
+    VERBOSE(VB_FILE, "Settings::ReadSettings() - parsing " + pszFile);
+
     string strLine;
     QString strKey;
     QString strVal;
