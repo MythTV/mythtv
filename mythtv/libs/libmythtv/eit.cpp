@@ -108,21 +108,23 @@ uint DBEvent::UpdateDB(MSqlQuery &query, int match_threshold) const
     int  match = INT_MIN;
     int  i     = -1;
 
-    if (count)
-        match = GetMatch(programs, i);
+    if (!count)
+        return InsertDB(query);
 
-    if ((match < match_threshold) && (i >= 0))
-    {
-        VERBOSE(VB_EIT, QString("match[%1]: %2 '%3' vs. '%4'")
-                .arg(i).arg(match).arg(title).arg(programs[i].title));
-    }
+    // move overlapping programs out of the way and update existing if possible
+    match = GetMatch(programs, i);
 
     if (match >= match_threshold)
         return UpdateDB(query, programs, i);
-    else if (!count)
-        return InsertDB(query);
     else
+    {
+        if (i >= 0)
+        {
+            VERBOSE(VB_EIT, QString("match[%1]: %2 '%3' vs. '%4'")
+                    .arg(i).arg(match).arg(title).arg(programs[i].title));
+        }
         return UpdateDB(query, programs, -1);
+    }
 }
 
 uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
