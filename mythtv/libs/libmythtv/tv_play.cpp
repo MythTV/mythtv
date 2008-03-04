@@ -2479,6 +2479,9 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 bool TV::HandleTrackAction(const QString &action)
 {
     bool handled = false;
+    if (!activenvp)
+        return false;
+
     if (action == "TOGGLECC" && !browsemode)
     {
         handled = true;
