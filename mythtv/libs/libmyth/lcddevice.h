@@ -28,6 +28,7 @@ class MPUBLIC LCDMenuItem
         checked = item_checked;
         name = item_name;
         indent = item_indent;
+        scroll = false;
         scrollPosition = indent;
     }
 
