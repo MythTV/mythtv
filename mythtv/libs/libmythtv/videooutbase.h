@@ -52,6 +52,7 @@ class VideoOutput
     virtual void FallbackDeint(void);
     virtual void BestDeint(void);
     virtual bool NeedsDoubleFramerate(void) const;
+    virtual bool IsBobDeint(void) const;
     virtual bool IsExtraProcessingRequired(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 

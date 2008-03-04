@@ -3681,7 +3681,7 @@ void VideoOutputXv::ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(frame);
 
-    bool safepauseframe = pauseframe && !NeedsDoubleFramerate();
+    bool safepauseframe = pauseframe && !IsBobDeint();
     if (m_deinterlacing && m_deintFilter != NULL &&
         m_deinterlaceBeforeOSD && (!pauseframe || safepauseframe))
     {
@@ -3724,7 +3724,7 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 
     vbuffers.LockFrame(frame, "ProcessFrameMem");
 
-    bool safepauseframe = pauseframe && !NeedsDoubleFramerate();
+    bool safepauseframe = pauseframe && !IsBobDeint();
     if (!pauseframe || safepauseframe)
     {
         if (filterList)
