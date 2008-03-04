@@ -137,12 +137,8 @@ sub getMovieData {
    }
    #parse cast data
    my $cast_data = parseBetween($response,"<table class=\"film_persons\">","</table>");
-   my $counter=0;
-   while ($counter <= 2){
-      if ($cast_data =~ s/alt=\"(.+)\"//){
-         $cast = $cast . ' ' . $1; 
-         $counter++;
-      }
+   if ($cast_data) {
+      $cast = join(",", ($cast_data =~ m/alt=\"(.+)\"/g));
    }
 
    if (defined $opt_d) {
