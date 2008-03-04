@@ -469,9 +469,8 @@ void MythContextPrivate::GetScreenBounds()
             .arg(desktop->width()).arg(desktop->height())
             .arg(desktop->numScreens()));
 
-    int screen = desktop->primaryScreen();
-    if (GetNumberOfXineramaScreens())
-        screen = parent->GetNumSetting("XineramaScreen", 0);
+    int screen = parent->GetNumSetting("XineramaScreen",
+                                       desktop->primaryScreen());
 
     if (screen == -1)       // Special case - span all screens
     {
