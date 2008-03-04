@@ -2036,6 +2036,8 @@ if disabled cpu_override && enabled proc_opt; then
        ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5160" > /dev/null ; then
        ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5462" > /dev/null ; then
+       ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
 # Various Intel Duo processors (EMT64T capable)
    elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=k8" # this would be pentium4 on 32 bit systems
