@@ -1812,7 +1812,7 @@
     <container name="selector">
       <area>25,260,770,310</area>
       <listarea name="alphabet" draworder="2">
-        <area>23,8,65,295</area>
+        <area>23,8,45,295</area>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
@@ -1826,7 +1826,7 @@
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <fcnfont name="record_font" function="record"></fcnfont>
         <fcnfont name="recording_font" function="recording"></fcnfont>
-        <column number="1" width="380" context="-1"></column>
+        <column number="1" width="365" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel2.png" location="-14,-7"></image>
       </listarea>
