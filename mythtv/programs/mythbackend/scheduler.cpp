@@ -3079,9 +3079,6 @@ void Scheduler::AddNotListed(void) {
 
         p->schedulerid = p->startts.toString() + "_" + p->chanid;
 
-        if (p == NULL)
-            continue;
-
         tmpList.push_back(p);
     }
 
