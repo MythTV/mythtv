@@ -103,13 +103,16 @@ static HostComboBox *AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
     gc->setLabel(QObject::tr("Upmix"));
-    gc->addSelection(QObject::tr("Passive"), "0");
+    gc->addSelection(QObject::tr("Passive"), "0", true); // default
     gc->addSelection(QObject::tr("Active Simple"), "1");
-    gc->addSelection(QObject::tr("Active Linear"), "2", true); // default
+    gc->addSelection(QObject::tr("Active Linear"), "2");
     gc->setHelpText(
             QObject::tr(
                 "Set the audio upmix type for 2ch to 6ch conversion. "
-                "This is for multi-channel/surround audio playback."));
+                "This is for multi-channel/surround audio playback. "
+                "'Passive' is the least demanding on the CPU. "
+                "'Active Simple' is more demanding and 'Active Linear' "
+                "is the most demanding (but highest quality)."));
     return gc;
 }
 

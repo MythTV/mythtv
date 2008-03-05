@@ -182,7 +182,7 @@ void DVBRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     {
         uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
         pat->tsheader()->SetContinuityCounter(next_cc);
-        BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
     }
 
     uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
@@ -222,7 +222,7 @@ void DVBRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
     for (uint i = 0; i < size ; i += TSPacket::SIZE)
-        BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 
     uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
