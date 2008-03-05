@@ -1875,6 +1875,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         GetNVP()->ReinitAudio();
     }
 
+    // if we don't have a video stream we still need to make sure some
+    // video params are set properly
+    if (selectedVideoIndex == -1)
+    {
+        QString tvformat = gContext->GetSetting("TVFormat").lower();
+        if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
+            tvformat == "pal-m" || tvformat == "atsc")
+        {
+            fps = 29.97;
+            GetNVP()->SetVideoParams(-1, -1, 29.97, 1);
+        }
+        else
+        {
+            fps = 25.0;
+            GetNVP()->SetVideoParams(-1, -1, 25.0, 1);
+        }
+    }
+
     if (GetNVP()->IsErrored())
         scanerror = -1;
 
