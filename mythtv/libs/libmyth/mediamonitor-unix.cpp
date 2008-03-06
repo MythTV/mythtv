@@ -465,9 +465,11 @@ bool MediaMonitorUnix::AddDevice(const char* devPath)
     struct fstab * mep = NULL;
     char lpath[PATH_MAX];
 
-    // Resolve the simlink for the device.
+    // Resolve the symlink for the device.
     int len = readlink(devicePath, lpath, PATH_MAX);
-    if (len > 0 && len < PATH_MAX)
+    if (len == -1)
+        len = 0;
+    if (len < PATH_MAX)
         lpath[len] = 0;
 
     // Attempt to open the file system descriptor entry.
@@ -495,7 +497,7 @@ bool MediaMonitorUnix::AddDevice(const char* devPath)
 
         // Check to see if this is the same as our passed in device.
         if ((strcmp(devicePath, mep->fs_spec) != 0) &&
-             (len && (strcmp(lpath, mep->fs_spec) != 0)))
+             (len && strncmp(lpath, mep->fs_spec, PATH_MAX) != 0))
             continue;
     }
 
