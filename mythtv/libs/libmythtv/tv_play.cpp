@@ -440,10 +440,19 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "VIEWSCHEDULED", "Display scheduled recording list", "");
-    REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
+    REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "Alt+F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
     REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "");
     REG_KEY("TV Playback", "SCREENSHOT","Save screenshot of current video frame", "");
+
+    /* Interactive Television keys */
+    REG_KEY("TV Playback", "MENURED",    "Menu Red",    "F2");
+    REG_KEY("TV Playback", "MENUGREEN",  "Menu Green",  "F3");
+    REG_KEY("TV Playback", "MENUYELLOW", "Menu Yellow", "F4");
+    REG_KEY("TV Playback", "MENUBLUE",   "Menu Blue",   "F5");
+    REG_KEY("TV Playback", "TEXTEXIT",   "Menu Exit",   "F6");
+    REG_KEY("TV Playback", "MENUTEXT",   "Menu Text",   "F7");
+    REG_KEY("TV Playback", "MENUEPG",    "Menu EPG",    "F12");
 
     /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -472,14 +481,6 @@ void TV::InitKeys(void)
     REG_KEY("Teletext Menu", "TOGGLEBACKGROUND","Toggle Background", "F7");
     REG_KEY("Teletext Menu", "REVEAL",      "Reveal hidden Text",    "F8");
 
-    /* Interactive Television keys */
-    REG_KEY("ITV Menu", "MENURED",    "Menu Red",    "F2");
-    REG_KEY("ITV Menu", "MENUGREEN",  "Menu Green",  "F3");
-    REG_KEY("ITV Menu", "MENUYELLOW", "Menu Yellow", "F4");
-    REG_KEY("ITV Menu", "MENUBLUE",   "Menu Blue",   "F5");
-    REG_KEY("ITV Menu", "TEXTEXIT",   "Menu Exit",   "F6");
-    REG_KEY("ITV Menu", "MENUTEXT",   "Menu Text",   "F7");
-    REG_KEY("ITV Menu", "MENUEPG",    "Menu EPG",    "F12");
 /*
   keys already used:
 
@@ -2678,7 +2679,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         QStringList itv_actions;
         if (gContext->GetMainWindow()->TranslateKeyPress(
-                "ITV Menu", e, itv_actions))
+                "TV Playback", e, itv_actions))
         for (uint i = 0; i < itv_actions.size(); i++)
         {
             if (activenvp->ITVHandleAction(itv_actions[i]))
