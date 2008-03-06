@@ -3567,10 +3567,10 @@ thequery,
     if (dbver == "1212")
     {
         const QString updates[] = {
-"DELETE FROM keybindings WHERE action LIKE 'MENU%' AND context='TV Playback';"
-"DELETE FROM keybindings WHERE action='TEXTEXIT' AND context='TV Playback';"
+"DELETE FROM keybindings WHERE action LIKE 'MENU%' AND context='TV Playback';",
+"DELETE FROM keybindings WHERE action='TEXTEXIT' AND context='TV Playback';",
 "DELETE FROM keybindings WHERE action='SIGNALMON' AND context='TV Playback' "
-"   AND keylist='F7';"
+"   AND keylist='F7';",
 "UPDATE keybindings SET context='TV Playback' WHERE context='ITV Menu';",
 ""
 };
