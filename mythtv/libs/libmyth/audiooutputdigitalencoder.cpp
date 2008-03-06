@@ -261,8 +261,9 @@ static int encode_frame(
         unsigned char *data,
         size_t &len)
 {
-    size_t enc_len;
-    int flags, sample_rate, bit_rate;
+    unsigned char *payload = data + 8;  // skip header, currently 52 or 54bits
+    size_t         enc_len;
+    int            flags, sample_rate, bit_rate;
 
     // we don't do any length/crc validation of the AC3 frame here; presumably
     // the receiver will have enough sense to do that.  if someone has a
@@ -275,9 +276,9 @@ static int encode_frame(
     uint nr_samples = 0, block_len;
     if (dts)
     {
-        enc_len = dts_syncinfo(data+8, &flags, &sample_rate, &bit_rate);
+        enc_len = dts_syncinfo(payload, &flags, &sample_rate, &bit_rate);
         int rate, sfreq, nblks;
-        dts_decode_header(data+8, &rate, &nblks, &sfreq);
+        dts_decode_header(payload, &rate, &nblks, &sfreq);
         nr_samples = nblks * 32;
         block_len = nr_samples * 2 * 2;
     }
@@ -285,10 +286,10 @@ static int encode_frame(
     {
 #ifdef ENABLE_AC3_DECODER
         enc_len = ac3_sync(
-            data + 8, &flags, &sample_rate, &bit_rate, (int*)&block_len);
+            payload, &flags, &sample_rate, &bit_rate, (int*)&block_len);
         block_len *= 2 * 2;
 #else
-        enc_len = a52_syncinfo(data + 8, &flags, &sample_rate, &bit_rate);
+        enc_len = a52_syncinfo(payload, &flags, &sample_rate, &bit_rate);
         block_len = MAX_AC3_FRAME_SIZE;
 #endif
     }
@@ -302,12 +303,12 @@ static int encode_frame(
 
     enc_len = min((uint)enc_len, block_len - 8);
 
-    //uint32_t x = *(uint32_t*)(data+8);
+    //uint32_t x = *(uint32_t*)payload;
     // in place swab
-    swab((const char *)data + 8, (char *)data + 8, enc_len);
+    swab((const char *)payload, (char *)payload, enc_len);
     //VERBOSE(VB_AUDIO|VB_TIMESTAMP, 
     //        QString("DigitalEncoder::Encode swab test %1 %2")
-    //        .arg(x,0,16).arg(*(uint32_t*)(data+8),0,16));
+    //        .arg(x,0,16).arg(*(uint32_t*)payload,0,16));
 
     // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
     // they form a valid IEC958 AC3 header.
@@ -351,7 +352,7 @@ static int encode_frame(
     data[5] = 0x00;
     data[6] = (enc_len << 3) & 0xFF;
     data[7] = (enc_len >> 5) & 0xFF;
-    memset(data + 8 + enc_len, 0, block_len - 8 - enc_len);
+    memset(payload + enc_len, 0, block_len - 8 - enc_len);
     len = block_len;
 
     return enc_len;
