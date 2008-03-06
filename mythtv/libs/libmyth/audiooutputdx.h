@@ -38,7 +38,7 @@ public:
     virtual void Reconfigure(int audio_bits, 
                              int audio_channels, 
                              int audio_samplerate,
-                             int audio_passthru);
+                             bool audio_passthru);
     virtual void SetBlocking(bool blocking);
 
     virtual bool AddSamples(char *buffer, int samples, long long timecode);
