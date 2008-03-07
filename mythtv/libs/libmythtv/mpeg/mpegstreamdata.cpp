@@ -185,6 +185,7 @@ void MPEGStreamData::Reset(int desiredProgram)
     _pids_listening.clear();
     _pids_notlistening.clear();
     _pids_writing.clear();
+    _pids_audio.clear();
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
 
