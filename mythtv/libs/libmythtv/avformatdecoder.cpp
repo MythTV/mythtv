@@ -70,6 +70,15 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
 void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
+static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
+{
+    // minimum buffer alignment
+    avcodec_align_dimensions(avctx, (int*)&width, (int*)&height);
+    // minimum MPEG alignment
+    width  = (width  + 15) & (~0xf);
+    height = (height + 15) & (~0xf);
+}
+
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
     static QString full_line("");
@@ -1131,20 +1140,22 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream)
     {
-        uint width  = enc->width;
-        uint height = enc->height;
+        uint align_width  = enc->width;
+        uint align_height = enc->height;
 
-        if (width == 0 && height == 0)
+        align_dimensions(enc, align_width, align_height);
+
+        if (align_width == 0 && align_height == 0)
         {
             VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
-                    "invalid dimensions, resetting decoder.");
-            width = 640;
-            height = 480;
+                    "failed to align dimensions, resetting decoder.");
+            align_width = 640;
+            align_height = 480;
             fps = 29.97;
             aspect_ratio = 4.0 / 3;
         }
 
-        GetNVP()->SetVideoParams(width, height, fps,
+        GetNVP()->SetVideoParams(align_width, align_height, fps,
                                  keyframedist, aspect_ratio, kScan_Detect, 
                                  dvd_video_codec_changed);
     }
@@ -2342,7 +2353,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (changed)
             {
-                GetNVP()->SetVideoParams(width, height, seqFPS,
+                uint awidth = width, aheight = height;
+                align_dimensions(context, awidth, aheight);
+
+                GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                          keyframedist, aspect, 
                                          kScan_Detect);
                 
@@ -2419,7 +2433,10 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (changed)
         {
-            GetNVP()->SetVideoParams(width, height, seqFPS,
+            uint awidth = width, aheight = height;
+            align_dimensions(context, awidth, aheight);
+
+            GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                      keyframedist, aspect_ratio,
                                      kScan_Detect);
 

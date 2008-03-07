@@ -47,7 +47,6 @@ extern "C" {
 #define LOC_ERR QString("VideoOutput, Error: ")
 
 static QSize fix_1080i(QSize raw);
-static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static QString to_comma_list(const QStringList &list);
 
@@ -376,9 +375,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     }
 
     display_visible_rect = QRect(0, 0, winw, winh);
-    video_disp_dim       = fix_1080i(QSize(width, height));
-    video_dim            = fix_alignment(QSize(width, height));
-    video_rect           = QRect(QPoint(winx, winy), video_disp_dim);
+    video_dim            = QSize(width, height);
+    video_rect           = QRect(QPoint(winx, winy), fix_1080i(video_dim));
 
     db_vdisp_profile->SetInput(video_dim);
 
@@ -605,8 +603,7 @@ bool VideoOutput::InputChanged(const QSize &input_size,
     (void)myth_codec_id;
     (void)codec_private;
 
-    video_disp_dim = fix_1080i(input_size);
-    video_dim      = fix_alignment(input_size);
+    video_dim = input_size;
 
     db_vdisp_profile->SetInput(video_dim);
 
@@ -713,10 +710,8 @@ static float sq(float a) { return a*a; }
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const
 {
-    float dv_w = (((float)video_disp_dim.width())  /
-                  display_video_rect.width());
-    float dv_h = (((float)video_disp_dim.height()) /
-                  display_video_rect.height());
+    float dv_w = ((float)video_dim.width())  / display_video_rect.width();
+    float dv_h = ((float)video_dim.height()) / display_video_rect.height();
 
     uint right_overflow = max((display_video_rect.width()
                                 + display_video_rect.left())
@@ -728,9 +723,8 @@ QRect VideoOutput::GetVisibleOSDBounds(
     // top left and bottom right corners respecting letterboxing
     QPoint tl = QPoint((uint) ceil(max(-display_video_rect.left(),0)*dv_w),
                        (uint) ceil(max(-display_video_rect.top(),0)*dv_h));
-    QPoint br = QPoint(
-        (uint) floor(video_disp_dim.width()  - (right_overflow * dv_w)),
-        (uint) floor(video_disp_dim.height() - (lower_overflow * dv_h)));
+    QPoint br = QPoint((uint) floor(video_dim.width()-(right_overflow*dv_w)),
+                       (uint) floor(video_dim.height()-(lower_overflow*dv_h)));
     // adjust for overscan
     if ((db_scale_vert > 0.0f) || (db_scale_horiz > 0.0f))
     {
@@ -768,7 +762,7 @@ QRect VideoOutput::GetVisibleOSDBounds(
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    return QRect(QPoint(0, 0), video_disp_dim);
+    return QRect(QPoint(0, 0), video_dim);
 }
 
 /** \fn VideoOutput::ApplyManualScaleAndMove(void)
@@ -875,9 +869,8 @@ void VideoOutput::ApplyDBScaleAndMove(void)
     if (db_scale_horiz > 0) 
     {
         float tmp = 1.0f - 2.0f * db_scale_horiz;
-        video_rect.moveLeft(
-            (int) round(video_disp_dim.width() * db_scale_horiz));
-        video_rect.setWidth((int) round(video_disp_dim.width() * tmp));
+        video_rect.moveLeft((int) round(video_dim.width() * db_scale_horiz));
+        video_rect.setWidth((int) round(video_dim.width() * tmp));
 
         int xoff = db_move.x();
         if (xoff > 0) 
@@ -1109,15 +1102,14 @@ void VideoOutput::PrintMoveResizeDebug(void)
 void VideoOutput::MoveResize(void)
 {
     // Preset all image placement and sizing variables.
-    video_rect         = QRect(QPoint(0, 0), video_disp_dim);
+    video_rect         = QRect(QPoint(0, 0), fix_1080i(video_dim));
     display_video_rect = display_visible_rect;
 
     // Avoid too small frames for audio only streams (for OSD).
     if ((video_rect.width() <= 0) || (video_rect.height() <= 0))
     {
-        video_disp_dim = display_visible_rect.size();
-        video_dim      = fix_alignment(display_visible_rect.size());
-        video_rect     = QRect(QPoint(0, 0), video_dim);
+        video_dim  = display_visible_rect.size();
+        video_rect = QRect(QPoint(0, 0), video_dim);
     }
 
     // Apply various modifications
@@ -1453,8 +1445,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     }
 
     // adjust for non-square pixels on screen
-    float dispPixelAdj =
-        (GetDisplayAspect() * video_disp_dim.height())/video_disp_dim.width();
+    float dispPixelAdj = (GetDisplayAspect() * video_dim.height()) /
+        video_dim.width();
 
     // adjust for non-square pixels in video
     float vidPixelAdj  = pipVideoWidth / (pipVideoAspect * pipVideoHeight);
@@ -1832,13 +1824,6 @@ static QSize fix_1080i(QSize raw)
     if (QSize(1440, 1088) == raw)
         return QSize(1440, 1080);
     return raw;
-}
-
-/// Correct for underalignment
-static QSize fix_alignment(QSize raw)
-{
-    return QSize((raw.width()  + 15) & (~0xf),
-                 (raw.height() + 15) & (~0xf));
 }
 
 /// Correct for rounding errors

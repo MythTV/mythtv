@@ -235,7 +235,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     QMutexLocker locker(&global_lock);
 
     bool cid_changed = (myth_codec_id != av_codec_id);
-    bool res_changed = input_size != video_disp_dim;
+    bool res_changed = input_size != video_dim;
     bool asp_changed = aspect != video_aspect;
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
@@ -318,7 +318,7 @@ QRect VideoOutputXv::GetTotalOSDBounds(void) const
     QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
                        display_visible_rect.height() & ~0x1);
 
-    QSize sz = (chroma_osd || gl_use_osd_opengl2) ? dvr2 : video_disp_dim;
+    QSize sz = (chroma_osd || gl_use_osd_opengl2) ? dvr2 : video_dim;
     return QRect(QPoint(0,0), sz);
 }
 
@@ -379,7 +379,7 @@ int VideoOutputXv::GetRefreshRate(void)
 
 void VideoOutputXv::ResizeForVideo(void) 
 {
-    ResizeForVideo(video_disp_dim.width(), video_disp_dim.height());
+    ResizeForVideo(video_dim.width(), video_dim.height());
 }
 
 void VideoOutputXv::ResizeForGui(void)
@@ -4073,7 +4073,7 @@ QRect VideoOutputXv::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
     QRect position;
     float pipVideoAspect = 1.3333f;
     // set height
-    int tmph = (video_disp_dim.height() * db_pip_size) / 100;
+    int tmph = (video_dim.height() * db_pip_size) / 100;
     // adjust for aspect override modes...
     int letterXadj = 0;
     int letterYadj = 0;
@@ -4106,18 +4106,18 @@ QRect VideoOutputXv::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
             break;
         case kPIPBottomLeft:
             xoff += letterXadj;
-            yoff = video_disp_dim.height() - position.height() - 
+            yoff = video_dim.height() - position.height() - 
                 yoff - letterYadj;
             break;
         case kPIPTopRight:
-            xoff = video_disp_dim.width() - position.width() -
+            xoff = video_dim.width() - position.width() -
                     xoff - letterXadj;
             yoff = yoff + letterYadj;
             break;
         case kPIPBottomRight:
-            xoff = video_disp_dim.width() - position.width() -
+            xoff = video_dim.width() - position.width() -
                     xoff - letterXadj;
-            yoff = video_disp_dim.height() - position.height() -
+            yoff = video_dim.height() - position.height() -
                    yoff - letterYadj;
             break;
     }

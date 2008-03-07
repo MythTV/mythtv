@@ -273,8 +273,7 @@ class VideoOutput
     float   display_aspect;   ///< Physical aspect ratio of playback window
 
     // Video dimensions
-    QSize   video_dim;        ///< Pixel dimensions of video buffer
-    QSize   video_disp_dim;   ///< Pixel dimensions of video display area
+    QSize   video_dim;        ///< Pixel dimensions of video
     float   video_aspect;     ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be
