@@ -793,7 +793,7 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
             ScreenListInfo *newsi = new ScreenListInfo(*si);
             // FIXME: this seems bogus
             newsi->types.setAutoDelete(true);
-            //delete selected;
+
             if (!list->GetCount())
             {
                 list->allowFocus(false);
@@ -801,6 +801,9 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
             }
             if (hasUnits)
                 showUnitsPopup(selected->text(), newsi);
+
+            doLocationDialog(si, true);
+
             UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_active_list, txt);
             itm->setDrawArrow(multiLoc);
             itm->setData(newsi);
