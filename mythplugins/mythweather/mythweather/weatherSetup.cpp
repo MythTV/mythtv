@@ -209,41 +209,41 @@ void ScreenSetup::wireUI()
                 SLOT(updateHelpText()));
     }
 
-    m_type_list = getUIListBtnType("typelist");
-    if (!m_type_list)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading typelist");
-    }
-    else
-    {
-        m_type_list->calculateScreenArea();
-        m_type_list->allowFocus(false);
-        // connect(m_active_list, SIGNAL(takingFocus()), m_type_list,
-        // SLOT(show()));
-        connect(m_type_list, SIGNAL(takingFocus()), m_type_list, SLOT(show()));
-        connect(m_active_list, SIGNAL(loosingFocus()), m_type_list,
-                SLOT(hide()));
-        connect(m_active_list, SIGNAL(takingFocus()),
-                this, SLOT(activeListItemSelected()));
-        connect(m_type_list, SIGNAL(takingFocus()), this,
-                SLOT(updateHelpText()));
-        connect(m_type_list, SIGNAL(itemSelected(UIListBtnTypeItem *)), this,
-                SLOT(updateHelpText()));
-    }
+//     m_type_list = getUIListBtnType("typelist");
+//     if (!m_type_list)
+//     {
+//         VERBOSE(VB_IMPORTANT, "error loading typelist");
+//     }
+//     else
+//     {
+//         m_type_list->calculateScreenArea();
+//         m_type_list->allowFocus(false);
+//         // connect(m_active_list, SIGNAL(takingFocus()), m_type_list,
+//         // SLOT(show()));
+//         connect(m_type_list, SIGNAL(takingFocus()), m_type_list, SLOT(show()));
+//         connect(m_active_list, SIGNAL(loosingFocus()), m_type_list,
+//                 SLOT(hide()));
+//         connect(m_active_list, SIGNAL(takingFocus()),
+//                 this, SLOT(activeListItemSelected()));
+//         connect(m_type_list, SIGNAL(takingFocus()), this,
+//                 SLOT(updateHelpText()));
+//         connect(m_type_list, SIGNAL(itemSelected(UIListBtnTypeItem *)), this,
+//                 SLOT(updateHelpText()));
+//     }
 
-    UITextType *txt = getUITextType("typelbl");
-    if (!txt)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading typelbl");
-    }
-    else
-    {
-        //connect(m_active_list, SIGNAL(takingFocus()), txt, SLOT(show()));
-        connect(m_type_list, SIGNAL(takingFocus()), txt, SLOT(show()));
-        connect(m_active_list, SIGNAL(loosingFocus()), txt, SLOT(hide()));
-        txt->hide();
-        txt->SetText(tr("Data Types"));
-    }
+//     UITextType *txt = getUITextType("typelbl");
+//     if (!txt)
+//     {
+//         VERBOSE(VB_IMPORTANT, "error loading typelbl");
+//     }
+//     else
+//     {
+//         //connect(m_active_list, SIGNAL(takingFocus()), txt, SLOT(show()));
+//         connect(m_type_list, SIGNAL(takingFocus()), txt, SLOT(show()));
+//         connect(m_active_list, SIGNAL(loosingFocus()), txt, SLOT(hide()));
+//         txt->hide();
+//         txt->SetText(tr("Data Types"));
+//     }
 
     m_finish_btn = getUITextButtonType("finishbutton");
     if (m_finish_btn)
@@ -352,18 +352,18 @@ void ScreenSetup::updateHelpText()
             text += tr("change units; ");
         text += tr("move screen up or down; or remove screen.");
     }
-    else if (itm == m_type_list)
-    {
-        UIListBtnTypeItem *btnitm = m_type_list->GetItemCurrent();
-        if (btnitm)
-        {
-            TypeListInfo *ti = (TypeListInfo *) btnitm->getData();
-            text = tr("%1\nLocation: %2\nSource: %3\n\nPress SELECT to change Location settings")
-                .arg(btnitm->text()).arg(ti->location != "" ? ti->location :
-                                         tr("Not Defined"))
-                .arg(ti->src ? ti->src->name : tr("Not Defined"));
-        }
-    }
+//     else if (itm == m_type_list)
+//     {
+//         UIListBtnTypeItem *btnitm = m_type_list->GetItemCurrent();
+//         if (btnitm)
+//         {
+//             TypeListInfo *ti = (TypeListInfo *) btnitm->getData();
+//             text = tr("%1\nLocation: %2\nSource: %3\n\nPress SELECT to change Location settings")
+//                 .arg(btnitm->text()).arg(ti->location != "" ? ti->location :
+//                                          tr("Not Defined"))
+//                 .arg(ti->src ? ti->src->name : tr("Not Defined"));
+//         }
+//     }
 
     m_help_txt->SetText(text);
 }
@@ -802,7 +802,8 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
             if (hasUnits)
                 showUnitsPopup(selected->text(), newsi);
 
-            doLocationDialog(si, true);
+            if (!doLocationDialog(newsi, true))
+                return;
 
             UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_active_list, txt);
             itm->setDrawArrow(multiLoc);
@@ -818,13 +819,13 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
                    "is supplied by existing sources"));
         }
     }
-    else if (list == m_type_list)
-    {
-        doLocationDialog((ScreenListInfo *) m_active_list->GetItemCurrent()->getData(), false);
-    }
+//     else if (list == m_type_list)
+//     {
+//         doLocationDialog((ScreenListInfo *) m_active_list->GetItemCurrent()->getData(), false);
+//     }
 }
 
-void ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
+bool ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
 {
     /*
      * If its alltypes, we round up all types for this screen,
@@ -842,13 +843,13 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
             types << ti->name;
         }
     }
-    else
-    {
-        TypeListInfo *ti =
-                (TypeListInfo *) m_type_list->GetItemCurrent()->getData();
-        infos.append(ti);
-        types << ti->name;
-    }
+//     else
+//     {
+//         TypeListInfo *ti =
+//                 (TypeListInfo *) m_type_list->GetItemCurrent()->getData();
+//         infos.append(ti);
+//         types << ti->name;
+//     }
     QString loc;
     ScriptInfo *src = 0;
     if (showLocationPopup(types, loc, src))
@@ -859,7 +860,11 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
             ti->src = src;
         }
         updateHelpText();
+
+        return true;
     }
+    else
+        return false;
 }
 
 void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
@@ -874,27 +879,27 @@ void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
         return;
 
     QDict<TypeListInfo> types = si->types;
-    m_type_list->Reset();
-    UITextType *txt = getUITextType("typelbl");
+//     m_type_list->Reset();
+//    UITextType *txt = getUITextType("typelbl");
     if (si->multiLoc)
     {
-        QDictIterator<TypeListInfo> it(si->types);
-        for (; it.current(); ++it)
-        {
-            UIListBtnTypeItem *item = new UIListBtnTypeItem(m_type_list,
-                                                           it.current()->name);
-            item->setData(it.current());
-        }
-
-        if (txt) txt->show();
-        m_type_list->show();
-        m_type_list->allowFocus(true);
+//         QDictIterator<TypeListInfo> it(si->types);
+//         for (; it.current(); ++it)
+//         {
+//             UIListBtnTypeItem *item = new UIListBtnTypeItem(m_type_list,
+//                                                            it.current()->name);
+//             item->setData(it.current());
+//         }
+// 
+//         if (txt) txt->show();
+//         m_type_list->show();
+//         m_type_list->allowFocus(true);
     }
     else
     {
-        if (txt) txt->hide();
-        m_type_list->hide();
-        m_type_list->allowFocus(false);
+//         if (txt) txt->hide();
+//        m_type_list->hide();
+//        m_type_list->allowFocus(false);
     }
     updateForeground();
 }
@@ -987,10 +992,10 @@ void ScreenSetup::deleteScreen(UIListBtnType *list)
     {
         nextPrevWidgetFocus(false);
         list->allowFocus(false);
-        m_type_list->hide();
-        m_type_list->allowFocus(false);
-        UITextType *txt = getUITextType("typelbl");
-        if (txt) txt->hide();
+//         m_type_list->hide();
+//         m_type_list->allowFocus(false);
+//         UITextType *txt = getUITextType("typelbl");
+//         if (txt) txt->hide();
     }
 
 }
@@ -1023,10 +1028,10 @@ void ScreenSetup::cursorRight(UIType *curr)
 
 void ScreenSetup::cursorLeft(UIType *curr)
 {
-    if (curr == m_type_list)
-    {
-        nextPrevWidgetFocus(false);
-    }
+//     if (curr == m_type_list)
+//     {
+//         nextPrevWidgetFocus(false);
+//     }
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1303,15 +1308,12 @@ void SourceSetup::sourceListItemSelected(UIListBtnTypeItem *itm)
 
 LocationDialog::LocationDialog(MythMainWindow *parent, QStringList types,
                                SourceManager *srcman) :
-    MythThemedDialog(parent, "location-dialog", false)
+    MythThemedDialog(parent, "setup-location", "weather-", "Location Selection")
 {
 
     m_types = types;
     m_src_man = srcman;
-    move(100, 100);
-    setFixedSize(screenwidth - 200, screenheight - 200);
-    gContext->ThemeWidget(this);
-    loadThemedWindow("setup-location", "weather-");
+
     wireUI();
 
     assignFirstFocus();

@@ -1,26 +1,26 @@
 <mythuitheme>
-
+    
     <window name="weather">
-
+        
         <font name="active" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="inactive" face="Bitstream Vera Sans">
             <color>#9999cc</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>28</size>
             <bold>yes</bold>
             <shadow>1,1</shadow>
         </font>
-
+        
         <font name="timedate" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <dropcolor>#000000</dropcolor>
@@ -28,127 +28,127 @@
             <shadow>1,1</shadow>
             <bold>yes</bold>
         </font>
-
+        
         <font name="weatherdata" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="label" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>14</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="label2" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>11</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="alerttext" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>12</size>
             <bold>no</bold>
         </font>
-
+        
         <font name="footer" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>17</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="location" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>17</size>
             <bold>yes</bold>
             <shadow>1,1</shadow>
         </font>
-
+        
         <font name="lohifont" face="Bitstream Vera Sans">
             <color>#ffff33</color>
             <size>17</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="lohifont2" face="Bitstream Vera Sans">
             <color>#ffff33</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="tempdata" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>24</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="tempdata2" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>16</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="todayfont" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>26</size>
             <bold>yes</bold>
         </font>
-
+        
         <font name="temp" face="Bitstream Vera Sans">
             <color>#ffffff</color>
             <size>50</size>
             <bold>yes</bold>
         </font>
-
+        
         <container name="background">
             <image name="backup" draworder="0">
                 <filename>mw-background.png</filename>
                 <position>22,175</position>
             </image>
-
+            
             <image name="lines" draworder="0">
                 <filename>mw-lines.png</filename>
                 <position>22,175</position>
             </image>
-
+            
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>25,25</position>
                 <staticsize>150,110</staticsize>
             </image>
         </container>
-
+        
         <container name="startup">
             <area>0,0,1280,720</area>
-
+            
             <image name="shading" draworder="0">
                 <filename>trans-backup.png</filename>
                 <position>0,0</position>
             </image>
-
+            
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>400,200</position>
             </image>
-
+            
             <textarea name="loading" align="right">
                 <font>header</font>
                 <area>30,170,400,50</area>
                 <value>loading...</value>
             </textarea>
-
+            
             <textarea name="retrieve" align="center">
                 <font>header</font>
                 <area>0,480,800,42</area>
                 <value>[ retrieving weather data ... ]</value>
             </textarea>
         </container>
-
+        
         <container name="Current Conditions">
             <area>0,0,1280,720</area>
-
+            
             <textarea name="*currentdatetime" draworder="2" align="right">
                 <font>timedate</font>
                 <area>830,185,360,40</area>
@@ -189,12 +189,12 @@
                 <font>weatherdata</font>
                 <value>Wind(Gust)</value>
             </textarea>
-
+            
             <textarea name="+wind_spdgst" draworder="5" align="right">
                 <area>230,336,300,32</area>
                 <font>weatherdata</font>
             </textarea>
-
+            
             <textarea name="dirlbl" draworder="5">
                 <area>40,384,245,32</area>
                 <font>weatherdata</font>
@@ -237,16 +237,16 @@
                 <filename>unknown.png</filename>
                 <staticsize>200,150</staticsize>
             </image>
-
+            
             <textarea name="+observation_time" draworder="5">
                 <area>39,540,450,35</area>
                 <font>footer</font>
             </textarea>
         </container>
-
+        
         <container name="Three Day Forecast">
             <area>0,0,1280,720</area>
-
+            
             <textarea name="+3dlocation" draworder="5" align="left">
                 <area>39,181,450,70</area>
                 <font>location</font>
@@ -256,12 +256,12 @@
                 <font>timedate</font>
                 <area>830,185,360,40</area>
             </textarea>
-
+            
             <textarea name="*pause_text" draworder="5" align="right">
                 <area>60,540,700,35</area>
                 <font>footer</font>
             </textarea>
-
+            
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,1280,45</area>
                 <font>header</font>
@@ -290,7 +290,7 @@
                 <position>55,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-
+            
             <textarea name="lolbl0" draworder="5" align="center">
                 <area>50,465,100,32</area>
                 <font>lohifont</font>
@@ -319,7 +319,7 @@
                 <position>520,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-
+            
             <textarea name="lolbl1" draworder="5" align="center">
                 <area>520,465,100,32</area>
                 <font>lohifont</font>
@@ -348,7 +348,7 @@
                 <position>945,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-
+            
             <textarea name="lolbl2" draworder="5" align="center">
                 <area>940,465,100,32</area>
                 <font>lohifont</font>
@@ -374,10 +374,10 @@
                 <font>footer</font>
             </textarea>
         </container>
-
+        
         <container name="Six Day Forecast">
             <area>0,0,1280,720</area>
-
+            
             <textarea name="+6dlocation" draworder="5" align="center">
                 <area>175,80,450,70</area>
                 <font>location</font>
@@ -391,7 +391,7 @@
                 <area>60,540,700,35</area>
                 <font>footer</font>
             </textarea>
-
+            
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -475,7 +475,7 @@
                 <position>559,365</position>
                 <staticsize>167,125</staticsize>
             </image>
-
+            
             <textarea name="hilbl0" draworder="5" align="left">
                 <area>70,297,100,30</area>
                 <font>lohifont2</font>
@@ -536,7 +536,7 @@
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-
+            
             <textarea name="+high-0" draworder="5" align="left">
                 <area>120,297,40,20</area>
                 <font>tempdata2</font>
@@ -585,20 +585,20 @@
                 <area>706,497,40,20</area>
                 <font>tempdata2</font>
             </textarea>
-
+            
             <textarea name="+updatetime" draworder="5">
                 <area>39,540,700,35</area>
                 <font>footer</font>
             </textarea>
         </container>
-
+        
         <container name="Static Map">
             <area>0,0,1280,720</area>
-
+            
             <blackhole name="nounits" draworder="0">
                 <area>0,0,0,0</area>
             </blackhole>
-
+            
             <textarea name="*currentdatetime" draworder="2" align="right">
                 <font>timedate</font>
                 <area>630,12,160,40</area>
@@ -607,7 +607,7 @@
                 <area>60,70,700,35</area>
                 <font>footer</font>
             </textarea>
-
+            
             <textarea name="+smdesc" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -621,14 +621,14 @@
                 <staticsize>730,450</staticsize>
             </image>
         </container>
-
+        
         <container name="Animated Map">
             <area>0,0,1280,720</area>
-
+            
             <blackhole name="nounits" draworder="0">
                 <area>0,0,0,0</area>
             </blackhole>
-
+            
             <textarea name="*currentdatetime" draworder="2" align="right">
                 <font>timedate</font>
                 <area>630,12,160,40</area>
@@ -637,7 +637,7 @@
                 <area>60,70,700,35</area>
                 <font>footer</font>
             </textarea>
-
+            
             <textarea name="+amdesc" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -653,14 +653,14 @@
                 <startinterval>1000</startinterval>
             </animatedimage>
         </container>
-
+        
         <container name="Severe Weather Alerts">
             <area>0,0,1280,720</area>
-
+            
             <blackhole name="nounits" draworder="0">
                 <area>0,0,0,0</area>
             </blackhole>
-
+            
             <textarea name="+swlocation" draworder="5">
                 <area>39,181,700,35</area>
                 <font>footer</font>
@@ -673,7 +673,7 @@
                 <area>60,540,700,35</area>
                 <font>footer</font>
             </textarea>
-
+            
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
@@ -696,10 +696,10 @@
                 <font>footer</font>
             </textarea>
         </container>
-
+        
         <container name="18 Hour Forecast">
             <area>0,0,1280,720</area>
-
+            
             <textarea name="+18hrlocation" draworder="5" align="center">
                 <area>175,80,450,70</area>
                 <font>location</font>
@@ -910,7 +910,7 @@
             </textarea>
         </container>
     </window>
-
+    
     <window name="global-setup">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
@@ -976,7 +976,7 @@
                 <multiline>yes</multiline>
                 <value>Seconds to display page after manual page change:</value>
             </textarea>
-
+            
             <blackhole name="pgto_spinbox" draworder="0">
                 <area>675,0,50,30</area>
             </blackhole>
@@ -1010,7 +1010,7 @@
                 <image function="checked_high" filename="mw_checked_high.png"></image>
                 <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
             </checkbox>
-
+            
             <textbutton name="finishbutton" draworder="0">
                 <position>500,400</position>
                 <font>button</font>
@@ -1057,7 +1057,7 @@
             <size>14</size>
             <bold>no</bold>
         </font>
-
+        
         <container name="header">
             <area>0,0,1280,600</area>
             <image name="logo" draworder="0">
@@ -1094,7 +1094,7 @@
                 <area>25,20,400,30</area>
                 <font>active</font>
             </textarea>
-            <listbtnarea name="typelist" draworder="0">
+            <!-- <listbtnarea name="typelist" draworder="0">
                 <area>265,45,200,348</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
@@ -1104,7 +1104,7 @@
             <textarea name="typelbl" draworder="0">
                 <area>260,20,200,30</area>
                 <font>active</font>
-            </textarea>
+            </textarea> -->
             <image name="txtlines" draworder="0">
                 <position>475,45</position>
                 <filename>cr-lines.png</filename>
@@ -1124,6 +1124,7 @@
             </textbutton>
         </container>
     </window>
+
     <window name="source-setup">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
@@ -1161,7 +1162,7 @@
             <size>14</size>
             <bold>no</bold>
         </font>
-
+        
         <container name="header">
             <area>0,0,800,600</area>
             <image name="logo" draworder="0">
@@ -1219,9 +1220,9 @@
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
         </container>
-
+        
     </window>
-
+    
     <window name="setup-location">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
@@ -1255,44 +1256,50 @@
             <bold>yes</bold>
         </font>
         <container name="search">
-            <area>0,0,900,500</area>
-            <textarea name="header" draworder="0" align="left">
-                <area>0,10,600,40</area>
+            <area>0,0,1200,800</area>
+            <textarea name="header" draworder="0" align="center">
+                <area>0,15,1200,40</area>
                 <value>Location Search</value>
                 <font>header</font>
             </textarea>
-            <textarea name="editlbl" draworder="0" align="right">
-                <area>25,80,280,40</area>
+            <textarea name="helptxt" draworder="0" align="center">
+                <area>0,50,1200,60</area>
                 <font>label</font>
-                <value>Enter Search String:</value>
+                <value>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</value>
+                <multiline>yes</multiline>
+            </textarea>
+            <textarea name="editlbl" draworder="0" align="right">
+                <area>25,115,280,40</area>
+                <font>label</font>
+                <value>Enter Location:</value>
             </textarea>
             <remoteedit name="loc-edit" draworder="0" align="left">
-                <area>315,75,360,30</area>
+                <area>315,110,600,30</area>
                 <font>edit</font>
             </remoteedit>
-            <textarea name="numresults" draworder="0" align="left">
-                <area>25,120,200,40</area>
-                <font>label</font>
-            </textarea>
             <textbutton name="searchbtn" draworder="0">
-                <position>425,120</position>
+                <position>550,150</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
             <listbtnarea name="results" draworder="0">
-                <area>25,175,700,270</area>
+                <area>25,205,1100,520</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
                 <showarrow>no</showarrow>
             </listbtnarea>
-            <textarea name="source" draworder="0" align="left">
-                <area>25,150,350,40</area>
+            <textarea name="numresults" draworder="0" align="center">
+                <area>300,750,400,40</area>
+                <font>label</font>
+            </textarea>
+            <textarea name="source" draworder="0" align="center">
+                <area>800,750,300,40</area>
                 <font>label</font>
             </textarea>
         </container>
     </window>
-
+    
 </mythuitheme>
