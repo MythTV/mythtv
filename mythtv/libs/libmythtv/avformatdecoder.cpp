@@ -943,8 +943,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (-1 == ret)
         return ret;
 
-    av_read_frame_flush(ic);
-
     AutoSelectTracks(); // This is needed for transcoder
 
     {
