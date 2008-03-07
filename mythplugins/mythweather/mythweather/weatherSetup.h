@@ -143,7 +143,7 @@ class ScreenSetup : public MythThemedDialog
 
     void doListSelect(UIListBtnType *list, UIListBtnTypeItem *selected);
     bool showUnitsPopup(const QString &name, ScreenListInfo *si);
-    void doLocationDialog(ScreenListInfo *si,  bool alltypes);
+    bool doLocationDialog(ScreenListInfo *si,  bool alltypes);
     bool showLocationPopup(QStringList types, QString &loc,
                            ScriptInfo *&src);
 
@@ -161,7 +161,7 @@ class ScreenSetup : public MythThemedDialog
     UITextType *m_help_txt;
     UIListBtnType *m_active_list;
     UIListBtnType *m_inactive_list;
-    UIListBtnType *m_type_list;
+    //UIListBtnType *m_type_list;
     UITextButtonType *m_finish_btn;
 };
 
