@@ -87,9 +87,9 @@ bool SourceManager::findScripts()
 
     // run through and see if any scripts have been deleted
     MSqlQuery db(MSqlQuery::InitCon());
-    QString query = "SELECT sourceid, path FROM weathersourcesettings "
-        "WHERE hostname = :HOST;";
-    db.prepare(query);
+
+    db.prepare("SELECT sourceid, path FROM weathersourcesettings "
+               "WHERE hostname = :HOST;");
     db.bindValue(":HOST", gContext->GetHostName());
     db.exec();
     QStringList toRemove;
@@ -102,8 +102,8 @@ bool SourceManager::findScripts()
             VERBOSE(VB_GENERAL,  fi.absFilePath() + " No longer exists");
         }
     }
-    query = "DELETE FROM weathersourcesettings WHERE sourceid = :ID;";
-    db.prepare(query);
+
+    db.prepare("DELETE FROM weathersourcesettings WHERE sourceid = :ID;");
     for (uint i = 0; i < toRemove.count(); ++i)
     {
         db.bindValue(":ID", toRemove[i]);
@@ -112,6 +112,7 @@ bool SourceManager::findScripts()
             VERBOSE(VB_IMPORTANT,  db.lastError().text());
         }
     }
+
     busyd->Close();
     busyd->deleteLater();
 

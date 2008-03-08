@@ -1437,7 +1437,7 @@
         </font>
         <font name="label" face="Bitstream Vera Sans">
             <color>#ffffff</color>
-            <size>14</size>
+            <size>15</size>
             <bold>no</bold>
         </font>
         <font name="button" face="Bitstream Vera Sans">
