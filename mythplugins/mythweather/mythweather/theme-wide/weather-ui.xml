@@ -267,21 +267,6 @@
                 <font>header</font>
                 <value>Three Day Forecast</value>
             </textarea>
-            <image name="background-0" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>40,220</position>
-                <staticsize>230,305</staticsize>
-            </image>
-            <image name="background-1" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>285,220</position>
-                <staticsize>230,305</staticsize>
-            </image>
-            <image name="background-2" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>530,220</position>
-                <staticsize>230,305</staticsize>
-            </image>
             <textarea name="+date-0" draworder="5" align="center">
                 <area>40,230,230,32</area>
                 <font>weatherdata</font>
@@ -391,42 +376,13 @@
                 <area>60,540,700,35</area>
                 <font>footer</font>
             </textarea>
-            
+
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,800,45</area>
                 <font>header</font>
                 <value>Six Day Forecast</value>
             </textarea>
-            <image name="background-0" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>40,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-1" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>283,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-2" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>526,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-3" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>40,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-4" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>283,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-5" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>526,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
+
             <textarea name="+date-0" draworder="5" align="center">
                 <area>40,140,233,25</area>
                 <font>label</font>
