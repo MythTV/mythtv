@@ -593,7 +593,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
                                     st->time_base.den,
                                     AV_TIME_BASE * (int64_t)st->time_base.num);
             adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
-        VERBOSE(VB_GENERAL,QString("PRESEEK DT new DTS = %1").arg(adj_cur_dts));
 
         }
 
