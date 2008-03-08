@@ -83,11 +83,11 @@ void GlobalSetup::wireUI()
         m_background_check->setState((bool) setting);
     }
 
-    m_skip_check = getUICheckBoxType("skipcheck");
-    if (!m_skip_check)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading skipcheck");
-    }
+//     m_skip_check = getUICheckBoxType("skipcheck");
+//     if (!m_skip_check)
+//     {
+//         VERBOSE(VB_IMPORTANT, "error loading skipcheck");
+//     }
 
     m_finish_btn = getUITextButtonType("finishbutton");
     if (m_finish_btn)
@@ -170,7 +170,7 @@ void ScreenSetup::wireUI()
     m_help_txt = getUITextType("helptxt");
     if (!m_help_txt)
     {
-        VERBOSE(VB_IMPORTANT, "error loading helptxt");
+        VERBOSE(VB_IMPORTANT, "Missing textarea helptxt");
     }
 
     UITextType *activeheader = getUITextType("activehdr");
@@ -184,7 +184,7 @@ void ScreenSetup::wireUI()
     m_active_list = getUIListBtnType("activelist");
     if (!m_active_list)
     {
-        VERBOSE(VB_IMPORTANT, "error loading activelist");
+        VERBOSE(VB_IMPORTANT, "Missing listbtntype activelist");
     }
     else
     {
@@ -200,7 +200,7 @@ void ScreenSetup::wireUI()
     m_inactive_list = getUIListBtnType("inactivelist");
     if (!m_inactive_list)
     {
-        VERBOSE(VB_IMPORTANT, "error loading inactivelist");
+        VERBOSE(VB_IMPORTANT, "Missing listbtntype inactivelist");
     }
     else
     {
@@ -341,7 +341,7 @@ void ScreenSetup::updateHelpText()
         if (!si->multiLoc && ti)
         {
             text += tr("Location: ") + (ti->location != "" ?
-                    ti->location : tr("Not Defined")) + "\n";
+                    ti->location : tr("Not Defined")) + "  ";
             text += tr("Source: " ) +
                     (ti->src ? ti->src->name : tr("Not Defined")) + "\n";
         }

@@ -910,7 +910,7 @@
             </textarea>
         </container>
     </window>
-    
+
     <window name="global-setup">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
@@ -949,77 +949,84 @@
             <bold>no</bold>
         </font>
         <container name="header">
-            <area>0,0,1280,600</area>
-            <image name="logo" draworder="0">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>157,118</staticsize>
-            </image>
+            <area>0,0,800,600</area>
+
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,1280,45</area>
+                <area>0,15,800,45</area>
                 <font>header</font>
                 <value>Global Settings</value>
             </textarea>
+
         </container>
+
         <container name="global-setup">
-            <area>0,150,1280,550</area>
+            <area>0,100,800,500</area>
             <!-- Context 0 - Global Setup (screens and timeouts) -->
-            <textarea name="timeout_text" draworder="0" align="right">
-                <area>50,5,620,60</area>
+
+            <textarea name="timeout_text" draworder="0">
+                <area>25,5,400,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Seconds to display each page:</value>
             </textarea>
-            <textarea name="holdtimeout_text" draworder="0" align="right">
-                <area>50,85,620,60</area>
+
+            <textarea name="holdtimeout_text" draworder="0">
+                <area>25,85,500,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Seconds to display page after manual page change:</value>
             </textarea>
-            
+
             <blackhole name="pgto_spinbox" draworder="0">
-                <area>675,0,50,30</area>
+                <area>600,0,50,30</area>
             </blackhole>
+
             <blackhole name="hold_spinbox" draworder="0">
-                <area>675,80,50,30</area>
+                <area>600,80,50,30</area>
             </blackhole>
-            <textarea name="backgroundlbl" draworder="0" align="right">
-                <area>50,165,620,60</area>
+
+            <textarea name="backgroundlbl" draworder="0">
+                <area>25,165,500,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Retrieve data in the background:</value>
             </textarea>
-            <textarea name="skiplbl" draworder="0" align="right">
-                <area>50,245,620,60</area>
+
+            <checkbox name="backgroundcheck" draworder="0">
+                <position>600,160</position>
+                <image function="checked" filename="mw_checked.png"></image>
+                <image function="unchecked" filename="mw_unchecked.png"></image>
+                <image function="checked_high" filename="mw_checked_high.png"></image>
+                <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
+            </checkbox>
+
+            <!-- <textarea name="skiplbl" draworder="0">
+                <area>25,245,500,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Skip pages still waiting for data (Not Implemented):</value>
             </textarea>
-            <!-- Don't really like these images -->
-            <checkbox name="backgroundcheck" draworder="0">
-                <position>675,160</position>
-                <image function="checked" filename="mw_checked.png"></image>
-                <image function="unchecked" filename="mw_unchecked.png"></image>
-                <image function="checked_high" filename="mw_checked_high.png"></image>
-                <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
-            </checkbox>
+
             <checkbox name="skipcheck" draworder="0">
-                <position>675,240</position>
+                <position>600,240</position>
                 <image function="checked" filename="mw_checked.png"></image>
                 <image function="unchecked" filename="mw_unchecked.png"></image>
                 <image function="checked_high" filename="mw_checked_high.png"></image>
                 <image function="unchecked_high" filename="mw_unchecked_high.png"></image>
-            </checkbox>
-            
+            </checkbox> -->
+
             <textbutton name="finishbutton" draworder="0">
-                <position>500,400</position>
+                <position>600,390</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
+
         </container>
+
     </window>
+
     <window name="screen-setup">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>
@@ -1057,16 +1064,11 @@
             <size>14</size>
             <bold>no</bold>
         </font>
-        
+
         <container name="header">
             <area>0,0,1280,600</area>
-            <image name="logo" draworder="0">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>157,118</staticsize>
-            </image>
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,1280,45</area>
+                <area>0,15,1280,45</area>
                 <font>header</font>
             </textarea>
         </container>
@@ -1162,67 +1164,71 @@
             <size>14</size>
             <bold>no</bold>
         </font>
-        
+
         <container name="header">
-            <area>0,0,800,600</area>
-            <image name="logo" draworder="0">
-                <filename>logo.png</filename>
-                <position>25,25</position>
-                <staticsize>157,118</staticsize>
-            </image>
+            <area>0,0,1200,800</area>
             <textarea name="header" draworder="0" align="center">
-                <area>0,18,1280,45</area>
+                <area>0,15,1200,45</area>
                 <font>header</font>
                 <value>Source Setup</value>
             </textarea>
         </container>
+
         <container name="global-setup">
-            <area>0,150,1280,650</area>
+            <area>0,50,1200,750</area>
+
             <listbtnarea name="srclist" draworder="0">
-                <area>30,45,350,348</area>
+                <area>30,45,220,348</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
             </listbtnarea>
+
             <image name="srclines" draworder="0">
-                <position>465,45</position>
+                <position>265,45</position>
                 <filename>cr-lines.png</filename>
                 <staticsize>500,370</staticsize>
             </image>
-            <textarea name ="updatetxt" draworder="0">
-                <area>490,80,300,60</area>
+
+            <textarea name="updatetxt" draworder="0">
+                <area>290,80,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Source Update Timeout (seconds):</value>
             </textarea>
-            <textarea name ="retrievetxt" draworder="0">
-                <area>490,160,300,60</area>
+
+            <textarea name="retrievetxt" draworder="0">
+                <area>290,160,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Data Retrieval Interval (minutes):</value>
             </textarea>
+
             <blackhole name="update_spinbox" draworder="0">
-                <area>800,75,70,30</area>
+                <area>600,75,70,30</area>
             </blackhole>
+
             <blackhole name="retrieve_spinbox" draworder="0">
-                <area>800,155,70,30</area>
+                <area>600,155,70,30</area>
             </blackhole>
+
             <textarea name="srcinfo" draworder="0" align="left">
-                <area>490,290,450,90</area>
+                <area>290,290,450,90</area>
                 <multiline>yes</multiline>
                 <font>help</font>
             </textarea>
+
             <textbutton name="finishbutton" draworder="0">
-                <position>500,400</position>
+                <position>600,450</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
+
         </container>
-        
     </window>
-    
+
     <window name="setup-location">
         <font name="header" face="Bitstream Vera Sans">
             <color>#ffffff</color>

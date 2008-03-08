@@ -116,7 +116,7 @@ class GlobalSetup : public MythThemedDialog
 
   private:
     UICheckBoxType *m_background_check;
-    UICheckBoxType *m_skip_check;
+//    UICheckBoxType *m_skip_check;
     WeatherSpinBox *m_timeout_spinbox;
     WeatherSpinBox *m_hold_spinbox;
     int m_timeout;
