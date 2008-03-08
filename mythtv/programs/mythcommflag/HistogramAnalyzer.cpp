@@ -203,8 +203,9 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     if (monochromatic)
         return FrameAnalyzer::ANALYZE_OK;
 
-    unsigned int width = nvp->GetVideoWidth();
-    unsigned int height = nvp->GetVideoHeight();
+    QSize buf_dim = nvp->GetVideoBufferSize();
+    unsigned int width  = buf_dim.width();
+    unsigned int height = buf_dim.height();
 
     if (logoFinder && (logo = logoFinder->getTemplate(&logorr1, &logocc1,
                     &logowidth, &logoheight)))

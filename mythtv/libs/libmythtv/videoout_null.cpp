@@ -79,17 +79,16 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&global_lock);
 
+    bool res_changed = input_size != video_disp_dim;
+
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
-    if (input_size.width()  == vbuffers.GetScratchFrame()->width &&
-        input_size.height() == vbuffers.GetScratchFrame()->height)
+    if (!res_changed)
     {
         vbuffers.Clear(GUID_I420_PLANAR);
         MoveResize();
         return true;
     }
-
-    video_dim = input_size;
 
     vbuffers.DiscardFrames(true);
     vbuffers.DeleteBuffers();
@@ -123,16 +122,16 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
 
     QMutexLocker locker(&global_lock);
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
-                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
-                  kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    video_dim = QSize(width, height);
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
+                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kKeepPrebuffer);
 
-    if (!vbuffers.CreateBuffers(width, height))
+    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
         return false;
+
     CreatePauseFrame();
 
     db_vdisp_profile->SetVideoRenderer("null");

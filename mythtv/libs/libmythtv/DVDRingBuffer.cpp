@@ -1021,8 +1021,9 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
     if (!parent)
         return false;
 
-    int videoheight = parent->GetVideoHeight();
-    int videowidth = parent->GetVideoWidth();
+    QSize video_disp_dim = parent->GetVideoSize();
+    int videoheight = video_disp_dim.height();
+    int videowidth = video_disp_dim.width();
 
     int32_t button;
     pci_t *pci;

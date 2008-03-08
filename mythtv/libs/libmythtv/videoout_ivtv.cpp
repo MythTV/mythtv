@@ -418,7 +418,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
 
-    osdbufsize = width * height * 4;
+    osdbufsize = video_dim.width() * video_dim.height() * 4;
 
     MoveResize();
 

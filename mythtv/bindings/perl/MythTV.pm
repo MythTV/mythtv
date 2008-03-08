@@ -213,13 +213,13 @@ package MythTV;
             push @devices, $dev;
         }
         if (@devices < 1) {
-            die "No backends found.  Please copy $conf/config.xml from a"
+            die "No backends found.  Please copy $conf/config.xml from a "
                ."working MythTV installation instead.\n";
         }
         my $upnp = $devices[0];
         if (@devices > 1) {
             die "Multiple devices found via UPnP.  This configuration not yet\n"
-               ."supported.  Please copy $conf/config.xml from a working"
+               ."supported.  Please copy $conf/config.xml from a working "
                ."MythTV installation instead.\n";
             #print $dev->getfriendlyname(), "\n";
         }

@@ -170,7 +170,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       totalFrames(0),               totalLength(0),
       rewindtime(0),                m_recusage(inUseID),
       // Input Video Attributes
-      video_width(0), video_height(0), video_size(0),
+      video_disp_dim(0,0), video_dim(0,0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
       forced_video_aspect(-1),
       m_scan(kScan_Interlaced),     m_scan_locked(false),
@@ -592,8 +592,8 @@ bool NuppelVideoPlayer::InitVideo(void)
     if (using_null_videoout)
     {
         videoOutput = new VideoOutputNull();
-        if (!videoOutput->Init(video_width, video_height, video_aspect,
-                               0, 0, 0, 0, 0, 0))
+        if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
+                               video_aspect, 0, 0, 0, 0, 0, 0))
         {
             errored = true;
             return false;
@@ -626,14 +626,13 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-        const QSize video_dim(video_width, video_height);
         const QRect display_rect(0, 0, widget->width(), widget->height());
 
         videoOutput = VideoOutput::Create(
             GetDecoder()->GetCodecDecoderName(),
             GetDecoder()->GetVideoCodecID(),
             GetDecoder()->GetVideoCodecPrivate(),
-            video_dim, video_aspect,
+            video_disp_dim, video_aspect,
             widget->winId(), display_rect, 0 /*embedid*/);
 
         if (!videoOutput)
@@ -701,7 +700,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
 
-    videoOutput->InputChanged(QSize(video_width, video_height), aspect, 
+    videoOutput->InputChanged(video_disp_dim, aspect, 
                               GetDecoder()->GetVideoCodecID(),
                               GetDecoder()->GetVideoCodecPrivate());
 
@@ -989,7 +988,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
         return;
 
-    if ((video_width  == width ) && (video_height     == height) && 
+    if ((video_disp_dim == QSize(width, height)) &&
         (video_aspect == aspect) && (video_frame_rate == fps   ) &&
         ((keyframedistance <= 0) || (keyframedistance == keyframedist)) &&
         !video_codec_changed)
@@ -997,9 +996,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         return;
     }
 
-    video_width  = (width  > 0) ? width  : video_width;
-    video_height = (height > 0) ? height : video_height;
-    video_size   = (video_height * video_width * 3) / 2;
+    video_dim    = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
+    video_disp_dim=QSize(width, height);
     video_aspect = (aspect > 0.0f) ? aspect : video_aspect;
     keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
 
@@ -1017,7 +1015,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (IsErrored())
         return;
 
-    SetScanType(detectInterlace(scan, m_scan, video_frame_rate, video_height));
+    SetScanType(detectInterlace(scan, m_scan, video_frame_rate,
+                                video_disp_dim.height()));
     m_scan_locked  = false;
     m_scan_tracker = (m_scan == kScan_Interlaced) ? 2 : 0;
 }
@@ -1238,8 +1237,8 @@ void NuppelVideoPlayer::InitFilters(void)
         VideoFrameType itmp = FMT_YV12;
         VideoFrameType otmp = FMT_YV12;
         int btmp;
-        postfilt_width = video_width;
-        postfilt_height = video_height;
+        postfilt_width = video_dim.width();
+        postfilt_height = video_dim.height();
 
         videoFilters = FiltMan->LoadFilters(
             filters, itmp, otmp, postfilt_width, postfilt_height, btmp);
@@ -1482,8 +1481,8 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
 VideoFrame *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
 {
-    w = video_width;
-    h = video_height;
+    w = video_dim.width();
+    h = video_dim.height();
 
     VideoFrame *retval = NULL;
 
@@ -2634,7 +2633,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     {
         // We need to make a preview copy of the frame...
         QMutexLocker locker(&yuv_lock);
-        QSize vsize = QSize(video_width, video_height);
+        QSize vsize = video_dim;
         if ((vsize            != yuv_scaler_in_size) ||
             (yuv_desired_size != yuv_scaler_out_size))
         {
@@ -5442,10 +5441,10 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
                 .arg(m_playbackinfo->recstartts.toString("yyyyMMddhhmmss")));
     }
 
-    if ((video_width <= 0) || (video_height <= 0))
+    if ((video_dim.width() <= 0) || (video_dim.height() <= 0))
     {
         VERBOSE(VB_PLAYBACK, QString("NVP: Video Resolution invalid %1x%2")
-            .arg(video_width).arg(video_height));
+                .arg(video_dim.width()).arg(video_dim.height()));
 
         // This is probably an audio file, just return a grey frame.
         vw = 640;
@@ -5541,22 +5540,23 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
         return NULL;
     }
 
-    avpicture_fill(&orig, data, PIX_FMT_YUV420P, video_width, video_height);
+    avpicture_fill(&orig, data, PIX_FMT_YUV420P,
+                   video_dim.width(), video_dim.height());
 
-    avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P, video_width,
-                          video_height);
+    avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P,
+                          video_dim.width(), video_dim.height());
 
-    bufflen = video_width * video_height * 4;
+    bufflen = video_dim.width() * video_dim.height() * 4;
     outputbuf = new unsigned char[bufflen];
 
-    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, video_width,
-                   video_height);
+    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32,
+                   video_dim.width(), video_dim.height());
 
     img_convert(&retbuf, PIX_FMT_RGBA32, &orig, PIX_FMT_YUV420P,
-                video_width, video_height);
+                video_dim.width(), video_dim.height());
 
-    vw = video_width;
-    vh = video_height;
+    vw = video_dim.width();
+    vh = video_dim.height();
     ar = video_aspect;
 
     DiscardVideoFrame(frame);
@@ -6716,7 +6716,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 // a 720x576 video resolution to fit the current OSD resolution
                 float vsize = 576.0;
                 if (ringBuffer->isDVD())
-                    vsize = (float)video_height;
+                    vsize = (float) video_disp_dim.height();
 
                 float hmult = osd->GetSubtitleBounds().width() / 720.0;
                 float vmult = osd->GetSubtitleBounds().height() / vsize;
@@ -7027,8 +7027,13 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         }
 
         // scale highlight image to match OSD size, if required
-        float hmult = osd->GetSubtitleBounds().width() / (float)video_width;
-        float vmult = osd->GetSubtitleBounds().height() / (float)video_height;
+        // TODO FIXME This is pretty bogus, it does not adjust for zooming
+        //   or scaling at all, nor does it account for OSD renderers
+        //   where the OSD resolution != video resolution.
+        float hmult = osd->GetSubtitleBounds().width() /
+            (float) video_disp_dim.width();
+        float vmult = osd->GetSubtitleBounds().height() /
+            (float) video_disp_dim.height();
 
         if ((hmult < 0.99) || (hmult > 1.01) || (vmult < 0.99) || (vmult > 1.01)) 
         {

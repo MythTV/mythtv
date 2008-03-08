@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-02-25, v0.21.00pre
+  2008-03-05, v0.21.00pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -184,9 +184,10 @@
      12.3 Storage Options
         12.3.1 Recording Profile
         12.3.2 Recording Group
-        12.3.3 Playback Group
-        12.3.4 Auto-Expire
-        12.3.5 Episode Limit
+        12.3.3 ANAME CDATA Storage Groups(REF)REF
+        12.3.4 Playback Group
+        12.3.5 Auto-Expire
+        12.3.6 Episode Limit
      12.4 Post Recording Processing
         12.4.1 Commercial Flagging
         12.4.2 Transcoding
@@ -198,15 +199,16 @@
         12.5.4 Common Tricks and Tips
         12.5.5 Working with SQL
      12.6 Scheduling with more than one Input
-        12.6.1 Stations, Channels and Video Sources
-        12.6.2 Order of Inputs
-        12.6.3 Matching Callsigns
-        12.6.4 Using Priorities to Prefer an Input
-        12.6.5 Input Priority
-        12.6.6 Channel Priority
-        12.6.7 Preferred Input
-        12.6.8 HDTV Priority
-        12.6.9 Custom Priority
+        12.6.1 Mutually Exclusive Inputs
+        12.6.2 Stations, Channels and Video Sources
+        12.6.3 Order of Inputs
+        12.6.4 Matching Callsigns
+        12.6.5 Using Priorities to Prefer an Input
+        12.6.6 Input Priority
+        12.6.7 Channel Priority
+        12.6.8 Preferred Input
+        12.6.9 HDTV Priority
+        12.6.10 Custom Priority
 
   13. MythPlugins.
   14. MythWeb.
@@ -341,8 +343,8 @@
      24.4 Caching support for Schedules Direct
 
 
-  ______________________________________________________________________
 
+  ______________________________________________________________________
 
   [1m1.  First things first.[0m
 
@@ -471,7 +473,6 @@
   See ``Saving or Restoring the database'' for instructions.
 
 
-
   [1m1.4.  How to obtain this document / PDF versions of this document[0m
 
   This HOWTO document is maintained at the primary MythTV website:
@@ -520,8 +521,8 @@
 
 
 
-  Feature that has been added to SVN but is not available in the current
-  release.
+  Feature that has been added to SVN (subversion, a revision control system)
+  but is not available in the current release.
 
 
   [1m1.7.  Mailing lists / getting help[0m
@@ -1669,7 +1670,7 @@
   or higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.48).
+  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.51).
 
 
   ______________________________________________________________________
@@ -1766,7 +1767,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.48.tar.bz2
+       $ tar -xjf xmltv-0.5.51.tar.bz2
 
 
 
@@ -1790,7 +1791,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.48
+       $ cd xmltv-0.5.51
        $ perl Makefile.PL
 
 
@@ -2603,7 +2604,7 @@
 
 
 
-       $ cd ~/mythtv-0.20.2/contrib/configfiles
+       $ cd ~/mythtv-0.21/contrib/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -3374,7 +3375,7 @@
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of MythTV v0.20.2, the available options are:
+  As of MythTV v0.21, the available options are:
 
 
        $ mythbackend --help
@@ -4235,8 +4236,8 @@
 
 
 
-       $ tar -xjf myththemes-0.20.2.tar.bz2
-       $ cd ~/myththemes-0.20.2
+       $ tar -xjf myththemes-0.21.tar.bz2
+       $ cd ~/myththemes-0.21
        $ qmake myththemes.pro
        $ su -
        # make install
@@ -4576,12 +4577,12 @@
   all TV tuner cards on the master and any slave. Its job is to search
   the TV listing for the shows you have requested and assign recordings
   to the TV tuner cards. If none of the shows that you've chosen
-  overlap, it simply records all of the shows. However, if there are
-  shows where the beginning and end times overlap, the scheduler follows
-  rules that you've specified or makes logical decisions about what
-  would be best if you haven't express your preference. Further, the
-  "Upcoming Recordings" page allows you make specific decisions about
-  what you really do and don't want to record.
+  overlap, it simply records all of them. However, if there are shows
+  where the beginning and end times overlap, the scheduler follows rules
+  that you've specified or makes logical decisions about what would be
+  best if you haven't expressed your preference. Further, the "Upcoming
+  Recordings" page allows you make specific decisions about what you
+  really do and don't want to record.
 
 
   [1m12.1.  Record Types[0m
@@ -4593,10 +4594,10 @@
 
   +o  Single Record -- record only this title at this specific time and
      this station. This is the best way to be sure that a certain
-     showing is recorded. However, if the TV listings change and the
-     show is not broadcast at that time, the show will not be recorded
-     but will be marked as Not Listed to let you know that you should
-     investigate.
+     showing will be recorded. However, if the TV listings change and
+     the show is not broadcast at that time, the show will not be
+     recorded but will be marked as Not Listed to let you know that you
+     should investigate.
 
   +o  Find One -- this will record a title once from any of the times
      that appear in the TV listings. This is useful for recording a
@@ -4610,7 +4611,9 @@
      on the same channel, weekday and time. Note that if the TV station
      changes the schedule for a special episode, it would not be
      recorded. However, you can add a Single record for the special
-     episode.
+     episode. If there are no matching showings in the TV listings, a
+     Not Listed item will be added to your schedule for the next time
+     slot to let you know that you should investigate.
 
   +o  Find Weekly -- this will record a title once per week from any of
      the times that appear in the TV listings beginning from the time of
@@ -4622,7 +4625,10 @@
 
   +o  Record Daily -- this records a show whenever the title is listed
      for the time and station on any day of the week. Here again, a show
-     will not be recorded if the time was altered by the station.
+     will not be recorded if the time was altered by the station. If
+     there are no matching showings in the TV listings, a Not Listed
+     item will be added to your schedule for the next time slot to let
+     you know that you should investigate.
 
   +o  Find Daily -- this will record a title once per day from any of the
      times that appear in the TV listings beginning from the time of the
@@ -4632,14 +4638,16 @@
      descriptive information. This may not be a good choice if there are
      different episodes shown during the day.
 
-  +o  Channel Record -- records a show anytime the title is listed on
-     this station.  This is perhaps the most common rule to use for most
-     shows.
+  +o  Channel Record -- records one showing of each unique episode from
+     any of the times the title is listed on this station.  This is
+     perhaps the most common rule to use for most shows.
+  +o  Record All -- records one showing of each unique episode from any
+     of the times this title is listed on any channel. This can be
+     useful if a station has sister stations where shows are rebroadcast
+     allowing the scheduler to record rebroadcasts on the other station
+     when the original airing cannot be recorded.
 
-  +o  Record All -- record this title on any channel at any time. This
-     can be useful if a station has sister stations where shows are
-     rebroadcast allowing the scheduler to record rebroadcasts on the
-     other station when the original airing cannot be recorded.
+
   [1m12.2.  Scheduling Options[0m
 
   [1m12.2.1.  Priority[0m
@@ -4649,62 +4657,70 @@
   are in conflict. However, priority values let the scheduler know what
   you prefer so that it can set the schedule based on your preferences.
 
-  Initially all priority values are set to zero. You may choose to leave
-  everything at "0" and let the scheduler follow rules to guess what you
-  might prefer when there are conflicts. However, if you have one or two
-  favorite shows, you may want to increase the priority value so the
-  scheduler will know that you would prefer recording these over other
-  shows. You might use certain values to rate shows so that all
-  favorites are 2. good shows are 1 and extra 'filler' shows are all -1
-  for example. You could sort each title on the "Set Priorities" to have
-  a unique value so the scheduler can always know which show you'd
-  prefer versus any other show. The choice and style are entirely up to
-  you. However, the more information you give to the scheduler, the more
-  likely it will make the choices you would prefer in the first place.
+  Initially, recording rule priority values are set to zero. You may
+  choose to leave everything at "0" and let the scheduler follow rules
+  to guess what you might prefer when there are conflicts. However, if
+  you have one or two favorite shows, you may want to increase the
+  priority value so the scheduler will know that you would prefer
+  recording these over other shows. You might use certain values to rate
+  shows so that all favorites are 2. good shows are 1 and extra 'filler'
+  shows are all -1 for example. You could sort each title on the "Set
+  Priorities" page to have a unique value so the scheduler can know
+  which show you'd prefer versus any other show. The choice and style
+  are entirely up to you. However, the more information you give to the
+  scheduler, the more likely it will make the choices you would prefer
+  in the first place.
 
   The scheduler choices are based on the total priority for a showing by
-  adding up four different priority factors. By default, most of these
-  factors are "0" but you may use any combination to express your likes
-  and needs.
+  adding up all priority factors that match the showing. By default,
+  most of these factors are "0" but you may use any combination to
+  express your likes and needs.
 
-  Per record rule -- this is the "priority" field in the "Scheduling
-  Options" section of the options page and this values is included for
-  any showings that match the recording rule.  You may choose to only
-  use these values and not use the other factors for the sake of
-  simplicity and clarity.
 
-  Per record type -- Setup->TV Settings->Recording Priorities->General
-  allows you to add to the priority based on the type. It may make sense
-  to increase the value for "Single" so that by default they have an
-  extra advantage over other shows. The default is +1. You may want to
-  decrease the value for Find rules so that they will be less likely to
-  interfere with regular shows and will be more likely to record in a
-  non-conflicting time instead. The default is -1.
+  +o  Per record rule -- this is the "priority" selection in the
+     "Scheduling Options" section of the options page and this value is
+     included for any showings that match the recording rule.  You may
+     choose to only use these values and not use the other factors for
+     the sake of simplicity and clarity.
 
-  Per channel -- Setup->TV Settings->Recording Priorities->Channel
-  Priorities can be useful if you believe that you prefer any of the
-  shows on certain channels. This would give all shows on a channel an
-  advantage by default.
+  +o  Per record type -- Setup->TV Settings->Recording
+     Priorities->General allows you to add to the priority based on the
+     type. It may make sense to increase the value for "Single" so that
+     by default they have an extra advantage over other shows. The
+     default is +1. You may want to decrease the value for Find rules so
+     that they will be less likely to interfere with regularly scheduled
+     shows and will be more likely to record in a non-conflicting time
+     instead.  The default is -1.
 
-  Input priority -- in the "mythtv-setup" program, the "Input
-  Connections" section allows you to add additional priority in the
-  "Input priority".  This is simply another priority factor but has an
-  interesting effect. If a card input has a higher value than the other
-  cards, the scheduler will see that you would rather record showings of
-  episodes on this input rather than a showing on another card. If you
-  have multiple cards of different quality, you may want to set input
-  priority to encourage the scheduler to record shows on your best
-  card(s) whenever possible. This can also be useful if you have
-  multiple video sources which include the same stations. For example,
-  with digital and analog cable you could increase the digital cable
-  input preference by 1 to tell the scheduler that you want to record
-  from the digital station whenever possible but the station on the
-  analog input could still be used when the digital input is busy.
+  +o  Per channel -- Setup->TV Settings->Recording Priorities->Channel
+     Priorities can be useful if you believe that you prefer any of the
+     shows on certain channels. This would give all shows on a channel
+     an advantage by default.
 
-  For any single showing of any show you've chosen to record, these
-  factors are added together to find the "total priority". This is the
-  priority that the scheduler uses to decide which shows are given the
-  first choice when filling in the schedule.
+  +o  Input priority -- in the "mythtv-setup" program, the "Input
+     Connections" section allows you to add additional priority in the
+     "Input priority".  This is simply another priority factor but has
+     an interesting effect. If a card input has a higher value than the
+     other cards, the scheduler will see that you would rather record
+     showings of episodes on this input rather than a showing on other
+     inputs. If you have multiple cards of different quality, you may
+     want to set input priority to encourage the scheduler to record
+     shows on your best card(s) whenever possible. This can also be
+     useful if you have multiple video sources which include the same
+     stations. For example, with digital and analog cable you could
+     increase the digital cable input preference by 1 to tell the
+     scheduler that you want to record from the digital channel whenever
+     possible but the channel on the analog input could still be used
+     when the digital input is busy.
+
+  +o  Custom Priority -- this allows you to add any specialized factors
+     you would like in order to influence scheduling decisions. See the
+     ``Custom Priority'' section below.
+
+     For any single showing of any show you've chosen to record, these
+     factors are added together to find the "total priority". This is
+     the priority that the scheduler uses to decide which showings are
+     given the first choice when filling in the schedule.
 
   The scheduling priority of a show may also be used to determine auto-
   expiration of recordings when disk space gets full (see ``Auto-
@@ -4757,7 +4773,6 @@
   scheduler exactly which shows you do want to record and/or don't want
   to record in any situation.
 
-
   [1m12.2.4.  Scheduling decisions[0m
 
   Here are the actual decisions made by the scheduler as it fills in the
@@ -4768,13 +4783,15 @@
      progress can not be moved to another input or time so it "wins" its
      current timeslot.
 
-  +o  Single showing rules with no match are marked Not Listed -- If a
-     Single or Override do not match the current listings because the
-     listings have changed, they are added to the schedule and marked to
-     indicate that they will not record.
-  +o  Other record statuses beat Inactive or Repeat -- If two rules match
-     the same showing of a program, a rule marked as inactive or a
-     showing marked as a repeat yield to the other rule.
+  +o  Single, Daily, or Weekly rules with no match are marked Not Listed
+     -- If these or Overrides do not match the current listings because
+     the listings have changed, they are added to the schedule and
+     marked to indicate that they will not record.
+
+  +o  Rules that could record beat rules that can not record a showing --
+     If two rules match the same showing of a program, a rule marked as
+     inactive or a showing marked as a repeat, for example, yield to the
+     other rule.
 
   +o  More specific record type is used in place of less specific -- If
      two rules match the same showing of a program, preference is given
@@ -4789,10 +4806,10 @@
   +o  Future start time beats past start time -- If there is an episode
      in progress and also a later showing of the same episode, it is
      better to record the complete episode. If there isn't another
-     showing, start recording now to record the remaining portion.  This
-     should only happen if you add a new rule while the show is in
-     progress or if the master backend is started after the start time
-     of a scheduled show.
+     showing, it will start recording immediately to record the
+     remaining portion. This should only happen if you add a new rule
+     while the show is in progress or if the master backend is started
+     after the start time of a scheduled show.
 
   +o  More specific record type beats less specific record type -- If two
      shows are on at the same time and have the same total priority but
@@ -4822,8 +4839,6 @@
      see if a scheduled show can be moved to another input or later
      matching showing without creating a new conflict so that the
      conflicting show can be scheduled to record.
-
-
   [1m12.2.5.  Reschedule Higher Priorities[0m
 
   Setup->TV Settings->Recording Priorities->General has a checkbox for
@@ -4951,7 +4966,12 @@
   interface, recordings can be assigned into "recording groups".
 
 
-  [1m12.3.3.  Playback Group[0m
+  [1m12.3.3.  ``Storage Groups''[0m
+
+  This allows you to select any special "Storage Groups" you may have
+  created to determine where recordings from this rule should be stored
+  on your disks. The "Default" storage group is always available.
+  [1m12.3.4.  Playback Group[0m
 
   This selects a set of pre-configured playback parameters which can be
   created and edited in Setup->TV Settings->Playback Groups.  When the
@@ -4960,7 +4980,7 @@
   amounts appropriate for this type of television program.
 
 
-  [1m12.3.4.  Auto-Expire[0m
+  [1m12.3.5.  Auto-Expire[0m
 
   MythTV will "autoexpire" old recordings to make room for new
   recordings when disk space gets filled up. This option can be set to
@@ -4979,7 +4999,7 @@
   chooses to expire the lowest-priority recordings first.
 
 
-  [1m12.3.5.  Episode Limit[0m
+  [1m12.3.6.  Episode Limit[0m
 
   An episode limit can also be configured to limit the maximum number of
   episodes recorded of a single series, to restrict that series' disk
@@ -5015,6 +5035,7 @@
   +o  %DIR% - the directory component of the recording's filename
 
   +o  %FILE% - the filename component of the recording's filename
+
 
   +o  %TITLE% - the title of the recording (e.g., name of the series)
 
@@ -5082,8 +5103,6 @@
   examples but leave it on the default for now. Arrow down to "Add this
   example clause" and press SELECT (Enter or Space on a keyboard). The
   large text box should now show:
-
-
             program.title = 'Nova'
 
 
@@ -5101,6 +5120,7 @@
   key is the "X" in the grouping for "1", zero is grouped with "9" and
   "0" acts as the "Caps Lock" key. You can press ENTER in the text box
   to popup a virtual keyboard.
+
   Note: the text box honors many familiar Emacs control keys. It is also
   possible to cut and paste text into the text box so you can edit with
   a favorite editor or insert a rule sent in email or from other
@@ -5145,19 +5165,20 @@
   settings".
 
 
+
   [1m12.5.3.  How it Works[0m
 
   MythTV stores TV program information in a database and uses the
   Structured Query Language (SQL) to access the data. Information about
   each TV program is stored in the 'program' table and information about
   each TV station you receive is stored in 'channel'. These two tables
-  are used in the scheduler queries and their fields are available to be
-  used in your rules. The rules you create are stored in 'record'.
+  are used in the scheduler queries and their columns are available to
+  be used in your rules. The rules you create are stored in 'record'.
 
   Normal rules in MythTV simply match the title in the rule with the
   titles in the 'program' table. MythTV also has search rules for
   "Titles", "Keywords" and "People". These store the key phrase in the
-  description field of the rule and includes them in specialized SQL
+  description column of the rule and includes them in specialized SQL
   replacements for the normal title check. There is also a type called
   "Power Search" which takes the raw SQL in the description as the
   replacement for title matching.
@@ -5210,8 +5231,6 @@
   their highest rated shows a dozen on more times per week. However, the
   scheduler only needs two or three choices to do a good job of making a
   flexible choice.
-
-
               program.title LIKE "Celebrity Fit Club%"
               AND DAYNAME(program.starttime) = "Sunday"
 
@@ -5228,7 +5247,6 @@
   Brother%" or "The Amazing Race%".
 
 
-
   [1m12.5.5.  Working with SQL[0m
 
   As you experiment, it is possible that you may misplace a quote or
@@ -5243,7 +5261,7 @@
   on the Web.
 
   While the example clauses demonstrate how to use many of the data
-  fields, you can get a more complete list of all the fields that are
+  columns, you can get a more complete list of all the columns that are
   available by using a MySQL client program:
 
 
@@ -5253,7 +5271,7 @@
 
 
 
-  This will show the names of all of the fields along with their type
+  This will show the names of all of the columns along with their type
   and default value. Most are easy to understand but a few need some
   explanation in order to use them effectively with Power Search.
 
@@ -5272,24 +5290,23 @@
      episodes before or after a certain date such as finding just the
      original series of "Battlestar Galactica".
 
-  +o  "program.previouslyshown" is a field created by MythTV to try to
+  +o  "program.previouslyshown" is a column created by MythTV to try to
      determine if a showing is more than 14 days after its original air
      date or if the show was marked as a repeat and did not have a date
      for the first airing. If this is "0" it usually means that this is
      a brand new show or a rebroadcast within the first two weeks.
-
-  +o  "program.generic" is a field created by MythTV to try mark showings
-     for a series where the specific episode information is not
+  +o  "program.generic" is a column created by MythTV to try mark
+     showings for a series where the specific episode information is not
      included. When these generic showings appear, it is impossible for
      the system to determine if they are repeats of the same episode(s)
      or if they are all different episodes.
 
-  +o  "program.first" is a field created by MythTV to mark the first
+  +o  "program.first" is a column created by MythTV to mark the first
      showing in the current listings for each episode, movie or special.
      Choosing to match only the "first" showing can be useful for sports
      that are brodcast live then repeated.
 
-  +o  "program.last" is a field created by MythTV to mark the last
+  +o  "program.last" is a column created by MythTV to mark the last
      showing in the current listings for each episode, movie or special.
      If a showing is marked both "first" and "last" then it is the only
      showing of that program in the current TV listings.
@@ -5303,13 +5320,34 @@
      producers but they are usually in the same order as the original
      air dates for the episodes.
 
-     Additional information can be found in the Schedules Direct
-     Developer forum at http://forums.schedulesdirect.org
-     <http://forums.schedulesdirect.org>
+  +o  "program.videoprop" also "audioprop" and "subtitletypes".  These
+     columns contain bit flags for a variety of attributes that may be
+     associated with a program. These are filled with information
+     offered by the TV listings provider. However, your listings source
+     will not have information for all of the available flags.
+     Therefore, some of these may not be useful for your search rules.
+     This information is organized in "sets" and the MySQL function
+     FIND_IN_SET() can be used to test for any of these flags. For
+     example:
 
-  Finally, if you are doing something very experimental and a field is
+
+       FIND_IN_SET('SURROUND', program.audioprop) > 0
+
+
+
+  would be true for the programs where the surround sound bit is
+  present.  To see all of the available attribute names:
+
+
+       $ mysql -u mythtv -pmythtv mythconverg
+       mysql> SHOW COLUMNS FROM program LIKE '%prop'\G
+       mysql> SHOW COLUMNS FROM program LIKE 'subtitletypes'\G
+
+
+
+  Finally, if you are doing something very experimental and a column is
   not giving you the results you had anticipated, you can always check
-  the MythTV source code to see exactly how a field is used. The open
+  the MythTV source code to see exactly how a column is used. The open
   source for MythTV is available from http://www.mythtv.org/
   <http://www.mythtv.org/> .
 
@@ -5319,17 +5357,8 @@
 
   MythTV is designed to allow recording television programs from one or
   more service providers, or video source, on one or more video input
-  from each provider. A single TV capture card may have video
-  connections to more than one of its inputs and each input may be from
-  a different service.  The card may only be allowed to record from one
-  of these inputs at one time because there is only one pipeline on the
-  card that actually captures the content and sends it to the PC.  Cards
-  such as the Hauppauge PVR-500 are able to record two sources
-  simultaneously, because it has two MPEG-2 encoders, and each encoder
-  appears as a separate device.
-
-
-
+  from each provider. Some inputs may not be allowed to record at the
+  same time as each other while others may record simultaneously.
   A television station may be broadcast on more than one channel from
   one provider or may be available on channels from two or more
   providers. If a TV station is available from more than one source, the
@@ -5339,7 +5368,58 @@
   input or more than one channel.
 
 
-  [1m12.6.1.  Stations, Channels and Video Sources[0m
+  [1m12.6.1.  Mutually Exclusive Inputs[0m
+
+  A single TV capture card may have video connections to more than one
+  of its inputs and each input may be from a different service.  The
+  card may only be allowed to record from one of these inputs at one
+  time because there is only one encoder on the card that actually
+  captures the content.
+
+
+
+  These are mutually exclusive meaning that only one input or the other
+  may record at a given time but not both.
+
+  Usually, inputs on different cards can record at the same time but two
+  or more inputs on the same card cannot. However, there are cases where
+  inputs on different cards should not be allowed to record at the same
+  time, for example, a firewire card and s-video analog card connected
+  to the same set top cable box.
+
+
+
+       |
+       |   coax +--------------+ firewire    ------------------+
+       |     .-=|Cable Provider|=------------=| Card 1 input 1 | HDTV
+       |     |  |HD/Cable STB  |=--.          +-----||||||||||||
+       |     |  +--------------+   | s-video ------------------+
+       |     |                     `---------=|        input 2 | Digital
+       |wall |               coax             | Card 2         |
+       |=---=^=------------------------------=|        input 3 | Cable
+       |                                      +-----||||||||||||
+
+
+
+  Input 1 and input 2 receive content from the same set top box and the
+  channels can not be tuned independently. Therefore only one of these
+  two inputs should be used at any given time. The solution is to create
+  an "Input Group" with [1mmythtv-setup [22min "Input connections". Including
+  these two inputs in the same Input Group will tell the scheduler that
+  these are mutually exclusive and may not record at the same time.
+  Inputs 2 and 3 are automatically mutually exclusive because they are
+  on the same card so there is no need to create an Input Group for
+  these inputs.
+
+  Cards such as the Hauppauge PVR-500 are able to record as two cards
+  simultaneously because it has two MPEG-2 encoders and each encoder
+  appears as a separate device. DVB cards may be allowed to capture
+  content from more than one channel at a time if the channels are in
+  the same MUX.
+
+
+
+  [1m12.6.2.  Stations, Channels and Video Sources[0m
 
   Although we may be accustomed to thinking of a broadcast station and
   its channel number as being synonymous, stations and channels are very
@@ -5349,7 +5429,9 @@
   different frequencies in different cities or by different providers in
   the same city. The same frequency will carry different stations in
   different cities.  In the digital realm of DVB and ATSC (HDTV), it is
-  even possible for a single frequency to carry multiple programs.
+  even possible for a single frequency to carry multiple program streams
+  but each of these streams of content are actually different channels
+  that the receiving devices can 'tune' to independently.
 
 
   +o  Station: building
@@ -5402,42 +5484,42 @@
   they carry the same station.
 
 
-  [1m12.6.2.  Order of Inputs[0m
+
+  [1m12.6.3.  Order of Inputs[0m
 
   By default the scheduler chooses the first (lowest numbered) input
   which has a showing of the scheduled program as it fills the schedule.
   If a lower priority show is on at the same time as a higher priority
   show that has been assigned to input 1, then input 2 will be used next
-  and so on. Therefore, it is best to configure your best card and input
-  first and next best card second.  There may be differences in the type
+  and so on. Therefore, configure your best card and input first and
+  next best card and input second.  There may be differences in the type
   or brand of capture card, signal quality from the cable, system
   resources such as disk space, CPU, etc. By configuring your best input
   first, more recordings, and your highest priority recordings, will use
   that input.
 
   A common situation is that a newer and better card is added last. For
-  example. someone may have two analog cable cards at first then adds an
-  HDTV card. If NBC is on a cable channel and "The Apprentice" is shown
-  in HDTV on an NBC HD channel, the scheduler would still prefer analog
-  inputs 1 and 2 over the new HD input 3.
+  example, you may initially setup your system with two analog cable
+  cards and then add a HDTV card. If NBC is on a cable channel and "The
+  Apprentice" is shown in HDTV on an NBC HD channel, the scheduler would
+  still prefer analog inputs 1 and 2 over the new HD input 3.
 
-
-  Therefore, if you add a new source which you will prefer, it is wise
-  to run mythtv-setup and "Delete all capture cards" then enter your
-  cards and inputs in your new order of preference. This will not remove
-  your sources and channels. You want to keep those and only renumber
+  So, if you'd like the scheduler to prefer a new source, the simplest
+  thing is to run [1mmythtv-setup [22mand "Delete all capture cards" then enter
+  your cards and inputs in your preferred order. This will not remove
+  your sources and channels - you want to keep those and only renumber
   your cards and inputs. In this example, once the changes have been
-  made and the Master Backend is restarted, the scheduler would the
+  made and the Master Backend is restarted, the scheduler would then
   choose "The Apprentice" in HD on the new input 1 and only use the
   analog inputs (now numbered 2 and 3) when the HDTV input was occupied
   with another show.
 
 
-  [1m12.6.3.  Matching Callsigns[0m
+  [1m12.6.4.  Matching Callsigns[0m
 
   If a recording rule is a type that can record from any channel, "The
   Apprentice" would match for any channel that shows episodes which may
-  include CNBC or BRAVO. However, for Single, Timeslot. Weekslot or
+  include CNBC or BRAVO. However, for Single, Timeslot, Weekslot or
   Channel rules, "The Apprentice" would only match showings on the
   selected station as identified by the "callsign". For example, KVBC is
   an NBC affiliate on channel 3. Channel 733 is KVBCDT which is HDTV
@@ -5447,12 +5529,12 @@
   3 could not be used to record.
 
   However, the "Channel Editor" in mythtv-setup can be used to change
-  the "Callsign" for channel 733 to be "KVBC" also. MythTV would then
-  understand that both of these channels are from the same broadcast
-  station. Assuming the HDTV input was input number "1", "The
-  Apprentice" would record on 733.  If, however, this HDTV input already
-  had a higher priority show assigned to it in that time slot, "The
-  Apprentice" would be assigned to KVBC channel 3 on input 2.
+  the Callsign for channel 733 to "KVBC". MythTV would then understand
+  that both of these channels are from the same broadcast station.
+  Assuming the HDTV input was input number "1", "The Apprentice" would
+  record on 733. If, however, this HDTV input already had a higher
+  priority show assigned to it in that time slot, "The Apprentice" would
+  be assigned to KVBC channel 3 on input 2.
 
   Having two channels with the same callsign may affect how program
   information is shown in mythfrontend. If two sources have the same
@@ -5472,7 +5554,7 @@
   channel, source and input to record "The Apprentice" on "KVBC".
 
 
-  [1m12.6.4.  Using Priorities to Prefer an Input[0m
+  [1m12.6.5.  Using Priorities to Prefer an Input[0m
 
   The fundamental concept to keep in mind is that the MythTV scheduler
   will choose the lowest numbered input available when showings have the
@@ -5481,13 +5563,14 @@
   showing will be considered before the showings with lower priority.
 
 
-  [1m12.6.5.  Input Priority[0m
+  [1m12.6.6.  Input Priority[0m
 
   "Input Connections" in mythtv-setup includes a box to set "Input
   priority" which defaults to "0". If a value is set, that amount will
   be added to the "total priority" for showings on that input. This can
   be used to influence using favored cards or not using less favored
   cards unless necessary.
+
   Let's say the "The Apprentice" is on at 8:00pm with a priority of 3.
   "Who Cares" is -2 and an episode is shown at 8:00pm then repeated at
   11:00pm. The scheduler would assign "The Apprentice" to card 1 and
@@ -5540,7 +5623,7 @@
   record on the best input.
 
 
-  [1m12.6.6.  Channel Priority[0m
+  [1m12.6.7.  Channel Priority[0m
 
   Priority can be added for individual channels (remember, frequencies
   from a video source, not stations). This can be used to tell the
@@ -5559,7 +5642,7 @@
   using 750 only when there are no analog inputs available.
 
 
-  [1m12.6.7.  Preferred Input[0m
+  [1m12.6.8.  Preferred Input[0m
 
   For an even finer grain of control, there is a per rule option to
   specify which input should be preferred for showings that match the
@@ -5585,7 +5668,7 @@
   Recording Priorities.
 
 
-  [1m12.6.8.  HDTV Priority[0m
+  [1m12.6.9.  HDTV Priority[0m
 
   In the preceeding fictious example, the Space Shuttle launch is
   broadcast in high definition and a preferred input is selected to give
@@ -5609,7 +5692,7 @@
 
 
 
-  [1m12.6.9.  Custom Priority[0m
+  [1m12.6.10.  Custom Priority[0m
 
 
 
@@ -5655,17 +5738,19 @@
 
 
 
-  Priority Rule Name: Don't wait for the last
-  Priority Value: -1
-  program.last > 0  AND program.first = 0
+       Priority Rule Name: Input 1 signal quality
+       Priority Value: -1
+       cardinput.cardinputid = 1 AND
+       channel.channum IN (3, 5, 39, 66)
 
 
 
-  When there is more than one showing of an episode, subtract 1 from the
-  last showing. This rule would tell the scheduler to try a little
-  harder to record any earlier showing. If there is a problem recording
-  an earlier showing then there would be at least one more opportunity
-  to record the program.
+  A common issue with two or more analog capture cards is that one of
+  the cards may have more interference on some channels than the same
+  channels on other cards. This example gives a disadvantage to the
+  channels in this list but only for the first input. Therefore, a show
+  on channel 39 would choose input 2 or 3 if possible but for channels
+  not in this list, input 1 is still the first choice.
 
   The Custom Priority editor includes many example fragments and
   complete examples that can be used or you can create your own to suit
@@ -5679,8 +5764,8 @@
 
 
 
-  $ tar -xjf mythplugins-0.20.2.tar.bz2
-  $ cd mythplugins-0.20.2
+  $ tar -xjf mythplugins-0.21.tar.bz2
+  $ cd mythplugins-0.21
   $ ./configure --help
 
   Usage:   configure [options]
@@ -5729,7 +5814,7 @@
 
 
   The sections detailing configuration of the plugins assume that you
-  are already in the ~/mythplugins-0.20.2/ directory.
+  are already in the ~/mythplugins-0.21/ directory.
 
   Note that a single [1mconfigure [22mscript now does configuration for all
   modules.  By default, it will compile all modules.  If you do not wish
@@ -5744,7 +5829,7 @@
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
        $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
        $ qmake mythplugins.pro
        $ make
@@ -5794,7 +5879,7 @@
 
 
 
-       $ cd ~/mythplugins-0.20.2/mythweb
+       $ cd ~/mythplugins-0.21/mythweb
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -5868,7 +5953,7 @@
   install the application:
 
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
        $ ./configure --disable-all --enable-opengl --enable-mythgallery
        $ qmake mythplugins.pro
        $ make
@@ -6154,7 +6239,7 @@
   Switch to the mythplugins directory:
 
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
 
 
 
@@ -6420,7 +6505,7 @@
 
 
 
-  $ cd ~/mythplugins-0.20.2
+  $ cd ~/mythplugins-0.21
   $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
   $ qmake mythplugins.pro
   $ make
@@ -6561,16 +6646,12 @@
 
   [1m18.  MythWeather.[0m
 
-  [1mNOTE[22m:  As of MythTV v0.20.2, MythWeather is disabled because it no
-  longer works correctly.  A working version of MythWeather can be found
-  in svn.
-
   MythWeather is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
   for instructions on downloading the tarball.
 
 
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
        $ ./configure --disable-all --enable-mythweather
        $ qmake mythplugins.pro
        $ make
@@ -6613,11 +6694,10 @@
   wish to see additional debugging information while MythWeather is
   running, run mythweather from the command line with as mythweather
   --debug
+
   You may also force mythweather to re-run the configuration by starting
   it on the command line as mythweather --configure.  These two options
   are mutually exclusive.
-
-
   [1m19.  MythVideo.[0m
 
   MythVideo is a part of the [1mmythplugins [22mpackage.  See ``MythPlugins''
@@ -6628,7 +6708,7 @@
 
 
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
        $ ./configure --disable-all --enable-mythvideo
        $ qmake mythplugins.pro
        $ make
@@ -6681,12 +6761,12 @@
   VCD playing.  You may remove these options if you don't need them.
 
 
-       $ cd ~/mythplugins-0.20
-       $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
-       $ qmake mythplugins.pro
-       $ make
-       $ su
-       # make install
+  $ cd ~/mythplugins-0.20
+  $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
+  $ qmake mythplugins.pro
+  $ make
+  $ su
+  # make install
 
 
 
@@ -6731,12 +6811,13 @@
   reader.
 
 
-       $ cd ~/mythplugins-0.20.2
+       $ cd ~/mythplugins-0.21
        $ ./configure --disable-all --enable-mythnews
        $ qmake mythplugins.pro
        $ make
        $ su
        # make install
+
 
 
   [1m22.  Troubleshooting.[0m

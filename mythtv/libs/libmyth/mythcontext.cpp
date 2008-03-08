@@ -119,7 +119,7 @@ int parse_verbose_arg(QString arg)
                   "The default for this program appears to be: '-v " <<
                   m_verbose << "'\n\n" <<
                   "Most options are additive except for none, all, and important.\n" <<
-                  "These three are semi-explicit and take precedence over any\n" <<
+                  "These three are semi-exclusive and take precedence over any\n" <<
                   "prior options given.  You can however use something like\n" <<
                   "'-v none,jobqueue' to get only JobQueue related messages\n" <<
                   "and override the default verbosity level.\n" <<

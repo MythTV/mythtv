@@ -70,15 +70,6 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
 void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
-static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
-{
-    // minimum buffer alignment
-    avcodec_align_dimensions(avctx, (int*)&width, (int*)&height);
-    // minimum MPEG alignment
-    width  = (width  + 15) & (~0xf);
-    height = (height + 15) & (~0xf);
-}
-
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
     static QString full_line("");
@@ -1138,22 +1129,20 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     if (selectedStream)
     {
-        uint align_width  = enc->width;
-        uint align_height = enc->height;
+        uint width  = enc->width;
+        uint height = enc->height;
 
-        align_dimensions(enc, align_width, align_height);
-
-        if (align_width == 0 && align_height == 0)
+        if (width == 0 && height == 0)
         {
             VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
-                    "failed to align dimensions, resetting decoder.");
-            align_width = 640;
-            align_height = 480;
+                    "invalid dimensions, resetting decoder.");
+            width = 640;
+            height = 480;
             fps = 29.97;
             aspect_ratio = 4.0 / 3;
         }
 
-        GetNVP()->SetVideoParams(align_width, align_height, fps,
+        GetNVP()->SetVideoParams(width, height, fps,
                                  keyframedist, aspect_ratio, kScan_Detect, 
                                  dvd_video_codec_changed);
     }
@@ -1871,6 +1860,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         GetNVP()->ReinitAudio();
     }
 
+    // if we don't have a video stream we still need to make sure some
+    // video params are set properly
+    if (selectedVideoIndex == -1)
+    {
+        QString tvformat = gContext->GetSetting("TVFormat").lower();
+        if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
+            tvformat == "pal-m" || tvformat == "atsc")
+        {
+            fps = 29.97;
+            GetNVP()->SetVideoParams(-1, -1, 29.97, 1);
+        }
+        else
+        {
+            fps = 25.0;
+            GetNVP()->SetVideoParams(-1, -1, 25.0, 1);
+        }
+    }
+
     if (GetNVP()->IsErrored())
         scanerror = -1;
 
@@ -2333,10 +2340,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (changed)
             {
-                uint awidth = width, aheight = height;
-                align_dimensions(context, awidth, aheight);
-
-                GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
+                GetNVP()->SetVideoParams(width, height, seqFPS,
                                          keyframedist, aspect, 
                                          kScan_Detect);
                 
@@ -2413,10 +2417,7 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (changed)
         {
-            uint awidth = width, aheight = height;
-            align_dimensions(context, awidth, aheight);
-
-            GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
+            GetNVP()->SetVideoParams(width, height, seqFPS,
                                      keyframedist, aspect_ratio,
                                      kScan_Detect);
 
@@ -3187,7 +3188,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (!d->HasMPEG2Dec())
             {
                 int current_width = curstream->codec->width;
-                int video_width = GetNVP()->GetVideoWidth();
+                int video_width = GetNVP()->GetVideoSize().width();
                 if (dvd_xvmc_enabled && GetNVP() && GetNVP()->getVideoOutput())
                 {
                     bool dvd_xvmc_active = false;
@@ -3519,7 +3520,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 (curstream->codec->channels * 2) / 
                                 curstream->codec->sample_rate);
 
-                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
+                    VERBOSE(VB_PLAYBACK,
                             LOC + QString("audio timecode %1 %2 %3 %4") 
                             .arg(pkt->pts).arg(pkt->dts)
                             .arg(temppts).arg(lastapts)); 
@@ -3706,7 +3707,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                       * av_q2d(curstream->codec->time_base));
                     }
 
-                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
+                    VERBOSE(VB_PLAYBACK, LOC +
                             QString("video timecode %1 %2 %3 %4")
                             .arg(pkt->pts).arg(pkt->dts).arg(temppts)
                             .arg(lastvpts));

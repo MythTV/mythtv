@@ -1361,10 +1361,18 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     if (profiles.empty())
         return;
 
+    if (!profiles.contains("Normal") &&
+        !profiles.contains("High Quality") &&
+        !profiles.contains("Slim"))
+    {
+        VideoDisplayProfile::CreateNewProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
-        profile = profiles[0];
+        profile = (profiles.contains("Normal")) ? "Normal" : profiles[0];
         VideoDisplayProfile::SetDefaultProfileName(profile, host);
     }
 
@@ -1372,7 +1380,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     grouptrigger->setLabel(QObject::tr("Current Video Playback Profile"));
     QStringList::const_iterator it;
     for (it = profiles.begin(); it != profiles.end(); it++)
-        grouptrigger->addSelection(*it);
+        grouptrigger->addSelection(QObject::tr(*it), *it);
 
     HorizontalConfigurationGroup *grp =
         new HorizontalConfigurationGroup(false, false, true, true);

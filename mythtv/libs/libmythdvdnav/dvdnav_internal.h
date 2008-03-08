@@ -186,14 +186,22 @@ struct dvdnav_s {
 /** USEFUL MACROS **/
 
 #ifdef __GNUC__
-#define printerrf(format, args...) snprintf(this->err_str, MAX_ERR_LEN, format, ## args);
+#define printerrf(format, args...) \
+  do { if (this) snprintf(this->err_str, MAX_ERR_LEN, format, ## args); } \
+  while (0)
 #else
 #ifdef _MSC_VER
-#define printerrf(str) snprintf(this->err_str, MAX_ERR_LEN, str);
+#define printerrf(str) \
+  do { if (this) snprintf(this->err_str, MAX_ERR_LEN, str); } \
+  while (0)
 #else
-#define printerrf(...) snprintf(this->err_str, MAX_ERR_LEN, __VA_ARGS__);
+#define printerrf(...) \
+  do { if (this) snprintf(this->err_str, MAX_ERR_LEN, __VA_ARGS__); } \
+  while (0)
 #endif /* WIN32 */
 #endif
-#define printerr(str) strncpy(this->err_str, str, MAX_ERR_LEN);
+#define printerr(str) \
+  do { if (this) strncpy(this->err_str, str, MAX_ERR_LEN); } \
+  while (0)
 
 #endif /* DVDNAV_INTERNAL_H_INCLUDED */

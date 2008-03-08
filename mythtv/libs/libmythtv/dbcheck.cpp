@@ -10,11 +10,12 @@ using namespace std;
 #include "mythdbcon.h"
 #include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
 #include "dbutil.h"
+#include "videodisplayprofile.h" // for "1214"
 
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1213";
+const QString currentDatabaseVersion = "1214";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -3578,6 +3579,45 @@ thequery,
         if (!performActualUpdate(updates, "1213", dbver))
         return false;
     }
+
+    if (dbver == "1213")
+    {
+        VERBOSE(VB_IMPORTANT, "In 1213 upg");
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT hostname "
+                      "FROM displayprofilegroups "
+                      "GROUP BY hostname");
+        bool ok = query.exec();
+        while (ok && query.next())
+        {
+            QString host = query.value(0).toString();
+            QStringList profiles = VideoDisplayProfile::GetProfiles(host);
+            if (profiles.contains("High Quality") &&
+                profiles.contains("Normal") &&
+                profiles.contains("Slim"))
+            {
+                continue;
+            }
+
+            VideoDisplayProfile::CreateNewProfiles(host);
+            profiles = VideoDisplayProfile::GetProfiles(host);
+            QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
+
+            VERBOSE(VB_IMPORTANT, QString("In 1213 upg(%1): p %2")
+                    .arg(host).arg(profile));
+
+            if (profiles.contains("Normal") &&
+                (profile=="CPU++" || profile=="CPU+" || profile=="CPU--"))
+            {
+                VideoDisplayProfile::SetDefaultProfileName("Normal", host);
+            }
+        }
+
+        const QString updates[] = { "" };
+        if (!performActualUpdate(updates, "1214", dbver))
+            return false;
+    }
+
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22

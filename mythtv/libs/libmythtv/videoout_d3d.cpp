@@ -120,19 +120,17 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
     db_vdisp_profile->SetVideoRenderer("didect3d");
 
-    if (input_size.width()  == m_InputCX &&
-        input_size.height() == m_InputCY)
+    if (video_dim.width() == m_InputCX && video_dim.height() == m_InputCY)
     {
         MoveResize();
         return true;
     }
 
-    m_InputCX = input_size.width();
-    m_InputCY = input_size.height();
+    m_InputCX = video_dim.width();
+    m_InputCY = video_dim.height();
     VERBOSE(VB_PLAYBACK, LOC + "InputChanged, x="<< m_InputCX
             << ", y=" << m_InputCY);
 
-    video_dim = input_size;
     vbuffers.DeleteBuffers();
 
     MoveResize();
@@ -469,10 +467,10 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
 
     m_hWnd = winid;
 
-    m_InputCX  = width;
-    m_InputCY = height;
+    m_InputCX = video_dim.width();
+    m_InputCY = video_dim.height();
 
-    if (!vbuffers.CreateBuffers(width, height))
+    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
         return false;
 
     if (!InitD3D())
