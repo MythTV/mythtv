@@ -97,7 +97,7 @@ if (!$xml) {
     die "Not xml";
 }
 
-printf "copyright::©BBC Weather\n";
+printf "copyright::Â©BBC Weather\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Forecast for (.*)$/$1/s;
@@ -155,7 +155,8 @@ foreach $item (@{$xml->{channel}->{item}}) {
         printf "icon-" . $i . "::flurries.png\n";
     }
     elsif ($weather_string =~ /^sleet$/i ||
-        $weather_string =~ /^sleet showers$/i) {
+        $weather_string =~ /^sleet showers$/i ||
+        $weather_string =~ /^hail showers$/i) {
         printf "icon-" . $i . "::rainsnow.png\n";
     }
     elsif ($weather_string =~ /^clear$/i) {

@@ -104,7 +104,7 @@ if (!$xml) {
 # The required elements which aren't provided by this feed
 printf "appt::NA\n";
 
-printf "copyright::©BBC Weather\n";
+printf "copyright::Â©BBC Weather\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Observations for (.*)$/$1/s;
@@ -156,7 +156,8 @@ elsif ($weather_string =~ /^light snow$/i ||
     printf "weather_icon::flurries.png\n"; 
 }
 elsif ($weather_string =~ /^sleet$/i ||
-    $weather_string =~ /^sleet showers$/i) { 
+    $weather_string =~ /^sleet showers$/i ||
+    $weather_string =~ /^hail showers$/i) {
     printf "weather_icon::rainsnow.png\n"; 
 }
 elsif ($weather_string =~ /^clear$/i) { 
