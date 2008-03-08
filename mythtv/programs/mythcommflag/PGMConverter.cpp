@@ -38,8 +38,9 @@ PGMConverter::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
     if (width != -1)
         return 0;
 
-    width = nvp->GetVideoWidth();
-    height = nvp->GetVideoHeight();
+    QSize buf_dim = nvp->GetVideoBufferSize();
+    width  = buf_dim.width();
+    height = buf_dim.height();
 
 #ifdef PGM_CONVERT_GREYSCALE
     if (avpicture_alloc(&pgm, PIX_FMT_GRAY8, width, height))

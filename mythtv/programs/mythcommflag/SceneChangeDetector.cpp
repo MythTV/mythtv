@@ -144,10 +144,12 @@ SceneChangeDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     scdiff = new unsigned short[nframes];
     memset(scdiff, 0, nframes * sizeof(*scdiff));
 
+    QSize video_disp_dim = nvp->GetVideoSize();
+
     VERBOSE(VB_COMMFLAG, QString(
                 "SceneChangeDetector::nuppelVideoPlayerInited %1x%2")
-            .arg(nvp->GetVideoWidth())
-            .arg(nvp->GetVideoHeight()));
+            .arg(video_disp_dim.width())
+            .arg(video_disp_dim.height()));
 
     return ares;
 }

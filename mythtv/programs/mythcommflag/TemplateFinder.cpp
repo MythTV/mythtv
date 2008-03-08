@@ -786,8 +786,9 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     QString tmpldims, nvpdims;
 
     (void)nframes; /* gcc */
-    width = nvp->GetVideoWidth();
-    height = nvp->GetVideoHeight();
+    QSize buf_dim = nvp->GetVideoBufferSize();
+    width  = buf_dim.width();
+    height = buf_dim.height();
     nvpdims = QString("%1x%2").arg(width).arg(height);
 
     if (debug_template)

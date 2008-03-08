@@ -1271,7 +1271,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
             .arg(input_size.height()).arg(aspect));
 
     bool cid_changed = (myth_codec_id != av_codec_id);
-    bool res_changed = input_size != video_dim;
+    bool res_changed = input_size != video_disp_dim;
     bool asp_changed = aspect != video_aspect;
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
@@ -1303,8 +1303,8 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
 
     DeleteQuartzBuffers();
 
-    data->srcWidth  = input_size.width();
-    data->srcHeight = input_size.height();
+    data->srcWidth  = video_dim.width();
+    data->srcHeight = video_dim.height();
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
 
@@ -1359,8 +1359,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    data->srcWidth  = width;
-    data->srcHeight = height;
+    data->srcWidth  = video_dim.width();
+    data->srcHeight = video_dim.height();
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
 

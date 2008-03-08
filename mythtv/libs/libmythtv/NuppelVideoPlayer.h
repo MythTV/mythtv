@@ -177,8 +177,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
 
     // Gets
-    int     GetVideoWidth(void) const         { return video_width; }
-    int     GetVideoHeight(void) const        { return video_height; }
+    QSize   GetVideoBufferSize(void) const    { return video_dim; }
+    QSize   GetVideoSize(void) const          { return video_disp_dim; }
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
@@ -591,9 +591,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
 
     // Input Video Attributes
-    int      video_width;     ///< Video (input) width
-    int      video_height;    ///< Video (input) height
-    int      video_size;      ///< Video (input) buffer size in bytes
+    QSize    video_disp_dim;  ///< Video (input) width & height
+    QSize    video_dim;       ///< Video (input) buffer width & height
     double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
     float    video_aspect;    ///< Video (input) Apect Ratio
     float    forced_video_aspect; 

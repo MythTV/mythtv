@@ -344,6 +344,13 @@ int VideoOutputDirectfb::GetRefreshRate(void)
     return v;
 }
 
+/// Correct for underalignment
+static QSize fix_alignment(QSize raw)
+{
+    return QSize((raw.width()  + 15) & (~0xf),
+                 (raw.height() + 15) & (~0xf));
+}
+
 bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                                int winx, int winy, int winw, int winh,
                                WId embedid)
@@ -467,13 +474,15 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
         return false;
     }
 
+    video_dim = fix_alignment(QSize(width, height));
+
     // Find an output layer that supports a format we can deal with.
     // begin with the video format we have as input, fall back to others
 
     data->videoLayerConfig.flags = (DFBDisplayLayerConfigFlags)
         (DLCONF_WIDTH | DLCONF_HEIGHT | DLCONF_PIXELFORMAT);
-    data->videoLayerConfig.width = width;
-    data->videoLayerConfig.height = height;
+    data->videoLayerConfig.width = video_dim.width();
+    data->videoLayerConfig.height = video_dim.height();
     data->videoLayerConfig.pixelformat = DSPF_I420;
 
     fberr = data->dfb->EnumDisplayLayers(data->dfb, layer_cb, data);
@@ -607,8 +616,8 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                   kKeepPrebuffer);
     desc.flags = (DFBSurfaceDescriptionFlags)
         (DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
-    desc.width = width;
-    desc.height = height;
+    desc.width = video_dim.width();
+    desc.height = video_dim.height();
     desc.pixelformat = data->videoLayerConfig.pixelformat;
 
     if (!data->CreateBuffers(vbuffers, desc))
@@ -913,8 +922,8 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
 
     desc.flags = (DFBSurfaceDescriptionFlags)
         (DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
-    desc.width  = input_size.width();
-    desc.height = input_size.height();
+    desc.width  = video_dim.width();
+    desc.height = video_dim.height();
     desc.pixelformat = data->videoLayerConfig.pixelformat;
 
     data->DeleteBuffers(vbuffers);

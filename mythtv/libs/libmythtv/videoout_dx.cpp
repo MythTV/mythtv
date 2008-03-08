@@ -110,8 +110,8 @@ bool VideoOutputDX::InputChanged(const QSize &input_size,
 
     db_vdisp_profile->SetVideoRenderer("directx");
 
-    XJ_width  = input_size.width();
-    XJ_height = input_size.height();
+    XJ_width  = video_dim.width();
+    XJ_height = video_dim.height();
 
     vbuffers.DeleteBuffers();
     
@@ -171,8 +171,8 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
 
     wnd = winid;
 
-    XJ_width  = width;
-    XJ_height = height;
+    XJ_width  = video_dim.width();
+    XJ_height = video_dim.height();
 
     vbuffers.CreateBuffers(XJ_width, XJ_height);
     MoveResize();

@@ -87,8 +87,9 @@ ClassicCommDetector::ClassicCommDetector(enum SkipTypes commDetectMethod_in,
 
 void ClassicCommDetector::Init()
 {
-    width = nvp->GetVideoWidth();
-    height = nvp->GetVideoHeight();
+    QSize video_disp_dim = nvp->GetVideoSize();
+    width  = video_disp_dim.width();
+    height = video_disp_dim.height();
     fps = nvp->GetFrameRate();
 
     preRoll  = (long long)(max(0,recordingStartedAt.secsTo(startedAt)) * fps);

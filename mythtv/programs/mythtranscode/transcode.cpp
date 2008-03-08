@@ -468,8 +468,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     QString vidsetting = NULL, audsetting = NULL, vidfilters = NULL;
 
-    int video_width = nvp->GetVideoWidth();
-    int video_height = nvp->GetVideoHeight();
+    QSize buf_size = nvp->GetVideoBufferSize();
+    int video_width = buf_size.width();
+    int video_height = buf_size.height();
      
     if (video_height == 1088) {
        VERBOSE(VB_IMPORTANT, "Found video height of 1088.  This is unusual and "
@@ -864,11 +865,13 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     nvr->SetNewVideoParams(video_aspect);
                 }
 
-                if (video_width != nvp->GetVideoWidth() ||
-                    video_height != nvp->GetVideoHeight())
+                QSize buf_size = nvp->GetVideoBufferSize();
+
+                if (video_width != buf_size.width() ||
+                    video_height != buf_size.height())
                 {
-                    video_width = nvp->GetVideoWidth();
-                    video_height = nvp->GetVideoHeight();
+                    video_width = buf_size.width();
+                    video_height = buf_size.height();
 
                     VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
                         .arg(video_width).arg(video_height)
@@ -926,11 +929,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 nvr->SetNewVideoParams(video_aspect);
             }
 
-            if (video_width != nvp->GetVideoWidth() || 
-                video_height != nvp->GetVideoHeight())
+
+            QSize buf_size = nvp->GetVideoBufferSize();
+
+            if (video_width != buf_size.width() ||
+                video_height != buf_size.height())
             {
-                video_width = nvp->GetVideoWidth();
-                video_height = nvp->GetVideoHeight(); 
+                video_width = buf_size.width();
+                video_height = buf_size.height();
+
                 VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
                         .arg(video_width).arg(video_height)
                         .arg(newWidth).arg(newHeight));
