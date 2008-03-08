@@ -58,7 +58,7 @@ void BackendSelect::Accept(void)
         reject();
 
     dev->AddRef();
-    if (Connect(dev))
+    if (Connect(dev))  // this does a Release()
         accept();
 }
 
@@ -209,7 +209,7 @@ void BackendSelect::customEvent(QCustomEvent *e)
         if (devLoc != NULL)
         {
             devLoc->AddRef();
-            AddItem(devLoc);
+            AddItem(devLoc);   // this does a Release()
         }
     }
     else if (message.startsWith("SSDP_REMOVE"))
@@ -255,8 +255,7 @@ void BackendSelect::FillListBox(void)
     for (it = ourMap.begin(); it != ourMap.end(); ++it)
     {
         pDevLoc = (DeviceLocation *)it.data();
-        AddItem(pDevLoc);
-        pDevLoc->Release();
+        AddItem(pDevLoc);   // this does a Release()
     }
 }
 
