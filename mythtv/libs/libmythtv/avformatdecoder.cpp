@@ -3698,7 +3698,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     // a little bit smaller or equal, compute it from the last.
                     // Otherwise assume a wraparound.
                     if (!ringBuffer->isDVD() && 
-                        temppts <= lastvpts && temppts + 10000 > lastvpts)
+                        temppts <= lastvpts &&
+                        (temppts + 10000 > lastvpts || temppts < 0))
                     {
                         temppts = lastvpts;
                         temppts += (long long)(1000 * av_q2d(context->time_base));
