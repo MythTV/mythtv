@@ -337,11 +337,11 @@ void ScreenSetup::updateHelpText()
         if (si->hasUnits)
             text += tr("Units: ") +
                     (si->units == ENG_UNITS ? tr("English Units") :
-                     tr("SI Units")) + "\n";
+                     tr("SI Units")) + "   ";
         if (!si->multiLoc && ti)
         {
             text += tr("Location: ") + (ti->location != "" ?
-                    ti->location : tr("Not Defined")) + "  ";
+                    ti->location : tr("Not Defined")) + "\n";
             text += tr("Source: " ) +
                     (ti->src ? ti->src->name : tr("Not Defined")) + "\n";
         }
@@ -444,30 +444,33 @@ void ScreenSetup::loadData()
                 m_weather_screens.parseContainer(e, tmpname, context, area);
                 types = WeatherScreen::getAllDynamicTypes(m_weather_screens.GetSet(name));
                 LayerSet *set = m_weather_screens.GetSet(name);
-        //        if (!active_screens.find(name))
-        //        {
+
+                si = new ScreenListInfo;
+                si->units = ENG_UNITS;
+                si->hasUnits = !(bool) set->GetType("nounits");
+                si->multiLoc = (bool) set->GetType("multilocation");
+                si->types.setAutoDelete(true);
+
+                QStringList type_strs;
+                for (uint i = 0; i < types.size(); ++i)
+                {
+                    ti = new TypeListInfo;
+                    ti->name =  types[i];
+                    ti->src = 0;
+                    si->types.insert(types[i], ti);
+                    type_strs << types[i];
+                }
+
+                QPtrList<ScriptInfo> tmp;
+                // Only add a screen to the list if we have a source
+                // available to satisfy the requirements.
+                if (m_src_man->findPossibleSources(type_strs, tmp))
+                {
                     UIListBtnTypeItem *itm =
                             new UIListBtnTypeItem(m_inactive_list, name);
-                    si = new ScreenListInfo;
-                    si->units = ENG_UNITS;
-                    si->hasUnits = !(bool) set->GetType("nounits");
-                    si->multiLoc = (bool) set->GetType("multilocation");
-                    si->types.setAutoDelete(true);
                     itm->setData(si);
-                    for (uint i = 0; i < types.size(); ++i)
-                    {
-                        ti = new TypeListInfo;
-                        ti->name =  types[i];
-                        ti->src = 0;
-                        si->types.insert(types[i], ti);
-                    }
-               // }
-               // else
-               // {
-               //   ScreenListInfo * si = active_screens[name];
-               //     si->hasUnits = !(bool) set->GetType("nounits");
-               //     si->multiLoc = (bool) set->GetType("multilocation");
-               // }
+                }
+
             }
         }
         n = n.nextSibling();
