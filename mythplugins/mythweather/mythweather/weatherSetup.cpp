@@ -1,5 +1,6 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/uilistbtntype.h>
+#include <qapplication.h>
 
 #include "weatherScreen.h"
 #include "weatherSource.h"
@@ -207,6 +208,8 @@ void ScreenSetup::wireUI()
         m_inactive_list->calculateScreenArea();
         connect(m_inactive_list, SIGNAL(takingFocus()), this,
                 SLOT(updateHelpText()));
+        connect(m_inactive_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
+                this, SLOT(updateHelpText()));
     }
 
 //     m_type_list = getUIListBtnType("typelist");
@@ -318,8 +321,22 @@ void ScreenSetup::updateHelpText()
 
     if (itm == m_inactive_list)
     {
-        text = tr("Add desired screens to the Active Screens list "
-            "by pressing SELECT");
+
+        UIListBtnTypeItem *lbt = m_inactive_list->GetItemCurrent();
+        if (!lbt)
+            return;
+
+        ScreenListInfo *si = (ScreenListInfo *) lbt->getData();
+        if (!si)
+            return;
+
+        QStringList sources = si->sources;
+
+        text = tr("Add desired screen to the Active Screens list "
+            "by pressing SELECT.") + "\n";
+        text += lbt->text() + "\n";
+        text += QString("%1: %2").arg(tr("Sources"))
+                                 .arg(sources.join(", "));
     }
     else if (itm == m_active_list)
     {
@@ -333,7 +350,7 @@ void ScreenSetup::updateHelpText()
 
         QDictIterator<TypeListInfo> it(si->types);
         TypeListInfo *ti = it.current();
-        text += m_active_list->GetItemCurrent()->text() + "\n";
+        text += lbt->text() + "\n";
         if (si->hasUnits)
             text += tr("Units: ") +
                     (si->units == ENG_UNITS ? tr("English Units") :
@@ -461,11 +478,17 @@ void ScreenSetup::loadData()
                     type_strs << types[i];
                 }
 
-                QPtrList<ScriptInfo> tmp;
+                QPtrList<ScriptInfo> scriptList;
                 // Only add a screen to the list if we have a source
                 // available to satisfy the requirements.
-                if (m_src_man->findPossibleSources(type_strs, tmp))
+                if (m_src_man->findPossibleSources(type_strs, scriptList))
                 {
+                    ScriptInfo *script;
+                    for (script = scriptList.first(); script;
+                                                script = scriptList.next())
+                    {
+                        si->sources.append(script->name);
+                    }
                     UIListBtnTypeItem *itm =
                             new UIListBtnTypeItem(m_inactive_list, name);
                     itm->setData(si);
@@ -1342,6 +1365,11 @@ void LocationDialog::doSearch()
     m_list->Reset();
     UITextType *resultslbl = getUITextType("numresults");
 
+    QString searchingresults = tr("Searching ... Results: %1");
+
+    resultslbl->SetText(searchingresults.arg(numresults));
+    qApp->processEvents();
+
     QPtrList<ScriptInfo> sources;
     // if a screen makes it this far, theres at least one source for it
     m_src_man->findPossibleSources(m_types, sources);
@@ -1354,6 +1382,8 @@ void LocationDialog::doSearch()
             QStringList results = m_src_man->getLocationList(si, search);
             result_cache[si] = results;
             numresults += results.size();
+            resultslbl->SetText(searchingresults.arg(numresults));
+            qApp->processEvents();
         }
     }
 
@@ -1372,7 +1402,7 @@ void LocationDialog::doSearch()
             itm->setData(ri);
         }
     }
-    resultslbl->SetText(tr("Results: %1").arg(numresults));
+    resultslbl->SetText(tr("Search Complete. Results: %1").arg(numresults));
     if (numresults)
     {
         m_list->allowFocus(true);

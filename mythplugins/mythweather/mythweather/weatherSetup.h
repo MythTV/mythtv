@@ -24,6 +24,7 @@ struct ScreenListInfo
      */
     QDict<TypeListInfo> types;
     QString helptxt;
+    QStringList sources;
     units_t units;
     bool hasUnits;
     bool multiLoc;
