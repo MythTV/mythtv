@@ -1276,6 +1276,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
     static const unsigned char sw64_h_cmds[] = { 0x1a, 0x5c, 0x2e, };
 
     const unsigned char *cmds = NULL;
+    unsigned char horizcmd = 0x00;
     uint num_ports = 0;
 
     // determine polarity from lnb
@@ -1290,6 +1291,8 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
         case kTypeLegacySW21:
             cmds = sw21_cmds;
             num_ports = 2;
+            if (horizontal)
+                horizcmd = 0x80;  
             break;
         case kTypeLegacySW42:
             cmds = sw42_cmds;
@@ -1313,7 +1316,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 
     // send command
     if (ioctl(m_tree.GetFD(), FE_DISHNETWORK_SEND_LEGACY_CMD,
-              cmds[pos]) == -1)
+              cmds[pos] | horizcmd) == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "FE_DISHNETWORK_SEND_LEGACY_CMD failed" + ENO);
