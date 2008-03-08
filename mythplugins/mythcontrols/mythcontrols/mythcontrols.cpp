@@ -100,8 +100,11 @@ bool MythControls::Create(void)
     foundtheme = LoadWindowFromXML("controls-ui.xml", "controls", this);
 
     if (!foundtheme)
+    {
         VERBOSE(VB_IMPORTANT, "Unable to load window 'controls' from "
                               "controls-ui.xml");
+        return false;
+    }
 
     m_description = dynamic_cast<MythUIText *>
                 (GetChild("description"));
