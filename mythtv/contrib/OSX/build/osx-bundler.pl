@@ -4,7 +4,7 @@
 # osx-bundler.pl - General purpose application bundling utility
 #
 # = LOCATION
-# http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/osx-bundler.pl
+# http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/build/osx-bundler.pl
 #
 # = USAGE
 my $usage = '
