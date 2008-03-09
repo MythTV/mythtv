@@ -996,8 +996,11 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         return;
     }
 
-    video_dim    = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
-    video_disp_dim=QSize(width, height);
+    if ((width > 0) && (height > 0))
+    {
+        video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
+        video_disp_dim = QSize(width, height);
+    }
     video_aspect = (aspect > 0.0f) ? aspect : video_aspect;
     keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
 
