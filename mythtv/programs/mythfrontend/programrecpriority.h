@@ -25,6 +25,7 @@ class ProgramRecPriorityInfo : public ProgramInfo
     int recCount;
     QDateTime last_record;
     int avg_delay;
+    int autoRecPriority;
 };
 
 class ProgramRecPriority : public MythDialog

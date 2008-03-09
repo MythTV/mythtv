@@ -3155,6 +3155,18 @@ static GlobalSpinBox *GRHDTVRecPriority()
     return bs;
 }
 
+static GlobalSpinBox *GRAutoRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoRecPriority", -99, 99, 1);
+    bs->setLabel(QObject::tr("Automatic Priority Range (+/-)"));
+    bs->setHelpText(QObject::tr("Up to this number of priority points may "
+                    "be added for titles that are usually watched soon after "
+                    "recording or subtracted for titles that are often "
+                    "watched several days or weeks later."));
+    bs->setValue(0);
+    return bs;
+}
+
 static GlobalSpinBox *GRSingleRecordRecPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("SingleRecordRecPriority",
@@ -4848,6 +4860,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     sched->addChild(GRComplexPriority());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());
+    sched->addChild(GRAutoRecPriority());
     addChild(sched);
 
     VerticalConfigurationGroup* rtype = new VerticalConfigurationGroup(false);

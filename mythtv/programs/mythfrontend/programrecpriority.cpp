@@ -34,13 +34,16 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) : ProgramInfo()
 {
     recTypeRecPriority = 0;
     recType = kNotRecording;
+    avg_delay = 0;
+    autoRecPriority = 0;
 }
-
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other) 
                       : ProgramInfo::ProgramInfo(other)
 {
     recTypeRecPriority = other.recTypeRecPriority;
     recType = other.recType;
+    avg_delay = other.avg_delay;
+    autoRecPriority = other.autoRecPriority;
 }
 
 ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &other)
@@ -800,6 +803,8 @@ void ProgramRecPriority::FillList(void)
     int cnt = 999, rtRecPriors[11];
     vector<ProgramInfo *> recordinglist;
 
+    int autopriority = gContext->GetNumSetting("AutoRecPriority", 0);
+
     programData.clear();
 
     RemoteGetAllScheduledRecordings(recordinglist);
@@ -889,6 +894,13 @@ void ProgramRecPriority::FillList(void)
                     progInfo->recCount = recMatch[progInfo->recordid];
                     progInfo->last_record = lastrec;
                     progInfo->avg_delay = avgd;
+
+                    if (autopriority)
+                        progInfo->autoRecPriority = 
+                            autopriority - (progInfo->avg_delay *
+                            (autopriority * 2 + 1) / 200);
+                    else
+                        progInfo->autoRecPriority = 0;
 
                     if (inactive)
                         progInfo->recstatus = rsInactive;
@@ -999,8 +1011,10 @@ class programRecPrioritySort
 
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
-            int finalA = a.prog->recpriority + a.prog->recTypeRecPriority;
-            int finalB = b.prog->recpriority + b.prog->recTypeRecPriority;
+            int finalA = a.prog->recpriority + a.prog->autoRecPriority +
+                         a.prog->recTypeRecPriority;
+            int finalB = b.prog->recpriority + b.prog->autoRecPriority +
+                         b.prog->recTypeRecPriority;
             if (finalA != finalB)
             {
                 if (m_reverse)
@@ -1362,7 +1376,8 @@ void ProgramRecPriority::updateList(QPainter *p)
 
                         int progRecPriority = progInfo->recpriority;
                         int finalRecPriority = progRecPriority + 
-                                        progInfo->recTypeRecPriority;
+                                               progInfo->autoRecPriority + 
+                                               progInfo->recTypeRecPriority;
         
                         QString tempSubTitle = progInfo->title;
                         if ((progInfo->rectype == kSingleRecord ||
@@ -1454,12 +1469,13 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
     if (programData.count() > 0 && curitem)
     {  
-        int progRecPriority, rectyperecpriority, finalRecPriority;
+        int progRecPriority, autorecpri, rectyperecpriority, finalRecPriority;
         RecordingType rectype; 
 
         progRecPriority = curitem->recpriority;
+        autorecpri = curitem->autoRecPriority;
         rectyperecpriority = curitem->recTypeRecPriority;
-        finalRecPriority = progRecPriority + rectyperecpriority;
+        finalRecPriority = progRecPriority + autorecpri + rectyperecpriority;
 
         rectype = curitem->recType;
 
@@ -1554,15 +1570,22 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("recpriority");
             if (type) {
-                if (curitem->recpriority >= 0)
-                    type->SetText("+"+QString::number(curitem->recpriority));
-                else
-                    type->SetText(QString::number(curitem->recpriority));
+                QString msg = "";
+                //if (curitem->recpriority >= 0)
+                //    msg += "+";
+
+                msg += QString::number(curitem->recpriority);
+
+                if(autorecpri != 0)
+                    msg += tr(" + %1 automatic priority (%2hr)")
+                              .arg(autorecpri).arg((curitem->avg_delay));
+                type->SetText(msg);
             }
 
             type = (UITextType *)container->GetType("recpriorityB");
             if (type) {
-                type->SetText(QString::number(abs(progRecPriority)));
+                type->SetText(QString::number(abs(progRecPriority +
+                                                  autorecpri)));
             }
 
             type = (UITextType *)container->GetType("recprioritysign");

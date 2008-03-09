@@ -2387,7 +2387,7 @@ void Scheduler::UpdateMatches(int recordid) {
 " WHERE ") + whereclauses[clause] + 
     QString(" AND (NOT ((RECTABLE.dupin & %1) AND program.previouslyshown)) "
             " AND (NOT ((RECTABLE.dupin & %2) AND program.generic > 0)) "
-            " AND (NOT ((RECTABLE.dupin & %2) AND (program.previouslyshown "
+            " AND (NOT ((RECTABLE.dupin & %3) AND (program.previouslyshown "
             "                                      OR program.first = 0))) ")
             .arg(kDupsExRepeats).arg(kDupsExGeneric).arg(kDupsFirstNew) +
     QString(" AND channel.visible = 1 AND "
@@ -2528,6 +2528,9 @@ void Scheduler::AddNewRecords(void)
     int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
     prefinputpri        = gContext->GetNumSetting("PrefInputPriority", 2);
     int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
+    int autopriority    = gContext->GetNumSetting("AutoRecPriority", 0);
+
+    int autostrata = autopriority * 2 + 1;
 
     QString pwrpri = "channel.recpriority + cardinput.recpriority";
 
@@ -2748,8 +2751,8 @@ void Scheduler::AddNewRecords(void)
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "program.videoprop+0, program.subtitletypes+0, program.audioprop+0, "
-"RECTABLE.storagegroup, capturecard.hostname, recordmatch.oldrecstatus, " + 
-    pwrpri + QString(
+"RECTABLE.storagegroup, capturecard.hostname, recordmatch.oldrecstatus, "
+"RECTABLE.avg_delay, " +  pwrpri + QString(
 "FROM recordmatch "
 " INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
 " INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
@@ -2859,7 +2862,11 @@ void Scheduler::AddNewRecords(void)
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
 
-        p->recpriority2 = result.value(45).toInt();
+        if (autopriority)
+            p->recpriority += autopriority - 
+                              (result.value(45).toInt() * autostrata / 200);
+
+        p->recpriority2 = result.value(46).toInt();
 
         if (complexpriority == 0)
         {
