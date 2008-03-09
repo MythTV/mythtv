@@ -1,0 +1,51 @@
+it2m
+=======================================
+Cedric FERRY : sonique_irc(at)yahoo(dot)fr (current maintainer)
+home : http://sonique54.free.fr/it2m
+package : http://sonique54.free.fr/it2m/it2m-0.1.i386.tar.bz2
+
+it2m permit you to import rating and numplays from 
+iTunes Music Library file (XML Format), from iTunes 6 and 7. 
+it2m is NOT endorsed by, nor affiliated with,
+Apple Computer nor any other company in ANY way.
+
+VERSION
+=======================================
+it2m : version 0.1
+with mysql 4.x and 5.x
+     libxml 2.x
+
+BUILD
+=======================================
+In order to compile it2m, you need to have MySQL 4.x or 5.x and xml2 
+installed (as well as the development files!).
+
+You need :
+- libxml2-dev 
+- libmysqlclientXX-dev (4 or 5)
+
+gcc `xml2-config --cflags --libs` -lmysqlclient -o it2m it2m.c
+
+RUN
+=======================================
+./it2m 
+
+USAGE
+=======================================
+Default Settings :
+itunes Music Library File path (XML) : iTunes Music Library.xml (default iTML.xml file in current directory)
+dbpassword : NO DEFAULT !
+user : root
+databasename : mythconverg (default MythTV database name)
+port : 3306 (default MySQL port)
+
+./it2m itunes.xml dbpassword user databasename port
+./it2m ([itunes.xml]|default='iTunes Music Library.xml') dbpassword
+       [ user [(database|default='mythconverg')] [(port|default=3306)] ]
+* VerySimple Use : YouPassWord
+* Simple : YourItunesMusicLin.xml YourPassWord
+* Custom : YourItunesMusicLin.xml YourPassWord YourUser
+* Default : "iTunes Music Library.xml" YourPass root  mythconverg 3306
+
+
+
