@@ -4,6 +4,7 @@
 #   based somewhat on greg froese's "myth.rebuilddatabase.pl"
 #   -- Lincoln Dale <ltd@interlink.com.au>, September 2006
 # 2007-03-11:  Added pretty print of unknown files vs. orphaned thumbnails. (Robert Kulagowski)
+# 2008-02-15:  Added dryrun and rerecord options (David George)
 
 #  The intent of this script is to be able to find orphaned rows in the 'recorded' table
 #  (entries which don't have matching media files) and orphaned media files (potentially
@@ -25,8 +26,13 @@
 #  and sets mythtv to fill up all your disk space with The Home Shopping Network, its entirely
 #  your fault.
 
+# The dryrun option will allow you to see the db entries/files that will be deleted without
+# actually executing them.
+# The rerecord option is useful if you lose a hard drive in your storage group to tell
+# the scheduler to re-record the lost programs (if they happen to be shown again).
+
 my $progname = "myth.find_orphans.pl";
-my $revision = "0.20";
+my $revision = "0.21";
 
 use DBI;
 use Sys::Hostname;
@@ -47,6 +53,8 @@ my $opt_dodelete =	0;
 my $opt_dodbdelete =	0;
 my $debug =		0;
 my $opt_help =		0;
+my $opt_dryrun = 	0;
+my $opt_rerecord = 	0;
 
 GetOptions(
         'host=s'	=> \$opt_host,
@@ -57,6 +65,8 @@ GetOptions(
 	'dir=s'		=> \$opt_dir,
 	'dodelete'	=> \$opt_dodelete,
 	'dodbdelete'	=> \$opt_dodbdelete,
+	'dryrun'	=> \$opt_dryrun,
+	'rerecord'	=> \$opt_rerecord,
         'debug+'	=> \$debug,
         'help'		=> \$opt_help,
         'h'		=> \$opt_help,
@@ -77,6 +87,8 @@ options:
 	--debug			increase debug level
 	--dodbdelete		remove recorded db entries with no matching file (default: don't)
 	--dodelete		delete files with no record (default: don't)
+	--dryrun		display delete actions without doing them
+	--rerecord		set db entries to re-record missing files (requires --dodbdelete)
 
 EOF
 ;
@@ -138,7 +150,18 @@ while (my @row=$sth->fetchrow_array) {
 		if ($opt_dodbdelete) {
 			my $sql = sprintf "DELETE FROM recorded WHERE basename LIKE \"%s\" LIMIT 1",$basename;
 			printf "performing database delete: %s\n",$sql;
-			$dbh->do($sql) || die "Could not execute $sql: $!\n";
+			if (!$opt_dryrun) {
+				$dbh->do($sql) || die "Could not execute $sql: $!\n";
+			}
+
+			if ($opt_rerecord) {
+				my $sql = sprintf "UPDATE oldrecorded SET duplicate = 0 where title = \"%s\" and starttime = \"%s\" and chanid = \"%s\"",
+					$title, $starttime, $channel;
+				printf "updating oldrecorded: %s\n", $sql;
+				if (!$opt_dryrun) {
+					$dbh->do($sql) || die "Could not execute $sql: $!\n";
+				}
+			}
 		}
 	} else {
 		$valid_recordings++;
@@ -171,11 +194,14 @@ foreach my $this_dir (keys %dirs) {
 				                                                                         
 				if ($opt_dodelete) {
 					printf STDERR "deleting  [%s]:  %s/%s\n",pretty_filesize($this_filesize),$this_dir,$this_file;
-					unlink "$this_dir/$this_file";
 
-					if (-f "$this_dir/$this_file") {
-						$errors++;
-						printf "ERROR: could not delete $this_dir/$this_file\n";
+					if (!$opt_dryrun) {
+						unlink "$this_dir/$this_file";
+
+						if (-f "$this_dir/$this_file") {
+							$errors++;
+							printf "ERROR: could not delete $this_dir/$this_file\n";
+						}
 					}
 				}
 			} else {
