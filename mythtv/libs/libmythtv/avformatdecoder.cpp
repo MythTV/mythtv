@@ -3520,7 +3520,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 (curstream->codec->channels * 2) / 
                                 curstream->codec->sample_rate);
 
-                    VERBOSE(VB_PLAYBACK,
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
                             LOC + QString("audio timecode %1 %2 %3 %4") 
                             .arg(pkt->pts).arg(pkt->dts)
                             .arg(temppts).arg(lastapts)); 
@@ -3708,7 +3708,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                       * av_q2d(curstream->codec->time_base));
                     }
 
-                    VERBOSE(VB_PLAYBACK, LOC +
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
                             QString("video timecode %1 %2 %3 %4")
                             .arg(pkt->pts).arg(pkt->dts).arg(temppts)
                             .arg(lastvpts));
