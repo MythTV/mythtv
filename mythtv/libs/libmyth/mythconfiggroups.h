@@ -17,12 +17,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
 
   public:
     ConfigurationGroup(bool luselabel   = true,  bool luseframe  = true,
-                       bool lzeroMargin = false, bool lzeroSpace = false) :
-        Setting(this),
-        uselabel(luselabel),     useframe(luseframe),
-        zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
-    {
-    }
+                       bool lzeroMargin = false, bool lzeroSpace = false);
 
     virtual void deleteLater(void);
 
@@ -61,6 +56,8 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
     bool useframe;
     bool zeroMargin;
     bool zeroSpace;
+    int margin;
+    int space;
 };
 
 class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup

@@ -16,6 +16,31 @@ static void clear_widgets(vector<Configurable*> &children,
     childwidget.clear();
 }
 
+ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
+                                       bool lzeroMargin, bool lzeroSpace) :
+    Setting(this),
+    uselabel(luselabel),     useframe(luseframe),
+    zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
+{
+    // Pre-calculate the margin and spacing that all sub-classes will use:
+
+    if (lzeroMargin)
+        margin = 4;
+    else
+    {
+        float wmult = 0, hmult = 0;
+
+        gContext->GetScreenSettings(wmult, hmult);
+
+        if (luselabel)
+            margin = (int)(28 * hmult);
+        else
+            margin = (int)(10 * hmult);
+    }
+
+    space = (lzeroSpace) ? 4 : -1;
+}
+
 ConfigurationGroup::~ConfigurationGroup()
 {
     childList::iterator it = children.begin();
@@ -91,13 +116,6 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     if (!useframe)
         widget->setFrameShape(QFrame::NoFrame);
-
-    float wmult = 0, hmult = 0;
-    gContext->GetScreenSettings(wmult, hmult);
-
-    int space  = (zeroSpace) ? 4 : -1;
-    int margin = (int) ((uselabel) ? (28 * hmult) : (10 * hmult));
-    margin = (zeroMargin) ? 4 : margin;
 
     layout = new QVBoxLayout(widget, margin, space);
 
@@ -197,36 +215,13 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     if (!useframe)
         widget->setFrameShape(QFrame::NoFrame);
 
-    QHBoxLayout *layout = NULL;
-
-    float wmult = 0, hmult = 0;
-
-    gContext->GetScreenSettings(wmult, hmult);
+    QHBoxLayout *layout = new QHBoxLayout(widget, margin, space);
 
     if (uselabel)
     {
-        int space = -1;
-        int margin = (int)(28 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-
-        layout = new QHBoxLayout(widget, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
-    }
-    else
-    {
-        int space = -1;
-        int margin = (int)(10 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-
-        layout = new QHBoxLayout(widget, margin, space);
     }
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
@@ -258,35 +253,15 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     QGridLayout *layout = NULL;
 
-    float wmult = 0, hmult = 0;
-
-    gContext->GetScreenSettings(wmult, hmult);
-
     int rows = (children.size()+columns-1) / columns;
+
+    layout = new QGridLayout(widget, rows, columns, margin, space);
+
     if (uselabel)
     {
-        int space = -1;
-        int margin = (int)(28 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-
-        layout = new QGridLayout(widget, rows, columns, margin, space);
         // This makes weird and bad things happen in qt -mdz 2002/12/28
         //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
-    }
-    else
-    {
-        int space = -1;
-        int margin = (int)(10 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-
-        layout = new QGridLayout(widget, rows, columns, margin, space);
     }
 
     for (unsigned i = 0 ; i < children.size() ; ++i)
