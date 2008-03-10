@@ -49,17 +49,11 @@
             <align>center</align>
         </textarea>
 
-        <buttonlist name="leftlist">
+        <buttonlist name="leftlist" from="basebuttonlist">
             <area>20,50,370,410</area>
-            <layout>vertical</layout>
             <activefont>active</activefont>
             <inactivefont>inactive</inactivefont>
             <showarrow>no</showarrow>
-            <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
-            <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-            <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
-            <spacing>5</spacing>
-            <margin>6</margin>
         </buttonlist>
 
         <textarea name="rightdesc" from="leftdesc">
@@ -71,16 +65,13 @@
             <area>410,50,370,410</area>
         </buttonlist>
 
-        <button name="action_0">
+        <button name="action_0" from="basebutton">
             <position>40,450</position>
             <activefont>keys</activefont>
             <inactivefont>keys</inactivefont>
-            <showarrow>no</showarrow>
             <regular-background filename="kb-button-off.png" />
             <selected-background filename="kb-button-on.png" />
             <inactive-background filename="kb-button-off.png" />
-            <margin>6</margin>
-            <textflags>allcenter</textflags>
         </button>
 
         <button name="action_1" from="action_0">
