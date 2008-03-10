@@ -597,7 +597,7 @@ use File::Basename;
 our $svnpath = dirname $svn;
 
 # Clean the environment
-$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin:$svnpath";
+$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin:/usr/sbin:$svnpath";
 $ENV{'DYLD_LIBRARY_PATH'} = "$PREFIX/lib";
 $ENV{'LD_LIBRARY_PATH'} = "/usr/local/lib";
 $ENV{'PKG_CONFIG_PATH'} = "$PREFIX/lib/pkgconfig:";
@@ -1179,7 +1179,7 @@ sub RecursiveCopy($$)
     my ($src, $dst) = @_;
 
     # First copy absolutely everything
-    &Syscall([ '/bin/cp', '-R', "$src", "$dst"]) or die;
+    &Syscall([ '/bin/cp', '-pR', "$src", "$dst"]) or die;
 
     # Then strip out any .svn directories
     my @files = map { chomp $_; $_ } `find $dst -name .svn`;
