@@ -1,5 +1,7 @@
 #include <unistd.h>
 
+#include <qfile.h>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
@@ -420,7 +422,43 @@ QStringList WeatherSource::getLocationList(const QString &str)
 
 void WeatherSource::startUpdate()
 {
+    m_buffer = "";
+
+    MSqlQuery db(MSqlQuery::InitCon());
     VERBOSE(VB_GENERAL, "Starting update of " + m_info->name);
+    db.prepare("SELECT updated FROM weathersourcesettings "
+               "WHERE sourceid = :ID AND "
+               "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
+    db.bindValue(":ID", getId());
+    db.exec();
+    if (db.size() > 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("%1 recently updated, skipping.")
+                                    .arg(m_info->name));
+
+        QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
+        QFile cache(cachefile);
+        if (cache.exists() && cache.open( IO_ReadOnly ))
+        {
+            QTextStream text( &cache );
+            m_buffer += text.read();
+            cache.close();
+
+            processData();
+
+            if (m_connectCnt)
+            {
+                emit newData(m_locale, m_units, m_data);
+            }
+            return;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("No cachefile for %1, forcing "
+                                          "update.").arg(m_info->name));
+        }
+    }
+
     m_data.clear();
     m_proc->clearArguments();
     m_proc->setWorkingDirectory(m_info->file->dir(true));
@@ -435,7 +473,6 @@ void WeatherSource::startUpdate()
     }
     m_proc->addArgument(m_locale);
 
-    m_buffer = "";
     connect( m_proc, SIGNAL(readyReadStdout()),
             this, SLOT(readFromStdout()));
     connect( m_proc, SIGNAL(processExited()),
@@ -478,6 +515,41 @@ void WeatherSource::processExit()
     if (tempStr)
         m_buffer += tempStr;
 
+    QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
+    QFile cache(cachefile);
+    if (cache.open( IO_WriteOnly ))
+    {
+        cache.writeBlock( m_buffer, qstrlen(m_buffer) );
+        cache.close();
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unable to save data to cachefile: %1")
+                                    .arg(cachefile));
+    }
+
+    processData();
+
+    MSqlQuery db(MSqlQuery::InitCon());
+
+    db.prepare("UPDATE weathersourcesettings "
+               "SET updated = NOW() WHERE sourceid = :ID;");
+
+    db.bindValue(":ID", getId());
+    if (!db.exec())
+    {
+        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        return;
+    }
+
+    if (m_connectCnt)
+    {
+        emit newData(m_locale, m_units, m_data);
+    }
+}
+
+void WeatherSource::processData()
+{
     QStringList data = QStringList::split('\n', m_buffer);
     QStringList temp;
     for (size_t i = 0; i < data.size(); ++i)
@@ -499,11 +571,6 @@ void WeatherSource::processExit()
         }
         else
             m_data[temp[0]] = temp[1];
-    }
-
-    if (m_connectCnt)
-    {
-        emit newData(m_locale, m_units, m_data);
     }
 }
 

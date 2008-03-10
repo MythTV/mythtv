@@ -8,7 +8,7 @@
 #include "dbcheck.h"
 #include "defs.h"
 
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -99,5 +99,14 @@ void InitializeDatabase()
          */
 
         performActualUpdate(updates, "1000", dbver);
+    }
+
+    if (dbver == "1000")
+    {
+        QStringList updates;
+        updates << "ALTER TABLE weathersourcesettings ADD COLUMN updated "
+                   "TIMESTAMP;";
+
+        performActualUpdate(updates, "1001", dbver);
     }
 }

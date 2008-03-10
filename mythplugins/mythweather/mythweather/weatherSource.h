@@ -87,6 +87,8 @@ class WeatherSource : public QObject
     void updateTimeout();
 
   private:
+    void processData();
+
     bool m_ready;
     bool m_inuse;
     ScriptInfo *m_info;
