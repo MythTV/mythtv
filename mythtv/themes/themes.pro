@@ -6,7 +6,7 @@ QMAKE_STRIP = echo
 TEMPLATE = app
 CONFIG -= moc qt
 
-!macx:QMAKE_COPY_DIR = sh ./cpsvndir
+QMAKE_COPY_DIR = sh ./cpsvndir
 
 themes.path = $${PREFIX}/share/mythtv/themes/
 themes.files = blue defaultosd blueosd default default-wide G.A.N.T classic DVR
