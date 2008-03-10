@@ -1,80 +1,100 @@
 <mythuitheme>
 
-  <font name="bigboldwhite" face="Arial">
-    <size>24</size>
-    <color>white</color>
-    <shadowcolor>black</shadowcolor>
-    <shadowoffset>4,4</shadowoffset>
-    <shadowalpha>64</shadowalpha>
-    <bold>yes</bold>
-  </font>
+    <font name="bigboldwhite" face="Arial">
+        <size>24</size>
+        <color>white</color>
+        <shadowcolor>black</shadowcolor>
+        <shadowoffset>4,4</shadowoffset>
+        <shadowalpha>64</shadowalpha>
+        <bold>yes</bold>
+    </font>
 
-  <font name="bigboldgrey" base="bigboldwhite">
-    <color>grey</color>
-  </font>
+    <font name="bigboldgrey" base="bigboldwhite">
+        <color>grey</color>
+    </font>
 
-  <buttonlist name="basebuttonlist">
-    <area>0,0,10,10</area>
-    <activefont>bigboldwhite</activefont>
-    <inactivefont>bigboldgrey</inactivefont>
-    <scrollarrows show="yes">
-      <statetype name="upscrollarrow">
-        <state type="off">
-          <imagetype name="upon">
-            <filename>lb-uparrow-reg.png</filename>
-          </imagetype>
-        </state>
-        <state type="full">
-          <imagetype name="upoff">
-            <filename>lb-uparrow-sel.png</filename>
-          </imagetype>
-        </state>
-      </statetype>
-      <statetype name="downscrollarrow">
-        <state type="off">
-          <imagetype name="dnon">
-            <filename>lb-dnarrow-reg.png</filename>
-          </imagetype>
-        </state>
-        <state type="full">
-          <imagetype name="dnoff">
-            <filename>lb-dnarrow-sel.png</filename>
-          </imagetype>
-        </state>
-      </statetype>
-    </scrollarrows>
-    <showarrow>yes</showarrow>
-    <arrow filename="lb-arrow.png"/>
-    <check-empty filename="lb-check-empty.png"/>
-    <check-half filename="lb-check-half.png"/>
-    <check-full filename="lb-check-full.png"/>
-    <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="100"/>
-    <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-    <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-    <spacing>10</spacing>
-    <margin>5</margin>
-  </buttonlist>
+    <buttonlist name="basebuttonlist">
+        <area>0,0,10,10</area>
+        <layout>vertical</layout>
+        <activefont>bigboldwhite</activefont>
+        <inactivefont>bigboldgrey</inactivefont>
+        <scrollarrows show="yes">
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </scrollarrows>
+        <showarrow>yes</showarrow>
+        <arrow filename="lb-arrow.png"/>
+        <check-empty filename="lb-check-empty.png"/>
+        <check-half filename="lb-check-half.png"/>
+        <check-full filename="lb-check-full.png"/>
+        <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
+        <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+        <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
+        <spacing>5</spacing>
+        <margin>6</margin>
+    </buttonlist>
 
-  <window name="MythDialogBox">
-    <area>150,50,500,500</area>
-    <imagetype name="backimg">
-        <filename>mythdialogbox-background.png</filename>
-    </imagetype>
+    <button name="basebutton">
+        <position>0,0</position>
+        <activefont>bigboldwhite</activefont>
+        <inactivefont>bigboldgrey</inactivefont>
+        <showarrow>no</showarrow>
+        <regular-background filename="text_button_off.png" />
+        <selected-background filename="text_button_on.png" />
+        <inactive-background filename="text_button_off.png" />
+        <margin>6</margin>
+        <textflags>allcenter</textflags>
+    </button>
 
-    <textarea name="messagearea">
-      <area>12,20,470,210</area>
-      <font>bigboldwhite</font>
-      <multiline>yes</multiline>
-      <align>center</align>
+    <textarea name="basetextarea">
+        <area>0,0,10,10</area>
+        <font>bigboldwhite</font>
+        <multiline>no</multiline>
+        <align>left</align>
     </textarea>
 
-    <buttonlist name="list" from="basebuttonlist">
-      <area>12,250,470,250</area>
-      <drawfrombottom>yes</drawfrombottom>
-      <textflags>center</textflags>
-      <showarrow>no</showarrow>
-      <scrollarrows show="no"></scrollarrows>
-    </buttonlist>
-  </window>
+    <window name="MythDialogBox">
+        <area>150,50,500,500</area>
+        <imagetype name="backimg">
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="messagearea">
+            <area>12,20,470,210</area>
+            <font>bigboldwhite</font>
+            <multiline>yes</multiline>
+            <align>center</align>
+        </textarea>
+
+        <buttonlist name="list" from="basebuttonlist">
+            <area>12,250,470,250</area>
+            <drawfrombottom>yes</drawfrombottom>
+            <textflags>center</textflags>
+            <showarrow>no</showarrow>
+            <scrollarrows show="no"></scrollarrows>
+        </buttonlist>
+    </window>
 
 </mythuitheme>
