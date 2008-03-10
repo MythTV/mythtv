@@ -1256,7 +1256,7 @@ int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
             // Only include HTML line break if display value doesn't already
             // contain breaks.
             if ((display.contains("<p>", false) > 0) ||
-                (display.contains("<br", false) > 0))
+                (display.contains("<br", false) > 0)) // matches <BR> or <br /
                 linebreak = "\r\n";
             else
                 linebreak = "<br />\r\n";
