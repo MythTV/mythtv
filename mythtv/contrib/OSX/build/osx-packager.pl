@@ -1037,7 +1037,7 @@ $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 
 ### Program which creates bundles:
-our @bundler = "$svndir/mythtv/contrib/OSX/osx-bundler.pl";
+our @bundler = "$svndir/mythtv/contrib/OSX/build/osx-bundler.pl";
 if ( $OPT{'verbose'} )
 {   push @bundler, '--verbose'   }
 

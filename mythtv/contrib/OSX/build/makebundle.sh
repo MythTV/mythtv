@@ -46,7 +46,7 @@ fi
 # with a binary, this will also produce the .app directory structure too.
 
 echo "Installing libraries into bundle as Frameworks"
-../../contrib/OSX/osx-bundler.pl $1 ../../libs/* $QTDIR/lib
+../../contrib/OSX/build/osx-bundler.pl $1 ../../libs/* $QTDIR/lib
 if [ $? -ne 0 ] ; then
     echo
     echo "    ERROR.    osx-bundler.pl failed"
