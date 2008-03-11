@@ -76,7 +76,6 @@ class DBox2Recorder : public DTVRecorder
     bool RequestInfo(void);
     int  findTSHeader(unsigned char *buffer, int len);
     void Close(void);
-    void ProcessTSPacket(unsigned char *tspacket, int len);
 
   private:
     // Members for creating/handling PAT and PMT
