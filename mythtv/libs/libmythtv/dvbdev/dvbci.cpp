@@ -959,7 +959,6 @@ bool cCiApplicationInformation::EnterMenu(void)
 }
 
 // --- cCiConditionalAccessSupport -------------------------------------------
-#define MAXCASYSTEMIDS 64
 
 class cCiConditionalAccessSupport : public cCiSession {
 private:

@@ -41,7 +41,7 @@
 #include <sys/stat.h>
 #include <sys/uio.h>
 
-#define MAXCASYSTEMIDS 16
+#define MAXCASYSTEMIDS 64
 
 class cMutex {
   friend class cCondVar;
