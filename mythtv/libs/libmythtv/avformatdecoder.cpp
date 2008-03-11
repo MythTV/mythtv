@@ -3374,6 +3374,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 {
                     bool reselectAudioTrack = false;
 
+                    /// HACK HACK HACK -- begin See #3731
+                    if (!GetNVP()->HasAudioIn())
+                    {
+                        VERBOSE(VB_AUDIO, LOC + "Audio is disabled - trying to restart it");
+                        reselectAudioTrack = true;
+                    }
+                    /// HACK HACK HACK -- end
+
                     // detect switches between stereo and dual languages
                     bool wasDual = audSubIdx != -1;
                     bool isDual = curstream->codec->avcodec_dual_language;

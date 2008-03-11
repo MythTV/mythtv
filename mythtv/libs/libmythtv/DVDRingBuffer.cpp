@@ -800,8 +800,8 @@ AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
     menuBtnLock.lock();
 
     if ((menuBuflength > 4) && buttonExists &&
-        (dvdMenuButton.rects[0].h > hl_height) && 
-        (dvdMenuButton.rects[0].w > hl_width))
+        (dvdMenuButton.rects[0].h >= hl_height) && 
+        (dvdMenuButton.rects[0].w >= hl_width))
     {
         return &(dvdMenuButton.rects[0]);
     }

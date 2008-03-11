@@ -81,6 +81,9 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
     MaxPostEncodeSize = 100000;
     PostEncodeFrame = (uchar *)malloc(MaxPostEncodeSize);
     
+    /* Set default values (pts mainly) */
+    avcodec_get_frame_defaults(&pictureOut);
+
     pictureOut.linesize[0] = h263EncContext->width;
     pictureOut.linesize[1] = h263EncContext->width / 2;
     pictureOut.linesize[2] = h263EncContext->width / 2;
