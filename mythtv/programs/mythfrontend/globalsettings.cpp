@@ -4703,8 +4703,13 @@ PlaybackSettings::PlaybackSettings()
                    QString(" (%1/%2)").arg(++i).arg(total));
     mac2->addChild(new MacMainSettings());
     mac2->addChild(new MacFloatSettings());
-    mac2->addChild(new MacDockSettings());
-    mac2->addChild(new MacDesktopSettings());
+
+    HorizontalConfigurationGroup *row =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    row->addChild(new MacDockSettings());
+    row->addChild(new MacDesktopSettings());
+    mac2->addChild(row);
+
     addChild(mac2);
 #endif
 }
