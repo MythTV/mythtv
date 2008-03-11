@@ -1278,7 +1278,7 @@
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="745" context="-1"></column>
+        <column number="1" width="715" context="-1"></column>
         <items>8</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-10,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
