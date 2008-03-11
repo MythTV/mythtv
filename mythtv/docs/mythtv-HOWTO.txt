@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-03-05, v0.21.00pre
+  2008-03-10, v0.21.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -449,7 +449,7 @@
   MythTV onto a VIA Epia M machine.
 
   See http://bit.blkbk.com <http://bit.blkbk.com> if you'd like to
-  install MythTV on a Xbox.
+  install MythTV on a Xbox.  [1mNOTE[22m:  Site appears unmaintained.
 
   See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
   instructions tailored to RedHat's Fedora Core distribution.
@@ -866,6 +866,13 @@
   device.) Using the on-board MPEG-2 encoder greatly reduces the CPU
   requirements for encoding.
 
+  The ivtv driver was incorporated into the Linux kernel starting at
+  v2.6.22.
+
+  There is a Beta driver for the HVR-1600 card at
+  http://www.ivtvdriver.org/index.php/Cx18
+  <http://www.ivtvdriver.org/index.php/Cx18>
+
   [1mNOTE[22m:  Motherboards with the Via chipset are notoriously bad with DMA
   and have caused numerous issues with ivtv, including hard locks.  See
   the ivtv website http://ivtvdriver.org <http://ivtvdriver.org> for the
@@ -902,7 +909,6 @@
   http://www.linuxtv.org/wiki/index.php/Main_Page
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
-
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels.  See
   http://www.lyngsat.com/ <http://www.lyngsat.com/> for the types of
@@ -914,11 +920,11 @@
   There are a number of HDTV cards with Linux drivers which are known to
   operate in the United States; a complete list of cards with DVB
   drivers can be found at
-  http://www.linuxtv.org/wiki/index.php/ATSC_devices
-  <http://www.linuxtv.org/wiki/index.php/ATSC_devices> Some cards
+  http://www.linuxtv.org/wiki/index.php/ATSC_Devices
+  <http://www.linuxtv.org/wiki/index.php/ATSC_Devices> Some cards
   support capture of unencrypted digital cable TV (utilizing QAM256),
-  others will only work with Over The Air signals captured with an
-  antenna (with 8VSB).
+  others will only work with Over The Air (aka "OTA") signals captured
+  with an antenna (with 8VSB).
 
   Cards that have been reported to work include:
 
@@ -966,6 +972,7 @@
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
   hardware acceleration.  If you enable the hardware acceleration, you
   may be able to use a 1.8GHz processor.
+
 
 
   [1m3.1.5.5.  Firewire.[0m
@@ -1022,16 +1029,6 @@
      cards (no driver - this is not the PVR-250/350 series of cards
      supported by the IvyTV driver)
 
-  +o  Hauppauge HVR-1600.  (no driver).  [1mNOTE[22m:  There have been reports
-     (2006-12 timeframe) that Hauppauge is putting the HVR-1600 inside
-     of the PVR-150 box; if you're purchasing a retail PVR-150,
-     carefully examine the packaging - there should be some indication
-     that the hardware inside is actually a HVR-1600 and not a PVR-150.
-     Check the Supported Hardware
-     (http://www.ivtvdriver.org/index.php/Supported_hardware
-     <http://www.ivtvdriver.org/index.php/Supported_hardware>) page of
-     the ivtv driver for updated support information.
-
   +o  ATI All-in-Wonder series
 
 
@@ -1044,7 +1041,6 @@
   cards and drivers will provide better quality or compatibility than
   others.  In particular, many audio devices included on motherboards
   can be problematic.
-
   The usual practice for capturing the audio associated with the video
   is to run a cable from an audio output on the video capture card to
   the Line input on a sound card. However, some video capture cards
@@ -1103,6 +1099,7 @@
   others, please post a message to the mythtv-users mailing list so the
   information can be included in future versions of the HOWTO. The list
   is organized by manufacturer.
+
 
   Reports here are based on what users of the cards have posted on the
   mythtv-users mailing list, so if you need configuration details,
@@ -1170,8 +1167,6 @@
   2. Take the audio output from the PVR-350 and connect it directly to
      your television / audio system.  You must indicate that you are
      using external audio control on the PVR-350 setup page.
-
-
   [1m3.1.9.4.  Other Options[0m
 
   Some devices with on-board TV-out capability, such as Xboxes converted
@@ -1218,7 +1213,7 @@
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.  The minimum MySQL
-  version is 3.23.
+  version is 5.0.
 
 
   [1m3.2.1.  Pre-compiled packages[0m
@@ -1290,6 +1285,7 @@
 
 
        # apt-get install mythtv-suite
+
 
 
   These steps however, do NOT perform the installation of any drivers
@@ -1415,6 +1411,7 @@
 
 
        everything already installed
+
 
 
   In that case, you're ready to move to the next ``section''.  Once you
@@ -2055,11 +2052,10 @@
 
   [1m6.  MySQL.[0m
 
-  If you install MySQL 4.x, rather than 3.x, you will also want to
-  comment out "log-bin" in your my.cnf configuration file. This option
-  will quickly fill your "/var" disk partition with many gigabytes of
-  data, unless you are doing database replication and deleting these
-  files regularly.
+  When you install MySQL 5.x you will also want to comment out "log-bin"
+  in your my.cnf configuration file. This option will quickly fill your
+  "/var" disk partition with many gigabytes of data, unless you are
+  doing database replication and deleting these files regularly.
 
   [1m6.1.  Distribution-specific information[0m
 
@@ -2197,7 +2193,7 @@
   these items, restart [1mMySQL[22m.
 
   [1mNOTE[22m:  Your distribution may have a customized MySQL configuration
-  file; in Mandrive, check /etc/sysconfig/mysqld for additional
+  file; in Mandriva, check /etc/sysconfig/mysqld for additional
   configuration.
 
 

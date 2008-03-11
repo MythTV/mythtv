@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-03-05, v0.21.00pre
+<date>2008-03-10, v0.21.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -96,6 +96,7 @@ to install MythTV onto a VIA Epia M machine.
 
 See <url url="http://bit.blkbk.com" name="http://bit.blkbk.com"> if you'd
 like to install MythTV on a Xbox.
+<bf>NOTE</bf>:  Site appears unmaintained.
 
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
@@ -490,6 +491,12 @@ CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
 on-board MPEG-2 encoder greatly reduces the CPU requirements for
 encoding.
 
+The ivtv driver was incorporated into the Linux kernel starting at v2.6.22.
+
+There is a Beta driver for the HVR-1600 card at <url
+url="http://www.ivtvdriver.org/index.php/Cx18"
+name="http://www.ivtvdriver.org/index.php/Cx18">
+
 <bf>NOTE</bf>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website <url url="http://ivtvdriver.org" name="http://ivtvdriver.org">
@@ -530,10 +537,11 @@ of content which is available.
 <sect3>HDTV.
 <p>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
-be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_devices"
-name="http://www.linuxtv.org/wiki/index.php/ATSC_devices"> Some cards support
-capture of unencrypted digital cable TV (utilizing QAM256), others will only
-work with Over The Air signals captured with an antenna (with 8VSB).
+be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_Devices"
+name="http://www.linuxtv.org/wiki/index.php/ATSC_Devices"> Some cards
+support capture of unencrypted digital cable TV (utilizing QAM256), others
+will only work with Over The Air (aka "OTA") signals captured with an
+antenna (with 8VSB).
 
 Cards that have been reported to work include:
 <itemize>
@@ -596,8 +604,8 @@ name="http://www.plextor.com/english/support/LinuxSDK.htm">. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.
 
 Hauppauge WinTV-PVR-USB2 (driver available at <url
-url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">) emulates a PVR-x50
-card.
+url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">)
+emulates a PVR-x50 card.
 
 <sect3>IP Recorder (RTSP, RTS, UDP)
 <p>MPEG-2, MPEG-4 and H.264 internet TS stream recording is supported using
@@ -619,14 +627,6 @@ service. This limitation is independent of the bandwidth you have purchased.
 <item>Hauppauge WinTV-USB series
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
-<item>Hauppauge HVR-1600.  (no driver).  <bf>NOTE</bf>:  There have been
-reports (2006-12 timeframe) that Hauppauge is putting the HVR-1600 inside of
-the PVR-150 box; if you're purchasing a retail PVR-150, carefully examine
-the packaging - there should be some indication that the hardware inside is
-actually a HVR-1600 and not a PVR-150.  Check the Supported Hardware (<url
-url="http://www.ivtvdriver.org/index.php/Supported_hardware"
-name="http://www.ivtvdriver.org/index.php/Supported_hardware">) page of the
-ivtv driver for updated support information.
 <item>ATI All-in-Wonder series
 </itemize>
 
@@ -797,7 +797,7 @@ satisfying any prerequisites.
 <img src="warning.png">
 <caption><bf>NOTE</bf>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
-MySQL must run on one of the MythTV boxes.  The minimum MySQL version is 3.23.
+MySQL must run on one of the MythTV boxes.  The minimum MySQL version is 5.0.
 </caption></figure>
 
 <sect2>Pre-compiled packages <label id="precompiled">
@@ -1516,7 +1516,7 @@ Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 # emerge mythtv
 </verb></tscreen>
 <sect>MySQL.<label id="mysql">
-<p>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+<p>When you install MySQL 5.x you will also want to comment
 out "log-bin" in your <tt>my.cnf</tt> configuration file. This option will
 quickly fill your "/var" disk partition with many gigabytes of data,
 unless you are doing database replication and deleting these files regularly.
@@ -1636,7 +1636,7 @@ on. Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
 <bf>MySQL</bf>.
 
 <bf>NOTE</bf>:  Your distribution may have a customized MySQL configuration
-file; in Mandrive, check <tt>/etc/sysconfig/mysqld</tt> for additional
+file; in Mandriva, check <tt>/etc/sysconfig/mysqld</tt> for additional
 configuration.
 
 <sect>Configuring Sound.
@@ -7931,12 +7931,11 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.21.00, 2008-03-05.  Start prepping for 0.21.  Add a tip for using a
-subdirectory as the target of a storage group in case of mount failure to
-prevent root partition fillup.  Update SVN download instructions to grab the
-entire tree, so that you don't end up with versions of code / themes that
-are incompatible.  Bump XMLTV version.  bjm's recording updates.
 
+v0.21.00, 2008-03-10.  Initial version for 0.21.  Update link to ATSC
+devices.  Add note that ivtv driver is in kernel.  Add note that xbox
+mini-distribution site appears dead.  Update information on HVR-1600. 
+Update minimum MySQL version.
 
 -->
 

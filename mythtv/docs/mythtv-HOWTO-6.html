@@ -14,7 +14,7 @@
 <HR>
 <H2><A NAME="mysql"></A> <A NAME="s6">6.</A> <A HREF="mythtv-HOWTO.html#toc6">MySQL.</A></H2>
 
-<P>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+<P>When you install MySQL 5.x you will also want to comment
 out "log-bin" in your <CODE>my.cnf</CODE> configuration file. This option will
 quickly fill your "/var" disk partition with many gigabytes of data,
 unless you are doing database replication and deleting these files regularly.</P>
@@ -165,7 +165,7 @@ on. Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
 <CODE>127.0.0.1</CODE>.  If you change either of these items, restart
 <B>MySQL</B>.</P>
 <P><B>NOTE</B>:  Your distribution may have a customized MySQL configuration
-file; in Mandrive, check <CODE>/etc/sysconfig/mysqld</CODE> for additional
+file; in Mandriva, check <CODE>/etc/sysconfig/mysqld</CODE> for additional
 configuration.</P>
 
 <HR>
