@@ -2957,7 +2957,7 @@ void Scheduler::AddNewRecords(void)
     for ( ; tmp != tmpList.end(); tmp++)
         worklist.push_back(*tmp);
 
-    if (schedTmpRecord = "sched_temp_record")
+    if (schedTmpRecord == "sched_temp_record")
     {
         result.prepare("DROP TABLE IF EXISTS sched_temp_record;");
         result.exec();
