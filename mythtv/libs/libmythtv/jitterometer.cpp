@@ -7,7 +7,7 @@
   
 #include "jitterometer.h"
 
-Jitterometer::Jitterometer(char *nname, int ncycles)
+Jitterometer::Jitterometer(const char *nname, int ncycles)
 {
   times = (unsigned *)malloc(ncycles * sizeof(unsigned));
   

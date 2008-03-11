@@ -76,7 +76,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
     m_LinkEffect.Initialise(pLinkEffect, engine);
 }
 
-static char *rchEventType[] =
+static const char *rchEventType[] =
 {
     "IsAvailable",
     "ContentAvailable",

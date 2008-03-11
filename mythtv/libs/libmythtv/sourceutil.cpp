@@ -85,7 +85,7 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         }
         QString sep = "_";
         uint max = counts["_"];
-        static char *spacers[6] = { "", "-", "#", ".", "0", NULL };
+        static const char *spacers[6] = { "", "-", "#", ".", "0", NULL };
         for (uint i=0; (spacers[i] != NULL); ++i)
         {
             if (counts[spacers[i]] > max)

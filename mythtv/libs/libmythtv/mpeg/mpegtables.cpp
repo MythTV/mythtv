@@ -751,65 +751,63 @@ const QString ProgramMapTable::toString() const
 const char *StreamID::toString(uint streamID)
 {
     // valid for some ATSC/DVB stuff too
-    char* retval = "unknown";
-
-    // video
-    if (StreamID::MPEG2Video==streamID)
+    switch (streamID)
+    {
+    case StreamID::MPEG2Video:
         return "video-mpeg2";
-    else if (StreamID::MPEG1Video==streamID)
+    case StreamID::MPEG1Video:
         return "video-mpeg1";
-    else if (StreamID::MPEG4Video==streamID)
+    case StreamID::MPEG4Video:
         return "video-mpeg4";
-    else if (StreamID::H264Video==streamID)
+    case StreamID::H264Video:
         return "video-h264";
-    else if (StreamID::OpenCableVideo==streamID)
+    case StreamID::OpenCableVideo:
         return "video-opencable";
 
     // audio
-    else if (StreamID::AC3Audio==streamID)
+    case StreamID::AC3Audio:
         return "audio-ac3";  // EIT, PMT
-    else if (StreamID::MPEG2Audio==streamID)
+    case StreamID::MPEG2Audio:
         return "audio-mp2-layer[1,2,3]"; // EIT, PMT
-    else if (StreamID::MPEG1Audio==streamID)
+    case StreamID::MPEG1Audio:
         return "audio-mp1-layer[1,2,3]"; // EIT, PMT
-    else if (StreamID::AACAudio==streamID)
+    case StreamID::AACAudio:
         return "audio-aac"; // EIT, PMT
-    else if (StreamID::DTSAudio==streamID)
+    case StreamID::DTSAudio:
         return "audio-dts"; // EIT, PMT
 
     // other
-    else if (StreamID::PrivSec==streamID)
+    case StreamID::PrivSec:
         return "private-sec";
-    else if (StreamID::PrivData==streamID)
+    case StreamID::PrivData:
         return "private-data";
 
     // DSMCC Object Carousel
-    else if (StreamID::DSMCC_A==streamID)
+    case StreamID::DSMCC_A:
 	return "dsmcc-a encap";
-    else if (StreamID::DSMCC_B==streamID)
+    case StreamID::DSMCC_B:
 	return "dsmcc-b std data";
-    else if (StreamID::DSMCC_C==streamID)
+    case StreamID::DSMCC_C:
 	return "dsmcc-c NPD data";
-    else if (StreamID::DSMCC_D==streamID)
+    case StreamID::DSMCC_D:
 	return "dsmcc-d data";
 
-    else switch (streamID)
-    {
-        case (TableID::STUFFING):
-            retval="stuffing"; break; // optionally in any
-        case (TableID::CAPTION):
-            retval="caption service"; break; // EIT, optionally in PMT
-        case (TableID::CENSOR):
-            retval="censor"; break; // EIT, optionally in PMT
-        case (TableID::ECN):
-            retval="extended channel name"; break;
-        case (TableID::SRVLOC):
-            retval="service location"; break; // required in VCT
-        case (TableID::TSS): // other channels with same stuff
-            retval="time-shifted service"; break;
-        case (TableID::CMPNAME): retval="component name"; break; //??? PMT
+    //case TableID::STUFFING: XXX: Duplicate?
+    //    return "stuffing"; // optionally in any
+    case TableID::CAPTION:
+        return "caption service"; // EIT, optionally in PMT
+    case TableID::CENSOR:
+        return "censor"; // EIT, optionally in PMT
+    case TableID::ECN:
+        return "extended channel name";
+    case TableID::SRVLOC:
+        return "service location"; // required in VCT
+    case TableID::TSS: // other channels with same stuff
+        return "time-shifted service";
+    case TableID::CMPNAME: 
+        return "component name"; //??? PMT
     }
-    return retval;
+    return "unknown";
 }
 
 QString ProgramMapTable::GetLanguage(uint i) const

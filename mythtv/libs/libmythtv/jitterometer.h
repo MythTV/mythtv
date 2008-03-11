@@ -5,7 +5,7 @@
 class Jitterometer
 {
  public:
-  Jitterometer(char *name, int num_cycles);
+  Jitterometer(const char *name, int num_cycles);
   ~Jitterometer();
 
 

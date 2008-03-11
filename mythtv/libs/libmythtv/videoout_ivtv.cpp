@@ -704,8 +704,8 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         return;
     }
 
-    int xoff;
-    int yoff;
+    int xoff = 0;
+    int yoff = 0;
 
     unsigned char *pipbuf = pipimage->buf;
 

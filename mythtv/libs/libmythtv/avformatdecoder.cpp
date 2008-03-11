@@ -4066,8 +4066,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     // allow the audio stuff to reencode
     GetNVP()->SetAudioCodec(using_passthru?codec_ctx:NULL);
-    QString errMsg = GetNVP()->ReinitAudio();
-    bool audiook = errMsg.isEmpty();
+    GetNVP()->ReinitAudio();
 
     return true;
 }

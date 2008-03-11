@@ -263,7 +263,7 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
     return ret;
 }
 
-char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
+const char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
 
 DRMVideoSync::DRMVideoSync(VideoOutput *vo, int fr, int ri, bool intl) :
     VideoSync(vo, fr, ri, intl)
@@ -355,7 +355,7 @@ void DRMVideoSync::AdvanceTrigger(void)
 #endif /* !_WIN32 */
 
 #ifndef _WIN32
-char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
+const char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
 
 nVidiaVideoSync::nVidiaVideoSync(VideoOutput *vo,
                                  int fi, int ri, bool intr) : 

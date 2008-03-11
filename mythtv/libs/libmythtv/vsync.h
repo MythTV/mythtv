@@ -147,7 +147,7 @@ class DRMVideoSync : public VideoSync
 
   private:
     int m_dri_fd;
-    static char *sm_dri_dev;
+    static const char *sm_dri_dev;
     
 };
 #endif // !_WIN32
@@ -176,7 +176,7 @@ class nVidiaVideoSync : public VideoSync
   private:
     bool dopoll(void) const;
     int m_nvidia_fd;
-    static char *sm_nvidia_dev;
+    static const char *sm_nvidia_dev;
 };
 #endif // !_WIN32
 

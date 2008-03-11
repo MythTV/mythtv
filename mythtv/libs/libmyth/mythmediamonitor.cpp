@@ -624,7 +624,8 @@ bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
  */
 
 QString MediaMonitor::defaultDevice(QString dbSetting,
-                                    QString label, char *hardCodedDefault)
+                                    QString label, 
+                                    const char *hardCodedDefault)
 {
     QString device = gContext->GetSetting(dbSetting);
 
