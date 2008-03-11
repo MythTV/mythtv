@@ -105,10 +105,10 @@ class UPnpCDSExtensionResults
 
 typedef struct
 {
-    char *title;
-    char *column;
-    char *sql;
-    char *where;
+    const char *title;
+    const char *column;
+    const char *sql;
+    const char *where;
 
 } UPnpCDSRootInfo;
          

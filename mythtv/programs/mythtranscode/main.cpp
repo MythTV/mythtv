@@ -827,7 +827,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             QFileInfo finfo(oldfile);
             if (followLinks && finfo.isSymLink())
             {
-                if (err = transUnlink(finfo.readLink().local8Bit()))
+                if ((err = transUnlink(finfo.readLink().local8Bit())))
                 {
                     VERBOSE(VB_IMPORTANT, QString(
                             "mythtranscode: Error deleting '%1' pointed to by "
@@ -836,7 +836,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                             .arg(oldfile).arg(strerror(errno)));
                 }
 
-                if (err = unlink(oldfile.local8Bit()))
+                if ((err = unlink(oldfile.local8Bit())))
                     VERBOSE(VB_IMPORTANT,
                             QString("mythtranscode: Error deleting '%1' link "
                                     "pointing to '%2', %3").arg(oldfile)

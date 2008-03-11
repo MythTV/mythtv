@@ -3368,7 +3368,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", "");
 
-    QButton *playButton;
+    QButton *playButton = NULL;
 
     if (!(m_player && m_player->IsSameProgram(curitem)))
     {
