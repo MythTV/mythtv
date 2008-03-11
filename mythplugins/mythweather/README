@@ -5,12 +5,13 @@ ldunning@gmail.com
 New Features
 ===============
 -New Screens:
+    Current Conditions
+    3 day forecast
     6 day forecast
     18 hour forecast
     Severe Weather Alerts
     Generic animated image screen
     Generic static image screen
-    UI Update of 3 day forecast
 
 -External programs used to grab data.
 -Which screens are displayed, and in what order, can be configured by the
@@ -28,7 +29,10 @@ wait for the initial data to be retrieved.
 Requirements
 ===============
 
-Currently builds against version 0.19 of MythTV.
+Currently builds against version 0.21 of MythTV.
+
+nice is required, it is used to reduce the priority of the scripts which are
+run in the background.
 
 The plugin relies on external scripts to retrieve weather data.
 Currently they are all written in perl so a current version of that is
@@ -50,7 +54,7 @@ Exporter
 Image::Size
 
 Currently its all or nothing, if any are missing, ./configure will fail.
-    
+
 Installation
 ===============
 
@@ -85,7 +89,7 @@ Screen Setup:
     sources doesn't allow them to change the units of the data.  Also, a screen
     can be a single location screen or a multi-location screen.  To change the
     location of a single location screen, you simply SELECT the screen in the
-    active screens list and choose Change Location.  To change the locations of
+    active screens list and choose Change Location. To change the locations of
     a multi-location screen you have to set the location of each individual data
     item.  This may not be ideal, but it does allow for very easy screen and
     source development, along with very customizable location setups.  The
