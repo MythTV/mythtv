@@ -8,8 +8,10 @@ SOURCE=$1
 mkdir -p $DESTDIR/$SOURCE || exit 1
 
 find $SOURCE -path '*/.svn' -prune -or -type d -exec mkdir -p $DESTDIR/{} \;
-find $SOURCE -path '*/.svn' -prune -or -type f -exec cp -p {} $DESTDIR/{} \; \
-             -exec chown $EUID $DESTDIR/{} \; -exec chmod 444 $DESTDIR/{} \;
+find $SOURCE -path '*/.svn' -prune -or ! -type d \
+             -exec cp -p {}    $DESTDIR/{} \; \
+             -exec chown $EUID $DESTDIR/{} \; \
+             -exec chmod 444   $DESTDIR/{} \;
 
 
 exit 0
