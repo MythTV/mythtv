@@ -66,7 +66,7 @@ class NameValue
     NameValue( const QString &name, const QString &value ) 
       : sName( name ), sValue( value ), pAttributes( NULL ) { }
 
-    NameValue( const QString &name, char *value ) 
+    NameValue( const QString &name, const char *value ) 
       : sName( name ), sValue( value ), pAttributes( NULL ) { }
 
     NameValue( const QString &name, int value ) 

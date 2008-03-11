@@ -332,7 +332,7 @@ bool MythGesture::record(const QPoint & p)
 }
 
 
-static char *gesturename[] = {
+static const char *gesturename[] = {
     "Up",
     "Down",
     "Left",

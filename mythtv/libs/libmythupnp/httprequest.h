@@ -66,8 +66,8 @@ typedef enum
 
 typedef struct
 {
-    char *pszExtension;
-    char *pszType;
+    const char *pszExtension;
+    const char *pszType;
 
 } MIMETypes;
 
