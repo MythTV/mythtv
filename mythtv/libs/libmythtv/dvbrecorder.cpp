@@ -575,6 +575,9 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket &tspacket)
     }
 
     BufferedWrite(tspacket);
+    // return value is not used and there is no doc for the return value
+    // assume true means the packet is successfully processed
+    return true;
 }
 
 void DVBRecorder::BufferedWrite(const TSPacket &tspacket)
