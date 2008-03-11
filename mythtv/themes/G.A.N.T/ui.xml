@@ -2169,7 +2169,7 @@
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="745" context="-1"></column>
+        <column number="1" width="715" context="-1"></column>
         <items>8</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-8,3"></image>
         <image function="uparrow" filename="gantup.png" location="740,15"></image>
