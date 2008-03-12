@@ -6,7 +6,7 @@
         <color>white</color>
     </font>
 
-    <font name="basefontextralarge" from="basesmall">
+    <font name="basefontextralarge" base="basesmall">
         <size>24</size>
         <shadowcolor>black</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
@@ -14,7 +14,7 @@
         <bold>yes</bold>
     </font>
 
-    <font name="baselarge" from="basesmall">
+    <font name="baselarge" base="basesmall">
         <size>20</size>
         <shadowcolor>black</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
@@ -22,16 +22,16 @@
         <bold>yes</bold>
     </font>
 
-    <font name="basemedium" from="basesmall">
+    <font name="basemedium" base="basesmall">
         <size>18</size>
     </font>
 
     <!-- Colour variations on base fonts -->
-    <font name="smallgrey" from="basesmall">
+    <font name="smallgrey" base="basesmall">
         <color>grey</color>
     </font>
     
-    <font name="mediumgrey" from="basemedium">
+    <font name="mediumgrey" base="basemedium">
         <color>grey</color>
     </font>
 
