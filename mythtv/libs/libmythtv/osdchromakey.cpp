@@ -23,6 +23,8 @@
 
 void ChromaKeyOSD::AllocImage(int i)
 {
+    uint size = 0;
+
     X11L;
     XImage *shm_img =
         XShmCreateImage(videoOutput->XJ_disp,
@@ -32,9 +34,12 @@ void ChromaKeyOSD::AllocImage(int i)
                         &shm_infos[i],
                         videoOutput->display_visible_rect.width(),
                         videoOutput->display_visible_rect.height());
-    uint size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
+    if (shm_img)
+        size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
     X11U;
 
+    shm_infos[i].shmid   = 0;
+    shm_infos[i].shmaddr = NULL;
     if (shm_img)
     {
         shm_infos[i].shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
