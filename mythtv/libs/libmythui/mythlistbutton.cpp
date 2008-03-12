@@ -156,7 +156,7 @@ void MythListButton::Reset()
 
     m_clearing = false;
     m_itemList.clear();
-    
+
     m_topItem     = 0;
     m_selItem     = 0;
     m_selPosition = 0;
@@ -176,7 +176,7 @@ void MythListButton::SetPositionArrowStates(void)
     if (m_ButtonList.size() > 0)
     {
         int button = 0;
-    
+
         if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
             button = m_itemsVisible - m_itemCount;
 
@@ -801,6 +801,7 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
     if (event->gesture() == MythGestureEvent::Click)
     {
         MoveToNamedPosition(dynamic_cast<MythUIButton *>(uitype)->GetText());
+        emit itemSelected(GetItemCurrent());
         emit itemClicked(GetItemCurrent());
     }
 }
@@ -1043,18 +1044,7 @@ bool MythListButton::ParseElement(QDomElement &element)
 
         m_textFlags = m_textFlags & Qt::WordBreak;
 
-        if (align == "center")
-            m_textFlags |= Qt::AlignCenter;
-        else if (align == "right")
-            m_textFlags |= Qt::AlignRight;
-        else if (align == "left")
-            m_textFlags |= Qt::AlignLeft;
-        else if (align == "allcenter")
-            m_textFlags |= Qt::AlignHCenter | Qt::AlignVCenter;
-        else if (align == "vcenter")
-            m_textFlags |= Qt::AlignVCenter;
-        else if (align == "hcenter")
-            m_textFlags |= Qt::AlignHCenter;
+        m_textFlags |= parseAlignment(align);
     }
     else
         return MythUIType::ParseElement(element);

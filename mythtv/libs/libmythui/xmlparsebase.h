@@ -21,6 +21,8 @@ class XMLParseBase
     static QSize parseSize(QDomElement &element, bool normalize = true);
     static QRect parseRect(const QString &text, bool normalize = true);
     static QRect parseRect(QDomElement &element, bool normalize = true);
+    static int parseAlignment(const QString &text);
+    static int parseAlignment(QDomElement &element);
 
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);

@@ -102,6 +102,44 @@ QRect XMLParseBase::parseRect(QDomElement &element, bool normalize)
     return parseRect(getFirstText(element), normalize);
 }
 
+int XMLParseBase::parseAlignment(const QString &text)
+{
+    int alignment = 0;
+
+    QStringList values = QStringList::split(",", text);
+
+    QStringList::Iterator it;
+    for ( it = values.begin(); it != values.end(); ++it )
+    {
+
+        if (*it == "center" || *it == "allcenter")
+        {
+            alignment |= Qt::AlignCenter;
+            break;
+        }
+        else if (*it == "left")
+            alignment |= Qt::AlignLeft;
+        else if (*it == "hcenter")
+            alignment |= Qt::AlignHCenter;
+        else if (*it == "right")
+            alignment |= Qt::AlignRight;
+        else if (*it == "top")
+            alignment |= Qt::AlignTop;
+        else if (*it == "vcenter")
+            alignment |= Qt::AlignVCenter;
+        else if (*it == "bottom")
+            alignment |= Qt::AlignBottom;
+
+    }
+
+    return alignment;
+}
+
+int XMLParseBase::parseAlignment(QDomElement &element)
+{
+    return parseAlignment(getFirstText(element));
+}
+
 static MythUIType *globalObjectStore = NULL;
 
 MythUIType *XMLParseBase::GetGlobalObjectStore(void)

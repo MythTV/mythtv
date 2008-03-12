@@ -125,18 +125,7 @@ bool MythUIButton::ParseElement(QDomElement &element)
 
         m_textFlags = m_textFlags & Qt::WordBreak;
 
-        if (align == "center")
-            m_textFlags |= Qt::AlignCenter;
-        else if (align == "right")
-            m_textFlags |= Qt::AlignRight;
-        else if (align == "left")
-            m_textFlags |= Qt::AlignLeft;
-        else if (align == "allcenter")
-            m_textFlags |= Qt::AlignHCenter | Qt::AlignVCenter;
-        else if (align == "vcenter")
-            m_textFlags |= Qt::AlignVCenter;
-        else if (align == "hcenter")
-            m_textFlags |= Qt::AlignHCenter;
+        m_textFlags |= parseAlignment(align);
 
         m_Text->SetJustification(m_textFlags);
     }

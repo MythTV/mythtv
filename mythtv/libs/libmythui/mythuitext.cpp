@@ -257,18 +257,7 @@ bool MythUIText::ParseElement(QDomElement &element)
         // preserve the wordbreak attribute, drop everything else
         m_Justification = m_Justification & Qt::WordBreak;
 
-        if (align == "center")
-            m_Justification |= Qt::AlignCenter;
-        else if (align == "right")
-            m_Justification |= Qt::AlignRight;
-        else if (align == "left")
-            m_Justification |= Qt::AlignLeft;
-        else if (align == "allcenter")
-            m_Justification |= Qt::AlignHCenter | Qt::AlignVCenter;
-        else if (align == "vcenter")
-            m_Justification |= Qt::AlignVCenter;
-        else if (align == "hcenter")
-            m_Justification |= Qt::AlignHCenter;
+        m_Justification |= parseAlignment(align);
     }
     else if (element.tagName() == "colorcycle")
     {
