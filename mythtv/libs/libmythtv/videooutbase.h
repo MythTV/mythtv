@@ -74,9 +74,9 @@ class VideoOutput
     virtual void Zoom(ZoomDirection direction);
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
-    virtual void GetOSDBounds(QRect &visible, QRect &total,
-                              float &pixelAspect, float &fontScale,
-                              float themeaspect) const;
+    virtual void GetOSDBounds(QRect &total, QRect &visible,
+                              float &visibleAspect, float &fontScale,
+                              float themeAspect) const;
 
     /// \brief Returns current display's frame refresh period in microseconds.
     ///        e.g. 1000000 / frame_rate_in_Hz

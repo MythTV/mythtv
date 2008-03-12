@@ -705,7 +705,7 @@ static float sq(float a) { return a*a; }
 //    { return ((1.0f - r) * a) + (r * b); }
 
 /**
- * \fn VideoOutput::GetVisibleOSDBounds(float&,float&) const
+ * \fn VideoOutput::GetVisibleOSDBounds(float&,float&,float) const
  * \brief Returns visible portions of total OSD bounds
  * \param visible_aspect physical aspect ratio of bounds returned
  * \param font_scaling   scaling to apply to fonts
