@@ -2858,9 +2858,11 @@ thequery,
 "    UNIQUE KEY grouphostdir (groupname, hostname, dirname)"
 "    );",
 "INSERT storagegroup (groupname, hostname, dirname) "
-"    SELECT 'Default', hostname, data "
+"    SELECT DISTINCT 'Default', hostname, data "
 "    FROM settings "
-"    WHERE value = 'RecordFilePrefix';",
+"    WHERE value = 'RecordFilePrefix' "
+"        AND hostname IS NOT NULL "
+"        AND hostname <> '';",
 "ALTER TABLE recorded ADD storagegroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
 "ALTER TABLE record   ADD storagegroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
 "ALTER TABLE inuseprograms ADD rechost VARCHAR(64) NOT NULL;",
