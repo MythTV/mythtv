@@ -742,7 +742,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         else return false;
     }
     if (strings[0] == "BitmapScaling" || strings[0] == "BSc") {
-        if (strings.count() < 4 || strings[1] != 2) return false;
+        if (strings.count() < 4 || strings[1] != "2") return false;
         else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
             return true;
         else return false;
