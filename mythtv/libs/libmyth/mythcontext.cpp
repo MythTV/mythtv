@@ -2949,10 +2949,10 @@ found:
 
 QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 {
-    if (filename.left(5) == "myth:")
+    if (filename.left(5) == "myth:" || filename.isEmpty())
         return NULL;
 
-    if (d->themecachedir != "" && fromcache)
+    if (!d->themecachedir.isEmpty() && fromcache)
     {
         QString cachefilepath;
         bool bFound = false;
@@ -2960,7 +2960,8 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         // Is absolute path in theme directory.
         if (!bFound)
         {
-            if (!strcmp(filename.left(d->m_themepathname.length()),
+            if (!d->m_themepathname.isEmpty() &&
+                !strcmp(filename.left(d->m_themepathname.length()),
                         d->m_themepathname))
             {
                 QString tmpfilename = filename;
