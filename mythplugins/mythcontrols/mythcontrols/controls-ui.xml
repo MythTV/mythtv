@@ -3,47 +3,7 @@
 
     <window name="controls">
 
-        <font name="active" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>14</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="inactive" face="Bitstream Vera Sans">
-            <color>#9999cc</color>
-            <size>14</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="keys" face="Bitstream Vera Sans">
-            <color>#000000</color>
-            <size>18</size>
-            <shadow>1,1</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="info" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>18</size>
-            <shadow>1,1</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="options" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>24</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="infotitle" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>20</size>
-            <shadow>10,10</shadow>
-            <bold>yes</bold>
-        </font>
-
         <textarea name="leftdesc">
-            <font>info</font>
             <area>20,20,370,20</area>
             <value>Contexts</value>
             <align>center</align>
@@ -51,8 +11,6 @@
 
         <buttonlist name="leftlist" from="basebuttonlist">
             <area>20,50,370,410</area>
-            <activefont>active</activefont>
-            <inactivefont>inactive</inactivefont>
             <showarrow>no</showarrow>
         </buttonlist>
 
@@ -67,8 +25,6 @@
 
         <button name="action_0" from="basebutton">
             <position>40,450</position>
-            <activefont>keys</activefont>
-            <inactivefont>keys</inactivefont>
             <regular-background filename="kb-button-off.png" />
             <selected-background filename="kb-button-on.png" />
             <inactive-background filename="kb-button-off.png" />
@@ -87,7 +43,6 @@
         </button>
 
         <textarea name="description">
-            <font>info</font>
             <area>30,490,740,110</area>
             <multiline>yes</multiline>
             <align>center</align>

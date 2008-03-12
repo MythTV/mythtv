@@ -1,23 +1,46 @@
 <mythuitheme>
 
-    <font name="bigboldwhite" face="Arial">
-        <size>24</size>
+    <!-- Base Font Definitions -->
+    <font name="basesmall" face="Bitstream Vera Sans">
+        <size>16</size>
         <color>white</color>
+    </font>
+
+    <font name="basefontextralarge" from="basesmall">
+        <size>24</size>
         <shadowcolor>black</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
     </font>
 
-    <font name="bigboldgrey" base="bigboldwhite">
+    <font name="baselarge" from="basesmall">
+        <size>20</size>
+        <shadowcolor>black</shadowcolor>
+        <shadowoffset>4,4</shadowoffset>
+        <shadowalpha>64</shadowalpha>
+        <bold>yes</bold>
+    </font>
+
+    <font name="basemedium" from="basesmall">
+        <size>18</size>
+    </font>
+
+    <!-- Colour variations on base fonts -->
+    <font name="smallgrey" from="basesmall">
+        <color>grey</color>
+    </font>
+    
+    <font name="mediumgrey" from="basemedium">
         <color>grey</color>
     </font>
 
+    <!-- Base definition of a buttonlist -->
     <buttonlist name="basebuttonlist">
         <area>0,0,10,10</area>
         <layout>vertical</layout>
-        <activefont>bigboldwhite</activefont>
-        <inactivefont>bigboldgrey</inactivefont>
+        <activefont>basemedium</activefont>
+        <inactivefont>basemediumgrey</inactivefont>
         <scrollarrows show="yes">
             <statetype name="upscrollarrow">
                 <state type="off">
@@ -56,10 +79,11 @@
         <margin>6</margin>
     </buttonlist>
 
+    <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>
-        <activefont>bigboldwhite</activefont>
-        <inactivefont>bigboldgrey</inactivefont>
+        <activefont>basemedium</activefont>
+        <inactivefont>basemediumgrey</inactivefont>
         <showarrow>no</showarrow>
         <regular-background filename="text_button_off.png" />
         <selected-background filename="text_button_on.png" />
@@ -68,22 +92,23 @@
         <textflags>allcenter</textflags>
     </button>
 
+    <!-- Base definition of a textarea -->
     <textarea name="basetextarea">
         <area>0,0,10,10</area>
-        <font>bigboldwhite</font>
+        <font>basesmall</font>
         <multiline>no</multiline>
         <align>left</align>
     </textarea>
 
+    <!-- Popup Dialogue Box -->
     <window name="MythDialogBox">
         <area>150,50,500,500</area>
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
-        <textarea name="messagearea">
+        <textarea name="messagearea" from="basetextarea">
             <area>12,20,470,210</area>
-            <font>bigboldwhite</font>
             <multiline>yes</multiline>
             <align>center</align>
         </textarea>
