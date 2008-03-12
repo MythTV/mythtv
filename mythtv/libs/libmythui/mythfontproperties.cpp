@@ -113,8 +113,13 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         return NULL;
     }
 
-    QString base = element.attribute("base", "");
-    if (!base.isNull() && !base.isEmpty())
+    QString base = element.attribute("from", "");
+
+    // Temporary fallback to old behaviour to ease transition
+    if (base.isEmpty())
+        base = element.attribute("base", "");
+
+    if (!base.isEmpty())
     {
         MythFontProperties *tmp = GetGlobalFontMap()->GetFont(base);
         if (!tmp)
