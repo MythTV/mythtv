@@ -11,7 +11,7 @@ find $SOURCE -path '*/.svn' -prune -or -type d -exec mkdir -p $DESTDIR/{} \;
 find $SOURCE -path '*/.svn' -prune -or ! -type d \
              -exec cp -p {}    $DESTDIR/{} \; \
              -exec chown $EUID $DESTDIR/{} \; \
-             -exec chmod 444   $DESTDIR/{} \;
+             -exec chmod +r    $DESTDIR/{} \;
 
 
 exit 0
