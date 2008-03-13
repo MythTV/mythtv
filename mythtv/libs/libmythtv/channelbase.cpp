@@ -66,8 +66,9 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     bool msg_error = true;
 
     QStringList inputs = GetConnectedInputs();
+    // Note we use qFind rather than std::find() for ulibc compat (#4507)
     QStringList::const_iterator start =
-        find(inputs.begin(), inputs.end(), inputname);
+        qFind(inputs.begin(), inputs.end(), inputname);
     start = (start == inputs.end()) ?  inputs.begin() : start;
 
     if (start != inputs.end())
