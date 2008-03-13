@@ -141,7 +141,11 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
 bool ThreadedFileWriter::Open(void)
 {
     ignore_writes = false;
-    fd = open(filename.ascii(), flags, mode);
+
+    if (filename == "-")
+        fd = fileno(stdout);
+    else
+        fd = open(filename.ascii(), flags, mode);
 
     if (fd < 0)
     {

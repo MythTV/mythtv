@@ -531,7 +531,8 @@ int main(int argc, char *argv[])
         }       
     }
 
-    if (infile.left(7) == "myth://") {
+    if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
+    {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
                "files.")
@@ -541,6 +542,8 @@ int main(int argc, char *argv[])
 
     if (outfile.isNull())
         outfile = infile + ".tmp";
+    else if (outfile == "-")
+        print_verbose_messages = VB_NONE;
 
     if (jobID >= 0)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
