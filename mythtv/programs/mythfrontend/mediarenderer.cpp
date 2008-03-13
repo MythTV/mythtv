@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mediarenderer.h"
+#include "mythfexml.h"
 #include "compat.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -90,6 +91,11 @@ MediaRenderer::MediaRenderer()
                                  "http-get:*:video/mpeg:*,"
                                  "http-get:*:video/nupplevideo:*,"
                                  "http-get:*:video/x-ms-wmv:*";
+        // ------------------------------------------------------------------
+        // Register the MythFEXML protocol... 
+        // ------------------------------------------------------------------
+        VERBOSE(VB_UPNP, "MediaRenderer::Registering MythFEXML Service." );
+        m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice() ));
 
         // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering AVTransport Service." ));
         // m_pHttpServer->RegisterExtension( m_pUPnpAVT = new UPnpAVTransport( RootDevice() ));

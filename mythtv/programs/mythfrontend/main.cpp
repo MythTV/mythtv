@@ -800,6 +800,11 @@ void reloadTheme(void)
     }
 }
 
+void getScreenShot(void)
+{
+    (void) gContext->GetMainWindow()->screenShot();
+}
+
 void InitJumpPoints(void)
 {
     REG_JUMP("Reload Theme", "", "", reloadTheme);
@@ -818,6 +823,8 @@ void InitJumpPoints(void)
     REG_JUMP("Manual Record Scheduling", "", "", startManual);
     REG_JUMP("Status Screen", "", "", showStatus);
     REG_JUMP("Previously Recorded", "", "", startPrevious);
+
+    REG_JUMPEX("ScreenShot","","",getScreenShot,false);
 
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");

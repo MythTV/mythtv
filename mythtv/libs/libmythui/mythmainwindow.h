@@ -101,6 +101,11 @@ class MythMainWindow : public QWidget
 
     MythPainter *GetCurrentPainter();
 
+    bool screenShot(QString fname, int x, int y, int x2, int y2, int w, int h);
+    bool screenShot(int x, int y, int x2, int y2);
+    bool screenShot(QString fname, int w, int h);
+    bool screenShot(void);
+
     void AllowInput(bool allow);
 
     QRect GetUIScreenRect();

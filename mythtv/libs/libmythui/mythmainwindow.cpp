@@ -8,6 +8,8 @@
 #include <qpaintdevicemetrics.h>
 #include <qdir.h>
 #include <qfile.h>
+#include <math.h>
+
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -71,6 +73,7 @@ static void *SpawnLirc(void *param)
 #ifdef USE_JOYSTICK_MENU
 static void *SpawnJoystickMenu(void *param)
 {
+	VERBOSE(VB_GENERAL,"SpawnJoystickMenu");
     MythMainWindow *main_window = (MythMainWindow *)param;
     QString config_file = MythContext::GetConfDir() + "/joystickmenurc";
     JoystickMenuClient *js = new JoystickMenuClient(main_window);
@@ -502,6 +505,83 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 void MythMainWindow::paintEvent(QPaintEvent *pe)
 {
     d->repaintRegion = d->repaintRegion.unite(pe->region());
+}
+
+bool MythMainWindow::screenShot(QString fname, int x, int y, int x2, int y2, int w, int h)
+{
+    bool ret = false;
+
+    QString extension = fname.section('.', -1, -1);
+    if (extension == "jpg")
+        extension = "JPEG";
+    else 
+        extension = "PNG";
+
+    VERBOSE(VB_GENERAL, QString("MythMainWindow::screenShot saving winId %1 to %2 (%3 x %4) [ %5/%6 - %7/%8] type %9")
+		        .arg(QApplication::desktop()->winId())
+			.arg(fname)
+			.arg(w)
+			.arg(h)
+			.arg(x)
+			.arg(y)
+			.arg(x2)
+			.arg(y2)
+			.arg(extension));
+
+    QPixmap p;
+    p = QPixmap::grabWindow( QApplication::desktop()->winId(), x, y, x2, y2);
+
+    QImage img = p.convertToImage();
+
+    if ( w == 0 )
+        w = img.width();
+
+    if ( h == 0 )
+        h = img.height();
+
+    VERBOSE(VB_GENERAL, QString("Scaling to %1 x %2 from %3 x %4")
+		    .arg(w)
+		    .arg(h)
+		    .arg(img.width())
+		    .arg(img.height()));
+
+    img = img.smoothScale( w, h , QImage::ScaleMin);
+        
+    if (img.save(fname ,extension,100))
+    {
+        VERBOSE(VB_GENERAL, "MythMainWindow::screenShot succeeded");
+	ret = true;
+    }
+    else 
+    {
+	VERBOSE(VB_GENERAL, "MythMainWindow::screenShot Failed!");
+	ret = false;
+    }
+
+    return ret;
+}
+
+bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
+{
+    QString fPath = gContext->GetSetting("ScreenShotPath","/tmp/");
+    QString fName = QString("/%1/myth-screenshot-%2.png")
+	            .arg(fPath)
+	            .arg(QDateTime::currentDateTime().toString("yyyy-mm-ddThh-mm-ss.zzz"));
+
+    return screenShot(fName, x, y, x2, y2, 0, 0);
+}
+
+bool MythMainWindow::screenShot(QString fname, int w, int h)
+{
+    QRect sLoc = qApp->mainWidget()->geometry();
+    return screenShot(fname, sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height(), w, h);
+}
+
+
+bool MythMainWindow::screenShot(void)
+{
+    QRect sLoc = qApp->mainWidget()->geometry();
+    return screenShot(sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height());
 }
 
 #ifdef USING_APPLEREMOTE

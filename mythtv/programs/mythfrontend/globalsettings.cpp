@@ -2224,6 +2224,15 @@ static HostLineEdit *LircKeyPressedApp()
     return ge;
 }
 
+static HostLineEdit *ScreenShotPath()
+{
+    HostLineEdit *ge = new HostLineEdit("ScreenShotPath");
+    ge->setLabel(QObject::tr("ScreenShotPath"));
+    ge->setValue("/tmp/");
+    ge->setHelpText(QObject::tr("Path to screenshot storage location. Should be writable by the frontend"));
+    return ge;
+}
+
 static HostCheckBox *UseArrowAccels()
 {
     HostCheckBox *gc = new HostCheckBox("UseArrowAccels");
@@ -4520,6 +4529,7 @@ MainGeneralSettings::MainGeneralSettings()
     MythMediaSettings *mediaMon = new MythMediaSettings();
 
     general->addChild(LircKeyPressedApp());
+    general->addChild(ScreenShotPath());
     general->addChild(row);
     general->addChild(NetworkControlPort());
     general->addChild(mediaMon);
