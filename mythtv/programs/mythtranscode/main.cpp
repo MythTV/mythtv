@@ -415,6 +415,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (outfile == "-")
+        print_verbose_messages = VB_NONE;
+
     //  Load the context
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -562,8 +565,6 @@ int main(int argc, char *argv[])
 
     if (outfile.isNull())
         outfile = infile + ".tmp";
-    else if (outfile == "-")
-        print_verbose_messages = VB_NONE;
 
     if (jobID >= 0)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
