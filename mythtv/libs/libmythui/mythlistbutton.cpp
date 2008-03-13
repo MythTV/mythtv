@@ -108,6 +108,17 @@ MythListButton::~MythListButton()
         checkFullPix->DownRef();
 }
 
+void MythListButton::Select()
+{
+    emit itemSelected(GetItemCurrent());
+    SetActive(true);
+}
+
+void MythListButton::Deselect()
+{
+    SetActive(false);
+}
+
 void MythListButton::SetFontActive(const MythFontProperties &font)
 {
     *m_fontActive   = font;
