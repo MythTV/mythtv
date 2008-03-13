@@ -860,7 +860,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
             else if (groupType == "GO7007")
             {
                 codecName->addSelection("MPEG-4");
-                //codecName->addSelection("MPEG-2");
+                codecName->addSelection("MPEG-2");
             }
             else
             {
