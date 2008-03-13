@@ -73,7 +73,6 @@ static void *SpawnLirc(void *param)
 #ifdef USE_JOYSTICK_MENU
 static void *SpawnJoystickMenu(void *param)
 {
-	VERBOSE(VB_GENERAL,"SpawnJoystickMenu");
     MythMainWindow *main_window = (MythMainWindow *)param;
     QString config_file = MythContext::GetConfDir() + "/joystickmenurc";
     JoystickMenuClient *js = new JoystickMenuClient(main_window);
