@@ -529,13 +529,16 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     // avcodec needs specific settings for mpeg2 compression
     switch (mpa_vidctx->time_base.den)
     {
-        case 2397: mpa_vidctx->time_base.den = 24000;
+        case 2397:
+        case 2398: mpa_vidctx->time_base.den = 24000;
                    mpa_vidctx->time_base.num = 1001;
                    break;
-        case 2997: mpa_vidctx->time_base.den = 30000;
+        case 2997:
+        case 2998: mpa_vidctx->time_base.den = 30000;
                    mpa_vidctx->time_base.num = 1001;
                    break;
-        case 5994: mpa_vidctx->time_base.den = 60000;
+        case 5994:
+        case 5995: mpa_vidctx->time_base.den = 60000;
                    mpa_vidctx->time_base.num = 1001;
                    break;
     }
