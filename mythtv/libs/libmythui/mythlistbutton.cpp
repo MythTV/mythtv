@@ -813,27 +813,28 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        MoveToNamedPosition(dynamic_cast<MythUIButton *>(uitype)->GetText());
-        emit itemSelected(GetItemCurrent());
-        emit itemClicked(GetItemCurrent());
+
+        QPoint position = event->GetPosition();
+
+        MythUIButton *button = GetButtonAtPoint(position);
+        if (button)
+        {
+            MoveToNamedPosition(button->GetText());
+            emit itemClicked(GetItemCurrent());
+        }
     }
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
- *         QApplication event loop. Should not be used directly.
+/** \brief Get the button within the list at a specified coordinates
  *
  *  \param p QPoint coordinates
  *
- *  \return MythUIType accepting focus found at this coordinates
+ *  \return MythUIButton at these coordinates
  */
-MythUIType *MythListButton::GetChildAt(const QPoint &p)
+MythUIButton *MythListButton::GetButtonAtPoint(const QPoint &p)
 {
     if (GetArea().contains(p))
     {
-        /* Unlike the assumption made elsewhere, we don't want to return
-           this UItype if it accepts focus, we want the MythUIButtons that
-           it contains */
-
         if (m_ChildrenList.isEmpty())
             return NULL;
 
@@ -844,7 +845,7 @@ MythUIType *MythListButton::GetChildAt(const QPoint &p)
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
             if (child != NULL)
             {
-                return child;
+                return dynamic_cast<MythUIButton *>(child);
             }
         }
     }

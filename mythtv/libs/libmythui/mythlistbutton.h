@@ -23,7 +23,8 @@ class MythListButton : public MythUIType
 
     virtual bool keyPressEvent(QKeyEvent *);
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
-    virtual MythUIType *GetChildAt(const QPoint &p);
+
+    MythUIButton *GetButtonAtPoint(const QPoint &p);
 
     void SetFontActive(const MythFontProperties &font);
     void SetFontInactive(const MythFontProperties &font);

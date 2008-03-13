@@ -80,6 +80,7 @@ class MythGestureEvent : public QCustomEvent
      */
     inline MythGestureEvent(size_t gesture):QCustomEvent(MythGestureEventType)
     {
+        m_position = QPoint(0,0);
         (gesture >= MaxGesture) ? _gesture = MaxGesture : _gesture = gesture;
     }
 
@@ -96,9 +97,13 @@ class MythGestureEvent : public QCustomEvent
      */
     operator QString() const;
 
+    void SetPosition(QPoint position) { m_position = position; }
+    QPoint GetPosition() { return m_position; }
+
  private:
 
     size_t _gesture;
+    QPoint m_position;
 };
 
 /* forward declaration of private information */

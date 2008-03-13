@@ -1304,12 +1304,12 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
-                {            
+                {
                     MythUIType *clicked;
                     QValueVector<MythScreenStack *>::iterator it;
                     QPoint p = dynamic_cast<QMouseEvent*>(e)->pos();
 
-                    delete ge;
+                    ge->SetPosition(p);
 
                     for (it = d->stackList.begin(); it != d->stackList.end(); 
                          it++)
@@ -1317,12 +1317,15 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (screen && (clicked = screen->GetChildAt(p)) != NULL)
                         {
+                            screen->SetFocusWidget(clicked);
                             clicked->gestureEvent(clicked, ge);
                             break;
                         }
                     }
+
+                    delete ge;
                 }
-                else 
+                else
                     QApplication::postEvent(this, ge);
 
                 return true;
