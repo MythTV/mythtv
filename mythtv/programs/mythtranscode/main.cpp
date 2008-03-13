@@ -31,6 +31,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 void UpdateJobQueue(float percent_done);
 int CheckJobQueue();
 static int glbl_jobID = -1;
+QString recorderOptions = "";
 
 void usage(char *progname) 
 {
@@ -63,6 +64,10 @@ void usage(char *progname)
     cerr << "\t--video               : Specifies that this is not a mythtv recording\n";
     cerr << "\t                        (must be used with --infile)\n";
     cerr << "\t--showprogress        : Display status info to the stdout\n";
+    cerr << "\t--recorderOptions <OPTIONS>\n";
+    cerr << "\t                or -ro: Pass a comma-separated list of\n";
+    cerr << "\t                        recordingprofile options to override\n";
+    cerr << "\t                        values in the database.\n";
     cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
     cerr << "\t--help           or -h: Prints this help statement.\n";
 }
@@ -323,6 +328,21 @@ int main(int argc, char *argv[])
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-ro") ||
+                 !strcmp(a.argv()[argpos],"--recorderOptions"))
+        {
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            {
+                recorderOptions = a.argv()[argpos + 1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -ro/--recorderOptions option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"--fifosync"))
         {
             fifosync = true;
@@ -555,6 +575,8 @@ int main(int argc, char *argv[])
 
     if (showprogress)
         transcode->ShowProgress(true);
+    if (recorderOptions != "")
+        transcode->SetRecorderOptions(recorderOptions);
     int result = 0;
     if (!mpeg2)
     {

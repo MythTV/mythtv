@@ -19,6 +19,7 @@ class Transcode : public QObject
                       bool honorCutList, bool framecontrol, int jobID,
                       QString fifodir, QMap<long long, int> deleteMap);
     void ShowProgress(bool val) { showprogress = val; }
+    void SetRecorderOptions(QString options) { recorderOptions = options; }
   private:
     bool GetProfile(QString profileName, QString encodingType, int height,
                     int frameRate);
@@ -33,6 +34,8 @@ class Transcode : public QObject
     FIFOWriter::FIFOWriter *fifow;
     QPtrList<struct kfatable_entry> *kfa_table;
     bool showprogress;
+
+    QString recorderOptions;
 };
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

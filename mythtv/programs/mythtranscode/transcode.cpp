@@ -10,6 +10,8 @@
 #include <qsqldatabase.h>
 #include <qmap.h>
 #include <math.h>
+#include <qstringlist.h>
+#include <qregexp.h>
 
 #include <iostream>
 using namespace std;
@@ -21,6 +23,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
+#include "exitcodes.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -243,6 +246,7 @@ Transcode::Transcode(ProgramInfo *pginfo)
     fifow = NULL;
     kfa_table = NULL;
     showprogress = false;
+    recorderOptions = "";
 }
 Transcode::~Transcode()
 {
@@ -492,6 +496,22 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
             return REENCODE_ERROR;
         }
+
+        // For overriding settings on the command line
+        QMap<QString, QString> recorderOptionsMap;
+        if (recorderOptions != "")
+        {
+            QStringList options = QStringList::split(",", recorderOptions);
+            unsigned int loop = 0;
+            while (loop < options.size())
+            {
+                QStringList tokens = QStringList::split("=", options[loop]);
+                recorderOptionsMap[tokens[0]] = tokens[1];
+
+                loop++;
+            }
+        }
+
         vidsetting = get_str_option(profile, "videocodec");
         audsetting = get_str_option(profile, "audiocodec");
         vidfilters = get_str_option(profile, "transcodefilters");
@@ -560,7 +580,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         nvr->SetVideoAspect(video_aspect);
         nvr->SetTranscoding(true);
 
-        if (vidsetting == "MPEG-4")
+        if ((vidsetting == "MPEG-4") ||
+            (recorderOptionsMap["videocodec"] == "mpeg4"))
         {
             nvr->SetOption("videocodec", "mpeg4");
 
@@ -571,15 +592,28 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             nvr->SetIntOption(&profile, "mpeg4qualdiff");
             nvr->SetIntOption(&profile, "mpeg4optionvhq");
             nvr->SetIntOption(&profile, "mpeg4option4mv");
-            nvr->SetupAVCodecVideo();
+#ifdef USING_FFMPEG_THREADS
+            nvr->SetIntOption(profile, "encodingthreadcount");
+#endif
         }
-        else if (vidsetting == "RTjpeg")
+        else if ((vidsetting == "MPEG-2") ||
+                 (recorderOptionsMap["videocodec"] == "mpeg2video"))
+        {
+            nvr->SetOption("videocodec", "mpeg2video");
+        
+            nvr->SetIntOption(&profile, "mpeg2bitrate");
+            nvr->SetIntOption(&profile, "scalebitrate");
+#ifdef USING_FFMPEG_THREADS
+            nvr->SetIntOption(&profile, "encodingthreadcount");
+#endif
+        }
+        else if ((vidsetting == "RTjpeg") ||
+                 (recorderOptionsMap["videocodec"] == "rtjpeg"))
         {
             nvr->SetOption("videocodec", "rtjpeg");
             nvr->SetIntOption(&profile, "rtjpegquality");
             nvr->SetIntOption(&profile, "rtjpegchromafilter");
             nvr->SetIntOption(&profile, "rtjpeglumafilter");
-            nvr->SetupRTjpeg();
         }
         else if (vidsetting == "")
         {
@@ -609,6 +643,48 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         {
             VERBOSE(VB_IMPORTANT, QString("Unknown audio codec: %1").arg(audsetting));
         }
+
+        // For overriding settings on the command line
+        if (recorderOptionsMap.size() > 0)
+        {
+            QMap<QString, QString>::Iterator it;
+            QString key, value;
+            for (it = recorderOptionsMap.begin();
+                 it != recorderOptionsMap.end(); ++it)
+            {
+                key   = it.key();
+                value = it.data();
+
+                VERBOSE(VB_IMPORTANT,
+                        QString("Forcing Recorder option '%1' to '%2'")
+                        .arg(key).arg(value));
+
+                if (value.contains(QRegExp("[^0-9]")))
+                    nvr->SetOption(key, value);
+                else
+                    nvr->SetOption(key, value.toInt());
+
+                if (key == "width")
+                    newWidth  = (value.toInt() + 15) & ~0xF;
+                else if (key == "height")
+                    newHeight = (value.toInt() + 15) & ~0xF;
+                else if (key == "videocodec")
+                {
+                    if (value == "mpeg4")
+                        vidsetting = "MPEG-4";
+                    else if (value == "mpeg2video")
+                        vidsetting = "MPEG-2";
+                    else if (value == "rtjpeg")
+                        vidsetting = "RTjpeg";
+                }
+            }
+        }
+
+        if ((vidsetting == "MPEG-4") ||
+            (vidsetting == "MPEG-2"))
+            nvr->SetupAVCodecVideo();
+        else if (vidsetting == "RTjpeg")
+            nvr->SetupRTjpeg();
 
         nvr->AudioInit(true);
 
