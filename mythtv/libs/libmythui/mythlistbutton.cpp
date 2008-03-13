@@ -110,7 +110,9 @@ MythListButton::~MythListButton()
 
 void MythListButton::Select()
 {
-    emit itemSelected(GetItemCurrent());
+    MythListButtonItem *item = GetItemCurrent();
+    if (item)
+        emit itemSelected(item);
     SetActive(true);
 }
 
