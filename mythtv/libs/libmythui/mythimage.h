@@ -20,6 +20,8 @@ class MythImage : public QImage
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() { return m_Changed; }
 
+    bool IsGradient() { return m_isGradient; }
+
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
 

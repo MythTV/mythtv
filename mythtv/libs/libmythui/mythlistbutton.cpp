@@ -21,8 +21,8 @@ MythListButton::MythListButton(MythUIType *parent, const char *name)
     Const();
 }
 
-MythListButton::MythListButton(MythUIType *parent, const char *name, 
-                               const QRect& area, bool showArrow, 
+MythListButton::MythListButton(MythUIType *parent, const char *name,
+                               const QRect& area, bool showArrow,
                                bool showScrollArrows)
               : MythUIType(parent, name)
 {
@@ -88,9 +88,9 @@ MythListButton::~MythListButton()
     delete m_selIterator;
 
     if (m_fontActive)
-       delete m_fontActive; 
+       delete m_fontActive;
     if (m_fontInactive)
-       delete m_fontInactive; 
+       delete m_fontInactive;
 
     if (itemRegPix)
         itemRegPix->DownRef();
@@ -139,7 +139,7 @@ void MythListButton::SetSpacing(int spacing)
 
 void MythListButton::SetMargin(int margin)
 {
-    m_itemMargin = margin;    
+    m_itemMargin = margin;
 }
 
 void MythListButton::SetDrawFromBottom(bool draw)
@@ -175,7 +175,7 @@ void MythListButton::Reset()
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount   = 0;
-    m_selIterator->toFirst(); 
+    m_selIterator->toFirst();
     m_topIterator->toFirst();
 
     SetPositionArrowStates();
@@ -227,7 +227,7 @@ void MythListButton::SetPositionArrowStates(void)
             m_upArrow->DisplayState(MythUIStateType::Full);
         else
             m_upArrow->DisplayState(MythUIStateType::Off);
-    
+
         if (m_topPosition + (int)m_itemsVisible < m_itemCount)
             m_downArrow->DisplayState(MythUIStateType::Full);
         else
@@ -242,7 +242,7 @@ void MythListButton::InsertItem(MythListButtonItem *item)
 
     m_itemCount++;
 
-    if (!lastItem) 
+    if (!lastItem)
     {
         m_topItem = item;
         m_selItem = item;
@@ -259,7 +259,7 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
 {
     if (m_clearing)
         return;
-    
+
     if (m_itemList.findRef(item) == -1)
         return;
 
@@ -312,7 +312,7 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
 
     SetPositionArrowStates();
 
-    if (m_selItem) 
+    if (m_selItem)
         emit itemSelected(m_selItem);
 }
 
@@ -366,7 +366,7 @@ MythListButtonItem* MythListButton::GetItemCurrent()
 
 MythListButtonItem* MythListButton::GetItemFirst()
 {
-    return m_itemList.first();    
+    return m_itemList.first();
 }
 
 MythListButtonItem* MythListButton::GetItemNext(MythListButtonItem *item)
@@ -397,14 +397,14 @@ QPtrListIterator<MythListButtonItem> MythListButton::GetIterator(void)
 
 MythListButtonItem* MythListButton::GetItemAt(int pos)
 {
-    return m_itemList.at(pos);    
+    return m_itemList.at(pos);
 }
 
 int MythListButton::GetItemPos(MythListButtonItem* item)
 {
     if (!item)
         return -1;
-    return m_itemList.findRef(item);    
+    return m_itemList.findRef(item);
 }
 
 void MythListButton::MoveUp(MovementUnit unit)
@@ -578,12 +578,12 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
     m_selItem = m_selIterator->current();
 
-    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1) 
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
     {
         ++(*m_topIterator);
         ++m_topPosition;
     }
-   
+
     m_topItem = m_topIterator->current();
 
     SetPositionArrowStates();
@@ -654,7 +654,7 @@ void MythListButton::Init()
     m_initialized = true;
 
     QRect arrowsRect;
-    if (m_showScrollArrows && m_upArrow) 
+    if (m_showScrollArrows && m_upArrow)
         arrowsRect = PlaceArrows(m_upArrow->GetArea().size());
     else
         arrowsRect = QRect(0, 0, 0, 0);
@@ -675,9 +675,9 @@ void MythListButton::Init()
 
     // If we have a background image and it's not a 10x10 gradient,
     // use it to define the button size
-    if (itemRegPix && (itemRegPix->height() > 10))
+    if (itemRegPix && !itemRegPix->IsGradient())
         m_itemHeight = itemRegPix->height();
-    if (itemRegPix && (itemRegPix->width() > 10))
+    if (itemRegPix && !itemRegPix->IsGradient())
         m_itemWidth = itemRegPix->width();
 
     CalculateVisibleItems();
@@ -956,7 +956,7 @@ void MythListButton::CalculateVisibleItems(void)
 
     if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
     {
-        while (y <= m_contentsRect.height() - m_itemHeight) 
+        while (y <= m_contentsRect.height() - m_itemHeight)
         {
             y += m_itemHeight + m_itemVertSpacing;
             m_rows++;
@@ -1160,13 +1160,13 @@ void MythListButton::Finalize(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-MythListButtonItem::MythListButtonItem(MythListButton* lbtype, 
+MythListButtonItem::MythListButtonItem(MythListButton* lbtype,
                                        const QString& text,
                                        MythImage *image, bool checkable,
                                        CheckState state, bool showArrow)
 {
     assert(lbtype);
-    
+
     m_parent    = lbtype;
     m_text      = text;
     m_image     = image;
@@ -1242,7 +1242,7 @@ void MythListButtonItem::setDrawArrow(bool flag)
 
 void MythListButtonItem::setData(void *data)
 {
-    m_data = data;    
+    m_data = data;
 }
 
 void *MythListButtonItem::getData()
