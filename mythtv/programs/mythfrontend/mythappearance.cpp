@@ -24,7 +24,6 @@ using namespace std;
 MythAppearance::MythAppearance(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name)
 {
-    gContext->addCurrentLocation("AppearanceWizard");
     // Initialise $stuff
     // Get UI size & offset settings from database
 
@@ -160,10 +159,7 @@ bool MythAppearance::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             doMenu();
         else if (action == "ESCAPE")
-        {
-            gContext->removeCurrentLocation();
-            GetMythMainWindow()->GetMainStack()->PopScreen();
-        }
+            DeleteScreen();
         else
             handled = false;
     }
