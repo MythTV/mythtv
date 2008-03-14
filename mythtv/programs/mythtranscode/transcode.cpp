@@ -644,6 +644,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             VERBOSE(VB_IMPORTANT, QString("Unknown audio codec: %1").arg(audsetting));
         }
 
+        nvr->AudioInit(true);
+
         // For overriding settings on the command line
         if (recorderOptionsMap.size() > 0)
         {
@@ -685,8 +687,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             nvr->SetupAVCodecVideo();
         else if (vidsetting == "RTjpeg")
             nvr->SetupRTjpeg();
-
-        nvr->AudioInit(true);
 
         outRingBuffer = new RingBuffer(outputname, true, false);
         nvr->SetRingBuffer(outRingBuffer);
