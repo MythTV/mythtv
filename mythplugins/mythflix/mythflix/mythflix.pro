@@ -2,10 +2,12 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
 TEMPLATE = lib
-CONFIG += plugin thread warn_on debug
+CONFIG += plugin thread
 TARGET = mythflix
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
+
+INCLUDEPATH += $${PREFIX}/include/mythtv
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = netflix-ui.xml

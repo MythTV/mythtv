@@ -22,42 +22,36 @@
 #ifndef MYTHFLIXQUEUE_H
 #define MYTHFLIXQUEUE_H
 
-
+// QT headers
 #include <qhttp.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 #include "newsengine.h"
 
-class QTimer;
-class UIListBtnType;
-
-class MythFlixQueue : public MythDialog
+/** \class MythFlix
+ *  \brief The netflix queue browser class.
+ */
+class MythFlixQueue : public MythScreenType
 {
     Q_OBJECT
 
 public:
 
-    MythFlixQueue(MythMainWindow *parent, const char *name = 0,
-                  QString queueName = "");
+    MythFlixQueue(MythScreenStack *, const char *, QString);
     ~MythFlixQueue();
 
-private:
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QCustomEvent*);
 
-    void loadTheme();
-    void loadWindow(QDomElement &element);
-    void paintEvent(QPaintEvent *e);
-
-    void updateBackground();
-    void updateSitesView();
-    void updateArticlesView();
-    void updateInfoView();
-    
-    void keyPressEvent(QKeyEvent *e);
-    void cursorUp(bool page=false);
-    void cursorDown(bool page=false);
+  private:
+    void loadData();
 
     void displayOptions();
 
@@ -66,15 +60,16 @@ private:
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
-    XMLParse      *m_Theme;
+    MythListButton *m_articlesList;
 
-    QPixmap       m_background;
+    MythUIText *m_nameText;
+    MythUIText *m_titleText;
+    MythUIText *m_descText;
 
-    UIListBtnType *m_UIArticles;
-    QRect          m_ArticlesRect;
-    QRect          m_InfoRect;
-    MythPopupBox  *popup;
-	QString        zoom;
+    MythUIImage *m_boxshotImage;
+
+    MythDialogBox  *m_menuPopup;
+    QString        zoom;
     QString        browser;
     NewsSite::List m_NewsSites;
 
@@ -82,16 +77,13 @@ private:
 
     QHttp         *http;
 
-    bool           expectingPopup;
-
 private slots:
+    void updateInfoView(MythListButtonItem*);
     void slotViewArticle();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 
     void slotSiteSelected(NewsSite*);
-    
-    void slotArticleSelected(UIListBtnTypeItem *item);
 
     void slotMoveToTop();
     void slotRemoveFromQueue();

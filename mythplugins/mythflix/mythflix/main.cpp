@@ -40,37 +40,49 @@
 
 using namespace std;
 
-//void runNews(void);
-
 void browse(void){
-        gContext->addCurrentLocation("flixbrowse");
-        MythFlix flix(gContext->GetMainWindow(), "netflix browse");
-        flix.exec();
-        gContext->removeCurrentLocation();
+    gContext->addCurrentLocation("flixbrowse");
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythFlix *mythflix = new MythFlix(mainStack, "mythflix");
+
+    if (mythflix->Create())
+        mainStack->AddScreen(mythflix);
+
+    gContext->removeCurrentLocation();
 }
 
 void queue(void){
-        gContext->addCurrentLocation("flixqueue");
-        QString queue = chooseQueue();
-        if (queue != "__NONE__")
-        {
-            MythFlixQueue flix(gContext->GetMainWindow(), "netflix queue",
-                               queue);
-            flix.exec();
-        }
-        gContext->removeCurrentLocation();
+    gContext->addCurrentLocation("flixqueue");
+    QString queue = chooseQueue();
+    if (queue != "__NONE__")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "mythflixqueue",
+                                                    queue);
+
+        if (mythflix->Create())
+            mainStack->AddScreen(mythflix);
+    }
+    gContext->removeCurrentLocation();
 }
 
 void history(void){
-        gContext->addCurrentLocation("flixhistory");
-        QString queue = chooseQueue();
-        if (queue != "__NONE__")
-        {
-            MythFlixQueue flix(gContext->GetMainWindow(), "netflix history",
-                               queue);
-               flix.exec();
-        }
-        gContext->removeCurrentLocation();
+    gContext->addCurrentLocation("flixhistory");
+    QString queue = chooseQueue();
+    if (queue != "__NONE__")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "mythflixqueue",
+                                                    queue);
+
+        if (mythflix->Create())
+            mainStack->AddScreen(mythflix);
+    }
+    gContext->removeCurrentLocation();
 }
 
 void NetFlixCallback(void *data, QString &selection)
@@ -136,8 +148,13 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    MythFlixConfig config(gContext->GetMainWindow(), "netflix");
-    config.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythFlixConfig *mythflixconfig = new MythFlixConfig(mainStack,
+                                                        "mythflixconfig");
+
+    if (mythflixconfig->Create())
+        mainStack->AddScreen(mythflixconfig);
 
     return 0;
 }

@@ -22,43 +22,34 @@
 #ifndef MYTHFLIX_H
 #define MYTHFLIX_H
 
-
-#include <qhttp.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 #include "newsengine.h"
 
-class QTimer;
-class UIListBtnType;
-
-class MythFlix : public MythDialog
+/** \class MythFlix
+ *  \brief The netflix browser class.
+ */
+class MythFlix : public MythScreenType
 {
     Q_OBJECT
 
-public:
+  public:
 
-    MythFlix(MythMainWindow *parent, const char *name = 0);
+    MythFlix(MythScreenStack *parent, const char *name);
     ~MythFlix();
 
-private:
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QCustomEvent*);
 
-    void loadTheme();
-    void loadWindow(QDomElement &element);
-    void paintEvent(QPaintEvent *e);
+  private:
+    void loadData();
 
-    void updateBackground();
-    void updateSitesView();
-    void updateArticlesView();
-    void updateInfoView();
-    
-    void keyPressEvent(QKeyEvent *e);
-    void cursorUp(bool page=false);
-    void cursorDown(bool page=false);
-    void cursorRight();
-    void cursorLeft();
     void displayOptions();
 
     void cancelRetrieve();
@@ -67,31 +58,28 @@ private:
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
-    XMLParse      *m_Theme;
+    MythListButton *m_sitesList;
+    MythListButton *m_articlesList;
 
-    UIListBtnType *m_UISites;
-    UIListBtnType *m_UIArticles;
+    MythUIText *m_statusText;
+    MythUIText *m_titleText;
+    MythUIText *m_descText;
 
-    QPixmap        m_background;
+    MythUIImage *m_boxshotImage;
 
-    QRect          m_SitesRect;
-    QRect          m_ArticlesRect;
-    QRect          m_InfoRect;
-    unsigned int   m_InColumn;
-    MythPopupBox  *popup;
+    MythDialogBox  *m_menuPopup;
     QString        zoom;
     QString        browser;
-    bool           expectingPopup;
     NewsSite::List m_NewsSites;
 
 private slots:
+    void updateInfoView(MythListButtonItem*);
     void slotViewArticle();
     void slotViewArticleTop();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 
-    void slotSiteSelected(UIListBtnTypeItem *item);
-    void slotArticleSelected(UIListBtnTypeItem *item);
+    void slotSiteSelected(MythListButtonItem *item);
     void slotShowNetFlixPage();
     void slotCancelPopup();
 };

@@ -22,86 +22,49 @@
 #ifndef MYTHFLIXCONFIG_H
 #define MYTHFLIXCONFIG_H
 
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
-
-class QTimer;
-class QPixmap;
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 class MythFlixConfigPriv;
 class NewsSiteItem;
-class UIListBtnType;
 
-class MythFlixSpinBox : public MythSpinBox
-{
-public:
-    
-    MythFlixSpinBox(QWidget* parent = 0, const char* widgetName = 0);
-
-protected:
-
-    virtual bool eventFilter(QObject* o, QEvent* e);
-    
-};
-
-class MythFlixConfig : public MythDialog
+class MythFlixConfig : public MythScreenType
 {
     Q_OBJECT
 
-public:
+  public:
 
-    MythFlixConfig(MythMainWindow *parent,
-                   const char *name = 0);
+    MythFlixConfig(MythScreenStack *parent, const char *name = 0);
     ~MythFlixConfig();
 
-private:
-    void changeContext();
-    void paintEvent(QPaintEvent *e);
-    void keyPressEvent(QKeyEvent *e);
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
+  private:
+    void loadData();
     void populateSites();
-    void loadTheme();
 
-    void updateBackground();
-    void updateSites();
-    void updateFreq();
-
-    void cursorUp(bool page=false);
-    void cursorDown(bool page=false);
-    void cursorLeft();
-    void cursorRight();
-
-    void toggleItem(UIListBtnTypeItem* item);
     bool findInDB(const QString& name);
     bool insertInDB(NewsSiteItem* site);
     bool removeFromDB(NewsSiteItem* site);
 
     MythFlixConfigPriv *m_priv;
 
-    XMLParse           *m_Theme;
-    uint                m_Context;
-    uint                m_InColumn;
+    MythListButton      *m_genresList;
+    MythListButton      *m_siteList;
 
-    UIListBtnType      *m_UICategory;
-    UIListBtnType      *m_UISite;
+    MythUIText *m_helpText;
+    MythUIText *m_contextText;
 
-    MythFlixSpinBox    *m_SpinBox;
-
-    QPixmap             m_background;
-
-    QRect               m_SiteRect;
-    QRect               m_FreqRect;
-
-    QTimer             *m_updateFreqTimer;
     int                 m_updateFreq;
 
 private slots:
-
-    void slotUpdateFreqChanged();
-    void slotUpdateFreqTimerTimeout();
-    void slotCategoryChanged(UIListBtnTypeItem* item);
+    void slotCategoryChanged(MythListButtonItem* item);
+    void toggleItem(MythListButtonItem* item);
 };
 
 #endif /* MYTHNEWSCONFIG_H */

@@ -19,32 +19,31 @@
  *
  * ============================================================ */
 
-#include <iostream>
-#include <cstdlib>
-
-#include <unistd.h>
-
-#include <qnetwork.h>
+// Qt headers
 #include <qapplication.h>
-#include <qdatetime.h>
-#include <qpainter.h>
 #include <qdir.h>
-#include <qtimer.h>
 #include <qregexp.h>
 #include <qprocess.h>
 
-#include <qurl.h>
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-#include "mythtv/httpcomms.h"
+// MythTV headers
+#include <mythtv/util.h>
+#include <mythtv/mythdbcon.h>
+#include <mythtv/httpcomms.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
+// MythFlix headers
 #include "mythflix.h"
 #include "flixutil.h"
 
-MythFlix::MythFlix(MythMainWindow *parent, const char *name )
-    : MythDialog(parent, name)
+/** \brief Creates a new MythFlix Browse Screen
+ *  \param parent Pointer to the screen stack
+ *  \param name The name of the window
+ */
+MythFlix::MythFlix(MythScreenStack *parent, const char *name)
+    : MythScreenType (parent, name)
 {
-    qInitNetworkProtocols ();
+    //qInitNetworkProtocols ();
 
     // Setup cache directory
 
@@ -58,21 +57,82 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
     dir = QDir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
-    
+
     // Initialize variables
     zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
-    expectingPopup = false;
-    m_InColumn     = 0;
-    m_UISites      = 0;
-    m_UIArticles   = 0;
 
-    setNoErase();
-    loadTheme();
+    m_sitesList      = 0;
+    m_articlesList   = 0;
+}
 
-    updateBackground();
+MythFlix::~MythFlix()
+{
+}
+
+bool MythFlix::Create()
+{
+
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("netflix-ui.xml", "browse", this);
+
+    if (!foundtheme)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to load window 'browse' from "
+                              "netflix-ui.xml");
+        return false;
+    }
+
+    m_sitesList = dynamic_cast<MythListButton *>
+                (GetChild("siteslist"));
+
+    connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
+            this, SLOT(slotSiteSelected(MythListButtonItem*)));
+
+    m_articlesList = dynamic_cast<MythListButton *>
+                (GetChild("articleslist"));
+
+    m_statusText = dynamic_cast<MythUIText *>
+                (GetChild("status"));
+
+    m_titleText = dynamic_cast<MythUIText *>
+                (GetChild("title"));
+
+    m_descText = dynamic_cast<MythUIText *>
+                (GetChild("description"));
+
+    m_boxshotImage = dynamic_cast<MythUIImage *>
+                (GetChild("boxshot"));
+
+    if (!m_sitesList || !m_articlesList)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    connect(m_sitesList, SIGNAL(itemSelected( MythListButtonItem*)),
+            this, SLOT(  updateInfoView(MythListButtonItem*)));
+    connect(m_articlesList, SIGNAL(itemSelected( MythListButtonItem*)),
+            this, SLOT(  updateInfoView(MythListButtonItem*)));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_sitesList);
+    m_sitesList->SetActive(true);
+    m_articlesList->SetActive(false);
+
+    loadData();
+
+    return true;
+}
+
+void MythFlix::loadData()
+{
 
     // Load sites from database
 
@@ -96,433 +156,175 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
 
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        UIListBtnTypeItem* item =
-            new UIListBtnTypeItem(m_UISites, site->name());
+        MythListButtonItem* item =
+            new MythListButtonItem(m_sitesList, site->name());
         item->setData(site);
     }
 
-    
+
     NewsSite* site = (NewsSite*) m_NewsSites.first();
-    connect(site, SIGNAL(finished(NewsSite*)),
+    if (site)
+    {
+        connect(site, SIGNAL(finished(NewsSite*)),
             this, SLOT(slotNewsRetrieved(NewsSite*)));
-    
+    }
+
     slotRetrieveNews();
+
 }
 
-MythFlix::~MythFlix()
+void MythFlix::updateInfoView(MythListButtonItem* selected)
 {
-    delete m_Theme;
-}
+    if (!selected)
+        return;
 
-void MythFlix::loadTheme()
-{
-    m_Theme = new XMLParse();
-    m_Theme->SetWMult(wmult);
-    m_Theme->SetHMult(hmult);
+    if (GetFocusWidget() == m_articlesList) {
 
-    QDomElement xmldata;
-    m_Theme->LoadTheme(xmldata, "browse", "netflix-");
+        NewsArticle *article = (NewsArticle*) selected->getData();
 
-    for (QDomNode child = xmldata.firstChild(); !child.isNull();
-         child = child.nextSibling()) {
-        
-        QDomElement e = child.toElement();
-        if (!e.isNull()) {
+        if (article)
+        {
 
-            if (e.tagName() == "font") {
-                m_Theme->parseFont(e);
-            }
-            else if (e.tagName() == "container") {
-                QRect area;
-                QString name;
-                int context;
-                m_Theme->parseContainer(e, name, context, area);
+            if (m_titleText)
+                m_titleText->SetText(article->title());
 
-                if (name.lower() == "sites")
-                    m_SitesRect = area;
-                else if (name.lower() == "articles")
-                    m_ArticlesRect = area;
-                else if (name.lower() == "info")
-                    m_InfoRect = area;
-            }
-            else {
-                VERBOSE(VB_IMPORTANT, QString("MythFlix: Unknown element: %1").arg(e.tagName()));
-                exit(-1);
-            }
-        }
-    }
+            if (m_descText)
+                m_descText->SetText(article->description());
 
-    LayerSet *container = m_Theme->GetSet("sites");
-    if (!container) {
-        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get sites container."));
-        exit(-1);
-    }
-        
-    m_UISites = (UIListBtnType*)container->GetType("siteslist");
-    if (!m_UISites) {
-        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get list area."));
-        exit(-1);
-    }
-        
-    connect(m_UISites, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-            SLOT(slotSiteSelected(UIListBtnTypeItem*)));
-
-    container = m_Theme->GetSet("articles");
-    if (!container) {
-        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get articles container."));
-        exit(-1);
-    }
-
-    m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
-    if (!m_UIArticles) {
-        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get articles list area."));
-        exit(-1);
-    }
-    
-    connect(m_UIArticles, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-            SLOT(slotArticleSelected(UIListBtnTypeItem*)));
-    
-    m_UISites->SetActive(true);
-    m_UIArticles->SetActive(false);
-}
-
-
-void MythFlix::paintEvent(QPaintEvent *e)
-{
-    QRect r = e->rect();
-
-    if (r.intersects(m_SitesRect))
-        updateSitesView();
-    if (r.intersects(m_ArticlesRect))
-        updateArticlesView();
-    if (r.intersects(m_InfoRect))
-        updateInfoView();
-}
-
-void MythFlix::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = m_Theme->GetSet("background");
-    if (container)
-    {
-        container->Draw(&tmp, 0, 0);
-    }
-
-    tmp.end();
-    m_background = bground;
-
-    setPaletteBackgroundPixmap(m_background);
-}
-
-void MythFlix::updateSitesView()
-{
-    QPixmap pix(m_SitesRect.size());
-    pix.fill(this, m_SitesRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("sites");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-
-    bitBlt(this, m_SitesRect.left(), m_SitesRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythFlix::updateArticlesView()
-{
-    QPixmap pix(m_ArticlesRect.size());
-    pix.fill(this, m_ArticlesRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("articles");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-
-    bitBlt(this, m_ArticlesRect.left(), m_ArticlesRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythFlix::updateInfoView()
-{
-    QPixmap pix(m_InfoRect.size());
-    pix.fill(this, m_InfoRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("info");
-    if (container)
-    {
-        NewsSite    *site     = 0;
-        NewsArticle *article  = 0;
-
-        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
-        if (siteUIItem && siteUIItem->getData()) 
-            site = (NewsSite*) siteUIItem->getData();
-        
-        UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-        if (articleUIItem && articleUIItem->getData())
-            article = (NewsArticle*) articleUIItem->getData();
-        
-        if (m_InColumn == 1) {
-
-            if (article)
+            // removes html tags
             {
-
-                UITextType *ttype =
-                    (UITextType *)container->GetType("status");
-//                if (ttype)
-//                    ttype->SetText("");
-
-                ttype =
-                    (UITextType *)container->GetType("title");
-                if (ttype)
-                    ttype->SetText(article->title());
-
-                ttype =
-                    (UITextType *)container->GetType("description");
-                if (ttype)
-                    ttype->SetText(article->description());
-
-                // removes html tags 
-                { 
-                    QString artText = article->description(); 
-                    // Replace paragraph and break HTML with newlines 
-                    if( artText.find(QRegExp("</(p|P)>")) ) 
-                    { 
-                        artText.replace( QRegExp("<(p|P)>"), ""); 
-                        artText.replace( QRegExp("</(p|P)>"), "\n\n"); 
-                    } 
-                    else 
-                    { 
-                        artText.replace( QRegExp("<(p|P)>"), "\n\n"); 
-                        artText.replace( QRegExp("</(p|P)>"), ""); 
-                    }                         
-                    artText.replace( QRegExp("<(br|BR|)/>"), "\n"); 
-                    artText.replace( QRegExp("<(br|BR|)>"), "\n"); 
-                    // These are done instead of simplifyWhitespace 
-                    // because that function also strips out newlines 
-                    // Replace tab characters with nothing 
-                    artText.replace( QRegExp("\t"), ""); 
-                    // Replace double space with single 
-                    artText.replace( QRegExp("  "), ""); 
-                    // Replace whitespace at beginning of lines with newline 
-                    artText.replace( QRegExp("\n "), "\n"); 
-                    // Remove any remaining HTML tags 
-                    QRegExp removeHTML(QRegExp("</?.+>")); 
-                    removeHTML.setMinimal(true); 
-                    artText.remove((const QRegExp&) removeHTML); 
-                    artText = artText.stripWhiteSpace(); 
-                    ttype->SetText(artText); 
-                }  
-
-                QString imageLoc = article->articleURL();
-                int length = imageLoc.length();
-                int index = imageLoc.findRev("/");
-                imageLoc = imageLoc.mid(index,length) + ".jpg";
-
-                QString fileprefix = MythContext::GetConfDir();
-                
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-            
-                fileprefix += "/MythFlix";
-            
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-            
-                VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1").arg(fileprefix));
-
-                QString sFilename(fileprefix + "/" + imageLoc);
-            
-                bool exists = QFile::exists(sFilename);
-                if (!exists) 
+                QString artText = article->description();
+                // Replace paragraph and break HTML with newlines
+                if( artText.find(QRegExp("</(p|P)>")) )
                 {
-                    VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file from server (%1)").arg(imageLoc));
-                    
-                    QString sURL("http://cdn.nflximg.com/us/boxshots/large/" + imageLoc);
-                
-                    if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
-                        VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download image from: %1").arg(sURL));
-                
-                    VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying boxshot file from server (%1)").arg(imageLoc));
+                    artText.replace( QRegExp("<(p|P)>"), "");
+                    artText.replace( QRegExp("</(p|P)>"), "\n\n");
                 }
-
-                UIImageType *itype = (UIImageType *)container->GetType("boxshot");
-                if (itype)
+                else
                 {
-                   itype->SetImage(sFilename);
-                   itype->LoadImage();
-        
-                   if (itype->isHidden())
-                       itype->show();   
+                    artText.replace( QRegExp("<(p|P)>"), "\n\n");
+                    artText.replace( QRegExp("</(p|P)>"), "");
                 }
-
+                artText.replace( QRegExp("<(br|BR|)/>"), "\n");
+                artText.replace( QRegExp("<(br|BR|)>"), "\n");
+                // These are done instead of simplifyWhitespace
+                // because that function also strips out newlines
+                // Replace tab characters with nothing
+                artText.replace( QRegExp("\t"), "");
+                // Replace double space with single
+                artText.replace( QRegExp("  "), "");
+                // Replace whitespace at beginning of lines with newline
+                artText.replace( QRegExp("\n "), "\n");
+                // Remove any remaining HTML tags
+                QRegExp removeHTML(QRegExp("</?.+>"));
+                removeHTML.setMinimal(true);
+                artText.remove((const QRegExp&) removeHTML);
+                artText = artText.stripWhiteSpace();
+                m_descText->SetText(artText);
             }
-        }
-        else {
 
-            if (site)
+            QString imageLoc = article->articleURL();
+            int length = imageLoc.length();
+            int index = imageLoc.findRev("/");
+            imageLoc = imageLoc.mid(index,length) + ".jpg";
+
+            QString fileprefix = MythContext::GetConfDir();
+
+            QDir dir(fileprefix);
+            if (!dir.exists())
+                dir.mkdir(fileprefix);
+
+            fileprefix += "/MythFlix";
+
+            dir = QDir(fileprefix);
+            if (!dir.exists())
+                dir.mkdir(fileprefix);
+
+            VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1")
+                                    .arg(fileprefix));
+
+            QString sFilename(fileprefix + "/" + imageLoc);
+
+            bool exists = QFile::exists(sFilename);
+            if (!exists)
             {
-                UITextType *ttype =
-                    (UITextType *)container->GetType("status");
-//                if (ttype)
-//                    ttype->SetText("");
+                VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file "
+                                            "from server (%1)").arg(imageLoc));
 
-                ttype =
-                    (UITextType *)container->GetType("title");
-                if (ttype)
-                    ttype->SetText(site->name());
+                QString sURL = QString("http://cdn.nflximg.com/us/boxshots/"
+                                       "large/%1").arg(imageLoc);
 
-                ttype =
-                    (UITextType *)container->GetType("description");
-                if (ttype)
-                    ttype->SetText(site->description());
+                if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
+                    VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download "
+                                                "image from: %1").arg(sURL));
 
-                UIImageType *itype = (UIImageType *)container->GetType("boxshot");
-                if (itype)
-                {
-                    itype->hide();   
-                }
-
+                VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying "
+                                            "boxshot file from server "
+                                            "(%1)").arg(imageLoc));
             }
+
+            if (m_boxshotImage)
+            {
+                m_boxshotImage->SetFilename(sFilename);
+                m_boxshotImage->Load();
+
+                if (!m_boxshotImage->IsVisible())
+                    m_boxshotImage->Show();
+            }
+
         }
-
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
     }
+    else {
 
-    p.end();
+        NewsSite *site = (NewsSite*) selected->getData();
 
+        if (site)
+        {
 
-    bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+            if (m_titleText)
+                m_titleText->SetText(site->name());
+
+            if (m_descText)
+                m_descText->SetText(site->description());
+
+            if (m_boxshotImage && m_boxshotImage->IsVisible())
+                m_boxshotImage->Hide();
+
+        }
+    }
 }
 
-void MythFlix::keyPressEvent(QKeyEvent *e)
+bool MythFlix::keyPressEvent(QKeyEvent *event)
 {
-    if (!e) return;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("NetFlix", e, actions);
-   
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    gContext->GetMainWindow()->TranslateKeyPress("NetFlix", event, actions);
+
+    for (uint i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP")
-            cursorUp();
-        else if (action == "PAGEUP")
-             cursorUp(true);
-        else if (action == "DOWN")
-            cursorDown();
-        else if (action == "PAGEDOWN")
-             cursorDown(true);
-        else if (action == "LEFT")
-            cursorLeft();
+        if (action == "LEFT")
+        {
+            NextPrevWidgetFocus(false);
+        }
         else if (action == "RIGHT")
-            cursorRight();
+        {
+            NextPrevWidgetFocus(true);
+        }
         else if((action == "SELECT") || (action == "MENU"))
             displayOptions();
+        else if (action == "ESCAPE")
+            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void MythFlix::cursorUp(bool page)
-{
-    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
-
-    if (m_InColumn == 0) {
-        m_UISites->MoveUp(unit);
-    }
-    else {
-        m_UIArticles->MoveUp(unit);
-    }
-}
-
-void MythFlix::cursorDown(bool page)
-{
-    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
-
-    if (m_InColumn == 0) {
-        m_UISites->MoveDown(unit);
-    }
-    else {
-        m_UIArticles->MoveDown(unit);
-    }
-}
-
-void MythFlix::cursorRight()
-{
-    if (m_InColumn == 1)
-    {
-        slotViewArticle();
-        return;
-    }
-
-    m_InColumn++;
-
-    m_UISites->SetActive(false);
-    m_UIArticles->SetActive(true);
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
-}
-
-void MythFlix::cursorLeft()
-{
-    if (m_InColumn == 0)
-    {
-        accept();
-        return;
-    }
-
-    m_InColumn--;
-
-    m_UISites->SetActive(true);
-    m_UIArticles->SetActive(false);
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
+    return handled;
 }
 
 void MythFlix::slotRetrieveNews()
@@ -549,35 +351,30 @@ void MythFlix::processAndShowNews(NewsSite* site)
 
     site->process();
 
-    UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
-    if (!siteUIItem || !siteUIItem->getData())
+    MythListButtonItem *siteListItem = m_sitesList->GetItemCurrent();
+    if (!siteListItem || !siteListItem->getData())
         return;
-    
-    if (site == (NewsSite*) siteUIItem->getData()) {
 
-        m_UIArticles->Reset();
+    if (site == (NewsSite*) siteListItem->getData()) {
+
+        m_articlesList->Reset();
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next()) {
-            UIListBtnTypeItem* item =
-                new UIListBtnTypeItem(m_UIArticles, article->title());
+            MythListButtonItem* item =
+                new MythListButtonItem(m_articlesList, article->title());
             item->setData(article);
         }
-
-        update(m_ArticlesRect);
-        update(m_InfoRect);
-    } 
+    }
 }
 
 void MythFlix::slotShowNetFlixPage()
 {
-    if (expectingPopup)
-        slotCancelPopup();
-    
-    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-    if (articleUIItem && articleUIItem->getData())
+
+    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    if (articleListItem && articleListItem->getData())
     {
-        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        NewsArticle *article = (NewsArticle*) articleListItem->getData();
         if(article)
         {
             QString cmdUrl(article->articleURL());
@@ -593,24 +390,16 @@ void MythFlix::slotShowNetFlixPage()
     }
 }
 
-void MythFlix::slotSiteSelected(UIListBtnTypeItem *item)
+void MythFlix::slotSiteSelected(MythListButtonItem *item)
 {
     if (!item || !item->getData())
         return;
-    
-    processAndShowNews((NewsSite*) item->getData());
-}
 
-void MythFlix::slotArticleSelected(UIListBtnTypeItem*)
-{
-    update(m_ArticlesRect);
-    update(m_InfoRect);
+    processAndShowNews((NewsSite*) item->getData());
 }
 
 void MythFlix::slotViewArticle()
 {
-    if (expectingPopup)
-        slotCancelPopup();
 
     QString queueName = chooseQueue();
     if (queueName != "__NONE__")
@@ -619,22 +408,20 @@ void MythFlix::slotViewArticle()
 
 void MythFlix::slotViewArticleTop()
 {
-    if (expectingPopup)
-        slotCancelPopup();
 
-    QString queueName = chooseQueue();
+   QString queueName = chooseQueue();
     if (queueName != "__NONE__")
         InsertMovieIntoQueue(queueName, true);
 }
 
 void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
 {
-    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
 
-    if (!articleUIItem)
+    if (!articleListItem)
         return;
 
-    NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+    NewsArticle *article = (NewsArticle*) articleListItem->getData();
     if(!article)
         return;
 
@@ -671,50 +458,34 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
         args += movieID;
 
         results = executeExternal(args, "Move To Top");
-    } 
+    }
 }
 
 void MythFlix::displayOptions()
 {
+    QString label = tr("Browse Options");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), "menu popup");
+    MythScreenStack *mainStack =
+                            GetMythMainWindow()->GetMainStack();
 
-    QLabel *label = popup->addLabel(tr("Browse Options"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    m_menuPopup = new MythDialogBox(label, mainStack, "mythflixmenupopup");
 
-    QButton *topButton = popup->addButton(tr("Add to Top of Queue"), this,
-                     SLOT(slotViewArticleTop()));
-    popup->addButton(tr("Add to Bottom of Queue"), this, SLOT(slotViewArticle()));
-                     
-    popup->addButton(tr("Show NetFlix Page"), this, SLOT(slotShowNetFlixPage()));
+    if (m_menuPopup->Create())
+        mainStack->AddScreen(m_menuPopup);
 
-    popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
+    m_menuPopup->SetReturnEvent(this, "options");
 
-    popup->ShowPopup(this, SLOT(slotCancelPopup()));
-
-    topButton->setFocus();
-
-    expectingPopup = true;
+    m_menuPopup->AddButton(tr("Add to Top of Queue"));
+    m_menuPopup->AddButton(tr("Add to Bottom of Queue"));
+    m_menuPopup->AddButton(tr("Show NetFlix Page"));
+    m_menuPopup->AddButton(tr("Cancel"));
 
 }
-
-void MythFlix::slotCancelPopup(void)
-{
-    popup->hide();
-    expectingPopup = false;
-
-    popup->deleteLater();
-    popup = NULL;
-
-    setActiveWindow();
-}
-
 
 // Execute an external command and return results in string
 //   probably should make this routing async vs polling like this
 //   but it would require a lot more code restructuring
-QString MythFlix::executeExternal(const QStringList& args, const QString& purpose) 
+QString MythFlix::executeExternal(const QStringList& args, const QString& purpose)
 {
     QString ret = "";
     QString err = "";
@@ -725,74 +496,74 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
 
     QString cmd = args[0];
     QFileInfo info(cmd);
-    
-    if (!info.exists()) 
+
+    if (!info.exists())
     {
        err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
-    } 
-    else if (!info.isExecutable()) 
+    }
+    else if (!info.isExecutable())
     {
        err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
-    } 
-    else if (proc.start()) 
+    }
+    else if (proc.start())
     {
-        while (true) 
+        while (true)
         {
-            while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+            while (proc.canReadLineStdout() || proc.canReadLineStderr())
             {
-                if (proc.canReadLineStdout()) 
+                if (proc.canReadLineStdout())
                 {
                     ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
-                } 
-              
-                if (proc.canReadLineStderr()) 
+                }
+
+                if (proc.canReadLineStderr())
                 {
-                    if (err == "") 
+                    if (err == "")
                     {
                         err = cmd + ": ";
-                    }                    
-                 
+                    }
+
                     err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
                 }
             }
-           
-            if (proc.isRunning()) 
+
+            if (proc.isRunning())
             {
                 qApp->processEvents();
                 usleep(10000);
-            } 
-            else 
+            }
+            else
             {
-                if (!proc.normalExit()) 
+                if (!proc.normalExit())
                 {
                     err = QString("\"%1\" failed: Process exited abnormally")
                                   .arg(cmd.local8Bit());
-                } 
-                
+                }
+
                 break;
             }
         }
-    } 
-    else 
+    }
+    else
     {
         err = QString("\"%1\" failed: Could not start process")
                       .arg(cmd.local8Bit());
     }
 
-    while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+    while (proc.canReadLineStdout() || proc.canReadLineStderr())
     {
-        if (proc.canReadLineStdout()) 
+        if (proc.canReadLineStdout())
         {
             ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
         }
-        
-        if (proc.canReadLineStderr()) 
+
+        if (proc.canReadLineStderr())
         {
-            if (err == "") 
+            if (err == "")
             {
                 err = cmd + ": ";
-            }                
-           
+            }
+
             err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
         }
     }
@@ -800,18 +571,44 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
     if (err != "")
     {
         QString tempPurpose(purpose);
-        
+
         if (tempPurpose == "")
             tempPurpose = "Command";
 
         VERBOSE(VB_IMPORTANT, QString("%1").arg(err));
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-        QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck NetFlix Settings"));
+//        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+//        QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck NetFlix Settings"));
         ret = "#ERROR";
     }
-    
-    VERBOSE(VB_IMPORTANT, ret); 
+
+    VERBOSE(VB_IMPORTANT, ret);
     return ret;
+}
+
+void MythFlix::customEvent(QCustomEvent *event)
+{
+
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "options")
+        {
+            if (buttonnum == 0)
+                slotViewArticleTop();
+            else if (buttonnum == 1)
+                slotViewArticle();
+            else if (buttonnum == 2)
+                slotShowNetFlixPage();
+        }
+
+        m_menuPopup = NULL;
+    }
+
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
