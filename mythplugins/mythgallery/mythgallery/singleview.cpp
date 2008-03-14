@@ -180,10 +180,22 @@ void SingleView::paintEvent(QPaintEvent *)
         {
             m_movieState = 2;
             ThumbItem *item = m_itemList.at(m_pos);
-            QString path = QString("\"") + item->GetPath() + "\"";
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
-            cmd.replace("%s", path);
-            myth_system(cmd);
+
+            if ((cmd.find("internal", 0, false) > -1) ||
+                (cmd.length() < 1))
+            {
+                cmd = "Internal";
+                gContext->GetMainWindow()->HandleMedia(cmd, item->GetPath());
+            }
+            else
+            {
+                QString path = QString("\"%1\"").arg(item->GetPath());
+
+                cmd.replace("%s", path);
+                myth_system(cmd);
+            }
+
             if (!m_slideshow_running)
             {
                 reject();
