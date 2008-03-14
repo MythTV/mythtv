@@ -84,6 +84,7 @@ class MythListButton : public MythUIType
 
     /* methods for subclasses to override */
     virtual uint ItemWidth(void) const { return m_itemWidth; }
+    virtual uint ItemHeight(void) const { return m_itemHeight; }
     virtual QRect CalculateContentsRect(const QRect &arrowsRect) const;
     virtual void CalculateVisibleItems(void);
     virtual const QRect PlaceArrows(const QSize &arrowSize);
@@ -102,6 +103,7 @@ class MythListButton : public MythUIType
     QRect m_rect;
     QRect m_contentsRect;
 
+    int m_itemWidth;
     int m_itemHeight;
     int m_itemHorizSpacing;
     int m_itemVertSpacing;
@@ -109,7 +111,6 @@ class MythListButton : public MythUIType
     uint m_itemsVisible;
     int m_rows;
     int m_columns;
-    int m_itemWidth;
 
     bool m_active;
     bool m_showScrollArrows;
