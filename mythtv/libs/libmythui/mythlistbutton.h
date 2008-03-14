@@ -46,6 +46,9 @@ class MythListButton : public MythUIType
     MythListButtonItem* GetItemNext(MythListButtonItem *item);
     MythListButtonItem* GetItemAt(int pos);
 
+    virtual uint ItemWidth(void) const { return m_itemWidth; }
+    virtual uint ItemHeight(void) const { return m_itemHeight; }
+
     bool MoveItemUpDown(MythListButtonItem *item, bool flag);
 
     QPtrListIterator<MythListButtonItem> GetIterator();
@@ -83,8 +86,6 @@ class MythListButton : public MythUIType
     void SetPositionArrowStates(void);
 
     /* methods for subclasses to override */
-    virtual uint ItemWidth(void) const { return m_itemWidth; }
-    virtual uint ItemHeight(void) const { return m_itemHeight; }
     virtual QRect CalculateContentsRect(const QRect &arrowsRect) const;
     virtual void CalculateVisibleItems(void);
     virtual const QRect PlaceArrows(const QSize &arrowSize);
