@@ -159,7 +159,7 @@ bool MythAppearance::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             doMenu();
         else if (action == "ESCAPE")
-            DeleteScreen();
+            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
