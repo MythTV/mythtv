@@ -41,48 +41,40 @@
 using namespace std;
 
 void browse(void){
-    gContext->addCurrentLocation("flixbrowse");
-
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythFlix *mythflix = new MythFlix(mainStack, "mythflix");
+    MythFlix *mythflix = new MythFlix(mainStack, "flixbrowse");
 
     if (mythflix->Create())
         mainStack->AddScreen(mythflix);
-
-    gContext->removeCurrentLocation();
 }
 
 void queue(void){
-    gContext->addCurrentLocation("flixqueue");
     QString queue = chooseQueue();
     if (queue != "__NONE__")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "mythflixqueue",
+        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixqueue",
                                                     queue);
 
         if (mythflix->Create())
             mainStack->AddScreen(mythflix);
     }
-    gContext->removeCurrentLocation();
 }
 
 void history(void){
-    gContext->addCurrentLocation("flixhistory");
     QString queue = chooseQueue();
     if (queue != "__NONE__")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "mythflixqueue",
+        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixhistory",
                                                     queue);
 
         if (mythflix->Create())
             mainStack->AddScreen(mythflix);
     }
-    gContext->removeCurrentLocation();
 }
 
 void NetFlixCallback(void *data, QString &selection)
