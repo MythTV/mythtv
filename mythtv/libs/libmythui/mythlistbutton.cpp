@@ -793,8 +793,13 @@ bool MythListButton::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            emit itemSelected(GetItemCurrent());
-            emit itemClicked(GetItemCurrent());
+            MythListButtonItem *item = GetItemCurrent();
+            if (item)
+            {
+                emit itemSelected(item);
+                emit itemClicked(item);
+                SetPositionArrowStates();
+            }
         }
         else
             handled = false;
@@ -821,6 +826,7 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         {
             MoveToNamedPosition(button->GetText());
             emit itemClicked(GetItemCurrent());
+            SetPositionArrowStates();
         }
     }
 }
