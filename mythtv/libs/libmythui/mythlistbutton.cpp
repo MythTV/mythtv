@@ -685,12 +685,13 @@ void MythListButton::Init()
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
     m_itemWidth = m_contentsRect.width();
 
-    // If we have a background image and it's not a 10x10 gradient,
+    // If we have a background image and it's not a gradient,
     // use it to define the button size
     if (itemRegPix && !itemRegPix->IsGradient())
+    {
         m_itemHeight = itemRegPix->height();
-    if (itemRegPix && !itemRegPix->IsGradient())
         m_itemWidth = itemRegPix->width();
+    }
 
     CalculateVisibleItems();
 
@@ -810,7 +811,6 @@ bool MythListButton::keyPressEvent(QKeyEvent *e)
             {
                 emit itemSelected(item);
                 emit itemClicked(item);
-                SetPositionArrowStates();
             }
         }
         else
@@ -843,7 +843,6 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
             SetItemCurrent(pos);
             //MoveToNamedPosition(button->GetText());
             emit itemClicked(GetItemCurrent());
-            SetPositionArrowStates();
             return;
         }
 
@@ -854,17 +853,11 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 
             if (name == "upscrollarrow")
             {
-                if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                    MoveUp(MoveRow);
-                else
-                    MoveUp();
+                MoveUp(MovePage);
             }
             else if (name == "downscrollarrow")
             {
-                if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                    MoveDown(MoveRow);
-                else
-                    MoveDown();
+                MoveDown(MovePage);
             }
             return;
         }
