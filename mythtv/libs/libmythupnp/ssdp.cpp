@@ -251,7 +251,7 @@ void SSDP::ProcessData( QSocketDevice *pSocket )
         // Parse request Type
         // ------------------------------------------------------------------
 
-        // cout << "SSDP::ProcessData - requestLine: " << sRequestLine << endl;
+        VERBOSE(VB_UPNP, QString( "SSDP::ProcessData - requestLine: %1" ).arg( sRequestLine ));
 
         SSDPRequestType eType = ProcessRequestLine( sRequestLine );
 
@@ -349,7 +349,9 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
     int     nMX  = 0;
 
-    //cout << "*** SSDP ProcessSearchrequest : [" << sST << "] MX = " << nMX << endl;
+    VERBOSE( VB_UPNP, QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
+                         .arg( sST )
+                         .arg( nMX ));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
@@ -388,7 +390,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
         // Excute task now for fastest response & queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
 
-        pTask->Execute( NULL );
+        //pTask->Execute( NULL );
 
         UPnp::g_pTaskQueue->AddTask( nNewMX, pTask );
 
@@ -433,6 +435,16 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
+    VERBOSE( VB_UPNP, QString( "SSDP::ProcessSearchResponse \n"
+                               "DescURL=%1\n"
+                               "ST     =%2\n"
+                               "USN    =%3\n"
+                               "Cache  =%4")
+                         .arg( sDescURL )
+                         .arg( sST      )
+                         .arg( sUSN     )
+                         .arg( sCache   ));
+
     int nPos = sCache.find( "max-age", 0, false );
 
     if (nPos < 0)
@@ -459,6 +471,19 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
     QString sNT      = GetHeaderValue( headers, "NT"            , "" );
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
+
+    VERBOSE( VB_UPNP, QString( "SSDP::ProcessNotify\n"
+                               "DescURL=%1\n"
+                               "NTS    =%2\n"
+                               "NT     =%3\n"
+                               "USN    =%4\n"
+                               "Cache  =%5" )
+                         .arg( sDescURL )
+                         .arg( sNTS     )
+                         .arg( sNT      )
+                         .arg( sUSN     )
+                         .arg( sCache   ));
+
 
     if (sNTS.contains( "ssdp:alive"))
     {
@@ -559,6 +584,12 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 
     QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
 
+    VERBOSE( VB_UPNP, QString( "SSDPExtension::GetDeviceDesc - Host=%1 Port=%2 UserAgent=%3" )
+                         .arg( pRequest->GetHostAddress() )
+                         .arg( m_nServicePort )
+                         .arg( sUserAgent ));
+
+
     UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(), 
                                         m_nServicePort,
                                         pRequest->m_response,
@@ -578,10 +609,17 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
 
     if (QFile::exists( pRequest->m_sFileName ))
     {
+        VERBOSE( VB_UPNP, QString( "SSDPExtension::GetFile( %1 ) - Exists" )
+                             .arg( pRequest->m_sFileName ));
 
         pRequest->m_eResponseType                     = ResponseTypeFile;
         pRequest->m_nResponseStatus                   = 200;
         pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    }
+    else
+    {
+        VERBOSE( VB_UPNP, QString( "SSDPExtension::GetFile( %1 ) - Not Found" )
+                             .arg( pRequest->m_sFileName ));
     }
 
 }
@@ -595,6 +633,8 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     SSDPCache    &cache  = UPnp::g_SSDPCache;
     int           nCount = 0;
     NameValueList list;
+
+    VERBOSE( VB_UPNP, "SSDPExtension::GetDeviceList" );
 
     cache.Lock();
 

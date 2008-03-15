@@ -32,6 +32,10 @@ class UPnpCDSVideo : public UPnpCDSExtension
 
     protected:
 
+        virtual UPnpCDSExtensionResults *ProcessItem( UPnpCDSRequest          *pRequest,
+                                                      UPnpCDSExtensionResults *pResults,
+                                                      QStringList             &idPath );
+
         virtual void             CreateItems   ( UPnpCDSRequest          *pRequest,
                                                  UPnpCDSExtensionResults *pResults,
                                                  int                      nNodeIdx,

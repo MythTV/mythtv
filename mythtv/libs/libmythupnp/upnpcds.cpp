@@ -887,31 +887,11 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem( UPnpCDSRequest          
                     }
                 }
             }
+            break;
         }
         case CDS_BrowseDirectChildren:
         {
-
-	    QStringList tokens;
-
-	    if (pRequest->m_sObjectId.length() > 0)
-            {
-                if (pRequest->m_sObjectId.contains("="))
-                    tokens = QStringList::split( "=", pRequest->m_sObjectId );
-	        else 
-	        {
-	             tokens =  QStringList::split( "/", pRequest->m_sObjectId );
-
-	             tokens = QStringList::split( " ", tokens[tokens.count() - 1] );
-                     tokens = QStringList::split( "?", tokens[0] );
-
-                     if (tokens[0].startsWith("Id"))
-                         tokens[0] = tokens[0].right(tokens[0].length() - 2);
-
-	        }	
-            }
-
-            pRequest->m_sParentId = tokens.last();
-            CreateItems( pRequest, pResults, 0, "", false );
+            // Items don't have any children.
             break;
         }
 
