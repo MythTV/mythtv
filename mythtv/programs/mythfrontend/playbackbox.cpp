@@ -309,7 +309,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         drawTransPixmap = new QPixmap();
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
-    int  initialFilt = gContext->GetNumSetting("QueryInitialFilter", 0);
 
     viewMask = (ViewMask)gContext->GetNumSetting(
             "DisplayGroupDefaultViewMask", VIEW_TITLES);
@@ -414,8 +413,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     gContext->addListener(this);
 
     if (!m_player && ((!recGroupPassword.isEmpty()) ||
-        ((titleList.count() <= 1) && (progsInDB > 0)) ||
-        (initialFilt)))
+        ((titleList.count() <= 1) && (progsInDB > 0))))
     {
         recGroup = "";
         showRecGroupChooser();
@@ -509,11 +507,10 @@ void PlaybackBox::displayRecGroup(QString newRecGroup)
 
 DialogCode PlaybackBox::exec(void)
 {
-    if (recGroup != "")
+    if (recGroup != "All Programs")
         return MythDialog::exec();
-    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 0)
+    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
     {
-        recGroup = "All Programs";
         showRecGroupChooser();
         return MythDialog::exec();
     }
