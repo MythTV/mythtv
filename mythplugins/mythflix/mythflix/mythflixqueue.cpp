@@ -123,10 +123,9 @@ bool MythFlixQueue::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
-    loadData();
-
     SetFocusWidget(m_articlesList);
-    m_articlesList->SetActive(true);
+
+    loadData();
 
     return true;
 }
@@ -179,103 +178,102 @@ void MythFlixQueue::loadData()
 
 void MythFlixQueue::updateInfoView(MythListButtonItem* selected)
 {
-
     NewsArticle *article  = 0;
 
     if (selected && selected->getData())
         article = (NewsArticle*) selected->getData();
 
-        if (article)
+    if (article)
+    {
+
+        if (m_titleText)
+            m_titleText->SetText(article->title());
+
+        if (m_descText)
+            m_descText->SetText(article->description());
+
+        // removes html tags
         {
-
-            if (m_titleText)
-                m_titleText->SetText(article->title());
-
-            if (m_descText)
-                m_descText->SetText(article->description());
-
-            // removes html tags
+            QString artText = article->description();
+            // Replace paragraph and break HTML with newlines
+            if( artText.find(QRegExp("</(p|P)>")) )
             {
-                QString artText = article->description();
-                // Replace paragraph and break HTML with newlines
-                if( artText.find(QRegExp("</(p|P)>")) )
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "");
-                    artText.replace( QRegExp("</(p|P)>"), "\n\n");
-                }
-                else
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "\n\n");
-                    artText.replace( QRegExp("</(p|P)>"), "");
-                }
-                artText.replace( QRegExp("<(br|BR|)/>"), "\n");
-                artText.replace( QRegExp("<(br|BR|)>"), "\n");
-                // These are done instead of simplifyWhitespace
-                // because that function also strips out newlines
-                // Replace tab characters with nothing
-                artText.replace( QRegExp("\t"), "");
-                // Replace double space with single
-                artText.replace( QRegExp("  "), "");
-                // Replace whitespace at beginning of lines with newline
-                artText.replace( QRegExp("\n "), "\n");
-                // Remove any remaining HTML tags
-                QRegExp removeHTML(QRegExp("</?.+>"));
-                removeHTML.setMinimal(true);
-                artText.remove((const QRegExp&) removeHTML);
-                artText = artText.stripWhiteSpace();
-                m_descText->SetText(artText);
+                artText.replace( QRegExp("<(p|P)>"), "");
+                artText.replace( QRegExp("</(p|P)>"), "\n\n");
             }
-
-            QString imageLoc = article->articleURL();
-            int length = imageLoc.length();
-            int index = imageLoc.findRev("/");
-            imageLoc = imageLoc.mid(index,length) + ".jpg";
-
-            QString fileprefix = MythContext::GetConfDir();
-
-            QDir dir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            fileprefix += "/MythFlix";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1")
-                                    .arg(fileprefix));
-
-            QString sFilename(fileprefix + "/" + imageLoc);
-
-            bool exists = QFile::exists(sFilename);
-            if (!exists)
+            else
             {
-                VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file "
-                                            "from server (%1)").arg(imageLoc));
-
-                QString sURL = QString("http://cdn.nflximg.com/us/boxshots/"
-                                       "large/%1").arg(imageLoc);
-
-                if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
-                    VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download "
-                                                "image from: %1").arg(sURL));
-
-                VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying "
-                                            "boxshot file from server "
-                                            "(%1)").arg(imageLoc));
+                artText.replace( QRegExp("<(p|P)>"), "\n\n");
+                artText.replace( QRegExp("</(p|P)>"), "");
             }
-
-            if (m_boxshotImage)
-            {
-                m_boxshotImage->SetFilename(sFilename);
-                m_boxshotImage->Load();
-
-                if (!m_boxshotImage->IsVisible())
-                    m_boxshotImage->Show();
-            }
-
+            artText.replace( QRegExp("<(br|BR|)/>"), "\n");
+            artText.replace( QRegExp("<(br|BR|)>"), "\n");
+            // These are done instead of simplifyWhitespace
+            // because that function also strips out newlines
+            // Replace tab characters with nothing
+            artText.replace( QRegExp("\t"), "");
+            // Replace double space with single
+            artText.replace( QRegExp("  "), "");
+            // Replace whitespace at beginning of lines with newline
+            artText.replace( QRegExp("\n "), "\n");
+            // Remove any remaining HTML tags
+            QRegExp removeHTML(QRegExp("</?.+>"));
+            removeHTML.setMinimal(true);
+            artText.remove((const QRegExp&) removeHTML);
+            artText = artText.stripWhiteSpace();
+            m_descText->SetText(artText);
         }
+
+        QString imageLoc = article->articleURL();
+        int length = imageLoc.length();
+        int index = imageLoc.findRev("/");
+        imageLoc = imageLoc.mid(index,length) + ".jpg";
+
+        QString fileprefix = MythContext::GetConfDir();
+
+        QDir dir(fileprefix);
+        if (!dir.exists())
+            dir.mkdir(fileprefix);
+
+        fileprefix += "/MythFlix";
+
+        dir = QDir(fileprefix);
+        if (!dir.exists())
+            dir.mkdir(fileprefix);
+
+        VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1")
+                                .arg(fileprefix));
+
+        QString sFilename(fileprefix + "/" + imageLoc);
+
+        bool exists = QFile::exists(sFilename);
+        if (!exists)
+        {
+            VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file "
+                                        "from server (%1)").arg(imageLoc));
+
+            QString sURL = QString("http://cdn.nflximg.com/us/boxshots/"
+                                    "large/%1").arg(imageLoc);
+
+            if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
+                VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download "
+                                            "image from: %1").arg(sURL));
+
+            VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying "
+                                        "boxshot file from server "
+                                        "(%1)").arg(imageLoc));
+        }
+
+        if (m_boxshotImage)
+        {
+            m_boxshotImage->SetFilename(sFilename);
+            m_boxshotImage->Load();
+
+            if (!m_boxshotImage->IsVisible())
+                m_boxshotImage->Show();
+        }
+
+    }
 
 }
 bool MythFlixQueue::keyPressEvent(QKeyEvent *event)
@@ -321,6 +319,10 @@ void MythFlixQueue::slotRetrieveNews()
 void MythFlixQueue::slotNewsRetrieved(NewsSite* site)
 {
     processAndShowNews(site);
+    // A temporary? workaround for the problem caused by updateInfoView()
+    // depending on data which isn't set until after itemSelected has been
+    // issued
+    SetItemCurrent(0);
 }
 
 void MythFlixQueue::processAndShowNews(NewsSite* site)
