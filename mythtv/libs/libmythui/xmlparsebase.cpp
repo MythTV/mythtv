@@ -106,15 +106,15 @@ int XMLParseBase::parseAlignment(const QString &text)
 {
     int alignment = 0;
 
-    text = text.lower();
-
     QStringList values = QStringList::split(",", text);
 
     QStringList::Iterator it;
     for ( it = values.begin(); it != values.end(); ++it )
     {
 
-        QString align = *it.stripWhiteSpace();
+        QString align = *it;
+        align = align.stripWhiteSpace();
+        align = align.lower();
 
         if (align == "center" || align == "allcenter")
         {
