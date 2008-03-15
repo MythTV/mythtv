@@ -33,6 +33,7 @@ class MythUIButton : public MythUIType
     void SetButtonImage(MythImage *image);
     void SetRightArrowImage(MythImage *image);
     void SetPaddingMargin(int margin);
+    void SetImageAlignment(int imagealign);
 
     void SetText(const QString &msg, int textFlags = -1);
     QString GetText() const { return m_Text->GetText(); }

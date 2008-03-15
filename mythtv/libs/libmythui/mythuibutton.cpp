@@ -226,6 +226,11 @@ void MythUIButton::SetPaddingMargin(int margin)
     m_PaddingMargin = margin;
 }
 
+void MythUIButton::SetImageAlignment(int imagealign)
+{
+    m_imageAlign = imagealign;
+}
+
 void MythUIButton::SetText(const QString &msg, int textFlags)
 {
     m_Text->SetText(msg);
@@ -360,6 +365,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     m_TextRect = button->m_TextRect;
     m_PaddingMargin = button->m_PaddingMargin;
     m_textFlags = button->m_textFlags;
+    m_imageAlign = button->m_imageAlign;
 
     MythUIType::CopyFrom(base);
 

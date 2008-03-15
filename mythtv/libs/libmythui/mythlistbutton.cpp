@@ -825,7 +825,10 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         MythUIButton *button = GetButtonAtPoint(position);
         if (button)
         {
-            MoveToNamedPosition(button->GetText());
+            QString buttonname = button->name();
+            int pos = buttonname.section(' ',2,2).toInt();
+            SetItemCurrent(pos);
+            //MoveToNamedPosition(button->GetText());
             emit itemClicked(GetItemCurrent());
             SetPositionArrowStates();
         }
@@ -1141,6 +1144,7 @@ void MythListButton::CopyFrom(MythUIType *base)
     m_drawFromBottom = lb->m_drawFromBottom;
 
     m_textFlags = lb->m_textFlags;
+    m_imageAlign = lb->m_imageAlign;
 
     m_clearing = false;
     m_topItem = m_selItem = NULL;
@@ -1280,6 +1284,7 @@ bool MythListButtonItem::moveUpDown(bool flag)
 void MythListButtonItem::SetToRealButton(MythUIButton *button, bool active_on)
 {
     button->SetText(m_text, m_parent->m_textFlags);
+    button->SetImageAlignment(m_parent->m_imageAlign);
     button->SetButtonImage(m_image);
 
     if (m_state == NotChecked)
