@@ -122,7 +122,7 @@ bool MythUIButton::ParseElement(QDomElement &element)
 
         m_Text->SetJustification(m_textFlags);
     }
-    else if (element.tagName() == "textflags")
+    else if (element.tagName() == "textflags" || element.tagName() == "align")
     {
         QString align = getFirstText(element).lower();
 

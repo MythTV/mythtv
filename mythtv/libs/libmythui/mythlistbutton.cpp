@@ -1059,7 +1059,7 @@ bool MythListButton::ParseElement(QDomElement &element)
         else
             m_textFlags &= ~Qt::WordBreak;
     }
-    else if (element.tagName() == "textflags")
+    else if (element.tagName() == "textflags" || element.tagName() == "align")
     {
         QString align = getFirstText(element).lower();
 

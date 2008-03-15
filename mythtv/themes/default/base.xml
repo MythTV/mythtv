@@ -30,7 +30,7 @@
     <font name="smallgrey" from="basesmall">
         <color>grey</color>
     </font>
-    
+
     <font name="mediumgrey" from="basemedium">
         <color>grey</color>
     </font>
@@ -77,6 +77,7 @@
         <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
         <spacing>5</spacing>
         <margin>6</margin>
+        <align>left, vcenter</align>
     </buttonlist>
 
     <!-- Base definition of a button -->
@@ -89,7 +90,7 @@
         <selected-background filename="text_button_on.png" />
         <inactive-background filename="text_button_off.png" />
         <margin>6</margin>
-        <textflags>allcenter</textflags>
+        <align>center</align>
     </button>
 
     <!-- Base definition of a textarea -->
@@ -116,7 +117,7 @@
         <buttonlist name="list" from="basebuttonlist">
             <area>12,250,470,250</area>
             <drawfrombottom>yes</drawfrombottom>
-            <textflags>center</textflags>
+            <align>center</align>
             <showarrow>no</showarrow>
             <scrollarrows show="no"></scrollarrows>
         </buttonlist>
