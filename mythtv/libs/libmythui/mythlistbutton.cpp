@@ -341,10 +341,15 @@ void MythListButton::SetItemCurrent(MythListButtonItem* item)
         m_selPosition = 0;
     }
 
-    m_itemCount = m_selPosition;
-    m_topItem = item;
-    m_selItem = item;
-    (*m_topIterator) = (*m_selIterator);
+    m_selItem = m_selIterator->current();
+
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+    {
+        ++(*m_topIterator);
+        ++m_topPosition;
+    }
+
+    m_topItem = m_topIterator->current();
 
     SetPositionArrowStates();
 
@@ -661,9 +666,15 @@ void MythListButton::Init()
         arrowsRect = QRect(0, 0, 0, 0);
 
     if (m_upArrow)
+    {
         m_upArrow->SetVisible(m_showScrollArrows);
+        m_upArrow->SetCanTakeFocus(true);
+    }
     if (m_downArrow)
+    {
         m_downArrow->SetVisible(m_showScrollArrows);
+        m_downArrow->SetCanTakeFocus(true);
+    }
 
     m_contentsRect = CalculateContentsRect(arrowsRect);
 
@@ -822,7 +833,9 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 
         QPoint position = event->GetPosition();
 
-        MythUIButton *button = GetButtonAtPoint(position);
+        MythUIType *type = GetChildAtPoint(position);
+
+        MythUIButton *button = dynamic_cast<MythUIButton *>(type);
         if (button)
         {
             QString buttonname = button->name();
@@ -831,6 +844,29 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
             //MoveToNamedPosition(button->GetText());
             emit itemClicked(GetItemCurrent());
             SetPositionArrowStates();
+            return;
+        }
+
+        MythUIStateType *arrow = dynamic_cast<MythUIStateType *>(type);
+        if (arrow)
+        {
+            QString name = arrow->name();
+
+            if (name == "upscrollarrow")
+            {
+                if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                    MoveUp(MoveRow);
+                else
+                    MoveUp();
+            }
+            else if (name == "downscrollarrow")
+            {
+                if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
+                    MoveDown(MoveRow);
+                else
+                    MoveDown();
+            }
+            return;
         }
     }
 }
@@ -839,9 +875,9 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
  *
  *  \param p QPoint coordinates
  *
- *  \return MythUIButton at these coordinates
+ *  \return MythUIType at these coordinates
  */
-MythUIButton *MythListButton::GetButtonAtPoint(const QPoint &p)
+MythUIType *MythListButton::GetChildAtPoint(const QPoint &p)
 {
     if (GetArea().contains(p))
     {
@@ -855,7 +891,7 @@ MythUIButton *MythListButton::GetButtonAtPoint(const QPoint &p)
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
             if (child != NULL)
             {
-                return dynamic_cast<MythUIButton *>(child);
+                return child;
             }
         }
     }
