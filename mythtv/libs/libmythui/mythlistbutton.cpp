@@ -1038,10 +1038,7 @@ bool MythListButton::ParseElement(QDomElement &element)
     else if (element.tagName() == "check-full")
         LoadPixmap(&checkFullPix, element);
     else if (element.tagName() == "regular-background")
-    {
         LoadPixmap(&itemRegPix, element);
-        SetPositionArrowStates();
-    }
     else if (element.tagName() == "selected-background")
         LoadPixmap(&itemSelActPix, element);
     else if (element.tagName() == "inactive-background")
