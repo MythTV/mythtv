@@ -19,6 +19,9 @@
  *
  * ============================================================ */
 
+// C headers
+#include <unistd.h>
+
 // Qt headers
 #include <qapplication.h>
 #include <qdir.h>
