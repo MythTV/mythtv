@@ -33,6 +33,7 @@ class MythListButton : public MythUIType
 
     void SetSpacing(int spacing);
     void SetMargin(int margin);
+    int  GetMargin() { return m_itemMargin; }
     void SetDrawFromBottom(bool draw);
 
     void SetActive(bool active);
