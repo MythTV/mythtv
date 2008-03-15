@@ -124,22 +124,22 @@ class UPnpCDSExtension
 
         QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
 
-        UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   QStringList             &idPath );
-        UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
-                                                   UPnpCDSExtensionResults *pResults,
-                                                   int                      nNodeIdx,
-                                                   QStringList             &idPath );
+        virtual UPnpCDSExtensionResults *ProcessRoot     ( UPnpCDSRequest          *pRequest, 
+                                                           UPnpCDSExtensionResults *pResults,
+                                                           QStringList             &idPath );
+        virtual UPnpCDSExtensionResults *ProcessAll      ( UPnpCDSRequest          *pRequest, 
+                                                           UPnpCDSExtensionResults *pResults,
+                                                           QStringList             &idPath );
+        virtual UPnpCDSExtensionResults *ProcessItem     ( UPnpCDSRequest          *pRequest,
+                                                           UPnpCDSExtensionResults *pResults,
+                                                           QStringList             &idPath );
+        virtual UPnpCDSExtensionResults *ProcessKey      ( UPnpCDSRequest          *pRequest,
+                                                           UPnpCDSExtensionResults *pResults,
+                                                           QStringList             &idPath );
+        virtual UPnpCDSExtensionResults *ProcessContainer( UPnpCDSRequest          *pRequest,
+                                                           UPnpCDSExtensionResults *pResults,
+                                                           int                      nNodeIdx,
+                                                           QStringList             &idPath );
 
         // ------------------------------------------------------------------
 

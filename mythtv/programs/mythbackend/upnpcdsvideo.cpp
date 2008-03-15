@@ -28,7 +28,7 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
           "1 as children "
             "FROM upnpmedia "
             "%1 "
-            "ORDER BY title DESC",
+            "ORDER BY title",
         "" }
 
 };
@@ -87,7 +87,7 @@ void UPnpCDSVideo::BuildItemQuery( MSqlQuery &query, const QStringMap &mapParams
 {
     int nVideoID = mapParams[ "Id" ].toInt();
 
-    QString sSQL = QString( "%1 WHERE class = 'VIDEO' AND intid=:VIDEOID " )
+    QString sSQL = QString( "%1 AND intid=:VIDEOID ORDER BY title DESC" )
                                                     .arg( GetItemListSQL( ) );
 
     query.prepare( sSQL );
@@ -211,6 +211,72 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 
     return nCount;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRequest,
+                                                    UPnpCDSExtensionResults *pResults, 
+                                                    QStringList             &idPath )
+{
+    pResults->m_nTotalMatches   = 0;
+    pResults->m_nUpdateID       = 1;
+
+    if (pRequest->m_sObjectId.length() == 0)
+        return pResults;
+
+    QStringList tokens = QStringList::split( "/", pRequest->m_sObjectId );
+    QString     sId    = tokens.last();
+
+    if (sId.startsWith("Id"))
+        sId = sId.right( sId.length() - 2);
+
+    switch( pRequest->m_eBrowseFlag )
+    {
+        case CDS_BrowseMetadata:
+        {
+            // --------------------------------------------------------------
+            // Return 1 Item
+            // --------------------------------------------------------------
+
+            QStringMap  mapParams;
+
+            mapParams.insert( "Id", sId );
+
+            MSqlQuery query(MSqlQuery::InitCon());
+
+            if (query.isConnected())                                                           
+            {
+                BuildItemQuery( query, mapParams );
+                query.exec();
+    
+                if (query.isActive() && query.size() > 0)
+                {
+                    if ( query.next() )
+                    {
+                        AddItem( pRequest->m_sParentId, pResults, false, query );
+                        pResults->m_nTotalMatches = 1;
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case CDS_BrowseDirectChildren:
+        {
+            pRequest->m_sParentId = sId;
+
+            CreateItems( pRequest, pResults, 0, "", false );
+
+            break;
+        }
+    }
+
+    return pResults;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -340,25 +406,17 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             .arg( sServerIp )
                             .arg( sPort     );
 
-    QString sURIParams = QString( "?Id=%1" )
-                            .arg( nVidID );
-
-    QString sId        = QString( "%1/item%2")
-                            .arg( sObjectId )
-                            .arg( sURIParams );
-
-    sURIParams = QString( "/Id%1" ).arg( nVidID );
-    sId        = QString( "%1/item%2").arg( sObjectId ).arg( sURIParams );
+    QString sURIParams = QString( "/Id%1" ).arg( nVidID );
+    QString sId        = QString( "Videos/0/item%1").arg( sURIParams );
 
     if (sParentID == QString("%1").arg(STARTING_VIDEO_OBJECTID))
     {
-        sParentID          = sObjectId;
+        sParentID = "Videos/0";
     }
     else
     {
-        sParentID          = QString( "%1/item/Id%2")
-                            .arg( sObjectId )
-                            .arg( sParentID );
+        sParentID = QString( "Videos/0/item/Id%1")
+                       .arg( sParentID );
     }
 
     QString sAlbumArtURI= QString( "%1GetVideoArt%2")
@@ -371,6 +429,8 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     {
         pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
         pItem->SetChildCount( GetCount( "parentid",QString( "%1" ).arg( nVidID )) );
+
+        pItem->SetPropValue( "storageUsed", "0" );  //-=>TODO: need proper value
     }
     else if (sItemType == "FILE" )
         pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
