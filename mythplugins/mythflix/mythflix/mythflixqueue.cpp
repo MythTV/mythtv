@@ -322,7 +322,7 @@ void MythFlixQueue::slotNewsRetrieved(NewsSite* site)
     // A temporary? workaround for the problem caused by updateInfoView()
     // depending on data which isn't set until after itemSelected has been
     // issued
-    SetItemCurrent(0);
+    m_articlesList->SetItemCurrent(0);
 }
 
 void MythFlixQueue::processAndShowNews(NewsSite* site)
