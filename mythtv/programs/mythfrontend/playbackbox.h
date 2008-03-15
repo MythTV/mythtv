@@ -129,6 +129,7 @@ class PlaybackBox : public MythDialog
 
   public slots:
     DialogCode exec();
+    void displayRecGroup(QString newRecGroup = "");
 
   protected slots:
     void timeout(void);
@@ -215,7 +216,7 @@ class PlaybackBox : public MythDialog
 
     void initRecGroupPopup(QString title, QString name);
     void closeRecGroupPopup(bool refreshList = true);
-    void setGroupFilter(void);
+    void setGroupFilter(QString newRecGroup = "");
     void recGroupChangerListBoxChanged(void);
     void recGroupChooserListBoxChanged(void);
     void setRecGroup(void);

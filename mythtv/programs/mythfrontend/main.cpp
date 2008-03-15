@@ -232,14 +232,22 @@ void startCustomPriority(void)
     qApp->lock();
 }
 
-void startPlayback(void)
+void startPlaybackWithGroup(QString recGroup = "")
 {
     PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), 
                     "tvplayselect");
 
+    if (recGroup != "")
+        pbb.displayRecGroup(recGroup);
+
     qApp->unlock();
     pbb.exec();
     qApp->lock();
+}
+
+void startPlayback(void)
+{
+    startPlaybackWithGroup();
 }
 
 void startDelete(void)
@@ -332,8 +340,14 @@ void TVMenuCallback(void *data, QString &selection)
         startTVNormal();
     else if (sel == "tv_watch_live_epg")
         startTVInGuide();
-    else if (sel == "tv_watch_recording")
-        startPlayback();
+    else if (sel.left(18) == "tv_watch_recording")
+    {
+        // use selection here because its case is untouched
+        if ((selection.length() > 19) && (selection.mid(18, 1) == " "))
+            startPlaybackWithGroup(selection.mid(19));
+        else
+            startPlayback();
+    }
     else if (sel == "tv_schedule")
         startGuide();
     else if (sel == "tv_delete")

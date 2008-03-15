@@ -497,6 +497,16 @@ PlaybackBox::~PlaybackBox(void)
     }
 }
 
+void PlaybackBox::displayRecGroup(QString newRecGroup)
+{
+    setGroupFilter(newRecGroup);
+
+    connected = FillList(true);
+
+    progIndex = 0;
+    titleIndex = 0;
+}
+
 DialogCode PlaybackBox::exec(void)
 {
     if (recGroup != "")
@@ -5263,12 +5273,17 @@ void PlaybackBox::recGroupChooserListBoxChanged(void)
     recGroupLastItem = recGroupListBox->currentItem();
 }
 
-void PlaybackBox::setGroupFilter(void)
+void PlaybackBox::setGroupFilter(QString newRecGroup)
 {
     QString savedPW = recGroupPassword;
     QString savedRecGroup = recGroup;
 
-    recGroup = recGroupListBox->currentText().section(" [", 0, 0);
+    if (newRecGroup != "")
+        recGroup = newRecGroup;
+    else if (recGroupListBox)
+        recGroup = recGroupListBox->currentText().section(" [", 0, 0);
+    else
+        return;
 
     if (recGroup == tr("Default"))
         recGroup = "Default";
@@ -5305,6 +5320,10 @@ void PlaybackBox::setGroupFilter(void)
 
     if (groupnameAsAllProg)
         groupDisplayName = tr(recGroup);
+
+    // Don't save anything if we forced a new group
+    if (newRecGroup != "")
+        return;
 
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", recGroup);
