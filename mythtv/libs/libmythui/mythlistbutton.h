@@ -144,6 +144,7 @@ class MythListButton : public MythUIType
     bool m_drawFromBottom;
 
     int m_textFlags;
+    int m_imageAlign;
 
     MythImage *arrowPix, *checkNonePix, *checkHalfPix, *checkFullPix;
     MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;

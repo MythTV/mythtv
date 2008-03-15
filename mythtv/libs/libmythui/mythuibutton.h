@@ -74,6 +74,7 @@ class MythUIButton : public MythUIType
     QRect m_TextRect;
     int m_PaddingMargin;
     int m_textFlags;
+    int m_imageAlign;
 };
 
 #endif

@@ -63,6 +63,7 @@ void MythListButton::Const(void)
     m_upArrow = m_downArrow = NULL;
 
     m_textFlags = Qt::AlignLeft | Qt::AlignVCenter;
+    m_imageAlign = Qt::AlignLeft | Qt::AlignVCenter;
 
     m_fontActive = new MythFontProperties();
     m_fontInactive = new MythFontProperties();
@@ -1065,6 +1066,10 @@ bool MythListButton::ParseElement(QDomElement &element)
         m_textFlags = m_textFlags & Qt::WordBreak;
 
         m_textFlags |= parseAlignment(align);
+    }
+    else if (element.tagName() == "imagealign")
+    {
+        m_imageAlign = parseAlignment(element);
     }
     else
         return MythUIType::ParseElement(element);

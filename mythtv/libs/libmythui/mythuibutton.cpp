@@ -11,6 +11,9 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name, bool doInit)
 
     m_PaddingMargin = 0;
 
+    m_textFlags = Qt::AlignLeft | Qt::AlignVCenter;
+    m_imageAlign = Qt::AlignLeft | Qt::AlignVCenter;
+
     if (doInit)
         Init();
 
@@ -128,6 +131,10 @@ bool MythUIButton::ParseElement(QDomElement &element)
         m_textFlags |= parseAlignment(align);
 
         m_Text->SetJustification(m_textFlags);
+    }
+    else if (element.tagName() == "imagealign")
+    {
+        m_imageAlign = parseAlignment(element);
     }
     else
         return MythUIType::ParseElement(element);
@@ -278,6 +285,7 @@ void MythUIButton::SetupPlacement(void)
 
     int textx = m_PaddingMargin;
     int imagex = m_PaddingMargin;
+    int imagey = m_PaddingMargin;
     int textwidth = width - 2 * m_PaddingMargin;
 
     if (checkRect != QRect())
@@ -286,7 +294,7 @@ void MythUIButton::SetupPlacement(void)
         textx += tmp;
         imagex += tmp;
         textwidth -= tmp;
-        
+
         m_CheckImage->SetPosition(m_PaddingMargin, 
                                   (height - checkRect.height()) / 2);
     }
@@ -303,8 +311,36 @@ void MythUIButton::SetupPlacement(void)
         int tmp = imageRect.width() + m_PaddingMargin;
         textx += tmp;
         textwidth -= tmp;
-        m_ButtonImage->SetPosition(imagex,
-                                   (height - imageRect.height()) / 2);
+
+        // Horizontal component
+        if (m_imageAlign & Qt::AlignLeft)
+        {
+            // Default
+        }
+        else if (m_imageAlign & Qt::AlignCenter)
+        {
+            imagex = (width - imageRect.width()) / 2;
+        }
+        else if (m_imageAlign & Qt::AlignRight)
+        {
+            imagex = width - m_PaddingMargin - imageRect.width();
+        }
+
+        // Vertical component
+        if (m_imageAlign & Qt::AlignTop)
+        {
+            imagey = m_PaddingMargin;
+        }
+        else if (m_imageAlign & Qt::AlignCenter)
+        {
+            imagey = (height - imageRect.height()) / 2;
+        }
+        else if (m_imageAlign & Qt::AlignBottom)
+        {
+            imagey = height - m_PaddingMargin - imageRect.height();
+        }
+
+        m_ButtonImage->SetPosition(imagex, imagey);
     }
 
     SetTextRect(QRect(textx, 0, textwidth, height));
