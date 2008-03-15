@@ -123,10 +123,10 @@ bool MythFlixQueue::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
+    loadData();
+
     SetFocusWidget(m_articlesList);
     m_articlesList->SetActive(true);
-
-    loadData();
 
     return true;
 }
