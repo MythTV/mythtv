@@ -12,18 +12,18 @@
             <showarrow>no</showarrow>
         </buttonlist>
 
-        <textarea name="title">
+        <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
             <font>baselarge</font>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="description">
+        <textarea name="description" from="basetextarea">
             <area>170,390,610,200</area>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="status">
+        <textarea name="status" from="basetextarea">
             <area>200,350,170,35</area>
         </textarea>
 
@@ -52,18 +52,18 @@
             <showarrow>no</showarrow>
         </buttonlist>
 
-        <textarea name="title">
+        <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
             <font>baselarge</font>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="description">
+        <textarea name="description" from="basetextarea">
             <area>170,390,610,200</area>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="status">
+        <textarea name="status" from="basetextarea">
             <area>200,350,170,35</area>
         </textarea>
 
@@ -90,12 +90,12 @@
             <area>20,40,300,500</area>
         </buttonlist>
 
-        <textarea name="context_switch">
+        <textarea name="context_switch" from="basetextarea">
             <area>20,550,760,50</area>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="help">
+        <textarea name="help" from="basetextarea">
             <area>20,90,760,150</area>
             <multiline>yes</multiline>
         </textarea>
