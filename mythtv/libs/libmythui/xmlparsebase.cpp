@@ -106,28 +106,32 @@ int XMLParseBase::parseAlignment(const QString &text)
 {
     int alignment = 0;
 
+    text = text.lower();
+
     QStringList values = QStringList::split(",", text);
 
     QStringList::Iterator it;
     for ( it = values.begin(); it != values.end(); ++it )
     {
 
-        if (*it == "center" || *it == "allcenter")
+        QString align = *it.stripWhiteSpace();
+
+        if (align == "center" || align == "allcenter")
         {
             alignment |= Qt::AlignCenter;
             break;
         }
-        else if (*it == "left")
+        else if (align == "left")
             alignment |= Qt::AlignLeft;
-        else if (*it == "hcenter")
+        else if (align == "hcenter")
             alignment |= Qt::AlignHCenter;
-        else if (*it == "right")
+        else if (align == "right")
             alignment |= Qt::AlignRight;
-        else if (*it == "top")
+        else if (align == "top")
             alignment |= Qt::AlignTop;
-        else if (*it == "vcenter")
+        else if (align == "vcenter")
             alignment |= Qt::AlignVCenter;
-        else if (*it == "bottom")
+        else if (align == "bottom")
             alignment |= Qt::AlignBottom;
 
     }
