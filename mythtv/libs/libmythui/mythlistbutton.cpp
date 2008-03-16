@@ -658,6 +658,13 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
     return true;
 }
 
+void MythListButton::SetAllChecked(MythListButtonItem::CheckState state)
+{
+    MythListButtonItem* item = 0;
+    for (item = m_itemList.first(); item; item = m_itemList.next())
+        item->setChecked(state);
+}
+
 void MythListButton::Init()
 {
     if (m_initialized)

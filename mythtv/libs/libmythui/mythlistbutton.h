@@ -7,9 +7,63 @@
 #include "mythuibutton.h"
 #include "mythgesture.h"
 
-class MythListButtonItem;
+class MythListButton;
 class MythFontProperties;
 class MythUIStateType;
+
+class MythListButtonItem
+{
+  public:
+    enum CheckState {
+        CantCheck = -1,
+        NotChecked = 0,
+        HalfChecked,
+        FullChecked
+    };
+
+    MythListButtonItem(MythListButton *lbtype, const QString& text,
+                       MythImage *image = 0, bool checkable = false,
+                       CheckState state = CantCheck, bool showArrow = false);
+    ~MythListButtonItem();
+
+    MythListButton *parent() const;
+
+    void setText(const QString &text);
+    QString text() const;
+
+    void setImage(MythImage *image);
+    const MythImage *image() const;
+
+    bool checkable() const;
+    void setCheckable(bool flag);
+
+    CheckState state() const;
+    void setChecked(CheckState state);
+
+    void setDrawArrow(bool flag);
+
+    void setData(void *data);
+    void *getData();
+
+    void setOverrideInactive(bool flag);
+    bool getOverrideInactive(void);
+
+    bool moveUpDown(bool flag);
+
+    void SetToRealButton(MythUIButton *button, bool active_on); 
+
+  protected:
+    MythListButton *m_parent;
+    QString         m_text;
+    MythImage      *m_image;
+    bool            m_checkable;
+    CheckState      m_state;
+    void           *m_data;
+    bool            m_showArrow;
+    bool            m_overrideInactive;
+
+    friend class MythListButton;
+};
 
 class MythListButton : public MythUIType
 {
@@ -52,6 +106,8 @@ class MythListButton : public MythUIType
     virtual uint ItemHeight(void) const { return m_itemHeight; }
 
     bool MoveItemUpDown(MythListButtonItem *item, bool flag);
+
+    void SetAllChecked(MythListButtonItem::CheckState state);
 
     QPtrListIterator<MythListButtonItem> GetIterator();
 
@@ -152,60 +208,6 @@ class MythListButton : public MythUIType
     MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
 
     friend class MythListButtonItem;
-};
-
-class MythListButtonItem
-{
-  public:
-    enum CheckState {
-        CantCheck = -1,
-        NotChecked = 0,
-        HalfChecked,
-        FullChecked
-    };
-
-    MythListButtonItem(MythListButton *lbtype, const QString& text,
-                       MythImage *image = 0, bool checkable = false,
-                       CheckState state = CantCheck, bool showArrow = false);
-    ~MythListButtonItem();
-
-    MythListButton *parent() const;
-
-    void setText(const QString &text);
-    QString text() const;
-
-    void setImage(MythImage *image);
-    const MythImage *image() const;
-
-    bool checkable() const;
-    void setCheckable(bool flag);
-
-    CheckState state() const;
-    void setChecked(CheckState state);
-
-    void setDrawArrow(bool flag);
-
-    void setData(void *data);
-    void *getData();
-
-    void setOverrideInactive(bool flag);
-    bool getOverrideInactive(void);
-
-    bool moveUpDown(bool flag);
-
-    void SetToRealButton(MythUIButton *button, bool active_on); 
-
-  protected:
-    MythListButton *m_parent;
-    QString         m_text;
-    MythImage      *m_image;
-    bool            m_checkable;
-    CheckState      m_state;
-    void           *m_data;
-    bool            m_showArrow;
-    bool            m_overrideInactive;
-
-    friend class MythListButton;
 };
 
 #endif
