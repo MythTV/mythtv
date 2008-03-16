@@ -140,7 +140,7 @@ void ThumbGenerator::run()
 
                 if (image.isNull())
                     continue; // give up;
-                
+
                 image = image.smoothScale(m_width,m_height,QImage::ScaleMin);
                 image.save(cachePath, "JPEG");
 

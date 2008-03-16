@@ -20,25 +20,19 @@
 static void run(MythMediaDevice *dev)
 {
     QString startdir = gContext->GetSetting("GalleryDir");
-    IconView icv(startdir, dev, gContext->GetMainWindow());
-    if (icv.GetError().isEmpty())
-        icv.exec();
-    else
-    {
-        DialogBox *dlg = new DialogBox(
-            gContext->GetMainWindow(), icv.GetError());
 
-        dlg->AddButton(QObject::tr("Ok"));
-        dlg->exec();
-        dlg->deleteLater();
-    }
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    IconView *iconview = new IconView(mainStack, "mythgallery",
+                                      startdir, dev);
+
+    if (iconview->Create())
+        mainStack->AddScreen(iconview);
 }
 
 void runGallery(void)
 {
-    gContext->addCurrentLocation("mythgallery");
     run(NULL);
-    gContext->removeCurrentLocation();
 }
 
 void handleMedia(MythMediaDevice *dev)
@@ -90,7 +84,6 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     qInitTiffIO();
-    
 
     gContext->ActivateSettingsCache(false);
     UpgradeGalleryDatabaseSchema();

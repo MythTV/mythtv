@@ -208,11 +208,6 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
         }
     }
 
-    if (thumbGen && !thumbGen->running())
-    {
-        thumbGen->start();
-    }
-
     return isGallery;
 }
 

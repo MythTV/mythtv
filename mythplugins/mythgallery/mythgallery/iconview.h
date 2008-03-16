@@ -22,61 +22,48 @@
 // Qt headers
 #include <qstringlist.h>
 
-// MythTV plugin headers
-#include <mythtv/mythdialogs.h>
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/mythmedia.h>
 
 // MythGallery headers
 #include "thumbview.h"
 
-class XMLParse;
-class UIListBtnType;
 class ThumbGenerator;
 class MediaMonitor;
 
-class IconView : public MythDialog
+class IconView : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    IconView(const QString   &galleryDir,
-             MythMediaDevice *initialDevice,
-             MythMainWindow  *parent);
+    IconView(MythScreenStack *parent, const char *name,
+             const QString &galleryDir, MythMediaDevice *initialDevice);
     ~IconView();
 
-    QString GetError(void) { return m_errorStr; }
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QCustomEvent*);
 
-  protected:
-    void paintEvent(QPaintEvent *e);
-    void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    QString GetError(void) { return m_errorStr; }
 
   private:
     void SetupMediaMonitor(void);
 
     bool LoadTheme(void);
-    bool LoadMenuTheme(void);
-    bool LoadViewTheme(void);
-    bool LoadThemeImages(void);
 
-    void updateBackground();
+    void LoadDirectory(const QString &dir);
 
-    void LoadDirectory(const QString &dir, bool topleft);
-
-    void UpdateMenu(void);
     void UpdateText(void);
-    void UpdateView(void);
-
-    bool MoveUp(void);
-    bool MoveDown(void);
-    bool MoveLeft(void);
-    bool MoveRight(void);
 
     bool HandleEscape(void);
     bool HandleMediaEscape(MediaMonitor*);
     bool HandleSubDirEscape(const QString &parent);
 
-    bool HandleItemSelect(const QString &action);
     bool HandleMediaDeviceSelect(ThumbItem *item);
     bool HandleImageSelect(const QString &action);
 
@@ -102,54 +89,27 @@ class IconView : public MythDialog
     void HandleMkDir(void);
     void HandleRename(void);
 
-    void HandleMenuButtonPress(void);
-
     void LoadThumbnail(ThumbItem *item);
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
 
-    void ClearMenu(UIListBtnType *menu);
+    void ClearMenu(MythListButton *menu);
 
     QPtrList<ThumbItem> m_itemList;
     QDict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
 
-    XMLParse           *m_theme;
-    QRect               m_menuRect;
-    QRect               m_textRect;
-    QRect               m_viewRect;
-    QRect               m_iconRect;
+    MythListButton      *m_menuList;
+    MythListButton      *m_submenuList;
+    MythListButton      *m_imageList;
 
-    bool                m_inMenu;
-    bool                m_inSubMenu;
-    UIListBtnType      *m_menuType;
-    UIListBtnType      *m_submenuType;
-
-    QPixmap             m_background;
-    QPixmap             m_backRegPix;
-    QPixmap             m_backSelPix;
-    QPixmap             m_folderRegPix;
-    QPixmap             m_folderSelPix;
-    QPixmap             m_MrkPix;
+    MythUIText          *m_captionText;
 
     bool                m_isGallery;
     bool                m_showDevices;
     QString             m_currDir;
     MythMediaDevice    *m_currDevice;
-
-    int                 m_currRow;
-    int                 m_currCol;
-    int                 m_lastRow;
-    int                 m_lastCol;
-    int                 m_topRow;
-    int                 m_nRows;
-    int                 m_nCols;
-
-    int                 m_spaceW;
-    int                 m_spaceH;
-    int                 m_thumbW;
-    int                 m_thumbH;
 
     ThumbGenerator     *m_thumbGen;
 
@@ -165,6 +125,9 @@ class IconView : public MythDialog
 
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
+    void HandleItemSelect(MythListButtonItem *);
+    void HandleMenuButtonPress(MythListButtonItem *);
+    void UpdateText(MythListButtonItem *);
 };
 
 

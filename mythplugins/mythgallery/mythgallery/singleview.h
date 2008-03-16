@@ -24,8 +24,12 @@
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <qimage.h>
 #include <qpointarray.h>
+
+// MythTV plugin headers
+#include <mythtv/mythdialogs.h>
 
 #include "imageview.h"
 #include "iconview.h"
