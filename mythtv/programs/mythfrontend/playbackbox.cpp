@@ -515,7 +515,7 @@ DialogCode PlaybackBox::exec(void)
         return MythDialog::exec();
     }
 
-    return kDialogCodeRejected;
+    return MythDialog::exec();
 }
 
 /* blocks until playing has stopped */
