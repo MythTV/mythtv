@@ -30,9 +30,9 @@ MythUIButton::~MythUIButton()
 void MythUIButton::Init()
 {
     m_BackgroundImage = new MythUIStateType(this, "buttonback");
-    m_CheckImage = new MythUIStateType(this, "buttoncheck");
     m_Text = new MythUIText(this, "buttontext");
     m_ButtonImage = new MythUIImage(this, "buttonimage");
+    m_CheckImage = new MythUIStateType(this, "buttoncheck");
     m_ArrowImage = new MythUIImage(this, "arrowimage");
 
     m_CheckImage->SetVisible(false);
