@@ -182,6 +182,12 @@ void MythListButton::Reset()
     SetPositionArrowStates();
 }
 
+void MythListButton::Update()
+{
+    if (m_initialized)
+        SetPositionArrowStates();
+}
+
 void MythListButton::SetPositionArrowStates(void)
 {
     if (!m_initialized)
@@ -1251,6 +1257,7 @@ const MythImage* MythListButtonItem::image() const
 void MythListButtonItem::setImage(MythImage *image)
 {
     m_image = image;
+    m_parent->Update();
 }
 
 bool MythListButtonItem::checkable() const
@@ -1273,6 +1280,7 @@ void MythListButtonItem::setChecked(MythListButtonItem::CheckState state)
     if (!m_checkable)
         return;
     m_state = state;
+    m_parent->Update();
 }
 
 void MythListButtonItem::setCheckable(bool flag)

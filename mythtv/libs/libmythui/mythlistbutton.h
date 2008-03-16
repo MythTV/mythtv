@@ -39,6 +39,7 @@ class MythListButton : public MythUIType
     void SetActive(bool active);
     bool isActive() { return m_active; }
     void Reset();
+    void Update();
 
     void SetItemCurrent(MythListButtonItem* item);
     void SetItemCurrent(int pos);
