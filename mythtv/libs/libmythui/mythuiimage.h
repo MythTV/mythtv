@@ -35,7 +35,7 @@ class MythUIImage : public MythUIType
     void SetSkip(int x, int y);
 
     void Reset(void);
-    void Load(void);
+    bool Load(void);
 
     virtual void Pulse(void);
 

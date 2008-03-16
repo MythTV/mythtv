@@ -136,7 +136,7 @@ void MythUIImage::SetSkip(int x, int y)
     m_Skip = QPoint(x, y);
 }
 
-void MythUIImage::Load(void)
+bool MythUIImage::Load(void)
 {
     Clear();
 
@@ -147,7 +147,8 @@ void MythUIImage::Load(void)
         if (m_HighNum >= 1)
             filename = QString(m_Filename).arg(i);
 
-        image->Load(filename);
+        if (!image->Load(filename))
+            return false;
 
         if (!m_ForceSize.isNull())
         {
@@ -171,6 +172,8 @@ void MythUIImage::Load(void)
 
     m_LastDisplay = QTime::currentTime();
     SetRedraw();
+
+    return true;
 }
 
 void MythUIImage::Reset(void)
