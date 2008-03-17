@@ -80,6 +80,7 @@ NetworkControl::NetworkControl(int port)
     jumpMap["zoneminderconsole"]     = "ZoneMinder Console";
     jumpMap["zoneminderliveview"]    = "ZoneMinder Live View";
     jumpMap["zoneminderevents"]      = "ZoneMinder Events";
+    jumpMap["snapshot"]              = "ScreenShot"; 
 
     // These jump point names match the (lowercased) locations from gContext
     jumpMap["channelrecpriority"]    = "Channel Recording Priorities";
