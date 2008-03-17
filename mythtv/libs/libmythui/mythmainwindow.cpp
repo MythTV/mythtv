@@ -506,7 +506,8 @@ void MythMainWindow::paintEvent(QPaintEvent *pe)
     d->repaintRegion = d->repaintRegion.unite(pe->region());
 }
 
-bool MythMainWindow::screenShot(QString fname, int x, int y, int x2, int y2, int w, int h)
+bool MythMainWindow::screenShot(QString fname, int x, int y,
+                                int x2, int y2, int w, int h)
 {
     bool ret = false;
 
@@ -516,16 +517,14 @@ bool MythMainWindow::screenShot(QString fname, int x, int y, int x2, int y2, int
     else 
         extension = "PNG";
 
-    VERBOSE(VB_GENERAL, QString("MythMainWindow::screenShot saving winId %1 to %2 (%3 x %4) [ %5/%6 - %7/%8] type %9")
-		        .arg(QApplication::desktop()->winId())
-			.arg(fname)
-			.arg(w)
-			.arg(h)
-			.arg(x)
-			.arg(y)
-			.arg(x2)
-			.arg(y2)
-			.arg(extension));
+    VERBOSE(VB_GENERAL, "MythMainWindow::screenShot saving winId " +
+                        QString("%1 to %2 (%3 x %4) [ %5/%6 - %7/%8] type %9")
+                        .arg((long)QApplication::desktop()->winId())
+                        .arg(fname)
+                        .arg(w).arg(h)
+                        .arg(x).arg(y)
+                        .arg(x2).arg(y2)
+                        .arg(extension));
 
     QPixmap p;
     p = QPixmap::grabWindow( QApplication::desktop()->winId(), x, y, x2, y2);
@@ -539,22 +538,22 @@ bool MythMainWindow::screenShot(QString fname, int x, int y, int x2, int y2, int
         h = img.height();
 
     VERBOSE(VB_GENERAL, QString("Scaling to %1 x %2 from %3 x %4")
-		    .arg(w)
-		    .arg(h)
-		    .arg(img.width())
-		    .arg(img.height()));
+                        .arg(w)
+                        .arg(h)
+                        .arg(img.width())
+                        .arg(img.height()));
 
     img = img.smoothScale( w, h , QImage::ScaleMin);
         
     if (img.save(fname ,extension,100))
     {
         VERBOSE(VB_GENERAL, "MythMainWindow::screenShot succeeded");
-	ret = true;
+        ret = true;
     }
     else 
     {
-	VERBOSE(VB_GENERAL, "MythMainWindow::screenShot Failed!");
-	ret = false;
+        VERBOSE(VB_GENERAL, "MythMainWindow::screenShot Failed!");
+        ret = false;
     }
 
     return ret;
@@ -564,8 +563,9 @@ bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
 {
     QString fPath = gContext->GetSetting("ScreenShotPath","/tmp/");
     QString fName = QString("/%1/myth-screenshot-%2.png")
-	            .arg(fPath)
-	            .arg(QDateTime::currentDateTime().toString("yyyy-mm-ddThh-mm-ss.zzz"));
+                    .arg(fPath)
+                    .arg(QDateTime::currentDateTime()
+                         .toString("yyyy-mm-ddThh-mm-ss.zzz"));
 
     return screenShot(fName, x, y, x2, y2, 0, 0);
 }
@@ -573,7 +573,8 @@ bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
 bool MythMainWindow::screenShot(QString fname, int w, int h)
 {
     QRect sLoc = qApp->mainWidget()->geometry();
-    return screenShot(fname, sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height(), w, h);
+    return screenShot(fname, sLoc.left(),sLoc.top(),
+                      sLoc.width(), sLoc.height(), w, h);
 }
 
 
