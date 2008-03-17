@@ -496,7 +496,7 @@ void ChannelEditor::channelIconImport(void)
     if (list->fillSelections() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "",
-                                        tr("Add some for channels first!"));
+                                        tr("Add some channels first!"));
         return;
     }
     
