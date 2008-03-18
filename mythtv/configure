@@ -1599,10 +1599,13 @@ case $targetos in
     enable  darwin
     disable dvb
     disable ivtv
+    ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
     osxver=$(uname -r | cut -c 1)
-    if [ ${osxver} = "9" ]; then 
-      disable mmx 
-    fi
+    if [[ ${ldver%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
+        disable mmx
+        echo "You have a broken ld. Playback of HD videos may be very poor"
+        echo "See http://svn.mythtv.org/trac/ticket/4200 for intelleopardmmx.patch"
+    fi 
     disable need_memalign
     disable opengl_video
     disable opengl_vsync
