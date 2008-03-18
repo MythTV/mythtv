@@ -1500,7 +1500,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation>Indtast gruppenavn eller tryk SELECT for at indtaste teksten vha. On-Screen-Tastaturet</translation>
+        <translation>Indtast gruppenavn eller tryk SELECT for at indtaste teksten vha. On-Screen-tastaturet</translation>
     </message>
     <message>
         <source>(Create new group)</source>
@@ -2047,14 +2047,14 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillad at dette program optages igen</translation>
     </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
     <message>
         <source>Match Criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Søgekriterier</translation>
     </message>
     <message>
         <source>W</source>
@@ -2098,7 +2098,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation>Max cpu&apos;er</translation>
     </message>
     <message>
         <source>Fallback Deinterlacer</source>
@@ -2106,11 +2106,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt antal cpu cores der kan bruges til dekodning.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation> Multitråded dekodning er deaktiveret - kun en cpu bliver brugt; vær venlig at rekompilere med --enable-ffmpeg-threads for at aktivere.</translation>
     </message>
 </context>
 <context>
@@ -3722,7 +3722,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Hue</translation>
+        <translation>Lød</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -3962,7 +3962,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>External channel change command</source>
-        <translation>Ekstern kommando til kanalskift$</translation>
+        <translation>Ekstern kommando til kanalskift</translation>
     </message>
     <message>
         <source>Preset tuner to channel</source>
@@ -4110,7 +4110,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Wakeup time format</source>
-        <translation>Startop tidsformatet.</translation>
+        <translation>Tidsformat for opvågning</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
@@ -4166,7 +4166,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
-        <translation type="unfinished"></translation>
+        <translation>Check-kommando før nedlukning</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
@@ -4310,7 +4310,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis der er flere log-linier for et modul end angivet her, vil de ældste linier blive slettet så antallet af linier ikke er større end den angivne værdi.  Sæt til 0 for at deaktivere.</translation>
     </message>
     <message>
         <source>Automatic Log Cleaning Enabled</source>
@@ -4602,7 +4602,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation>Filtre som kan bruges når der optages fra denne kanal. Brugt ikke ved hardware enkodnings kort.</translation>
+        <translation>Filtre til brug ved optagelse fra denne kanal. Bruges ikke ved kort der har hardware-enkodning.</translation>
     </message>
     <message>
         <source>Playback filters</source>
@@ -4694,7 +4694,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
-        <translation>Den kommando udføres umiddelbart efter start af backend. Parameteren &apos;$status&apos; erstattes af enten &apos;auto&apos; hvis maskinen blev startet automatisk or &apos;user&apos; hvis en bruger tændte den.</translation>
+        <translation>Denne kommando udføres umiddelbart efter start af backend. Parameteren &apos;$status&apos; erstattes af enten &apos;auto&apos; hvis maskinen blev startet automatisk or &apos;user&apos; hvis en bruger tændte den.</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -4845,11 +4845,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Start in Title section</source>
-        <translation>Start i title sektionen</translation>
+        <translation>Start i titel-sektionen</translation>
     </message>
     <message>
         <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil markøren starte i Titel-vinduet, ellers vil den starte i optagelserne.</translation>
     </message>
     <message>
         <source>Show group summary</source>
@@ -4877,7 +4877,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
-        <translation>Aktivér strengere Reklame sporings kode. Slå den fra hvis nogle reklamer ikke bliver sporet.</translation>
+        <translation>Aktivér strengere reklamedetektions-kode.  Slå den fra hvis nogle reklamer ikke bliver fundet.</translation>
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, include blank frames following commercial breaks as part of the commercial break.</source>
@@ -4889,7 +4889,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil MythTV opføre sig som om reklamer starter dette antal sekunder for tidligt.  Dette kan være nyttigt hvis du bruger notifikation af reklamer i stedet for automatisk overspringning.</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -4901,11 +4901,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil frem- og tilbagespoling fortsætte efter at tasten er sluppet.  Ved at trykke på tasten igen øges frem- eller tilbagespolingshastigheden.  De alternative frem- og tilbagespolingstaster opfører sig altid på denne måde.</translation>
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil et tryk på en &apos;sticky&apos; tilbagespolingsknap mens der spoles fremad skifte til tilbagespoling, og omvendt.  Hvis dette er deaktiveret, vil et tryk reducere hastigheden eller skifte til afspilning hvis hastigheden ikke kan reduceres yderligere.</translation>
     </message>
     <message>
         <source>Always display Closed Captioning</source>
@@ -4913,7 +4913,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vises undertekster ved afspilning af optagelser samt i LiveTV.  Undertekster kan slås til og fra ved at trykke &apos;T&apos; under afspilning.</translation>
     </message>
     <message>
         <source>If enabled, Browse mode will automatically be activated whenever you use Channel UP/DOWN while watching Live TV.</source>
@@ -4921,7 +4921,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet automatisk den gemte position i en optagelse når optagelsen afspilles.  Hvis dette er deaktiveret, kan du markere begyndelsen med tilbagespolingsknappen og derefter gemme positionen.</translation>
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
@@ -4929,7 +4929,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Under afspilning vil MythTV lytte efter forbindelse fra &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programmerne på denne port.  See README-filen i contrib/mythnotify/ for yderligere information.</translation>
     </message>
     <message>
         <source>Display thumbnail preview images of recordings</source>
@@ -4945,11 +4945,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil &apos;Vis optagelse&apos; og &apos;Slet optagelse&apos; skærmbillederne bruge transparens.  Deaktiver hvis valg af optagelse er langsomt pga. højt CPU-forbrug.</translation>
     </message>
     <message>
         <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Udfyld&apos; er den hurtigste metode. &apos;Billede&apos; er forholdsvis langsom, men giver en høj visuel kvalitet. Ingen skygger er det hurtigste.</translation>
     </message>
     <message>
         <source>System Exit key</source>
@@ -4993,7 +4993,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>At startup, MythTV will change the Qt widget style to this setting.  If &quot;Desktop Style&quot; is selected, MythTV will use the existing desktop setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV vil ændre Qt &quot;widget style&quot; til dette ved start.  Hvis &quot;Skrivebord&quot; er valgt, vil MythTV bruge den aktuelle skrivebordsindstilling.</translation>
     </message>
     <message>
         <source>Time limit for ATSC signal lock (msec)</source>
@@ -5029,7 +5029,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyt højprioritetsprogrammer til andre kort og visninger under løsning af konflikter.  Dette kan bruges til at optage programmer med lavere prioritet som måske ellers ikke ville blive optaget, men giver risiko for at misse et program med højere prioritet hvis programoversigten ændres.</translation>
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
@@ -5405,7 +5405,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>When looking for new jobs to process, the Job Queue will wait this long between checks.</source>
-        <translation>Når der kigges efter nye jobs, vil der ventes dette antal senkunder mellem hver check.</translation>
+        <translation>Når der ledes efter nye jobs, vil jobkøen vente dette antal sekunder mellem hvert check.</translation>
     </message>
     <message>
         <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used which could cause problems on slower systems.</source>
@@ -5627,15 +5627,15 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gennemsigtigheden af hovedvinduet.  Sæt til 100 for ingen gennemsigtighed og til 0 for helt gennemsigtigt.</translation>
     </message>
     <message>
         <source>Video in floating window</source>
-        <translation type="unfinished"></translation>
+        <translation>Video i flydende vindue</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil video blive vist i et flydende vindue.  Kun gyldig hvis &quot;Brug GUI-størrelse for TV-afspilning&quot; og &quot;Kør frontend i et vindue&quot; er aktiveret.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5643,15 +5643,15 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gennemsigtigheden af det flydende vindue.  Sæt til 100 for ingen gennemsigtighed og til 0 for helt gennemsigtigt.</translation>
     </message>
     <message>
         <source>Video in the dock</source>
-        <translation type="unfinished"></translation>
+        <translation>Video i dokken</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil video blive vist i applikationens dok-ikon.  Kun gyldig hvis &quot;Brug GUI-størrelse for TV-afspilning&quot; og &quot;Kør frontend i et vindue&quot; er aktiveret.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5663,7 +5663,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil video blive vist på skrivebordet, bag Finder-ikonerne.  Kun gyldig hvis &quot;Brug GUI-størrelse for TV-afspilning&quot; og &quot;Kør frontend i et vindue&quot; er aktiveret.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5843,7 +5843,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished">Antal forsøg på at vække serveren inden frontenden giver op.</translation>
+        <translation>Antal forsøg på at vække serveren inden frontenden giver op.</translation>
     </message>
     <message>
         <source>Wake command</source>
@@ -5859,7 +5859,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished">Hvis aktiveret, vil QuickTime korrigere videoens gammaværdi så den matcher din monitor.  At deaktivere dette kan reducere CPU-belastningen.</translation>
+        <translation>Hvis aktiveret, vil QuickTime korrigere videoens gammaværdi så den matcher din monitor.  At deaktivere dette kan reducere CPU-belastningen.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5931,7 +5931,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>this recording rule is inactive.</source>
-        <translation type="unfinished">denne optagelse er ikke aktiv.</translation>
+        <translation>denne optagelsesregel er ikke aktiv.</translation>
     </message>
     <message>
         <source>Find ID</source>
@@ -6023,11 +6023,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
-        <translation type="unfinished"></translation>
+        <translation>HD-ringbufferen tillader backend at håndtere stor spidsbelastning.  Jo større buffer, jo længere tids spidsbelastning kan håndteres.  Imidlertid kan en for stor buffer give anledning til swapping, som giver dårligere performance.</translation>
     </message>
     <message>
         <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Find Enkelt, Find Ugentlig og Find Daglig optagelsestyper vil få denne yderligere prioritetsværdi.</translation>
     </message>
     <message>
         <source>Follow symbolic links when deleting files</source>
@@ -6184,7 +6184,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, kan du indtaste tal og hoppe til en vilkårlig kanal.</translation>
     </message>
     <message>
         <source>Select your preferred language</source>
@@ -6198,7 +6198,7 @@ Frekvensen er for denne kanal er i Hz.</translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polaritet (ingen standardværdi)</translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
@@ -6257,7 +6257,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>The time (in seconds) that the menu will remain visible after navigation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den tid (i sekunder) som menuen forbliver synlig efter navigation.</translation>
     </message>
     <message>
         <source>Enable realtime priority threads</source>
@@ -6265,7 +6265,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Når mythfrontend køres med root-privilegier, kan nogle tråde tildeles forjhøjet prioritet.  Deaktiver dette hvis frontend fryser under afspilning.</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
@@ -6357,7 +6357,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Standard</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Digital TV standard.
@@ -6395,7 +6395,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>DVB Transport</source>
-        <translation type="unfinished">DVB Transport</translation>
+        <translation>DVB-transport</translation>
     </message>
     <message>
         <source>Transport Options</source>
@@ -6411,7 +6411,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kør på den angivne skærm eller brug alle skærme.</translation>
     </message>
     <message>
         <source>In X</source>
@@ -6419,7 +6419,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontal opløsning når der vises video med en bestemt opløsning.</translation>
     </message>
     <message>
         <source>In Y</source>
@@ -6427,7 +6427,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal opløsning når der vises video med en bestemt opløsning.</translation>
     </message>
     <message>
         <source>GUI</source>
@@ -6491,11 +6491,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to Reinit Video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke geninitialisere video.</translation>
     </message>
     <message>
         <source>And, never ask again.</source>
-        <translation type="unfinished">og spørg aldrig igen.</translation>
+        <translation>og spørg aldrig igen.</translation>
     </message>
     <message>
         <source>And, don&apos;t ask again in this session.</source>
@@ -6609,7 +6609,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="unfinished">Standard filter som skal bruges på Afspil Optagelse skærmen.</translation>
+        <translation>Standard-filter som skal bruges på Afspil Optagelse skærmen.</translation>
     </message>
     <message>
         <source>Save current group filter when changed</source>
@@ -6621,39 +6621,39 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished">Standard visning&gt;</translation>
+        <translation>Standard visning</translation>
     </message>
     <message>
         <source>Show Titles only</source>
-        <translation type="unfinished">Vis kun titler</translation>
+        <translation>Vis kun titler</translation>
     </message>
     <message>
         <source>Show Titles and Categories</source>
-        <translation type="unfinished">Vis titler og kategorier</translation>
+        <translation>Vis titler og kategorier</translation>
     </message>
     <message>
         <source>Show Titles, Categories, and Recording Groups</source>
-        <translation type="unfinished">Vis titler, kategorier og optagelses grupper</translation>
+        <translation>Vis titler, kategorier og optagelsesgrupper</translation>
     </message>
     <message>
         <source>Show Titles and Recording Groups</source>
-        <translation type="unfinished">Vis titler og optagelses grupper</translation>
+        <translation>Vis titler og optagelsesgrupper</translation>
     </message>
     <message>
         <source>Show Categories only</source>
-        <translation type="unfinished">Vis kun kategorier</translation>
+        <translation>Vis kun kategorier</translation>
     </message>
     <message>
         <source>Show Categories and Recording Groups</source>
-        <translation type="unfinished">Vis kategorier og optagelses grupper</translation>
+        <translation>Vis kategorier og optagelsesgrupper</translation>
     </message>
     <message>
         <source>Show Recording Groups only</source>
-        <translation type="unfinished">Vis kun optagelses grupper</translation>
+        <translation>Vis kun optagelsesgrupper</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished">Vælg grupperingen der skal vises som standard på Afspil optagelser skærmen.</translation>
+        <translation>Vælg grupperingen der skal vises som standard på Afspil optagelser skærmen.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -6673,7 +6673,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette er standardværdien for Automatisk Transkodning-indstillingen når en ny optagelsesregel oprettes.</translation>
     </message>
     <message>
         <source>Default Transcoder</source>
@@ -6681,7 +6681,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette er standardværdien for Transkoder-indstillingen når en ny optagelsesregel oprettes.</translation>
     </message>
     <message>
         <source>Run User Job #%1 On New Recordings</source>
@@ -6753,7 +6753,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kan bruge TV out og MPEG-dekoderen på et PVR-350 kort for højkvalitets afspilning.  Dette kræver yderligere at ivtv-fb kerne-modulet er indlæst og konfigureret korrekt.</translation>
     </message>
     <message>
         <source>Normally, PVR-350 audio is looped into a sound card; here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
@@ -7239,7 +7239,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>How to treat existing channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvordan eksisterende kanaler skal behandles.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -7295,7 +7295,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sæt til en værdi der er mindre end eller lig med det antal processorer på backenden der vil udføre enkodningen.</translation>
     </message>
     <message>
         <source>MPEG-2 Parameters</source>
@@ -7307,23 +7307,23 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>libmpeg2</source>
-        <translation type="unfinished">libmpeg2</translation>
+        <translation>libmpeg2</translation>
     </message>
     <message>
         <source>Standard XvMC</source>
-        <translation type="unfinished">Stardard XvMC</translation>
+        <translation>Standard XvMC</translation>
     </message>
     <message>
         <source>VIA XvMC</source>
-        <translation type="unfinished">VIA XvMC</translation>
+        <translation>VIA XvMC</translation>
     </message>
     <message>
         <source>Decoder to use to play back MPEG2 video.</source>
-        <translation type="unfinished">Dekoder som bruges til afspilning af MPEG2 video.</translation>
+        <translation>Dekoder som bruges til afspilning af MPEG2 video.</translation>
     </message>
     <message>
         <source>Standard will use ffmpeg library.</source>
-        <translation type="unfinished">ffmpeg bruges som standard.</translation>
+        <translation>ffmpeg bruges som standard.</translation>
     </message>
     <message>
         <source>libmpeg2 will use mpeg2 library; this is faster on some AMD processors.</source>
@@ -7331,7 +7331,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
-        <translation type="unfinished">VIA XvMC vil bruge VIA VLD XvMC udvidelsen.</translation>
+        <translation>VIA XvMC vil bruge VIA VLD XvMC-udvidelsen.</translation>
     </message>
     <message>
         <source>Cable HRC</source>
@@ -7347,7 +7347,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>De fleste kabelTV-systemer i USA bruger QAM-256 or QAM-64, men nogle blandede systemer bruger 8-VSB for OTA kanaler.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -7511,7 +7511,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Recording Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelse tilgængelig</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
@@ -7527,7 +7527,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Periode</translation>
     </message>
     <message>
         <source>start time</source>
@@ -7583,7 +7583,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lad automatisk nyre optagelsesregler bruge denne gruppe hvis titlen matcher dette regulære udtryk.  For eksempel ville &quot;(Nyheder|CNN)&quot; matche enhver titel hvor &quot;Nyheder&quot; eller &quot;CNN&quot; forekommer.</translation>
     </message>
     <message>
         <source>Skip ahead (seconds)</source>
@@ -7647,7 +7647,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Adapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Adapter</translation>
     </message>
     <message>
         <source>Presenter</source>
@@ -7731,11 +7731,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med datoen i dag.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med datoen i morgen.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
@@ -7759,7 +7759,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Suggested Next: </source>
-        <translation type="unfinished"></translation>
+        <translation>Foreslået næste: </translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
@@ -7787,7 +7787,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
-        <translation type="unfinished"></translation>
+        <translation>Definerer en periode hvor master backend skal være vågen</translation>
     </message>
     <message>
         <source>Shutdown with Master Backend</source>
@@ -7815,11 +7815,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Angiv enten den nøjagtige frekvens i kHz eller en gyldig kanal for dit &quot;TV-format&quot;.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den værdi der skal lægges til den angivne frekvens i kHz, for finindstilling.</translation>
     </message>
     <message>
         <source>Spain</source>
@@ -7879,7 +7879,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette angiver den metode som MythTV anvender for at detektere hvor reklamer begynder og slutter.</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
@@ -7895,11 +7895,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antallet af bonusdage der tildeles et program for hvert prioritetspoint.  Dette bruges kun når autoudløbsmetoden Vægtet tid/Prioritet er valgt.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished">Mac hardware acceleration</translation>
+        <translation>Mac hardware-acceleration</translation>
     </message>
     <message>
         <source>Transcoder command</source>
@@ -7945,7 +7945,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando der køres hvis dit BIOS kræver en genstart før nvram-wakeup indstillingerne slår igennem.  Lad forblive blank hvis dit BIOS ikke kræver en genstart.  Se README-filen for flere eksempler.</translation>
     </message>
     <message>
         <source>Single LNB / Input</source>
@@ -7993,7 +7993,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Anthology</source>
-        <translation type="unfinished"></translation>
+        <translation>Antologi</translation>
     </message>
     <message>
         <source>Automobile</source>
@@ -8017,7 +8017,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Business</source>
-        <translation type="unfinished"></translation>
+        <translation>Forretning</translation>
     </message>
     <message>
         <source>Classical</source>
@@ -8025,7 +8025,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>College</source>
-        <translation type="unfinished"></translation>
+        <translation>Universitet</translation>
     </message>
     <message>
         <source>Combat</source>
@@ -8037,7 +8037,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Commentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommentar</translation>
     </message>
     <message>
         <source>Concert</source>
@@ -8049,7 +8049,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Contemporary</source>
-        <translation type="unfinished"></translation>
+        <translation>Samtid</translation>
     </message>
     <message>
         <source>Crime</source>
@@ -8069,7 +8069,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Elementary</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundlæggende</translation>
     </message>
     <message>
         <source>Erotica</source>
@@ -8133,7 +8133,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>High School</source>
-        <translation type="unfinished"></translation>
+        <translation>Gymnasium</translation>
     </message>
     <message>
         <source>History</source>
@@ -8149,7 +8149,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjemmet</translation>
     </message>
     <message>
         <source>Horror</source>
@@ -8157,11 +8157,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information</translation>
     </message>
     <message>
         <source>Instruction</source>
-        <translation type="unfinished"></translation>
+        <translation>Instruktion</translation>
     </message>
     <message>
         <source>International</source>
@@ -8189,7 +8189,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Medical</source>
-        <translation type="unfinished"></translation>
+        <translation>Medicinsk</translation>
     </message>
     <message>
         <source>Meeting</source>
@@ -8209,11 +8209,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Mystery</source>
-        <translation type="unfinished"></translation>
+        <translation>Mysterium</translation>
     </message>
     <message>
         <source>National</source>
-        <translation type="unfinished"></translation>
+        <translation>Nationalt</translation>
     </message>
     <message>
         <source>Nature</source>
@@ -8233,7 +8233,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Prerecorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Forud optaget</translation>
     </message>
     <message>
         <source>Product</source>
@@ -8253,15 +8253,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Reading</source>
-        <translation type="unfinished"></translation>
+        <translation>Læsning</translation>
     </message>
     <message>
         <source>Repair</source>
-        <translation type="unfinished"></translation>
+        <translation>Reparation</translation>
     </message>
     <message>
         <source>Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Anmeldelse</translation>
     </message>
     <message>
         <source>Romance</source>
@@ -8277,7 +8277,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Service</translation>
     </message>
     <message>
         <source>Shopping</source>
@@ -8285,23 +8285,23 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Soap Opera</source>
-        <translation type="unfinished"></translation>
+        <translation>Serie</translation>
     </message>
     <message>
         <source>Special</source>
-        <translation type="unfinished"></translation>
+        <translation>Speciel</translation>
     </message>
     <message>
         <source>Suspense</source>
-        <translation type="unfinished"></translation>
+        <translation>Spænding</translation>
     </message>
     <message>
         <source>Talk</source>
-        <translation type="unfinished"></translation>
+        <translation>Talkshow</translation>
     </message>
     <message>
         <source>Technical</source>
-        <translation type="unfinished"></translation>
+        <translation>Teknisk</translation>
     </message>
     <message>
         <source>Tennis</source>
@@ -8309,15 +8309,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejser</translation>
     </message>
     <message>
         <source>Variety</source>
-        <translation type="unfinished"></translation>
+        <translation>Varieté</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Weather</source>
@@ -8325,11 +8325,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Western</source>
-        <translation type="unfinished">Vestlig</translation>
+        <translation>Western</translation>
     </message>
     <message>
         <source>DataDirect</source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect</translation>
     </message>
     <message>
         <source>Time Offset</source>
@@ -8341,7 +8341,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>(Works for DataDirect listings only.)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Virker kun for DataDirect-listninger.)</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -8357,7 +8357,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Current Example</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelt eksempel</translation>
     </message>
     <message>
         <source>Store</source>
@@ -8392,12 +8392,12 @@ Myth will now exit.</source>
     <message>
         <source>TT CC</source>
         <comment>Teletext closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>TT UT</translation>
     </message>
     <message>
         <source>TT Menu</source>
         <comment>Teletext Menu</comment>
-        <translation type="unfinished"></translation>
+        <translation>TT-menu</translation>
     </message>
     <message>
         <source>TXT CAP</source>
@@ -8414,7 +8414,7 @@ Myth will now exit.</source>
     <message>
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ingen undertekster</translation>
     </message>
     <message>
         <source>Position</source>
@@ -8422,16 +8422,16 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>No Seektable</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen søgetabel</translation>
     </message>
     <message>
         <source>Page Not Available</source>
         <comment>Requested Teletext page not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Siden findes ikke</translation>
     </message>
     <message>
         <source>Recording Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsestype</translation>
     </message>
     <message>
         <source>This option allows you to filter out unwanted streams. &apos;Normal&apos; will record all relevant streams including interactive television data. &apos;TV Only&apos; will record only audio, video and subtitle streams. </source>
@@ -8439,15 +8439,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>TV Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun TV</translation>
     </message>
     <message>
         <source>Audio Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun lyd</translation>
     </message>
     <message>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
@@ -8504,11 +8504,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Enheds-ID</translation>
     </message>
     <message>
         <source>Tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuner</translation>
     </message>
     <message>
         <source>HDHomeRun DTV tuner box</source>
@@ -8516,7 +8516,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Input priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Indgangs-prioritet</translation>
     </message>
     <message>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
@@ -8584,7 +8584,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Black background for analog closed captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort baggrund for analoge undertekster</translation>
     </message>
     <message>
         <source>If enabled, analog captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
@@ -8592,7 +8592,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Always display closed captioning or subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis altid undertekster</translation>
     </message>
     <message>
         <source>Enable Interactive TV</source>
@@ -8686,11 +8686,13 @@ Myth will now exit.</source>
         <source>Failed to open 
  &apos;%1&apos; in %2 
 Check if the video exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke åbne
+ &apos;%1&apos; i %2 
+Kontrollér at videoen findes</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished">^(Den |Det |En |Et )</translation>
+        <translation>^(Den |Det |En |Et )</translation>
     </message>
     <message>
         <source>Delete Now</source>
@@ -8698,7 +8700,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Disable AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktivér Autoudløb</translation>
     </message>
     <message>
         <source>AutoExpire Actions:</source>
@@ -8706,7 +8708,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Time offset for EIT listings</source>
-        <translation type="unfinished">Tids offset for EIT listinger</translation>
+        <translation>Tids-offset for EIT listinger</translation>
     </message>
     <message>
         <source>Adjust the relative timezone of the EIT EPG data.  &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the EIT timezone, interpreting times as local.</source>
@@ -8750,7 +8752,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>(REC)</source>
-        <translation type="unfinished">(OPTAG)</translation>
+        <translation>(OPTAG)</translation>
     </message>
     <message>
         <source>Adjust Playback</source>
@@ -8766,7 +8768,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished">Lydstyrke</translation>
+        <translation>Lydstyrke</translation>
     </message>
     <message>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
@@ -8790,11 +8792,11 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Delete files slowly</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet filer langsomt</translation>
     </message>
     <message>
         <source>Analog</source>
-        <translation type="unfinished"></translation>
+        <translation>Analog</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
@@ -8826,7 +8828,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>MPEG</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
@@ -8843,26 +8845,26 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>sekunder</translation>
     </message>
     <message>
         <source>DVD Menu Not Available</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-menu ikke tilgængelig</translation>
     </message>
     <message>
         <source>Group</source>
         <comment>Play Group</comment>
-        <translation type="unfinished">Gruppe</translation>
+        <translation>Gruppe</translation>
     </message>
     <message>
         <source>f</source>
         <comment>RecStatusChar rsFailed</comment>
-        <translation type="unfinished"></translation>
+        <translation>f</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecStatusChar rsOtherShowing</comment>
-        <translation type="unfinished">O</translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>Recorder Failed</source>
@@ -8874,11 +8876,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Sidst optaget</translation>
     </message>
     <message>
         <source>Next Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Næste optagelse</translation>
     </message>
     <message>
         <source>Watch List Score</source>
@@ -8886,19 +8888,19 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Auto-expire off</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoudløb fra</translation>
     </message>
     <message>
         <source>Marked as &apos;watched&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeret som &quot;set&quot;</translation>
     </message>
     <message>
         <source>Not the earliest episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke den tidligste episode</translation>
     </message>
     <message>
         <source>Recently deleted episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Episode slettet for nylig</translation>
     </message>
     <message>
         <source>Watch List Status</source>
@@ -8914,7 +8916,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Main Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Hovedsprog</translation>
     </message>
     <message>
         <source>SAP Language</source>
@@ -8922,11 +8924,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Dual</source>
-        <translation type="unfinished"></translation>
+        <translation>Begge</translation>
     </message>
     <message>
         <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg hvilke(t) sprog der skal optages når der udsendes to sprog.  Kun Lag II understøtter optagelsen af to sprog (Begge).</translation>
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
@@ -8970,7 +8972,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">LiveTV</translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <source>Listings grabber</source>
@@ -8978,19 +8980,19 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>GUID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>Generisk</translation>
     </message>
     <message>
         <source>800Mbps</source>
-        <translation type="unfinished">800Mbps</translation>
+        <translation>800Mbps</translation>
     </message>
     <message>
         <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-adresse eller Device ID angivet på bunden af din HDHomeRun.  Du kan bruge &quot;FFFFFFFF&quot; hvis der kun er én enhed på dit netværk.</translation>
     </message>
     <message>
         <source>M3U URL</source>
@@ -9006,7 +9008,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Unencrypted channels only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun ikke-krypterede kanaler</translation>
     </message>
     <message>
         <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
@@ -9014,7 +9016,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Allow audio only channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillad kanaler kun med lyd</translation>
     </message>
     <message>
         <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
@@ -9026,11 +9028,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Aldrig</translation>
     </message>
     <message>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Altid</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
@@ -9066,7 +9068,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Maximum number of prescaled themes to cache.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt antal preskalerede temaer der skal gemmes i cachen.</translation>
     </message>
     <message>
         <source>Always stream recordings from the backend</source>
@@ -9150,7 +9152,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Total Disk Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Total diskplads:</translation>
     </message>
     <message>
         <source>MythTV Drive #%1:</source>
@@ -9158,15 +9160,15 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Directories:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mapper:</translation>
     </message>
     <message>
         <source>Directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappe:</translation>
     </message>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nogle filsystemer bruger mange ressourcer ved sletning af store optagelsersfiler.  Denne indstilling får MythTV til at slette filen langsomt på denne backend for at begrænse ressourceforbruget.</translation>
     </message>
     <message>
         <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
@@ -9218,7 +9220,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Database Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Database-server-indstillinger</translation>
     </message>
     <message>
         <source>Ping test server?</source>
@@ -9230,15 +9232,15 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port</translation>
     </message>
     <message>
         <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="unfinished"></translation>
+        <translation>Portnummeret databasen bruger.  Lad være blank hvis standardporten (3306) bruges.</translation>
     </message>
     <message>
         <source>Database name</source>
-        <translation type="unfinished"></translation>
+        <translation>Database-navn</translation>
     </message>
     <message>
         <source>Enable Database Server Wakeup</source>
@@ -9254,39 +9256,39 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Opgradér</translation>
     </message>
     <message>
         <source>Use current schema</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug aktuelle skema</translation>
     </message>
     <message>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation>som en søgning</translation>
     </message>
     <message>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation>som et eksempel</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Surround-lyd</translation>
     </message>
     <message>
         <source>Dolby Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolby-lyd</translation>
     </message>
     <message>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Widescreen</translation>
     </message>
     <message>
         <source>Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekster tilgængelige</translation>
     </message>
     <message>
         <source>Average Time Shift</source>
@@ -9294,7 +9296,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>hours</source>
-        <translation type="unfinished"></translation>
+        <translation>timer</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
@@ -9310,23 +9312,23 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Searching for installed XMLTV grabbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Søger efter installerede XMLTV grabbere</translation>
     </message>
     <message>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorér</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished">Detektér</translation>
+        <translation>Detektér</translation>
     </message>
     <message>
         <source>Interlaced</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
-        <translation type="unfinished">Interlaced (Normal)</translation>
+        <translation>Interlaced (Normal)</translation>
     </message>
     <message>
         <source>Interlaced (Reversed)</source>
@@ -9334,23 +9336,23 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Progressive</source>
-        <translation type="unfinished">Progressive</translation>
+        <translation>Progressiv</translation>
     </message>
     <message>
         <source>14:9</source>
-        <translation type="unfinished">14:9</translation>
+        <translation>14:9</translation>
     </message>
     <message>
         <source>Half</source>
-        <translation type="unfinished"></translation>
+        <translation>Halv</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuld</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Stræk</translation>
     </message>
     <message>
         <source>currently running.</source>
@@ -9362,11 +9364,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>FAILED: xmltv ran but was interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>FEJL: xmltv kørte, men blev afbrudt.</translation>
     </message>
     <message>
         <source>FAILED: xmltv returned error code %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>FEJL: xmltv kørte, men returnerede fejlkode %1.</translation>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
@@ -9390,7 +9392,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Run User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kør brugerjob #%1</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
@@ -9406,11 +9408,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Auto Expire Instead of Delete Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoudløb i stedet for Slet optagelse</translation>
     </message>
     <message>
         <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
-        <translation type="unfinished"></translation>
+        <translation>I stedet for at slette en optagelse, flyt den til &apos;Slettet&apos; gruppen og slå Autoudløb til.</translation>
     </message>
     <message>
         <source>Profile Item</source>
@@ -9423,7 +9425,7 @@ The frequency for this channel in</source>
     <message>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;</translation>
     </message>
     <message>
         <source>if rez</source>
@@ -9431,11 +9433,11 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Ændre</translation>
+        <translation>Redigér</translation>
     </message>
     <message>
         <source>Add New Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj ny</translation>
     </message>
     <message>
         <source>Playback Profiles</source>
@@ -9447,29 +9449,31 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj ny</translation>
     </message>
     <message>
         <source>Enter Playback Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast navn på afspilningsgruppe</translation>
     </message>
     <message>
         <source>Sorry, playback group
 name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beklager, navnet på afspilningsgruppen
+må ikke være tomt.</translation>
     </message>
     <message>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beklager, afspilningsgruppen
+&apos;%1&apos; er allerede i brug.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Fejl</translation>
+        <translation>Fejl</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Lodret skalering</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
@@ -9477,7 +9481,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Horizontal scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Vandret skalering</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
@@ -9493,7 +9497,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Warn on no audio output</source>
-        <translation type="unfinished"></translation>
+        <translation>Advar hvis ingen lyd</translation>
     </message>
     <message>
         <source>Always prompt (excluding Live TV)</source>
@@ -9513,35 +9517,35 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Show quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Afslut&quot;</translation>
     </message>
     <message>
         <source>Show quit and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Afslut&quot; og &quot;Luk ned&quot;</translation>
     </message>
     <message>
         <source>Show quit, reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Afslut&quot;, &quot;Genstart&quot;, og &quot;Luk ned&quot;</translation>
     </message>
     <message>
         <source>Show shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Luk ned&quot;</translation>
     </message>
     <message>
         <source>Show reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Genstart&quot;</translation>
     </message>
     <message>
         <source>Show reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &quot;Genstart&quot;, og &quot;Luk ned&quot;</translation>
     </message>
     <message>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Som standard er det kun remote frontends der vises nedlukningsmulighederne i menuen.  Her kan du tvinge bestemte muligheder til at blive vist.</translation>
     </message>
     <message>
         <source>Reboot command</source>
-        <translation type="unfinished"></translation>
+        <translation>Genstart-kommandoe</translation>
     </message>
     <message>
         <source>Command or script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
@@ -9561,7 +9565,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom</translation>
     </message>
     <message>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
@@ -9569,23 +9573,23 @@ name can not be blank.</source>
     </message>
     <message>
         <source>UI Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>UI-tema</translation>
     </message>
     <message>
         <source>OSD Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD-tema</translation>
     </message>
     <message>
         <source>Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu-tema</translation>
     </message>
     <message>
         <source>Fine tune font size (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Finindstil fontstørrelse (%)</translation>
     </message>
     <message>
         <source>Fine tune all font sizes by this percentage. Font sizes should be the correct relative size if the X11 DPI (dots per inch) is set to 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Finindstil alle fontstørrelser med denne procentsats.  Relative fontstørrelser burde være korrekte hvis DPI (pixels pr. tomme) er sat til 100 i X11.</translation>
     </message>
     <message>
         <source>Avoid back to back recordings from different channels</source>
@@ -9601,11 +9605,11 @@ name can not be blank.</source>
     </message>
     <message>
         <source> (and other removable devices)</source>
-        <translation type="unfinished"></translation>
+        <translation> (og andre flytbare enheder)</translation>
     </message>
     <message>
         <source>Ignore Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorér enheder</translation>
     </message>
     <message>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
@@ -9613,7 +9617,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>PVR-350 Hardware Decoder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 Hardware-dekoder indstillinger</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
@@ -9625,7 +9629,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse</translation>
     </message>
     <message>
         <source>Settings Access</source>
@@ -9633,7 +9637,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Shutdown/Reboot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for nedlukning/genstart</translation>
     </message>
     <message>
         <source>General Playback</source>
@@ -9641,7 +9645,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsesgrupper</translation>
     </message>
     <message>
         <source>Default JobQueue settings for new scheduled recordings</source>
@@ -9649,31 +9653,31 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Yes, Exit and Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, afslut og genstart</translation>
     </message>
     <message>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Filen for denne optagelse er tom.</translation>
     </message>
     <message>
         <source>IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-adresse</translation>
     </message>
     <message>
         <source>Status Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Status-port</translation>
     </message>
     <message>
         <source>Security Pin (Required)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sikkerheds-PIN-kode (krævet)</translation>
     </message>
     <message>
         <source>Pin code required for a frontend to connect to the backend. Blank prevents all connections, 0000 allows any client to connect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den PIN-kode der kræves for at en frontend kan forbinde til denne backend.  Tom forhindrer alle forbindelser.  0000 tillader alle frontends at forbinde.</translation>
     </message>
     <message>
         <source>Your Local Timezone (for XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Din lokale tidszone (for XMLTV)</translation>
     </message>
     <message>
         <source>Used if the XMLTV data comes from a different timezone than your own. This adjust the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
@@ -10818,7 +10822,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det tema du bruger indeholder ikke et &apos;recording_options&apos; element.  Kontakt ophavsmanden til temaet og bed dem om at opdatere det.&lt;br&gt;&lt;br&gt;Det næste skærmbillede vil være tomt.  Tryk på EXIT for at komme tilbage til menuen.</translation>
     </message>
     <message>
         <source>Unknown Element</source>
@@ -10826,7 +10830,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished">Det tema du bruger indeholder et ukendt element (%1). Dette vil blive ignoreret</translation>
+        <translation>Det tema du bruger indeholder et ukendt element (%1).  Elementet vil blive ignoreret</translation>
     </message>
 </context>
 <context>
@@ -12114,7 +12118,7 @@ Vælg en aktuel optagelse</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende optagelser</translation>
     </message>
 </context>
 <context>
