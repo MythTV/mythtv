@@ -62,26 +62,26 @@ OpenGLContext::~OpenGLContext()
 
     MakeCurrent(false);
 
-    if (m_priv->m_glx_window)
-    {
-        X11S(glXDestroyWindow(m_display, m_priv->m_glx_window));
-        m_priv->m_glx_window = 0;
-    }
-
-    if (m_priv->m_gl_window)
-    {
-        X11S(XDestroyWindow(m_display, m_priv->m_gl_window));
-        m_priv->m_gl_window = 0;
-    }
-
-    if (m_priv->m_glx_context)
-    {
-        X11S(glXDestroyContext(m_display, m_priv->m_glx_context));
-        m_priv->m_glx_context = 0;
-    }
-
     if (m_priv)
     {
+        if (m_priv->m_glx_window)
+        {
+            X11S(glXDestroyWindow(m_display, m_priv->m_glx_window));
+            m_priv->m_glx_window = 0;
+        }
+
+        if (m_priv->m_gl_window)
+        {
+            X11S(XDestroyWindow(m_display, m_priv->m_gl_window));
+            m_priv->m_gl_window = 0;
+        }
+
+        if (m_priv->m_glx_context)
+        {
+            X11S(glXDestroyContext(m_display, m_priv->m_glx_context));
+            m_priv->m_glx_context = 0;
+        }
+
         delete m_priv;
         m_priv = NULL;
     }
@@ -338,6 +338,9 @@ bool OpenGLContext::SetupTexture(const QSize &size, uint tex, int filt)
     unsigned char *scratch =
         new unsigned char[(size.width() * size.height() * 4) + 128];
 
+    if (!scratch)
+        return false;
+
     bzero(scratch, size.width() * size.height() * 4);
 
     GLint check;
@@ -349,11 +352,7 @@ bool OpenGLContext::SetupTexture(const QSize &size, uint tex, int filt)
     glGetTexLevelParameteriv(GetTextureType(), 0, GL_TEXTURE_WIDTH, &check);
     MakeCurrent(false);
 
-    if (scratch)
-    {
-        delete scratch;
-        scratch = NULL;
-    }
+    delete [] scratch;
 
     return (check == size.width());
 }
