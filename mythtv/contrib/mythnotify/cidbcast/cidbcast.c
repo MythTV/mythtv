@@ -153,7 +153,7 @@ char *replace(char *in_string, char *out_string, char* key_string, char *replace
   str_index = 0;
   while(str_index <= end && c != NULL)
   {
-    /* Copy characters from the left of matched pattern occurence */
+    /* Copy characters from the left of matched pattern occurrence */
     cpy_len = key_idx-str_index;
     strncpy(out_string+outstring_idx, in_string+str_index, cpy_len);
     outstring_idx += cpy_len;

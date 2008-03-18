@@ -74,7 +74,7 @@ int open_port(char * com_port) {
   }
 
   if ( debug >= 2 ) {
-    printf("  Setting file options suceeded!\n");
+    printf("  Setting file options succeeded!\n");
     printf("  Getting current options for the port...\n");
   }
 
@@ -123,7 +123,7 @@ int open_port(char * com_port) {
   }
 
   if ( debug >= 2 ) {
-    printf("  Setting local mode suceeded!\n");
+    printf("  Setting local mode succeeded!\n");
   }
   if ( debug >= 1 ) {
     printf("Leaving function open_port()\n");
@@ -157,7 +157,7 @@ void set_rts(int fd) {
     } else {
       printf("    RTS bit is unset\n");
     }
-    printf("  Checking current state of RTS line suceeded\n");
+    printf("  Checking current state of RTS line succeeded\n");
     printf("  Setting RTS line...\n");
   }
 
@@ -186,7 +186,7 @@ void set_rts(int fd) {
       printf("    FAILED to set RTS bit\n");
       exit(EXIT_FAILURE);
     }
-    printf("  Checking new state of RTS line suceeded\n");
+    printf("  Checking new state of RTS line succeeded\n");
   }
   if ( debug >= 1 ) {
     printf("Leaving function set_rts()\n");
@@ -277,7 +277,7 @@ int main (int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   if ( debug >= 1 ) {
-    printf("Writing data suceeded\n");
+    printf("Writing data succeeded\n");
   }
 
   tcdrain(fd);

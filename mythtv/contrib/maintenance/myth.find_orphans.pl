@@ -1,35 +1,38 @@
 #!/usr/bin/perl
 
-# check for recording anomolies -
+# check for recording anomalies -
 #   based somewhat on greg froese's "myth.rebuilddatabase.pl"
 #   -- Lincoln Dale <ltd@interlink.com.au>, September 2006
-# 2007-03-11:  Added pretty print of unknown files vs. orphaned thumbnails. (Robert Kulagowski)
-# 2008-02-15:  Added dryrun and rerecord options (David George)
+# 2007-03-11:  Added pretty print of unknown files vs. orphaned thumbnails.
+# (Robert Kulagowski) 2008-02-15: Added dryrun and rerecord options (David
+# George)
 
-#  The intent of this script is to be able to find orphaned rows in the 'recorded' table
-#  (entries which don't have matching media files) and orphaned media files (potentially
-#  taking up gigabytes of otherwise usable disk space) which have no matching row in
-#  the 'recorded' db table.
+#  The intent of this script is to be able to find orphaned rows in the
+#  'recorded' table (entries which don't have matching media files) and
+#  orphaned media files (potentially taking up gigabytes of otherwise usable
+#  disk space) which have no matching row in the 'recorded' db table.
 #
-#  By default, running the script will simply return a list of problems it finds.
-#  Running with --dodbdelete will remove db recorded rows for which there is no matching
-#  media file.  Running with --dodelete will delete media files for which there is no
-#  matching db record.
+#  By default, running the script will simply return a list of problems it
+#  finds. Running with --dodbdelete will remove db recorded rows for which
+#  there is no matching media file.  Running with --dodelete will delete
+#  media files for which there is no matching db record.
 #
-#  This script may be useful to fix up some orphaned db entries (causes mythweb to run
-#  verrry slow) as well as reclaim some disk space from some orphaned media files.
-#  (in an ideal world, neither of these would ever happen, but i've seen both happen in reality).
-#  This script makes it easy to keep track of whether it has or hasn't happened, even if you
-#  have thousands of recordings and terabytes of stored media.
+#  This script may be useful to fix up some orphaned db entries (causes
+#  mythweb to run very slowly) as well as reclaim some disk space from some
+#  orphaned media files. (in an ideal world, neither of these would ever
+#  happen, but I've seen both happen in reality). This script makes it easy
+#  to keep track of whether it has or hasn't happened, even if you have
+#  thousands of recordings and terabytes of stored media.
 #
-#  no warranties expressed or implied.  if you run this and it deletes all your recordings
-#  and sets mythtv to fill up all your disk space with The Home Shopping Network, its entirely
-#  your fault.
-
-# The dryrun option will allow you to see the db entries/files that will be deleted without
-# actually executing them.
-# The rerecord option is useful if you lose a hard drive in your storage group to tell
-# the scheduler to re-record the lost programs (if they happen to be shown again).
+#  no warranties expressed or implied.  if you run this and it deletes all
+#  your recordings and sets mythtv to fill up all your disk space with The
+#  Home Shopping Network, its entirely your fault.
+#
+# The dryrun option will allow you to see the db entries/files that will be
+# deleted without actually executing them.
+# The rerecord option is useful if you lose a hard drive in your storage
+# group to tell the scheduler to re-record the lost programs (if they happen
+# to be shown again).
 
 my $progname = "myth.find_orphans.pl";
 my $revision = "0.21";

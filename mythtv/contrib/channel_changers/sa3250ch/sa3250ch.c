@@ -177,7 +177,7 @@ int main (int argc, char *argv[])
                    cmd[0], cmd[1], cmd[2]);
        avc1394_transaction_block(handle, 0, cmd, 3, 1);       
    } else {
-       /* Default method sending three seperate digits */
+       /* Default method sending three separate digits */
        dig[2] = 0x30 | (chn % 10);
        dig[1] = 0x30 | ((chn % 100)  / 10);
        dig[0] = 0x30 | ((chn % 1000) / 100);

@@ -171,7 +171,7 @@ int main (int argc, char *argv[])
 
    if (!handle) {
       if (!errno) {
-         fprintf(stderr, "Not Compatable!\n");
+         fprintf(stderr, "Not Compatible!\n");
       } else {
          perror("Couldn't get 1394 handle");
          fprintf(stderr, "Is ieee1394, driver, and raw1394 loaded?\n");

@@ -101,7 +101,7 @@ sub EscapeFilename {
     my $fn = $_[0];
     # escape everything that's possibly dangerous
     $fn =~ s{([^[:alnum:]])}{\\\1}g;
-    # it's embarassing to escape / and . so put those back
+    # it's embarrassing to escape / and . so put those back
     $fn =~ s{\\([/.])}{\1}g;
     return $fn;
 }
@@ -347,7 +347,7 @@ foreach my $show (@files) {
             $guess_title = $row[0];
             $guess_subtitle = $row[1];
             $guess_description = $row[2];
-            print "Using guide data informaton for defaults\n";
+            print "Using guide data information for defaults\n";
         }
     }
 

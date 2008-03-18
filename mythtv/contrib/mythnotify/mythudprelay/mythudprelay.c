@@ -177,7 +177,7 @@ int send_xml_output(GLOBALS *globals, SOCKET_HANDLE* sock)
   
 } 
 
-/* Transfrom received XML data using XSL */
+/* Transform received XML data using XSL */
 int process_udp_xml(GLOBALS *globals)
 {
   xsltStylesheetPtr cur = NULL;
@@ -219,7 +219,7 @@ int process_udp_xml(GLOBALS *globals)
 				res,
 				cur);
 
-  /* If tranformation is empty - error. Its possible the incoming
+  /* If transformation is empty - error. Its possible the incoming
   ** XML was not an event the XSLT handles */
   if ((rc < 0) || (xml_output_len == 0))
   {
@@ -294,7 +294,7 @@ void print_help(char *progname)
   printf("  -b, --bcast     : UDP broadcast address (--bcast=255.255.255.255)\n");
   printf("  -x, --xslfile   : XSL file to use as a template (--xslfile=cid.xml)\n");
   printf("  -v, --verbose   : some verbose debug stuff\n");
-  printf("\nAn XSL (XSLT) file is required - it is used to transfrom the incoming\n");
+  printf("\nAn XSL (XSLT) file is required - it is used to transform the incoming\n");
   printf("XML to the output XML (mythnotify)\n");
 }
 

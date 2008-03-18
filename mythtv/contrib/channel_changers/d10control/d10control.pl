@@ -4,9 +4,9 @@
 # By Josh Wilmes (http://www.hitchhiker.org/dss)
 # Based on info from http://www.isd.net/mevenmo/audiovideo.html
 #
-# I take no responsibility for any damage this script might cause.  
-# Feel free to modify and redistribute this as you see fit, but please retain
-# the comments above.
+# I take no responsibility for any damage this script might cause. Feel free
+# to modify and redistribute this as you see fit, but please retain the
+# comments above.
 
 # See usage command or run without and parameters for how to use
 # Documentation of box protocol and cables at 
@@ -322,7 +322,7 @@ sub channel_change_type {
    } elsif ($type eq "command") {
       $chan_change_key_param = 0;
    } else {
-      die "Unkown channel_change_type $type\n";
+      die "Unknown channel_change_type $type\n";
    }
 }
 

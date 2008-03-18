@@ -20,8 +20,8 @@ use DBI;
 ### default settings ###
 %settings = (
 	#
-	# mythtv's configulation file
-	# please edit configulation path
+	# mythtv's configuration file
+	# please edit configuration path
 	'configfile'	=> '/usr/local/share/mythtv/mysql.txt',
 
 	# mail charset

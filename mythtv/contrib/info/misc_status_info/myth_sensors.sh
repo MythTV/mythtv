@@ -14,7 +14,7 @@
 # The following lines output CPU and Motherboard temperature and CPU and Case
 # fan speed information.  Modify the patterns (i.e. /CPU Temp/) to match the
 # sensors output lines containing the data you want to grab (i.e. /Core0
-# Temp/).  Continue adding lines to the awk program as desired to incude
+# Temp/).  Continue adding lines to the awk program as desired to include
 # additional information.
 
 sensors | awk '

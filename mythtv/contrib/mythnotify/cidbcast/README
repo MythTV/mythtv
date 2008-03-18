@@ -16,7 +16,7 @@ broadcast.
 
   By default, /dev/ttyS0 is used, the UDP port is 6947, and the broadcast
 address is 255.255.255.255. The default modem init string is
-"AT S7=45 S0=0 L0 V1 X4 &c1 E0 Q0 #CID=1 S41=1". All these can be overriden
+"AT S7=45 S0=0 L0 V1 X4 &c1 E0 Q0 #CID=1 S41=1". All these can be overridden
 with command line options - invoke with '--help' for syntax.
 
   NOTE: S41=1 is used to turn on distinctive ringing detection.
@@ -81,7 +81,7 @@ gnassas@mac.com 6/25/2005
 
 The phonebook argument allows cidbcast to supply names when the
 telco doesn't transmit one which is very handy in my area where
-few/no mobile numbers have names associated with them. Subsitutions
+few/no mobile numbers have names associated with them. Substitutions
 are made just before expanding the keywords in the xml file. The
 phonebook parsing routine is very simplistic - it expects a number,
 a colon and then a name with no whitespace before or after. The
