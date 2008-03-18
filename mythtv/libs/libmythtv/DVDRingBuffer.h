@@ -41,11 +41,12 @@ class MPUBLIC DVDRingBufferPriv
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = part; _title = title; }
     uint GetTotalTimeOfTitle(void);
-    uint GetChapterLength(void) { return pgLength / 90000; }
+    uint GetChapterLength(void) const { return pgLength / 90000; }
     uint GetCellStart(void);
-    bool InStillFrame(void) { return cellHasStillFrame; }
-    bool IsWaiting(void) { return dvdWaiting; }
-    int  NumPartsInTitle(void) { return titleParts; }
+    bool InStillFrame(void) const { return cellHasStillFrame; }
+    bool AudioStreamsChanged(void) const { return audioStreamsChanged; }
+    bool IsWaiting(void) const { return dvdWaiting; }
+    int  NumPartsInTitle(void) const { return titleParts; }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
 
     AVSubtitleRect *GetMenuButton(void);
@@ -97,6 +98,7 @@ class MPUBLIC DVDRingBufferPriv
     int NumMenuButtons(void) const;
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     void InStillFrame(bool change) { cellHasStillFrame = change; }
+    void AudioStreamsChanged(bool change) { audioStreamsChanged = change; }
     uint GetCurrentTime(void) { return (currentTime / 90000); }
     uint TitleTimeLeft(void);
     void  SetTrack(uint type, int trackNo);
@@ -129,6 +131,7 @@ class MPUBLIC DVDRingBufferPriv
     bool           gotStop;
 
     bool           cellHasStillFrame;
+    bool           audioStreamsChanged;
     bool           dvdWaiting;
     long long      titleLength;
     MythTimer      stillFrameTimer;

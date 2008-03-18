@@ -1443,6 +1443,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     map<int,uint> lang_sub_cnt;
     map<int,uint> lang_aud_cnt;
 
+    if (ringBuffer->isDVD() &&
+        ringBuffer->DVD()->AudioStreamsChanged())
+    {
+        ringBuffer->DVD()->AudioStreamsChanged(false);
+        RemoveAudioStreams();
+    }
+
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = ic->streams[i]->codec;
@@ -1858,6 +1865,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         GetNVP()->SetAudioParams(-1, -1, -1, false /* AC3/DTS pass-through */);
         GetNVP()->ReinitAudio();
+        if (ringBuffer->isDVD()) 
+            audioIn = AudioInfo();
     }
 
     // if we don't have a video stream we still need to make sure some
@@ -1991,7 +2000,6 @@ void AvFormatDecoder::RemoveAudioStreams()
         else
             i++;
     }
-    av_read_frame_flush(ic);
 }
 
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -3020,7 +3028,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 if ((storedPackets.count() > 10 && !decodeStillFrame) ||
                     decodeStillFrame)
                 {
-                    RemoveAudioStreams();
                     storevideoframes = false;
                     dvdTitleChanged = false;
                     ScanStreams(true);
