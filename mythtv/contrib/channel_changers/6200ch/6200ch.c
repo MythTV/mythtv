@@ -92,6 +92,7 @@
 
 void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn);
 void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn);
+void set_power_fast(raw1394handle_t handle, int device, int verbose);
 
 void usage()
 {
@@ -99,6 +100,7 @@ void usage()
            "<channel_num>\n");
    fprintf(stderr, "-v        print additional verbose output\n");
    fprintf(stderr, "-s        use single packet method\n");
+   fprintf(stderr, "-w        toggle power state\n");
    fprintf(stderr, "-n NODE   node to start device scanning on (default:%i)\n",
            STARTING_NODE);
    fprintf(stderr, "-p PORT   port/adapter to use              (default:%i)\n",
@@ -114,23 +116,22 @@ int main (int argc, char *argv[])
    int i;
    int verbose = 0;
    int single_packet = 0;
+   int toggle_power = 0;
    int bGUID=0;
    octlet_t cli_GUID=0LL;
    octlet_t node_GUID=0LL;
-   quadlet_t cmd[2];
-   int chn = 550;
+   int chn = 0;
 
    /* some people experience crashes when starting on node 1 */
    int starting_node = STARTING_NODE;
    int starting_port = STARTING_PORT;
    int c;
-   int index;
 
    if (argc < 2) 
       usage();
 
    opterr = 0;
-   while ((c = getopt(argc, argv, "vsg:n:p:")) != -1)
+   while ((c = getopt(argc, argv, "vswg:n:p:")) != -1)
    {
        switch (c) {
        case 'v':
@@ -138,6 +139,9 @@ int main (int argc, char *argv[])
            break;
        case 's':
            single_packet = 1;
+           break;
+       case 'w':
+           toggle_power = 1;
            break;
        case 'n':
            starting_node = atoi(optarg);
@@ -157,11 +161,15 @@ int main (int argc, char *argv[])
    }
 
    /* print out usage message if not enough arguments */
-   if (optind != argc-1) {
+   if (optind == argc-1)
+   {
+       /* the last argument is the channel number */
+       chn = atoi(argv[optind]);
+   }
+   else if (!toggle_power)
+   {
        usage();
    }
-   /* the last argument is the channel number */
-   chn = atoi(argv[optind]);
 
 #ifdef RAW1394_V_0_8
    raw1394handle_t handle = raw1394_get_handle();
@@ -268,10 +276,16 @@ int main (int argc, char *argv[])
         exit(1);
    }
 
-   if (single_packet)
-       set_chan_fast(handle, device, verbose, chn);
-   else
-       set_chan_slow(handle, device, verbose, chn);
+   if (toggle_power)
+       set_power_fast(handle, device, verbose);
+
+   if (chn)
+   {
+       if (single_packet)
+           set_chan_fast(handle, device, verbose, chn);
+       else
+           set_chan_slow(handle, device, verbose, chn);
+   }
 
    raw1394_destroy_handle(handle);
    exit(0);
@@ -314,6 +328,27 @@ void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
                chn, cmd[0], cmd[1], cmd[2]);
  
     avc1394_transaction_block(handle, device, cmd, 3, RETRY_COUNT_FAST);
+}
+
+void set_power_fast(raw1394handle_t handle, int device, int verbose)
+{
+    quadlet_t cmd[2];
+    quadlet_t *response;
+
+    cmd[0] = ((CTL_CMD0) & 0xffffff00) | AVC1394_PANEL_OPERATION_POWER;
+    cmd[1] = 0;
+
+    response = avc1394_transaction_block(
+        handle, device, cmd, 2, RETRY_COUNT_FAST);
+
+    if (verbose)
+    {
+        printf("AV/C command for power = 0x%08X\n", cmd[0]);
+        if (NULL != response)
+          printf("  (%x) 0x%x\n", (*response) >> 24, *response);
+        else
+          printf("  No response\n");
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
