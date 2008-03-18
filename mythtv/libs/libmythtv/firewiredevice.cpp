@@ -224,8 +224,11 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return true;
     }
 
+    // the PACE is obviously not a Motorola channel changer, but the
+    // same commands work for it as the Motorola.
     bool is_mot = ((panel_model.upper().left(4) == "DCT-") ||
-                   (panel_model.upper().left(4) == "DCH-"));
+                   (panel_model.upper().left(4) == "DCH-") ||
+                   (panel_model.upper().left(4) == "PACE-"));
 
     if (is_mot && !alt_method)
     {
@@ -444,6 +447,20 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[motorola_vendor_ids[i] << 32 | 0x64cb] = "DCT-6212";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
     }
+
+    const uint64_t pace_vendor_ids[] =
+    {
+        /* PACE 550-HD */
+        0x5094,
+    };
+
+    const uint pace_vendor_id_cnt =
+        sizeof(pace_vendor_ids) / sizeof(uint64_t);
+
+    for (uint i = 0; i < pace_vendor_id_cnt; i++)
+    {
+        id_to_model[pace_vendor_ids[i] << 32 | 0xd330] = "PACE-550";
+    }
 }
 
 bool FirewireDevice::IsSTBSupported(const QString &panel_model)
@@ -458,6 +475,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "SA3250HD") ||
             (model == "SA4200HD") ||
             (model == "SA4250HDC") ||
+            (model == "PACE-550") ||
             (model == "GENERIC"));
 }
 
