@@ -1641,22 +1641,20 @@ QRect OSD::parseRect(QString text)
 
 void OSD::ClearAll(const QString &name)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
         container->Clear();
-
-    osdlock.unlock();
 }
 
 void OSD::ClearAllText(const QString &name)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
         container->ClearAllText();
-
-    osdlock.unlock();
 }
 
 void OSD::SetText(const QString &name,
@@ -1664,7 +1662,8 @@ void OSD::SetText(const QString &name,
 {
     HideAllExcept(name);
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -1686,12 +1685,12 @@ void OSD::SetText(const QString &name,
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::SetInfoText(QMap<QString, QString> infoMap, int length)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("program_info");
     if (container)
     {
@@ -1710,7 +1709,6 @@ void OSD::SetInfoText(QMap<QString, QString> infoMap, int length)
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::SetInfoText(const QString &text, const QString &subtitle,
@@ -1725,7 +1723,8 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
 
     bool hassubtitle = true;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("program_info");
     if (container)
     {
@@ -1763,7 +1762,6 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::SetUpOSDClosedHandler(TV *tv)
@@ -1797,7 +1795,8 @@ void OSD::ShowStatus(struct StatusPosInfo posInfo,
 
     HideAllExcept("status");
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("status");
     if (container)
     {
@@ -1840,12 +1839,12 @@ void OSD::ShowStatus(struct StatusPosInfo posInfo,
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::UpdateStatus(struct StatusPosInfo posInfo)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("status");
     if (container)
     {
@@ -1923,12 +1922,12 @@ void OSD::UpdateStatus(struct StatusPosInfo posInfo)
             }
         }
     }
-    osdlock.unlock();
 }
 
 void OSD::EndStatus(void)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("status");
     if (container)
     {
@@ -1936,12 +1935,12 @@ void OSD::EndStatus(void)
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::SetChannumText(const QString &text, int length)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("channel_number");
     if (container)
     {
@@ -1953,14 +1952,13 @@ void OSD::SetChannumText(const QString &text, int length)
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::AddCCText(const QString &text, int x, int y, int color, 
                     bool teletextmode)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("cc_page");
     if (container)
     {
@@ -1972,12 +1970,12 @@ void OSD::AddCCText(const QString &text, int x, int y, int color,
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::ClearAllCCText()
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("cc_page");
     if (container)
     {
@@ -1991,14 +1989,14 @@ void OSD::ClearAllCCText()
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::UpdateCCText(vector<ccText*> *ccbuf,
                        int replace, int scroll, bool scroll_prsv,
                        int scroll_yoff, int scroll_ymax)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("cc_page");
     if (container)
     {
@@ -2014,7 +2012,6 @@ void OSD::UpdateCCText(vector<ccText*> *ccbuf,
         m_setsvisible = true;
         changed = true;
     }
-    osdlock.unlock();
 }
 
 void OSD::SetCC708Service(const CC708Service *service)
@@ -2068,7 +2065,8 @@ void OSD::SetSettingsText(const QString &text, int length)
 {
     HideAllExcept("settings");
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet("settings");
     if (container)
     {
@@ -2080,15 +2078,14 @@ void OSD::SetSettingsText(const QString &text, int length)
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::NewDialogBox(const QString &name, const QString &message, 
                        QStringList &options, int length,
                        int initial_selection)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -2175,11 +2172,13 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     m_setsvisible = true;
     changed = true;
 
-    osdlock.unlock();
+    locker.mutex()->unlock();
 
     int count = 0;
     while (!container->HasDisplayed() && count++ < 10)
         usleep(1000);
+
+    locker.mutex()->lock();
 }
 
 void OSD::HighlightDialogSelection(OSDSet *container, int num)
@@ -2211,7 +2210,7 @@ void OSD::HighlightDialogSelection(OSDSet *container, int num)
 
 void OSD::TurnDialogOff(const QString &name)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
     if (container)
@@ -2219,13 +2218,12 @@ void OSD::TurnDialogOff(const QString &name)
         container->Hide();
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::DialogUp(const QString &name)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -2242,12 +2240,12 @@ void OSD::DialogUp(const QString &name)
             changed = true;
         }
     }
-    osdlock.unlock();
 }
 
 void OSD::DialogDown(const QString &name)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -2264,19 +2262,16 @@ void OSD::DialogDown(const QString &name)
             changed = true;
         }
     }
-    osdlock.unlock();
 }
 
 bool OSD::DialogShowing(const QString &name)
 {
-    if (name == "")
+    QMutexLocker locker(&osdlock);
+
+    if (name.isEmpty())
         return false;
 
-    osdlock.lock();
-    bool ret = (GetSet(name) != NULL);
-    osdlock.unlock();
-
-    return ret;
+    return (GetSet(name) != NULL);
 }
 
 void OSD::DialogAbort(const QString &name)
@@ -2302,14 +2297,14 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
         return;
 
     char name[128];
-    sprintf(name, "%lld-%d", number, type);
+    snprintf(name, 128 - 1, "%lld-%d", number, type);
 
     int pos  = number * 1000 / totalframes;
     int xtmp = (int)(round(editarrowRect.width() * wmult) / 1000.0 * pos);
     int xpos = xtmp + (int)(editarrowRect.left() * wmult);
     int ypos = (int) round(editarrowRect.top() * hmult);
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *set = new OSDSet(name, false,
                              osdBounds.width(), osdBounds.height(),
@@ -2340,29 +2335,27 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     set->Display();
 
     changed = true;
-
-    osdlock.unlock();
 }
 
 void OSD::HideEditArrow(long long number, int type)
 {
     char name[128];
-    sprintf(name, "%lld-%d", number, type);
+    snprintf(name, 128 - 1, "%lld-%d", number, type);
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     OSDSet *set = GetSet(name);
     if (set)
         set->Hide();
 
     changed = true;
-    osdlock.unlock();
 }
 
 bool OSD::HideAllExcept(const QString &other)
 {
     bool result = false;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *oset = GetSet(other);
 
@@ -2382,15 +2375,15 @@ bool OSD::HideAllExcept(const QString &other)
         }
 
     changed = true;
-    osdlock.unlock();
 
     return result;
 }
 
 bool OSD::HideSet(const QString &name)
 {
+    QMutexLocker locker(&osdlock);
+
     bool ret = false;
-    osdlock.lock();
 
     OSDSet *set = GetSet(name);
     if (set)
@@ -2401,14 +2394,15 @@ bool OSD::HideSet(const QString &name)
     }
 
     changed = true;
-    osdlock.unlock();
+
     return ret;
 }
 
 bool OSD::HideSets(QStringList &name)
 {
+    QMutexLocker locker(&osdlock);
+
     bool ret = false;
-    osdlock.lock();
 
     OSDSet *set;
     QStringList::Iterator i = name.begin();
@@ -2424,14 +2418,14 @@ bool OSD::HideSets(QStringList &name)
     }
 
     changed = true;
-    osdlock.unlock();
+
     return ret;
 }
 
 void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 
                          const QString &edittime, const QString &framecnt)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     QString name = "editmode";
     OSDSet *set = GetSet(name);
@@ -2454,14 +2448,12 @@ void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                        long long totalFrames)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     QString name = "editmode";
     OSDSet *set = GetSet(name);
@@ -2525,20 +2517,19 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::SetVisible(OSDSet *set, int length)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     if (length > 0)
         set->DisplayFor(length * 1000000);
     else
         set->Display();
+
     m_setsvisible = true;
     changed = true;
-    osdlock.unlock();
 }
 
 void OSD::DisableFade(void)
@@ -2696,7 +2687,7 @@ void OSD::StartNotify(UDPNotifyOSDSet *notifySet, int displaytime)
 
     vector<UDPNotifyOSDTypeText *> *textList;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(notifySet->GetName());
     if (container)
@@ -2723,8 +2714,6 @@ void OSD::StartNotify(UDPNotifyOSDSet *notifySet, int displaytime)
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
@@ -2732,7 +2721,7 @@ void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
     if (!notifySet)
         return;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(notifySet->GetName());
     if (container)
@@ -2742,8 +2731,6 @@ void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
         m_setsvisible = true;
         changed = true;
     }
-
-    osdlock.unlock();
 }
 
 OSDListTreeType *OSD::ShowTreeMenu(const QString &name, 
@@ -2754,7 +2741,7 @@ OSDListTreeType *OSD::ShowTreeMenu(const QString &name,
 
     OSDListTreeType *rettree = NULL;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
     if (container)
@@ -2771,8 +2758,6 @@ OSDListTreeType *OSD::ShowTreeMenu(const QString &name,
             changed = true;
         }
     }
-
-    osdlock.unlock();
 
     return rettree;
 }
@@ -2791,7 +2776,7 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
 
     bool ret = runningTreeMenu->HandleKeypress(e);
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
     if (!runningTreeMenu->IsVisible())
     {
@@ -2803,8 +2788,6 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
     }
 
     changed = true;
-
-    osdlock.unlock();
 
     return ret;
 }
