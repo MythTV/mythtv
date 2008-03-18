@@ -580,6 +580,10 @@ static void compute_frame_duration(int *pnum, int *pden, AVStream *st,
 
     *pnum = 0;
     *pden = 0;
+
+    if (!st || !st->codec)
+        return;
+    
     switch(st->codec->codec_type) {
     case CODEC_TYPE_VIDEO:
         if(st->time_base.num*1000LL > st->time_base.den){
@@ -792,7 +796,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
     for(;;) {
         /* select current input stream component */
         st = s->cur_st;
-        if (st) {
+        if (st && st->codec) {
             if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
                 /* raw data support */
@@ -867,7 +871,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 s->cur_pkt.pos = startpos;
 
             st = s->streams[s->cur_pkt.stream_index];
-            if(st->codec->debug & FF_DEBUG_PTS)
+            if(st && st->codec && st->codec->debug & FF_DEBUG_PTS)
                 av_log(s, AV_LOG_DEBUG, "av_read_packet stream=%d, pts=%"PRId64", dts=%"PRId64", size=%d\n",
                     s->cur_pkt.stream_index,
                     s->cur_pkt.pts,
@@ -877,7 +881,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             s->cur_st = st;
             s->cur_ptr = s->cur_pkt.data;
             s->cur_len = s->cur_pkt.size;
-            if (st->need_parsing && !st->parser) {
+            if (st && st->need_parsing && !st->parser) {
                 st->parser = av_parser_init(st->codec->codec_id);
                 if (!st->parser) {
                     /* no parser available : just output the raw packets */
@@ -892,7 +896,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             }
         }
     }
-    if(st->codec->debug & FF_DEBUG_PTS)
+    if(st->codec && st->codec->debug & FF_DEBUG_PTS)
         av_log(s, AV_LOG_DEBUG, "av_read_frame_internal stream=%d, pts=%"PRId64", dts=%"PRId64", size=%d\n",
             pkt->stream_index,
             pkt->pts,
