@@ -47,8 +47,8 @@ class GameTreeItem : public QObject
     Q_OBJECT
   public:
     GameTreeItem(GameTreeRoot* root)
-      : m_root(root)
-      , m_romInfo(0)
+      : m_romInfo(0)
+      , m_root(root)
       , m_depth(0)
       , m_isFilled(false)
     {
@@ -58,8 +58,8 @@ class GameTreeItem : public QObject
     }
 
     GameTreeItem(GameTreeRoot* root, bool showHashed)
-      : m_root(root)
-      , m_romInfo(0)
+      : m_romInfo(0)
+      , m_root(root)
       , m_depth(0)
       , m_isFilled(false)
     {
