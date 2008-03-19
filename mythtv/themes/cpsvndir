@@ -5,6 +5,19 @@
 DESTDIR=$2
 SOURCE=$1
 
+if [ -z "$1" -o -z "$2" ]; then
+    echo "Usage: $0 source-dir destination-dir"
+    exit -1
+fi
+
+# Some shells don't set EUID
+if [ -z "$EUID" ]; then
+    if [ -x /usr/bin/id ]; then EUID=`id -u` ;fi
+    if [ -z "$EUID" ];     then EUID=$USER   ;fi
+    if [ -z "$EUID" ];     then EUID=0       ;fi  # Will fail if not root
+fi
+
+
 mkdir -p $DESTDIR/$SOURCE || exit 1
 
 find $SOURCE -path '*/.svn' -prune -or -type d -exec mkdir -p $DESTDIR/{} \;
@@ -15,4 +28,3 @@ find $SOURCE -path '*/.svn' -prune -or ! -type d \
 
 
 exit 0
-
