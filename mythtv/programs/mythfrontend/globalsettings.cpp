@@ -1789,7 +1789,7 @@ static HostComboBox *ChannelOrdering()
     HostComboBox *gc = new HostComboBox("ChannelOrdering");
     gc->setLabel(QObject::tr("Channel ordering"));
     gc->addSelection(QObject::tr("channel number"), "channum");
-    gc->addSelection(QObject::tr("channel name"),   "callsign");
+    gc->addSelection(QObject::tr("callsign"),       "callsign");
     return gc;
 }
 
