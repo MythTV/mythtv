@@ -240,7 +240,7 @@ void UPnpMedia::BuildMediaMap(void)
                 filecount = nextID;
 
                 VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan "
-                                                "starting in :%1:")
+                                                "starting in :%2:")
                                                     .arg(sMediaType)
                                                     .arg(*it));
 
