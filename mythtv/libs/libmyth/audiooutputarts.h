@@ -14,15 +14,11 @@ using namespace std;
 class AudioOutputARTS : public AudioOutputBase
 {
   public:
-     AudioOutputARTS(QString main_device, QString passthru_device,
-                     int audio_bits, 
-                     int audio_channels, int audio_samplerate,
-                     AudioOutputSource source,
-                     bool set_initial_vol, bool laudio_passthru);
+     AudioOutputARTS(const AudioSettings &settings);
      virtual ~AudioOutputARTS();
 
     // Volume control
-    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
 
   protected:
@@ -31,8 +27,8 @@ class AudioOutputARTS : public AudioOutputBase
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual inline int getSpaceOnSoundcard(void);
-    virtual inline int getBufferedOnSoundcard(void);
+    virtual int  GetSpaceOnSoundcard(void) const;
+    virtual int  GetBufferedOnSoundcard(void) const;
 
      
 

@@ -481,7 +481,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
 bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible) const
 {
     bool rbf_playing = (ringBuffer != NULL) && !ringBuffer->isPaused();
-    bool aud_playing = (audioOutput != NULL) && !audioOutput->GetPause();
+    bool aud_playing = (audioOutput != NULL) && !audioOutput->IsPaused();
     if (is_pause_still_possible)
     {
         bool decoder_pausing = (0.0f == next_play_speed) && !next_normal_speed;
@@ -798,9 +798,10 @@ QString NuppelVideoPlayer::ReinitAudio(void)
 
     if (audioOutput)
     {
-        audioOutput->Reconfigure(audio_bits, audio_channels,
-                                 audio_samplerate, audio_passthru,
-                                 audio_codec);
+        const AudioSettings settings(
+            audio_bits, audio_channels, audio_samplerate,
+            audio_passthru, audio_codec);
+        audioOutput->Reconfigure(settings);
         errMsg = audioOutput->GetError();
         if (!errMsg.isEmpty())
             audioOutput->SetStretchFactor(audio_stretchfactor);
@@ -2726,7 +2727,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
 
-    if (audioOutput && !audio_paused && audioOutput->GetPause())
+    if (audioOutput && !audio_paused && audioOutput->IsPaused())
         audioOutput->Pause(false);
 
     AVSync();

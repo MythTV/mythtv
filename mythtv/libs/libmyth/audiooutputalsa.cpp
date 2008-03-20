@@ -13,23 +13,14 @@ using namespace std;
 #define LOC_WARN QString("ALSA, Warning: ")
 #define LOC_ERR QString("ALSA, Error: ")
 
-AudioOutputALSA::AudioOutputALSA(
-    QString laudio_main_device, QString           laudio_passthru_device,
-    int     laudio_bits,        int               laudio_channels,
-    int     laudio_samplerate,  AudioOutputSource lsource,
-    bool    lset_initial_vol,   bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     pcm_handle(NULL),             numbadioctls(0),
     killAudioLock(false),         mixer_handle(NULL),
-    mixer_control(QString::null), volume_range_multiplier(1.0f),
-    playback_vol_min(0),          playback_vol_max(1)
+    mixer_control(QString::null)
 {
     // Set everything up
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputALSA::~AudioOutputALSA()
@@ -236,7 +227,7 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
     }
 }
 
-inline int AudioOutputALSA::getBufferedOnSoundcard(void)
+int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 { 
     if (pcm_handle == NULL)
     {
@@ -265,11 +256,13 @@ inline int AudioOutputALSA::getBufferedOnSoundcard(void)
 }
 
 
-inline int AudioOutputALSA::getSpaceOnSoundcard(void)
+int AudioOutputALSA::GetSpaceOnSoundcard(void) const
 {
     if (pcm_handle == NULL)
     {
-        VERBOSE(VB_IMPORTANT, QString("getSpaceOnSoundcard() called with pcm_handle == NULL!"));
+        VERBOSE(VB_IMPORTANT, QString("GetSpaceOnSoundcard() ") +
+                "called with pcm_handle == NULL!");
+
         return 0;
     }
 
@@ -477,9 +470,9 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle,
 }
 
 
-int AudioOutputALSA::GetVolumeChannel(int channel)
+int AudioOutputALSA::GetVolumeChannel(int channel) const
 {
-    long actual_volume, volume;
+    long actual_volume;
 
     if (mixer_handle == NULL)
         return 100;
@@ -509,15 +502,14 @@ int AudioOutputALSA::GetVolumeChannel(int channel)
         }
     }
 
-    GetVolumeRange(elem);
+    ALSAVolumeInfo vinfo = GetVolumeRange(elem);
 
-    snd_mixer_selem_get_playback_volume(elem, (snd_mixer_selem_channel_id_t)channel,
-                                        &actual_volume);
-    volume = (int)((actual_volume - playback_vol_min) *
-                   volume_range_multiplier);
+    snd_mixer_selem_get_playback_volume(
+        elem, (snd_mixer_selem_channel_id_t)channel, &actual_volume);
 
-    return volume;
+    return vinfo.ToMythRange(actual_volume);
 }
+
 void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
 {
     SetCurrentVolume(mixer_control, channel, volume);
@@ -557,10 +549,9 @@ void AudioOutputALSA::SetCurrentVolume(QString control, int channel, int volume)
         }
     }
 
-    GetVolumeRange(elem);
+    ALSAVolumeInfo vinfo = GetVolumeRange(elem);
 
-    int set_vol = (int)(volume / volume_range_multiplier +
-                        playback_vol_min + 0.5);
+    long set_vol = vinfo.ToALSARange(volume);
 
     int err = snd_mixer_selem_set_playback_volume(elem, chan, set_vol);
     if (err < 0)
@@ -677,15 +668,29 @@ void AudioOutputALSA::SetupMixer(void)
     }
 }
 
-void AudioOutputALSA::GetVolumeRange(snd_mixer_elem_t *elem)
+ALSAVolumeInfo AudioOutputALSA::GetVolumeRange(snd_mixer_elem_t *elem) const
 {
-    snd_mixer_selem_get_playback_volume_range(elem, &playback_vol_min,
-                                              &playback_vol_max);
-    volume_range_multiplier = (100.0 / (float)(playback_vol_max -
-                                               playback_vol_min));
+    long volume_min, volume_max;
+
+    int err = snd_mixer_selem_get_playback_volume_range(
+        elem, &volume_min, &volume_max);
+
+    if (err < 0)
+    {
+        static bool first_time = true;
+        if (first_time)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "snd_mixer_selem_get_playback_volume_range()" + ENO);
+            first_time = false;
+        }
+    }
+
+    ALSAVolumeInfo vinfo(volume_min, volume_max);
 
     VERBOSE(VB_AUDIO, QString("Volume range is %1 to %2, mult=%3")
-            .arg(playback_vol_min).arg(playback_vol_max)
-            .arg(volume_range_multiplier));
-}
+            .arg(vinfo.volume_min).arg(vinfo.volume_max)
+            .arg(vinfo.range_multiplier));
 
+    return vinfo;
+}

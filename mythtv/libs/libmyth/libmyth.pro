@@ -11,7 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
-HEADERS += audiooutputdigitalencoder.h
+HEADERS += audiooutputdigitalencoder.h audiosettings.cpp
 HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += DisplayRes.h DisplayResScreen.h exitcodes.h
 HEADERS += generictree.h httpcomms.h langsettings.h lcddevice.h
@@ -23,12 +23,12 @@ HEADERS += mythstorage.h mythwidgets.h mythwizard.h
 HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
 HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
 HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
-HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
+HEADERS += volumebase.h virtualkeyboard.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += compat.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
-SOURCES += audiooutputdigitalencoder.cpp
+SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += generictree.cpp httpcomms.cpp langsettings.cpp lcddevice.cpp
@@ -40,7 +40,7 @@ SOURCES += mythstorage.cpp mythwidgets.cpp mythwizard.cpp
 SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
-SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
+SOURCES += volumebase.cpp virtualkeyboard.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
@@ -70,7 +70,8 @@ inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h mythverbose.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
-inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
+inc.files += audiooutput.h audiosettings.h
+inc.files += inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h

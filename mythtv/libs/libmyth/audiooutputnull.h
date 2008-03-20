@@ -23,34 +23,29 @@
 
 class AudioOutputNULL : public AudioOutputBase
 {
-public:
-    AudioOutputNULL(QString laudio_main_device,
-                    QString laudio_passthru_device,
-                    int laudio_bits,
-                    int laudio_channels, int laudio_samplerate,
-                    AudioOutputSource lsource,
-                    bool lset_initial_vol, bool laudio_passthru);
+  public:
+    AudioOutputNULL(const AudioSettings &settings);
+
     virtual ~AudioOutputNULL();
 
     virtual void Reset(void);
 
 
     // Volume control
-    virtual int GetVolumeChannel(int /* channel */){ return 100; }
-    virtual void SetVolumeChannel(int /* channel */, int /* volume */){ return; }
+    virtual int GetVolumeChannel(int /* channel */) const { return 100; }
+    virtual void SetVolumeChannel(int /* channel */, int /* volume */){return;}
 
     virtual int readOutputData(unsigned char *read_buffer, int max_length);
 
-protected:
-    // You need to implement the following functions
+  protected:
+    // AudioOutputBase
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual inline int getSpaceOnSoundcard(void);
-    virtual inline int getBufferedOnSoundcard(void);
+    virtual int  GetSpaceOnSoundcard(void) const;
+    virtual int  GetBufferedOnSoundcard(void) const;
 
-private:
-
+  private:
     QMutex        pcm_output_buffer_mutex;
     unsigned char pcm_output_buffer[NULLAUDIO_OUTPUT_BUFFER_SIZE];
     int           current_buffer_size;

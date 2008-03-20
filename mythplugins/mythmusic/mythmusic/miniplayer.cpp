@@ -181,7 +181,7 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                 if (gPlayer->isPlaying())
                     return;
 
-                if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
+                if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
                 {
                     gPlayer->pause();
                     return;
@@ -198,7 +198,8 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                     if (gPlayer->isPlaying())
                         gPlayer->stop();
 
-                    if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
+                    if (gPlayer->getOutput() &&
+                        gPlayer->getOutput()->IsPaused())
                     {
                         gPlayer->pause();
                         return;

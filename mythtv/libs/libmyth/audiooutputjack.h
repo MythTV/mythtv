@@ -12,16 +12,11 @@ using namespace std;
 class AudioOutputJACK : public AudioOutputBase
 {
   public:
-    AudioOutputJACK(QString laudio_main_device,
-                    QString laudio_passthru_device,
-                    int laudio_bits,
-                    int laudio_channels, int laudio_samplerate,
-                    AudioOutputSource lsource,
-                    bool lset_initial_vol, bool laudio_passthru);
+    AudioOutputJACK(const AudioSettings &settings);
     virtual ~AudioOutputJACK();
    
     // Volume control
-    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
  
   protected:
@@ -30,8 +25,8 @@ class AudioOutputJACK : public AudioOutputBase
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual inline int getSpaceOnSoundcard(void);
-    virtual inline int getBufferedOnSoundcard(void);
+    virtual int  GetSpaceOnSoundcard(void) const;
+    virtual int  GetBufferedOnSoundcard(void) const;
 
   private:
 

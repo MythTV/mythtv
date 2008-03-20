@@ -71,22 +71,14 @@ void CALLBACK AudioOutputWinPrivate::waveOutProc(
     }
 }
 
-AudioOutputWin::AudioOutputWin(
-    QString laudio_main_device,  QString           laudio_passthru_device,
-    int     laudio_bits,         int               laudio_channels,
-    int     laudio_samplerate,   AudioOutputSource lsource,
-    bool    lset_initial_vol,    bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     m_priv(new AudioOutputWinPrivate()),
     m_nPkts(0),
     m_CurrentPkt(0),
     m_OutPkts(NULL)
 {
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 
     m_OutPkts = (unsigned char**) calloc(kPacketCnt, sizeof(unsigned char*));
 }
@@ -193,17 +185,17 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
     m_CurrentPkt++;
 }
 
-int AudioOutputWin::getSpaceOnSoundcard(void)
+int AudioOutputWin::GetSpaceOnSoundcard(void) const
 {
     return (kPacketCnt - m_nPkts) * 1536 * 4;
 }
 
-int AudioOutputWin::getBufferedOnSoundcard(void)
+int AudioOutputWin::GetBufferedOnSoundcard(void) const
 {
     return m_nPkts * 1536 * 4;
 }
 
-int AudioOutputWin::GetVolumeChannel(int channel)
+int AudioOutputWin::GetVolumeChannel(int channel) const
 {
     DWORD dwVolume = 0xffffffff;
     int Volume = 100;

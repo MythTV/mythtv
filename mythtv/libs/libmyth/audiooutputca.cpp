@@ -111,20 +111,11 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
  *  \brief Implements Core Audio (Mac OS X Hardware Abstraction Layer) output.
  */
 
-AudioOutputCA::AudioOutputCA(QString laudio_main_device,
-                             QString laudio_passthru_device,
-                             int laudio_bits, int laudio_channels,
-                             int laudio_samplerate,
-                             AudioOutputSource lsource,
-                             bool lset_initial_vol, bool laudio_passthru)
-    : AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                      laudio_bits,        laudio_channels,
-                      laudio_samplerate,  lsource,
-                      lset_initial_vol,   laudio_passthru),
+AudioOutputCA::AudioOutputCA(const AudioSettings &settings)
+    : AudioOutputBase(settings),
       d(new CoreAudioData(this))
 {
-    Reconfigure(laudio_bits, laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputCA::~AudioOutputCA()
@@ -302,7 +293,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
         bzero(aubuf + written_size, size - written_size);
     }
 
-    /* update audiotime (bufferedBytes is read by getBufferedOnSoundcard) */
+    /* update audiotime (bufferedBytes is read by GetBufferedOnSoundcard) */
     UInt64 nanos = AudioConvertHostTimeToNanos(
                         timestamp - AudioGetCurrentHostTime());
     bufferedBytes = (int)((nanos / 1000000000.0) *    // secs
@@ -320,12 +311,12 @@ void AudioOutputCA::WriteAudio(unsigned char *aubuf, int size)
     return;     // unneeded and unused in CA
 }
 
-int AudioOutputCA::getSpaceOnSoundcard(void)
+int AudioOutputCA::GetSpaceOnSoundcard(void) const
 {
     return 0;   // unneeded and unused in CA
 }
 
-int AudioOutputCA::getBufferedOnSoundcard(void)
+int AudioOutputCA::GetBufferedOnSoundcard(void) const
 {
     return bufferedBytes;
 }
@@ -333,7 +324,7 @@ int AudioOutputCA::getBufferedOnSoundcard(void)
 /** Reimplement the base class's version of GetAudiotime()
  *  so that we don't use gettimeofday or pthread mutexes.
  */
-int AudioOutputCA::GetAudiotime(void)
+int AudioOutputCA::GetAudiotime(void) const
 {
     int ret;
 
@@ -360,7 +351,7 @@ void AudioOutputCA::SetAudiotime(void)
     int totalbuffer;
 
 
-    soundcard_buffer = getBufferedOnSoundcard();
+    soundcard_buffer = GetBufferedOnSoundcard();
     totalbuffer = audiolen(false) + soundcard_buffer;
  
     if (GetSoundStretch())
@@ -408,7 +399,7 @@ OSStatus RenderCallbackAnalog(void                       *inRefCon,
     return noErr;
 }
 
-int AudioOutputCA::GetVolumeChannel(int channel)
+int AudioOutputCA::GetVolumeChannel(int channel) const
 {
     // FIXME: this only returns global volume
     (void)channel;

@@ -21,23 +21,14 @@ extern "C"
 #include "bio2jack.h"
 }
 
-AudioOutputJACK::AudioOutputJACK(
-    QString laudio_main_device, QString           laudio_passthru_device,
-    int     laudio_bits,        int               laudio_channels,
-    int     laudio_samplerate,  AudioOutputSource lsource,
-    bool    lset_initial_vol,   bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
-    audioid(-1)
+AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
+    AudioOutputBase(settings), audioid(-1)
 {
     // Initialise the Jack output layer
     JACK_Init();
 
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputJACK::~AudioOutputJACK()
@@ -68,9 +59,11 @@ bool AudioOutputJACK::OpenDevice()
     audioid = -1;
     while (timer.elapsed() < 2000 && audioid == -1)
     {
-        err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate,
+        unsigned long audio_samplerate_long = audio_samplerate;
+        err = JACK_OpenEx(&audioid, 16, &audio_samplerate_long,
                           audio_channels, audio_channels, &jack_port_name,
                           jack_port_name_count, jack_port_flags);
+        audio_samplerate = audio_samplerate_long;
         if (err == 1) {
             Error(QString("Error connecting to jackd:%1.  Is it running?")
                   .arg(audio_main_device));
@@ -79,9 +72,11 @@ bool AudioOutputJACK::OpenDevice()
             // need to resample
             VERBOSE(VB_AUDIO, QString("Failed to open device at"
                                       " requested samplerate.  Retrying"));
-            err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate,
+            unsigned long audio_samplerate_long = audio_samplerate;
+            err = JACK_OpenEx(&audioid, 16, &audio_samplerate_long,
                               audio_channels, audio_channels, &jack_port_name,
                               jack_port_name_count, jack_port_flags);
+            audio_samplerate = audio_samplerate_long;
         } else if (err == ERR_PORT_NOT_FOUND) {
             VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), "
                     " Port not found.").arg(audio_main_device));
@@ -156,12 +151,12 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 }
 
 
-inline int AudioOutputJACK::getBufferedOnSoundcard(void)
+int AudioOutputJACK::GetBufferedOnSoundcard(void) const
 {
     return  JACK_GetBytesStored(audioid) + fragment_size * 2;
 }
 
-inline int AudioOutputJACK::getSpaceOnSoundcard(void)
+int AudioOutputJACK::GetSpaceOnSoundcard(void) const
 {
     int space = 0;
 
@@ -184,7 +179,7 @@ void AudioOutputJACK::VolumeInit(void)
     JACK_SetAllVolume(audioid, volume);
 }
 
-int AudioOutputJACK::GetVolumeChannel(int channel)
+int AudioOutputJACK::GetVolumeChannel(int channel) const
 {
     unsigned int vol = 0;
     

@@ -25,21 +25,13 @@ using namespace std;
 #include "audiooutputoss.h"
 #include "util.h"
 
-AudioOutputOSS::AudioOutputOSS(
-    QString laudio_main_device, QString           laudio_passthru_device,
-    int     laudio_bits,        int               laudio_channels,
-    int     laudio_samplerate,  AudioOutputSource lsource,
-    bool    lset_initial_vol,   bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputOSS::AudioOutputOSS(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     audiofd(-1), numbadioctls(0),
     mixerfd(-1), control(SOUND_MIXER_VOLUME)
 {
     // Set everything up
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputOSS::~AudioOutputOSS()
@@ -249,7 +241,7 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
 }
 
 
-inline int AudioOutputOSS::getBufferedOnSoundcard(void) 
+int AudioOutputOSS::GetBufferedOnSoundcard(void) const
 {
     int soundcard_buffer=0;
 //GREG This is needs to be fixed for sure!
@@ -259,8 +251,7 @@ inline int AudioOutputOSS::getBufferedOnSoundcard(void)
     return soundcard_buffer;
 }
 
-
-inline int AudioOutputOSS::getSpaceOnSoundcard(void)
+int AudioOutputOSS::GetSpaceOnSoundcard(void) const
 {
     audio_buf_info info;
     int space = 0;
@@ -340,7 +331,7 @@ void AudioOutputOSS::VolumeCleanup()
     }
 }
 
-int AudioOutputOSS::GetVolumeChannel(int channel)
+int AudioOutputOSS::GetVolumeChannel(int channel) const
 {
     int volume=0;
     int tmpVol=0;

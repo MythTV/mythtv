@@ -18,15 +18,10 @@ class CoreAudioData;
 class AudioOutputCA : public AudioOutputBase
 {
 public:
-    AudioOutputCA(QString laudio_main_device,
-                  QString laudio_passthru_device,
-                  int laudio_bits,
-                  int laudio_channels, int laudio_samplerate,
-                  AudioOutputSource lsource,
-                  bool lset_initial_vol, bool laudio_passthru);
+    AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
-    virtual int GetAudiotime(void);
+    virtual int GetAudiotime(void) const;
     void        SetAudiotime(void);
 
     // callback for delivering audio to output device
@@ -34,7 +29,7 @@ public:
                      unsigned long long timestamp);
 
     // Volume control
-    virtual int  GetVolumeChannel(int channel);
+    virtual int  GetVolumeChannel(int channel) const;
     virtual void SetVolumeChannel(int channel, int volume);
 
     void Debug(QString msg)
@@ -52,8 +47,8 @@ protected:
     virtual bool OpenDevice(void);
     virtual void CloseDevice(void);
     virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int getSpaceOnSoundcard(void);
-    virtual int getBufferedOnSoundcard(void);
+    virtual int  GetSpaceOnSoundcard(void) const;
+    virtual int  GetBufferedOnSoundcard(void) const;
     
     virtual bool StartOutputThread(void) { return true; }
     virtual void StopOutputThread(void) {}

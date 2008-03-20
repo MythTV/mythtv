@@ -41,7 +41,8 @@ class AudioReencodeBuffer : public AudioOutput
     AudioReencodeBuffer(int audio_bits, int audio_channels)
     {
         Reset();
-        Reconfigure(audio_bits, audio_channels, 0, 0);
+        const AudioSettings settings(audio_bits, audio_channels, 0, false);
+        Reconfigure(settings);
         bufsize = 512000;
         audiobuffer = new unsigned char[bufsize];
 
@@ -57,19 +58,13 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits, int audio_channels,
-                             int audio_samplerate, bool audio_passthru,
-                             void *audio_codec = NULL)
+    virtual void Reconfigure(const AudioSettings &settings)
     {
-        (void)audio_samplerate;
-        (void)audio_passthru;
-        (void)audio_codec;
-
         ClearError();
-        bits = audio_bits;
-        channels = audio_channels;
+        bits = settings.bits;
+        channels = settings.channels;
         bytes_per_sample = bits * channels / 8;
-        if ((uint)audio_channels > 2)
+        if ((uint)settings.channels > 2)
             Error(QString("Invalid channel count %1").arg(channels));
     }
 
@@ -156,7 +151,7 @@ class AudioReencodeBuffer : public AudioOutput
     {
         last_audiotime = timecode;
     }
-    virtual bool GetPause(void)
+    virtual bool IsPaused(void) const
     {
         return false;
     }
@@ -170,12 +165,12 @@ class AudioReencodeBuffer : public AudioOutput
         return;
     }
 
-    virtual int GetAudiotime(void)
+    virtual int GetAudiotime(void) const
     {
         return last_audiotime;
     }
 
-    virtual int GetVolumeChannel(int)
+    virtual int GetVolumeChannel(int) const
     { 
         // Do nothing
         return 100;
@@ -190,7 +185,7 @@ class AudioReencodeBuffer : public AudioOutput
     }
     
 
-    virtual int GetCurrentVolume(void)
+    virtual int GetCurrentVolume(void) const
     { 
         // Do nothing
         return 100;
@@ -211,7 +206,7 @@ class AudioReencodeBuffer : public AudioOutput
     {
         // Do nothing
     }
-    virtual kMuteState GetMute(void) 
+    virtual kMuteState GetMute(void) const
     {
         // Do nothing
         return MUTE_OFF;

@@ -187,7 +187,9 @@ bool VorbisDecoder::initialize()
 
     if (output()) 
     {
-        output()->Reconfigure(16, chan, freq, false /*AC3/DTS pass through*/);
+        const AudioSettings settings(
+            16, chan, freq, false /*AC3/DTS pass through*/);
+        output()->Reconfigure(settings);
         output()->SetSourceBitrate(bitrate);
     }
 

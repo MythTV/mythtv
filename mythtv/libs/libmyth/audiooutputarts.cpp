@@ -7,20 +7,12 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputarts.h"
 
-AudioOutputARTS::AudioOutputARTS(
-    QString laudio_main_device,     QString laudio_passthru_device,
-    int     laudio_bits,            int     laudio_channels,
-    int     laudio_samplerate,      AudioOutputSource lsource,
-    bool    lset_initial_vol,       bool    laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputARTS::AudioOutputARTS(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     pcm_handle(NULL), buff_size(-1), can_hw_pause(false)
 {
     // Set everything up
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputARTS::~AudioOutputARTS()
@@ -88,17 +80,17 @@ void AudioOutputARTS::WriteAudio(unsigned char *aubuf, int size)
     }
 }
 
-inline int AudioOutputARTS::getBufferedOnSoundcard(void)
+int AudioOutputARTS::GetBufferedOnSoundcard(void) const
 {
-    return buff_size - getSpaceOnSoundcard();
+    return buff_size - GetSpaceOnSoundcard();
 }
 
-inline int AudioOutputARTS::getSpaceOnSoundcard(void)
+int AudioOutputARTS::GetSpaceOnSoundcard(void) const
 {
     return arts_stream_get(pcm_handle, ARTS_P_BUFFER_SIZE);
 }
 
-int AudioOutputARTS::GetVolumeChannel(int /*channel*/)
+int AudioOutputARTS::GetVolumeChannel(int /*channel*/) const
 {
     // Do nothing
     return 100;

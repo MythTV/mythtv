@@ -5,14 +5,12 @@
 using namespace std;
 #include "volumebase.h"
 
-VolumeBase::VolumeBase() 
+VolumeBase::VolumeBase() :
+    internal_vol(false), volume(80), current_mute_state(MUTE_OFF)
 {
-    volume = 80;
-    current_mute_state=MUTE_OFF;
-    internal_vol = false;
-};
+}
 
-int VolumeBase::GetCurrentVolume(void)
+int VolumeBase::GetCurrentVolume(void) const
 {
     return volume;
 }
@@ -58,7 +56,7 @@ void VolumeBase::ToggleMute(void)
     SetMute(current_mute_state == MUTE_OFF);
 }
 
-kMuteState VolumeBase::GetMute(void)
+kMuteState VolumeBase::GetMute(void) const
 {
     return current_mute_state;
 }

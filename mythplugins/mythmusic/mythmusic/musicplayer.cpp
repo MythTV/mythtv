@@ -184,7 +184,7 @@ void MusicPlayer::stop(bool stopAll)
 
     if (m_output)
     {
-        if (m_output->GetPause())
+        if (m_output->IsPaused())
         {
             pause();
         }

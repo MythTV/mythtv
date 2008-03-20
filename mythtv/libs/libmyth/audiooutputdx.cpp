@@ -95,15 +95,8 @@ DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0
 DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 
 
-AudioOutputDX::AudioOutputDX(
-    QString laudio_main_device,  QString           laudio_passthru_device,
-    int     laudio_bits,         int               laudio_channels,
-    int     laudio_samplerate,   AudioOutputSource lsource,
-    bool    lset_initial_vol,    bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputDX::AudioOutputDX(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     dsound_dll(NULL),
     dsobject(NULL),
     dsbuffer(NULL),
@@ -121,8 +114,7 @@ AudioOutputDX::AudioOutputDX(
 {
     InitDirectSound();
     
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 void AudioOutputDX::SetBlocking(bool blocking)
@@ -130,23 +122,20 @@ void AudioOutputDX::SetBlocking(bool blocking)
     // FIXME: kedl: not sure what else could be required here?
 }
 
-void AudioOutputDX::Reconfigure(int audio_bits, 
-                                int audio_channels, 
-                                int audio_samplerate,
-                                bool audio_passthru)
+void AudioOutputDX::Reconfigure(const AudioSettings &settings)
 {
     if (dsbuffer)
         DestroyDSBuffer();
         
-    CreateDSBuffer(audio_bits, audio_channels, audio_samplerate, false);
+    CreateDSBuffer(settings.bits, settings.channels, settings.samplerate, false);
     
     awaiting_data = true;
     paused = true;
         
-    effdsp = audio_samplerate;
-    this->audio_bits = audio_bits;
-    this->audio_channels = audio_channels;
-    this->audio_passthru = audio_passthru;
+    effdsp = settings.samplerate;
+    this->audio_bits = settings.bits;
+    this->audio_channels = settings.channels;
+    this->audio_passthru = settings.use_passthru;
 }
 
 AudioOutputDX::~AudioOutputDX()
@@ -287,11 +276,6 @@ void AudioOutputDX::SetEffDsp(int dsprate)
     effdsp = dsprate / 100;
 }
 
-bool AudioOutputDX::GetPause(void)
-{
-    return paused;
-}
-
 void AudioOutputDX::Pause(bool pause)
 {
     HRESULT dsresult;
@@ -326,7 +310,7 @@ void AudioOutputDX::Pause(bool pause)
     paused = pause;
 }
 
-int AudioOutputDX::GetAudiotime(void)
+int AudioOutputDX::GetAudiotime(void) const
 {
     DWORD play_pos;
     HRESULT dsresult;
@@ -746,7 +730,7 @@ void AudioOutputDX::Drain()
 
 }
 
-int AudioOutputDX::GetVolumeChannel(int channel)
+int AudioOutputDX::GetVolumeChannel(int channel) const
 {
     // Do nothing
     return 100;

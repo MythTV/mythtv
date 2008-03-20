@@ -17,28 +17,20 @@
 class AudioOutputDX : public AudioOutputBase
 {
 public:
-    AudioOutputDX(QString laudio_main_device,
-                  QString laudio_passthru_device,
-                  int laudio_bits,
-                  int laudio_channels, int laudio_samplerate,
-                  AudioOutputSource lsource,
-                  bool lset_initial_vol, bool laudio_passthru);
+    AudioOutputDX(const AudioSettings &settings);
     virtual ~AudioOutputDX();
 
     /// BEGIN HACK HACK HACK HACK These need to actually be implemented!
     bool OpenDevice(void) { return false; }
-    void CloseDevice(void) {}
-    void WriteAudio(unsigned char*, int) {}
-    virtual int getSpaceOnSoundcard(void) { return 0; }
-    virtual int getBufferedOnSoundcard(void) { return 0; }
+    virtual void CloseDevice(void) {}
+    virtual void WriteAudio(unsigned char*, int) {}
+    virtual int  GetSpaceOnSoundcard(void)    const { return 0; }
+    virtual int  GetBufferedOnSoundcard(void) const { return 0; }
 #warning Several methods in AudioOutputDX need to be implemented...
     /// END HACK HACK HACK HACK
 	
     virtual void Reset(void);
-    virtual void Reconfigure(int audio_bits, 
-                             int audio_channels, 
-                             int audio_samplerate,
-                             bool audio_passthru);
+    virtual void Reconfigure(const AudioSettings &settings);
     virtual void SetBlocking(bool blocking);
 
     virtual bool AddSamples(char *buffer, int samples, long long timecode);
@@ -46,15 +38,15 @@ public:
     virtual void SetEffDsp(int dsprate);
     virtual void SetTimecode(long long timecode);
 
-    virtual bool GetPause(void);
+    virtual bool IsPaused(void) const { return paused; }
     virtual void Pause(bool paused);
 
     virtual void Drain(void);
 
-    virtual int GetAudiotime(void);
+    virtual int GetAudiotime(void) const;
 
     // Volume control
-    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual int GetVolumeChannel(int channel) const; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
 
  private:

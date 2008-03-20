@@ -1286,7 +1286,7 @@ void PlaybackBoxMusic::play()
         return;
     }
 
-    if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
+    if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
     {
         gPlayer->pause();
         return;
@@ -2134,7 +2134,7 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         QString time_string = getTimeString(maxTime, 0);
 
-        if (gPlayer->getOutput() && gPlayer->getOutput()->GetPause())
+        if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
         {
             gPlayer->stop();
         }

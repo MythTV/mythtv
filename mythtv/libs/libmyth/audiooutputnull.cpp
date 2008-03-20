@@ -20,25 +20,17 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputnull.h"
 
-AudioOutputNULL::AudioOutputNULL(
-    QString laudio_main_device, QString           laudio_passthru_device,
-    int     laudio_bits,        int               laudio_channels,
-    int     laudio_samplerate,  AudioOutputSource lsource,
-    bool    lset_initial_vol,   bool              laudio_passthru) :
-    AudioOutputBase(laudio_main_device, laudio_passthru_device,
-                    laudio_bits,        laudio_channels,
-                    laudio_samplerate,  lsource,
-                    lset_initial_vol,   laudio_passthru),
+AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
+    AudioOutputBase(settings),
     pcm_output_buffer_mutex(false),
     current_buffer_size(0),
-    locked_audio_channels(laudio_channels),
-    locked_audio_bits(laudio_bits),
-    locked_audio_samplerate(laudio_samplerate)
+    locked_audio_channels(settings.channels),
+    locked_audio_bits(settings.bits),
+    locked_audio_samplerate(settings.samplerate)
 {
     bzero(pcm_output_buffer, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
 
-    Reconfigure(laudio_bits,       laudio_channels,
-                laudio_samplerate, laudio_passthru);
+    Reconfigure(settings);
 }
 
 AudioOutputNULL::~AudioOutputNULL()
@@ -111,7 +103,7 @@ void AudioOutputNULL::Reset()
     AudioOutputBase::Reset();
 }
 
-inline int AudioOutputNULL::getBufferedOnSoundcard(void) 
+int AudioOutputNULL::GetBufferedOnSoundcard(void) const
 {
     if (buffer_output_data_for_use)
     {
@@ -122,7 +114,7 @@ inline int AudioOutputNULL::getBufferedOnSoundcard(void)
 }
 
 
-inline int AudioOutputNULL::getSpaceOnSoundcard(void)
+int AudioOutputNULL::GetSpaceOnSoundcard(void) const
 {
     if (buffer_output_data_for_use)
     {
