@@ -383,8 +383,10 @@ bool aacDecoder::initializeMP4()
 
     if (output())
     {
-        output()->Reconfigure(16, channels, sample_rate,
-                              false /* AC3/DTS pass through */);
+        const AudioSettings settings(
+            16 /*bits*/, channels, sample_rate,
+            false /* AC3/DTS pass through */);
+        output()->Reconfigure(settings);
         output()->SetSourceBitrate(bitrate);
     }
 
