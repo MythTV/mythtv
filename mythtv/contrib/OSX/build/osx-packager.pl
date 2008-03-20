@@ -354,6 +354,7 @@ diff -ru qt-mac-free-3.3.8.orig/src/tools/qglobal.h qt-mac-free-3.3.8.new/src/to
           'sub-src',
           'qmake-install',
           'moc-install',
+          # For lupdate, et c.:     'tools-install',
           'src-install'
         ],
   },
@@ -555,6 +556,8 @@ mkdir $PREFIX;
 our $SRCDIR = "$WORKDIR/src";
 mkdir $SRCDIR;
 
+our $SVNDIR = "$SRCDIR/myth-svn";
+
 # configure mythplugins, and mythtv, etc
 our %conf = (
   'mythplugins'
@@ -646,7 +649,11 @@ if ($OPT{'distclean'})
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/libmyth*' ]);
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/mythtv'   ]);
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/share/mythtv' ]);
-  &Syscall([ '/bin/rm', '-f', '-r', $SRCDIR ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.o',     '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.a',     '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.dylib', '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.orig',  '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.rej',   '-delete' ]);
   exit;
 }
 
@@ -847,8 +854,7 @@ foreach my $dir ('include', 'lib', 'share')
 }
 }
 
-my $svndir = "$SRCDIR/myth-svn";
-mkdir $svndir;
+mkdir $SVNDIR;
 
 # Deal with Subversion branches, revisions and tags:
 my $svnrepository = 'http://svn.mythtv.org/svn/';
@@ -898,14 +904,14 @@ elsif ( ! $OPT{'nohead'} )
 if (! $OPT{'nohead'})
 {
   # Empty subdirectory 'config' sometimes causes checkout problems
-  &Syscall(['rm', '-fr', $svndir . '/mythtv/config']);
+  &Syscall(['rm', '-fr', $SVNDIR . '/mythtv/config']);
   Verbose("Checking out source code");
   &Syscall([ $svn, 'co', @svnrevision,
-            map($svnrepository . $_, @comps), $svndir ]) or die;
+            map($svnrepository . $_, @comps), $SVNDIR ]) or die;
 }
 else
 {
-  &Syscall("mkdir -p $svndir/mythtv/config")
+  &Syscall("mkdir -p $SVNDIR/mythtv/config")
 }
 
 # Deal with user-supplied skip arguments
@@ -925,7 +931,7 @@ if ( ! @comps )
 # Build MythTV and any plugins
 foreach my $comp (@comps)
 {
-  my $compdir = "$svndir/$comp/" ;
+  my $compdir = "$SVNDIR/$comp/" ;
 
   chdir $compdir;
 
@@ -1037,9 +1043,21 @@ $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 
 ### Program which creates bundles:
-our @bundler = "$svndir/mythtv/contrib/OSX/build/osx-bundler.pl";
+our @bundler = "$SVNDIR/mythtv/contrib/OSX/build/osx-bundler.pl";
 if ( $OPT{'verbose'} )
 {   push @bundler, '--verbose'   }
+
+
+### Framework that has a screwed up link dep. path
+my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
+            'Framework/AVCVideoServices.framework';
+my @AVCfw = split / /, `ls -d $AVCfw`;
+my $AVCfw = pop @AVCfw;
+chop $AVCfw;
+
+if ( $AVCfw )
+{   print "$AVCfw\n"   }
+
 
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
@@ -1060,7 +1078,7 @@ foreach my $target ( @targets )
   # Get a fresh copy of the binary
   &Verbose("Building self-contained $target");
   &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
-  &Syscall([ 'cp',  "$svndir/mythtv/programs/$builtTarget/$builtTarget",
+  &Syscall([ 'cp',  "$SVNDIR/mythtv/programs/$builtTarget/$builtTarget",
              "$SCRIPTDIR/$target" ]) or die;
 
   # Convert it to a bundled .app
@@ -1068,9 +1086,11 @@ foreach my $target ( @targets )
              "$PREFIX/lib/", "$PREFIX/lib/mysql" ])
       or die;
 
-
   # Remove copy of binary
   unlink "$SCRIPTDIR/$target" or die;
+
+  if ( $AVCfw )
+  {  &RecursiveCopy($AVCfw, "$finalTarget/Contents/Frameworks")  }
 
  if ( $target eq "MythFrontend" or $target =~ m/^MythTV/ )
  {
@@ -1089,7 +1109,7 @@ foreach my $target ( @targets )
   {   &Syscall([ @bundler, $lib ]) or die   }
 
   # The icon
-  &Syscall([ 'cp',  "$svndir/mythtv/programs/mythfrontend/mythfrontend.icns",
+  &Syscall([ 'cp',  "$SVNDIR/mythtv/programs/mythfrontend/mythfrontend.icns",
              "$res/application.icns" ]) or die;
   &Syscall([ '/Developer/Tools/SetFile', '-a', 'C', $finalTarget ]) or die;
  }
