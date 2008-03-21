@@ -58,6 +58,9 @@ my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
 my $proxy = '';
 #my $proxy = 'http://enter.your.proxy.here:8080';
 
+# Main mythtv version - used to name dlls
+my $version = 0.21;
+
 # TODO -  use this list to define the components to build - only the first of these currently works well.
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 
@@ -472,6 +475,7 @@ cd %QTDIR%
 ;
 # mythtv,mythplugins,myththemes
 foreach my $comp( @components ) {
+       push @{$expect}, [ dir => $mythtv.$comp, mkdirs => $mythtv.$comp ];
 push @{$expect}, 
 [ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['set PATH='.$dosmsys.'bin;%PATH% && cd '.$dosmythtv.' && IF NOT EXIST '.$dosmythtv.'mythtv\mythtv.pro svn checkout  http://svn.mythtv.org/svn/trunk/'."$comp $comp",'nocheck'],comment => 'Get all the mythtv sources from SVN!:'.$comp ];
 }
@@ -562,14 +566,38 @@ push @{$expect},
 # configure
 [ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
 # make
-[ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
-[ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
-[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
-[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv."mythtv/libs/libmyth/libmyth-$version.dll",
+            $mythtv.'mythtv/last_build.txt'],
+  shell => ['rm '.$unixmythtv."mythtv/libs/libmyth/libmyth-$version.dll",
+            'source '.$unixmythtv.'qt_env.sh',
+            'cd '.$unixmythtv.'mythtv','make'],
+comment => "libs/libmyth/libmyth-$version.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier" ],
+[ newer => [$mythtv."mythtv/libs/libmythtv/libmythtv-$version.dll",
+            $mythtv.'mythtv/last_build.txt'],
+  shell => ['rm '.$unixmythtv."mythtv/libs/libmythtv/libmythtv-$version.dll",
+            'source '.$unixmythtv.'qt_env.sh',
+            'cd '.$unixmythtv.'mythtv','make'],
+comment => "libs/libmythtv/libmythtv-$version.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier" ],
+[ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',
+            $mythtv.'mythtv/last_build.txt'],
+  shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',
+            'source '.$unixmythtv.'qt_env.sh',
+            'cd '.$unixmythtv.'mythtv','make'],
+comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+[ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',
+            $mythtv.'mythtv/last_build.txt'],
+  shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe',
+            'source '.$unixmythtv.'qt_env.sh',
+            'cd '.$unixmythtv.'mythtv','make'],
+comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 
 # re-install to msys /usr/bin folders etc, if we have a newer mythtv build
 # ready:
-[ newer => [$msys.'bin/mythfrontend.exe',$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'], shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make install'], comment => 'was the last configure successful? then install mythtv ' ],
+[ newer => [$msys.'bin/mythfrontend.exe',
+            $mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'],
+  shell => ['source '.$unixmythtv.'qt_env.sh',
+            'cd '.$unixmythtv.'mythtv','make install'],
+comment => 'was the last configure successful? then install mythtv ' ],
 
 # it seems that mythverbose.h isn't installed as it should be.... (needed by
 # the plugins compile)
