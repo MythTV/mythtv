@@ -28,9 +28,12 @@ my $NOISY = 1; # set to 0 for less output to the screen
 $| = 1; # autoflush stdout;
 
 # this script was last tested to work with this version, on other versions YMMV.
-#my $SVNRELEASE = '15528'; #builds and runs with 3x patches commented out below
-#my $SVNRELEASE = '15586'; # builds and runs without patches except backend.gz
-my $SVNRELEASE = '15699'; # latest build that seemed to run without any additional patches, YMMV.
+my $SVNRELEASE = '16167'; # latest build that has been confirmed to run , but  seems to need 4 patches:  
+#4724 http://svn.mythtv.org/trac/raw-attachment/ticket/4724/win32_storeconnection.patch 
+#4706 http://svn.mythtv.org/trac/raw-attachment/ticket/4706/mythsocket_win32_events.patch 
+#4699 http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch 
+#4702 http://svn.mythtv.org/trac/raw-attachment/ticket/4702/mingw.patch 
+
 #my $SVNRELEASE = 'HEAD' ;# if you are game, go forth and test the latest release! 
 
 # We allow SourceForge to tell us which server to download from,
@@ -504,7 +507,7 @@ push @{$expect},
 
 # is svn num (ie file contents) changed since last run, if so, do a 'make
 # clean' (overkill, I know, but safer)!
-[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['touch '.$unixmythtv.'mythtv/last_build.txt','cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt','touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ],
+[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], shell => ['rm -f '.$unixmythtv.'delete_to_do_make_clean.txt','touch '.$unixmythtv.'mythtv/last_build.txt','cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt','touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ], 
 
 # apply any outstanding win32 patches - this section will be hard to keep up
 # with HEAD/SVN:
@@ -533,11 +536,25 @@ push @{$expect},
 #[ filesame => [$mythtv.'mythtv/15541_undo.patch',$sources."15541_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
 #[ grep  => ['\#include \"compat.h\"',$mythtv.'mythtv/libs/libmythui/mythpainter.cpp'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth/","patch -p2 < ".$unixmythtv."mythtv/15541_undo.patch"] , comment => 'currently need this patch too, equivalemnt of: svn merge -r 15541:15540 .'],
 
+# [16167] needs these 4 to run:  
+#4724 http://svn.mythtv.org/trac/raw-attachment/ticket/4724/win32_storeconnection.patch 
+[ archive => $mythtv.'mythtv/win32_storeconnection.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4724/win32_storeconnection.patch', comment => 'win32_storeconnection.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'], 
+[ file => $mythtv.'_', shell => ["cd ".$unixmythtv."mythtv/libs/libmyth","patch -p0 < ".$unixmythtv."mythtv/win32_storeconnection.patch","nocheck"] , comment => 'apply above patch'], 
+#4706 http://svn.mythtv.org/trac/raw-attachment/ticket/4706/mythsocket_win32_events.patch 
+[ archive => $mythtv.'mythtv/mythsocket_win32_events.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4706/mythsocket_win32_events.patch', comment => 'mythsocket_win32_events.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'], 
+[ file => $mythtv.'_', shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/mythsocket_win32_events.patch","nocheck"] , comment => 'apply above patch'], 
+#4699 http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch 
+[ archive => $mythtv.'mythtv/win32_fs.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch', comment => 'win32_fs.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'], 
+[ file => $mythtv.'_', shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/win32_fs.patch","nocheck"] , comment => 'apply above patch'], 
+#4702 http://svn.mythtv.org/trac/raw-attachment/ticket/4702/mingw.patch 
+[ archive => $mythtv.'mythtv/mingw.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4702/mingw.patch', comment => 'mingw.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'], 
+[ file => $mythtv.'_', shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/mingw.patch","nocheck"] , comment => 'apply above patch'], 
+	 
 
 [ file => $mythtv.'mythtv/config/config.pro', shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], comment => 'create an empty config.pro or the mythtv build will fail'],
 
-# do a make clean before?
-[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make clean','make distclean','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary, and the build will be MUCH faster without it, but it is safer with it...'],
+# do a make clean before? Yes, if the SVN revision has changed (it deleted the file for us), or the user deleted the file manually, to request it. 
+[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make clean','find . -type f -name \*.dll | grep -v run | xargs -n1 rm','find . -type f -name \*.a | grep -v run | xargs -n1 rm','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
 
 #broken Makefile, delete it
 [ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
@@ -586,6 +603,7 @@ mkdir '.$unixmythtv.'mythtv/run/sqldrivers
 cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'mythtv/run/sqldrivers 
 # pthread dlls and mingwm10.dll are copied from here:
 cp /mingw/bin/*.dll '.$unixmythtv.'mythtv/run
+cp /bin/msys*.dll '.$unixmythtv.'mythtv/run
 ','nocheck' 
 ],comment => 'write a script that will copy all the files necessary for running mythtv out of the build folder into the ./run folder'],
 
