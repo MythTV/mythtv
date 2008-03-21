@@ -77,7 +77,7 @@
       <text lang="NB">Avspilling</text>
       <text lang="CZ">Přehrávání</text>
       <text lang="RU">Воспроизведение</text>
-      <text lang="HE">הסרטת</text>
+      <text lang="HE">הסרטה</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -85,6 +85,7 @@
       <type>TV_SETTINGS_PLAYBACK_OSD</type>
       <text>Playback OSD</text>
       <text lang="SI">OSD</text>
+      <text lang="HE">תצוגה בזמן הסרטה</text>
       <action>SETTINGS OSD</action>
    </button>
 

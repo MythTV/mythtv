@@ -54,6 +54,7 @@
    <button>
        <type>SCREENSETUPWIZARD</type>
        <text>Screen Setup Wizards</text>
+       <text lang="HE">אשף הגדרות מסך</text>
        <action>SCREENSETUPWIZARD</action>
    </button>
 

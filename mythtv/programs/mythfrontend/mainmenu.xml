@@ -200,6 +200,7 @@
      <text lang="NL">Afsluiten</text>
      <text lang="RU">Завершение работы</text>
      <text lang="PL">Zamknij system</text>
+     <text lang="HE">כיבוי</text>
      <action>SHUTDOWN</action>
    </button> -->
 

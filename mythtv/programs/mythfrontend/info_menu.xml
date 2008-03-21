@@ -68,6 +68,7 @@
      <text lang="JA">ムービータイム</text>
      <text lang="RU">Афиша кино</text>
      <text lang="PL">Repertuar kin</text>
+     <text lang="HE">זמני הקרנת סרטים</text>
      <action>PLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -94,7 +95,7 @@
      <text lang="CZ">Počasí</text>
      <text lang="RU">Погода</text>
      <text lang="PL">Pogoda</text>
-     <text lang="HE">מזג האיור</text>
+     <text lang="HE">מזג האויר</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
