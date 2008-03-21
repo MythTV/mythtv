@@ -10,6 +10,8 @@
 
 #include <qstring.h>
 
+#include "mythexp.h"
+
 typedef enum {
     AUDIOOUTPUT_UNKNOWN,
     AUDIOOUTPUT_VIDEO,
@@ -17,7 +19,7 @@ typedef enum {
     AUDIOOUTPUT_TELEPHONY,
 } AudioOutputSource;
 
-class AudioSettings
+class MPUBLIC AudioSettings
 {
   public:
     AudioSettings();
