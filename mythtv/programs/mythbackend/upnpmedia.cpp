@@ -105,11 +105,8 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
     int parentid;
     QDir vidDir(directory);
     QString title;
-    // If we can't read it's contents move on
     //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID =
     //%3").arg(directory).arg(rootID).arg(itemID));
-    if (!vidDir.isReadable())
-        return itemID;
 
     if (rootID > 0) 
         parentid = rootID;
@@ -117,7 +114,9 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
         parentid = itemID;
 
     vidDir.setSorting( QDir:: DirsFirst | QDir::Name );
-    const QFileInfoList* List = vidDir.entryInfoList();
+    const QFileInfoList *List = vidDir.entryInfoList();
+    // If we can't read it's contents move on
+    if (!List) return itemID;
     for (QFileInfoListIterator it(*List); it; ++it)
     {
         QFileInfo Info(*it.current());
