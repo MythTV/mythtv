@@ -120,7 +120,7 @@
    <button>
      <type>STREAM</type>
      <text>Play online streams</text>
-     <text lang="HE">נגן רצף מכוון</text>
+     <text lang="HE">נגן מדיה מכוונת</text>
      <action>PLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>

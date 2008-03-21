@@ -23,7 +23,7 @@
       <text lang="CZ">Programový průvodce</text>
       <text lang="RU">Программа передач</text>
       <text lang="PL">Przewodnik programowy</text>
-      <text lang="HE">מדריך תכניות</text>
+      <text lang="HE">מדריך שידורים</text>
       <alttext>Guide</alttext>
       <alttext lang="IT">Guida</alttext>
       <alttext lang="FR">Grille</alttext>
@@ -226,7 +226,7 @@
       <text lang="CZ">Volné nahrávání</text>
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Dostosuj nagrywanie</text>
-      <text lang="HE">תפירת הקלטה</text>
+      <text lang="HE">הקלטה לפי כללים</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 

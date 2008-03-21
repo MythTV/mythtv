@@ -66,19 +66,19 @@
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר שרת ברירת מחדל</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <source>Configure Manually</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר ידנית</translation>
     </message>
 </context>
 <context>
@@ -171,30 +171,30 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>צור קבוצת כניסה</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>הכנס שם קבוצה חדש</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>סליחה, שם קבוצה אינו יכול להיות ריק.</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>סליחה, שם קבוצה זה כבר בשימוש.</translation>
     </message>
 </context>
 <context>
     <name>CardInputEditor</name>
     <message>
         <source>Input connections</source>
-        <translation type="unfinished">Input connections</translation>
+        <translation>מחברי כניסה</translation>
     </message>
 </context>
 <context>
@@ -245,35 +245,35 @@
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה בטוח שברצונך למחוק את כל הערוצים ?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה בטוח שברצונך למחוק את כל הערוצים הלא משוייכים ?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה בטוח שברצונך למחוק את כל הערוצים ב%1 ?</translation>
     </message>
     <message>
         <source>Add some for channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation>הוסף מספר ערוצים תחילה!</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <source>Download all icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>הורד אייקונים מהרשת..</translation>
     </message>
     <message>
         <source>Rescan for missing icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>סרוק לאייקונים חסרים..</translation>
     </message>
     <message>
         <source>Download icon for </source>
-        <translation type="unfinished"></translation>
+        <translation>הורד אייקון עבור</translation>
     </message>
 </context>
 <context>
@@ -475,23 +475,23 @@
     </message>
     <message>
         <source>stored search</source>
-        <translation type="unfinished"></translation>
+        <translation>חיפוש שמור</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>הוסף</translation>
     </message>
     <message>
         <source>Match this series</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם לסדרה זו</translation>
     </message>
     <message>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם למילים בכותרת משנה</translation>
     </message>
     <message>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>רק מופעים המסומנים כמסך רחב</translation>
     </message>
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
@@ -904,6 +904,14 @@
         <source>Western</source>
         <translation type="unfinished">Western</translation>
     </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mini DiSEqC</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FirewireDesc</name>
@@ -923,51 +931,52 @@
     <name>InfoDialog</name>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט תוכנית בכל זמן בכל ערוץ</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט תוכנית זו בכל זמן שהוא בערוץ זה</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט תוכנית זו באותו זמן בכל שבוע</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט תוכנית זו באותו זמן בכל יום</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished">הקלטה יחדה של כותר זה</translation>
+        <translation>הקלטה יחדה של כותר זה</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט שידור זה של התוכנית</translation>
     </message>
     <message>
         <source>Don&apos;t record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תקליט תוכנית זו</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תקליט שידור זה של התוכנית</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation>Record this showing with override options</translation>
+        <translation>הקלט מופע זה של התוכנית באופציית עקיפה
+</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation>Record this showing with normal options</translation>
+        <translation>הקלט מופע זה של התוכנית באופציה רגילה</translation>
     </message>
     <message>
         <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
-        <translation>To go to the advanced recordings screen, press &apos;i&apos;</translation>
+        <translation>למסך אפשרויות הקלטה מתקדמות הקש &apos;i&apos;</translation>
     </message>
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>לצפיה ברשימת מופעים עתידים של תוכנית זו הקש &apos;S&apos;</translation>
     </message>
 </context>
 <context>
@@ -981,19 +990,19 @@
     <name>JobQueue</name>
     <message>
         <source>Transcode</source>
-        <translation>Transcode</translation>
+        <translation>המרה</translation>
     </message>
     <message>
         <source>Flag Commercials</source>
-        <translation>Flag Commercials</translation>
+        <translation>סמן פרסומות</translation>
     </message>
     <message>
         <source>Unknown Job</source>
-        <translation type="unfinished"></translation>
+        <translation>משימה לא ידועה</translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation>Undefined</translation>
+        <translation>לא מוגדר</translation>
     </message>
 </context>
 <context>
@@ -1015,19 +1024,19 @@
     <name>ManualBox</name>
     <message>
         <source>Manual Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה ידנית</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation>Title:</translation>
+        <translation>כותרת:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Subtitle:</translation>
+        <translation>כותרת משנה:</translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation>Duration:</translation>
+        <translation>משך:</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -1035,7 +1044,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>Start</translation>
+        <translation>תחילת</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -1046,35 +1055,35 @@
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>מתזמן הקלטות ידני</translation>
     </message>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished">:ערוץ</translation>
+        <translation>ערוץ:</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>תאריך או יום בשבוע</translation>
     </message>
     <message>
         <source>5 weekdays if daily</source>
-        <translation>5 weekdays if daily</translation>
+        <translation>אמצע השבוע אם יומי</translation>
     </message>
     <message>
         <source>7 days per week if daily</source>
-        <translation>7 days per week if daily</translation>
+        <translation>7 ימים אם יומי</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation>Time:</translation>
+        <translation>זמן:</translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation>Duration:</translation>
+        <translation>משך:</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation>minute</translation>
+        <translation>דקה</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -1082,11 +1091,11 @@
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation>Title (optional):</translation>
+        <translation>כותרת (אופציונאלי):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation>Set Recording Options</translation>
+        <translation>קבע אפשרויות הקלטה</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1094,57 +1103,57 @@
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה ידנית</translation>
     </message>
 </context>
 <context>
     <name>MediaMonitor</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <source>Select removable media to eject or insert</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר מדיה להכניס או להוציא</translation>
     </message>
     <message>
         <source>No devices to eject</source>
-        <translation type="unfinished"></translation>
+        <translation>אין התקן להוציא</translation>
     </message>
     <message>
         <source>Failed to unmount %1</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח לנתק את %1</translation>
     </message>
     <message>
         <source>You may safely remove %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ניתן לנתק את %1 בביטחה</translation>
     </message>
     <message>
         <source>Failed to eject %1</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מצליח להוציא את %1</translation>
     </message>
     <message>
         <source>Select a CD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר כונן CD</translation>
     </message>
     <message>
         <source>Select a VCD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר כונן VCD</translation>
     </message>
     <message>
         <source>Select a DVD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר כונן DVD</translation>
     </message>
     <message>
         <source>Select a DVD writer</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר צורב DVD</translation>
     </message>
 </context>
 <context>
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation type="unfinished">Transport</translation>
+        <translation>שינוע</translation>
     </message>
 </context>
 <context>
@@ -1238,7 +1247,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>ביטול</translation>
+        <translation type="unfinished">בטל</translation>
     </message>
 </context>
 <context>
@@ -1290,11 +1299,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Create New Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>צור קבוצת צפיה חדשה</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>הכנס שם קבוצה או SELECT לשימוש במקלדת וירטואלית</translation>
     </message>
     <message>
         <source>Delete playback group:</source>
@@ -1473,15 +1482,15 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
-        <translation>Change Recording Group</translation>
+        <translation>שנה קבוצת הקלטה</translation>
     </message>
     <message>
         <source>Change Playback Group</source>
-        <translation>Change Playback Group</translation>
+        <translation>שנה קבוצת צפיה</translation>
     </message>
     <message>
         <source>Job Options</source>
-        <translation>Job Options</translation>
+        <translation>אפשרויות עבודה</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1529,11 +1538,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תשמר פרק זה</translation>
     </message>
     <message>
         <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>שמר פרק זה</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
@@ -1545,7 +1554,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Change Recording Title</source>
-        <translation>Change Recording Title</translation>
+        <translation>שנה את שם ההקלטה</translation>
     </message>
     <message>
         <source>User Job</source>
@@ -1577,11 +1586,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation>Remove from Playlist</translation>
+        <translation>הסר מרשימת צפיה</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation>Add to Playlist</translation>
+        <translation>הוסף לרשימת צפיה</translation>
     </message>
     <message>
         <source>Stop Recording</source>
@@ -1589,11 +1598,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation>Storage Options</translation>
+        <translation>אפשרויות אכסון</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation>Recording Options</translation>
+        <translation>אפשרויות הקלטה</translation>
     </message>
     <message>
         <source>Status Icons</source>
@@ -1601,7 +1610,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>פרסומות סומנו</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
@@ -1753,27 +1762,27 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק, ואפשר להקליט מחדש</translation>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר לתוכנית זו להקליט מחדש</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>סמן כלא נצפה</translation>
     </message>
     <message>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>סמן כנצפה</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>בטל מחיקה</translation>
     </message>
     <message>
         <source>Delete Forever</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק לצמיתות</translation>
     </message>
     <message>
         <source>Recording is in Mono</source>
@@ -1915,7 +1924,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation>Select Sort Order</translation>
+        <translation>בחר סדר מיון</translation>
     </message>
     <message>
         <source>Sort by Time</source>
@@ -1923,7 +1932,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Reverse Time</translation>
+        <translation>הפוך זמן</translation>
     </message>
     <message>
         <source>Sort by Title</source>
@@ -1931,11 +1940,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation>Reverse Title</translation>
+        <translation>הפוך כותרתReverse Title</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>שים לב:מחיקת פריטים מרשימה זו אינה מוחקת את ההקלטה.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1943,7 +1952,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Allow this episode to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר לפרק זה להקליט מחדש</translation>
     </message>
     <message>
         <source>Never record this episode</source>
@@ -1951,7 +1960,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק פרק זה מהרשימה</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
@@ -1959,11 +1968,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>זמן</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Title</translation>
+        <translation>כותרתTitle</translation>
     </message>
 </context>
 <context>
@@ -1996,7 +2005,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>New Title Search</source>
-        <translation>חיפוש כותר חגד</translation>
+        <translation>חיפוש כותר חדש</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -2028,11 +2037,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Movie Search</source>
-        <translation>Movie Search</translation>
+        <translation>חיפוש סרטים</translation>
     </message>
     <message>
         <source>Time Search</source>
-        <translation>Time Search</translation>
+        <translation>חיפוש זמן</translation>
     </message>
     <message>
         <source>Unknown Search</source>
@@ -2052,15 +2061,15 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Select List</source>
-        <translation>Select List</translation>
+        <translation>בחר רשימה</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation>Select</translation>
+        <translation>בחר</translation>
     </message>
     <message>
         <source>Select Phrase</source>
-        <translation>Select Phrase</translation>
+        <translation>בחר ביטוי</translation>
     </message>
     <message>
         <source>&lt;New Phrase&gt;</source>
@@ -2076,11 +2085,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation>Record</translation>
+        <translation>הקלט</translation>
     </message>
     <message>
         <source>Select Search</source>
-        <translation>Select Search</translation>
+        <translation>בחר חיפוש</translation>
     </message>
     <message>
         <source>&lt;New Search&gt;</source>
@@ -2092,27 +2101,27 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Select Time</source>
-        <translation>Select Time</translation>
+        <translation>בחר זמן</translation>
     </message>
     <message>
         <source>Edit Power Search Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר שדות חיפוש מתקדם</translation>
     </message>
     <message>
         <source>Optional title phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>ביטוי כותרת אפשרי:</translation>
     </message>
     <message>
         <source>Optional subtitle phrase:</source>
-        <translation>Optional subtitle phrase:</translation>
+        <translation>ביטוי כותרת משנה אפשרי:</translation>
     </message>
     <message>
         <source>Optional description phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>ביטוי תאור אפשרי:</translation>
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(כל סוג תוכנית)</translation>
     </message>
     <message>
         <source>Movies</source>
@@ -2120,15 +2129,15 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Series</source>
-        <translation>Series</translation>
+        <translation>סדרה</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation>Show</translation>
+        <translation>מופע</translation>
     </message>
     <message>
         <source>Sports</source>
-        <translation>Sports</translation>
+        <translation>ספורט</translation>
     </message>
     <message>
         <source>(Any Genre)</source>
@@ -2136,7 +2145,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>(Any Station)</source>
-        <translation>(Any Station)</translation>
+        <translation>(כל תחנה)</translation>
     </message>
     <message>
         <source>All</source>
@@ -2144,11 +2153,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Premieres</source>
-        <translation>Premieres</translation>
+        <translation>בכורה</translation>
     </message>
     <message>
         <source>Specials</source>
-        <translation>Specials</translation>
+        <translation>מיוחד</translation>
     </message>
     <message>
         <source>4 stars</source>
@@ -2168,59 +2177,59 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Power Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>הוראת הקלטה מתקדמת</translation>
     </message>
     <message>
         <source>Stored Search</source>
-        <translation type="unfinished"></translation>
+        <translation>חיפוש שמור</translation>
     </message>
     <message>
         <source>Select a search stored from</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר חיפוש שמור מ</translation>
     </message>
     <message>
         <source>Custom Record</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה מותאמת</translation>
     </message>
     <message>
         <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation type="unfinished"></translation>
+        <translation>0..9 מעביר לNx10 אחוז ברשימה</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק הוראה &apos;%1&apos; $2 ?</translation>
     </message>
     <message>
         <source>Unrated</source>
-        <translation type="unfinished"></translation>
+        <translation>ללא דרוג</translation>
     </message>
     <message>
         <source>At least ***/</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות ***/</translation>
     </message>
     <message>
         <source>At least ***</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות ***</translation>
     </message>
     <message>
         <source>At least **/</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות **/</translation>
     </message>
     <message>
         <source>At least **</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות **</translation>
     </message>
     <message>
         <source>At least */</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות */</translation>
     </message>
     <message>
         <source>At least *</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות *</translation>
     </message>
     <message>
         <source>At least /</source>
-        <translation type="unfinished"></translation>
+        <translation>לפחות /</translation>
     </message>
 </context>
 <context>
@@ -2239,47 +2248,47 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
-        <translation>Recording %1 of %2</translation>
+        <translation>מקליט %1 מתוך %2</translation>
     </message>
     <message>
         <source>Recording just this showing</source>
-        <translation>Recording just this showing</translation>
+        <translation>מקליט רק מופע זה</translation>
     </message>
     <message>
         <source>Recording with override options</source>
-        <translation>Recording with override options</translation>
+        <translation>מקליט באפשרויות עקיפה</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation>Recording every week</translation>
+        <translation>מקליט כל שבוע</translation>
     </message>
     <message>
         <source>Recording in this timeslot</source>
-        <translation>Recording in this timeslot</translation>
+        <translation>מקליט בזמן שידור זה</translation>
     </message>
     <message>
         <source>Recording on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>מקליט בערוץ זה</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished"></translation>
+        <translation>מקליט כל המופעים</translation>
     </message>
     <message>
         <source>Recording one showing</source>
-        <translation>Recording one showing</translation>
+        <translation>מקליט מופע אחד</translation>
     </message>
     <message>
         <source>Recording a showing daily</source>
-        <translation>Recording a showing daily</translation>
+        <translation>מקליט מופע באופן יומי</translation>
     </message>
     <message>
         <source>Recording a showing weekly</source>
-        <translation>Recording a showing weekly</translation>
+        <translation>מקליט מופע באופן שבועי</translation>
     </message>
     <message>
         <source>Not allowed to record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>לא מורשה להקליט מופע זה</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
@@ -2291,7 +2300,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק הוראת הקלטה &apos;%1&apos; %2 ?</translation>
     </message>
 </context>
 <context>
@@ -2414,339 +2423,339 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation>Any</translation>
+        <translation>כל</translation>
     </message>
     <message>
         <source>Education</source>
-        <translation>Education</translation>
+        <translation>חינוכי</translation>
     </message>
     <message>
         <source>Entertainment</source>
-        <translation>Entertainment</translation>
+        <translation>בידור</translation>
     </message>
     <message>
         <source>Movie</source>
-        <translation>Movie</translation>
+        <translation>סרט</translation>
     </message>
     <message>
         <source>News</source>
-        <translation>News</translation>
+        <translation>חדשות</translation>
     </message>
     <message>
         <source>Religious</source>
-        <translation>Religious</translation>
+        <translation>דת</translation>
     </message>
     <message>
         <source>Sports</source>
-        <translation>Sports</translation>
+        <translation>ספורט</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation>Other</translation>
+        <translation>אחר</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>Action</translation>
+        <translation>פעולה</translation>
     </message>
     <message>
         <source>Advertisement</source>
-        <translation>Advertisement</translation>
+        <translation>פירסומת</translation>
     </message>
     <message>
         <source>Animated</source>
-        <translation>Animated</translation>
+        <translation>הנפשה</translation>
     </message>
     <message>
         <source>Anthology</source>
-        <translation>Anthology</translation>
+        <translation>קובץ</translation>
     </message>
     <message>
         <source>Automobile</source>
-        <translation>Automobile</translation>
+        <translation>רכב</translation>
     </message>
     <message>
         <source>Awards</source>
-        <translation>Awards</translation>
+        <translation>פרסים</translation>
     </message>
     <message>
         <source>Baseball</source>
-        <translation>Baseball</translation>
+        <translation>כדור בסיס</translation>
     </message>
     <message>
         <source>Basketball</source>
-        <translation>Basketball</translation>
+        <translation>כדורסל</translation>
     </message>
     <message>
         <source>Bulletin</source>
-        <translation>Bulletin</translation>
+        <translation>מבזק</translation>
     </message>
     <message>
         <source>Business</source>
-        <translation>Business</translation>
+        <translation>עסקים</translation>
     </message>
     <message>
         <source>Classical</source>
-        <translation>Classical</translation>
+        <translation>קלאסי</translation>
     </message>
     <message>
         <source>College</source>
-        <translation>College</translation>
+        <translation>מכללות</translation>
     </message>
     <message>
         <source>Combat</source>
-        <translation>Combat</translation>
+        <translation>קרב</translation>
     </message>
     <message>
         <source>Comedy</source>
-        <translation>Comedy</translation>
+        <translation>קומדיה</translation>
     </message>
     <message>
         <source>Commentary</source>
-        <translation>Commentary</translation>
+        <translation>פרשנות</translation>
     </message>
     <message>
         <source>Concert</source>
-        <translation>Concert</translation>
+        <translation>קונצרט</translation>
     </message>
     <message>
         <source>Consumer</source>
-        <translation>Consumer</translation>
+        <translation>צרכנות</translation>
     </message>
     <message>
         <source>Contemporary</source>
-        <translation>Contemporary</translation>
+        <translation>בר זמננו</translation>
     </message>
     <message>
         <source>Crime</source>
-        <translation>Crime</translation>
+        <translation>פשע</translation>
     </message>
     <message>
         <source>Dance</source>
-        <translation>Dance</translation>
+        <translation>מחול</translation>
     </message>
     <message>
         <source>Documentary</source>
-        <translation>Documentary</translation>
+        <translation>תעודי</translation>
     </message>
     <message>
         <source>Drama</source>
-        <translation>Drama</translation>
+        <translation>דרמה</translation>
     </message>
     <message>
         <source>Elementary</source>
-        <translation>Elementary</translation>
+        <translation>אלמנטרי</translation>
     </message>
     <message>
         <source>Erotica</source>
-        <translation>Erotica</translation>
+        <translation>ארוטיקה</translation>
     </message>
     <message>
         <source>Exercise</source>
-        <translation>Exercise</translation>
+        <translation>תרגול</translation>
     </message>
     <message>
         <source>Fantasy</source>
-        <translation>Fantasy</translation>
+        <translation>פנטזיה</translation>
     </message>
     <message>
         <source>Farm</source>
-        <translation>Farm</translation>
+        <translation>חווה</translation>
     </message>
     <message>
         <source>Fashion</source>
-        <translation>Fashion</translation>
+        <translation>אופנה</translation>
     </message>
     <message>
         <source>Fiction</source>
-        <translation>Fiction</translation>
+        <translation>סיפורת</translation>
     </message>
     <message>
         <source>Food</source>
-        <translation>Food</translation>
+        <translation>אוכל</translation>
     </message>
     <message>
         <source>Football</source>
-        <translation>Football</translation>
+        <translation>כדורגל</translation>
     </message>
     <message>
         <source>Foreign</source>
-        <translation>Foreign</translation>
+        <translation>זר</translation>
     </message>
     <message>
         <source>Fund Raiser</source>
-        <translation>Fund Raiser</translation>
+        <translation>גיוס כספים</translation>
     </message>
     <message>
         <source>Game/Quiz</source>
-        <translation>Game/Quiz</translation>
+        <translation>משחק/חידון</translation>
     </message>
     <message>
         <source>Garden</source>
-        <translation>Garden</translation>
+        <translation>גינה</translation>
     </message>
     <message>
         <source>Golf</source>
-        <translation>Golf</translation>
+        <translation>גולף</translation>
     </message>
     <message>
         <source>Government</source>
-        <translation>Government</translation>
+        <translation>ממשל</translation>
     </message>
     <message>
         <source>Health</source>
-        <translation>Health</translation>
+        <translation>בריאות</translation>
     </message>
     <message>
         <source>High School</source>
-        <translation>High School</translation>
+        <translation>ביה&quot;ס תיכון</translation>
     </message>
     <message>
         <source>History</source>
-        <translation>History</translation>
+        <translation>היסטוריה</translation>
     </message>
     <message>
         <source>Hobby</source>
-        <translation>Hobby</translation>
+        <translation>תחביב</translation>
     </message>
     <message>
         <source>Hockey</source>
-        <translation>Hockey</translation>
+        <translation>הוקי</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>Home</translation>
+        <translation>בית</translation>
     </message>
     <message>
         <source>Horror</source>
-        <translation>Horror</translation>
+        <translation>זוועה</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation>מידע</translation>
     </message>
     <message>
         <source>Instruction</source>
-        <translation>Instruction</translation>
+        <translation>הדרכה</translation>
     </message>
     <message>
         <source>International</source>
-        <translation>International</translation>
+        <translation>בין לאומי</translation>
     </message>
     <message>
         <source>Interview</source>
-        <translation>Interview</translation>
+        <translation>ראיון</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>Language</translation>
+        <translation>שפה</translation>
     </message>
     <message>
         <source>Legal</source>
-        <translation>Legal</translation>
+        <translation>חוק</translation>
     </message>
     <message>
         <source>Live</source>
-        <translation>Live</translation>
+        <translation>חי</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation>Local</translation>
+        <translation>מקומי</translation>
     </message>
     <message>
         <source>Math</source>
-        <translation>Math</translation>
+        <translation>מתמטיקה</translation>
     </message>
     <message>
         <source>Medical</source>
-        <translation>Medical</translation>
+        <translation>רפואה</translation>
     </message>
     <message>
         <source>Meeting</source>
-        <translation>Meeting</translation>
+        <translation>פגישה</translation>
     </message>
     <message>
         <source>Military</source>
-        <translation>Military</translation>
+        <translation>צבא</translation>
     </message>
     <message>
         <source>Miniseries</source>
-        <translation>Miniseries</translation>
+        <translation>מיני סדרה</translation>
     </message>
     <message>
         <source>Music</source>
-        <translation>Music</translation>
+        <translation>מוסיקה</translation>
     </message>
     <message>
         <source>Mystery</source>
-        <translation>Mystery</translation>
+        <translation>מסתורין</translation>
     </message>
     <message>
         <source>National</source>
-        <translation>National</translation>
+        <translation>לאומי</translation>
     </message>
     <message>
         <source>Nature</source>
-        <translation>Nature</translation>
+        <translation>טבע</translation>
     </message>
     <message>
         <source>Police</source>
-        <translation>Police</translation>
+        <translation>משטרה</translation>
     </message>
     <message>
         <source>Politics</source>
-        <translation>Politics</translation>
+        <translation>פוליטיקה</translation>
     </message>
     <message>
         <source>Premiere</source>
-        <translation>Premiere</translation>
+        <translation>בכורה</translation>
     </message>
     <message>
         <source>Prerecorded</source>
-        <translation>Prerecorded</translation>
+        <translation>מוקלט מראש</translation>
     </message>
     <message>
         <source>Product</source>
-        <translation>Product</translation>
+        <translation>מוצר</translation>
     </message>
     <message>
         <source>Professional</source>
-        <translation>Professional</translation>
+        <translation>מקצועי</translation>
     </message>
     <message>
         <source>Public</source>
-        <translation>Public</translation>
+        <translation>ציבורי</translation>
     </message>
     <message>
         <source>Racing</source>
-        <translation>Racing</translation>
+        <translation>מרוץ</translation>
     </message>
     <message>
         <source>Reading</source>
-        <translation>Reading</translation>
+        <translation>קריאה</translation>
     </message>
     <message>
         <source>Repair</source>
-        <translation>Repair</translation>
+        <translation>תיקון</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation>Repeat</translation>
+        <translation>חוזר</translation>
     </message>
     <message>
         <source>Review</source>
-        <translation>Review</translation>
+        <translation>סקירה</translation>
     </message>
     <message>
         <source>Romance</source>
-        <translation>Romance</translation>
+        <translation>רומנטי</translation>
     </message>
     <message>
         <source>Science</source>
-        <translation>Science</translation>
+        <translation>מדע</translation>
     </message>
     <message>
         <source>Series</source>
-        <translation>Series</translation>
+        <translation>סדרה</translation>
     </message>
     <message>
         <source>Service</source>
@@ -2754,39 +2763,39 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Shopping</source>
-        <translation>Shopping</translation>
+        <translation>קניות</translation>
     </message>
     <message>
         <source>Soap Opera</source>
-        <translation>Soap Opera</translation>
+        <translation>אופרת סבון</translation>
     </message>
     <message>
         <source>Special</source>
-        <translation>Special</translation>
+        <translation>מיוחד</translation>
     </message>
     <message>
         <source>Suspense</source>
-        <translation>Suspense</translation>
+        <translation>מתח</translation>
     </message>
     <message>
         <source>Talk</source>
-        <translation>Talk</translation>
+        <translation>דיבורים</translation>
     </message>
     <message>
         <source>Technical</source>
-        <translation>Technical</translation>
+        <translation>טכני</translation>
     </message>
     <message>
         <source>Tennis</source>
-        <translation>Tennis</translation>
+        <translation>טניס</translation>
     </message>
     <message>
         <source>Travel</source>
-        <translation>Travel</translation>
+        <translation>נסיעות</translation>
     </message>
     <message>
         <source>Variety</source>
-        <translation>Variety</translation>
+        <translation>מגוון</translation>
     </message>
     <message>
         <source>Video</source>
@@ -2794,11 +2803,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Weather</source>
-        <translation>Weather</translation>
+        <translation>מזג אויר</translation>
     </message>
     <message>
         <source>Western</source>
-        <translation>Western</translation>
+        <translation>מערבון</translation>
     </message>
     <message>
         <source>Channel Options</source>
@@ -2830,11 +2839,11 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Sort Mode</source>
-        <translation>Sort Mode</translation>
+        <translation>מוד מיון</translation>
     </message>
     <message>
         <source>Hide channels without channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">הסתר ערוצים ללא מספר ערוץ</translation>
     </message>
     <message>
         <source>Channel Scanner</source>
@@ -2846,7 +2855,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Transport Editor</source>
-        <translation>Transport Editor</translation>
+        <translation>עורך שינוע</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -2946,7 +2955,7 @@ Returning to the previous menu.</translation>
     </message>
     <message>
         <source>Frequency</source>
-        <translation>Frequency</translation>
+        <translation>תדר</translation>
     </message>
     <message>
         <source>or</source>
@@ -3424,7 +3433,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Page Not Available</source>
         <comment>Requested Teletext page not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>דף אינו זמין</translation>
     </message>
     <message>
         <source>Title match (regex)</source>
@@ -3480,27 +3489,27 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>New Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>שם קבוצת פרופיל החדשה</translation>
     </message>
     <message>
         <source>(Create new profile group)</source>
-        <translation>(Create new profile group)</translation>
+        <translation>(צור קבוצת פרופיל חדשה)</translation>
     </message>
     <message>
         <source>Delete profile group:</source>
-        <translation type="unfinished"></translation>
+        <translation>למחוק קבוצת פרופיל:</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">כן, מחק קבוצה</translation>
+        <translation>כן, מחק קבוצה</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">לא, אל תמחק קבוצה</translation>
+        <translation>לא, אל תמחק קבוצה</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>שם קבוצת פרופיל</translation>
     </message>
     <message>
         <source>Hostname</source>
@@ -3602,39 +3611,39 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Single Record</source>
-        <translation>Single Record</translation>
+        <translation>הקלטה יחידה</translation>
     </message>
     <message>
         <source>Record Daily</source>
-        <translation>Record Daily</translation>
+        <translation>הקלט כל יום</translation>
     </message>
     <message>
         <source>Record Weekly</source>
-        <translation>Record Weekly</translation>
+        <translation>הקלט כל שבוע</translation>
     </message>
     <message>
         <source>Channel Record</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט בערוץ</translation>
     </message>
     <message>
         <source>Record All</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט הכל</translation>
     </message>
     <message>
         <source>Find One</source>
-        <translation>Find One</translation>
+        <translation>חפש אחד</translation>
     </message>
     <message>
         <source>Find Daily</source>
-        <translation>Find Daily</translation>
+        <translation>חפש כל יום</translation>
     </message>
     <message>
         <source>Find Weekly</source>
-        <translation>Find Weekly</translation>
+        <translation>חפש כל שבוע</translation>
     </message>
     <message>
         <source>Override Recording</source>
-        <translation>Override Recording</translation>
+        <translation>עקוף הקלטה</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -3805,43 +3814,43 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Never Record</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תקליט אף פעם</translation>
     </message>
     <message>
         <source>Recorder Off-Line</source>
-        <translation type="unfinished"></translation>
+        <translation>המקליט אינו מקוון</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
-        <translation>This showing will be recorded.</translation>
+        <translation>מופע זה יוקלט.</translation>
     </message>
     <message>
         <source>This showing is being recorded.</source>
-        <translation>This showing is being recorded.</translation>
+        <translation>מופע זה מוקלט כרגע.</translation>
     </message>
     <message>
         <source>This showing was recorded.</source>
-        <translation>This showing was recorded.</translation>
+        <translation>מופע זה הוקלט.</translation>
     </message>
     <message>
         <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation>This showing was recorded but was aborted before recording was completed.</translation>
+        <translation>מופע זה הוקלט אך ההקלטה הופסקה לפני הסיום.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
-        <translation>This showing was not recorded because it was scheduled after it would have ended.</translation>
+        <translation>מופע זה לא הוקלט מכיוון שתוזמן לאחר שהסתיים.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
-        <translation>This showing was not recorded because it was manually cancelled.</translation>
+        <translation>מופע זה לא הוקלט עקב ביטול ידני.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
-        <translation>there wasn&apos;t enough disk space available.</translation>
+        <translation>לא היה מספיק מקום בדיסק.</translation>
     </message>
     <message>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>כרטיס הטלויזיה היה כבר בשימוש.</translation>
     </message>
     <message>
         <source>the recording failed.</source>
@@ -3849,63 +3858,63 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב מופע זה לא ידוע.</translation>
     </message>
     <message>
         <source>This showing will not be recorded because </source>
-        <translation>This showing will not be recorded because </translation>
+        <translation>מופע זה לא יוקלט מכיוון ש</translation>
     </message>
     <message>
         <source>This showing was not recorded because </source>
-        <translation>This showing was not recorded because </translation>
+        <translation>מופע זה לא הוקלט מכיוון ש</translation>
     </message>
     <message>
         <source>it was manually set to not record.</source>
-        <translation type="unfinished"></translation>
+        <translation>סומן באופן ידני לא להקלטה.</translation>
     </message>
     <message>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה הוקלט בעבר לפי מדיניות הכפילות שנבחרה לכותר זה.</translation>
     </message>
     <message>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה הוקלט בעבר ועדיין זמין ברשימת ההקלטות.</translation>
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה יוקלט בזמן מוקדם יותר.</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>קיימים יותר מדי הקלטות של תוכנית זאת.</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>תוכנית אחרת בעלת קדימות גבוהה תוקלט.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה יוקלט בזמן מאוחר יותר.</translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה הוא שידור חוזר.</translation>
     </message>
     <message>
         <source>it was marked to never be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>סומן לא להקליט לעולם.</translation>
     </message>
     <message>
         <source>the backend recorder is off-line.</source>
-        <translation type="unfinished"></translation>
+        <translation>המקליט בשרת אינו מקוון.</translation>
     </message>
     <message>
         <source>you should never see this.</source>
-        <translation>you should never see this.</translation>
+        <translation>אתה לא צריך לראות את זה.</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Title</translation>
+        <translation>כותרת</translation>
     </message>
     <message>
         <source>Title Pronounce</source>
@@ -3913,7 +3922,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Part %1 of %2, </source>
-        <translation>Part %1 of %2, </translation>
+        <translation type="unfinished">חלק %1 מ %2 .</translation>
     </message>
     <message>
         <source>HDTV</source>
@@ -3926,15 +3935,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Subtitled</source>
-        <translation>Subtitled</translation>
+        <translation>כתוביות</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation>Stereo</translation>
+        <translation>סטריאו</translation>
     </message>
     <message>
         <source>Unidentified Episode</source>
-        <translation>Unidentified Episode</translation>
+        <translation>פרק לא מוגדר</translation>
     </message>
     <message>
         <source>Description</source>
@@ -3947,11 +3956,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation>Type</translation>
+        <translation>סוג</translation>
     </message>
     <message>
         <source>Episode Number</source>
-        <translation>Episode Number</translation>
+        <translation>פרק מספר</translation>
     </message>
     <message>
         <source>Original Airdate</source>
@@ -3963,83 +3972,83 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Actors</source>
-        <translation>Actors</translation>
+        <translation>שחקנים</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation>Director</translation>
+        <translation>במאי</translation>
     </message>
     <message>
         <source>Producer</source>
-        <translation>Producer</translation>
+        <translation>מפיק</translation>
     </message>
     <message>
         <source>Executive Producer</source>
-        <translation>Executive Producer</translation>
+        <translation>מפיק בפועל</translation>
     </message>
     <message>
         <source>Writer</source>
-        <translation>Writer</translation>
+        <translation>כותב</translation>
     </message>
     <message>
         <source>Guest Star</source>
-        <translation>Guest Star</translation>
+        <translation>כוכב אורח</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation>Host</translation>
+        <translation>מנחה</translation>
     </message>
     <message>
         <source>Adapter</source>
-        <translation>Adapter</translation>
+        <translation>מעבד</translation>
     </message>
     <message>
         <source>Presenter</source>
-        <translation>Presenter</translation>
+        <translation>מגיש</translation>
     </message>
     <message>
         <source>Commentator</source>
-        <translation>Commentator</translation>
+        <translation>פרשן</translation>
     </message>
     <message>
         <source>Guest</source>
-        <translation>Guest</translation>
+        <translation>אורח</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Status</translation>
+        <translation>מצב</translation>
     </message>
     <message>
         <source>Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>הוראת הקלטה</translation>
     </message>
     <message>
         <source>Search Phrase</source>
-        <translation>Search Phrase</translation>
+        <translation>חפש משפט</translation>
     </message>
     <message>
         <source>Find ID</source>
-        <translation>Find ID</translation>
+        <translation>מצא ID</translation>
     </message>
     <message>
         <source>Recording Host</source>
-        <translation>Recording Host</translation>
+        <translation>שרת הקלטה</translation>
     </message>
     <message>
         <source>Recorded File Size</source>
-        <translation type="unfinished"></translation>
+        <translation>גודל קובץ ההקלטה</translation>
     </message>
     <message>
         <source>Recording Profile</source>
-        <translation>Recording Profile</translation>
+        <translation>פרופיל הקלטה</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation>Recording Group</translation>
+        <translation>קבוצת הקלטה</translation>
     </message>
     <message>
         <source>Playback Group</source>
-        <translation>Playback Group</translation>
+        <translation>קבוצת הסרטה</translation>
     </message>
     <message>
         <source>Reactivate</source>
@@ -4059,48 +4068,49 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Change Ending Time</source>
-        <translation>Change Ending Time</translation>
+        <translation>שנה זמן סיום</translation>
     </message>
     <message>
         <source>Edit Options</source>
-        <translation type="unfinished"></translation>
+        <translation>ערוך אפשרויות</translation>
     </message>
     <message>
         <source>Add Override</source>
-        <translation>Add Override</translation>
+        <translation>הוסף עקיפה</translation>
     </message>
     <message>
         <source>Edit Override</source>
-        <translation type="unfinished"></translation>
+        <translation>ערוך עקיפה</translation>
     </message>
     <message>
         <source>Clear Override</source>
-        <translation>Clear Override</translation>
+        <translation>בטל עקיפה</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
 </source>
-        <translation> The following programs will be recorded instead:</translation>
+        <translation>התוכנית הבאה תוקלט במקום :
+</translation>
     </message>
     <message>
         <source>Record anyway</source>
-        <translation>Record anyway</translation>
+        <translation>הקלט בכל זאת</translation>
     </message>
     <message>
         <source>Forget Previous</source>
-        <translation>Forget Previous</translation>
+        <translation>שכח מהקודם</translation>
     </message>
     <message>
         <source>Codec</source>
-        <translation>Codec</translation>
+        <translation>מקודד</translation>
     </message>
     <message>
         <source>MP3 Quality</source>
-        <translation>MP3 Quality</translation>
+        <translation>איכות MP3</translation>
     </message>
     <message>
         <source>The higher the slider number, the lower the quality of the audio.  Better quality audio (lower numbers) requires more CPU.</source>
-        <translation>The higher the slider number, the lower the quality of the audio.  Better quality audio (lower numbers) requires more CPU.</translation>
+        <translation>ככל שהערך גבוהה, איכות הקלטת הקול ירודה.  איכות הקלטה גבוהה (ערך נמוך) דורש יותר משאבי מעבד.</translation>
     </message>
     <message>
         <source>Volume (%)</source>
@@ -4108,11 +4118,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>עוצמת הקלטה בכרטיס הדגימה</translation>
     </message>
     <message>
         <source>Sampling rate</source>
-        <translation>Sampling rate</translation>
+        <translation>קצב דגימה</translation>
     </message>
     <message>
         <source>Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.</source>
@@ -4120,51 +4130,51 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation type="unfinished">Type</translation>
     </message>
     <message>
         <source>Sets the audio type</source>
-        <translation>Sets the audio type</translation>
+        <translation type="unfinished">Sets the audio type</translation>
     </message>
     <message>
         <source>Bitrate</source>
-        <translation>Bitrate</translation>
+        <translation type="unfinished">Bitrate</translation>
     </message>
     <message>
         <source>Sets the audio bitrate</source>
-        <translation>Sets the audio bitrate</translation>
+        <translation type="unfinished">Sets the audio bitrate</translation>
     </message>
     <message>
         <source>Volume of the recording </source>
-        <translation>Volume of the recording </translation>
+        <translation type="unfinished">Volume of the recording </translation>
     </message>
     <message>
         <source>Bitrate Settings</source>
-        <translation>Bitrate Settings</translation>
+        <translation type="unfinished">Bitrate Settings</translation>
     </message>
     <message>
         <source>Audio Quality</source>
-        <translation>Audio Quality</translation>
+        <translation type="unfinished">Audio Quality</translation>
     </message>
     <message>
         <source>RTjpeg Quality</source>
-        <translation>RTjpeg Quality</translation>
+        <translation type="unfinished">RTjpeg Quality</translation>
     </message>
     <message>
         <source>Higher is better quality.</source>
-        <translation>Higher is better quality.</translation>
+        <translation type="unfinished">Higher is better quality.</translation>
     </message>
     <message>
         <source>Luma filter</source>
-        <translation>Luma filter</translation>
+        <translation type="unfinished">Luma filter</translation>
     </message>
     <message>
         <source>Lower is better.</source>
-        <translation>Lower is better.</translation>
+        <translation type="unfinished">Lower is better.</translation>
     </message>
     <message>
         <source>Chroma filter</source>
-        <translation>Chroma filter</translation>
+        <translation type="unfinished">Chroma filter</translation>
     </message>
     <message>
         <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
@@ -4176,7 +4186,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Minimum quality</source>
-        <translation>Minimum quality</translation>
+        <translation type="unfinished">Minimum quality</translation>
     </message>
     <message>
         <source>Modifying the default may have severe consequences.</source>
@@ -4184,15 +4194,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Maximum quality</source>
-        <translation>Maximum quality</translation>
+        <translation type="unfinished">Maximum quality</translation>
     </message>
     <message>
         <source>Max quality difference between frames</source>
-        <translation>Max quality difference between frames</translation>
+        <translation type="unfinished">Max quality difference between frames</translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
-        <translation>Enable interlaced DCT encoding</translation>
+        <translation type="unfinished">Enable interlaced DCT encoding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
@@ -4200,7 +4210,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation>Enable interlaced motion estimation</translation>
+        <translation type="unfinished">Enable interlaced motion estimation</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
@@ -4208,7 +4218,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable high-quality encoding</source>
-        <translation>Enable high-quality encoding</translation>
+        <translation type="unfinished">Enable high-quality encoding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
@@ -4216,7 +4226,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable 4MV encoding</source>
-        <translation>Enable 4MV encoding</translation>
+        <translation type="unfinished">Enable 4MV encoding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
@@ -4224,7 +4234,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Number of threads</source>
-        <translation>Number of threads</translation>
+        <translation type="unfinished">Number of threads</translation>
     </message>
     <message>
         <source>Threads to use for software encoding.</source>
@@ -4236,7 +4246,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Max. Bitrate</source>
-        <translation>Max. Bitrate</translation>
+        <translation type="unfinished">Max. Bitrate</translation>
     </message>
     <message>
         <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
@@ -4320,7 +4330,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Normal</source>
-        <translation>Normal</translation>
+        <translation>רגיל</translation>
     </message>
     <message>
         <source>TV Only</source>
@@ -4336,7 +4346,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Width</source>
-        <translation>Width</translation>
+        <translation>רוחב</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
@@ -4344,7 +4354,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Height</source>
-        <translation>Height</translation>
+        <translation>גובה</translation>
     </message>
     <message>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
@@ -4352,11 +4362,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Image size</source>
-        <translation>Image size</translation>
+        <translation>גודל תמונה</translation>
     </message>
     <message>
         <source>Profile</source>
-        <translation>Profile</translation>
+        <translation>פרופיל</translation>
     </message>
     <message>
         <source>Autodetect</source>
@@ -4368,19 +4378,19 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
-        <translation>Record using the &quot;%1&quot; profile</translation>
+        <translation>הקלט בפרופיל &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Transcode using Autodetect</source>
-        <translation type="unfinished"></translation>
+        <translation>קדד מחדש עם זיהוי אוטומטי</translation>
     </message>
     <message>
         <source>Transcode using &quot;%1&quot;</source>
-        <translation>Transcode using &quot;%1&quot;</translation>
+        <translation>קדד מחדש עם &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Profile name</source>
-        <translation>Profile name</translation>
+        <translation>שם הפרופיל</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -4537,47 +4547,47 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Power Search</source>
-        <translation>Power Search</translation>
+        <translation>חיפוש מתקדם</translation>
     </message>
     <message>
         <source>Title Search</source>
-        <translation>Title Search</translation>
+        <translation>חיפוש כותר</translation>
     </message>
     <message>
         <source>Keyword Search</source>
-        <translation>Keyword Search</translation>
+        <translation>חיפוש מילות מפתח</translation>
     </message>
     <message>
         <source>People Search</source>
-        <translation>People Search</translation>
+        <translation>חיפוש אנשים</translation>
     </message>
     <message>
         <source>Unknown Search</source>
-        <translation type="unfinished">חיפוש לא ידוע</translation>
+        <translation>חיפוש לא ידוע</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation>Signal Lock</translation>
+        <translation>נעילת אות</translation>
     </message>
     <message>
         <source>Signal Power</source>
-        <translation>Signal Power</translation>
+        <translation>עוצמת אות</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
-        <translation>Scheduling Options</translation>
+        <translation>אפשרויות תזמון</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation>Post Recording Processing</translation>
+        <translation>עיבוד לאחר הקלטה</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation>Storage Options</translation>
+        <translation>אפשרויות אכסון</translation>
     </message>
     <message>
         <source>Schedule Information</source>
-        <translation>Schedule Information</translation>
+        <translation>מידע על תזמון</translation>
     </message>
     <message>
         <source>Program details</source>
@@ -4661,55 +4671,55 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation>Record this showing with normal options</translation>
+        <translation>הקלט שידור זה באפשרויות רגילות</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation>Record this showing with override options</translation>
+        <translation>הקלט שידור זה באפשרויות עקיפה</translation>
     </message>
     <message>
         <source>Do not allow this showing to be recorded</source>
-        <translation>Do not allow this showing to be recorded</translation>
+        <translation>אל תאפשר שהקלטת שידור זה</translation>
     </message>
     <message>
         <source>Start recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>התחל הקלטה ב%1 דקות איחור</translation>
     </message>
     <message>
         <source>Start recording %1 minute late</source>
-        <translation>Start recording %1 minute late</translation>
+        <translation>התחל הקלטה ב%1 דקה איחור</translation>
     </message>
     <message>
         <source>Start recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>התחל הקלטה בזמן</translation>
     </message>
     <message>
         <source>Start recording %1 minute early</source>
-        <translation>Start recording %1 minute early</translation>
+        <translation>התחל הקלטה %1 דקה לפני הזמן</translation>
     </message>
     <message>
         <source>Start recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>התחל הקלטה %1 דקות לפני הזמן</translation>
     </message>
     <message>
         <source>End recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>סיים הקלטה %1 דקות לפני הזמן</translation>
     </message>
     <message>
         <source>End recording %1 minute early</source>
-        <translation>End recording %1 minute early</translation>
+        <translation>סיים הקלטה %1 דקה לפני הזמן</translation>
     </message>
     <message>
         <source>End recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>סיים הקלטה בזמן</translation>
     </message>
     <message>
         <source>End recording %1 minute late</source>
-        <translation>End recording %1 minute late</translation>
+        <translation>סיים הקלטה ב%1 דקה איחור</translation>
     </message>
     <message>
         <source>End recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>סיים הקלטה ב%1 דקות איחור</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
@@ -4717,63 +4727,63 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>חפש כפילויות בהקלטות קודמות ומאוחרות</translation>
     </message>
     <message>
         <source>Look for duplicates in current recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>חפש כפילויות בהקלטות נוכחיות בלבד</translation>
     </message>
     <message>
         <source>Look for duplicates in previous recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>חפש כפילויות בהקלטות קודמות בלבד</translation>
     </message>
     <message>
         <source>[ Match duplicates with ]</source>
-        <translation type="unfinished"></translation>
+        <translation>[ התאם כפילויות עם ]</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">התאם כפילויות עם כיתוביות ותאור</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם כפילויות עם כיתוביות</translation>
     </message>
     <message>
         <source>Match duplicates using description</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם כפילויות עם תאור מפורט</translation>
     </message>
     <message>
         <source>Don&apos;t match duplicates</source>
-        <translation>Don&apos;t match duplicates</translation>
+        <translation>אל תתאים כפילויות</translation>
     </message>
     <message>
         <source>[ Select recording Profile ]</source>
-        <translation>[ Select recording Profile ]</translation>
+        <translation>[בחר פרופיל הקלטה ]</translation>
     </message>
     <message>
         <source>Transcode new recordings</source>
-        <translation>Transcode new recordings</translation>
+        <translation>קדד מחדש הקלטות חדשות</translation>
     </message>
     <message>
         <source>Do not Transcode new recordings</source>
-        <translation>Do not Transcode new recordings</translation>
+        <translation>אל תקודד מחדש הקלטות חדשות</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>סמן פרסומות בהקלטות חדשות</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תסמן פרסומות בהקלטות חדשות</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
-        <translation>Run &apos;%1&apos;</translation>
+        <translation>הפעל את &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תפעיל &apos;%1&apos; על הקלטות חדשות</translation>
     </message>
     <message>
         <source>Allow auto expire</source>
@@ -4793,11 +4803,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק את הישן ביותר עם יהיו יותר פרקים מהמותר</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תקליט אם יהיו יותר פרקים מהמותר</translation>
     </message>
     <message>
         <source>No episode limit</source>
@@ -4809,43 +4819,43 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Keep at most %1 episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>השאר לפחות %1 פרקים</translation>
     </message>
     <message>
         <source>Reduce priority by %1</source>
-        <translation>Reduce priority by %1</translation>
+        <translation>הורד עדיפות ב%1</translation>
     </message>
     <message>
         <source>Normal recording priority</source>
-        <translation>Normal recording priority</translation>
+        <translation>עדיפות הקלטה רגילה</translation>
     </message>
     <message>
         <source>Raise priority by %1</source>
-        <translation>Raise priority by %1</translation>
+        <translation>העלה עדיפות ב%1</translation>
     </message>
     <message>
         <source>Select Recording Group</source>
-        <translation>Select Recording Group</translation>
+        <translation>בחר קבוצת הקלטה</translation>
     </message>
     <message>
         <source>Create a new recording group</source>
-        <translation>Create a new recording group</translation>
+        <translation>צור קבוצת הקלטה חדשה</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
-        <translation>Select Playback Group</translation>
+        <translation>בחר קבוצת הקרנה</translation>
     </message>
     <message>
         <source>Select Preferred Input</source>
-        <translation>Select Preferred Input</translation>
+        <translation>בחר כניסה מועדפת</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
-        <translation>Preview schedule changes</translation>
+        <translation>הצג שינויים בתזמון</translation>
     </message>
     <message>
         <source>Save these settings</source>
-        <translation>Save these settings</translation>
+        <translation>שמור הגדרות אלו</translation>
     </message>
     <message>
         <source>(CH)</source>
@@ -7280,7 +7290,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Opacity</source>
-        <translation>Opacity</translation>
+        <translation>שקיפות</translation>
     </message>
     <message>
         <source>Video in floating window</source>
@@ -7368,7 +7378,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>General (Basic)</source>
-        <translation>General (Basic)</translation>
+        <translation>כללי (בסיס)</translation>
     </message>
     <message>
         <source>General (AutoExpire)</source>
@@ -7376,11 +7386,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>General (Jobs)</source>
-        <translation>General (Jobs)</translation>
+        <translation>כללי (עבודות)</translation>
     </message>
     <message>
         <source>General (Advanced)</source>
-        <translation>General (Advanced)</translation>
+        <translation>כללי (מתקדם)</translation>
     </message>
     <message>
         <source>Program Guide</source>
@@ -7388,7 +7398,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Scheduler Options</source>
-        <translation>Scheduler Options</translation>
+        <translation>אפשרויות מתזמן</translation>
     </message>
     <message>
         <source>Recording Type Priority Settings</source>
@@ -7412,11 +7422,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Theme Error</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאת ערכת נושא</translation>
     </message>
     <message>
         <source>Your theme does not contain elements required to display the status screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>ערכת הנושא שלך אינה מכילה אלמנטים הדרושים להצגת מסך המצב.</translation>
     </message>
     <message>
         <source>Do you really want to exit MythTV?</source>
@@ -7442,7 +7452,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Directed By</source>
-        <translation>Directed By</translation>
+        <translation>בוים על ידי</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -7450,7 +7460,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Failed to get selector object</source>
-        <translation type="unfinished"></translation>
+        <translation>כשל בהשגת אוביקט בחירה</translation>
     </message>
     <message>
         <source>Myth could not locate the selector object within your theme.
@@ -7464,55 +7474,55 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Recording Available</source>
-        <translation>Recording Available</translation>
+        <translation>הקלטה זמינה</translation>
     </message>
     <message>
         <source>This recording is currently in use by:</source>
-        <translation>This recording is currently in use by:</translation>
+        <translation type="unfinished">הקלטה כרגע בשימוש על ידי:</translation>
     </message>
     <message>
         <source>This recording is currently Available</source>
-        <translation>This recording is currently Available</translation>
+        <translation>הקלטה זמינה כרגע</translation>
     </message>
     <message>
         <source>Recording Unavailable</source>
-        <translation>Recording Unavailable</translation>
+        <translation>הקלטה אינה זמינה</translation>
     </message>
     <message>
         <source>This recording is currently being deleted and is unavailable</source>
-        <translation>This recording is currently being deleted and is unavailable</translation>
+        <translation>הקלטה זו נמחקת כרגע ואינה זמינה</translation>
     </message>
     <message>
         <source>The file for this recording can not be found</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן למצוא את הקובץ של הקלטה זו</translation>
     </message>
     <message>
         <source>Listings Status</source>
-        <translation>Listings Status</translation>
+        <translation>מצב לוח השידורים</translation>
     </message>
     <message>
         <source>Tuner Status</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב כרטיס הקלטה</translation>
     </message>
     <message>
         <source>Log Entries</source>
-        <translation>Log Entries</translation>
+        <translation>יומן ארועים</translation>
     </message>
     <message>
         <source>Job Queue</source>
-        <translation>Job Queue</translation>
+        <translation>עבודות בתור</translation>
     </message>
     <message>
         <source>Machine Status</source>
-        <translation>Machine Status</translation>
+        <translation>מצב המכונה</translation>
     </message>
     <message>
         <source>AutoExpire List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת תפוגה אוטומטית</translation>
     </message>
     <message>
         <source>Acknowledge all log entries at this priority level or lower?</source>
-        <translation type="unfinished"></translation>
+        <translation>לאשר כל רשומות היומן בחשיבות זו או פחותה ממנה ?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -7520,35 +7530,35 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Setting priority level to %1</source>
-        <translation>Setting priority level to %1</translation>
+        <translation>קובע עדיפות ל%1</translation>
     </message>
     <message>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב לוח השידורים מראה את מצב העדכון האחרון של mythfilldatabase</translation>
     </message>
     <message>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב כרטיס הקלטה מראה את מצב כרטיסי ההקלטה ביחידת השרת</translation>
     </message>
     <message>
         <source>DVB Status</source>
-        <translation>DVB Status</translation>
+        <translation>מצב DVB</translation>
     </message>
     <message>
         <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב DVB מראה נתוני איכות של כרטיסי DVB באם נמצאים</translation>
     </message>
     <message>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>יומן ארועים מראה הודעות מערכת שלא קראת במידה ואפשרת אופציה זו</translation>
     </message>
     <message>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
-        <translation type="unfinished"></translation>
+        <translation>תור משימות מראה את כל עבודות הממתינות לביצוע כגון סימון פירסומות וכו.</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב המכונה מראה נתונים על מערכת ההפעלה במחשב זה</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
@@ -7556,15 +7566,15 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת תפוגה אוטומטית מראה את רשימת התוכניות שתאריך התפוגה שלהם קרוב לפי סדר עולה. הקלטות בראש הרשימה יפוגו ראשונות.</translation>
     </message>
     <message>
         <source>Acknowledge this log entry?</source>
-        <translation>Acknowledge this log entry?</translation>
+        <translation>לאשר רשימת יומן ארועים ?</translation>
     </message>
     <message>
         <source>Delete Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>למחוק משימה?</translation>
     </message>
     <message>
         <source>Pause</source>
@@ -7588,7 +7598,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Delete Now</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק עכשיו</translation>
     </message>
     <message>
         <source>Disable AutoExpire</source>
@@ -7596,19 +7606,19 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>AutoExpire Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation>פעולות תפוגה אוטומטית:</translation>
     </message>
     <message>
         <source>Myth version:</source>
-        <translation>Myth version:</translation>
+        <translation>גרסת Myth :</translation>
     </message>
     <message>
         <source>Last mythfilldatabase guide update:</source>
-        <translation type="unfinished"></translation>
+        <translation>עדכון בסיס נתונים אחרון:</translation>
     </message>
     <message>
         <source>Started:   </source>
-        <translation>Started:   </translation>
+        <translation>התחיל:   </translation>
     </message>
     <message>
         <source>Finished: </source>
@@ -7616,7 +7626,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation>Result: </translation>
+        <translation>תוצאה: </translation>
     </message>
     <message>
         <source>Suggested Next: </source>
@@ -7624,27 +7634,27 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>There&apos;s no guide data available!</source>
-        <translation type="unfinished"></translation>
+        <translation>אין בנמצא לוח שידורים</translation>
     </message>
     <message>
         <source>Have you run mythfilldatabase?</source>
-        <translation>Have you run mythfilldatabase?</translation>
+        <translation>האם הפעלת את mythfilldatabase ?</translation>
     </message>
     <message>
         <source>There is guide data until </source>
-        <translation type="unfinished"></translation>
+        <translation>נתקבל לוח שידורים עד </translation>
     </message>
     <message>
         <source>days</source>
-        <translation>days</translation>
+        <translation>ימים</translation>
     </message>
     <message>
         <source>day</source>
-        <translation>day</translation>
+        <translation>יום</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
-        <translation>WARNING: is mythfilldatabase running?</translation>
+        <translation>זהירות: האם mythfilldatabase בפעולה?</translation>
     </message>
     <message>
         <source>DataDirect Status: </source>
@@ -7652,7 +7662,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נמצאו פריטים ברמת חשיבות %1 או נמוכה יותר.</translation>
     </message>
     <message>
         <source>Use 1-8 to change priority level.</source>
@@ -7664,55 +7674,55 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation>%1 בסיכובסיכום, %2 בשימוש, %3 (או %4%) פנוי.</translation>
+        <translation>%1 בסיכום, %2 בשימוש, %3 (או %4%) פנוי.</translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
-        <translation>, using your %1 rate of %2 Kb/sec</translation>
+        <translation>, בשימוש בקצב %1 של %2 Kb/sec</translation>
     </message>
     <message>
         <source>%1 hours left</source>
-        <translation>%1 hours left</translation>
+        <translation>נשארו %1 שעות</translation>
     </message>
     <message>
         <source>%1 hours and %2 minutes left</source>
-        <translation type="unfinished"></translation>
+        <translation>נשארו %1 שעות ו%2 דקות</translation>
     </message>
     <message>
         <source>%1 minutes left</source>
-        <translation type="unfinished"></translation>
+        <translation>נשארו %1 דקות</translation>
     </message>
     <message>
         <source>Uptime</source>
-        <translation>Uptime</translation>
+        <translation>זמן בפעולה</translation>
     </message>
     <message>
         <source>average</source>
-        <translation>average</translation>
+        <translation>ממוצא</translation>
     </message>
     <message>
         <source>maximum</source>
-        <translation>maximum</translation>
+        <translation>מירבי</translation>
     </message>
     <message>
         <source>System</source>
-        <translation>System</translation>
+        <translation>מערכת</translation>
     </message>
     <message>
         <source>This machine</source>
-        <translation>This machine</translation>
+        <translation>מכונה זו</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Load</translation>
+        <translation>עומס</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>unknown</translation>
+        <translation>לא ידוע</translation>
     </message>
     <message>
         <source>failed</source>
-        <translation>failed</translation>
+        <translation>נכשל</translation>
     </message>
     <message>
         <source>RAM</source>
@@ -7724,7 +7734,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>MythTV server</source>
-        <translation>MythTV server</translation>
+        <translation>שרת MythTV</translation>
     </message>
     <message>
         <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
@@ -8490,23 +8500,23 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>מופעים אחרים</translation>
     </message>
     <message>
         <source>the recorder failed to record.</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה נכשלה.</translation>
     </message>
     <message>
         <source>this recording rule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation>הוראת הקלטה זו אינה פעילה.</translation>
     </message>
     <message>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>הראות הקלטה זו אינה תואמת לאף שידור בלוח התוכניות.</translation>
     </message>
     <message>
         <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק זה יוקלט בערוץ אחר בזמן השידור.</translation>
     </message>
     <message>
         <source>Mono</source>
@@ -8672,39 +8682,39 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Include in the &quot;%1&quot; recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>צרף בקבוצת הקלטה &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">הוצא פרקים בלתי מזוהים</translation>
+        <translation>הוצא פרקים בלתי מזוהים</translation>
     </message>
     <message>
         <source>Exclude old episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>הוצא פרקים ישנים</translation>
     </message>
     <message>
         <source>Record new episode first showings</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטת שידור ראשון של פרקים חדשים</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle then description</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם כפילויות עם כתוביות ואז תאור מפורט</translation>
     </message>
     <message>
         <source>This recording rule is inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>הוראת הקלטה זו אינה פעילה</translation>
     </message>
     <message>
         <source>This recording rule is active</source>
-        <translation type="unfinished"></translation>
+        <translation>הוראת הקלטה זו פעילה</translation>
     </message>
     <message>
         <source>Select Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר קבוצת איכסון</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; storage group</source>
-        <translation type="unfinished"></translation>
+        <translation>שמור בקבוצת איכסון &quot;%1&quot;</translation>
     </message>
     <message>
         <source>LiveTV</source>
@@ -9442,7 +9452,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase הופעל אך לא הכניס מידע חדש עבור %1 מ %2 מקורות. יתכן וזה מסמן תקלה במייבא לוח השידורים.</translation>
     </message>
     <message>
         <source>Max Audio Channels</source>
@@ -9470,10 +9480,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Active Linear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10113,39 +10119,39 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>נגן מהסימניה</translation>
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished">Play from beginning</translation>
+        <translation>נגן מהתחלה</translation>
     </message>
     <message>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>הקובץ של הקלטה זו ריק.</translation>
     </message>
     <message>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה זו אינה זמינה עדיין.</translation>
     </message>
     <message>
         <source>Schedule Status</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב תזמון הקלטות</translation>
     </message>
     <message>
         <source>Schedule Status shows current statistics from the scheduler.</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב תזמון הקלטות מראה נתוני מתזמן הקלטות</translation>
     </message>
     <message>
         <source>Move to Default group</source>
-        <translation type="unfinished"></translation>
+        <translation>העבר לקבוצת ברירת המחדל</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>בטל מחיקה</translation>
     </message>
     <message>
         <source>Total Disk Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>שטח דיסק כולל:</translation>
     </message>
     <message>
         <source>MythTV Drive #%1:</source>
@@ -10303,6 +10309,10 @@ name can not be blank.</source>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback. &apos;Passive&apos; is the least demanding on the CPU. &apos;Active Simple&apos; is more demanding and &apos;Active Linear&apos; is the most demanding (but highest quality).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10567,23 +10577,23 @@ name can not be blank.</source>
     </message>
     <message>
         <source>is unavailable</source>
-        <translation>is unavailable</translation>
+        <translation>לא זמין</translation>
     </message>
     <message>
         <source>is watching live TV</source>
-        <translation>is watching live TV</translation>
+        <translation>משמש לצפיה</translation>
     </message>
     <message>
         <source>is recording</source>
-        <translation>is recording</translation>
+        <translation>מקליט כרגע</translation>
     </message>
     <message>
         <source>is not recording</source>
-        <translation>is not recording</translation>
+        <translation>אינו מקליט</translation>
     </message>
     <message>
         <source>Tuner %1 </source>
-        <translation>טונר %1 </translation>
+        <translation>טיונר %1 </translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
@@ -10623,31 +10633,31 @@ No other details</translation>
     </message>
     <message>
         <source>standard rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקים רגילים מוגדרים</translation>
     </message>
     <message>
         <source>search rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי חיפוש מוגדרים</translation>
     </message>
     <message>
         <source>marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>מסומן כHDTV</translation>
     </message>
     <message>
         <source>from source</source>
-        <translation type="unfinished"></translation>
+        <translation>ממקור</translation>
     </message>
     <message>
         <source>on input</source>
-        <translation type="unfinished"></translation>
+        <translation>בכניסה</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>זמן ריצה מתוכנן:</translation>
     </message>
     <message>
         <source>%1 of these are Deleted and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 כאלו נמחקו וצרכו %2</translation>
     </message>
 </context>
 <context>
@@ -10729,23 +10739,23 @@ Directory From Storage Group?</source>
     <name>TV</name>
     <message>
         <source>Record and watch while it records</source>
-        <translation>Record and watch while it records</translation>
+        <translation>הקלט וצפה תוך כדי הקלטה</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>המשך להקליט וחזור לתפריט ראשי</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>הפסק להקליט, אני רוצה לראות טלוויזיה</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>%1 Settings</translation>
+        <translation>הגדרות %1</translation>
     </message>
     <message>
         <source>Seek:</source>
-        <translation>Seek:</translation>
+        <translation>חפש :</translation>
     </message>
     <message>
         <source>Forward</source>
@@ -10757,7 +10767,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Rewind</source>
-        <translation>Rewind</translation>
+        <translation>חזור</translation>
     </message>
     <message>
         <source>Skip Back</source>
@@ -10777,7 +10787,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Jump to Beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>דלג לתחילה</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
@@ -10849,11 +10859,11 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Rewind %1X</source>
-        <translation>Rewind %1X</translation>
+        <translation>אחורה %1X</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>עצור קידוד</translation>
     </message>
     <message>
         <source>Transcoding</source>
@@ -10861,11 +10871,11 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Try Again</source>
-        <translation>Try Again</translation>
+        <translation>נסה שוב</translation>
     </message>
     <message>
         <source>Searching...</source>
-        <translation>Searching...</translation>
+        <translation>מחפש...</translation>
     </message>
     <message>
         <source>Skip</source>
@@ -10890,15 +10900,15 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Partial Lock</source>
-        <translation>Partial Lock</translation>
+        <translation>נעילה חלקית</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>ללא נעילה</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation>Lock</translation>
+        <translation>נעילה</translation>
     </message>
     <message>
         <source>Signal %1%</source>
@@ -10943,7 +10953,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Audio Resync</source>
-        <translation>Audio Resync</translation>
+        <translation>סנכרון קול מחדש</translation>
     </message>
     <message>
         <source>Audio Sync</source>
@@ -10955,19 +10965,19 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Mute Off</source>
-        <translation type="unfinished"></translation>
+        <translation>בטל השתקה</translation>
     </message>
     <message>
         <source>Mute On</source>
-        <translation>Mute On</translation>
+        <translation>השתקת קול</translation>
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>השתקת ערוץ שמאל</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>השתקת ערוץ ימין</translation>
     </message>
     <message>
         <source>Sleep </source>
@@ -11015,15 +11025,15 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation>Continue Editing</translation>
+        <translation>המשך בעריכה</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation>Do not edit</translation>
+        <translation>אל תערוך</translation>
     </message>
     <message>
         <source>Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>עורך ערוצים</translation>
     </message>
     <message>
         <source>Callsign</source>
@@ -11055,23 +11065,23 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation>Picture-in-Picture</translation>
+        <translation>תמונה בתוך תמונה</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation>Enable/Disable</translation>
+        <translation>אפשור/מניעה</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation>Swap PiP/Main</translation>
+        <translation>החלף תמונת חלון/ראשי</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation>Change Active Window</translation>
+        <translation>שנה חלון פעיל</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation>Enable Browse Mode</translation>
+        <translation>אפשר מצב סיור</translation>
     </message>
     <message>
         <source>Previous Channel</source>
@@ -11079,7 +11089,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>תפריט DVD ראשי</translation>
     </message>
     <message>
         <source>Edit Recording</source>
@@ -11254,7 +11264,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Detect</source>
-        <translation>Detect</translation>
+        <translation>זהה</translation>
     </message>
     <message>
         <source>Progressive</source>
@@ -11278,23 +11288,23 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Select Audio Track</source>
-        <translation>Select Audio Track</translation>
+        <translation>בחר ערוץ שמע</translation>
     </message>
     <message>
         <source>Select Subtitle</source>
-        <translation>Select Subtitle</translation>
+        <translation>בחר כתוביות</translation>
     </message>
     <message>
         <source>Select VBI CC</source>
-        <translation>Select VBI CC</translation>
+        <translation>בחר VBI CC</translation>
     </message>
     <message>
         <source>Select ATSC CC</source>
-        <translation>Select ATSC CC</translation>
+        <translation>בחר ATSC CC</translation>
     </message>
     <message>
         <source>Select DVB CC</source>
-        <translation>Select DVB CC</translation>
+        <translation>בחר DVB CC</translation>
     </message>
     <message>
         <source>Toggle On/Off</source>
@@ -11318,35 +11328,35 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>התוכנה משתמשת בכל הכניסות האפשריות לערוץ שבחרת. אם ברצונך לצפות בהקלטה פעילה, בחר בה מתוך תפריט צפיה בהקלטות.(sp)(sp) אם ברצונך לצפות בשידור חי, בטל את אחת ההקלטות מתפריט המחיקה.</translation>
     </message>
     <message>
         <source>Skip Back Not Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>דילוג אחורה אינו מותר</translation>
     </message>
     <message>
         <source>Previous Chapter</source>
-        <translation>Previous Chapter</translation>
+        <translation>פרק קודם</translation>
     </message>
     <message>
         <source>Previous Title</source>
-        <translation>Previous Title</translation>
+        <translation>כותרת קודמת</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>דלג תמונה בודדת</translation>
     </message>
     <message>
         <source>Next Chapter</source>
-        <translation>Next Chapter</translation>
+        <translation>פרק הבא</translation>
     </message>
     <message>
         <source>Next Title</source>
-        <translation>Next Title</translation>
+        <translation>כותרת הבאה</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Exit</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <source>Chan %1: %2</source>
@@ -11355,39 +11365,40 @@ Directory From Storage Group?</source>
     <message>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>כל המקלטים בפעולה.
+בחר הקלטה נוכחית</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>התוכנה רוצה להקליט את &quot;%1&quot; בערוץ %2 תוך %d שניות. האם ברצונך:</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>הרשה להקליט וחזור לתפריט הראשי</translation>
     </message>
     <message>
         <source>Record it later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט אחר כך, אני רוצה לראות טלוויזיה</translation>
     </message>
     <message>
         <source>Record them later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלט אותם אחר כך, אני רוצה לראות טלוויזיה</translation>
     </message>
     <message>
         <source>Don&apos;t let them record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תקליט, אני רוצה לראות טלוויזיה</translation>
     </message>
     <message>
         <source>End Of Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>סוף הקלטה</translation>
     </message>
     <message>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>התוכנית האחרונה: %1 אינה קיימת</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>מחק הקלטה זו ?</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
@@ -11403,27 +11414,27 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>תמונה קפואה</translation>
     </message>
     <message>
         <source>Title: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>כותרת: %1 (%2)</translation>
     </message>
     <message>
         <source>Chapter: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>פרק: %1/%2</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">כן</translation>
+        <translation>כן</translation>
     </message>
     <message>
         <source>Adjust Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>התאם מילוי</translation>
     </message>
     <message>
         <source>Switch Input</source>
-        <translation type="unfinished"></translation>
+        <translation>שנה כניסה</translation>
     </message>
     <message>
         <source>C</source>
@@ -11437,94 +11448,102 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Switch Source</source>
-        <translation type="unfinished"></translation>
+        <translation>שנה מקור</translation>
     </message>
     <message>
         <source>DVD Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>תפריט פרקי DVD</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטות הבאות</translation>
     </message>
     <message>
         <source>Screen Shot</source>
-        <translation type="unfinished"></translation>
+        <translation>תמונת מסך</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה</translation>
     </message>
     <message>
         <source>You are exiting %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אתה יוצא מ%1</translation>
     </message>
     <message>
         <source>Exit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>יציאה מ%1</translation>
     </message>
     <message>
         <source>&apos;%1&apos; Group Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>סיסמה לקבוצה &apos;%1&apos;:</translation>
     </message>
     <message>
         <source>Password Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>סיסמא שגויה</translation>
+    </message>
+    <message>
+        <source>MythTV is using all inputs for Live TV?</source>
+        <translation>התוכנה משתמשת בכל הכניסות לשידור חי ?</translation>
+    </message>
+    <message>
+        <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
+        <translation>אין לתוכנה כרטיסי דגימה מוגדרים. אנא הפעל את mythtv-setup.</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Scheduled Recordings:</source>
-        <translation>Scheduled Recordings:</translation>
+        <translation>הקלטה מתוזמנת:</translation>
     </message>
     <message>
         <source>Showing:</source>
-        <translation>Showing:</translation>
+        <translation>מופע:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>לא תזמנת אף תוכנית להקלטה</translation>
     </message>
     <message>
         <source>To schedule a recording, exit this screen and</source>
-        <translation>To schedule a recording, exit this screen and</translation>
+        <translation>לתזמון הקלטה, צא ממסך זה ו</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר ב &apos;לוח שידורים&apos; או &apos;חיפוש תוכניות&apos;</translation>
     </message>
     <message>
         <source>Preview Schedule Changes:</source>
-        <translation>Preview Schedule Changes:</translation>
+        <translation>צפה בשינויי תזמון:</translation>
     </message>
     <message>
         <source>The recording schedule would not be affected.</source>
-        <translation>The recording schedule would not be affected.</translation>
+        <translation>תזמון ההקלטות לא יושפע.</translation>
     </message>
     <message>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>עדיפות הקלטה לערוץ</translation>
     </message>
     <message>
         <source>Source:</source>
-        <translation>Source:</translation>
+        <translation>מקור:</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Priority:</translation>
+        <translation>עדיפות:</translation>
     </message>
     <message>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>עדיפויות הקלטת תוכניות</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation>Priority</translation>
+        <translation>עדיפות</translation>
     </message>
     <message>
         <source>Final Priority</source>
-        <translation>Final Priority</translation>
+        <translation>עדיפות סופית</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
@@ -11532,7 +11551,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Record Type:</source>
-        <translation>Record Type:</translation>
+        <translation>סוג הקלטה:</translation>
     </message>
     <message>
         <source>Channel:</source>
@@ -11568,7 +11587,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>(4) Program Guide   **(6) Program Finder **</source>
@@ -11576,23 +11595,23 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Select a letter...</source>
-        <translation>Select a letter...</translation>
+        <translation>בחר אות...</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר את האות שבה מתחילה התוכנית ולחץ SELECT או חץ ימני</translation>
     </message>
     <message>
         <source>Select a program...</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר תוכנית...</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר את שם התוכנית שברצונך למצוא. כשסיימת חזור עם החץ השמאלי. לחץ SELECT לתזמון הקלטה.</translation>
     </message>
     <message>
         <source>No Programs</source>
-        <translation type="unfinished">אין תכניות</translation>
+        <translation>אין תכניות</translation>
     </message>
     <message>
         <source>There are no available programs under this search. Please select another search.</source>
@@ -11600,15 +11619,15 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished">רשימות תוכניות</translation>
+        <translation>רשימות תוכניות</translation>
     </message>
     <message>
         <source>(1)Time (2)Title</source>
-        <translation>(1)Time (2)Title</translation>
+        <translation>(1)זמן  (2)כותרת</translation>
     </message>
     <message>
         <source>No listings found for this program. </source>
-        <translation type="unfinished"></translation>
+        <translation>לא נמצאו נתוני שידור לתוכנית זו.</translation>
     </message>
     <message>
         <source>Airdate:</source>
@@ -11620,11 +11639,11 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב מערכת - בחר קטגוריה לצפיה במצבה</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>מסך זה מציג את מצב יחידות המערכת השונות</translation>
     </message>
     <message>
         <source>Program Details:</source>
@@ -11636,50 +11655,50 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Welcome to MythTV</source>
-        <translation>Welcome to MythTV</translation>
+        <translation>ברוכים הבאים ל MythTV</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown shortly.</source>
-        <translation>MythTV is idle and will shutdown shortly.</translation>
+        <translation>MythTV אינה פעילה ותכבה בקרוב.</translation>
     </message>
     <message>
         <source>Current Recording(s)</source>
-        <translation>Current Recording(s)</translation>
+        <translation>הקלטות נוכחיות</translation>
     </message>
     <message>
         <source>Retrieving Recording Status ...</source>
-        <translation>Retrieving Recording Status ...</translation>
+        <translation>מאחזר מצב הקלטות ...</translation>
     </message>
     <message>
         <source>Next Scheduled Recording(s)</source>
-        <translation>Next Scheduled Recording(s)</translation>
+        <translation>הקלטות הבאות</translation>
     </message>
     <message>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation>Retrieving Scheduled Recordings ...</translation>
+        <translation>מאחזר הקלטות שתוזמנו ...</translation>
     </message>
     <message>
         <source>WARNING: There are conflicting scheduled recordings!</source>
-        <translation>WARNING: There are conflicting scheduled recordings!</translation>
+        <translation>זהירות: ישנה התנגשות בין הקלטות שתוזמנו!</translation>
     </message>
     <message>
         <source>(1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) הכל (2) חשובים</translation>
     </message>
     <message>
         <source>(1) Channel    (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) ערוץ (2) עדיפות</translation>
     </message>
     <message>
         <source>(1) Title    (2) Priority    (4) Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) כותרת (2) עדיפות (4) סוג</translation>
     </message>
 </context>
 <context>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>שינוע חדש</translation>
     </message>
 </context>
 <context>
@@ -11717,19 +11736,19 @@ Select a Current Recording</source>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Search</translation>
+        <translation>חיפוש</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished">Starts with text</translation>
+        <translation>מתחיל בטקסט</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished">Contains text</translation>
+        <translation>מכיל טקסט</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
 </context>
 <context>
@@ -11755,22 +11774,22 @@ Select a Current Recording</source>
     <name>V4LConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation>Probed info</translation>
+        <translation>תוצאות בדיקה</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>כשל בפתיחה</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>כשל בבדיקה</translation>
     </message>
 </context>
 <context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>תפריט מקור וידאו</translation>
     </message>
     <message>
         <source>Edit..</source>
@@ -11782,11 +11801,11 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה בטוח שברצונך למחוק את כל מקורות הוידאו ?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>כן, מחק את מקורות הוידאו</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
@@ -11802,14 +11821,14 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>מקורות וידאו</translation>
     </message>
 </context>
 <context>
     <name>VideoSourceSelector</name>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished">מקור וידאו</translation>
+        <translation>מקור וידאו</translation>
     </message>
 </context>
 <context>
@@ -11831,11 +11850,11 @@ Select a Current Recording</source>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
-        <translation>Time Conflict</translation>
+        <translation>התנגשות בזמן</translation>
     </message>
     <message>
         <source>No Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>אין התנגשויות</translation>
     </message>
     <message>
         <source>All</source>
@@ -11843,70 +11862,70 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Important</source>
-        <translation>Important</translation>
+        <translation>חשוב</translation>
     </message>
     <message>
         <source>Conflict Today</source>
-        <translation type="unfinished"></translation>
+        <translation>התנגשות היום</translation>
     </message>
     <message>
         <source>Conflict </source>
-        <translation type="unfinished"></translation>
+        <translation>התנגשות </translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>למחוק הוראה &apos;%1&apos; %2 ?</translation>
     </message>
 </context>
 <context>
     <name>WelcomeDialog</name>
     <message>
         <source>Start Frontend</source>
-        <translation>Start Frontend</translation>
+        <translation type="unfinished">Start Frontend</translation>
     </message>
     <message>
         <source>Cannot connect to server!</source>
-        <translation>Cannot connect to server!</translation>
+        <translation type="unfinished">Cannot connect to server!</translation>
     </message>
     <message>
         <source>There are no recordings currently taking place</source>
-        <translation>There are no recordings currently taking place</translation>
+        <translation type="unfinished">There are no recordings currently taking place</translation>
     </message>
     <message>
         <source>There are no scheduled recordings</source>
-        <translation>There are no scheduled recordings</translation>
+        <translation type="unfinished">There are no scheduled recordings</translation>
     </message>
     <message>
         <source>Please Wait ...</source>
-        <translation>Please Wait ...</translation>
+        <translation type="unfinished">Please Wait ...</translation>
     </message>
     <message>
         <source>MythTV is about to start recording.</source>
-        <translation>MythTV is about to start recording.</translation>
+        <translation type="unfinished">MythTV is about to start recording.</translation>
     </message>
     <message>
         <source>MythTV is busy recording.</source>
-        <translation>MythTV is busy recording.</translation>
+        <translation type="unfinished">MythTV is busy recording.</translation>
     </message>
     <message>
         <source>MythTV is busy flagging commercials.</source>
-        <translation>MythTV is busy flagging commercials.</translation>
+        <translation type="unfinished">MythTV is busy flagging commercials.</translation>
     </message>
     <message>
         <source>MythTV is busy grabbing EPG data.</source>
-        <translation>MythTV is busy grabbing EPG data.</translation>
+        <translation type="unfinished">MythTV is busy grabbing EPG data.</translation>
     </message>
     <message>
         <source>MythTV is locked by a user.</source>
-        <translation>MythTV is locked by a user.</translation>
+        <translation type="unfinished">MythTV is locked by a user.</translation>
     </message>
     <message>
         <source>MythTV is in a daily wakeup/shutdown period.</source>
-        <translation>MythTV is in a daily wakeup/shutdown period.</translation>
+        <translation type="unfinished">MythTV is in a daily wakeup/shutdown period.</translation>
     </message>
     <message>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
-        <translation>MythTV is about to start a wakeup/shutdown period.</translation>
+        <translation type="unfinished">MythTV is about to start a wakeup/shutdown period.</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
@@ -11914,7 +11933,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is idle.</source>
-        <translation>MythTV is idle.</translation>
+        <translation type="unfinished">MythTV is idle.</translation>
     </message>
     <message>
         <source>Menu</source>
@@ -11922,23 +11941,23 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Unlock Shutdown</source>
-        <translation>Unlock Shutdown</translation>
+        <translation type="unfinished">Unlock Shutdown</translation>
     </message>
     <message>
         <source>Lock Shutdown</source>
-        <translation>Lock Shutdown</translation>
+        <translation type="unfinished">Lock Shutdown</translation>
     </message>
     <message>
         <source>Run mythfilldatabase</source>
-        <translation>Run mythfilldatabase</translation>
+        <translation type="unfinished">Run mythfilldatabase</translation>
     </message>
     <message>
         <source>Shutdown Now</source>
-        <translation>Shutdown Now</translation>
+        <translation type="unfinished">Shutdown Now</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Exit</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -11946,15 +11965,15 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
-        <translation>Cannot shutdown because MythTV is currently recording</translation>
+        <translation type="unfinished">Cannot shutdown because MythTV is currently recording</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start recording</source>
-        <translation>Cannot shutdown because MythTV is about to start recording</translation>
+        <translation type="unfinished">Cannot shutdown because MythTV is about to start recording</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
-        <translation>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</translation>
+        <translation type="unfinished">Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</translation>
     </message>
     <message>
         <source>MythTV is busy transcoding.</source>
