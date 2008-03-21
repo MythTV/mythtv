@@ -3305,10 +3305,10 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-class AudioSettings : public TriggeredConfigurationGroup
+class AudioSettingsGroup : public TriggeredConfigurationGroup
 {
   public:
-     AudioSettings() :
+     AudioSettingsGroup() :
          TriggeredConfigurationGroup(false, true, false, false)
      {
          setLabel(QObject::tr("Audio"));
@@ -4507,7 +4507,7 @@ MainGeneralSettings::MainGeneralSettings()
 {
     DatabaseSettings::addDatabaseSettings(this);
 
-    AudioSettings *audio = new AudioSettings();
+    AudioSettingsGroup *audio = new AudioSettingsGroup();
     addChild(audio);
 
     VerticalConfigurationGroup *general =
