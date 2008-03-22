@@ -5908,6 +5908,8 @@ void TV::doEditSchedule(int editType)
             break;
         }
         case kScheduleProgramFinder:
+            if (!paused)
+                DoPause(false);
             RunProgramFind(false, false);
             break;
         case kScheduledRecording:
