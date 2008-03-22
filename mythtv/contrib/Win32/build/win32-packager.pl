@@ -599,11 +599,6 @@ comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these fi
             'cd '.$unixmythtv.'mythtv','make install'],
 comment => 'was the last configure successful? then install mythtv ' ],
 
-# it seems that mythverbose.h isn't installed as it should be.... (needed by
-# the plugins compile)
-[ filesame => [$msys.'include/mythtv/mythverbose.h',$mythtv.'mythtv/libs/libmyth/mythverbose.h'], copy => [''=>''], comment => 'mythverbose.h ist installed properly yet...' ],
-
-
 # install some themes? does a 'make install' do that adequately (no, not if
 # running outside msys)?
 # copy the basic themes somewhere that mythtv can get at it.
@@ -632,6 +627,7 @@ cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'m
 # pthread dlls and mingwm10.dll are copied from here:
 cp /mingw/bin/*.dll '.$unixmythtv.'mythtv/run
 cp /bin/msys*.dll '.$unixmythtv.'mythtv/run
+cp '.$unixmythtv.'mythtv/contrib/Win32/debug/*.cmd '.$unixmythtv.'mythtv/run
 ','nocheck' 
 ],comment => 'write a script that will copy all the files necessary for running mythtv out of the build folder into the ./run folder'],
 
