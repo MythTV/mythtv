@@ -1030,6 +1030,10 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     {
         recorder->SetOptionsFromProfile(
             &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev);
+        // Override the samplerate defined in the profile if this card
+        // was configured with a fixed rate.
+        if (genOpt.audiosamplerate)
+            recorder->SetOption("samplerate", genOpt.audiosamplerate);
         recorder->SetRingBuffer(ringBuffer);
         recorder->Initialize();
 
