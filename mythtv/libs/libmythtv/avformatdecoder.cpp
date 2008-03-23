@@ -3230,7 +3230,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     av_free_packet(pkt);
                     CloseCodecs();
                     ScanStreams(false);
-                    QMutexLocker locker(&avcodeclock);
                     allowedquit = true;
                     dvd_video_codec_changed = false;
                     continue;
