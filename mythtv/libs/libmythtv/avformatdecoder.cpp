@@ -1988,6 +1988,9 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
  */
 void AvFormatDecoder::RemoveAudioStreams()
 {
+    if (!GetNVP() || !GetNVP()->HasAudioIn())
+        return;
+ 
     QMutexLocker locker(&avcodeclock);
     for (uint i = 0; i < ic->nb_streams;)
     {
