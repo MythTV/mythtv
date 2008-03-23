@@ -18,7 +18,7 @@
 ##############################################################################
 
 use strict;
-use LWP::UserAgent;
+#use LWP::UserAgent;
 use IO::File;
 use Data::Dumper; 
 use File::Copy qw(cp);
@@ -118,6 +118,9 @@ my $unixmythtv  = perl2unix($mythtv);
 # MinGW-5.1.3.exe on disk for that to work, so there is an earlier
 # declaration to 'fetch' it)
 
+# Script later creates %HOMEPATH%\.mythtv\mysql.txt
+if ( ! exists $ENV{'HOMEPATH'} || $ENV{'HOMEPATH'} eq '\\' )
+{   $ENV{'HOMEPATH'} = $ENV{'USERPROFILE'}   }
 
 #build expectations (causes) :
 #  missing a file (given an expected path)                                 [file]
