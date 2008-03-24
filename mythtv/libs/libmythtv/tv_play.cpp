@@ -5886,6 +5886,8 @@ void TV::doEditSchedule(int editType)
             break;
         case kScheduledRecording:
         {
+            if (!paused)
+                DoPause(false);
             QMutexLocker locker(&pbinfoLock);
             ScheduledRecording *record = new ScheduledRecording();
             record->loadByProgram(playbackinfo);
