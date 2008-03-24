@@ -567,7 +567,7 @@ push @{$expect},
 [ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
 
 # configure
-[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
+[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-xvmc --enable-directx --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
 # make
 [ newer => [$mythtv."mythtv/libs/libmyth/libmyth-$version.dll",
             $mythtv.'mythtv/last_build.txt'],
