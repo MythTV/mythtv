@@ -1623,21 +1623,21 @@ case $targetos in
     FFSERVERLDFLAGS=-Wl,-bind_at_load
     ;;
   mingw32*)
-    enable backend
+    enable  backend
     disable bindings_perl
     disable bindings_python
     disable dv1394
     disable dvb
     disable ivtv
-    enable memalign_hack
+    enable  memalign_hack
     disable network
     enable opengl
     if enabled wince; then
         disable protocols
     fi
     disable v4l
-    enable windows
-    enable x11
+    enable  windows
+    disable x11
     ###### Standard ffmpeg configure stuff follows:
     targetos=mingw32
     shlibdir="$bindir"
