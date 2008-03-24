@@ -1606,12 +1606,13 @@ case $targetos in
         echo "You have a broken ld. Playback of HD videos may be very poor"
         echo "See http://svn.mythtv.org/trac/ticket/4200 for intelleopardmmx.patch"
     fi 
-    disable need_memalign
     disable opengl_video
     disable opengl_vsync
     enable  proc_opt
     disable v4l
     disable x11
+    ###### Standard ffmpeg configure stuff follows:
+    disable need_memalign
     SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(SPPVERSION),-compatibility_version,$(SPPVERSION) -Wl,-read_only_relocs,suppress'
     VHOOKSHFLAGS='-dynamiclib -Wl,-single_module -flat_namespace -undefined suppress -Wl,-install_name,$(SHLIBDIR)/vhook/$@'
     strip="strip -x"
@@ -1622,9 +1623,23 @@ case $targetos in
     FFSERVERLDFLAGS=-Wl,-bind_at_load
     ;;
   mingw32*)
-    targetos=mingw32
     enable backend
+    disable bindings_perl
+    disable bindings_python
+    disable dv1394
+    disable dvb
+    disable ivtv
+    enable memalign_hack
+    disable network
+    enable opengl
+    if enabled wince; then
+        disable protocols
+    fi
+    disable v4l
     enable windows
+    enable x11
+    ###### Standard ffmpeg configure stuff follows:
+    targetos=mingw32
     shlibdir="$bindir"
     VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
     VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
@@ -1632,17 +1647,7 @@ case $targetos in
         VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
         VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
     fi
-    dv1394="no"
-    ffserver="no"
-    network="no"
-    opengl="yes"
-    if enabled wince; then
-        protocols="no"
-    fi
     disable ffserver
-    disable v4l
-    disable bindings_perl
-    disable bindings_python
     SLIBPREF="lib"
     SLIBSUF=".dll"
     EXESUF=".exe"
