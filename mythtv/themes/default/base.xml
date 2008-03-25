@@ -6,12 +6,8 @@
         <color>white</color>
     </font>
 
-    <font name="basefontextralarge" from="basesmall">
-        <size>24</size>
-        <shadowcolor>black</shadowcolor>
-        <shadowoffset>4,4</shadowoffset>
-        <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+    <font name="basemedium" from="basesmall">
+        <size>18</size>
     </font>
 
     <font name="baselarge" from="basesmall">
@@ -22,8 +18,12 @@
         <bold>yes</bold>
     </font>
 
-    <font name="basemedium" from="basesmall">
-        <size>18</size>
+    <font name="basefontextralarge" from="basesmall">
+        <size>24</size>
+        <shadowcolor>black</shadowcolor>
+        <shadowoffset>4,4</shadowoffset>
+        <shadowalpha>64</shadowalpha>
+        <bold>yes</bold>
     </font>
 
     <!-- Colour variations on base fonts -->
