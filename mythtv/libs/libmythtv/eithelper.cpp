@@ -827,6 +827,18 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[   13LL << 32 | 8916 << 16 ] = // national multiplex
         fix[ 6200LL << 32 | 8916 << 16 ] = // Madrid (TeleMadrid)
         EITFixUp::kEFixForceISO8859_15;
+
+    // DVB-S Astra 19.2E french channels
+    fix[     1022LL << 32 | 1 << 16 |  6901 ] = // DIRECT 8
+        fix[ 1022LL << 32 | 1 << 16 |  6905 ] = // France 24 (en Francais)
+        fix[ 1022LL << 32 | 1 << 16 |  6911 ] = // DIRECT 8
+        fix[ 1072LL << 32 | 1 << 16 |  8201 ] = // CANAL+
+        fix[ 1070LL << 32 | 1 << 16 |  8004 ] = // EURONEWS
+        fix[ 1091LL << 32 | 1 << 16 | 31220 ] = // EuroNews
+        fix[ 1094LL << 32 | 1 << 16 | 17027 ] = // LCP
+        fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
+        fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
+        EITFixUp::kEFixForceISO8859_15;
 }
 
 static int calc_eit_utc_offset(void)
