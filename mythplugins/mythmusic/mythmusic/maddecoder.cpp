@@ -93,7 +93,7 @@ bool MadDecoder::initialize()
         output_buf = new char[globalBufferSize * 2];
 
     if (! input()->isOpen()) {
-        if (! input()->open(IO_ReadOnly)) {
+        if (! input()->open(QIODevice::ReadOnly)) {
             error("DecoderMAD: Failed to open input.  Error " +
                   QString::number(input()->status()) + ".");
             return FALSE;

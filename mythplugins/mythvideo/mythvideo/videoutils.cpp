@@ -1,4 +1,4 @@
-#include <qdir.h>
+#include <QDir>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>

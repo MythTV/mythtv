@@ -2,6 +2,7 @@
 #define MINIPLAYER_H_
 
 #include <qstring.h>
+#include <QKeyEvent>
 
 #include "mythtv/mythdialogs.h"
 
@@ -29,7 +30,7 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
 
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
-    virtual void customEvent(QCustomEvent *event);
+    virtual void customEvent(QEvent *event);
 
   private:
     void    wireupTheme(void);

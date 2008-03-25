@@ -12,9 +12,11 @@
 
 */
 
-#include <qptrlist.h>
+#include <Q3PtrList>
 
 #include <mythtv/mythdialogs.h>
+
+class QKeyEvent;
 
 class FileAssociation;
 
@@ -55,7 +57,7 @@ class FileAssocDialog : public MythThemedDialog
 
   private:
 
-    QPtrList<FileAssociation>   file_associations;
+    Q3PtrList<FileAssociation>   file_associations;
     FileAssociation             *current_fa;
 
     //

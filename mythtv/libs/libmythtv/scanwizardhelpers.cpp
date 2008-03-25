@@ -178,8 +178,13 @@ DialogCode ScanProgressPopup::exec(void)
     done = false;
     dialog->ShowPopup(this, SLOT(PopupDone(int)));
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!done)
-        wait.wait(100);
+        wait.wait(&mutex, 100);
 
     return dialog->result();
 }
@@ -251,7 +256,7 @@ void MultiplexSetting::SetSourceID(uint _sourceid)
 InputSelector::InputSelector(
     uint _default_cardid, const QString &_default_inputname) :
     ComboBoxSetting(this), sourceid(0), default_cardid(_default_cardid),
-    default_inputname(QDeepCopy<QString>(_default_inputname))
+    default_inputname(Q3DeepCopy<QString>(_default_inputname))
 {
     setLabel(tr("Input"));
 }
@@ -424,7 +429,6 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 ScanCountry::ScanCountry() : ComboBoxSetting(this)
 {
     Country country = AU;
-#if (QT_VERSION >= 0x030300)
     QLocale locale = QLocale::system();
     QLocale::Country qtcountry = locale.country();
     if (qtcountry == QLocale::Australia)
@@ -439,7 +443,6 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
         country = UK;
     else if (qtcountry == QLocale::Spain)
         country = ES;
-#endif
 
     setLabel(tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == AU);

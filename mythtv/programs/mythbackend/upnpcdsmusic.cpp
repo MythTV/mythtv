@@ -250,14 +250,14 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     QString        sName;
 
     int            nId          = query.value( 0).toInt();
-    QString        sArtist      = QString::fromUtf8(query.value( 1).toString());
-    QString        sAlbum       = QString::fromUtf8(query.value( 2).toString());
-    QString        sTitle       = QString::fromUtf8(query.value( 3).toString());
-    QString        sGenre       = QString::fromUtf8(query.value( 4).toString());
+    QString        sArtist      = query.value( 1).toString();
+    QString        sAlbum       = query.value( 2).toString();
+    QString        sTitle       = query.value( 3).toString();
+    QString        sGenre       = query.value( 4).toString();
 //    int            nYear        = query.value( 5).toInt();
     int            nTrackNum    = query.value( 6).toInt();
-    QString        sDescription = QString::fromUtf8(query.value( 7).toString());
-    QString        sFileName    = QString::fromUtf8(query.value( 8).toString());
+    QString        sDescription = query.value( 7).toString();
+    QString        sFileName    = query.value( 8).toString();
     uint           nLength      = query.value( 9).toInt();
 
 /*

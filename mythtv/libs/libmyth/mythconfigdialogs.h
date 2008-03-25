@@ -6,7 +6,7 @@
 // Qt headers
 #include <qobject.h>
 #include <qstring.h>
-#include <qdeepcopy.h>
+#include <Q3DeepCopy>
 
 // MythTV headers
 #include "mythexp.h"

@@ -2,8 +2,10 @@
 #define _SOURCEMANAGER_H_
 
 #include <qobject.h>
-#include <qintdict.h>
+#include <q3intdict.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <Q3PtrList>
 
 #include "defs.h"
 
@@ -23,7 +25,7 @@ class SourceManager : public QObject
     void startTimers();
     void stopTimers();
     void doUpdate();
-    bool findPossibleSources(QStringList types, QPtrList<ScriptInfo> &sources);
+    bool findPossibleSources(QStringList types, Q3PtrList<ScriptInfo> &sources);
     void clearSources();
     bool findScripts();
     bool findScriptsDB();
@@ -36,9 +38,9 @@ class SourceManager : public QObject
     void timeout(void) {}
 
   private:
-    QPtrList<ScriptInfo> m_scripts; //all scripts
-    QPtrList<WeatherSource> m_sources; //in-use scripts
-    QIntDict<WeatherSource> m_sourcemap;
+    Q3PtrList<ScriptInfo> m_scripts; //all scripts
+    Q3PtrList<WeatherSource> m_sources; //in-use scripts
+    Q3IntDict<WeatherSource> m_sourcemap;
     units_t m_units;
     void recurseDirs(QDir dir);
 };

@@ -203,7 +203,7 @@ void ObjCarousel::AddModuleData(unsigned long carousel, DsmccDb *ddb,
     VERBOSE(VB_DSMCC, QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
-    QPtrListIterator<DSMCCCacheModuleData> it(m_Cache);
+    Q3PtrListIterator<DSMCCCacheModuleData> it(m_Cache);
     DSMCCCacheModuleData *cachep;
     for (; (cachep = it.current()) != 0; ++it)
     {

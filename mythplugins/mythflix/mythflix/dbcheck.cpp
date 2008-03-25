@@ -1,5 +1,7 @@
 #include <qstring.h>
 #include <qdir.h>
+//Added by qt3to4:
+#include <QSqlError>
 
 #include <iostream>
 using namespace std;
@@ -8,7 +10,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1003";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -37,8 +39,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.prepare(thequery);
-        query.exec();
+        query.exec(thequery);
 
         if (query.lastError().type() != QSqlError::None)
         {
@@ -100,5 +101,44 @@ bool UpgradeFlixDatabaseSchema(void)
             return false;
     }
     
+
+    if (dbver == "1001")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE netflix"
+"  MODIFY name varbinary(100) NOT NULL,"
+"  MODIFY category varbinary(255) NOT NULL,"
+"  MODIFY url varbinary(255) NOT NULL,"
+"  MODIFY ico varbinary(255) default NULL,"
+"  MODIFY queue varbinary(32) NOT NULL default '';",
+""
+};
+
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE netflix"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(100) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(255) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY url varchar(255) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY ico varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY queue varchar(32) CHARACTER SET utf8 NOT NULL default '';",
+""
+};
+
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
+    }
+
     return true;
 }

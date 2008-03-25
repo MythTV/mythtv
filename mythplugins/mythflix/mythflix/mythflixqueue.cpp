@@ -23,13 +23,14 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qnetwork.h>
+#include <q3network.h>
 #include <qapplication.h>
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qregexp.h>
-#include <qprocess.h>
+#include <q3process.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -45,7 +46,7 @@ MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name,
                              QString queueName)
     : MythScreenType(parent, name)
 {
-    qInitNetworkProtocols ();
+    q3InitNetworkProtocols ();
 
     // Setup cache directory
 
@@ -161,8 +162,8 @@ void MythFlixQueue::loadData()
         QString url;
         QDateTime time;
         while ( query.next() ) {
-            name = QString::fromUtf8(query.value(0).toString());
-            url  = QString::fromUtf8(query.value(1).toString());
+            name = query.value(0).toString();
+            url  = query.value(1).toString();
             time.setTime_t(query.value(2).toUInt());
             m_NewsSites.append(new NewsSite(name,url,time));
         }
@@ -356,8 +357,8 @@ void MythFlixQueue::slotMoveToTop()
         if(article)
         {
 
-            QStringList args =
-                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+            QStringList args(gContext->GetShareDir() +
+                             "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());
             int length = movieID.length();
@@ -393,8 +394,8 @@ void MythFlixQueue::slotRemoveFromQueue()
         if(article)
         {
 
-            QStringList args =
-                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+            QStringList args(gContext->GetShareDir() +
+                             "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());
             int length = movieID.length();
@@ -441,8 +442,8 @@ void MythFlixQueue::slotMoveToQueue()
                 return;
             }
 
-            QStringList base =
-                gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+            QStringList base(gContext->GetShareDir() +
+                             "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());
             int length = movieID.length();
@@ -536,18 +537,18 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
 
     VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
                       arg(args.join(" ")).local8Bit() );
-    QProcess proc(args, this);
+    Q3Process proc(args, this);
 
     QString cmd = args[0];
     QFileInfo info(cmd);
 
     if (!info.exists())
     {
-       err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
+       err = QString("\"%1\" failed: does not exist").arg(cmd);
     }
     else if (!info.isExecutable())
     {
-       err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
+       err = QString("\"%1\" failed: not executable").arg(cmd);
     }
     else if (proc.start())
     {
@@ -581,7 +582,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
                 if (!proc.normalExit())
                 {
                     err = QString("\"%1\" failed: Process exited abnormally")
-                                  .arg(cmd.local8Bit());
+                                  .arg(cmd);
                 }
 
                 break;
@@ -591,7 +592,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
     else
     {
         err = QString("\"%1\" failed: Could not start process")
-                      .arg(cmd.local8Bit());
+                      .arg(cmd);
     }
 
     while (proc.canReadLineStdout() || proc.canReadLineStderr())
@@ -629,7 +630,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
     return ret;
 }
 
-void MythFlixQueue::customEvent(QCustomEvent *event)
+void MythFlixQueue::customEvent(QEvent *event)
 {
 
     if (event->type() == kMythDialogBoxCompletionEventType)

@@ -19,7 +19,8 @@
 
 */
 
-#include <qvaluevector.h>
+#include <q3valuevector.h>
+#include <QStringList>
 #include <qregexp.h>
 
 #include "Engine.h"
@@ -703,7 +704,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
 bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 {
     QString csFeat = QString::fromUtf8((const char *)feature.Bytes(), feature.Size());
-    QStringList strings = QStringList::split(QRegExp("[\\(\\,\\)]"), csFeat);
+    QStringList strings = csFeat.split(QRegExp("[\\(\\,\\)]"));
 
     if (strings[0] == "ApplicationStacking" || strings[0] == "ASt") return true;
     // We're required to support cloning for Text, Bitmap and Rectangle.
@@ -750,7 +751,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 
     // I think we only support the video fully on screen
     if (strings[0] == "VideoDecodeOffset" || strings[0] == "VDO") {
-        if (strings.count() >= 3 && strings[1] == 10 && strings[1] == 0) return true;
+        if (strings.count() >= 3 && strings[1] == "10" && strings[1] == "0") return true;
         else return false;
     }
     // We support bitmaps that are partially off screen (don't we?)

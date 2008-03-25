@@ -1,8 +1,8 @@
 /*
-	webcam.h
+    webcam.h
 
-	(c) 2003 Paul Volkaerts
-	
+    (c) 2003 Paul Volkaerts
+
     header for the main interface screen
 */
 
@@ -12,9 +12,11 @@
 #include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 #include <qdatetime.h>
+#include <QEvent>
+#include <QMutex>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -72,20 +74,20 @@ struct wcClient
     int actualFps;
     int interframeTime;
     int framesDelivered;
-    QPtrList<unsigned char> BufferList;
-    QPtrList<unsigned char> FullBufferList;
+    Q3PtrList<unsigned char> BufferList;
+    Q3PtrList<unsigned char> FullBufferList;
     QTime timeLastCapture;
 
 };
 
 
-class WebcamEvent : public QCustomEvent
+class WebcamEvent : public QEvent
 {
 public:
     enum Type { FrameReady = (QEvent::User + 200), WebcamErrorEv, WebcamDebugEv  };
 
-    WebcamEvent(Type t, wcClient *c) : QCustomEvent(t) { client=c; }
-    WebcamEvent(Type t, QString s) : QCustomEvent(t) { text=s; }
+    WebcamEvent(Type t, wcClient *c) : QEvent((QEvent::Type)t) { client=c; }
+    WebcamEvent(Type t, QString s) : QEvent((QEvent::Type)t) { text=s; }
     ~WebcamEvent() {}
 
     wcClient *getClient() { return client; }
@@ -156,7 +158,7 @@ class Webcam : public QThread
     static LRESULT CALLBACK StatusCallbackProc(HWND hWnd, int nID, LPSTR lpStatusText);
 #endif
 
-    QPtrList<wcClient> wcClientList;
+    Q3PtrList<wcClient> wcClientList;
     QMutex WebcamLock;
 
     void SetSize(int width, int height);

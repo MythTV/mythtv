@@ -32,7 +32,7 @@
 #include "Actions.h"
 
 #include <qpoint.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 class MHEngine;
 
@@ -132,7 +132,7 @@ protected:
     MHSequence <QPoint> m_Positions;
     bool    m_fWrapAround, m_fMultipleSelection;
     //Internal attributes
-    QPtrList <MHListItem> m_ItemList; // Items found by looking up the object refs
+    Q3PtrList <MHListItem> m_ItemList; // Items found by looking up the object refs
     int m_nFirstItem; // First item displayed - N.B. MHEG indexes from 1.
     bool m_fFirstItemDisplayed, m_fLastItemDisplayed;
     int m_nLastCount, m_nLastFirstItem;

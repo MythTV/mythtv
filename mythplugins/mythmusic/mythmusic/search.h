@@ -2,14 +2,16 @@
 #define SEARCH_H_
 
 #include <qregexp.h>
+//Added by qt3to4:
+#include <QLabel>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythwidgets.h>
 
-class SearchListBoxItem: public QListBoxText
+class SearchListBoxItem: public Q3ListBoxText
 {
   public:
     SearchListBoxItem(const QString &text, unsigned int id)
-       : QListBoxText(text), id(id) {};
+       : Q3ListBoxText(text), id(id) {};
 
     unsigned int getId() { return id; }
 
@@ -41,8 +43,8 @@ class SearchDialog: public MythPopupBox
     QLabel              *caption;
     MythListBox         *listbox;  
     MythLineEdit        *searchText;
-    QButton             *cancelButton;
-    QButton             *okButton;
+    QAbstractButton             *cancelButton;
+    QAbstractButton             *okButton;
 
     QString              whereClause;
 };

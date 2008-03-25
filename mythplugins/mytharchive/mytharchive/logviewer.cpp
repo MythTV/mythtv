@@ -5,8 +5,14 @@
 using namespace std;
 
 // qt
+#include <Q3TextStream>
+#include <QAbstractButton>
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <QKeyEvent>
+#include <Q3VBoxLayout>
 #include <qlayout.h>
-#include <qhbox.h>
+#include <q3hbox.h>
 #include <qfile.h>
 
 // mythtv
@@ -25,8 +31,8 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
 {
     m_updateTime = gContext->GetNumSetting("LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(0 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(15 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(0 * wmult));
 
     // Window title
     QString message = tr("Log Viewer");
@@ -40,7 +46,7 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     m_autoupdateCheck = new MythCheckBox( this );
     m_autoupdateCheck->setBackgroundOrigin(WindowOrigin);
     m_autoupdateCheck->setChecked(true);
@@ -59,7 +65,7 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
     hbox->addWidget(label);
 
     // listbox
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_listbox = new MythListBox( this );
     m_listbox->setBackgroundOrigin(WindowOrigin);
@@ -71,10 +77,10 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_listbox);
 
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     //  cancel Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_cancelButton = new MythPushButton( this, "cancel" );
     m_cancelButton->setBackgroundOrigin(WindowOrigin);
@@ -222,10 +228,10 @@ bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
     if (!file.exists())
         return false;
 
-    if (file.open( IO_ReadOnly ))
+    if (file.open( QIODevice::ReadOnly ))
     {
         QString s;
-        QTextStream stream(&file);
+        Q3TextStream stream(&file);
 
          // ignore the first startline lines
         while ( !stream.atEnd() && startline > 0)
@@ -340,7 +346,7 @@ void LogViewer::showMenu()
     m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                       "logviewer menu");
 
-    QButton *button = m_popupMenu->addButton(tr("Increase Font Size"), this,
+    QAbstractButton *button = m_popupMenu->addButton(tr("Increase Font Size"), this,
             SLOT(increaseFontSize()));
 
     m_popupMenu->addButton(tr("Decrease Font Size"), this,

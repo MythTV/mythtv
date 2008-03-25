@@ -1,17 +1,17 @@
 /*
-	logging.cpp
+    logging.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Methods for logging object of the myth transcoding daemon
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Methods for logging object of the myth transcoding daemon
 
 */
 #include "logging.h"
 
 #include <unistd.h>
 #include <cstdlib>
-#include <qdatetime.h>
+#include <QDateTime>
 
 #include <mythtv/mythcontext.h>
 
@@ -35,7 +35,7 @@ MTDLogger::MTDLogger(bool log_stdout)
     if(!log_to_stdout)
     {
         logging_file.setName(logfile_name);
-        if(!logging_file.open(IO_WriteOnly))
+        if(!logging_file.open(QIODevice::WriteOnly))
         {
             VERBOSE(VB_IMPORTANT, QString("Problem opening logfile. Does this"
                                           "look openable to you: %1")
@@ -85,9 +85,9 @@ void MTDLogger::socketClosed()
 
 void MTDLogger::writeString(const QString &log_entry)
 {
-    if(log_to_stdout)
+    if (log_to_stdout)
     {
-        cout << log_entry << endl;
+        VERBOSE(VB_IMPORTANT, log_entry);
     }
     else
     {

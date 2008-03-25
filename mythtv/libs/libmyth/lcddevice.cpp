@@ -17,6 +17,9 @@
 // Qt headers
 #include <qapplication.h>
 #include <qregexp.h>
+#include <Q3TextStream>
+#include <Q3CString>
+#include <Q3PtrList>
 
 // MythTV headers
 #include "libmythui/mythmainwindow.h"
@@ -179,7 +182,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                     lcd_ready = true;
                     bConnected = true;
 
-                    QTextStream os(socket);
+                    Q3TextStream os(socket);
                     os << "HELLO\n";
                     break;
                 }
@@ -219,8 +222,8 @@ void LCD::sendToServer(const QString &someText)
         return;
     }
 
-    QTextStream os(socket);
-    os.setEncoding(QTextStream::Latin1);
+    Q3TextStream os(socket);
+    os.setEncoding(Q3TextStream::Latin1);
 
     last_command = someText;
 
@@ -270,7 +273,7 @@ void LCD::readyRead(MythSocket *sock)
     // back) ignoring it.
 
     int dataSize = socket->bytesAvailable() + 1; 
-    QCString data(dataSize);
+    Q3CString data(dataSize);
 
     socket->readBlock(data.data(), dataSize);
 
@@ -319,7 +322,7 @@ void LCD::readyRead(MythSocket *sock)
     {
         VERBOSE(VB_IMPORTANT, "lcddevice: WARNING: Something is getting passed"
                         "to LCDServer that it doesn't understand");
-        VERBOSE(VB_IMPORTANT, "lcddevice: last command: " << last_command);
+        VERBOSE(VB_IMPORTANT, QString("lcddevice: last command: %1").arg( last_command ));
     }
     else if (aList[0] == "KEY")
         handleKeyPress(aList.last().stripWhiteSpace());
@@ -521,7 +524,7 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
             + quotedString(subtitle));
 }
 
-void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name, 
+void LCD::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
                        bool popMenu)
 {
     if (!lcd_ready || !lcd_showmenu)
@@ -540,7 +543,7 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     s += " " + QString(popMenu ? "TRUE" : "FALSE");
 
 
-    QPtrListIterator<LCDMenuItem> it(*menuItems);
+    Q3PtrListIterator<LCDMenuItem> it(*menuItems);
     LCDMenuItem *curItem;
 
     while ((curItem = it.current()) != 0)
@@ -565,7 +568,7 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     sendToServer(s);
 }
 
-void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
+void LCD::switchToGeneric(Q3PtrList<LCDTextItem> *textItems)
 {
     if (!lcd_ready || !lcd_showgeneric)
         return;
@@ -579,7 +582,7 @@ void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
 
     QString s = "SWITCH_TO_GENERIC";
 
-    QPtrListIterator<LCDTextItem> it(*textItems);
+    Q3PtrListIterator<LCDTextItem> it(*textItems);
     LCDTextItem *curItem;
 
     while ((curItem = it.current()) != 0)

@@ -8,16 +8,17 @@
 #define DBOX2EPG_H_
 
 // Qt headers
-#include <qmap.h>
-#include <qobject.h>
-#include <qthread.h>
-#include <qdatetime.h>
+#include <QObject>
+#include <QThread>
+#include <QMap>
 
-class QHttp;
+class QString;
+class QDateTime;
+class Q3Http;
 class DBox2Channel;
 class DBox2DBOptions;
 
-class DBox2EPG : public QObject, public QThread
+class DBox2EPG : public QThread
 {
     Q_OBJECT
   public:
@@ -50,7 +51,7 @@ class DBox2EPG : public QObject, public QThread
     int  GetChannelID(const QString& channelnumber);
     void run(void);
 
-    QHttp             *http;
+    Q3Http             *http;
     DBox2DBOptions    *m_dbox2options;
     DBox2Channel      *m_dbox2channel;
     QMap<int,QString>  m_channelnumbers;

@@ -19,7 +19,7 @@
  * ============================================================ */
 
 // Qt headers
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
@@ -157,7 +157,7 @@ void ImageView::UpdateLCD(const ThumbItem *item)
     QString desc = QString::number(m_pos + 1) + " / " +
         QString::number(m_itemList.count());
 
-    QPtrList<LCDTextItem> textItems;
+    Q3PtrList<LCDTextItem> textItems;
     textItems.setAutoDelete(true);
     textItems.append(new LCDTextItem(
                          1, ALIGN_CENTERED, name, "Generic", true));

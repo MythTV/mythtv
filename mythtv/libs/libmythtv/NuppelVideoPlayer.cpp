@@ -21,9 +21,7 @@ using namespace std;
 
 // Qt headers
 #include <qapplication.h>
-#include <qstringlist.h>
-#include <qdeepcopy.h>
-#include <qmap.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include "config.h"
@@ -395,10 +393,10 @@ void NuppelVideoPlayer::SetAudioInfo(const QString &main_device,
     audio_main_device = audio_passthru_device = QString::null;
 
     if (!main_device.isEmpty())
-        audio_main_device     = QDeepCopy<QString>(main_device);
+        audio_main_device     = Q3DeepCopy<QString>(main_device);
 
     if (!passthru_device.isEmpty())
-        audio_passthru_device = QDeepCopy<QString>(passthru_device);
+        audio_passthru_device = Q3DeepCopy<QString>(passthru_device);
 
     audio_samplerate      = (int)samplerate;
 }
@@ -412,7 +410,12 @@ void NuppelVideoPlayer::PauseDecoder(void)
 
     if (!actuallypaused)
     {
-        while (!decoderThreadPaused.wait(4000))
+        // Qt4 requires a QMutex as a parameter...
+        // not sure if this is the best solution.  Mutex Must be locked before wait.
+        QMutex mutex;
+        mutex.lock();
+
+        while (!decoderThreadPaused.wait(&mutex, 4000))
         {
             if (eof)
                 return;
@@ -562,7 +565,7 @@ void NuppelVideoPlayer::SetPlaybackInfo(ProgramInfo *pginfo)
     {
         m_playbackinfo->MarkAsInUse(true, m_recusage);
         videoFiltersForProgram =
-            QDeepCopy<QString>(m_playbackinfo->chanOutputFilters);
+            Q3DeepCopy<QString>(m_playbackinfo->chanOutputFilters);
     }
 }
 
@@ -1215,18 +1218,18 @@ void NuppelVideoPlayer::InitFilters(void)
     {
         if (videoFiltersForProgram[0] != '+')
         {
-            filters = QDeepCopy<QString>(videoFiltersForProgram);
+            filters = Q3DeepCopy<QString>(videoFiltersForProgram);
         }
         else
         {
             if ((filters.length() > 1) && (filters.right(1) != ","))
                 filters += ",";
-            filters += QDeepCopy<QString>(videoFiltersForProgram.mid(1));
+            filters += Q3DeepCopy<QString>(videoFiltersForProgram.mid(1));
         }
     }
 
     if (!videoFiltersOverride.isEmpty())
-        filters = QDeepCopy<QString>(videoFiltersOverride);
+        filters = Q3DeepCopy<QString>(videoFiltersOverride);
 
     videofiltersLock.lock();
 
@@ -4353,7 +4356,7 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
         framesLeft = margin;
         if (!editmode && hasdeletetable && IsInDelete(framesRead))
         {
-            QMapConstIterator<long long, int> it = deleteMap.end();
+            QMap<long long, int>::const_iterator it = deleteMap.end();
             --it;
             if (it.key() == totalFrames)
             {
@@ -4674,7 +4677,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 
     if (dialogname != "")
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -4701,7 +4704,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
     bool exactstore = exactseeks;
     GetDecoder()->setExactSeeks(true);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -5708,7 +5711,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark();
 
-    if (dm_iter == NULL && honorCutList)
+    if (honorCutList)   //Qt4 port: removed dm_iter == NULL &&
         dm_iter = deleteMap.begin();
     
     if (!GetDecoder()->GetFrame(0))
@@ -7435,16 +7438,16 @@ void NuppelVideoPlayer::TextWrite(uint service_num,
 void NuppelVideoPlayer::SetOSDFontName(const QString osdfonts[22],
                                        const QString &prefix)
 {
-    osdfontname   = QDeepCopy<QString>(osdfonts[0]);
-    osdccfontname = QDeepCopy<QString>(osdfonts[1]); 
+    osdfontname   = Q3DeepCopy<QString>(osdfonts[0]);
+    osdccfontname = Q3DeepCopy<QString>(osdfonts[1]);
     for (int i = 2; i < 22; i++)
-        osd708fontnames[i - 2] = QDeepCopy<QString>(osdfonts[i]);
-    osdprefix = QDeepCopy<QString>(prefix);
+        osd708fontnames[i - 2] = Q3DeepCopy<QString>(osdfonts[i]);
+    osdprefix = Q3DeepCopy<QString>(prefix);
 }
 
 void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
 {
-    osdtheme = QDeepCopy<QString>(themename);
+    osdtheme = Q3DeepCopy<QString>(themename);
 }
 
 // EIA-708 caption support -- end

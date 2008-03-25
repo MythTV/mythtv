@@ -1,7 +1,7 @@
 #include <algorithm>
 
-#include <qwidgetstack.h>
-#include <qtabdialog.h>
+#include <q3widgetstack.h>
+#include <q3tabdialog.h>
 
 #include "mythconfiggroups.h"
 
@@ -108,16 +108,16 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                   QWidget* parent,
                                                   const char* widgetName) 
 {
-    widget = new QGroupBox(parent, widgetName);
+    widget = new Q3GroupBox(parent, widgetName);
     connect(widget, SIGNAL(destroyed(QObject*)),
             this,   SLOT(widgetDeleted(QObject*)));
 
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (!useframe)
-        widget->setFrameShape(QFrame::NoFrame);
+        widget->setFrameShape(Q3GroupBox::NoFrame);
 
-    layout = new QVBoxLayout(widget, margin, space);
+    layout = new Q3VBoxLayout(widget, margin, space);
 
     if (uselabel)
         widget->setTitle(getLabel());
@@ -209,11 +209,11 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                     QWidget* parent, 
                                                     const char* widgetName) 
 {
-    QGroupBox* widget = new QGroupBox(parent, widgetName);
+    Q3GroupBox* widget = new Q3GroupBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (!useframe)
-        widget->setFrameShape(QFrame::NoFrame);
+        widget->setFrameShape(Q3GroupBox::NoFrame);
 
     QHBoxLayout *layout = new QHBoxLayout(widget, margin, space);
 
@@ -245,11 +245,11 @@ QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                               QWidget* parent, 
                                               const char* widgetName)
 {
-    QGroupBox* widget = new QGroupBox(parent, widgetName);
+    Q3GroupBox* widget = new Q3GroupBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (!useframe)
-        widget->setFrameShape(QFrame::NoFrame);
+        widget->setFrameShape(Q3GroupBox::NoFrame);
 
     QGridLayout *layout = NULL;
 
@@ -297,7 +297,7 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                  QWidget* parent,
                                                  const char* widgetName) 
 {
-    widget = new QWidgetStack(parent, widgetName);
+    widget = new Q3WidgetStack(parent, widgetName);
     connect(widget, SIGNAL(destroyed(QObject*)),
             this,   SLOT(widgetDeleted(QObject*)));
 
@@ -415,7 +415,7 @@ void TriggeredConfigurationGroup::addTarget(QString triggerValue,
                                             Configurable *target)
 {
     VerifyLayout();
-    triggerMap[QDeepCopy<QString>(triggerValue)] = target;
+    triggerMap[triggerValue] = target;
 
     if (!configStack)
     {
@@ -574,7 +574,7 @@ QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                 QWidget* parent,
                                                 const char* widgetName) 
 {
-    QTabDialog* widget = new QTabDialog(parent, widgetName);
+    Q3TabDialog* widget = new Q3TabDialog(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     
     for(unsigned i = 0 ; i < children.size() ; ++i)

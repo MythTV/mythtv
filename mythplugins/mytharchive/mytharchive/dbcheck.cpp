@@ -3,6 +3,8 @@
 // qt
 #include <qstring.h>
 #include <qdir.h>
+//Added by qt3to4:
+#include <QSqlError>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -12,7 +14,7 @@
 #include "dbcheck.h"
 
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1003";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -41,8 +43,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.prepare(thequery);
-        query.exec();
+        query.exec(thequery);
 
         if (query.lastError().type() != QSqlError::None)
         {
@@ -110,6 +111,49 @@ bool UpgradeArchiveDatabaseSchema(void)
         };
 
         if (!performActualUpdate(updates, "1001", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1001")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE archiveitems"
+"  MODIFY title varbinary(128) default NULL,"
+"  MODIFY subtitle varbinary(128) default NULL,"
+"  MODIFY description blob,"
+"  MODIFY startdate varbinary(30) default NULL,"
+"  MODIFY starttime varbinary(30) default NULL,"
+"  MODIFY filename blob NOT NULL,"
+"  MODIFY cutlist blob;",
+""
+};
+
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE archiveitems"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY description text CHARACTER SET utf8,"
+"  MODIFY startdate varchar(30) CHARACTER SET utf8 default NULL,"
+"  MODIFY starttime varchar(30) CHARACTER SET utf8 default NULL,"
+"  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY cutlist text CHARACTER SET utf8;",
+""
+};
+
+        if (!performActualUpdate(updates, "1003", dbver))
             return false;
     }
 

@@ -49,10 +49,10 @@ bool checkProcess(const QString &lockFile)
 {
     // read the PID from the lock file
     QFile file(lockFile);
-    file.open(IO_ReadOnly);
-    QString line;
+    
+    file.open(QIODevice::ReadOnly);
 
-    file.readLine(line, 100);
+    QString line(file.readLine(100));
 
     bool bOK = false;
     pid_t pid = line.toInt(&bOK);
@@ -436,7 +436,8 @@ void runSelectMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
+             << endl;
     }
 }
 
@@ -468,7 +469,8 @@ void runFormatMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
+             << endl;
     }
 }
 
@@ -509,7 +511,8 @@ void runMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
+             << endl;
     }
 }
 

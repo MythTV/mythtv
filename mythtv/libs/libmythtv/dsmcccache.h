@@ -5,7 +5,7 @@
 #ifndef DSMCC_CACHE_H
 #define DSMCC_CACHE_H
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qmap.h>

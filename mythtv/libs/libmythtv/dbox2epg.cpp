@@ -4,9 +4,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 #include <qdatetime.h>
-#include <qhttp.h>
+#include <q3http.h>
 
 #include "dbox2channel.h"
 #include "dbox2epg.h"
@@ -22,7 +22,7 @@
 #define LOC_ERR  QString("DBox2EPG(%1) Error: ").arg(m_cardid)
 
 DBox2EPG::DBox2EPG()
-    : http(new QHttp()),
+    : http(new Q3Http()),
       m_dbox2options(NULL),
       m_dbox2channel(NULL),
       m_cardid(-1),
@@ -129,7 +129,7 @@ void DBox2EPG::run()
 
 void DBox2EPG::ScheduleRequestEPG(const QString& channelNumber)
 {
-    m_requestedChannel = QDeepCopy<QString>(channelNumber);
+    m_requestedChannel = Q3DeepCopy<QString>(channelNumber);
     m_pendingRequest = true;
 }
 
@@ -150,7 +150,7 @@ void DBox2EPG::RequestEPG(const QString& channelNumber)
             .arg(requestString));
 
     // Request EPG via http. Signal will be emmited when request is done.
-    QHttpRequestHeader header("GET", requestString);
+    Q3HttpRequestHeader header("GET", requestString);
     header.setValue("Host", m_dbox2options->host);
 
     m_currentEPGRequestChannel = channelNumber;
@@ -191,10 +191,10 @@ void DBox2EPG::UpdateDB(uint chanid,
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":STARTTIME",   startTime);
     query.bindValue(":ENDTIME",     endTime);
-    query.bindValue(":TITLE",       title.utf8());
+    query.bindValue(":TITLE",       title);
     query.bindValue(":SUBTITLE",    "");
-    query.bindValue(":DESCRIPTION", description.utf8());
-    query.bindValue(":CATEGORY",    category.utf8());
+    query.bindValue(":DESCRIPTION", description);
+    query.bindValue(":CATEGORY",    category);
     query.bindValue(":AIRDATE",     "0");
     query.bindValue(":STARS",       "0");
 

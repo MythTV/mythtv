@@ -5,13 +5,9 @@
 #include <sys/stat.h>  // for chmod
 
 // Qt headers
-#include <qmap.h>
 #include <qdir.h>
-#include <qfile.h>
-#include <qstring.h>
-#include <qregexp.h>
 #include <qfileinfo.h>
-#include <qdeepcopy.h>
+#include <Q3TextStream>
 
 // MythTV headers
 #include "datadirect.h"
@@ -311,8 +307,8 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         float staravg = 0.0;
         if (!curr_program.starRating.isEmpty()) 
         {
-            int fullstarcount = curr_program.starRating.contains("*");
-            int halfstarcount = curr_program.starRating.contains("+");
+            int fullstarcount = curr_program.starRating.count("*");
+            int halfstarcount = curr_program.starRating.count("+");
             staravg = (fullstarcount + (halfstarcount * .5)) / 4;
         }
 
@@ -344,10 +340,10 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "      :COLORCODE,   :SYNDNUM,    :ORIGAIRDATE)    ");
 
         query.bindValue(":PROGRAMID",   curr_program.programid);
-        query.bindValue(":TITLE",       curr_program.title.utf8());
-        query.bindValue(":SUBTITLE",    curr_program.subtitle.utf8());
-        query.bindValue(":DESCRIPTION", curr_program.description.utf8());
-        query.bindValue(":SHOWTYPE",    curr_program.showtype.utf8()); 
+        query.bindValue(":TITLE",       curr_program.title);
+        query.bindValue(":SUBTITLE",    curr_program.subtitle);
+        query.bindValue(":DESCRIPTION", curr_program.description);
+        query.bindValue(":SHOWTYPE",    curr_program.showtype);
         query.bindValue(":CATTYPE",     cat_type);
         query.bindValue(":MPAARATING",  curr_program.mpaaRating);
         query.bindValue(":STARRATING",  curr_program.starRating);
@@ -377,10 +373,10 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "VALUES (:PROGRAMID, :ROLE, :GIVENNAME, :SURNAME, :FULLNAME)");
 
         query.bindValue(":PROGRAMID",   lastprogramid);
-        query.bindValue(":ROLE",        roleunderlines.utf8());
-        query.bindValue(":GIVENNAME",   curr_productioncrew.givenname.utf8());
-        query.bindValue(":SURNAME",     curr_productioncrew.surname.utf8());
-        query.bindValue(":FULLNAME",    fullname.utf8());
+        query.bindValue(":ROLE",        roleunderlines);
+        query.bindValue(":GIVENNAME",   curr_productioncrew.givenname);
+        query.bindValue(":SURNAME",     curr_productioncrew.surname);
+        query.bindValue(":FULLNAME",    fullname);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_productioncrew", query);
@@ -396,7 +392,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             "VALUES (:PROGRAMID, :CLASS, :RELEVANCE)");
 
         query.bindValue(":PROGRAMID",   lastprogramid);
-        query.bindValue(":CLASS",       curr_genre.gclass.utf8());
+        query.bindValue(":CLASS",       curr_genre.gclass);
         query.bindValue(":RELEVANCE",   curr_genre.relevance);
 
         if (!query.exec())
@@ -569,7 +565,7 @@ QString DataDirectProcessor::CreateTempDirectory(void)
 {
     if (tmpDir == "/tmp")
         tmpDir = createTempFile("/tmp/mythtv_ddp_XXXXXX", true);
-    return QDeepCopy<QString>(tmpDir);
+    return Q3DeepCopy<QString>(tmpDir);
 }
 
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
@@ -941,7 +937,7 @@ FILE *DataDirectProcessor::DDPost(
     }
 
     QFile postfile(postFilename);
-    if (!postfile.open(IO_WriteOnly))
+    if (!postfile.open(QIODevice::WriteOnly))
     {
         err_txt = "Unable to open post data output file.";
         return NULL;
@@ -949,7 +945,7 @@ FILE *DataDirectProcessor::DDPost(
 
     QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
     QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-    QTextStream poststream(&postfile);
+    Q3TextStream poststream(&postfile);
     poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
     poststream << "<SOAP-ENV:Envelope\n";
     poststream <<
@@ -998,14 +994,14 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QString ddurl = providers[listings_provider].webServiceURL;
 
     QFile postfile(GetPostFilename());
-    if (!postfile.open(IO_WriteOnly))
+    if (!postfile.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
                 .arg(GetPostFilename()) + ENO);
         return false;
     }
 
-    QTextStream poststream(&postfile);
+    Q3TextStream poststream(&postfile);
     poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
     poststream << "<SOAP-ENV:Envelope\n";
     poststream
@@ -1041,9 +1037,9 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     bool GotNextSuggestedTime = false;
     bool GotBlockedTime = false;
 
-    if (file.open(IO_ReadOnly)) 
+    if (file.open(QIODevice::ReadOnly))
     {
-        QTextStream stream(&file);
+        Q3TextStream stream(&file);
         QString line;
         while (!stream.atEnd()) 
         {
@@ -1170,7 +1166,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
     if (cachedata && (inputfile != cache_dd_data))
     {
         QFile in, out(cache_dd_data);
-        bool ok = out.open(IO_WriteOnly);
+        bool ok = out.open(QIODevice::WriteOnly);
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_WARN +
@@ -1180,7 +1176,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         else
         {
             VERBOSE(VB_GENERAL, LOC + "Saving listings to DD cache");
-            ok = in.open(IO_ReadOnly, fp);
+            ok = in.open(QIODevice::ReadOnly, fp);
             out.close(); // let copy routine handle dst file
         }
 
@@ -1218,7 +1214,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     bool ok = true;
     QFile f;
-    if (f.open(IO_ReadOnly, fp)) 
+    if (f.open(QIODevice::ReadOnly, fp))
     {
         DDStructureParser ddhandler(*this);
         QXmlInputSource  xmlsource(&f);
@@ -1433,7 +1429,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
                 .arg(get_cache_filename(lineupid)).arg(lfile.size()));
         return cache_dt;
     }
-    if (!lfile.open(IO_ReadOnly))
+    if (!lfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
                 <<QString("can not open file '%1'")
@@ -1442,7 +1438,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     }
 
     QString tmp;
-    QTextStream io(&lfile);
+    Q3TextStream io(&lfile);
     io >> tmp;
     cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
 
@@ -1455,7 +1451,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
 bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
 {
     QFile lfile(get_cache_filename(lineupid));
-    if (!lfile.exists() || (lfile.size() < 8) || !lfile.open(IO_ReadOnly))
+    if (!lfile.exists() || (lfile.size() < 8) || !lfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "GrabLineupFromCache("<<lineupid<<") -- failed");
         return false;
@@ -1463,7 +1459,7 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
 
     QString tmp;
     uint size;
-    QTextStream io(&lfile);
+    Q3TextStream io(&lfile);
     io >> tmp; // read in date
     io >> size; // read in number of channels mapped
 
@@ -1515,13 +1511,13 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 {
     QString fn = get_cache_filename(lineupid);
     QFile lfile(fn.ascii());
-    if (!lfile.open(IO_WriteOnly))
+    if (!lfile.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, "SaveLineupToCache("<<lineupid<<") -- failed");
         return false;
     }
 
-    QTextStream io(&lfile);
+    Q3TextStream io(&lfile);
     io << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
     
     const DDLineupChannels channels = GetDDLineup(lineupid);
@@ -1754,36 +1750,36 @@ QString DataDirectProcessor::GetPostFilename(void) const
 {
     if (tmpPostFile.isEmpty())
         tmpPostFile = createTempFile(tmpDir + "/mythtv_post_XXXXXX");
-    return QDeepCopy<QString>(tmpPostFile);
+    return Q3DeepCopy<QString>(tmpPostFile);
 }
 
 QString DataDirectProcessor::GetResultFilename(void) const
 {
     if (tmpResultFile.isEmpty())
         tmpResultFile = createTempFile(tmpDir + "/mythtv_result_XXXXXX");
-    return QDeepCopy<QString>(tmpResultFile);
+    return Q3DeepCopy<QString>(tmpResultFile);
 }
 
 QString DataDirectProcessor::GetCookieFilename(void) const
 {
     if (cookieFile.isEmpty())
         cookieFile = createTempFile(tmpDir + "/mythtv_cookies_XXXXXX");
-    return QDeepCopy<QString>(cookieFile);
+    return Q3DeepCopy<QString>(cookieFile);
 }
 
 void DataDirectProcessor::SetUserID(const QString &uid)
 {
-    userid = QDeepCopy<QString>(uid);
+    userid = Q3DeepCopy<QString>(uid);
 }
 
 void DataDirectProcessor::SetPassword(const QString &pwd)
 {
-    password = QDeepCopy<QString>(pwd);
+    password = Q3DeepCopy<QString>(pwd);
 }
 
 void DataDirectProcessor::SetInputFile(const QString &file)
 {
-    inputfilename = QDeepCopy<QString>(file);
+    inputfilename = Q3DeepCopy<QString>(file);
 }
 
 bool DataDirectProcessor::Post(QString url, const PostList &list,
@@ -1838,14 +1834,14 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 bool DataDirectProcessor::ParseLineups(const QString &documentFile)
 {
     QFile file(documentFile);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to open '%1'").arg(documentFile));
         return false;
     }
 
-    QTextStream stream(&file);
+    Q3TextStream stream(&file);
     bool in_form = false;
     QString get_action = QString::null;
     QMap<QString,QString> name_value;
@@ -1910,7 +1906,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
                                       const QString &documentFile)
 {
     QFile file(documentFile);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to open '%1'").arg(documentFile));
@@ -1918,7 +1914,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         return false;
     }
 
-    QTextStream stream(&file);
+    Q3TextStream stream(&file);
     bool in_form = false;
     int in_label = 0;
     QMap<QString,QString> settings;
@@ -2015,7 +2011,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
 static QString html_escape(QString str)
 {
     QString new_str = "";
-    for (uint i = 0; i < str.length(); i++)
+    for (int i = 0; i < str.length(); i++)
     {
         if (str[i].isLetterOrNumber())
             new_str += str[i];
@@ -2043,7 +2039,7 @@ static QString get_setting(QString line, QString key)
     if (beg < 0)
         return QString::null;
 
-    uint i = beg + kfind.length();
+    int i = beg + kfind.length();
     while (i < line.length() && !line[i].isSpace() && line[i] != '>')
         i++;
 
@@ -2244,10 +2240,10 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 
     if (srcid)
     {
-        lineupid_to_srcid[QDeepCopy<QString>(lineupid)] = srcid;
+        lineupid_to_srcid[Q3DeepCopy<QString>(lineupid)] = srcid;
 
         // set type for source
-        srcid_to_type[srcid] = QDeepCopy<QString>(type);
+        srcid_to_type[srcid] = Q3DeepCopy<QString>(type);
 
         VERBOSE(VB_GENERAL, "sourceid "<<srcid<<" has lineup type: "<<type);
     }
@@ -2256,7 +2252,7 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 static QString get_lineup_type(uint sourceid)
 {
     QMutexLocker locker(&lineup_type_lock);
-    return QDeepCopy<QString>(srcid_to_type[sourceid]);
+    return Q3DeepCopy<QString>(srcid_to_type[sourceid]);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

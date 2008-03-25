@@ -2,7 +2,7 @@
 #define AUDIODRV_H_
 
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 #include <qdatetime.h>
 

@@ -8,10 +8,12 @@
 #ifndef DIRECTORY_H_
 #define DIRECTORY_H_
 
-#include <qvaluelist.h>
-#include <qlistview.h>
-#include <qptrlist.h>
+#include <q3valuelist.h>
+#include <q3listview.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
+//Added by qt3to4:
+#include <QStringList>
 
 #include <mythtv/uitypes.h>
 
@@ -91,7 +93,7 @@ class DirEntry
 	//	video/voice capabilities/default
 };
 
-class Directory : public QPtrList<DirEntry>
+class Directory : public Q3PtrList<DirEntry>
 {
   public:
     
@@ -100,13 +102,13 @@ class Directory : public QPtrList<DirEntry>
     QString getName() { return name; }
     void writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree);
     DirEntry *fetchById(int id);
-    void getMatchingCalls(DirEntry *source, QPtrList<DirEntry> &CallList);
-    virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
+    void getMatchingCalls(DirEntry *source, Q3PtrList<DirEntry> &CallList);
+    virtual int compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2);
     DirEntry *getDirEntrybyDbId(int dbId);
     DirEntry *getDirEntrybyUrl(QString Url);
     void saveChangesinDB();
     void deleteEntry(DirEntry *Entry);
-    void AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly);
+    void AddAllEntriesToList(QStringList &l, bool SpeeddialsOnly);
     void ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly);
 
   private:
@@ -151,15 +153,15 @@ class CallRecord
 };
 
 
-class CallHistory : public QPtrList<CallRecord>
+class CallHistory : public Q3PtrList<CallRecord>
 {
   public:
 
-    	CallHistory() : QPtrList<CallRecord>() {};
+    	CallHistory() : Q3PtrList<CallRecord>() {};
     	~CallHistory();
         void writeTree(GenericTree *placed_tree, GenericTree *received_tree);
         CallRecord *fetchById(int id);
-        virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
+        virtual int compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2);
         void saveChangesinDB();
         void deleteRecords();
   private:
@@ -179,7 +181,7 @@ class DirectoryContainer
     CallRecord *fetchCallRecordById(int id);
     void AddEntry(DirEntry *entry, QString Dir, bool addToUITree);
     void ChangeEntry(DirEntry *entry, QString nn, QString Url, QString fn, QString sn, QString ph, bool OnHomeLan);
-    QStrList getDirectoryList(void);
+    QStringList getDirectoryList(void);
     GenericTree *addToTree(QString DirName);
     void getRecentCalls(DirEntry *source, CallHistory &RecentCalls);
     void AddToCallHistory(CallRecord *entry, bool addToUITree);
@@ -195,7 +197,7 @@ class DirectoryContainer
     void clearAllVoicemail();
     void deleteVoicemail(QString vmailName);
     DirEntry *FindMatchingDirectoryEntry(QString url);
-    QStrList ListAllEntries(bool SpeeddialsOnly);
+    QStringList ListAllEntries(bool SpeeddialsOnly);
     void ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly);
 
 
@@ -204,7 +206,7 @@ class DirectoryContainer
     GenericTree *findInTree(GenericTree *Root, int at1, int atv1, int at2, int atv2);
     void PutVoicemailInTree(GenericTree *tree_to_write_to);
 
-    QPtrList<Directory>  AllDirs;
+    Q3PtrList<Directory>  AllDirs;
     CallHistory         *callHistory;
 
     GenericTree         *TreeRoot,

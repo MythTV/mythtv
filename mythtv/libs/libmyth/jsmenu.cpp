@@ -41,10 +41,6 @@ using namespace std;
 #include "jsmenu.h"
 #include "jsmenuevent.h"
 
-#if (QT_VERSION < 0x030100)
-#error Native LIRC support requires Qt 3.1 or greater.
-#endif
-
 #define LOC QString("JoystickMenuClient: ")
 #define LOC_ERROR QString("JoystickMenuClient Error: ")
 

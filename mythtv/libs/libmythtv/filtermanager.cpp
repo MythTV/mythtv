@@ -10,7 +10,8 @@
 // Qt headers
 #include <qdir.h>
 #include <qstringlist.h>
-#include <qstrlist.h>
+#include <q3strlist.h>
+#include <Q3PtrList>
 
 // MythTV headers
 #include "filtermanager.h"
@@ -58,7 +59,7 @@ void FilterChain::ProcessFrame(VideoFrame *Frame)
     }
 }
 
-void FilterChain::deleteItem(QPtrCollection::Item d)
+void FilterChain::deleteItem(Q3PtrCollection::Item d)
 {
     if (del_item)
     {
@@ -93,7 +94,7 @@ FilterManager::FilterManager()
 
 FilterManager::~FilterManager()
 {
-    for (QPtrListIterator<FilterInfo> i(Filters); i.current (); ++i)
+    for (Q3PtrListIterator<FilterInfo> i(Filters); i.current (); ++i)
     {
         free(i.current()->symbol);
         free(i.current()->name);
@@ -147,13 +148,13 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                                         VideoFrameType &outpixfmt, int &width,
                                         int &height, int &bufsize)
 {
-    QPtrList<FilterInfo> FiltInfoChain;
+    Q3PtrList<FilterInfo> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
-    QPtrList<FmtConv> FmtList;
+    Q3PtrList<FmtConv> FmtList;
     FilterInfo *FI, *FI2;
     QString Opts;
     FilterInfo *Convert = GetFilterInfoByName("convert");
-    QStrList OptsList (TRUE);
+    Q3StrList OptsList (TRUE);
     QStringList FilterList = QStringList::split(",", Filters);
     VideoFilter *NewFilt = NULL;
     FmtConv *FC, *FC2, *S1, *S2, *S3;

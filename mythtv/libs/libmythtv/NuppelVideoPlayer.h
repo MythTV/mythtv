@@ -1,11 +1,9 @@
 #ifndef NUPPELVIDEOPLAYER
 #define NUPPELVIDEOPLAYER
 
-#include <qstring.h>
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qptrqueue.h>
-#include <qdatetime.h>
+
+
+
 #include <sys/time.h>
 
 #include "RingBuffer.h"
@@ -141,7 +139,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
     void SetLength(int len)                   { totalLength = len; }
     void SetVideoFilters(const QString &override)
-        { videoFiltersOverride = QDeepCopy<QString>(override); }
+        { videoFiltersOverride = Q3DeepCopy<QString>(override); }
     void SetFramesPlayed(long long played)    { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
     void SetPipPlayer(NuppelVideoPlayer *pip)

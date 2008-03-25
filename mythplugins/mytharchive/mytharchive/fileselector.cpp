@@ -4,6 +4,8 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // Myth
 #include <mythtv/mythcontext.h>
@@ -341,7 +343,7 @@ void FileSelector::updateSelectedList()
     {
         while (query.next())
         {
-            QString filename = QString::fromUtf8(query.value(0).toString());
+            QString filename = query.value(0).toString();
             if (m_selectedList.findIndex(filename) == -1)
                 m_selectedList.append(filename);
         }
@@ -361,12 +363,13 @@ void FileSelector::updateFileList()
     if (d.exists())
     {
         // first get a list of directory's in the current directory
-        const QFileInfoList *list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoListIterator it(*list);
-        QFileInfo *fi;
+        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QFileInfoList::const_iterator it = list.begin();
+        const QFileInfo *fi;
 
-        while ( (fi = it.current()) != 0 )
+        while (it != list.end())
         {
+            fi = &(*it);
             if (fi->fileName() != ".")
             {
                 FileData  *data = new FileData; 
@@ -390,10 +393,11 @@ void FileSelector::updateFileList()
         {
             // second get a list of file's in the current directory
             list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
-            it = QFileInfoListIterator(*list);
+            it = list.begin();
 
-            while ( (fi = it.current()) != 0 )
+            while (it != list.end())
             {
+                fi = &(*it);
                 FileData  *data = new FileData; 
                 data->selected = false;
                 data->directory = false;

@@ -6,7 +6,10 @@
 #include <qstringlist.h>
 #include <qthread.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
 
 #include "metadata.h"
 #include "playlist.h"
@@ -112,7 +115,7 @@ class DatabaseBox : public MythThemedDialog
 
     QStringList         treelevels;
 
-    QPtrList<UITextType> m_lines;
+    Q3PtrList<UITextType> m_lines;
 };
 
 #endif

@@ -306,7 +306,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         cout << "--- GetFilesystemInfos directory list start ---" << endl;
         for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
         {
-            cout << "Dir: " << it1->hostname << ":" << it1->directory << endl;
+            cout << "Dir: " << (const char *)it1->hostname << ":" << (const char *)it1->directory << endl;
             cout << "     Location: ";
             if (it1->isLocal)
                 cout << "Local";

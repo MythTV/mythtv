@@ -54,7 +54,6 @@ using namespace std;
 #define LOC_ERR QString("VideoOutputXv Error: ")
 
 extern "C" {
-#define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 #include <X11/extensions/Xinerama.h>
     extern int      XShmQueryExtension(Display*);
@@ -545,7 +544,7 @@ class XvAttributes
     XvAttributes() :
         description(QString::null), xv_flags(0), feature_flags(0) {}
     XvAttributes(const QString &a, uint b, uint c) :
-        description(QDeepCopy<QString>(a)), xv_flags(b), feature_flags(c) {}
+        description(Q3DeepCopy<QString>(a)), xv_flags(b), feature_flags(c) {}
 
   public:
     QString description;

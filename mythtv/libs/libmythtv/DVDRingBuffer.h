@@ -5,9 +5,10 @@
 #define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
-#include <qstring.h>
-#include <qobject.h>
-#include <qmutex.h>
+#include <QMap>
+#include <QString>
+#include <QMutex>
+
 #include "util.h"
 extern "C" {
 #include "../libavcodec/avcodec.h"

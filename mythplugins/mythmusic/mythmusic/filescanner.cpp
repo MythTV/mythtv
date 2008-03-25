@@ -85,19 +85,20 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     if (!d.exists())
         return;
 
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
+    QFileInfoList list = d.entryInfoList();
+    if (list.isEmpty())
         return;
 
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
 
     /* Recursively traverse directory, calling QApplication::processEvents()
        every now and then to ensure the UI updates */
     int update_interval = 0;
     int newparentid = 0;
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
+        fi = &(*it);
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
@@ -158,7 +159,7 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
     // Load the directory id or insert it and get the id
     query.prepare("SELECT directory_id FROM music_directories "
                 "WHERE path = :DIRECTORY ;");
-    query.bindValue(":DIRECTORY", directory.utf8());
+    query.bindValue(":DIRECTORY", directory);
 
     if (query.exec() || query.isActive())
     {
@@ -170,7 +171,7 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
         {
             query.prepare("INSERT INTO music_directories (path, parent_id) "
                         "VALUES (:DIRECTORY, :PARENTID);");
-            query.bindValue(":DIRECTORY", directory.utf8());
+            query.bindValue(":DIRECTORY", directory);
             query.bindValue(":PARENTID", parentid);
 
             if (!query.exec() || !query.isActive()
@@ -215,7 +216,7 @@ bool FileScanner::HasFileChanged(const QString &filename, const QString &date_mo
     }
     else {
         VERBOSE(VB_IMPORTANT, QString("Failed to stat file: %1")
-            .arg(filename.local8Bit()));
+            .arg(filename));
     }
     return false;
 }
@@ -250,7 +251,7 @@ void FileScanner::AddFileToDB(const QString &filename)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
                       "directory_id = :DIRID, imagetype = :TYPE;");
-        query.bindValue(":FILE", name.utf8());
+        query.bindValue(":FILE", name);
         query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
 
@@ -409,7 +410,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM music_songs WHERE "
                   "filename = :NAME ;");
-    query.bindValue(":NAME", sqlfilename.utf8());
+    query.bindValue(":NAME", sqlfilename);
     query.exec();
 }
 
@@ -575,8 +576,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
     {
         while (query.next())
         {
-            name = m_startdir +
-                QString::fromUtf8(query.value(0).toString());
+            name = m_startdir + query.value(0).toString();
 
             if (name != QString::null)
             {
@@ -634,8 +634,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
         {
             QString name;
 
-            name = m_startdir +
-                QString::fromUtf8(query.value(0).toString());
+            name = m_startdir + query.value(0).toString();
 
             if (name != QString::null)
             {

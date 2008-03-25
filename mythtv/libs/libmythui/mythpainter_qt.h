@@ -3,6 +3,9 @@
 
 #include "mythpainter.h"
 #include "mythimage.h"
+
+#include <QPixmap>
+
 #include "compat.h"
 
 class QPainter;
@@ -35,8 +38,6 @@ class MythQtPainter : public MythPainter
   protected:
 
     QPainter *painter;
-    QPainter *mainPainter;
-    QPixmap *drawPixmap;
     QRegion clipRegion;
 };
 

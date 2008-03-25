@@ -11,8 +11,8 @@
 #ifndef __UPNP_H__
 #define __UPNP_H__
 
-#include <qobject.h>
-#include <qmutex.h>
+
+
 
 #include "configuration.h"
 

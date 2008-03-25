@@ -3,8 +3,11 @@
 
 #include <qtimer.h>
 #include <qmutex.h>
-#include <qvaluevector.h>
-#include <qptrvector.h>
+#include <q3valuevector.h>
+#include <q3ptrvector.h>
+//Added by qt3to4:
+#include <QSqlQuery>
+#include <QKeyEvent>
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythdbcon.h>
@@ -94,7 +97,7 @@ class GameTreeItem : public QObject
     void edit(void);
 
   private:
-    QButton *OKButton;
+    QAbstractButton *OKButton;
     MythPopupBox *info_popup;
     GameTreeRoot* m_root;
     unsigned m_depth;
@@ -108,7 +111,7 @@ class GameTree : public MythThemedDialog
     Q_OBJECT
 
   public:
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
 
     GameTree(MythMainWindow *parent, QString windowName,
              QString themeFilename, const char *name = 0);
@@ -134,8 +137,8 @@ class GameTree : public MythThemedDialog
     GenericTree		  *m_favouriteNode;
     UIManagedTreeListType *m_gameTreeUI;
 
-    QValueVector<GameTreeRoot *> m_gameTreeRoots;
-    QValueVector<GameTreeItem *> m_gameTreeItems;
+    Q3ValueVector<GameTreeRoot *> m_gameTreeRoots;
+    Q3ValueVector<GameTreeItem *> m_gameTreeItems;
 
     UITextType  *m_gameTitle;
     UITextType  *m_gameSystem;

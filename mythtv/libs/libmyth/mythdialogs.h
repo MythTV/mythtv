@@ -1,19 +1,16 @@
 #ifndef MYTHDIALOGS_H_
 #define MYTHDIALOGS_H_
 
-#include <qwidget.h>
 #include <qdialog.h>
-#include <qprogressbar.h>
-#include <qdom.h>
-#include <qptrlist.h>
-#include <qpixmap.h>
-#include <qpushbutton.h>
 #include <qlabel.h>
-#include <qevent.h>
-#include <qvaluevector.h>
-#include <qscrollview.h>
-#include <qthread.h>
-#include <qlayout.h>
+#include <qabstractbutton.h>
+#include <QObject>
+#include <Q3VBoxLayout>
+#include <Q3ProgressBar>
+#include <QFrame>
+#include <Q3ScrollView>
+#include <Q3ValueVector>
+#include <Q3PtrList>
 
 #include "mythexp.h"
 
@@ -106,6 +103,7 @@ class MPUBLIC MythDialog : public QFrame
 
  signals:
     void menuButtonPressed();
+    void leaveModality();
 
   public slots:
     DialogCode exec(void);
@@ -150,8 +148,8 @@ class MPUBLIC MythPopupBox : public MythDialog
     QLabel *addLabel(QString caption, LabelSize size = Medium, 
                      bool wrap = false);
 
-    QButton *addButton(QString caption, QObject *target = NULL, 
-                       const char *slot = NULL);
+    QAbstractButton *addButton(QString caption, QObject *target = NULL,
+                               const char *slot = NULL);
 
     void ShowPopup(QObject *target = NULL, const char *slot = NULL);
     void ShowPopupAtXY(int destx, int desty, 
@@ -212,7 +210,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     void defaultButtonPressedHandler(void);
 
   private:
-    QVBoxLayout *vbox;
+    Q3VBoxLayout *vbox;
     QColor popupForegroundColor;
     int hpadding, wpadding;
     bool arrowAccel;
@@ -275,14 +273,14 @@ class MPUBLIC MythProgressDialog: public MythDialog
   protected:
     void Teardown(void);
     ~MythProgressDialog(); // use deleteLater() instead for thread safety
-    QProgressBar *progress;
+    Q3ProgressBar *progress;
     QLabel *msglabel;
 
   private:
     void setTotalSteps(int totalSteps);
     int steps;
     int m_totalSteps;
-    QPtrList<class LCDTextItem> * textItems;
+    Q3PtrList<class LCDTextItem> * textItems;
 };
 
 /** MythDialog box that displays a busy spinner-style dialog box to
@@ -422,8 +420,8 @@ class MPUBLIC MythThemedDialog : public MythDialog
     QDomElement xmldata;
     int context;
 
-    QPtrList<LayerSet>  my_containers;
-    QPtrList<UIType>    focus_taking_widgets;
+    Q3PtrList<LayerSet>  my_containers;
+    Q3PtrList<UIType>    focus_taking_widgets;
 
     QRect redrawRect;
 };
@@ -489,8 +487,8 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
     QLabel              *caption;
     MythRemoteLineEdit  *editor;
     MythListBox         *listbox;  
-    QButton             *ok_button;
-    QButton             *cancel_button;
+    QAbstractButton     *ok_button;
+    QAbstractButton     *cancel_button;
 };
 
 class MPUBLIC MythImageFileDialog: public MythThemedDialog
@@ -504,7 +502,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
 
   public:
 
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
     
     MythImageFileDialog(QString *result,
                         QString top_directory,
@@ -538,7 +536,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
 
 // ---------------------------------------------------------------------------
 
-class MPUBLIC MythScrollDialog : public QScrollView
+class MPUBLIC MythScrollDialog : public Q3ScrollView
 {
     Q_OBJECT
     
@@ -556,6 +554,9 @@ class MPUBLIC MythScrollDialog : public QScrollView
     void setAreaMultiplied(int areaWTimes, int areaHTimes);
 
     DialogCode result(void) const;
+
+  signals:
+    void leaveModality();
 
   public slots:
 

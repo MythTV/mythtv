@@ -21,8 +21,10 @@
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qapplication.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // myth
 #include "mythtv/mythcontext.h"
@@ -191,8 +193,8 @@ UITextType* ZMConsole::getTextType(QString name)
 
     if (!type)
     {
-        cout << "ERROR: Failed to find '" << name <<  "' UI element in theme file\n"
-                << "Bailing out!" << endl;
+        VERBOSE(VB_IMPORTANT, "ERROR: Failed to find '" + name + "' UI element in theme file\n" +
+                "              Bailing out!");
         exit(0);
     }
 

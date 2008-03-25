@@ -13,7 +13,7 @@
 
 #include <qapplication.h>
 #include <qobject.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qdir.h>
 #include <qstringlist.h>
 #include <qregexp.h>
@@ -180,13 +180,13 @@ void Decoder::SetLocationFormatUseTags(void)
     ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
-static QPtrList<DecoderFactory> *factories = 0;
+static Q3PtrList<DecoderFactory> *factories = 0;
 
 static void checkFactories() 
 {
     if (!factories) 
     {
-        factories = new QPtrList<DecoderFactory>;
+        factories = new Q3PtrList<DecoderFactory>;
 
         Decoder::registerFactory(new VorbisDecoderFactory);
         Decoder::registerFactory(new MadDecoderFactory);

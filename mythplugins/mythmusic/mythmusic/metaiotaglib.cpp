@@ -4,6 +4,8 @@
 #include "metadata.h"
 
 #include <mythtv/mythcontext.h>
+//Added by qt3to4:
+#include <Q3ValueList>
 
 MetaIOTagLib::MetaIOTagLib(void)
     : MetaIO(".mp3")
@@ -126,7 +128,7 @@ Metadata* MetaIOTagLib::read(QString filename)
             genre = "";
     int year = 0, tracknum = 0, length = 0, playcount = 0, rating = 0, id = 0;
     bool compilation = false;
-    QValueList<struct AlbumArtImage> albumart;
+    Q3ValueList<struct AlbumArtImage> albumart;
 
     QString extension = filename.section( '.', -1 ) ;
 
@@ -318,7 +320,7 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
 AlbumArtList MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *tag)
 {
 
-    QValueList<struct AlbumArtImage> artlist;
+    Q3ValueList<struct AlbumArtImage> artlist;
 
     if (!tag->frameListMap()["APIC"].isEmpty())
     {

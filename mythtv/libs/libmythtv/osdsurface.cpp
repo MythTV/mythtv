@@ -4,6 +4,7 @@
 #include "compat.h"
 
 #include <algorithm>
+#include <Q3MemArray>
 using namespace std;
 
 #ifdef MMX
@@ -96,8 +97,8 @@ void OSDSurface::Clear(void)
 void OSDSurface::ClearUsed(void)
 {
     QMutexLocker lock(&usedRegionsLock);
-    QMemArray<QRect> rects = usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
+    Q3MemArray<QRect> rects = usedRegions.rects();
+    Q3MemArray<QRect>::Iterator it = rects.begin();
     QRect drawRect;
     int startcol, startline, endcol, endline, cwidth, uvcwidth;
     int yoffset;
@@ -144,8 +145,8 @@ bool OSDSurface::IsClear(void)
 bool OSDSurface::IntersectsDrawn(QRect &newrect)
 {
     QMutexLocker lock(&usedRegionsLock);
-    QMemArray<QRect> rects = usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
+    Q3MemArray<QRect> rects = usedRegions.rects();
+    Q3MemArray<QRect>::Iterator it = rects.begin();
     for (; it != rects.end(); ++it)
         if (newrect.intersects(*it))
             return true;
@@ -572,8 +573,8 @@ void OSDSurface::BlendToYV12(unsigned char *yptrdest,
     const OSDSurface *surface = this;
     blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
 
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
+    Q3MemArray<QRect> rects = surface->usedRegions.rects();
+    Q3MemArray<QRect>::Iterator it = rects.begin();
     for (; it != rects.end(); ++it)
     {
         int begx = max((*it).left(),   0);
@@ -699,8 +700,8 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
     if (blend_to_black)
         bzero(argbptr, stride * outheight);
 
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
+    Q3MemArray<QRect> rects = surface->usedRegions.rects();
+    Q3MemArray<QRect>::Iterator it = rects.begin();
     for (; it != rects.end(); ++it)
     {
         QRect drawRect = *it;
@@ -791,8 +792,8 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
 
     bzero(outbuf, stride * outheight);
 
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
+    Q3MemArray<QRect> rects = surface->usedRegions.rects();
+    Q3MemArray<QRect>::Iterator it = rects.begin();
     for (; it != rects.end(); ++it)
     {
         QRect drawRect = *it;

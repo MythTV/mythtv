@@ -15,6 +15,7 @@
 
 #include "parentalcontrols.h"
 
+class QKeyEvent;
 class Metadata;
 class VideoList;
 

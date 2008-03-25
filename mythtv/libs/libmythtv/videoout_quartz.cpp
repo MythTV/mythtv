@@ -39,7 +39,7 @@ const int kKeepPrebuffer   = 2;
 #include <iostream>
 using namespace std;
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include "DisplayRes.h"
 #include "yuv2rgb.h"
@@ -132,7 +132,7 @@ class QuartzData
     int                ZoomedRight;       // VideoOutputBase::mz_move.x()
 
     // Output viewports:
-    QPtrList<VideoOutputQuartzView> views;   // current views
+    Q3PtrList<VideoOutputQuartzView> views;   // current views
 
     // Embedding:
     VideoOutputQuartzView * embeddedView;    // special embedded widget

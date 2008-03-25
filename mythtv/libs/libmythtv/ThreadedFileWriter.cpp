@@ -12,7 +12,6 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
@@ -120,7 +119,7 @@ void *ThreadedFileWriter::boot_syncer(void *wotsit)
 ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
                                        int pflags, mode_t pmode) :
     // file stuff
-    filename(QDeepCopy<QString>(fname)), flags(pflags),
+    filename(Q3DeepCopy<QString>(fname)), flags(pflags),
     mode(pmode),                         fd(-1),
     // state
     no_writes(false),                    flush(false),
@@ -209,6 +208,11 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     bool first = true;
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (count > BufFree())
     {
         if (first)
@@ -218,7 +222,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
             first = false;
         }
 
-        bufferWroteData.wait(100);
+        bufferWroteData.wait(&mutex, 100);
     }
     if (!first)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND end");
@@ -270,10 +274,15 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
  */
 void ThreadedFileWriter::Flush(void)
 {
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     flush = true;
     while (BufUsed() > 0)
     {
-        if (!bufferEmpty.wait(2000))
+        if (!bufferEmpty.wait(&mutex, 2000))
             VERBOSE(VB_IMPORTANT, LOC + "Taking a long time to flush..");
     }
     flush = false;
@@ -341,9 +350,14 @@ void ThreadedFileWriter::SetWriteBufferMinWriteSize(uint newMinSize)
  */
 void ThreadedFileWriter::SyncLoop(void)
 {
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!in_dtor)
     {
-        bufferSyncWait.wait(written > tfw_min_write_size ? 1000 : 100);
+        bufferSyncWait.wait(&mutex, written > tfw_min_write_size ? 1000 : 100);
         Sync();
     }
 }
@@ -356,6 +370,11 @@ void ThreadedFileWriter::DiskLoop(void)
     uint size = 0;
     written = 0;
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!in_dtor || BufUsed() > 0)
     {
         size = BufUsed();
@@ -367,7 +386,7 @@ void ThreadedFileWriter::DiskLoop(void)
             ((size < tfw_min_write_size) &&
              (written >= tfw_min_write_size))))
         {
-            bufferHasData.wait(100);
+            bufferHasData.wait(&mutex, 100);
             continue;
         }
 

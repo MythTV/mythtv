@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 #include <qtextcodec.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // Only some of the QTextCodec calls are reenterant.
 // If you use this please verify that you are using a reenterant call.
@@ -141,7 +141,7 @@ QString myth_category_type_to_string(uint category_type)
     if ((category_type > kCategoryNone) && (category_type < kCategoryLast))
         return QString(cattype[category_type]);
 
-    return QString::null;
+    return QString("");
 }
 
 MythCategoryType string_to_myth_category_type(const QString &category_type)
@@ -174,12 +174,12 @@ QString ContentDescriptor::GetDescription(uint i) const
     // Try to get detailed description
     map<uint,QString>::const_iterator it = categoryDesc.find(Nibble(i));
     if (it != categoryDesc.end())
-        return QDeepCopy<QString>((*it).second);
+        return Q3DeepCopy<QString>((*it).second);
 
     // Fall back to category description
     it = categoryDesc.find(Nibble1(i)<<4);
     if (it != categoryDesc.end())
-        return QDeepCopy<QString>((*it).second);
+        return Q3DeepCopy<QString>((*it).second);
 
     // Found nothing? Just return empty string.
     return "";

@@ -8,6 +8,8 @@
 #define ARCHIVEUTIL_H_
 
 #include <qstring.h>
+//Added by qt3to4:
+#include <Q3PtrList>
 
 class ProgramInfo;
 
@@ -65,7 +67,7 @@ typedef struct
     bool hasCutlist;
     bool useCutlist;
     bool editedDetails;
-    QPtrList<ThumbImage> thumbList;
+    Q3PtrList<ThumbImage> thumbList;
 } ArchiveItem;
 
 QString formatSize(long long sizeKB, int prec = 2);

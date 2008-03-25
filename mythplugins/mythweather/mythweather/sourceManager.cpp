@@ -2,6 +2,8 @@
 #include <qfileinfo.h>
 #include <qstring.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <Q3PtrList>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -185,7 +187,7 @@ ScriptInfo *SourceManager::getSourceByName(const QString &name)
 QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
 {
     if (!m_scripts.contains(si))
-        return NULL;
+        return QStringList();
     WeatherSource *ws = new WeatherSource(si);
     return ws->getLocationList(str);
 }
@@ -254,10 +256,10 @@ void SourceManager::doUpdate()
 }
 
 bool SourceManager::findPossibleSources(QStringList types,
-                                        QPtrList<ScriptInfo> &sources)
+                                        Q3PtrList<ScriptInfo> &sources)
 {
     ScriptInfo *si;
-    QPtrList<ScriptInfo> results;
+    Q3PtrList<ScriptInfo> results;
     bool handled;
     for (si = m_scripts.first(); si; si = m_scripts.next())
     {
@@ -332,15 +334,14 @@ void SourceManager::recurseDirs( QDir dir )
         return;
 
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
-    const QFileInfoList *files = dir.entryInfoList();
-    if (!files)
-        return;
+    QFileInfoList files = dir.entryInfoList();
 
-    QFileInfoListIterator itr(*files);
-    QFileInfo *file;
+    QFileInfoList::const_iterator itr = files.begin();
+    const QFileInfo *file;
 
-    while ((file = itr.current())) 
+    while (itr != files.end()) 
     {
+        file = &(*itr);
         ++itr;
         if (file->isDir()) 
         {

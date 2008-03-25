@@ -16,6 +16,7 @@
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qsqlquery.h>
+#include <QSqlError>
 
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function 
 // in recordingtypes.cpp.
@@ -483,7 +484,7 @@ void ScheduledRecording::save(bool sendSig)
                 "WHERE recordid = :RECORDID ;");
         query.bindValue(":RECPRIORITY", getRecPriority());
         query.bindValue(":TRANSCODER", transcoder->getValue().toInt());
-        query.bindValue(":PLAYGROUP", playgroup->getValue().utf8());
+        query.bindValue(":PLAYGROUP", playgroup->getValue());
         query.bindValue(":RECORDID", getRecordID());
 
         if (!query.exec())

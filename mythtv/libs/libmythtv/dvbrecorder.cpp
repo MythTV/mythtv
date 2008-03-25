@@ -459,6 +459,7 @@ bool DVBRecorder::PauseAndWait(int timeout)
 {
     if (request_pause)
     {
+        QMutex waitlock;
         if (!paused)
         {
             assert(_stream_handler);
@@ -471,7 +472,8 @@ bool DVBRecorder::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        unpauseWait.wait(timeout);
+        waitlock.lock();
+        unpauseWait.wait(&waitlock, timeout);
     }
 
     if (!request_pause && paused)

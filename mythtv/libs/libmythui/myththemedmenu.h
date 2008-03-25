@@ -3,6 +3,8 @@
 
 #include "mythscreentype.h"
 
+#include <QKeyEvent>
+
 class MythMainWindow;
 class MythThemedMenuPrivate;
 class MythThemedMenuState;

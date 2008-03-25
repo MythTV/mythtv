@@ -1,14 +1,16 @@
 #ifndef MYTHDBCON_H_
 #define MYTHDBCON_H_
 
-#include <qsqldatabase.h>
-#include <qmutex.h>
-#include <qsemaphore.h> 
-#include <qstring.h>
-#include <qptrlist.h>
-
 #include <iostream>
 using namespace std;
+
+#include <qsqldatabase.h>
+#include <qvariant.h>
+#include <qsql.h>
+#include <qsqlquery.h>
+#include <qsemaphore.h>
+#include <qsqlerror.h>
+#include <qsqlfield.h>
 
 #include "mythcontext.h"
 
@@ -25,11 +27,11 @@ class MPUBLIC MSqlDatabase
     bool isOpen(void);
     bool OpenDatabase(void);
     bool KickDatabase(void);
-    QSqlDatabase *db(void) { return m_db; }
+    QSqlDatabase db(void) { return m_db; }
 
   private:
     QString m_name;
-    QSqlDatabase *m_db;
+    QSqlDatabase m_db;
     QDateTime m_lastDBKick;
 };
 
@@ -51,7 +53,7 @@ class MDBManager
     MSqlDatabase *getDDCon(void);
 
   private:
-    QPtrList<MSqlDatabase> m_pool;
+    Q3PtrList<MSqlDatabase> m_pool;
     QMutex m_lock;
     QSemaphore *m_sem;
     int m_connID;
@@ -64,7 +66,7 @@ class MDBManager
 typedef struct _MSqlQueryInfo
 {
     MSqlDatabase *db;
-    QSqlDatabase *qsqldb;
+    QSqlDatabase qsqldb;
     bool returnConnection;
 } MSqlQueryInfo;
 
@@ -107,14 +109,19 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     /// \brief Only updated once during object creation
     bool isConnected(void) { return m_isConnected; }
 
-    /// \brief This is needed since we define exec(const QString &query)
-    bool exec(void) { return QSqlQuery::exec(); }
+    /// \brief Wrap QSqlQuery::exec() so we can display SQL
+    bool exec(void);
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
     bool exec(const QString &query);
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
+
+    /// \brief Wrap QSqlQuery::bindValue so we can convert null QStrings to empty QStrings
+    void bindValue ( const QString & placeholder, const QVariant & val, QSql::ParamType paramType = QSql::In );
+    /// \brief Wrap QSqlQuery::bindValue so we can convert null QStrings to empty QStrings
+    void bindValue ( int pos, const QVariant & val, QSql::ParamType paramType = QSql::In );
 
     /// \brief Add all the bindings in the passed in bindings
     void bindValues(MSqlBindings &bindings);
@@ -141,10 +148,14 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
 
+    static QMutex prepareLock;
+
   private:
     MSqlDatabase *m_db;
     bool m_isConnected;
     bool m_returnConnection;
+    QString m_last_prepared_query; // holds a copy of the last prepared query
+    QRegExp m_testbindings;
 };
 
 #endif    

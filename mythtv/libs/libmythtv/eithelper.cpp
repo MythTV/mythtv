@@ -7,9 +7,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt headers
-#include <qdeepcopy.h>
-
 // MythTV includes
 #include "eit.h"
 #include "eithelper.h"
@@ -326,10 +323,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             continue;
         }
 
-        QString title         = QString::null;
-        QString subtitle      = QString::null;
-        QString description   = QString::null;
-        QString category      = QString::null;
+        QString title         = QString("");
+        QString subtitle      = QString("");
+        QString description   = QString("");
+        QString category      = QString("");
         MythCategoryType category_type = kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
@@ -376,7 +373,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
         desc_list_t contentIds =
             MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
-        QString programId = "", seriesId = "";
+        QString programId = QString("");
+        QString seriesId  = QString("");
         for (uint j = 0; j < contentIds.size(); j++)
         {
             DVBContentIdentifierDescriptor desc(contentIds[j]);
@@ -416,10 +414,10 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     uint fix = fixup[133 << 16];
     fix |= EITFixUp::kFixGenericDVB;
 
-    QString title         = QString::null;
-    QString subtitle      = QString::null;
-    QString description   = QString::null;
-    QString category      = QString::null;
+    QString title         = QString("");
+    QString subtitle      = QString("");
+    QString description   = QString("");
+    QString category      = QString("");
     MythCategoryType category_type = kCategoryNone;
     unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
@@ -564,8 +562,8 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     uint atsc_key = (atsc_major << 16) | atsc_minor;
 
     QMutexLocker locker(&eitList_lock);
-    db_events.enqueue(new DBEvent(chanid, QDeepCopy<QString>(event.title),
-                                  QDeepCopy<QString>(ett),
+    db_events.enqueue(new DBEvent(chanid, Q3DeepCopy<QString>(event.title),
+                                  Q3DeepCopy<QString>(ett),
                                   starttime, endtime,
                                   fixup[atsc_key], subtitle_type,
                                   audio_properties, video_properties));

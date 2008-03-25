@@ -1,16 +1,19 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qimage.h>
 #include <qpainter.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qsqldatabase.h>
-#include <qhbox.h>
+#include <q3hbox.h>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <QSqlError>
 
 #include <unistd.h>
 
@@ -49,13 +52,13 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     prevItem = 0;
     addString = tr("Add");
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
 
-    QVBoxLayout *vkbox = new QVBoxLayout(vbox, (int)(1 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vkbox, (int)(1 * wmult));
+    Q3VBoxLayout *vkbox = new Q3VBoxLayout(vbox, (int)(1 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vkbox, (int)(1 * wmult));
 
     // Edit selection
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     QString message = tr("Edit Priority Rule") + ": ";
     QLabel *label = new QLabel(message, this);
@@ -79,12 +82,12 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     {
         while (result.next())
         {
-            QString trimTitle = QString::fromUtf8(result.value(0).toString());
+            QString trimTitle = result.value(0).toString();
             trimTitle.remove(QRegExp(" \\(.*\\)$"));
 
             m_rule->insertItem(trimTitle);
             m_recpri   << result.value(1).toString();
-            m_recdesc << QString::fromUtf8(result.value(2).toString());
+            m_recdesc << result.value(2).toString();
 
             if (trimTitle == baseTitle)
                 titlematch = m_rule->count() - 1;
@@ -96,7 +99,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     hbox->addWidget(m_rule);
 
     // Title edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Priority Rule Name") + ": ";
     label = new QLabel(message, this);
@@ -109,7 +112,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     hbox->addWidget(m_title);
 
     // Value edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Priority Value") + ": ";
     label = new QLabel(message, this);
@@ -232,7 +235,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     vbox->addWidget(m_description);
 
     //  Test Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_testButton = new MythPushButton( this, "test" );
     m_testButton->setBackgroundOrigin(WindowOrigin);
@@ -468,11 +471,7 @@ bool CustomPriority::checkSyntax(void)
         else
         {
             msg = tr("An error was found when checking") + ":\n\n";
-#if QT_VERSION >= 0x030200
             msg += query.executedQuery();
-#else
-            msg += query.lastQuery();
-#endif
             msg += "\n\n" + tr("The database error was") + ":\n";
             msg += query.lastError().databaseText();
             ret = false;
@@ -502,7 +501,7 @@ void CustomPriority::testSchedule(void)
     query.prepare(thequery);
     query.bindValue(":LOCK", "DiffSchedule");
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (Obtaining lock in testRecording): \n"
@@ -516,7 +515,7 @@ void CustomPriority::testSchedule(void)
     thequery = QString("DROP TABLE IF EXISTS %1;").arg(ttable);
     query.prepare(thequery);
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (deleting old table in testRecording): \n"
@@ -531,7 +530,7 @@ void CustomPriority::testSchedule(void)
                        .arg(ttable);
     query.prepare(thequery);
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (create new table): \n"
@@ -571,7 +570,7 @@ void CustomPriority::testSchedule(void)
     query.prepare(thequery);
     query.bindValue(":LOCK", "DiffSchedule");
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (free lock): \n"

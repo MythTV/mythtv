@@ -24,9 +24,9 @@
 */
 
 #include <qstring.h>
-#include <qcstring.h>
+#include <q3cstring.h>
 #include <qapplication.h>
-#include <qprogressbar.h>
+#include <q3progressbar.h>
 
 #include "metadata.h"
 #include "lameencoder.h"

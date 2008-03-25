@@ -1,6 +1,9 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/uilistbtntype.h>
 #include <qapplication.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 #include "weatherScreen.h"
 #include "weatherSource.h"
@@ -43,7 +46,7 @@ void GlobalSetup::wireUI()
         m_timeout_spinbox->setRange(1, 1000);
         m_timeout_spinbox->setLineStep(1);
         m_timeout_spinbox->setFont(gContext->GetMediumFont());
-        m_timeout_spinbox->setFocusPolicy(QWidget::NoFocus);
+        m_timeout_spinbox->setFocusPolicy(Qt::NoFocus);
         m_timeout_spinbox->setGeometry(blckhl->getScreenArea());
         blckhl->allowFocus(true);
         connect(blckhl, SIGNAL(takingFocus()), m_timeout_spinbox,
@@ -64,7 +67,7 @@ void GlobalSetup::wireUI()
         m_hold_spinbox->setRange(1, 1000);
         m_hold_spinbox->setLineStep(1);
         m_hold_spinbox->setFont(gContext->GetMediumFont());
-        m_hold_spinbox->setFocusPolicy(QWidget::NoFocus);
+        m_hold_spinbox->setFocusPolicy(Qt::NoFocus);
         m_hold_spinbox->setGeometry(blckhl->getScreenArea());
         blckhl->allowFocus(true);
         connect(blckhl, SIGNAL(takingFocus()), m_hold_spinbox,
@@ -348,7 +351,7 @@ void ScreenSetup::updateHelpText()
         if (!si)
             return;
 
-        QDictIterator<TypeListInfo> it(si->types);
+        Q3DictIterator<TypeListInfo> it(si->types);
         TypeListInfo *ti = it.current();
         text += lbt->text() + "\n";
         if (si->hasUnits)
@@ -387,7 +390,7 @@ void ScreenSetup::updateHelpText()
 
 void ScreenSetup::loadData()
 {
-    QIntDict<ScreenListInfo> active_screens;
+    Q3IntDict<ScreenListInfo> active_screens;
     ScreenListInfo *si;
     TypeListInfo *ti;
 
@@ -407,7 +410,7 @@ void ScreenSetup::loadData()
 
     QFile xml(uifile);
     QDomDocument doc;
-    if (!xml.open(IO_ReadOnly))
+    if (!xml.open(QIODevice::ReadOnly))
         return;
     QString msg;
     int line, col;
@@ -478,7 +481,7 @@ void ScreenSetup::loadData()
                     type_strs << types[i];
                 }
 
-                QPtrList<ScriptInfo> scriptList;
+                Q3PtrList<ScriptInfo> scriptList;
                 // Only add a screen to the list if we have a source
                 // available to satisfy the requirements.
                 if (m_src_man->findPossibleSources(type_strs, scriptList))
@@ -622,7 +625,7 @@ void ScreenSetup::saveData()
 {
     // check if all active screens have sources/locations defined
     QStringList notDefined;
-    QPtrListIterator<UIListBtnTypeItem> screens = m_active_list->GetIterator();
+    Q3PtrListIterator<UIListBtnTypeItem> screens = m_active_list->GetIterator();
     if (!screens)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No Screens",
@@ -635,7 +638,7 @@ void ScreenSetup::saveData()
     {
         UIListBtnTypeItem *itm = *screens;
         ScreenListInfo *si = (ScreenListInfo *) itm->getData();
-        QDictIterator<TypeListInfo> it(si->types);
+        Q3DictIterator<TypeListInfo> it(si->types);
         for (; it.current(); ++it)
         {
             TypeListInfo *ti = it.current();
@@ -665,7 +668,7 @@ void ScreenSetup::saveData()
     query = "INSERT into weatherscreens (draworder, container, units, hostname) "
             "VALUES (:DRAW, :CONT, :UNITS, :HOST);";
     db.prepare(query);
-    QPtrListIterator<UIListBtnTypeItem> an_it = m_active_list->GetIterator();
+    Q3PtrListIterator<UIListBtnTypeItem> an_it = m_active_list->GetIterator();
     int draworder = 0;
     while (an_it)
     {
@@ -697,7 +700,7 @@ void ScreenSetup::saveData()
                     "weatherscreens_screen_id, weathersourcesettings_sourceid) "
                     "VALUES (:LOC, :ITEM, :SCREENID, :SRCID);";
             db2.prepare(query2);
-            QDictIterator<TypeListInfo> it(si->types);
+            Q3DictIterator<TypeListInfo> it(si->types);
             TypeListInfo *ti;
             for (; it.current(); ++it)
             {
@@ -802,8 +805,8 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
     {
         ScreenListInfo *si = (ScreenListInfo *) selected->getData();
         QStringList type_strs;
-        QDict<TypeListInfo> types;
-        QDictIterator<TypeListInfo> it(si->types);
+        Q3Dict<TypeListInfo> types;
+        Q3DictIterator<TypeListInfo> it(si->types);
         for (; it.current(); ++it)
         {
             TypeListInfo *newti = new TypeListInfo(*it.current());
@@ -813,7 +816,7 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
         bool hasUnits = si->hasUnits;
         bool multiLoc = si->multiLoc;
 
-        QPtrList<ScriptInfo> tmp;
+        Q3PtrList<ScriptInfo> tmp;
         if (m_src_man->findPossibleSources(type_strs, tmp))
         {
             ScreenListInfo *newsi = new ScreenListInfo(*si);
@@ -858,10 +861,10 @@ bool ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
      * if its not, just the seleted item in m_type_list
      */
     QStringList types;
-    QPtrList<TypeListInfo> infos;
+    Q3PtrList<TypeListInfo> infos;
     if (alltypes)
     {
-        QDictIterator<TypeListInfo> it(si->types);
+        Q3DictIterator<TypeListInfo> it(si->types);
         for (; it.current(); ++it)
         {
             TypeListInfo *ti = it.current();
@@ -904,7 +907,7 @@ void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
     if (!si)
         return;
 
-    QDict<TypeListInfo> types = si->types;
+    Q3Dict<TypeListInfo> types = si->types;
 //     m_type_list->Reset();
 //    UITextType *txt = getUITextType("typelbl");
     if (si->multiLoc)
@@ -1075,7 +1078,7 @@ SourceSetup::~SourceSetup()
 {
     delete m_update_spinbox;
     delete m_retrieve_spinbox;
-    QPtrListIterator<UIListBtnTypeItem> it = m_src_list->GetIterator();
+    Q3PtrListIterator<UIListBtnTypeItem> it = m_src_list->GetIterator();
     UIListBtnTypeItem *itm;
     while ((itm = it.current()))
     {
@@ -1112,7 +1115,7 @@ void SourceSetup::wireUI()
         m_update_spinbox->setRange(10, 600);
         m_update_spinbox->setLineStep(1);
         m_update_spinbox->setFont(gContext->GetMediumFont());
-        m_update_spinbox->setFocusPolicy(QWidget::NoFocus);
+        m_update_spinbox->setFocusPolicy(Qt::NoFocus);
         m_update_spinbox->setGeometry(blckhl->getScreenArea());
         connect(blckhl, SIGNAL(takingFocus()), m_update_spinbox,
                 SLOT(setFocus()));
@@ -1134,7 +1137,7 @@ void SourceSetup::wireUI()
         m_retrieve_spinbox->setRange(10, 1000);
         m_retrieve_spinbox->setLineStep(1);
         m_retrieve_spinbox->setFont(gContext->GetMediumFont());
-        m_retrieve_spinbox->setFocusPolicy(QWidget::NoFocus);
+        m_retrieve_spinbox->setFocusPolicy(Qt::NoFocus);
         m_retrieve_spinbox->setGeometry(blckhl->getScreenArea());
 
         connect(blckhl, SIGNAL(takingFocus()), m_retrieve_spinbox,
@@ -1208,7 +1211,7 @@ void SourceSetup::saveData()
             "WHERE sourceid = :ID;";
     db.prepare(query);
 
-    QPtrListIterator<UIListBtnTypeItem> an_it = m_src_list->GetIterator();
+    Q3PtrListIterator<UIListBtnTypeItem> an_it = m_src_list->GetIterator();
 
     while (an_it)
     {
@@ -1370,7 +1373,7 @@ void LocationDialog::doSearch()
     resultslbl->SetText(searchingresults.arg(numresults));
     qApp->processEvents();
 
-    QPtrList<ScriptInfo> sources;
+    Q3PtrList<ScriptInfo> sources;
     // if a screen makes it this far, theres at least one source for it
     m_src_man->findPossibleSources(m_types, sources);
     QString search = m_edit->getText();

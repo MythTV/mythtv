@@ -11,12 +11,14 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qpixmap.h>
-
 #include <unistd.h>
 #include <cstdlib>
+
+#include <QApplication>
+#include <QStringList>
+#include <QPixmap>
+#include <QPaintEvent>
+#include <QKeyEvent>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -68,12 +70,10 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
-
-
-        if (action == "SELECT" && allowselect)
+        if (*p == "SELECT" && allowselect)
         {
             handled = true;
             startPlayItem();
@@ -86,9 +86,10 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
     {
         gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (QStringList::const_iterator p = actions.begin();
+             p != actions.end()&& !handled; ++p)
         {
-            if (actions[i] == "PLAYBACK")
+            if (*p == "PLAYBACK")
             {
                 handled = true;
                 startPlayItem();
@@ -138,10 +139,11 @@ void VideoSelected::paintEvent(QPaintEvent *e)
 
 namespace
 {
-    const int kMythVideoStartPlayEventType = 301976;
+    const QEvent::Type kMythVideoStartPlayEventType =
+            static_cast<QEvent::Type>(QEvent::User + 1976);
 }
 
-void VideoSelected::customEvent(QCustomEvent *e)
+void VideoSelected::customEvent(QEvent *e)
 {
     if (e->type() == kMythVideoStartPlayEventType)
     {
@@ -191,7 +193,7 @@ void VideoSelected::updatePlayWait(QPainter *p)
         // This is done so we don't lock the paint event (bad).
         ++m_state;
         QApplication::postEvent(this,
-                                new QCustomEvent(kMythVideoStartPlayEventType));
+                                new QEvent(kMythVideoStartPlayEventType));
     }
     else if (m_state == 5)
     {
@@ -242,7 +244,7 @@ void VideoSelected::updateInfo(QPainter *p)
                            ImageCache::getImageCache().load(coverfile,
                                                             img_size.width(),
                                                             img_size.height(),
-                                                            QImage::ScaleFree);
+                                                            Qt::IgnoreAspectRatio);
 
                    if (img)
                    {

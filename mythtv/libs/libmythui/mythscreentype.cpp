@@ -59,11 +59,13 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
     if (!widget)
     {
-        QPtrListIterator<MythUIType> it(m_FocusWidgetList);
+        QList<MythUIType *>::iterator it = m_FocusWidgetList.begin();
         MythUIType *current;
 
-        while ((current = it.current()))
+        while (it != m_FocusWidgetList.end())
         {
+            current = *it;
+
             if (current->CanTakeFocus())
             {
                 widget = current;
@@ -83,24 +85,25 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 
     return true;
 }
- 
+
 bool MythScreenType::NextPrevWidgetFocus(bool up)
 {
     if (!m_CurrentFocusWidget || m_FocusWidgetList.isEmpty())
         return SetFocusWidget(NULL);
 
     bool reachedCurrent = false;
-    // QPtrListIterator will always start at the beginning of the list
-    // in this function. It is not a traditional list iterator
-    QPtrListIterator<MythUIType> it(m_FocusWidgetList);
+
+    QList<MythUIType *>::iterator it = m_FocusWidgetList.begin();
     MythUIType *current;
 
     // There is probably a more efficient way to do this, but the list
     // is never going to be that big so it will do for now
     if (up)
     {
-        while ((current = it.current()))
+        while (it != m_FocusWidgetList.end())
         {
+            current = *it;
+
             if (reachedCurrent)
                 return SetFocusWidget(current);
 
@@ -112,9 +115,11 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
     }
     else
     {
-        it.toLast();
-        while ((current = it.current()))
+        it = m_FocusWidgetList.end() - 1;
+        while (it != m_FocusWidgetList.begin() - 1)
         {
+            current = *it;
+
             if (reachedCurrent)
                 return SetFocusWidget(current);
 
@@ -127,9 +132,9 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 
     // fall back to first/last possible widget
     if (up)
-        return SetFocusWidget(it.toFirst());
+        return SetFocusWidget(*(m_FocusWidgetList.begin()));
     else
-        return SetFocusWidget(it.toLast());
+        return SetFocusWidget(*(m_FocusWidgetList.end() - 1));
 
     return false;
 }
@@ -140,7 +145,7 @@ bool MythScreenType::BuildFocusList(void)
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
-    if (m_FocusWidgetList.count() > 0)
+    if (m_FocusWidgetList.size() > 0)
         return true;
 
     return false;

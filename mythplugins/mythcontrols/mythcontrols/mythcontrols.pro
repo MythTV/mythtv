@@ -24,3 +24,5 @@ SOURCES += keygrabber.cpp main.cpp
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+#The following line was inserted by qt3to4
+QT += sql xml opengl qt3support

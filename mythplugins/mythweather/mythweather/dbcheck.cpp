@@ -8,19 +8,23 @@
 #include "dbcheck.h"
 #include "defs.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1003";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+ 
+    if (!gContext->SaveSettingOnHost("WeatherDBSchemaVer",newnumber,NULL))
+    {   
+        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
+                              .arg(newnumber));
 
-    query.exec("DELETE FROM settings WHERE value='WeatherDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('WeatherDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+        return false;
+    }
+
+    return true;
 }
 
-static void performActualUpdate(const QStringList updates, QString version,
+static bool performActualUpdate(const QStringList updates, QString version,
                                 QString &dbver)
 {
     VERBOSE(VB_IMPORTANT, QString("Upgrading to MythWeather schema version ") +
@@ -28,15 +32,32 @@ static void performActualUpdate(const QStringList updates, QString version,
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    for (size_t i = 0; i < updates.size(); ++i)
+    QStringList::const_iterator it = updates.begin();
+    
+    while (it != updates.end())
     {
-        if (!query.exec(updates[i]))
-            VERBOSE(VB_IMPORTANT,
-                    QObject::tr("ERROR Executing query %1").arg(updates[i]));
+        QString thequery = *it;
+        query.exec(thequery);
+
+        if (query.lastError().type() != QSqlError::None)
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+        ++it;
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
 /*
@@ -45,12 +66,12 @@ static void performActualUpdate(const QStringList updates, QString version,
  * that way, with cascading, updating screens won't need to blow out everything
  * in the db everytime.
  */
-void InitializeDatabase()
+bool InitializeDatabase()
 {
     QString dbver = gContext->GetSetting("WeatherDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
 
     if (dbver == "")
     {
@@ -98,7 +119,8 @@ void InitializeDatabase()
          * that we don't use any more
          */
 
-        performActualUpdate(updates, "1000", dbver);
+        if (!performActualUpdate(updates, "1000", dbver))
+            return false;
     }
 
     if (dbver == "1000")
@@ -107,6 +129,63 @@ void InitializeDatabase()
         updates << "ALTER TABLE weathersourcesettings ADD COLUMN updated "
                    "TIMESTAMP;";
 
-        performActualUpdate(updates, "1001", dbver);
+        if (!performActualUpdate(updates, "1001", dbver))
+            return false;
     }
+
+
+
+    if (dbver == "1001")
+    {
+        QStringList updates;
+        updates << QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+            .arg(gContext->GetDatabaseParams().dbName) <<
+            "ALTER TABLE weatherdatalayout"
+            "  MODIFY location varbinary(64) NOT NULL,"
+            "  MODIFY dataitem varbinary(64) NOT NULL;" <<
+            "ALTER TABLE weatherscreens"
+            "  MODIFY container varbinary(64) NOT NULL,"
+            "  MODIFY hostname varbinary(64) default NULL;" <<
+            "ALTER TABLE weathersourcesettings"
+            "  MODIFY source_name varbinary(64) NOT NULL,"
+            "  MODIFY hostname varbinary(64) default NULL,"
+            "  MODIFY path varbinary(255) default NULL,"
+            "  MODIFY author varbinary(128) default NULL,"
+            "  MODIFY version varbinary(32) default NULL,"
+            "  MODIFY email varbinary(255) default NULL,"
+            "  MODIFY types mediumblob;";
+
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1002")
+    {
+        QStringList updates;
+        updates << QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+                .arg(gContext->GetDatabaseParams().dbName) <<
+            "ALTER TABLE weatherdatalayout"
+            "  DEFAULT CHARACTER SET default,"
+            "  MODIFY location varchar(64) CHARACTER SET utf8 NOT NULL,"
+            "  MODIFY dataitem varchar(64) CHARACTER SET utf8 NOT NULL;" <<
+            "ALTER TABLE weatherscreens"
+            "  DEFAULT CHARACTER SET default,"
+            "  MODIFY container varchar(64) CHARACTER SET utf8 NOT NULL,"
+            "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL;" <<
+            "ALTER TABLE weathersourcesettings"
+            "  DEFAULT CHARACTER SET default,"
+            "  MODIFY source_name varchar(64) CHARACTER SET utf8 NOT NULL,"
+            "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL,"
+            "  MODIFY path varchar(255) CHARACTER SET utf8 default NULL,"
+            "  MODIFY author varchar(128) CHARACTER SET utf8 default NULL,"
+            "  MODIFY version varchar(32) CHARACTER SET utf8 default NULL,"
+            "  MODIFY email varchar(255) CHARACTER SET utf8 default NULL,"
+            "  MODIFY types mediumtext CHARACTER SET utf8;";
+
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
+    }
+
+    return true;
 }

@@ -102,12 +102,15 @@ void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     }
 }
 
-void ProgramData::fixProgramList(QValueList<ProgInfo> *fixlist)
+void ProgramData::fixProgramList(Q3ValueList<ProgInfo> *fixlist)
 {
-    qHeapSort(*fixlist);
+#pragma comment( "!!!!! neet to fix/re-add qSort call !!!!!" )
+// -=>TODO: Qt4 Couldn't figure out how to get qSort to compile
 
-    QValueList<ProgInfo>::iterator i = fixlist->begin();
-    QValueList<ProgInfo>::iterator cur;
+//    qSort( fixlist->begin(), fixlist->end() );
+
+    Q3ValueList<ProgInfo>::iterator i = fixlist->begin();
+    Q3ValueList<ProgInfo>::iterator cur;
     while (1)    
     {
         cur = i;
@@ -141,7 +144,7 @@ void ProgramData::fixProgramList(QValueList<ProgInfo> *fixlist)
         // remove overlapping programs
         if (conflict(*cur, *i))
         {
-            QValueList<ProgInfo>::iterator tokeep, todelete;
+            Q3ValueList<ProgInfo>::iterator tokeep, todelete;
 
             if ((*cur).end <= (*cur).start)
                 tokeep = i, todelete = cur;
@@ -181,10 +184,10 @@ void ProgramData::fixProgramList(QValueList<ProgInfo> *fixlist)
 }
 
 void ProgramData::handlePrograms(
-    int id, QMap<QString, QValueList<ProgInfo> > *proglist)
+    int id, QMap<QString, Q3ValueList<ProgInfo> > *proglist)
 {
     int unchanged = 0, updated = 0;
-    QMap<QString, QValueList<ProgInfo> >::Iterator mapiter;
+    QMap<QString, Q3ValueList<ProgInfo> >::Iterator mapiter;
 
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
@@ -223,11 +226,11 @@ void ProgramData::handlePrograms(
                 continue;
             }
 
-            QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
+            Q3ValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
             fixProgramList(sortlist);
 
-            QValueList<ProgInfo>::iterator i = sortlist->begin();
+            Q3ValueList<ProgInfo>::iterator i = sortlist->begin();
             for (; i != sortlist->end(); i++)
             {
                 query.prepare("SELECT * FROM program WHERE "
@@ -253,15 +256,15 @@ void ProgramData::handlePrograms(
                 query.bindValue(":CHANID", chanid);
                 query.bindValue(":START", (*i).start);
                 query.bindValue(":END", (*i).end);
-                query.bindValue(":TITLE", (*i).title.utf8());
-                query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
-                query.bindValue(":DESC", (*i).desc.utf8());
-                query.bindValue(":CATEGORY", (*i).category.utf8());
-                query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
-                query.bindValue(":AIRDATE", (*i).airdate.utf8());
-                query.bindValue(":STARS", (*i).stars.utf8());
+                query.bindValue(":TITLE", (*i).title);
+                query.bindValue(":SUBTITLE", (*i).subtitle);
+                query.bindValue(":DESC", (*i).desc);
+                query.bindValue(":CATEGORY", (*i).category);
+                query.bindValue(":CATEGORY_TYPE", (*i).catType);
+                query.bindValue(":AIRDATE", (*i).airdate);
+                query.bindValue(":STARS", (*i).stars);
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce);
                 query.bindValue(":AUDIOPROP", (*i).audioproperties);
                 query.bindValue(":VIDEOPROP", (*i).videoproperties);
                 query.bindValue(":SUBTYPES", (*i).subtitletype);
@@ -298,7 +301,7 @@ void ProgramData::handlePrograms(
                             .arg(query.value(1).toDateTime().toString(Qt::ISODate))
                             .arg(query.value(2).toDateTime().toString(Qt::ISODate))
                             .arg((*i).channel)
-                            .arg(QString::fromUtf8(query.value(0).toString())));
+                            .arg(query.value(0).toString()));
                     }
 
                     VERBOSE(VB_XMLTV,
@@ -356,15 +359,15 @@ void ProgramData::handlePrograms(
                 query.bindValue(":CHANID", chanid);
                 query.bindValue(":STARTTIME", (*i).start);
                 query.bindValue(":ENDTIME", (*i).end);
-                query.bindValue(":TITLE", (*i).title.utf8());
-                query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
-                query.bindValue(":DESCRIPTION", (*i).desc.utf8());
-                query.bindValue(":CATEGORY", (*i).category.utf8());
-                query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
-                query.bindValue(":AIRDATE", (*i).airdate.utf8());
-                query.bindValue(":STARS", (*i).stars.utf8());
+                query.bindValue(":TITLE", (*i).title);
+                query.bindValue(":SUBTITLE", (*i).subtitle);
+                query.bindValue(":DESCRIPTION", (*i).desc);
+                query.bindValue(":CATEGORY", (*i).category);
+                query.bindValue(":CATEGORY_TYPE", (*i).catType);
+                query.bindValue(":AIRDATE", (*i).airdate);
+                query.bindValue(":STARS", (*i).stars);
                 query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce);
                 query.bindValue(":AUDIOPROP", (*i).audioproperties);
                 query.bindValue(":VIDEOPROP", (*i).videoproperties);
                 query.bindValue(":SUBTYPES", (*i).subtitletype);
@@ -385,7 +388,7 @@ void ProgramData::handlePrograms(
 
                 updated++;
 
-                QValueList<ProgRating>::iterator j = (*i).ratings.begin();
+                Q3ValueList<ProgRating>::iterator j = (*i).ratings.begin();
                 for (; j != (*i).ratings.end(); j++)
                 {
                     query.prepare("INSERT INTO programrating (chanid,starttime,"
@@ -393,19 +396,19 @@ void ProgramData::handlePrograms(
                                   ":RATING);");
                     query.bindValue(":CHANID", chanid);
                     query.bindValue(":START", (*i).start);
-                    query.bindValue(":SYS", (*j).system.utf8());
-                    query.bindValue(":RATING", (*j).rating.utf8());
+                    query.bindValue(":SYS", (*j).system);
+                    query.bindValue(":RATING", (*j).rating);
 
                     if (!query.exec())
                         MythContext::DBError("programrating insert", query);
                 }
 
-                QValueList<ProgCredit>::iterator k = (*i).credits.begin();
+                Q3ValueList<ProgCredit>::iterator k = (*i).credits.begin();
                 for (; k != (*i).credits.end(); k++)
                 {
                     query.prepare("SELECT person FROM people WHERE "
                                   "name = :NAME;");
-                    query.bindValue(":NAME", (*k).name.utf8());
+                    query.bindValue(":NAME", (*k).name);
                     if (!query.exec())
                         MythContext::DBError("person lookup", query);
 
@@ -420,13 +423,13 @@ void ProgramData::handlePrograms(
                     {
                         query.prepare("INSERT INTO people (name) VALUES "
                                       "(:NAME);");
-                        query.bindValue(":NAME", (*k).name.utf8());
+                        query.bindValue(":NAME", (*k).name);
                         if (!query.exec())
                             MythContext::DBError("person insert", query);
 
                         query.prepare("SELECT person FROM people WHERE "
                                       "name = :NAME;");
-                        query.bindValue(":NAME", (*k).name.utf8());
+                        query.bindValue(":NAME", (*k).name);
                         if (!query.exec())
                             MythContext::DBError("person lookup", query);
 
@@ -448,7 +451,7 @@ void ProgramData::handlePrograms(
                                   "(:CHANID, :START, :ROLE, :PERSON);");
                     query.bindValue(":CHANID", chanid);
                     query.bindValue(":START", (*i).start);
-                    query.bindValue(":ROLE", (*k).role.utf8());
+                    query.bindValue(":ROLE", (*k).role);
                     query.bindValue(":PERSON", personid);
                     if (!query.exec())
                     {
@@ -458,7 +461,7 @@ void ProgramData::handlePrograms(
                                       "starttime = :START "
                                       "WHERE chanid = :CHANID AND "
                                       "starttime = :START2 and person = :PERSON");
-                        query.bindValue(":ROLE", (*k).role.utf8());
+                        query.bindValue(":ROLE", (*k).role);
                         query.bindValue(":START", (*i).start);
                         query.bindValue(":CHANID", chanid);
                         query.bindValue(":START2", (*i).start);

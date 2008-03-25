@@ -78,3 +78,5 @@ mingw {
 
     LIBS += -logg
 }
+#The following line was inserted by qt3to4
+QT += xml  sql opengl qt3support 

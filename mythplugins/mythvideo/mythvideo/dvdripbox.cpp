@@ -1,17 +1,17 @@
 /*
-	dvdripbox.cpp
+    dvdripbox.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     implementation of the main interface
 */
-#include <qapplication.h>
+#include <QApplication>
+#include <QKeyEvent>
 
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
-using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
@@ -211,7 +211,7 @@ void DVDRipBox::createSocket()
     {
         delete client_socket;
     }
-    client_socket = new QSocket(this);
+    client_socket = new Q3Socket(this);
     connect(client_socket, SIGNAL(error(int)), this, SLOT(connectionError(int)));
     connect(client_socket, SIGNAL(connected()), this, SLOT(connectionMade()));
     connect(client_socket, SIGNAL(readyRead()), this, SLOT(readFromServer()));
@@ -284,9 +284,10 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
         if (action == "UP")
             nextPrevWidgetFocus(false);
@@ -401,7 +402,7 @@ void DVDRipBox::connectionError(int error_id)
     //
     //  Can't connect. User probably hasn't run mtd
     //
-    if(error_id == QSocket::ErrConnectionRefused)
+    if(error_id == Q3Socket::ErrConnectionRefused)
     {
         QString warning = tr("Cannot connect to your Myth "
                              "Transcoding Daemon. You can try "
@@ -410,14 +411,14 @@ void DVDRipBox::connectionError(int error_id)
                              "then something is really wrong.");
         warning_text->SetText(warning);
     }
-    else if(error_id == QSocket::ErrHostNotFound)
+    else if(error_id == Q3Socket::ErrHostNotFound)
     {
         QString warning = tr("Attempting to connect to your "
                              "mtd said host not found. This "
                              "is unrecoverably bad. ");
         warning_text->SetText(warning);
     }
-    else if(error_id == QSocket::ErrSocketRead)
+    else if(error_id == Q3Socket::ErrSocketRead)
     {
         QString warning = tr("Socket communication errors. "
                              "This is unrecoverably bad. ");
@@ -470,10 +471,9 @@ void DVDRipBox::sendToServer(const QString &some_text)
     }
     else
     {
-        cerr << "dvdripbox.o: was asked to send the following text while not connected: \"" 
-             << some_text
-             << "\"" 
-             << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("dvdripbox.o: was asked to send the following text "
+                        "while not connected: \"%1\"").arg(some_text));
     }
 }
 
@@ -580,7 +580,9 @@ void DVDRipBox::handleStatus(QStringList tokens)
 
     if(tokens.count() < 4)
     {
-        cerr << "dvdripbox.o: I got an mtd update I couldn't understand:" << tokens.join(" ") << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("dvdripbox.o: I got an mtd update I couldn't "
+                        "understand: %1").arg(tokens.join(" ")));
         return;
     }
 
@@ -695,7 +697,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     else if(tokens[2] == "job" && tokens[4] == "overall")
     {
         QString title = "";
-        for(uint i = 6; i < tokens.count(); i++)
+        for(QStringList::size_type i = 6; i < tokens.count(); i++)
         {
             title.append(tokens[i]);
             if(i != tokens.count() - 1)
@@ -708,7 +710,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     else if(tokens[2] == "job" && tokens[4] == "subjob")
     {
         QString subjob_string = "";
-        for(uint i = 6; i < tokens.count(); i++)
+        for(QStringList::size_type i = 6; i < tokens.count(); i++)
         {
             subjob_string.append(tokens[i]);
             if(i != tokens.count() - 1)
@@ -791,7 +793,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         if(tokens[3].toUInt() > 0)
         {
             QString disc_name = "";
-            for(uint i = 4; i < tokens.count(); i++)
+            for(QStringList::size_type i = 4; i < tokens.count(); i++)
             {
                 disc_name += tokens[i];
                 if(i < tokens.count() - 1)
@@ -845,7 +847,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         }
         
         QString audio_string = "";
-        for(uint i = 6; i < tokens.count(); i++)
+        for(QStringList::size_type i = 6; i < tokens.count(); i++)
         {
             audio_string += tokens[i];
             if(i < tokens.count() - 1)
@@ -868,7 +870,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         }
         
         QString name_string = "";
-        for(uint i = 6; i < tokens.count(); i++)
+        for(QStringList::size_type i = 6; i < tokens.count(); i++)
         {
             name_string += tokens[i];
             if(i < tokens.count() - 1)

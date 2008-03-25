@@ -11,6 +11,7 @@ using namespace std;
 #include <qwaitcondition.h>
 #include <qmap.h> 
 #include <qobject.h>
+#include <Q3ValueList>
 
 // MythTV headers
 #include "scheduledrecording.h"
@@ -129,7 +130,7 @@ class Scheduler : public QObject
     int FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
 
-    QValueList<int> reschedQueue;
+    Q3ValueList<int> reschedQueue;
     QMutex reschedLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;

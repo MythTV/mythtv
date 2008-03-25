@@ -1,8 +1,8 @@
-#include <qpixmap.h>
-#include <qimage.h>
-
 #include <map>
 #include <list>
+
+#include <QPixmap>
+#include <QImage>
 
 #include "mythtv/mythcontext.h"
 
@@ -31,7 +31,7 @@ class ImageCacheImp
     }
 
     const QPixmap *load(const QString &image_file, int width, int height,
-                        QImage::ScaleMode scale)
+                        Qt::AspectRatioMode scale)
     {
         QPixmap *ret = NULL;
         cache_entry_ptr cep = addScaleImage(image_file, width, height, scale);
@@ -94,13 +94,13 @@ class ImageCacheImp
     struct cache_entry
     {
         cache_entry(const QString &file) :
-            filename(file), scale_mode(QImage::ScaleFree),
+            filename(file), scale_mode(Qt::IgnoreAspectRatio),
                 scale_width(0), scale_height(0)
         {
         }
 
         cache_entry(const QString &file, QPixmap *img) :
-            filename(file), scale_mode(QImage::ScaleFree),
+            filename(file), scale_mode(Qt::IgnoreAspectRatio),
                 scale_width(0), scale_height(0)
         {
             if (img)
@@ -112,7 +112,7 @@ class ImageCacheImp
         QString filename;
         QPixmap image;
         QPixmap scale_image;
-        QImage::ScaleMode scale_mode;
+        Qt::AspectRatioMode scale_mode;
         int scale_width;
         int scale_height;
     };
@@ -156,7 +156,7 @@ class ImageCacheImp
     }
 
     cache_entry_ptr addScaleImage(const QString &image_file, int width,
-                                  int height, QImage::ScaleMode scale)
+                                  int height, Qt::AspectRatioMode scale)
     {
         cache_entry_ptr ret = addImage(image_file);
         if (ret && !ret->image.isNull())
@@ -170,7 +170,7 @@ class ImageCacheImp
                 ret->scale_mode = scale;
                 QImage scale_me(ret->image.convertToImage());
                 ret->scale_image.
-                        convertFromImage(scale_me.smoothScale(width,height,
+                        convertFromImage(scale_me.smoothScale(width, height,
                                                               scale));
                 ret->scale_width = width;
                 ret->scale_height = height;
@@ -232,7 +232,7 @@ const QPixmap *ImageCache::load(const QString &image_file)
 }
 
 const QPixmap *ImageCache::load(const QString &image_file, int width,
-                                int height, QImage::ScaleMode scale)
+                                int height, Qt::AspectRatioMode scale)
 {
     return m_imp->load(image_file, width, height, scale);
 }

@@ -3,8 +3,14 @@
 #include <math.h>
 
 #include <qapplication.h>
-#include <qsimplerichtext.h>
+#include <q3simplerichtext.h>
 #include <qbitmap.h>
+#include <QLabel>
+#include <QPixmap>
+#include <Q3ValueList>
+#include <QKeyEvent>
+#include <QEvent>
+#include <Q3PtrList>
 
 using namespace std;
 
@@ -317,7 +323,7 @@ QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
         if (multiline)
             diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
                                                justification, data,
-                                               index + margin).height();
+                                               index + margin, 0).height();
         else
             diff = maxwidth - fm.width(data, index + margin);
         if (diff >= 0)
@@ -559,7 +565,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
         if (m_debug == true)
         {
             cerr << "    +UIBarType::Drawing @ (" << drawx << ", " << drawy << ")" << endl;
-            cerr << "     +UIBarType::Data = " << msg << endl;
+            cerr << "     +UIBarType::Data = " << (const char *)msg << endl;
         }
         dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
                      xdrop - m_textoffset.x(), ydrop - (int)(2 * m_textoffset.y()),
@@ -599,7 +605,7 @@ UIGuideType::UIGuideType(const QString &name, int order)
     seltype = 1;
     filltype = Alpha;
 
-    allData = new QPtrList<UIGTCon>[maxRows];
+    allData = new Q3PtrList<UIGTCon>[maxRows];
 
     for (int i = 0; i < maxRows; i++)
         allData[i].setAutoDelete(true);
@@ -992,7 +998,7 @@ void AlphaBlender::blendImage(const QImage &image, const QColor &color)
     unsigned char *b = table->b;
 
     int size = image.height() * image.width();
-    unsigned char *data = *image.jumpTable();
+    uchar *data = (uchar *)(*image.jumpTable());
 
     for (int i = 0; i < size; i++)
     {
@@ -1142,7 +1148,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     dr->setFont(tmpfont->face);
                     if (m_debug == true)
                         cerr << "   +UIListType::Draw() Data: "
-                             << tempWrite << "\n";
+                             << (const char *)tempWrite << "\n";
                     lastShown = true;
                  }
               }
@@ -1469,7 +1475,7 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
                     cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
                     cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
                 }
-                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y, -1, -1);
             }
             else if (m_debug == true)
             {
@@ -1678,7 +1684,7 @@ void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (!((*imageList)[m_currentimage])->isNull())
             {
-                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *(*imageList)[m_currentimage], m_drop_x, m_drop_y);
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *(*imageList)[m_currentimage], m_drop_x, m_drop_y, -1, -1);
             }
         }
     }
@@ -1796,28 +1802,28 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
                 {
                     for(int i = 0; i < m_repeat; i++)
                     {
-                        p->drawPixmap(m_displaypos.x() + (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                        p->drawPixmap(m_displaypos.x() + (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y, -1, -1);
                     }
                 }
                 else if (m_orientation == 1)
                 {
                     for(int i = 0; i < m_repeat; i++)
                     {
-                        p->drawPixmap(m_displaypos.x() - (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                        p->drawPixmap(m_displaypos.x() - (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y, -1, -1);
                     }
                 }
                 else if (m_orientation == 2)
                 {
                     for(int i = 0; i < m_repeat; i++)
                     {
-                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() - (i * img.height()), img, m_drop_x, m_drop_y);
+                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() - (i * img.height()), img, m_drop_x, m_drop_y, -1, -1);
                     }
                 }
                 else if (m_orientation == 3)
                 {
                     for(int i = 0; i < m_repeat; i++)
                     {
-                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() + (i * img.height()), img, m_drop_x, m_drop_y);
+                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() + (i * img.height()), img, m_drop_x, m_drop_y, -1, -1);
                     }
                 }
             }
@@ -1944,7 +1950,7 @@ UIImageGridType::UIImageGridType(const QString &name, int order)
     showCheck = false;
     showSelected = false;
 
-    allData = new QPtrList<ImageGridItem>;
+    allData = new Q3PtrList<ImageGridItem>;
     allData->setAutoDelete(true);
 }
 
@@ -2413,7 +2419,7 @@ void UIImageGridType::recalculateLayout(void)
 }
 
 QPixmap *UIImageGridType::createScaledPixmap(QString filename,
-                                             int width, int height, QImage::ScaleMode mode)
+                                             int width, int height, Qt::AspectRatioMode mode)
 {
     QPixmap *pixmap = NULL;
 
@@ -2422,7 +2428,7 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = gContext->LoadScaleImage(filename);
         if (!img)
         {
-            cout << "Failed to load image" << filename << endl;
+            cout << "Failed to load image" << (const char *)filename << endl;
             return NULL;
         }
         else
@@ -2454,14 +2460,14 @@ void UIImageGridType::loadCellImages(void)
     int sh = (int) (7 * m_hmult);
 
     normalPixmap = createScaledPixmap(normalImage, imgWidth, imgHeight,
-                                      QImage::ScaleFree);
+                                      Qt::ScaleFree);
     highlightedPixmap = createScaledPixmap(highlightedImage, imgWidth, imgHeight,
-                                           QImage::ScaleFree);
+                                           Qt::ScaleFree);
     selectedPixmap = createScaledPixmap(selectedImage, imgWidth, imgHeight,
-                                        QImage::ScaleFree);
+                                        Qt::ScaleFree);
     defaultPixmap = createScaledPixmap(defaultImage, imgWidth - 2 * sw,
                                        imgHeight - 2 * sh,
-                                       QImage::ScaleMin);
+                                       Qt::ScaleMin);
 }
 
 void UIImageGridType::calculateScreenArea(void)
@@ -2570,7 +2576,8 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
         if (m_debug == true)
         {
             cerr << "   +UITextType::Draw() <- inside Layer\n";
-            cerr << "       -Message: " << m_message << " (cut: " << msg << ")" <<  endl;
+            cerr << "       -Message: " << (const char *)m_message << " (cut: "
+                 << (const char *)msg << ")" <<  endl;
         }
     }
     else
@@ -2600,19 +2607,19 @@ UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
     m_name = name;
     takes_focus = true;
 
-    if (QStyleSheet::mightBeRichText(text))
+    if (Q3StyleSheet::mightBeRichText(text))
         m_message = text;
     else
-        m_message = QStyleSheet::convertFromPlainText(text, QStyleSheetItem::WhiteSpaceNormal);
+        m_message = Q3StyleSheet::convertFromPlainText(text, Q3StyleSheetItem::WhiteSpaceNormal);
 
     m_font = font;
     m_displayArea = displayrect;
     m_yPos = 0;
     m_textArea = textrect;
     m_order = dorder;
-    m_image = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
-    m_background = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
-    m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
+    m_image = new QPixmap(m_displayArea.width(), m_displayArea.height());
+    m_background = new QPixmap(m_displayArea.width(), m_displayArea.height() );
+    m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height() );
     m_backgroundImage = NULL;
     m_backgroundFile = "";
 
@@ -2637,10 +2644,10 @@ UIRichTextType::~UIRichTextType()
 
 void UIRichTextType::SetText(const QString &text)
 {
-    if (QStyleSheet::mightBeRichText(text))
+    if (Q3StyleSheet::mightBeRichText(text))
         m_message = text;
     else
-        m_message = QStyleSheet::convertFromPlainText(text, QStyleSheetItem::WhiteSpaceNormal);
+        m_message = Q3StyleSheet::convertFromPlainText(text, Q3StyleSheetItem::WhiteSpaceNormal);
 
     m_yPos = 0;
     m_showUpArrow = false;
@@ -2710,7 +2717,7 @@ void UIRichTextType::refreshImage()
     brush.setPixmap(*m_compBackground);
     p.fillRect(0, 0, m_displayArea.width(), m_displayArea.height() , brush);
     p.translate(m_textArea.x() - m_displayArea.x() , m_textArea.y() - m_displayArea.y());
-    QSimpleRichText richText(m_message, m_font->face);
+    Q3SimpleRichText richText(m_message, m_font->face);
     richText.setWidth(m_textArea.width());
     richText.draw(&p, 0, -m_yPos, clipRect, gContext->GetMainWindow()->colorGroup(), 0);
     m_textHeight = richText.height();
@@ -2853,7 +2860,7 @@ void UIRemoteEditType::createEdit(MythThemedDialog* parent)
     m_parentDialog = parent;
     edit = new MythRemoteLineEdit(parent);
      
-    edit->setFocusPolicy(QWidget::NoFocus);
+    edit->setFocusPolicy( Qt::NoFocus );
     edit->setText(m_text);
     edit->setCurrentFont(m_font->face);
     edit->setMinimumHeight(getScreenArea().height());
@@ -3144,7 +3151,8 @@ void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
             if (m_debug == true)
             {
                 cerr << "   +UITextType::Draw() <- inside Layer\n";
-                cerr << "       -Message: " << m_message << " (cut: " << msg << ")" <<  endl;
+                cerr << "       -Message: " << (const char *)m_message << " (cut: "
+                     << (const char *)msg << ")" <<  endl;
             }
             dr->restore();
             //dr->translate(horizontal_transform, vertical_transform);
@@ -3306,12 +3314,12 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
             if (m_orientation == 0)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
-                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace);
+                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace, -1);
             }
             else if (m_orientation == 1)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
-                dr->drawPixmap(m_location.x() + width, m_location.y(), m_filler, width - m_fillerSpace, 0);
+                dr->drawPixmap(m_location.x() + width, m_location.y(), m_filler, width - m_fillerSpace, 0, -1, -1);
             }
             else if (m_orientation == 2)
             {
@@ -3320,12 +3328,12 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
                                 (m_location.y() + m_container.height()) - height,
                                 m_filler,
                                 0,
-                                (m_filler.height() - height) - m_fillerSpace);
+                                (m_filler.height() - height) - m_fillerSpace, -1, -1);
             }
             else if (m_orientation == 3)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
-                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, -1, height + m_fillerSpace);
+                dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, -1, height + m_fillerSpace );
             }
         }
     }
@@ -3484,8 +3492,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int pos = parent->getChildPosition(current_node, visual_order);
             bool selected;
 
-            QPtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
-            QPtrList<LCDMenuItem> menuItems;
+            Q3PtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
+            Q3PtrList<LCDMenuItem> menuItems;
             menuItems.setAutoDelete(true);
 
             if (pos > (int)lcddev->getLCDHeight())
@@ -3869,7 +3877,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
 }
 
-void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
+void UIManagedTreeListType::moveToNode(Q3ValueList<int> route_of_branches)
 {
     current_node = my_tree_data->findNode(route_of_branches);
     if (!current_node)
@@ -3881,7 +3889,7 @@ void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
     emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
-void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branches)
+void UIManagedTreeListType::moveToNodesFirstChild(Q3ValueList<int> route_of_branches)
 {
     GenericTree *finder = my_tree_data->findNode(route_of_branches);
 
@@ -3909,7 +3917,7 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
     }
 }
 
-QValueList <int> * UIManagedTreeListType::getRouteToActive()
+Q3ValueList <int> * UIManagedTreeListType::getRouteToActive()
 {
     if (active_node)
     {
@@ -3942,7 +3950,7 @@ QStringList UIManagedTreeListType::getRouteToCurrent()
     return route_to_current;
 }
 
-bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
+bool UIManagedTreeListType::tryToSetActive(Q3ValueList <int> route)
 {
     GenericTree *a_node = my_tree_data->findNode(route);
     if (a_node && a_node->isSelectable())
@@ -3973,7 +3981,7 @@ bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
     {
         if (route[0] == my_tree_data->getString())
         {
-            for(uint i = 1; i < route.count(); i ++)
+            for(int i = 1; i < route.count(); i ++)
             {
                 GenericTree *descender = current_node->getChildByName(route[i]);
                 if (descender)
@@ -5509,7 +5517,7 @@ QString UIKeyType::decodeChar(QString c)
             }
             else
                 cout <<  "UIKeyType::decodeChar - bad char code " 
-                     <<  "(" << sCode << ")" << endl;
+                     <<  "(" << (const char *)sCode << ")" << endl;
         }
         else
         {
@@ -5775,8 +5783,8 @@ void UIKeyboardType::leftCursor()
     }
     else if (m_parentEdit->inherits("QTextEdit"))
     {
-        QTextEdit *par = (QTextEdit *)m_parentEdit;
-        par->moveCursor(QTextEdit::MoveBackward, false);
+        Q3TextEdit *par = (Q3TextEdit *)m_parentEdit;
+        par->moveCursor(Q3TextEdit::MoveBackward, false);
     }
     else
     {
@@ -5797,8 +5805,8 @@ void UIKeyboardType::rightCursor()
     }
     else if (m_parentEdit->inherits("QTextEdit"))
     {
-        QTextEdit *par = (QTextEdit *)m_parentEdit;
-        par->moveCursor(QTextEdit::MoveForward, false);
+        Q3TextEdit *par = (Q3TextEdit *)m_parentEdit;
+        par->moveCursor(Q3TextEdit::MoveForward, false);
     }
     else
     {
@@ -6020,7 +6028,7 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, false))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;

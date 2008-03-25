@@ -29,7 +29,7 @@ class SimpleSRStorage : public SimpleDBStorage
                     getColumn() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, setting->getValue().utf8());
+            bindings.insert(colTag, setting->getValue());
 
             return query;
         }
@@ -68,7 +68,7 @@ class SRSetting: public ManagedListSetting
                     getColumn() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, getValue().utf8());
+            bindings.insert(colTag, getValue());
 
             return query;
         }
@@ -110,7 +110,7 @@ class SRSelectSetting : public SelectManagedListSetting
                     getColumn() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, getValue().utf8());
+            bindings.insert(colTag, getValue());
 
             return query;
         }
@@ -151,7 +151,7 @@ class SRBoolSetting : public BoolManagedListSetting
                     + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, getValue().utf8());
+            bindings.insert(colTag, getValue());
 
             return query;
         }
@@ -195,7 +195,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
                     getColumn() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, getValue().utf8());
+            bindings.insert(colTag, getValue());
 
             return query;
         }
@@ -822,7 +822,7 @@ class SRRecGroup: public SRSelectSetting
             if (query.exec() && query.isActive() && query.size() > 0)
                 while (query.next())
                 {
-                    value = QString::fromUtf8(query.value(0).toString());
+                    value = query.value(0).toString();
                     groups += value;
 
                     if (value == "Default")
@@ -835,7 +835,7 @@ class SRRecGroup: public SRSelectSetting
             if (query.exec() && query.isActive() && query.size() > 0)
                 while (query.next())
                 {
-                    value = QString::fromUtf8(query.value(0).toString());
+                    value = query.value(0).toString();
                     groups += value;
 
                     if (value == "Default")

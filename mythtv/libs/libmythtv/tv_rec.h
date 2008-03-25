@@ -4,8 +4,8 @@
 #include <qstring.h>
 #include <pthread.h>
 #include <qdatetime.h>
-#include <qvaluelist.h>
-#include <qptrlist.h>
+#include <q3valuelist.h>
+#include <q3ptrlist.h>
 #include <qmap.h>
 #include <qstringlist.h>
 #include <qwaitcondition.h>

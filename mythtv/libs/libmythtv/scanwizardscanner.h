@@ -37,6 +37,7 @@
 
 // Qt headers
 #include <qstring.h>
+#include <QEvent>
 
 // MythTV headers
 #include "settings.h"
@@ -107,7 +108,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void dvbLock(int);
     void dvbSNR(int);
     void dvbSignalStrength(int);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
     void MonitorProgress(bool lock, bool strength, bool snr);
     void RunPopup(void);

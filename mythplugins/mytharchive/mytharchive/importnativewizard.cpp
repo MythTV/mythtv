@@ -4,6 +4,8 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // Myth
 #include <mythtv/mythcontext.h>
@@ -403,12 +405,13 @@ void ImportNativeWizard::updateFileList()
     if (d.exists())
     {
         // first get a list of directory's in the current directory
-        const QFileInfoList *list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoListIterator it(*list);
-        QFileInfo *fi;
+        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QFileInfoList::const_iterator it = list.begin();
+        const QFileInfo *fi;
 
-        while ( (fi = it.current()) != 0 )
+        while (it != list.end())
         {
+            fi = &(*it);
             if (fi->fileName() != ".")
             {
                 FileInfo  *data = new FileInfo; 
@@ -430,10 +433,11 @@ void ImportNativeWizard::updateFileList()
 
         // second get a list of file's in the current directory
         list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
-        it = QFileInfoListIterator(*list);
+        it = list.begin();
 
-        while ( (fi = it.current()) != 0 )
+        while (it != list.end())
         {
+            fi = &(*it);
             FileInfo  *data = new FileInfo; 
             data->selected = false;
             data->directory = false;
@@ -489,7 +493,7 @@ void ImportNativeWizard::loadXML(const QString &filename)
 {
     QDomDocument doc("mydocument");
     QFile file(filename);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
         return;
 
     if (!doc.setContent( &file )) 
@@ -745,7 +749,7 @@ void ImportNativeWizard::fillSearchList(const QString &field)
     {
         while (query.next())
         {
-            m_searchList << QString::fromUtf8(query.value(0).toString());
+            m_searchList << query.value(0).toString();
         }
     }
 }

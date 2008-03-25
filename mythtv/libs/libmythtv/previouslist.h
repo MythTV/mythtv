@@ -2,6 +2,9 @@
 #define PREVIOUSLIST_H_
 
 #include <qdatetime.h>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QPaintEvent>
 #include "libmyth/uitypes.h"
 #include "libmyth/xmlparse.h"
 #include "libmyth/mythwidgets.h"
@@ -36,7 +39,7 @@ class MPUBLIC PreviousList : public MythDialog
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
   private:
     int m_recid;

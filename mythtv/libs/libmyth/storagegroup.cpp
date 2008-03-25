@@ -28,8 +28,8 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *                  This is parameter is ignored if group is an empty string.
  */
 StorageGroup::StorageGroup(const QString group, const QString hostname) :
-    m_groupname(QDeepCopy<QString>(group)),
-    m_hostname(QDeepCopy<QString>(hostname))
+    m_groupname(Q3DeepCopy<QString>(group)),
+    m_hostname(Q3DeepCopy<QString>(hostname))
 {
     m_dirlist.clear();
 
@@ -41,8 +41,8 @@ void StorageGroup::Init(const QString group, const QString hostname)
     QString dirname;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    m_groupname = QDeepCopy<QString>(group);
-    m_hostname  = QDeepCopy<QString>(hostname);
+    m_groupname = Q3DeepCopy<QString>(group);
+    m_hostname  = Q3DeepCopy<QString>(hostname);
     m_dirlist.clear();
 
     QString sql = "SELECT DISTINCT dirname "
@@ -56,8 +56,12 @@ void StorageGroup::Init(const QString group, const QString hostname)
     }
 
     query.prepare(sql);
-    query.bindValue(":GROUP", m_groupname.utf8());
-    query.bindValue(":HOSTNAME", m_hostname);
+    if (!m_groupname.isEmpty())
+    {
+        query.bindValue(":GROUP", m_groupname);
+        if (!m_hostname.isEmpty())
+            query.bindValue(":HOSTNAME", m_hostname);
+    }
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("StorageGroup::StorageGroup()", query);
@@ -85,12 +89,12 @@ void StorageGroup::Init(const QString group, const QString hostname)
     {
         do
         {
-            dirname = QString::fromUtf8(query.value(0).toString());
+            dirname = query.value(0).toString();
             dirname.replace(QRegExp("^\\s*"), "");
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
                 dirname.remove(dirname.length() - 1, 1);
-            m_dirlist << QDeepCopy<QString>(dirname);
+            m_dirlist << Q3DeepCopy<QString>(dirname);
         }
         while (query.next());
     }
@@ -111,7 +115,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
                            .arg(kDefaultStorageDir);
         }
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-        m_dirlist << QDeepCopy<QString>(tmpDir);
+        m_dirlist << Q3DeepCopy<QString>(tmpDir);
     }
 }
 
@@ -152,7 +156,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
                 .arg(m_dirlist[curDir]));
         checkFile.setName(testFile);
         if (checkFile.exists())
-            return QDeepCopy<QString>(m_dirlist[curDir]);
+            return Q3DeepCopy<QString>(m_dirlist[curDir]);
 
         curDir++;
     }
@@ -181,7 +185,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 
-    return QDeepCopy<QString>(result);
+    return Q3DeepCopy<QString>(result);
 }
 
 QString StorageGroup::FindNextDirMostFree(void)
@@ -229,7 +233,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
                                    .arg(nextDir));
 
-    return QDeepCopy<QString>(nextDir);
+    return Q3DeepCopy<QString>(nextDir);
 }
 
 void StorageGroup::CheckAllStorageGroupDirs(void)
@@ -255,8 +259,8 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     QDir testDir("");
     while (query.next())
     {
-        m_groupname = QString::fromUtf8(query.value(0).toString());
-        dirname = QString::fromUtf8(query.value(1).toString());
+        m_groupname = query.value(0).toString();
+        dirname = query.value(1).toString();
 
         dirname.replace(QRegExp("^\\s*"), "");
         dirname.replace(QRegExp("\\s*$"), "");
@@ -307,11 +311,11 @@ QStringList StorageGroup::getRecordingsGroups(void)
     query.prepare(sql);
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
-            groups += QString::fromUtf8(query.value(0).toString());
+            groups += query.value(0).toString();
 
     groups.sort();
 
-    return QDeepCopy<QStringList>(groups);
+    return Q3DeepCopy<QStringList>(groups);
 }
 
 /****************************************************************************/
@@ -345,7 +349,7 @@ SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
 
     bool ok = (MythDialog::Accepted == popup->ExecPopup());
     if (ok)
-        text = QDeepCopy<QString>(textEdit->text());
+        text = Q3DeepCopy<QString>(textEdit->text());
 
     popup->hide();
     popup->deleteLater();
@@ -400,8 +404,8 @@ void StorageGroupEditor::open(QString name)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("INSERT INTO storagegroup (groupname, hostname, dirname) "
                       "VALUES (:NAME, :HOSTNAME, :DIRNAME);");
-        query.bindValue(":NAME", m_group.utf8());
-        query.bindValue(":DIRNAME", name.utf8());
+        query.bindValue(":NAME", m_group);
+        query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythContext::DBError("StorageGroupEditor::open", query);
@@ -425,16 +429,16 @@ void StorageGroupEditor::open(QString name)
                       "WHERE groupname = :NAME "
                           "AND dirname = :DIRNAME "
                           "AND hostname = :HOSTNAME;");
-        query.bindValue(":NAME", m_group.utf8());
-        query.bindValue(":DIRNAME", lastValue.utf8());
+        query.bindValue(":NAME", m_group);
+        query.bindValue(":DIRNAME", lastValue);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythContext::DBError("StorageGroupEditor::open", query);
 
         query.prepare("INSERT INTO storagegroup (groupname, hostname, dirname) "
                       "VALUES (:NAME, :HOSTNAME, :DIRNAME);");
-        query.bindValue(":NAME", m_group.utf8());
-        query.bindValue(":DIRNAME", name.utf8());
+        query.bindValue(":NAME", m_group);
+        query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythContext::DBError("StorageGroupEditor::open", query);
@@ -465,8 +469,8 @@ void StorageGroupEditor::doDelete(void)
                       "WHERE groupname = :NAME "
                           "AND dirname = :DIRNAME "
                           "AND hostname = :HOSTNAME;");
-        query.bindValue(":NAME", m_group.utf8());
-        query.bindValue(":DIRNAME", name.utf8());
+        query.bindValue(":NAME", m_group);
+        query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythContext::DBError("StorageGroupEditor::doDelete", query);
@@ -487,7 +491,7 @@ void StorageGroupEditor::load(void) {
     query.prepare("SELECT dirname, id FROM storagegroup "
                   "WHERE groupname = :NAME AND hostname = :HOSTNAME "
                   "ORDER BY id;");
-    query.bindValue(":NAME", m_group.utf8());
+    query.bindValue(":NAME", m_group);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec() || !query.isActive())
         MythContext::DBError("StorageGroupEditor::doDelete", query);
@@ -604,7 +608,7 @@ void StorageGroupListEditor::doDelete(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM storagegroup "
                       "WHERE groupname = :NAME AND hostname = :HOSTNAME;");
-        query.bindValue(":NAME", name.utf8());
+        query.bindValue(":NAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythContext::DBError("StorageGroupListEditor::doDelete", query);
@@ -639,7 +643,7 @@ void StorageGroupListEditor::load(void)
     else
     {
         while (query.next())
-            names << QString::fromUtf8(query.value(0).toString());
+            names << query.value(0).toString();
     }
 
     query.prepare("SELECT distinct groupname "
@@ -651,7 +655,7 @@ void StorageGroupListEditor::load(void)
     else
     {
         while (query.next())
-            masterNames << QString::fromUtf8(query.value(0).toString());
+            masterNames << query.value(0).toString();
     }
 
     listbox->clearSelections();

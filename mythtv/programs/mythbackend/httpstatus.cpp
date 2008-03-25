@@ -17,11 +17,11 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/compat.h"
 
-#include <qtextstream.h>
-#include <qdir.h>
-#include <qfile.h>
+
+
+
+
 #include <qregexp.h>
-#include <qbuffer.h>
 #include <qlocale.h>
 #include <math.h>
 #include <stdio.h>
@@ -477,13 +477,13 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
+void HttpStatus::PrintStatus( Q3TextStream &os, QDomDocument *pDoc )
 {
     
     QString shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    os.setEncoding(QTextStream::UnicodeUTF8);
+    os.setEncoding(Q3TextStream::UnicodeUTF8);
 
     QDateTime qdtNow = QDateTime::currentDateTime();
 
@@ -630,7 +630,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
+int HttpStatus::PrintEncoderStatus( Q3TextStream &os, QDomElement encoders )
 {
     QString timeformat   = gContext->GetSetting("TimeFormat", "h:mm AP");
     int     nNumEncoders = 0;
@@ -760,7 +760,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
+int HttpStatus::PrintScheduled( Q3TextStream &os, QDomElement scheduled )
 {
     QDateTime qdtNow          = QDateTime::currentDateTime();
     QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -898,7 +898,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
+int HttpStatus::PrintJobQueue( Q3TextStream &os, QDomElement jobs )
 {
     QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -1043,7 +1043,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMachineInfo( Q3TextStream &os, QDomElement info )
 {
     QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -1221,7 +1221,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
     return( 1 );
 }
 
-int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
+int HttpStatus::PrintMiscellaneousInfo( Q3TextStream &os, QDomElement info )
 {
     if (info.isNull())
         return( 0 );

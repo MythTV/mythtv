@@ -287,8 +287,8 @@ void CC708Window::AddChar(QChar ch)
         return;
 
     QString dbg_char = ch;
-    if ((int)ch < 32)
-        dbg_char = QString("0x%1").arg((int)ch, 0,16);
+    if (ch.toAscii() < 32)
+        dbg_char = QString("0x%1").arg( (int)ch.toAscii(), 0,16);
 
     if (!IsPenValid())
     {
@@ -299,7 +299,7 @@ void CC708Window::AddChar(QChar ch)
         return;
     }
 
-    if ((int)ch == 0x0D)
+    if (ch.toAscii() == 0x0D)
     {
         Scroll(pen.row + 1, 0);
         return;

@@ -2,7 +2,8 @@
 #define CUSTOMEDIT_H_
 
 #include <qdatetime.h>
-#include <qhbox.h>
+#include <q3hbox.h>
+#include <QLabel>
 #include "libmyth/mythwidgets.h"
 #include "NuppelVideoPlayer.h"
 

@@ -1,17 +1,19 @@
 /*
-	titledialog.h
+    titledialog.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     the dialog where you actually choose titles to rip
 */
 
 #ifndef TITLEDIALOG_H_
 #define TITLEDIALOG_H_
 
-#include <qtimer.h>
-#include <qsocket.h>
+#include <QTimer>
+#include <Q3Socket>
+
+#include <Q3PtrList>
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythcontext.h>
@@ -19,15 +21,17 @@
 
 #include "dvdinfo.h"
 
+class QKeyEvent;
+
 class TitleDialog : public MythThemedDialog
 {
     Q_OBJECT
 
   public:
   
-    TitleDialog(QSocket *a_socket, 
+    TitleDialog(Q3Socket *a_socket, 
                 QString d_name, 
-                QPtrList<DVDTitleInfo> *titles,
+                Q3PtrList<DVDTitleInfo> *titles,
                 MythMainWindow *parent, 
                 QString window_name,
                 QString theme_filename,
@@ -58,9 +62,9 @@ class TitleDialog : public MythThemedDialog
   
     QTimer                 *check_dvd_timer;
     QString                disc_name;
-    QPtrList<DVDTitleInfo> *dvd_titles;
+    Q3PtrList<DVDTitleInfo> *dvd_titles;
     DVDTitleInfo           *current_title;
-    QSocket                *socket_to_mtd;
+    Q3Socket                *socket_to_mtd;
 
     //
     //  GUI "widgets"

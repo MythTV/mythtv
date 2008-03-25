@@ -12,7 +12,7 @@
 #include "httprequest.h"
 #include <qfileinfo.h>
 #include <qregexp.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <limits.h>
 #include "util.h"
 
@@ -243,12 +243,12 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     int            nChanid      = query.value( 0).toInt();
     QDateTime      dtStartTime  = query.value( 1).toDateTime();
     QDateTime      dtEndTime    = query.value( 2).toDateTime();
-    QString        sTitle       = QString::fromUtf8(query.value( 3).toString());
-    QString        sSubtitle    = QString::fromUtf8(query.value( 4).toString());
-    QString        sDescription = QString::fromUtf8(query.value( 5).toString());
+    QString        sTitle       = query.value( 3).toString();
+    QString        sSubtitle    = query.value( 4).toString();
+    QString        sDescription = query.value( 5).toString();
     QString        sCategory    = query.value( 6).toString();
     QString        sHostName    = query.value( 7).toString();
-    QString        sRecGroup    = QString::fromUtf8(query.value( 8).toString());
+    QString        sRecGroup    = query.value( 8).toString();
     long long      nFileSize    = stringToLongLong( query.value( 9).toString() );
     QString        sBaseName    = query.value(10).toString();
 

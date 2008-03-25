@@ -8,7 +8,7 @@
 #include "iptvfeederudp.h"
 
 // Qt headers
-#include <qurl.h>
+#include <q3url.h>
 
 // Live555 headers
 #include <BasicUsageEnvironment.hh>
@@ -56,7 +56,7 @@ bool IPTVFeederUDP::Open(const QString &url)
         return true;
     }
         
-    QUrl parse(url);
+    Q3Url parse(url);
     if (!parse.isValid() || !parse.hasHost() || !parse.hasPort())
     {
         VERBOSE(VB_RECORD, LOC + "Open() -- end 2");

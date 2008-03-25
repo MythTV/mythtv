@@ -1,13 +1,16 @@
 #ifndef RTP_H_
 #define RTP_H_
 
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 #include <qdatetime.h>
+
+#include <QEvent>
+#include <qwaitcondition.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -33,20 +36,20 @@
 
 class rtp;
 
-class RtpEvent : public QCustomEvent
+class RtpEvent : public QEvent
 {
 public:
     enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv, RtpRtcpStatsEv };
 
-    RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
+    RtpEvent(Type t, QString s="") : QEvent((QEvent::Type)t) { text=s; }
     RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, 
              int s7, int s8, int s9, int s10, int s11, int s12, int s13, int s14, int s15, int s16)
-              : QCustomEvent(t) 
+              : QEvent((QEvent::Type)t)
              { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; 
                pkInDisc=s5; pkOutDrop=s6;
                byteIn=s7; byteOut=s8; bytePlayed=s9; framesIn=s10; framesOut=s11; framesInDisc=s12; 
                framesOutDisc=s13; minPlayout=s14; avgPlayout=s15; maxPlayout=s16; }
-    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2) : QCustomEvent(t) 
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2) : QEvent((QEvent::Type)t)
              { rtpThread=r; timestamp=tm; msPeriod = ms; rtcpFractionLoss=s1; rtcpTotalLoss=s2;}    
     ~RtpEvent()                 {  }
     QString msg()               { return text;}
@@ -203,7 +206,7 @@ typedef struct VIDEOBUFFER
 #define DTMF_STAR 10
 #define DTMF_HASH 11
 #define DTMF2CHAR(d) ((d)>DTMF_HASH ? '?' : ((d)==DTMF_STAR ? '*' : ((d) == DTMF_HASH ? '#' : ((d)+'0'))))
-#define CHAR2DTMF(c) ((c)=='#' ? DTMF_HASH : ((c)=='*' ? DTMF_STAR : ((c)-'0')))
+#define CHAR2DTMF(c) ((c)=='#' ? DTMF_HASH : ((c)=='*' ? DTMF_STAR : ((c).latin1())))
 
 
 
@@ -227,7 +230,7 @@ private:
 #define JB_REASON_DTMF        4   // Buffer which matches seq-number contained DTMF
 #define JB_REASON_DUPLICATE   5   // Got the same sequence number twice
 
-class Jitter : public QPtrList<RTPPACKET>
+class Jitter : public Q3PtrList<RTPPACKET>
 {
 public:
     Jitter();
@@ -238,7 +241,7 @@ public:
     void       InsertJBuffer(RTPPACKET *Buffer);
     RTPPACKET *DequeueJBuffer(ushort seqNum, int &reason);  
     int        DumpAllJBuffers(bool StopAtMarkerBit);
-    virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
+    virtual int compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2);
     int        AnyData() { return count(); };
     bool       isPacketQueued(ushort Seq);
     int        countPacketsInFrontOf(ushort Seq);
@@ -248,7 +251,7 @@ public:
 
 
 private:
-    QPtrList<RTPPACKET> FreeJitterQ;
+    Q3PtrList<RTPPACKET> FreeJitterQ;
 };
 
 
@@ -282,12 +285,12 @@ enum rtpRxMode { RTP_RX_AUDIO_TO_BUFFER=1,   RTP_RX_AUDIO_TO_SPEAKER=2,      RTP
 class rtpListener : public QThread
 {
 public:
-    rtpListener(QSocketDevice *s, QWaitCondition *w) { sock=s; cond=w; killThread=false; start(); }
+    rtpListener(Q3SocketDevice *s, QWaitCondition *w) { sock=s; cond=w; killThread=false; start(); }
     ~rtpListener() { killThread=true; wait(); }
     virtual void run() { while (!killThread) { if (sock->waitForMore(2000) > 0) cond->wakeAll(); }}
 
 private:
-    QSocketDevice *sock;
+    Q3SocketDevice *sock;
     QWaitCondition *cond;
     bool killThread;
 };
@@ -363,8 +366,8 @@ private:
     
     QObject *eventWindow;
     QMutex rtpMutex;
-    QSocketDevice *rtpSocket;
-    QSocketDevice *rtcpSocket;
+    Q3SocketDevice *rtpSocket;
+    Q3SocketDevice *rtcpSocket;
     QWaitCondition *eventCond;
     QTime timeNextRtcpTx;
     codec   *Codec;
@@ -405,8 +408,8 @@ private:
 
     // Video
     int videoPayload;
-    QPtrList<VIDEOBUFFER> FreeVideoBufferQ;
-    QPtrList<VIDEOBUFFER> rxedVideoFrames;
+    Q3PtrList<VIDEOBUFFER> FreeVideoBufferQ;
+    Q3PtrList<VIDEOBUFFER> rxedVideoFrames;
     VIDEOBUFFER *videoToTx;
     int videoFrameFirstSeqNum;
 

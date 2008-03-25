@@ -24,7 +24,7 @@
 #include <qfile.h>
 #include <qdatastream.h>
 #include <qdom.h>
-#include <qurloperator.h>
+#include <q3urloperator.h>
 
 extern "C" {
 #include <stdlib.h>
@@ -78,7 +78,7 @@ NewsSite::NewsSite(const QString& name,
     m_articleList.clear();
 
     m_data.resize(0);
-    m_urlOp = new QUrlOperator(m_url);
+    m_urlOp = new Q3UrlOperator(m_url);
 
 }
 
@@ -136,10 +136,10 @@ void NewsSite::retrieve()
 {
     stop();
 
-    connect(m_urlOp, SIGNAL(data(const QByteArray&, QNetworkOperation*)),
-            this, SLOT(slotGotData(const QByteArray&, QNetworkOperation*)));
-    connect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
-            this, SLOT(slotFinished(QNetworkOperation*)));
+    connect(m_urlOp, SIGNAL(data(const QByteArray&, Q3NetworkOperation*)),
+            this, SLOT(slotGotData(const QByteArray&, Q3NetworkOperation*)));
+    connect(m_urlOp, SIGNAL(finished(Q3NetworkOperation*)),
+            this, SLOT(slotFinished(Q3NetworkOperation*)));
 
     m_state = NewsSite::Retrieving;
     m_data.resize(0);
@@ -152,10 +152,10 @@ void NewsSite::stop()
 {
     m_urlOp->stop();
 
-    disconnect(m_urlOp, SIGNAL(data(const QByteArray&, QNetworkOperation*)),
-               this, SLOT(slotGotData(const QByteArray&, QNetworkOperation*)));
-    disconnect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
-               this, SLOT(slotFinished(QNetworkOperation*)));
+    disconnect(m_urlOp, SIGNAL(data(const QByteArray&, Q3NetworkOperation*)),
+               this, SLOT(slotGotData(const QByteArray&, Q3NetworkOperation*)));
+    disconnect(m_urlOp, SIGNAL(finished(Q3NetworkOperation*)),
+               this, SLOT(slotFinished(Q3NetworkOperation*)));
 }
 
 bool NewsSite::successful() const
@@ -168,13 +168,13 @@ QString NewsSite::errorMsg() const
     return m_errorString;
 }
 
-void NewsSite::slotFinished(QNetworkOperation* op)
+void NewsSite::slotFinished(Q3NetworkOperation* op)
 {
-    if (op->state() == QNetworkProtocol::StDone &&
-        op->errorCode() == QNetworkProtocol::NoError) {
+    if (op->state() == Q3NetworkProtocol::StDone &&
+        op->errorCode() == Q3NetworkProtocol::NoError) {
 
         QFile xmlFile(m_destDir+QString("/")+m_name);
-        if (xmlFile.open( IO_WriteOnly )) {
+        if (xmlFile.open( QIODevice::WriteOnly )) {
             QDataStream stream( &xmlFile );
             stream.writeRawBytes(m_data.data(), m_data.size());
             xmlFile.close();
@@ -213,7 +213,7 @@ void NewsSite::process()
         return;
     }
 
-    if (!xmlFile.open(IO_ReadOnly)) {
+    if (!xmlFile.open(QIODevice::ReadOnly)) {
         new NewsArticle(this, tr("Failed to retrieve news"), "", "");
         cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
         return;
@@ -264,7 +264,7 @@ void NewsSite::process()
 }
 
 void NewsSite::slotGotData(const QByteArray& data,
-                           QNetworkOperation* op)
+                           Q3NetworkOperation* op)
 {
     if (op)
     {

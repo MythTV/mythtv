@@ -6,10 +6,10 @@
 #define DSMCC_OBJCAROUSEL_H
 
 
-#include <qptrlist.h>
-#include <qvaluevector.h>
-#include <qcstring.h>
-#include <qptrvector.h>
+#include <q3ptrlist.h>
+#include <q3valuevector.h>
+#include <q3cstring.h>
+#include <q3ptrvector.h>
 
 class DsmccDii;
 class Dsmcc;
@@ -55,7 +55,7 @@ class DSMCCCacheModuleData
     unsigned long  m_receivedData; ///< Size received so far.
 
     /// Block table.  As blocks are received they are added to this table. 
-    QPtrVector<QByteArray> m_blocks;
+    Q3PtrVector<QByteArray> m_blocks;
     /// True if we have completed this module.
     bool                   m_completed;
     ModuleDescriptorData   m_descriptorData;
@@ -70,9 +70,9 @@ class ObjCarousel
                        const unsigned char *data);
 
     DSMCCCache                     filecache;
-    QPtrList<DSMCCCacheModuleData> m_Cache;
+    Q3PtrList<DSMCCCacheModuleData> m_Cache;
     /// Component tags matched to this carousel.
-    QValueVector<unsigned short>   m_Tags;
+    Q3ValueVector<unsigned short>   m_Tags;
     unsigned long                  m_id;
 };
 

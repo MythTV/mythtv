@@ -102,7 +102,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
     // --------------------------------------------------------------------
 
-    setFocusPolicy(QWidget::WheelFocus);
+    setFocusPolicy(Qt::WheelFocus);
 
     // --------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     if (!transType.isEmpty() && m_effect_map.contains(transType))
         m_effect_method = m_effect_map[transType];
 
-    if (!m_effect_method || transType == QString("random (gl)"))
+    if (m_effect_method.isEmpty() || transType == QString("random (gl)"))
     {
         m_effect_method = GetRandomEffect();
         m_effect_random = true;
@@ -269,7 +269,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     float scrollX = 0.2f;
     float scrollY = 0.2f;
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -1258,7 +1258,8 @@ void GLSingleView::createTexInfo(void)
 
     QPixmap pix(512, 512);
 
-    QPainter p(&pix, this);
+    QPainter p(&pix);
+    p.initFrom(this);
     p.fillRect(0, 0, pix.width(), pix.height(), Qt::black);
     p.setPen(Qt::white);
 

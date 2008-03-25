@@ -1,7 +1,8 @@
-#include <qimage.h>
-
 #include <set>
 #include <map>
+
+#include <QImage>
+#include <QImageReader>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
@@ -77,7 +78,13 @@ void VideoScannerImp::doScan(const QStringList &dirs)
         new MythProgressDialog(QObject::tr("Searching for video files"),
                                dirs.size());
 
-    QStringList imageExtensions = QImage::inputFormatList();
+    QList<QByteArray> image_types = QImageReader::supportedImageFormats();
+    QStringList imageExtensions;
+    for (QList<QByteArray>::const_iterator p = image_types.begin();
+         p != image_types.end(); ++p)
+    {
+        imageExtensions.push_back(QString(*p));
+    }
     int counter = 0;
 
     FileCheckList fs_files;

@@ -48,7 +48,7 @@ class MediaServer : public UPnp
 
 	void RebuildMediaMap(void) { upnpMedia->BuildMediaMap(); };
 
-//        void     customEvent( QCustomEvent *e );
+//        void     customEvent( QEvent *e );
 
         void     RegisterExtension  ( UPnpCDSExtension    *pExtension );
         void     UnregisterExtension( UPnpCDSExtension    *pExtension );

@@ -21,6 +21,7 @@ using namespace std;
 #include <qdir.h>
 #include <qdom.h>
 #include <qimage.h>
+#include <Q3TextStream>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -77,13 +78,13 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
     VERBOSE(VB_JOBQUEUE, QString("copying from %1").arg(source));
     VERBOSE(VB_JOBQUEUE, QString("to %2").arg(destination));
 
-    if (!srcFile.open(IO_ReadOnly))
+    if (!srcFile.open(QIODevice::ReadOnly))
     { 
         VERBOSE(VB_JOBQUEUE, "ERROR: Unable to open source file");
         return false;
     }
 
-    if (!destFile.open(IO_WriteOnly))
+    if (!destFile.open(QIODevice::WriteOnly))
     { 
         VERBOSE(VB_JOBQUEUE, "ERROR: Unable to open destination file");
         VERBOSE(VB_JOBQUEUE, "Do you have write access to the directory?");
@@ -240,7 +241,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
 
     QDomDocument doc("archivejob");
     QFile file(jobFile);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_JOBQUEUE, "Could not open job file: " + jobFile); 
         return 1;
@@ -369,7 +370,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
 
     title = itemNode.attribute("title");
     filename = itemNode.attribute("filename");
-    doDelete = (itemNode.attribute("delete", "0") = "0");
+    doDelete = (itemNode.attribute("delete", "0") == "0");
     VERBOSE(VB_JOBQUEUE, QString("Archiving %1 (%2), do delete: %3")
         .arg(title).arg(filename).arg(doDelete));
 
@@ -716,13 +717,13 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     QString baseName = getBaseName(filename);
     QString xmlFile = saveDirectory + title + "/" + baseName + ".xml";
     QFile f(xmlFile);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_JOBQUEUE, "MythNativeWizard: Failed to open file for writing - " + xmlFile);
         return 0;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -756,7 +757,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
 
     title = itemNode.attribute("title");
     filename = itemNode.attribute("filename");
-    doDelete = (itemNode.attribute("delete", "0") = "0");
+    doDelete = (itemNode.attribute("delete", "0") == "0");
     VERBOSE(VB_JOBQUEUE, QString("Archiving %1 (%2), do delete: %3")
             .arg(title).arg(filename).arg(doDelete));
 
@@ -966,13 +967,13 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
     QFileInfo fileInfo(filename);
     QString xmlFile = saveDirectory + title + "/" + fileInfo.fileName() + ".xml";
     QFile f(xmlFile);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_JOBQUEUE, "MythNativeWizard: Failed to open file for writing - " + xmlFile);
         return 0;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -1006,7 +1007,7 @@ int NativeArchive::doImportArchive(const QString &xmlFile, int chanID)
     // open xml file 
     QDomDocument doc("mydocument");
     QFile file(xmlFile);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_JOBQUEUE, "ERROR: Failed to open file for reading - " + xmlFile);
         return 1;
@@ -1614,7 +1615,8 @@ QString NativeArchive::findNodeText(const QDomElement &elem, const QString &node
     QDomNodeList nodeList = elem.elementsByTagName(nodeName);
     if (nodeList.count() < 1)
     {
-        cout << QString("Couldn't find a '%1' element in XML file").arg(nodeName) << endl;
+        cout << QString("Couldn't find a '%1' element in XML file")
+            .arg(nodeName).toLocal8Bit().constData() << endl;
         return "";
     }
 
@@ -2254,13 +2256,13 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
     // finally save the xml to the file
     QFile f(outFile);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_JOBQUEUE, "Failed to open file for writing - " + outFile);
         return 1;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -2277,14 +2279,14 @@ int getDBParamters(QString outFile)
 
     // save the db paramters to the file
     QFile f(outFile);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         cout << "MythArchiveHelper: Failed to open file for writing - "
-                << outFile << endl;
+                << outFile.toLocal8Bit().constData() << endl;
         return 1;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << params.dbHostName << endl;
     t << params.dbUserName << endl;
     t << params.dbPassword << endl;

@@ -1,6 +1,7 @@
 #include <unistd.h>
 
 #include <qfile.h>
+#include <q3textstream.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -9,7 +10,7 @@
 #include "weatherScreen.h"
 #include "weatherSource.h"
 
-QStringList WeatherSource::probeTypes(QProcess *proc)
+QStringList WeatherSource::probeTypes(Q3Process *proc)
 {
     QStringList types;
 
@@ -18,7 +19,7 @@ QStringList WeatherSource::probeTypes(QProcess *proc)
     {
         VERBOSE(VB_IMPORTANT,
                 "cannot run script " + proc->arguments().join(" "));
-        return 0;
+        return QStringList();
     }
     while (proc->isRunning());
 
@@ -26,7 +27,7 @@ QStringList WeatherSource::probeTypes(QProcess *proc)
     {
         VERBOSE(VB_IMPORTANT, "Error Running Script");
         VERBOSE(VB_IMPORTANT, proc->readStderr());
-        return 0;
+        return QStringList();
     }
     QString tempStr;
 
@@ -39,13 +40,13 @@ QStringList WeatherSource::probeTypes(QProcess *proc)
     if (types.size() == 0)
     {
         VERBOSE(VB_IMPORTANT, "invalid output from -t option");
-        return 0;
+        return QStringList();
     }
 
     return types;
 }
 
-bool WeatherSource::probeTimeouts(QProcess *proc, uint &updateTimeout,
+bool WeatherSource::probeTimeouts(Q3Process *proc, uint &updateTimeout,
                                   uint &scriptTimeout)
 {
     proc->addArgument("-T");
@@ -91,7 +92,7 @@ bool WeatherSource::probeTimeouts(QProcess *proc, uint &updateTimeout,
     return true;
 }
 
-bool WeatherSource::probeInfo(QProcess *proc, QString &name, QString &version,
+bool WeatherSource::probeInfo(Q3Process *proc, QString &name, QString &version,
                               QString &author, QString &email)
 {
     /*
@@ -146,10 +147,10 @@ bool WeatherSource::probeInfo(QProcess *proc, QString &name, QString &version,
 ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
 {
     QStringList temp;
-    QProcess *proc;
+    Q3Process *proc;
 
     if (fi.isReadable() && fi.isExecutable())
-        proc = new QProcess(fi.absFilePath());
+        proc = new Q3Process(fi.absFilePath());
     else
         return 0;
 
@@ -321,7 +322,7 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     m_updateTimer = new QTimer(this);
     connect( m_updateTimer, SIGNAL(timeout()),
             this, SLOT(updateTimeout()));
-    m_proc = new QProcess(info->file->absFilePath());
+    m_proc = new Q3Process(info->file->absFilePath());
     m_proc->setWorkingDirectory(QDir(gContext->GetShareDir() +
                                      "mythweather/scripts/"));
     connect(this, SIGNAL(killProcess()), m_proc, SLOT(kill()));
@@ -347,7 +348,7 @@ WeatherSource::WeatherSource(const QString &filename)
 
     if (info)
     {
-        m_proc = new QProcess(filename);
+        m_proc = new Q3Process(filename);
         m_proc->setWorkingDirectory(QDir(gContext->GetShareDir() +
                                          "mythweather/scripts/"));
         connect(this, SIGNAL(killProcess()),
@@ -397,13 +398,13 @@ QStringList WeatherSource::getLocationList(const QString &str)
     if (m_proc->isRunning())
     {
         VERBOSE(VB_IMPORTANT, "error script already running");
-        return NULL;
+        return QStringList();
     }
 
     if (!m_proc->start())
     {
         VERBOSE(VB_IMPORTANT, "cannot start script");
-        return NULL;
+        return QStringList();
     }
 
     while (m_proc->isRunning())
@@ -438,9 +439,9 @@ void WeatherSource::startUpdate()
 
         QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
         QFile cache(cachefile);
-        if (cache.exists() && cache.open( IO_ReadOnly ))
+        if (cache.exists() && cache.open( QIODevice::ReadOnly ))
         {
-            QTextStream text( &cache );
+            Q3TextStream text( &cache );
             m_buffer += text.read();
             cache.close();
 
@@ -466,7 +467,7 @@ void WeatherSource::startUpdate()
     m_proc->addArgument(m_info->file->absFilePath());
     m_proc->addArgument("-u");
     m_proc->addArgument(m_units == SI_UNITS ? "SI" : "ENG");
-    if (m_dir && m_dir != "")
+    if (!m_dir.isEmpty())
     {
         m_proc->addArgument("-d");
         m_proc->addArgument(m_dir);
@@ -512,12 +513,12 @@ void WeatherSource::processExit()
     }
 
     QString tempStr = m_proc->readStdout();
-    if (tempStr)
+    if (!tempStr.isEmpty())
         m_buffer += tempStr;
 
     QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
     QFile cache(cachefile);
-    if (cache.open( IO_WriteOnly ))
+    if (cache.open( QIODevice::WriteOnly ))
     {
         cache.writeBlock( m_buffer, qstrlen(m_buffer) );
         cache.close();
@@ -565,7 +566,7 @@ void WeatherSource::processData()
             return; // we don't emit signal
         }
 
-        if (m_data[temp[0]])
+        if (!m_data[temp[0]].isEmpty())
         {
             m_data[temp[0]].append("\n" + temp[1]);
         }

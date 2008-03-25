@@ -242,3 +242,6 @@ contains( CONFIG_LIBA52, yes ) {
 contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -lfftw3f
 }
+
+#The following line was inserted by qt3to4
+QT += network xml opengl sql qt3support

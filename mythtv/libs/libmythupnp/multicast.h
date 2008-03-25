@@ -12,7 +12,7 @@
 #define __MULTICAST_H__
 
 // Qt headers
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 
 // MythTV headers
 #include "compat.h"
@@ -27,7 +27,7 @@
 
 // -=>TODO: Need to add support for Multi-Homed machines.
 
-class QMulticastSocket : public QSocketDevice
+class QMulticastSocket : public Q3SocketDevice
 {
     public:
 
@@ -38,7 +38,7 @@ class QMulticastSocket : public QSocketDevice
     public:
 
         QMulticastSocket( QString sAddress, Q_UINT16 nPort, u_char ttl = 0 )
-         : QSocketDevice( QSocketDevice::Datagram )
+         : Q3SocketDevice( Q3SocketDevice::Datagram )
         {
             m_address.setAddress( sAddress );
             m_port = nPort;

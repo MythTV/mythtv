@@ -1,13 +1,17 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QEvent>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QKeyEvent>
 
 #include <stdlib.h>
 
@@ -35,7 +39,9 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
                             "view scheduled", (TV*)player, showTV);
     vsb->Show();
     qApp->unlock();
-    vsbIsVisibleCond.wait();
+    QMutex vsb_lock;
+    vsb_lock.lock();
+    vsbIsVisibleCond.wait(&vsb_lock);
     delete vsb;
 
     return NULL;
@@ -715,7 +721,7 @@ void ViewScheduled::selected()
     EmbedTVWindow();
 }
 
-void ViewScheduled::customEvent(QCustomEvent *e)
+void ViewScheduled::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;

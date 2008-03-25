@@ -1064,6 +1064,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
 {
     if (request_pause)
     {
+        QMutex waitlock;
         if (!paused)
         {
             if (requires_special_pause)
@@ -1081,7 +1082,8 @@ bool MpegRecorder::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        unpauseWait.wait(timeout);
+        waitlock.lock();
+        unpauseWait.wait(&waitlock, timeout);
     }
     if (!request_pause)
     {

@@ -108,12 +108,12 @@ void EITFixUp::Fix(DBEvent &event) const
     if (event.fixup)
     {
         if (event.subtitle == event.title)
-            event.subtitle = QString::null;
+            event.subtitle = QString("");
 
         if (event.description.isEmpty() && !event.subtitle.isEmpty())
         {
             event.description = event.subtitle;
-            event.subtitle = QString::null;
+            event.subtitle = QString("");
         }
     }
 
@@ -893,7 +893,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     QRegExp    tmpExp1;
 
     // Remove subtitle, it contains category information too specific to use
-    event.subtitle = QString::null;
+    event.subtitle = QString("");
 
     // No need to continue without a description.
     if (event.description.length() <= 0)
@@ -903,8 +903,8 @@ void EITFixUp::FixMCA(DBEvent &event) const
     tmpExp1 = m_mcaIncompleteTitle;
     if (tmpExp1.search(event.title) != -1)
     {
-        tmpExp1 = QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
-                          m_mcaCompleteTitleb.pattern());
+        tmpExp1 = QRegExp( QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
+                                   m_mcaCompleteTitleb.pattern()));
         tmpExp1.setCaseSensitive(false);
         if (tmpExp1.search(event.description) != -1)
         {

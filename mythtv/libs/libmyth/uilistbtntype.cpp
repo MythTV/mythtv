@@ -21,6 +21,10 @@
 
 #include <iostream>
 
+#include <QLabel>
+#include <Q3PtrList>
+#include <QPixmap>
+
 #include "mythcontext.h"
 #include "lcddevice.h"
 
@@ -302,7 +306,7 @@ void UIListTreeType::Draw(QPainter *p, int order, int context)
     if (m_order != order)
         return;
 
-    QPtrListIterator<UIListBtnType> it(listLevels);
+    Q3PtrListIterator<UIListBtnType> it(listLevels);
     UIListBtnType *child;
 
     int maxx = 0;
@@ -344,7 +348,7 @@ void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int context
     if (m_context != -1 && m_context != context)
         return;
 
-    QPtrListIterator<UIListBtnType> it(listLevels);
+    Q3PtrListIterator<UIListBtnType> it(listLevels);
     UIListBtnType *child;
 
     int maxx = 0;
@@ -400,7 +404,7 @@ void UIListTreeType::RefreshCurrentLevel(void)
 {
     if (currentlevel)
     {
-        QPtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
+        Q3PtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
 
         UIListBtnTypeItem *item;
         while ((item = it.current()))
@@ -420,9 +424,9 @@ void UIListTreeType::FillLevelFromTree(UIListGenericTree *item,
 
     ClearLevel(list);
 
-    QPtrList<GenericTree> *itemlist = item->getAllChildren();
+    Q3PtrList<GenericTree> *itemlist = item->getAllChildren();
 
-    QPtrListIterator<GenericTree> it(*itemlist);
+    Q3PtrListIterator<GenericTree> it(*itemlist);
     GenericTree *child;
 
     while ((child = it.current()) != 0)
@@ -875,8 +879,8 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_itemList.setAutoDelete(false);
     m_topItem = 0;
     m_selItem = 0;
-    m_selIterator = new QPtrListIterator<UIListBtnTypeItem>(m_itemList);
-    m_topIterator = new QPtrListIterator<UIListBtnTypeItem>(m_itemList);
+    m_selIterator = new Q3PtrListIterator<UIListBtnTypeItem>(m_itemList);
+    m_topIterator = new Q3PtrListIterator<UIListBtnTypeItem>(m_itemList);
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
@@ -1167,9 +1171,9 @@ int UIListBtnType::GetCount()
     return m_itemCount;
 }
 
-QPtrListIterator<UIListBtnTypeItem> UIListBtnType::GetIterator(void)
+Q3PtrListIterator<UIListBtnTypeItem> UIListBtnType::GetIterator(void)
 {
-    return QPtrListIterator<UIListBtnTypeItem>(m_itemList);
+    return Q3PtrListIterator<UIListBtnTypeItem>(m_itemList);
 }
 
 UIListBtnTypeItem* UIListBtnType::GetItemAt(int pos)
@@ -1533,7 +1537,7 @@ bool UIListBtnType::incSearchNext(void)
     //  starts or contains the search text
     //
 
-    QPtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
+    Q3PtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
     ++it;
 
     while (it.current())
@@ -1624,10 +1628,10 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
             // add max of lcd height menu items either side of the selected item
             // let the lcdserver figure out which ones to display
 
-            QPtrList<LCDMenuItem> menuItems;
+            Q3PtrList<LCDMenuItem> menuItems;
             menuItems.setAutoDelete(true);
 
-            QPtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
+            Q3PtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
             uint count = 0;
 
             // move back up the list a little
@@ -1697,7 +1701,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
     int x = m_rect.x() + m_xdrawoffset;
 
     int y = m_rect.y();
-    QPtrListIterator<UIListBtnTypeItem> it = (*m_topIterator);
+    Q3PtrListIterator<UIListBtnTypeItem> it = (*m_topIterator);
     while (it.current() && 
            (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
     {
@@ -1820,7 +1824,7 @@ void UIListBtnType::Init()
             g += gstep;
             b += bstep;
         }
-        p.setPen(black);
+        p.setPen(Qt::black);
         p.drawLine(0, 0, 0, img.height() - 1);
         p.drawLine(0, 0, img.width() - 1, 0);
         p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
@@ -1851,7 +1855,7 @@ void UIListBtnType::Init()
             g += gstep;
             b += bstep;
         }
-        p.setPen(black);
+        p.setPen(Qt::black);
         p.drawLine(0, 0, 0, img.height() - 1);
         p.drawLine(0, 0, img.width() - 1, 0);
         p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
@@ -1875,7 +1879,7 @@ void UIListBtnType::Init()
             g += gstep;
             b += bstep;
         }
-        p.setPen(black);
+        p.setPen(Qt::black);
         p.drawLine(0, 0, 0, img.height() - 1);
         p.drawLine(0, 0, img.width() - 1, 0);
         p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
@@ -1930,7 +1934,7 @@ UIListBtnTypeItem::UIListBtnTypeItem(
     UIListBtnType *parent, const QString &text,
     QPixmap *pixmap, bool checkable,
     CheckState state, bool showArrow) :
-    m_parent(parent), m_text(QDeepCopy<QString>(text)), m_pixmap(pixmap),
+    m_parent(parent), m_text(text), m_pixmap(pixmap),
     m_checkable(checkable), m_state(state), m_data(NULL),
 
     m_checkRect(0,0,0,0), m_pixmapRect(0,0,0,0),

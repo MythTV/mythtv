@@ -102,7 +102,8 @@ void runMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
+             << endl;
     }
 
     delete diag;
@@ -139,13 +140,14 @@ void initKeys(void)
 
 QString GetMySipIp()
 {
-    QSocketDevice *tempSocket = new QSocketDevice (QSocketDevice::Datagram);
+    Q3SocketDevice *tempSocket = new Q3SocketDevice (Q3SocketDevice::Datagram);
     QString ifName = gContext->GetSetting("SipBindInterface");
     struct ifreq ifreq;
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(tempSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface " << ifName << endl;
+        cerr << "Failed to find network interface "
+             << ifName.toLocal8Bit().constData() << endl;
         delete tempSocket;
         tempSocket = 0;
         return "";
@@ -171,7 +173,8 @@ char myHostname[64];
     QString Dir       = "My MythTVs";
     QString Surname   = myHostname;
     QString FirstName = QString("Local Myth Host");
-    QString NickName  = gContext->GetSetting("MySipName") + "(" + myHostname + ")";
+    QString NickName  = QString("%1(%2)")
+        .arg(gContext->GetSetting("MySipName")).arg(myHostname);
     QString Uri;
     if (gContext->GetNumSetting("SipRegisterWithProxy", 1))
         Uri = gContext->GetSetting("SipProxyAuthName");
@@ -202,7 +205,11 @@ char myHostname[64];
             if ((query.value(1).toString() != NickName) || 
                 (query.value(2).toString() != Uri))
             {
-                cout << "SIP: Updating out-of-date autogen directory entry; " << query.value(1).toString() << ", " << query.value(2).toString() << endl;
+                cout << "SIP: Updating out-of-date autogen directory entry; "
+                     << query.value(1).toString().toLocal8Bit().constData()
+                     << ", "
+                     << query.value(2).toString().toLocal8Bit().constData()
+                     << endl;
 
                 MSqlQuery query2(MSqlQuery::InitCon());
                 thequery = QString("UPDATE phonedirectory "

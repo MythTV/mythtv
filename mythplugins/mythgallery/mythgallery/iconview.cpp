@@ -20,12 +20,17 @@
 
 // C++ headers
 #include <algorithm>
+
 using namespace std;
 
 // Qt headers
 #include <qevent.h>
 #include <qdir.h>
-#include <qwmatrix.h>
+#include <qmatrix.h>
+#include <QKeyEvent>
+#include <Q3ValueList>
+#include <QPixmap>
+#include <QFileInfo>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -200,10 +205,12 @@ void IconView::LoadDirectory(const QString &dir)
         MythImage *image = GetMythPainter()->GetFormatImage();
         QPixmap *pixmap = thumbitem->GetPixmap();
         if (pixmap)
+        {
             image->Assign(*pixmap);
-        thumbitem->SetPixmap(NULL);
+            thumbitem->SetPixmap(NULL);
 
-        item->setImage(image);
+            item->setImage(image);
+        }
     }
 
     uint buttonwidth = m_imageList->ItemWidth() -
@@ -237,9 +244,12 @@ void IconView::LoadThumbnail(ThumbItem *item)
             if (subdir.count() > 0)
             {
                 // check if the image format is understood
-                QString path =
-                    subdir.entryInfoList()->getFirst()->absFilePath();
-                image.load(path);
+                QFileInfoList::const_iterator it = subdir.entryInfoList().begin();
+                if (it != subdir.entryInfoList().end())
+                {
+                    QString path = it->absFilePath();
+                    image.load(path);
+                }
             }
         }
         else
@@ -259,10 +269,13 @@ void IconView::LoadThumbnail(ThumbItem *item)
 
     if (!canLoadGallery)
     {
-        QString cachePath =
-            m_thumbGen->getThumbcacheDir(m_currDir) + item->GetName();
+        QString cachePath = QString("%1%2.jpg")
+                                .arg(m_thumbGen->getThumbcacheDir(m_currDir))
+                                .arg(item->GetName());
 
-        image.load(cachePath);
+        if (!image.load(cachePath))
+            VERBOSE(VB_IMPORTANT, QString("Could not load thumbnail: %1")
+                                            .arg(cachePath));
     }
 
     if (!image.isNull())
@@ -273,7 +286,7 @@ void IconView::LoadThumbnail(ThumbItem *item)
 
         if (rotateAngle != 0)
         {
-            QWMatrix matrix;
+            QMatrix matrix;
             matrix.rotate(rotateAngle);
             image = image.xForm(matrix);
         }
@@ -524,8 +537,8 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 {
     bool handled = false;
     QDir curdir(m_currDir);
-    QValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
-    QValueList<MythMediaDevice*>::iterator it = removables.begin();
+    Q3ValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+    Q3ValueList<MythMediaDevice*>::iterator it = removables.begin();
     for (; !handled && (it != removables.end()); it++)
     {
         if (!mon->ValidateAndLock(*it))
@@ -625,43 +638,48 @@ bool IconView::HandleEscape(void)
     return handled;
 }
 
-void IconView::customEvent(QCustomEvent *e)
+void IconView::customEvent(QEvent *event)
 {
-    if (!e || (e->type() != QEvent::User))
-        return;
+    ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
-    ThumbData *td = (ThumbData*) (e->data());
-    if (!td) return;
-
-    ThumbItem *thumbitem = m_itemDict.find(td->fileName);
-    if (thumbitem)
+    if (tge->type() == ThumbGenEvent::ImageReady)
     {
-        thumbitem->SetPixmap(NULL);
+        ThumbData *td = tge->thumbData;
+        if (!td) return;
 
-        int rotateAngle = thumbitem->GetRotationAngle();
-
-        if (rotateAngle)
+        ThumbItem *thumbitem = m_itemDict.find(td->fileName);
+        if (thumbitem)
         {
-            QWMatrix matrix;
-            matrix.rotate(rotateAngle);
-            td->thumb = td->thumb.xForm(matrix);
+            thumbitem->SetPixmap(NULL);
+
+            int rotateAngle = thumbitem->GetRotationAngle();
+
+            if (rotateAngle)
+            {
+                QMatrix matrix;
+                matrix.rotate(rotateAngle);
+                td->thumb = td->thumb.xForm(matrix);
+            }
+
+
+            int pos = m_itemList.find(thumbitem);
+
+            LoadThumbnail(thumbitem);
+
+            MythImage *image = GetMythPainter()->GetFormatImage();
+            QPixmap *pixmap = thumbitem->GetPixmap();
+            if (pixmap)
+            {
+                image->Assign(*pixmap);
+
+                MythListButtonItem *item = m_imageList->GetItemAt(pos);
+                item->setImage(image);
+            }
+
+            thumbitem->SetPixmap(NULL);
         }
-
-
-        int pos = m_itemList.find(thumbitem);
-
-        LoadThumbnail(thumbitem);
-
-        MythImage *image = GetMythPainter()->GetFormatImage();
-        QPixmap *pixmap = thumbitem->GetPixmap();
-        if (pixmap)
-            image->Assign(*pixmap);
-        thumbitem->SetPixmap(NULL);
-
-        MythListButtonItem *item = m_imageList->GetItemAt(pos);
-        item->setImage(image);
+        delete td;
     }
-    delete td;
 
 }
 
@@ -969,9 +987,9 @@ void IconView::HandleShowDevices(void)
 #ifndef _WIN32
     if (mon)
     {
-        QValueList<MythMediaDevice*> removables =
+        Q3ValueList<MythMediaDevice*> removables =
             mon->GetMedias(MEDIATYPE_DATA);
-        QValueList<MythMediaDevice*>::Iterator it = removables.begin();
+        Q3ValueList<MythMediaDevice*>::Iterator it = removables.begin();
         for (; it != removables.end(); it++)
         {
             if (mon->ValidateAndLock(*it))
@@ -1128,17 +1146,16 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
         return;
 
     d.setNameFilter(MEDIA_FILENAMES);
-    d.setSorting(m_sortorder);
+    d.setSorting((QDir::SortFlag)m_sortorder);
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks  | QDir::Readable);
     d.setMatchAllDirs(true);
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return;
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
+    QFileInfoList list = d.entryInfoList();
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
 
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
+        fi = &(*it);
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
@@ -1152,8 +1169,8 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
         else
         {
             VERBOSE(VB_GENERAL, LOC + QString("Copying %1 to %2")
-                    .arg(fi->absFilePath().local8Bit())
-                    .arg(toDir.local8Bit()));
+                    .arg(fi->absFilePath())
+                    .arg(toDir));
 
             // TODO FIXME, we shouldn't need a myth_system call here
             QString cmd = "cp \"" + fi->absFilePath().local8Bit() +

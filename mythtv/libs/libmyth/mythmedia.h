@@ -1,9 +1,9 @@
 #ifndef MYTH_MEDIA_H
 #define MYTH_MEDIA_H
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QObject>
+#include <QMap>
+#include <QString>
 
 #include "mythexp.h"
 

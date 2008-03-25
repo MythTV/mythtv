@@ -23,13 +23,13 @@
 #define NEWSENGINE_H
 
 #include <qstring.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qobject.h>
 #include <qdatetime.h>
-#include <qcstring.h>
+#include <q3cstring.h>
 
-class QUrlOperator;
-class QNetworkOperation;
+class Q3UrlOperator;
+class Q3NetworkOperation;
 class NewsSite;
 
 // -------------------------------------------------------
@@ -38,7 +38,7 @@ class NewsArticle
 {
 public:
 
-    typedef QPtrList<NewsArticle> List;
+    typedef Q3PtrList<NewsArticle> List;
 
     NewsArticle(NewsSite *parent, const QString& title,
                 const QString& desc, const QString& artURL,
@@ -80,7 +80,7 @@ public:
         Success
     };
 
-    typedef QPtrList<NewsSite> List;
+    typedef Q3PtrList<NewsSite> List;
 
     NewsSite(const QString& name, const QString& url,
              const QDateTime& updated);
@@ -117,7 +117,7 @@ private:
     QString    m_imageURL;
 
     NewsArticle::List m_articleList;
-    QUrlOperator     *m_urlOp;
+    Q3UrlOperator     *m_urlOp;
 
     void ReplaceHtmlChar( QString &s);
 
@@ -127,9 +127,9 @@ signals:
 
 private slots:
 
-    void slotFinished(QNetworkOperation*);
+    void slotFinished(Q3NetworkOperation*);
     void slotGotData(const QByteArray& data,
-                     QNetworkOperation* op);
+                     Q3NetworkOperation* op);
 };
 
 #endif /* NEWSENGINE_H */

@@ -1,11 +1,14 @@
 #ifndef MYTHSOCKET_H
 #define MYTHSOCKET_H
 
-#include <qsocketdevice.h>
-#include <qwaitcondition.h>
-#include <qtimer.h>
 #include <pthread.h>
-#include <qptrlist.h>
+
+#include <QTextStream>
+#include <QString>
+#include <QStringList>
+#include <Q3SocketDevice>
+#include <Q3PtrList>
+
 #include "mythexp.h"
 
 class QHostAddress;
@@ -21,7 +24,7 @@ class MPUBLIC MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
-class MPUBLIC MythSocket : public QSocketDevice
+class MPUBLIC MythSocket : public Q3SocketDevice
 {
     friend void readyReadThread_iffound(MythSocket*);
 
@@ -48,7 +51,7 @@ class MPUBLIC MythSocket : public QSocketDevice
     QString errorToString(void) { return errorToString(error()); }
     QString errorToString(const Error error);
 
-    void setSocket(int socket, Type type = QSocketDevice::Stream);
+    void setSocket(int socket, Type type = Q3SocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
 
     Q_LONG readBlock(char *data, Q_ULONG len);
@@ -85,9 +88,9 @@ class MPUBLIC MythSocket : public QSocketDevice
     static pthread_t            m_readyread_thread;
     static bool                 m_readyread_run;
     static QMutex               m_readyread_lock;
-    static QPtrList<MythSocket> m_readyread_list;
-    static QPtrList<MythSocket> m_readyread_dellist;
-    static QPtrList<MythSocket> m_readyread_addlist;
+    static Q3PtrList<MythSocket> m_readyread_list;
+    static Q3PtrList<MythSocket> m_readyread_dellist;
+    static Q3PtrList<MythSocket> m_readyread_addlist;
     static int                  m_readyread_pipe[2];
 
     static void StartReadyReadThread(void);
@@ -98,7 +101,7 @@ class MPUBLIC MythSocket : public QSocketDevice
     static void WakeReadyReadThread(void);
     static void ShutdownReadyReadThread(void);
 
-    friend class QPtrList<MythSocket>;
+    friend class Q3PtrList<MythSocket>;
 };
 
 #endif

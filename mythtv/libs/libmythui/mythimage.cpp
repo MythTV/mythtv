@@ -1,8 +1,7 @@
 #include <cassert>
 #include <stdint.h>
 
-#include <qpainter.h>
-#include <qapplication.h>
+
 
 #include "mythimage.h"
 #include "mythmainwindow.h"

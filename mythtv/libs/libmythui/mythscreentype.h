@@ -2,6 +2,7 @@
 #define MYTHSCREEN_TYPE_H_
 
 #include "mythuitype.h"
+#include "qlist.h"
 
 class MythScreenStack;
 
@@ -47,7 +48,7 @@ class MythScreenType : public MythUIType
     bool m_IsDeleting;
 
     MythUIType *m_CurrentFocusWidget;
-    QPtrList<MythUIType> m_FocusWidgetList;
+    QList<MythUIType *> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
 

@@ -1,4 +1,7 @@
 #include <cstdlib>
+
+#include <QPixmap>
+
 using namespace std;
 
 #include "managedlist.h"
@@ -768,7 +771,7 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
     container = theme->GetSet(containerName);
     if (!container)
     {
-        cerr << "Failed to get container " << containerName << endl;
+        cerr << "Failed to get container " << (const char *)containerName << endl;
         return false;
     }
 
@@ -777,7 +780,7 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
-        cerr << "Failed to get list " << listName << endl;
+        cerr << "Failed to get list " << (const char *)listName << endl;
         return false;
     }
 

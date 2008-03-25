@@ -78,8 +78,7 @@ long GetIPAddressList(QStringList &sStrList)
 
     if (getifaddrs(&list) == -1)
     {
-        VERBOSE(VB_UPNP, QString("GetIPAddressList() - getifaddrs failed: ")
-                         + strerror(errno));
+        VERBOSE(VB_UPNP, "GetIPAddressList() - getifaddrs failed: " << strerror(errno));
         return 0;
     }
 
@@ -101,8 +100,7 @@ long GetIPAddressList(QStringList &sStrList)
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
                       address, sizeof(address)) == NULL)
         {
-            VERBOSE(VB_UPNP, QString("GetIPAddressList() - inet_ntop failed: ")
-                             + strerror(errno));
+            VERBOSE(VB_UPNP, "GetIPAddressList() - inet_ntop failed: " << strerror(errno));
             continue;
         }
 
@@ -130,7 +128,7 @@ long GetIPAddressList( QStringList &sStrList )
 
     sStrList.clear();
 
-    QSocketDevice socket( QSocketDevice::Datagram );
+    Q3SocketDevice socket( Q3SocketDevice::Datagram );
 
     struct ifreq  ifReqs[ 16 ];
     struct ifreq  ifReq;

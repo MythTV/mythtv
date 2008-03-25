@@ -14,7 +14,7 @@
 
 #include "util.h"
 
-#include <qtextstream.h>
+#include <q3textstream.h>
 #include <math.h>
 #include <qregexp.h>
 
@@ -292,9 +292,9 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
     int          nCount  = 0;
     QByteArray   aBody;
-    QTextStream  tsBody( aBody, IO_WriteOnly );
+    Q3TextStream  tsBody( aBody, QIODevice::WriteOnly );
 
-    tsBody.setEncoding( QTextStream::UnicodeUTF8 );
+    tsBody.setEncoding( Q3TextStream::UnicodeUTF8 );
 
     // ----------------------------------------------------------------------
     // Build Body... Only send if there are changes
@@ -306,9 +306,9 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // -=>TODO: Need to add support for more than one CallBack URL.
 
         QByteArray  *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
-        QTextStream  tsMsg( *pBuffer, IO_WriteOnly );
+        Q3TextStream  tsMsg( *pBuffer, QIODevice::WriteOnly );
 
-        tsMsg.setEncoding( QTextStream::UnicodeUTF8 );
+        tsMsg.setEncoding( Q3TextStream::UnicodeUTF8 );
 
         // ----------------------------------------------------------------------
         // Build Message Header 
@@ -335,7 +335,8 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         VERBOSE(VB_UPNP, QString("UPnp::Eventing::NotifySubscriber( %1 ) : %2 Variables").arg( sHost ).arg(nCount));
 
-        UPnpEventTask    *pEventTask      = new UPnpEventTask( pInfo->qURL.host(), nPort, pBuffer ); 
+        UPnpEventTask    *pEventTask      = new UPnpEventTask( QHostAddress( pInfo->qURL.host() ),
+                                                                             nPort, pBuffer );
 
         UPnp::g_pTaskQueue->AddTask( 250, pEventTask );
 
@@ -354,7 +355,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int Eventing::BuildNotifyBody( QTextStream &ts, TaskTime ttLastNotified )
+int Eventing::BuildNotifyBody( Q3TextStream &ts, TaskTime ttLastNotified )
 {
     int nCount = 0;
 

@@ -12,11 +12,11 @@
 #define HTTPREQUEST_H_
 
 #include <iostream>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
+#include <Q3TextStream>
 
 using namespace std;
 
-#include <qsocket.h>
 #include "upnputil.h"
 #include "bufferedsocketdevice.h"
 
@@ -127,7 +127,7 @@ class HTTPRequest
 
         QString             m_sFileName;
 
-        QTextStream         m_response;
+        Q3TextStream         m_response;
 
         IPostProcess       *m_pPostProcess;
 

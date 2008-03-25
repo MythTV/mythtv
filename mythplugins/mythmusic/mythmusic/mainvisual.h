@@ -13,12 +13,15 @@
 
 #include <qwidget.h>
 #include <qdialog.h>
-#include <qmemarray.h>
+#include <q3memarray.h>
 #include <qpixmap.h>
 #include <qimage.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <qtimer.h>
+#include <QPaintEvent>
+#include <QResizeEvent>
+#include <QHideEvent>
 
 class Buffer;
 class Output;
@@ -105,7 +108,7 @@ public:
 
     void paintEvent( QPaintEvent * );
     void resizeEvent( QResizeEvent * );
-    void customEvent( QCustomEvent * );
+    void customEvent( QEvent * );
     void hideEvent( QHideEvent * );
 
     void setFrameRate( int newfps );
@@ -133,7 +136,7 @@ private:
     VisualBase *vis;
     Metadata *meta;
     QPixmap pixmap;
-    QPtrList<VisualNode> nodes;
+    Q3PtrList<VisualNode> nodes;
     bool playing;
     int fps;
     QTimer *timer;
@@ -173,7 +176,7 @@ public:
 
 protected:
     QColor startColor, targetColor;
-    QMemArray<double> magnitudes;
+    Q3MemArray<double> magnitudes;
     QSize size;
     bool rubberband;
     double falloff;

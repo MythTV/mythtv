@@ -4,6 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythmpeg2-$$LIBVERSION
 CONFIG += thread staticlib warn_off
+CONFIG -= qt
 
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC -fno-common

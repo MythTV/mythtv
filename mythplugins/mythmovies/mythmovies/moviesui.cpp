@@ -1,11 +1,13 @@
 #include <qtimer.h>
 #include <qapplication.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/compat.h>
 
-#include <qprocess.h>
+#include <q3process.h>
 #include <unistd.h>
 #include <cstdlib>
 
@@ -32,18 +34,18 @@ namespace
 
         VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
                 arg(args.join(" ")).local8Bit() );
-        QProcess proc(args);
+        Q3Process proc(args);
 
         QString cmd = args[0];
         QFileInfo info(cmd);
 
         if (!info.exists())
         {
-            err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
+            err = QString("\"%1\" failed: does not exist").arg(cmd);
         }
         else if (!info.isExecutable())
         {
-            err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
+            err = QString("\"%1\" failed: not executable").arg(cmd);
         }
         else if (proc.start())
         {
@@ -79,7 +81,7 @@ namespace
                     if (!proc.normalExit())
                     {
                         err = QString("\"%1\" failed: Process exited "
-                                "abnormally").arg(cmd.local8Bit());
+                                "abnormally").arg(cmd);
                     }
 
                     break;
@@ -89,7 +91,7 @@ namespace
         else
         {
             err = QString("\"%1\" failed: Could not start process")
-                    .arg(cmd.local8Bit());
+                    .arg(cmd);
         }
 
         while (proc.canReadLineStdout() || proc.canReadLineStderr())
@@ -599,8 +601,8 @@ void MoviesUI::processTheatre(QDomNode &n)
                         "(theatername, theateraddress)" 
                         "values (:NAME,:ADDRESS)");
 
-                query->bindValue(":NAME", t.name.utf8());
-                query->bindValue(":ADDRESS", t.address.utf8());
+                query->bindValue(":NAME", t.name);
+                query->bindValue(":ADDRESS", t.address);
                 if (!query->exec())
                 {
                     VERBOSE(VB_IMPORTANT, "Failure to Insert Theater");
@@ -655,7 +657,7 @@ void MoviesUI::processMovie(QDomNode &n, int theaterId)
     }
     
     query->prepare("SELECT id FROM movies_movies Where moviename = :NAME");
-    query->bindValue(":NAME", m.name.utf8());
+    query->bindValue(":NAME", m.name);
     if (query->exec() && query->next())
     {
         movieId = query->value(0).toInt();
@@ -665,9 +667,9 @@ void MoviesUI::processMovie(QDomNode &n, int theaterId)
         query->prepare("INSERT INTO movies_movies ("
                 "moviename, rating, runningtime) values ("
                 ":NAME, :RATING, :RUNNINGTIME)");
-        query->bindValue(":NAME", m.name.utf8());
-        query->bindValue(":RATING", m.rating.utf8());
-        query->bindValue(":RUNNINGTIME", m.runningTime.utf8());
+        query->bindValue(":NAME", m.name);
+        query->bindValue(":RATING", m.rating);
+        query->bindValue(":RUNNINGTIME", m.runningTime);
         if (query->exec())
         {
             movieId = query->lastInsertId().toInt();

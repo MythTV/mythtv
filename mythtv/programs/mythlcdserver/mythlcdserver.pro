@@ -13,3 +13,5 @@ HEADERS += lcdserver.h serversocket.h lcdprocclient.h
 
 SOURCES += main.cpp lcdserver.cpp serversocket.cpp lcdprocclient.cpp 
 
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

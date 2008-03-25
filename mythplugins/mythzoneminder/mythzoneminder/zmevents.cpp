@@ -19,8 +19,13 @@
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qapplication.h>
+//Added by qt3to4:
+#include <Q3Frame>
+#include <QPixmap>
+#include <QLabel>
+#include <QKeyEvent>
 
 // myth
 #include "mythtv/mythcontext.h"
@@ -68,8 +73,8 @@ UITextType* ZMEvents::getTextType(QString name)
 
     if (!type)
     {
-        cout << "ERROR: Failed to find '" << name <<  "' UI element in theme file\n"
-                << "Bailing out!" << endl;
+        VERBOSE(VB_IMPORTANT, "ERROR: Failed to find '" + name + "' UI element in theme file\n" +
+                "              Bailing out!");
         exit(0);
     }
 
@@ -528,7 +533,7 @@ void ZMEvents::gridItemChanged(ImageGridItem *item)
                     {
                         QSize size = m_eventGrid->getImageItemSize();
                         QPixmap *pixmap = new QPixmap(image.smoothScale(
-                                size.width(), size.height(), QImage::ScaleMin));
+                                size.width(), size.height(), Qt::KeepAspectRatio));
 
                         gridItem->pixmap = pixmap;
                     }
@@ -595,7 +600,7 @@ void ZMEvents::showMenu()
     QLabel *caption = popup->addLabel(tr("Event List Menu"), MythPopupBox::Medium);
     caption->setAlignment(Qt::AlignCenter);
 
-    QButton *button = popup->addButton(tr("Refresh"));
+    QAbstractButton *button = popup->addButton(tr("Refresh"));
     if (getContext() == 1)
         popup->addButton(tr("Show Image View"));
     else
@@ -604,8 +609,8 @@ void ZMEvents::showMenu()
 
     QLabel *splitter = popup->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setFrameShape(Q3Frame::HLine);
+    splitter->setFrameShadow(Q3Frame::Sunken);
     splitter->setMinimumHeight((int) (25 * hmult));
     splitter->setMaximumHeight((int) (25 * hmult));
 

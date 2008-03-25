@@ -4,7 +4,7 @@
 // Qt headers
 #include <qstring.h>
 #include <qdatetime.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 #include <qmap.h>
 
 // MythTV headers
@@ -88,8 +88,8 @@ class ProgInfo
 
     QString clumpidx;
     QString clumpmax;
-    QValueList<ProgRating> ratings;
-    QValueList<ProgCredit> credits;
+    Q3ValueList<ProgRating> ratings;
+    Q3ValueList<ProgCredit> credits;
     QString content;
 };
 
@@ -99,14 +99,14 @@ class MPUBLIC ProgramData
     ProgramData() : listing_wrap_offset(0) {}
 
     void handlePrograms(int id,
-                        QMap<QString, QValueList<ProgInfo> > *proglist);
+                        QMap<QString, Q3ValueList<ProgInfo> > *proglist);
 
     static int  fix_end_times(void);
     static void clearDataByChannel(int chanid, QDateTime from, QDateTime to);
     static void clearDataBySource(int sourceid, QDateTime from, QDateTime to);
 
   private:
-    void fixProgramList(QValueList<ProgInfo> *fixlist);
+    void fixProgramList(Q3ValueList<ProgInfo> *fixlist);
 
   public:
     int  listing_wrap_offset;

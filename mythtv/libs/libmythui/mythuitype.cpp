@@ -1,7 +1,6 @@
 #include <iostream>
-using namespace std;
 
-#include <qfontmetrics.h>
+using namespace std;
 
 #include "mythuitype.h"
 #include "mythimage.h"
@@ -61,14 +60,14 @@ MythUIType *MythUIType::GetChild(const char *name, const char *inherits)
     return NULL;
 }
 
-QValueVector<MythUIType *> *MythUIType::GetAllChildren(void)
+QVector<MythUIType *> *MythUIType::GetAllChildren(void)
 {
     return &m_ChildrenList;
 }
 
 void MythUIType::DeleteAllChildren(void)
 {
-    QValueVector<MythUIType*>::iterator it;
+    QVector<MythUIType*>::iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->deleteLater();
@@ -97,7 +96,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
             return NULL;
 
         /* check all children */
-        QValueVector<MythUIType*>::iterator it;
+        QVector<MythUIType*>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
@@ -237,7 +236,7 @@ void MythUIType::Pulse(void)
     HandleMovementPulse();
     HandleAlphaPulse();
 
-    QValueVector<MythUIType *>::Iterator it;
+    QVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->Pulse();
 }
@@ -268,7 +267,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
 
     DrawSelf(p, xoffset, yoffset, alphaMod, clipRect);
 
-    QValueVector<MythUIType *>::Iterator it;
+    QVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(), 
@@ -340,7 +339,7 @@ QString MythUIType::cutDown(const QString &data, QFont *font,
         if (multiline)
             diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
                                                justification, data,
-                                               index + margin).height();
+                                               index + margin, 0).height();
         else
             diff = maxwidth - fm.width(data, index + margin);
         if (diff >= 0)
@@ -417,7 +416,7 @@ bool MythUIType::keyPressEvent(QKeyEvent *)
     return false;
 }
 
-void MythUIType::customEvent(QCustomEvent *)
+void MythUIType::customEvent(QEvent *)
 {
     return;
 }
@@ -481,12 +480,12 @@ void MythUIType::Show(void)
     emit Showing();
 }
 
-void MythUIType::AddFocusableChildrenToList(QPtrList<MythUIType> &focusList)
+void MythUIType::AddFocusableChildrenToList(QList<MythUIType *> &focusList)
 {
     if (m_CanHaveFocus)
         focusList.append(this);
 
-    QValueVector<MythUIType *>::Iterator it;
+    QVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->AddFocusableChildrenToList(focusList);
 }
@@ -533,7 +532,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_XYDestination = base->m_XYDestination;
     m_XYSpeed = base->m_XYSpeed;
 
-    QValueVector<MythUIType *>::Iterator it;
+    QVector<MythUIType *>::Iterator it;
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end(); 
          ++it)
     {

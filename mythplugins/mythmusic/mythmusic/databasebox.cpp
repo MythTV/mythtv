@@ -1,5 +1,8 @@
 #include <cstdlib>
 #include <iostream>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
 using namespace std;
 
 // qt
@@ -7,7 +10,7 @@ using namespace std;
 #include <qstringlist.h>
 #include <qpixmap.h>
 #include <qregexp.h>
-#include <qframe.h>
+#include <q3frame.h>
 #include <qlayout.h>
 #include <qevent.h>
 
@@ -186,7 +189,7 @@ void DatabaseBox::showWaiting()
         if (class LCD * lcd = LCD::Get())
         {
             // Set Loading Message on the LCD
-            QPtrList<LCDTextItem> textItems;
+            Q3PtrList<LCDTextItem> textItems;
             textItems.setAutoDelete(true);
 
             textItems.append(new LCDTextItem(1, ALIGN_CENTERED, 
@@ -385,7 +388,7 @@ void DatabaseBox::ErrorPopup(const QString &msg)
 
     error_popup->addLabel(msg);
 
-    QButton *mac_b =error_popup->addButton(tr("OK"), this,
+    QAbstractButton *mac_b =error_popup->addButton(tr("OK"), this,
                                            SLOT(closeErrorPopup()));
 
     int x = (int)(100 * wmult);
@@ -546,7 +549,7 @@ void DatabaseBox::fillCD(void)
         
         //  reflect selections in cd playlist
 
-        QPtrListIterator<GenericTree> it = cditem->getFirstChildIterator();
+        Q3PtrListIterator<GenericTree> it = cditem->getFirstChildIterator();
         UIListGenericTree *uit;
                 
         while ((uit = (UIListGenericTree *)it.current()))
@@ -810,7 +813,7 @@ void DatabaseBox::doPlaylistPopup(TreeCheckItem *item_ptr)
     playlist_popup = new MythPopupBox(gContext->GetMainWindow(), 
                                       "playlist_popup");
 
-    QButton *mac_b = playlist_popup->addButton(tr("Move to Active Play Queue"),
+    QAbstractButton *mac_b = playlist_popup->addButton(tr("Move to Active Play Queue"),
                                                this, SLOT(copyToActive()));
 
     playlist_popup->addButton(tr("Delete This Playlist"), this, 
@@ -856,7 +859,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
     active_popup->addButton(tr("Clear the Active Play Queue"), this, 
                             SLOT(clearActive()));
 
-    QButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"), 
+    QAbstractButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"), 
                                           this, SLOT(popBackPlaylist()));
 
     // CD writing
@@ -870,8 +873,8 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
             cdwriter = true;
     }
 
-    QButton *cdaudiob = NULL;
-    QButton *cdmp3b = NULL;
+    QAbstractButton *cdaudiob = NULL;
+    QAbstractButton *cdmp3b = NULL;
 
     if (cdwriter)
     {
@@ -988,7 +991,7 @@ void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
 
     if (keep_going)
     {
-        QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
+        Q3PtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
         TreeCheckItem *child;
         while ((child = (TreeCheckItem *)it.current())) 
         {
@@ -1037,7 +1040,7 @@ void DatabaseBox::checkParent(UIListGenericTree *item)
         bool allon = true;
         bool oneon = false;
 
-        QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
+        Q3PtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
 
         while ((child = (TreeCheckItem *)it.current()))
         {
@@ -1219,7 +1222,7 @@ void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
         startingpoint = rootNode;
     }
 
-    QPtrListIterator<GenericTree> it = startingpoint->getFirstChildIterator();
+    Q3PtrListIterator<GenericTree> it = startingpoint->getFirstChildIterator();
     UIListGenericTree *uit;
 
     // Using the current playlist metadata, check the boxes on the ListView 

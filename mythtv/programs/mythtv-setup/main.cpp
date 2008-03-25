@@ -93,7 +93,7 @@ void SetupMenu(MythMainWindow *win)
     }
     else
     {
-        cerr << "Couldn't find theme " << theme << endl;
+        cerr << "Couldn't find theme " << (const char *)theme << endl;
     }
 }
 
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
                     tokens[0].replace(QRegExp("^[\"']"), "");
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
     if (geometry != "")
         if (!gContext->ParseGeometryOverride(geometry))
             cerr << "Illegal -geometry argument '"
-                 << geometry << "' (ignored)\n";
+                 << (const char *)geometry << "' (ignored)\n";
 
     if (settingsOverride.size())
     {
@@ -305,6 +305,7 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
+    mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
     gContext->UpdateImageCache();
     MythThemeBase *themeBase = new MythThemeBase();
@@ -350,7 +351,7 @@ int main(int argc, char *argv[])
         {
             QString prompt;
 
-            if (problems->contains("\n") > 1)
+            if (problems->count("\n") > 1)
                 prompt = QObject::tr("Do you want to fix these problems?");
             else
                 prompt = QObject::tr("Do you want to fix this problem?");

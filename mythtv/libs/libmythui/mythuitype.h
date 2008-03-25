@@ -3,10 +3,12 @@
 
 #include <qobject.h>
 #include <qimage.h>
-#include <qobjectlist.h>
-#include <qptrlist.h>
-#include <qvaluevector.h>
+#include <qobject.h>
+#include <qlist.h>
+#include <qvector.h>
 #include <qfont.h>
+#include <QEvent>
+#include <QKeyEvent>
 
 #include "xmlparsebase.h"
 
@@ -30,7 +32,7 @@ class MythUIType : public QObject, public XMLParseBase
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const char *name, const char *inherits = 0);
     MythUIType *GetChildAt(const QPoint &p);
-    QValueVector<MythUIType *> *GetAllChildren(void);
+    QVector<MythUIType *> *GetAllChildren(void);
 
     void DeleteAllChildren(void);
 
@@ -78,7 +80,7 @@ class MythUIType : public QObject, public XMLParseBase
     bool AddFont(const QString &text, MythFontProperties *fontProp);
 
   protected:
-    virtual void customEvent(QCustomEvent *);
+    virtual void customEvent(QEvent *);
 
   public slots:
     void LoseFocus();
@@ -103,7 +105,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
 
-    void AddFocusableChildrenToList(QPtrList<MythUIType> &focusList);
+    void AddFocusableChildrenToList(QList<MythUIType *> &focusList);
     void HandleAlphaPulse();
     void HandleMovementPulse();
 
@@ -121,7 +123,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
 
-    QValueVector<MythUIType *> m_ChildrenList;
+    QVector<MythUIType *> m_ChildrenList;
 
     bool m_Visible;
     bool m_HasFocus;

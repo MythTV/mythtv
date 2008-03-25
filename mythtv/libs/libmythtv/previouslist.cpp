@@ -1,13 +1,17 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
 #include <iostream>
 #include <map>
@@ -752,7 +756,7 @@ void PreviousList::removalDialog()
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
-        query.bindValue(":TITLE", pi->title.utf8());
+        query.bindValue(":TITLE", pi->title);
         query.exec();
 
         ScheduledRecording::signalChange(0);
@@ -781,7 +785,7 @@ void PreviousList::deleteItem()
     fillItemList();
 }
 
-void PreviousList::customEvent(QCustomEvent *e)
+void PreviousList::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;

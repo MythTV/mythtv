@@ -68,7 +68,10 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
             setLabel(QObject::tr("Profile name"));
         }
 
-      public slots:
+      // -=>TODO: Qt4 can't have nested classes with slots/signals
+      //          Is this slot even used????
+      //public slots:
+      public:
         virtual void setValue(const QString &newValue)
         {
             bool editable = (newValue != "Default") && (newValue != "Live TV");

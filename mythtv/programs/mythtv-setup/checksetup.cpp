@@ -27,7 +27,7 @@ static bool checkPath(QString path, QString *probs)
     }
 
     QFile test(path.append("/.test"));
-    if (test.open(IO_WriteOnly))
+    if (test.open(QIODevice::WriteOnly))
         test.remove();
     else
     {

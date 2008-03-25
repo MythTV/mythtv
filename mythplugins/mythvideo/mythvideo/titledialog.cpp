@@ -1,19 +1,21 @@
 /*
-	titledialog.cpp
+    titledialog.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     the dialog where you actually choose titles to rip
 */
 
 #include <iostream>
-using namespace std;
 
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qframe.h>
-#include <qregexp.h>
+#include <Q3PtrList>
+#include <QKeyEvent>
+
+#include <QLayout>
+#include <QLabel>
+#include <Q3Frame>
+#include <QRegExp>
 
 #include <mythtv/util.h>
 #include <mythtv/uitypes.h>
@@ -21,9 +23,9 @@ using namespace std;
 
 #include "titledialog.h"
 
-TitleDialog::TitleDialog(QSocket *a_socket, 
+TitleDialog::TitleDialog(Q3Socket *a_socket, 
                          QString d_name, 
-                         QPtrList<DVDTitleInfo> *titles, 
+                         Q3PtrList<DVDTitleInfo> *titles, 
                          MythMainWindow *parent,
                          QString window_name,
                          QString theme_filename,
@@ -105,7 +107,7 @@ void TitleDialog::showCurrentTitle()
         if(audio_select)
         {
             audio_select->cleanOut();
-            QPtrList<DVDAudioInfo> *audio_tracks = current_title->getAudioTracks();
+            Q3PtrList<DVDAudioInfo> *audio_tracks = current_title->getAudioTracks();
             for(uint j = 0; j < audio_tracks->count(); j++)
             {
                 audio_select->addItem(j + 1, audio_tracks->at(j)->getAudioString());
@@ -138,7 +140,7 @@ void TitleDialog::showCurrentTitle()
         {
             subtitle_select->cleanOut();
             subtitle_select->addItem(-1, tr("None"));
-            QPtrList<DVDSubTitleInfo> *subtitles = current_title->getSubTitles();
+            Q3PtrList<DVDSubTitleInfo> *subtitles = current_title->getSubTitles();
             for(uint j = 0; j < subtitles->count(); ++j)
             {
                 subtitle_select->addItem(subtitles->at(j)->getID(), subtitles->at(j)->getName());
@@ -167,9 +169,10 @@ void TitleDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
 
         if (action == "PAGEDOWN")

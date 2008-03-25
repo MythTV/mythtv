@@ -244,7 +244,8 @@ void Tone::Play(QString deviceName, bool loop)
             audioTimer->start(Samples / 8, true); // At 8khz, convert to ms by "/8"
         }
         else
-            cout << "MythPhone: could not open " << deviceName << " to play tone\n";
+            VERBOSE(VB_IMPORTANT, QString("MythPhone: could not open %1")
+                    .arg(deviceName));
     }
 #endif    
 }

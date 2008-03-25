@@ -14,3 +14,6 @@ QMAKE_CLEAN += $(TARGET)
 
 # Input
 SOURCES += main.cpp
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

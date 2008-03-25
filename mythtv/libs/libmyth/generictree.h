@@ -2,9 +2,9 @@
 #define GENERICTREE_H_
 
 #include <qstring.h>
-#include <qvaluevector.h>
-#include <qvaluelist.h>
-#include <qptrlist.h>
+#include <q3valuevector.h>
+#include <q3valuelist.h>
+#include <q3ptrlist.h>
 
 #include "mythexp.h"
 
@@ -14,7 +14,7 @@ class SortableGenericTreeList;
 
 class MPUBLIC GenericTree
 {
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
 
   public:
     GenericTree(const QString &a_string = "", int an_int = 0, 
@@ -29,21 +29,21 @@ class MPUBLIC GenericTree
 
     GenericTree *findLeaf(int ordering_index = -1);
 
-    GenericTree* findNode(QValueList<int> route_of_branches);
-    GenericTree* recursiveNodeFinder(QValueList<int> route_of_branches);
-    bool checkNode(QValueList<int> route_of_branches);
+    GenericTree* findNode(Q3ValueList<int> route_of_branches);
+    GenericTree* recursiveNodeFinder(Q3ValueList<int> route_of_branches);
+    bool checkNode(Q3ValueList<int> route_of_branches);
 
     GenericTree *nextSibling(int number_down, int ordering_index = -1);
     GenericTree *prevSibling(int number_up, int ordering_index = -1);
 
-    QPtrListIterator<GenericTree> getFirstChildIterator(int ordering = -1);
+    Q3PtrListIterator<GenericTree> getFirstChildIterator(int ordering = -1);
 
     GenericTree *getSelectedChild(int ordering_index);
     GenericTree *getChildAt(uint reference, int ordering_index = -1);
     GenericTree *getChildByName(const QString &a_name);
     GenericTree *getChildByInt(int an_int);
 
-    QPtrList<GenericTree> *getAllChildren(int ordering_index = -1);
+    Q3PtrList<GenericTree> *getAllChildren(int ordering_index = -1);
 
     int getChildPosition(GenericTree *child, int ordering_index = -1);
     int getPosition(void);
@@ -78,7 +78,7 @@ class MPUBLIC GenericTree
     void becomeSelectedChild(void);
     void setSelectedChild(GenericTree* a_node) { m_selected_subnode = a_node; }
 
-    void addYourselfIfSelectable(QPtrList<GenericTree> *flat_list);
+    void addYourselfIfSelectable(Q3PtrList<GenericTree> *flat_list);
     void buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
 
     GenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around, 

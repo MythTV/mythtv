@@ -1,9 +1,9 @@
-#include "cleanup.h"
-
 #include <mythtv/mythcontext.h>
 
 #include <list>
 #include <algorithm>
+
+#include "cleanup.h"
 
 CleanupProc::~CleanupProc()
 {

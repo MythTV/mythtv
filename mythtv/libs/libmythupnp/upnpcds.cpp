@@ -14,7 +14,7 @@
 
 #include "util.h"
 
-#include <qtextstream.h>
+#include <q3textstream.h>
 #include <math.h>
 #include <qregexp.h>
 
@@ -606,8 +606,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     if (pResults != NULL)
     {
-
-        if (key)  
+        if (!key.isEmpty())
             idPath.last().append(QString("=%1").arg(key)); 
         else 
         {
@@ -615,8 +614,6 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
             {
                 idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
                 idPath = QStringList::split( "?", idPath[0] );
-
-                idPath = idPath[0];
 
                 if (idPath[0].startsWith("Id"))
                     idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
@@ -916,7 +913,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
     // ----------------------------------------------------------------------
     
     QString sKey = idPath.last().section( '=', 1, 1 );
-    QUrl::decode( sKey );
+    Q3Url::decode( sKey );
 
     if (sKey.length() > 0)
     {

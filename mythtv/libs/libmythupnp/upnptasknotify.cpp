@@ -17,10 +17,10 @@
 
 // Qt headers
 #include <qstringlist.h>
-#include <qdeepcopy.h>
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>
+#include <Q3CString>
 
 // MythTV headers
 #include "upnp.h"
@@ -60,7 +60,7 @@ UPnpNotifyTask::~UPnpNotifyTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket, 
+void UPnpNotifyTask::SendNotifyMsg( Q3SocketDevice *pSocket,
                                     QString        sNT,
                                     QString        sUDN )
 {
@@ -96,13 +96,13 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
     // Refresh IP Address List in case of changes
     // ----------------------------------------------------------------------
 
-    QStringList addressList = QDeepCopy<QStringList>(UPnp::g_IPAddrList);
+    QStringList addressList = UPnp::g_IPAddrList;
 
     for ( QStringList::Iterator it  = addressList.begin(); 
                                 it != addressList.end(); 
                               ++it ) 
     {
-        if (!*it)
+        if ((*it).isEmpty())
         {
             VERBOSE(VB_GENERAL,
                     "UPnpNotifyTask::SendNotifyMsg - NULL in m_addressList");
@@ -118,7 +118,7 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
                              .arg( m_nServicePort);
 
         QString  sPacket  = sHeader + sData;
-        QCString scPacket = sPacket.utf8();
+        Q3CString scPacket = sPacket.utf8();
 
         // ------------------------------------------------------------------
         // Send Packet to Socket (Send same packet twice)
@@ -139,7 +139,7 @@ void UPnpNotifyTask::SendNotifyMsg( QSocketDevice *pSocket,
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
 
-    QSocketDevice *pMulticast = new QMulticastSocket( SSDP_GROUP       , SSDP_PORT );
+    Q3SocketDevice *pMulticast = new QMulticastSocket( SSDP_GROUP       , SSDP_PORT );
 //    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
 
     // ----------------------------------------------------------------------
@@ -181,7 +181,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::ProcessDevice( QSocketDevice *pSocket, UPnpDevice *pDevice )
+void UPnpNotifyTask::ProcessDevice( Q3SocketDevice *pSocket, UPnpDevice *pDevice )
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages

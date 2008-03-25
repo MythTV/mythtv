@@ -14,11 +14,11 @@
 #include <sys/time.h>
 
 #include <qdom.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <quuid.h>
 #include <qdatetime.h> 
-#include <qptrlist.h>
-#include <qdict.h>
+#include <q3ptrlist.h>
+#include <q3dict.h>
 
 #include "upnpimpl.h"
 #include "upnputil.h"
@@ -36,7 +36,7 @@ class SubscriberInfo
         TaskTime            ttLastNotified;
 
         QString             sUUID;
-        QUrl                qURL;
+        Q3Url                qURL;
         unsigned short      nKey;
         unsigned long       nDuration;       // Seconds
 
@@ -98,7 +98,7 @@ class SubscriberInfo
 
 //////////////////////////////////////////////////////////////////////////////
 
-class Subscribers : public QDict< SubscriberInfo > 
+class Subscribers : public Q3Dict< SubscriberInfo >
 {
     public:
 
@@ -108,7 +108,7 @@ class Subscribers : public QDict< SubscriberInfo >
         }       
 };
 
-typedef QDictIterator< SubscriberInfo >  SubscriberIterator;
+typedef Q3DictIterator< SubscriberInfo >  SubscriberIterator;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -186,7 +186,7 @@ class StateVariable : public StateVariableBase
 
 //////////////////////////////////////////////////////////////////////////////
 
-class StateVariables : public QDict< StateVariableBase > 
+class StateVariables : public Q3Dict< StateVariableBase >
 {
     protected:
 
@@ -244,7 +244,7 @@ class StateVariables : public QDict< StateVariableBase >
 
 };
 
-typedef QDictIterator< StateVariableBase >  StateVariableIterator;
+typedef Q3DictIterator< StateVariableBase >  StateVariableIterator;
         
               
 //////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ class Eventing : public HttpServerExtension,
 
         virtual void Notify           ( );
         void         NotifySubscriber ( SubscriberInfo *pInfo );
-        int          BuildNotifyBody  ( QTextStream &ts, TaskTime ttLastNotified );
+        int          BuildNotifyBody  ( Q3TextStream &ts, TaskTime ttLastNotified );
 
         void         HandleSubscribe  ( HTTPRequest *pRequest ); 
         void         HandleUnsubscribe( HTTPRequest *pRequest ); 

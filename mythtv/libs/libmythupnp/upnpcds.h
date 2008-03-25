@@ -13,6 +13,7 @@
 
 #include <qdom.h>
 #include <qdatetime.h> 
+#include <Q3PtrList>
 
 #include "upnp.h"
 #include "upnpcdsobjects.h"
@@ -196,7 +197,7 @@ class UPnpCDSExtension
         virtual QString GetSortCapabilities  () { return( "" ); }
 };
 
-typedef QPtrList< UPnpCDSExtension > UPnpCDSExtensionList;   
+typedef Q3PtrList< UPnpCDSExtension > UPnpCDSExtensionList;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

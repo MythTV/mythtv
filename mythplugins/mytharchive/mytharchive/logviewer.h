@@ -3,8 +3,10 @@
 
 // qt
 #include <qlayout.h>
-#include <qhbox.h>
+#include <q3hbox.h>
 #include <qvariant.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // myth
 #include <mythtv/mythwidgets.h>

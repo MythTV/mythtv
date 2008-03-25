@@ -1,17 +1,12 @@
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qimage.h>
-#include <qpixmap.h>
-#include <qdir.h>
-#include <qpainter.h>
-#include <unistd.h>
-#include <qsqldatabase.h>
+#include <q3network.h>
+#include <QPixmap>
+#include <QImage>
 #include <qurl.h>
-#include <qnetwork.h>
-#include <qwaitcondition.h>
-#include <qregexp.h>
-
-#include <qhostaddress.h>
+#include <qapplication.h>
+#include <qdir.h>
+#include <qfileinfo.h>
+#include <qdesktopwidget.h>
+#include <qpainter.h>
 
 #include <cmath>
 #include <queue>
@@ -110,14 +105,14 @@ int parse_verbose_arg(QString arg)
                   "Accepts any combination (separated by comma) of:\n\n" <<
 
 #define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-                QString("  %1").arg(ARG_STR).leftJustify(15, ' ', true) << \
+                (const char *)QString("  %1").arg(ARG_STR).leftJustify(15, ' ', true) << \
                 " - " << ARG_HELP << "\n" <<
 
                   VERBOSE_MAP(VERBOSE_ARG_HELP)
 
                   "\n" <<
                   "The default for this program appears to be: '-v " <<
-                  m_verbose << "'\n\n" <<
+                  (const char *)m_verbose << "'\n\n" <<
                   "Most options are additive except for none, all, and important.\n" <<
                   "These three are semi-exclusive and take precedence over any\n" <<
                   "prior options given.  You can however use something like\n" <<
@@ -161,7 +156,7 @@ int parse_verbose_arg(QString arg)
             else
             {
                 cerr << "Unknown argument for -v/--verbose: "
-                     << option << endl;;
+                     << (const char *)option << endl;;
             }
         }
     }
@@ -280,6 +275,8 @@ class MythContextPrivate
     int m_geometry_x, m_geometry_y;
     int m_geometry_w, m_geometry_h;
 
+    bool m_geometryOverridden;
+
     QString themecachedir;
 
     int bigfontsize, mediumfontsize, smallfontsize;
@@ -330,6 +327,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_wmult(1.0), m_hmult(1.0),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
+      m_geometryOverridden(false),
       themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       serverSock(NULL), eventSock(NULL),
@@ -345,12 +343,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     if (tmp_installprefix)
         m_installprefix = tmp_installprefix;
 
-#if QT_VERSION >= 0x030200
     QDir prefixDir = qApp->applicationDirPath();
-#else
-    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
-    QDir prefixDir(appPath.left(appPath.findRev("/")));
-#endif
 
     if (QDir(m_installprefix).isRelative())
     {
@@ -453,7 +446,7 @@ void MythContextPrivate::EndTempWindow(void)
  */
 void MythContextPrivate::GetScreenBounds()
 {
-    if (m_geometry_w)
+    if (m_geometryOverridden)
     {
         // Geometry on the command-line overrides everything
         m_xbase  = m_geometry_x;
@@ -662,7 +655,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 
     // Queries the user for the DB info, using the command 
     // line or the GUI depending on the application.
-    while (failure.length())
+    while (!failure.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, QString("%1").arg(failure));
         if (( manualSelect && ChooseBackend(failure)) || 
@@ -694,7 +687,7 @@ NoDBfound:
  */
 void MythContextPrivate::StoreGUIsettings()
 {
-    if (m_geometry_w)
+    if (m_geometryOverridden)
     {
         // Geometry on the command-line overrides everything
         m_screenxbase  = m_geometry_x;
@@ -863,7 +856,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
         }
     }
 
-    if (!f->open(IO_WriteOnly))
+    if (!f->open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
                                       "for writing").arg(path));
@@ -871,7 +864,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     }
     
     VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
-    QTextStream s(f);
+    Q3TextStream s(f);
     s << "DBHostName=" << params.dbHostName << endl;
 
     s << "\n"
@@ -975,17 +968,17 @@ bool MythContextPrivate::FindSettingsProbs(void)
 QString MythContextPrivate::getResponse(const QString &query,
                                         const QString &def)
 {
-    cout << query;
+    cout << (const char *)query;
 
     if (def != "")
-        cout << " [" << def << "]  ";
+        cout << " [" << (const char *)def << "]  ";
     else
         cout << "  ";
 
     if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
     {
         cout << endl << "[console is not interactive, using default '"
-             << def  << "']" << endl;
+             << (const char *)def  << "']" << endl;
         return def;
     }
 
@@ -1001,7 +994,7 @@ QString MythContextPrivate::getResponse(const QString &query,
 
     QString qresponse = response;
 
-    if (qresponse == "")
+    if (qresponse.isEmpty())
         qresponse = def;
 
     return qresponse;
@@ -1010,7 +1003,7 @@ QString MythContextPrivate::getResponse(const QString &query,
 int MythContextPrivate::intResponse(const QString &query, int def)
 {
     QString str_resp = getResponse(query, QString("%1").arg(def));
-    if (!str_resp)
+    if (str_resp.isEmpty())
         return false;
     bool ok;
     int resp = str_resp.toInt(&ok);
@@ -1042,18 +1035,18 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         QString response;
         
         // give user chance to skip config
-        cout << endl << error << endl << endl;
+        cout << endl << (const char *)error << endl << endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
-        if (!response || response.left(1).lower() != "y")
+        if (response.isEmpty() || response.left(1).lower() != "y")
             return false;
         
         params.dbHostName = getResponse("Database host name:",
                                         params.dbHostName);
         response = getResponse("Should I test connectivity to this host "
                                "using the ping command?", "yes");
-        params.dbHostPing = (!response || response.left(1).lower() != "y");
+        params.dbHostPing = (response.isEmpty() || response.left(1).lower() != "y");
 
         params.dbPort     = intResponse("Database non-default port:",
                                         params.dbPort);
@@ -1073,7 +1066,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         response = getResponse("Would you like to use Wake-On-LAN to retry "
                                "database connections?",
                                (params.wolEnabled ? "yes" : "no"));
-        if (response)
+        if (!response.isEmpty())
             params.wolEnabled  = (response.left(1).lower() == "y");
 
         if (params.wolEnabled)
@@ -1510,7 +1503,7 @@ MythContext::MythContext(const QString &binversion)
     }
 #endif
 
-    qInitNetworkProtocols();
+    q3InitNetworkProtocols();
 
     d = new MythContextPrivate(this);
     assert(d);
@@ -1698,7 +1691,7 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
         QString str = QString("ANN %1 %2 %3")
             .arg(blockingClient ? "Playback" : "Monitor")
             .arg(d->m_localhostname).arg(false);
-        QStringList strlist = str;
+        QStringList strlist(str);
         serverSock->writeStringList(strlist);
         serverSock->readStringList(strlist, true);
 
@@ -1712,7 +1705,7 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
             
             QString str = QString("ANN Monitor %1 %2")
                                  .arg(d->m_localhostname).arg(true);
-            QStringList strlist = str;
+            QStringList strlist(str);
             eventSock->writeStringList(strlist);
             eventSock->readStringList(strlist);
 
@@ -1818,7 +1811,7 @@ bool MythContext::IsFrontendOnly(void)
     // find out if a backend runs on this host...
     bool backendOnLocalhost = false;
 
-    QStringList strlist = "QUERY_IS_ACTIVE_BACKEND";
+    QStringList strlist("QUERY_IS_ACTIVE_BACKEND");
     strlist << GetHostName();
 
     SendReceiveStringList(strlist);
@@ -1883,7 +1876,7 @@ QString MythContext::GetHostName(void)
     // The reference counting in QString isn't thread-safe, so we need
     // take care of it ourselves.
     d->m_hostnamelock.lock();
-    QString tmp = QDeepCopy<QString>(d->m_localhostname);
+    QString tmp = Q3DeepCopy<QString>(d->m_localhostname);
     d->m_hostnamelock.unlock();
     return tmp;
 }
@@ -2089,17 +2082,15 @@ void MythContext::ClearOldImageCache(void)
 
     dir.setPath(cachedirname);
 
-    const QFileInfoList *list = dir.entryInfoList();
-    if (!list)
-        return;
+    QFileInfoList list = dir.entryInfoList();
 
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
+    QFileInfoList::const_iterator it = list.begin();
     QMap<QDateTime, QString> dirtimes;
+    const QFileInfo *fi;
 
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
-        ++it;
+        fi = &(*it++);
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
         if (fi->isDir() && !fi->isSymLink())
@@ -2123,7 +2114,7 @@ void MythContext::ClearOldImageCache(void)
     for (; dit != dirtimes.end(); ++dit)
     {
         VERBOSE(VB_FILE, QString("Keeping cache dir: %1")
-                .arg((*dit).data()));
+                .arg(*dit));
     }
 }
 
@@ -2142,16 +2133,13 @@ void MythContext::RemoveCacheDir(const QString &dirname)
     if (!dir.exists())
         return;
 
-    const QFileInfoList *list = dir.entryInfoList();
-    if (!list)
-        return;
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
 
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
-        ++it;
+        fi = &(*it++);
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
         if (fi->isFile() && !fi->isSymLink())
@@ -2188,33 +2176,31 @@ void MythContext::CacheThemeImagesDirectory(const QString &dirname,
     if (!dir.exists())
         return;
 
-    const QFileInfoList *list = dir.entryInfoList();
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-
     MythProgressDialog *caching = NULL;
+    QFileInfoList list = dir.entryInfoList();
+
     if (subdirname.length() == 0)
         caching = new MythProgressDialog(QObject::tr("Pre-scaling theme images"),
-                                         list->count());
-
+                                         list.count());
     int progress = 0;
 
     QString destdir = d->themecachedir;
     if (subdirname.length() > 0)
         destdir += subdirname + "/";
 
-    while ((fi = it.current()) != 0)
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
     {
+        fi = &(*it++);
         if (caching)
             caching->setProgress(progress);
         progress++;
 
-        ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
+
         if (fi->isDir() && subdirname.length() == 0)
         {
             QString newdirname = fi->fileName();
@@ -2445,7 +2431,15 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
                                   " height=%2 at %3,%4")
                           .arg(d->m_geometry_w).arg(d->m_geometry_h)
                           .arg(d->m_geometry_x).arg(d->m_geometry_y));
+
+    d->m_geometryOverridden = true;
+
     return true;
+}
+
+bool MythContext::IsGeometryOverridden(void)
+{
+    return d->m_geometryOverridden;
 }
 
 /** \fn FindThemeDir(const QString &themename)
@@ -2541,9 +2535,9 @@ QString MythContext::GetThemeDir(void)
     return d->m_themepathname;
 }
 
-QValueList<QString> MythContext::GetThemeSearchPath(void)
+Q3ValueList<QString> MythContext::GetThemeSearchPath(void)
 {
-    QValueList<QString> searchpath;
+    Q3ValueList<QString> searchpath;
 
     searchpath.append(GetThemeDir());
     if (d->IsWideMode())
@@ -2562,16 +2556,9 @@ void MythContext::DBError(const QString &where, const QSqlQuery& query)
 {
     QString str = QString("DB Error (%1):\n").arg(where);
 
-#if QT_VERSION >= 0x030200
     str += "Query was:\n";
     str += query.executedQuery() + "\n";
     str += QString::fromUtf8(DBErrorMessage(query.lastError()));
-#else
-    str += "Your version of Qt is too old to provide proper debugging\n";
-    str += "Query may have been:\n";
-    str += QString::fromUtf8(query.lastQuery()) + "\n";
-    str += DBErrorMessage(query.lastError());
-#endif
     VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
 }
 
@@ -2616,7 +2603,7 @@ bool MythContext::SaveSettingOnHost(const QString &key,
     if (query.isConnected())
     {
 
-        if ((host) && (host != ""))
+        if (!host.isEmpty())
             query.prepare("DELETE FROM settings WHERE value = :KEY "
                           "AND hostname = :HOSTNAME ;");
         else
@@ -2624,21 +2611,23 @@ bool MythContext::SaveSettingOnHost(const QString &key,
                           "AND hostname is NULL;");
 
         query.bindValue(":KEY", key);
-        query.bindValue(":HOSTNAME", host);
+        if (!host.isEmpty())
+            query.bindValue(":HOSTNAME", host);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Clear setting", query);
 
-        if ((host) && (host != ""))
+        if (!host.isEmpty())
             query.prepare("INSERT INTO settings (value,data,hostname) "
                           "VALUES ( :VALUE, :DATA, :HOSTNAME );");
         else
-            query.prepare("INSERT INTO settings (value,data,hostname ) "
-                          "VALUES ( :VALUE, :DATA, NULL );");
+            query.prepare("INSERT INTO settings (value,data ) "
+                          "VALUES ( :VALUE, :DATA );");
 
         query.bindValue(":VALUE", key);
         query.bindValue(":DATA", newValue);
-        query.bindValue(":HOSTNAME", host);
+        if (!host.isEmpty())
+            query.bindValue(":HOSTNAME", host);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("SaveSettingOnHost query failure: ", query);
@@ -2692,7 +2681,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
         if (query.isActive() && query.size() > 0)
         {
             query.next();
-            value = QString::fromUtf8(query.value(0).toString());
+            value = query.value(0).toString();
             found = true;
         }
         else
@@ -2705,7 +2694,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
             if (query.isActive() && query.size() > 0)
             {
                 query.next();
-                value = QString::fromUtf8(query.value(0).toString());
+                value = query.value(0).toString();
                 found = true;
             }
         }
@@ -2944,8 +2933,8 @@ bool MythContext::FindThemeFile(QString &filename)
         basename = filename.mid(pathStart + 1);
 
     QString file;
-    QValueList<QString> searchpath = GetThemeSearchPath();
-    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+    Q3ValueList<QString> searchpath = GetThemeSearchPath();
+    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         if (QFile::exists((file = *ii + filename)))
@@ -3161,7 +3150,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 
 QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 {
-    QUrl qurl = url;
+    Q3Url qurl = url;
     if (qurl.host() == "")
         return NULL;
  
@@ -3326,8 +3315,8 @@ void MythContext::readyRead(MythSocket *sock)
 
 bool MythContext::CheckProtoVersion(MythSocket* socket)
 {
-    QStringList strlist = QString("MYTH_PROTO_VERSION %1")
-                                 .arg(MYTH_PROTO_VERSION);
+    QStringList strlist(QString("MYTH_PROTO_VERSION %1")
+                        .arg(MYTH_PROTO_VERSION));
     socket->writeStringList(strlist);
     socket->readStringList(strlist, true);
 
@@ -3652,36 +3641,36 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
     QString resp;
 
-    cout << endl << message << endl << endl;
+    cout << endl << (const char *)message << endl << endl;
 
     if (backupResult == "__FAILED__")
         cout << "WARNING: MythTV was unable to backup your database."
              << endl << endl;
     else if (backupResult != "")
         cout << "If your system becomes unstable, a database backup is "
-                "located in " << backupResult << endl << endl;
+            "located in " << backupResult.toLocal8Bit().constData() << endl << endl;
 
     if (expertMode)
     {
         resp = d->getResponse("Would you like to use the existing schema?",
                               "yes");
-        if (!resp || resp.left(1).lower() == "y")
+        if (resp.isEmpty() || resp.left(1).lower() == "y")
             return MYTH_SCHEMA_USE_EXISTING;
     }
 
     resp = d->getResponse("\nShall I upgrade this database?", "yes");
-    if (resp && resp.left(1).lower() != "y")
+    if (!resp.isEmpty() && resp.left(1).lower() != "y")
         return MYTH_SCHEMA_EXIT;
 
     if (connections)
-        cout << endl << warnOtherCl <<endl;
+        cout << endl << (const char *)warnOtherCl <<endl;
 
     if ((backupResult == "__FAILED__") ||
         (backupResult == ""))
     {
         resp = d->getResponse("\nA database backup might be a good idea"
                               "\nAre you sure you want to upgrade?", "no");
-        if (!resp || resp.left(1).lower() == "n")
+        if (resp.isEmpty() || resp.left(1).lower() == "n")
             return MYTH_SCHEMA_EXIT;
     }
 
@@ -3826,7 +3815,7 @@ void MythContext::LogEntry(const QString &module, int priority,
         query.bindValue(":PRIORITY", priority);
         query.bindValue(":HOSTNAME", d->m_localhostname);
         query.bindValue(":MESSAGE", message);
-        query.bindValue(":DETAILS", details.utf8());
+        query.bindValue(":DETAILS", details);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("LogEntry", query);
@@ -3941,7 +3930,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
 void MythContext::addCurrentLocation(QString location)
 {
     QMutexLocker locker(&locationLock);
-    if (currentLocation.last() != location)
+    if (currentLocation.isEmpty() || currentLocation.last() != location)
         currentLocation.push_back(location);
 }
 
@@ -3978,12 +3967,12 @@ bool MythContext::GetScreenIsAsleep(void)
 /// that the MythContext::Init() can detect Xinerama setups.
 void MythContext::SetX11Display(const QString &display)
 {
-    x11_display = QDeepCopy<QString>(display);
+    x11_display = Q3DeepCopy<QString>(display);
 }
 
 QString MythContext::GetX11Display(void)
 {
-    return QDeepCopy<QString>(x11_display);
+    return Q3DeepCopy<QString>(x11_display);
 }
 
 void MythContext::dispatch(MythEvent &event)

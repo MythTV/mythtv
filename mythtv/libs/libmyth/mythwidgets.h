@@ -1,26 +1,30 @@
 #ifndef MYTHWIDGETS_H_
 #define MYTHWIDGETS_H_
 
-#include <qbutton.h>
+//#include <qbutton.h>
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <qslider.h>
 #include <qlineedit.h>
-#include <qtextedit.h>
+#include <q3textedit.h>
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
 #include <qdialog.h>
-#include <qlistview.h>
-#include <qheader.h>
-#include <qtable.h>
-#include <qbuttongroup.h>
-#include <qlistbox.h>
+#include <q3listview.h>
+#include <q3header.h>
+#include <q3table.h>
+#include <q3buttongroup.h>
+#include <q3listbox.h>
 #include <qcheckbox.h>
 #include <qradiobutton.h>
 #include <qimage.h>
 #include <qlabel.h>
 #include <qtimer.h> 
-#include <qdeepcopy.h>
+#include <QFocusEvent>
+#include <QMouseEvent>
+#include <QHideEvent>
+#include <QKeyEvent>
+#include <QEvent>
 
 #include <vector>
 
@@ -101,7 +105,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
     void changeHelpText(QString);
 
   protected:
-    virtual bool eventFilter (QObject* o, QEvent* e);
+    virtual void keyPressEvent(QKeyEvent* e);
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
 
@@ -180,7 +184,7 @@ class MPUBLIC MythLineEdit : public QLineEdit
  * A LineEdit that does special things when you press number keys
  * (enter letters with multiple presses, just like a phone keypad)
  */
-class MPUBLIC MythRemoteLineEdit : public QTextEdit
+class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
 {
     Q_OBJECT
   public:
@@ -265,18 +269,18 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     PopupPosition    popupPosition;
 };
 
-class MPUBLIC MythTable : public QTable
+class MPUBLIC MythTable : public Q3Table
 {
   public:
-    MythTable(QWidget *parent) : QTable(parent) { }
+    MythTable(QWidget *parent) : Q3Table(parent) { }
 
     void keyPressEvent(QKeyEvent *e);
 };
 
-class MPUBLIC MythButtonGroup : public QButtonGroup
+class MPUBLIC MythButtonGroup : public Q3ButtonGroup
 {
   public:
-    MythButtonGroup(QWidget *parent = 0) : QButtonGroup(parent) { }
+    MythButtonGroup(QWidget *parent = 0) : Q3ButtonGroup(parent) { }
 
     void moveFocus(int key);
 };
@@ -366,20 +370,20 @@ class MPUBLIC MythRadioButton: public QRadioButton
     QString helptext;
 };
 
-class MPUBLIC MythListView : public QListView
+class MPUBLIC MythListView : public Q3ListView
 {
     Q_OBJECT
   public:
     MythListView(QWidget *parent);
 
-    void ensureItemVCentered (const QListViewItem *i);
+    void ensureItemVCentered (const Q3ListViewItem *i);
 
   protected:
     void keyPressEvent(QKeyEvent *e);
     void focusInEvent(QFocusEvent *e);
 };
 
-class MPUBLIC MythListBox: public QListBox {
+class MPUBLIC MythListBox: public Q3ListBox {
     Q_OBJECT
   public:
     MythListBox(QWidget* parent);
@@ -388,7 +392,7 @@ class MPUBLIC MythListBox: public QListBox {
 
     void setHelpText(const QString&);
 
-    int currentItem() { return QListBox::currentItem(); }
+    int currentItem() { return Q3ListBox::currentItem(); }
 
   protected:
     void focusInEvent(QFocusEvent *e);
@@ -398,7 +402,7 @@ class MPUBLIC MythListBox: public QListBox {
   public slots:
     void setCurrentItem(const QString& matchText, bool caseSensitive = true, 
                         bool partialMatch = false);
-    void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
+    void setCurrentItem(int index) { Q3ListBox::setCurrentItem(index); };
 
   signals:
     void changeHelpText(QString);

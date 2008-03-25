@@ -26,7 +26,8 @@
 #include <qapplication.h>
 #include <qdir.h>
 #include <qregexp.h>
-#include <qprocess.h>
+#include <q3process.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -150,8 +151,8 @@ void MythFlix::loadData()
         QString url;
         QDateTime time;
         while ( query.next() ) {
-            name = QString::fromUtf8(query.value(0).toString());
-            url  = QString::fromUtf8(query.value(1).toString());
+            name = query.value(0).toString();
+            url  = query.value(1).toString();
             time.setTime_t(query.value(2).toUInt());
             m_NewsSites.append(new NewsSite(name,url,time));
         }
@@ -428,7 +429,7 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
     if(!article)
         return;
 
-    QStringList args = gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+    QStringList args(gContext->GetShareDir() + "mythflix/scripts/netflix.pl");
 
     if (queueName != "")
     {
@@ -449,7 +450,8 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
     if (atTop)
     {
         // Move to top of queue as well
-        args = gContext->GetShareDir() + "mythflix/scripts/netflix.pl";
+        args = QStringList(gContext->GetShareDir() +
+                           "mythflix/scripts/netflix.pl");
 
         if (queueName != "")
         {
@@ -494,19 +496,19 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
     QString err = "";
 
     VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
-                      arg(args.join(" ")).local8Bit() );
-    QProcess proc(args, this);
+                      arg(args.join(" ")));
+    Q3Process proc(args, this);
 
     QString cmd = args[0];
     QFileInfo info(cmd);
 
     if (!info.exists())
     {
-       err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
+       err = QString("\"%1\" failed: does not exist").arg(cmd);
     }
     else if (!info.isExecutable())
     {
-       err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
+       err = QString("\"%1\" failed: not executable").arg(cmd);
     }
     else if (proc.start())
     {
@@ -540,7 +542,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
                 if (!proc.normalExit())
                 {
                     err = QString("\"%1\" failed: Process exited abnormally")
-                                  .arg(cmd.local8Bit());
+                                  .arg(cmd);
                 }
 
                 break;
@@ -550,7 +552,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
     else
     {
         err = QString("\"%1\" failed: Could not start process")
-                      .arg(cmd.local8Bit());
+                      .arg(cmd);
     }
 
     while (proc.canReadLineStdout() || proc.canReadLineStderr())
@@ -588,7 +590,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
     return ret;
 }
 
-void MythFlix::customEvent(QCustomEvent *event)
+void MythFlix::customEvent(QEvent *event)
 {
 
     if (event->type() == kMythDialogBoxCompletionEventType)

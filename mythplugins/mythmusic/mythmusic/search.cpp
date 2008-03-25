@@ -82,7 +82,6 @@ void SearchDialog::runQuery(QString searchText)
     searchText.toULongLong(&isNumber);
     QString searchLimit = gContext->GetSetting("MaxSearchResults");
     searchText.replace("'", "''");
-    searchText = searchText.utf8();
 
     if (!isNumber)
     {
@@ -193,7 +192,7 @@ void SearchDialog::runQuery(QString searchText)
                     int index = -1;
                     while( (index = text.findRev(QRegExp(stxt, false), index)) != -1 )
                     {
-                        text.insert(index + stxt.contains('['), "]");
+                        text.insert(index + (stxt.contains('[') ? 1 : 0), "]");
                         text.insert(index, "[");
                     }
                 }
@@ -202,7 +201,7 @@ void SearchDialog::runQuery(QString searchText)
 
         // Insert item into listbox, including song identifier
         listbox->insertItem(new SearchListBoxItem(
-                                QString::fromUtf8(text),
+                                text,
                                 query.value(4).toUInt()));
 
         matchCount++;

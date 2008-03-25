@@ -1,13 +1,10 @@
 #ifndef MYTHMAINWINDOW_H_
 #define MYTHMAINWINDOW_H_
 
-#include <qwidget.h>
-#include <qdialog.h>
 #include <qevent.h>
-#include <qfont.h>
-#ifdef USE_OPENGL_PAINTER
+#include <qobject.h>
+#include <qwidget.h>
 #include <qgl.h>
-#endif
 
 #include "mythuitype.h"
 #include "mythscreenstack.h"
@@ -17,11 +14,11 @@ class MythMediaDevice;
 const int kExternalKeycodeEventType = 33213;
 const int kExitToMainMenuEventType = 33214;
 
-class ExternalKeycodeEvent : public QCustomEvent
+class ExternalKeycodeEvent : public QEvent
 {
   public:
     ExternalKeycodeEvent(const int key) 
-           : QCustomEvent(kExternalKeycodeEventType), keycode(key) {}
+           : QEvent((QEvent::Type)kExternalKeycodeEventType), keycode(key) {}
 
     int getKeycode() { return keycode; }
 
@@ -29,10 +26,10 @@ class ExternalKeycodeEvent : public QCustomEvent
     int keycode;
 };
 
-class ExitToMainMenuEvent : public QCustomEvent
+class ExitToMainMenuEvent : public QEvent
 {
   public:
-    ExitToMainMenuEvent(void) : QCustomEvent(kExitToMainMenuEventType) {}
+    ExitToMainMenuEvent(void) : QEvent((QEvent::Type)kExitToMainMenuEventType) {}
 };
 
 #define REG_KEY(a, b, c, d) GetMythMainWindow()->RegisterKey(a, b, c, d)
@@ -47,15 +44,15 @@ typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString
 
 class MythMainWindowPrivate;
 
-// Cheat moc
-#ifdef USE_OPENGL_PAINTER
-#define QWidget QGLWidget
-#endif
+class MythPainterWindowGL;
+class MythPainterWindowQt;
 
 class MythMainWindow : public QWidget
 {
     Q_OBJECT
-#undef QWidget
+    friend class MythPainterWindowGL;
+    friend class MythPainterWindowQt;
+
   public:
     void Init(void);
     void Show(void);
@@ -127,17 +124,21 @@ class MythMainWindow : public QWidget
     QWidget *currentWidget(void);
 
   public slots:
-    void drawTimeout();
     void mouseTimeout();
+
+  protected slots:
+    void animate();
 
   protected:
     MythMainWindow(const bool useDB = true);
     virtual ~MythMainWindow();
 
     bool eventFilter(QObject *o, QEvent *e);
-    void customEvent(QCustomEvent *ce);
+    void customEvent(QEvent *ce);
     void closeEvent(QCloseEvent *e);
-    void paintEvent(QPaintEvent *e);
+
+    void drawScreen();
+
 #ifdef USING_APPLEREMOTE
     bool event(QEvent* e);
 #endif

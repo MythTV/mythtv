@@ -17,7 +17,7 @@ using namespace std;
 // Qt headers
 #include <qstring.h>
 #include <qstringlist.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 class text_subtitle_t
 {
@@ -26,7 +26,7 @@ class text_subtitle_t
     text_subtitle_t() : start(0), end(0) {}
     text_subtitle_t(const text_subtitle_t &other) :
         start(other.start), end(other.end),
-        textLines(QDeepCopy<QStringList>(other.textLines)) {}
+        textLines(Q3DeepCopy<QStringList>(other.textLines)) {}
 
   public:
     uint64_t    start;      ///< Starting time in msec or starting frame

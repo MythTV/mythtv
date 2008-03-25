@@ -14,6 +14,9 @@
 #include <getopt.h>
 #include <stdint.h>
 
+#include <Q3ValueList>
+#include <Q3PtrList>
+
 #ifdef USING_MINGW
 #include <winsock2.h>
 #else
@@ -71,7 +74,7 @@ void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     }
 }
 
-void DEBUGpts(QPtrList<MPEG2frame> *vFrame)
+void DEBUGpts(Q3PtrList<MPEG2frame> *vFrame)
 {
     int pos = vFrame->at();
     for (vFrame->first(); vFrame->current(); vFrame->next())
@@ -101,9 +104,9 @@ static QString PtsTime(int64_t pts)
                 (((unsigned int)(pts / 90.) % 3600000) % 60000) % 1000));
 }
 
-PTSOffsetQueue::PTSOffsetQueue(int vidid, QValueList<int> keys, int64_t initPTS)
+PTSOffsetQueue::PTSOffsetQueue(int vidid, Q3ValueList<int> keys, int64_t initPTS)
 {
-    QValueList<int>::Iterator it;
+    Q3ValueList<int>::Iterator it;
     poq_idx_t idx;
     vid_id = vidid;
     keyList = keys;
@@ -120,7 +123,7 @@ PTSOffsetQueue::PTSOffsetQueue(int vidid, QValueList<int> keys, int64_t initPTS)
 
 int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
 {
-    QValueList<poq_idx_t>::Iterator it;
+    Q3ValueList<poq_idx_t>::Iterator it;
     int64_t value = offset[idx].first().newPTS;
     bool done = false;
 
@@ -147,7 +150,7 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
 
 void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 {
-    QValueList<int>::Iterator it;
+    Q3ValueList<int>::Iterator it;
     poq_idx_t idx;
 
     idx.newPTS = newPTS;
@@ -161,7 +164,7 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 
 void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
 {
-    QValueList<int>::Iterator it;
+    Q3ValueList<int>::Iterator it;
     int64_t delta = MPEG2fixup::diff2x33(newPTS, offset[vid_id].last().newPTS);
     poq_idx_t idx;
 
@@ -184,7 +187,7 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
 int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
 {
     int64_t delta = 0;
-    QValueList<poq_idx_t> *dltaList = &orig[idx];
+    Q3ValueList<poq_idx_t> *dltaList = &orig[idx];
     while (dltaList->count() && 
            (pkt.pos     >= dltaList->first().pos_pts ||
             pkt.duration > dltaList->first().framenum))
@@ -207,7 +210,7 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
 {
-    displayFrame = new QPtrListIterator<MPEG2frame> (vFrame);
+    displayFrame = new Q3PtrListIterator<MPEG2frame> (vFrame);
 
     infile = inf;
     rx.outfile = outf;
@@ -300,10 +303,10 @@ MPEG2fixup::~MPEG2fixup()
         vSecondary.remove();
         delete tmpFrame;
     }
-    for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+    for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
-        QPtrList<MPEG2frame> *af = &it.data();
+        Q3PtrList<MPEG2frame> *af = &it.data();
         max_frames += af->count();
         while (af->count())
         {
@@ -568,7 +571,7 @@ void MPEG2fixup::InitReplex()
     memset(rx.exttype, 0, sizeof(rx.exttype));
     memset(rx.exttypcnt, 0, sizeof(rx.exttypcnt));
     int mp2_count = 0, ac3_count = 0;
-    for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+    for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
@@ -764,7 +767,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                     inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
                     aud_map[i] = ext_count++;
-                    aFrame[i] = QPtrList<MPEG2frame> ();
+                    aFrame[i] = Q3PtrList<MPEG2frame> ();
                 }
                 else
                     VERBOSE(MPF_GENERAL, QString(
@@ -936,7 +939,7 @@ void MPEG2fixup::WriteFrame(const char *filename, MPEG2frame *f)
         return;
     if (! tmpFrame->isSequence)
     {
-        QPtrListIterator<MPEG2frame> it (vFrame);
+        Q3PtrListIterator<MPEG2frame> it (vFrame);
         while (*it)
         {
             if((*it)->isSequence)
@@ -1292,10 +1295,10 @@ bool MPEG2fixup::FindStart()
         if (vFrame.isEmpty())
             continue;
 
-        for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+        for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
                 it != aFrame.end(); it++)
         {
-            QPtrList<MPEG2frame> *af = &it.data();
+            Q3PtrList<MPEG2frame> *af = &it.data();
 
             if (found.contains(it.key()))
                 continue;
@@ -1424,7 +1427,7 @@ void MPEG2fixup::SetRepeat(uint8_t *ptr, int size, int fields, bool topff)
 
 MPEG2frame *MPEG2fixup::FindFrameNum(int frameNum)
 {
-    QPtrListIterator<MPEG2frame> it (vFrame);
+    Q3PtrListIterator<MPEG2frame> it (vFrame);
 
     while (*it)
     {
@@ -1439,7 +1442,7 @@ MPEG2frame *MPEG2fixup::FindFrameNum(int frameNum)
 
 void MPEG2fixup::RenumberFrames(int start_pos, int delta)
 {
-    QPtrListIterator<MPEG2frame> it (vFrame);
+    Q3PtrListIterator<MPEG2frame> it (vFrame);
 
     it+= start_pos;
 
@@ -1559,7 +1562,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
     return spare;
 }
 
-int MPEG2fixup::ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos)
+int MPEG2fixup::ConvertToI(Q3PtrList<MPEG2frame> *orderedFrames, int headPos)
 {
     MPEG2frame *spare = NULL;
     AVPacket pkt;
@@ -1570,7 +1573,7 @@ int MPEG2fixup::ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos)
         if (PlaybackSecondary())
             return 1;
 
-    QPtrListIterator<MPEG2frame> it(*orderedFrames);
+    Q3PtrListIterator<MPEG2frame> it(*orderedFrames);
     for (it.toFirst(); *it; ++it)
     {
         int i = GetFrameNum(it.current());
@@ -1582,7 +1585,7 @@ int MPEG2fixup::ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos)
         //pkt.data is a newly malloced area
         {
             QString fname = (SHOW_MSG(MPF_PROCESS)) ?
-                   QString("cnv%1").arg(ins_count++) : NULL;
+                   QString("cnv%1").arg(ins_count++) : QString();
             if(BuildFrame(&pkt, fname))
                 return 1;
             VERBOSE(MPF_GENERAL,
@@ -1621,7 +1624,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     //pkt.data is a newly malloced area
     {
         QString fname = (SHOW_MSG(MPF_PROCESS) ?
-                            (QString("ins%1").arg(ins_count++)) : NULL);
+                            (QString("ins%1").arg(ins_count++)) : QString());
         if (BuildFrame(&pkt, fname))
             return -1;
         VERBOSE(MPF_GENERAL, QString("Inserting %1 I-Frames after #%2 %3")
@@ -1711,9 +1714,9 @@ void MPEG2fixup::ShowRangeMap(QMap<long long, int> *mapPtr, QString msg)
     }
 }
 
-QPtrList<MPEG2frame> MPEG2fixup::ReorderDTStoPTS(QPtrList<MPEG2frame> *dtsOrder)
+Q3PtrList<MPEG2frame> MPEG2fixup::ReorderDTStoPTS(Q3PtrList<MPEG2frame> *dtsOrder)
 {
-    QPtrList<MPEG2frame> Lreorder;
+    Q3PtrList<MPEG2frame> Lreorder;
     int pos = dtsOrder->at();
 
     if (dtsOrder->current() == dtsOrder->getLast())
@@ -1804,10 +1807,10 @@ int MPEG2fixup::Start()
                          .arg(vid_id).arg(PtsTime(vFrame.current()->pkt.pts))
                          .arg(vFrame.count()));
 
-    for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+    for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
-        QPtrList<MPEG2frame> *af = &it.data();
+        Q3PtrList<MPEG2frame> *af = &it.data();
         deltaPTS = diff2x33(vFrame.current()->pkt.pts, af->first()->pkt.pts);
         VERBOSE(MPF_GENERAL, QString("#%1 PTS:%2 Delta: %3ms queue: %4")
                              .arg(it.key())
@@ -1838,10 +1841,10 @@ int MPEG2fixup::Start()
         cutStartPTS = origvPTS / 300;
     }
 
-    for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+    for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
-        QPtrList<MPEG2frame> *af = &it.data();
+        Q3PtrList<MPEG2frame> *af = &it.data();
         origaPTS[it.key()] = af->first()->pkt.pts * 300;
         expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
@@ -1887,7 +1890,7 @@ int MPEG2fixup::Start()
                 bool ptsorder_eq_dtsorder = false;
                 int frame_pos = vFrame.at();
                 int64_t dtsExtra = 0, PTSdiscrep = 0;
-                QPtrList<MPEG2frame> Lreorder;
+                Q3PtrList<MPEG2frame> Lreorder;
                 MPEG2frame *markedFrame = NULL, *markedFrameP = NULL;
 
                 if (expectedvPTS != expectedDTS + ptsIncrement * 300)
@@ -1934,7 +1937,7 @@ int MPEG2fixup::Start()
                         while (!done &&
                                (uint)(frame_pos + count + 1) < vFrame.count())
                         {
-                            QPtrList<MPEG2frame> tmpReorder;
+                            Q3PtrList<MPEG2frame> tmpReorder;
                             vFrame.at(frame_pos + count);
                             tmpReorder = ReorderDTStoPTS(&vFrame);
                             for (MPEG2frame *curFrame = tmpReorder.first();
@@ -2004,7 +2007,7 @@ int MPEG2fixup::Start()
                             cutStartPTS = add2x33(markedFrameP->pkt.pts,
                                           ptsIncrement * 
                                           GetNbFields(markedFrameP) / 2);
-                            QMap<int, QPtrList<MPEG2frame> >::iterator it;
+                            QMap<int, Q3PtrList<MPEG2frame> >::iterator it;
                             for (it = aFrame.begin(); it != aFrame.end(); it++)
                             {
                                 cutState[it.key()] = 1;
@@ -2195,10 +2198,10 @@ int MPEG2fixup::Start()
                 StoreSecondary();
         }
 
-        for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
+        for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
                 it != aFrame.end(); it++)
         {
-            QPtrList<MPEG2frame> *af = &it.data();
+            Q3PtrList<MPEG2frame> *af = &it.data();
             AVCodecContext *CC = getCodecContext(it.key());
             bool backwardsPTS = false;
 

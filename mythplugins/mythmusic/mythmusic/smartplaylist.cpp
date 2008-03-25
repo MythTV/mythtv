@@ -4,8 +4,13 @@
 #include <qsqlrecord.h>
 #include <qsqlfield.h> 
 #include <qsqldriver.h>
-#include <qsqlcursor.h>
-#include <qhbox.h>
+#include <q3sqlcursor.h>
+#include <q3hbox.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QKeyEvent>
+#include <Q3Frame>
+#include <Q3VBoxLayout>
 
 #include <unistd.h>
 #include <iostream>
@@ -172,9 +177,6 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
         value2 = evaluateDateValue(value2);
     }
     
-    value1 = value1.utf8();
-    value2 = value2.utf8();
-    
     if (Operator->name == "is equal to")
     {
         result = result + " = " + formattedFieldValue(value1);
@@ -215,7 +217,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     else
     {
         result = "";
-        cout << "getCriteriaSQL(): invalid operator '" << Operator->name  << "'" << endl;  
+        VERBOSE(VB_IMPORTANT, "getCriteriaSQL(): invalid operator '" + Operator->name  + "'");
     }
     
     return result;    
@@ -271,7 +273,7 @@ QString getSQLFieldName(QString fieldName)
 ///////////////////////////////////////////////////////////////////////
 */
 
-SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox)
+SmartPLCriteriaRow::SmartPLCriteriaRow(QWidget *parent, Q3HBoxLayout *hbox)
 {
     // field combo
     fieldCombo = new MythComboBox(false, parent, "field" );
@@ -804,10 +806,10 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
                   " value1, value2)"
                   "VALUES (:SMARTPLAYLISTID, :FIELD, :OPERATOR, :VALUE1, :VALUE2);");
     query.bindValue(":SMARTPLAYLISTID", smartPlaylistID);
-    query.bindValue(":FIELD", Field.utf8());
-    query.bindValue(":OPERATOR", Operator.utf8());
-    query.bindValue(":VALUE1", Value1.utf8());
-    query.bindValue(":VALUE2", Value2.utf8());                
+    query.bindValue(":FIELD", Field);
+    query.bindValue(":OPERATOR", Operator);
+    query.bindValue(":VALUE1", Value1);
+    query.bindValue(":VALUE2", Value2);                
     
     if (!query.exec())
     {
@@ -897,8 +899,8 @@ void SmartPLCriteriaRow::getOperatorList(SmartPLFieldType fieldType)
 SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)
 {
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(0 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(15 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(0 * wmult));
      
     // Window title
     QString message = tr("Smart Playlist Editor");
@@ -913,7 +915,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     hbox->addWidget(label);
 
     // category
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Category:");
     label = new QLabel(message, this);
@@ -938,7 +940,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     hbox->addWidget(categoryButton);
  
     // Title edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Title:");
     label = new QLabel(message, this);
@@ -951,7 +953,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     hbox->addWidget(titleEdit);
 
     // match
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     message = tr("Match");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
@@ -973,27 +975,27 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     SmartPLCriteriaRow *row;
     criteriaRows.setAutoDelete(true);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
     criteriaRows.append(row);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
     criteriaRows.append(row);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
     criteriaRows.append(row);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
     criteriaRows.append(row);
    
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     message = tr("Order By:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
@@ -1022,7 +1024,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     hbox->addWidget(orderByButton);
  
     // matches
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     message = tr("Matches:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
@@ -1032,8 +1034,8 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     message = "0";
     matchesLabel = new QLabel(message, this);
     matchesLabel->setLineWidth(2);
-    matchesLabel->setFrameShape(QFrame::Panel);
-    matchesLabel->setFrameShadow(QFrame::Sunken);
+    matchesLabel->setFrameShape(Q3Frame::Panel);
+    matchesLabel->setFrameShadow(Q3Frame::Sunken);
     matchesLabel->setBackgroundOrigin(WindowOrigin);
     matchesLabel->setMinimumWidth((int) (90 * hmult));
     matchesLabel->setMaximumWidth((int) (90 * hmult));
@@ -1061,7 +1063,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     hbox->addWidget(label);
        
     //  Exit Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     cancelButton = new MythPushButton( this, "cancel" );
     cancelButton->setBackgroundOrigin(WindowOrigin);
@@ -1168,10 +1170,10 @@ void SmartPlaylistEditor::saveClicked(void)
     // insert new smartplaylist
     query.prepare("INSERT INTO music_smartplaylists (name, categoryid, matchtype, orderby, limitto) "
                 "VALUES (:NAME, :CATEGORYID, :MATCHTYPE, :ORDERBY, :LIMIT);");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     query.bindValue(":CATEGORYID", categoryid);
     query.bindValue(":MATCHTYPE", matchType);
-    query.bindValue(":ORDERBY", orderBy.utf8());
+    query.bindValue(":ORDERBY", orderBy);
     query.bindValue(":LIMIT", limit);                
     
     if (!query.exec())
@@ -1185,7 +1187,7 @@ void SmartPlaylistEditor::saveClicked(void)
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists "
                   "WHERE categoryid = :CATEGORYID AND name = :NAME;");
     query.bindValue(":CATEGORYID", categoryid);
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     if (query.exec())
     {
         if (query.isActive() && query.numRowsAffected() > 0)
@@ -1195,7 +1197,7 @@ void SmartPlaylistEditor::saveClicked(void)
         }
         else
         {
-            cout << "Failed to find ID for smartplaylist: " << name << endl;
+            VERBOSE(VB_IMPORTANT, "Failed to find ID for smartplaylist: " + name);
             return;
         }
     }    
@@ -1243,7 +1245,7 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     
     query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists WHERE name = :NAME AND categoryid = :CATEGORYID;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     query.bindValue(":CATEGORYID", categoryid);
     if (query.exec())
     {
@@ -1257,12 +1259,12 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
                 matchCombo->setCurrentText(tr("All"));
             else
                 matchCombo->setCurrentText(tr("Any"));
-            orderByCombo->setCurrentText(QString::fromUtf8(query.value(4).toString()));
+            orderByCombo->setCurrentText(query.value(4).toString());
             limitSpinEdit->setValue(query.value(5).toInt());
         }
         else
         {
-            cout << "Cannot find smartplaylist: " << name << endl;
+            VERBOSE(VB_IMPORTANT, "Cannot find smartplaylist: " + name);
             return;
         }
     }
@@ -1296,10 +1298,10 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
         for (uint x = 0; x < rowCount; x++)
         {
             row = criteriaRows.at(x);
-            QString Field = QString::fromUtf8(query.value(0).toString());
-            QString Operator = QString::fromUtf8(query.value(1).toString());
-            QString Value1 = QString::fromUtf8(query.value(2).toString());
-            QString Value2 = QString::fromUtf8(query.value(3).toString());
+            QString Field = query.value(0).toString();
+            QString Operator = query.value(1).toString();
+            QString Value1 = query.value(2).toString();
+            QString Value2 = query.value(3).toString();
             if (row)
                 row->initValues(Field, Operator, Value1, Value2);
                 
@@ -1380,7 +1382,7 @@ void SmartPlaylistEditor::newCategory(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO music_smartplaylist_categories (name) "
                 "VALUES (:NAME);");
-    query.bindValue(":NAME", categoryEdit->text().utf8());
+    query.bindValue(":NAME", categoryEdit->text());
     
     if (!query.exec())
     {
@@ -1426,8 +1428,8 @@ void SmartPlaylistEditor::renameCategory(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE music_smartplaylist_categories SET name = :NEW_CATEGORY "
                   "WHERE name = :OLD_CATEGORY;");
-    query.bindValue(":OLD_CATEGORY", categoryCombo->currentText().utf8());
-    query.bindValue(":NEW_CATEGORY", categoryEdit->text().utf8());
+    query.bindValue(":OLD_CATEGORY", categoryCombo->currentText());
+    query.bindValue(":NEW_CATEGORY", categoryEdit->text());
 
     if (!query.exec())
         MythContext::DBError("Rename smartplaylist", query);
@@ -1531,7 +1533,7 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             while (query.next())
-                categoryCombo->insertItem(QString::fromUtf8(query.value(0).toString()));
+                categoryCombo->insertItem(query.value(0).toString());
         }
         else
         {
@@ -1556,7 +1558,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
     int ID;
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists WHERE name = :NAME "
                   "AND categoryid = :CATEGORYID;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     query.bindValue(":CATEGORYID", categoryid);
     if (query.exec())
     {
@@ -1614,8 +1616,7 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
     {
         while (query.next())
         {
-            SmartPlaylistEditor::deleteSmartPlaylist(category, 
-                   QString::fromUtf8(query.value(0).toString()));
+            SmartPlaylistEditor::deleteSmartPlaylist(category, query.value(0).toString());
         }                                             
     }
     
@@ -1635,7 +1636,7 @@ int SmartPlaylistEditor::lookupCategoryID(QString category)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT categoryid FROM music_smartplaylist_categories "
                   "WHERE name = :CATEGORY;");
-    query.bindValue(":CATEGORY", category.utf8());
+    query.bindValue(":CATEGORY", category);
 
     if (query.exec())
     {
@@ -1646,7 +1647,7 @@ int SmartPlaylistEditor::lookupCategoryID(QString category)
         }
         else
         {
-            cout << "Failed to find smart playlist category: " << category << endl;
+            VERBOSE(VB_IMPORTANT, "Failed to find smart playlist category: " + category);
             ID = -1;
         }
     }
@@ -1672,8 +1673,8 @@ void  SmartPlaylistEditor::getCategoryAndName(QString &category, QString &name)
 SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)
 {
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     // Window title
     QString message = tr("Smart Playlist Result Viewer");
@@ -1683,7 +1684,7 @@ SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *nam
     hbox->addWidget(label);
 
     // listview
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     listView = new MythListView(this);
     listView->addColumn(tr("ID"));
     listView->addColumn(tr("Artist"));
@@ -1696,7 +1697,7 @@ SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *nam
     hbox->addWidget(listView);    
     
     //  Exit Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     exitButton = new MythPushButton( this, "Program" );
     exitButton->setBackgroundOrigin(WindowOrigin);
@@ -1724,18 +1725,18 @@ void SmartPLResultViewer::setSQL(QString sql)
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(sql);
     
-    QListViewItem *item;
+    Q3ListViewItem *item;
     if (query.last())
     {
         do
         {
-            item = new QListViewItem(listView, 
+            item = new Q3ListViewItem(listView, 
                 query.value(0).toString(),
-                QString::fromUtf8(query.value(1).toString()), 
-                QString::fromUtf8(query.value(2).toString()),
-                QString::fromUtf8(query.value(3).toString()), 
-                QString::fromUtf8(query.value(4).toString()),
-                query.value(5).toString(), 
+                query.value(1).toString(),
+                query.value(2).toString(),
+                query.value(3).toString(),
+                query.value(4).toString(),
+                query.value(5).toString(),
                 query.value(6).toString());
         } while (query.prev());
     }
@@ -1757,9 +1758,9 @@ SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *nam
 
     // we have to create a parentless layout because otherwise MythPopupbox
     // complains about already having a layout
-    vbox = new QVBoxLayout((QWidget *) 0, (int)(10 * hmult));
+    vbox = new Q3VBoxLayout((QWidget *) 0, (int)(10 * hmult));
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     
     // create the widgets
     
@@ -1777,7 +1778,7 @@ SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *nam
     hbox->addWidget(caption);
     
     // category
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     categoryCombo = new MythComboBox(false, this, "categoryCombo");
     categoryCombo->setFocus(); 
     connect(categoryCombo, SIGNAL(highlighted(int)), this, SLOT(categoryChanged(void)));
@@ -1786,13 +1787,13 @@ SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *nam
     getSmartPlaylistCategories();
     
     // listbox
-    hbox = new QHBoxLayout(vbox, (int)(5 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * hmult));
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
     hbox->addWidget(listbox);
     
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     selectButton = new MythPushButton(this, "selectbutton");
     if (keyboard_accelerators)
         selectButton->setText(tr("1 Select"));
@@ -1807,7 +1808,7 @@ SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *nam
         newButton->setText(tr("New"));
     hbox->addWidget(newButton);
     
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     editButton = new MythPushButton(this, "editbutton");
     if (keyboard_accelerators)    
         editButton->setText(tr("3 Edit"));
@@ -2019,8 +2020,7 @@ void SmartPlaylistDialog::getSmartPlaylistCategories(void)
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             while (query.next())
-                categoryCombo->insertItem(
-                               QString::fromUtf8(query.value(0).toString()));
+                categoryCombo->insertItem(query.value(0).toString());
         }
     }    
     else
@@ -2039,14 +2039,13 @@ void SmartPlaylistDialog::getSmartPlaylists(QString category)
     query.prepare("SELECT name FROM music_smartplaylists WHERE categoryid = :CATEGORYID "
                   "ORDER BY name;");
     query.bindValue(":CATEGORYID", categoryid);
-                   
-    if (query.exec())
+                       if (query.exec())
     {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             while (query.next())
             {
-                listbox->insertItem(QString::fromUtf8(query.value(0).toString()));
+                listbox->insertItem(query.value(0).toString());
             }
             
             listbox->setCurrentItem(0);
@@ -2079,8 +2078,8 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
     
     // we have to create a parent less layout because otherwise MythPopupbox
     // complains about already having a layout
-    vbox = new QVBoxLayout((QWidget *) 0, (int)(10 * hmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    vbox = new Q3VBoxLayout((QWidget *) 0, (int)(10 * hmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     
     // create the widgets
     
@@ -2098,14 +2097,14 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
     hbox->addWidget(caption);
     
     // listbox
-    hbox = new QHBoxLayout(vbox, (int)(5 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * hmult));
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
     hbox->addWidget(listbox);
     
     // fields
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     orderByCombo = new MythComboBox(false, this, "orderByCombo");
     orderByCombo->setFocus(); 
     connect(orderByCombo, SIGNAL(highlighted(int)), this, SLOT(orderByChanged(void)));
@@ -2113,7 +2112,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
     hbox->addWidget(orderByCombo);    
     getOrderByFields();
 
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     addButton = new MythPushButton(this, "addbutton");
     if (keyboard_accelerators)
         addButton->setText(tr("1 Add"));
@@ -2128,7 +2127,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
         deleteButton->setText(tr("Delete"));
     hbox->addWidget(deleteButton);
     
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     moveUpButton = new MythPushButton(this, "moveupbutton");
     if (keyboard_accelerators)
         moveUpButton->setText(tr("3 Move Up"));
@@ -2144,7 +2143,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
         moveDownButton->setText(tr("Move Down"));
     hbox->addWidget(moveDownButton);
 
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     ascendingButton = new MythPushButton(this, "ascendingbutton");
     if (keyboard_accelerators)
         ascendingButton->setText(tr("5 Ascending"));
@@ -2159,7 +2158,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
         descendingButton->setText(tr("Descending"));
     hbox->addWidget(descendingButton);
    
-    hbox = new QHBoxLayout(vbox, (int)(5 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(5 * wmult));
     okButton = new MythPushButton(this, "okbutton");
     if (keyboard_accelerators)
         okButton->setText(tr("7 OK"));
@@ -2177,8 +2176,8 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
     connect(descendingButton, SIGNAL(clicked()), this, SLOT(descendingPressed()));
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
     
-    connect(listbox, SIGNAL(selectionChanged(QListBoxItem*)), this, 
-            SLOT(listBoxSelectionChanged(QListBoxItem*)));
+    connect(listbox, SIGNAL(selectionChanged(Q3ListBoxItem*)), this, 
+            SLOT(listBoxSelectionChanged(Q3ListBoxItem*)));
     
     orderByChanged();
 }
@@ -2222,7 +2221,7 @@ void SmartPLOrderByDialog::setFieldList(QString fieldList)
     orderByChanged();
 }
         
-void SmartPLOrderByDialog::listBoxSelectionChanged(QListBoxItem *item)
+void SmartPLOrderByDialog::listBoxSelectionChanged(Q3ListBoxItem *item)
 {
     if (!item) 
         return;
@@ -2416,8 +2415,8 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
 {
     // we have to create a parent less layout because otherwise MythPopupbox
     // complains about already having a layout
-    vbox = new QVBoxLayout(NULL, 0, (int)(15 * hmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(15 * wmult));
+    vbox = new Q3VBoxLayout(NULL, 0, (int)(15 * hmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(15 * wmult));
     
     // create the widgets
     
@@ -2436,7 +2435,7 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     
     // fixed date widgets
     QDate date = QDate::currentDate();
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     fixedRadio = new MythRadioButton(this, "nopopsize");
     fixedRadio->setText(tr("Fixed Date"));
     fixedRadio->setBackgroundOrigin(ParentOrigin);
@@ -2444,7 +2443,7 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     fixedRadio->setFocus();
     hbox->addWidget(fixedRadio);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     dayLabel = new QLabel(tr("Day"), this, "nopopsize");
     dayLabel->setBackgroundOrigin(ParentOrigin);
     dayLabel->setAlignment(Qt::AlignLeft);
@@ -2484,17 +2483,17 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     yearSpinEdit->setValue(date.year());
     hbox->addWidget(yearSpinEdit);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     QLabel *splitter = new QLabel("", this);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setFrameShape(Q3Frame::HLine);
+    splitter->setFrameShadow(Q3Frame::Sunken);
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
     hbox->addWidget(splitter);
 
     // date now widgets
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     nowRadio = new MythRadioButton(this);
     nowRadio->setText(tr("Use Current Date"));
     nowRadio->setBackgroundOrigin(ParentOrigin);
@@ -2502,7 +2501,7 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     hbox->addWidget(nowRadio);
 
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     splitter = new QLabel("          ", this, "nopopsize");
     splitter->setBackgroundOrigin(ParentOrigin);
     splitter->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -2521,11 +2520,11 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     hbox->addWidget(addDaysSpinEdit);
     
     // status label
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     statusLabel = new QLabel(QString(""), this);
     statusLabel->setLineWidth(2);
-    statusLabel->setFrameShape(QFrame::Panel);
-    statusLabel->setFrameShadow(QFrame::Sunken);
+    statusLabel->setFrameShape(Q3Frame::Panel);
+    statusLabel->setFrameShadow(Q3Frame::Sunken);
     statusLabel->setBackgroundOrigin(ParentOrigin);
     statusLabel->setAlignment(Qt::AlignLeft);
     statusLabel->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
@@ -2533,12 +2532,12 @@ SmartPLDateDialog::SmartPLDateDialog(MythMainWindow *parent, const char *name)
     hbox->addWidget(statusLabel);
 
     // buttons
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     okButton = new MythPushButton(this);
     okButton->setText(tr("OK"));
     hbox->addWidget(okButton);
     
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     cancelButton = new MythPushButton(this);
     cancelButton->setText(tr("Cancel"));
     hbox->addWidget(cancelButton);

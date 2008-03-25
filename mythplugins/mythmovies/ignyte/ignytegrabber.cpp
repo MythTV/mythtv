@@ -32,7 +32,7 @@ void IgnyteGrabber::checkHttp()
     {
         if (ms.hasError())
         {
-            cerr << "Data Source Error" << endl << flush;
+            cerr << "Data Source Error" << endl;
         }
         else
         {
@@ -52,5 +52,5 @@ void IgnyteGrabber::outputData(QString data)
     data = data.remove('\r');
     data = data.remove('\n');
     data = "<?xml version=\"1.0\" encoding=\"utf-8\"?><MovieTimes>" + data + "</MovieTimes>";
-    cout << data;
+    cout << data.toLocal8Bit().constData();
 }

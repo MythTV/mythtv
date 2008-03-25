@@ -3,7 +3,6 @@
 
 #include <qstring.h>
 #include <qdatetime.h>
-#include <qvaluevector.h>
 
 #include "mythuitype.h"
 #include "mythuitext.h"

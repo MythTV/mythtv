@@ -30,6 +30,7 @@
 #include <mythtv/libmythui/mythdialogbox.h>
 
 #include "newsengine.h"
+#include <QKeyEvent>
 
 /** \class MythFlix
  *  \brief The netflix browser class.
@@ -45,7 +46,7 @@ class MythFlix : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QCustomEvent*);
+    void customEvent(QEvent*);
 
   private:
     void loadData();

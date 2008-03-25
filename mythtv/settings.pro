@@ -33,6 +33,7 @@ isEmpty(QMAKE_EXTENSION_LIB) {
 MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
+QMAKE_LFLAGS -= -Wl,--no-undefined
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '
@@ -88,8 +89,8 @@ release:contains( ARCH_POWERPC, yes ) {
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
-DEFINES += PREFIX=\"$${PREFIX}\"
-DEFINES += LIBDIR=\"$${LIBDIR}\"
+DEFINES += PREFIX=\\\"$${PREFIX}\\\"
+DEFINES += LIBDIR=\\\"$${LIBDIR}\\\"
 
 # construct linking path
 LOCAL_LIBDIR_X11 =

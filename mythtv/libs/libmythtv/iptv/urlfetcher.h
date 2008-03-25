@@ -8,12 +8,12 @@
 using namespace std;
 
 // Qt headers
-#include <qnetworkprotocol.h>
-#include <qcstring.h>
+#include <q3networkprotocol.h>
+#include <q3cstring.h>
 #include <qstring.h>
 
-class QNetworkOperation;
-class QUrlOperator;
+class Q3NetworkOperation;
+class Q3UrlOperator;
 
 class URLFetcher : public QObject
 {
@@ -30,12 +30,12 @@ class URLFetcher : public QObject
     void deleteLater(void);
 
   private slots:
-    void Finished(QNetworkOperation *op);
-    void Data(const QByteArray &data, QNetworkOperation *op);
+    void Finished(Q3NetworkOperation *op);
+    void Data(const QByteArray &data, Q3NetworkOperation *op);
 
   private:
-    QUrlOperator            *op;
-    QNetworkProtocol::State  state;
+    Q3UrlOperator            *op;
+    Q3NetworkProtocol::State  state;
     vector<unsigned char>    buf;
 };
 

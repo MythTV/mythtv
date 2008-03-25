@@ -1,9 +1,9 @@
 /*
-	phoneui.cpp
+    phoneui.cpp
 
-	(c) 2004 Paul Volkaerts
-	
-  Implementation of the main telephony user interface
+    (c) 2004 Paul Volkaerts
+
+    Implementation of the main telephony user interface
 */
 #include <qapplication.h>
 #include <qfile.h>
@@ -12,6 +12,12 @@
 #include <qdir.h>
 #include <qimage.h>
 #include <qbitmap.h>
+//Added by qt3to4:
+#include <QLabel>
+#include <QStringList>
+#include <QPixmap>
+#include <Q3ValueList>
+#include <QKeyEvent>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -78,7 +84,7 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     DirectoryList->showWholeTree(true);
     DirectoryList->colorSelectables(true);
 
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
     branches_to_current_node.append(0); //  Root node
     branches_to_current_node.append(0); //  Speed Dials!
     DirectoryList->moveToNodesFirstChild(branches_to_current_node);
@@ -380,9 +386,7 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
 }
-
-
-void PhoneUIBox::customEvent(QCustomEvent *event)
+void PhoneUIBox::customEvent(QEvent *event)
 {
 QString spk;
     switch ((int)event->type()) 
@@ -497,7 +501,7 @@ void PhoneUIBox::PlaceCall(QString url, QString name, QString Mode, bool onLocal
     if (currentCallEntry)
         delete currentCallEntry;
     currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
-    phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
+    phoneUIStatusBar->updateMidCallCaller(!name.isEmpty() ? name : url);
 }
 
 void PhoneUIBox::AnswerCall(QString Mode, bool onLocalLan)
@@ -685,12 +689,14 @@ void PhoneUIBox::DrawLocalWebcamImage()
                             WC_INSET_WIDTH, WC_INSET_HEIGHT);
         if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
         {
-            ScaledImage = Image.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
+            ScaledImage = Image.scaled(puthere.width(), puthere.height(),
+                                       Qt::KeepAspectRatio);
         }
         else
         {
             QImage zoomedImage = Image.copy(zx, zy, zoomWidth, zoomHeight);
-            ScaledImage = zoomedImage.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
+            ScaledImage = zoomedImage.scaled(puthere.width(), puthere.height(),
+                                             Qt::KeepAspectRatio);
         }
         
         // Draw the local webcam image if not in full-screen, else it gets drawn later
@@ -792,7 +798,9 @@ void PhoneUIBox::ProcessRxVideoFrame()
 
             if ((v->w != rxVideoArea.width()) || (v->h != rxVideoArea.height()))
             {
-                ScaledImage = rxImage.scale(rxVideoArea.width(), rxVideoArea.height(), QImage::ScaleMin);
+                ScaledImage = rxImage.scaled(rxVideoArea.width(),
+                                             rxVideoArea.height(),
+                                             Qt::KeepAspectRatio);
                 imageToDisplay = &ScaledImage;
             }
             else
@@ -900,7 +908,8 @@ void PhoneUIBox::ProcessSipNotification()
         }
 
         else 
-            cerr << "SIP: Unknown Notify type " << NotifyType << endl;
+            cerr << "SIP: Unknown Notify type "
+                 << NotifyType.toLocal8Bit().constData() << endl;
     }
 }
 
@@ -1064,7 +1073,7 @@ void PhoneUIBox::doMenuPopup()
 
     menuPopup = new MythPopupBox(gContext->GetMainWindow(), "MENU_popup");
 
-    QButton *b1 = 0;
+    QAbstractButton *b1 = 0;
 
     switch (selType)
     {
@@ -1528,9 +1537,9 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
     // Set defaults and fill out listboxes
     if (edit == 0)
     {
-        QStrList DirList = DirContainer->getDirectoryList();
+        QStringList DirList = DirContainer->getDirectoryList();
         DirList.append("new");
-        entryDir->insertStrList(DirList);
+        entryDir->addItems(DirList);
     }
 
     if (edit == 0)
@@ -1719,12 +1728,12 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
             drawCallPopupCallHistory(incallPopup, RecentCalls.prev());
         }
     
-        QButton *button2=0;
+        QAbstractButton *button2=0;
         if (DialorAnswer == tr("Dial"))
         {
             if (!audioOnly)
             {
-                QButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(outcallDialVideoSelected()));
+                QAbstractButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(outcallDialVideoSelected()));
                 button1->setFocus();
             }
             button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(outcallDialVoiceSelected()));
@@ -1734,7 +1743,7 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
         {
             if (!audioOnly)
             {
-                QButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(incallDialVideoSelected()));
+                QAbstractButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(incallDialVideoSelected()));
                 button1->setFocus();
             }
             button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(incallDialVoiceSelected()));

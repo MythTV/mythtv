@@ -1,13 +1,6 @@
 #include <iostream>
 using namespace std;
 
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qbuttongroup.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qapplication.h>
-
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "mythwidgets.h"
@@ -25,7 +18,7 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
     maintext->setBackgroundOrigin(WindowOrigin);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
 
-    box = new QVBoxLayout(this, (int)(60 * wmult), (int)(0 * hmult));
+    box = new Q3VBoxLayout(this, (int)(60 * wmult), (int)(0 * hmult));
 
     box->addWidget(maintext, 1);
 
@@ -38,7 +31,7 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
         box->addWidget(checkbox, 0);
     }
 
-    buttongroup = new QButtonGroup(0);
+    buttongroup = new Q3ButtonGroup(0);
   
     if (checkbox)
         buttongroup->insert(checkbox);

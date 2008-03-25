@@ -1,9 +1,13 @@
 #ifndef VIDEOBROWSER_H_
 #define VIDEOBROWSER_H_
 
-#include <qpainter.h>
+#include <QPixmap>
 
 #include "videodlg.h"
+
+class QPainter;
+class QPaintEvent;
+class QKeyEvent;
 
 class VideoBrowser : public VideoDialog
 {

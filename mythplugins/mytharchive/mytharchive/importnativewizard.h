@@ -6,6 +6,10 @@
 // qt
 #include <qstring.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 // myth
 #include <mythtv/mythdialogs.h>
@@ -59,7 +63,7 @@ class ImportNativeWizard : public MythThemedDialog
 
     QString            m_filemask;
     QString            m_curDirectory;
-    QPtrList<FileInfo> m_fileData;
+    Q3PtrList<FileInfo> m_fileData;
     QStringList        m_selectedList;
 
     //

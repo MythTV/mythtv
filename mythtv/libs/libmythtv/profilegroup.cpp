@@ -4,11 +4,13 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include <qsqldatabase.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qcursor.h>
 #include <qlayout.h>
+#include <Q3ValueList>
+#include <Q3VBoxLayout>
 #include <iostream>
-#include <qaccel.h>
+#include <q3accel.h>
 
 QString ProfileGroupStorage::whereClause(MSqlBindings &bindings)
 {
@@ -29,7 +31,7 @@ QString ProfileGroupStorage::setClause(MSqlBindings &bindings)
             getColumn() + " = " + colTag);
 
     bindings.insert(idTag, parent.getProfileNum());
-    bindings.insert(colTag, setting->getValue().utf8());
+    bindings.insert(colTag, setting->getValue());
 
     return query;
 }
@@ -104,9 +106,8 @@ void ProfileGroup::fillSelections(SelectSetting* setting) {
                    continue;
                }
             }
-            QString value = QString::fromUtf8(result.value(0).toString());
-            if (result.value(2).toString() != NULL &&
-                result.value(2).toString() != "")
+            QString value = result.value(0).toString();
+            if (!result.value(2).toString().isEmpty())
                 value += QString(" (%1)").arg(result.value(2).toString());
             setting->addSelection(value, result.value(1).toString());
         }
@@ -124,7 +125,7 @@ QString ProfileGroup::getName(int group)
     if (result.exec() && result.isActive() && result.size() > 0)
     {
         result.next();
-        return QString::fromUtf8(result.value(0).toString());
+        return result.value(0).toString();
     }
 
     return NULL;
@@ -189,7 +190,7 @@ void ProfileGroupEditor::open(int id) {
         {
             profilegroup->save();
             profileID = profilegroup->getProfileNum();
-            QValueList <int> found;
+            Q3ValueList <int> found;
             
             MSqlQuery result(MSqlQuery::InitCon());
             QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
@@ -209,7 +210,7 @@ void ProfileGroupEditor::open(int id) {
             for(int i = 0; availProfiles[i] != ""; i++)
             {
                 bool skip = false;
-                for (QValueList <int>::Iterator j = found.begin();
+                for (Q3ValueList <int>::Iterator j = found.begin();
                        j != found.end(); j++)
                     if (i == *j)
                         skip = true;
@@ -264,7 +265,7 @@ DialogCode ProfileGroupEditor::exec(void)
         float wmult = 0.0f, hmult  = 0.0f;
         gContext->GetScreenSettings(width, wmult, height, hmult);
 
-        QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
+        Q3VBoxLayout *layout = new Q3VBoxLayout(dialog, (int)(20 * hmult));
         layout->addWidget(listbox->configWidget(NULL, dialog));
 
         dialog->Show();

@@ -9,10 +9,10 @@
 #include "mythtv/mythcontext.h"
 
 #include <qapplication.h>
-#include <qsocket.h>
+#include <q3socket.h>
 
 
-StreamInput::StreamInput(const QUrl &source)
+StreamInput::StreamInput(const Q3Url &source)
     : request(0), url(source), sock(0), stage(0)
 {
 }
@@ -37,7 +37,7 @@ void StreamInput::setup()
     request = ".song " + path.utf8() + "\r\n";
 
 
-    sock = new QSocket;
+    sock = new Q3Socket;
     connect(sock, SIGNAL(error(int)), this, SLOT(error(int)));
     connect(sock, SIGNAL(hostFound()), this, SLOT(hostfound()));
     connect(sock, SIGNAL(connected()), this, SLOT(connected()));

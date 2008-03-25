@@ -1,9 +1,10 @@
 #ifndef SCHEDULEDRECORDING_H
 #define SCHEDULEDRECORDING_H
 
+#include <qpointer.h>
+
 #include "settings.h"
 #include "recordingtypes.h"
-#include <qdatetime.h>
 #include <list>
 
 
@@ -70,7 +71,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     
     void makeOverride(void);
     const ProgramInfo* getProgramInfo() const { return m_pginfo; }
-    QGuardedPtr<RootSRGroup> getRootGroup(void) { return rootGroup; }
+    QPointer<RootSRGroup> getRootGroup(void) { return rootGroup; }
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
@@ -250,7 +251,7 @@ protected:
     class SRParentId* parentid;
     
     const ProgramInfo* m_pginfo;
-    QGuardedPtr<RootSRGroup> rootGroup;
+    QPointer<RootSRGroup> rootGroup;
     QString chanstr;
     QString chansign;
     QString channame;

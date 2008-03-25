@@ -4,8 +4,12 @@
 
 #include <qstring.h>
 #include <qdatetime.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qlayout.h>
+#include <QEvent>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QKeyEvent>
 #include <vector>
 
 #include "libmyth/mythwidgets.h"
@@ -80,7 +84,7 @@ class MPUBLIC GuideGrid : public MythDialog
     void upcoming();
     void details();
 
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
   protected:
     GuideGrid(MythMainWindow *parent,

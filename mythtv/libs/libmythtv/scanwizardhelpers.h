@@ -35,6 +35,9 @@
 
 #include "settings.h"
 
+#include <qwaitcondition.h>
+#include <qevent.h>
+
 class TransFreqTableSelector;
 class TransLabelSetting;
 class ScanWizardScanner;
@@ -92,7 +95,7 @@ class ScanProgressPopup : public ConfigurationPopupDialog
     TransLabelSetting *sta;
 };
 
-class ScannerEvent : public QCustomEvent
+class ScannerEvent : public QEvent
 {
     friend class QObject; // quiet OSX gcc warning
 
@@ -110,7 +113,7 @@ class ScannerEvent : public QCustomEvent
         SetStatusSignalLock,
     };
 
-    ScannerEvent(TYPE t) : QCustomEvent(t + QEvent::User) { ; }
+    ScannerEvent(TYPE t) : QEvent( (QEvent::Type)(t + QEvent::User)) { ; }
 
     QString strValue()              const { return str; }
     void    strValue(const QString& _str) { str = _str; }

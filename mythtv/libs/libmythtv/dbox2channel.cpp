@@ -9,8 +9,8 @@
 using namespace std;
 
 // Qt headers
-#include <qdeepcopy.h>
-#include <qhttp.h>
+#include <q3deepcopy.h>
+#include <q3http.h>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -51,7 +51,7 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
       m_channelListReady(false),     m_lastChannel("1"),
       m_requestChannel(""),          m_epg(new DBox2EPG()),
       m_recorderAlive(false),        m_recorder(NULL),
-      http(new QHttp()),             httpChanger(new QHttp()),
+      http(new Q3Http()),             httpChanger(new Q3Http()),
       m_relay(new DBox2CRelay(this)),
       m_dbox2channelcount(0)
 {
@@ -125,11 +125,11 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
         VERBOSE(VB_CHANNEL, LOC + "Channel list not received yet. \n\t\t\t" +
                 QString("Will switch to channel %1 later...").arg(newChan));
 
-        m_requestChannel = QDeepCopy<QString>(newChan);
+        m_requestChannel = Q3DeepCopy<QString>(newChan);
         return true;
     }
 
-    QString chan = QDeepCopy<QString>(newChan);
+    QString chan = Q3DeepCopy<QString>(newChan);
     if (chan.isEmpty())
     {
         VERBOSE(VB_CHANNEL, LOC + "Empty channel name has been provided. "
@@ -230,7 +230,7 @@ void DBox2Channel::LoadChannels(void)
     // Request Channel list via http.
     // Signal will be emmitted when list is ready.
 
-    QHttpRequestHeader header("GET", "/control/channellist");
+    Q3HttpRequestHeader header("GET", "/control/channellist");
     header.setValue("Host", m_dbox2options->host);
     http->setHost(m_dbox2options->host, m_dbox2options->httpport);
     http->request(header);
@@ -300,7 +300,7 @@ void DBox2Channel::RequestChannelChange(QString channelID)
     // Request channel change via http.
     // Signal will be emmited when request is done.
 
-    QHttpRequestHeader header("GET", requestString);
+    Q3HttpRequestHeader header("GET", requestString);
     header.setValue("Host", m_dbox2options->host);
     httpChanger->setHost(m_dbox2options->host, m_dbox2options->httpport);
     httpChanger->request(header);

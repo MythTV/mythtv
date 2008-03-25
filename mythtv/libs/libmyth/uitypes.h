@@ -8,12 +8,15 @@
 #include <qrect.h>
 #include <qfile.h>
 #include <qmap.h>
+#include <Q3ValueList>
+#include <QKeyEvent>
 #include <vector>
-#include <qvaluevector.h>
+#include <q3valuevector.h>
 #include <qfont.h>
 #include <qpixmap.h>
 #include <qpainter.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
+#include <q3dict.h>
 
 #include "mythwidgets.h"
 #include "util.h"
@@ -222,7 +225,7 @@ class AlphaBlender
     void blendImage(const QImage &image, const QColor &color);
 
   private:
-    QDict<AlphaTable> alphaTables;
+    Q3Dict<AlphaTable> alphaTables;
     int alpha;
 };
 
@@ -307,7 +310,7 @@ class MPUBLIC UIGuideType : public UIType
     void drawRecType(QPainter *dr, UIGTCon *data);
     void drawCurrent(QPainter *dr, UIGTCon *data);
 
-    QPtrList<UIGTCon> *allData;
+    Q3PtrList<UIGTCon> *allData;
     UIGTCon selectedItem;
 
     QPixmap recImages[15];
@@ -458,7 +461,7 @@ class MPUBLIC UIImageGridType : public UIType
         void loadImages(void);
         void loadCellImages(void);
         QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                    QImage::ScaleMode mode);
+                                    Qt::AspectRatioMode mode);
         MythDialog *window;
         int rowCount;
         int columnCount;
@@ -508,7 +511,7 @@ class MPUBLIC UIImageGridType : public UIType
         QPixmap *dnArrowRegPixmap;
         QPixmap *dnArrowActPixmap;
 
-        QPtrList<ImageGridItem> *allData;
+        Q3PtrList<ImageGridItem> *allData;
 };
 
 class MPUBLIC UIListType : public UIType
@@ -1050,7 +1053,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     //  don't need this
     //
     typedef QMap <int, QRect> CornerMap;
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
 
   public:
 
@@ -1068,11 +1071,11 @@ class MPUBLIC UIManagedTreeListType : public UIType
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
     void    Draw(QPainter *, int drawlayer, int context);
     void    assignTreeData(GenericTree *a_tree);
-    void    moveToNode(QValueList<int> route_of_branches);
-    void    moveToNodesFirstChild(QValueList<int> route_of_branchs);
-    QValueList <int>* getRouteToActive();
+    void    moveToNode(Q3ValueList<int> route_of_branches);
+    void    moveToNodesFirstChild(Q3ValueList<int> route_of_branchs);
+    Q3ValueList <int>* getRouteToActive();
     QStringList getRouteToCurrent();
-    bool    tryToSetActive(QValueList <int> route);
+    bool    tryToSetActive(Q3ValueList <int> route);
     bool    tryToSetCurrent(QStringList route);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
     void    setArrowImages(QPixmap up, QPixmap down, QPixmap left, QPixmap right)
@@ -1157,9 +1160,9 @@ class MPUBLIC UIManagedTreeListType : public UIType
     QPixmap                 down_arrow_image;
     QPixmap                 left_arrow_image;
     QPixmap                 right_arrow_image;
-    QPtrList<QPixmap>       resized_highlight_images;
+    Q3PtrList<QPixmap>       resized_highlight_images;
     QMap<int, QPixmap*>     highlight_map;
-    QValueList <int>        route_to_active;
+    Q3ValueList <int>        route_to_active;
     bool                    show_whole_tree;
     bool                    scrambled_parents;
     bool                    color_selectables;
@@ -1355,7 +1358,7 @@ class MPUBLIC UISelectorType : public UIPushButtonType
 
     QRect                   m_area;
     fontProp                *m_font;
-    QPtrList<IntStringPair> my_data;
+    Q3PtrList<IntStringPair> my_data;
     IntStringPair           *current_data;
 
 };
@@ -1480,7 +1483,7 @@ class MPUBLIC UIKeyboardType : public UIType
     UIKeyboardType(const QString &, int);
     ~UIKeyboardType();
 
-    typedef QPtrList <UIKeyType> KeyList;
+    typedef Q3PtrList <UIKeyType> KeyList;
 
     void SetContainer(LayerSet *container) { m_container = container; }
     void SetArea(QRect &area) { m_area = area; }

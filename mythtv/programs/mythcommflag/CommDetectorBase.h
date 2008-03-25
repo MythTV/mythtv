@@ -1,8 +1,8 @@
 #ifndef _CommDetectorBase_H_
 #define _CommDetectorBase_H_
 
-#include "qobject.h"
-class QString;
+#include <QObject>
+#include <QMap>
 
 enum commMapValues {
     MARK_START = 0,

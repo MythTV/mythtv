@@ -66,7 +66,7 @@ DTVRecorder::~DTVRecorder()
 void DTVRecorder::SetOption(const QString &name, const QString &value)
 {
     if (name == "recordingtype")
-        _recording_type = QDeepCopy<QString>(value);
+        _recording_type = Q3DeepCopy<QString>(value);
     else
         RecorderBase::SetOption(name, value);
 }

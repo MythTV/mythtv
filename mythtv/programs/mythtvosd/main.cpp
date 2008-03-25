@@ -10,9 +10,9 @@ using namespace std;
 
 // Qt headers
 #include <qapplication.h>
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qstring.h>
-#include <qcstring.h>
+#include <q3cstring.h>
 #include <qfile.h>
 #include <qhostaddress.h>
 
@@ -134,9 +134,9 @@ int main(int argc, char *argv[])
     else
     {
         QFile mfile(templatearg);
-        if (!mfile.open(IO_ReadOnly))
+        if (!mfile.open(QIODevice::ReadOnly))
         {
-            cerr << "Unable to open template file '" << templatearg << "'\n";
+            cerr << "Unable to open template file '" << (const char *)templatearg << "'\n";
             return TVOSD_EXIT_NO_TEMPLATE;
         }
 
@@ -180,8 +180,8 @@ int main(int argc, char *argv[])
         if (verbose)
         {
 
-            cerr << "name: " << name 
-		 << " -- value: " << value.local8Bit() << endl;
+            cerr << "name: " << (const char *)name
+		 << " -- value: " << (const char *)value.local8Bit() << endl;
         }
 
         name.append("%");
@@ -191,9 +191,9 @@ int main(int argc, char *argv[])
     }
 
     if (verbose)
-        cout << "output:\n" << message.local8Bit() << endl;
+        cout << "output:\n" << (const char *)message.local8Bit() << endl;
 
-    QSocketDevice sock(QSocketDevice::Datagram);
+    Q3SocketDevice sock(Q3SocketDevice::Datagram);
 
     int yes = 1;
     if (setsockopt(sock.socket(), SOL_SOCKET, SO_BROADCAST, &yes, sizeof(int))
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
         return TVOSD_EXIT_SOCKET_ERROR;
     }
 
-    QCString utf8 = message.utf8();
+    Q3CString utf8 = message.utf8();
     int size = utf8.length();
 
     if (sock.writeBlock(utf8.data(), size, address, port) < 0)
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "Sent UDP/XML packet to IP " << address.toString() 
+        cout << "Sent UDP/XML packet to IP " << (const char *)address.toString()
              << " and port: " << port << endl;
     }
    

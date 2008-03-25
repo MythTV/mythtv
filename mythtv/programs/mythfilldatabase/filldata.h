@@ -3,7 +3,7 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 
 // libmythtv headers
 #include "datadirect.h"
@@ -55,7 +55,7 @@ class FillData
     bool grabData(Source source, int offset, QDate *qCurrentDate = 0);
     void grabDataFromDDFile(int id, int offset, const QString &filename,
                             const QString &lineupid, QDate *qCurrentDate = 0);
-    bool fillData(QValueList<Source> &sourcelist);
+    bool fillData(Q3ValueList<Source> &sourcelist);
     ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine);
     void readXawtvChannels(int id, QString xawrcfile);
 

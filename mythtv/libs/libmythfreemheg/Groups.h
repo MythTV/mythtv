@@ -24,7 +24,7 @@
 #define GROUPCLASS_H
 #include <qstring.h>
 #include <qdatetime.h> 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include "Root.h"
 #include "Ingredients.h"
@@ -73,7 +73,7 @@ protected:
     // to the group in UK MHEG.  We record the time that the group starts running so
     // we know how to calculate absolute times.
     QTime m_StartTime;
-    QPtrList<MHTimer> m_Timers;
+    Q3PtrList<MHTimer> m_Timers;
     int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
                         // next event or zero if there aren't any.
     int m_nLastId; // Highest numbered ingredient.  Used to make new ids for clones.

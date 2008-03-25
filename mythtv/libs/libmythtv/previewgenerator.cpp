@@ -97,7 +97,7 @@ PreviewGenerator::~PreviewGenerator()
 
 void PreviewGenerator::SetOutputFilename(const QString &fileName)
 {
-    outFileName = QDeepCopy<QString>(fileName);
+    outFileName = fileName;
 }
 
 void PreviewGenerator::TeardownAll(void)
@@ -291,7 +291,7 @@ bool PreviewGenerator::RemotePreviewSetup(void)
 
 bool PreviewGenerator::RemotePreviewRun(void)
 {
-    QStringList strlist = "QUERY_GENPIXMAP";
+    QStringList strlist( "QUERY_GENPIXMAP" );
     programInfo.ToStringList(strlist);
     strlist.push_back(timeInSeconds ? "s" : "f");
     encodeLongLong(strlist, captureTime);
@@ -377,7 +377,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     if (ok && data.size())
     {
         QFile file(outFileName);
-        ok = file.open(IO_Raw|IO_WriteOnly);
+        ok = file.open(QIODevice::Unbuffered|QIODevice::WriteOnly);
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, QString("Failed to open: '%1'")
@@ -530,7 +530,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
     QString outname = pathname + ".png";
 
     if (outFileName.isEmpty())
-        return QDeepCopy<QString>(outname);
+        return outname;
 
     outname = outFileName;
     QFileInfo fi(outname);
@@ -552,7 +552,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
                 .arg(outFileName).arg(outname));
     }
 
-    return QDeepCopy<QString>(outname);
+    return outname;
 }
 
 bool PreviewGenerator::IsLocal(void) const

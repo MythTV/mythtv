@@ -29,3 +29,5 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
+#The following line was inserted by qt3to4
+QT += xml sql opengl qt3support 

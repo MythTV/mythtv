@@ -26,7 +26,9 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdict.h>
+#include <q3dict.h>
+//Added by qt3to4:
+#include <Q3ValueList>
 
 /** \class ActionID
  *  \brief A class that uniquely identifies an action.
@@ -61,6 +63,6 @@ class ActionID
     QString m_context;
     QString m_action;
 };
-typedef QValueList<ActionID> ActionList;
+typedef Q3ValueList<ActionID> ActionList;
 
 #endif /* ACTIONID_H */

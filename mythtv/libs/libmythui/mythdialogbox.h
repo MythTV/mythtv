@@ -2,6 +2,7 @@
 #define MYTHDIALOGBOX_H_
 
 #include "qevent.h"
+#include <QKeyEvent>
 
 #include "mythscreentype.h"
 #include "mythlistbutton.h"
@@ -11,11 +12,11 @@ class MythListButton;
 
 const int kMythDialogBoxCompletionEventType = 34111;
 
-class DialogCompletionEvent : public QCustomEvent
+class DialogCompletionEvent : public QEvent
 {
   public: 
     DialogCompletionEvent(const QString &id, int result)
-        : QCustomEvent(kMythDialogBoxCompletionEventType), 
+        : QEvent((QEvent::Type)kMythDialogBoxCompletionEventType),
           m_id(id), m_result(result) { }
 
     QString GetId() { return m_id; }

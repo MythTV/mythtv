@@ -5,7 +5,10 @@
 #include <qstring.h>
 #include <qevent.h>
 #include <qthread.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
+#include <qwaitcondition.h>
+#include <qmutex.h>
+
 #include <mythtv/mythobservable.h>
 
 class Metadata;

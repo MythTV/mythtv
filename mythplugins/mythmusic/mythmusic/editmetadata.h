@@ -2,6 +2,9 @@
 #define EDITMETADATA_H_
 
 #include <iostream>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
 using namespace std;
 
 #include <mythtv/mythdialogs.h>
@@ -56,7 +59,7 @@ class EditMetadataDialog : public MythThemedDialog
     void showMenu(void);
     void updateImageGrid(void);
     QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                QImage::ScaleMode mode);
+                                Qt::AspectRatioMode mode);
 
     bool                   metadataOnly;
     Metadata *m_metadata, *m_sourceMetadata ;

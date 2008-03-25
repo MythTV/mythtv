@@ -3,13 +3,13 @@
 
 #include <qevent.h>
 
-class ScreenSaverEvent : public QCustomEvent
+class ScreenSaverEvent : public QEvent
 {
 public:
     enum ScreenSaverEventType {ssetDisable, ssetRestore, ssetReset};
 
     ScreenSaverEvent(ScreenSaverEventType type) :
-        QCustomEvent(kScreenSaverEventType), sset(type)
+        QEvent((QEvent::Type)kScreenSaverEventType), sset(type)
     {
     }
 

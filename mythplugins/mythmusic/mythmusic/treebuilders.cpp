@@ -103,7 +103,7 @@ void MusicTreeBuilder::makeTree(MusicNode *root, const MetadataPtrList &metas)
     BranchMap branches;
     
     Metadata *meta;
-    QPtrListIterator<Metadata> iter(metas);
+    Q3PtrListIterator<Metadata> iter(metas);
     while ((meta = iter.current()) != 0) 
     {
         if (isLeafDone(meta)) 

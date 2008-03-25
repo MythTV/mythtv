@@ -6,13 +6,13 @@ extern "C" {
 #include "frame.h"
 }
 
-#include <qdict.h>
-#include <qptrlist.h>
+#include <q3dict.h>
+#include <q3ptrlist.h>
 #include <qstring.h>
 
 using namespace std;
 
-class FilterChain : public QPtrList<VideoFilter>
+class FilterChain : public Q3PtrList<VideoFilter>
 {
   public:
     FilterChain();
@@ -22,7 +22,7 @@ class FilterChain : public QPtrList<VideoFilter>
     void ProcessFrame(VideoFrame *Frame);
 
   private:
-    void deleteItem(QPtrCollection::Item d);
+    void deleteItem(Q3PtrCollection::Item d);
 };
 
 class FilterManager
@@ -45,15 +45,15 @@ class FilterManager
         return FilterByName.find(name);
     }
 
-    QPtrList <FilterInfo> GetAllFilterInfo()
+    Q3PtrList <FilterInfo> GetAllFilterInfo()
     {
-        return QPtrList<FilterInfo>(Filters);
+        return Q3PtrList<FilterInfo>(Filters);
     }
 
 
   private:
-    QPtrList<FilterInfo> Filters;
-    QDict<FilterInfo> FilterByName;
+    Q3PtrList<FilterInfo> Filters;
+    Q3Dict<FilterInfo> FilterByName;
 };
 
 #endif // #ifndef FILTERMANAGER

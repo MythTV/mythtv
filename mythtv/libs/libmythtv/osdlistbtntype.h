@@ -28,10 +28,11 @@ using namespace std;
 
 // Qt headers
 #include <qcolor.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qevent.h>
 #include <qmutex.h>
-#include <qptrvector.h>
+#include <q3ptrvector.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include "osdtypes.h"

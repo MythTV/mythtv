@@ -6,11 +6,13 @@
 
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
-#include <qapplication.h>
-#include <qregexp.h>
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+
+#include <qapplication.h>
+#include <q3textstream.h>
 
 #include "lcdprocclient.h"
 #include "mythcontext.h"
@@ -43,7 +45,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDProcClient: An LCDProcClient object now exists");
 
-    socket = new QSocket(this);
+    socket = new Q3Socket(this);
     connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
     connect(socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
 
@@ -72,10 +74,10 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     volume_level = 0.0;
     connected = false;
     send_buffer = "";
-    lcdMenuItems = new QPtrList<LCDMenuItem>;
+    lcdMenuItems = new Q3PtrList<LCDMenuItem>;
     lcdMenuItems->setAutoDelete(true);
 
-    lcdTextItems = new QPtrList<LCDTextItem>;
+    lcdTextItems = new Q3PtrList<LCDTextItem>;
     lcdTextItems->setAutoDelete(true);
 
     timeTimer = new QTimer(this);
@@ -154,17 +156,17 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!connected)
     {
-        QTextStream os(socket);
+        Q3TextStream os(socket);
         socket->connectToHost(hostname, port);
 
-        while (--timeout && socket->state() != QSocket::Idle)
+        while (--timeout && socket->state() != Q3Socket::Idle)
         {
             qApp->lock();
             qApp->processEvents();
             qApp->unlock();
             usleep(1000);
 
-            if (socket->state() == QSocket::Connected)
+            if (socket->state() == Q3Socket::Connected)
             {
                 connected = true;
                 os << "hello\n";
@@ -179,7 +181,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
 void LCDProcClient::sendToServer(const QString &someText)
 {
     // Check the socket, make sure the connection is still up
-    if (socket->state() == QSocket::Idle)
+    if (socket->state() == Q3Socket::Idle)
     {
         if (!lcd_ready)
             return;
@@ -195,8 +197,8 @@ void LCDProcClient::sendToServer(const QString &someText)
         return;
     }
 
-    QTextStream os(socket);
-    os.setEncoding(QTextStream::Latin1);
+    Q3TextStream os(socket);
+    os.setEncoding(Q3TextStream::Latin1);
 
     last_command = someText;
 
@@ -293,7 +295,7 @@ void LCDProcClient::checkConnections()
     }
 
     //check connection to LCDProc server
-    if (socket->state() == QSocket::Idle)
+    if (socket->state() == Q3Socket::Idle)
     {
         if (debug_level > 0)
            VERBOSE(VB_GENERAL, "LCDProcClient: connecting to LCDProc server");
@@ -584,7 +586,7 @@ void LCDProcClient::loadSettings()
 
 void LCDProcClient::showStartupMessage(void)
 {
-    QPtrList<LCDTextItem> textItems;
+    Q3PtrList<LCDTextItem> textItems;
     textItems.setAutoDelete(true);
 
     QStringList list = formatScrollerText(startup_message);
@@ -727,11 +729,11 @@ void LCDProcClient::veryBadThings(int anError)
 
     QString err;
 
-    if (anError == QSocket::ErrConnectionRefused)
+    if (anError == Q3Socket::ErrConnectionRefused)
         err = "connection refused.";
-    else if (anError == QSocket::ErrHostNotFound)
+    else if (anError == Q3Socket::ErrHostNotFound)
         err = "host not found.";
-    else if (anError == QSocket::ErrSocketRead)
+    else if (anError == Q3Socket::ErrSocketRead)
         err = "socket read failed.";
     else
         err = "unknown error.";
@@ -802,12 +804,12 @@ void LCDProcClient::startTime()
         recStatusTimer->start(LCD_TIME_TIME, FALSE);
 }
 
-void LCDProcClient::outputText(QPtrList<LCDTextItem> *textItems)
+void LCDProcClient::outputText(Q3PtrList<LCDTextItem> *textItems)
 {
     if (!lcd_ready)
         return;
 
-    QPtrListIterator<LCDTextItem> it( *textItems );
+    Q3PtrListIterator<LCDTextItem> it( *textItems );
     LCDTextItem *curItem;
     QString num;
     unsigned int counter = 1;
@@ -944,7 +946,7 @@ void LCDProcClient::formatScrollingWidgets()
         return; // Weird...
 
     unsigned int max_len = 0;
-    QPtrListIterator<LCDTextItem> it(*lcdTextItems);
+    Q3PtrListIterator<LCDTextItem> it(*lcdTextItems);
     LCDTextItem *curItem;
 
     // Get the length of the longest item to scroll
@@ -999,7 +1001,7 @@ void LCDProcClient::scrollWidgets()
     if (lcdTextItems->isEmpty())
         return; // Weird...
 
-    QPtrListIterator<LCDTextItem> it(*lcdTextItems);
+    Q3PtrListIterator<LCDTextItem> it(*lcdTextItems);
     LCDTextItem *curItem;
 
     unsigned int len = 0;
@@ -1121,10 +1123,10 @@ void LCDProcClient::startChannel(QString channum, QString title, QString subtitl
     outputChannel();
 }
 
-void LCDProcClient::startGeneric(QPtrList<LCDTextItem> * textItems)
+void LCDProcClient::startGeneric(Q3PtrList<LCDTextItem> * textItems)
 {
     LCDTextItem *curItem;
-    QPtrListIterator<LCDTextItem> it( *textItems );
+    Q3PtrListIterator<LCDTextItem> it( *textItems );
     QString aString;
 
     if (lcd_showgeneric)
@@ -1175,7 +1177,7 @@ void LCDProcClient::startGeneric(QPtrList<LCDTextItem> * textItems)
     formatScrollingWidgets();
 }
 
-void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name, 
+void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
                     bool popMenu)
 {
     // Now do the menu items
@@ -1195,7 +1197,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
     if (lcdHeight > 1)
     outputCenteredText("Menu", app_name, "topWidget", 1);
 
-    QPtrListIterator<LCDMenuItem> it(*menuItems);
+    Q3PtrListIterator<LCDMenuItem> it(*menuItems);
     LCDMenuItem *curItem;
 
     // First loop through and figure out where the selected item is in the
@@ -1232,7 +1234,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
 
     // QPtrListIterator doesn't contain a deep copy constructor. . .
     // This will contain a copy of the menuItems for scrolling purposes
-    QPtrListIterator<LCDMenuItem> itTemp(*menuItems);
+    Q3PtrListIterator<LCDMenuItem> itTemp(*menuItems);
     lcdMenuItems->clear();
     counter = 1;
     while ((curItem = itTemp.current()) != 0)
@@ -1385,7 +1387,7 @@ void LCDProcClient::beginScrollingMenuText()
 
     menuScrollPosition = 1;
 
-    QPtrListIterator<LCDMenuItem> it( *lcdMenuItems );
+    Q3PtrListIterator<LCDMenuItem> it( *lcdMenuItems );
     LCDMenuItem *curItem;
 
     QString temp;
@@ -1419,7 +1421,7 @@ void LCDProcClient::scrollMenuText()
         return;
 
     QString aString, bString;
-    QPtrListIterator<LCDMenuItem> it(*lcdMenuItems);
+    Q3PtrListIterator<LCDMenuItem> it(*lcdMenuItems);
     LCDMenuItem *curItem;
 
     ++menuScrollPosition;
@@ -2204,7 +2206,7 @@ void LCDProcClient::switchToChannel(QString channum, QString title, QString subt
     startChannel(channum, title, subtitle);
 }
 
-void LCDProcClient::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name, 
+void LCDProcClient::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
                        bool popMenu)
 {
     if (!lcd_ready)
@@ -2216,7 +2218,7 @@ void LCDProcClient::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_n
     startMenu(menuItems, app_name, popMenu);
 }
 
-void LCDProcClient::switchToGeneric(QPtrList<LCDTextItem> *textItems)
+void LCDProcClient::switchToGeneric(Q3PtrList<LCDTextItem> *textItems)
 {
     if (!lcd_ready)
         return;
@@ -2337,7 +2339,7 @@ LCDProcClient::~LCDProcClient()
     gContext->removeListener(this);
 }
 
-void LCDProcClient::customEvent(QCustomEvent *e)
+void LCDProcClient::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {

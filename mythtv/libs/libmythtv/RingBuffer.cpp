@@ -13,7 +13,7 @@
 #include <pthread.h>
 
 // Qt headers
-#include <qsocket.h>
+#include <q3socket.h>
 #include <qfile.h>
 #include <qapplication.h>
 #include <qdatetime.h>
@@ -86,7 +86,7 @@ const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
 RingBuffer::RingBuffer(const QString &lfilename,
                        bool write, bool readahead,
                        uint read_retries)
-    : filename(QDeepCopy<QString>(lfilename)),
+    : filename(Q3DeepCopy<QString>(lfilename)),
       tfw(NULL),                fd2(-1),
       writemode(false),
       readpos(0),               writepos(0),
@@ -697,7 +697,12 @@ void RingBuffer::WaitForPause(void)
 
     if  (!readaheadpaused)
     {
-        while (!pauseWait.wait(1000))
+        // Qt4 requires a QMutex as a parameter...
+        // not sure if this is the best solution.  Mutex Must be locked before wait.
+        QMutex mutex;
+        mutex.lock();
+
+        while (!pauseWait.wait(&mutex, 1000))
             VERBOSE(VB_IMPORTANT,
                     LOC + "Waited too long for ringbuffer pause..");
     }
@@ -947,9 +952,14 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
     }
     else
     {
+        // Qt4 requires a QMutex as a parameter...
+        // not sure if this is the best solution.  Mutex Must be locked before wait.
+        QMutex mutex;
+        mutex.lock();
+
         while (!readsallowed && !stopreads)
         {
-            if (!readsAllowedWait.wait(1000))
+            if (!readsAllowedWait.wait(&mutex, 1000))
             {
                  VERBOSE(VB_IMPORTANT,
                          LOC + "Taking too long to be allowed to read..");

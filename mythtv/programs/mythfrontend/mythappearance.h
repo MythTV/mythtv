@@ -3,7 +3,6 @@
 
 #include <qstringlist.h>
 #include <qstring.h>
-#include <qptrlist.h>
 
 #include "mythscreentype.h"
 #include "mythuitext.h"
@@ -24,7 +23,7 @@ class MythAppearance : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QCustomEvent *event);
+    void customEvent(QEvent *event);
 
   protected: 
     void doMenu();

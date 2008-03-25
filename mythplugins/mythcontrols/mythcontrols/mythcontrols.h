@@ -31,6 +31,8 @@
 #include <mythtv/libmythui/mythdialogbox.h>
 
 #include "keybindings.h"
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 
 typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
@@ -49,7 +51,7 @@ class MythControls : public MythScreenType
 
     virtual bool Create(void);
     virtual bool keyPressEvent(QKeyEvent *);
-    virtual void customEvent(QCustomEvent*);
+    virtual void customEvent(QEvent*);
 
     typedef enum
     {
@@ -88,6 +90,9 @@ class MythControls : public MythScreenType
     void DeleteKey(void);
     void LeftSelected(MythListButtonItem*);
     void RightSelected(MythListButtonItem*);
+    void LeftPressed(MythListButtonItem*);
+    void RightPressed(MythListButtonItem*);
+    void ActionButtonPressed();
     bool JumpTo(QKeyEvent *event) { return false; }
     /// \brief Save the bindings to the Database.
     void Save(void) { m_bindings->CommitChanges(); }
@@ -101,12 +106,12 @@ class MythControls : public MythScreenType
     MythUIText        *m_description;
     MythUIText        *m_leftDescription;
     MythUIText        *m_rightDescription;
-    QPtrList<MythUIButton> m_actionButtons;
+    Q3PtrList<MythUIButton> m_actionButtons;
     MythDialogBox *m_menuPopup;
 
     KeyBindings       *m_bindings;
     QStringList        m_sortedContexts; ///< sorted list of contexts
-    QDict<QStringList> m_contexts;       ///< actions for a given context
+    Q3Dict<QStringList> m_contexts;       ///< actions for a given context
     ListType           m_leftListType;
     ListType           m_rightListType;
 };

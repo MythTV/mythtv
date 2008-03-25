@@ -104,7 +104,7 @@ long long DVDRingBufferPriv::Seek(long long time)
 
     if (ffrewSkip != 1 && time != 0)
     {
-        QMapConstIterator<uint, uint> it = seekSpeedMap.find(labs(time));
+        QMap<uint, uint>::const_iterator it = seekSpeedMap.find(labs(time));
         seekSpeed = it.data();
         if (time < 0)
             seekSpeed = -seekSpeed;
@@ -153,13 +153,13 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to open DVD device at %1")
-                .arg(filename.local8Bit()));
+                .arg((const char *)filename.local8Bit()));
         return false;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Opened DVD device at %1")
-                .arg(filename.local8Bit()));
+                .arg((const char *)filename.local8Bit()));
         dvdnav_set_readahead_flag(dvdnav, 1);
         dvdnav_set_PGC_positioning_flag(dvdnav, 1);
 
@@ -1128,7 +1128,7 @@ int DVDRingBufferPriv::GetSubTrackNum(uint stream_id)
 {
     if (subTrackMap.empty())
         return -1;
-    QMapConstIterator<uint, uint> it = subTrackMap.begin();
+    QMap<uint, uint>::const_iterator it = subTrackMap.begin();
     for (; it != subTrackMap.end(); ++it)
     {
         if (it.key() == stream_id)
@@ -1145,7 +1145,7 @@ int DVDRingBufferPriv::GetAudioTrackNum(uint stream_id)
 {
     if (audioTrackMap.empty())
         return -1;
-    QMapConstIterator<uint, uint> it = audioTrackMap.begin();
+    QMap<uint, uint>::const_iterator it = audioTrackMap.begin();
     for (; it != audioTrackMap.end(); ++it)
     {
         if (it.key() == stream_id)
@@ -1173,7 +1173,7 @@ uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
     str2[0] = QChar(code >> 8);
     str2[1] = QChar(code & 0xff);
     QString str3 = iso639_str2_to_str3(QString(str2, 2));
-    if (str3)
+    if (!str3.isEmpty())
         return iso639_str3_to_key(str3);
     return 0;
 }

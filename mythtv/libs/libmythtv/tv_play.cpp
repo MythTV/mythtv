@@ -12,6 +12,8 @@ using namespace std;
 #include <qfile.h>
 #include <qtimer.h>
 #include <qdir.h>
+#include <QKeyEvent>
+#include <QEvent>
 
 #include "mythdbcon.h"
 #include "tv_play.h"
@@ -1178,7 +1180,7 @@ void TV::UpdateOSDAskAllowDialog(void)
         type = kAskAllowOneRec;
         it = askAllowPrograms.begin();
 
-        QString channel = QDeepCopy<QString>(db_channel_format);
+        QString channel = Q3DeepCopy<QString>(db_channel_format);
         channel
             .replace("<num>",  (*it).info->chanstr)
             .replace("<sign>", (*it).info->chansign)
@@ -1217,7 +1219,7 @@ void TV::UpdateOSDAskAllowDialog(void)
             if (title.length() > 20)
                 title = title.left(17) + "...";
 
-            QString channel = QDeepCopy<QString>(db_channel_format);
+            QString channel = Q3DeepCopy<QString>(db_channel_format);
             channel
                 .replace("<num>",  (*it).info->chanstr)
                 .replace("<sign>", (*it).info->chansign)
@@ -2496,7 +2498,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         }
         case MythEvent::MythEventMessage:
         {
-            customEvent((QCustomEvent *)e);
+            customEvent((QEvent *)e);
             return true;
         }
         default:
@@ -2668,7 +2670,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (gContext->GetMainWindow()->TranslateKeyPress(
                 "Teletext Menu", e, tt_actions))
         {
-            for (uint i = 0; i < tt_actions.size(); i++)
+            for (int i = 0; i < tt_actions.size(); i++)
                 if (activenvp->HandleTeletextAction(tt_actions[i]))
                     return;
         }
@@ -2680,7 +2682,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         QStringList itv_actions;
         if (gContext->GetMainWindow()->TranslateKeyPress(
                 "TV Playback", e, itv_actions))
-        for (uint i = 0; i < itv_actions.size(); i++)
+        for (int i = 0; i < itv_actions.size(); i++)
         {
             if (activenvp->ITVHandleAction(itv_actions[i]))
                 return;
@@ -2699,7 +2701,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         int passThru = 0;
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2761,7 +2763,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         int passThru = 0;
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2807,7 +2809,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (dialogname != "" && GetOSD() && GetOSD()->DialogShowing(dialogname))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2963,7 +2965,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (adjustingPicture)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (int i = 0; i < actions.size(); i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2981,7 +2983,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
    
     if (stretchAdjustment)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (int i = 0; i < actions.size(); i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3003,7 +3005,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
    
     if (audiosyncAdjustment)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (int i = 0; i < actions.size(); i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3039,7 +3041,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     if (activerbuffer &&
         activerbuffer->isDVD() && activerbuffer->DVD()->IsInMenu())
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (int i = 0; i < actions.size(); i++)
         {
             QString action = actions[i];
             int nb_buttons = activerbuffer->DVD()->NumMenuButtons();
@@ -3064,7 +3066,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
        }
     }
              
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -3354,7 +3356,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         if (doing_ff_rew)
         {
-            for (unsigned int i = 0; i < actions.size() && !handled; i++)
+            for (int i = 0; i < actions.size() && !handled; i++)
             {
                 QString action = actions[i];
                 bool ok = false;
@@ -3385,7 +3387,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (!handled)
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             bool ok = false;
@@ -3401,7 +3403,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (StateIsLiveTV(GetState()) || StateIsPlaying(internalState))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3423,7 +3425,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     uint aindx = (activenvp == nvp) ? 0 : 1;
     if (StateIsLiveTV(GetState()))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3454,7 +3456,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     if ((StateIsLiveTV(GetState()) || StateIsPlaying(internalState)) &&
         (activerbuffer && !activerbuffer->InDVDMenuOrStillFrame()))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3482,7 +3484,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     
     if (StateIsLiveTV(GetState()) && !pseudoLiveTVState[aindx])
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -3534,7 +3536,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
     else if (StateIsPlaying(internalState))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -4783,7 +4785,7 @@ void TV::ChangeChannel(int direction)
 QString TV::GetQueuedInput(void) const
 {
     QMutexLocker locker(&queuedInputLock);
-    return QDeepCopy<QString>(queuedInput);
+    return Q3DeepCopy<QString>(queuedInput);
 }
 
 int TV::GetQueuedInputAsInt(bool *ok, int base) const
@@ -4800,7 +4802,7 @@ QString TV::GetQueuedChanNum(void) const
         return "";
 
     // strip initial zeros and other undesirable characters
-    uint i = 0;
+    int i = 0;
     for (; i < queuedChanNum.length(); i++)
     {
         if ((queuedChanNum[i] > '0') && (queuedChanNum[i] <= '9'))
@@ -4811,7 +4813,7 @@ QString TV::GetQueuedChanNum(void) const
     // strip whitespace at end of string
     queuedChanNum.stripWhiteSpace();
 
-    return QDeepCopy<QString>(queuedChanNum);
+    return Q3DeepCopy<QString>(queuedChanNum);
 }
 
 /** \fn TV::ClearInputQueues(bool)
@@ -4890,7 +4892,7 @@ bool TV::ProcessSmartChannel(QString &inputStr)
             chan = chan.left(chan.length()-1);
 
             QMutexLocker locker(&queuedInputLock);
-            queuedChanNum = QDeepCopy<QString>(chan);
+            queuedChanNum = Q3DeepCopy<QString>(chan);
         }
     }
 
@@ -4930,7 +4932,7 @@ bool TV::ProcessSmartChannel(QString &inputStr)
 #endif
 
     QMutexLocker locker(&queuedInputLock);
-    inputStr = QDeepCopy<QString>(queuedChanNum);
+    inputStr = Q3DeepCopy<QString>(queuedChanNum);
 
     return !is_not_complete;
 }
@@ -5176,8 +5178,8 @@ void TV::SetPreviousChannel()
     if (chan_name != prevChan[i])
     {
         QMutexLocker locker(&queuedInputLock);
-        queuedInput   = QDeepCopy<QString>(prevChan[i]);
-        queuedChanNum = QDeepCopy<QString>(prevChan[i]);
+        queuedInput   = Q3DeepCopy<QString>(prevChan[i]);
+        queuedChanNum = Q3DeepCopy<QString>(prevChan[i]);
         queuedChanID  = 0;
     }
 
@@ -5341,7 +5343,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     if (!GetOSD() || browsemode || !queuedChanNum.isEmpty())
     {
         if (&lastSignalMsg != &strlist)
-            lastSignalMsg = QDeepCopy<QStringList>(strlist);
+            lastSignalMsg = Q3DeepCopy<QStringList>(strlist);
         return;
     }
 
@@ -6272,8 +6274,8 @@ void TV::ChangeChannel(const DBChanList &options)
                 GetOSD()->HideSet("channel_number");
             
             QMutexLocker locker(&queuedInputLock);
-            queuedInput   = QDeepCopy<QString>(channum);
-            queuedChanNum = QDeepCopy<QString>(channum);
+            queuedInput   = Q3DeepCopy<QString>(channum);
+            queuedChanNum = Q3DeepCopy<QString>(channum);
             queuedChanID  = chanid;
             break;
         }
@@ -6309,7 +6311,7 @@ void TV::UnMute(void)
         aud->ToggleMute();
 }
 
-void TV::customEvent(QCustomEvent *e)
+void TV::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -6424,7 +6426,7 @@ void TV::customEvent(QCustomEvent *e)
             if (tokens[1] == "UPDATE")
             {
                 tvchainUpdateLock.lock();
-                tvchainUpdate += QDeepCopy<QString>(tokens[2]);
+                tvchainUpdate += Q3DeepCopy<QString>(tokens[2]);
                 tvchainUpdateLock.unlock();
             }
         }
@@ -6464,7 +6466,7 @@ void TV::customEvent(QCustomEvent *e)
             if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
             {
                 ncLock.lock();
-                networkControlCommands.push_back(QDeepCopy<QString>(message));
+                networkControlCommands.push_back(Q3DeepCopy<QString>(message));
                 ncLock.unlock();
             }
         }
@@ -6514,7 +6516,7 @@ void TV::customEvent(QCustomEvent *e)
                 QMap<long long, int> newMap;
                 QStringList mark;
                 QStringList marks = QStringList::split(",", tokens[3]);
-                for (unsigned int i = 0; i < marks.size(); i++)
+                for (int i = 0; i < marks.size(); i++)
                 {
                     mark = QStringList::split(":", marks[i]);
                     newMap[mark[0].toInt()] = mark[1].toInt();
@@ -7072,7 +7074,7 @@ void TV::ChannelEditXDSFill(InfoMap &infoMap) const
         QString unsetsign = QObject::tr("UNKNOWN%1", "Synthesized callsign");
         uint    unsetcmpl = unsetsign.length() - 2;
         unsetsign = unsetsign.left(unsetcmpl);
-        if (infoMap["callsign"].left(unsetcmpl) == unsetcmpl)
+        if (infoMap["callsign"].left(unsetcmpl) == unsetsign) // was unsetcmpl????
             modifiable["callsign"] = true;
     }
     modifiable["channame"] = infoMap["channame"].isEmpty();
@@ -7178,7 +7180,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     {
         InfoMap::const_iterator it_field = (*it_val).find(field);
         if (it_field != (*it_val).end())
-            return QDeepCopy<QString>(*it_field);
+            return Q3DeepCopy<QString>(*it_field);
     }
 
     if (!allow_partial_match || value.isEmpty())
@@ -7206,7 +7208,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     {
         InfoMap::const_iterator it_field = (*best_match).find(field);
         if (it_field != (*it_val).end())
-            return QDeepCopy<QString>(*it_field);
+            return Q3DeepCopy<QString>(*it_field);
     }
 
     return QString::null;

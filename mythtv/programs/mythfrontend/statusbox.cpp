@@ -1,11 +1,14 @@
 #include <qlayout.h>
-#include <qiconview.h>
+#include <q3iconview.h>
 #include <qsqldatabase.h>
-#include <qwidgetstack.h>
-#include <qvbox.h>
-#include <qgrid.h>
+#include <q3widgetstack.h>
+#include <q3vbox.h>
+#include <q3grid.h>
 #include <qregexp.h>
 #include <qhostaddress.h>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -1027,7 +1030,7 @@ void StatusBox::doTunerStatus()
         int cardid = query.value(0).toInt();
 
         QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
-        QStringList strlist = cmd;
+        QStringList strlist( cmd );
         strlist << "GET_STATE";
 
         gContext->SendReceiveStringList(strlist);
@@ -1054,7 +1057,7 @@ void StatusBox::doTunerStatus()
         if (state == kState_RecordingOnly ||
             state == kState_WatchingRecording)
         {
-            strlist = QString("QUERY_RECORDER %1").arg(cardid);
+            strlist = QStringList( QString("QUERY_RECORDER %1").arg(cardid));
             strlist << "GET_RECORDING";
             gContext->SendReceiveStringList(strlist);
             ProgramInfo *proginfo = new ProgramInfo;
@@ -1107,7 +1110,7 @@ void StatusBox::doLogEntries(void)
                                .arg(query.value(4).toString())
                                .arg(query.value(1).toString())
                                .arg(query.value(5).toString())
-                               .arg(QString::fromUtf8(query.value(6).toString()));
+                               .arg(query.value(6).toString());
             else
                 line = tr("On %1 %2 from %3.%4\n%5\nNo other details")
                                .arg(query.value(3).toDateTime()
@@ -1331,7 +1334,7 @@ static const QString uptimeStr(time_t uptime)
 
         sprintf(buff, "%d:%02d:%02d", hours, min, secs);
 
-        return str + buff;
+        return str + QString( buff );
     }
 }
 

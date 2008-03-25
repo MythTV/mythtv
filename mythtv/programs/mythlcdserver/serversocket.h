@@ -10,12 +10,12 @@
 
 */
 
-#include <qsocket.h>
-#include <qserversocket.h>
+#include <q3socket.h>
+#include <q3serversocket.h>
 
 
 
-class LCDServerSocket : public QServerSocket
+class LCDServerSocket : public Q3ServerSocket
 {
 
     Q_OBJECT
@@ -28,8 +28,8 @@ class LCDServerSocket : public QServerSocket
 
   signals:
   
-    void newConnect(QSocket *);
-    void endConnect(QSocket *);
+    void newConnect(Q3Socket *);
+    void endConnect(Q3Socket *);
     
   private slots:
   

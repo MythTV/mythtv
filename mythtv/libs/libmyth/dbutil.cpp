@@ -278,7 +278,7 @@ QString DBUtil::GetBackupDirectory()
         }
     }
 
-    if (!directory)
+    if (directory.isNull())
         // Rather than use kDefaultStorageDir, the default for
         // FindNextDirMostFree() when no dirs are defined for the StorageGroup,
         // use /tmp as it's possible that kDefaultStorageDir doesn't exist
@@ -302,7 +302,7 @@ bool DBUtil::DoBackup(QString &filename)
        [mysqldump] section that provides the password.  This will fail if the
        user's ~/.my.cnf (which is read after the --defaults-extra-file)
        specifies a different password that's incorrect for dbUserName */
-    QString tempExtraConfFile = QDeepCopy<QString>(
+    QString tempExtraConfFile = Q3DeepCopy<QString>(
                     createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX"));
     FILE *fp;
     if (!(fp = fopen(tempExtraConfFile.ascii(), "w")))
@@ -414,7 +414,7 @@ bool DBUtil::QueryDBMSVersion(void)
             dbmsVersion = QString::null;
         }
         else
-            dbmsVersion = QString::fromUtf8(query.value(0).toString());
+            dbmsVersion = query.value(0).toString();
     }
     m_versionString = dbmsVersion;
 

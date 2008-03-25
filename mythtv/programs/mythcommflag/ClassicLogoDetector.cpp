@@ -404,7 +404,7 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
 
     for(unsigned int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
     {
-        cerr << QString::number(y).rightJustify(3, ' ') << ": ";
+        cerr << (const char *)QString::number(y).rightJustify(3, ' ') << ": ";
         for(unsigned int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
         {
             if (fromCurrentFrame)

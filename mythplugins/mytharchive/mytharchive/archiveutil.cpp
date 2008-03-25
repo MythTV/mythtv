@@ -221,7 +221,7 @@ bool getFileDetails(ArchiveItem *a)
 
     QDomDocument doc("mydocument");
     QFile file(outFile);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
         return false;
 
     if (!doc.setContent( &file )) 

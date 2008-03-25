@@ -25,3 +25,6 @@ HEADERS += DynamicLineArt.h TokenGroup.h Link.h Logging.h freemheg.h
 LIBS += $$EXTRA_LIBS
 
 mingw:  target.path = $${PREFIX}/bin
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

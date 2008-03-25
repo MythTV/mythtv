@@ -5,6 +5,8 @@
 #include <qstringlist.h>
 #include <qstring.h>
 #include <qmap.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 #include <mythtv/uitypes.h>
 

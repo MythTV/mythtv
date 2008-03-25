@@ -6,10 +6,12 @@
 #include <cerrno>
 #include <sys/time.h>
 #include <ctime>
+#include <math.h>
+
 #include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
-#include <math.h>
+#include <Q3PtrList>
 #include <qstringlist.h>
 #include <qregexp.h>
 
@@ -482,9 +484,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int newWidth = video_width;
     int newHeight = video_height;
 
-    kfa_table = new QPtrList<struct kfatable_entry>;
+    kfa_table = new Q3PtrList<struct kfatable_entry>;
 
-    if (fifodir == NULL)
+    if (!fifodir.isEmpty())
     {
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
@@ -690,7 +692,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     }
 
     if (vidsetting == encodingType && !framecontrol &&
-        fifodir == NULL && honorCutList &&
+        fifodir.isEmpty() && honorCutList &&
         video_width == newWidth && video_height == newHeight)
     {
         copyvideo = true;
@@ -725,7 +727,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     frame.height = newHeight;
     frame.size = newWidth * newHeight * 3 / 2;
 
-    if (fifodir != NULL)
+    if (!fifodir.isEmpty())
     {
         QString audfifo = fifodir + QString("/audout");
         QString vidfifo = fifodir + QString("/vidout");

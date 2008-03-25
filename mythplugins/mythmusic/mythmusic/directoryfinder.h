@@ -6,6 +6,9 @@
 // qt
 #include <qstring.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QPixmap>
 
 // myth
 #include <mythtv/mythdialogs.h>

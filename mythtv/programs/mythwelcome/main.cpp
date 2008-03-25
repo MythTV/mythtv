@@ -159,7 +159,7 @@ static bool log_rotate(bool report_error)
         /* If we can't open the new logfile, send data to /dev/null */
         if (report_error)
         {
-            cerr << "cannot open logfile " << logfile << endl;
+            cerr << "cannot open logfile " << logfile.toAscii().constData() << endl;
             return false;
         }
 

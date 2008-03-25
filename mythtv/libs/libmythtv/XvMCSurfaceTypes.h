@@ -4,6 +4,8 @@
 
 #ifdef USING_XVMC
 
+#include <QString>
+
 #include <qwindowdefs.h>
 #include "mythcontext.h"
 #include <X11/extensions/XvMC.h>
@@ -189,7 +191,7 @@ class XvMCSurfaceTypes
 
     static QString XvMCDescription(Display *pdisp = NULL);
     QString toString(Display *pdisp = NULL, XvPortID p = 0) const;
-    ostream& operator<<(ostream& os) const { return os << toString(); }
+    ostream& operator<<(ostream& os) const { return os << (const char *)toString(); }
 
   private:
     int num;

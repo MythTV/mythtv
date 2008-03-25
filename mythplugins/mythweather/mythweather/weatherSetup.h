@@ -5,6 +5,10 @@
 #include <mythtv/xmlparse.h>
 
 #include "defs.h"
+//Added by qt3to4:
+#include <Q3ValueList>
+#include <QKeyEvent>
+#include <QEvent>
 
 class SourceManager;
 class UIListBtnTypeItem;
@@ -22,7 +26,7 @@ struct ScreenListInfo
      * TODO may need to store container name, since the text will probably get
      * translated
      */
-    QDict<TypeListInfo> types;
+    Q3Dict<TypeListInfo> types;
     QString helptxt;
     QStringList sources;
     units_t units;
@@ -217,7 +221,7 @@ class LocationDialog : public MythThemedDialog
     void wireUI();
 
   private:
-    QDict<QValueList<ScriptInfo *> > m_cache;
+    Q3Dict<Q3ValueList<ScriptInfo *> > m_cache;
     QStringList m_types;
     SourceManager *m_src_man;
     UIListBtnType *m_list;

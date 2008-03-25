@@ -8,7 +8,7 @@ void MythSoap::doSoapRequest(QString host, QString path, QString soapAction,
 {
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
 
-    QHttpRequestHeader header("POST", path);
+    Q3HttpRequestHeader header("POST", path);
     header.setValue("Host", host);
     header.setValue("SOAPAction",  soapAction);
     header.setContentType("text/xml");
@@ -38,7 +38,8 @@ void MythSoap::httpDone(bool error)
 {
     if (error)
     {
-        cerr << "Error in mythsoap.o retrieving data: " << http.errorString() << endl << flush;
+        cerr << "Error in mythsoap.o retrieving data: " <<
+            http.errorString().toLocal8Bit().constData() << endl;
         m_error = true;
     }
     else
@@ -50,7 +51,7 @@ void MythSoap::httpDone(bool error)
         {
             http.readBlock(buffer, len);
             buffer[len] = '\0';
-            m_data.assign(buffer, len + 1);
+            m_data = QByteArray(buffer, len + 1);
         }
         else
         {

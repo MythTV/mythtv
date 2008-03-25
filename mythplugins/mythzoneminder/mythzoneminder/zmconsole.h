@@ -22,6 +22,8 @@
 #include <mythtv/mythdialogs.h>
 
 #include "zmdefines.h"
+//Added by qt3to4:
+#include <QKeyEvent>
 
 class ZMConsole : public MythThemedDialog
 {

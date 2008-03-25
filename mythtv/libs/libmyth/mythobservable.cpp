@@ -1,5 +1,6 @@
 #include <qobject.h>
 #include <qapplication.h>
+#include <Q3PtrList>
 #include "mythobservable.h"
 
 MythObservable::MythObservable()
@@ -32,7 +33,7 @@ QObject* MythObservable::nextListener()
     return m_listeners.next();
 }
 
-QPtrList<QObject> MythObservable::getListeners()
+Q3PtrList<QObject> MythObservable::getListeners()
 {
     return m_listeners;
 }

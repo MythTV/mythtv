@@ -3,11 +3,11 @@
 
 // C++ headers
 #include <iostream>
-#include <cstdlib>
 using namespace std;
 
 // Qt headers
 #include <qapplication.h>
+#include <Q3ValueList>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -448,10 +448,10 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--export-icon-map [<filename>]\n";
             cout << "   Exports your current icon map to <filename> (default: "
-                    << export_icon_data_filename << ")\n";
+                    << (const char *)export_icon_data_filename << ")\n";
             cout << "--import-icon-map [<filename>]\n";
             cout << "   Imports an icon map from <filename> (default: " <<
-                    import_icon_data_filename << ")\n";
+                    (const char *)import_icon_data_filename << ")\n";
             cout << "--update-icon-map\n";
             cout << "   Updates icon map icons only\n";
             cout << "--reset-icon-map [all]\n";
@@ -576,7 +576,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        QValueList<Source> sourcelist;
+        Q3ValueList<Source> sourcelist;
 
         MSqlQuery sourcequery(MSqlQuery::InitCon());
         QString where = "";

@@ -1,5 +1,5 @@
 #include <unistd.h>
-#include <qpointarray.h>
+
 #include <qbitarray.h>
 
 #include "mhi.h"
@@ -175,6 +175,11 @@ void *MHIContext::StartMHEGEngine(void *param)
 
 void MHIContext::RunMHEGEngine(void)
 {
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!m_stop)
     {
         int toWait;
@@ -207,7 +212,7 @@ void MHIContext::RunMHEGEngine(void)
         if (toWait > 1000 || toWait == 0)
             toWait = 1000;
 
-        m_engine_wait.wait(toWait);
+        m_engine_wait.wait(&mutex, toWait);
     }
 }
 
@@ -304,6 +309,12 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     // Since the DSMCC carousel and the MHEG engine are currently on the
     // same thread this is safe.  Otherwise we need to make a deep copy of
     // the result.
+
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!m_stop)
     {
         int res = m_dsmcc->GetDSMCCObject(path, result);
@@ -316,7 +327,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
         // some more packets.  We should eventually find out if this item is
         // present.
         ProcessDSMCCQueue();
-        m_engine_wait.wait(1000);
+        m_engine_wait.wait(&mutex, 1000);
     }
     return false; // Stop has been set.  Say the object isn't present.
 }
@@ -487,7 +498,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
         {
             // Replace this item with a set of cut-outs.
             (void)m_display.take(i--);
-            QMemArray<QRect> rects = (QRegion(imageRect)
+            Q3MemArray<QRect> rects = (QRegion(imageRect)
                                       - QRegion(displayRect)).rects();
             for (uint j = 0; j < rects.size(); j++)
             {
@@ -1223,7 +1234,7 @@ void MHIDLA::DrawBorderedRectangle(int x, int y, int width, int height)
 void MHIDLA::DrawOval(int x, int y, int width, int height)
 {
     // Simple but inefficient way of drawing a ellipse.
-    QPointArray ellipse;
+    Q3PointArray ellipse;
     ellipse.makeEllipse(x, y, width, height);
     DrawPoly(true, ellipse);
 }
@@ -1232,7 +1243,7 @@ void MHIDLA::DrawOval(int x, int y, int width, int height)
 void MHIDLA::DrawArcSector(int x, int y, int width, int height,
                            int start, int arc, bool isSector)
 {
-    QPointArray points;
+    Q3PointArray points;
     // MHEG and Qt both measure arcs as angles anticlockwise from
     // the 3 o'clock position but MHEG uses 64ths of a degree
     // whereas Qt uses 16ths.
@@ -1252,7 +1263,7 @@ void MHIDLA::DrawArcSector(int x, int y, int width, int height,
 // The UK profile says that MHEG should not contain concave or
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
-void MHIDLA::DrawPoly(bool isFilled, const QPointArray &points)
+void MHIDLA::DrawPoly(bool isFilled, const Q3PointArray &points)
 {
     int nPoints = points.size();
     if (nPoints < 2)
@@ -1401,7 +1412,7 @@ void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
         {
             for (int j = 0; j < rect.height(); j += m_image.height())
             {
-                bitBlt(&tiledImage, i, j, &m_image, 0, 0, -1, -1, 0);
+                bitBlt( &tiledImage, i, j, &m_image, 0, 0, -1, -1, (Qt::ImageConversionFlags)0);
             }
         }
         m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage);

@@ -2,7 +2,9 @@
 #define MYTHVERBOSE_H_
 
 #ifdef __cplusplus
-#   include <qdatetime.h>
+#   include <QDateTime>
+#   include <QString>
+#   include <QTextStream>
 
     using namespace std;
 #else
@@ -117,7 +119,8 @@ extern MPUBLIC unsigned int print_verbose_messages;
             if ((print_verbose_messages & (mask)) == (mask)) \
                 cout << QDateTime::currentDateTime()         \
                         .toString("yyyy-MM-dd hh:mm:ss.zzz") \
-                     << " " << args << endl;
+                        .toLocal8Bit().constData()           \
+                     << " " << (const char*)(args) << endl;
     #else
         #ifdef HAVE_GETTIMEOFDAY
             #define VERBOSEDATE                              \
@@ -158,7 +161,8 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 MythContext::verbose_mutex.lock(); \
-                cout << dtime << " " << args << endl; \
+                cout << dtime.toLocal8Bit().constData() << " " \
+                     << QString(args).toLocal8Bit().constData() << endl; \
                 MythContext::verbose_mutex.unlock(); \
             } \
         } while (0)
@@ -173,11 +177,11 @@ extern MPUBLIC unsigned int print_verbose_messages;
             { \
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                ostringstream verbose_macro_tmp; \
-                verbose_macro_tmp << dtime << " " << args; \
-                MythContext::verbose_mutex.lock(); \
-                cout << verbose_macro_tmp.str() << endl; \
-                MythContext::verbose_mutex.unlock(); \
+                QTextStream ssMsg(&dtime);                  \
+                ssMsg << " " << args;                                   \
+                MythContext::verbose_mutex.lock();                      \
+                cout << ssMsg.string()->toLocal8Bit().constData() << endl; \
+                MythContext::verbose_mutex.unlock();                    \
             } \
         } while (0)
 

@@ -443,9 +443,9 @@ void scaleYuvImage(const uchar *yuvBuffer, int ow, int oh, int dw, int dh, uchar
   QImage vImage((uchar *)yuvBuffer+(ow*oh*5/4), ow/2, oh/2, 8, (QRgb *)0, 0, QImage::LittleEndian);
 
   // The QImage scaling fn maintains aspect ratio but may end up with a picture thats too big
-  QImage ScaledYImage = yImage.scale(dw, dh, QImage::ScaleMax);
-  QImage ScaledUImage = uImage.scale(dw/2, dh/2, QImage::ScaleMax);
-  QImage ScaledVImage = vImage.scale(dw/2, dh/2, QImage::ScaleMax);
+  QImage ScaledYImage = yImage.scaled(dw, dh, Qt::KeepAspectRatioByExpanding);
+  QImage ScaledUImage = uImage.scaled(dw/2, dh/2, Qt::KeepAspectRatioByExpanding);
+  QImage ScaledVImage = vImage.scaled(dw/2, dh/2, Qt::KeepAspectRatioByExpanding);
 
   // This should ensure the scaled image is cropped to size too, for the cases where the aspect ratios did not match
   for (h=0; h<dh; h++)

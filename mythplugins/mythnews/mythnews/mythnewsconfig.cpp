@@ -20,10 +20,15 @@
  * ============================================================ */
 
 #include <qapplication.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QEvent>
+#include <QPaintEvent>
 #include <iostream>
 #include <cstdlib>
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstring.h>
 #include <qfile.h>
 #include <qdom.h>
@@ -42,7 +47,7 @@ class NewsSiteItem
 {
 public:
 
-    typedef QPtrList<NewsSiteItem> List;
+    typedef Q3PtrList<NewsSiteItem> List;
 
     QString name;
     QString category;
@@ -57,7 +62,7 @@ class NewsCategory
 {
 public:
 
-    typedef QPtrList<NewsCategory> List;
+    typedef Q3PtrList<NewsCategory> List;
 
     QString             name;
     NewsSiteItem::List  siteList;
@@ -148,7 +153,7 @@ void MythNewsConfig::populateSites()
                        + "mythnews/news-sites.xml";
     QFile xmlFile(filename);
 
-    if (!xmlFile.exists() || !xmlFile.open(IO_ReadOnly)) {
+    if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly)) {
         VERBOSE(VB_IMPORTANT, "MythNews: Cannot open news-sites.xml");
         return;
     }
@@ -295,7 +300,7 @@ void MythNewsConfig::loadTheme()
         m_SpinBox->setValue(m_updateFreq);
         QFont f = gContext->GetMediumFont();
         m_SpinBox->setFont(f);
-        m_SpinBox->setFocusPolicy(QWidget::NoFocus);
+        m_SpinBox->setFocusPolicy(Qt::NoFocus);
         m_SpinBox->setGeometry(spinboxHolder->getScreenArea());
         m_SpinBox->hide();
         connect(m_SpinBox, SIGNAL(valueChanged(int)),
@@ -376,7 +381,7 @@ void MythNewsConfig::updateSites()
     p.end();
     
     bitBlt(this, m_SiteRect.left(), m_SiteRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
 }
 
 void MythNewsConfig::updateFreq()
@@ -400,7 +405,7 @@ void MythNewsConfig::updateFreq()
     p.end();
     
     bitBlt(this, m_FreqRect.left(), m_FreqRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
 }
 
 void MythNewsConfig::toggleItem(UIListBtnTypeItem *item)
@@ -676,11 +681,11 @@ bool MythNewsSpinBox::eventFilter(QObject* o, QEvent* e)
     if (e->type() == QEvent::FocusIn)
     {
         QColor highlight = colorGroup().highlight();
-        editor()->setPaletteBackgroundColor(highlight);
+        lineEdit()->setPaletteBackgroundColor(highlight);
     }
     else if (e->type() == QEvent::FocusOut)
     {
-        editor()->unsetPalette();
+        lineEdit()->unsetPalette();
     }
 
     if (e->type() != QEvent::KeyPress)

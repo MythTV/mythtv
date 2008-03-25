@@ -1,9 +1,9 @@
 /*
-	dvdinfo.h
+    dvdinfo.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     header for class to store info about a DVD
 */
 
@@ -11,8 +11,8 @@
 #define DVDINFO_H_
 
 // Qt headers
-#include <qstring.h>
-#include <qptrlist.h>
+#include <QString>
+#include <Q3PtrList>
 
 class DVDSubTitleInfo
 {
@@ -108,8 +108,8 @@ class DVDTitleInfo
 
     void                       addAudio(DVDAudioInfo *new_audio_track);
     void                       addSubTitle(DVDSubTitleInfo *new_subtitle);
-    QPtrList<DVDAudioInfo>*    getAudioTracks(){return &audio_tracks;}
-    QPtrList<DVDSubTitleInfo>* getSubTitles(){return &subtitles;}
+    Q3PtrList<DVDAudioInfo>*    getAudioTracks(){return &audio_tracks;}
+    Q3PtrList<DVDSubTitleInfo>* getSubTitles(){return &subtitles;}
     DVDAudioInfo*              getAudioTrack(int which_one){return audio_tracks.at(which_one);}
         
   private:
@@ -122,8 +122,8 @@ class DVDTitleInfo
     uint    minutes;
     uint    seconds;
     
-    QPtrList<DVDAudioInfo>    audio_tracks;
-    QPtrList<DVDSubTitleInfo> subtitles;
+    Q3PtrList<DVDAudioInfo>    audio_tracks;
+    Q3PtrList<DVDSubTitleInfo> subtitles;
 
     bool    is_selected;
     int     selected_quality;
@@ -152,11 +152,11 @@ class DVDInfo
     DVDTitleInfo*           getTitle(uint which_one);
 
     QString                 getName(){return volume_name;}
-    QPtrList<DVDTitleInfo>* getTitles(){return &titles;}
+    Q3PtrList<DVDTitleInfo>* getTitles(){return &titles;}
     
   private:
 
-    QPtrList<DVDTitleInfo>  titles;
+    Q3PtrList<DVDTitleInfo>  titles;
     QString             volume_name;
 };
 

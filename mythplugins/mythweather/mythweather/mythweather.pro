@@ -35,3 +35,5 @@ macx {
 }
 
 mingw:DEFINES += USING_MINGW
+#The following line was inserted by qt3to4
+QT += opengl sql xml qt3support

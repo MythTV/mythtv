@@ -13,3 +13,5 @@ trans.files += mythcontrols_si.qm mythcontrols_fr.qm mythcontrols_cz.qm
 INSTALLS += trans
 
 SOURCES += dummy.c
+#The following line was inserted by qt3to4
+QT +=  qt3support

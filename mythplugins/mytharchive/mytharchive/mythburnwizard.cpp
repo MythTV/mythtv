@@ -9,6 +9,8 @@
 // qt
 #include <qdir.h>
 #include <qapplication.h>
+#include <QKeyEvent>
+#include <Q3TextStream>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -554,7 +556,7 @@ void MythburnWizard::loadEncoderProfiles()
 
     QDomDocument doc("mydocument");
     QFile file(filename);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
         return;
 
     if (!doc.setContent( &file )) 
@@ -836,13 +838,14 @@ void MythburnWizard::getThemeList(void)
     d.setPath(themeDir);
     if (d.exists())
     {
-        const QFileInfoList *list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoListIterator it(*list);
-        QFileInfo *fi;
+        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QFileInfoList::const_iterator it = list.begin();
+        const QFileInfo *fi;
 
         int count = 0;
-        while ( (fi = it.current()) != 0 )
+        while (it != list.end())
         {
+            fi = &(*it++);
             // only include theme directory's with a preview image
             if (QFile::exists(themeDir + fi->fileName() + "/preview.png"))
             {
@@ -935,9 +938,9 @@ QString MythburnWizard::loadFile(const QString &filename)
     if (!file.exists())
         return "";
 
-    if (file.open( IO_ReadOnly ))
+    if (file.open( QIODevice::ReadOnly ))
     {
-        QTextStream stream(&file);
+        Q3TextStream stream(&file);
 
         while ( !stream.atEnd() )
         {
@@ -1106,21 +1109,21 @@ void MythburnWizard::getArchiveListFromDB(void)
         {
             // check this item is still available
             QString type = query.value(1).toString();
-            QString filename = QString::fromUtf8(query.value(8).toString());
+            QString filename = query.value(8).toString();
             if (isArchiveItemValid(type, filename))
             {
                 ArchiveItem *item = new ArchiveItem;
 
                 item->id = query.value(0).toInt();
                 item->type = type;
-                item->title = QString::fromUtf8(query.value(2).toString());
-                item->subtitle = QString::fromUtf8(query.value(3).toString());
-                item->description = QString::fromUtf8(query.value(4).toString());
+                item->title = query.value(2).toString();
+                item->subtitle = query.value(3).toString();
+                item->description = query.value(4).toString();
                 item->size = query.value(5).toLongLong();
                 item->newsize = query.value(5).toLongLong();
                 item->encoderProfile = NULL;
-                item->startDate = QString::fromUtf8(query.value(6).toString());
-                item->startTime = QString::fromUtf8(query.value(7).toString());
+                item->startDate = query.value(6).toString();
+                item->startTime =query.value(7).toString();
                 item->filename = filename;
                 item->hasCutlist = hasCutList(type, filename);
                 item->useCutlist = false;
@@ -1224,11 +1227,11 @@ void MythburnWizard::createConfigFile(const QString &filename)
         {
             QDomElement details = doc.createElement("details");
             file.appendChild(details);
-            details.setAttribute("title", a->title.utf8());
-            details.setAttribute("subtitle", a->subtitle.utf8());
-            details.setAttribute("startdate", a->startDate.utf8());
-            details.setAttribute("starttime", a->startTime.utf8());
-            QDomText desc = doc.createTextNode(a->description.utf8());
+            details.setAttribute("title", a->title);
+            details.setAttribute("subtitle", a->subtitle);
+            details.setAttribute("startdate", a->startDate);
+            details.setAttribute("starttime", a->startTime);
+            QDomText desc = doc.createTextNode(a->description);
             details.appendChild(desc);
         }
 
@@ -1242,7 +1245,7 @@ void MythburnWizard::createConfigFile(const QString &filename)
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
                 ThumbImage *thumbImage = a->thumbList.at(x);
-                thumb.setAttribute("caption", thumbImage->caption.utf8());
+                thumb.setAttribute("caption", thumbImage->caption);
                 thumb.setAttribute("filename", thumbImage->filename);
                 thumb.setAttribute("frame", (int) thumbImage->frame);
             }
@@ -1263,14 +1266,14 @@ void MythburnWizard::createConfigFile(const QString &filename)
 
     // finally save the xml to the file
     QFile f(filename);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         cout << "MythburnWizard::createConfigFile: Failed to open file for writing - "
-             << filename << endl;
+             << filename.toLocal8Bit().constData() << endl;
         return;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << doc.toString(4);
     f.close();
 }
@@ -1337,7 +1340,7 @@ void MythburnWizard::showMenu()
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                       "popupMenu");
 
-    QButton *button;
+    QAbstractButton *button;
     button = popupMenu->addButton(tr("Edit Details"), this, SLOT(editDetails()));
     button->setFocus();
 

@@ -11,7 +11,7 @@
 #ifndef __UPNPUTIL_H__
 #define __UPNPUTIL_H__
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <qmap.h>
 
@@ -41,7 +41,7 @@ typedef QMap< QString, QString >    QStringMap;
 
 class NameValue;
 
-class NameValueList : public QPtrList< NameValue > 
+class NameValueList : public Q3PtrList< NameValue >
 {
     public:
 

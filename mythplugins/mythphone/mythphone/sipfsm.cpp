@@ -6,10 +6,14 @@
 */
 #include <qapplication.h>
 #include <qfile.h>
-#include <qsocket.h>
-#include <qsocketdevice.h>
+#include <q3socket.h>
+#include <q3socketdevice.h>
 #include <qdatetime.h>
-#include <qurl.h>
+#include <q3url.h>
+//Added by qt3to4:
+#include <QStringList>
+#include <Q3PtrList>
+#include <Q3TextStream>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,7 +47,7 @@ using namespace std;
 
 // Static variables for the debug file used
 QFile *debugFile;
-QTextStream *debugStream;
+Q3TextStream *debugStream;
 QObject *eventWindow;
 QStringList EventQ;
 QStringList NotifyQ;
@@ -132,14 +136,14 @@ void SipContainer::UiClosed()
     EventQLock.unlock();
 }
 
-void SipContainer::UiWatch(QStrList uriList)
+void SipContainer::UiWatch(QStringList uriList)
 {
-    QStrListIterator it(uriList);
+    QStringList::iterator it = uriList.begin();
 
     EventQLock.lock();
     EventQ.append("UIWATCH");
-    for (; it.current(); ++it)
-        EventQ.append(it.current());
+    for (; it != uriList.end(); ++it)
+        EventQ.append(*it);
     EventQ.append("");
     EventQLock.unlock();
 }
@@ -284,8 +288,8 @@ void SipThread::SipThreadWorker()
 #ifndef WIN32
     QString debugFileName = MythContext::GetConfDir() + "/MythPhone/siplog.txt";
     debugFile = new QFile(debugFileName);
-    if (debugFile->open(IO_WriteOnly))
-        debugStream = new QTextStream (debugFile);
+    if (debugFile->open(QIODevice::WriteOnly))
+        debugStream = new Q3TextStream (debugFile);
 #else
     debugStream = 0;
 #endif
@@ -580,7 +584,7 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
     if (natIp.length() == 0)
         natIp = localIp;
     SipFsm::Debug(SipDebugEvent::SipDebugEv, QString("SIP listening on IP Address ") + localIp + ":" + QString::number(localPort) + " NAT address " + natIp + "\n\n");
-    cout << "SIP listening on IP Address " << localIp << ":" << localPort << " NAT address " << natIp << endl;
+    cout << "SIP listening on IP Address " << localIp.toLocal8Bit().constData() << ":" << localPort << " NAT address " << natIp.toLocal8Bit().constData() << endl;
 
     // Create the timer list
     timerList = new SipTimer;
@@ -630,7 +634,7 @@ void SipFsm::Debug(SipDebugEvent::Type t, QString dbg)
 
 QString SipFsm::OpenSocket(int Port)
 {
-    sipSocket = new QSocketDevice (QSocketDevice::Datagram);
+    sipSocket = new Q3SocketDevice (Q3SocketDevice::Datagram);
     sipSocket->setBlocking(false);
 
 #ifndef WIN32
@@ -639,7 +643,7 @@ QString SipFsm::OpenSocket(int Port)
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(sipSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface " << ifName << endl;
+        cerr << "Failed to find network interface " << ifName.toLocal8Bit().constData() << endl;
         delete sipSocket;
         sipSocket = 0;
         return "";
@@ -670,7 +674,7 @@ QString SipFsm::OpenSocket(int Port)
 
     if (!sipSocket->bind(myIP, Port))
     {
-        cerr << "Failed to bind for SIP connection " << myIP.toString() << endl;
+        cerr << "Failed to bind for SIP connection " << myIP.toString().toLocal8Bit().constData() << endl;
         delete sipSocket;
         sipSocket = 0;
         return "";
@@ -705,11 +709,11 @@ QString SipFsm::DetermineNatAddress()
     {
         // Send a HTTP packet to the configured URL asking for our NAT IP addres
         QString natWebServer = gContext->GetSetting("NatIpAddress");
-        QUrl Url(natWebServer);
+        Q3Url Url(natWebServer);
         QString httpGet = QString("GET %1 HTTP/1.0\r\n"
                                   "User-Agent: MythPhone/1.0\r\n"
                                   "\r\n").arg(Url.path());
-        QSocketDevice *httpSock = new QSocketDevice(QSocketDevice::Stream);
+        Q3SocketDevice *httpSock = new Q3SocketDevice(Q3SocketDevice::Stream);
         QHostAddress hostIp;
         int port = Url.port();
         if (port == -1)
@@ -769,7 +773,7 @@ QString SipFsm::DetermineNatAddress()
                 cerr << "Error sending NAT discovery packet to socket\n";
         }
         else
-            cout << "SIP: Could not connect to NAT discovery host " << Url.host() << ":" << Url.port() << endl;
+            cout << "SIP: Could not connect to NAT discovery host " << Url.host().toLocal8Bit().constData() << ":" << Url.port() << endl;
         httpSock->close();
         delete httpSock;
     }
@@ -787,7 +791,7 @@ void SipFsm::Transmit(QString Msg, QString destIP, int destPort)
         sipSocket->writeBlock((const char *)Msg, Msg.length(), dest, destPort);
     }
     else
-        cerr << "SIP: Cannot transmit SIP message to " << destIP << endl;
+        cerr << "SIP: Cannot transmit SIP message to " << destIP.toLocal8Bit().constData() << endl;
 }
 
 bool SipFsm::Receive(SipMsg &sipMsg)
@@ -799,7 +803,10 @@ bool SipFsm::Receive(SipMsg &sipMsg)
         if (len > 0)
         {
             rxMsg[len] = 0;
-            SipFsm::Debug(SipDebugEvent::SipTraceRxEv, QDateTime::currentDateTime().toString() + " Received: Len " + QString::number(len) + "\n" + rxMsg + "\n");
+            SipFsm::Debug(SipDebugEvent::SipTraceRxEv,
+                          QString("%1 Received: Len %2\n%3\n")
+                          .arg(QDateTime::currentDateTime().toString())
+                          .arg(len).arg(rxMsg));
             sipMsg.decode(rxMsg);
             return true;
         }
@@ -1001,10 +1008,10 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
             if ((statusCode >= 100) && (statusCode < 200))    return SIP_INVITESTATUS_1xx;
             if ((statusCode >= 300) && (statusCode < 700))    return SIP_INVITESTATUS_3456xx;
         }
-        cerr << "SIP: Unknown STATUS method " << statusMethod << endl;
+        cerr << "SIP: Unknown STATUS method " << statusMethod.toLocal8Bit().constData() << endl;
     }
     else
-        cerr << "SIP: Unknown method " << Method << endl << sipMsg->string() << endl;
+        cerr << "SIP: Unknown method " << Method.toLocal8Bit().constData() << endl << sipMsg->string().toLocal8Bit().constData() << endl;
     return SIP_UNKNOWN;
 }
 
@@ -1472,7 +1479,7 @@ void SipCall::initialise()
             CodecList[n++].Encoding = "GSM";
         }
         else
-            cout << "Unknown codec " << CodecStr << " in Codec Priority List\n";
+            cout << "Unknown codec " << CodecStr.toLocal8Bit().constData() << " in Codec Priority List\n";
         if (sep != -1)
         {
             QString tempStr = CodecListString.mid(sep+1);
@@ -1547,7 +1554,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         remoteUrl = new SipUrl(DestinationUri, "");
         if ((remoteUrl->getHostIp()).length() == 0)
         {
-            cout << "SIP: Tried to call " << DestinationUri << " but can't get destination IP address\n";
+            cout << "SIP: Tried to call " << DestinationUri.toLocal8Bit().constData() << " but can't get destination IP address\n";
             State = SIP_IDLE;
             break;
         }
@@ -1557,7 +1564,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         if ((remoteUrl->getHost() == "volkaerts") &&
             (!(parent->getRegistrar())->getRegisteredContact(remoteUrl)))
         {
-            cout << DestinationUri << " is not registered here\n";
+            cout << DestinationUri.toLocal8Bit().constData() << " is not registered here\n";
             break;
         }
 #endif
@@ -1963,7 +1970,7 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Invite.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -1997,7 +2004,7 @@ void SipCall::BuildSendReInvite(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Invite.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -2084,7 +2091,7 @@ void SipCall::BuildSendCancel(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Cancel.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -2135,7 +2142,7 @@ void SipCall::BuildSendBye(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Bye.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -2209,7 +2216,7 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
         remoteVideoPort = Sdp->getVideoPort();
 
         // See if there is an audio codec we support
-        QPtrList<sdpCodec> *audioCodecs = Sdp->getAudioCodecList();
+        Q3PtrList<sdpCodec> *audioCodecs = Sdp->getAudioCodecList();
         sdpCodec *c;
         if (audioCodecs)
         {
@@ -2235,7 +2242,7 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
         }
 
         // See if there is a video codec we support
-        QPtrList<sdpCodec> *videoCodecs = Sdp->getVideoCodecList();
+        Q3PtrList<sdpCodec> *videoCodecs = Sdp->getVideoCodecList();
         if (videoCodecs)
         {
             for (c=videoCodecs->first(); c; c=videoCodecs->next())
@@ -2367,7 +2374,7 @@ int SipRegistrar::FSM(int Event, SipMsg *sipMsg, void *Value)
             }
             else
             {
-                cout << "SIP Registration rejected for domain " << (sipMsg->getToUrl())->getHost() << endl;
+                cout << "SIP Registration rejected for domain " << (sipMsg->getToUrl())->getHost().toLocal8Bit().constData() << endl;
                 SendResponse(404, sipMsg, s->getHostIp(), s->getPort());
             }
         }
@@ -2377,7 +2384,7 @@ int SipRegistrar::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             SipRegisteredUA *it = (SipRegisteredUA *)Value;
             RegisteredList.remove(it);
-            cout << "SIP Registration Expired client " << it->getContactIp() << ":" << it->getContactPort() << endl;
+            cout << "SIP Registration Expired client " << it->getContactIp().toLocal8Bit().constData() << ":" << it->getContactPort() << endl;
             delete it;
         }
         break;
@@ -2397,7 +2404,7 @@ void SipRegistrar::add(SipUrl *Url, QString hostIp, int Port, int Expires)
         RegisteredList.append(entry);
         //TODO - Start expiry timer
         (parent->Timer())->Start(this, Expires*1000, SIP_REGISTRAR_TEXP, RegisteredList.current());
-        cout << "SIP Registered client " << Url->getUser() << " at " << hostIp << endl;
+        cout << "SIP Registered client " << Url->getUser().toLocal8Bit().constData() << " at " << hostIp.toLocal8Bit().constData() << endl;
     }
 
     // Entry does exist, refresh the entry expiry timer
@@ -2418,11 +2425,11 @@ void SipRegistrar::remove(SipUrl *Url)
     {
         RegisteredList.remove(it);
         (parent->Timer())->Stop(this, SIP_REGISTRAR_TEXP, it);
-        cout << "SIP Unregistered client " << Url->getUser() << " at " << Url->getHostIp() << endl;
+        cout << "SIP Unregistered client " << Url->getUser().toLocal8Bit().constData() << " at " << Url->getHostIp().toLocal8Bit().constData() << endl;
         delete it;
     }
     else
-        cerr << "SIP Registrar could not find registered client " << Url->getUser() << endl;
+        cerr << "SIP Registrar could not find registered client " << Url->getUser().toLocal8Bit().constData() << endl;
 }
 
 bool SipRegistrar::getRegisteredContact(SipUrl *Url)
@@ -2520,7 +2527,7 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         case 200:
             if (sipMsg->getExpires() > 0)
                 Expires = sipMsg->getExpires();
-            cout << "SIP Registered to " << ProxyUrl->getHost() << " for " << Expires << "s" << endl;
+            cout << "SIP Registered to " << ProxyUrl->getHost().toLocal8Bit().constData() << " for " << Expires << "s" << endl;
             State = SIP_REG_REGISTERED;
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
@@ -2534,7 +2541,7 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         default:
             if (sipMsg->getStatusCode() != 100)
             {
-                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
+                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase().toLocal8Bit().constData() << endl;
                 State = SIP_REG_FAILED;
                 (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
             }
@@ -2549,14 +2556,14 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         case 200:
             if (sipMsg->getExpires() > 0)
                 Expires = sipMsg->getExpires();
-            cout << "SIP Registered to " << ProxyUrl->getHost() << " for " << Expires << "s" << endl;
+            cout << "SIP Registered to " << ProxyUrl->getHost().toLocal8Bit().constData() << " for " << Expires << "s" << endl;
             State = SIP_REG_REGISTERED;
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
         default:
             if (sipMsg->getStatusCode() != 100)
             {
-                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
+                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase().toLocal8Bit().constData() << endl;
                 State = SIP_REG_FAILED;
                 (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
             }
@@ -2583,7 +2590,7 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
 
     default:
-        cerr << "SIP Registration: Unknown Event " << EventtoString(Event) << ", State " << State << endl;
+        cerr << "SIP Registration: Unknown Event " << EventtoString(Event).toLocal8Bit().constData() << ", State " << State << endl;
         break;
     }
     return 0;
@@ -2745,7 +2752,7 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Notify.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watcherUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -2977,7 +2984,7 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Subscribe.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watchedUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -3131,7 +3138,7 @@ void SipIM::SendMessage(SipMsg *authMsg, QString Text)
         if (authMsg->getAuthMethod() == "Digest")
             Message.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), imUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
         sentAuthenticated = true;
     }
     else    
@@ -3210,7 +3217,7 @@ a listener will create an OSD message.
 
 SipNotify::SipNotify()
 {
-    notifySocket = new QSocketDevice (QSocketDevice::Datagram);
+    notifySocket = new Q3SocketDevice (Q3SocketDevice::Datagram);
     notifySocket->setBlocking(false);
     QHostAddress thisIP;
     thisIP.setAddress("127.0.0.1");
@@ -3272,7 +3279,7 @@ events.  Would be better implemented as a QT timer but is not because
 of  thread problems.
 **********************************************************************/
 
-SipTimer::SipTimer():QPtrList<aSipTimer>()
+SipTimer::SipTimer():Q3PtrList<aSipTimer>()
 {
 }
 
@@ -3294,7 +3301,7 @@ void SipTimer::Start(SipFsmBase *Instance, int ms, int expireEvent, void *Value)
     inSort(t);
 }
 
-int SipTimer::compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2)
+int SipTimer::compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2)
 {
     QDateTime t1 = ((aSipTimer *)s1)->getExpire();
     QDateTime t2 = ((aSipTimer *)s2)->getExpire();

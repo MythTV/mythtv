@@ -11,7 +11,7 @@
 // http://www.transcoding.org/cgi-bin/transcode
 /////////////////////////////////////////////////////////////////////
 
-#include <qapplication.h>
+#include <QApplication>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>

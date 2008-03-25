@@ -10,7 +10,7 @@
 
 #include <qfileinfo.h>
 #include <qregexp.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <qdir.h>
 #include <limits.h>
 #include "util.h"
@@ -382,8 +382,8 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
                             MSqlQuery               &query )
 {
     int            nVidID       = query.value( 0).toInt();
-    QString        sTitle       = QString::fromUtf8(query.value( 1).toString());
-    QString        sFileName    = QString::fromUtf8(query.value( 2).toString());
+    QString        sTitle       = query.value( 1).toString();
+    QString        sFileName    = query.value( 2).toString();
     QString        sItemType    = query.value( 3).toString();
     QString        sParentID    = query.value( 5).toString();
     QString        sCoverArt    = query.value( 6).toString();

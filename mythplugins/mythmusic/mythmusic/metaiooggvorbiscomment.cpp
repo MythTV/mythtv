@@ -8,6 +8,8 @@
 // C++ headers
 #include <cstdlib>
 #include <iostream>
+//Added by qt3to4:
+#include <Q3CString>
 using namespace std;
 
 // MythTV headers
@@ -104,7 +106,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
         p_comment = pComment;
     }
 
-    QCString utf8str;
+    Q3CString utf8str;
     if (!mdata->Artist().isEmpty())
     {
         utf8str = mdata->Artist().utf8();

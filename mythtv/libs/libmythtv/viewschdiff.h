@@ -1,9 +1,12 @@
 #ifndef VIEWSCHEDULEDIFF_H_
 #define VIEWSCHEDULEDIFF_H_
 
-#include <qvaluevector.h>
+#include <q3valuevector.h>
 #include <qdatetime.h>
 #include <qdom.h>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
@@ -81,7 +84,7 @@ class MPUBLIC ViewScheduleDiff : public MythDialog
     QString altTable;
     QString m_title;
 
-    QValueVector<struct ProgramStruct> recList;
+    Q3ValueVector<struct ProgramStruct> recList;
 
     int recordid; ///< recordid that differs from master (-1 = assume all)
 

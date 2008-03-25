@@ -3,8 +3,8 @@
 
 #include <qstring.h>
 #include <qstringlist.h>
-#include <qptrdict.h>
-#include <qdict.h>
+#include <q3ptrdict.h>
+#include <q3dict.h>
 
 #include "metadata.h"
 

@@ -1,8 +1,7 @@
 #ifndef DUMMYDECODER_H_
 #define DUMMYDECODER_H_
 
-#include <qmap.h>
-#include <qptrlist.h>
+
 
 #include "programinfo.h"
 #include "format.h"

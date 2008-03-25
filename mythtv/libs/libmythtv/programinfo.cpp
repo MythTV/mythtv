@@ -1,5 +1,5 @@
 #include <iostream>
-#include <qsocket.h>
+#include <q3socket.h>
 #include <qregexp.h>
 #include <qmap.h>
 #include <qlayout.h>
@@ -177,21 +177,21 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     isVideo = other.isVideo;
     lenMins = other.lenMins;
     
-    title = QDeepCopy<QString>(other.title);
-    subtitle = QDeepCopy<QString>(other.subtitle);
-    description = QDeepCopy<QString>(other.description);
-    category = QDeepCopy<QString>(other.category);
-    chanid = QDeepCopy<QString>(other.chanid);
-    chanstr = QDeepCopy<QString>(other.chanstr);
-    chansign = QDeepCopy<QString>(other.chansign);
-    channame = QDeepCopy<QString>(other.channame);
+    title = Q3DeepCopy<QString>(other.title);
+    subtitle = Q3DeepCopy<QString>(other.subtitle);
+    description = Q3DeepCopy<QString>(other.description);
+    category = Q3DeepCopy<QString>(other.category);
+    chanid = Q3DeepCopy<QString>(other.chanid);
+    chanstr = Q3DeepCopy<QString>(other.chanstr);
+    chansign = Q3DeepCopy<QString>(other.chansign);
+    channame = Q3DeepCopy<QString>(other.channame);
     chancommfree = other.chancommfree;
-    chanOutputFilters = QDeepCopy<QString>(other.chanOutputFilters);
+    chanOutputFilters = Q3DeepCopy<QString>(other.chanOutputFilters);
     
-    pathname = QDeepCopy<QString>(other.pathname);
-    storagegroup = QDeepCopy<QString>(other.storagegroup);
+    pathname = Q3DeepCopy<QString>(other.pathname);
+    storagegroup = Q3DeepCopy<QString>(other.storagegroup);
     filesize = other.filesize;
-    hostname = QDeepCopy<QString>(other.hostname);
+    hostname = Q3DeepCopy<QString>(other.hostname);
 
     startts = other.startts;
     endts = other.endts;
@@ -219,11 +219,11 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     cardid = other.cardid;
     shareable = other.shareable;
     duplicate = other.duplicate;
-    schedulerid = QDeepCopy<QString>(other.schedulerid);
+    schedulerid = Q3DeepCopy<QString>(other.schedulerid);
     findid = other.findid;
     recpriority = other.recpriority;
-    recgroup = QDeepCopy<QString>(other.recgroup);
-    playgroup = QDeepCopy<QString>(other.playgroup);
+    recgroup = Q3DeepCopy<QString>(other.recgroup);
+    playgroup = Q3DeepCopy<QString>(other.playgroup);
     programflags = other.programflags;
     transcoder = other.transcoder;
     audioproperties = other.audioproperties;
@@ -233,18 +233,18 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
 
-    seriesid = QDeepCopy<QString>(other.seriesid);
-    programid = QDeepCopy<QString>(other.programid);
-    catType = QDeepCopy<QString>(other.catType);
+    seriesid = Q3DeepCopy<QString>(other.seriesid);
+    programid = Q3DeepCopy<QString>(other.programid);
+    catType = Q3DeepCopy<QString>(other.catType);
 
-    sortTitle = QDeepCopy<QString>(other.sortTitle);
+    sortTitle = Q3DeepCopy<QString>(other.sortTitle);
 
     originalAirDate = other.originalAirDate;
     stars = other.stars;
-    year = QDeepCopy<QString>(other.year);
+    year = Q3DeepCopy<QString>(other.year);
     ignoreBookmark = other.ignoreBookmark; 
    
-    inUseForWhat = QDeepCopy<QString>(other.inUseForWhat);
+    inUseForWhat = Q3DeepCopy<QString>(other.inUseForWhat);
     lastInUseTime = other.lastInUseTime;
     record = NULL;
 
@@ -359,7 +359,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
  */
 bool ProgramInfo::FromStringList(const QStringList &list, uint offset)
 {
-    QStringList::const_iterator it = list.at(offset);
+    QStringList::const_iterator it = list.begin()+offset;
     return FromStringList(it, list.end());
 }
 
@@ -705,10 +705,12 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 
     MSqlBindings bindings;
     QString querystr = "WHERE program.chanid = :CHANID "
-                       "  AND program.starttime < :STARTTS "
-                       "  AND program.endtime > :STARTTS ";
+                       "  AND program.starttime < :STARTTS1 "
+                       "  AND program.endtime > :STARTTS2 ";
     bindings[":CHANID"] = channel;
-    bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
+    QString startts = dtime.toString("yyyy-MM-ddThh:mm:50");
+    bindings[":STARTTS1"] = startts;
+    bindings[":STARTTS2"] = startts;
 
     schedList.FromScheduler();
     progList.FromProgram(querystr, bindings, schedList);
@@ -758,8 +760,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     p->description        = "";
     p->category           = "";
     p->chanstr            = query.value(1).toString();
-    p->chansign           = QString::fromUtf8(query.value(2).toString());
-    p->channame           = QString::fromUtf8(query.value(3).toString());
+    p->chansign           = query.value(2).toString();
+    p->channame           = query.value(3).toString();
     p->repeat             = 0;
     p->chancommfree       = (query.value(4).toInt() == -2);
     p->chanOutputFilters  = query.value(5).toString();
@@ -884,13 +886,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->endts = query.value(24).toDateTime();
         proginfo->recstartts = query.value(1).toDateTime();
         proginfo->recendts = query.value(2).toDateTime();
-        proginfo->title = QString::fromUtf8(query.value(3).toString());
-        proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
-        proginfo->description = QString::fromUtf8(query.value(5).toString());
+        proginfo->title = query.value(3).toString();
+        proginfo->subtitle = query.value(4).toString();
+        proginfo->description = query.value(5).toString();
 
         proginfo->chanstr = query.value(6).toString();
-        proginfo->chansign = QString::fromUtf8(query.value(7).toString());
-        proginfo->channame = QString::fromUtf8(query.value(8).toString());
+        proginfo->chansign = query.value(7).toString();
+        proginfo->channame = query.value(8).toString();
         proginfo->chancommfree = (query.value(9).toInt() == -2);
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
@@ -930,12 +932,12 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         proginfo->getProgramProperties();
 
-        proginfo->recgroup = QString::fromUtf8(query.value(26).toString());
-        proginfo->storagegroup = QString::fromUtf8(query.value(27).toString());
-        proginfo->playgroup = QString::fromUtf8(query.value(21).toString());
+        proginfo->recgroup = query.value(26).toString();
+        proginfo->storagegroup = query.value(27).toString();
+        proginfo->playgroup = query.value(21).toString();
         proginfo->recpriority = query.value(22).toInt();
 
-        proginfo->pathname = QString::fromUtf8(query.value(25).toString());
+        proginfo->pathname = query.value(25).toString();
 
         return proginfo;
     }
@@ -1165,7 +1167,7 @@ void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
                   " SET recgroup = :RECGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":RECGROUP", newrecgroup.utf8());
+    query.bindValue(":RECGROUP", newrecgroup);
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
@@ -1188,7 +1190,7 @@ void ProgramInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
                   " SET playgroup = :PLAYGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":PLAYGROUP", newplaygroup.utf8());
+    query.bindValue(":PLAYGROUP", newplaygroup);
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
@@ -1212,8 +1214,8 @@ void ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QStri
                   " SET title = :TITLE, subtitle = :SUBTITLE"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":TITLE", newTitle.utf8());
-    query.bindValue(":SUBTITLE", newSubtitle.utf8());
+    query.bindValue(":TITLE", newTitle);
+    query.bindValue(":SUBTITLE", newSubtitle);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", recstartts.toString("yyyyMMddhhmmss"));
 
@@ -1674,7 +1676,7 @@ void ProgramInfo::StartedRecording(QString ext)
                  " AND title = :TITLE;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", startts);
-    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":TITLE", title);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program data on record", query);
 
@@ -1692,8 +1694,8 @@ static bool insert_program(const ProgramInfo        *pg,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("LOCK TABLES recorded WRITE");
-    if (!query.exec())
+    //query.prepare("LOCK TABLES recorded WRITE");
+    if (!query.exec("LOCK TABLES recorded WRITE"))
     {
         MythContext::DBError("insert_program -- lock", query);
         return false;
@@ -1714,8 +1716,8 @@ static bool insert_program(const ProgramInfo        *pg,
         else
             VERBOSE(VB_IMPORTANT, "recording already exists...");
 
-        query.prepare("UNLOCK TABLES");
-        query.exec();
+        //query.prepare("UNLOCK TABLES");
+        query.exec("UNLOCK TABLES");
         return false;
     }
 
@@ -1751,23 +1753,23 @@ static bool insert_program(const ProgramInfo        *pg,
     query.bindValue(":CHANID",      pg->chanid);
     query.bindValue(":STARTS",      pg->recstartts);
     query.bindValue(":ENDS",        pg->recendts);
-    query.bindValue(":TITLE",       pg->title.utf8());
-    query.bindValue(":SUBTITLE",    pg->subtitle.utf8());
-    query.bindValue(":DESC",        pg->description.utf8());
+    query.bindValue(":TITLE",       pg->title);
+    query.bindValue(":SUBTITLE",    pg->subtitle);
+    query.bindValue(":DESC",        pg->description);
     query.bindValue(":HOSTNAME",    pg->hostname);
-    query.bindValue(":CATEGORY",    pg->category.utf8());
-    query.bindValue(":RECGROUP",    pg->recgroup.utf8());
+    query.bindValue(":CATEGORY",    pg->category);
+    query.bindValue(":RECGROUP",    pg->recgroup);
     query.bindValue(":AUTOEXP",     schd->GetAutoExpire());
-    query.bindValue(":SERIESID",    pg->seriesid.utf8());
-    query.bindValue(":PROGRAMID",   pg->programid.utf8());
+    query.bindValue(":SERIESID",    pg->seriesid);
+    query.bindValue(":PROGRAMID",   pg->programid);
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->repeat);
     query.bindValue(":TRANSCODER",  schd->GetTranscoder());
-    query.bindValue(":PLAYGROUP",   pg->playgroup.utf8());
+    query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", schd->getRecPriority());
     query.bindValue(":BASENAME",    pg->pathname);
-    query.bindValue(":STORGROUP",   pg->storagegroup.utf8());
+    query.bindValue(":STORGROUP",   pg->storagegroup);
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
     query.bindValue(":PROFILE",     schd->getProfileName());
@@ -1775,8 +1777,8 @@ static bool insert_program(const ProgramInfo        *pg,
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     bool active = query.isActive();
 
-    query.prepare("UNLOCK TABLES");
-    query.exec();
+    //query.prepare("UNLOCK TABLES");
+    query.exec("UNLOCK TABLES");
 
     if (!ok && !active)
         MythContext::DBError("insert_program -- insert", query);
@@ -1903,7 +1905,7 @@ long long ProgramInfo::GetFilesize(void)
 int ProgramInfo::GetMplexID(void) const
 {
     int ret = 0;
-    if (chanid)
+    if (!chanid.isEmpty())
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1996,7 +1998,7 @@ QStringList ProgramInfo::GetDVDBookmark(QString serialid, bool delbookmark) cons
         query.prepare(" SELECT title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
                         " WHERE serialid = ? ");
-        query.addBindValue(serialid.utf8());
+        query.addBindValue(serialid);
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -2036,8 +2038,8 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
     query.prepare("INSERT IGNORE INTO dvdbookmark "
                     " (serialid, name)"
                     " VALUES ( :SERIALID, :NAME );");
-    query.bindValue(":SERIALID", serialid.utf8());
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":SERIALID", serialid);
+    query.bindValue(":NAME", name);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SetDVDBookmark inserting", query);
@@ -2049,11 +2051,11 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
                     "     framenum    = ? , "
                     "     timestamp   = NOW() "
                     " WHERE serialid = ? ;");
-    query.addBindValue(title.utf8());
-    query.addBindValue(audionum.utf8());
-    query.addBindValue(subtitlenum.utf8());
-    query.addBindValue(frame.utf8());
-    query.addBindValue(serialid.utf8());
+    query.addBindValue(title);
+    query.addBindValue(audionum);
+    query.addBindValue(subtitlenum);
+    query.addBindValue(frame);
+    query.addBindValue(serialid);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SetDVDBookmark updating", query);
@@ -2831,7 +2833,7 @@ void ProgramInfo::ReactivateRecording(void)
                    "  starttime = :STARTTIME AND "
                    "  title = :TITLE;");
     result.bindValue(":STARTTIME", startts);
-    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":TITLE", title);
     result.bindValue(":STATION", chansign);
 
     result.exec();
@@ -2865,12 +2867,12 @@ void ProgramInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts.toString(Qt::ISODate));
     result.bindValue(":END", endts.toString(Qt::ISODate));
-    result.bindValue(":TITLE", title.utf8());
-    result.bindValue(":SUBTITLE", subtitle.utf8());
-    result.bindValue(":DESC", description.utf8());
-    result.bindValue(":CATEGORY", category.utf8());
-    result.bindValue(":SERIESID", seriesid.utf8());
-    result.bindValue(":PROGRAMID", programid.utf8());
+    result.bindValue(":TITLE", title);
+    result.bindValue(":SUBTITLE", subtitle);
+    result.bindValue(":DESC", description);
+    result.bindValue(":CATEGORY", category);
+    result.bindValue(":SERIESID", seriesid);
+    result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
     result.bindValue(":RECORDID", recordid);
     result.bindValue(":STATION", chansign);
@@ -2910,7 +2912,7 @@ void ProgramInfo::DeleteHistory(void)
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
                    "starttime = :START AND station = :STATION");
-    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":TITLE", title);
     result.bindValue(":START", recstartts);
     result.bindValue(":STATION", chansign);
     
@@ -2952,7 +2954,7 @@ void ProgramInfo::ForgetHistory(void)
                        "AND starttime = :STARTTIME "
                        "AND title = :TITLE;");
     result.bindValue(":STARTTIME", recstartts);
-    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":TITLE", title);
     result.bindValue(":CHANID", chanid);
 
     result.exec();
@@ -2966,9 +2968,9 @@ void ProgramInfo::ForgetHistory(void)
                    "  AND description = :DESC) OR "
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
-    result.bindValue(":TITLE", title.utf8());
-    result.bindValue(":SUBTITLE", subtitle.utf8());
-    result.bindValue(":DESC", description.utf8());
+    result.bindValue(":TITLE", title);
+    result.bindValue(":SUBTITLE", subtitle);
+    result.bindValue(":DESC", description);
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
     
@@ -3015,9 +3017,9 @@ void ProgramInfo::SetDupHistory(void)
                    "  AND description = :DESC) OR "
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
-    result.bindValue(":TITLE", title.utf8());
-    result.bindValue(":SUBTITLE", subtitle.utf8());
-    result.bindValue(":DESC", description.utf8());
+    result.bindValue(":TITLE", title);
+    result.bindValue(":SUBTITLE", subtitle);
+    result.bindValue(":DESC", description);
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
     
@@ -3413,10 +3415,10 @@ void ProgramInfo::Save(void) const
     query.bindValue(":CHANID", chanid.toInt());
     query.bindValue(":STARTTIME", startts);
     query.bindValue(":ENDTIME", endts);
-    query.bindValue(":TITLE", title.utf8());
-    query.bindValue(":SUBTITLE", subtitle.utf8());
-    query.bindValue(":DESCRIPTION", description.utf8());
-    query.bindValue(":CATEGORY", category.utf8());
+    query.bindValue(":TITLE", title);
+    query.bindValue(":SUBTITLE", subtitle);
+    query.bindValue(":DESCRIPTION", description);
+    query.bindValue(":CATEGORY", category);
     query.bindValue(":AIRDATE", "0");
     query.bindValue(":STARS", "0");
 
@@ -3566,7 +3568,7 @@ void ProgramInfo::showDetails(void) const
             generic = query.value(9).toInt();
             showtype = query.value(10).toString();
             colorcode = query.value(11).toString();
-            title_pronounce = QString::fromUtf8(query.value(12).toString());
+            title_pronounce = query.value(12).toString();
         }
         else if (!query.isActive())
             MythContext::DBError(LOC + "showDetails", query);
@@ -3737,8 +3739,8 @@ void ProgramInfo::showDetails(void) const
 
             while(query.next())
             {
-                role = QString::fromUtf8(query.value(0).toString());
-                pname = QString::fromUtf8(query.value(1).toString());
+                role = query.value(0).toString();
+                pname = query.value(1).toString();
 
                 if (rstr == role)
                     plist += ", " + pname;
@@ -3858,7 +3860,7 @@ void ProgramInfo::showDetails(void) const
         s = QString("%1, ").arg(recordid);
         if (rectype != kNotRecording)
             s += RecTypeText();
-        if (record->getRecordTitle())
+        if (!(record->getRecordTitle().isEmpty()))
             s += QString(" \"%2\"").arg(record->getRecordTitle());
         ADD_PAR(QObject::tr("Recording Rule"), s, msg)
 
@@ -4057,7 +4059,7 @@ QString ProgramInfo::GetRecGroupPassword(QString group)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT password FROM recgrouppassword "
                         "WHERE recgroup = :GROUP ;");
-        query.bindValue(":GROUP", group.utf8());
+        query.bindValue(":GROUP", group);
 
         if (query.exec() && query.isActive() && query.size() > 0)
             if (query.next())
@@ -4082,7 +4084,7 @@ void ProgramInfo::UpdateRecGroup(void)
     query.bindValue(":CHANID", chanid);
     if (query.exec() && query.next())
     {
-        recgroup = QString::fromUtf8(query.value(0).toString());
+        recgroup = query.value(0).toString();
     }
 }
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
@@ -4562,7 +4564,7 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
         query = QString("QUERY_GETALLPENDING");
     }
 
-    QStringList slist = query;
+    QStringList slist( query );
     if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
         VERBOSE(VB_IMPORTANT,
@@ -4573,7 +4575,7 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
     hasConflicts = slist[0].toInt();
 
     bool result = true;
-    QStringList::const_iterator sit = slist.at(2);
+    QStringList::const_iterator sit = slist.begin()+2;
 
     while (result && sit != slist.end())
     {
@@ -4656,13 +4658,13 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->recstartts = p->startts;
         p->recendts = p->endts;
         p->lastmodified = p->startts;
-        p->title = QString::fromUtf8(query.value(3).toString());
-        p->subtitle = QString::fromUtf8(query.value(4).toString());
-        p->description = QString::fromUtf8(query.value(5).toString());
-        p->category = QString::fromUtf8(query.value(6).toString());
+        p->title = query.value(3).toString();
+        p->subtitle = query.value(4).toString();
+        p->description = query.value(5).toString();
+        p->category = query.value(6).toString();
         p->chanstr = query.value(7).toString();
-        p->chansign = QString::fromUtf8(query.value(8).toString());
-        p->channame = QString::fromUtf8(query.value(9).toString());
+        p->chansign = query.value(8).toString();
+        p->channame = query.value(9).toString();
         p->repeat = query.value(10).toInt();
         p->chancommfree = (query.value(11).toInt() == -2);
         p->chanOutputFilters = query.value(12).toString();
@@ -4834,9 +4836,9 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             proginfo->endts         = query.value(30).toDateTime();
             proginfo->recstartts    = query.value(1).toDateTime();
             proginfo->recendts      = query.value(2).toDateTime();
-            proginfo->title         = QString::fromUtf8(query.value(3).toString());
-            proginfo->subtitle      = QString::fromUtf8(query.value(4).toString());
-            proginfo->description   = QString::fromUtf8(query.value(5).toString());
+            proginfo->title         = query.value(3).toString();
+            proginfo->subtitle      = query.value(4).toString();
+            proginfo->description   = query.value(5).toString();
             proginfo->hostname      = query.value(6).toString();
 
             proginfo->dupin         = RecordingDupInType(query.value(17).toInt());
@@ -4866,7 +4868,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
                     proginfo->hasAirDate  = false;
             }
 
-            proginfo->pathname = QString::fromUtf8(query.value(28).toString());
+            proginfo->pathname = query.value(28).toString();
 
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
@@ -4875,8 +4877,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             if (!query.value(7).toString().isEmpty())
             {
                 proginfo->chanstr  = query.value(7).toString();
-                proginfo->channame = QString::fromUtf8(query.value(8).toString());
-                proginfo->chansign = QString::fromUtf8(query.value(9).toString());
+                proginfo->channame = query.value(8).toString();
+                proginfo->chansign = query.value(9).toString();
             }
             else
             {
@@ -4917,10 +4919,10 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
             proginfo->videoproperties = query.value(33).toInt();
             proginfo->subtitleType = query.value(34).toInt();
 
-            proginfo->category     = QString::fromUtf8(query.value(15).toString());
-            proginfo->recgroup     = QString::fromUtf8(query.value(16).toString());
-            proginfo->playgroup    = QString::fromUtf8(query.value(27).toString());
-            proginfo->storagegroup = QString::fromUtf8(query.value(36).toString());
+            proginfo->category     = query.value(15).toString();
+            proginfo->recgroup     = query.value(16).toString();
+            proginfo->playgroup    = query.value(27).toString();
+            proginfo->storagegroup = query.value(36).toString();
             proginfo->recstatus    = rsRecorded;
 
             if ((pSchedList != NULL) && (proginfo->recendts > rectime))
@@ -4983,15 +4985,15 @@ bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
         p->recstartts = p->startts;
         p->recendts = p->endts;
         p->lastmodified = p->startts;
-        p->title = QString::fromUtf8(query.value(3).toString());
-        p->subtitle = QString::fromUtf8(query.value(4).toString());
-        p->description = QString::fromUtf8(query.value(5).toString());
-        p->category = QString::fromUtf8(query.value(6).toString());
+        p->title = query.value(3).toString();
+        p->subtitle = query.value(4).toString();
+        p->description = query.value(5).toString();
+        p->category = query.value(6).toString();
         p->seriesid = query.value(7).toString();
         p->programid = query.value(8).toString();
         p->chanstr = query.value(9).toString();
-        p->chansign = QString::fromUtf8(query.value(10).toString());
-        p->channame = QString::fromUtf8(query.value(11).toString());
+        p->chansign = query.value(10).toString();
+        p->channame = query.value(11).toString();
         p->findid = query.value(12).toInt();
         p->rectype = RecordingType(query.value(13).toInt());
         p->recstatus = RecStatusType(query.value(14).toInt());
@@ -5004,8 +5006,8 @@ bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
     return true;
 }
 
-int ProgramList::compareItems(QPtrCollection::Item item1,
-                              QPtrCollection::Item item2)
+int ProgramList::compareItems(Q3PtrCollection::Item item1,
+                              Q3PtrCollection::Item item2)
 {
     if (compareFunc)
         return compareFunc(reinterpret_cast<ProgramInfo *>(item1),

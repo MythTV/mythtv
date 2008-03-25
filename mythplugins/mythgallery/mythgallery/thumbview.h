@@ -4,10 +4,12 @@
 #define _THUMBVIEW_H_
 
 // Qt headers
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 #include <qstring.h>
-#include <qptrlist.h>
-#include <qdict.h>
+#include <q3ptrlist.h>
+#include <q3dict.h>
+//Added by qt3to4:
+#include <QPixmap>
 
 class MythMediaDevice;
 class QPixmap;
@@ -21,8 +23,8 @@ class ThumbItem
         m_pixmap(NULL),        m_mediaDevice(NULL) { }
     ThumbItem(const QString &name, const QString &path, bool isDir,
               MythMediaDevice *dev = NULL) :
-        m_name(QDeepCopy<QString>(name)), m_caption(QString::null),
-        m_path(QDeepCopy<QString>(path)), m_isDir(isDir),
+        m_name(Q3DeepCopy<QString>(name)), m_caption(QString::null),
+        m_path(Q3DeepCopy<QString>(path)), m_isDir(isDir),
         m_pixmap(NULL),                   m_mediaDevice(dev) { }
     ~ThumbItem();
 
@@ -33,11 +35,11 @@ class ThumbItem
     // sets
     void SetRotationAngle(int angle);
     void SetName(const QString &name)
-        { m_name = QDeepCopy<QString>(name); }
+        { m_name = Q3DeepCopy<QString>(name); }
     void SetCaption(const QString &caption)
-        { m_caption = QDeepCopy<QString>(caption); }
+        { m_caption = Q3DeepCopy<QString>(caption); }
     void SetPath(const QString &path, bool isDir)
-        { m_path = QDeepCopy<QString>(path); m_isDir = isDir; }
+        { m_path = Q3DeepCopy<QString>(path); m_isDir = isDir; }
     void SetPixmap(QPixmap *pixmap);
     void SetMediaDevice(MythMediaDevice *dev)
         { m_mediaDevice = dev; }
@@ -64,7 +66,7 @@ class ThumbItem
     QPixmap *m_pixmap;
     MythMediaDevice *m_mediaDevice;
 };
-typedef QPtrList<ThumbItem> ThumbList;
-typedef QDict<ThumbItem>    ThumbDict;
+typedef Q3PtrList<ThumbItem> ThumbList;
+typedef Q3Dict<ThumbItem>    ThumbDict;
 
 #endif // _THUMBVIEW_H_

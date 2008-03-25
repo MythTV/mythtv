@@ -3,7 +3,7 @@
 // Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
 
 #include <qstringlist.h>
-#include <qdeepcopy.h>
+#include <Q3CString>
 
 #include "format.h"
 #include "cc608decoder.h"
@@ -596,7 +596,7 @@ void CC608Decoder::ResetCC(int mode)
 
 void CC608Decoder::BufferCC(int mode, int len, int clr)
 {
-    QCString tmpbuf;
+    Q3CString tmpbuf;
     if (len)
     {
         // calculate UTF-8 encoding length
@@ -929,7 +929,7 @@ bool is_better(const QString &newStr, const QString &oldStr)
 
         // check if the string contains any bogus characters
         for (uint i = 0; i < newStr.length(); i++)
-            if ((int)newStr[i] < 0x20)
+            if (newStr[i].toAscii() < 0x20)
                 return false;
 
         return true;
@@ -968,7 +968,7 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
     {
         uint cf = (future) ? 1 : 0;
         if (!(xds_rating[cf][i]&0xF0))
-            return QDeepCopy<QString>(main);
+            return Q3DeepCopy<QString>(main);
 
         main += " ";
         // TPG flags
@@ -982,13 +982,13 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
             main += "L"; // Language
     }
 
-    return QDeepCopy<QString>(main);
+    return Q3DeepCopy<QString>(main);
 }
 
 QString CC608Decoder::GetProgramName(bool future) const
 {
     QMutexLocker locker(&xds_lock);
-    return QDeepCopy<QString>(xds_program_name[(future) ? 1 : 0]);
+    return Q3DeepCopy<QString>(xds_program_name[(future) ? 1 : 0]);
 }
 
 QString CC608Decoder::GetProgramType(bool future) const
@@ -1004,7 +1004,7 @@ QString CC608Decoder::GetProgramType(bool future) const
         tmp += xds_program_type_string[program_type[i]];
     }
 
-    return QDeepCopy<QString>(tmp);
+    return Q3DeepCopy<QString>(tmp);
 }
 
 QString CC608Decoder::GetXDS(const QString &key) const
@@ -1036,9 +1036,9 @@ QString CC608Decoder::GetXDS(const QString &key) const
         return GetProgramType(true);
 
     else if (key == "callsign")
-        return QDeepCopy<QString>(xds_net_call);
+        return Q3DeepCopy<QString>(xds_net_call);
     else if (key == "channame")
-        return QDeepCopy<QString>(xds_net_name);
+        return Q3DeepCopy<QString>(xds_net_name);
     else if (key == "tsid")
         return QString::number(xds_tsid);
 

@@ -18,7 +18,7 @@ using namespace std;
 #include <qfile.h>
 #include <qmap.h>
 #include <qdir.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qdatetime.h>
 
 // MythTV headers
@@ -52,7 +52,7 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          bool           _must_have_mplexid) :
     ComboBoxSetting(this),
     initial_sourceid(_initial_sourceid),
-    card_types(QDeepCopy<QString>(_card_types)),
+    card_types(Q3DeepCopy<QString>(_card_types)),
     must_have_mplexid(_must_have_mplexid)
 {
     setLabel(tr("Video Source"));
@@ -551,7 +551,7 @@ XMLTVConfig::XMLTVConfig(const VideoSource &parent) :
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
 
-    QProcess find_grabber_proc( QString("tv_find_grabbers"), this );
+    Q3Process find_grabber_proc( QString("tv_find_grabbers"), this );
     find_grabber_proc.addArgument("baseline");
     find_grabber_proc.addArgument("manualconfig");
     if ( find_grabber_proc.start() ) {
@@ -714,17 +714,17 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
                                bool allow_duplicates)
     {
         uint cnt = 0;
-        const QFileInfoList *il = dir.entryInfoList();
-        if (!il)
-            return cnt;
-        
-        QFileInfoListIterator it( *il );
-        QFileInfo *fi;
 
-        for (; (fi = it.current()) != 0; ++it)
+        QFileInfoList il = dir.entryInfoList();
+
+        for( QFileInfoList::iterator it  = il.begin();
+                                     it != il.end();
+                                   ++it )
         {
+            QFileInfo &fi = *it;
+
             struct stat st;
-            QString filepath = fi->absFilePath();
+            QString filepath = fi.absFilePath();
             int err = lstat(filepath, &st);
 
             if (0 != err)
@@ -799,16 +799,16 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
                                const QString &driver)
     {
         uint cnt = 0;
-        const QFileInfoList *il = dir.entryInfoList();
-        if (!il)
-            return cnt;
 
-        QFileInfoListIterator it(*il);
-        QFileInfo *fi;
+        QFileInfoList il = dir.entryInfoList();
 
-        for (; (fi = it.current()) != 0; ++it)
+        for( QFileInfoList::iterator it  = il.begin();
+                                     it != il.end();
+                                   ++it )
         {
-            QString device = fi->absFilePath();
+            QFileInfo &fi = *it;
+
+            QString device = fi.absFilePath();
             int vbifd = open(device.ascii(), O_RDWR);
             if (vbifd < 0)
                 continue;
@@ -1820,8 +1820,7 @@ void InputGroup::load(void)
 
             if (grpcnt[groupid] == 1)
             {
-                names.push_back(
-                    QString::fromUtf8(query.value(2).toString()));
+                names.push_back(query.value(2).toString());
                 grpid.push_back(groupid);
             }
         }
@@ -2164,7 +2163,7 @@ void CardInput::CreateNewInputGroup(void)
             gContext->GetMainWindow(), tr("Create Input Group"),
             tr("Enter new group name"), tmp_name);
 
-        new_name = QDeepCopy<QString>(tmp_name);
+        new_name = Q3DeepCopy<QString>(tmp_name);
 
         if (!ok)
             return;
@@ -2182,7 +2181,7 @@ void CardInput::CreateNewInputGroup(void)
             "SELECT inputgroupname "
             "FROM inputgroup "
             "WHERE inputgroupname = :GROUPNAME");
-        query.bindValue(":GROUPNAME", new_name.utf8());
+        query.bindValue(":GROUPNAME", new_name);
 
         if (!query.exec())
         {
@@ -2676,7 +2675,7 @@ void CardInputEditor::load()
         CardUtil::GetCardInputs(cardid, videodevice, cardtype,
                                 inputLabels, cardInputs);
 
-        for (uint i = 0; i < inputLabels.size(); i++, j++)
+        for (int i = 0; i < inputLabels.size(); i++, j++)
         {
             cardinputs.push_back(cardInputs[i]);
             listbox->addSelection(inputLabels[i], QString::number(j));
@@ -2805,7 +2804,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 
             // According to #1779 and #1935 the AverMedia 180 needs
             // a 3000 ms signal timeout, at least for QAM tuning.
-            if (frontend_name = "Nextwave NXT200X VSB/QAM frontend")
+            if (frontend_name == "Nextwave NXT200X VSB/QAM frontend")
             {
                 signal_timeout->setValue(3000);
                 channel_timeout->setValue(5500);

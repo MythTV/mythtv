@@ -3,11 +3,14 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qmap.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <QKeyEvent>
+#include <QEvent>
 #include <qdir.h>
 #include <qtextcodec.h>
 #include <qwidget.h>
+
+#include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <cerrno>
@@ -424,7 +427,7 @@ void TVMenuCallback(void *data, QString &selection)
         MainGeneralSettings mainsettings;
         mainsettings.exec();
         menu->ReloadExitKey();
-        QStringList strlist = QString("REFRESH_BACKEND");
+        QStringList strlist( QString("REFRESH_BACKEND") );
         gContext->SendReceiveStringList(strlist);
     } 
     else if (sel == "settings playback") 
@@ -616,7 +619,7 @@ bool RunMenu(QString themedir)
         return true;
     }
 
-    cerr << "Couldn't find theme " << themedir << endl;
+    cerr << "Couldn't find theme " << (const char *)themedir << endl;
     return false;
 }   
 
@@ -652,28 +655,28 @@ QString RandTheme(QString &themename)
     QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
 
-    const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
-
-    QFileInfoListIterator it( *fil);
-    QFileInfo *theme;
     QStringList themelist;
-
     srand(time(NULL));
 
-    for ( ; it.current() !=0; ++it)
+    QFileInfoList fil = themes.entryInfoList();
+
+    for( QFileInfoList::iterator it =  fil.begin();
+                                 it != fil.end();
+                               ++it )
     {
-        theme = it.current();
-        if (theme->fileName() == "." || theme->fileName() =="..")
+        QFileInfo  &theme = *it;
+
+        if (theme.fileName() == "." || theme.fileName() =="..")
             continue;
 
-        QFileInfo xml(theme->absFilePath() + "/theme.xml");
+        QFileInfo xml(theme.absFilePath() + "/theme.xml");
 
         if (!xml.exists())
             continue;
 
         // We don't want the same one as last time.
-        if (theme->fileName() != themename)
-            themelist.append(theme->fileName());
+        if (theme.fileName() != themename)
+            themelist.append(theme.fileName());
     }
 
     if (themelist.size()) 
@@ -974,7 +977,7 @@ int log_rotate(int report_error)
     if (new_logfd < 0) {
         /* If we can't open the new logfile, send data to /dev/null */
         if (report_error) {
-            cerr << "cannot open logfile " << logfile << endl;
+            cerr << "cannot open logfile " << (const char *)logfile << endl;
             return -1;
         }
 
@@ -1245,7 +1248,7 @@ int main(int argc, char **argv)
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
                     tokens[0].replace(QRegExp("^[\"']"), "");
@@ -1277,11 +1280,11 @@ int main(int argc, char **argv)
  
                 QStringList pairs = QStringList::split(",", tmpArg);
                 QString value;
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     value = gContext->GetSetting(pairs[index]);
-                    cout << "\tSettings Value : " << pairs[index];
-                    cout <<  " = " << value << endl;
+                    cout << "\tSettings Value : " << (const char *)pairs[index];
+                    cout <<  " = " << (const char *)value << endl;
                 }
                 return FRONTEND_EXIT_OK;
             }
@@ -1432,7 +1435,7 @@ int main(int argc, char **argv)
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {
-        cerr << "Couldn't find theme " << themename << endl;
+        cerr << "Couldn't find theme " << (const char *)themename << endl;
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1441,6 +1444,7 @@ int main(int argc, char **argv)
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
+    mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
     gContext->UpdateImageCache();
     themeBase = new MythThemeBase();
@@ -1522,7 +1526,7 @@ int main(int argc, char **argv)
         themedir = gContext->FindThemeDir(themename);
         if (themedir == "")
         {
-            cerr << "Couldn't find theme " << themename << endl;
+            cerr << "Couldn't find theme " << (const char *)themename << endl;
             return FRONTEND_EXIT_NO_THEME;
         }
 

@@ -60,6 +60,8 @@
 #include <qregexp.h>
 #include <qdir.h>
 #include <qapplication.h>
+#include <Q3PtrList>
+
 #include "util.h"
 #include "mythcontext.h"
 #include "lcddevice.h"
@@ -80,10 +82,10 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
 
     //  Create the socket to listen to for connections
     m_serverSocket = new LCDServerSocket(port);
-    connect(m_serverSocket, SIGNAL(newConnect(QSocket *)),
-            this, SLOT(newConnection(QSocket *)));
-    connect(m_serverSocket, SIGNAL(endConnect(QSocket *)),
-            this, SLOT(endConnection(QSocket *)));
+    connect(m_serverSocket, SIGNAL(newConnect(Q3Socket *)),
+            this, SLOT(newConnection(Q3Socket *)));
+    connect(m_serverSocket, SIGNAL(endConnect(Q3Socket *)),
+            this, SLOT(endConnection(Q3Socket *)));
 
     m_lastSocket = NULL;
 
@@ -96,7 +98,7 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
         m_lcd->setStartupMessage(message, messageTime);
 }
 
-void LCDServer::newConnection(QSocket *socket)
+void LCDServer::newConnection(Q3Socket *socket)
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
 
@@ -107,7 +109,7 @@ void LCDServer::newConnection(QSocket *socket)
         m_lcd->switchToTime();
 }
 
-void LCDServer::endConnection(QSocket *socket)
+void LCDServer::endConnection(Q3Socket *socket)
 {
     socket->close();
 
@@ -121,7 +123,7 @@ void LCDServer::endConnection(QSocket *socket)
 void LCDServer::readSocket()
 {
 
-    QSocket *socket = (QSocket *)sender();
+    Q3Socket *socket = (Q3Socket *)sender();
     m_lastSocket = socket;
 
     while(socket->canReadLine())
@@ -163,7 +165,7 @@ QStringList LCDServer::parseCommand(QString &command)
     return tokens;
 }
 
-void LCDServer::parseTokens(const QStringList &tokens, QSocket *socket)
+void LCDServer::parseTokens(const QStringList &tokens, Q3Socket *socket)
 {
     //
     //  parse commands coming in from the socket
@@ -264,7 +266,7 @@ void LCDServer::shutDown()
     exit(0);
 }
 
-void LCDServer::sendMessage(QSocket *where, const QString &what)
+void LCDServer::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
@@ -281,7 +283,7 @@ void LCDServer::sendKeyPress(QString key_pressed)
         sendMessage(m_lastSocket, "KEY " + key_pressed);  
 }
 
-void LCDServer::sendConnected(QSocket *socket)
+void LCDServer::sendConnected(Q3Socket *socket)
 {
     QString sWidth, sHeight;
     int nWidth = 0, nHeight = 0;
@@ -298,7 +300,7 @@ void LCDServer::sendConnected(QSocket *socket)
     sendMessage(socket, "CONNECTED " + sWidth + " " + sHeight);
 }
 
-void LCDServer::switchToTime(QSocket *socket)
+void LCDServer::switchToTime(Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer:: SWITCH_TO_TIME");
@@ -309,7 +311,7 @@ void LCDServer::switchToTime(QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToMusic(const QStringList &tokens, QSocket *socket)
+void LCDServer::switchToMusic(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_MUSIC");
@@ -329,7 +331,7 @@ void LCDServer::switchToMusic(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToGeneric(const QStringList &tokens, QSocket *socket)
+void LCDServer::switchToGeneric(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_GENERIC");
@@ -344,7 +346,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QSocket *socket)
         return;
     }
 
-    QPtrList<LCDTextItem> items;
+    Q3PtrList<LCDTextItem> items;
     items.setAutoDelete(true);
 
     for (uint x = 1; x < tokens.count(); x += 5)
@@ -398,7 +400,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToChannel(const QStringList &tokens, QSocket *socket)
+void LCDServer::switchToChannel(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_CHANNEL");
@@ -419,7 +421,7 @@ void LCDServer::switchToChannel(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToVolume(const QStringList &tokens, QSocket *socket)
+void LCDServer::switchToVolume(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_VOLUME");
@@ -440,7 +442,7 @@ void LCDServer::switchToVolume(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToNothing(QSocket *socket)
+void LCDServer::switchToNothing(Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_NOTHING");
@@ -451,7 +453,7 @@ void LCDServer::switchToNothing(QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::switchToMenu(const QStringList &tokens, QSocket *socket)
+void LCDServer::switchToMenu(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SWITCH_TO_MENU: " << tokens.count());
@@ -481,7 +483,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QSocket *socket)
         return;
     }
 
-    QPtrList<LCDMenuItem> items;
+    Q3PtrList<LCDMenuItem> items;
     items.setAutoDelete(true);
 
     for (uint x = 3; x < tokens.count(); x += 5)
@@ -548,7 +550,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::setChannelProgress(const QStringList &tokens, QSocket *socket)
+void LCDServer::setChannelProgress(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SET_CHANNEL_PROGRESS");
@@ -579,7 +581,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::setGenericProgress(const QStringList &tokens, QSocket *socket)
+void LCDServer::setGenericProgress(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SET_GENERIC_PROGRESS");
@@ -618,7 +620,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::setMusicProgress(const QStringList &tokens, QSocket *socket)
+void LCDServer::setMusicProgress(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SET_MUSIC_PROGRESS");
@@ -649,7 +651,7 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::setMusicProp(const QStringList &tokens, QSocket *socket)
+void LCDServer::setMusicProp(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SET_MUSIC_PROP");
@@ -717,7 +719,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::setVolumeLevel(const QStringList &tokens, QSocket *socket)
+void LCDServer::setVolumeLevel(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: SET_VOLUME_LEVEL");
@@ -748,7 +750,7 @@ void LCDServer::setVolumeLevel(const QStringList &tokens, QSocket *socket)
     sendMessage(socket, "OK");
 }
 
-void LCDServer::updateLEDs(const QStringList &tokens, QSocket *socket)
+void LCDServer::updateLEDs(const QStringList &tokens, Q3Socket *socket)
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDServer: UPDATE_LEDS");

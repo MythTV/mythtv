@@ -10,6 +10,7 @@
 #ifndef OLDSETTINGS_H
 #define OLDSETTINGS_H
 #include <qstring.h>
+#include <QPixmap>
 #include <map>
 
 #include "mythexp.h"

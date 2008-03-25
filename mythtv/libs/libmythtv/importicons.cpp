@@ -122,7 +122,7 @@ void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
     switch (state)
     {
         case STATE_NORMAL:
-            if (m_editManual->getValue())
+            if (!m_editManual->getValue().isEmpty())
                  m_buttonManual->setEnabled(true);
             else
             m_buttonManual->setEnabled(false);
@@ -440,7 +440,7 @@ QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
     QTextStream rawStream(raw,IO_WriteOnly);
     rawStream << strParam;
 
-    QBuffer data(raw);
+    QBuffer data(&raw);
     QHttpRequestHeader header;
 
     header.setContentType(QString("application/x-www-form-urlencoded"));

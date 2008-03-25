@@ -1,5 +1,5 @@
 #include <qobject.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <iostream>
 #include <qdir.h>
@@ -108,7 +108,7 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     {
         QFile f(romname);
 
-        if (f.open(IO_ReadOnly))
+        if (f.open(QIODevice::ReadOnly))
         {
             offset = calcOffset(GameType, f.size());
 

@@ -1,7 +1,7 @@
 #ifndef MYTHSOAP_H_
 #define MYTHSOAP_H_
 
-#include <qhttp.h>
+#include <q3http.h>
 #include <qstring.h>
 
 class MythSoap : public QObject
@@ -16,7 +16,7 @@ class MythSoap : public QObject
         MythSoap();
 
     private:
-        QHttp http;
+        Q3Http http;
         bool  m_done;
         bool m_error;
         QByteArray m_data;

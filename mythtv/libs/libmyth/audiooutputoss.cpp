@@ -297,7 +297,7 @@ void AudioOutputOSS::VolumeInit()
 
     if (mixerfd < 0)
     {
-        cerr << "Unable to open mixer: '" << device << "'\n";
+        cerr << "Unable to open mixer: '" << (const char *)device << "'\n";
         return;
     }
 

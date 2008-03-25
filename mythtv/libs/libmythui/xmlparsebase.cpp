@@ -42,7 +42,7 @@ QPoint XMLParseBase::parsePoint(const QString &text, bool normalize)
 {
     int x, y;
     QPoint retval;
-    if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
+    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
 
     if (normalize)
@@ -60,7 +60,7 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
 {
     int x, y;
     QSize retval;
-    if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
+    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
     {
         if (x == -1 || y == -1)
         {
@@ -88,7 +88,7 @@ QRect XMLParseBase::parseRect(const QString &text, bool normalize)
 {
     int x, y, w, h;
     QRect retval;
-    if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
+    if (sscanf(text.toAscii().constData(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
 
     if (normalize)
@@ -330,8 +330,8 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
                                      const QString &windowname,
                                      MythUIType *parent)
 {
-    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    QValueList<QString>::iterator i;
+    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    Q3ValueList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {
         QString themefile = *i + xmlfile;
@@ -353,7 +353,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
     QDomDocument doc;
     QFile f(filename);
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
         return false;
@@ -365,9 +365,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << filename << endl;
+        cerr << "Error parsing: " << (const char *)filename << endl;
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        cerr << (const char *)errorMsg << endl;
         f.close();
         return false;
     }
@@ -435,8 +435,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
 bool XMLParseBase::LoadBaseTheme(void)
 {
-    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    QValueList<QString>::iterator i;
+    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    Q3ValueList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {
         QString themefile = *i + "base.xml";

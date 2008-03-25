@@ -4,6 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythavcodec-$$LIBVERSION
 CONFIG += thread dll warn_off
+CONFIG -= qt
 target.path = $${LIBDIR}
 INSTALLS = target
 

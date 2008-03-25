@@ -5,6 +5,8 @@
 #include <mythtv/mythdbcon.h>
 
 #include "helperobjects.h"
+//Added by qt3to4:
+#include <QKeyEvent>
 
 
 class QTimer;
@@ -13,7 +15,7 @@ class MoviesUI : public MythThemedDialog
 {
     Q_OBJECT
   public:
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
 
     MoviesUI(MythMainWindow *parent, QString windowName,
              QString themeFilename, const char *name = 0);
@@ -55,8 +57,8 @@ class MoviesUI : public MythThemedDialog
     UITextType  *m_theaterName;
     MythPopupBox *aboutPopup;
     MythPopupBox *menuPopup;
-    QButton *OKButton;
-    QButton *updateButton;
+    QAbstractButton *OKButton;
+    QAbstractButton *updateButton;
 
   public slots:
     void handleTreeListSelection(int, IntVector*);

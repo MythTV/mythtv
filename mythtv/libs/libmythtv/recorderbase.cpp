@@ -160,6 +160,11 @@ bool RecorderBase::WaitForPause(int timeout)
     MythTimer t;
     t.start();
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (true)
     {
         int wait = timeout - t.elapsed();
@@ -169,7 +174,7 @@ bool RecorderBase::WaitForPause(int timeout)
         else if (IsPaused())
             return true;
 
-        pauseWait.wait(wait);
+        pauseWait.wait(&mutex, wait);
     }
 }
 
@@ -190,7 +195,13 @@ bool RecorderBase::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        unpauseWait.wait(timeout);
+
+        // Qt4 requires a QMutex as a parameter...
+        // not sure if this is the best solution.  Mutex Must be locked before wait.
+        QMutex mutex;
+        mutex.lock();
+
+        unpauseWait.wait(&mutex, timeout);
     }
     if (!request_pause)
         paused = false;

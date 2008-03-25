@@ -6,8 +6,7 @@
 #include "mythpainter.h"
 
 #include <qimage.h>
-
-class QPixmap;
+#include <QPixmap>
 
 class MythImage : public QImage
 {

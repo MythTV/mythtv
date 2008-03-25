@@ -23,7 +23,7 @@
 class DBox2Recorder;
 class DBox2Channel;
 class DBox2EPG;
-class QHttp;
+class Q3Http;
 
 class DBox2CRelay : public QObject
 {
@@ -83,8 +83,8 @@ class DBox2Channel : public ChannelBase
     bool              m_recorderAlive;
     DBox2Recorder    *m_recorder;
 
-    QHttp            *http;
-    QHttp            *httpChanger;
+    Q3Http            *http;
+    Q3Http            *httpChanger;
     DBox2CRelay      *m_relay;
 
     int               m_dbox2channelcount;

@@ -4,6 +4,8 @@
 #include "mythtv/mythdbcon.h"
 
 #include "flixutil.h"
+//Added by qt3to4:
+#include <QLabel>
 
 QString chooseQueue(QString excludedQueue)
 {

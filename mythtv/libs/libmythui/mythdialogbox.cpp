@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <QKeyEvent>
 
 #include "mythdialogbox.h"
 #include "mythlistbutton.h"
@@ -66,7 +67,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     if (GetMythMainWindow()->TranslateKeyPress("qt", event, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;

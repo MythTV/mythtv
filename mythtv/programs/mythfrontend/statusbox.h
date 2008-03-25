@@ -2,6 +2,10 @@
 #define STATUSBOX_H_
 
 #include <qstringlist.h>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
+
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"

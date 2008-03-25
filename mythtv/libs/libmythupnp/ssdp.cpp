@@ -17,6 +17,7 @@
 #include "broadcast.h"
 
 #include <qregexp.h>
+#include <Q3CString>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,7 +43,7 @@ SSDP::SSDP( int nServicePort ) : m_bTermRequested( false )
     m_nPort        = UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
     m_nSearchPort  = UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
 
-    m_Sockets[ SocketIdx_Search    ] = new QSocketDevice( QSocketDevice::Datagram ); 
+    m_Sockets[ SocketIdx_Search    ] = new Q3SocketDevice( Q3SocketDevice::Datagram );
     m_Sockets[ SocketIdx_Multicast ] = new QMulticastSocket( SSDP_GROUP, m_nPort );
     m_Sockets[ SocketIdx_Broadcast ] = new QBroadcastSocket( "255.255.255.255", m_nPort );
 
@@ -54,6 +55,8 @@ SSDP::SSDP( int nServicePort ) : m_bTermRequested( false )
     // Setup SearchSocket
     QHostAddress ip4addr( (Q_UINT32) INADDR_ANY );
     m_Sockets[ SocketIdx_Search ]->bind( ip4addr, m_nSearchPort ); 
+
+    m_Sockets[ SocketIdx_Search ]->bind( QHostAddress::Any, m_nSearchPort );
 
     m_pNotifyTask   = NULL;
 
@@ -139,7 +142,7 @@ void SSDP::DisableNotifications()
 
 void SSDP::PerformSearch( const QString &sST )
 {
-    QCString sRequest = QString( "M-SEARCH * HTTP/1.1\r\n"
+    Q3CString sRequest = QString( "M-SEARCH * HTTP/1.1\r\n"
                                  "HOST: 239.255.255.250:1900\r\n"
                                  "MAN: \"ssdp:discover\"\r\n"
                                  "MX: 2\r\n"
@@ -147,7 +150,7 @@ void SSDP::PerformSearch( const QString &sST )
                                  "\r\n" )
                            .arg( sST ).utf8();
 
-    QSocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
+    Q3SocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
 
     QHostAddress address;
     address.setAddress( SSDP_GROUP );
@@ -226,14 +229,14 @@ void SSDP::run()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDP::ProcessData( QSocketDevice *pSocket )
+void SSDP::ProcessData( Q3SocketDevice *pSocket )
 {
     long nBytes = 0;
     long nRead  = 0;
 
     while ((nBytes = pSocket->bytesAvailable()) > 0)
     {
-        QCString buffer( nBytes + 1 );
+        Q3CString buffer( nBytes + 1 );
 
         nRead = pSocket->readBlock( buffer.data(), nBytes );
 
@@ -639,7 +642,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     cache.Lock();
 
     QString     sXML;
-    QTextStream os( sXML, IO_WriteOnly );
+    Q3TextStream os( sXML, QIODevice::WriteOnly );
 
     for (SSDPCacheEntriesMap::Iterator it  = cache.Begin();
                                        it != cache.End();

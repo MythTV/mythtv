@@ -108,8 +108,8 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
     if (ok)
     {
         // Set the current channum to the new channel's channum
-        curchannelname = QDeepCopy<QString>(channum);
-        (*it)->startChanNum = QDeepCopy<QString>(channum);
+        curchannelname = Q3DeepCopy<QString>(channum);
+        (*it)->startChanNum = Q3DeepCopy<QString>(channum);
     }
 
     VERBOSE(VB_CHANNEL, loc + " " + ((ok) ? "success" : "failure"));

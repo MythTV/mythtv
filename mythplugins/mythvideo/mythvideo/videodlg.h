@@ -1,7 +1,7 @@
 #ifndef VIDEODIALOG_H_
 #define VIDEODIALOG_H_
 
-#include <qstring.h>
+#include <QString>
 
 #include <mythtv/mythdialogs.h>
 
@@ -57,7 +57,7 @@ class VideoDialog : public MythDialog
     bool createPopup();
     void cancelPopup(void);
     void doMenu(bool info);
-    QButton *AddPopupViews();
+    QAbstractButton *AddPopupViews();
 
     QPixmap myBackground;
     std::auto_ptr<ParentalLevel> currentParentalLevel;

@@ -53,7 +53,7 @@ class ChannelID : public IntegerSetting, public TransientStorage
                 MythContext::DBError("ChannelID::save", query);
 
             if (query.numRowsAffected() != 1)
-                cerr << "ChannelID:Failed to insert into: " << table << endl;
+                cerr << "ChannelID:Failed to insert into: " << (const char *)table << endl;
         }
     }
     void save() 

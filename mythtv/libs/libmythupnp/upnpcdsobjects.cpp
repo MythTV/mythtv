@@ -9,9 +9,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnpcds.h"
-#include <qurl.h>
+#include <q3url.h>
 
-#include <qtextstream.h>
+#include <q3textstream.h>
 
 inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 
@@ -93,7 +93,7 @@ QString CDSObject::GetPropValue( QString sName )
     if (pProp != NULL)
     {
         QString sValue = pProp->m_sValue;
-        QUrl::decode( sValue );
+        Q3Url::decode( sValue );
         return( sValue );
     }
     
@@ -157,9 +157,9 @@ void CDSObject::SetChildCount( long nCount )
 QString CDSObject::toXml()// FilterMap &filter )
 {
     QString     sXML;
-    QTextStream os( sXML, IO_WriteOnly );
+    Q3TextStream os( sXML, QIODevice::WriteOnly );
     
-    os.setEncoding( QTextStream::UnicodeUTF8 );
+    os.setEncoding( Q3TextStream::UnicodeUTF8 );
 
     toXml( os ); //, filter );
 
@@ -170,7 +170,7 @@ QString CDSObject::toXml()// FilterMap &filter )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::toXml( QTextStream &os ) //, FilterMap &filter )
+void CDSObject::toXml( Q3TextStream &os ) //, FilterMap &filter )
 {
     QString sEndTag = "";
     bool    bFilter = false;

@@ -4,7 +4,7 @@
 #include <set>
 using namespace std;
 
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 #include <qregexp.h>
 #include <stdint.h>
 #include <qimage.h>
@@ -28,12 +28,12 @@ DBChannel::DBChannel(
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _favorite, uint _mplexid, bool _visible,
     const QString &_name, const QString &_icon) :
-    channum(QDeepCopy<QString>(_channum)),
-    callsign(QDeepCopy<QString>(_callsign)),
+    channum(Q3DeepCopy<QString>(_channum)),
+    callsign(Q3DeepCopy<QString>(_callsign)),
     chanid(_chanid), major_chan(_major_chan), minor_chan(_minor_chan),
     favorite(_favorite), mplexid(_mplexid), visible(_visible),
-    name(QDeepCopy<QString>(_name)),
-    icon(QDeepCopy<QString>(_icon))
+    name(Q3DeepCopy<QString>(_name)),
+    icon(Q3DeepCopy<QString>(_icon))
 {
     mplexid = (mplexid == 32767) ? 0 : mplexid;
     icon = (icon == "none") ? QString::null : icon;
@@ -41,16 +41,16 @@ DBChannel::DBChannel(
 
 DBChannel& DBChannel::operator=(const DBChannel &other)
 {
-    channum    = QDeepCopy<QString>(other.channum);
-    callsign   = QDeepCopy<QString>(other.callsign);
+    channum    = Q3DeepCopy<QString>(other.channum);
+    callsign   = Q3DeepCopy<QString>(other.callsign);
     chanid     = other.chanid;
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
     favorite   = other.favorite;
     mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
     visible    = other.visible;
-    name       = QDeepCopy<QString>(other.name);
-    icon       = QDeepCopy<QString>(other.icon);
+    name       = Q3DeepCopy<QString>(other.name);
+    icon       = Q3DeepCopy<QString>(other.icon);
 
     return *this;
 }
@@ -183,9 +183,7 @@ static uint insert_dtv_multiplex(
 
     QString updateStr =
         "UPDATE dtv_multiplex "
-        "SET sourceid         = :SOURCEID,      sistandard   = :SISTANDARD, "
-        "    frequency        = :FREQUENCY,     modulation   = :MODULATION, "
-        "    transportid      = :TRANSPORTID,   networkid    = :NETWORKID, "
+        "SET frequency        = :FREQUENCY,     modulation   = :MODULATION, "
         "    symbolrate       = :SYMBOLRATE,    bandwidth    = :BANDWIDTH, "
         "    polarity         = :POLARITY,      inversion    = :INVERSION, "
         "    transmission_mode= :TRANS_MODE,    fec          = :INNER_FEC, "
@@ -299,16 +297,16 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
         }
 
         mux = ChannelUtil::CreateMultiplex(
-            sourceid,            "dvb",
-            freq,                 QString::null,
+            (int)sourceid,        "dvb",
+            (uint)freq,           QString(),
             // DVB specific
-            tsid,                 netid,
-            -1,                   QChar(cd.BandwidthString()[0]),
+            (int)tsid,            (int)netid,
+            -1,                   cd.BandwidthString()[0].toAscii(),
             -1,                   'a',
-            QChar(cd.TransmissionModeString()[0]),
-            QString::null,                  cd.ConstellationString(),
-            QChar(cd.HierarchyString()[0]), cd.CodeRateHPString(),
-            cd.CodeRateLPString(),          cd.GuardIntervalString());
+            cd.TransmissionModeString()[0].toAscii(),
+            QString(),                         cd.ConstellationString(),
+            cd.HierarchyString()[0].toAscii(), cd.CodeRateHPString(),
+            cd.CodeRateLPString(),             cd.GuardIntervalString());
 
         if (mux)
             muxes.push_back(mux);
@@ -331,11 +329,11 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,
-            QChar(cd.PolarizationString()[0]), 'a',
+            cd.PolarizationString()[0].toAscii(), 'a',
             -1,
-            cd.FECInnerString(),  QString::null,
-            -1,                   QString::null,
-            QString::null,        QString::null);
+            cd.FECInnerString(),  QString(),
+            -1,                   QString(),
+            QString(),            QString());
 
         if (mux)
             muxes.push_back(mux);
@@ -410,16 +408,16 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
                                   int transport_id, int network_id)
 {
     return insert_dtv_multiplex(
-        sourceid,                    mux.sistandard,
-        mux.frequency,               mux.modulation.toString(),
+        sourceid,                         mux.sistandard,
+        mux.frequency,                    mux.modulation.toString(),
         // DVB specific
-        transport_id,                network_id,
-        mux.symbolrate,              mux.bandwidth.toChar(),
-        mux.polarity.toChar(),       mux.inversion.toChar(),
-        mux.trans_mode.toChar(),
-        mux.fec.toString(),          mux.modulation.toString(),
-        mux.hierarchy.toChar(),      mux.hp_code_rate.toString(),
-        mux.lp_code_rate.toString(), mux.guard_interval.toString());
+        transport_id,                     network_id,
+        mux.symbolrate,                   mux.bandwidth.toChar().toAscii(),
+        mux.polarity.toChar().toAscii(),  mux.inversion.toChar().toAscii(),
+        mux.trans_mode.toChar().toAscii(),
+        mux.fec.toString(),               mux.modulation.toString(),
+        mux.hierarchy.toChar().toAscii(), mux.hp_code_rate.toString(),
+        mux.lp_code_rate.toString(),      mux.guard_interval.toString());
 }
 
 
@@ -962,7 +960,7 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
 
 QString ChannelUtil::GetUnknownCallsign(void)
 {
-    return QDeepCopy<QString>(QObject::tr("UNKNOWN", "Synthesized callsign"));
+    return Q3DeepCopy<QString>(QObject::tr("UNKNOWN", "Synthesized callsign"));
 }
 
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
@@ -1013,7 +1011,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
         // find based on mpeg program number and mplexid alone
     qstr.push_back(
         QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND serviceID=%1 AND mplexid=%2")
+                "WHERE sourceid=%1 AND serviceID=%2 AND mplexid=%3")
         .arg(source_id).arg(program_number).arg(mplexid));
 
     for (uint i = 0; i < qstr.size(); i++)
@@ -1166,8 +1164,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chanNum);
     query.bindValue(":SOURCEID",  db_sourceid);
-    query.bindValue(":CALLSIGN",  callsign.utf8());
-    query.bindValue(":NAME",      service_name.utf8());
+    query.bindValue(":CALLSIGN",  callsign);
+    query.bindValue(":NAME",      service_name);
 
     if (db_mplexid > 0)
         query.bindValue(":MPLEXID",   db_mplexid);
@@ -1248,11 +1246,11 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     query.bindValue(":CHANID", channel_id);
 
     if (set_channum)
-        query.bindValue(":CHANNUM", chan_num.utf8());
+        query.bindValue(":CHANNUM", chan_num);
 
     query.bindValue(":SOURCEID",  source_id);
-    query.bindValue(":CALLSIGN",  callsign.utf8());
-    query.bindValue(":NAME",      service_name.utf8());
+    query.bindValue(":CALLSIGN",  callsign);
+    query.bindValue(":NAME",      service_name);
 
     query.bindValue(":MPLEXID",   db_mplexid);
 
@@ -1462,14 +1460,14 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
 
         DBChannel chan(
             query.value(0).toString(),                    /* channum    */
-            QString::fromUtf8(query.value(1).toString()), /* callsign   */
+            query.value(1).toString(),                    /* callsign   */
             query.value(2).toUInt(),                      /* chanid     */
             query.value(3).toUInt(),                      /* ATSC major */
             query.value(4).toUInt(),                      /* ATSC minor */
             favorites[query.value(2).toUInt()],           /* favid      */
             query.value(7).toUInt(),                      /* mplexid    */
             query.value(8).toBool(),                      /* visible    */
-            QString::fromUtf8(query.value(5).toString()), /* name       */
+            query.value(5).toString(),                    /* name       */
             query.value(6).toString());                   /* icon       */
 
         list.push_back(chan);
@@ -1607,7 +1605,7 @@ void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
 
     while (it != list.end())
     {
-        QString tmp = QDeepCopy<QString>(it->channum);
+        QString tmp = Q3DeepCopy<QString>(it->channum);
         std::pair<seen_set::iterator, bool> insret = seen.insert(tmp);
         if (insret.second)
             ++it;

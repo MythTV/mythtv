@@ -23,6 +23,7 @@
 #define FREEMHEG_H
 
 #include <qregion.h>
+#include <Q3PointArray>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -68,7 +69,7 @@ class MHRgba
 {
 public:
     MHRgba(int red, int green, int blue, int alpha):
-      m_red(red), m_green(green), m_blue(blue), m_alpha(alpha) {};
+      m_red(Qt::red), m_green(Qt::green), m_blue(Qt::blue), m_alpha(alpha) {};
     MHRgba(): m_red(0), m_green(0), m_blue(0), m_alpha(0) {};
     int red() const { return m_red; }
     int green() const { return m_green; }
@@ -158,7 +159,7 @@ public:
     virtual void DrawBorderedRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawOval(int x, int y, int width, int height) = 0;
     virtual void DrawArcSector(int x, int y, int width, int height, int start, int arc, bool isSector) = 0;
-    virtual void DrawPoly(bool isFilled, const QPointArray &points) = 0;
+    virtual void DrawPoly(bool isFilled, const Q3PointArray &points) = 0;
 };
 
 class MHTextDisplay {

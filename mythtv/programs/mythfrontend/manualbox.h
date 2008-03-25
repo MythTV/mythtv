@@ -2,7 +2,10 @@
 #define MANUALBOX_H_
 
 #include <qdatetime.h>
-#include <qhbox.h>
+#include <q3hbox.h>
+#include <QEvent>
+#include <QLabel>
+
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "tv.h"
@@ -10,9 +13,9 @@
 #include <pthread.h>
 
 class TV;
-class QListViewItem;
+class Q3ListViewItem;
 class QLabel;
-class QProgressBar;
+class Q3ProgressBar;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
@@ -40,7 +43,7 @@ class ManualBox : public MythDialog
      bool eventFilter(QObject *o, QEvent *e);
 
   private:
-    QHBox *m_boxframe;
+    Q3HBox *m_boxframe;
     QLabel *m_pixlabel;
     MythLineEdit *m_title;
     MythLineEdit *m_subtitle;

@@ -3,6 +3,11 @@
 #include <qfont.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
+#include <QKeyEvent>
+#include <QEvent>
+#include <Q3PtrList>
+#include <QPixmap>
+#include <QPaintEvent>
 #include <math.h>
 #include <qcursor.h>
 #include <qapplication.h>
@@ -10,8 +15,8 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qdatetime.h>
-#include <qvgroupbox.h>
-#include <qheader.h>
+#include <q3vgroupbox.h>
+#include <q3header.h>
 #include <qrect.h>
 
 #include <unistd.h>
@@ -285,7 +290,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     gContext->addListener(this);
     
     keyDown = false;
-    setFocusPolicy(QWidget::ClickFocus); //get keyRelease events after refocus
+    setFocusPolicy(Qt::ClickFocus); //get keyRelease events after refocus
 }
 
 GuideGrid::~GuideGrid()
@@ -356,8 +361,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
         return; //check for Escape in case something goes wrong 
                 //with KeyRelease events, shouldn't happen.
 
-    if (e->key() != Key_Control && e->key() != Key_Shift && 
-        e->key() != Key_Meta && e->key() != Key_Alt)
+    if (e->key() != Qt::Key_Control && e->key() != Qt::Key_Shift &&
+        e->key() != Qt::Key_Meta && e->key() != Qt::Key_Alt)
         keyDown = true;    
 
     if (e->state() == Qt::ControlButton)
@@ -398,7 +403,7 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             }
         }        
 	      
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -535,7 +540,7 @@ void GuideGrid::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                cerr << "Unknown element: " << (const char *)e.tagName() << endl;
                 continue;
             }
         }
@@ -987,7 +992,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     }
 
     program = proglist->first();
-    QPtrList<ProgramInfo> unknownlist;
+    Q3PtrList<ProgramInfo> unknownlist;
     bool unknown = false;
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
@@ -1157,7 +1162,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     } 
 }
 
-void GuideGrid::customEvent(QCustomEvent *e)
+void GuideGrid::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -1957,8 +1962,8 @@ void GuideGrid::editRecording()
     if (pginfo->title == unknownTitle)
         return;
 
-    FocusPolicy storeFocus = focusPolicy();
-    setFocusPolicy(QWidget::NoFocus);
+    Qt::FocusPolicy storeFocus = focusPolicy();
+    setFocusPolicy(Qt::NoFocus);
 
     ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
     temppginfo->EditRecording();
@@ -1984,8 +1989,8 @@ void GuideGrid::editScheduled()
     if (pginfo->title == unknownTitle)
         return;
 
-    FocusPolicy storeFocus = focusPolicy();
-    setFocusPolicy(QWidget::NoFocus);
+    Qt::FocusPolicy storeFocus = focusPolicy();
+    setFocusPolicy(Qt::NoFocus);
 
     ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
     temppginfo->EditScheduled();
@@ -2211,7 +2216,7 @@ void GuideGrid::jumpToChannelTimeout()
 // otherwise.
 bool GuideGrid::jumpToChannelGetInputDigit(QStringList &actions, int &digit)
 {
-    for (unsigned int i = 0; i < actions.size(); ++i) 
+    for (int i = 0; i < actions.size(); ++i)
     {
         QString action = actions[i];
         if (action[0] >= '0' && action[0] <= '9') 

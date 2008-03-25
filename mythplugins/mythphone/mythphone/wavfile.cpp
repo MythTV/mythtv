@@ -34,7 +34,7 @@ wavfile::~wavfile()
 bool wavfile::load(const char *Filename)
 {
     QFile f(Filename);
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         cerr << "Cannot open for reading file " << Filename << endl;
         return false;
@@ -154,7 +154,7 @@ void wavfile::print()
 bool wavfile::saveToFile(const char *Filename)
 {
     QFile f(Filename);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         cerr << "Cannot open for writing file " << Filename << endl;
         return false;

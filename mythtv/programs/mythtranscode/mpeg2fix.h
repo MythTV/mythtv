@@ -2,9 +2,9 @@
 #include <pthread.h>
 //Qt
 #include <qmap.h>
-#include <qptrlist.h>
-#include <qptrqueue.h>
-#include <qvaluelist.h>
+#include <q3ptrlist.h>
+#include <q3ptrqueue.h>
+#include <q3valuelist.h>
 #include <qstringlist.h>
 #include <qdatetime.h>
 
@@ -88,15 +88,15 @@ typedef struct {
 class PTSOffsetQueue
 {
   public:
-    PTSOffsetQueue(int vidid, QValueList<int> keys, int64_t initPTS);
+    PTSOffsetQueue(int vidid, Q3ValueList<int> keys, int64_t initPTS);
     void SetNextPTS(int64_t newPTS, int64_t atPTS);
     void SetNextPos(int64_t newPTS, AVPacket &pkt);
     int64_t Get(int idx, AVPacket *pkt);
     int64_t UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt);
   private:
-    QMap<int, QValueList<poq_idx_t> > offset;
-    QMap<int, QValueList<poq_idx_t> > orig;
-    QValueList<int> keyList;
+    QMap<int, Q3ValueList<poq_idx_t> > offset;
+    QMap<int, Q3ValueList<poq_idx_t> > orig;
+    Q3ValueList<int> keyList;
     int vid_id;
 };
 
@@ -177,11 +177,11 @@ class MPEG2fixup
     void StoreSecondary();
     int  PlaybackSecondary();
     MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);
-    int ConvertToI(QPtrList<MPEG2frame> *orderedFrames, int headPos);
+    int ConvertToI(Q3PtrList<MPEG2frame> *orderedFrames, int headPos);
     int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
-    QPtrList<MPEG2frame> ReorderDTStoPTS(QPtrList<MPEG2frame> *dtsOrder);
+    Q3PtrList<MPEG2frame> ReorderDTStoPTS(Q3PtrList<MPEG2frame> *dtsOrder);
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
                          int64_t &PTSdiscrep, int numframes, bool fix);
     void SetFrameNum(uint8_t *ptr, int num);
@@ -216,14 +216,14 @@ class MPEG2fixup
     int (*check_abort)();
     void (*update_status)(float percent_done);
 
-    QPtrList<MPEG2frame> vSecondary;
+    Q3PtrList<MPEG2frame> vSecondary;
     bool use_secondary;
 
-    QPtrList<MPEG2frame> vFrame;
-    QMap<int, QPtrList<MPEG2frame> > aFrame;
-    QPtrQueue<MPEG2frame> framePool;
-    QPtrQueue<MPEG2frame> unreadFrames;
-    QPtrListIterator<MPEG2frame> *displayFrame;
+    Q3PtrList<MPEG2frame> vFrame;
+    QMap<int, Q3PtrList<MPEG2frame> > aFrame;
+    Q3PtrQueue<MPEG2frame> framePool;
+    Q3PtrQueue<MPEG2frame> unreadFrames;
+    Q3PtrListIterator<MPEG2frame> *displayFrame;
     mpeg2dec_t *header_decoder;
     mpeg2dec_t *img_decoder;
 

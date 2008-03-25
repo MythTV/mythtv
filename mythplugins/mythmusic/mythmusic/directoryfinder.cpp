@@ -3,6 +3,8 @@
 #include <qdir.h>
 #include <qapplication.h>
 #include <qfileinfo.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // Myth
 #include <mythtv/mythcontext.h>
@@ -248,8 +250,9 @@ void DirectoryFinder::updateFileList()
         d.setPath("/");
     }
 
-    const QFileInfoList *list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-    if (!list)
+    QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+
+    if (list.isEmpty())
     {
         m_directoryList.append("..");
 
@@ -262,11 +265,12 @@ void DirectoryFinder::updateFileList()
     }
     else
     {
-        QFileInfoListIterator it(*list);
-        QFileInfo *fi;
+        QFileInfoList::const_iterator it = list.begin();
+        const QFileInfo *fi;
         int index = 0;
-        while ( (fi = it.current()) != 0 )
+        while (it != list.end())
         {
+            fi = &(*it);
             if (fi->fileName() != ".")
             {
                 m_directoryList.append(fi->fileName());

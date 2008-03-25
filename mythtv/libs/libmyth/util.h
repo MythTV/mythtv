@@ -4,6 +4,7 @@
 #include <qstringlist.h>
 #include <qdatetime.h>
 #include <qcolor.h>
+#include <QPixmap>
 
 #include <stdint.h>
 #include <time.h>

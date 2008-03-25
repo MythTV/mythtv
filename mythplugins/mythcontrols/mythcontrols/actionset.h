@@ -27,7 +27,7 @@
 // Qt headers
 #include <qstringlist.h>
 #include <qmap.h>
-#include <qdict.h>
+#include <q3dict.h>
 
 /** \class ActionSet
  *  \brief Maintains consistancy between actions and keybindings.
@@ -83,7 +83,7 @@ class ActionSet
 
   private:
     QMap<QString, ActionList> m_keyToActionMap;
-    QDict<Context>            m_contexts;
+    Q3Dict<Context>            m_contexts;
     ActionList                m_modified;
 };
 

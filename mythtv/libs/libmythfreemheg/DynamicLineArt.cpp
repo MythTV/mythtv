@@ -29,6 +29,7 @@
 #include "ASN1Codes.h"
 #include "Engine.h"
 #include "freemheg.h"
+#include <Q3PointArray>
 
 MHDynamicLineArt::MHDynamicLineArt()
 {
@@ -155,7 +156,7 @@ void MHDynamicLineArt::DrawArcSector(bool fIsSector, int x, int y, int width, in
     engine->Redraw(GetVisibleArea());
 }
 
-void MHDynamicLineArt::DrawPoly(bool fIsPolygon, const QPointArray &points, MHEngine *engine)
+void MHDynamicLineArt::DrawPoly(bool fIsPolygon, const Q3PointArray &points, MHEngine *engine)
 {
     m_picture->DrawPoly(fIsPolygon, points);
     engine->Redraw(GetVisibleArea());
@@ -177,7 +178,7 @@ void MHDrawPoly::Initialise(MHParseNode *p, MHEngine *engine)
 
 void MHDrawPoly::Perform(MHEngine *engine)
 {
-    QPointArray points(m_Points.Size());
+    Q3PointArray points(m_Points.Size());
     for (int i = 0; i < m_Points.Size(); i++) {
         MHPointArg *pPoint = m_Points[i];
         points.setPoint(i, pPoint->x.GetValue(engine), pPoint->y.GetValue(engine));

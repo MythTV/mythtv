@@ -75,7 +75,7 @@ MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
         if (gContext->CheckProtoVersion(sock))
         {
             QString hostname = gContext->GetHostName();
-            QStringList strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
+            QStringList strlist( QString("ANN Playback %1 %2").arg(hostname).arg(false) );
             sock->writeStringList(strlist);
             sock->readStringList(strlist, true);
         }
@@ -91,7 +91,7 @@ MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
 
 bool RemoteEncoder::IsRecording(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "IS_RECORDING";
 
     SendReceiveStringList(strlist);
@@ -102,7 +102,7 @@ bool RemoteEncoder::IsRecording(void)
 
 ProgramInfo *RemoteEncoder::GetRecording(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_RECORDING";
 
     SendReceiveStringList(strlist);
@@ -120,7 +120,7 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
  */
 float RemoteEncoder::GetFrameRate(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FRAMERATE";
 
     SendReceiveStringList(strlist);
@@ -138,7 +138,7 @@ float RemoteEncoder::GetFrameRate(void)
  */
 long long RemoteEncoder::GetFramesWritten(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FRAMES_WRITTEN";
 
     SendReceiveStringList(strlist);
@@ -156,7 +156,7 @@ long long RemoteEncoder::GetFramesWritten(void)
  */
 long long RemoteEncoder::GetFilePosition(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FILE_POSITION";
 
     SendReceiveStringList(strlist);
@@ -172,7 +172,7 @@ long long RemoteEncoder::GetFilePosition(void)
  */
 long long RemoteEncoder::GetMaxBitrate(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_MAX_BITRATE";
 
     SendReceiveStringList(strlist);
@@ -191,7 +191,7 @@ long long RemoteEncoder::GetMaxBitrate(void)
  */
 long long RemoteEncoder::GetKeyframePosition(long long desired)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_KEYFRAME_POS";
     encodeLongLong(strlist, desired);
 
@@ -205,7 +205,7 @@ long long RemoteEncoder::GetKeyframePosition(long long desired)
 void RemoteEncoder::FillPositionMap(int start, int end,
                                     QMap<long long, long long> &positionMap)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "FILL_POSITION_MAP";
     strlist << QString::number(start);
     strlist << QString::number(end);
@@ -228,7 +228,7 @@ void RemoteEncoder::FillPositionMap(int start, int end,
 
 void RemoteEncoder::CancelNextRecording(bool cancel)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "CANCEL_NEXT_RECORDING";
     strlist << QString::number((cancel) ? 1 : 0);
                           
@@ -237,7 +237,7 @@ void RemoteEncoder::CancelNextRecording(bool cancel)
 
 void RemoteEncoder::FrontendReady(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "FRONTEND_READY";
 
     SendReceiveStringList(strlist);
@@ -249,7 +249,7 @@ void RemoteEncoder::FrontendReady(void)
  */
 void RemoteEncoder::StopPlaying(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "STOP_PLAYING";
 
     SendReceiveStringList(strlist);
@@ -262,7 +262,7 @@ void RemoteEncoder::StopPlaying(void)
  */
 void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip, QString startchan)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "SPAWN_LIVETV";
     strlist << chainId;
     strlist << QString::number((int)pip);
@@ -278,7 +278,7 @@ void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip, QString startchan)
  */
 void RemoteEncoder::StopLiveTV(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "STOP_LIVETV";
 
     SendReceiveStringList(strlist);
@@ -291,7 +291,7 @@ void RemoteEncoder::StopLiveTV(void)
  */
 void RemoteEncoder::PauseRecorder(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "PAUSE";
 
     SendReceiveStringList(strlist);
@@ -301,7 +301,7 @@ void RemoteEncoder::PauseRecorder(void)
 
 void RemoteEncoder::FinishRecording(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "FINISH_RECORDING";
 
     SendReceiveStringList(strlist);
@@ -309,7 +309,7 @@ void RemoteEncoder::FinishRecording(void)
 
 void RemoteEncoder::SetLiveRecording(bool recording)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "SET_LIVE_RECORDING";
     strlist << QString::number(recording);
 
@@ -321,7 +321,7 @@ QString RemoteEncoder::GetInput(void)
     if (lastinput.length() > 2)
         return lastinput;
 
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_INPUT";
 
     SendReceiveStringList(strlist);
@@ -332,7 +332,7 @@ QString RemoteEncoder::GetInput(void)
 
 QString RemoteEncoder::SetInput(QString input)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "SET_INPUT";
     strlist << input;
 
@@ -346,7 +346,7 @@ QString RemoteEncoder::SetInput(QString input)
 
 void RemoteEncoder::ToggleChannelFavorite(void)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "TOGGLE_CHANNEL_FAVORITE";
 
     SendReceiveStringList(strlist);
@@ -354,7 +354,7 @@ void RemoteEncoder::ToggleChannelFavorite(void)
 
 void RemoteEncoder::ChangeChannel(int channeldirection)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "CHANGE_CHANNEL";
     strlist << QString::number(channeldirection);
 
@@ -366,7 +366,7 @@ void RemoteEncoder::ChangeChannel(int channeldirection)
 
 void RemoteEncoder::SetChannel(QString channel)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "SET_CHANNEL";
     strlist << channel;
 
@@ -394,7 +394,7 @@ void RemoteEncoder::SetChannel(QString channel)
  */
 int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "SET_SIGNAL_MONITORING_RATE";
     strlist << QString::number(rate);
     strlist << QString::number((int)notifyFrontend);
@@ -442,7 +442,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
 
 int RemoteEncoder::GetPictureAttribute(PictureAttribute attr)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
 
     if (kPictureAttribute_Contrast == attr)
         strlist << "GET_CONTRAST";
@@ -471,7 +471,7 @@ int RemoteEncoder::GetPictureAttribute(PictureAttribute attr)
 int RemoteEncoder::ChangePictureAttribute(
     PictureAdjustType type, PictureAttribute attr, bool up)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
 
     if (kPictureAttribute_Contrast == attr)
         strlist << "CHANGE_CONTRAST";
@@ -495,7 +495,7 @@ int RemoteEncoder::ChangePictureAttribute(
 
 void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "CHANGE_DEINTERLACER";
     strlist << QString::number((int)deint_mode);
 
@@ -513,7 +513,7 @@ void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
  */
 bool RemoteEncoder::CheckChannel(QString channel)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "CHECK_CHANNEL";
     strlist << channel;
 
@@ -537,7 +537,7 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
     // this function returns true if the channelid is not a valid
     // channel on the current recorder. It queries to server in order
     // to determine this.
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "SHOULD_SWITCH_CARD";
     strlist << channelid;
 
@@ -559,7 +559,7 @@ bool RemoteEncoder::CheckChannelPrefix(
     bool          &is_extra_char_useful,
     QString       &needed_spacer)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "CHECK_CHANNEL_PREFIX";
     strlist << prefix;
 
@@ -600,7 +600,7 @@ void RemoteEncoder::GetNextProgram(int direction,
                                    QString &channelname, QString &chanid,
                                    QString &seriesid, QString &programid)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "GET_NEXT_PROGRAM_INFO";
     strlist << channelname;
     strlist << chanid;
@@ -626,7 +626,7 @@ void RemoteEncoder::GetNextProgram(int direction,
 void RemoteEncoder::GetChannelInfo(QMap<QString, QString> &infoMap,
                                    uint chanid)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_CHANNEL_INFO";
     strlist << QString::number(chanid);
 
@@ -644,7 +644,7 @@ void RemoteEncoder::GetChannelInfo(QMap<QString, QString> &infoMap,
 
 bool RemoteEncoder::SetChannelInfo(const QMap<QString, QString> &infoMap)
 {
-    QStringList strlist = "SET_CHANNEL_INFO";
+    QStringList strlist( "SET_CHANNEL_INFO" );
     strlist << make_safe(infoMap["chanid"]);
     strlist << make_safe(infoMap["sourceid"]);
     strlist << make_safe(infoMap["oldchannum"]);

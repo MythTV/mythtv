@@ -1,7 +1,9 @@
 #include <math.h>
+#include <unistd.h>
+
 #include <qdir.h>
 #include <qfileinfo.h>
-#include <unistd.h>
+#include <Q3PtrList>
 
 #include "NuppelVideoPlayer.h"
 #include "compat.h"
@@ -61,16 +63,16 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
     usleep(sleepus);
 }
 
-int nuppelVideoPlayerInited(QPtrList<FrameAnalyzer> *pass,
-        QPtrList<FrameAnalyzer> *finishedAnalyzers,
-        QPtrList<FrameAnalyzer> *deadAnalyzers,
+int nuppelVideoPlayerInited(Q3PtrList<FrameAnalyzer> *pass,
+        Q3PtrList<FrameAnalyzer> *finishedAnalyzers,
+        Q3PtrList<FrameAnalyzer> *deadAnalyzers,
         NuppelVideoPlayer *nvp, long long nframes)
 {
-    QPtrListIterator<FrameAnalyzer>     iifa(*pass);
+    Q3PtrListIterator<FrameAnalyzer>     iifa(*pass);
     FrameAnalyzer                       *fa;
     FrameAnalyzer::analyzeFrameResult   ares;
 
-    for (QPtrListIterator<FrameAnalyzer> jjfa = iifa;
+    for (Q3PtrListIterator<FrameAnalyzer> jjfa = iifa;
             (fa = iifa.current()); iifa = jjfa)
     {
         ++jjfa;
@@ -106,18 +108,18 @@ int nuppelVideoPlayerInited(QPtrList<FrameAnalyzer> *pass,
     return 0;
 }
 
-long long processFrame(QPtrList<FrameAnalyzer> *pass,
-        QPtrList<FrameAnalyzer> *finishedAnalyzers,
-        QPtrList<FrameAnalyzer> *deadAnalyzers,
+long long processFrame(Q3PtrList<FrameAnalyzer> *pass,
+        Q3PtrList<FrameAnalyzer> *finishedAnalyzers,
+        Q3PtrList<FrameAnalyzer> *deadAnalyzers,
         const VideoFrame *frame, long long frameno)
 {
-    QPtrListIterator<FrameAnalyzer>     iifa(*pass);
+    Q3PtrListIterator<FrameAnalyzer>     iifa(*pass);
     FrameAnalyzer                       *fa;
     FrameAnalyzer::analyzeFrameResult   ares;
     long long                           nextFrame, minNextFrame;
 
     minNextFrame = FrameAnalyzer::ANYFRAME;
-    for (QPtrListIterator<FrameAnalyzer> jjfa = iifa;
+    for (Q3PtrListIterator<FrameAnalyzer> jjfa = iifa;
             (fa = iifa.current()); iifa = jjfa)
     {
         ++jjfa;
@@ -162,29 +164,29 @@ long long processFrame(QPtrList<FrameAnalyzer> *pass,
     return minNextFrame;
 }
 
-int passFinished(QPtrList<FrameAnalyzer> *pass, long long nframes, bool final)
+int passFinished(Q3PtrList<FrameAnalyzer> *pass, long long nframes, bool final)
 {
     FrameAnalyzer       *fa;
 
-    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
+    for (Q3PtrListIterator<FrameAnalyzer> iifa(*pass);
             (fa = iifa.current()); ++iifa)
         (void)fa->finished(nframes, final);
 
     return 0;
 }
 
-int passReportTime(QPtrList<FrameAnalyzer> *pass)
+int passReportTime(Q3PtrList<FrameAnalyzer> *pass)
 {
     FrameAnalyzer       *fa;
 
-    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
+    for (Q3PtrListIterator<FrameAnalyzer> iifa(*pass);
             (fa = iifa.current()); ++iifa)
         (void)fa->reportTime();
 
     return 0;
 }
 
-bool searchingForLogo(TemplateFinder *tf, QPtrList<FrameAnalyzer> *pass)
+bool searchingForLogo(TemplateFinder *tf, Q3PtrList<FrameAnalyzer> *pass)
 {
     return tf && pass->find(tf) != -1;
 }
@@ -322,7 +324,7 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     , sceneChangeDetector(NULL)
     , debugdir("")
 {
-    QPtrList<FrameAnalyzer> pass0, pass1;
+    Q3PtrList<FrameAnalyzer> pass0, pass1;
     PGMConverter            *pgmConverter = NULL;
     BorderDetector          *borderDetector = NULL;
     HistogramAnalyzer       *histogramAnalyzer = NULL;
@@ -447,17 +449,17 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
         if (nframes)
         {
             cerr << "\b\b\b\b\b\b\b\b\b\b\b"
-                 << QString::number(percentage).rightJustify(3, ' ')
+                 << (const char *)QString::number(percentage).rightJustify(3, ' ')
                  << "%/"
-                 << QString::number((int)fps).rightJustify(3, ' ')
+                 << (const char *)QString::number((int)fps).rightJustify(3, ' ')
                  << "fps";
         }
         else
         {
             cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                 << QString::number(frameno).rightJustify(6, ' ')
+                 << (const char *)QString::number(frameno).rightJustify(6, ' ')
                  << "/"
-                 << QString::number((int)fps).rightJustify(3, ' ')
+                 << (const char *)QString::number((int)fps).rightJustify(3, ' ')
                  << "fps";
         }
         cerr.flush();
@@ -567,7 +569,7 @@ bool CommDetector2::go(void)
             currentPass != frameAnalyzers.end();
             ++currentPass, passno++)
     {
-        QPtrList<FrameAnalyzer> deadAnalyzers;
+        Q3PtrList<FrameAnalyzer> deadAnalyzers;
 
         VERBOSE(VB_COMMFLAG, QString(
                     "CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
@@ -702,7 +704,7 @@ bool CommDetector2::go(void)
             nvp->DiscardVideoFrame(currentFrame);
         }
 
-        QPtrListIterator<FrameAnalyzer> iifa(finishedAnalyzers);
+        Q3PtrListIterator<FrameAnalyzer> iifa(finishedAnalyzers);
         FrameAnalyzer *fa;
         while ((fa = iifa.current()))
         {

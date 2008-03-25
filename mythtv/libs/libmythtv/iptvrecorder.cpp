@@ -125,9 +125,14 @@ void IPTVRecorder::StopRecording(void)
     Pause();
     _channel->GetFeeder()->Close();
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     _request_recording = false;
     while (_recording)
-        _cond_recording.wait(500);
+        _cond_recording.wait(&mutex, 500);
 
     VERBOSE(VB_RECORD, LOC + "StopRecording() -- end");
 }

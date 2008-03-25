@@ -1,7 +1,7 @@
 #ifndef G711_H_
 #define G711_H_
 
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include "rtp.h"
 
 extern "C" {

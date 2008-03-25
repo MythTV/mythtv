@@ -2,7 +2,7 @@
 #define NUPPELDECODER_H_
 
 #include <qmap.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include "programinfo.h"
 #include "format.h"
@@ -114,7 +114,7 @@ class NuppelDecoder : public DecoderBase
     unsigned char *buf2;
     unsigned char *planes[3];
 
-    QPtrList <RawDataList> StoredData;
+    Q3PtrList <RawDataList> StoredData;
 
     int videosizetotal;
     int videoframesread;

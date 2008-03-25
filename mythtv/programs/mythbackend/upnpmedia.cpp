@@ -53,7 +53,7 @@ void *UPnpMedia::doUPnpMediaThread(void *param)
 
 QString UPnpMedia::GetTitleName(QString fPath, QString fName)
 {
-    if (m_mapTitleNames[fPath])
+    if (!m_mapTitleNames[fPath].isNull())
     {
         return m_mapTitleNames[fPath];
     }
@@ -63,7 +63,7 @@ QString UPnpMedia::GetTitleName(QString fPath, QString fName)
 
 QString UPnpMedia::GetCoverArt(QString fPath)
 {
-    if (m_mapCoverArt[fPath])
+    if (!m_mapCoverArt[fPath].isNull())
     {
         return m_mapCoverArt[fPath];
     }
@@ -113,13 +113,15 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
     else
         parentid = itemID;
 
-    vidDir.setSorting( QDir:: DirsFirst | QDir::Name );
-    const QFileInfoList *List = vidDir.entryInfoList();
+    vidDir.setSorting( QDir::DirsFirst | QDir::Name );
+    QFileInfoList List = vidDir.entryInfoList();
     // If we can't read it's contents move on
-    if (!List) return itemID;
-    for (QFileInfoListIterator it(*List); it; ++it)
+    if (List.isEmpty())
+        return itemID;
+
+    for (QFileInfoListIterator it = List.begin(); it != List.end(); ++it)
     {
-        QFileInfo Info(*it.current());
+        QFileInfo Info(*it);
         QString fName = Info.fileName();
         QString fPath = Info.filePath();
 

@@ -1,20 +1,23 @@
 #ifndef MYTH_MEDIA_MONITOR_H
 #define MYTH_MEDIA_MONITOR_H
 
-#include <qvaluelist.h>
-#include <qguardedptr.h>
+#include <q3valuelist.h>
+#include <qpointer.h>
 #include <qthread.h>
 #include <qstring.h>
+#include <QStringList>
+#include <QMutex>
+#include <QEvent>
 
 #include "mythmedia.h"
 
 const int kMediaEventType = 30042;
 
-class MPUBLIC MediaEvent : public QCustomEvent
+class MPUBLIC MediaEvent : public QEvent
 {
   public:
     MediaEvent(MediaStatus oldStatus, MythMediaDevice* pDevice) 
-         : QCustomEvent(kMediaEventType) 
+         : QEvent((QEvent::Type)kMediaEventType)
            { m_OldStatus = oldStatus; m_Device = pDevice;}
 
     MediaStatus getOldStatus(void) const { return m_OldStatus; }
@@ -22,7 +25,7 @@ class MPUBLIC MediaEvent : public QCustomEvent
 
   protected:
     MediaStatus m_OldStatus;
-    QGuardedPtr<MythMediaDevice> m_Device;
+    QPointer<MythMediaDevice> m_Device;
 };
 
 class MediaMonitor;
@@ -34,7 +37,7 @@ class MonitorThread : public QThread
     virtual void run(void);
 
   protected:
-    QGuardedPtr<MediaMonitor> m_Monitor;
+    QPointer<MediaMonitor> m_Monitor;
     unsigned long m_Interval;
 };
 
@@ -66,7 +69,7 @@ class MPUBLIC MediaMonitor : public QObject
     // To safely dereference the pointers returned by this function
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
-    QValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
+    Q3ValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
     MythMediaDevice* GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
@@ -98,8 +101,8 @@ class MPUBLIC MediaMonitor : public QObject
 
   protected:
     QMutex                       m_DevicesLock;
-    QValueList<MythMediaDevice*> m_Devices;
-    QValueList<MythMediaDevice*> m_RemovedDevices;
+    Q3ValueList<MythMediaDevice*> m_Devices;
+    Q3ValueList<MythMediaDevice*> m_RemovedDevices;
     QMap<MythMediaDevice*, int>  m_UseCount;
 
     // List of devices/mountpoints that the user doesn't want to monitor:

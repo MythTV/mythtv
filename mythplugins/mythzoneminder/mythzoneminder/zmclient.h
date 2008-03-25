@@ -8,11 +8,12 @@ using namespace std;
 // qt
 #include <qobject.h>
 #include <qstringlist.h>
-#include <qvaluevector.h>
-#include <qsocket.h>
+#include <q3valuevector.h>
+#include <q3socket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
 #include <qmutex.h>
+#include <qimage.h>
 
 // myth
 #include "mythtv/mythsocket.h"

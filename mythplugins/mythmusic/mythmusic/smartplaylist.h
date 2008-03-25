@@ -3,8 +3,14 @@
 
 #include <qdatetime.h>
 #include <qlayout.h>
-#include <qhbox.h>
+#include <q3hbox.h>
 #include <qvariant.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <Q3PtrList>
+#include <QKeyEvent>
+#include <Q3VBoxLayout>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
@@ -42,7 +48,7 @@ class SmartPLCriteriaRow : public QObject
 
   public:
     
-    SmartPLCriteriaRow(QWidget *parent, QHBoxLayout *hbox);
+    SmartPLCriteriaRow(QWidget *parent, Q3HBoxLayout *hbox);
     ~SmartPLCriteriaRow(void);
     
     QString            getSQL(void);
@@ -143,11 +149,11 @@ class SmartPlaylistEditor : public MythDialog
     // category popup
     MythPopupBox       *category_popup;
     MythRemoteLineEdit *categoryEdit; 
-    QButton            *newCategoryButton;
-    QButton            *renameCategoryButton;
-    QButton            *deleteCategoryButton;
+    QAbstractButton            *newCategoryButton;
+    QAbstractButton            *renameCategoryButton;
+    QAbstractButton            *deleteCategoryButton;
     
-    QPtrList<SmartPLCriteriaRow> criteriaRows;
+    Q3PtrList<SmartPLCriteriaRow> criteriaRows;
     int matchesCount;
     bool bNewPlaylist;
     bool bPlaylistIsValid;
@@ -199,14 +205,14 @@ class SmartPlaylistDialog: public MythPopupBox
     void getSmartPlaylistCategories(void);
     void getSmartPlaylists(QString category);
     
-    QVBoxLayout         *vbox;
+    Q3VBoxLayout         *vbox;
     QLabel              *caption;
     MythComboBox        *categoryCombo;
     MythListBox         *listbox;  
-    QButton             *selectButton;
-    QButton             *editButton;
-    QButton             *deleteButton;
-    QButton             *newButton;
+    QAbstractButton             *selectButton;
+    QAbstractButton             *editButton;
+    QAbstractButton             *deleteButton;
+    QAbstractButton             *newButton;
     
 };
 
@@ -230,7 +236,7 @@ class SmartPLOrderByDialog: public MythPopupBox
     void ascendingPressed(void);
     void descendingPressed(void);
     void orderByChanged(void);
-    void listBoxSelectionChanged(QListBoxItem *item);
+    void listBoxSelectionChanged(Q3ListBoxItem *item);
     
  protected:
     void keyPressEvent(QKeyEvent *e);
@@ -238,17 +244,17 @@ class SmartPLOrderByDialog: public MythPopupBox
  private:
     void getOrderByFields(void);
    
-    QVBoxLayout         *vbox;
+    Q3VBoxLayout         *vbox;
     QLabel              *caption;
     MythComboBox        *orderByCombo;
     MythListBox         *listbox;  
-    QButton             *addButton;
-    QButton             *deleteButton;
-    QButton             *moveUpButton;
-    QButton             *moveDownButton;
-    QButton             *ascendingButton;
-    QButton             *descendingButton;
-    QButton             *okButton;
+    QAbstractButton             *addButton;
+    QAbstractButton             *deleteButton;
+    QAbstractButton             *moveUpButton;
+    QAbstractButton             *moveDownButton;
+    QAbstractButton             *ascendingButton;
+    QAbstractButton             *descendingButton;
+    QAbstractButton             *okButton;
 };
 
 class SmartPLDateDialog: public MythPopupBox
@@ -275,7 +281,7 @@ class SmartPLDateDialog: public MythPopupBox
  private:
     QString             dateValue;
     
-    QVBoxLayout         *vbox;
+    Q3VBoxLayout         *vbox;
     QLabel              *caption;
     QLabel              *dayLabel;
     QLabel              *monthLabel; 
@@ -291,8 +297,8 @@ class SmartPLDateDialog: public MythPopupBox
     MythSpinBox         *addDaysSpinEdit;
     QLabel              *statusLabel;
     
-    QButton             *cancelButton;
-    QButton             *okButton;
+    QAbstractButton             *cancelButton;
+    QAbstractButton             *okButton;
 };
 
 #endif

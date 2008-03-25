@@ -7,8 +7,8 @@ using namespace std;
 
 // Qt widgets
 #include <qlineedit.h>
-#include <qhbox.h>
-#include <qvbox.h>
+#include <q3hbox.h>
+#include <q3vbox.h>
 #include <qlabel.h>
 #include <qslider.h>
 #include <qlcdnumber.h>
@@ -88,14 +88,14 @@ void Configurable::enableOnUnset(const QString &val)
 
 QString Setting::getValue(void) const
 {
-    return QDeepCopy<QString>(settingValue);
+    return settingValue;
 }
 
 void Setting::setValue(const QString &newValue)
 {
-    settingValue = QDeepCopy<QString>(newValue);
+    settingValue = newValue;
     SetChanged(true);
-    emit valueChanged(QDeepCopy<QString>(settingValue));
+    emit valueChanged(settingValue);
 }
 
 int SelectSetting::findSelection(const QString &label, QString value) const
@@ -119,10 +119,9 @@ void SelectSetting::addSelection(const QString &label, QString value,
     int found = findSelection(label, value);
     if (found < 0)
     {
-        labels.push_back(QDeepCopy<QString>(label));
-        values.push_back(QDeepCopy<QString>(value));
-        emit selectionAdded(QDeepCopy<QString>(label),
-                            QDeepCopy<QString>(value));
+        labels.push_back(label);
+        values.push_back(value);
+        emit selectionAdded( label, value);
     }
 
     if (select || !isSet)
@@ -150,24 +149,26 @@ bool SelectSetting::removeSelection(const QString &label, QString value)
         current = min(current, (uint) (labels.size() - 1));
     }
 
-    emit selectionRemoved(label, QDeepCopy<QString>(value));
+    emit selectionRemoved(label, value);
 
     return true;
 }
 
-void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath) {
-     const QFileInfoList *il = dir.entryInfoList();
-     if (!il)
-         return;
+void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath)
+{
+    QFileInfoList il = dir.entryInfoList();
 
-     QFileInfoListIterator it( *il );
-     QFileInfo *fi;
+    for (QFileInfoList::Iterator it = il.begin();
+                                 it != il.end();
+                               ++it )
+    {
+        QFileInfo &fi = *it;
 
-     for(; (fi = it.current()) != 0; ++it)
-         if (absPath)
-             addSelection(fi->absFilePath());
-         else
-             addSelection(fi->fileName());
+        if (absPath)
+            addSelection( fi.absFilePath() );
+        else
+            addSelection( fi.fileName() );
+    }
 }
 
 void SelectSetting::clearSelections(void) {
@@ -182,8 +183,7 @@ void SelectSetting::setValue(const QString &newValue)
     int found = getValueIndex(newValue);
     if (found < 0)
     {
-        addSelection(QDeepCopy<QString>(newValue),
-                     QDeepCopy<QString>(newValue), true);
+        addSelection(newValue, newValue, true);
     }
     else
     {
@@ -213,7 +213,7 @@ QString SelectSetting::getSelectionLabel(void) const
     if (!isSet || (current >= values.size()))
         return QString::null;
 
-    return QDeepCopy<QString>(labels[current]);
+    return labels[current];
 }
 
 /** \fn SelectSetting::getValueIndex(QString)
@@ -237,7 +237,7 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     (void)cg;
 
-    QWidget* widget = new QHBox(parent, widgetName);
+    QWidget* widget = new Q3HBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
@@ -259,16 +259,16 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
 QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char *widgetName) {
-    QHBox *widget;
+    Q3HBox *widget;
 
     if (labelAboveWidget)
     {
-        widget = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
     }
     else
-        widget = new QHBox(parent, widgetName);
+        widget = new Q3HBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
@@ -354,15 +354,15 @@ void BoundedIntegerSetting::setValue(int newValue)
 
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                      const char* widgetName) {
-    QHBox* widget;
+    Q3HBox* widget;
     if (labelAboveWidget) 
     {
-        widget = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
     } 
     else
-        widget = new QHBox(parent, widgetName);
+        widget = new Q3HBox(parent, widgetName);
 
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -378,7 +378,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     slider->setHelpText(getHelpText());
     slider->setMinValue(min);
     slider->setMaxValue(max);
-    slider->setOrientation(QSlider::Horizontal);
+    slider->setOrientation( Qt::Horizontal );
     slider->setLineStep(step);
     slider->setValue(intValue());
     slider->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -407,7 +407,7 @@ SpinBoxSetting::SpinBoxSetting(
     sstep(_allow_single_step), svtext("")
 {
     if (!_special_value_text.isEmpty())
-        svtext = QDeepCopy<QString>(_special_value_text);
+        svtext = _special_value_text;
 
     IntegerSetting *iset = (IntegerSetting *) this;
     connect(iset, SIGNAL(valueChanged(     int)),
@@ -416,15 +416,15 @@ SpinBoxSetting::SpinBoxSetting(
 
 QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                       const char* widgetName) {
-    QHBox* box;
+    Q3HBox* box;
     if (labelAboveWidget) 
     {
-        box = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                        QSizePolicy::Maximum));
     } 
     else
-        box = new QHBox(parent, widgetName);
+        box = new Q3HBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
@@ -521,15 +521,15 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
                                           const char* widgetName) {
     (void)cg;
 
-    QHBox* widget;
+    Q3HBox* widget;
     if (labelAboveWidget) 
     {
-        widget = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
     } 
     else
-        widget = new QHBox(parent, widgetName);
+        widget = new Q3HBox(parent, widgetName);
 
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -552,15 +552,15 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
 
 QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
-    QHBox* box;
+    Q3HBox* box;
     if (labelAboveWidget) 
     {
-        box = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                        QSizePolicy::Maximum));
     } 
     else
-        box = new QHBox(parent, widgetName);
+        box = new Q3HBox(parent, widgetName);
 
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -591,11 +591,19 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         widget->setStep(step);
 
     if (rw)
+    {
         connect(widget, SIGNAL(highlighted(const QString &)),
                 this, SLOT(setValue(const QString &)));
+        connect(widget, SIGNAL(activated(const QString &)),
+                this, SLOT(setValue(const QString &)));
+    }
     else
+    {
         connect(widget, SIGNAL(highlighted(int)),
                 this, SLOT(setValue(int)));
+        connect(widget, SIGNAL(activated(int)),
+                this, SLOT(setValue(int)));
+    }
 
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
@@ -667,7 +675,7 @@ void ComboBoxSetting::addSelection(
 {
     if ((findSelection(label, value) < 0) && widget)
     {
-        widget->insertItem(QDeepCopy<QString>(label));
+        widget->insertItem(label);
     }
 
     SelectSetting::addSelection(label, value, select);
@@ -767,6 +775,11 @@ void TimeSetting::setValue(const QTime& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
 }
 
+QString DateSetting::getValue(void) const
+{
+    return settingValue;
+}
+
 QDate DateSetting::dateValue(void) const {
     return QDate::fromString(getValue(), Qt::ISODate);
 }
@@ -777,7 +790,7 @@ void DateSetting::setValue(const QDate& newValue) {
 
 QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
-    QButtonGroup* widget = new QButtonGroup(parent, widgetName);
+    Q3ButtonGroup* widget = new Q3ButtonGroup(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setTitle(getLabel());
 
@@ -852,7 +865,31 @@ void AutoIncrementDBSetting::save(QString table)
             MythContext::DBError("inserting row", query);
             return;
         }
-        setValue(query.lastInsertId().toInt());
+        // XXX -- HACK BEGIN:
+        // lastInsertID fails with "QSqlQuery::value: not positioned on a valid record"
+        // if we get a invalid QVariant we workaround the problem by taking advantage
+        // of mysql always incrementing the auto increment pointer
+        // this breaks if someone modifies the auto increment pointer
+        //setValue(query.lastInsertId().toInt());
+
+        QVariant var = query.lastInsertId();
+
+        if (var.type())
+            setValue(var.toInt());
+        else
+        {
+            querystr = QString("SELECT MAX(" + column + ") FROM " + table + ";");
+            if (query.exec(querystr) && query.next())
+            {
+                int lii = query.value(0).toInt();
+                lii = lii ? lii : 1;
+                setValue(lii);
+            }
+            else
+                VERBOSE(VB_IMPORTANT, "Can't determine the Id of the last insert"
+                        "QSqlQuery.lastInsertId() failed, the workaround failed too!");
+        }
+        // XXX -- HACK END:
     }
 }
 
@@ -889,7 +926,7 @@ void ListBoxSetting::addSelection(
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                       const char* widgetName)
 {
-    QWidget* box = new QVBox(parent, widgetName);
+    QWidget* box = new Q3VBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
@@ -1009,7 +1046,7 @@ void ImageSelectSetting::imageSet(int num)
 
     QImage temp = *(images[current]);
     temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult),
-                            QImage::ScaleMin);
+                            Qt::ScaleMin);
 
     QPixmap tmppix(temp);
     imagelabel->setPixmap(tmppix);
@@ -1023,15 +1060,15 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 
     gContext->GetScreenSettings(width, m_wmult, height, m_hmult);
 
-    QHBox* box;
+    Q3HBox* box;
     if (labelAboveWidget) 
     {
-        box = dynamic_cast<QHBox*>(new QVBox(parent, widgetName));
+        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
         box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                        QSizePolicy::Maximum));
     } 
     else
-        box = new QHBox(parent, widgetName);
+        box = new Q3HBox(parent, widgetName);
 
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -1069,7 +1106,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     { 
         QImage temp = *(images[current]);
         temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult), 
-                                QImage::ScaleMin);
+                                Qt::ScaleMin);
  
         QPixmap tmppix(temp);
         imagelabel->setPixmap(tmppix);
@@ -1077,13 +1114,15 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     else
     {
         QPixmap tmppix((int)(184 * m_hmult), (int)(138 * m_hmult));
-        tmppix.fill(black);
+        tmppix.fill(Qt::black);
 
         imagelabel->setPixmap(tmppix);
     }
 
     connect(widget, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
     connect(widget, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
+    connect(widget, SIGNAL(activated(int)), this, SLOT(setValue(int)));
+    connect(widget, SIGNAL(activated(int)), this, SLOT(imageSet(int)));
 
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
@@ -1182,7 +1221,7 @@ QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                                        const char* widgetName) {
     (void)cg;
 
-    QHBox* widget = new QHBox(parent,widgetName);
+    Q3HBox* widget = new Q3HBox(parent,widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
@@ -1191,7 +1230,7 @@ QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
         label->setBackgroundOrigin(QWidget::WindowOrigin);
     }
 
-    QProgressBar* progress = new QProgressBar(totalSteps, widget, widgetName);
+    Q3ProgressBar* progress = new Q3ProgressBar(totalSteps, widget, widgetName);
     progress->setBackgroundOrigin(QWidget::WindowOrigin);
 
     connect(this, SIGNAL(valueChanged(int)), progress, SLOT(setProgress(int)));

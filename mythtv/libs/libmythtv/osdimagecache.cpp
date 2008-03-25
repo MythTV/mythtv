@@ -12,7 +12,7 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qdatastream.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -40,7 +40,7 @@ OSDImageCacheValue::OSDImageCacheValue(
     m_yuv(yuv),         m_ybuffer(ybuffer),
     m_ubuffer(ubuffer), m_vbuffer(vbuffer),
     m_alpha(alpha),     m_imagesize(imagesize),
-    m_cacheKey(QDeepCopy<QString>(cacheKey))
+    m_cacheKey(Q3DeepCopy<QString>(cacheKey))
 {
     uint yuv_size = m_imagesize.width() * m_imagesize.height() * 3 / 2;
     m_size_in_bytes =
@@ -172,7 +172,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
 
     QDir dir(MythContext::GetConfDir() + "/osdcache/");
     QFile cacheFile(dir.path() + "/" + key);
-    cacheFile.open(IO_ReadOnly);
+    cacheFile.open(QIODevice::ReadOnly);
     uint32_t imwidth  = 0;
     uint32_t imheight = 0;
 
@@ -250,7 +250,7 @@ void OSDImageCache::SaveToDisk(const OSDImageCacheValue *value)
     }
 
     QFile cacheFile(dir.path() + "/" + value->GetKey());
-    if (!cacheFile.open(IO_WriteOnly | IO_Truncate))
+    if (!cacheFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating osdcache file failed.");
         return;

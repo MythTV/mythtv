@@ -3,6 +3,7 @@
 #ifndef _OSD_CHROMAKEY_H_
 #define _OSD_CHROMAKEY_H_
 
+#include "mythcontext.h"
 #include "videoout_xv.h"
 
 class ChromaKeyOSD

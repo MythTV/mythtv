@@ -3,19 +3,17 @@
 
 #include <pthread.h>
 
-#include <qserversocket.h>
-#include <qsocket.h>
-#include <qdom.h>
-#include <qdatetime.h> 
-#include <qstring.h>
-#include <qmap.h>
+#include <q3serversocket.h>
+#include <q3textstream.h>
+#include <q3socket.h>
+#include <q3valuelist.h>
+#include <qobject.h>
 #include <qmutex.h>
-#include <qvaluelist.h>
 #include <qwaitcondition.h>
 
 class MainServer;
 
-class NetworkControl : public QServerSocket
+class NetworkControl : public Q3ServerSocket
 {
     Q_OBJECT
   public:
@@ -43,7 +41,7 @@ class NetworkControl : public QServerSocket
     QString processHelp(QStringList tokens);
 
     void notifyDataAvailable(void);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;
@@ -59,14 +57,14 @@ class NetworkControl : public QServerSocket
     QMap <QString, int> keyMap;
 
     QMutex clientLock;
-    QSocket *client;
-    QTextStream *cs;
+    Q3Socket *client;
+    Q3TextStream *cs;
 
-    QValueList<QString> networkControlCommands;
+    Q3ValueList<QString> networkControlCommands;
     QMutex ncLock;
     QWaitCondition ncCond;
 
-    QValueList<QString> networkControlReplies;
+    Q3ValueList<QString> networkControlReplies;
     QMutex nrLock;
 
     pthread_t command_thread;

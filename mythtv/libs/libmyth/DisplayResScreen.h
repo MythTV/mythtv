@@ -1,13 +1,15 @@
 #ifndef __DISPLAYRESCREEN_H__
 #define __DISPLAYRESCREEN_H__
 
-using namespace std;
-
-#include <qstringlist.h>
 #include <vector>
 #include <map>
 #include <algorithm>
+
+#include <QString>
+
 #include "mythexp.h"
+
+using namespace std;
 
 class MPUBLIC DisplayResScreen
 {

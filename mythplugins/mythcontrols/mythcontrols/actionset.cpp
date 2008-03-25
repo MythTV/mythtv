@@ -23,8 +23,8 @@
 
 // Qt headers
 #include <qmap.h>
-#include <qdict.h>
-#include <qvaluelist.h>
+#include <q3dict.h>
+#include <q3valuelist.h>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -155,7 +155,7 @@ QStringList ActionSet::GetContextStrings(void) const
 {
     QStringList context_strings;
 
-    QDictIterator<Context> it(m_contexts);
+    Q3DictIterator<Context> it(m_contexts);
     for (; it.current(); ++it)
         context_strings.append(it.currentKey());
     
@@ -174,7 +174,7 @@ QStringList ActionSet::GetActionStrings(const QString &context_name) const
     if (!c)
         return action_strings;
 
-    QDictIterator<Action> it(*(m_contexts[context_name]));
+    Q3DictIterator<Action> it(*(m_contexts[context_name]));
     for (; it.current(); ++it)
         action_strings.append(it.currentKey());
     
@@ -255,7 +255,7 @@ QStringList ActionSet::GetContextKeys(const QString & context_name) const
     QStringList keys;
     Context *c = m_contexts[context_name];
 
-    QDictIterator<Action> it(*c);
+    Q3DictIterator<Action> it(*c);
     for (;it.current(); ++it)
     {
         QStringList akeys = (*it)->GetKeys();

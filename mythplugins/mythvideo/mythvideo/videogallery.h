@@ -16,6 +16,9 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "videodlg.h"
 
+class QPaintEvent;
+class QKeyEvent;
+
 class UIListBtnTypeItem;
 
 class VideoGallery : public VideoDialog
@@ -50,7 +53,7 @@ class VideoGallery : public VideoDialog
     void updateText(QPainter *p);
     void updateView(QPainter *p);
     void updateArrows(QPainter *p);
-    void updateSingleIcon(QPainter *p, int lx, int ly);
+    void updateSingleIcon(int lx, int ly);
     void drawIcon(QPainter *p, GenericTree *curTreePos, int curPos, int xpos,
                   int ypos);
 

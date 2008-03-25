@@ -1,7 +1,7 @@
 #ifndef VIDEO_SCANNER_H
 #define VIDEO_SCANNER_H
 
-#include <qstringlist.h> // optional
+#include <QStringList> // optional
 
 class VideoScanner
 {

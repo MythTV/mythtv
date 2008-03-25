@@ -1,6 +1,8 @@
 #ifndef MYTHLISTBUTTON_H_
 #define MYTHLISTBUTTON_H_
 
+#include <Q3PtrList>
+
 #include "mythuitype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
@@ -109,7 +111,7 @@ class MythListButton : public MythUIType
 
     void SetAllChecked(MythListButtonItem::CheckState state);
 
-    QPtrListIterator<MythListButtonItem> GetIterator();
+    Q3PtrListIterator<MythListButtonItem> GetIterator();
 
     int GetCurrentPos() { return m_selPosition; }
     int GetItemPos(MythListButtonItem* item);
@@ -178,7 +180,7 @@ class MythListButton : public MythUIType
     MythUIStateType *m_upArrow;
     MythUIStateType *m_downArrow;
 
-    QValueVector<MythUIButton *> m_ButtonList;
+    QVector<MythUIButton *> m_ButtonList;
 
     MythFontProperties *m_fontActive;
     MythFontProperties *m_fontInactive;
@@ -189,14 +191,14 @@ class MythListButton : public MythUIType
     MythListButtonItem* m_topItem;
     MythListButtonItem* m_selItem;
 
-    QPtrListIterator<MythListButtonItem> *m_topIterator;
-    QPtrListIterator<MythListButtonItem> *m_selIterator;
+    Q3PtrListIterator<MythListButtonItem> *m_topIterator;
+    Q3PtrListIterator<MythListButtonItem> *m_selIterator;
 
     int m_selPosition;
     int m_topPosition;
     int m_itemCount;
 
-    QPtrList<MythListButtonItem> m_itemList;
+    Q3PtrList<MythListButtonItem> m_itemList;
 
     QPoint m_drawoffset;
     bool m_drawFromBottom;

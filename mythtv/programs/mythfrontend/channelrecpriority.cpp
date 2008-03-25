@@ -1,13 +1,16 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QKeyEvent>
 
 #include <iostream>
 #include <map>
@@ -383,8 +386,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
         // order may change if sorting by recoring priority, so resort
         if (sortType == byRecPriority)
             SortList();
-        updateList(&p);
-        updateInfo(&p);
+        update(fullRect);
     }
 }
 
@@ -435,8 +437,7 @@ void ChannelRecPriority::FillList(void)
     {
         while (result.next())
         {
-            srcMap[result.value(0).toInt()] =
-                QString::fromUtf8(result.value(1).toString());
+            srcMap[result.value(0).toInt()] = result.value(1).toString();
         }
     }
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
@@ -450,10 +451,10 @@ void ChannelRecPriority::FillList(void)
             chaninfo->chanid = result.value(0).toInt();
             chaninfo->chanstr = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
-            chaninfo->callsign = QString::fromUtf8(result.value(3).toString());
+            chaninfo->callsign = result.value(3).toString();
             chaninfo->iconpath = result.value(4).toString();
             chaninfo->recpriority = result.value(5).toString();
-            chaninfo->channame = QString::fromUtf8(result.value(6).toString());
+            chaninfo->channame = result.value(6).toString();
             if (result.value(7).toInt() > 0)
                 visMap[chaninfo->chanid] = true;
             chaninfo->sourcename = srcMap[chaninfo->sourceid];
@@ -769,10 +770,10 @@ void ChannelRecPriority::edit()
         chanInfo->chanid = result.value(0).toInt();
         chanInfo->chanstr = result.value(1).toString();
         chanInfo->sourceid = result.value(2).toInt();
-        chanInfo->callsign = QString::fromUtf8(result.value(3).toString());
+        chanInfo->callsign = result.value(3).toString();
         chanInfo->iconpath = result.value(4).toString();
         chanInfo->recpriority = result.value(5).toString();
-        chanInfo->channame = QString::fromUtf8(result.value(6).toString());
+        chanInfo->channame = result.value(6).toString();
         if (result.value(7).toInt() > 0)
             visMap[chanInfo->chanid] = true;
         else

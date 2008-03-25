@@ -34,6 +34,7 @@
 
 // Qt headers
 #include <qapplication.h>
+#include <QEvent>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -136,7 +137,7 @@ void ScanWizardScanner::Teardown()
 #endif
 }
 
-void ScanWizardScanner::customEvent(QCustomEvent *e)
+void ScanWizardScanner::customEvent(QEvent *e)
 {
     ScannerEvent *scanEvent = (ScannerEvent*) e;
 

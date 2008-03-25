@@ -7,6 +7,9 @@
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qmap.h>
+#include <Q3GridLayout>
+#include <Q3PtrList>
+
 #include <qregexp.h>
 #include <vector>
 
@@ -146,7 +149,7 @@ enum AutoExpireType {
 };
 
 class ScheduledRecording;
-class QGridLayout;
+class Q3GridLayout;
 
 class MPUBLIC ProgramInfo
 {
@@ -406,7 +409,7 @@ class MPUBLIC ProgramInfo
 /** \class ProgramList
  *  \brief QPtrList of ProgramInfo instances, with helper functions.
  */
-class MPUBLIC ProgramList: public QPtrList<ProgramInfo> {
+class MPUBLIC ProgramList: public Q3PtrList<ProgramInfo> {
  public:
     ProgramList(bool autoDelete = true) {
         setAutoDelete(autoDelete);
@@ -442,8 +445,8 @@ class MPUBLIC ProgramList: public QPtrList<ProgramInfo> {
     };
 
  protected:
-    virtual int compareItems(QPtrCollection::Item item1,
-                             QPtrCollection::Item item2);
+    virtual int compareItems(Q3PtrCollection::Item item1,
+                             Q3PtrCollection::Item item2);
 
  private:
     CompareFunc compareFunc;

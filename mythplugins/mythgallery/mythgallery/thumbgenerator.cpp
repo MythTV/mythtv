@@ -24,6 +24,8 @@
 #include <qobject.h>
 #include <qfileinfo.h>
 #include <qdir.h>
+#include <QEvent>
+#include <qimagereader.h>
 
 #include "config.h"
 #include "mythtv/mythcontext.h"
@@ -89,7 +91,7 @@ void ThumbGenerator::run()
 
         QString file, dir;
         bool    isGallery;
-        
+
         m_mutex.lock();
         dir       = m_directory;
         isGallery = m_isGallery;
@@ -107,7 +109,7 @@ void ThumbGenerator::run()
             continue;
 
         if (isGallery) {
-            
+
             if (fileInfo.isDir()) 
                 isGallery = checkGalleryDir(fileInfo);
             else
@@ -115,8 +117,9 @@ void ThumbGenerator::run()
         }
 
         if (!isGallery) {
-        
-            QString cachePath = getThumbcacheDir(dir) + file;
+
+            QString cachePath = QString("%1%2.jpg").arg(getThumbcacheDir(dir))
+                                                   .arg(file);
             QFileInfo cacheInfo(cachePath);
 
             if (cacheInfo.exists() &&
@@ -124,7 +127,7 @@ void ThumbGenerator::run()
                 continue;
             }
             else {
-                
+
                 // cached thumbnail not there or out of date
                 QImage image;
 
@@ -141,7 +144,7 @@ void ThumbGenerator::run()
                 if (image.isNull())
                     continue; // give up;
 
-                image = image.smoothScale(m_width,m_height,QImage::ScaleMin);
+                image = image.smoothScale(m_width,m_height,Qt::KeepAspectRatio);
                 image.save(cachePath, "JPEG");
 
                 // deep copies all over
@@ -152,8 +155,8 @@ void ThumbGenerator::run()
 
                 // inform parent we have thumbnail ready for it
                 QApplication::postEvent(m_parent,
-                                        new QCustomEvent(QEvent::User, td));
-                
+                                        new ThumbGenEvent(ThumbGenEvent::ImageReady, td));
+
             }
         }
     }
@@ -177,8 +180,9 @@ bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
     
     if (subdir.count() > 0) {
         // check if the image format is understood
-        QString path(subdir.entryInfoList()->getFirst()->absFilePath());
-        return (QImageIO::imageFormat(path) != 0);
+        QString path(subdir.entryInfoList().begin()->absFilePath());
+        QImageReader testread(path);
+        return testread.canRead();
     }
     else
         return false;
@@ -194,8 +198,11 @@ bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
     {
         fn.insert(firstDot, ".thumb");
         QFileInfo galThumb(fi.dirPath(true) + "/" + fn);
-        if (galThumb.exists()) 
-            return (QImageIO::imageFormat(galThumb.absFilePath()) != 0);
+        if (galThumb.exists())
+        {
+            QImageReader testread(galThumb.absFilePath());
+            return testread.canRead();
+        }
         else
             return false;
     }
@@ -206,16 +213,18 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 {
     QDir dir(fi.absFilePath());
     dir.setFilter(QDir::Files);
-    const QFileInfoList *list = dir.entryInfoList();
-    if (!list)
+    QFileInfoList list = dir.entryInfoList();
+    if (list.isEmpty())
         return;
 
-    QFileInfoListIterator it( *list );
-    QFileInfo *f;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *f;
 
     bool found = false;
-    while ( (f = it.current()) != 0 ) {
-        if (QImage::imageFormat(f->absFilePath()) != 0) {
+    while (it != list.end()) {
+        f = &(*it);
+        QImageReader testread(f->absFilePath());
+        if (testread.canRead()) {
             found = true;
             break;
         }
@@ -231,15 +240,16 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
         // go into subdirs and keep looking
 
         dir.setFilter(QDir::Dirs);
-        const QFileInfoList *dirList = dir.entryInfoList();
-        if (!dirList)
+        QFileInfoList dirlist = dir.entryInfoList();
+        if (dirlist.isEmpty())
             return;
 
-        QFileInfoListIterator it( *dirList );
-        QFileInfo *f;
+        QFileInfoList::const_iterator it = dirlist.begin();
+        const QFileInfo *f;
 
-        while ( ((f = it.current()) != 0) && image.isNull() ) {
+        while (it != dirlist.end() && image.isNull() ) {
 
+            f = &(*it);
             ++it;
 
             if (f->fileName() == "." || f->fileName() == "..")
@@ -260,8 +270,8 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
         {
             if (!tmpDir.mkdir(tmpDir.absPath()))
             {
-                std::cerr << "Unable to create temp dir for movie thumbnail creation: "
-                          << tmpDir.absPath() << endl;
+                VERBOSE(VB_IMPORTANT, "Unable to create temp dir for movie "
+                        "thumbnail creation: " + tmpDir.absPath());
             }
         }
 

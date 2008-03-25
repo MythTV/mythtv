@@ -1,6 +1,11 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <qdir.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QLabel>
+#include <Q3PtrList>
+#include <QPixmap>
 #include "editmetadata.h"
 #include "decoder.h"
 #include "genres.h"
@@ -82,7 +87,7 @@ void EditMetadataDialog::fillWidgets()
     {
         QString timestamp = m_metadata->LastPlayStr();
 
-        if (timestamp.contains('-') < 1)
+        if (!timestamp.contains('-'))
         {
             timestamp.insert(4, '-');
             timestamp.insert(7, '-');
@@ -142,7 +147,7 @@ void EditMetadataDialog::gridItemChanged(ImageGridItem *item)
 
 void EditMetadataDialog::updateImageGrid()
 {
-    QPtrList<AlbumArtImage> *albumArtList = albumArt->getImageList();
+    Q3PtrList<AlbumArtImage> *albumArtList = albumArt->getImageList();
 
     QSize size = coverart_grid->getImageItemSize();
 
@@ -153,7 +158,7 @@ void EditMetadataDialog::updateImageGrid()
 
         QPixmap *pixmap = createScaledPixmap(albumArtList->at(x)->filename,
                                              size.width(), size.height(),
-                                             QImage::ScaleMin);
+                                             Qt::KeepAspectRatio);
 
         ImageGridItem *item = new ImageGridItem(albumArtList->at(x)->typeName,
                 pixmap, false, (void*) albumArtList->at(x));
@@ -170,7 +175,7 @@ void EditMetadataDialog::updateImageGrid()
 }
 
 QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
-                                         int width, int height, QImage::ScaleMode mode)
+                                         int width, int height, Qt::AspectRatioMode mode)
 {
     QPixmap *pixmap = NULL;
 
@@ -610,7 +615,7 @@ void EditMetadataDialog::showSaveMenu()
 
     QLabel *label = popup->addLabel(tr("Save Changes?"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
-    QButton *topButton;
+    QAbstractButton *topButton;
 
     if (metadataOnly)
     {

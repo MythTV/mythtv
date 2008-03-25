@@ -7,7 +7,7 @@
 using namespace std;
 
 #include <qstringlist.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 #include <qmutex.h>
 #include <qsize.h>
 #include <qmap.h>
@@ -157,7 +157,7 @@ class MPUBLIC VideoDisplayProfile
     void LoadBestPreferences(const QSize &size, float framerate);
 
     QString GetActualVideoRenderer(void) const
-        { return QDeepCopy<QString>(last_video_renderer); }
+        { return Q3DeepCopy<QString>(last_video_renderer); }
 
     QString GetPreference(const QString &key) const;
     void    SetPreference(const QString &key, const QString &value);

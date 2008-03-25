@@ -1,4 +1,8 @@
 #include <iostream>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
+#include <Q3Frame>
 using namespace std;
 
 // qt
@@ -23,7 +27,7 @@ MiniPlayer::MiniPlayer(MythMainWindow *parent,
                     bool setsize)
             : MythThemedDialog(parent, name, setsize)
 {
-    setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    setFrameStyle(Q3Frame::NoFrame | Q3Frame::Plain);
     setLineWidth(1);
     m_parentPlayer = parentPlayer;
 
@@ -298,7 +302,7 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MiniPlayer::customEvent(QCustomEvent *event)
+void MiniPlayer::customEvent(QEvent *event)
 {
     if (isHidden())
         return;
@@ -750,7 +754,7 @@ void MiniPlayer::showSpeed(void)
 
     if (class LCD *lcd = LCD::Get())
     {
-        QPtrList<LCDTextItem> textItems;
+        Q3PtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
         textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
                                          msg, "Generic", false));

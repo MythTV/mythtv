@@ -28,7 +28,7 @@ static bool parse_extinf(const QString &data,
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid) :
-    _cardid(cardid),       _inputname(QDeepCopy<QString>(inputname)),
+    _cardid(cardid),       _inputname(Q3DeepCopy<QString>(inputname)),
     _sourceid(sourceid),
     _chan_cnt(1),          _thread_running(false),
     _stop_now(false),      _lock(false)

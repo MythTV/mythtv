@@ -12,6 +12,9 @@
 #include <mythtv/dialogbox.h>
 
 #include "archiveutil.h"
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
 
 class MythburnWizard : public MythThemedDialog
 {

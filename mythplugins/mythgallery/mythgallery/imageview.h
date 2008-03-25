@@ -25,7 +25,7 @@
 using namespace std;
 
 // Qt headers
-#include <qpointarray.h>
+#include <q3pointarray.h>
 
 // MythGallery headers
 #include "iconview.h"

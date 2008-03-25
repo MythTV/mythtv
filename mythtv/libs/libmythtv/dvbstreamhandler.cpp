@@ -11,7 +11,6 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
 
 // MythTV headers
 #include "dvbstreamhandler.h"
@@ -188,11 +187,15 @@ void DVBStreamHandler::Start(void)
 
     if (!IsRunning())
     {
+        QMutex is_running_lock;
         pthread_create(&_reader_thread, NULL,
                        run_dvb_stream_handler_thunk, this);
 
         while (!IsRunning())
-            _running_state_changed.wait(100);
+        {
+            is_running_lock.lock();
+            _running_state_changed.wait(&is_running_lock, 100);
+        }
     }
 }
 

@@ -36,7 +36,7 @@ QString NetworkInformationTable::toString(void) const
 
     for (uint i = 0; i < TransportStreamCount(); i++)
     {
-        str.append(QString("  Transport #%1 TSID(0x%1) ")
+        str.append(QString("  Transport #%1 TSID(0x%2) ")
                    .arg(i, 2, 10).arg(TSID(i), 0, 16));
         str.append(QString("original_network_id(0x%2) desc_len(%3)\n")
                    .arg(OriginalNetworkID(i), 0, 16)

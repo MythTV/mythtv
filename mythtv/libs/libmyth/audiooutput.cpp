@@ -122,13 +122,13 @@ void AudioOutput::SetStretchFactor(float /*factor*/)
 
 void AudioOutput::Error(const QString &msg)
 {
-    lastError = QDeepCopy<QString>(msg);
+    lastError = Q3DeepCopy<QString>(msg);
     VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
 }
 
 void AudioOutput::Warn(const QString &msg)
 {
-    lastWarn = QDeepCopy<QString>(msg);
+    lastWarn = Q3DeepCopy<QString>(msg);
     VERBOSE(VB_IMPORTANT, "AudioOutput Warning: " + lastWarn);
 }
 

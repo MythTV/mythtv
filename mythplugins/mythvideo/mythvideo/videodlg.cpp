@@ -1,6 +1,8 @@
 #include <cstdlib>
 
-#include <qapplication.h>
+#include <QApplication>
+#include <QPixmap>
+#include <QLabel>
 
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythcontext.h>
@@ -106,12 +108,12 @@ void VideoDialog::cancelPopup(void)
     }
 }
 
-QButton *VideoDialog::AddPopupViews()
+QAbstractButton *VideoDialog::AddPopupViews()
 {
     if (!popup)
         return NULL;
 
-    std::vector<QButton *> buttons;
+    std::vector<QAbstractButton *> buttons;
 
     if (!(m_type & DLG_BROWSER))
         buttons.push_back(popup->addButton(tr("Switch to Browse View"), this,
@@ -158,7 +160,7 @@ void VideoDialog::slotViewPlot()
                                               MythPopupBox::Small,true);
         plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
 
-        QButton *okButton = plotbox->addButton(
+        QAbstractButton *okButton = plotbox->addButton(
             tr("OK"), plotbox, SLOT(accept()));
         okButton->setFocus();
 

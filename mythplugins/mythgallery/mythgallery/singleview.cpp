@@ -23,6 +23,10 @@
 
 // C++ headers
 #include <iostream>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 using namespace std;
 
 // Qt headers
@@ -215,7 +219,7 @@ void SingleView::paintEvent(QPaintEvent *)
                 bitBlt(&pix,
                        (screenwidth  - m_pixmap->width())  >> 1,
                        (screenheight - m_pixmap->height()) >> 1,
-                       m_pixmap,0,0,-1,-1,Qt::CopyROP);
+                       m_pixmap,0,0,-1,-1);
             }
             else
             {
@@ -240,7 +244,8 @@ void SingleView::paintEvent(QPaintEvent *)
                            m_caption_pixmap, QRect(0, 0, screenwidth, 100));
 
                     // Draw caption
-                    QPainter p(&pix, this);
+                    QPainter p(&pix);
+                    p.initFrom(this);
                     p.drawText(0, screenheight - 100, screenwidth, 100,
                                Qt::AlignCenter, item->GetCaption());
                     p.end();
@@ -251,7 +256,8 @@ void SingleView::paintEvent(QPaintEvent *)
 
             if (m_zoom != 1.0f)
             {
-                QPainter p(&pix, this);
+                QPainter p(&pix);
+                p.initFrom(this);
                 p.drawText(screenwidth / 10, screenheight / 10,
                            QString::number(m_zoom) + "x Zoom");
                 p.end();
@@ -267,9 +273,10 @@ void SingleView::paintEvent(QPaintEvent *)
                 }
 
                 bitBlt(&pix, QPoint(screenwidth / 10, screenheight / 10),
-                       m_info_pixmap, QRect(0,0,-1,-1), Qt::CopyROP);
+                       m_info_pixmap, QRect(0,0,-1,-1));
 
-                QPainter p(&pix, this);
+                QPainter p(&pix);
+                p.initFrom(this);
                 ThumbItem *item = m_itemList.at(m_pos);
                 QString info = QString::null;
                 if (item)
@@ -291,7 +298,7 @@ void SingleView::paintEvent(QPaintEvent *)
 
         }
         
-        bitBlt(this, QPoint(0,0), &pix, QRect(0,0,-1,-1), Qt::CopyROP);
+        bitBlt(this, QPoint(0,0), &pix, QRect(0,0,-1,-1));
     }
     else if (!m_effect_method.isEmpty())
         RunEffect(m_effect_method);
@@ -599,7 +606,7 @@ void SingleView::Load(void)
     m_angle = item->GetRotationAngle();
     if (m_angle != 0)
     {
-        QWMatrix matrix;
+        QMatrix matrix;
         matrix.rotate(m_angle);
         m_image = m_image.xForm(matrix);
     }
@@ -623,7 +630,7 @@ void SingleView::Rotate(int angle)
     if (m_image.isNull())
         return;
 
-    QWMatrix matrix;
+    QMatrix matrix;
     matrix.rotate(angle);
     m_image = m_image.xForm(matrix);
 
@@ -752,7 +759,7 @@ void SingleView::CreateEffectPixmap(void)
         QPoint src_loc((m_effect_pixmap->width()  - m_pixmap->width() ) >> 1,
                        (m_effect_pixmap->height() - m_pixmap->height()) >> 1);
         bitBlt(m_effect_pixmap, src_loc,
-               m_pixmap, QRect(0, 0, -1, -1), Qt::CopyROP);
+               m_pixmap, QRect(0, 0, -1, -1));
     }
 }
 
@@ -795,6 +802,7 @@ void SingleView::EffectChessboard(void)
                       (m_effect_bounds.y()) ? 0 : m_effect_delta0.y());
     m_effect_bounds = QRect(t, m_effect_bounds.size());
 
+    QPainter painter(this);
     for (int y = 0; y < m_effect_bounds.width(); y += (m_effect_delta0.y()<<1))
     {
         QPoint src0(m_effect_delta1.x(), y + m_effect_delta1.y());
@@ -803,8 +811,8 @@ void SingleView::EffectChessboard(void)
         QPoint src1(m_effect_bounds.x(), y + m_effect_bounds.y());
         QRect  dst1(m_effect_bounds.x(), y + m_effect_bounds.y(),
                     m_effect_delta0.x(), m_effect_delta0.y());
-        bitBlt(this, src0, m_effect_pixmap, dst0, Qt::CopyROP, true);
-        bitBlt(this, src1, m_effect_pixmap, dst0, Qt::CopyROP, true);
+        painter.drawPixmap(src0, *m_effect_pixmap, dst0);
+        painter.drawPixmap(src1, *m_effect_pixmap, dst0);
     }
 
     m_slideshow_frame_delay_state = m_effect_framerate;
@@ -842,12 +850,12 @@ void SingleView::EffectSweep(void)
         }
 
         int w, x, i;
+        QPainter p(this);
         for (w = 2, i = 4, x = m_effect_bounds.x(); i > 0;
              i--, w <<= 1, x -= m_effect_delta0.x())
         {
-            bitBlt(this, QPoint(x, 0),
-                   m_effect_pixmap, QRect(x, 0, w, m_effect_bounds.height()),
-                   Qt::CopyROP, true);
+            p.drawPixmap(QPoint(x, 0), *m_effect_pixmap,
+                         QRect(x, 0, w, m_effect_bounds.height()));
         }
 
         m_effect_bounds.moveLeft(m_effect_bounds.x() + m_effect_delta0.x());
@@ -867,12 +875,12 @@ void SingleView::EffectSweep(void)
         }
 
         int h, y, i;
+        QPainter p(this);
         for (h = 2, i = 4, y = m_effect_bounds.y(); i > 0;
              i--, h <<= 1, y -= m_effect_delta0.y())
         {
-            bitBlt(this, QPoint(0, y), m_effect_pixmap,
-                   QRect(0, y, m_effect_bounds.width(), h),
-                   Qt::CopyROP, true);
+            p.drawPixmap(QPoint(0, y), *m_effect_pixmap,
+                         QRect(0, y, m_effect_bounds.width(), h));
         }
 
         m_effect_bounds.moveTop(m_effect_bounds.y() + m_effect_delta0.y());
@@ -906,12 +914,12 @@ void SingleView::EffectGrowing(void)
         return;
     }
 
+    QPainter p(this);
     QSize dst_sz(m_effect_bounds.width()  - (m_effect_bounds.x() << 1),
                  m_effect_bounds.height() - (m_effect_bounds.y() << 1));
 
-    bitBlt(this, m_effect_bounds.topLeft(),
-           m_effect_pixmap, QRect(m_effect_bounds.topLeft(), dst_sz),
-           Qt::CopyROP, true);
+    p.drawPixmap(m_effect_bounds.topLeft(),
+                 *m_effect_pixmap, QRect(m_effect_bounds.topLeft(), dst_sz));
 
     m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
@@ -935,11 +943,11 @@ void SingleView::EffectHorizLines(void)
         return;
     }
 
+    QPainter p(this);
     for (int y = iyPos[m_effect_i]; y < m_effect_bounds.height(); y += 8)
     {
-        bitBlt(this, QPoint(0, y),
-               m_effect_pixmap, QRect(0, y, m_effect_bounds.width(), 1),
-               Qt::CopyROP, true);
+        p.drawPixmap(QPoint(0, y), *m_effect_pixmap,
+                     QRect(0, y, m_effect_bounds.width(), 1));
     }
 
     m_effect_i++;
@@ -976,11 +984,11 @@ void SingleView::EffectVertLines(void)
         return;
     }
 
+    QPainter p(this);
     for (int x = ixPos[m_effect_i]; x < m_effect_bounds.width(); x += 8)
     {
-        bitBlt(this, QPoint(x, 0),
-               m_effect_pixmap, QRect(x, 0, 1, m_effect_bounds.height()),
-               Qt::CopyROP, true);
+        p.drawPixmap(QPoint(x, 0), *m_effect_pixmap,
+                     QRect(x, 0, 1, m_effect_bounds.height()));
     }
 
     m_effect_i++;
@@ -1011,6 +1019,7 @@ void SingleView::EffectMeltdown(void)
 
     int x = 0;
     bool done = true;
+    QPainter p(this);
     for (int i = 0; i < m_effect_delta1.x(); i++, x += m_effect_delta0.x())
     {
         int y = m_effect_meltdown_y_disp[i];
@@ -1021,10 +1030,8 @@ void SingleView::EffectMeltdown(void)
         if ((rand() & 0xF) < 6)
             continue;
 
-        bitBlt(this, QPoint(x, y),
-               m_effect_pixmap,
-               QRect(x, y, m_effect_delta0.x(), m_effect_delta0.y()),
-               Qt::CopyROP, true);
+        p.drawPixmap(QPoint(x, y), *m_effect_pixmap,
+                     QRect(x, y, m_effect_delta0.x(), m_effect_delta0.y()));
 
         m_effect_meltdown_y_disp[i] += m_effect_delta0.y();
     }
@@ -1068,42 +1075,39 @@ void SingleView::EffectIncomingEdges(void)
     int y1 = m_effect_bounds.height() - m_effect_bounds.y();
     m_effect_i++;
 
+    QPainter p(this);
     if (kIncomingEdgesMoving == m_effect_subtype)
     {
         // moving image edges
-        bitBlt(this,  0,  0, m_effect_pixmap,
+        p.drawPixmap(0,  0, *m_effect_pixmap,
                m_effect_delta1.x() - m_effect_bounds.x(),
                m_effect_delta1.y() - m_effect_bounds.y(),
-               m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this, x1,  0, m_effect_pixmap,
+               m_effect_bounds.x(), m_effect_bounds.y()
+               );
+        p.drawPixmap(x1,  0, *m_effect_pixmap,
                m_effect_delta1.x(), m_effect_delta1.y() - m_effect_bounds.y(),
-               m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this,  0, y1, m_effect_pixmap,
+               m_effect_bounds.x(), m_effect_bounds.y()
+               );
+        p.drawPixmap(0, y1, *m_effect_pixmap,
                m_effect_delta1.x() - m_effect_bounds.x(), m_effect_delta1.y(),
-               m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this, x1, y1, m_effect_pixmap,
+               m_effect_bounds.x(), m_effect_bounds.y()
+               );
+        p.drawPixmap(x1, y1, *m_effect_pixmap,
                m_effect_delta1.x(), m_effect_delta1.y(),
-               m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
+               m_effect_bounds.x(), m_effect_bounds.y()
+               );
     }
     else
     {
         // fixed image edges
-        bitBlt(this,  0,  0,
-               m_effect_pixmap, 0,   0, m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this, x1,  0,
-               m_effect_pixmap, x1,  0, m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this,  0, y1,
-               m_effect_pixmap,  0, y1, m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
-        bitBlt(this, x1, y1,
-               m_effect_pixmap, x1, y1, m_effect_bounds.x(), m_effect_bounds.y(),
-               Qt::CopyROP, true);
+        p.drawPixmap( 0,  0, *m_effect_pixmap,  0,  0,
+                     m_effect_bounds.x(), m_effect_bounds.y());
+        p.drawPixmap(x1,  0, *m_effect_pixmap, x1,  0,
+                     m_effect_bounds.x(), m_effect_bounds.y());
+        p.drawPixmap( 0, y1, *m_effect_pixmap,  0, y1,
+                     m_effect_bounds.x(), m_effect_bounds.y());
+        p.drawPixmap(x1, y1, *m_effect_pixmap, x1, y1,
+                     m_effect_bounds.x(), m_effect_bounds.y());
     }
 
     m_slideshow_frame_delay_state = 20;
@@ -1223,10 +1227,10 @@ void SingleView::EffectSpiralIn(void)
         m_effect_spiral_tmp0.setY(m_effect_spiral_tmp0.y() + m_effect_delta1.y());
     }
 
-    bitBlt(this, m_effect_bounds.x(), m_effect_bounds.y(), m_effect_pixmap,
+    QPainter p(this);
+    p.drawPixmap(m_effect_bounds.x(), m_effect_bounds.y(), *m_effect_pixmap,
            m_effect_bounds.x(), m_effect_bounds.y(),
-           m_effect_delta1.x(), m_effect_delta1.y(),
-           Qt::CopyROP, true);
+           m_effect_delta1.x(), m_effect_delta1.y());
 
     m_effect_bounds.moveTopLeft(m_effect_bounds.topLeft() + m_effect_delta0);
     m_effect_j--;
@@ -1327,12 +1331,12 @@ void SingleView::EffectNoise(void)
     h = height() >> fact;
     sz = 1 << fact;
 
+    QPainter p(this);
     for (i = (w * h) << 1; i > 0; i--)
     {
         x = (rand() % w) << fact;
         y = (rand() % h) << fact;
-        bitBlt(this, QPoint(x, y),
-               m_effect_pixmap, QRect(x, y, sz, sz), Qt::CopyROP, true);
+        p.drawPixmap(QPoint(x, y), *m_effect_pixmap, QRect(x, y, sz, sz));
     }
 
     m_slideshow_frame_delay_state = -1;
@@ -1409,6 +1413,7 @@ void SingleView::SlideTimeout(void)
 void SingleView::CaptionTimeout(void)
 {
     m_caption_timer->stop();
-    bitBlt(this, QPoint(0, screenheight - 100),
-           m_caption_restore_pixmap, QRect(0,0,-1,-1), Qt::CopyROP);
+    QPainter p(this);
+    p.drawPixmap(QPoint(0, screenheight - 100),
+                 *m_caption_restore_pixmap, QRect(0,0,-1,-1));
 }

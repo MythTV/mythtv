@@ -4,7 +4,8 @@
 #include <qstring.h>
 #include <qrect.h>
 #include <qmap.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
+#include <QKeyEvent>
 #include <vector>
 #include <qobject.h>
 #include <qregexp.h>
@@ -100,7 +101,7 @@ class OSDSet : public QObject
     void SetFrameInterval(int frint)    { m_frameint = frint; }
     void SetWantsUpdates(bool updates)  { m_wantsupdates = updates; }
     void SetDrawEveryFrame(bool draw)   { m_draweveryframe = draw; }
-    void SetShowWith(const QString &re) { m_showwith = re; };
+    void SetShowWith(const QString &re) { m_showwith = QRegExp( re ); };
     bool SetSelected(int index);
     void SetText(const InfoMap &infoMap);
     

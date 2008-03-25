@@ -26,6 +26,8 @@
 #include "Visible.h"
 #include "BaseActions.h"
 
+#include <Q3PointArray>
+
 
 class MHDynamicLineArt;
 class MHDLADisplay;
@@ -64,7 +66,7 @@ public:
     virtual void DrawLine(int x1, int y1, int x2, int y2, MHEngine *);
     virtual void DrawOval(int x1, int y1, int width, int height, MHEngine *);
     virtual void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *);
-    virtual void DrawPoly(bool fIsPolygon, const QPointArray &points, MHEngine *);
+    virtual void DrawPoly(bool fIsPolygon, const Q3PointArray &points, MHEngine *);
 
 protected:
     MHDLADisplay *m_picture; // The sequence of drawing actions.

@@ -3,6 +3,10 @@
 #include "mythcontext.h"
 #include "sr_dialog.h"
 
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
+
 RecOptDialog::RecOptDialog(ScheduledRecording* sr, MythMainWindow *parent, const char *name)
             : MythDialog(parent, name), listMenu(this, "listMenu")
 {

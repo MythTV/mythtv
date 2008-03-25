@@ -213,7 +213,7 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
    unsigned short j, previous;
    Raster_Map *rtmp;
 
-   j = text[0];
+   j = text[0].toAscii();
    FT_Load_Glyph(face, j, FT_LOAD_DEFAULT);
    x_offset = 2; //(face->glyph->metrics.horiBearingX) / 64;
 

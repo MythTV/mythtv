@@ -22,11 +22,15 @@
 #define SINGLEVIEW_H
 
 #include <vector>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
 using namespace std;
 
 // Qt headers
 #include <qimage.h>
-#include <qpointarray.h>
+#include <q3pointarray.h>
 
 // MythTV plugin headers
 #include <mythtv/mythdialogs.h>
@@ -134,8 +138,8 @@ class SingleView : public MythDialog, public ImageView
     QPoint        m_effect_spiral_tmp1;
     vector<int>   m_effect_meltdown_y_disp;
     float         m_effect_multi_circle_out_delta_alpha;
-    QPointArray   m_effect_milti_circle_out_points;
-    QPointArray   m_effect_circle_out_points;
+    Q3PointArray   m_effect_milti_circle_out_points;
+    Q3PointArray   m_effect_circle_out_points;
 };
 
 #endif /* SINGLEVIEW_H */

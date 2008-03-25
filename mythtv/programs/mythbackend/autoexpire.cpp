@@ -233,7 +233,7 @@ void AutoExpire::CalcParams()
     double expireMinGB = ((maxKBperMin + maxKBperMin/3)
                           * expireFreq + extraKB) >> 20;
     VERBOSE(VB_IMPORTANT, LOC +
-            QString("CalcParams(): Max required Free Space: %2 GB w/freq: "
+            QString("CalcParams(): Max required Free Space: %1 GB w/freq: "
                     "%2 min").arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
@@ -651,7 +651,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             {
                 QString chanid = query.value(0).toString();
                 QDateTime startts = query.value(1).toDateTime();
-                QString title = QString::fromUtf8(query.value(2).toString());
+                QString title = query.value(2).toString();
                 QDateTime progstart = query.value(3).toDateTime();
                 QDateTime progend = query.value(4).toDateTime();
                 int duplicate = query.value(6).toInt();
@@ -744,7 +744,7 @@ void AutoExpire::PrintExpireList(QString expHost)
 
     cout << "MythTV AutoExpire List ";
     if (expHost != "ALL")
-        cout << "for '" << expHost << "' ";
+        cout << "for '" << (const char *)expHost << "' ";
     cout << "(programs listed in order of expiration)\n";
 
     pginfolist_t::iterator i = expireList.begin();
@@ -760,11 +760,11 @@ void AutoExpire::PrintExpireList(QString expHost)
         if (first->subtitle != "")
             title += ": \"" + first->subtitle + "\"";
 
-        cout << title.local8Bit().leftJustify(39, ' ', true) << " "
-             << QString("%1").arg(first->filesize >> 20).local8Bit()
+        cout << (const char *)title.local8Bit().leftJustify(39, ' ', true) << " "
+             << (const char *)QString("%1").arg(first->filesize >> 20).local8Bit()
                 .rightJustify(5, ' ', true) << "MB  "
-             << first->startts.toString().local8Bit().leftJustify(24, ' ', true)
-             << " [" << QString("%1").arg(first->recpriority).local8Bit()
+             << (const char *)first->startts.toString().local8Bit().leftJustify(24, ' ', true)
+             << " [" << (const char *)QString("%1").arg(first->recpriority).local8Bit()
                 .rightJustify(3, ' ', true) << "]"
              << endl;
     }
@@ -956,16 +956,16 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         proginfo->endts = query.value(14).toDateTime();
         proginfo->recstartts = m_recstartts;
         proginfo->recendts = query.value(2).toDateTime();
-        proginfo->title = QString::fromUtf8(query.value(3).toString());
-        proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
-        proginfo->description = QString::fromUtf8(query.value(5).toString());
+        proginfo->title = query.value(3).toString();
+        proginfo->subtitle = query.value(4).toString();
+        proginfo->description = query.value(5).toString();
         proginfo->hostname = query.value(6).toString();
 
         if (!query.value(7).toString().isEmpty())
         {
             proginfo->chanstr = query.value(7).toString();
-            proginfo->channame = QString::fromUtf8(query.value(8).toString());
-            proginfo->chansign = QString::fromUtf8(query.value(9).toString());
+            proginfo->channame = query.value(8).toString();
+            proginfo->chansign = query.value(9).toString();
         }
         else
         {
@@ -978,8 +978,8 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         proginfo->programid = query.value(11).toString();
         proginfo->recpriority = query.value(12).toInt();
         proginfo->filesize = stringToLongLong(query.value(15).toString());
-        proginfo->recgroup = QString::fromUtf8(query.value(16).toString());
-        proginfo->storagegroup = QString::fromUtf8(query.value(17).toString());
+        proginfo->recgroup = query.value(16).toString();
+        proginfo->storagegroup = query.value(17).toString();
         proginfo->pathname = query.value(18).toString();
 
         VERBOSE(VB_FILE, LOC + QString("    Adding   "

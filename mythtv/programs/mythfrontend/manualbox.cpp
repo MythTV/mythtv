@@ -1,20 +1,26 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qdatetime.h>
-#include <qprogressbar.h>
+#include <q3progressbar.h>
 #include <qapplication.h>
 #include <qtimer.h>
 #include <qimage.h>
 #include <qpainter.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qfile.h>
 #include <qsqldatabase.h>
 #include <qregexp.h>
-#include <qhbox.h>
+#include <q3hbox.h>
+#include <Q3HBoxLayout>
+#include <Q3Frame>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QEvent>
+#include <Q3VBoxLayout>
 
 #include <unistd.h>
 
@@ -37,7 +43,7 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
     m_tv = NULL;
     tvstarting = false;
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(15 * wmult));
 
     // Window title
     QString message = tr("Manual Recording");
@@ -47,30 +53,30 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
     vbox->addWidget(label);
 
     // Video
-    m_boxframe = new QHBox(this);
-    m_boxframe->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_boxframe = new Q3HBox(this);
+    m_boxframe->setFrameStyle(Q3Frame::Panel | Q3Frame::Sunken);
     m_boxframe->setLineWidth(2);
     m_boxframe->setBackgroundOrigin(WindowOrigin);
-    m_boxframe->setFocusPolicy(QWidget::StrongFocus);
+    m_boxframe->setFocusPolicy(Qt::StrongFocus);
     m_boxframe->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     m_boxframe->setMargin((int)(5 * wmult));
     m_boxframe->installEventFilter(this);
 
     QPixmap temp((int)(320 * wmult), (int)(240 * hmult));
-    temp.fill(black);
+    temp.fill(Qt::black);
 
     m_pixlabel = new QLabel(m_boxframe);
     m_pixlabel->setBackgroundOrigin(WindowOrigin);
     m_pixlabel->setPixmap(temp);
     m_pixlabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     hbox->addWidget(m_boxframe);
 
     //hbox->addWidget(m_pixlabel);
     
     // Title edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Title:");
     label = new QLabel(message, this);
@@ -85,7 +91,7 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
     m_title->setFocus();
  
     // Subtitle edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Subtitle:");
     label = new QLabel(message, this);
@@ -99,7 +105,7 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
 
 
     // Duration spin box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Duration:");
     label = new QLabel(message, this);
@@ -121,7 +127,7 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
 
 
     // Start and stop buttons
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_startButton = new MythPushButton( this, "start" );
     m_startButton->setBackgroundOrigin(WindowOrigin);
@@ -163,11 +169,11 @@ bool ManualBox::eventFilter(QObject *, QEvent *e)
 {
     if (e->type() == QEvent::FocusIn)
     {
-        m_boxframe->setFrameStyle(QFrame::Panel | QFrame::Raised);
+        m_boxframe->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised);
     }
     else if (e->type() == QEvent::FocusOut)
     {
-        m_boxframe->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        m_boxframe->setFrameStyle(Q3Frame::Panel | Q3Frame::Sunken);
     }
     else if (e->type() == QEvent::KeyPress)
     {

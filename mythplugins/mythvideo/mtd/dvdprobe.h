@@ -1,8 +1,8 @@
 /*
-	dvdprobe.h
+    dvdprobe.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
 
     header for dvd probing code (libdvdread)
 */
@@ -31,8 +31,8 @@
 #endif
 
 // Qt headers
-#include <qstring.h>
-#include <qptrlist.h>
+#include <QString>
+#include <Q3PtrList>
 
 class DVDSubTitle
 {
@@ -128,9 +128,9 @@ class DVDTitle
 
     void                   printYourself();
     void                   addAudio(DVDAudio *new_audio_track);
-    QPtrList<DVDAudio>    *getAudioTracks() { return &audio_tracks; }
+    Q3PtrList<DVDAudio>    *getAudioTracks() { return &audio_tracks; }
     void                   addSubTitle(DVDSubTitle *new_subitle);
-    QPtrList<DVDSubTitle> *getSubTitles() { return &subtitles; }
+    Q3PtrList<DVDSubTitle> *getSubTitles() { return &subtitles; }
 
   private:
     uint    numb_chapters;
@@ -152,8 +152,8 @@ class DVDTitle
     QString video_format;
     uint    dvdinput_id;
 
-    QPtrList<DVDAudio>    audio_tracks;
-    QPtrList<DVDSubTitle> subtitles;
+    Q3PtrList<DVDAudio>    audio_tracks;
+    Q3PtrList<DVDSubTitle> subtitles;
 };
 
 class DVDProbe
@@ -169,7 +169,7 @@ class DVDProbe
 
     bool                probe();
     QString             getName() { return volume_name; }
-    QPtrList<DVDTitle> *getTitles() { return &titles; }
+    Q3PtrList<DVDTitle> *getTitles() { return &titles; }
     DVDTitle           *getTitle(uint which_one);
 
   private:
@@ -178,7 +178,7 @@ class DVDProbe
     QString      device;
     dvd_reader_t *dvd;
 
-    QPtrList<DVDTitle>  titles;
+    Q3PtrList<DVDTitle>  titles;
     QString             volume_name;
 };
 

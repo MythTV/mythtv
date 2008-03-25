@@ -1,13 +1,16 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
 #include <iostream>
 #include <map>
@@ -718,8 +721,6 @@ void ProgramRecPriority::deactivate(void)
                     MythContext::DBError("Update recording schedule inactive query", query);
             }
 
-        QPainter p(this);
-        updateInfo(&p);
         update(fullRect);
     }
 }
@@ -759,7 +760,6 @@ void ProgramRecPriority::details(void)
 void ProgramRecPriority::changeRecPriority(int howMuch) 
 {
     int tempRecPriority, cnt;
-    QPainter p(this);
     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
     ProgramRecPriorityInfo *progInfo;
  
@@ -777,8 +777,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
         // order may change if sorting by recording priority, so resort
         if (sortType == byRecPriority)
             SortList();
-        updateList(&p);
-        updateInfo(&p);
+        update(fullRect);
     }
 }
 
@@ -866,7 +865,7 @@ void ProgramRecPriority::FillList(void)
         while (result.next()) 
         {
             int recordid = result.value(0).toInt();
-            QString title = QString::fromUtf8(result.value(1).toString());
+            QString title = result.value(1).toString();
             QString chanid = result.value(2).toString();
             QString tempTime = result.value(3).toString();
             QString tempDate = result.value(4).toString();

@@ -17,3 +17,5 @@ SOURCES += main.cpp ../mythvideo/dbcheck.cpp logging.cpp mtd.cpp serversocket.cp
 SOURCES += jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp
 
 mingw:DEFINES += USING_MINGW
+#The following line was inserted by qt3to4
+QT += xml opengl qt3support  sql

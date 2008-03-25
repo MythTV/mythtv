@@ -412,12 +412,12 @@ bool DVBChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    curchannelname = QDeepCopy<QString>(channum);
+    curchannelname = Q3DeepCopy<QString>(channum);
 
     VERBOSE(VB_CHANNEL, loc + "Tuned to frequency.");
 
     currentInputID = nextInputID;
-    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
+    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
 
     return true;
 }
@@ -803,7 +803,7 @@ bool DVBChannel::Retune(void)
 
 QString DVBChannel::GetFrontendName(void) const
 {
-    return QDeepCopy<QString>(frontend_name);
+    return Q3DeepCopy<QString>(frontend_name);
 }
 
 /** \fn DVBChannel::IsTuningParamsProbeSupported(void) const
@@ -874,7 +874,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     }
 
     uint    mplex      = tuning.mplex;
-    QString sistandard = QDeepCopy<QString>(tuning.sistandard);
+    QString sistandard = Q3DeepCopy<QString>(tuning.sistandard);
 
     tuning = dvbparams_to_dtvmultiplex(card_type, params);
 

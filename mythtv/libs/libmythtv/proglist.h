@@ -2,6 +2,9 @@
 #define PROGLIST_H_
 
 #include <qdatetime.h>
+#include <QEvent>
+#include <QPaintEvent>
+#include <QKeyEvent>
 #include "libmyth/uitypes.h"
 #include "libmyth/xmlparse.h"
 #include "libmyth/mythwidgets.h"
@@ -61,7 +64,7 @@ class MPUBLIC ProgLister : public MythDialog
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
     void quickRecord(void);
 
   private:

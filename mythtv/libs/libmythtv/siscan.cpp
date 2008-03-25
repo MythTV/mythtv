@@ -92,7 +92,7 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
       scanMode(IDLE),
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
-      inputname(QDeepCopy<QString>(_inputname)),
+      inputname(Q3DeepCopy<QString>(_inputname)),
       // Settable
       ignoreAudioOnlyServices(false),
       ignoreDataServices(false),
@@ -110,7 +110,7 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
 {
     // Initialize statics
     init_freq_tables();
-    current = scanTransports.end();
+    current = transport_scan_items_it_t( scanTransports.end());
 
     // Create a stream data for digital signal monitors
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
@@ -228,7 +228,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
-    nextIt = scanTransports.end();
+    nextIt = transport_scan_items_it_t( scanTransports.end() );
 
     MSqlQuery query(MSqlQuery::InitCon());
     // Run DB query to get transports on sourceid SourceID
@@ -272,7 +272,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     transportsScanned = 0;
     if (scanTransports.size())
     {
-        nextIt        = scanTransports.begin();
+        nextIt        = transport_scan_items_it_t(scanTransports.begin());
         scanMode      = TRANSPORT_LIST;
         return true;
     }
@@ -658,7 +658,7 @@ void SIScan::HandleActiveScan(void)
     if (!HasTimedOut())
         return;
 
-    if (0 == nextIt.offset() && nextIt != scanTransports.begin())
+    if (0 == nextIt.offset() && nextIt != transport_scan_items_it_t(scanTransports.begin()))
     {
         // Stop signal monitor for previous transport
         signalMonitor->Stop();
@@ -672,7 +672,7 @@ void SIScan::HandleActiveScan(void)
 
     current = nextIt; // Increment current
 
-    if (current != scanTransports.end())
+    if (current != transport_scan_items_it_t(scanTransports.end()))
     {
         ScanTransport(current);
 
@@ -685,7 +685,7 @@ void SIScan::HandleActiveScan(void)
         emit ServiceScanComplete();
         scanMode = IDLE;
         scanTransports.clear();
-        current = nextIt = scanTransports.end();
+        current = nextIt = transport_scan_items_it_t(scanTransports.end());
     }
 }
 
@@ -798,7 +798,7 @@ bool SIScan::ScanTransports(int SourceID,
         return false;
 
     scanTransports.clear();
-    nextIt = scanTransports.end();
+    nextIt = transport_scan_items_it_t( scanTransports.end());
 
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
@@ -834,7 +834,7 @@ bool SIScan::ScanTransports(int SourceID,
     timer.start();
     waitingForTables = false;
 
-    nextIt            = scanTransports.begin();
+    nextIt            = transport_scan_items_it_t( scanTransports.begin() );
     transportsScanned = 0;
     scanMode          = TRANSPORT_LIST;
 
@@ -847,7 +847,7 @@ bool SIScan::ScanForChannels(uint sourceid,
                              const DTVChannelList &channels)
 {
     scanTransports.clear();
-    nextIt = scanTransports.end();
+    nextIt = transport_scan_items_it_t( scanTransports.end());
 
     DTVTunerType tunertype;
     tunertype.Parse(cardtype);
@@ -874,7 +874,7 @@ bool SIScan::ScanForChannels(uint sourceid,
     timer.start();
     waitingForTables = false;
 
-    nextIt            = scanTransports.begin();
+    nextIt            = transport_scan_items_it_t( scanTransports.begin());
     transportsScanned = 0;
     scanMode          = TRANSPORT_LIST;
 
@@ -906,7 +906,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
         return false;
 
     scanTransports.clear();
-    nextIt = scanTransports.end();
+    nextIt = transport_scan_items_it_t( scanTransports.end() );
 
     DTVMultiplex tuning;
 
@@ -949,7 +949,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
     timer.start();
     waitingForTables = false;
 
-    nextIt            = scanTransports.begin();
+    nextIt            = transport_scan_items_it_t(scanTransports.begin());
     transportsScanned = 0;
     scanMode          = TRANSPORT_LIST;
 
@@ -959,7 +959,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
 bool SIScan::ScanTransport(int mplexid)
 {
     scanTransports.clear();
-    nextIt = scanTransports.end();
+    nextIt = transport_scan_items_it_t(scanTransports.end());
 
     MSqlQuery query(MSqlQuery::InitCon());
     // Run DB query to get transports on sourceid SourceID
@@ -1003,7 +1003,7 @@ bool SIScan::ScanTransport(int mplexid)
     transportsScanned = 0;
     if (scanTransports.size())
     {
-        nextIt        = scanTransports.begin();
+        nextIt        = transport_scan_items_it_t(scanTransports.begin());
         scanMode      = TRANSPORT_LIST;
         return true;
     }
@@ -1036,8 +1036,8 @@ bool SIScan::CheckImportedList(const DTVChannelInfoList &channels,
             found = true;
             if (!channels[i].name.isEmpty())
             {
-                service_name = QDeepCopy<QString>(channels[i].name);
-                callsign     = QDeepCopy<QString>(channels[i].name);
+                service_name = Q3DeepCopy<QString>(channels[i].name);
+                callsign     = Q3DeepCopy<QString>(channels[i].name);
             }
         }
     }

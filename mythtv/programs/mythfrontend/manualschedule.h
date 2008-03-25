@@ -2,7 +2,9 @@
 #define MANUALSCHEDULE_H_
 
 #include <qdatetime.h>
-#include <qhbox.h>
+#include <q3hbox.h>
+#include <QLabel>
+
 #include "libmyth/mythwidgets.h"
 #include "tv.h"
 #include "NuppelVideoPlayer.h"
@@ -10,9 +12,9 @@
 
 #include <pthread.h>
 
-class QListViewItem;
+class Q3ListViewItem;
 class QLabel;
-class QProgressBar;
+class Q3ProgressBar;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
@@ -40,7 +42,7 @@ class ManualSchedule : public MythDialog
     int daysahead;
     int prev_weekday;
 
-    QHBox *m_boxframe;
+    Q3HBox *m_boxframe;
     QLabel *m_pixlabel;
     MythRemoteLineEdit *m_title;
     MythComboBox *m_channel;

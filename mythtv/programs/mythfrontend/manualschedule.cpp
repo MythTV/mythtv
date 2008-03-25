@@ -1,21 +1,23 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qdatetime.h>
-#include <qprogressbar.h>
+#include <q3progressbar.h>
 #include <qapplication.h>
 #include <qtimer.h>
 #include <qimage.h>
 #include <qpainter.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qfile.h>
 #include <qsqldatabase.h>
 #include <qregexp.h>
-#include <qhbox.h>
-#include <qdatetimeedit.h>
+#include <q3hbox.h>
+#include <q3datetimeedit.h>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
 
 #include <unistd.h>
 
@@ -43,7 +45,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     m_startDateTime = m_nowDateTime;
     daysahead = 0;
     
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
 
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -57,11 +59,11 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     vbox->addWidget(label);
 
-    QVBoxLayout *vkbox = new QVBoxLayout(vbox, (int)(1 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vkbox, (int)(1 * wmult));
+    Q3VBoxLayout *vkbox = new Q3VBoxLayout(vbox, (int)(1 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vkbox, (int)(1 * wmult));
 
     // Channel
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Channel:");
     label = new QLabel(message, this);
@@ -81,7 +83,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = QDeepCopy<QString>(longChannelFormat);
+        QString chantext = Q3DeepCopy<QString>(longChannelFormat);
         chantext
             .replace("<num>",  channels[i].channum)
             .replace("<sign>", channels[i].callsign)
@@ -94,7 +96,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_channel);
 
     // Program Date
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Date or day of the week") + ": ";
     label = new QLabel(message, this);
@@ -118,7 +120,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     }
     hbox->addWidget(m_startdate);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     QTime thisTime = m_nowDateTime.time();
     thisTime = thisTime.addSecs((30 - thisTime.minute() % 30) * 60);
@@ -182,7 +184,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_duration);
 
     // Title edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     message = tr("Title (optional):");
     label = new QLabel(message, this);
@@ -195,7 +197,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_title);
 
     //  Record Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_recordButton = new MythPushButton( this, "Program" );
     m_recordButton->setBackgroundOrigin(WindowOrigin);
@@ -205,7 +207,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_recordButton);
 
     //  Cancel Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_cancelButton = new MythPushButton( this, "Program" );
     m_cancelButton->setBackgroundOrigin(WindowOrigin);
@@ -305,8 +307,8 @@ void ManualSchedule::recordClicked(void)
     {
         query.next();
         p.chanstr = query.value(1).toString();
-        p.chansign = QString::fromUtf8(query.value(2).toString());
-        p.channame = QString::fromUtf8(query.value(3).toString());
+        p.chansign = query.value(2).toString();
+        p.channame = query.value(3).toString();
     }
 
     int addsec = m_duration->currentItem() * 300;
@@ -324,7 +326,7 @@ void ManualSchedule::recordClicked(void)
                   p.startts.toString(timeformat);
 
     p.title += " (" + tr("Manual Record") + ")";
-    p.description = QDeepCopy<QString>(p.title);
+    p.description = Q3DeepCopy<QString>(p.title);
 
     ScheduledRecording *record = new ScheduledRecording();
     record->loadByProgram(&p);

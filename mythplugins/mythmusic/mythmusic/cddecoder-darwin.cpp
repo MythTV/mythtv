@@ -69,7 +69,7 @@ bool CdDecoder::initialize()
     QDomDocument TOC;
     uint         trk;
 
-    if (!TOCfile.open(IO_ReadOnly))
+    if (!TOCfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_GENERAL,
                 "Unable to open Audio CD TOC file: " + TOCfile.name());

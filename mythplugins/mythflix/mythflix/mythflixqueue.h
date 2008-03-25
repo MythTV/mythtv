@@ -23,7 +23,8 @@
 #define MYTHFLIXQUEUE_H
 
 // QT headers
-#include <qhttp.h>
+#include <q3http.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
@@ -48,7 +49,7 @@ public:
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QCustomEvent*);
+    void customEvent(QEvent*);
 
   private:
     void loadData();
@@ -75,7 +76,7 @@ public:
 
     QString        m_queueName;
 
-    QHttp         *http;
+    Q3Http         *http;
 
 private slots:
     void updateInfoView(MythListButtonItem*);

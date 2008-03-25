@@ -385,8 +385,8 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     {
         pos = angle.left(angle.length() - 1).toDouble();
         if ((translated &&
-             (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere"))) ||
-            (!translated && (postfix.upper() == "W")))
+             (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere")[0])) ||
+            (!translated && (postfix.upper() == 'W')))
         {
             pos = -pos;
         }
@@ -810,7 +810,7 @@ void LNBConfig::SetPreset(const QString &value)
         return;
 
     lnb_preset &preset = lnb_presets[index];
-    if (preset.name == NULL)
+    if (preset.name.isEmpty())
     {
         m_type->setEnabled(true);
         UpdateType();

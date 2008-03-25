@@ -87,9 +87,9 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
 
   private:
     vector<QWidget*>    childwidget;
-    QGroupBox          *widget;
+    Q3GroupBox          *widget;
     ConfigurationGroup *confgrp;
-    QVBoxLayout        *layout;
+    Q3VBoxLayout        *layout;
 };
 
 class MPUBLIC HorizontalConfigurationGroup : public ConfigurationGroup
@@ -172,7 +172,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
 
   protected:
     vector<QWidget*>    childwidget;
-    QWidgetStack       *widget;
+    Q3WidgetStack       *widget;
     ConfigurationGroup *confgrp;
     uint                top;
     bool                saveAll;

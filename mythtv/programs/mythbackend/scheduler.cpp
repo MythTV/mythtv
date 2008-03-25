@@ -4,6 +4,7 @@
 #include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
+#include <Q3ValueList>
 
 #include <iostream>
 #include <algorithm>
@@ -172,7 +173,7 @@ void Scheduler::verifyCards(void)
             subquery.exec();
             
             if (!subquery.isActive() || subquery.size() <= 0)
-                cerr << query.value(1).toString() << " is defined, but isn't "
+                cerr << (const char *)query.value(1).toString() << " is defined, but isn't "
                      << "attached to a cardinput.\n";
         }
     }
@@ -463,19 +464,19 @@ void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
         cout << prefix;
 
     if (p->subtitle > " ")
-        episode = QString("%1 - \"%2\"").arg(p->title.local8Bit())
-            .arg(p->subtitle.local8Bit());
+        episode = QString("%1 - \"%2\"").arg((const char *)p->title.local8Bit())
+            .arg((const char *)p->subtitle.local8Bit());
     else
         episode = p->title.local8Bit();
 
-    cout << episode.leftJustify(30, ' ', true) << " "
-         << p->chanstr.rightJustify(4, ' ') << " " 
-         << p->chansign.leftJustify(7, ' ', true) << " "
-         << p->recstartts.toString("dd hh:mm-").local8Bit()
-         << p->recendts.toString("hh:mm  ").local8Bit()
+    cout << (const char *)episode.leftJustify(30, ' ', true) << " "
+         << (const char *)p->chanstr.rightJustify(4, ' ') << " "
+         << (const char *)p->chansign.leftJustify(7, ' ', true) << " "
+         << (const char *)p->recstartts.toString("dd hh:mm-").local8Bit()
+         << (const char *)p->recendts.toString("hh:mm  ").local8Bit()
          << p->sourceid << " " << p->cardid << " " << p->inputid << "  " 
-         << p->RecTypeChar() << " " << p->RecStatusChar() << " "
-         << (QString::number(p->recpriority) + "/" + 
+         << (const char *)p->RecTypeChar() << " " << (const char *)p->RecStatusChar() << " "
+         << (const char *)(QString::number(p->recpriority) + "/" +
              QString::number(p->recpriority2)).rightJustify(5, ' ')
          << endl;
 }
@@ -812,7 +813,8 @@ bool Scheduler::FindNextConflict(
             continue;
 
         if (is_conflict_dbg)
-            cout << QString("\n  comparing with '%1' ").arg(q->title);
+            cout << QString("\n  comparing with '%1' ").arg(q->title)
+                .toLocal8Bit().constData();
 
         if (p->cardid != 0 && (p->cardid != q->cardid) &&
             !igrp.GetSharedInputGroup(p->inputid, q->inputid))
@@ -843,11 +845,12 @@ bool Scheduler::FindNextConflict(
 
         if (is_conflict_dbg)
             cout << "\n" <<
-                QString("  cardid's: %1, %2 ").arg(p->cardid).arg(q->cardid) +
-                QString("Shared input group: %1 ")
-                .arg(igrp.GetSharedInputGroup(p->inputid, q->inputid)) +
-                QString("mplexid's: %1, %2")
-                .arg(p->GetMplexID()).arg(q->GetMplexID());
+                (QString("  cardid's: %1, %2 ").arg(p->cardid).arg(q->cardid) +
+                 QString("Shared input group: %1 ")
+                 .arg(igrp.GetSharedInputGroup(p->inputid, q->inputid)) +
+                 QString("mplexid's: %1, %2")
+                 .arg(p->GetMplexID()).arg(q->GetMplexID()))
+                .toLocal8Bit().constData();
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
@@ -883,7 +886,7 @@ const ProgramInfo *Scheduler::FindConflict(
         if (is_conflict_dbg)
         {
             cout << QString("Checking '%1' for conflicts on cardid %2")
-                .arg(p->title).arg(it.key());
+                .arg(p->title).arg(it.key()).toLocal8Bit().constData();
         }
 
         const RecList &cardlist = *it;
@@ -1069,7 +1072,7 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
             QString msg = QString(
                 "Moved \"%1\" on chanid: %2 from card: %3 to %4 "
                 "to avoid LiveTV conflict")
-                .arg(p->title.local8Bit()).arg(p->chanid)
+                .arg(p->title.local8Bit().constData()).arg(p->chanid)
                 .arg(p->cardid).arg(q->cardid);
             VERBOSE(VB_SCHEDULE, msg);
         }
@@ -1725,7 +1728,7 @@ void Scheduler::RunScheduler(void)
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
                               "is locked by an external application.")
-                    .arg(nextRecording->title.local8Bit())
+                    .arg((const char *)nextRecording->title.local8Bit())
                     .arg(nextRecording->chanid)
                     .arg(nextRecording->cardid)
                     .arg(nextRecording->sourceid);
@@ -2119,7 +2122,7 @@ void Scheduler::UpdateManuals(int recordid)
         return;
     }
 
-    QValueList<int> chanidlist;
+    Q3ValueList<int> chanidlist;
     while (query.next())
         chanidlist.append(query.value(0).toInt());
 
@@ -2212,7 +2215,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
     while (result.next())
     {
         QString prefix = QString(":NR%1").arg(count);
-        qphrase = QString::fromUtf8(result.value(3).toString());
+        qphrase = result.value(3).toString();
 
         RecSearchType searchtype = RecSearchType(result.value(1).toInt());
 
@@ -2225,11 +2228,11 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 
         QString bindrecid = prefix + "RECID";
         QString bindphrase = prefix + "PHRASE";
-        QString bindlikephrase = prefix + "LIKEPHRASE";
+        QString bindlikephrase1 = prefix + "LIKEPHRASE1";
+        QString bindlikephrase2 = prefix + "LIKEPHRASE2";
+        QString bindlikephrase3 = prefix + "LIKEPHRASE3";
 
         bindings[bindrecid] = result.value(0).toString();
-        bindings[bindphrase] = qphrase.utf8();
-        bindings[bindlikephrase] = QString(QString("%") + qphrase + "%").utf8();
 
         switch (searchtype)
         {
@@ -2242,20 +2245,25 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                       .arg(qphrase));
             break;
         case kTitleSearch:
+            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
-                      "program.title LIKE " + bindlikephrase);
+                      "program.title LIKE " + bindlikephrase1);
             break;
         case kKeywordSearch:
+            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase2] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase3] = QString(QString("%") + qphrase + "%");
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       " AND program.manualid = 0"
-                      " AND (program.title LIKE " + bindlikephrase +
-                      " OR program.subtitle LIKE " + bindlikephrase +
-                      " OR program.description LIKE " + bindlikephrase + ")");
+                      " AND (program.title LIKE " + bindlikephrase1 +
+                      " OR program.subtitle LIKE " + bindlikephrase2 +
+                      " OR program.description LIKE " + bindlikephrase3 + ")");
             break;
         case kPeopleSearch:
+            bindings[bindphrase] = qphrase;
             from << ", people, credits";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
@@ -2301,7 +2309,8 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         from << "";
         where << s;
         bindings[":NRST"] = kNoSearch;
-        bindings[":NRRECORDID"] = recordid;
+        if (recordid != -1)
+            bindings[":NRRECORDID"] = recordid;
     }
 }
 
@@ -2372,8 +2381,8 @@ void Scheduler::UpdateMatches(int recordid) {
     if (print_verbose_messages & VB_SCHEDULE)
     {
         for (clause = 0; clause < fromclauses.count(); clause++)
-            cout << "Query " << clause << ": " << fromclauses[clause] 
-                 << "/" << whereclauses[clause] << endl;
+            cout << "Query " << clause << ": " << (const char *)fromclauses[clause]
+                 << "/" << (const char *)whereclauses[clause] << endl;
     }
 
     for (clause = 0; clause < fromclauses.count(); clause++)
@@ -2444,7 +2453,7 @@ void Scheduler::UpdateMatches(int recordid) {
 
         if (!result.isActive())
         {
-            MythContext::DBError("UpdateMatches", result);
+            MythContext::DBError("UpdateMatches3", result);
             continue;
         }
 
@@ -2492,7 +2501,7 @@ void Scheduler::AddNewRecords(void)
     while (rlist.next())
     {
         int recid = rlist.value(0).toInt();
-        QString qtitle = QString::fromUtf8(rlist.value(1).toString());
+        QString qtitle = rlist.value(1).toString();
         int maxEpisodes = rlist.value(2).toInt();
         int maxNewest = rlist.value(3).toInt();
 
@@ -2807,13 +2816,13 @@ void Scheduler::AddNewRecords(void)
         p->sourceid = result.value(1).toInt();
         p->startts = result.value(2).toDateTime();
         p->endts = result.value(3).toDateTime();
-        p->title = QString::fromUtf8(result.value(4).toString());
-        p->subtitle = QString::fromUtf8(result.value(5).toString());
-        p->description = QString::fromUtf8(result.value(6).toString());
+        p->title = result.value(4).toString();
+        p->subtitle = result.value(5).toString();
+        p->description = result.value(6).toString();
         p->chanstr = result.value(7).toString();
-        p->chansign = QString::fromUtf8(result.value(8).toString());
-        p->channame = QString::fromUtf8(result.value(9).toString());
-        p->category = QString::fromUtf8(result.value(11).toString());
+        p->chansign = result.value(8).toString();
+        p->channame = result.value(9).toString();
+        p->category = result.value(11).toString();
         p->recpriority = result.value(12).toInt();
         p->dupin = RecordingDupInType(result.value(13).toInt());
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
@@ -2823,9 +2832,9 @@ void Scheduler::AddNewRecords(void)
         p->recstartts = result.value(18).toDateTime();
         p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
-        p->recgroup = QString::fromUtf8(result.value(21).toString());
-        p->storagegroup = QString::fromUtf8(result.value(42).toString());
-        p->playgroup = QString::fromUtf8(result.value(36).toString());
+        p->recgroup = result.value(21).toString();
+        p->storagegroup = result.value(42).toString();
+        p->playgroup = result.value(36).toString();
         p->chancommfree = (result.value(23).toInt() == -2);
         p->hostname = result.value(43).toString();
         p->cardid = result.value(24).toInt();
@@ -3073,16 +3082,16 @@ void Scheduler::AddNotListed(void) {
             continue;
         }
 
-        p->title = QString::fromUtf8(result.value(9).toString());
+        p->title = result.value(9).toString();
 
         if (p->rectype == kSingleRecord || p->rectype == kOverrideRecord)
         {
-            p->subtitle = QString::fromUtf8(result.value(10).toString());
-            p->description = QString::fromUtf8(result.value(11).toString());
+            p->subtitle = result.value(10).toString();
+            p->description = result.value(11).toString();
         }
         p->chanstr = result.value(12).toString();
-        p->chansign = QString::fromUtf8(result.value(13).toString());
-        p->channame = QString::fromUtf8(result.value(14).toString());
+        p->chansign = result.value(13).toString();
+        p->channame = result.value(14).toString();
 
         p->schedulerid = p->startts.toString() + "_" + p->chanid;
 
@@ -3155,21 +3164,21 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
                 proginfo->endts.setTime(QTime(0,0));
             }
 
-            proginfo->title = QString::fromUtf8(result.value(5).toString());
+            proginfo->title = result.value(5).toString();
             proginfo->subtitle =
-                QString::fromUtf8(result.value(6).toString());
+                result.value(6).toString();
             proginfo->description =
-                QString::fromUtf8(result.value(7).toString());
+                result.value(7).toString();
 
             proginfo->recpriority = result.value(8).toInt();
             proginfo->channame =
-                QString::fromUtf8(result.value(10).toString());
+                result.value(10).toString();
             if (proginfo->channame.isNull())
                 proginfo->channame = "";
             proginfo->recgroup =
-                QString::fromUtf8(result.value(12).toString());
+                result.value(12).toString();
             proginfo->playgroup =
-                QString::fromUtf8(result.value(22).toString());
+                result.value(22).toString();
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
@@ -3178,11 +3187,11 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
             if (proginfo->chanstr.isNull())
                 proginfo->chanstr = "";
             proginfo->chansign = 
-                QString::fromUtf8(result.value(17).toString());
+                result.value(17).toString();
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
             proginfo->category = 
-                QString::fromUtf8(result.value(20).toString());
+                result.value(20).toString();
             proginfo->findid = result.value(21).toInt();
             
             proginfo->recstartts = proginfo->startts;
@@ -3503,7 +3512,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
              fslistit++)
         {
             FileSystemInfo *fs = *fslistit;
-            cout << fs->hostname << ":" << fs->directory << endl;
+            cout << (const char *)fs->hostname << ":" << (const char *)fs->directory << endl;
             cout << "    Location    : ";
             if (fs->isLocal)
                 cout << "local" << endl;

@@ -1,7 +1,7 @@
 #ifndef MYTHOBSERVABLE_H_
 #define MYTHOBSERVABLE_H_
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include "mythexp.h"
 #include "mythevent.h"
 
@@ -21,7 +21,7 @@ class QObject;
        {
            QObject *listener = firstListener();
                while (listener) {
-                   QApplication::postEvent (listener, new QCustomEvent(100));
+                   QApplication::postEvent (listener, new QEvent(100));
                listener = nextListener();  
            }
        }
@@ -110,7 +110,7 @@ class MPUBLIC MythObservable
 
         \returns a copy of the list of listener
     */
-    QPtrList<QObject> getListeners(void);
+    Q3PtrList<QObject> getListeners(void);
 
     /** \brief Dispatch an event to all listeners 
                        
@@ -134,7 +134,7 @@ class MPUBLIC MythObservable
     void dispatchNow(MythEvent &event);
 
   private:
-    QPtrList<QObject> m_listeners;
+    Q3PtrList<QObject> m_listeners;
 };
 
 #endif /* MYTHOBSERVABLE_H */

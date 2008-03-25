@@ -65,7 +65,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
         {
             // found a sub to display
             m_lastReturnedSubtitle = sub;
-            return QDeepCopy<QStringList>(m_lastReturnedSubtitle.textLines);
+            return Q3DeepCopy<QStringList>(m_lastReturnedSubtitle.textLines);
         }
 
         // the subtitle time span has ended, let's display a blank sub
@@ -142,8 +142,10 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
             // if the encoding has not been detected to be non-UTF8
             // before (the heuristics method can sometimes return
             // larger than the lineLength for unknown reason, thus the >= )
-            utf8 = utf8 &&
-                (utf8Codec->heuristicContentMatch(subLine, lineLength) >= lineLength);
+
+            // Qt4 port: method removed from Qt library, replacemnet unknown
+            //utf8 = utf8 &&
+            //    (utf8Codec->heuristicContentMatch(subLine, lineLength) >= lineLength);
 
             // use Latin1 as the fallback encoding in case there was
             // non-UTF8 strings detected

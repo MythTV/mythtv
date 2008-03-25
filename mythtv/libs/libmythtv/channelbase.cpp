@@ -134,7 +134,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 {
                     inputname = *it;
                     if (mplexid_restriction)
-                        startchannel = QDeepCopy<QString>((*cit).channum);
+                        startchannel = Q3DeepCopy<QString>((*cit).channum);
                     msg2 = QString("selected to '%1' on input '%2' instead.")
                         .arg(startchannel).arg(inputname);
                     msg_error = false;
@@ -955,7 +955,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
         query.next();
         QString test = query.value(1).toString();
         if (test != QString::null)
-            inputName = QString::fromUtf8(test);
+            inputName = test;
 
         msg = QString("Found channel(%1) on another input (%2) of card (%3).")
             .arg(channum).arg(inputName).arg(GetCardID());

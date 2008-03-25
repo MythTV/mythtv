@@ -343,7 +343,10 @@ WorkerThread *ThreadPool::GetWorkerThread()
                 pThread = AddWorkerThread( false, m_nIdleTimeout );
             else
             {
-                if (m_threadAvail.wait( 5000 ) == false )
+                QMutex mutex;
+                mutex.lock();
+
+                if (m_threadAvail.wait( &mutex, 5000 ) == false )
                     return( NULL );     // timeout exceeded.
             }
         }

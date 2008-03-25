@@ -6,12 +6,12 @@
 
 #include "libmythupnp/upnpdevice.h"
 
-class ListBoxDevice : public QListBoxText
+class ListBoxDevice : public Q3ListBoxText
 {
     public:
 
-        ListBoxDevice(QListBox *list, const QString &name, DeviceLocation *dev)
-            : QListBoxText(list, name)
+        ListBoxDevice(Q3ListBox *list, const QString &name, DeviceLocation *dev)
+            : Q3ListBoxText(list, name)
         {
             if ((m_dev = dev) != NULL)
                 m_dev->AddRef();
@@ -37,7 +37,7 @@ class BackendSelect : public MythDialog
                  BackendSelect(MythMainWindow *parent, DatabaseParams *params);
         virtual ~BackendSelect();
 
-        void     customEvent(QCustomEvent *e);
+        void     customEvent(QEvent *e);
 
         QString  m_PIN;
         QString  m_USN;

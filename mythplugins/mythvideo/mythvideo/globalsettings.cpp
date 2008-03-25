@@ -1,14 +1,14 @@
+#include <map>
+#include <vector>
+
+#include <QDir>
+
 #include <mythtv/mythcontext.h>
 
 #include "globalsettings.h"
 #include "globals.h"
 #include "videodlg.h"
 #include "parentalcontrols.h"
-
-#include <map>
-#include <vector>
-
-#include <qdir.h>
 
 namespace
 {

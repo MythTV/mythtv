@@ -28,6 +28,8 @@
 #include <mythtv/libmythui/mythlistbutton.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 class MythFlixConfigPriv;
 class NewsSiteItem;

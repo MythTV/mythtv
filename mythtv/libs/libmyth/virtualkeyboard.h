@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 #include <qimage.h>
+#include <QKeyEvent>
 
 #include "mythdialogs.h"
 

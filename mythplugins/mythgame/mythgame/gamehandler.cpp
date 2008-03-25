@@ -3,7 +3,7 @@
 #include "rom_metadata.h"
 
 #include <qobject.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <iostream>
 #include <qdir.h>
@@ -19,7 +19,7 @@
 
 using namespace std;
 
-static QPtrList<GameHandler> *handlers = 0;
+static Q3PtrList<GameHandler> *handlers = 0;
 
 bool existsHandler(const QString name)
 {
@@ -43,7 +43,7 @@ static void checkHandlers(void)
     // clear the existing list so that we can regenerate a new one.
     if (! handlers)
     {   
-        handlers = new QPtrList<GameHandler>;
+        handlers = new Q3PtrList<GameHandler>;
     }
     else {
         handlers->clear();
@@ -501,7 +501,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
     {
         while (query.next())
         {
-            QString RomName = QString::fromUtf8(query.value(0).toString());
+            QString RomName = query.value(0).toString();
             QString RomPath = query.value(1).toString();
             QString GameName = query.value(2).toString();
             if (RomName != QString::null)
@@ -537,10 +537,11 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
     if (!RomDir.isReadable()) 
         return 0;
 
-    const QFileInfoList* List = RomDir.entryInfoList();
-    for (QFileInfoListIterator it(*List); it; ++it)
+    QFileInfoList List = RomDir.entryInfoList();
+    for (QFileInfoList::const_iterator it = List.begin();
+         it != List.end(); ++it)
     {   
-        QFileInfo Info(*it.current());
+        QFileInfo Info = *it;
         QString RomName = Info.fileName();
 
         if (RomName == "." ||
@@ -613,10 +614,11 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
         return;
 
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
-    const QFileInfoList* List = RomDir.entryInfoList();
-    for (QFileInfoListIterator it(*List); it; ++it)
+    QFileInfoList List = RomDir.entryInfoList();
+    for (QFileInfoList::const_iterator it = List.begin();
+         it != List.end(); ++it)
     {
-        QFileInfo Info(*it.current());
+        QFileInfo Info = *it;
         QString RomName = Info.fileName();
         QString GameName = Info.baseName(TRUE);
 
@@ -666,7 +668,7 @@ void GameHandler::processGames(GameHandler *handler)
     int maxcount = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if ((handler->SystemRomPath()) && (handler->GameType() != "PC"))
+    if ((!handler->SystemRomPath().isEmpty()) && (handler->GameType() != "PC"))
     {
         QDir d(handler->SystemRomPath());
         if (d.exists())
@@ -766,7 +768,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 
 GameHandler* GameHandler::GetHandlerByName(QString systemname)
 {
-    if (!systemname)
+    if (systemname.isEmpty())
         return NULL;
 
     GameHandler *handler = handlers->first();
@@ -784,7 +786,7 @@ GameHandler* GameHandler::GetHandlerByName(QString systemname)
 void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
 {
     GameHandler *handler;
-    if (systemname) 
+    if (systemname.isEmpty()) 
     {
         handler = GetHandlerByName(systemname);
     }
@@ -847,7 +849,7 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
 
     QString savedir = QDir::currentDirPath ();
     QDir d;
-    if (handler->SystemWorkingPath()) {
+    if (!handler->SystemWorkingPath().isEmpty()) {
         if (!d.cd(handler->SystemWorkingPath()))
         {
             VERBOSE(VB_GENERAL, LOC_ERR + QString("Failed to change to specified Working Directory: %1")

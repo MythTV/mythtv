@@ -10,6 +10,10 @@
 */
 
 #include <qapplication.h>
+//Added by qt3to4:
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QKeyEvent>
 
 #include <unistd.h>
 #include <cstdlib>
@@ -135,7 +139,7 @@ void Weather::setupScreens(QDomElement &xml)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown element: " + e.tagName());
                 exit(0);
             }
         }

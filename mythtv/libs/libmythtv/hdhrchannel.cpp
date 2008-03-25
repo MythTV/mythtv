@@ -232,7 +232,7 @@ bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
         .arg((localIP >>  8) & 0xFF).arg((localIP >>  0) & 0xFF)
         .arg(localPort);
 
-    if (!TunerSet("target", configValue))
+    if (TunerSet("target", configValue).isEmpty())
     {
         return false;
     }
@@ -242,7 +242,7 @@ bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
 
 bool HDHRChannel::DeviceClearTarget()
 {
-    return TunerSet("target", "0.0.0.0:0");
+    return !TunerSet("target", "0.0.0.0:0").isEmpty();
 }
 
 bool HDHRChannel::SetChannelByString(const QString &channum)
@@ -335,13 +335,13 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = QDeepCopy<QString>(channum);
+    curchannelname = Q3DeepCopy<QString>(channum);
 
     // Set the major and minor channel for any additional multiplex tuning
     SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
+    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
 
     // Turn on the HDHomeRun program filtering if it is supported
     // and we are tuning to an MPEG program number.
@@ -397,11 +397,11 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
             QString("TuneTo(%1,%2)").arg(frequency).arg(modulation));
 
     if (modulation == "8vsb")
-        ok = TunerSet("channel", QString("8vsb:%1").arg(frequency));
+        ok = !TunerSet("channel", QString("8vsb:%1").arg(frequency)).isEmpty();
     else if (modulation == "qam_64")
-        ok = TunerSet("channel", QString("qam64:%1").arg(frequency));
+        ok = !TunerSet("channel", QString("qam64:%1").arg(frequency)).isEmpty();
     else if (modulation == "qam_256")
-        ok = TunerSet("channel", QString("qam256:%1").arg(frequency));
+        ok = !TunerSet("channel", QString("qam256:%1").arg(frequency)).isEmpty();
 
     if (ok)
         SetSIStandard(si_std);

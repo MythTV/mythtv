@@ -3,7 +3,6 @@
 
 #include <qstring.h>
 #include <qdatetime.h>
-#include <qvaluevector.h>
 
 #include "mythuitype.h"
 #include "mythimage.h"
@@ -29,7 +28,7 @@ class MythUIImage : public MythUIType
     void ResetFilename();
 
     void SetImage(MythImage *img);
-    void SetImages(QValueVector<MythImage *> &images);
+    void SetImages(QVector<MythImage *> &images);
 
     void SetSize(int width, int height);
     void SetSkip(int x, int y);
@@ -54,7 +53,7 @@ class MythUIImage : public MythUIType
     QString m_Filename;
     QString m_OrigFilename;
 
-    QValueVector<MythImage *> m_Images;
+    QVector<MythImage *> m_Images;
 
     QPoint m_Skip;
     QSize  m_ForceSize;

@@ -5,6 +5,8 @@
 
 // mytharchive
 #include "editmetadata.h"
+//Added by qt3to4:
+#include <QKeyEvent>
 
 EditMetadataDialog::EditMetadataDialog(ArchiveItem *source_metadata,
                                  MythMainWindow *parent,
@@ -117,7 +119,7 @@ void EditMetadataDialog::wireUpTheme()
         description_edit->createEdit(this);
         MythRemoteLineEdit *edit = (MythRemoteLineEdit *) description_edit->getEdit();
         if (edit)
-            edit->setWordWrap(QTextEdit::WidgetWidth); 
+            edit->setWordWrap(Q3TextEdit::WidgetWidth); 
         connect(description_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
 

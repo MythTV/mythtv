@@ -10,11 +10,14 @@
 // POSIX headers
 #include <time.h>
 
+#include <QObject>
+
 // MythTV headers
 #include "dtvrecorder.h"
 
 class DBox2Channel;
-class QHttp;
+class Q3Http;
+class QString;
 
 typedef struct stream_meta_
 {
@@ -95,7 +98,7 @@ class DBox2Recorder : public DTVRecorder
     int             httpPort;
     QString         ip;
     bool            isOpen;
-    QHttp          *http;
+    Q3Http          *http;
     DBox2Relay     *m_relay;
     int             m_lastPIDRequestID;
     int             m_lastInfoRequestID;

@@ -5,7 +5,7 @@
 using namespace std;
 
 // Qt includes
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV includes
 #include "mythdbcon.h"
@@ -14,7 +14,7 @@ using namespace std;
 #include "programinfo.h" // for subtitle types and audio and video properties
 
 DBPerson::DBPerson(Role _role, const QString &_name) :
-    role(_role), name(QDeepCopy<QString>(_name))
+    role(_role), name(Q3DeepCopy<QString>(_name))
 {
 }
 
@@ -47,7 +47,7 @@ uint DBPerson::GetPersonDB(MSqlQuery &query) const
         "SELECT person "
         "FROM people "
         "WHERE name = :NAME");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
 
     if (!query.exec())
         MythContext::DBError("get_person", query);
@@ -62,7 +62,7 @@ uint DBPerson::InsertPersonDB(MSqlQuery &query) const
     query.prepare(
         "INSERT IGNORE INTO people (name) "
         "VALUES (:NAME);");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
 
     if (query.exec())
         return 1;
@@ -84,7 +84,7 @@ uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
     query.bindValue(":PERSON",    personid);
     query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", starttime);
-    query.bindValue(":ROLE",      GetRole().utf8());
+    query.bindValue(":ROLE",      GetRole());
 
     if (query.exec())
         return 1;
@@ -164,24 +164,23 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
             string_to_myth_category_type(query.value(4).toString());
 
         DBEvent prog(chanid,
-                     QString::fromUtf8(query.value(0).toString()),
-                     QString::fromUtf8(query.value(1).toString()),
-                     QString::fromUtf8(query.value(2).toString()),
-                     QString::fromUtf8(query.value(3).toString()),
+                     query.value(0).toString(),
+                     query.value(1).toString(),
+                     query.value(2).toString(),
+                     query.value(3).toString(),
                      category_type,
                      query.value(5).toDateTime(), query.value(6).toDateTime(),
                      fixup,
                      query.value(7).toUInt(),
                      query.value(8).toUInt(),
                      query.value(9).toUInt(),
-                     QString::fromUtf8(query.value(10).toString()),
-                     QString::fromUtf8(query.value(11).toString())
+                     query.value(10).toString(),
+                     query.value(11).toString()
                      );
 
         prog.partnumber = query.value(12).toUInt();
         prog.parttotal  = query.value(13).toUInt();
-        prog.syndicatedepisodenumber = 
-                          QString::fromUtf8(query.value(14).toString());
+        prog.syndicatedepisodenumber = query.value(14).toString();
         prog.airdate    = query.value(15).toString();
         prog.originalairdate = query.value(16).toDate();
 
@@ -313,7 +312,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     if (lcategory.isEmpty() && !match.category.isEmpty())
         lcategory = match.category;
 
-    if (lairdate.isEmpty() && !match.airdate.isEmpty() && match.airdate != '0')
+    if (lairdate.isEmpty() && !match.airdate.isEmpty() && match.airdate != "0")
         lairdate = match.airdate;
 
     if (!loriginalairdate.isValid() && match.originalairdate.isValid())
@@ -368,11 +367,11 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":OLDSTART",    match.starttime);
-    query.bindValue(":TITLE",       ltitle.utf8());
-    query.bindValue(":SUBTITLE",    lsubtitle.utf8());
-    query.bindValue(":DESC",        ldesc.utf8());
-    query.bindValue(":CAT",         lcategory.utf8());
-    query.bindValue(":CATTYPE",     lcattype.utf8());
+    query.bindValue(":TITLE",       ltitle);
+    query.bindValue(":SUBTITLE",    lsubtitle);
+    query.bindValue(":DESC",        ldesc);
+    query.bindValue(":CAT",         lcategory);
+    query.bindValue(":CATTYPE",     lcattype);
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
     query.bindValue(":CC",          lsubtype & SUB_HARDHEAR ? true : false);
@@ -384,12 +383,12 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":VIDEOPROP",   lvideo);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
-    query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber.utf8());
+    query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber);
     query.bindValue(":AIRDATE",     lairdate.isEmpty() ? "0000" : lairdate);
     query.bindValue(":ORIGAIRDATE", loriginalairdate);
     query.bindValue(":LSOURCE",     1);
-    query.bindValue(":SERIESID",    lseriesId.utf8());
-    query.bindValue(":PROGRAMID",   lprogramId.utf8());
+    query.bindValue(":SERIESID",    lseriesId);
+    query.bindValue(":PROGRAMID",   lprogramId);
     query.bindValue(":PREVSHOWN",   lpreviouslyshown);
 
     if (!query.exec())
@@ -533,11 +532,11 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     QString cattype = myth_category_type_to_string(category_type);
 
     query.bindValue(":CHANID",      chanid);
-    query.bindValue(":TITLE",       title.utf8());
-    query.bindValue(":SUBTITLE",    subtitle.utf8());
-    query.bindValue(":DESCRIPTION", description.utf8());
-    query.bindValue(":CATEGORY",    category.utf8());
-    query.bindValue(":CATTYPE",     cattype.utf8());
+    query.bindValue(":TITLE",       title);
+    query.bindValue(":SUBTITLE",    subtitle);
+    query.bindValue(":DESCRIPTION", description);
+    query.bindValue(":CATEGORY",    category);
+    query.bindValue(":CATTYPE",     cattype);
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
     query.bindValue(":CC",          subtitleType & SUB_HARDHEAR ? true : false);
@@ -549,12 +548,12 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":VIDEOPROP",   videoProps);
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
-    query.bindValue(":SYNDICATENO", syndicatedepisodenumber.utf8());
+    query.bindValue(":SYNDICATENO", syndicatedepisodenumber);
     query.bindValue(":AIRDATE",     airdate.isEmpty() ? "0000" : airdate);
     query.bindValue(":ORIGAIRDATE", originalairdate);
     query.bindValue(":LSOURCE",     1);
-    query.bindValue(":SERIESID",    lseriesId.utf8());
-    query.bindValue(":PROGRAMID",   lprogramId.utf8());
+    query.bindValue(":SERIESID",    lseriesId);
+    query.bindValue(":PROGRAMID",   lprogramId);
     query.bindValue(":PREVSHOWN",   previouslyshown);
 
     if (!query.exec())

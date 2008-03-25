@@ -1,7 +1,7 @@
 #ifndef MYTHSCREEN_STACK_H_
 #define MYTHSCREEN_STACK_H_
 
-#include <qvaluevector.h>
+#include <qvector.h>
 #include <qobject.h>
 
 class MythScreenType;
@@ -19,7 +19,7 @@ class MythScreenStack : public QObject
 
     MythScreenType *GetTopScreen(void);
 
-    void GetDrawOrder(QValueVector<MythScreenType *> &screens);
+    void GetDrawOrder(QVector<MythScreenType *> &screens);
     int TotalScreens();
 
     void DisableEffects(void) { m_DoTransitions = false; }
@@ -30,8 +30,8 @@ class MythScreenStack : public QObject
     void CheckNewFadeTransition();
     void CheckDeletes();
 
-    QValueVector<MythScreenType *> m_Children;
-    QValueVector<MythScreenType *> m_DrawOrder;
+    QVector<MythScreenType *> m_Children;
+    QVector<MythScreenType *> m_DrawOrder;
 
     MythScreenType *topScreen;
 
@@ -39,7 +39,7 @@ class MythScreenStack : public QObject
     bool m_InNewTransition;
     MythScreenType *newTop;
 
-    QValueVector<MythScreenType *> m_ToDelete;
+    QVector<MythScreenType *> m_ToDelete;
 };
   
 #endif

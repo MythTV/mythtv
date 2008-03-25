@@ -12,10 +12,11 @@
 
 #include <qregexp.h>
 #include <qstringlist.h>
-#include <qtextstream.h>
-#include <qurl.h>
+#include <q3textstream.h>
+#include <q3url.h>
 #include <qfile.h>
 #include <qfileinfo.h>
+#include <Q3CString>
 
 #include "mythconfig.h"
 #if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
@@ -95,10 +96,10 @@ HTTPRequest::HTTPRequest() : m_eType          ( RequestTypeUnknown ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
-                             m_response       ( m_aBuffer, IO_WriteOnly ),
+                             m_response       ( m_aBuffer, QIODevice::WriteOnly ),
                              m_pPostProcess   ( NULL )
 {
-    m_response.setEncoding( QTextStream::UnicodeUTF8 );
+    m_response.setEncoding( Q3TextStream::UnicodeUTF8 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -198,7 +199,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
 long HTTPRequest::SendResponse( void )
 {
     long      nBytes    = 0;
-    QCString  sHeader;
+    Q3CString  sHeader;
 
     switch( m_eResponseType )
     {
@@ -279,7 +280,7 @@ long HTTPRequest::SendResponse( void )
 
 long HTTPRequest::SendResponseFile( QString sFileName )
 {
-    QCString    sHeader;
+    Q3CString    sHeader;
     long        nBytes  = 0;
     long long   llSize  = 0;
     long long   llStart = 0;
@@ -671,8 +672,8 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
             if ((sName.length() != 0) && (sValue.length() !=0))
             {
-                QUrl::decode( sName  );
-                QUrl::decode( sValue );
+                Q3Url::decode( sName  );
+                Q3Url::decode( sValue );
 
                 mapParams.insert( sName.stripWhiteSpace(), sValue );
                 nCount++;
@@ -1106,8 +1107,8 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                     if (!oText.isNull())
                         sValue = oText.nodeValue();
                      
-                    QUrl::decode( sName  );
-                    QUrl::decode( sValue );
+                    Q3Url::decode( sName  );
+                    Q3Url::decode( sValue );
 
                     m_mapParams.insert( sName.stripWhiteSpace(), sValue );
                 }

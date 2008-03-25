@@ -15,7 +15,8 @@ using namespace std;
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qfile.h>
-#include <qprocess.h>
+#include <q3process.h>
+#include <Q3ValueList>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -253,8 +254,8 @@ bool FillData::grabDDData(Source source, int poffset,
 // XMLTV stuff
 bool FillData::grabDataFromFile(int id, QString &filename)
 {
-    QValueList<ChanInfo> chanlist;
-    QMap<QString, QValueList<ProgInfo> > proglist;
+    Q3ValueList<ChanInfo> chanlist;
+    QMap<QString, Q3ValueList<ProgInfo> > proglist;
 
     if (!xmltv_parser.parseFile(filename, &chanlist, &proglist))
         return false;
@@ -438,10 +439,10 @@ void FillData::grabDataFromDDFile(
  *         program info grabbed with the associated grabber.
  *  \return true if there was no failures
  */
-bool FillData::fillData(QValueList<Source> &sourcelist)
+bool FillData::fillData(Q3ValueList<Source> &sourcelist)
 {
-    QValueList<Source>::Iterator it;
-    QValueList<Source>::Iterator it2;
+    Q3ValueList<Source>::Iterator it;
+    Q3ValueList<Source>::Iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -569,7 +570,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         if (is_grabber_external(xmltv_grabber))
         {
 
-            QProcess grabber_capabilities_proc(xmltv_grabber);
+            Q3Process grabber_capabilities_proc(xmltv_grabber);
             grabber_capabilities_proc.addArgument(QString("--capabilities"));
             if ( grabber_capabilities_proc.start() )
             {
@@ -628,7 +629,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
         if (hasprefmethod)
         {
 
-            QProcess grabber_method_proc(xmltv_grabber);
+            Q3Process grabber_method_proc(xmltv_grabber);
             grabber_method_proc.addArgument("--preferredmethod");
             if ( grabber_method_proc.start() )
             {
@@ -982,7 +983,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
     fstream fin(xawrcfile.ascii(), ios::in);
     if (!fin.is_open()) return;
 
-    QValueList<ChanInfo> chanlist;
+    Q3ValueList<ChanInfo> chanlist;
 
     QString xawid;
     QString channel;

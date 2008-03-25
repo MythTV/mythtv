@@ -11,6 +11,7 @@ using namespace std;
 // Qt headers
 #include <qstring.h>
 #include <qmutex.h>
+#include <qwaitcondition.h>
 
 class RingBuffer;
 class MythSocket;
@@ -46,8 +47,9 @@ class FileTransfer
   private:
    ~FileTransfer();
 
-    bool readthreadlive;
-    QMutex readthreadLock;
+    volatile bool  readthreadlive;
+    bool           readsLocked;
+    QWaitCondition readsUnlockedCond;
 
     RingBuffer *rbuffer;
     MythSocket *sock;
@@ -55,6 +57,7 @@ class FileTransfer
 
     vector<char> requestBuffer;
 
+    QMutex lock;
     QMutex refLock;
     int refCount;
 };

@@ -20,6 +20,9 @@
 #include <qcursor.h>
 #include <qstring.h>
 #include <qregexp.h>
+#include <QHideEvent>
+#include <QResizeEvent>
+#include <QPaintEvent>
 
 // mythtv
 #include <mythtv/audiooutput.h>
@@ -49,9 +52,9 @@ VisualBase::VisualBase(bool screensaverenable)
 VisualBase::~VisualBase()
 {
     //
-    //	This is only here so 
-    //	that derived classes
-    //	can destruct properly
+    //    This is only here so
+    //    that derived classes
+    //    can destruct properly
     //
     if (!xscreensaverenable)
         gContext->DoRestoreScreensaver();
@@ -65,7 +68,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 
     QFontMetrics fm(p->font());
     int width = fm.width(warning);
-    int height = fm.height() * (warning.contains("\n") + 1);
+    int height = fm.height() * (warning.contains("\n") ? 2 : 1);
     int x = size.width() / 2 - width / 2;
     int y = size.height() / 2 - height / 2;
 
@@ -181,7 +184,7 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
 
     cnt = len;
 
-    if (c == 2) 
+    if (c == 2)
     {
         l = new short[len];
         r = new short[len];
@@ -190,8 +193,8 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
             stereo16_from_stereopcm8(l, r, b, cnt);
         else if (p == 16)
             stereo16_from_stereopcm16(l, r, (short *) b, cnt);
-    } 
-    else if (c == 1) 
+    }
+    else if (c == 1)
     {
         l = new short[len];
 
@@ -199,7 +202,7 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
             mono16_from_monopcm8(l, b, cnt);
         else if (p == 16)
             mono16_from_monopcm16(l, (short *) b, cnt);
-    } 
+    }
     else
         len = 0;
 
@@ -217,12 +220,12 @@ void MainVisual::timeout()
 
     VisualNode *node = 0;
 
-    if (playing && output()) 
+    if (playing && output())
     {
         long synctime = output()->GetAudiotime();
         mutex()->lock();
         VisualNode *prev = 0;
-        while ((node = nodes.first())) 
+        while ((node = nodes.first()))
         {
             if (node->offset > synctime)
                 break;
@@ -240,14 +243,14 @@ void MainVisual::timeout()
     if (node)
         delete node;
 
-    if (vis && process) 
+    if (vis && process)
     {
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
         {
             bitBlt(this, 0, 0, &pixmap);
         }
-    } 
+    }
 
     if (!playing && stop)
         timer->stop();
@@ -266,15 +269,15 @@ void MainVisual::resizeEvent( QResizeEvent *event )
     if ( vis )
         vis->resize( size() );
 
-    info_widget->setDisplayRect(QRect((int)(pixmap.width() * 0.1), 
+    info_widget->setDisplayRect(QRect((int)(pixmap.width() * 0.1),
                                       (int)(pixmap.height() * 0.75),
-                                      (int)(pixmap.width() * 0.8), 
+                                      (int)(pixmap.width() * 0.8),
                                       (int)(pixmap.height() * 0.18)));
 }
 
-void MainVisual::customEvent(QCustomEvent *event)
+void MainVisual::customEvent(QEvent *event)
 {
-    switch (event->type()) 
+    switch (event->type())
     {
         case OutputEvent::Playing:
         case OutputEvent::Info:
@@ -322,12 +325,12 @@ void MainVisual::hideBanner(void)
     info_widget->showInformation("");
 }
 
-void MainVisual::bannerTimeout(void) 
+void MainVisual::bannerTimeout(void)
 {
     hideBanner();
 }
 
-// static member function 
+// static member function
 QStringList MainVisual::Visualizations()
 {
     QStringList visualizations;
@@ -337,7 +340,7 @@ QStringList MainVisual::Visualizations()
         pVisFactory->plugins(&visualizations);
     }
 
-    return visualizations; 
+    return visualizations;
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -398,7 +401,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
 
     QFontMetrics fm(p.font());
     int textWidth = fm.width(info);
-    int textHeight = fm.height() * (info.contains("\n") + 1);
+    int textHeight = fm.height() * (info.contains("\n") ? 2 : 1);
     int x = indent;
     int y = indent;
 
@@ -408,7 +411,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
 
         // draw the albumArt image
         QImage image(albumArt);
-        image = image.smoothScale(width(), height(), QImage::ScaleMin);
+        image = image.smoothScale(width(), height(), Qt::KeepAspectRatio);
         p.drawImage(QPoint(width() / 2 - image.width() / 2, height() / 2 - image.height() / 2), image);
 
         x += displayRect.x();
@@ -426,7 +429,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
             // draw the albumArt image
 
             QImage image(albumArt);
-            image = image.smoothScale(height(), height(), QImage::ScaleMin);
+            image = image.smoothScale(height(), height(), Qt::KeepAspectRatio);
             p.drawImage(QPoint(0, 0), image);
             x += height();
         }
@@ -436,7 +439,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
     if (!fullScreen || visMode == 2)
     {
         QString info_copy = info;
-        for (int offset = 0; offset < textHeight; offset += fm.height()) 
+        for (int offset = 0; offset < textHeight; offset += fm.height())
         {
             QString l = info_copy.left(info_copy.find("\n"));
             p.setPen(Qt::black);
@@ -475,14 +478,14 @@ void InfoWidget::showInformation(const QString &text)
 
     QFontMetrics fm(p.font());
     int textWidth = fm.width(info);
-    int textHeight = fm.height() * (info.contains("\n") + 1);
+    int textHeight = fm.height() * (info.contains("\n") ? 2 : 1);
     int x = indent;
     int y = indent;
 
     p.fillRect(0, 0, info_pixmap.width(), info_pixmap.height(), QColor ("darkblue"));
 
     QString info_copy = info;
-    for (int offset = 0; offset < textHeight; offset += fm.height()) 
+    for (int offset = 0; offset < textHeight; offset += fm.height())
     {
         QString l = info_copy.left(info_copy.find("\n"));
         p.setPen(Qt::black);
@@ -496,7 +499,7 @@ void InfoWidget::showInformation(const QString &text)
     repaint();
 }
 
-void InfoWidget::paintEvent( QPaintEvent * ) 
+void InfoWidget::paintEvent( QPaintEvent * )
 {
     bitBlt(this, 0, 0, &info_pixmap);
 }
@@ -522,7 +525,7 @@ void StereoScope::resize( const QSize &newsize )
     uint os = magnitudes.size();
     magnitudes.resize( size.width() * 2 );
     for ( ; os < magnitudes.size(); os++ )
-	magnitudes[os] = 0.0;
+    magnitudes[os] = 0.0;
 }
 
 bool StereoScope::process( VisualNode *node )
@@ -535,94 +538,94 @@ bool StereoScope::process( VisualNode *node )
     double index, step = 512.0 / size.width();
 
     if (node) {
-	index = 0;
-	for ( i = 0; i < size.width(); i++) {
-	    indexTo = (int)(index + step);
+    index = 0;
+    for ( i = 0; i < size.width(); i++) {
+        indexTo = (int)(index + step);
             if (indexTo == (int)(index))
                 indexTo = (int)(index + 1);
 
-	    if ( rubberband ) {
-		valL = magnitudesp[ i ];
-		valR = magnitudesp[ i + size.width() ];
-		if (valL < 0.) {
-		    valL += falloff;
-		    if ( valL > 0. )
-			valL = 0.;
-		} else {
-		    valL -= falloff;
-		    if ( valL < 0. )
-			valL = 0.;
-		}
-		if (valR < 0.) {
-		    valR += falloff;
-		    if ( valR > 0. )
-			valR = 0.;
-		} else {
-		    valR -= falloff;
-		    if ( valR < 0. )
-			valR = 0.;
-		}
-	    } else
-		valL = valR = 0.;
+        if ( rubberband ) {
+        valL = magnitudesp[ i ];
+        valR = magnitudesp[ i + size.width() ];
+        if (valL < 0.) {
+            valL += falloff;
+            if ( valL > 0. )
+            valL = 0.;
+        } else {
+            valL -= falloff;
+            if ( valL < 0. )
+            valL = 0.;
+        }
+        if (valR < 0.) {
+            valR += falloff;
+            if ( valR > 0. )
+            valR = 0.;
+        } else {
+            valR -= falloff;
+            if ( valR < 0. )
+            valR = 0.;
+        }
+        } else
+        valL = valR = 0.;
 
-	    for (s = (int)index; s < indexTo && s < node->length; s++) {
-		tmpL = ( ( node->left ?
-			   double( node->left[s] ) : 0.) *
-			 double( size.height() / 4 ) ) / 32768.;
-		tmpR = ( ( node->right ?
-			   double( node->right[s]) : 0.) *
-			 double( size.height() / 4 ) ) / 32768.;
-		if (tmpL > 0)
-		    valL = (tmpL > valL) ? tmpL : valL;
-		else
-		    valL = (tmpL < valL) ? tmpL : valL;
-		if (tmpR > 0)
-		    valR = (tmpR > valR) ? tmpR : valR;
-		else
-		    valR = (tmpR < valR) ? tmpR : valR;
-	    }
+        for (s = (int)index; s < indexTo && s < node->length; s++) {
+        tmpL = ( ( node->left ?
+               double( node->left[s] ) : 0.) *
+             double( size.height() / 4 ) ) / 32768.;
+        tmpR = ( ( node->right ?
+               double( node->right[s]) : 0.) *
+             double( size.height() / 4 ) ) / 32768.;
+        if (tmpL > 0)
+            valL = (tmpL > valL) ? tmpL : valL;
+        else
+            valL = (tmpL < valL) ? tmpL : valL;
+        if (tmpR > 0)
+            valR = (tmpR > valR) ? tmpR : valR;
+        else
+            valR = (tmpR < valR) ? tmpR : valR;
+        }
 
-	    if (valL != 0. || valR != 0.)
-		allZero = FALSE;
+        if (valL != 0. || valR != 0.)
+        allZero = FALSE;
 
-	    magnitudesp[ i ] = valL;
-	    magnitudesp[ i + size.width() ] = valR;
+        magnitudesp[ i ] = valL;
+        magnitudesp[ i + size.width() ] = valR;
 
-	    index = index + step;
-	}
+        index = index + step;
+    }
     } else if (rubberband) {
-	for ( i = 0; i < size.width(); i++) {
-	    valL = magnitudesp[ i ];
-	    if (valL < 0) {
-		valL += 2;
-		if (valL > 0.)
-		    valL = 0.;
-	    } else {
-		valL -= 2;
-		if (valL < 0.)
-		    valL = 0.;
-	    }
+    for ( i = 0; i < size.width(); i++) {
+        valL = magnitudesp[ i ];
+        if (valL < 0) {
+        valL += 2;
+        if (valL > 0.)
+            valL = 0.;
+        } else {
+        valL -= 2;
+        if (valL < 0.)
+            valL = 0.;
+        }
 
-	    valR = magnitudesp[ i + size.width() ];
-	    if (valR < 0.) {
-		valR += falloff;
-		if (valR > 0.)
-		    valR = 0.;
-	    } else {
-		valR -= falloff;
-		if (valR < 0.)
-		    valR = 0.;
-	    }
+        valR = magnitudesp[ i + size.width() ];
+        if (valR < 0.) {
+        valR += falloff;
+        if (valR > 0.)
+            valR = 0.;
+        } else {
+        valR -= falloff;
+        if (valR < 0.)
+            valR = 0.;
+        }
 
-	    if (valL != 0. || valR != 0.)
-		allZero = FALSE;
+        if (valL != 0. || valR != 0.)
+        allZero = FALSE;
 
-	    magnitudesp[ i ] = valL;
-	    magnitudesp[ i + size.width() ] = valR;
-	}
+        magnitudesp[ i ] = valL;
+        magnitudesp[ i + size.width() ] = valR;
+    }
     } else {
-	for ( i = 0; (unsigned) i < magnitudes.size(); i++ )
-	    magnitudesp[ i ] = 0.;
+    for ( i = 0; (unsigned) i < magnitudes.size(); i++ )
+        magnitudesp[ i ] = 0.;
     }
 
     return allZero;
@@ -635,80 +638,80 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 
     p->fillRect(0, 0, size.width(), size.height(), back);
     for ( int i = 1; i < size.width(); i++ ) {
-	// left
-	per = double( magnitudesp[ i ] * 2 ) /
-	      double( size.height() / 4 );
-	if (per < 0.0)
-	    per = -per;
-	if (per > 1.0)
-	    per = 1.0;
-	else if (per < 0.0)
-	    per = 0.0;
+    // left
+    per = double( magnitudesp[ i ] * 2 ) /
+          double( size.height() / 4 );
+    if (per < 0.0)
+        per = -per;
+    if (per > 1.0)
+        per = 1.0;
+    else if (per < 0.0)
+        per = 0.0;
 
-	r = startColor.red() + (targetColor.red() -
-				startColor.red()) * (per * per);
-	g = startColor.green() + (targetColor.green() -
-				  startColor.green()) * (per * per);
-	b = startColor.blue() + (targetColor.blue() -
-				 startColor.blue()) * (per * per);
+    r = startColor.red() + (targetColor.red() -
+                startColor.red()) * (per * per);
+    g = startColor.green() + (targetColor.green() -
+                  startColor.green()) * (per * per);
+    b = startColor.blue() + (targetColor.blue() -
+                 startColor.blue()) * (per * per);
 
-	if (r > 255.0)
-	    r = 255.0;
-	else if (r < 0.0)
-	    r = 0;
+    if (r > 255.0)
+        r = 255.0;
+    else if (r < 0.0)
+        r = 0;
 
-	if (g > 255.0)
-	    g = 255.0;
-	else if (g < 0.0)
-	    g = 0;
+    if (g > 255.0)
+        g = 255.0;
+    else if (g < 0.0)
+        g = 0;
 
-	if (b > 255.0)
-	    b = 255.0;
-	else if (b < 0.0)
-	    b = 0;
+    if (b > 255.0)
+        b = 255.0;
+    else if (b < 0.0)
+        b = 0;
 
-	p->setPen( QColor( int(r), int(g), int(b) ) );
+    p->setPen( QColor( int(r), int(g), int(b) ) );
         p->setPen(Qt::red);
-	p->drawLine( i - 1, (int)((size.height() / 4) + magnitudesp[i - 1]),
-		     i, (int)((size.height() / 4) + magnitudesp[i]));
+    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudesp[i - 1]),
+             i, (int)((size.height() / 4) + magnitudesp[i]));
 
-	// right
-	per = double( magnitudesp[ i + size.width() ] * 2 ) /
-	      double( size.height() / 4 );
-	if (per < 0.0)
-	    per = -per;
-	if (per > 1.0)
-	    per = 1.0;
-	else if (per < 0.0)
-	    per = 0.0;
+    // right
+    per = double( magnitudesp[ i + size.width() ] * 2 ) /
+          double( size.height() / 4 );
+    if (per < 0.0)
+        per = -per;
+    if (per > 1.0)
+        per = 1.0;
+    else if (per < 0.0)
+        per = 0.0;
 
-	r = startColor.red() + (targetColor.red() -
-				startColor.red()) * (per * per);
-	g = startColor.green() + (targetColor.green() -
-				  startColor.green()) * (per * per);
-	b = startColor.blue() + (targetColor.blue() -
-				 startColor.blue()) * (per * per);
+    r = startColor.red() + (targetColor.red() -
+                startColor.red()) * (per * per);
+    g = startColor.green() + (targetColor.green() -
+                  startColor.green()) * (per * per);
+    b = startColor.blue() + (targetColor.blue() -
+                 startColor.blue()) * (per * per);
 
-	if (r > 255.0)
-	    r = 255.0;
-	else if (r < 0.0)
-	    r = 0;
+    if (r > 255.0)
+        r = 255.0;
+    else if (r < 0.0)
+        r = 0;
 
-	if (g > 255.0)
-	    g = 255.0;
-	else if (g < 0.0)
-	    g = 0;
+    if (g > 255.0)
+        g = 255.0;
+    else if (g < 0.0)
+        g = 0;
 
-	if (b > 255.0)
-	    b = 255.0;
-	else if (b < 0.0)
-	    b = 0;
+    if (b > 255.0)
+        b = 255.0;
+    else if (b < 0.0)
+        b = 0;
 
-	p->setPen( QColor( int(r), int(g), int(b) ) );
+    p->setPen( QColor( int(r), int(g), int(b) ) );
         p->setPen(Qt::red);
-	p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
-		     magnitudesp[i + size.width() - 1]),
-		     i, (int)((size.height() * 3 / 4) + 
+    p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
+             magnitudesp[i + size.width() - 1]),
+             i, (int)((size.height() * 3 / 4) +
                      magnitudesp[i + size.width()]));
     }
 
@@ -716,44 +719,44 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 }
 
 MonoScope::MonoScope()
-{       
-}   
-        
+{
+}
+
 MonoScope::~MonoScope()
-{       
-}           
-    
+{
+}
+
 bool MonoScope::process( VisualNode *node )
-{       
+{
     bool allZero = TRUE;
-    int i;  
+    int i;
     long s, indexTo;
     double *magnitudesp = magnitudes.data();
     double val, tmp;
 
     double index, step = 512.0 / size.width();
 
-    if (node) 
+    if (node)
     {
         index = 0;
-        for ( i = 0; i < size.width(); i++) 
+        for ( i = 0; i < size.width(); i++)
         {
             indexTo = (int)(index + step);
             if (indexTo == (int)index)
                 indexTo = (int)(index + 1);
 
-            if ( rubberband ) 
+            if ( rubberband )
             {
                 val = magnitudesp[ i ];
-                if (val < 0.) 
+                if (val < 0.)
                 {
                     val += falloff;
                     if ( val > 0. )
                     {
                         val = 0.;
                     }
-                } 
-                else 
+                }
+                else
                 {
                     val -= falloff;
                     if ( val < 0. )
@@ -761,13 +764,13 @@ bool MonoScope::process( VisualNode *node )
                         val = 0.;
                     }
                 }
-            } 
+            }
             else
             {
                 val = 0.;
             }
 
-            for (s = (int)index; s < indexTo && s < node->length; s++) 
+            for (s = (int)index; s < indexTo && s < node->length; s++)
             {
                 tmp = ( double( node->left[s] ) +
                         (node->right ? double( node->right[s] ) : 0) *
@@ -789,8 +792,8 @@ bool MonoScope::process( VisualNode *node )
             magnitudesp[ i ] = val;
             index = index + step;
         }
-    } 
-    else if (rubberband) 
+    }
+    else if (rubberband)
     {
         for ( i = 0; i < size.width(); i++) {
             val = magnitudesp[ i ];
@@ -808,8 +811,8 @@ bool MonoScope::process( VisualNode *node )
                 allZero = FALSE;
             magnitudesp[ i ] = val;
         }
-    } 
-    else 
+    }
+    else
     {
         for ( i = 0; i < size.width(); i++ )
             magnitudesp[ i ] = 0.;

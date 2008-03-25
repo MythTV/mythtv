@@ -11,7 +11,7 @@ class ImageCache
   public:
     const QPixmap *load(const QString &image_file);
     const QPixmap *load(const QString &image_file, int width, int height,
-                        QImage::ScaleMode scale);
+                        Qt::AspectRatioMode scale);
     const QPixmap *load(const QString &image_file, QPixmap *pre_loaded);
     bool hitTest(const QString &image_file) const;
     void resize(unsigned int new_size);

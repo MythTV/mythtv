@@ -5,7 +5,8 @@
 #include <qstringlist.h>
 #include <qrect.h>
 #include <qpoint.h>
-#include <qvaluevector.h>
+#include <q3valuevector.h>
+#include <QKeyEvent>
 #include <ctime>
 #include <qmap.h>
 #include <qdom.h>

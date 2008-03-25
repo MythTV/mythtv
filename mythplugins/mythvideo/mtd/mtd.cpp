@@ -1,19 +1,20 @@
 /*
-	mtd.cpp
+    mtd.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Methods for the core mtd object
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Methods for the core mtd object
 
 */
 
 #include <unistd.h>
 #include <cstdlib>
-#include <qstringlist.h>
-#include <qregexp.h>
-#include <qdir.h>
-#include <qtimer.h>
+#include <QStringList>
+#include <QRegExp>
+#include <QDir>
+#include <QTimer>
+#include <Q3PtrList>
 
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
@@ -114,10 +115,10 @@ MTD::MTD(int port, bool log_stdout)
     //
     
     server_socket = new MTDServerSocket(port);
-    connect(server_socket, SIGNAL(newConnect(QSocket *)),
-            this, SLOT(newConnection(QSocket *)));
-    connect(server_socket, SIGNAL(endConnect(QSocket *)),
-            this, SLOT(endConnection(QSocket *)));
+    connect(server_socket, SIGNAL(newConnect(Q3Socket *)),
+            this, SLOT(newConnection(Q3Socket *)));
+    connect(server_socket, SIGNAL(endConnect(Q3Socket *)),
+            this, SLOT(endConnection(Q3Socket *)));
     
     //
     //  Create the logging object
@@ -199,7 +200,7 @@ void MTD::checkDisc()
         have_disc = true;
         if(had_disc)
         {
-            if(!old_name == dvd_probe->getName())
+            if (old_name != dvd_probe->getName())
             {
                 //
                 //  DVD changed
@@ -213,7 +214,7 @@ void MTD::checkDisc()
             //  DVD inserted
             //
             emit writeToLog(QString("DVD inserted: %1").arg(dvd_probe->getName()));
-            QPtrList<DVDTitle> *list_of_titles = dvd_probe->getTitles();
+            Q3PtrList<DVDTitle> *list_of_titles = dvd_probe->getTitles();
             
             //
             //  Do not use an iterator, cause 
@@ -253,9 +254,10 @@ void MTD::cleanThreads()
     //
 
     JobThread *iterator;
-    for(iterator = job_threads.first(); iterator; iterator = job_threads.next() )
+    for (iterator = job_threads.first(); iterator;
+         iterator = job_threads.next() )
     {
-        if(iterator->finished())
+        if (iterator->isFinished())
         {
             QString problem = iterator->getProblem();
             QString job_command = iterator->getJobString();
@@ -293,7 +295,7 @@ void MTD::cleanThreads()
     
 }
 
-void MTD::newConnection(QSocket *socket)
+void MTD::newConnection(Q3Socket *socket)
 {
     connect(socket, SIGNAL(readyRead()),
             this, SLOT(readSocket()));
@@ -301,7 +303,7 @@ void MTD::newConnection(QSocket *socket)
     mtd_log->socketOpened();
 }
 
-void MTD::endConnection(QSocket *socket)
+void MTD::endConnection(Q3Socket *socket)
 {
     socket->close();
     mtd_log->socketClosed();
@@ -310,7 +312,7 @@ void MTD::endConnection(QSocket *socket)
 void MTD::readSocket()
 {
 
-    QSocket *socket = (QSocket *)sender();
+    Q3Socket *socket = (Q3Socket *)sender();
     if(socket->canReadLine())
     {
         QString incoming_data = socket->readLine();
@@ -323,7 +325,7 @@ void MTD::readSocket()
 }
 
 
-void MTD::parseTokens(const QStringList &tokens, QSocket *socket)
+void MTD::parseTokens(const QStringList &tokens, Q3Socket *socket)
 {
     //
     //  parse commands coming in from the socket
@@ -414,7 +416,7 @@ void MTD::shutDown()
     exit(0);
 }
 
-void MTD::sendMessage(QSocket *where, const QString &what)
+void MTD::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
@@ -422,12 +424,12 @@ void MTD::sendMessage(QSocket *where, const QString &what)
     where->writeBlock(message.utf8(), message.utf8().length());
 }
 
-void MTD::sayHi(QSocket *socket)
+void MTD::sayHi(Q3Socket *socket)
 {
     sendMessage(socket, "greetings");
 }
 
-void MTD::sendStatusReport(QSocket *socket)
+void MTD::sendStatusReport(Q3Socket *socket)
 {
     //
     //  Tell the client how many jobs are 
@@ -456,7 +458,7 @@ void MTD::sendStatusReport(QSocket *socket)
     sendMessage(socket, "status dvd complete");
 }
 
-void MTD::sendMediaReport(QSocket *socket)
+void MTD::sendMediaReport(Q3Socket *socket)
 {
     //
     //  Tell the client what's on a disc
@@ -472,7 +474,7 @@ void MTD::sendMediaReport(QSocket *socket)
         {
             sleep(1);
         }
-        QPtrList<DVDTitle>   *dvd_titles = dvd_probe->getTitles();
+        Q3PtrList<DVDTitle>   *dvd_titles = dvd_probe->getTitles();
         sendMessage(socket, QString("media dvd summary %1 %2").arg(dvd_titles->count()).arg(dvd_probe->getName()));
 
         //
@@ -496,7 +498,7 @@ void MTD::sendMediaReport(QSocket *socket)
             //
             //  For each track, send all the audio info
             //
-            QPtrList<DVDAudio> *audio_tracks = dvd_titles->at(i)->getAudioTracks();
+            Q3PtrList<DVDAudio> *audio_tracks = dvd_titles->at(i)->getAudioTracks();
             for(uint j = 0; j < audio_tracks->count(); j++)
             {
                 //
@@ -514,7 +516,7 @@ void MTD::sendMediaReport(QSocket *socket)
             //
             //  For each subtitle, send the id number, the lang code, and the name
             //
-            QPtrList<DVDSubTitle> *subtitles = dvd_titles->at(i)->getSubTitles();
+            Q3PtrList<DVDSubTitle> *subtitles = dvd_titles->at(i)->getSubTitles();
             for(uint j = 0; j < subtitles->count(); j++)
             {
                 sendMessage(socket, QString("media dvd title-subtitle %1 %2 %3 %4")
@@ -670,7 +672,7 @@ void MTD::startDVD(const QStringList &tokens)
 
     QString dir_and_file = "";
 
-    for(uint i=7; i < tokens.count(); i++)
+    for(QStringList::size_type i = 7; i < tokens.count(); i++)
     {
         dir_and_file += tokens[i];
         if(i != tokens.count() - 1)
@@ -979,7 +981,7 @@ bool MTD::isItOkToStartTranscoding()
     return false;
 }
 
-void MTD::customEvent(QCustomEvent *ce)
+void MTD::customEvent(QEvent *ce)
 {
     if(ce->type() == 65432)
     {

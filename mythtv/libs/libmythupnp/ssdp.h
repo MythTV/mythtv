@@ -12,7 +12,7 @@
 #define __SSDP_H__
 
 #include <qthread.h>
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qfile.h>
 
 #include "httpserver.h"
@@ -54,13 +54,13 @@ typedef enum
 #define SocketIdx_Multicast  1
 #define SocketIdx_Broadcast  2
 
-#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( QSocketDevice * ))
+#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( Q3SocketDevice * ))
 
 class SSDP : public QThread
 {
     private:
 
-        QSocketDevice      *m_Sockets[3];
+        Q3SocketDevice      *m_Sockets[3];
 
         int                 m_nPort;
         int                 m_nSearchPort;
@@ -85,7 +85,7 @@ class SSDP : public QThread
                                     const QString    &sKey, 
                                     const QString    &sDefault );
 
-        void    ProcessData       ( QSocketDevice *pSocket );
+        void    ProcessData       ( Q3SocketDevice *pSocket );
 
         SSDPRequestType ProcessRequestLine( const QString &sLine );
 

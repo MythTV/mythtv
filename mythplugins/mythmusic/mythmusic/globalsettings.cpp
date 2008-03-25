@@ -10,9 +10,15 @@
 #include <qdir.h>
 #include <qimage.h>
 #include <qstringlist.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qapplication.h>
 #include <qobject.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QLabel>
+#include <QKeyEvent>
+#include <QEvent>
+#include <Q3VBoxLayout>
 
 // mythtv
 #include <mythtv/util.h>
@@ -484,14 +490,14 @@ static HostComboBox *CDWriterDevice()
         QStringList args;
         QStringList result;
 
-        args = "cdrecord";
+        args << "cdrecord";
         args += "--scanbus";
 
         if (argadd[i].length() > 1)
             args += argadd[i];
 
         QString  cmd = args.join(" ");
-        QProcess proc(args);
+        Q3Process proc(args);
 
         MythTimer totaltimer;
     
@@ -708,8 +714,8 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
                                            MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     // Window title
     QString message = tr("Visualizations");
@@ -723,7 +729,7 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     label = new QLabel(tr("Selected Visualizations"), this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
@@ -735,18 +741,18 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
     hbox->addWidget(label);
 
     // selected listview
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     selectedList = new MythListView(this);
     selectedList->addColumn(tr("Name"));
     selectedList->addColumn(tr("Provider"));
     selectedList->setSorting(-1);         // disable sorting
-    selectedList->setSelectionMode(QListView::Single);
-    connect(selectedList, SIGNAL(currentChanged(QListViewItem *)),
-            this, SLOT(selectedChanged(QListViewItem *)));
-    connect(selectedList, SIGNAL(spacePressed(QListViewItem *)),
-            this, SLOT(selectedOnSelect(QListViewItem *)));
-    connect(selectedList, SIGNAL(returnPressed(QListViewItem *)),
-            this, SLOT(selectedOnSelect(QListViewItem *)));
+    selectedList->setSelectionMode(Q3ListView::Single);
+    connect(selectedList, SIGNAL(currentChanged(Q3ListViewItem *)),
+            this, SLOT(selectedChanged(Q3ListViewItem *)));
+    connect(selectedList, SIGNAL(spacePressed(Q3ListViewItem *)),
+            this, SLOT(selectedOnSelect(Q3ListViewItem *)));
+    connect(selectedList, SIGNAL(returnPressed(Q3ListViewItem *)),
+            this, SLOT(selectedOnSelect(Q3ListViewItem *)));
     selectedList->installEventFilter(this);
     hbox->addWidget(selectedList);
 
@@ -755,18 +761,18 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
     availableList->addColumn(tr("Name"));
     availableList->addColumn(tr("Provider"));
     availableList->setSorting(0);
-    connect(availableList, SIGNAL(currentChanged(QListViewItem *)),
-            this, SLOT(availableChanged(QListViewItem *)));
-    connect(availableList, SIGNAL(spacePressed(QListViewItem *)),
-            this, SLOT(availableOnSelect(QListViewItem *)));
-    connect(availableList, SIGNAL(returnPressed(QListViewItem *)),
-            this, SLOT(availableOnSelect(QListViewItem *)));
+    connect(availableList, SIGNAL(currentChanged(Q3ListViewItem *)),
+            this, SLOT(availableChanged(Q3ListViewItem *)));
+    connect(availableList, SIGNAL(spacePressed(Q3ListViewItem *)),
+            this, SLOT(availableOnSelect(Q3ListViewItem *)));
+    connect(availableList, SIGNAL(returnPressed(Q3ListViewItem *)),
+            this, SLOT(availableOnSelect(Q3ListViewItem *)));
     availableList->installEventFilter(this);
 
     hbox->addWidget(availableList);
 
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     MythPushButton *button = new MythPushButton( this, "Program" );
     button->setBackgroundOrigin(WindowOrigin);
     button->setText( tr( "Move Up" ) );
@@ -792,7 +798,7 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
 
 
     //OK Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     button = new MythPushButton( this, "Program" );
     button->setBackgroundOrigin(WindowOrigin);
     button->setText( tr( "OK" ) );
@@ -815,7 +821,7 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
 
 void VisualizationsEditor::fillWidgets(const QString &currentSelection)
 {
-    QListViewItem *item;
+    Q3ListViewItem *item;
     QStringList currentList = QStringList::split(";", currentSelection);
     QStringList visualizations = MainVisual::Visualizations();
     visualizations.sort();
@@ -839,7 +845,7 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
                 pluginName = "MythMusic";
             }
 
-            item = new QListViewItem(selectedList, item, visName, pluginName);
+            item = new Q3ListViewItem(selectedList, item, visName, pluginName);
         }
         else
             VERBOSE(VB_IMPORTANT, QString("'%1' is not in the list of supported visualizers")
@@ -864,7 +870,7 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
                 pluginName = "MythMusic";
             }
 
-            item = new QListViewItem(availableList, item, visName, pluginName);
+            item = new Q3ListViewItem(availableList, item, visName, pluginName);
         }
     }
 
@@ -897,11 +903,11 @@ void VisualizationsEditor::cancelClicked(void)
 
 void VisualizationsEditor::upClicked(void)
 {
-    QListViewItem *item = selectedList->currentItem();
+    Q3ListViewItem *item = selectedList->currentItem();
 
     if (item)
     {
-        QListViewItem *itemAbove = item->itemAbove();
+        Q3ListViewItem *itemAbove = item->itemAbove();
         if (itemAbove)
             itemAbove = itemAbove->itemAbove();
 
@@ -920,11 +926,11 @@ void VisualizationsEditor::upClicked(void)
 
 void VisualizationsEditor::downClicked(void)
 {
-    QListViewItem *item = selectedList->currentItem();
+    Q3ListViewItem *item = selectedList->currentItem();
 
     if (item)
     {
-        QListViewItem *itemBelow = item->itemBelow();
+        Q3ListViewItem *itemBelow = item->itemBelow();
         if (itemBelow)
         {
             item->moveItem(itemBelow);
@@ -937,7 +943,7 @@ QString VisualizationsEditor::getSelectedModes(void)
 {
     QString res = "";
 
-    QListViewItem *item = selectedList->firstChild();
+    Q3ListViewItem *item = selectedList->firstChild();
 
     while (item)
     {
@@ -955,23 +961,23 @@ QString VisualizationsEditor::getSelectedModes(void)
     return res;
 }
 
-void VisualizationsEditor::selectedChanged(QListViewItem *item)
+void VisualizationsEditor::selectedChanged(Q3ListViewItem *item)
 {
     if (item)
         item->setSelected(true);
 }
 
-void VisualizationsEditor::availableChanged(QListViewItem *item)
+void VisualizationsEditor::availableChanged(Q3ListViewItem *item)
 {
     if (item)
         item->setSelected(true);
 }
 
-void VisualizationsEditor::availableOnSelect(QListViewItem *item)
+void VisualizationsEditor::availableOnSelect(Q3ListViewItem *item)
 {
     if (item)
     {
-        QListViewItem *currItem = selectedList->currentItem();
+        Q3ListViewItem *currItem = selectedList->currentItem();
         if (!currItem)
             currItem = selectedList->lastItem();
 
@@ -984,7 +990,7 @@ void VisualizationsEditor::availableOnSelect(QListViewItem *item)
     }
 }
 
-void VisualizationsEditor::selectedOnSelect(QListViewItem *item)
+void VisualizationsEditor::selectedOnSelect(Q3ListViewItem *item)
 {
     if (item)
     {

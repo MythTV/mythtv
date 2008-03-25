@@ -4,10 +4,12 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <qdatetime.h>
+#include <QKeyEvent>
+#include <QEvent>
 #include <pthread.h>
-#include <qvaluevector.h>
-#include <qvaluelist.h>
-#include <qptrlist.h>
+#include <q3valuevector.h>
+#include <q3valuelist.h>
+#include <q3ptrlist.h>
 #include <qmutex.h>
 #include <qstringlist.h>
 #include <qregexp.h>
@@ -38,7 +40,7 @@ class OSDListTreeType;
 class OSDGenericTree;
 class LiveTVChain;
 
-typedef QValueVector<QString>    str_vec_t;
+typedef Q3ValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
@@ -136,7 +138,7 @@ class MPUBLIC TV : public QObject
     // User input processing commands
     void ProcessKeypress(QKeyEvent *e);
     void ProcessNetworkControlCommand(const QString &command);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
     bool HandleTrackAction(const QString &action);
 
     // LiveTV commands
@@ -523,7 +525,7 @@ class MPUBLIC TV : public QObject
     QTimer *idleTimer; ///< Timer for turning off playback after idle period.
 
     /// Queue of unprocessed key presses.
-    QPtrList<QKeyEvent> keyList;
+    Q3PtrList<QKeyEvent> keyList;
     /// Since keys are processed outside Qt event loop, we need a lock.
     QMutex  keyListLock;
     bool    keyRepeat;      ///< Are repeats logical on last key?
@@ -692,7 +694,7 @@ class MPUBLIC TV : public QObject
     static const uint kPreviousSource;
 
     // Network Control stuff
-    QValueList<QString> networkControlCommands;
+    Q3ValueList<QString> networkControlCommands;
     QMutex ncLock;
 };
 

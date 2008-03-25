@@ -7,6 +7,8 @@
 
 */
 #include <qapplication.h>
+//Added by qt3to4:
+#include <Q3PtrList>
 
 #include <stdio.h>
 #include <string.h>
@@ -371,7 +373,7 @@ void rtp::Debug(QString dbg)
     if (eventWindow)
         QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RtpDebugEv, now + " " + dbg));
 #else
-    cout << dbg;
+    cout << dbg.toLocal8Bit().constData();
 #endif
 }
 
@@ -409,12 +411,12 @@ void rtp::SendRtcpStatistics()
 
 void rtp::OpenSocket()
 {
-    rtpSocket = new QSocketDevice (QSocketDevice::Datagram);
+    rtpSocket = new Q3SocketDevice (Q3SocketDevice::Datagram);
     rtpSocket->setBlocking(false);
     rtpSocket->setSendBufferSize(49152);
     rtpSocket->setReceiveBufferSize(49152);
 
-    rtcpSocket = new QSocketDevice (QSocketDevice::Datagram);
+    rtcpSocket = new Q3SocketDevice (Q3SocketDevice::Datagram);
     rtcpSocket->setBlocking(false);
 
 #ifndef WIN32
@@ -423,7 +425,7 @@ void rtp::OpenSocket()
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(rtpSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface " << ifName << endl;
+        cerr << "Failed to find network interface " << ifName.toLocal8Bit().constData() << endl;
         delete rtpSocket;
         rtpSocket = 0;
         return;
@@ -454,14 +456,14 @@ void rtp::OpenSocket()
 
     if (!rtpSocket->bind(myIP, myPort))
     {
-        cerr << "Failed to bind for RTP connection " << myIP.toString() << endl;
+        cerr << "Failed to bind for RTP connection " << myIP.toString().toLocal8Bit().constData() << endl;
         delete rtpSocket;
         rtpSocket = 0;
     }
 
     if (!rtcpSocket->bind(myIP, myRtcpPort))
     {
-        cerr << "Failed to bind for RTCP connection " << myIP.toString() << endl;
+        cerr << "Failed to bind for RTCP connection " << myIP.toString().toLocal8Bit().constData() << endl;
         delete rtcpSocket;
         rtcpSocket = 0;
     }
@@ -740,7 +742,7 @@ void rtp::PlayOutAudio()
                     if (DTMFFilter)
                     {
                         QChar dtmf = DTMFFilter->process(decodeBuffer, PlayLen/sizeof(short));
-                        if (dtmf)
+                        if (!dtmf.isNull())
                         {
                             rtpMutex.lock();
                             dtmfIn.append(dtmf);
@@ -754,7 +756,7 @@ void rtp::PlayOutAudio()
                     {
                         PlayLen = Codec->Decode(JBuf->RtpData, decodeBuffer, mLen, spkPower);
                         QChar dtmf = DTMFFilter->process(decodeBuffer, PlayLen/sizeof(short));
-                        if (dtmf)
+                        if (!dtmf.isNull())
                         {
                             rtpMutex.lock();
                             dtmfIn.append(dtmf);
@@ -1158,7 +1160,7 @@ void rtp::HandleRxDTMF(RTPPACKET *RTPpacket)
         lastDtmfTimestamp = RTPpacket->RtpTimeStamp;
         rtpMutex.lock();
         dtmfIn.append(DTMF2CHAR(dtmf->dtmfDigit));
-        cout << "Received DTMF digit " << dtmfIn << endl;
+        cout << "Received DTMF digit " << dtmfIn.toLocal8Bit().constData() << endl;
         rtpMutex.unlock();
     }
 }
@@ -1530,7 +1532,7 @@ void TxShaper::flushHistory()
 //                                     JITTER BUFFER
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Jitter::Jitter():QPtrList<RTPPACKET>()
+Jitter::Jitter():Q3PtrList<RTPPACKET>()
 {
     // Make a linked list of all the free buffers
     for (int i=0; i<JITTERQ_SIZE; i++)
@@ -1601,7 +1603,7 @@ void Jitter::InsertJBuffer(RTPPACKET *Buffer)
 }
 
 
-int Jitter::compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2)
+int Jitter::compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2)
 {
     RTPPACKET *r1 = (RTPPACKET *)s1;
     RTPPACKET *r2 = (RTPPACKET *)s2;

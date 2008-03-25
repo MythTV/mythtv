@@ -22,3 +22,5 @@ LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION
 LIBS += -lmythavformat-$$LIBVERSION
+#The following line was inserted by qt3to4
+QT += xml  sql opengl qt3support 

@@ -10,9 +10,8 @@
 class OutputListeners;
 class OutputEvent;
 
-#include <qthread.h>
-#include <qevent.h>
-#include <qptrlist.h>
+#include <QMutex>
+
 #include "mythobservable.h"
 
 class QObject;
@@ -94,7 +93,7 @@ protected:
 
 private:
     QMutex mtx;
-    QPtrList<MythTV::Visual> visuals;
+    Q3PtrList<MythTV::Visual> visuals;
     
     unsigned int bufsize;
 };

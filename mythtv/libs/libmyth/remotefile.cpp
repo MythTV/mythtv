@@ -1,9 +1,8 @@
-#include <qurl.h>
-
-#include <unistd.h>
-
 #include <iostream>
+#include <unistd.h>
 using namespace std;
+
+#include <q3url.h>
 
 #include "remotefile.h"
 #include "util.h"
@@ -34,7 +33,7 @@ RemoteFile::~RemoteFile()
 
 MythSocket *RemoteFile::openSocket(bool control)
 {
-    QUrl qurl(path);
+    Q3Url qurl(path);
 
     QString host = qurl.host();
     int port = qurl.port();
@@ -59,14 +58,14 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (control)
     {
-        strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
+        strlist.append( QString("ANN Playback %1 %2").arg(hostname).arg(false) );
         lsock->writeStringList(strlist);
         lsock->readStringList(strlist, true);
     }
     else
     {
-        strlist = QString("ANN FileTransfer %1 %2 %3")
-            .arg(hostname).arg(usereadahead).arg(retries);
+        strlist.append( QString("ANN FileTransfer %1 %2 %3")
+            .arg(hostname).arg(usereadahead).arg(retries) );
         strlist << QString("%1").arg(dir);
 
         lsock->writeStringList(strlist);
@@ -101,7 +100,7 @@ void RemoteFile::Close(void)
     if (!controlSock)
         return;
 
-    QStringList strlist = QString(query).arg(recordernum);
+    QStringList strlist( QString(query).arg(recordernum) );
     strlist << "DONE";
 
     lock.lock();
@@ -165,7 +164,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     if (!controlSock->isOpen() || controlSock->error())
         return 0;
 
-    QStringList strlist = QString(query).arg(recordernum);
+    QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SEEK";
     encodeLongLong(strlist, pos);
     strlist << QString::number(whence);
@@ -230,7 +229,7 @@ int RemoteFile::Read(void *data, int size)
         controlSock->readStringList(tempstrlist);
     }
     
-    QStringList strlist = QString(query).arg(recordernum);
+    QStringList strlist( QString(query).arg(recordernum) );
     strlist << "REQUEST_BLOCK";
     strlist << QString::number(size);
     controlSock->writeStringList(strlist);
@@ -318,7 +317,7 @@ void RemoteFile::SetTimeout(bool fast)
     if (!controlSock->isOpen() || controlSock->error())
         return;
 
-    QStringList strlist = QString(query).arg(recordernum);
+    QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SET_TIMEOUT";
     strlist << QString::number((int)fast);
 

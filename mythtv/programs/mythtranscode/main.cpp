@@ -1,9 +1,4 @@
 #include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qmap.h>
-#include <qfileinfo.h>
-#include <qregexp.h>
 #include <qdir.h>
 
 #include <unistd.h>
@@ -381,7 +376,7 @@ int main(int argc, char *argv[])
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
             {
                 QStringList pairs = QStringList::split(",", a.argv()[argpos+1]);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
                     tokens[0].replace(QRegExp("^[\"']"), "");
@@ -475,12 +470,12 @@ int main(int argc, char *argv[])
          cerr << "Can't specify both -j and --buildindex\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (keyframesonly && fifodir != NULL)
+    if (keyframesonly && !fifodir.isEmpty())
     {
          cerr << "Cannot specify both --fifodir and --allkeys\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (fifosync && fifodir == NULL)
+    if (fifosync && !fifodir.isEmpty())
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
@@ -512,8 +507,8 @@ int main(int argc, char *argv[])
 
         if (!pginfo)
         {
-            cerr << "Couldn't find recording for chanid " << chanid << " @ " 
-                 << starttime << endl;
+            cerr << "Couldn't find recording for chanid " << (const char *)chanid << " @ "
+                 << (const char *)starttime << endl;
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 
@@ -679,13 +674,13 @@ int main(int argc, char *argv[])
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo)
 {
-    if (pginfo && ! mapfile)
+    if (pginfo && mapfile.isEmpty())
     {
         pginfo->ClearPositionMap(MARK_KEYFRAME);
         pginfo->ClearPositionMap(MARK_GOP_START);
         pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME);
     }
-    else if (mapfile)
+    else if (!mapfile.isEmpty())
     {
         FILE *mapfh = fopen(mapfile, "w");
         QMap<long long, long long>::Iterator i;
@@ -719,7 +714,7 @@ int slowDelete(QString filename)
     bool inBackground = true;
     int increment =
         gContext->GetNumSetting("TruncateIncrement", 10 * 1024 * 1024);
-    QString msg = QString("Error Truncating '%1'").arg(filename.local8Bit());
+    QString msg = QString("Error Truncating '%1'").arg(filename.local8Bit().constData());
 
 
     struct stat st;
@@ -853,21 +848,21 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             QFileInfo finfo(oldfile);
             if (followLinks && finfo.isSymLink())
             {
-                if ((err = transUnlink(finfo.readLink().local8Bit())))
+                if ((err = transUnlink(finfo.readLink().local8Bit().constData())))
                 {
                     VERBOSE(VB_IMPORTANT, QString(
                             "mythtranscode: Error deleting '%1' pointed to by "
                             "%2, %3")
-                            .arg(finfo.readLink().local8Bit())
-                            .arg(oldfile).arg(strerror(errno)));
+                            .arg((const char *)finfo.readLink().local8Bit())
+                            .arg((const char *)oldfile).arg(strerror(errno)));
                 }
 
-                if ((err = unlink(oldfile.local8Bit())))
+                if ((err = unlink(oldfile.local8Bit().constData())))
                     VERBOSE(VB_IMPORTANT,
                             QString("mythtranscode: Error deleting '%1' link "
                                     "pointing to '%2', %3").arg(oldfile)
-                                    .arg(finfo.readLink().local8Bit())
-                                    .arg(strerror(errno)));
+                            .arg(finfo.readLink().local8Bit().constData())
+                            .arg(strerror(errno)));
             }
             else
             {

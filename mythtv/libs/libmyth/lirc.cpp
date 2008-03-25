@@ -14,10 +14,6 @@
 #include "lircevent.h"
 #include "util.h"
 
-#if (QT_VERSION < 0x030100)
-#error Native LIRC support requires Qt 3.1 or greater.
-#endif
-
 /** \class LircClient
  *  \brief Interface between mythtv and lircd
  *

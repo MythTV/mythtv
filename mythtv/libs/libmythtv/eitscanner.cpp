@@ -81,6 +81,11 @@ void EITScanner::RunEventLoop(void)
     MythTimer t;
     uint eitCount = 0;
     
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (!exitThread)
     {
         uint list_size = eitHelper->GetListSize();
@@ -146,7 +151,7 @@ void EITScanner::RunEventLoop(void)
             eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
-        exitThreadCond.wait(400); // sleep up to 400 ms.
+        exitThreadCond.wait(&mutex, 400); // sleep up to 400 ms.
     }
 }
 
@@ -266,7 +271,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
     if (activeScanChannels.size())
     {
         uint randomStart = random() % activeScanChannels.size();
-        activeScanNextChan = activeScanChannels.at(randomStart);
+        activeScanNextChan = activeScanChannels.begin()+randomStart;
 
         activeScanNextTrig = QDateTime::currentDateTime();
         activeScanTrigTime = max_seconds_per_source;

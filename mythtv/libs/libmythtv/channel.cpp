@@ -536,7 +536,7 @@ bool Channel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = QDeepCopy<QString>(channum);
+    curchannelname = Q3DeepCopy<QString>(channum);
 
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
@@ -548,7 +548,7 @@ bool Channel::SetChannelByString(const QString &channum)
     SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
+    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
 
     return true;
 }

@@ -3,6 +3,7 @@
 
 #include "qobject.h"
 #include "qstring.h"
+#include <QEvent>
 
 #include "mythcontext.h"
 
@@ -15,7 +16,7 @@ class CustomEventRelayer : public QObject
 {
     Q_OBJECT
 public:
-    CustomEventRelayer(void (*fp_in)(QCustomEvent*)) : fp(fp_in)
+    CustomEventRelayer(void (*fp_in)(QEvent*)) : fp(fp_in)
     {
         gContext->addListener(this);
     };
@@ -30,10 +31,10 @@ public:
         gContext->removeListener(this);
     };
 
-    void customEvent(QCustomEvent *e) { fp(e);}
+    void customEvent(QEvent *e) { fp(e);}
        
 private:
-    void (*fp)(QCustomEvent*);
+    void (*fp)(QEvent*);
 };
 
 #endif

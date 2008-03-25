@@ -1,9 +1,9 @@
 #ifndef PLAYLIST_H_
 #define PLAYLIST_H_
 
-#include <qvaluelist.h>
-#include <qlistview.h>
-#include <qptrlist.h>
+#include <q3valuelist.h>
+#include <q3listview.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 
 #include "metadata.h"
@@ -139,7 +139,7 @@ class Playlist
     int                 playlistid;
     QString             name;
     QString             raw_songlist;
-    QPtrList<Track>     songs;
+    Q3PtrList<Track>     songs;
     AllMusic            *all_available_music;
     PlaylistsContainer  *parent;
     bool                changed;
@@ -211,8 +211,8 @@ class PlaylistsContainer
   private:  
     Playlist            *active_playlist;
     Playlist            *backup_playlist;
-    QValueList<int>     cd_playlist;
-    QPtrList<Playlist>  *all_other_playlists;
+    Q3ValueList<int>     cd_playlist;
+    Q3PtrList<Playlist>  *all_other_playlists;
     AllMusic            *all_available_music;
     PlaylistTitle       *active_widget;
     int                 pending_writeback_index;

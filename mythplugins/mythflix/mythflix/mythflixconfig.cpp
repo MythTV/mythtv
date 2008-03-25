@@ -21,10 +21,12 @@
 
 // QT headers
 #include <qapplication.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstring.h>
 #include <qfile.h>
 #include <qdom.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -43,7 +45,7 @@ class NewsSiteItem
 {
 public:
 
-    typedef QPtrList<NewsSiteItem> List;
+    typedef Q3PtrList<NewsSiteItem> List;
 
     QString name;
     QString category;
@@ -58,7 +60,7 @@ class NewsCategory
 {
 public:
 
-    typedef QPtrList<NewsCategory> List;
+    typedef Q3PtrList<NewsCategory> List;
 
     QString             name;
     NewsSiteItem::List  siteList;
@@ -118,7 +120,7 @@ void MythFlixConfig::populateSites()
                        + "mythflix/netflix-rss.xml";
     QFile xmlFile(filename);
 
-    if (!xmlFile.exists() || !xmlFile.open(IO_ReadOnly)) {
+    if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly)) {
         VERBOSE(VB_IMPORTANT, QString("MythFlix: Cannot open netflix-rss.xml"));
         return;
     }

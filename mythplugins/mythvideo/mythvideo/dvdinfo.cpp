@@ -1,19 +1,17 @@
 /*
-	dvdinfo.cpp
+    dvdinfo.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     implementation for dvd "struct"
 */
 
 #include <iostream>
-using namespace std;
-#include <stdio.h>
-
-#include "dvdinfo.h"
 
 #include <mythtv/mythcontext.h>
+
+#include "dvdinfo.h"
 
 DVDAudioInfo::DVDAudioInfo(int track_number, const QString &audio_description)
 {

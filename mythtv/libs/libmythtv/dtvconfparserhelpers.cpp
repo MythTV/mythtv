@@ -10,7 +10,7 @@ bool DTVParamHelper::ParseParam(const QString &symbol, int &value,
 {
     const DTVParamHelperStruct *p = table;
 
-    while (p->symbol != NULL)
+    while (!p->symbol.isEmpty())
     {
         if (p->symbol == symbol.left(p->symbol.length()))
         {

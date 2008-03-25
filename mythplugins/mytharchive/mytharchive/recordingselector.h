@@ -10,6 +10,9 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 class ProgramInfo;
 
@@ -47,7 +50,7 @@ class RecordingSelector : public MythThemedDialog
     void wireUpTheme(void);
 
     vector<ProgramInfo *>  *recordingList;
-    QPtrList<ProgramInfo> selectedList;
+    Q3PtrList<ProgramInfo> selectedList;
 
     UIListBtnType    *recording_list;
 

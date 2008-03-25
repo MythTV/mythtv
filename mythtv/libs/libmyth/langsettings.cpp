@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <QTranslator>
 
 using namespace std;
 

@@ -16,6 +16,7 @@ using namespace std;
 #include <qfile.h>
 #include <qcolor.h>
 #include <qregexp.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include "ttfont.h"
@@ -351,7 +352,7 @@ void OSD::SetTextSubtitles(const QStringList &lines)
 {
     const uint SUBTITLE_FONT_SIZE     = 20;
     const float SUBTITLE_LINE_SPACING = 1.1;
-    const uint MAX_CHARACTERS_PER_ROW = 50;    
+    const int MAX_CHARACTERS_PER_ROW  = 50;
     // how many pixels of empty space at the bottom
     const uint BOTTOM_PAD = SUBTITLE_FONT_SIZE;
 
@@ -1535,7 +1536,7 @@ bool OSD::LoadTheme(void)
     QDomDocument doc;
     QFile f(themefile);
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "OSD::LoadTheme(): Can't open: " << themefile);
         return false; 
@@ -1605,7 +1606,7 @@ QPoint OSD::parsePoint(QString text)
 {
     int x, y;
     QPoint retval(0, 0);
-    if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
+    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
     return retval;
 }
@@ -1617,13 +1618,13 @@ QColor OSD::parseColor(QString text)
     if (regexp.exactMatch(text))
     {
         int val;
-        if (sscanf(text.data(), "#%x", &val) == 1)
+        if (sscanf(text.toAscii().constData(), "#%x", &val) == 1)
             retval = QColor((val >> 16) & 0xff, (val >> 8) & 0xff, val & 0xff);
     }
     else
     {
         int r, g, b;
-        if (sscanf(text.data(), "%d,%d,%d", &r, &g, &b) == 3)
+        if (sscanf(text.toAscii().constData(), "%d,%d,%d", &r, &g, &b) == 3)
             retval = QColor(r, g, b);
     }
     return retval;
@@ -1633,7 +1634,7 @@ QRect OSD::parseRect(QString text)
 {
     int x, y, w, h;
     QRect retval(0, 0, 0, 0);
-    if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
+    if (sscanf(text.toAscii().constData(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
 
     return retval;
@@ -2568,7 +2569,8 @@ OSDSurface *OSD::Display(void)
 
     vector<OSDSet *> removeList;
 
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
+
     vector<OSDSet *>::iterator i = setList->begin();
     for (; i != setList->end(); i++)
     {
@@ -2609,7 +2611,7 @@ OSDSurface *OSD::Display(void)
         removeList.pop_back();
     }
 
-    osdlock.unlock();
+    locker.unlock();
 
     m_setsvisible = anytodisplay;
 

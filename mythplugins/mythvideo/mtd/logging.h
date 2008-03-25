@@ -1,18 +1,18 @@
 #ifndef MTDLOGGING_H_
 #define MTDLOGGING_H_
 /*
-	logging.h
+    logging.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Headers for logging object of the myth transcoding daemon
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Headers for logging object of the myth transcoding daemon
 
 */
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qfile.h>
+#include <QObject>
+#include <QString>
+#include <QFile>
 
 
 class MTDLogger : public QObject

@@ -33,7 +33,7 @@ match they will be ignored.
 #include <sys/types.h>
 
 #include <qapplication.h>
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qsocketnotifier.h>
 #include <qhostaddress.h>
 
@@ -134,7 +134,7 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
     // need to lock because of the socket notifier.
     qApp->lock();
 
-    qsd = new QSocketDevice(QSocketDevice::Datagram);
+    qsd = new Q3SocketDevice(Q3SocketDevice::Datagram);
     if (!qsd->bind(bcastaddr, udp_port))
     {
         VERBOSE(VB_IMPORTANT, QString("Could not bind to UDP notify port: %1")

@@ -8,7 +8,7 @@
 #include "iconview.h"
 #include "gallerysettings.h"
 #include "dbcheck.h"
-#include "qtiffio.h"
+//#include "qtiffio.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
@@ -83,7 +83,7 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    qInitTiffIO();
+    //qInitTiffIO();
 
     gContext->ActivateSettingsCache(false);
     UpgradeGalleryDatabaseSchema();

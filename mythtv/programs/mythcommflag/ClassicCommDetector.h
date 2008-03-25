@@ -1,10 +1,13 @@
 #ifndef _CLASSIC_COMMDETECTOR_H_
 #define _CLASSIC_COMMDETECTOR_H_
 
+#include <QObject>
+#include <QMap>
+#include <QDateTime>
+
 #include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "libmythtv/frame.h"
-#include "qdatetime.h"
 
 class NuppelVideoPlayer;
 class LogoDetectorBase;

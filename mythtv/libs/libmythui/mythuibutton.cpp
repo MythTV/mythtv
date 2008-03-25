@@ -142,6 +142,20 @@ bool MythUIButton::ParseElement(QDomElement &element)
     return true;
 }
 
+/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+ *         QApplication event loop. Should not be used directly.
+ *
+ *  \param uitype The mythuitype receiving the event
+ *  \param event Mouse event
+ */
+void MythUIButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+{
+    if (event->gesture() == MythGestureEvent::Click)
+    {
+        emit buttonPressed();
+    }
+}
+
 MythImage* MythUIButton::LoadImage(QDomElement element)
 {
     MythImage *tmp;
@@ -400,7 +414,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;

@@ -18,6 +18,7 @@
 // qt
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qsqlerror.h>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -141,7 +142,7 @@ void runMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themedir);
     }
 }
 

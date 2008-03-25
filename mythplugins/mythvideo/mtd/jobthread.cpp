@@ -1,10 +1,10 @@
 /*
-	jobthread.cpp
+    jobthread.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Where things actually happen
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Where things actually happen
 
 */
 
@@ -15,11 +15,11 @@
 
 #include <algorithm>
 
-#include <qdatetime.h>
-#include <qdir.h>
-#include <qapplication.h>
-#include <qdeepcopy.h>
-#include <qprocess.h>
+#include <QDateTime>
+#include <QDir>
+#include <QApplication>
+#include <Q3DeepCopy>
+#include <Q3Process>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -72,13 +72,13 @@ bool JobThread::keepGoing()
 QString JobThread::getProblem()
 {
     QMutexLocker qml(&problem_string_mutex);
-    return QDeepCopy<QString>(problem_string);
+    return Q3DeepCopy<QString>(problem_string);
 }
 
 QString JobThread::getJobString()
 {
     QMutexLocker qml(&job_string_mutex);
-    return QDeepCopy<QString>(job_string);
+    return Q3DeepCopy<QString>(job_string);
 }
 
 void JobThread::updateSubjobString( int seconds_elapsed, 
@@ -169,13 +169,13 @@ void JobThread::setSubName(const QString &new_name, uint priority)
 QString JobThread::getJobName()
 {
     QMutexLocker qml(&job_name_mutex);
-    return QDeepCopy<QString>(job_name);
+    return Q3DeepCopy<QString>(job_name);
 }
 
 QString JobThread::getSubName()
 {
     QMutexLocker qml(&subjob_name_mutex);
-    return QDeepCopy<QString>(subjob_name);
+    return Q3DeepCopy<QString>(subjob_name);
 }
 
 void JobThread::problem(const QString &a_problem)
@@ -374,7 +374,7 @@ bool DVDThread::ripTitle(int title_number,
     //
     
     RipFile ripfile(to_location, extension, true);
-    if(!ripfile.open(IO_WriteOnly | IO_Raw | IO_Truncate, multiple_files))
+    if(!ripfile.open(QIODevice::WriteOnly | QIODevice::Unbuffered | QIODevice::Truncate, multiple_files))
     {
         problem(QString("DVDPerfectThread could not open output file: %1")
                 .arg(ripfile.name()));
@@ -680,7 +680,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
     }
 
     RipFile ripfile(destination_file_string, ".iso", true);
-    if(!ripfile.open(IO_WriteOnly | IO_Raw | IO_Truncate, false))
+    if(!ripfile.open(QIODevice::WriteOnly | QIODevice::Unbuffered | QIODevice::Truncate, false))
     {
         problem(QString("DVDISOCopyThread could not open output file: %1")
                 .arg(ripfile.name()));
@@ -1302,7 +1302,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     QString transcode_command_string = "transcode command will be: " + tc_arguments.join(" ");
     sendLoggingEvent(transcode_command_string);
 
-    tc_process = new QProcess(tc_arguments);
+    tc_process = new Q3Process(tc_arguments);
     tc_process->setWorkingDirectory(*working_directory);
     return true;
 }

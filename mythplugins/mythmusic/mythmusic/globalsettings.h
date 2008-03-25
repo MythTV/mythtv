@@ -3,6 +3,9 @@
 
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QEvent>
 
 class MusicGeneralSettings : public ConfigurationWizard
 {
@@ -48,10 +51,10 @@ class VisualizationsEditor : public MythDialog
     void cancelClicked(void);
     void upClicked(void);
     void downClicked(void);
-    void availableChanged(QListViewItem *item);
-    void selectedChanged(QListViewItem *item);
-    void availableOnSelect(QListViewItem *item);
-    void selectedOnSelect(QListViewItem *item);
+    void availableChanged(Q3ListViewItem *item);
+    void selectedChanged(Q3ListViewItem *item);
+    void availableOnSelect(Q3ListViewItem *item);
+    void selectedOnSelect(Q3ListViewItem *item);
 
   protected:
     bool eventFilter(QObject *obj, QEvent *ev);

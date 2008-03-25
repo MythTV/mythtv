@@ -2,6 +2,8 @@
 #define TREECHECKITEM_H_
 
 #include <mythtv/uilistbtntype.h>
+//Added by qt3to4:
+#include <QPixmap>
 
 class QPixmap;
 class PlaylistsContainer;

@@ -1,5 +1,8 @@
 // C++ headers
 #include <iostream>
+
+#include "mythcontext.h"
+
 using namespace std;
 
 // C headers
@@ -39,14 +42,14 @@ using namespace std;
 #include <qpixmap.h>
 #include <qfont.h>
 #include <qfile.h>
-#include <qdeepcopy.h>
+#include <Q3CString>
+#include <Q3DeepCopy>
 
 // Myth headers
 #include "mythconfig.h"
 #include "exitcodes.h"
 #include "util.h"
 #include "util-x11.h"
-#include "mythcontext.h"
 #include "mythmediamonitor.h"
 
 #ifdef CONFIG_DARWIN
@@ -129,7 +132,7 @@ void encodeLongLong(QStringList &list, long long num)
 long long decodeLongLong(QStringList &list, uint offset)
 {
     long long retval = 0;
-    if (offset >= list.size())
+    if (offset >= (uint)list.size())
     {
         VERBOSE(VB_IMPORTANT,
                 "decodeLongLong() called with offset >= list size.");
@@ -481,7 +484,7 @@ long long getDiskSpace(const QString &file_on_disk,
     struct statfs statbuf;
     bzero(&statbuf, sizeof(statbuf));
     long long freespace = -1;
-    QCString cstr = file_on_disk.local8Bit();
+    Q3CString cstr = file_on_disk.local8Bit();
 
     total = used = -1;
 
@@ -835,10 +838,10 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         return -1LL;
 
     if (!dst.isWritable() && !dst.isOpen())
-        odst = dst.open(IO_Raw|IO_WriteOnly|IO_Truncate);
+        odst = dst.open(QIODevice::Unbuffered|QIODevice::WriteOnly|QIODevice::Truncate);
 
     if (!src.isReadable() && !src.isOpen())
-        osrc = src.open(IO_Raw|IO_ReadOnly);
+        osrc = src.open(QIODevice::Unbuffered|QIODevice::ReadOnly);
 
     bool ok = dst.isWritable() && src.isReadable();
     long long total_bytes = 0LL;
@@ -939,7 +942,7 @@ double MythGetPixelAspectRatio(void)
 unsigned long long myth_get_approximate_large_file_size(const QString &fname)
 {
     // .local8Bit() not thread-safe.. even with Qt4, make a deep copy first..
-    QString filename = QDeepCopy<QString>(fname);
+    QString filename = Q3DeepCopy<QString>(fname);
 #ifdef USING_MINGW
     struct _stati64 status;
     _stati64(filename.local8Bit(), &status);

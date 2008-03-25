@@ -1,10 +1,10 @@
 #ifndef MYTHEVENT_H_
 #define MYTHEVENT_H_
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qevent.h>
-#include <qdeepcopy.h>
+#include <QString>
+#include <QStringList>
+#include <Q3DeepCopy>
+#include <QEvent>
 
 /** \class MythEvent
     \brief This class is used as a container for messages.
@@ -12,26 +12,34 @@
     Any subclass of this that adds data to the event should override
     the clone method. As example, see OutputEvent in output.h. 
  */
-class MPUBLIC MythEvent : public QCustomEvent
+class MPUBLIC MythEvent : public QEvent
 {
   public:
     enum Type { MythEventMessage = (User + 1000) };
 
-    MythEvent(int t) : QCustomEvent(t)
+    MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
-    MythEvent(const QString lmessage) : QCustomEvent(MythEventMessage)
+    MythEvent(const QString lmessage) : QEvent((QEvent::Type)MythEventMessage)
     {
-        message = QDeepCopy<QString>(lmessage);
-        extradata = "empty";
+        message = Q3DeepCopy<QString>(lmessage);
+        extradata.append( "empty" );
     }
 
     MythEvent(const QString lmessage, const QStringList &lextradata)
-           : QCustomEvent(MythEventMessage)
+           : QEvent((QEvent::Type)MythEventMessage)
     {
-        message = QDeepCopy<QString>(lmessage);
+        message = Q3DeepCopy<QString>(lmessage);
         extradata = lextradata;
     }
+
+    MythEvent(const QString lmessage, const QString lextradata)
+           : QEvent((QEvent::Type)MythEventMessage)
+    {
+        message = Q3DeepCopy<QString>(lmessage);
+        extradata.append( lextradata );
+    }
+
     
     virtual ~MythEvent() {}
 

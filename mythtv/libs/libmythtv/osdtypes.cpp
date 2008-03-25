@@ -1,7 +1,7 @@
 #include <qimage.h>
 #include <qmap.h>
 #include <qregexp.h>
-#include <qdeepcopy.h>
+#include <QKeyEvent>
 
 #include <iostream>
 #include <algorithm>
@@ -487,7 +487,7 @@ static int extract_hot_key(const QString &text)
     int i = text.find("[");
     if ((i < 0) || ((i + 1) >= (int)text.length()))
         return 0;
-    int ch = text.at(i + 1).upper() - 'A' + Qt::Key_A;
+    int ch = text.at(i + 1).upper().toAscii() - 'A' + Qt::Key_A;
     if (ch >= Qt::Key_A && ch <= Qt::Key_Z)
         return ch;
     return 0;
@@ -657,7 +657,7 @@ bool OSDSet::CanShowWith(const QString &name) const
 OSDType::OSDType(const QString &name) :
     m_lock(true),
     m_hidden(false),
-    m_name(QDeepCopy<QString>(name)),
+    m_name(name),
     m_parent(NULL)
 {
 }
@@ -665,7 +665,7 @@ OSDType::OSDType(const QString &name) :
 QString OSDType::Name(void)
 {
     QMutexLocker locker(&m_lock);
-    return QDeepCopy<QString>(m_name);
+    return m_name;
 }
 
 OSDType::~OSDType()
@@ -681,8 +681,8 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_displaysize(displayrect),
     m_screensize(displayrect),
     m_unbiasedsize(unbias(m_screensize, wmult, hmult)),
-    m_message(QDeepCopy<QString>(text)),
-    m_default_msg(QDeepCopy<QString>(text)),
+    m_message(text),
+    m_default_msg(text),
 
     m_font(font),
     m_altfont(NULL),
@@ -755,8 +755,8 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other) :
     m_screensize = other.m_screensize;
     m_unbiasedsize = other.m_unbiasedsize;
 
-    m_message = QDeepCopy<QString>(other.m_message);
-    m_default_msg = QDeepCopy<QString>(other.m_default_msg);
+    m_message = other.m_message;
+    m_default_msg = other.m_default_msg;
 
     m_font = other.m_font;
     m_altfont = other.m_altfont;
@@ -833,7 +833,7 @@ QString OSDTypeText::BasicConvertFromRtoL(const QString &text)
 
     QString output = rtl_string_composer.join("");
 
-    return QDeepCopy<QString>(output);
+    return output;
 }
 
 QString OSDTypeText::ConvertFromRtoL(const QString &text) const
@@ -889,21 +889,21 @@ void OSDTypeText::SetText(const QString &text)
 QString OSDTypeText::GetText(void) const
 {
     QMutexLocker locker(&m_lock);
-    return QDeepCopy<QString>(m_message);
+    return m_message;
 }
 
 void OSDTypeText::SetDefaultText(const QString &text)
 {
     QMutexLocker locker(&m_lock);
     m_message     = ConvertFromRtoL(text);
-    m_default_msg = QDeepCopy<QString>(m_message);
+    m_default_msg = m_message;
     m_scrollinit  = false;
 }
 
 QString OSDTypeText::GetDefaultText(void) const
 {
     QMutexLocker locker(&m_lock);
-    return QDeepCopy<QString>(m_default_msg);
+    return m_default_msg;
 }
 
 void OSDTypeText::SetMultiLine(bool multi)
@@ -971,7 +971,7 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     if (m_multiline)
     {
-        QString tmp_msg = QDeepCopy<QString>(m_message);
+        QString tmp_msg = m_message;
         regexp_lock.lock();
         tmp_msg.replace(br, "\n");
         tmp_msg.replace(nl," \n ");
@@ -1106,7 +1106,7 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
 
     if (m_draw_info_str != text)
     {
-        m_draw_info_str = QDeepCopy<QString>(text);
+        m_draw_info_str = text;
         m_draw_info.clear();
         m_draw_info_len = 0;
 
@@ -1609,7 +1609,7 @@ void OSDTypeImage::Load(const QImage &img)
 
     m_alpha = new unsigned char[imwidth * imheight];
 
-    rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, img.bits(),
+    rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, (unsigned char *)img.bits(),
                      img.width(), img.height(), img.bytesPerLine() / 4);
 
     m_imagesize = QRect(0, 0, imwidth, imheight);

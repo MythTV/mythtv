@@ -4,11 +4,11 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <pthread.h>
-#include <qvaluevector.h>
-#include <qvaluelist.h>
+#include <q3valuevector.h>
+#include <q3valuelist.h>
 #include <qdom.h>
 
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qsocketnotifier.h>
 #include <qhostaddress.h>
 
@@ -75,7 +75,7 @@ class UDPNotify : public QObject
     QDomDocument doc;
 
     // Socket Device for UDP communication.
-    QSocketDevice *qsd;
+    Q3SocketDevice *qsd;
     // Notifier, signals available data on socket.
     QSocketNotifier *qsn;
 

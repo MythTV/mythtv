@@ -1,3 +1,5 @@
+#include <Q3ValueList>
+
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -78,8 +80,8 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     query.bindValue(":WATCHING", 0);
     query.bindValue(":PREFIX", m_hostprefix);
     query.bindValue(":CARDTYPE", m_cardtype);
-    query.bindValue(":CHANNAME", channum.utf8());
-    query.bindValue(":INPUT", inputname.utf8());
+    query.bindValue(":CHANNAME", channum);
+    query.bindValue(":INPUT", inputname);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
@@ -112,7 +114,7 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
                 .arg(pginfo->recstartts.toString("yyyyMMddhhmmss"))
                 .arg(pginfo->recendts.toString("yyyyMMddhhmmss")));
 
-    QValueList<LiveTVChainEntry>::iterator it;
+    Q3ValueList<LiveTVChainEntry>::iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid == pginfo->chanid &&
@@ -128,7 +130,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 {
     QMutexLocker lock(&m_lock);
 
-    QValueList<LiveTVChainEntry>::iterator it, del;
+    Q3ValueList<LiveTVChainEntry>::iterator it, del;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid == pginfo->chanid &&
@@ -212,8 +214,8 @@ void LiveTVChain::ReloadAll(void)
             entry.discontinuity = query.value(3).toInt();
             entry.hostprefix = query.value(5).toString();
             entry.cardtype = query.value(6).toString();
-            entry.channum = QString::fromUtf8(query.value(7).toString());
-            entry.inputname = QString::fromUtf8(query.value(8).toString());
+            entry.channum = query.value(7).toString();
+            entry.inputname = query.value(8).toString();
 
             m_maxpos = query.value(4).toInt() + 1;
 
@@ -293,7 +295,7 @@ int LiveTVChain::ProgramIsAt(const QString &chanid,
     QMutexLocker lock(&m_lock);
 
     int count = 0;
-    QValueList<LiveTVChainEntry>::const_iterator it;
+    Q3ValueList<LiveTVChainEntry>::const_iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it, ++count)
     {
         if ((*it).chanid == chanid &&

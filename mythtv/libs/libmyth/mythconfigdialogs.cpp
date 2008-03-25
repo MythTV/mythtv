@@ -3,7 +3,7 @@
 #include "mythconfigdialogs.h"
 #include "mythwizard.h"
 
-#include <qhbox.h>
+#include <q3hbox.h>
 
 static void clear_widgets(vector<Configurable*> &children,
                           vector<QWidget*>      &childwidget)
@@ -20,7 +20,7 @@ void ConfigPopupDialogWidget::keyPressEvent(QKeyEvent* e)
 {
     switch (e->key())
     {
-        case Key_Escape:
+        case Qt::Key_Escape:
             reject();
             emit popupDone(MythDialog::Rejected);
             break;
@@ -50,7 +50,7 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
 
     if (getLabel() != "")
     {
-        QHBox* box = new QHBox(dialog);
+        Q3HBox* box = new Q3HBox(dialog);
         box->setBackgroundOrigin(QWidget::WindowOrigin);
         box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
                                        QSizePolicy::Maximum));
@@ -194,7 +194,7 @@ void ConfigurationDialog::setLabel(const QString &label)
     }
     else
     {
-        cfgGrp->setLabel(QDeepCopy<QString>(label));
+        cfgGrp->setLabel(label);
         cfgGrp->setUseLabel(true);
         cfgGrp->setUseFrame(true);
     }

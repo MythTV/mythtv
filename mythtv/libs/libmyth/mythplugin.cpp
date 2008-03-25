@@ -6,8 +6,6 @@
 #endif
 
 // Qt includes
-#include <qstringlist.h>
-#include <qdict.h>
 #include <qdir.h>
 
 // MythTV includes
@@ -37,7 +35,7 @@ int MythPlugin::init(const char *libversion)
         return ifunc(libversion);
 
     QString error_msg(dlerror());
-    if (!error_msg)
+    if (error_msg.isEmpty())
     {
         (void)dlopen(QLibrary::library().ascii(), RTLD_LAZY);
         error_msg = dlerror();
@@ -281,7 +279,7 @@ void MythPluginManager::orderMenuPlugins(void)
 
 void MythPluginManager::DestroyAllPlugins(void)
 {
-    QDictIterator<MythPlugin> it(m_dict);
+    Q3DictIterator<MythPlugin> it(m_dict);
     for (; it.current(); ++it)
     {
         MythPlugin *plugin = it.current();

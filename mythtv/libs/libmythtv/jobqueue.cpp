@@ -5,6 +5,7 @@
 #include <qdatetime.h>
 #include <qfileinfo.h>
 #include <qregexp.h>
+#include <QEvent>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -56,7 +57,7 @@ JobQueue::~JobQueue(void)
     gContext->removeListener(this);
 }
 
-void JobQueue::customEvent(QCustomEvent *e)
+void JobQueue::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -193,7 +194,7 @@ void JobQueue::ProcessQueue(void)
         {
             inTimeWindow = InJobRunWindow();
             jobsRunning = 0;
-            for (unsigned int x = 0; x < jobs.size(); x++)
+            for (int x = 0; x < jobs.size(); x++)
             {
                 status = jobs[x].status;
                 hostname = jobs[x].hostname;
@@ -231,7 +232,7 @@ void JobQueue::ProcessQueue(void)
             }
 
 
-            for (unsigned int x = 0;
+            for ( int x = 0;
                  (x < jobs.size()) && (jobsRunning < maxJobs); x++)
             {
                 id = jobs[x].id;
@@ -1938,8 +1939,8 @@ void JobQueue::DoTranscodeThread(void)
                               .arg(StatusText(GetJobStatus(jobID)));
 
         QString details = QString("%1%2: %3 (%4)")
-                            .arg(program_info->title.local8Bit())
-                            .arg(subtitle.local8Bit())
+                            .arg((const char *)program_info->title.local8Bit())
+                            .arg((const char *)subtitle.local8Bit())
                             .arg(transcoderName)
                             .arg(PrettyPrint(origfilesize));
 
@@ -1961,8 +1962,8 @@ void JobQueue::DoTranscodeThread(void)
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
             details = QString("%1%2: %3 does not exist or is not executable")
-                            .arg(program_info->title.local8Bit())
-                            .arg(subtitle.local8Bit())
+                            .arg((const char *)program_info->title.local8Bit())
+                            .arg((const char *)subtitle.local8Bit())
                             .arg(path);
 
             VERBOSE(VB_IMPORTANT,
@@ -2083,8 +2084,8 @@ void JobQueue::DoFlagCommercialsThread(void)
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
     QString logDesc = QString("%1%2 recorded from channel %3 at %4")
-                          .arg(program_info->title.local8Bit())
-                          .arg(subtitle.local8Bit())
+                          .arg((const char *)program_info->title.local8Bit())
+                          .arg((const char *)subtitle.local8Bit())
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
     
@@ -2227,7 +2228,7 @@ void JobQueue::DoUserJobThread(void)
     QString msg = QString("Started \"%1\" for \"%2\" recorded "
                           "from channel %3 at %4")
                           .arg(jobDesc)
-                          .arg(program_info->title.local8Bit())
+                          .arg((const char *)program_info->title.local8Bit())
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
     VERBOSE(VB_GENERAL, LOC + msg);
@@ -2270,7 +2271,7 @@ void JobQueue::DoUserJobThread(void)
         msg = QString("Finished \"%1\" for \"%2\" recorded from "
                       "channel %3 at %4.")
                       .arg(jobDesc)
-                      .arg(program_info->title.local8Bit())
+                      .arg((const char *)program_info->title.local8Bit())
                       .arg(program_info->chanid)
                       .arg(program_info->recstartts.toString());
         VERBOSE(VB_GENERAL, LOC + msg);

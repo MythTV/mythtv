@@ -4,6 +4,7 @@ using namespace std;
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qapplication.h>
+#include <QKeyEvent>
 
 #include "progdetails.h"
 #include "mythcontext.h"

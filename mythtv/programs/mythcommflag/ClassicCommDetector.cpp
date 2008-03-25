@@ -414,18 +414,18 @@ bool ClassicCommDetector::go()
                 if (myTotalFrames)
                 {
                     cerr << "\b\b\b\b\b\b\b\b\b\b\b"
-                         << QString::number(percentage).rightJustify(3, ' ')
+                         << (const char *)QString::number(percentage).rightJustify(3, ' ')
                          << "%/"
-                         << QString::number((int)flagFPS).rightJustify(3, ' ')
+                         << (const char *)QString::number((int)flagFPS).rightJustify(3, ' ')
                          << "fps";
                 }
                 else
                 {
                     cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                         << QString::number(currentFrameNumber)
+                         << (const char *)QString::number(currentFrameNumber)
                                             .rightJustify(6, ' ')
                          << "/"
-                         << QString::number((int)flagFPS).rightJustify(3, ' ')
+                         << (const char *)QString::number((int)flagFPS).rightJustify(3, ' ')
                          << "fps";
                 }
                 cerr.flush();

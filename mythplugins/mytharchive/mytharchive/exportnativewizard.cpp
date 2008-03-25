@@ -8,6 +8,8 @@
 // qt
 #include <qdir.h>
 #include <qapplication.h>
+#include <QKeyEvent>
+#include <Q3TextStream>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -461,14 +463,14 @@ void ExportNativeWizard::getArchiveListFromDB(void)
             NativeItem *item = new NativeItem;
 
             item->id = query.value(0).toInt();
-            item->type = QString::fromUtf8(query.value(1).toString());
-            item->title = QString::fromUtf8(query.value(2).toString());
-            item->subtitle = QString::fromUtf8(query.value(3).toString());
-            item->description = QString::fromUtf8(query.value(4).toString());
+            item->type = query.value(1).toString();
+            item->title = query.value(2).toString();
+            item->subtitle = query.value(3).toString();
+            item->description = query.value(4).toString();
             item->size = query.value(5).toLongLong();
-            item->startDate = QString::fromUtf8(query.value(6).toString());
-            item->startTime = QString::fromUtf8(query.value(7).toString());
-            item->filename = QString::fromUtf8(query.value(8).toString()); // Utf8 ??
+            item->startDate = query.value(6).toString();
+            item->startTime = query.value(7).toString();
+            item->filename = query.value(8).toString();
             item->hasCutlist = (query.value(9).toInt() > 0);
             item->useCutlist = false;
             item->editedDetails = false;
@@ -514,7 +516,7 @@ void ExportNativeWizard::showMenu()
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                       "popupMenu");
 
-    QButton *button;
+    QAbstractButton *button;
 
     button = popupMenu->addButton(tr("Remove Item"), this, SLOT(removeItem()));
     button->setFocus();
@@ -596,14 +598,14 @@ void ExportNativeWizard::createConfigFile(const QString &filename)
 
     // finally save the xml to the file
     QFile f(filename);
-    if (!f.open(IO_WriteOnly))
+    if (!f.open(QIODevice::WriteOnly))
     {
         cout << "ExportNativeWizard::createConfigFile: Failed to open file for writing - "
-                << filename << endl;
+                << filename.toLocal8Bit().constData() << endl;
         return;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     t << doc.toString(4);
     f.close();
 }

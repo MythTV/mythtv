@@ -71,7 +71,7 @@ bool ThemeInfo::parseThemeInfo()
 
     QFile f(m_theme->absFilePath() + "/themeinfo.xml");
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_FILE, QString("Unable to open themeinfo.xml "
                                       "for %1").arg(m_theme->absFilePath()));

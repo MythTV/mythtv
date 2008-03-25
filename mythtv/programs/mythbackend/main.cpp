@@ -252,7 +252,7 @@ int log_rotate(int report_error)
         // If we can't open the new logfile, send data to /dev/null
         if (report_error)
         {
-            cerr << "cannot open logfile " << logfile << endl;
+            cerr << "cannot open logfile " << (const char *)logfile << endl;
             return -1;
         }
         new_logfd = open("/dev/null", O_WRONLY);

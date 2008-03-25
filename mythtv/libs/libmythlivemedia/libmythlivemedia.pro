@@ -304,3 +304,6 @@ using_live {
     SOURCES += liveMedia/WAVAudioFileServerMediaSubsession.cpp
     SOURCES += liveMedia/WAVAudioFileSource.cpp
 }
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

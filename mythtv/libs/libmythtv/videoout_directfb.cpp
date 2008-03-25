@@ -25,6 +25,7 @@ using namespace std;
 #include <qwidget.h>
 #include <qevent.h>
 #include <qmutex.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include "mythcontext.h"

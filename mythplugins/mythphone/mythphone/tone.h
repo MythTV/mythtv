@@ -12,7 +12,7 @@
 #include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 
 #ifndef WIN32

@@ -24,7 +24,9 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -70,7 +72,7 @@ void KeyGrabPopupBox::Teardown(void)
 ///        modifier keys.
 QString KeyGrabPopupBox::GetCapturedKey(void) const
 {
-    return QDeepCopy<QString>(m_capturedKey);
+    return Q3DeepCopy<QString>(m_capturedKey);
 }
 
 void KeyGrabPopupBox::keyReleaseEvent(QKeyEvent *e)

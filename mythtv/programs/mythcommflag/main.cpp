@@ -4,6 +4,7 @@
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qdir.h>
+#include <QEvent>
 
 #include <iostream>
 #include <fstream>
@@ -101,8 +102,8 @@ int QueueCommFlagJob(QString chanid, QString starttime)
     if (!pginfo)
     {
         if (!quiet)
-            cerr << "Unable to find program info for chanid " << chanid
-                 << " @ " << starttime << endl;
+            cerr << "Unable to find program info for chanid " << (const char *)chanid
+                 << " @ " << (const char *)starttime << endl;
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
@@ -112,15 +113,15 @@ int QueueCommFlagJob(QString chanid, QString starttime)
     if (result)
     {
         if (!quiet)
-            cerr << "Job Queued for chanid " << chanid << " @ "
-                 << starttime << endl;
+            cerr << "Job Queued for chanid " << (const char *)chanid << " @ "
+                 << (const char *)starttime << endl;
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
     else
     {
         if (!quiet)
-            cerr << "Error queueing job for chanid " << chanid
-                 << " @ " << starttime << endl;
+            cerr << "Error queueing job for chanid " << (const char *)chanid
+                 << " @ " << (const char *)starttime << endl;
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
@@ -162,7 +163,7 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
 
     QStringList tokens = QStringList::split(",", newCutList);
 
-    for (unsigned int i = 0; i < tokens.size(); i++)
+    for (int i = 0; i < tokens.size(); i++)
     {
         QStringList cutpair = QStringList::split("-", tokens[i]);
         cutlist[cutpair[0].toInt()] = MARK_CUT_START;
@@ -223,9 +224,9 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
     }
 
     if (list == "cutlist")
-        cout << QString("Cutlist: %1\n").arg(result);
+        cout << (const char *)QString("Cutlist: %1\n").arg(result);
     else
-        cout << QString("Commercial Skip List: %1\n").arg(result);
+        cout << (const char *)QString("Commercial Skip List: %1\n").arg((const char *)result);
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
@@ -317,7 +318,7 @@ void commDetectorGotNewCommercialBreakList()
     RemoteSendMessage(message);
 }
 
-void incomingCustomEvent(QCustomEvent* e)
+void incomingCustomEvent(QEvent* e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -431,9 +432,9 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
         if (outputfilename.length())
         {
             fstream outputstream(outputfilename, ios::app | ios::out );
-            outputstream << "commercialBreakListFor: " << program_info->title
-                         << " on " << program_info->chanid << " @ "
-                         << program_info->recstartts.toString(Qt::ISODate)
+            outputstream << "commercialBreakListFor: " << (const char *)program_info->title
+                         << " on " << (const char *)program_info->chanid << " @ "
+                         << (const char *)program_info->recstartts.toString(Qt::ISODate)
                          << endl;
             outputstream << "totalframecount: " << nvp->GetTotalFrameCount()
                          << endl;
@@ -502,16 +503,16 @@ int FlagCommercials(QString chanid, QString starttime)
         if (outputfilename.length())
         {
             fstream output(outputfilename, ios::app | ios::out );
-            output << "commercialBreakListFor: " << program_info->title
-                   << " on " << program_info->chanid << " @ "
-                   << program_info->recstartts.toString(Qt::ISODate) << endl;
+            output << "commercialBreakListFor: " << (const char *)program_info->title
+                   << " on " << (const char *)program_info->chanid << " @ "
+                   << (const char *)program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(output, commBreakList);
         }
         else
         {
-            cout << "commercialBreakListFor: " << program_info->title
-                 << " on " << program_info->chanid << " @ "
-                 << program_info->recstartts.toString(Qt::ISODate) << endl;
+            cout << "commercialBreakListFor: " << (const char *)program_info->title
+                 << " on " << (const char *)program_info->chanid << " @ "
+                 << (const char *)program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(cout, commBreakList);
         }
         delete program_info;
@@ -521,9 +522,9 @@ int FlagCommercials(QString chanid, QString starttime)
 
     if (!quiet)
     {
-        cerr << chanid.leftJustify(6, ' ', true) << "  "
-             << starttime.leftJustify(14, ' ', true) << "  "
-             << program_info->title.leftJustify(41, ' ', true) << "  ";
+        cerr << (const char *)chanid.leftJustify(6, ' ', true) << "  "
+             << (const char *)starttime.leftJustify(14, ' ', true) << "  "
+             << (const char *)program_info->title.leftJustify(41, ' ', true) << "  ";
         cerr.flush();
     }
 
@@ -852,7 +853,7 @@ int main(int argc, char *argv[])
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
                     tokens[0].replace(QRegExp("^[\"']"), "");
@@ -972,7 +973,7 @@ int main(int argc, char *argv[])
         else
         {
             cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                 << fullfile.dirName() << endl;
+                 << (const char *)fullfile.dirName() << endl;
             return COMMFLAG_EXIT_NO_PROGRAM_DATA;
         }
     }
@@ -1063,7 +1064,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            cerr << "Building seek table for: " << filename << "\n";
+            cerr << "Building seek table for: " << (const char *)filename << "\n";
         }
     }
 

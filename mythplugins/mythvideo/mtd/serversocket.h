@@ -1,21 +1,21 @@
 #ifndef SERVERSOCKET_H_
 #define SERVERSOCKET_H_
 /*
-	serversocket.h
+    serversocket.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Headers for the mtd server-side of socket communications
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Headers for the mtd server-side of socket communications
 
 */
 
-#include <qsocket.h>
-#include <qserversocket.h>
+#include <Q3Socket>
+#include <Q3ServerSocket>
 
-class QSocket;
+class Q3Socket;
 
-class MTDServerSocket : public QServerSocket
+class MTDServerSocket : public Q3ServerSocket
 {
 
     Q_OBJECT
@@ -28,8 +28,8 @@ class MTDServerSocket : public QServerSocket
 
   signals:
   
-    void newConnect(QSocket *);
-    void endConnect(QSocket *);
+    void newConnect(Q3Socket *);
+    void endConnect(Q3Socket *);
     
   private slots:
   

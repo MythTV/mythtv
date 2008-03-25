@@ -17,6 +17,10 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <memory>
 
 #include <mythtv/uitypes.h>
+#include <QPixmap>
+
+class QPaintEvent;
+class QKeyEvent;
 
 class Metadata;
 class VideoList;
@@ -39,7 +43,7 @@ class VideoSelected : public MythDialog
   protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
   private:
     QPixmap getPixmap(QString &level);

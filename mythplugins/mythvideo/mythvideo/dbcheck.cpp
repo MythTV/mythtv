@@ -1,6 +1,6 @@
-#include <qstring.h>
-#include <qregexp.h>
-#include <qstringlist.h>
+#include <QString>
+#include <QRegExp>
+#include <QStringList>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -13,7 +13,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1016";
+    const QString currentDatabaseVersion = "1018";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -251,7 +251,6 @@ namespace
             const QString updates[] = {
 "INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
 " '2', bookmark FROM videobookmarks;",
-"DROP TABLE videobookmarks;",
 ""
             };
 
@@ -646,6 +645,110 @@ namespace
             "ALTER TABLE videometadata MODIFY inetref VARCHAR(255) NOT NULL;";
             performActualUpdate(updates, "1016", dbver, MythVideoVersionName);
         }
+
+        if (dbver == "1016")
+        {
+            const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE dvdbookmark"
+"  MODIFY serialid varbinary(16) NOT NULL default '',"
+"  MODIFY name varbinary(32) default NULL;",
+"ALTER TABLE dvdinput"
+"  MODIFY v_format varbinary(16) default NULL;",
+"ALTER TABLE dvdtranscode"
+"  MODIFY name varbinary(128) NOT NULL,"
+"  MODIFY codec varbinary(128) NOT NULL,"
+"  MODIFY codec_param varbinary(128) default NULL,"
+"  MODIFY tc_param varbinary(128) default NULL;",
+"ALTER TABLE filemarkup"
+"  MODIFY filename blob NOT NULL;",
+"ALTER TABLE videocast"
+"  MODIFY cast varbinary(128) NOT NULL;",
+"ALTER TABLE videocategory"
+"  MODIFY category varbinary(128) NOT NULL;",
+"ALTER TABLE videocountry"
+"  MODIFY country varbinary(128) NOT NULL;",
+"ALTER TABLE videogenre"
+"  MODIFY genre varbinary(128) NOT NULL;",
+"ALTER TABLE videometadata"
+"  MODIFY title varbinary(128) NOT NULL,"
+"  MODIFY director varbinary(128) NOT NULL,"
+"  MODIFY plot blob,"
+"  MODIFY rating varbinary(128) NOT NULL,"
+"  MODIFY inetref varbinary(255) NOT NULL,"
+"  MODIFY filename blob NOT NULL,"
+"  MODIFY coverfile blob NOT NULL,"
+"  MODIFY playcommand varbinary(255) default NULL;",
+"ALTER TABLE videotypes"
+"  MODIFY extension varbinary(128) NOT NULL,"
+"  MODIFY playcommand varbinary(255) NOT NULL;",
+""
+};
+
+            performActualUpdate(updates, "1017", dbver, MythVideoVersionName);
+        }
+
+
+        if (dbver == "1017")
+        {
+            const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE dvdbookmark"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY serialid varchar(16) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY name varchar(32) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE dvdinput"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY v_format varchar(16) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE dvdtranscode"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY codec varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY codec_param varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY tc_param varchar(128) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE filemarkup"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY filename text CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE videocast"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY cast varchar(128) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE videocategory"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY category varchar(128) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE videocountry"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY country varchar(128) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE videogenre"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY genre varchar(128) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE videometadata"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY director varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY plot text CHARACTER SET utf8,"
+"  MODIFY rating varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY inetref varchar(255) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY coverfile text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY playcommand varchar(255) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE videometadatacast"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE videometadatacountry"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE videometadatagenre"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE videotypes"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY extension varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY playcommand varchar(255) CHARACTER SET utf8 NOT NULL;",
+""
+};
+
+            performActualUpdate(updates, "1018", dbver, MythVideoVersionName);
+        }
+
     }
 }
 

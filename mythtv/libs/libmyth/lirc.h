@@ -3,7 +3,7 @@
 
 #include <lirc/lirc_client.h>
 #include <qobject.h>
-#include <qsocket.h>
+#include <q3socket.h>
 #include <qstring.h>
 
 #include "mythdialogs.h"

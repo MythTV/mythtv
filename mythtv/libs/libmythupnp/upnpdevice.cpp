@@ -58,7 +58,7 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
     QDomDocument doc ( "upnp" );
     QFile        file( sFileName );
 
-    if ( !file.open( IO_ReadOnly ) )
+    if ( !file.open( QIODevice::ReadOnly ) )
         return false;
 
     QString sErrMsg;
@@ -264,7 +264,7 @@ void UPnpDeviceDesc::SetNumValue( const QDomNode &n, int &nValue )
 QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 {
     QString     sXML;
-    QTextStream os( sXML, IO_WriteOnly );
+    Q3TextStream os( sXML, QIODevice::WriteOnly );
 
     GetValidXML( sBaseAddress, nPort, os );
 
@@ -275,7 +275,7 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, QTextStream &os, const QString &sUserAgent )
+void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, Q3TextStream &os, const QString &sUserAgent )
 {
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
@@ -296,7 +296,7 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, QTextS
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::OutputDevice( QTextStream &os, 
+void UPnpDeviceDesc::OutputDevice( Q3TextStream &os,
                                    UPnpDevice *pDevice, 
                                    const QString &sUserAgent )
 {

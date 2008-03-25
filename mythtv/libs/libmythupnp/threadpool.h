@@ -12,7 +12,7 @@
 #define __THREADPOOL_H__
 
 #include <qstring.h> 
-#include <qptrlist.h> 
+#include <q3ptrlist.h>
 #include <qmutex.h> 
 #include <qwaitcondition.h> 
 #include <qthread.h>
@@ -98,7 +98,7 @@ class WorkerThread : public QThread
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-typedef QPtrList< WorkerThread >  WorkerThreadList;
+typedef Q3PtrList< WorkerThread >  WorkerThreadList;
 
 class ThreadPool
 {

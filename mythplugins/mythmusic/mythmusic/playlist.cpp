@@ -3,16 +3,21 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
+
 using namespace std;
 #include "playlist.h"
 #include "qdatetime.h"
+//Added by qt3to4:
+#include <Q3PtrList>
+#include <Q3TextStream>
+
 #include <mythtv/mythcontext.h>
 #include "smartplaylist.h"
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
 
 #include <qfileinfo.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qapplication.h>
 
 Track::Track(int x, AllMusic *all_music_ptr)
@@ -316,7 +321,7 @@ void PlaylistsContainer::load()
     backup_playlist = new Playlist(all_available_music);
     backup_playlist->setParent(this);
     
-    all_other_playlists = new QPtrList<Playlist>;
+    all_other_playlists = new Q3PtrList<Playlist>;
     all_other_playlists->setAutoDelete(true);
     
     cd_playlist.clear();
@@ -489,7 +494,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
                       "WHERE playlist_name = :NAME"
                       " AND (hostname = '' OR hostname = :HOST);");
     }
-    query.bindValue(":NAME", a_name.utf8());
+    query.bindValue(":NAME", a_name);
     query.bindValue(":HOST", a_host);
 
     if (query.exec() && query.size() > 0)
@@ -497,7 +502,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
         while (query.next())
         {
             playlistid = query.value(0).toInt();
-            name = QString::fromUtf8(query.value(1).toString());
+            name = query.value(1).toString();
             raw_songlist = query.value(2).toString();
         }
         if (name == "default_playlist_storage")
@@ -531,7 +536,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     while (query.next())
     {
         playlistid = query.value(0).toInt();
-        name = QString::fromUtf8(query.value(1).toString());
+        name = query.value(1).toString();
         raw_songlist = query.value(2).toString();
     }
 
@@ -731,7 +736,7 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     int categoryID = SmartPlaylistEditor::lookupCategoryID(category);
     if (categoryID == -1)
     {
-        cout << "Cannot find Smartplaylist Category: " << category << endl;
+        VERBOSE(VB_GENERAL, "Cannot find Smartplaylist Category: " + category);
         return;
     }
     
@@ -743,7 +748,7 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     
     query.prepare("SELECT smartplaylistid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists WHERE categoryid = :CATEGORYID AND name = :NAME;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     query.bindValue(":CATEGORYID", categoryID);
         
     if (query.exec())
@@ -753,12 +758,12 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
             query.first();
             ID = query.value(0).toInt();
             matchType = (query.value(1).toString() == "All") ? " AND " : " OR ";
-            orderBy = QString::fromUtf8(query.value(2).toString());
+            orderBy = query.value(2).toString();
             limitTo = query.value(3).toInt();
         }
         else
         {
-            cout << "Cannot find smartplaylist: " << name << endl;
+            VERBOSE(VB_GENERAL, "Cannot find smartplaylist: " + name);
             return;
         }
     }
@@ -780,10 +785,10 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
         bool bFirst = true;
         while (query.next())
         {
-            QString fieldName = QString::fromUtf8(query.value(0).toString());
-            QString operatorName = QString::fromUtf8(query.value(1).toString());
-            QString value1 = QString::fromUtf8(query.value(2).toString());
-            QString value2 = QString::fromUtf8(query.value(3).toString());
+            QString fieldName = query.value(0).toString();
+            QString operatorName = query.value(1).toString();
+            QString value1 = query.value(2).toString();
+            QString value2 = query.value(3).toString();
             if (!bFirst)
                 whereClause += matchType + getCriteriaSQL(fieldName, operatorName, value1, value2); 
             else
@@ -888,7 +893,7 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
         query.prepare(str_query);
     }
     query.bindValue(":LIST", raw_songlist);
-    query.bindValue(":NAME", a_name.utf8());
+    query.bindValue(":NAME", a_name);
     query.bindValue(":SONGCOUNT", songcount);
     query.bindValue(":PLAYTIME", playtime);
     if (save_host)
@@ -1175,7 +1180,7 @@ GenericTree* PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
     //  Write the other playlists
     //
     
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );  
+    Q3PtrListIterator<Playlist> iterator( *all_other_playlists );  
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
@@ -1334,7 +1339,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
 
     active_playlist->removeTrack(kill_me * -1, false);
 
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );    
+    Q3PtrListIterator<Playlist> iterator( *all_other_playlists );    
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
@@ -1434,7 +1439,7 @@ Playlist *PlaylistsContainer::getPlaylist(int id)
     //  called this) that are also traversing the same list get
     //  reset. That took a **long** time to figure out
 
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );    
+    Q3PtrListIterator<Playlist> iterator( *all_other_playlists );    
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
@@ -1535,7 +1540,7 @@ void PlaylistsContainer::postLoad()
 
     active_playlist->postLoad();
     backup_playlist->postLoad();
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );    
+    Q3PtrListIterator<Playlist> iterator( *all_other_playlists );    
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
@@ -1565,7 +1570,7 @@ bool PlaylistsContainer::nameIsUnique(QString a_name, int which_id)
         return false;
     }
 
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );    
+    Q3PtrListIterator<Playlist> iterator( *all_other_playlists );    
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
@@ -1581,7 +1586,7 @@ bool PlaylistsContainer::nameIsUnique(QString a_name, int which_id)
 
 bool PlaylistsContainer::cleanOutThreads()
 {
-    if(playlists_loader->finished())
+    if(playlists_loader->isFinished())
     {
         return true;
     }
@@ -1743,13 +1748,13 @@ int Playlist::CreateCDMP3(void)
 
     QFile reclistfile(tmprecordlist);
 
-    if (!reclistfile.open(IO_WriteOnly))
+    if (!reclistfile.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
         return 1;
     }
 
-    QTextStream recstream(&reclistfile);
+    Q3TextStream recstream(&reclistfile);
 
     QStringList::Iterator iter;
 
@@ -1765,8 +1770,7 @@ int Playlist::CreateCDMP3(void)
                                       100);
     progress->setProgress(1);
 
-    QStringList args;
-    args = "mkisofs";
+    QStringList args("mkisofs");
     args += "-graft-points";
     args += "-path-list";
     args += tmprecordlist;
@@ -1775,11 +1779,11 @@ int Playlist::CreateCDMP3(void)
     args += "-J";
     args += "-R";
 
-    cout << "Running: " << args.join(" ") << endl;
+    VERBOSE(VB_GENERAL, "Running: " + args.join(" "));
 
     bool retval = 0;
 
-    QProcess isofs(args);
+    Q3Process isofs(args);
     
     if (isofs.start())
     {
@@ -1822,7 +1826,7 @@ int Playlist::CreateCDMP3(void)
     progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
     progress->setProgress(2);
 
-    args = "cdrecord";
+    args = QStringList("cdrecord");
     args += "-v";
     //args += "-dummy";
     args += "dev=";
@@ -1837,9 +1841,9 @@ int Playlist::CreateCDMP3(void)
     args += "-data";
     args += tmprecordisofs;
 
-    cout << "Running: " << args.join(" ") << endl;
+    VERBOSE(VB_GENERAL, "Running: " + args.join(" "));
 
-    QProcess burn(args);
+    Q3Process burn(args);
 
     if (burn.start())
     {

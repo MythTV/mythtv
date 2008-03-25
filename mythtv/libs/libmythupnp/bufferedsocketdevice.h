@@ -12,11 +12,58 @@
 #define __BUFFEREDSOCKETDEVICE_H__
 
 // Qt headers
-#include <qsocketdevice.h>
+#include <Q3PtrList>
+#include <Q3SocketDevice>
+
+
+#include <q3socketdevice.h>
+//#include <q3membuf_p.h>
 
 // MythTV headers
-#include "private/qinternal_p.h"
 #include "compat.h"
+
+// file q3membuf_p.h not installed on my system using ubuntu Qt4 Dev Package.
+// Including class here.
+
+class Q_COMPAT_EXPORT Q3Membuf
+{
+public:
+    Q3Membuf();
+    ~Q3Membuf();
+
+    void append(QByteArray *ba);
+    void clear();
+
+    bool consumeBytes(Q_ULONG nbytes, char *sink);
+    QByteArray readAll();
+    bool scanNewline(QByteArray *store);
+    bool canReadLine() const;
+
+    int ungetch(int ch);
+
+    qint64 size() const;
+
+private:
+
+    QList<QByteArray *> buf;
+    qint64 _size;
+    qint64 _index;
+};
+
+inline void Q3Membuf::append(QByteArray *ba)
+{ buf.append(ba); _size += ba->size(); }
+
+inline void Q3Membuf::clear()
+{ qDeleteAll(buf); buf.clear(); _size=0; _index=0; }
+
+inline QByteArray Q3Membuf::readAll()
+{ QByteArray ba; ba.resize(_size); consumeBytes(_size,ba.data()); return ba; }
+
+inline bool Q3Membuf::canReadLine() const
+{ return const_cast<Q3Membuf*>(this)->scanNewline(0); }
+
+inline qint64 Q3Membuf::size() const
+{ return _size; }
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -30,7 +77,7 @@ class BufferedSocketDevice
 {
     protected:
 
-        QSocketDevice          *m_pSocket;
+        Q3SocketDevice          *m_pSocket;
 
         Q_ULONG                 m_nMaxReadBufferSize; 
         QIODevice::Offset       m_nWriteSize;           // write total buf size
@@ -41,8 +88,8 @@ class BufferedSocketDevice
         QHostAddress            m_DestHostAddress;
         Q_UINT16                m_nDestPort;
 
-        QMembuf                 m_bufRead;
-        QPtrList<QByteArray>    m_bufWrite;
+        Q3Membuf                m_bufRead;
+        Q3PtrList<QByteArray>   m_bufWrite;
 
         int     ReadBytes      ( );
         bool    ConsumeWriteBuf( Q_ULONG nbytes );
@@ -50,13 +97,13 @@ class BufferedSocketDevice
     public:
 
         BufferedSocketDevice( int nSocket );
-        BufferedSocketDevice( QSocketDevice *pSocket = NULL,
+        BufferedSocketDevice( Q3SocketDevice *pSocket = NULL,
                               bool    bTakeOwnership = false );
 
         virtual ~BufferedSocketDevice( );
 
-        QSocketDevice      *SocketDevice        ();
-        void                SetSocketDevice     ( QSocketDevice *pSocket );
+        Q3SocketDevice      *SocketDevice        ();
+        void                SetSocketDevice     ( Q3SocketDevice *pSocket );
 
         void                SetDestAddress      ( QHostAddress hostAddress,
                                                   Q_UINT16     nPort );
@@ -66,7 +113,7 @@ class BufferedSocketDevice
         void                Flush               ();
         QIODevice::Offset   Size                ();
         QIODevice::Offset   At                  (); 
-        bool                At                  ( QIODevice::Offset );
+        bool                At                  ( qlonglong );
         bool                AtEnd               ();
 
         Q_ULONG             BytesAvailable      (); 

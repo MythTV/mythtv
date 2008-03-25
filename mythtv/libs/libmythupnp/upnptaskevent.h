@@ -14,6 +14,8 @@
 #include "upnp.h"
 #include "bufferedsocketdevice.h"
 
+#include <Q3CString>
+
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -30,7 +32,7 @@ class UPnpEventTask : public Task
         int          m_nPeerPort;
         QByteArray  *m_pPayload;
 
-        QCString     m_sPayload;
+        Q3CString     m_sPayload;
 
     protected:
 

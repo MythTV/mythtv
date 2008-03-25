@@ -7,6 +7,8 @@
 
 */
 
+#include <QKeyEvent>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 
@@ -224,9 +226,10 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
 
         if (action == "UP")

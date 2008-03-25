@@ -272,7 +272,7 @@ QString MythGesture::translate(void)
 bool MythGesture::record(const QPoint & p)
 {
     /* only record if we haven't exceeded the maximum points */
-    if ((points.size() >= max_points) || !recording())
+    if (((uint)points.size() >= max_points) || !recording())
         return false;
 
     if (points.size() == 0)

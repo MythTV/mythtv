@@ -3,7 +3,7 @@
 # cpsvndir: recursive directory copy excluding .svn sub dirs.
 
 DESTDIR=$2
-SOURCE=$1
+SOURCE=$(basename "$1")
 
 if [ -z "$1" -o -z "$2" ]; then
     echo "Usage: $0 source-dir destination-dir"

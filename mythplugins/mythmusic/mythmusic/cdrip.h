@@ -5,6 +5,9 @@
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
+//Added by qt3to4:
+#include <QEvent>
+#include <QKeyEvent>
 
 class CdDecoder;
 class Encoder;
@@ -30,28 +33,6 @@ class CDEjectorThread: public QThread
         Ripper            *m_parent;
 };
 
-enum StatusTypes
-{
-    ST_TRACK_TEXT = 0,
-    ST_OVERALL_TEXT,
-    ST_STATUS_TEXT,
-    ST_TRACK_PROGRESS,
-    ST_TRACK_PERCENT,
-    ST_TRACK_START,
-    ST_OVERALL_PROGRESS,
-    ST_OVERALL_PERCENT,
-    ST_OVERALL_START,
-    ST_FINISHED,
-    ST_ENCODER_ERROR
-};
-
-typedef struct
-{
-    int type;
-    QString text;
-    int value;
-} StatusData;
-
 typedef struct
 {
     Metadata *metadata;
@@ -73,8 +54,6 @@ class CDRipperThread: public QThread
     private:
         virtual void run(void);
         int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
-        void sendEvent(int eventType, const QString &value);
-        void sendEvent(int eventType, int value);
 
         bool isCancelled(void);
 
@@ -165,6 +144,32 @@ class Ripper : public MythThemedDialog
 };
 
 
+class RipStatusEvent : public QEvent
+{
+  public:
+    enum Type
+    {
+        ST_TRACK_TEXT = (QEvent::User + 3000),
+        ST_OVERALL_TEXT,
+        ST_STATUS_TEXT,
+        ST_TRACK_PROGRESS,
+        ST_TRACK_PERCENT,
+        ST_TRACK_START,
+        ST_OVERALL_PROGRESS,
+        ST_OVERALL_PERCENT,
+        ST_OVERALL_START,
+        ST_FINISHED,
+        ST_ENCODER_ERROR
+    };
+
+    RipStatusEvent(Type t, int val) : QEvent((QEvent::Type)t) { value=val; }
+    RipStatusEvent(Type t, const QString &val) : QEvent((QEvent::Type)t) { text=val; }
+    ~RipStatusEvent() {}
+
+    QString text;
+    int value;
+};
+
 class RipStatus : public MythThemedDialog
 {
   Q_OBJECT
@@ -181,7 +186,7 @@ class RipStatus : public MythThemedDialog
   private:
     void wireupTheme(void);
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
     vector<RipTrack*> *m_tracks;
     int                m_quality;

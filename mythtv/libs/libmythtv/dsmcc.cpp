@@ -44,7 +44,7 @@ Dsmcc::Dsmcc()
  */
 ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
 {
-    QPtrListIterator<ObjCarousel> it(carousels);
+    Q3PtrListIterator<ObjCarousel> it(carousels);
     ObjCarousel *car;
 
     for (; (car = it.current()) != NULL; ++it)
@@ -77,7 +77,7 @@ ObjCarousel *Dsmcc::AddTap(unsigned short componentTag, unsigned carouselId)
     }
 
     // Add this only if it's not already there.
-    QValueVector<unsigned short>::iterator it;
+    Q3ValueVector<unsigned short>::iterator it;
     for (it = car->m_Tags.begin(); it != car->m_Tags.end(); ++it)
     {
         if (*it == componentTag)
@@ -385,7 +385,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
                            int dataBroadcastId)
 {
     // Does this component tag match one of our carousels?
-    QPtrListIterator<ObjCarousel> it(carousels);
+    Q3PtrListIterator<ObjCarousel> it(carousels);
     ObjCarousel *car;
 
     VERBOSE(VB_DSMCC, QString("[dsmcc] Read block size %1 from tag %2 "
@@ -397,7 +397,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
     for (; (car = it.current()) != NULL; ++it)
     {
         // Is the component tag one of the ones we know?
-        QValueVector<unsigned short>::iterator it;
+        Q3ValueVector<unsigned short>::iterator it;
         for (it = car->m_Tags.begin(); it != car->m_Tags.end(); ++it)
         {
             if (*it == componentTag)
@@ -471,7 +471,7 @@ void Dsmcc::Reset()
 int Dsmcc::GetDSMCCObject(QStringList &objectPath, QByteArray &result)
 {
     ObjCarousel *car;
-    QPtrListIterator<ObjCarousel> it(carousels);
+    Q3PtrListIterator<ObjCarousel> it(carousels);
 
     if (carousels.isEmpty())
         return 1; // Not yet loaded.

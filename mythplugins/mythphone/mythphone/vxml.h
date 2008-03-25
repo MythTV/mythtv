@@ -1,7 +1,10 @@
 #ifndef VXML_H_
 #define VXML_H_
 
-#include <qurl.h>
+#include <q3url.h>
+//Added by qt3to4:
+#include <Q3PtrList>
+#include <QWaitCondition>
 
 #include "rtp.h"
 
@@ -27,7 +30,7 @@ class vxmlVariable
     int     spLength;
 };
 
-class vxmlVarContainer : public QPtrList<vxmlVariable>
+class vxmlVarContainer : public Q3PtrList<vxmlVariable>
 {
   public:
     vxmlVarContainer();
@@ -88,7 +91,7 @@ class vxmlParser
     QWaitCondition *waker;
     QDomDocument vxmlDoc;
     vxmlVarContainer *vxmlVarList;
-    QUrl lastUrl;
+    Q3Url lastUrl;
 
     rtp *Rtp;
 };

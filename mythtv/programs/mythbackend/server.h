@@ -1,12 +1,12 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <qserversocket.h>
+#include <q3serversocket.h>
 #include <qmutex.h>
 
 class MythSocket;
 
-class MythServer : public QServerSocket
+class MythServer : public Q3ServerSocket
 {
     Q_OBJECT
   public:

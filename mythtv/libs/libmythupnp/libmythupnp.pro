@@ -70,3 +70,6 @@ macx {
 
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

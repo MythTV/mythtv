@@ -39,13 +39,15 @@ void MythUIClock::Pulse(void)
 
     if (m_Time > m_nextUpdate)
     {
-        m_Message = m_Time.toString(m_Format);
+        QString newMsg;
+
+        newMsg = m_Time.toString(m_Format);
         if (m_SecsFlash)
         {
             if (m_Flash)
             {
-                m_Message.replace(":", " ");
-                m_Message.replace(".", " ");
+                newMsg.replace(":", " ");
+                newMsg.replace(".", " ");
                 m_Flash = false;
             }
             else
@@ -53,7 +55,13 @@ void MythUIClock::Pulse(void)
         }
 
         m_CutMessage = "";
-        SetRedraw();
+
+        if (m_Message != newMsg)
+        {
+            m_Message = newMsg;
+            SetRedraw();
+        }
+
         m_nextUpdate = m_Time.addSecs(1);
     }
 

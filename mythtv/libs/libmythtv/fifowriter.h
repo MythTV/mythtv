@@ -7,7 +7,7 @@
 // Qt headers
 #include <qstring.h>
 #include <qmutex.h>
-#include <qptrqueue.h>
+#include <q3ptrqueue.h>
 
 // MythTV headers
 #include "mythexp.h"

@@ -15,10 +15,10 @@
 #include "libmyth/util.h"
 #include "libmyth/mythdbcon.h"
 
+#include <q3textstream.h>
 #include "previewgenerator.h"
 #include "backendutil.h"
 
-#include <qtextstream.h>
 #include <qdir.h>
 #include <qfile.h>
 #include <qregexp.h>
@@ -222,7 +222,7 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
         if (query.isActive() && query.size() > 0)
         {
              QString     sHosts;
-             QTextStream os( &sHosts, IO_WriteOnly );
+             Q3TextStream os( &sHosts, QIODevice::WriteOnly );
 
             while(query.next())
             {
@@ -266,7 +266,7 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
         if (query.isActive() && query.size() > 0)
         {
              QString     sKeys;
-             QTextStream os( &sKeys, IO_WriteOnly );
+             Q3TextStream os( &sKeys, QIODevice::WriteOnly );
 
             while(query.next())
             {
@@ -315,7 +315,7 @@ void MythXML::GetSetting( HTTPRequest *pRequest )
         // Was a Key Supplied?
 
         QString       sXml;
-        QTextStream   os( &sXml, IO_WriteOnly );
+        Q3TextStream   os( &sXml, QIODevice::WriteOnly );
 
         if (sKey.length() > 0)
         {
@@ -813,7 +813,7 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     
     QString sId =  pRequest->m_mapParams[ "Id"  ];
 
-    if (sId == 0)
+    if (sId.isEmpty())
     {
         QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
 
@@ -881,7 +881,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
     QString sId =  pRequest->m_mapParams[ "Id"  ];
 
-    if (sId == 0)
+    if (sId.isEmpty())
     {
         QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
 
@@ -925,7 +925,7 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
         pRequest->m_sFileName = QString( "%1/%2" )
                         .arg( musicbasepath )
-                        .arg( QString::fromUtf8(query.value(0).toString()) );
+                        .arg( query.value(0).toString() );
     }
 
     if ((nWidth == 0) && (nHeight == 0))
@@ -1441,7 +1441,7 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
                 query.first();  
                 pRequest->m_sFileName = QString( "%1/%2" )
                         .arg( sBasePath )
-                        .arg( QString::fromUtf8(query.value(0).toString()) );
+                        .arg( query.value(0).toString() );
             }
         }
 
@@ -1548,7 +1548,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
                 query.first();
                 pRequest->m_sFileName = QString( "%1/%2" )
                                            .arg( sBasePath )
-                            .arg( QString::fromUtf8(query.value(0).toString()) );
+                            .arg( query.value(0).toString() );
             }
         }
 
@@ -1613,7 +1613,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
     }
 
     QString     sXml;
-    QTextStream os( &sXml, IO_WriteOnly );
+    Q3TextStream os( &sXml, QIODevice::WriteOnly );
 
     os <<  "<Database>";
     os <<   "<Host>"      << params.dbHostName << "</Host>";

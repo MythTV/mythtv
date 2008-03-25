@@ -33,3 +33,6 @@ using_oss:DEFINES += USING_OSS
 using_dvb:DEFINES += USING_DVB
 
 using_valgrind:DEFINES += USING_VALGRIND
+
+#The following line was inserted by qt3to4
+QT += network xml sql opengl qt3support

@@ -3,9 +3,13 @@
 
 #include <qmap.h>
 #include <qtimer.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <qmutex.h>
 #include <qdom.h>
+#include <QEvent>
+#include <Q3ValueList>
+#include <Q3PtrList>
+
 #include <vector>
 using namespace std;
 
@@ -31,7 +35,7 @@ class MainServer : public QObject, public MythSocketCBs
 
    ~MainServer();
 
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
@@ -142,7 +146,7 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *getFileTransferByID(int id);
     FileTransfer *getFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(QUrl &url);
+    QString LocalFilePath(Q3Url &url);
 
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);
@@ -160,7 +164,7 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    QPtrList<LiveTVChain> liveTVChains;
+    Q3PtrList<LiveTVChain> liveTVChains;
     QMutex liveTVChainsLock;
 
     QMap<int, EncoderLink *> *encoderList;
@@ -196,7 +200,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QMutex deferredDeleteLock;
     QTimer *deferredDeleteTimer;
-    QValueList<DeferredDeleteStruct> deferredDeleteList;
+    Q3ValueList<DeferredDeleteStruct> deferredDeleteList;
 
     QTimer *autoexpireUpdateTimer;
 

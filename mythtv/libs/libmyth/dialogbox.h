@@ -1,21 +1,20 @@
 #ifndef DIALOGBOX_H_
 #define DIALOGBOX_H_
 
-#include <qcheckbox.h>
+#include <QObject>
+#include <QCheckBox>
+#include <Q3ButtonGroup>
+#include <Q3VBoxLayout>
 
 #include "mythdialogs.h"
 #include "compat.h" // to undef DialogBox
-
-class QVBoxLayout;
-class QButtonGroup;
-class QString;
 
 class MPUBLIC DialogBox : public MythDialog
 {
     Q_OBJECT
   public:
     DialogBox(MythMainWindow *parent, const QString &text, 
-              const char *checkboxtext = 0, const char *name = 0);
+              const char *checkboxtext = NULL, const char *name = NULL);
 
     void AddButton(const QString &title);
 
@@ -29,8 +28,8 @@ class MPUBLIC DialogBox : public MythDialog
     ~DialogBox() {} // use deleteLater() for thread safety
 
   private:
-    QVBoxLayout *box;
-    QButtonGroup *buttongroup;
+    Q3VBoxLayout *box;
+    Q3ButtonGroup *buttongroup;
 
     QCheckBox *checkbox;
 };

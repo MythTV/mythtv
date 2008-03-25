@@ -2,10 +2,10 @@
 #define _LIVETVCHAIN_H_
 
 #include <qstring.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 #include <qdatetime.h>
 #include <qmutex.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include "mythexp.h"
 
@@ -89,7 +89,7 @@ class MPUBLIC LiveTVChain
     static ProgramInfo *EntryToProgram(const LiveTVChainEntry &entry);
 
     QString m_id;
-    QValueList<LiveTVChainEntry> m_chain;
+    Q3ValueList<LiveTVChainEntry> m_chain;
     int m_maxpos;
     mutable QMutex m_lock;
 
@@ -106,7 +106,7 @@ class MPUBLIC LiveTVChain
     int m_jumppos;
 
     QMutex m_sockLock;
-    QPtrList<MythSocket> m_inUseSocks;
+    Q3PtrList<MythSocket> m_inUseSocks;
 };
 
 #endif

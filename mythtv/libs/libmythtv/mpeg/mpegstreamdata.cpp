@@ -9,7 +9,7 @@ using namespace std;
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "mpegstreamdata.h"
@@ -140,7 +140,7 @@ void MPEGStreamData::SetDesiredProgram(int p)
 
 void MPEGStreamData::SetRecordingType(const QString &recording_type)
 {
-    _recording_type = QDeepCopy<QString>(recording_type);
+    _recording_type = Q3DeepCopy<QString>(recording_type);
     uint neededVideo = (_recording_type == "tv")    ? 1 : 0;
     uint neededAudio = (_recording_type == "audio") ? 1 : 0;
     SetVideoStreamsRequired(neededVideo);
@@ -149,7 +149,7 @@ void MPEGStreamData::SetRecordingType(const QString &recording_type)
 
 QString MPEGStreamData::GetRecordingType(void) const
 {
-    return QDeepCopy<QString>(_recording_type);
+    return Q3DeepCopy<QString>(_recording_type);
 }
 
 void MPEGStreamData::SetEITHelper(EITHelper *eit_helper)

@@ -156,7 +156,7 @@ int ChannelListSetting::fillSelections(void)
     {
         for (; query.next() ; idx++) 
         {
-            QString name = QString::fromUtf8(query.value(0).toString());
+            QString name = query.value(0).toString();
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
             QString sourceid = "Unassigned";
@@ -509,7 +509,7 @@ void ChannelEditor::channelIconImport(void)
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-        channelname = QString::fromUtf8(query.value(0).toString());
+        channelname = query.value(0).toString();
     }
 
     QStringList buttons;

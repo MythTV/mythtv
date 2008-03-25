@@ -1,14 +1,14 @@
 /*
-	serversocket.cpp
+    serversocket.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Methods for the mtd server side socket connections
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Methods for the mtd server side socket connections
 
 */
 
-#include <qsocket.h>
+#include <Q3Socket>
 
 #include <stdlib.h>
 #include <mythtv/mythcontext.h>
@@ -17,7 +17,7 @@
 
 
 MTDServerSocket::MTDServerSocket(int port, QObject *parent)
-                :QServerSocket(port, 1, parent)
+                :Q3ServerSocket(port, 1, parent)
 {
     if(!ok())
     {
@@ -34,7 +34,7 @@ MTDServerSocket::MTDServerSocket(int port, QObject *parent)
 
 void MTDServerSocket::newConnection(int socket)
 {
-    QSocket *new_socket = new QSocket(this);
+    Q3Socket *new_socket = new Q3Socket(this);
     connect(new_socket, SIGNAL(delayedCloseFinished()), this, SLOT(discardClient()));
     connect(new_socket, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
     new_socket->setSocket(socket);
@@ -44,7 +44,7 @@ void MTDServerSocket::newConnection(int socket)
 
 void MTDServerSocket::discardClient()
 {
-    QSocket *socket = (QSocket *)sender();
+    Q3Socket *socket = (Q3Socket *)sender();
     if(socket)
     {
         emit(endConnect(socket));

@@ -53,7 +53,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
     if (m_pPayload == NULL)
         return;
 
-    QSocketDevice        *pSockDev = new QSocketDevice( QSocketDevice::Stream );
+    Q3SocketDevice        *pSockDev = new Q3SocketDevice( Q3SocketDevice::Stream );
     BufferedSocketDevice *pSock    = new BufferedSocketDevice( pSockDev );
 
     pSockDev->setBlocking( true );

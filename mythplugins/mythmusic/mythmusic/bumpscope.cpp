@@ -149,13 +149,13 @@ void BumpScope::generate_cmap(unsigned int color)
 
         for (i = 255; i > 0; i--)
         {
-             r = (unsigned int)(((double)(100 * red / 255) * intense1[i] + intense2[i]));
+             r = (unsigned int)(((double)(100 * Qt::red / 255) * intense1[i] + intense2[i]));
              if (r > 255) 
                  r = 255;
-             g = (unsigned int)(((double)(100 * green / 255) * intense1[i] + intense2[i]));
+             g = (unsigned int)(((double)(100 * Qt::green / 255) * intense1[i] + intense2[i]));
              if (g > 255) 
                  g = 255;
-             b = (unsigned int)(((double)(100 * blue / 255) * intense1[i] + intense2[i]));
+             b = (unsigned int)(((double)(100 * Qt::blue / 255) * intense1[i] + intense2[i]));
              if (b > 255) 
                  b = 255;
 

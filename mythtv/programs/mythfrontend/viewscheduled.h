@@ -3,6 +3,11 @@
 
 #include <qdatetime.h>
 #include <qdom.h>
+#include <QPixmap>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QPaintEvent>
+
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
@@ -36,7 +41,7 @@ class ViewScheduled : public MythDialog
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
   private:
     void FillList(void);

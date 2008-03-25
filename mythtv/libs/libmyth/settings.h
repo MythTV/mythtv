@@ -1,10 +1,5 @@
 // -*- Mode: c++ -*-
 
-#ifndef MYTHCONFIG
-#include "mythconfigdialogs.h"
-#include "mythconfiggroups.h"
-#endif // MYTHCONFIG
-
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
@@ -13,9 +8,7 @@
 using namespace std;
 
 // Qt headers
-#include <qobject.h>
-#include <qstring.h>
-#include <qdeepcopy.h>
+#include <QObject>
 
 // MythTV headers
 #include "mythexp.h"
@@ -27,7 +20,7 @@ using namespace std;
 class QWidget;
 class ConfigurationGroup;
 class QDir;
-class QWidgetStack;
+class Q3WidgetStack;
 class Setting;
 
 class MPUBLIC Configurable : public QObject
@@ -54,21 +47,21 @@ class MPUBLIC Configurable : public QObject
 
     // A name for looking up the setting
     void setName(QString str) {
-        configName = QDeepCopy<QString>(str);
+        configName = str;
         if (label == QString::null)
             setLabel(str);
     };
-    QString getName(void) const { return QDeepCopy<QString>(configName); };
+    QString getName(void) const { return configName; };
     virtual Setting* byName(const QString &name) = 0;
 
     // A label displayed to the user
-    void setLabel(QString str) { label = QDeepCopy<QString>(str); }
-    QString getLabel(void) const { return QDeepCopy<QString>(label); }
+    void setLabel(QString str) { label = str; }
+    QString getLabel(void) const { return label; }
     void setLabelAboveWidget(bool l = true) { labelAboveWidget = l; }
 
     virtual void setHelpText(const QString &str)
-        { helptext = QDeepCopy<QString>(str); }
-    QString getHelpText(void) const { return QDeepCopy<QString>(helptext); }
+        { helptext = str; }
+    QString getHelpText(void) const { return helptext; }
 
     void setVisible(bool b) { visible = b; };
     bool isVisible(void) const { return visible; };
@@ -520,6 +513,8 @@ class MPUBLIC DateSetting : public Setting
   public:
     DateSetting(Storage *_storage) : Setting(_storage) { }
 
+        QString getValue(void) const;
+
     QDate dateValue(void) const;
 
   public slots:
@@ -560,7 +555,7 @@ class MPUBLIC ButtonSetting: public Setting
 
   public:
     ButtonSetting(Storage *_storage, QString _name = "button") :
-        Setting(_storage), name(QDeepCopy<QString>(_name)), button(NULL) { }
+        Setting(_storage), name(_name), button(NULL) { }
 
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                                   const char* widgetName=0);
@@ -721,7 +716,7 @@ class MPUBLIC HostTimeBox : public ComboBoxSetting, public HostDBStorage
             for (minute = 0; minute < 60; minute += interval)
             {
                 timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
-                addSelection(timeStr, QDeepCopy<QString>(timeStr),
+                addSelection(timeStr, timeStr,
                              timeStr == defaultTime);
             }
         }
@@ -806,11 +801,16 @@ class MPUBLIC GlobalTimeBox : public ComboBoxSetting, public GlobalDBStorage
             for (minute = 0; minute < 60; minute += interval)
             {
                 timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
-                addSelection(timeStr, QDeepCopy<QString>(timeStr),
+                addSelection(timeStr, timeStr,
                              timeStr == defaultTime);
             }
         }
     }
 };
+
+#ifndef MYTHCONFIG
+#include "mythconfigdialogs.h"
+#include "mythconfiggroups.h"
+#endif // MYTHCONFIG
 
 #endif // SETTINGS_H

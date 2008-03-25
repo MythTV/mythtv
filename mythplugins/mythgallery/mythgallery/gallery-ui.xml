@@ -15,13 +15,8 @@
             <showscrollarrows>no</showscrollarrows>
         </buttonlist>
 
-        <textarea name="text" from="basetextarea">
-            <area>200,550,620,35</area>
-            <font>basemedium</font>
-        </textarea>
-
         <buttonlist name="images">
-            <area>170,20,620,550</area>
+            <area>170,20,620,515</area>
             <layout>grid</layout>
             <showarrow>no</showarrow>
             <regular-background filename="gallery-back-reg.png" />
@@ -35,6 +30,11 @@
             <textflags>hcenter,bottom</textflags>
         </buttonlist>
 
+        <textarea name="text" from="basetextarea">
+            <area>190,540,580,35</area>
+            <font>basemedium</font>
+        </textarea>
+
     </window>
 
     <window>
@@ -46,7 +46,7 @@
         <textarea name="caption" from="basetextarea">
             <area>0,550,800,50</area>
             <font>basemedium</font>
-            <textflags>hcenter,vcenter</textflags>
+            <align>hcenter,vcenter</align>
         </textarea>
 
     </window>

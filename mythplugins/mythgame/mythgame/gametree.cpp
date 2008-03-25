@@ -1,5 +1,8 @@
 #include <qapplication.h>
 #include <qpushbutton.h>
+//Added by qt3to4:
+#include <QSqlQuery>
+#include <QKeyEvent>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -271,7 +274,7 @@ void GameTree::updateRomInfo(RomInfo *rom) {
     else
         m_gameFavourite->SetText("No");
 
-    if (rom->ImagePath())
+    if (!rom->ImagePath().isEmpty())
         m_gameImage->SetImage(rom->ImagePath());
 
 }
@@ -318,7 +321,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 
         if (item->isLeaf())
         {
-            if (romInfo->ImagePath()) 
+            if (!romInfo->ImagePath().isEmpty()) 
             {
                 if ( timer->isActive() ) 
                     timer->changeInterval(330); 

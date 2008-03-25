@@ -1,11 +1,11 @@
 /*
-	fileobs.cpp
+    fileobs.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Implementation for file objects that know
-	how to do clever things
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Implementation for file objects that know
+    how to do clever things
 
 */
 
@@ -13,7 +13,7 @@
 
 #include <mythtv/mythcontext.h>
 #include "fileobs.h"
-#include "qdir.h"
+#include <QDir>
 
 RipFile::RipFile(const QString &a_base, const QString &an_extension,
         bool auto_remove_bad) : base_name(a_base), extension(an_extension),
@@ -25,7 +25,7 @@ RipFile::RipFile(const QString &a_base, const QString &an_extension,
     files.setAutoDelete(true);
 }
 
-bool RipFile::open(int mode, bool multiple_files)
+bool RipFile::open(const QIODevice::OpenMode &mode, bool multiple_files)
 {
     use_multiple_files = multiple_files;
     access_mode = mode;

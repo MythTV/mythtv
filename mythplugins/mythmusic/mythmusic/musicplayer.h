@@ -108,7 +108,7 @@ class MusicPlayer : public QObject
     ResumeMode  getResumeMode(void) { return m_resumeMode; }
 
   protected:
-    void customEvent(QCustomEvent *event);
+    void customEvent(QEvent *event);
 
   private:
     void stopDecoder(void);

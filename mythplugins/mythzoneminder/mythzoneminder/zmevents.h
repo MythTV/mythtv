@@ -23,6 +23,9 @@
 
 // zm
 #include <zmdefines.h>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
 
 class ZMEvents : public MythThemedDialog
 {
@@ -58,7 +61,7 @@ public:
 
     void updateImageGrid();
     QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                QImage::ScaleMode mode);
+                                Qt::AspectRatioMode mode);
 
     bool                 m_oldestFirst;
     int                  m_currentEvent;

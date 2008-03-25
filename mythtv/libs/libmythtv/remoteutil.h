@@ -1,7 +1,8 @@
 #ifndef REMOTEUTIL_H_
 #define REMOTEUTIL_H_
 
-#include <qptrlist.h>
+#include <QDateTime>
+#include <Q3PtrList>
 #include <qstring.h>
 
 #include <vector>
@@ -98,7 +99,7 @@ MPUBLIC int RemoteCheckForRecording(ProgramInfo *pginfo);
 MPUBLIC int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
                                      int underrecsecs);
 MPUBLIC bool RemoteGetRecordingStatus(
-    QPtrList<TunerStatus> *tunerList, bool list_inactive);
+    Q3PtrList<TunerStatus> *tunerList, bool list_inactive);
 MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 #endif

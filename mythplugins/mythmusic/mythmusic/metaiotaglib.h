@@ -8,6 +8,8 @@
 #include <attachedpictureframe.h>
 #include <mpegfile.h>
 #include <mpegproperties.h>
+//Added by qt3to4:
+#include <Q3ValueList>
 
 using TagLib::MPEG::File;
 using TagLib::Tag;
@@ -17,7 +19,7 @@ using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::String;
 using TagLib::MPEG::Properties;
 
-typedef QValueList<struct AlbumArtImage> AlbumArtList;
+typedef Q3ValueList<struct AlbumArtImage> AlbumArtList;
 
 class MetaIOTagLib : public MetaIO
 {

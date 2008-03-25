@@ -1,4 +1,3 @@
-#include <qdeepcopy.h>
 #include <qfile.h>
 #include <qstringlist.h>
 #include <unistd.h>
@@ -21,7 +20,7 @@ uint RemoteGetFlags(uint cardid)
             return rec->GetFlags();
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "GET_FLAGS";
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return 0;
@@ -38,7 +37,7 @@ uint RemoteGetState(uint cardid)
             return rec->GetState();
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "GET_STATE";
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return kState_ChangingState;
@@ -54,7 +53,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
     else
         str += "Play";
 
-    QStringList strlist = str;
+    QStringList strlist(str);
 
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
 
@@ -74,7 +73,7 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
 {
     FileSystemInfo fsInfo;
     vector<FileSystemInfo> fsInfos;
-    QStringList strlist = QString("QUERY_FREE_SPACE_LIST");
+    QStringList strlist(QString("QUERY_FREE_SPACE_LIST"));
 
     if (gContext->SendReceiveStringList(strlist))
     {
@@ -97,7 +96,7 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
 
 bool RemoteGetLoad(float load[3])
 {
-    QStringList strlist = QString("QUERY_LOAD");
+    QStringList strlist(QString("QUERY_LOAD"));
 
     if (gContext->SendReceiveStringList(strlist))
     {
@@ -112,7 +111,7 @@ bool RemoteGetLoad(float load[3])
 
 bool RemoteGetUptime(time_t &uptime)
 {
-    QStringList strlist = QString("QUERY_UPTIME");
+    QStringList strlist(QString("QUERY_UPTIME"));
 
     if (!gContext->SendReceiveStringList(strlist))
         return false;
@@ -124,17 +123,15 @@ bool RemoteGetUptime(time_t &uptime)
         uptime = strlist[0].toUInt();
     else if (sizeof(time_t) == sizeof(long))
         uptime = strlist[0].toULong();
-#if QT_VERSION >= 0x030200
     else if (sizeof(time_t) == sizeof(long long))
         uptime = strlist[0].toULongLong();
-#endif
 
     return true;
 }
 
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
-    QStringList strlist = QString("QUERY_MEMSTATS");
+    QStringList strlist(QString("QUERY_MEMSTATS"));
 
     if (gContext->SendReceiveStringList(strlist))
     {
@@ -150,7 +147,7 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 
 bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
 {
-    QStringList strlist = "QUERY_CHECKFILE";
+    QStringList strlist("QUERY_CHECKFILE");
     strlist << QString::number((int)checkSlaves);
     pginfo->ToStringList(strlist);
 
@@ -181,7 +178,7 @@ bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
         }
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "RECORD_PENDING";
     strlist << QString::number(secsleft);
     strlist << QString::number(hasLater);
@@ -195,7 +192,7 @@ bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
 
 void RemoteStopRecording(ProgramInfo *pginfo)
 {
-    QStringList strlist = QString("STOP_RECORDING");
+    QStringList strlist(QString("STOP_RECORDING"));
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
@@ -213,7 +210,7 @@ bool RemoteStopLiveTV(uint cardid)
         }
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "STOP_LIVETV";
 
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
@@ -234,7 +231,7 @@ bool RemoteStopRecording(uint cardid)
         }
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "STOP_RECORDING";
 
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
@@ -250,9 +247,9 @@ bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
     QStringList strlist;
 
     if (forceMetadataDelete)
-        strlist = QString("FORCE_DELETE_RECORDING");
+        strlist.append(QString("FORCE_DELETE_RECORDING"));
     else
-        strlist = QString("DELETE_RECORDING");
+        strlist.append(QString("DELETE_RECORDING"));
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
@@ -262,7 +259,7 @@ bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
 
     if (forgetHistory)
     {
-        strlist = QString("FORGET_RECORDING");
+        strlist = QStringList(QString("FORGET_RECORDING"));
         pginfo->ToStringList(strlist);
 
         gContext->SendReceiveStringList(strlist);
@@ -281,9 +278,7 @@ bool RemoteUndeleteRecording(ProgramInfo *pginfo)
     if (!undelete_possible)
         return result;
 
-    QStringList strlist;
-
-    strlist = QString("UNDELETE_RECORDING");
+    QStringList strlist(QString("UNDELETE_RECORDING"));
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
@@ -296,13 +291,13 @@ bool RemoteUndeleteRecording(ProgramInfo *pginfo)
 
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
-    QStringList strList = QString("QUERY_GETALLSCHEDULED");
+    QStringList strList(QString("QUERY_GETALLSCHEDULED"));
     RemoteGetRecordingList(&scheduledlist, strList);
 }
 
 void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist)
 {
-    QStringList strList = QString("QUERY_GETEXPIRING");
+    QStringList strList(QString("QUERY_GETEXPIRING"));
     RemoteGetRecordingList(&expiringlist, strList);
 }
 
@@ -321,7 +316,7 @@ int RemoteGetRecordingList(vector<ProgramInfo *> *reclist, QStringList &strList)
             return 0;
         }
 
-        QStringList::const_iterator it = strList.at(1);
+        QStringList::const_iterator it = strList.begin() + 1;
         for (int i = 0; i < numrecordings; i++)
         {
             ProgramInfo *pginfo = new ProgramInfo();
@@ -336,7 +331,7 @@ int RemoteGetRecordingList(vector<ProgramInfo *> *reclist, QStringList &strList)
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo)
 {
     QString cmd = QString("QUERY_GETCONFLICTING");
-    QStringList strlist = cmd;
+    QStringList strlist( cmd );
     pginfo->ToStringList(strlist);
 
     vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
@@ -347,7 +342,7 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo)
 
 RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
 {
-    QStringList strlist = "GET_NEXT_FREE_RECORDER";
+    QStringList strlist( "GET_NEXT_FREE_RECORDER" );
     strlist << QString("%1").arg(curr);
 
     if (!gContext->SendReceiveStringList(strlist, true))
@@ -364,7 +359,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
 // free recorder from this list.
 RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders)
 {
-    QStringList strlist = "GET_FREE_RECORDER_LIST";
+    QStringList strlist( "GET_FREE_RECORDER_LIST" );
 
     if (!gContext->SendReceiveStringList(strlist, true))
         return NULL;
@@ -387,7 +382,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders
 
 RemoteEncoder *RemoteRequestRecorder(void)
 {
-    QStringList strlist = "GET_FREE_RECORDER";
+    QStringList strlist( "GET_FREE_RECORDER" );
 
     if (!gContext->SendReceiveStringList(strlist, true))
         return NULL;
@@ -401,7 +396,7 @@ RemoteEncoder *RemoteRequestRecorder(void)
 
 RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
 {
-    QStringList strlist = "GET_RECORDER_NUM";
+    QStringList strlist( "GET_RECORDER_NUM" );
     pginfo->ToStringList(strlist);
 
     if (!gContext->SendReceiveStringList(strlist))
@@ -416,7 +411,7 @@ RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
 
 RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
 {
-    QStringList strlist = "GET_RECORDER_FROM_NUM";
+    QStringList strlist( "GET_RECORDER_FROM_NUM" );
     strlist << QString("%1").arg(recordernum);
 
     if (!gContext->SendReceiveStringList(strlist))
@@ -432,7 +427,7 @@ vector<uint> RemoteRequestFreeRecorderList(void)
 {
     vector<uint> list;
 
-    QStringList strlist = "GET_FREE_RECORDER_LIST";
+    QStringList strlist("GET_FREE_RECORDER_LIST");
 
     if (!gContext->SendReceiveStringList(strlist, true))
         return list;
@@ -449,7 +444,7 @@ vector<InputInfo> RemoteRequestFreeInputList(uint cardid,
 {
     vector<InputInfo> list;
 
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "GET_FREE_INPUTS";
     for (uint i = 0; i < excluded_cardids.size(); i++)
         strlist << QString::number(excluded_cardids[i]);
@@ -476,7 +471,7 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
 {
     InputInfo blank;
 
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "GET_BUSY_INPUT";
 
     if (!gContext->SendReceiveStringList(strlist))
@@ -495,7 +490,7 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
 
 void RemoteCancelNextRecording(uint cardid, bool cancel)
 {
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "CANCEL_NEXT_RECORDING";
     strlist << QString::number((cancel) ? 1 : 0);
                           
@@ -504,7 +499,7 @@ void RemoteCancelNextRecording(uint cardid, bool cancel)
 
 void RemoteSendMessage(const QString &message)
 {
-    QStringList strlist = "MESSAGE";
+    QStringList strlist( "MESSAGE" );
     strlist << message;
 
     gContext->SendReceiveStringList(strlist);
@@ -512,7 +507,7 @@ void RemoteSendMessage(const QString &message)
 
 void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
 {
-    QStringList strlist = "QUERY_GENPIXMAP";
+    QStringList strlist( "QUERY_GENPIXMAP" );
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
@@ -522,7 +517,7 @@ QDateTime RemoteGetPreviewLastModified(ProgramInfo *pginfo)
 {
     QDateTime retdatetime;
 
-    QStringList strlist = "QUERY_PIXMAP_LASTMODIFIED"; 
+    QStringList strlist( "QUERY_PIXMAP_LASTMODIFIED" );
     pginfo->ToStringList(strlist);
     
     if (!gContext->SendReceiveStringList(strlist))
@@ -539,7 +534,7 @@ QDateTime RemoteGetPreviewLastModified(ProgramInfo *pginfo)
 
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
 {
-    QStringList strlist = "FILL_PROGRAM_INFO";
+    QStringList strlist( "FILL_PROGRAM_INFO" );
     strlist << playbackhostname;
     pginfo->ToStringList(strlist);
 
@@ -561,7 +556,7 @@ bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
             return rec->IsBusy(&busy_input);
     }
 
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+    QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(cardid));
     strlist << "IS_BUSY";
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return true;
@@ -576,7 +571,7 @@ bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
 
 QStringList RemoteRecordings(void)
 {
-    QStringList strlist = "QUERY_ISRECORDING";
+    QStringList strlist("QUERY_ISRECORDING");
     QStringList empty;
 
     empty << "0" << "0";
@@ -593,7 +588,7 @@ int RemoteGetRecordingMask(void)
 
     QString cmd = "QUERY_ISRECORDING";
 
-    QStringList strlist = cmd;
+    QStringList strlist( cmd );
 
     if (!gContext->SendReceiveStringList(strlist))
         return mask;
@@ -604,7 +599,7 @@ int RemoteGetRecordingMask(void)
     {
         cmd = QString("QUERY_RECORDER %1").arg(i + 1);
 
-        strlist = cmd;
+        strlist = QStringList( cmd );
         strlist << "IS_RECORDING";
 
         if (gContext->SendReceiveStringList(strlist))
@@ -622,7 +617,7 @@ int RemoteGetRecordingMask(void)
 
 int RemoteGetFreeRecorderCount(void)
 {
-    QStringList strlist = "GET_FREE_RECORDER_COUNT";
+    QStringList strlist( "GET_FREE_RECORDER_COUNT" );
 
     if (!gContext->SendReceiveStringList(strlist, true))
         return 0;
@@ -639,7 +634,7 @@ int RemoteGetFreeRecorderCount(void)
 
 int RemoteCheckForRecording(ProgramInfo *pginfo)
 {  //returns recordernum if pginfo recording in progress, else 0
-    QStringList strlist = QString("CHECK_RECORDING");
+    QStringList strlist( QString("CHECK_RECORDING") );
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
@@ -674,7 +669,7 @@ int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
 }
 
 bool RemoteGetRecordingStatus(
-    QPtrList<TunerStatus> *tunerList, bool list_inactive)
+    Q3PtrList<TunerStatus> *tunerList, bool list_inactive)
 {
     bool isRecording = false;
     vector<uint> cardlist = CardUtil::GetCardList();
@@ -698,7 +693,7 @@ bool RemoteGetRecordingStatus(
 
         while (state == kState_ChangingState)
         {
-            strlist = cmd;
+            strlist = QStringList(cmd);
             strlist << "GET_STATE";
             gContext->SendReceiveStringList(strlist);
 
@@ -717,7 +712,7 @@ bool RemoteGetRecordingStatus(
             if (!tunerList)
                 break;
 
-            strlist = QString("QUERY_RECORDER %1").arg(cardid);
+            strlist = QStringList(QString("QUERY_RECORDER %1").arg(cardid));
             strlist << "GET_RECORDING";
             gContext->SendReceiveStringList(strlist);
 
@@ -761,7 +756,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
 {
     QString str = "QUERY_RECORDINGS ";
     str += "Recording";
-    QStringList strlist = str;
+    QStringList strlist( str );
 
     vector<ProgramInfo *> *reclist = new vector<ProgramInfo *>;
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;

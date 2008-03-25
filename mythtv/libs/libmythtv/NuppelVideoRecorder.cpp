@@ -16,6 +16,7 @@
 #include <cmath>
 
 #include <qstringlist.h>
+#include <Q3PtrList>
 
 #include <iostream>
 using namespace std;
@@ -1191,6 +1192,11 @@ void NuppelVideoRecorder::StartRecording(void)
 
     int syncerrors = 0;
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (encoding) 
     {
         if (request_pause)
@@ -1200,7 +1206,7 @@ void NuppelVideoRecorder::StartRecording(void)
            if (IsPaused() && tvrec)
                tvrec->RecorderPaused();
 
-           unpauseWait.wait(100);
+           unpauseWait.wait(&mutex, 100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
            continue;
@@ -1452,6 +1458,11 @@ void NuppelVideoRecorder::DoV4L2(void)
     recording = true;
     resetcapture = false;
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (encoding) {
 again:
         if (request_pause)
@@ -1461,7 +1472,7 @@ again:
             if (IsPaused() && tvrec)
                 tvrec->RecorderPaused();
 
-            unpauseWait.wait(100);
+            unpauseWait.wait(&mutex, 100);
             if (cleartimeonpause)
                 gettimeofday(&stm, &tzone);
             continue;
@@ -1704,6 +1715,11 @@ void NuppelVideoRecorder::DoMJPEG(void)
     encoding = true;
     recording = true;
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (encoding)
     {
         if (request_pause)
@@ -1713,7 +1729,7 @@ void NuppelVideoRecorder::DoMJPEG(void)
            if (IsPaused() && tvrec)
                tvrec->RecorderPaused();
 
-           unpauseWait.wait(100);
+           unpauseWait.wait(&mutex, 100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
            continue;
@@ -2081,7 +2097,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 }
 
 void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
-                                     QPtrList<struct kfatable_entry> *kfa_table)
+                                     Q3PtrList<struct kfatable_entry> *kfa_table)
 {
     int numentries = kfa_table->count();
 
@@ -2312,6 +2328,11 @@ void NuppelVideoRecorder::doAudioThread(void)
     trigger = PCM_ENABLE_INPUT;
     ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     audiopaused = false;
     while (childrenLive) 
     {
@@ -2322,7 +2343,7 @@ void NuppelVideoRecorder::doAudioThread(void)
             if (IsPaused() && tvrec)
                 tvrec->RecorderPaused();
 
-            unpauseWait.wait(100);
+            unpauseWait.wait(&mutex, 100);
             act = act_audio_buffer;
             continue;
         }
@@ -2709,11 +2730,16 @@ void NuppelVideoRecorder::doVbiThread(void)
         }
     }
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (childrenLive) 
     {
         if (request_pause)
         {
-            unpauseWait.wait(100);
+            unpauseWait.wait(&mutex, 100);
             continue;
         }
 
@@ -2775,6 +2801,11 @@ void NuppelVideoRecorder::doVbiThread(void)
 
 void NuppelVideoRecorder::doWriteThread(void)
 {
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     writepaused = false;
     while (childrenLive && !IsErrored())
     {
@@ -2785,7 +2816,7 @@ void NuppelVideoRecorder::doWriteThread(void)
             if (IsPaused() && tvrec)
                 tvrec->RecorderPaused();
 
-            unpauseWait.wait(100);
+            unpauseWait.wait(&mutex, 100);
             continue;
         }
         writepaused = false;

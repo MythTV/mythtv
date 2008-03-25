@@ -8,9 +8,12 @@ extern "C" {
 #include "filter.h"
 }
 
-#include <qframe.h>
-#include <qptrqueue.h>
-#include <qptrlist.h>
+#include <QSize>
+#include <QRect>
+#include <QString>
+#include <QPoint>
+#include <QMap>
+
 #include "videobuffers.h"
 #include "mythcodecid.h"
 #include "videoouttypes.h"

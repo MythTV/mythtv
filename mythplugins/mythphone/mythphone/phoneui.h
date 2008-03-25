@@ -12,9 +12,12 @@
 
 #include <qregexp.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 #include <qsound.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QLabel>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
@@ -45,7 +48,7 @@ class PhoneUIBox : public MythThemedDialog
 
   public:
 
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
     
     PhoneUIBox(MythMainWindow *parent, QString window_name,
                QString theme_filename, const char *name = 0);
@@ -53,7 +56,7 @@ class PhoneUIBox : public MythThemedDialog
     ~PhoneUIBox(void);
 
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *);
+    void customEvent(QEvent *);
     
   public slots:
 

@@ -15,6 +15,7 @@ using namespace std;
 // qt
 #include <qdir.h>
 #include <qdom.h>
+#include <QKeyEvent>
 
 // mythtv
 #include <mythtv/mythcontext.h>
@@ -135,7 +136,7 @@ void RecordingSelector::showMenu()
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                  "popupMenu");
 
-    QButton *button;
+    QAbstractButton *button;
     button = popupMenu->addButton(tr("Clear All"), this, SLOT(clearAll()));
     button->setFocus();
     popupMenu->addButton(tr("Select All"), this, SLOT(selectAll()));
@@ -326,9 +327,9 @@ void RecordingSelector::OKPressed()
                 "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
                 ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
         query.bindValue(":TYPE", "Recording");
-        query.bindValue(":TITLE", p->title.utf8());
-        query.bindValue(":SUBTITLE", p->subtitle.utf8());
-        query.bindValue(":DESCRIPTION", p->description.utf8());
+        query.bindValue(":TITLE", p->title);
+        query.bindValue(":SUBTITLE", p->subtitle);
+        query.bindValue(":DESCRIPTION", p->description);
         query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
         query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
         query.bindValue(":SIZE", p->filesize);
@@ -469,7 +470,7 @@ void RecordingSelector::updateSelectedList()
     {
         while (query.next())
         {
-            QString filename = QString::fromUtf8(query.value(0).toString()); 
+            QString filename = query.value(0).toString(); 
 
             ProgramInfo *p;
             vector<ProgramInfo *>::iterator i = recordingList->begin();

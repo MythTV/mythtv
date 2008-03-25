@@ -6,8 +6,8 @@ class QSqlDatabase;
 #include <qmutex.h>
 #include <qobject.h>
 #include <qfile.h>
-#include <qtextstream.h>
-#include <qprocess.h>
+#include <q3textstream.h>
+#include <q3process.h>
 
 using namespace std;
 

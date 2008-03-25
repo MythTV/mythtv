@@ -7,8 +7,6 @@ using namespace std;
 #include <qpixmap.h>
 #include <qpainter.h>
 #include <qgl.h>
-#include <qcache.h>
-#include <qintcache.h>
 
 #include "config.h"
 #ifdef CONFIG_DARWIN
@@ -195,7 +193,7 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
         int tx_w = NearestGLTextureSize(im->width());
         int tx_h = NearestGLTextureSize(im->height());
         if (tx_w != im->width() || tx_h !=  im->height())
-            tx = QGLWidget::convertToGLFormat(im->scale(tx_w, tx_h));
+            tx = QGLWidget::convertToGLFormat(im->scaled(tx_w, tx_h));
         else
             tx = QGLWidget::convertToGLFormat(*im);
     }
@@ -328,20 +326,23 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     tmp.drawText(0, 0, r.width(), r.height(), flags, msg);
     tmp.end();
 
-    im->Assign(pm.convertToImage().convertDepth(8, Qt::MonoOnly |
+    im->Assign(pm.convertToImage().convertToFormat(QImage::Format_Indexed8,
+                                                   Qt::MonoOnly |
                                                    Qt::ThresholdDither |
                                                    Qt::AvoidDither));
 
     qApp->unlock();
 
     int numColors = im->numColors();
-    QRgb *colorTable = im->colorTable();
 
-    for (int i = 0; i < numColors; i++)
+    QVector<QRgb> colorTable = im->colorTable();
+
+    for (int i = 0; i < colorTable.count(); i++)
     {
         int alpha = 255 - qRed(colorTable[i]);
         colorTable[i] = qRgba(0, 0, 0, alpha);
     }
+    im->setColorTable(colorTable);
 
     m_StringToImageMap[incoming] = im;
     m_StringExpireList.push_back(incoming);

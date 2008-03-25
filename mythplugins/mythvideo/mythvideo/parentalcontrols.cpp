@@ -1,5 +1,9 @@
 #include <map>
 
+#include <Q3Frame>
+#include <QLabel>
+#include <QKeyEvent>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 
@@ -184,9 +188,9 @@ MythMultiPasswordDialog::MythMultiPasswordDialog(const QString &message,
     setGeometry((screenwidth - 250) / 2,
                 (screenheight - 50) / 2, totalWidth, 50);
 
-    QFrame *outside_border = new QFrame(this);
+    Q3Frame *outside_border = new Q3Frame(this);
     outside_border->setGeometry(0, 0, totalWidth, 50);
-    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised);
+    outside_border->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised);
     outside_border->setLineWidth(4);
 
     QLabel *message_label = new QLabel(message, this);
@@ -212,10 +216,10 @@ void MythMultiPasswordDialog::keyPressEvent(QKeyEvent *e)
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
         bool handled = false;
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (QStringList::const_iterator p = actions.begin();
+             p != actions.end() && !handled; ++p)
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
+            if (*p == "ESCAPE")
             {
                 handled = true;
                 MythDialog::keyPressEvent(e);
@@ -226,8 +230,8 @@ void MythMultiPasswordDialog::keyPressEvent(QKeyEvent *e)
 
 void MythMultiPasswordDialog::checkPassword(const QString &password)
 {
-    for (QStringList::iterator p = m_passwords.begin(); p != m_passwords.end();
-         ++p)
+    for (QStringList::const_iterator p = m_passwords.begin();
+         p != m_passwords.end(); ++p)
     {
         if (password == *p)
             accept();

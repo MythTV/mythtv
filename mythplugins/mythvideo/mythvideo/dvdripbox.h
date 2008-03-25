@@ -1,26 +1,27 @@
 /*
-	dvdripbox.h
+    dvdripbox.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
     header for the main interface screen
 */
 
 #ifndef DVDRIPBOX_H_
 #define DVDRIPBOX_H_
 
-#include <qregexp.h>
-#include <qtimer.h>
-#include <qptrlist.h>
-#include <qthread.h>
-#include <qsocket.h>
+#include <QRegExp>
+#include <QTimer>
+#include <Q3PtrList>
+#include <QThread>
+#include <Q3Socket>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
 
-
 #include "dvdinfo.h"
+
+class QKeyEvent;
 
 class MTDJob : public QObject
 {
@@ -81,7 +82,7 @@ class DVDRipBox : public MythThemedDialog
 
   public:
 
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
     
     DVDRipBox(MythMainWindow *parent, QString window_name,
               QString dev, QString theme_filename, const char *name = 0);
@@ -121,7 +122,7 @@ class DVDRipBox : public MythThemedDialog
     void    wireUpTheme();
     void    createSocket();
 
-    QSocket          *client_socket;
+    Q3Socket          *client_socket;
     QTimer           *status_timer;
     bool             tried_mtd;
     bool             connected;
@@ -129,7 +130,7 @@ class DVDRipBox : public MythThemedDialog
     bool             have_disc;
     bool             first_disc_found;
     bool             block_media_requests;
-    QPtrList<MTDJob> jobs;
+    Q3PtrList<MTDJob> jobs;
     uint             numb_jobs;
     int              current_job;
     bool             ignore_cancels;

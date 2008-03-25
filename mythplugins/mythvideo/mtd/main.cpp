@@ -1,17 +1,17 @@
 /*
-	main.cpp
+    main.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Starting point for the myth transcoding daemon
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Starting point for the myth transcoding daemon
 
 */
 
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qtextstream.h>
+#include <QApplication>
+#include <QSqlDatabase>
+#include <QFile>
+#include <Q3TextStream>
 
 #include <unistd.h>
 

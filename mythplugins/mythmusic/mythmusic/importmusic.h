@@ -4,6 +4,10 @@
 #include <iostream>
 using namespace std;
 
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QThread>
+
 #include <mythtv/mythdialogs.h>
 
 class Metadata;

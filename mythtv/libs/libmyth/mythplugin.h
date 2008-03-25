@@ -2,9 +2,9 @@
 #define MYTHPLUGIN_H_
 
 #include <qlibrary.h>
-#include <qdict.h>
+#include <q3dict.h>
 #include <qmap.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include "mythexp.h"
 
@@ -78,11 +78,11 @@ class MPUBLIC MythPluginManager
     void DestroyAllPlugins();
      
   private:
-    QDict<MythPlugin> m_dict;
+    Q3Dict<MythPlugin> m_dict;
    
     QMap<QString, MythPlugin *> moduleMap;
     QMap<QString, MythPlugin *> menuPluginMap;
-    QPtrList<MythPlugin> menuPluginList;
+    Q3PtrList<MythPlugin> menuPluginList;
 
     void orderMenuPlugins();
 };

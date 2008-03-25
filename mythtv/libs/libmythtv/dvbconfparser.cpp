@@ -31,8 +31,7 @@
  */
 
 // Qt headers
-#include <qstringlist.h>
-#include <qdeepcopy.h>
+#include <Q3TextStream>
 #include <qfile.h>
 
 // MythTV headers
@@ -67,7 +66,7 @@ QString DTVChannelInfo::toString() const
 
 DTVConfParser::DTVConfParser(enum cardtype_t _type, uint _sourceid,
                              const QString &_file)
-    : type(_type), sourceid(_sourceid), filename(QDeepCopy<QString>(_file))
+    : type(_type), sourceid(_sourceid), filename(Q3DeepCopy<QString>(_file))
 {
 }
 
@@ -76,11 +75,11 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
     channels.clear();
 
     QFile file(filename);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
         return ERROR_OPEN;
 
     bool ok = true;
-    QTextStream stream(&file);
+    Q3TextStream stream(&file);
     QString line;
     while (!stream.atEnd())
     {
@@ -90,7 +89,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
             continue;
 
         QStringList list = QStringList::split(":", line);
-        QString str = *list.at(0);
+        QString str = list[ 0 ];
         int channelNo = -1;
 
         if (str.at(0) == '@')

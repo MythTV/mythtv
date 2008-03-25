@@ -3,7 +3,7 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 
 class ChanInfo
 {
@@ -41,9 +41,9 @@ class ChannelData
         cardtype(QString::null) {}
 
     bool insert_chan(uint sourceid);
-    void handleChannels(int id, QValueList<ChanInfo> *chanlist);
+    void handleChannels(int id, Q3ValueList<ChanInfo> *chanlist);
     unsigned int promptForChannelUpdates(
-        QValueList<ChanInfo>::iterator chaninfo, unsigned int chanid);
+        Q3ValueList<ChanInfo>::iterator chaninfo, unsigned int chanid);
 
   public:
     bool    interactive;

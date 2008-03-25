@@ -1,17 +1,17 @@
 #ifndef MTD_H_
 #define MTD_H_
 /*
-	mtd.h
+    mtd.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Headers for the core mtd object
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Headers for the core mtd object
 
 */
 
-#include <qobject.h>
-#include <qptrlist.h>
+#include <QObject>
+#include <Q3PtrList>
 
 #include "logging.h"
 #include "serversocket.h"
@@ -70,15 +70,15 @@ class MTD : public QObject
 
   private slots:
   
-    void newConnection(QSocket *);
-    void endConnection(QSocket *);
+    void newConnection(Q3Socket *);
+    void endConnection(Q3Socket *);
     void readSocket();
-    void parseTokens(const QStringList &tokens, QSocket *socket);
+    void parseTokens(const QStringList &tokens, Q3Socket *socket);
     void shutDown();
-    void sendMessage(QSocket *where, const QString &what);
-    void sayHi(QSocket *socket);
-    void sendStatusReport(QSocket *socket);
-    void sendMediaReport(QSocket *socket);
+    void sendMessage(Q3Socket *where, const QString &what);
+    void sayHi(Q3Socket *socket);
+    void sendStatusReport(Q3Socket *socket);
+    void sendMediaReport(Q3Socket *socket);
     void startJob  (const QStringList &tokens);
     void startAbort(const QStringList &tokens);
     void startDVD  (const QStringList &tokens);
@@ -93,11 +93,11 @@ class MTD : public QObject
     
   private:
 
-    void customEvent(QCustomEvent *ce);
+    void customEvent(QEvent *ce);
   
     MTDLogger           *mtd_log;    
     MTDServerSocket     *server_socket;
-    QPtrList<JobThread> job_threads;
+    Q3PtrList<JobThread> job_threads;
     QMutex              *dvd_drive_access;
     QMutex              *titles_mutex;
     bool                keep_running;

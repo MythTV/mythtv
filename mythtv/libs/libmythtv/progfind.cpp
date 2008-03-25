@@ -16,6 +16,11 @@
 #include <qstringlist.h>
 #include <qcursor.h>
 #include <qregexp.h>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
+
 #include <unistd.h>
 #include <time.h>
 #include <cassert>
@@ -177,7 +182,7 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -437,7 +442,7 @@ void ProgFinder::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                cerr << "Unknown element: " << (const char *)e.tagName() << endl;
                 continue;
             }
         }
@@ -859,7 +864,7 @@ void ProgFinder::showSearchList()
                 if (t < 0)
                     cerr << "MythProgFind: -1 Error in showSearchList()\n";
 
-                if (searchData[t] != NULL)
+                if (!searchData[t].isEmpty())
                 {
                     if (curLabel == (int)(showsPerListing / 2))
                         ltype->SetItemText(curLabel, " " + searchData[t] + " ");
@@ -887,7 +892,7 @@ void ProgFinder::showSearchList()
                      i < (int)((tempSearch + 1) * showsPerListing); i++)
                 {
                     ltype->EnableForcedFont(curLabel, "inactive");
-                    if (initData[i] != NULL)
+                    if (!initData[i].isEmpty())
                     {
                         if (curLabel == (int)(showsPerListing / 2))
                             ltype->SetItemText(curLabel, " " + initData[i] +
@@ -951,7 +956,7 @@ void ProgFinder::showProgramList()
                     else
                         ltype->EnableForcedFont(curLabel, "inactive");
 
-                    if (progData[t] != NULL)
+                    if (!progData[t].isEmpty())
                     {
                         if (progData[t] != "**!0")
                         {
@@ -1057,7 +1062,7 @@ void ProgFinder::selectSearchData()
     if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (selectSearchData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
+        cerr << "MythProgFind: QUERY = " << (const char *)thequery.local8Bit() << endl;
         return;
     }
 
@@ -1074,7 +1079,7 @@ void ProgFinder::selectSearchData()
         {
             if (running == false)
                 return;
-            data = QString::fromUtf8(query.value(0).toString());
+            data = query.value(0).toString();
 
             if (formatSelectedData(data))
             {
@@ -1185,7 +1190,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
     MSqlBindings bindings;
     QString querystr = "WHERE program.title = :TITLE "
                        "  AND program.endtime > :ENDTIME ";
-    bindings[":TITLE"] = progTitle.utf8();
+    bindings[":TITLE"] = progTitle;
     bindings[":ENDTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 
     showData.FromProgram(querystr, bindings, schedList);
@@ -1228,7 +1233,7 @@ void ProgFinder::getSearchData(int charNum)
     if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (getSearchData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery << endl;
+        cerr << "MythProgFind: QUERY = " << (const char *)thequery << endl;
         return;
     }
 
@@ -1242,7 +1247,7 @@ void ProgFinder::getSearchData(int charNum)
 
         while (query.next())
         {
-            data = QString::fromUtf8(query.value(0).toString());
+            data = query.value(0).toString();
 
             if (formatSelectedData(data, charNum))
             {
@@ -1335,10 +1340,10 @@ void ProgFinder::whereClauseGetSearchData(int charNum, QString &where,
                 "        OR title LIKE :FOUR ) "
                 "AND starttime > :STARTTIME "
                 "ORDER BY title;";
-        bindings[":ONE"] = one.utf8();
-        bindings[":TWO"] = two.utf8();
-        bindings[":THREE"] = three.utf8();
-        bindings[":FOUR"] = four.utf8();
+        bindings[":ONE"] = one;
+        bindings[":TWO"] = two;
+        bindings[":THREE"] = three;
+        bindings[":FOUR"] = four;
         bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
     }
 }
@@ -1445,7 +1450,7 @@ void ProgFinder::getAllProgramData()
     }
 }
 
-void ProgFinder::customEvent(QCustomEvent *e)
+void ProgFinder::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -1506,7 +1511,7 @@ void JaProgFinder::fillSearchData()
     for (int charNum = 0; charNum < searchCount; charNum++)
     {
         gotInitData[curLabel] = 0;
-        searchData[curLabel] = QString::fromUtf8(searchChars[charNum]);
+        searchData[curLabel] = searchChars[charNum];
         curLabel++;
     }
 }
@@ -1617,7 +1622,7 @@ void HeProgFinder::fillSearchData()
     for (int charNum = 0; charNum < searchCount; charNum++)
     {
         gotInitData[curLabel] = 0;
-        searchData[curLabel] = QString::fromUtf8(searchChars[charNum]);
+        searchData[curLabel] = searchChars[charNum];
         curLabel++;
     }
 }

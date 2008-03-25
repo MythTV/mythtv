@@ -5,6 +5,8 @@
 
 #include <memory>
 
+class QKeyEvent;
+
 namespace mythvideo_videomanager { class VideoManagerImp; };
 
 class VideoList;

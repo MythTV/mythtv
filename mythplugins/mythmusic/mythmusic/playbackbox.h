@@ -4,7 +4,8 @@
 // qt
 #include <qtimer.h>
 #include <qmutex.h>
-#include <qvaluevector.h>
+#include <q3valuevector.h>
+#include <QKeyEvent>
 
 // mythtv
 #include <mythtv/mythwidgets.h>
@@ -28,7 +29,7 @@ class PlaybackBoxMusic : public MythThemedDialog
 
   public:
 
-    typedef QValueVector<int> IntVector;
+    typedef Q3ValueVector<int> IntVector;
 
     PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                      QString theme_filename,
@@ -36,7 +37,7 @@ class PlaybackBoxMusic : public MythThemedDialog
 
     ~PlaybackBoxMusic(void);
 
-    void customEvent(QCustomEvent *);
+    void customEvent(QEvent *);
     void keyPressEvent(QKeyEvent *e);
     void constructPlaylistTree();
 

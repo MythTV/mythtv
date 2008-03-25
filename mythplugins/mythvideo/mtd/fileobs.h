@@ -1,20 +1,20 @@
 #ifndef FILEOBS_H_
 #define FILEOBS_H_
 /*
-	fileobs.h
+    fileobs.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Headers for file objects that know
-	how to do clever things
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Headers for file objects that know
+    how to do clever things
 
 */
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qfile.h>
-#include <qptrlist.h>
+#include <QString>
+#include <QStringList>
+#include <QFile>
+#include <Q3PtrList>
 
 class RipFile
 {
@@ -25,7 +25,7 @@ class RipFile
             bool auto_remove_bad);
     ~RipFile();
     
-    bool    open(int mode, bool multiple_files);
+    bool    open(const QIODevice::OpenMode &mode, bool multiple_files);
     QStringList close();
     void    remove();
     QString name();
@@ -37,8 +37,8 @@ class RipFile
     int             filesize;
     QFile           *active_file;
     int             bytes_written;
-    int             access_mode;
-    QPtrList<QFile> files;
+    QIODevice::OpenMode access_mode;
+    Q3PtrList<QFile> files;
     bool            use_multiple_files;
     bool            auto_remove_bad_rips;
 };

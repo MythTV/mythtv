@@ -24,7 +24,7 @@
 
 // Qt headers
 #include <qthread.h>
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 
 // MythTV headers
 #include "upnputil.h"

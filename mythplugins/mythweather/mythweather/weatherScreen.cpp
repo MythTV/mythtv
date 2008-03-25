@@ -5,6 +5,9 @@
 #include "weather.h"
 #include "weatherScreen.h"
 #include "defs.h"
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
 
 WeatherScreen *WeatherScreen::loadScreen(Weather *parent, LayerSet *container,
                                          int id)
@@ -434,7 +437,7 @@ void StaticImageScreen::prepareWidget(UIType *widget)
         {
             if (max.width() > -1 && max.height() > -1)
             {
-                imgsize.scale(max, QSize::ScaleMin);
+                imgsize.scale(max, Qt::KeepAspectRatio);
 
                 QPoint orgPos = img->DisplayPos();
 
@@ -498,7 +501,7 @@ void AnimatedImageScreen::prepareWidget(UIType *widget)
         {
             if (max.width() > -1 && max.height() > -1)
             {
-                imgsize.scale(max, QSize::ScaleMin);
+                imgsize.scale(max, Qt::KeepAspectRatio);
 
                 QPoint orgPos = img->DisplayPos();
 

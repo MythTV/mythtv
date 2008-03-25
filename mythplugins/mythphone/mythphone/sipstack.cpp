@@ -12,6 +12,10 @@
 #include <qdatetime.h>
 #include <qhostaddress.h>
 #include <qdom.h>
+//Added by qt3to4:
+#include <Q3PtrList>
+
+#include <mythtv/mythcontext.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -252,7 +256,7 @@ void SipMsg::addAuthorization(QString authMethod, QString Username, QString Pass
     Msg += ", realm=\"" + Realm + "\"";
     Msg += ", uri=\"" + Uri + "\"";
     Msg += ", nonce=\"" + Nonce + "\"";
-    Msg += QString(", response=\"") + Response + "\"";
+    Msg += QString(", response=\"%1\"").arg(Response);
     Msg += ", algorithm=md5\r\n";
 }
 
@@ -300,7 +304,7 @@ void SipMsg::insertVia(QString Hostname, int Port)
     if ((*it).find("Via:", 0, false) == 0)
         attList.insert(it, Via);
     else
-        attList.insert(attList.at(1), Via);
+        attList.insert(attList.begin()+1, Via);
 
     // And recreate the completed msg
     Msg = attList.join("\r\n");
@@ -467,7 +471,7 @@ void SipMsg::decodeAuthenticate(QString auth)
                 cout << "SIP: QOP value not set to AUTH in Challenge\n";
         }
         else
-            cout << "SIP: Unknown parameter in -Authenticate; " << ParamName << endl;
+            VERBOSE(VB_IMPORTANT, "SIP: Unknown parameter in -Authenticate; " + ParamName);
     }
 }
 
@@ -599,7 +603,7 @@ void SipMsg::decodeSdp(QString content)
     if (sdp != 0)
         delete sdp;
     sdp = new SipSdp("", 0, 0);
-    QPtrList<sdpCodec> *codecList = 0; // Tracks the media block we are parsing
+    Q3PtrList<sdpCodec> *codecList = 0; // Tracks the media block we are parsing
     for (it=sdpList.begin(); (it != sdpList.end()) && (*it != ""); it++)
     {
         codecList = decodeSDPLine(*it, codecList);
@@ -653,7 +657,7 @@ void SipMsg::decodePlainText(QString content)
     PlainTextContent = content;
 }
 
-QPtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList)
+Q3PtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, Q3PtrList<sdpCodec> *codecList)
 {
     if (sdpLine.startsWith("c="))
         decodeSDPConnection(sdpLine);
@@ -672,7 +676,7 @@ void SipMsg::decodeSDPConnection(QString c)
     }
 }
 
-QPtrList<sdpCodec> *SipMsg::decodeSDPMedia(QString m)
+Q3PtrList<sdpCodec> *SipMsg::decodeSDPMedia(QString m)
 {
     if (sdp)
     {
@@ -681,7 +685,7 @@ QPtrList<sdpCodec> *SipMsg::decodeSDPMedia(QString m)
         if (m.startsWith("m=audio"))
         {
             sdp->setAudioPort((m.section(' ', 1, 1)).toInt());
-            while ((s = m.section(' ', c+3, c+3)) != 0)
+            while (!(s = m.section(' ', c+3, c+3)).isEmpty())
             {
                 sdp->addAudioCodec(s.toInt(), "");
                 c++;
@@ -691,7 +695,7 @@ QPtrList<sdpCodec> *SipMsg::decodeSDPMedia(QString m)
         else if (m.startsWith("m=video"))
         {
             sdp->setVideoPort((m.section(' ', 1, 1)).toInt());
-            while ((s = m.section(' ', c+3, c+3)) != 0)
+            while (!(s = m.section(' ', c+3, c+3)).isEmpty())
             {
                 sdp->addVideoCodec(s.toInt(), "", "");
                 c++;
@@ -702,7 +706,7 @@ QPtrList<sdpCodec> *SipMsg::decodeSDPMedia(QString m)
     return 0;
 }
 
-void SipMsg::decodeSDPMediaAttribute(QString a, QPtrList<sdpCodec> *codecList)
+void SipMsg::decodeSDPMediaAttribute(QString a, Q3PtrList<sdpCodec> *codecList)
 {
     if ((codecList != 0) && ((a.startsWith("a=rtpmap:")) || (a.startsWith("a=fmtp:"))))
     {

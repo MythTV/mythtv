@@ -14,6 +14,8 @@
 
 #include <mythtv/mythdialogs.h>
 
+class QKeyEvent;
+
 class Metadata;
 class MetadataListManager;
 

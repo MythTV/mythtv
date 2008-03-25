@@ -1,3 +1,5 @@
+//Added by qt3to4:
+#include <Q3PtrList>
 /*
 	sipstack.h
 
@@ -104,10 +106,10 @@ private:
     void decodeSdp(QString content);
     void decodeXpidf(QString content);
     void decodePlainText(QString content);
-    QPtrList<sdpCodec> *decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList);
+    Q3PtrList<sdpCodec> *decodeSDPLine(QString sdpLine, Q3PtrList<sdpCodec> *codecList);
     void decodeSDPConnection(QString c);
-    QPtrList<sdpCodec> *decodeSDPMedia(QString m);
-    void decodeSDPMediaAttribute(QString a, QPtrList<sdpCodec> *codecList);
+    Q3PtrList<sdpCodec> *decodeSDPMedia(QString m);
+    void decodeSDPMediaAttribute(QString a, Q3PtrList<sdpCodec> *codecList);
     SipUrl *decodeUrl(QString source);
 
     QString Msg;
@@ -233,8 +235,8 @@ public:
     void encode();
     const QString string() { return thisSdp; }
     int length()     { return thisSdp.length(); }
-    QPtrList<sdpCodec> *getAudioCodecList() { return &audioCodec; }
-    QPtrList<sdpCodec> *getVideoCodecList() { return &videoCodec; }
+    Q3PtrList<sdpCodec> *getAudioCodecList() { return &audioCodec; }
+    Q3PtrList<sdpCodec> *getVideoCodecList() { return &videoCodec; }
     QString getMediaIP() { return MediaIp; }
     void setMediaIp(QString ip) { MediaIp = ip; }
     void setAudioPort(int p) { audioPort=p; }
@@ -244,8 +246,8 @@ public:
 
 private:
     QString thisSdp;
-    QPtrList<sdpCodec> audioCodec;
-    QPtrList<sdpCodec> videoCodec;
+    Q3PtrList<sdpCodec> audioCodec;
+    Q3PtrList<sdpCodec> videoCodec;
     int audioPort, videoPort;
     QString MediaIp;
 };

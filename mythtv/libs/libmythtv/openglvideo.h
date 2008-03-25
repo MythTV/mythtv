@@ -77,7 +77,7 @@ class OpenGLVideo
     QString GetDeinterlacer(void) const
          { return FilterToString(GetDeintFilter()); };
     void SetSoftwareDeinterlacer(const QString &filter)
-         { softwareDeinterlacer = QDeepCopy<QString>(filter); };
+         { softwareDeinterlacer = Q3DeepCopy<QString>(filter); };
 
     void PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                       long long frame);

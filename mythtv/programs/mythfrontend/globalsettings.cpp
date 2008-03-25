@@ -300,7 +300,7 @@ static HostComboBox *DisplayRecGroup()
         {
             if (query.value(0).toString() != "Default")
             {
-                QString recgroup = QString::fromUtf8(query.value(0).toString());
+                QString recgroup = query.value(0).toString();
                 gc->addSelection(recgroup, recgroup);
             }
         }
@@ -312,7 +312,7 @@ static HostComboBox *DisplayRecGroup()
     {
         while (query.next())
         {
-            QString key = QString::fromUtf8(query.value(0).toString());
+            QString key = query.value(0).toString();
             gc->addSelection(key, key);
         }
     }
@@ -1602,19 +1602,19 @@ static HostComboBox *MenuTheme()
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
     gc->addSelection(QObject::tr("Default"), "default");
-    const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
-    if (!fil)
-        return gc;
 
-    QFileInfoListIterator it( *fil );
-    QFileInfo *theme;
+    QFileInfoList fil = themes.entryInfoList(QDir::Dirs);
 
-    for( ; it.current() != 0 ; ++it ) {
-        theme = it.current();
-        QFileInfo xml(theme->absFilePath() + "/mainmenu.xml");
+    for( QFileInfoList::iterator it =  fil.begin();
+                                 it != fil.end();
+                               ++it )
+    {
+        QFileInfo  &theme = *it;
 
-        if (theme->fileName()[0] != '.' && xml.exists())
-            gc->addSelection(theme->fileName());
+        QFileInfo xml(theme.absFilePath() + "/mainmenu.xml");
+
+        if (theme.fileName()[0] != '.' && xml.exists())
+            gc->addSelection(theme.fileName());
     }
 
     return gc;
@@ -2782,25 +2782,24 @@ ThemeSelector::ThemeSelector(QString label):
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
-    const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
-    if (!fil)
-        return;
 
-    QFileInfoListIterator it( *fil );
-    QFileInfo *theme;
+    QFileInfoList fil = themes.entryInfoList(QDir::Dirs);
 
-    for( ; it.current() != 0 ; ++it ) {
-        theme = it.current();
+    for( QFileInfoList::iterator it =  fil.begin();
+                                 it != fil.end();
+                               ++it )
+    {
+        QFileInfo  &theme = *it;
 
-        if (theme->fileName() == "." || theme->fileName() == ".."
-                || theme->fileName() == "default"
-                || theme->fileName() == "default-wide")
+        if (theme.fileName() == "." || theme.fileName() == ".."
+                || theme.fileName() == "default"
+                || theme.fileName() == "default-wide")
             continue;
 
         QFileInfo preview;
         QString name;
 
-        ThemeInfo *themeinfo = new ThemeInfo(theme->absFilePath());
+        ThemeInfo *themeinfo = new ThemeInfo(theme.absFilePath());
 
         if (!themeinfo)
             continue;
@@ -2820,7 +2819,7 @@ ThemeSelector::ThemeSelector(QString label):
         if (!preview.exists())
         {
             VERBOSE(VB_IMPORTANT, QString("Theme %1 missing preview image.")
-                                    .arg(theme->fileName()));
+                                    .arg(theme.fileName()));
             QString defaultpreview = themes.absPath();
             if (themeinfo->IsWide())
             {
@@ -2842,7 +2841,7 @@ ThemeSelector::ThemeSelector(QString label):
             continue;
         }
 
-        addImageSelection(name, previewImage, theme->fileName());
+        addImageSelection(name, previewImage, theme.fileName());
     }
 
     if (themetype & THEME_UI)
@@ -3727,17 +3726,17 @@ uint PVR350VideoDevice::fillSelectionsFromDir(const QDir &dir,
                                               bool allow_duplicates)
 {
     uint cnt = 0;
-    const QFileInfoList *il = dir.entryInfoList();
-    if (!il)
-        return cnt;
-        
-    QFileInfoListIterator it( *il );
-    QFileInfo *fi;
 
-    for (; (fi = it.current()) != 0; ++it)
+    QFileInfoList il = dir.entryInfoList();
+
+    for( QFileInfoList::iterator it =  il.begin();
+                                 it != il.end();
+                               ++it )
     {
+        QFileInfo  &fi = *it;
+
         struct stat st;
-        QString filepath = fi->absFilePath();
+        QString filepath = fi.absFilePath();
         int err = lstat(filepath, &st);
 
         if (0 != err)

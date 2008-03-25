@@ -16,17 +16,17 @@ bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
         if (handle == NULL)
         {
             handle = stdout;
-            if (m & IO_ReadOnly)
+            if (m & QIODevice::ReadOnly)
             {
                 handle = stdin;
             }
         }
-        retval = file.open(m, handle);
+        retval = file.open( handle, (QIODevice::OpenMode)m );
     }
     else
     {
         file.setName(filename);
-        retval = file.open(m);
+        retval = file.open( (QIODevice::OpenMode)m );
     }
 
     return retval;

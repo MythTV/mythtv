@@ -8,6 +8,8 @@
 
 // mytharchive
 #include "mythburnwizard.h"
+//Added by qt3to4:
+#include <QKeyEvent>
 
 class EditMetadataDialog : public MythThemedDialog
 {

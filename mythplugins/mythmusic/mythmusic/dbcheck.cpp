@@ -1,5 +1,7 @@
 #include <qstring.h>
 #include <qdir.h>
+//Added by qt3to4:
+#include <QSqlError>
 
 #include <iostream>
 using namespace std;
@@ -9,7 +11,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1013";
+const QString currentDatabaseVersion = "1016";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {   
@@ -38,8 +40,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.prepare(thequery);
-        query.exec();
+        query.exec(thequery);
 
         if (query.lastError().type() != QSqlError::None)
         {
@@ -613,10 +614,124 @@ bool UpgradeMusicDatabaseSchema(void)
             return false;
 
     }
-/* in 0.21 */
-//"DROP TABLE musicmetadata;",
-//"DROP TABLE musicplaylist;",
 
+    if (dbver == "1013")
+    {
+        const QString updates[] = {
+"DROP TABLE musicmetadata;",
+"DROP TABLE musicplaylist;",
+""
+};
+
+        if (!performActualUpdate(updates, "1014", dbver))
+            return false;
+    }
+
+    if (dbver == "1014")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE music_albumart"
+"  MODIFY filename varbinary(255) NOT NULL default '';",
+"ALTER TABLE music_albums"
+"  MODIFY album_name varbinary(255) NOT NULL default '';",
+"ALTER TABLE music_artists"
+"  MODIFY artist_name varbinary(255) NOT NULL default '';",
+"ALTER TABLE music_directories"
+"  MODIFY path blob NOT NULL;",
+"ALTER TABLE music_genres"
+"  MODIFY genre varbinary(255) NOT NULL default '';",
+"ALTER TABLE music_playlists"
+"  MODIFY playlist_name varbinary(255) NOT NULL default '',"
+"  MODIFY playlist_songs blob NOT NULL,"
+"  MODIFY hostname varbinary(64) NOT NULL default '';",
+"ALTER TABLE music_smartplaylist_categories"
+"  MODIFY name varbinary(128) NOT NULL;",
+"ALTER TABLE music_smartplaylist_items"
+"  MODIFY field varbinary(50) NOT NULL,"
+"  MODIFY operator varbinary(20) NOT NULL,"
+"  MODIFY value1 varbinary(255) NOT NULL,"
+"  MODIFY value2 varbinary(255) NOT NULL;",
+"ALTER TABLE music_smartplaylists"
+"  MODIFY name varbinary(128) NOT NULL,"
+"  MODIFY orderby varbinary(128) NOT NULL default '';",
+"ALTER TABLE music_songs"
+"  MODIFY filename blob NOT NULL,"
+"  MODIFY name varbinary(255) NOT NULL default '',"
+"  MODIFY format varbinary(4) NOT NULL default '0',"
+"  MODIFY mythdigest varbinary(255) default NULL,"
+"  MODIFY description varbinary(255) default NULL,"
+"  MODIFY comment varbinary(255) default NULL,"
+"  MODIFY eq_preset varbinary(255) default NULL;",
+"ALTER TABLE music_stats"
+"  MODIFY total_time varbinary(12) NOT NULL default '0',"
+"  MODIFY total_size varbinary(10) NOT NULL default '0';",
+""
+};
+
+        if (!performActualUpdate(updates, "1015", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1015")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE music_albumart"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY filename varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_albums"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY album_name varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_artists"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY artist_name varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_directories"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY path text CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE music_genres"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY genre varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_playlists"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY playlist_name varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY playlist_songs text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_smartplaylist_categories"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE music_smartplaylist_items"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY field varchar(50) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY operator varchar(20) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY value1 varchar(255) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY value2 varchar(255) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE music_smartplaylists"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY orderby varchar(128) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE music_songs"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY name varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY format varchar(4) CHARACTER SET utf8 NOT NULL default '0',"
+"  MODIFY mythdigest varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY description varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY comment varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY eq_preset varchar(255) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE music_stats"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY total_time varchar(12) CHARACTER SET utf8 NOT NULL default '0',"
+"  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';",
+""
+};
+
+        if (!performActualUpdate(updates, "1016", dbver))
+            return false;
+    }
 
     return true;
 }

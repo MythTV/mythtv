@@ -2,6 +2,10 @@
 #include <qdir.h>
 #include <qapplication.h>
 #include <qfontmetrics.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QLabel>
+#include <Q3Frame>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -55,10 +59,10 @@ static bool copyFile(const QString &src, const QString &dst)
     char buffer[bufferSize];
     int len;
 
-    if (!s.open(IO_ReadOnly))
+    if (!s.open(QIODevice::ReadOnly))
         return false;
 
-    if (!d.open(IO_WriteOnly))
+    if (!d.open(QIODevice::WriteOnly))
     {
         s.close();
         return false;
@@ -508,7 +512,7 @@ void ImportMusicDialog::startScan()
     busy->start();
     scanner->start();
 
-    while (!scanner->finished())
+    while (!scanner->isFinished())
     {
         usleep(500);
         qApp->processEvents();
@@ -538,15 +542,16 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
     if (!d.exists())
         return;
 
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
+    const QFileInfoList list = d.entryInfoList();
+    if (list.isEmpty())
         return;
 
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
 
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
+        fi = &(*it);
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
@@ -607,13 +612,13 @@ void ImportMusicDialog::showMenu()
     m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                       "menu");
 
-    QButton *button = m_popupMenu->addButton(tr("Save Defaults"), this,
+    QAbstractButton *button = m_popupMenu->addButton(tr("Save Defaults"), this,
             SLOT(saveDefaults()));
 
     QLabel *splitter = m_popupMenu->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setFrameShape(Q3Frame::HLine);
+    splitter->setFrameShadow(Q3Frame::Sunken);
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
 
@@ -835,7 +840,7 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
     if (m_tracks->size() == 0)
         return;
 
-    QFileInfo fi(*m_sourceFiles.at(m_currentTrack));
+    QFileInfo fi(m_sourceFiles.at(m_currentTrack));
 
     ImportCoverArtDialog dialog(fi.dirPath(true), m_tracks->at(m_currentTrack)->metadata,
                                 gContext->GetMainWindow(), "import_coverart");
@@ -997,15 +1002,16 @@ void ImportCoverArtDialog::scanDirectory()
     QString nameFilter = gContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
-    const QFileInfoList *list = d.entryInfoList(nameFilter);
-    if (!list)
+    QFileInfoList list = d.entryInfoList(nameFilter);
+    if (list.isEmpty())
         return;
 
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
 
-    while ((fi = it.current()) != 0)
+    while (it != list.end())
     {
+        fi = &(*it);
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;

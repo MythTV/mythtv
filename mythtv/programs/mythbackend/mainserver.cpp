@@ -3,10 +3,12 @@
 #include <qdatetime.h>
 #include <qfile.h>
 #include <qdir.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <qthread.h>
 #include <qwaitcondition.h>
 #include <qregexp.h>
+#include <QEvent>
+#include <Q3PtrList>
 
 #include <cstdlib>
 #include <cerrno>
@@ -83,8 +85,8 @@ int delete_file_immediately(const QString &filename,
             QFile target(linktext);
             if (!(success1 = target.remove()))
             {
-                VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' -> '%2': %3")
-                        .arg(filename).arg(linktext.local8Bit())
+                VERBOSE(VB_IMPORTANT, (const char *)QString("Error deleting '%1' -> '%2': %3")
+                        .arg((const char *)filename).arg((const char *)linktext.local8Bit())
                         .arg(strerror(errno)));
             }
         }
@@ -602,8 +604,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "BACKEND_MESSAGE")
     {
         QString message = listline[1];
-        QStringList extra = listline[2];
-        for (uint i = 3; i < listline.size(); i++)
+        QStringList extra( listline[2] );
+        for (int i = 3; i < listline.size(); i++)
             extra << listline[i];
         MythEvent me(message, extra);
         gContext->dispatch(me);
@@ -644,7 +646,7 @@ void MainServer::MarkUnused(ProcessRequestThread *prt)
     threadPoolLock.unlock();
 }
 
-void MainServer::customEvent(QCustomEvent *e)
+void MainServer::customEvent(QEvent *e)
 {
     QStringList broadcast;
     bool sendstuff = false;
@@ -680,7 +682,7 @@ void MainServer::customEvent(QCustomEvent *e)
             }
             else
             {
-                cerr << "Cannot find program info for '" << me->Message()
+                cerr << "Cannot find program info for '" << (const char *)me->Message()
                      << "', while attempting to Auto-Expire." << endl;
             }
 
@@ -795,7 +797,7 @@ void MainServer::customEvent(QCustomEvent *e)
         if (me->Message().left(6) == "LOCAL_")
             return;
 
-        broadcast = "BACKEND_MESSAGE";
+        broadcast = QStringList( "BACKEND_MESSAGE" );
         broadcast << me->Message();
         broadcast += me->ExtraDataList();
         sendstuff = true;
@@ -815,7 +817,7 @@ void MainServer::customEvent(QCustomEvent *e)
             sendGlobal = true;
         }
 
-        QPtrList<PlaybackSock> sentSet;
+        Q3PtrList<PlaybackSock> sentSet;
 
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
@@ -920,7 +922,7 @@ void MainServer::HandleVersion(MythSocket *socket, QString version)
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
                                 MythSocket *socket)
 {
-    QStringList retlist = "OK";
+    QStringList retlist( "OK" );
 
     sockListLock.lock();
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
@@ -967,7 +969,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             ProgramInfo pinfo;
             ProgramList slavelist;
-            QStringList::const_iterator sit = slist.at(1);
+            QStringList::const_iterator sit = slist.begin()+1;
             while (sit != slist.end())
             {
                 if (!pinfo.FromStringList(sit, slist.end()))
@@ -1006,7 +1008,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a remote file transfer")
                                .arg(commands[2]));
-        QUrl qurl = slist[1];
+        Q3Url qurl = slist[1];
         QString filename = LocalFilePath(qurl);
 
         FileTransfer *ft = NULL;
@@ -1179,9 +1181,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->endts = query.value(30).toDateTime();
             proginfo->recstartts = query.value(1).toDateTime();
             proginfo->recendts = query.value(2).toDateTime();
-            proginfo->title = QString::fromUtf8(query.value(3).toString());
-            proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
-            proginfo->description = QString::fromUtf8(query.value(5).toString());
+            proginfo->title = query.value(3).toString();
+            proginfo->subtitle = query.value(4).toString();
+            proginfo->description = query.value(5).toString();
             proginfo->hostname = query.value(6).toString();
 
             proginfo->dupin = RecordingDupInType(query.value(17).toInt());
@@ -1213,7 +1215,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->hasAirDate  = false;
             }
 
-            proginfo->pathname = QString::fromUtf8(query.value(28).toString());
+            proginfo->pathname = query.value(28).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -1221,8 +1223,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (!query.value(7).toString().isEmpty())
             {
                 proginfo->chanstr = query.value(7).toString();
-                proginfo->channame = QString::fromUtf8(query.value(8).toString());
-                proginfo->chansign = QString::fromUtf8(query.value(9).toString());
+                proginfo->channame = query.value(8).toString();
+                proginfo->chansign = query.value(9).toString();
             }
             else
             {
@@ -1265,12 +1267,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->programflags = flags;
 
-            proginfo->category = QString::fromUtf8(query.value(15).toString());
+            proginfo->category = query.value(15).toString();
 
-            proginfo->recgroup = QString::fromUtf8(query.value(16).toString());
-            proginfo->playgroup = QString::fromUtf8(query.value(27).toString());
+            proginfo->recgroup = query.value(16).toString();
+            proginfo->playgroup = query.value(27).toString();
             proginfo->storagegroup =
-                QString::fromUtf8(query.value(39).toString());
+                query.value(39).toString();
 
             proginfo->recpriority = query.value(36).toInt();
 
@@ -1625,7 +1627,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":TITLE", ds->title.utf8());
+    query.bindValue(":TITLE", ds->title);
     query.bindValue(":STARTTIME", ds->recstartts);
 
     if (!query.exec() || !query.isActive())
@@ -1697,14 +1699,14 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
     VERBOSE(VB_FILE, QString("About to unlink/delete file: '%1'")
             .arg(filename));
 
-    QString errmsg = QString("Delete Error '%1'").arg(filename.local8Bit());
+    QString errmsg = QString("Delete Error '%1'").arg((const char *)filename.local8Bit());
     if (finfo.isSymLink())
     {
         linktext = finfo.readLink();
         if (linktext.left(1) != "/")
             linktext = finfo.dirPath(true) + "/" + finfo.readLink();
 
-        errmsg += QString(" -> '%2'").arg(linktext.local8Bit());
+        errmsg += QString(" -> '%2'").arg((const char *)linktext.local8Bit());
     }
 
     if (followLinks && finfo.isSymLink())
@@ -1741,7 +1743,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
  */
 int MainServer::OpenAndUnlink(const QString &filename)
 {
-    QString msg = QString("Error deleting '%1'").arg(filename.local8Bit());
+    QString msg = QString("Error deleting '%1'").arg((const char *)filename.local8Bit());
     int fd = open(filename.local8Bit(), O_WRONLY);
 
     if (fd == -1)
@@ -1864,7 +1866,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
         }
     }
 
-    QStringList outputlist = QString::number(result);
+    QStringList outputlist( QString::number(result) );
     if (pbssock)
         SendResponse(pbssock, outputlist);
 
@@ -1905,7 +1907,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             }
             if (pbssock)
             {
-                QStringList outputlist = "0";
+                QStringList outputlist( "0" );
                 SendResponse(pbssock, outputlist);
             }
  
@@ -1956,7 +1958,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     if (pbssock)
     {
-        QStringList outputlist = QString::number(recnum);
+        QStringList outputlist( QString::number(recnum) );
         SendResponse(pbssock, outputlist);
     }
 
@@ -1994,7 +1996,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             DoHandleStopRecording(pginfo, NULL);
         else
             delete pginfo;
-        QStringList outputlist = QString::number(0);
+        QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
@@ -2025,7 +2027,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
             if (pbssock)
             {
-                QStringList outputlist = QString::number(num);
+                QStringList outputlist( QString::number(num) );
                 SendResponse(pbssock, outputlist);
             }
 
@@ -2115,7 +2117,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
     if (pbssock)
     {
-        QStringList outputlist = QString::number(resultCode);
+        QStringList outputlist( QString::number(resultCode) );
         SendResponse(pbssock, outputlist);
     }
 
@@ -2160,7 +2162,7 @@ void MainServer::DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pb
         gContext->dispatch(me);
     }
 
-    QStringList outputlist = QString::number(ret);
+    QStringList outputlist( QString::number(ret) );
     SendResponse(pbssock, outputlist);
 }
 
@@ -2170,10 +2172,10 @@ void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
     if (m_sched)
     {
         m_sched->Reschedule(recordid);
-        result = QString::number(1);
+        result = QStringList( QString::number(1) );
     }
     else
-        result = QString::number(0);
+        result = QStringList( QString::number(0) );
 
     if (pbs)
     {
@@ -2196,7 +2198,7 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 
     if (pbssock)
     {
-        QStringList outputlist = QString::number(0);
+        QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
     }
 
@@ -2331,7 +2333,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
              exists = slave->CheckFile(pginfo);
              slave->DownRef();
 
-             QStringList outputlist = QString::number(exists);
+             QStringList outputlist( QString::number(exists) );
              if (exists)
                  outputlist << pginfo->pathname;
              else
@@ -2349,7 +2351,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     if (checkFile.exists() == true)
         exists = 1;
 
-    QStringList strlist = QString::number(exists);
+    QStringList strlist( QString::number(exists) );
     if (exists)
         strlist << pburl;
     else
@@ -2833,7 +2835,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         VERBOSE(VB_IMPORTANT, "MainServer::HandleRecorderQuery() " +
                 QString("Unknown encoder: %1").arg(recnum));
-        QStringList retlist = "bad";
+        QStringList retlist( "bad" );
         SendResponse(pbssock, retlist);
         return;
     }
@@ -3179,7 +3181,7 @@ void MainServer::HandleSetNextLiveTVDir(QStringList &commands,
     {
         VERBOSE(VB_IMPORTANT, "MainServer::HandleSetNextLiveTVDir() " +
                 QString("Unknown encoder: %1").arg(recnum));
-        QStringList retlist = "bad";
+        QStringList retlist( "bad" );
         SendResponse(pbssock, retlist);
         return;
     }
@@ -3187,7 +3189,7 @@ void MainServer::HandleSetNextLiveTVDir(QStringList &commands,
     EncoderLink *enc = iter.data();
     enc->SetNextLiveTVDir(commands[2]);
 
-    QStringList retlist = "OK";
+    QStringList retlist( "OK" );
     SendResponse(pbssock, retlist);
 }
 
@@ -3636,7 +3638,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
         }
     }
     
-    QStringList strlist = QString::number(retval);
+    QStringList strlist( QString::number(retval) );
 
     if (encoder)
     {
@@ -3712,7 +3714,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     MythEvent me(message);
     gContext->dispatch(me);
 
-    QStringList retlist = "OK";
+    QStringList retlist( "OK" );
 
     SendResponse(pbssock, retlist);
 }
@@ -3758,14 +3760,14 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     int       height         = -1;
     bool      has_extra_data = false;
 
-    QStringList::const_iterator it = slist.at(1);
+    QStringList::const_iterator it = slist.begin() + 1;
     QStringList::const_iterator end = slist.end();
     ProgramInfo *pginfo = new ProgramInfo();
     bool ok = pginfo->FromStringList(it, end);
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "MainServer: Failed to parse pixmap request.");
-        QStringList outputlist = "BAD";
+        QStringList outputlist("BAD");
         outputlist += "ERROR_INVALID_REQUEST";
         SendResponse(pbssock, outputlist);
     }
@@ -3808,7 +3810,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
         if (slave)
         {
-            QStringList outputlist = "OK";
+            QStringList outputlist("OK");
             if (has_extra_data)
             {
                 outputlist = slave->GenPreviewPixmap(
@@ -3834,7 +3836,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     {
         VERBOSE(VB_IMPORTANT, "MainServer: HandleGenPreviewPixmap: Unable to "
                 "find file locally, unable to make preview image.");
-        QStringList outputlist = "BAD";
+        QStringList outputlist( "BAD" );
         outputlist += "ERROR_NOFILE";
         SendResponse(pbssock, outputlist);
         delete pginfo;
@@ -3853,7 +3855,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (ok)
     {
-        QStringList outputlist = "OK";
+        QStringList outputlist("OK");
         if (!outputfile.isEmpty())
             outputlist += outputfile;
         SendResponse(pbssock, outputlist);
@@ -3861,7 +3863,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     else
     {
         VERBOSE(VB_IMPORTANT, "MainServer: Failed to make preview image.");
-        QStringList outputlist = "BAD";
+        QStringList outputlist( "BAD" );
         outputlist += "ERROR_UNKNOWN";
         SendResponse(pbssock, outputlist);
     } 
@@ -3893,7 +3895,8 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
              slave->DownRef();
 
              strlist = (slavetime.isValid()) ?
-                 QString::number(slavetime.toTime_t()) : "BAD";
+                 QStringList(QString::number(slavetime.toTime_t())) :
+                 QStringList("BAD");
 
              SendResponse(pbssock, strlist);
              delete pginfo;
@@ -3911,7 +3914,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     {
         VERBOSE(VB_IMPORTANT, "MainServer: HandlePixmapLastModified: Unable to "
                 "find file locally, unable to get last modified date.");
-        QStringList outputlist = "BAD";
+        QStringList outputlist( "BAD" );
         SendResponse(pbssock, outputlist);
         delete pginfo;
         return;
@@ -3924,10 +3927,10 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     if (finfo.exists())
     {
         lastmodified = finfo.lastModified();
-        strlist = QString::number(lastmodified.toTime_t());
+        strlist = QStringList(QString::number(lastmodified.toTime_t()));
     }
     else
-        strlist = "BAD";   
+        strlist = QStringList( "BAD" );
  
     SendResponse(pbssock, strlist);
     delete pginfo;
@@ -3937,7 +3940,7 @@ void MainServer::HandleBackendRefresh(MythSocket *socket)
 {
     gContext->RefreshBackendConfig();
 
-    QStringList retlist = "OK";
+    QStringList retlist( "OK" );
     SendResponse(socket, retlist);    
 }
 
@@ -3946,7 +3949,7 @@ void MainServer::HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs)
     pbs->setBlockShutdown(blockShutdown);
     
     MythSocket *socket = pbs->getSocket();
-    QStringList retlist = "OK";
+    QStringList retlist( "OK" );
     SendResponse(socket, retlist);    
 }
 
@@ -4174,7 +4177,7 @@ LiveTVChain *MainServer::GetExistingChain(QString id)
 
     LiveTVChain *chain;
 
-    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
     while ((chain = it.current()) != 0)
     {
         ++it;
@@ -4191,7 +4194,7 @@ LiveTVChain *MainServer::GetExistingChain(MythSocket *sock)
 
     LiveTVChain *chain;
 
-    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
     while ((chain = it.current()) != 0)
     {
         ++it;
@@ -4208,7 +4211,7 @@ LiveTVChain *MainServer::GetChainWithRecording(ProgramInfo *pginfo)
 
     LiveTVChain *chain;
 
-    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
     while ((chain = it.current()) != 0)
     {
         ++it;
@@ -4234,7 +4237,7 @@ void MainServer::DeleteChain(LiveTVChain *chain)
     delete chain;
 }
 
-QString MainServer::LocalFilePath(QUrl &url)
+QString MainServer::LocalFilePath(Q3Url &url)
 {
     QString lpath = url.path();
 
@@ -4317,7 +4320,7 @@ QString MainServer::LocalFilePath(QUrl &url)
         }
     }
 
-    return QDeepCopy<QString>(lpath);
+    return lpath;
 }
 
 void MainServer::reconnectTimeout(void)
@@ -4354,7 +4357,7 @@ void MainServer::reconnectTimeout(void)
 
     masterServerSock->Lock();
 
-    QStringList strlist = str;
+    QStringList strlist( str );
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
@@ -4410,7 +4413,7 @@ bool MainServer::isClientConnected()
 // sends the Slavebackends the request to shut down using haltcmd
 void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 {
-    QStringList bcast = "SHUTDOWN_NOW";
+    QStringList bcast( "SHUTDOWN_NOW" );
     bcast << haltcmd;
 
     sockListLock.lock();

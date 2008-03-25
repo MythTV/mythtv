@@ -734,7 +734,7 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     int fd = open(devName, mode, 0);
     if (fd == -1)
     {
-        cerr << "Cannot open device " << devName << endl;
+        cerr << "Cannot open device " << devName.toLocal8Bit().constData() << endl;
         return -1;
     }                  
 
@@ -920,7 +920,7 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     int fd = open(devName, mode, 0);
     if (fd == -1)
     {
-        cerr << "Cannot open device " << devName << endl;
+        cerr << "Cannot open device " << devName.toLocal8Bit().constData() << endl;
         return -1;
     }                  
 

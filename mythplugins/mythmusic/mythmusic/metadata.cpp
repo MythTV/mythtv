@@ -5,6 +5,8 @@
 #include <qregexp.h> 
 #include <qdatetime.h>
 #include <qdir.h>
+//Added by qt3to4:
+#include <Q3ValueList>
 
 using namespace std;
 
@@ -135,18 +137,18 @@ bool Metadata::isInDatabase()
     "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
     "WHERE music_songs.filename = :FILENAME "
     "AND music_directories.path = :DIRECTORY ;");
-    query.bindValue(":FILENAME", sqlfilename.utf8());
-    query.bindValue(":DIRECTORY", sqldir.utf8());
+    query.bindValue(":FILENAME", sqlfilename);
+    query.bindValue(":DIRECTORY", sqldir);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
-        m_artist = QString::fromUtf8(query.value(0).toString());
-        m_compilation_artist = QString::fromUtf8(query.value(1).toString());
-        m_album = QString::fromUtf8(query.value(2).toString());
-        m_title = QString::fromUtf8(query.value(3).toString());
-        m_genre = QString::fromUtf8(query.value(4).toString());
+        m_artist = query.value(0).toString();
+        m_compilation_artist = query.value(1).toString();
+        m_album = query.value(2).toString();
+        m_title = query.value(3).toString();
+        m_genre = query.value(4).toString();
         m_year = query.value(5).toInt();
         m_tracknum = query.value(6).toInt();
         m_length = query.value(7).toInt();
@@ -186,7 +188,7 @@ void Metadata::dumpToDatabase()
         // Load the directory id
         query.prepare("SELECT directory_id FROM music_directories "
                     "WHERE path = :DIRECTORY ;");
-        query.bindValue(":DIRECTORY", sqldir.utf8());
+        query.bindValue(":DIRECTORY", sqldir);
 
         if (!query.exec() || !query.isActive())
         {
@@ -200,7 +202,7 @@ void Metadata::dumpToDatabase()
         else
         {
             query.prepare("INSERT INTO music_directories (path) VALUES (:DIRECTORY);");
-            query.bindValue(":DIRECTORY", sqldir.utf8());
+            query.bindValue(":DIRECTORY", sqldir);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -216,7 +218,7 @@ void Metadata::dumpToDatabase()
         // Load the artist id
         query.prepare("SELECT artist_id FROM music_artists "
                     "WHERE artist_name = :ARTIST ;");
-        query.bindValue(":ARTIST", m_artist.utf8());
+        query.bindValue(":ARTIST", m_artist);
 
         if (!query.exec() || !query.isActive())
         {
@@ -230,7 +232,7 @@ void Metadata::dumpToDatabase()
         else
         {
             query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
-            query.bindValue(":ARTIST", m_artist.utf8());
+            query.bindValue(":ARTIST", m_artist);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -250,7 +252,7 @@ void Metadata::dumpToDatabase()
     {
         query.prepare("SELECT artist_id FROM music_artists "
                     "WHERE artist_name = :ARTIST ;");
-        query.bindValue(":ARTIST", m_compilation_artist.utf8());
+        query.bindValue(":ARTIST", m_compilation_artist);
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("music select compilation artist id", query);
@@ -263,7 +265,7 @@ void Metadata::dumpToDatabase()
         else
         {
             query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
-            query.bindValue(":ARTIST", m_compilation_artist.utf8());
+            query.bindValue(":ARTIST", m_compilation_artist);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -281,7 +283,7 @@ void Metadata::dumpToDatabase()
                     "WHERE artist_id = :COMP_ARTIST_ID "
                     " AND album_name = :ALBUM ;");
         query.bindValue(":COMP_ARTIST_ID", m_compartistid);
-        query.bindValue(":ALBUM", m_album.utf8());
+        query.bindValue(":ALBUM", m_album);
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("music select album id", query);
@@ -295,7 +297,7 @@ void Metadata::dumpToDatabase()
         {
             query.prepare("INSERT INTO music_albums (artist_id, album_name, compilation, year) VALUES (:COMP_ARTIST_ID, :ALBUM, :COMPILATION, :YEAR);");
             query.bindValue(":COMP_ARTIST_ID", m_compartistid);
-            query.bindValue(":ALBUM", m_album.utf8());
+            query.bindValue(":ALBUM", m_album);
             query.bindValue(":COMPILATION", m_compilation);
             query.bindValue(":YEAR", m_year);
 
@@ -313,7 +315,7 @@ void Metadata::dumpToDatabase()
         // Genres
         query.prepare("SELECT genre_id FROM music_genres "
                     "WHERE genre = :GENRE ;");
-        query.bindValue(":GENRE", m_genre.utf8());
+        query.bindValue(":GENRE", m_genre);
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("music select genre id", query);
@@ -326,7 +328,7 @@ void Metadata::dumpToDatabase()
         else
         {
             query.prepare("INSERT INTO music_genres (genre) VALUES (:GENRE);");
-            query.bindValue(":GENRE", m_genre.utf8());
+            query.bindValue(":GENRE", m_genre);
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
@@ -374,12 +376,12 @@ void Metadata::dumpToDatabase()
     query.bindValue(":DIRECTORY", m_directoryid);
     query.bindValue(":ARTIST", m_artistid);
     query.bindValue(":ALBUM", m_albumid);
-    query.bindValue(":TITLE", m_title.utf8());
+    query.bindValue(":TITLE", m_title);
     query.bindValue(":GENRE", m_genreid);
     query.bindValue(":YEAR", m_year);
     query.bindValue(":TRACKNUM", m_tracknum);
     query.bindValue(":LENGTH", m_length);
-    query.bindValue(":FILENAME", sqlfilename.utf8());
+    query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":RATING", m_rating);
     query.bindValue(":FORMAT", m_format);
     query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
@@ -396,7 +398,7 @@ void Metadata::dumpToDatabase()
 
     if (! m_albumart.empty())
     {
-        QValueList<struct AlbumArtImage>::iterator it;
+        Q3ValueList<struct AlbumArtImage>::iterator it;
         for ( it = m_albumart.begin(); it != m_albumart.end(); ++it )
         {
             query.prepare("SELECT albumart_id FROM music_albumart WHERE "
@@ -679,7 +681,7 @@ void Metadata::incPlayCount()
     m_changed = true;
 }
 
-void Metadata::setEmbeddedAlbumArt(QValueList<struct AlbumArtImage> albumart)
+void Metadata::setEmbeddedAlbumArt(Q3ValueList<struct AlbumArtImage> albumart)
 {
     m_albumart = albumart;
 }
@@ -720,7 +722,7 @@ QStringList Metadata::fillFieldList(QString field)
     {
         while (query.next())
         {
-            searchList << QString::fromUtf8(query.value(0).toString());
+            searchList << query.value(0).toString();
         }
     }
     return searchList;
@@ -805,29 +807,29 @@ Metadata *Metadata::getMetadataFromID(int id)
     if (query.isActive() && query.size() > 0)
     {
         query.next();
-        filename = QString::fromUtf8(query.value(9).toString());
+        filename = query.value(9).toString();
         if (!filename.contains("://"))
             filename = m_startdir + filename;
 
-        artist = QString::fromUtf8(query.value(1).toString());
+        artist = query.value(1).toString();
         if (artist.isEmpty())
             artist = QObject::tr("Unknown Artist");
 
-        album = QString::fromUtf8(query.value(3).toString());
+        album = query.value(3).toString();
         if (album.isEmpty())
             album = QObject::tr("Unknown Album");
 
-        title = QString::fromUtf8(query.value(4).toString());
+        title = query.value(4).toString();
         if (title.isEmpty())
             title = QObject::tr("Unknown Title");
 
         meta = new Metadata(
             filename,
             artist,
-            QString::fromUtf8(query.value(2).toString()),
+            query.value(2).toString(),
             album,
             title,
-            QString::fromUtf8(query.value(5).toString()),
+            query.value(5).toString(),
             query.value(6).toInt(),
             query.value(7).toInt(),
             query.value(8).toInt(),
@@ -903,7 +905,7 @@ bool AllMusic::cleanOutThreads()
     //  probably selected mythmusic and then
     //  escaped out right away
     
-    if(m_metadata_loader->finished())
+    if(m_metadata_loader->isFinished())
     {
         return true;
     }
@@ -974,29 +976,29 @@ void AllMusic::resync()
     {
         while (query.next())
         {
-            filename = QString::fromUtf8(query.value(9).toString());
+            filename = query.value(9).toString();
             if (!filename.contains("://"))
                 filename = m_startdir + filename;
 
-            artist = QString::fromUtf8(query.value(1).toString());
+            artist = query.value(1).toString();
             if (artist.isEmpty())
                 artist = QObject::tr("Unknown Artist");
 
-            album = QString::fromUtf8(query.value(3).toString());
+            album = query.value(3).toString();
             if (album.isEmpty())
                 album = QObject::tr("Unknown Album");
 
-            title = QString::fromUtf8(query.value(4).toString());
+            title = query.value(4).toString();
             if (title.isEmpty())
                 title = QObject::tr("Unknown Title");
 
             Metadata *temp = new Metadata(
                 filename,
                 artist,
-                QString::fromUtf8(query.value(2).toString()),
+                query.value(2).toString(),
                 album,
                 title,
-                QString::fromUtf8(query.value(5).toString()),
+                query.value(5).toString(),
                 query.value(6).toInt(),
                 query.value(7).toInt(),
                 query.value(8).toInt(),
@@ -1038,7 +1040,7 @@ void AllMusic::resync()
     //  To find this data quickly, build a map
     //  (a map to pointers!)
 
-    QPtrListIterator<Metadata> an_iterator( m_all_music );
+    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
     Metadata *map_add;
 
     music_map.clear();
@@ -1083,7 +1085,7 @@ void AllMusic::buildTree()
     //  Select Music screen
     //
 
-    QPtrListIterator<Metadata> an_iterator( m_all_music );
+    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
     Metadata *inserter;
     MetadataPtrList list;
 
@@ -1226,7 +1228,7 @@ void AllMusic::save()
     //  have changed (ratings, etc.)
     
     
-    QPtrListIterator<Metadata> an_iterator( m_all_music );
+    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
     Metadata *searcher;
     while ( (searcher = an_iterator.current()) != 0 )
     {
@@ -1305,7 +1307,7 @@ void AllMusic::setSorting(QString a_paths)
 
 void AllMusic::setAllVisible(bool visible)
 {
-    QPtrListIterator<Metadata> an_iterator( m_all_music );
+    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
     Metadata *md;
     while ( (md = an_iterator.current()) != 0 )
     {
@@ -1365,7 +1367,7 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
     }
 
 
-    QPtrListIterator<Metadata>  anit(my_tracks);
+    Q3PtrListIterator<Metadata>  anit(my_tracks);
     Metadata *a_track;
     while ((a_track = anit.current() ) != 0)
     {
@@ -1379,7 +1381,7 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
     }  
 
     
-    QPtrListIterator<MusicNode> iter(my_subnodes);
+    Q3PtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *sub_traverse;
     while ((sub_traverse = iter.current() ) != 0)
     {
@@ -1400,7 +1402,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     sub_node->setAttribute(4, a_counter);
     sub_node->setAttribute(5, a_counter);
 
-    QPtrListIterator<Metadata>  anit(my_tracks);
+    Q3PtrListIterator<Metadata>  anit(my_tracks);
     Metadata *a_track;
     int track_counter = 0;
     anit.toFirst();
@@ -1440,7 +1442,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     }  
 
     
-    QPtrListIterator<MusicNode> iter(my_subnodes);
+    Q3PtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *sub_traverse;
     int another_counter = 0;
     iter.toFirst();
@@ -1466,7 +1468,7 @@ void MusicNode::sort()
     my_subnodes.sort();
     
     //  Tell any subnodes to sort themselves
-    QPtrListIterator<MusicNode> iter(my_subnodes);
+    Q3PtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *crawler;
     while ( (crawler = iter.current()) != 0 )
     {
@@ -1483,9 +1485,9 @@ void MusicNode::printYourself(int indent_level)
     {
         cout << " " ;
     }
-    cout << my_title << endl;
+    cout << my_title.toLocal8Bit().constData() << endl;
 
-    QPtrListIterator<Metadata>  anit(my_tracks);
+    Q3PtrListIterator<Metadata>  anit(my_tracks);
     Metadata *a_track;
     while( (a_track = anit.current() ) != 0)
     {
@@ -1493,11 +1495,11 @@ void MusicNode::printYourself(int indent_level)
         {
             cout << " " ;
         } 
-        cout << a_track->Title() << endl ;
+        cout << a_track->Title().toLocal8Bit().constData() << endl ;
         ++anit;
     }       
     
-    QPtrListIterator<MusicNode> iter(my_subnodes);
+    Q3PtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *print;
     while( (print = iter.current() ) != 0)
     {
@@ -1508,14 +1510,14 @@ void MusicNode::printYourself(int indent_level)
 
 /**************************************************************************/
 
-int MetadataPtrList::compareItems(QPtrCollection::Item item1, 
-                                  QPtrCollection::Item item2)
+int MetadataPtrList::compareItems(Q3PtrCollection::Item item1, 
+                                  Q3PtrCollection::Item item2)
 {
     return ((Metadata*)item1)->compare((Metadata*)item2);
 }
 
-int MusicNodePtrList::compareItems (QPtrCollection::Item item1, 
-                                    QPtrCollection::Item item2)
+int MusicNodePtrList::compareItems (Q3PtrCollection::Item item1, 
+                                    Q3PtrCollection::Item item2)
 {
     MusicNode *itemA = (MusicNode*)item1;
     MusicNode *itemB = (MusicNode*)item2;
@@ -1568,7 +1570,7 @@ void AlbumArtImages::findImages(void)
             "WHERE music_directories.path = :DIR "
             "OR song_id = :SONGID "
             "ORDER BY music_albumart.imagetype;");
-    query.bindValue(":DIR", dir.utf8());
+    query.bindValue(":DIR", dir);
     query.bindValue(":SONGID", trackid);
     if (query.exec())
     {
@@ -1576,8 +1578,7 @@ void AlbumArtImages::findImages(void)
         {
             AlbumArtImage *image = new AlbumArtImage;
             image->id = query.value(0).toInt();
-            image->filename = Metadata::GetStartdir() + "/" + 
-                    QString::fromUtf8(query.value(1).toString());
+            image->filename = Metadata::GetStartdir() + "/" + query.value(1).toString();
             image->imageType = (ImageType) query.value(2).toInt();
             image->typeName = getTypeName(image->imageType);
             if (query.value(3).toInt() == 1)

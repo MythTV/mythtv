@@ -1,13 +1,16 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QKeyEvent>
 
 #include <iostream>
 #include <cstdlib>

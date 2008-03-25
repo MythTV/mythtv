@@ -1,6 +1,9 @@
-#include <qpixmap.h>
 #include <unistd.h>
 #include <algorithm>
+
+#include <QPixmap>
+#include <QPaintEvent>
+#include <QKeyEvent>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -62,9 +65,10 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
     QStringList actions;
 
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
 
         if ((action == "SELECT" || action == "PLAY") && curitem)
@@ -106,10 +110,10 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
     {
         gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (QStringList::const_iterator p = actions.begin();
+             p != actions.end() && !handled; ++p)
         {
-            QString action = actions[i];
-            if (action == "PLAYBACK")
+            if (*p == "PLAYBACK")
             {
                 handled = true;
                 slotWatchVideo();
@@ -125,7 +129,7 @@ void VideoBrowser::doMenu(bool info)
 {
     if (createPopup())
     {
-        QButton *focusButton = NULL;
+        QAbstractButton *focusButton = NULL;
         if (info)
         {
             focusButton = popup->addButton(tr("Watch This Video"), this,
@@ -163,13 +167,14 @@ void VideoBrowser::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
     QPainter p(this);
-    if (m_state == 0)
+    if (m_state == 0 && allowPaint)
     {
-       if (r.intersects(infoRect) && allowPaint == true)
+       if (r.intersects(infoRect))
        {
            updateInfo(&p);
        }
-       if (r.intersects(browsingRect) && allowPaint == true)
+
+       if (r.intersects(browsingRect))
        {
            updateBrowsing(&p);
        }
@@ -295,7 +300,7 @@ void VideoBrowser::updateInfo(QPainter *p)
                             ImageCache::getImageCache().load(coverfile,
                                                                 img_size.width(),
                                                                 img_size.height(),
-                                                                QImage::ScaleFree);
+                                                                Qt::IgnoreAspectRatio);
                     if (img)
                     {
                         if (itype->GetImage().serialNumber() !=

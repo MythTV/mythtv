@@ -18,11 +18,14 @@
 
 // C++ headers
 #include <iostream>
+
 using namespace std;
 
 // Qt headers
+#include <Q3ValueList>
+#include <Q3TextStream>
 #include <qapplication.h>
-#include <qprocess.h>
+#include <q3process.h>
 #include <qdir.h>
 #include <qfile.h>
 
@@ -160,7 +163,7 @@ bool MediaMonitorUnix::CheckMountable(void)
         QFile removable(sysfs.absFilePath("removable"));
         if (removable.exists())
         {
-            removable.open(IO_ReadOnly);
+            removable.open(QIODevice::ReadOnly);
             int c = removable.getch();
             removable.close();
 
@@ -183,13 +186,13 @@ bool MediaMonitorUnix::CheckMountable(void)
 QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 {
 #ifdef linux
-    QProcess udevinfo(this);
+    Q3Process udevinfo(this);
     udevinfo.addArgument("udevinfo");
     udevinfo.addArgument("-q");
     udevinfo.addArgument("name");
     udevinfo.addArgument("-rp");
     udevinfo.addArgument(sysfs);
-    udevinfo.setCommunication(QProcess::Stdout|QProcess::Stderr);
+    udevinfo.setCommunication(Q3Process::Stdout|Q3Process::Stderr);
 
     udevinfo.start();
 
@@ -219,9 +222,9 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
 
 #ifdef linux
     QFile file("/proc/sys/dev/cdrom/info");
-    if (file.open(IO_ReadOnly))
+    if (file.open(QIODevice::ReadOnly))
     {
-        QTextStream stream(&file);
+        Q3TextStream stream(&file);
         QString line;
         while (!stream.atEnd())
         {
@@ -257,9 +260,9 @@ static void LookupModel(MythMediaDevice* device)
     if (devname.startsWith("hd"))  // IDE drive
     {
         QFile  file("/proc/ide/" + devname.left(3) + "/model");
-        if (file.open(IO_ReadOnly))
+        if (file.open(QIODevice::ReadOnly))
         {
-            QTextStream stream(&file);
+            Q3TextStream stream(&file);
 
             desc.append(stream.readLine());
             file.close();
@@ -276,9 +279,9 @@ static void LookupModel(MythMediaDevice* device)
         path.append("/device/");
 
         QFile  file(path + "vendor");
-        if (file.open(IO_ReadOnly))
+        if (file.open(QIODevice::ReadOnly))
         {
-            QTextStream stream(&file);
+            Q3TextStream stream(&file);
 
             desc.append(stream.readLine());
             desc.append(' ');
@@ -286,9 +289,9 @@ static void LookupModel(MythMediaDevice* device)
         }
 
         file.setName(path + "model");
-        if (file.open(IO_ReadOnly))
+        if (file.open(QIODevice::ReadOnly))
         {
-            QTextStream stream(&file);
+            Q3TextStream stream(&file);
 
             desc.append(stream.readLine());
             desc.append(' ');
@@ -336,7 +339,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    QValueList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
+    Q3ValueList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
     for (; itr != m_Devices.end(); ++itr)
     {
         if (stat((*itr)->getDevicePath(), &sb) < 0)

@@ -18,7 +18,7 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qdir.h>
-#include <qurl.h>
+#include <q3url.h>
 
 // mythtv
 #include <mythtv/mythdbcon.h>
@@ -410,7 +410,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         }
         else
         {
-            m_image = art.smoothScale(m_size, QImage::ScaleMin);
+            m_image = art.smoothScale(m_size, Qt::KeepAspectRatio);
         }
     }
 
@@ -421,9 +421,9 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
     // Paint the image
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
-    p->drawPixmap((m_size.width() - m_image.width()) / 2,
-                  (m_size.height() - m_image.height()) / 2,
-                  m_image);
+    p->drawImage((m_size.width() - m_image.width()) / 2,
+                 (m_size.height() - m_image.height()) / 2,
+                 m_image);
 
     // Store our new size
     m_cursize = m_size;

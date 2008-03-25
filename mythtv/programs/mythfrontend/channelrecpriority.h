@@ -3,6 +3,10 @@
 
 #include <qdatetime.h>
 #include <qdom.h>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
+
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"

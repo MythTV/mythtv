@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 #include <qmap.h>
+#include <Q3ValueList>
 
 #include "programinfo.h"
 #include "format.h"
@@ -24,7 +25,7 @@ struct IvtvQueuedFrame
     IvtvQueuedFrame(void) { raw = 0; actual = 0; };
     IvtvQueuedFrame(int r, long long a) { raw = r; actual = a; };
 };
-typedef QValueList<IvtvQueuedFrame> ivtv_frame_list_t;
+typedef Q3ValueList<IvtvQueuedFrame> ivtv_frame_list_t;
 
 class DeviceInfo
 {

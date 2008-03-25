@@ -8,6 +8,13 @@ using namespace std;
 // Qt includes
 #include <qapplication.h>
 #include <qregexp.h>
+//Added by qt3to4:
+#include <QLabel>
+#include <QPixmap>
+#include <Q3ValueList>
+#include <QKeyEvent>
+#include <Q3Frame>
+#include <Q3PtrList>
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
@@ -136,7 +143,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     if (class LCD *lcd = LCD::Get())
     {
         // Set please wait on the LCD
-        QPtrList<LCDTextItem> textItems;
+        Q3PtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
 
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
@@ -582,13 +589,13 @@ void PlaybackBoxMusic::showMenu()
         caption->setAlignment(Qt::AlignCenter);
     }
 
-    QButton *button = playlist_popup->addButton(tr("Smart playlists"), this,
+    QAbstractButton *button = playlist_popup->addButton(tr("Smart playlists"), this,
                               SLOT(showSmartPlaylistDialog()));
 
     QLabel *splitter = playlist_popup->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setFrameShape(Q3Frame::HLine);
+    splitter->setFrameShadow(Q3Frame::Sunken);
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
 
@@ -762,13 +769,13 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
     if (!menufilters && !getInsertPLOptions(insertOption, playOption, bRemoveDups))
         return;
 
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
     trackCount = music_tree_list->getCurrentNode()->siblingCount();
 
     // store path to current track
     if (curMeta)
     {
-        QValueList <int> *a_route;
+        Q3ValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
         branches_to_current_node = *a_route;
         curTrackID = curMeta->ID();
@@ -884,7 +891,7 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
 
 void PlaybackBoxMusic::playFirstTrack()
 {
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
 
     stop();
     wipeTrackInfo();
@@ -914,7 +921,7 @@ void PlaybackBoxMusic::updatePlaylistFromCD()
 
 void PlaybackBoxMusic::postUpdate()
 {
-   QValueList <int> branches_to_current_node;
+   Q3ValueList <int> branches_to_current_node;
 
    if (visual_mode_delay > 0)
        visual_mode_timer->start(visual_mode_delay * 1000);
@@ -998,9 +1005,9 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         mainvisual->deleteMetadata();
 
         // Get a reference to the current track
-        QValueList <int> branches_to_current_node;
+        Q3ValueList <int> branches_to_current_node;
 
-        QValueList <int> *a_route;
+        Q3ValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
         branches_to_current_node = *a_route;
 
@@ -1074,7 +1081,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                     updatePlaylistFromCD();
 
                 music_tree_list->showWholeTree(show_whole_tree);
-                QValueList <int> branches_to_current_node;
+                Q3ValueList <int> branches_to_current_node;
                 branches_to_current_node.append(0); //  Root node
                 branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
                 branches_to_current_node.append(0); //  Active play Queue
@@ -1258,7 +1265,7 @@ void PlaybackBoxMusic::showSpeed(bool on_or_off)
         float playSpeed = gPlayer->getSpeed();
         speed_text.sprintf("x%4.2f", playSpeed);
         speed_text = tr("Speed: ") + speed_text;
-        QPtrList<LCDTextItem> textItems;
+        Q3PtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
         textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
                                          speed_text, "Generic", false));
@@ -1692,11 +1699,11 @@ void PlaybackBoxMusic::setRepeatMode(MusicPlayer::RepeatMode mode)
 
 void PlaybackBoxMusic::savePosition(uint position)
 {
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
 
     if (curMeta)
     {
-        QValueList <int> *a_route;
+        Q3ValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
         branches_to_current_node = *a_route;
     }
@@ -1710,7 +1717,7 @@ void PlaybackBoxMusic::savePosition(uint position)
     }
 
     QString s = "";
-    QValueListIterator <int> it;
+    Q3ValueListIterator <int> it;
     for (it = branches_to_current_node.begin(); it != branches_to_current_node.end(); ++it)
         s += "," + QString::number(*it);
 
@@ -1722,7 +1729,7 @@ void PlaybackBoxMusic::savePosition(uint position)
 
 void PlaybackBoxMusic::restorePosition(const QString &position)
 {
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
 
     if (position != "")
     {
@@ -1823,11 +1830,11 @@ void PlaybackBoxMusic::editPlaylist()
 {
     // Get a reference to the current track
 
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
 
     if (curMeta)
     {
-        QValueList <int> *a_route;
+        Q3ValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
         branches_to_current_node = *a_route;
     }
@@ -1878,7 +1885,7 @@ void PlaybackBoxMusic::editPlaylist()
         cd_watcher->start(1000);
 }
 
-void PlaybackBoxMusic::customEvent(QCustomEvent *event)
+void PlaybackBoxMusic::customEvent(QEvent *event)
 {
     switch ((int)event->type()) 
     {
@@ -2065,7 +2072,7 @@ void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
     if (!albumArt.isNull())
     {
        // draw the albumArt image
-       albumArt = albumArt.smoothScale(img_size.width(), img_size.height(), QImage::ScaleMin);
+       albumArt = albumArt.smoothScale(img_size.width(), img_size.height(), Qt::KeepAspectRatio);
        QPixmap img(albumArt);
        albumart_image->SetImage(img);
        albumart_image->refresh();
@@ -2320,15 +2327,15 @@ bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
     QLabel *caption = popup->addLabel(tr("Update Playlist Options"), MythPopupBox::Medium);
     caption->setAlignment(Qt::AlignCenter);
 
-    QButton *button = popup->addButton(tr("Replace"));
+    QAbstractButton *button = popup->addButton(tr("Replace"));
     popup->addButton(tr("Insert after current track"));
     popup->addButton(tr("Append to end"));
     button->setFocus();
 
     QLabel *splitter = popup->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setFrameShape(Q3Frame::HLine);
+    splitter->setFrameShadow(Q3Frame::Sunken);
     splitter->setMinimumHeight((int) (25 * hmult));
     splitter->setMaximumHeight((int) (25 * hmult));
 

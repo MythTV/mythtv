@@ -1,18 +1,24 @@
 #include <qcursor.h>
 #include <qdialog.h>
 #include <qdir.h>
-#include <qvbox.h>
+#include <q3vbox.h>
 #include <qapplication.h>
 #include <qlayout.h>
 #include <qdir.h>
 #include <qregexp.h>
-#include <qaccel.h>
-#include <qfocusdata.h>
-#include <qdict.h>
+#include <q3accel.h>
+#include <q3dict.h>
 #include <qsqldatabase.h>
-#include <qobjectlist.h> 
+#include <qobject.h>
+#include <QImageReader>
 #include <qeventloop.h>
-#include <qdeepcopy.h>
+#include <QLabel>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <Q3VBoxLayout>
+#include <Q3Frame>
+#include <QPaintEvent>
+#include <Q3PtrList>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -76,6 +82,8 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
         gContext->ThemeWidget(this);
     }
 
+    setAutoFillBackground(true);
+
     parent->attach(this);
     m_parent = parent;
 }
@@ -103,12 +111,6 @@ void MythDialog::TeardownAll(void)
 
 void MythDialog::setNoErase(void)
 {
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-#ifdef QWS
-    flags |= WResizeNoErase;
-#endif
-    setWFlags(flags);
 }
 
 bool MythDialog::onMediaEvent(MythMediaDevice*)
@@ -182,13 +184,11 @@ DialogCode MythDialog::exec(void)
 
     Show();
 
-    in_loop = TRUE;
+    in_loop = true;
 
-    QEventLoop *qteloop = QApplication::eventLoop();
-    if (!qteloop)
-        return kDialogCodeRejected;
-
-    qteloop->enterLoop();
+    QEventLoop eventLoop;
+    connect(this, SIGNAL(leaveModality()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
 
     DialogCode res = result();
 
@@ -202,11 +202,10 @@ void MythDialog::hide(void)
 
     // Reimplemented to exit a modal when the dialog is hidden.
     QWidget::hide();
-    QEventLoop *qteloop = QApplication::eventLoop();
-    if (in_loop && qteloop)
+    if (in_loop)
     {
-        in_loop = FALSE;
-        qteloop->exitLoop();
+        in_loop = false;
+        emit leaveModality();
     }
 }
 
@@ -217,7 +216,7 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
 
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -227,8 +226,8 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
             else if (action == "UP" || action == "LEFT")
             {
                 if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                     focusWidget()->focusPolicy() == QWidget::WheelFocus))
+                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                     focusWidget()->focusPolicy() == Qt::WheelFocus))
                 {
                 }
                 else
@@ -237,8 +236,8 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
             else if (action == "DOWN" || action == "RIGHT")
             {
                 if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                     focusWidget()->focusPolicy() == QWidget::WheelFocus)) 
+                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                     focusWidget()->focusPolicy() == Qt::WheelFocus))
                 {
                 }
                 else
@@ -280,8 +279,8 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
 
     setLineWidth(3);
     setMidLineWidth(3);
-    setFrameShape(QFrame::Panel);
-    setFrameShadow(QFrame::Raised);
+    setFrameShape(Q3Frame::Panel);
+    setFrameShadow(Q3Frame::Raised);
     setPalette(parent->palette());
     popupForegroundColor = foregroundColor ();
     setFont(parent->font());
@@ -289,7 +288,9 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
 
-    vbox = new QVBoxLayout(this, (int)(10 * hmult));
+    vbox = new Q3VBoxLayout(this, (int)(10 * hmult));
+    setAutoFillBackground(true);
+    setWindowFlags(Qt::FramelessWindowHint);
 }
 
 MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
@@ -308,16 +309,16 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
 
     setLineWidth(3);
     setMidLineWidth(3);
-    setFrameShape(QFrame::Panel);
-    setFrameShadow(QFrame::Raised);
-    setFrameStyle(QFrame::Box | QFrame::Plain);
+    setFrameShape(Q3Frame::Panel);
+    setFrameShadow(Q3Frame::Raised);
+    setFrameStyle(Q3Frame::Box | Q3Frame::Plain);
     setPalette(parent->palette());
     setFont(parent->font());
 
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
 
-    vbox = new QVBoxLayout(this, (int)(10 * hmult));
+    vbox = new Q3VBoxLayout(this, (int)(10 * hmult));
 
     if (!graphicPopup)
         setPaletteBackgroundColor(popupBackground);
@@ -326,10 +327,68 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setPaletteForegroundColor(popupHighlight);
 
     popupForegroundColor = popupForeground;
+    setAutoFillBackground(true);
+    setWindowFlags(Qt::FramelessWindowHint);
 }
+
 
 bool MythPopupBox::focusNextPrevChild(bool next)
 {
+
+    // -=>TODO: Temp fix... should re-evalutate/re-code.
+
+    QList<QWidget *> objList = qFindChildren<QWidget *>(this);
+
+    QWidget *pCurr    = focusWidget();
+    QWidget *pNew     = NULL;
+    int      nCurrIdx = -1;
+    int      nIdx;
+
+    for (nIdx = 0; nIdx < objList.size(); ++nIdx )
+    {
+        if (objList[ nIdx ] == pCurr)
+        {
+            nCurrIdx = nIdx;
+            break;
+        }
+    }
+
+    if (nCurrIdx == -1)
+        return false;
+
+    nIdx = nCurrIdx;
+
+    do
+    {
+        if (next)
+        {
+            ++nIdx;
+
+            if (nIdx == objList.size())
+                nIdx = 0;
+        }
+        else
+        {
+            --nIdx;
+
+            if (nIdx < 0)
+                nIdx = objList.size() -1;
+        }
+
+        pNew = objList[ nIdx ];
+
+        if (pNew && !pNew->focusProxy() && pNew->isVisibleTo( this ) &&
+            pNew->isEnabled() && (pNew->focusPolicy() != Qt::NoFocus))
+        {
+            pNew->setFocus();
+            return true;
+        }
+    }
+    while (nIdx != nCurrIdx);
+
+    return false;
+
+/*
     QFocusData *focusList = focusData();
     QObjectList *objList = queryList(NULL,NULL,false,true);
 
@@ -358,6 +417,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 
     candidate->setFocus();
     return true;
+*/
 }
 
 void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
@@ -403,7 +463,7 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
     return label;
 }
 
-QButton *MythPopupBox::addButton(QString caption, QObject *target, 
+QAbstractButton *MythPopupBox::addButton(QString caption, QObject *target,
                                  const char *slot)
 {
     if (!target)
@@ -431,13 +491,14 @@ void MythPopupBox::ShowPopup(QObject *target, const char *slot)
 void MythPopupBox::ShowPopupAtXY(int destx, int desty, 
                                  QObject *target, const char *slot)
 {
-    const QObjectList *objlist = children();
-    QObjectListIt it(*objlist);
-    QObject *objs;
+    QList< QObject* > objlist = children();
 
-    while ((objs = it.current()) != 0)
+    for (QList< QObject* >::Iterator it  = objlist.begin();
+                                     it != objlist.end();
+                                   ++it )
     {
-        ++it;
+        QObject *objs = *it;
+
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
@@ -449,10 +510,12 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
 
     int x = 0, y = 0, maxw = 0, poph = 0;
 
-    it = QObjectListIt(*objlist);
-    while ((objs = it.current()) != 0)
+    for (QList< QObject* >::Iterator it  = objlist.begin();
+                                     it != objlist.end();
+                                   ++it )
     {
-        ++it;
+        QObject *objs = *it;
+
         if (objs->isWidgetType())
         {
             QString objname = objs->name();
@@ -511,7 +574,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for ( int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
 
@@ -567,16 +630,17 @@ DialogCode MythPopupBox::ExecPopupAtXY(int destx, int desty,
 
 void MythPopupBox::defaultButtonPressedHandler(void)
 {
-    const QObjectList *objlist = children();
-    QObjectListIt itf(*objlist);
-    QObject *objs;
+    QList< QObject* > objlist = children();
+
     int i = 0;
     bool foundbutton = false;
 
-    // this bit of code will work if the window is focused
-    while ((objs = itf.current()) != 0)
+    for (QList< QObject* >::Iterator it  = objlist.begin();
+                                     it != objlist.end();
+                                   ++it )
     {
-        ++itf;
+        QObject *objs = *it;
+
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
@@ -598,11 +662,13 @@ void MythPopupBox::defaultButtonPressedHandler(void)
     }
 
     // this bit of code should always work but requires a cast
-    QObjectListIt itd(*objlist);
     i = 0;
-    while ((objs = itd.current()) != 0)
+    for (QList< QObject* >::Iterator it  = objlist.begin();
+                                     it != objlist.end();
+                                   ++it )
     {
-        ++itd;
+        QObject *objs = *it;
+
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
@@ -641,7 +707,7 @@ bool MythPopupBox::showOkPopup(
     MythPopupBox *popup = new MythPopupBox(parent, title);
 
     popup->addLabel(message, MythPopupBox::Medium, true);
-    QButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
+    QAbstractButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
     okButton->setFocus();
     bool ret = (kDialogCodeAccepted == popup->ExecPopup());
 
@@ -657,9 +723,8 @@ bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
     MythPopupBox *popup = new MythPopupBox(parent, title);
 
     popup->addLabel(message, Medium, true);
-    QButton *okButton = NULL, *cancelButton = NULL;
-    okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
-    cancelButton = popup->addButton(tr("Cancel"), popup, SLOT(reject()));
+    QAbstractButton *okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    QAbstractButton *cancelButton = popup->addButton(tr("Cancel"), popup, SLOT(reject()));
 
     if (focusOk)
         okButton->setFocus();
@@ -694,7 +759,7 @@ bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
     
     bool ok = (Accepted == popup->ExecPopup());
     if (ok)
-        text = QDeepCopy<QString>(textEdit->text());
+        text = textEdit->text();
 
     popup->hide();
     popup->deleteLater();
@@ -731,7 +796,7 @@ QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
 
     QString password = QString::null;
     if (popup->ExecPopup() == Accepted)
-        password = QDeepCopy<QString>(entry->text());
+        password = entry->text();
 
     popup->hide();
     popup->deleteLater();
@@ -755,7 +820,7 @@ DialogCode MythPopupBox::ShowButtonPopup(
     const uint def = CalcItemIndex(default_button);
     for (unsigned int i = 0; i < buttonmsgs.size(); i++ )
     {
-        QButton *but = popup->addButton(buttonmsgs[i]);
+        QAbstractButton *but = popup->addButton(buttonmsgs[i]);
         if (def == i)
             but->setFocus();
     }
@@ -786,15 +851,15 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
     setFixedSize(QSize(screenwidth - xoff * 2, yoff));
 
-    QVBoxLayout *lay = new QVBoxLayout(this, 0);
+    Q3VBoxLayout *lay = new Q3VBoxLayout(this, 0);
 
-    QVBox *vbox = new QVBox(this);
+    Q3VBox *vbox = new Q3VBox(this);
     lay->addWidget(vbox);
 
     vbox->setLineWidth(3);
     vbox->setMidLineWidth(3);
-    vbox->setFrameShape(QFrame::Panel);
-    vbox->setFrameShadow(QFrame::Raised);
+    vbox->setFrameShape(Q3Frame::Panel);
+    vbox->setFrameShadow(Q3Frame::Raised);
     vbox->setMargin((int)(15 * wmult));
 
     msglabel = new QLabel(vbox);
@@ -802,10 +867,10 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
     msglabel->setText(message);
     vbox->setStretchFactor(msglabel, 5);
 
-    QHBox *hbox = new QHBox(vbox);
+    Q3HBox *hbox = new Q3HBox(vbox);
     hbox->setSpacing(5);
     
-    progress = new QProgressBar(totalSteps, hbox);
+    progress = new Q3ProgressBar(totalSteps, hbox);
     progress->setBackgroundOrigin(ParentOrigin);
 
     if (cancelButton && slot && target)
@@ -819,7 +884,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
 
     if (class LCD * lcddev = LCD::Get())
     {
-        textItems = new QPtrList<LCDTextItem>;
+        textItems = new Q3PtrList<LCDTextItem>;
         textItems->setAutoDelete(true);
 
         textItems->clear();
@@ -893,7 +958,7 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -1036,7 +1101,7 @@ bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filen
     //
 
     //  Loop over containers
-    QPtrListIterator<LayerSet> an_it(my_containers);
+    Q3PtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
     while ((looper = an_it.current()) != 0)
     {
@@ -1075,7 +1140,7 @@ bool MythThemedDialog::buildFocusList()
 
     //  Loop over containers
     LayerSet *looper;
-    QPtrListIterator<LayerSet> another_it(my_containers);
+    Q3PtrListIterator<LayerSet> another_it(my_containers);
     while ((looper = another_it.current()) != 0)
     {
         //  Loop over UITypes within each container
@@ -1302,7 +1367,7 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
     whole_dialog_painter.drawPixmap(inv_rect.topLeft(), my_background,
                                     inv_rect);
 
-    QPtrListIterator<LayerSet> an_it(my_containers);
+    Q3PtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
 
     while ((looper = an_it.current()) != 0)
@@ -1377,7 +1442,7 @@ bool MythThemedDialog::assignFirstFocus()
         widget_with_current_focus->looseFocus();
     }
 
-    QPtrListIterator<UIType> an_it(focus_taking_widgets);
+    Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
     UIType *looper;
 
     while ((looper = an_it.current()) != 0)
@@ -1399,7 +1464,7 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
     if (up_or_down)
     {
         bool reached_current = false;
-        QPtrListIterator<UIType> an_it(focus_taking_widgets);
+        Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
         UIType *looper;
 
         while ((looper = an_it.current()) != 0)
@@ -1428,7 +1493,7 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
     else
     {
         bool reached_current = false;
-        QPtrListIterator<UIType> an_it(focus_taking_widgets);
+        Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
         an_it.toLast();
         UIType *looper;
 
@@ -1509,7 +1574,7 @@ UIType* MythThemedDialog::getUIObject(const QString &name)
     //  UIType objects "owned" by this dialog
     //
 
-    QPtrListIterator<LayerSet> an_it(my_containers);
+    Q3PtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
 
     while ((looper = an_it.current()) != 0)
@@ -1632,7 +1697,7 @@ UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
 
 LayerSet* MythThemedDialog::getContainer(const QString& name)
 {
-    QPtrListIterator<LayerSet> an_it(my_containers);
+    Q3PtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
 
     while( (looper = an_it.current()) != 0)
@@ -1685,9 +1750,9 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     this->setGeometry((screenwidth - 250 ) / 2,
                       (screenheight - 50 ) / 2,
                       totalWidth,50);
-    QFrame *outside_border = new QFrame(this);
+    Q3Frame *outside_border = new Q3Frame(this);
     outside_border->setGeometry(0,0,totalWidth,50);
-    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
+    outside_border->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised );
     outside_border->setLineWidth(4);
     QLabel *message_label = new QLabel(message, this);
     message_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -1711,7 +1776,7 @@ void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -1773,7 +1838,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -1931,7 +1996,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     //  Make a nice border
     //
 
-    this->setFrameStyle(QFrame::Panel | QFrame::Raised );
+    this->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised );
     this->setLineWidth(4);
 
 
@@ -1993,7 +2058,7 @@ void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2031,10 +2096,10 @@ void MythImageFileDialog::buildTree(QString starting_where)
     //
     //  Go through the files and build a tree
     //    
-    for(uint i = 0; i < image_files.count(); ++i)
+    for(int i = 0; i < image_files.count(); ++i)
     {
         bool make_active = false;
-        QString file_string = *(image_files.at(i));
+        QString file_string = image_files[ i ];
         if (file_string == *selected_file)
         {
             make_active = true;
@@ -2087,7 +2152,16 @@ void MythImageFileDialog::buildTree(QString starting_where)
 
 void MythImageFileDialog::buildFileList(QString directory)
 {
-    QStringList imageExtensions = QImage::inputFormatList();
+    QStringList imageExtensions;
+
+    QList< QByteArray > exts = QImageReader::supportedImageFormats();
+
+    for (QList< QByteArray >::Iterator it  = exts.begin();
+                                       it != exts.end();
+                                     ++it )
+    {
+        imageExtensions.append( QString( *it ) );
+    }
 
     // Expand the list Qt gives us, working off what we know was built into
     // Qt based on the list it gave us
@@ -2100,44 +2174,43 @@ void MythImageFileDialog::buildFileList(QString directory)
     if (!d.exists())
         return;
 
-    const QFileInfoList *list = d.entryInfoList();
-
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
     QRegExp r;
-    while ((fi = it.current()) != 0)
+
+    QFileInfoList list = d.entryInfoList();
+
+    for( QFileInfoList::iterator it = list.begin();
+                                 it != list.end();
+                               ++it )
     {
-        ++it;
-        if (fi->fileName() == "." ||
-            fi->fileName() == ".." )
+        QFileInfo &fi = *it;
+
+        if (fi.fileName() == "." ||
+            fi.fileName() == ".." )
         {
             continue;
         }
             
-        if (fi->isDir())
+        if (fi.isDir())
         {
-            buildFileList(fi->absFilePath());
+            buildFileList(fi.absFilePath());
         }
         else
         {
-            r.setPattern("^" + fi->extension() + "$");
+            r.setPattern("^" + fi.extension() + "$");
             r.setCaseSensitive(false);
             QStringList result = imageExtensions.grep(r);
             if (!result.isEmpty())
             {
-                image_files.append(fi->absFilePath());
+                image_files.append(fi.absFilePath());
             }
             else
             {
-                r.setPattern("^" + fi->extension());
+                r.setPattern("^" + fi.extension());
                 r.setCaseSensitive(false);
                 QStringList other_result = imageExtensions.grep(r);
                 if (!result.isEmpty())
                 {
-                    image_files.append(fi->absFilePath());
+                    image_files.append(fi.absFilePath());
                 }
             }
         }
@@ -2184,7 +2257,7 @@ MythImageFileDialog::~MythImageFileDialog()
 MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
                                    MythScrollDialog::ScrollMode mode,
                                    const char *name)
-    : QScrollView(parent, name)
+    : Q3ScrollView(parent, name)
 {
     if (!parent)
     {
@@ -2211,9 +2284,9 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     setFont(m_defaultMediumFont);
     setCursor(QCursor(Qt::ArrowCursor));
     
-    setFrameShape(QFrame::NoFrame);
-    setHScrollBarMode(QScrollView::AlwaysOff);
-    setVScrollBarMode(QScrollView::AlwaysOff);
+    setFrameShape(Q3Frame::NoFrame);
+    setHScrollBarMode(Q3ScrollView::AlwaysOff);
+    setVScrollBarMode(Q3ScrollView::AlwaysOff);
     setFixedSize(QSize(m_screenWidth, m_screenHeight));
 
     gContext->ThemeWidget(viewport());
@@ -2300,7 +2373,7 @@ DialogCode MythScrollDialog::result(void) const
 
 void MythScrollDialog::show()
 {
-    QScrollView::show();    
+    Q3ScrollView::show();
 }
 
 void MythScrollDialog::hide()
@@ -2310,11 +2383,10 @@ void MythScrollDialog::hide()
 
     // Reimplemented to exit a modal when the dialog is hidden.
     QWidget::hide();
-    QEventLoop *qteloop = QApplication::eventLoop();
-    if (m_inLoop && qteloop)
+    if (m_inLoop)
     {
+        emit leaveModality();
         m_inLoop = false;
-        qteloop->exitLoop();
     }
 }
 
@@ -2333,11 +2405,9 @@ DialogCode MythScrollDialog::exec(void)
 
     m_inLoop = true;
 
-    QEventLoop *qteloop = QApplication::eventLoop();
-    if (!qteloop)
-        return kDialogCodeRejected;
-
-    qteloop->enterLoop();
+    QEventLoop eventLoop;
+    connect(this, SIGNAL(leaveModality()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
 
     DialogCode res = result();
 
@@ -2373,7 +2443,7 @@ void MythScrollDialog::keyPressEvent(QKeyEvent *e)
 
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -2383,8 +2453,8 @@ void MythScrollDialog::keyPressEvent(QKeyEvent *e)
             else if (action == "UP" || action == "LEFT")
             {
                 if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                     focusWidget()->focusPolicy() == QWidget::WheelFocus))
+                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                     focusWidget()->focusPolicy() == Qt::WheelFocus))
                 {
                 }
                 else
@@ -2393,8 +2463,8 @@ void MythScrollDialog::keyPressEvent(QKeyEvent *e)
             else if (action == "DOWN" || action == "RIGHT")
             {
                 if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                     focusWidget()->focusPolicy() == QWidget::WheelFocus)) 
+                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                                             focusWidget()->focusPolicy() == Qt::WheelFocus))
                 {
                 }
                 else
@@ -2464,7 +2534,7 @@ void MythScrollDialog::paintEvent(QRegion&, int , int , int , int )
 void MythScrollDialog::setContentsPos(int x, int y)
 {
     viewport()->setUpdatesEnabled(false);
-    QScrollView::setContentsPos(x,y);
+    Q3ScrollView::setContentsPos(x,y);
     viewport()->setUpdatesEnabled(true);
     updateContents();
 }

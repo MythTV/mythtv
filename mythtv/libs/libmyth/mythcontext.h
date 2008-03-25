@@ -1,22 +1,15 @@
 #ifndef MYTHCONTEXT_H_
 #define MYTHCONTEXT_H_
 
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qpixmap.h>
-#include <qpalette.h>
-#include <qobject.h>
-#include <qptrlist.h>
-#include <qevent.h>
-#include <qmutex.h>
-#include <qstringlist.h>
-#include <qnetwork.h> 
-#include <qmap.h>
-
 #include <cerrno>
 #include <iostream>
 #include <sstream>
 #include <vector>
+
+#include <QObject>
+#include <QString>
+#include <QMutex>
+#include <Q3ValueList>
 
 #include "mythexp.h"
 #include "mythobservable.h"
@@ -25,9 +18,13 @@
 
 using namespace std;
 
-#if (QT_VERSION < 0x030300)
-#error You need Qt version >= 3.3.0 to compile MythTV.
+#if (QT_VERSION < 0x040300)
+#error You need Qt version >= 4.3.0 to compile MythTV.
 #endif
+
+class QFont;
+class QImage;
+class QPixmap;
 
 class Settings;
 class QSqlDatabase;
@@ -106,7 +103,7 @@ class MPUBLIC MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.22.20080320-1"
+#define MYTH_BINARY_VERSION "0.22.20080320-2"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -201,11 +198,12 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     // Parse an X11 style command line (-geometry) string
     bool ParseGeometryOverride(const QString geometry);
+    bool IsGeometryOverridden(void);
 
     QString FindThemeDir(const QString &themename);
     QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
-    QValueList<QString> GetThemeSearchPath(void);
+    Q3ValueList<QString> GetThemeSearchPath(void);
 
     QString GetMenuThemeDir(void);
 
@@ -349,7 +347,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     QString app_binary_version;
 
     QMutex locationLock;
-    QValueList <QString> currentLocation;
+    Q3ValueList <QString> currentLocation;
 };
 
 /// This global variable contains the MythContext instance for the application

@@ -8,6 +8,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <qbuffer.h>
+
 #include "soapclient.h"
 
 #include "mythcontext.h"  // for VERBOSE
@@ -161,7 +163,7 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     // --------------------------------------------------------------
 
     QByteArray  aBuffer;
-    QTextStream os( aBuffer, IO_WriteOnly );
+    QTextStream os( &aBuffer );
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"; 
     os << "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n";
@@ -185,15 +187,17 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     os << " </s:Body>\r\n";
     os << "</s:Envelope>\r\n";
 
+    os.flush();
+
     // --------------------------------------------------------------
     // Perform Request
     // --------------------------------------------------------------
 
-    QBuffer buff( aBuffer );
+    QBuffer     buff( &aBuffer );
 
     QString sXml = HttpComms::postHttp( url, 
                                         &header,
-                                        &buff,
+                                        (QIODevice *)&buff,
                                         10000, // ms
                                         3,     // retries
                                         0,     // redirects

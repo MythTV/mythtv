@@ -13,7 +13,7 @@ using namespace std;
 // Qt headers
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <qsocket.h>
+#include <q3socket.h>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -1327,6 +1327,11 @@ void TVRec::RunTV(void)
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     while (HasFlags(kFlagRunMainLoop))
     {
         // If there is a state change queued up, do it...
@@ -1481,7 +1486,7 @@ void TVRec::RunTV(void)
             lock.mutex()->unlock();
             sched_yield();
             triggerEventSleep.wakeAll();
-            triggerEventLoop.wait(1000 /* ms */);
+            triggerEventLoop.wait(&mutex, 1000 /* ms */);
             lock.mutex()->lock();
         }
     }
@@ -1495,9 +1500,15 @@ void TVRec::RunTV(void)
 
 bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 {
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
     bool ok = false;
     MythTimer t;
     t.start();
+
     while (!ok && ((unsigned long) t.elapsed()) < time)
     {
         if (wake)
@@ -1507,7 +1518,7 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
         // It is possible for triggerEventSleep.wakeAll() to be sent
         // before we enter wait so we only wait 100 ms so we can try
         // again a few times before 15 second timeout on frontend...
-        triggerEventSleep.wait(100);
+        triggerEventSleep.wait(&mutex, 100);
         stateChangeLock.lock();
 
         // verify that we were triggered.
@@ -1621,25 +1632,25 @@ bool TVRec::GetDevices(int cardid,
     // General options
     test = query.value(0).toString();
     if (test != QString::null)
-        gen_opts.videodev = QString::fromUtf8(test);
+        gen_opts.videodev = test;
 
     test = query.value(1).toString();
     if (test != QString::null)
-        gen_opts.vbidev = QString::fromUtf8(test);
+        gen_opts.vbidev = test;
 
     test = query.value(2).toString();
     if (test != QString::null)
-        gen_opts.audiodev = QString::fromUtf8(test);
+        gen_opts.audiodev = test;
 
     gen_opts.audiosamplerate = max(testnum, query.value(3).toInt());
 
     test = query.value(4).toString();
     if (test != QString::null)
-        gen_opts.defaultinput = QString::fromUtf8(test);
+        gen_opts.defaultinput = test;
 
     test = query.value(5).toString();
     if (test != QString::null)
-        gen_opts.cardtype = QString::fromUtf8(test);
+        gen_opts.cardtype = test;
 
     gen_opts.skip_btaudio = query.value(6).toUInt();
 
@@ -1666,7 +1677,7 @@ bool TVRec::GetDevices(int cardid,
 
     test = query.value(fireoff + 1).toString();
     if (test != QString::null)
-        firewire_opts.model = QString::fromUtf8(test);
+        firewire_opts.model = test;
 
     firewire_opts.connection  = query.value(fireoff + 2).toUInt();
 
@@ -1676,7 +1687,7 @@ bool TVRec::GetDevices(int cardid,
 
     test = query.value(dbox2off + 1).toString();
     if (test != QString::null)
-        dbox2_opts.host = QString::fromUtf8(test);
+        dbox2_opts.host = test;
 
     dbox2_opts.httpport = query.value(dbox2off + 2).toUInt();
 
@@ -1703,7 +1714,7 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     }
     else if (query.next())
     {
-        startchan = QString::fromUtf8(query.value(0).toString());
+        startchan = query.value(0).toString();
         if (!startchan.isEmpty())
         {
             VERBOSE(VB_CHANNEL, LOC + QString("Start channel: %1.")
@@ -1730,7 +1741,7 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     }
     while (query.next())
     {
-        startchan = QString::fromUtf8(query.value(0).toString());
+        startchan = query.value(0).toString();
         if (!startchan.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Start channel from DB is "
@@ -1755,7 +1766,7 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     }
     while (query.next())
     {
-        startchan = QString::fromUtf8(query.value(0).toString());
+        startchan = query.value(0).toString();
         if (!startchan.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Start channel invalid, "
@@ -2215,7 +2226,7 @@ bool TVRec::CheckChannel(QString name) const
  */
 static QString add_spacer(const QString &channel, const QString &spacer)
 {
-    QString chan = QDeepCopy<QString>(channel);
+    QString chan = Q3DeepCopy<QString>(channel);
     if ((chan.length() >= 2) && !spacer.isEmpty())
         return chan.left(chan.length()-1) + spacer + chan.right(1);
     return chan;
@@ -2322,7 +2333,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     if (fchanid.size() == 1) // Unique channel...
     {
-        needed_spacer = QDeepCopy<QString>(fspacer[0]);
+        needed_spacer = Q3DeepCopy<QString>(fspacer[0]);
         bool nc       = (fchannum[0] != add_spacer(prefix, fspacer[0]));
 
         is_complete_valid_channel_on_rec = (nc) ? 0 : fcardid[0];
@@ -2366,7 +2377,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     for (uint i = 0; (i < fspacer.size() && spacer_needed); i++)
         spacer_needed = !fspacer[i].isEmpty();
     if (spacer_needed)
-        needed_spacer = QDeepCopy<QString>(fspacer[0]);
+        needed_spacer = Q3DeepCopy<QString>(fspacer[0]);
 
     // If it isn't useful to wait for more characters,
     // then try to commit to any true match immediately.
@@ -2374,7 +2385,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     {
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
-            needed_spacer = QDeepCopy<QString>(fspacer[i]);
+            needed_spacer = Q3DeepCopy<QString>(fspacer[i]);
             is_complete_valid_channel_on_rec = fcardid[i];
             return true;
         }
@@ -3146,10 +3157,10 @@ void TVRec::GetNextProgram(int direction,
     }
     else if (query.next())
     {
-        title     = QString::fromUtf8(query.value(0).toString());
-        subtitle  = QString::fromUtf8(query.value(1).toString());
-        desc      = QString::fromUtf8(query.value(2).toString());
-        category  = QString::fromUtf8(query.value(3).toString());
+        title     = query.value(0).toString();
+        subtitle  = query.value(1).toString();
+        desc      = query.value(2).toString();
+        category  = query.value(3).toString();
         starttime = query.value(4).toString();
         endtime   = query.value(5).toString();
         callsign  = query.value(6).toString();
@@ -3347,7 +3358,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 
     uint    sourceid   = channel->GetCurrentSourceID();
     QString oldchannum = channel->GetCurrentName();
-    QString newchannum = QDeepCopy<QString>(request.channel);
+    QString newchannum = Q3DeepCopy<QString>(request.channel);
 
     if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
     {

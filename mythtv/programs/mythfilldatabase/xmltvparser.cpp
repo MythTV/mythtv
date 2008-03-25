@@ -2,6 +2,7 @@
 #include <qfile.h>
 #include <qstringlist.h>
 #include <qdatetime.h>
+#include <Q3ValueList>
 
 // C++ headers
 #include <iostream>
@@ -51,7 +52,7 @@ QString getFirstText(QDomElement element)
     return "";
 }
 
-ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl baseUrl)
+ChanInfo *XMLTVParser::parseChannel(QDomElement &element, Q3Url baseUrl)
 {
     ChanInfo *chaninfo = new ChanInfo;
 
@@ -75,7 +76,7 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                QUrl iconUrl(baseUrl, info.attribute("src", ""), true);
+                Q3Url iconUrl(baseUrl, info.attribute("src", ""), true);
                 chaninfo->iconpath = iconUrl.toString();
             }
             else if (info.tagName() == "display-name")
@@ -169,7 +170,7 @@ void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 84
     }
     else
     {
-        cerr << "Ignoring unknown timestamp format: " << ts << endl;
+        cerr << "Ignoring unknown timestamp format: " << (const char *)ts << endl;
         return;
     }
 
@@ -488,7 +489,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     partnumber = QString::number(tmp);
                 }
                 
-                if (partnumber != 0 && parttotal >= partnumber && !parttotal.isEmpty())
+                if (!parttotal.isEmpty() && parttotal >= partnumber)
                 {
                     pginfo->parttotal = parttotal;
                     pginfo->partnumber = partnumber;
@@ -576,13 +577,13 @@ ProgInfo *XMLTVParser::parseProgram(
 }
                   
 bool XMLTVParser::parseFile(
-    QString filename, QValueList<ChanInfo> *chanlist,
-    QMap<QString, QValueList<ProgInfo> > *proglist)
+    QString filename, Q3ValueList<ChanInfo> *chanlist,
+    QMap<QString, Q3ValueList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
     QFile f;
 
-    if (!dash_open(f, filename, IO_ReadOnly))
+    if (!dash_open(f, filename, QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for reading.")
                 .arg(filename));
@@ -628,9 +629,9 @@ bool XMLTVParser::parseFile(
 
     QDomElement docElem = doc.documentElement();
 
-    QUrl baseUrl(docElem.attribute("source-data-url", ""));
+    Q3Url baseUrl(docElem.attribute("source-data-url", ""));
 
-    QUrl sourceUrl(docElem.attribute("source-info-url", ""));
+    Q3Url sourceUrl(docElem.attribute("source-info-url", ""));
     if (sourceUrl.toString() == "http://labs.zap2it.com/")
     {
         VERBOSE(VB_IMPORTANT, "Don't use tv_grab_na_dd, use the"

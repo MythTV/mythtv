@@ -9,6 +9,8 @@
 #include "mythuiimage.h"
 #include "mythfontproperties.h"
 
+#include "mythgesture.h"
+
 // A button is a:
 // - multi-state background image (active/selected/etc)
 // - Text (with a set of properties)
@@ -25,6 +27,8 @@ class MythUIButton : public MythUIType
 
     MythUIButton(MythUIType *parent, const char *name, bool doInit = true);
    ~MythUIButton();
+
+    virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
 
     void SetBackgroundImage(StateType state, MythImage *image);
     void SetCheckImage(MythUIStateType::StateType state, MythImage *image);

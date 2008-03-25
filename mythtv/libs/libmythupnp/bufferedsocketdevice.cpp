@@ -19,9 +19,9 @@
 
 BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 {
-    m_pSocket = new QSocketDevice();
+    m_pSocket = new Q3SocketDevice();
 
-    m_pSocket->setSocket         ( nSocket, QSocketDevice::Stream );
+    m_pSocket->setSocket         ( nSocket, Q3SocketDevice::Stream );
     m_pSocket->setBlocking       ( false );
     m_pSocket->setAddressReusable( true );
 
@@ -44,7 +44,7 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( QSocketDevice *pSocket /*= NULL*/, 
+BufferedSocketDevice::BufferedSocketDevice( Q3SocketDevice *pSocket /*= NULL*/,
                                             bool bTakeOwnership /* = false */ )
 {
 
@@ -111,7 +111,7 @@ bool BufferedSocketDevice::Connect( const QHostAddress &addr, Q_UINT16 port )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QSocketDevice *BufferedSocketDevice::SocketDevice()
+Q3SocketDevice *BufferedSocketDevice::SocketDevice()
 {
     return( m_pSocket );
 }
@@ -120,7 +120,7 @@ QSocketDevice *BufferedSocketDevice::SocketDevice()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void BufferedSocketDevice::SetSocketDevice( QSocketDevice *pSocket )
+void BufferedSocketDevice::SetSocketDevice( Q3SocketDevice *pSocket )
 {
     if ((m_bHandleSocketDelete) && (m_pSocket != NULL))
         delete m_pSocket;
@@ -310,16 +310,16 @@ void BufferedSocketDevice::Flush()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QIODevice::Offset BufferedSocketDevice::Size() 
+qlonglong BufferedSocketDevice::Size()
 {
-    return (QIODevice::Offset)BytesAvailable();
+    return (qlonglong)BytesAvailable();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QIODevice::Offset BufferedSocketDevice::At()
+qlonglong BufferedSocketDevice::At()
 {
     return( 0 );
 }
@@ -328,7 +328,7 @@ QIODevice::Offset BufferedSocketDevice::At()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool BufferedSocketDevice::At( QIODevice::Offset index )
+bool BufferedSocketDevice::At( qlonglong index )
 {
     ReadBytes();
 

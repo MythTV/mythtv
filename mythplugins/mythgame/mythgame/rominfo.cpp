@@ -253,7 +253,7 @@ void RomInfo::fillData()
     if (query.isActive() && query.size() > 0);
     {
         query.next();
-        if (query.value(0).toString()) 
+        if (!query.value(0).toString().isEmpty()) 
         {
             QString Image = query.value(0).toString() + "/" + romname;
             if (FindImage(query.value(0).toString() + "/" + romname, &Image))

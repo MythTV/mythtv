@@ -1,6 +1,5 @@
-#include <qstringlist.h>
-#include <qsqldatabase.h>
-#include <qmap.h>
+
+
 
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
@@ -32,7 +31,7 @@ class Transcode : public QObject
     RingBuffer *inRingBuffer;
     RingBuffer *outRingBuffer;
     FIFOWriter::FIFOWriter *fifow;
-    QPtrList<struct kfatable_entry> *kfa_table;
+    Q3PtrList<struct kfatable_entry> *kfa_table;
     bool showprogress;
 
     QString recorderOptions;

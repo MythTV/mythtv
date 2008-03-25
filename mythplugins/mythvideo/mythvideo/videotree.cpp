@@ -1,6 +1,9 @@
-#include <qapplication.h>
-
 #include <stdlib.h>
+
+#include <QApplication>
+#include <QPixmap>
+#include <QLabel>
+#include <QKeyEvent>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
@@ -141,7 +144,7 @@ class VideoTreeImp
             QSize img_size = video_poster->GetSize(true);
             const QPixmap *img = ImageCache::getImageCache()
                     .load(item->CoverFile(), img_size.width(),
-                          img_size.height(), QImage::ScaleFree);
+                          img_size.height(), Qt::IgnoreAspectRatio);
             if (img)
             {
                 video_poster->SetImage(*img);
@@ -279,9 +282,10 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
 
         if (action == "SELECT")
@@ -336,10 +340,10 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
     {
         gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (QStringList::const_iterator p = actions.begin();
+             p != actions.end() && !handled; ++p)
         {
-            QString action = actions[i];
-            if (action == "PLAYBACK")
+            if (*p == "PLAYBACK")
             {
                 handled = true;
                 playVideo(curitem);
@@ -453,7 +457,7 @@ void VideoTree::doMenu(bool info)
 {
     if (createPopup())
     {
-        QButton *focusButton = NULL;
+        QAbstractButton *focusButton = NULL;
         if (info)
         {
             focusButton = popup->addButton(tr("Watch This Video"), this,
@@ -527,7 +531,7 @@ void VideoTree::slotViewPlot()
                                               MythPopupBox::Small,true);
         plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
 
-        QButton *okButton = plotbox->addButton(
+        QAbstractButton *okButton = plotbox->addButton(
             QObject::tr("OK"), plotbox, SLOT(accept()));
         okButton->setFocus();
 

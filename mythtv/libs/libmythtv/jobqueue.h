@@ -6,6 +6,7 @@
 #include <qmutex.h>
 #include <qobject.h>
 #include <qsqldatabase.h>
+#include <QEvent>
 #include <qwaitcondition.h>
 #include <pthread.h>
 
@@ -101,7 +102,7 @@ class MPUBLIC JobQueue : public QObject
   public:
     JobQueue(bool master);
     ~JobQueue(void);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
     static bool QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes = JOB_NONE);
     static bool QueueJob(int jobType, QString chanid,

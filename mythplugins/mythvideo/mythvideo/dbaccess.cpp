@@ -1,12 +1,12 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythcontext.h>
 
-#include "dbaccess.h"
-#include "cleanup.h"
-
 #include <algorithm>
 #include <vector>
 #include <map>
+
+#include "dbaccess.h"
+#include "cleanup.h"
 
 namespace
 {
@@ -186,7 +186,7 @@ class SingleValueImp
             while (query.next())
             {
                 int id = query.value(0).toInt();
-                QString val = QString::fromUtf8(query.value(1).toString());
+                QString val = query.value(1).toString();
                 m_entries.insert(entry_map::value_type(id, val));
             }
         }

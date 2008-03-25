@@ -51,9 +51,9 @@ private:
         QString strNameCSV;          //!< name (csv form)
     };
     //! List of CSV entries
-    typedef QValueList<CSVEntry> ListEntries;
+    typedef Q3ValueList<CSVEntry> ListEntries;
     //! iterator over list of CSV entries
-    typedef QValueListIterator<CSVEntry> ListEntriesIter;
+    typedef Q3ValueListIterator<CSVEntry> ListEntriesIter;
 
     ListEntries m_listEntries;       //!< list of TV channels to search for
     ListEntries m_missingEntries;    //!< list of TV channels with no unique icon
@@ -67,9 +67,9 @@ private:
         QString strLogo;             //!< the actual logo
     };
     //! List of SearchEntry entries
-    typedef QValueList<SearchEntry> ListSearchEntries;
+    typedef Q3ValueList<SearchEntry> ListSearchEntries;
     //! iterator over list of SearchEntry entries
-    typedef QValueListIterator<SearchEntry> ListSearchEntriesIter;
+    typedef Q3ValueListIterator<SearchEntry> ListSearchEntriesIter;
 
     ListSearchEntries m_listSearch;  //!< the list of SearchEntry
     QString m_strMatches;            //!< the string for the submit() call

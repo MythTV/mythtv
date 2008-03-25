@@ -44,3 +44,6 @@ HEADERS += TemplateFinder.h TemplateMatcher.h
 HEADERS += HistogramAnalyzer.h
 HEADERS += BlankFrameDetector.h
 HEADERS += SceneChangeDetector.h
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

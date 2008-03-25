@@ -6,7 +6,7 @@
 
 #include "iptvchannel.h"
 
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -20,7 +20,7 @@
 IPTVChannel::IPTVChannel(TVRec         *parent,
                          const QString &videodev)
     : DTVChannel(parent),
-      m_videodev(QDeepCopy<QString>(videodev)),
+      m_videodev(Q3DeepCopy<QString>(videodev)),
       m_feeder(new IPTVFeederWrapper()),
       m_lock(true)
 {
@@ -111,7 +111,7 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = QDeepCopy<QString>(channum);
+    curchannelname = Q3DeepCopy<QString>(channum);
 
     // Set the dtv channel info for any additional multiplex tuning
     SetDTVInfo(/*atsc_major*/ 0, /*atsc_minor*/ 0,
@@ -179,7 +179,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
         }
 
         // Try to map name to a channel in the map
-        const QString name = QString::fromUtf8(query.value(1).toString());
+        const QString name = query.value(1).toString();
         for (it = m_freeboxchannels.begin();
              it != m_freeboxchannels.end(); ++it)
         {

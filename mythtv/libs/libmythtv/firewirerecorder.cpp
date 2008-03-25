@@ -181,7 +181,9 @@ bool FirewireRecorder::PauseAndWait(int timeout)
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        unpauseWait.wait(timeout);
+        QMutex unpause_lock;
+        unpause_lock.lock();
+        unpauseWait.wait(&unpause_lock, timeout);
     }
     if (!request_pause && paused)
     {

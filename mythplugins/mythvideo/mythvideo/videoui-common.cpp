@@ -12,7 +12,7 @@ void ShowCastDialog(MythMainWindow *wparent, Metadata &item)
     mlb->insertStringList(GetCastList(item));
     castbox->addWidget(mlb, true);
 
-    QButton *okButton = castbox->addButton(QObject::tr("Ok"));
+    QAbstractButton *okButton = castbox->addButton(QObject::tr("Ok"));
     okButton->setFocus();
 
     castbox->ExecPopup();

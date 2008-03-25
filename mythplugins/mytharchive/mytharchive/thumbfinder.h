@@ -4,6 +4,10 @@
 #include <qthread.h>
 #include <qstring.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 using namespace std;
 #include <iostream>
@@ -54,7 +58,7 @@ class ThumbFinder : public MythThemedDialog
   private:
     int  getChapterCount(const QString &menuTheme);
     QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                  QImage::ScaleMode mode);
+                                  Qt::AspectRatioMode mode);
     void changeSeekAmount(bool up);
     void updateThumb(void);
     void updateCurrentPos(void);
@@ -64,7 +68,7 @@ class ThumbFinder : public MythThemedDialog
 
     ArchiveItem    *m_archiveItem;
     int             m_thumbCount;
-    QPtrList<ThumbImage> m_thumbList;
+    Q3PtrList<ThumbImage> m_thumbList;
     QString         m_thumbDir;
 
     // avcodec stuff

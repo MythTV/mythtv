@@ -22,7 +22,7 @@
 // Qt headers
 #include <qregexp.h>
 #include <qstringlist.h>
-#include <qtextstream.h>
+#include <q3textstream.h>
 #include <qdatetime.h>
 
 // MythTV headers
@@ -46,7 +46,7 @@ QString  HttpServer::g_sPlatform;
 /////////////////////////////////////////////////////////////////////////////
 
 HttpServer::HttpServer( int nPort ) 
-          : QServerSocket( nPort, 20 ), //5),
+          : Q3ServerSocket( nPort, 20 ), //5),
             ThreadPool( "HTTP" )
 {
     m_extensions.setAutoDelete( true );

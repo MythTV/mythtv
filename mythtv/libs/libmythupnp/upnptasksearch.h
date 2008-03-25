@@ -19,7 +19,7 @@
 #endif
 
 // Qt headers
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 
 // MythTV headers
 #include "upnp.h"
@@ -53,8 +53,8 @@ class UPnpSearchTask : public Task
 
         virtual ~UPnpSearchTask();
 
-        void     ProcessDevice ( QSocketDevice *pSocket, UPnpDevice *pDevice );
-        void     SendMsg       ( QSocketDevice  *pSocket, 
+        void     ProcessDevice ( Q3SocketDevice *pSocket, UPnpDevice *pDevice );
+        void     SendMsg       ( Q3SocketDevice  *pSocket,
                                  QString         sST,
                                  QString         sUDN );
 

@@ -13,9 +13,9 @@
 
 #include <qdom.h>
 #include <qdatetime.h> 
-#include <qtextstream.h>
-#include <qdict.h>
-#include <qptrlist.h>
+#include <q3textstream.h>
+#include <q3dict.h>
+#include <q3ptrlist.h>
 
 class CDSObject;
 
@@ -59,9 +59,9 @@ class Property
         }
 };
 
-typedef QDict        < Property >  Properties;
-typedef QDictIterator< Property >  PropertiesIterator;
-typedef QPtrList     < CDSObject>  CDSObjects;
+typedef Q3Dict        < Property >  Properties;
+typedef Q3DictIterator< Property >  PropertiesIterator;
+typedef Q3PtrList     < CDSObject>  CDSObjects;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -92,7 +92,7 @@ class Resource
         }
 };
 
-typedef QPtrList < Resource > Resources;
+typedef Q3PtrList < Resource > Resources;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -118,7 +118,7 @@ class ContainerClass
         }
 };
 
-typedef QPtrList < ContainerClass > Classes;
+typedef Q3PtrList < ContainerClass > Classes;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -174,7 +174,7 @@ class CDSObject
         QString       GetPropValue( QString sName );
 
         QString       toXml      ();
-        void          toXml      ( QTextStream &os );
+        void          toXml      ( Q3TextStream &os );
 
         long          GetChildCount();
         void          SetChildCount( long nCount );

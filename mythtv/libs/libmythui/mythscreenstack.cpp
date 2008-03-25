@@ -7,7 +7,7 @@
 #include <cassert>
 using namespace std;
 
-#include <qobjectlist.h>
+#include <qobject.h>
 #include <qapplication.h>
 
 const int kFadeVal = 10;
@@ -111,7 +111,7 @@ void MythScreenStack::PopScreen(bool allowFade)
 
     if (!m_Children.isEmpty())
     {
-        QValueVector<MythScreenType *>::Iterator it;
+        QVector<MythScreenType *>::Iterator it;
         for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
             if (*it != top && !(*it)->IsDeleting())
@@ -142,7 +142,7 @@ MythScreenType *MythScreenStack::GetTopScreen(void)
     return NULL;
 }
 
-void MythScreenStack::GetDrawOrder(QValueVector<MythScreenType *> &screens)
+void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
 {
     if (m_InNewTransition)
         CheckNewFadeTransition();
@@ -158,7 +158,7 @@ void MythScreenStack::RecalculateDrawOrder(void)
     if (m_Children.isEmpty())
         return;
 
-    QValueVector<MythScreenType *>::Iterator it;
+    QVector<MythScreenType *>::Iterator it;
 
     for (it = m_Children.begin(); it != m_Children.end(); ++it)
     {
@@ -186,7 +186,7 @@ void MythScreenStack::DoNewFadeTransition(void)
 
     if (newTop->IsFullscreen())
     {
-        QValueVector<MythScreenType *>::Iterator it;
+        QVector<MythScreenType *>::Iterator it;
         for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
             if (!(*it)->IsDeleting())
@@ -223,7 +223,7 @@ void MythScreenStack::CheckDeletes(void)
 
     bool changed = false;
 
-    QValueVector<MythScreenType *>::Iterator it = m_ToDelete.begin();
+    QVector<MythScreenType *>::Iterator it = m_ToDelete.begin();
     while (it != m_ToDelete.end() && !m_ToDelete.isEmpty())
     {
         bool deleteit = false;
@@ -237,7 +237,7 @@ void MythScreenStack::CheckDeletes(void)
         {
             bool found = false;
 
-            QValueVector<MythScreenType *>::Iterator test;
+            QVector<MythScreenType *>::Iterator test;
             for (test = m_DrawOrder.begin(); test != m_DrawOrder.end(); ++test)
             {
                 if (*it == *test)
@@ -253,7 +253,7 @@ void MythScreenStack::CheckDeletes(void)
 
         if (deleteit)
         {
-            QValueVector<MythScreenType *>::Iterator test;
+            QVector<MythScreenType *>::Iterator test;
             for (test = m_Children.begin(); test != m_Children.end(); ++test)
             {
                 if (*test == *it)

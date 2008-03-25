@@ -1,6 +1,8 @@
 #include <cassert>
 #include <qpainter.h>
 #include <qpixmap.h>
+#include <qvector.h>
+
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
@@ -41,51 +43,22 @@ void MythQtPainter::Begin(QWidget *parent)
 
     MythPainter::Begin(parent);
 
-    // Oddly enough, caching these makes drawing slower.
-    mainPainter = new QPainter(parent);
-    drawPixmap = new QPixmap(parent->size());
-    painter = new QPainter(drawPixmap);
-
+    painter = new QPainter(parent);
     clipRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
 void MythQtPainter::End(void)
 {
     painter->end();
-
-    if (!clipRegion.isEmpty() && !clipRegion.isNull())
-    {
-        QMemArray<QRect> rects = clipRegion.rects();
-
-        for (unsigned int i = 0; i < rects.size(); i++)
-        {
-            QRect rect = rects[i];
-
-            if (rect.width() == 0 || rect.height() == 0)
-                continue;
-
-            mainPainter->drawPixmap(rect.topLeft(), *drawPixmap, rect);
-        }
-    }
-    else
-        mainPainter->drawPixmap(0, 0, *drawPixmap);
-
-    mainPainter->end();
-
     delete painter;
-    delete drawPixmap;
-    delete mainPainter;
 
     MythPainter::End();
 }
 
 void MythQtPainter::SetClipRect(const QRect &clipRect)
 {
-    if (clipRect.size() == drawPixmap->size())
-        return;
-
     painter->setClipRect(clipRect);
-    if (clipRect != QRect())
+    if (!clipRect.isEmpty())
     {
         painter->setClipping(true);
         if (clipRegion.isNull() || clipRegion.isEmpty())

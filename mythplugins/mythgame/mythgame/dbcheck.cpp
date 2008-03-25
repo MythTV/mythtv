@@ -1,4 +1,6 @@
 #include <qstring.h>
+//Added by qt3to4:
+#include <QSqlError>
 
 #include <iostream>
 using namespace std;
@@ -10,7 +12,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1012";
+const QString currentDatabaseVersion = "1014";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -39,8 +41,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.prepare(thequery);
-        query.exec();
+        query.exec(thequery);
 
         if (query.lastError().type() != QSqlError::None)
         {
@@ -137,11 +138,11 @@ bool UpgradeGameDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("GameDBSchemaVer");
     MSqlQuery query(MSqlQuery::InitCon());
-   
+
     if (dbver == currentDatabaseVersion)
         return true;
 
-    if (dbver == "")
+    if (dbver.isEmpty())
     {
         if (!InitializeDatabase())
             return false;
@@ -199,7 +200,7 @@ bool UpgradeGameDatabaseSchema(void)
     if (dbver == "1006")
     {   
         
-        if (gContext->GetSetting("GameAllTreeLevels"))
+        if (!gContext->GetSetting("GameAllTreeLevels").isEmpty())
             query.exec("UPDATE settings SET data = 'system gamename' WHERE value = 'GameAllTreeLevels'; ");
 
         QString updates[] = {
@@ -287,6 +288,101 @@ bool UpgradeGameDatabaseSchema(void)
 };
 
         if (!performActualUpdate(updates, "1012", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1012")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE gamemetadata"
+"  MODIFY system varbinary(128) NOT NULL default '',"
+"  MODIFY romname varbinary(128) NOT NULL default '',"
+"  MODIFY gamename varbinary(128) NOT NULL default '',"
+"  MODIFY genre varbinary(128) NOT NULL default '',"
+"  MODIFY year varbinary(10) NOT NULL default '',"
+"  MODIFY publisher varbinary(128) NOT NULL default '',"
+"  MODIFY rompath varbinary(255) NOT NULL default '',"
+"  MODIFY gametype varbinary(64) NOT NULL default '',"
+"  MODIFY country varbinary(128) NOT NULL default '',"
+"  MODIFY crc_value varbinary(64) NOT NULL default '',"
+"  MODIFY version varbinary(64) NOT NULL default '';",
+"ALTER TABLE gameplayers"
+"  MODIFY playername varbinary(64) NOT NULL default '',"
+"  MODIFY workingpath varbinary(255) NOT NULL default '',"
+"  MODIFY rompath varbinary(255) NOT NULL default '',"
+"  MODIFY screenshots varbinary(255) NOT NULL default '',"
+"  MODIFY commandline blob NOT NULL,"
+"  MODIFY gametype varbinary(64) NOT NULL default '',"
+"  MODIFY extensions varbinary(128) NOT NULL default '';",
+"ALTER TABLE romdb"
+"  MODIFY crc varbinary(64) NOT NULL default '',"
+"  MODIFY name varbinary(128) NOT NULL default '',"
+"  MODIFY description varbinary(128) NOT NULL default '',"
+"  MODIFY category varbinary(128) NOT NULL default '',"
+"  MODIFY year varbinary(10) NOT NULL default '',"
+"  MODIFY manufacturer varbinary(128) NOT NULL default '',"
+"  MODIFY country varbinary(128) NOT NULL default '',"
+"  MODIFY publisher varbinary(128) NOT NULL default '',"
+"  MODIFY platform varbinary(64) NOT NULL default '',"
+"  MODIFY flags varbinary(64) NOT NULL default '',"
+"  MODIFY version varbinary(64) NOT NULL default '',"
+"  MODIFY binfile varbinary(64) NOT NULL default '';",
+""
+};
+
+        if (!performActualUpdate(updates, "1013", dbver))
+            return false;
+    }
+
+
+    if (dbver == "1013")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
+        .arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE gamemetadata"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY system varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY romname varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY gamename varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY genre varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY year varchar(10) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY publisher varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rompath varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY gametype varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY country varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY crc_value varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY version varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE gameplayers"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY playername varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY workingpath varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rompath varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY screenshots varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY commandline text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY gametype varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY extensions varchar(128) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE romdb"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY crc varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY category varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY year varchar(10) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY manufacturer varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY country varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY publisher varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY platform varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY flags varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY version varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY binfile varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+""
+};
+
+        if (!performActualUpdate(updates, "1014", dbver))
             return false;
     }
 

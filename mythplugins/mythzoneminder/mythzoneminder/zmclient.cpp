@@ -187,7 +187,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
 
 bool ZMClient::checkProtoVersion(void)
 {
-    QStringList strList = "HELLO";
+    QStringList strList("HELLO");
     if (!sendReceiveStringList(strList))
     {
         VERBOSE(VB_IMPORTANT, QString("Server didn't respond to 'HELLO'!!"));
@@ -253,7 +253,7 @@ ZMClient::~ZMClient()
 
 void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskStat)
 {
-    QStringList strList = "GET_SERVER_STATUS";
+    QStringList strList("GET_SERVER_STATUS");
     if (!sendReceiveStringList(strList))
         return;
 
@@ -266,7 +266,7 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
 {
     monitorList->clear();
 
-    QStringList strList = "GET_MONITOR_STATUS";
+    QStringList strList("GET_MONITOR_STATUS");
     if (!sendReceiveStringList(strList))
         return;
 
@@ -294,7 +294,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
 {
     eventList->clear();
 
-    QStringList strList = "GET_EVENT_LIST";
+    QStringList strList("GET_EVENT_LIST");
     strList << monitorName << (oldestFirst ? "1" : "0") ;
     strList << date;
 
@@ -342,7 +342,7 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
 {
     dateList.clear();
 
-    QStringList strList = "GET_EVENT_DATES";
+    QStringList strList("GET_EVENT_DATES");
     strList << monitorName << (oldestFirst ? "1" : "0") ;
 
     if (!sendReceiveStringList(strList))
@@ -376,7 +376,7 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
 {
     frameList->clear();
 
-    QStringList strList = "GET_FRAME_LIST";
+    QStringList strList("GET_FRAME_LIST");
     strList << QString::number(eventID);
     if (!sendReceiveStringList(strList))
         return;
@@ -410,7 +410,7 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
 
 void ZMClient::deleteEvent(int eventID)
 {
-    QStringList strList = "DELETE_EVENT";
+    QStringList strList("DELETE_EVENT");
     strList << QString::number(eventID);
     sendReceiveStringList(strList);
 }
@@ -418,7 +418,7 @@ void ZMClient::deleteEvent(int eventID)
 void ZMClient::deleteEventList(vector<Event*> *eventList)
 {
     // delete events in 100 event chunks
-    QStringList strList = "DELETE_EVENT_LIST";
+    QStringList strList("DELETE_EVENT_LIST");
     int count = 0;
     vector<Event*>::iterator it;
     for (it = eventList->begin(); it != eventList->end(); it++)
@@ -428,7 +428,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
         if (++count == 100)
         {
             sendReceiveStringList(strList);
-            strList = "DELETE_EVENT_LIST";
+            strList = QStringList("DELETE_EVENT_LIST");
             count = 0;
         }
     }
@@ -437,7 +437,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
     sendReceiveStringList(strList);
 
     // run zmaudit to clean up the orphaned db entries
-    strList = "RUN_ZMAUDIT";
+    strList = QStringList("RUN_ZMAUDIT");
     sendReceiveStringList(strList);
 }
 
@@ -461,7 +461,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
                 timer.start();
             }
         }
-        else if (sret < 0 && m_socket->error() != QSocketDevice::NoError)
+        else if (sret < 0 && m_socket->error() != Q3SocketDevice::NoError)
         {
             VERBOSE(VB_GENERAL, QString("readData: Error, readBlock %1")
                             .arg(m_socket->errorToString()));
@@ -502,7 +502,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
 
 void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, QImage &image)
 {
-    QStringList strList = "GET_EVENT_FRAME";
+    QStringList strList("GET_EVENT_FRAME");
     strList << QString::number(monitorID);
     strList << QString::number(eventID);
     strList << QString::number(frameNo);
@@ -533,7 +533,7 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, QImage &im
 
 void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image)
 {
-    QStringList strList = "GET_ANALYSE_FRAME";
+    QStringList strList("GET_ANALYSE_FRAME");
     strList << QString::number(monitorID);
     strList << QString::number(eventID);
     strList << QString::number(frameNo);
@@ -564,7 +564,7 @@ void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &
 
 int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize)
 {
-    QStringList strList = "GET_LIVE_FRAME";
+    QStringList strList("GET_LIVE_FRAME");
     strList << QString::number(monitorID);
     if (!sendReceiveStringList(strList))
     {
@@ -604,7 +604,7 @@ void ZMClient::getCameraList(QStringList &cameraList)
 {
     cameraList.clear();
 
-    QStringList strList = "GET_CAMERA_LIST";
+    QStringList strList("GET_CAMERA_LIST");
     if (!sendReceiveStringList(strList))
         return;
 
@@ -626,7 +626,7 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
 {
     monitorList->clear();
 
-    QStringList strList = "GET_MONITOR_LIST";
+    QStringList strList("GET_MONITOR_LIST");
     if (!sendReceiveStringList(strList))
         return;
 

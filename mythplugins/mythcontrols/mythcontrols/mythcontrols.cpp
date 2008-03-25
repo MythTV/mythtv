@@ -30,8 +30,9 @@
 #include <qnamespace.h>
 #include <qstringlist.h>
 #include <qapplication.h>
-#include <qbuttongroup.h>
-#include <qdeepcopy.h>
+#include <q3buttongroup.h>
+#include <q3deepcopy.h>
+#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -124,26 +125,35 @@ bool MythControls::Create(void)
         return false;
     }
 
-    connect(m_leftList,  SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT(  LeftSelected( MythListButtonItem*)));
+    connect(m_leftList,  SIGNAL(itemSelected(MythListButtonItem*)),
+            this, SLOT(LeftSelected(MythListButtonItem*)));
+    connect(m_leftList,  SIGNAL(itemClicked(MythListButtonItem*)),
+            this, SLOT(LeftPressed(MythListButtonItem*)));
 
-    connect(m_rightList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT(  RightSelected(MythListButtonItem*)));
+    connect(m_rightList, SIGNAL(itemSelected(MythListButtonItem*)),
+            this, SLOT(RightSelected(MythListButtonItem*)));
+    connect(m_rightList,  SIGNAL(itemClicked(MythListButtonItem*)),
+            this, SLOT(RightPressed(MythListButtonItem*)));
     connect(m_rightList, SIGNAL(TakingFocus()),
             this, SLOT(RefreshKeyInformation()));
 
     for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
     {
-        m_actionButtons.append(dynamic_cast<MythUIButton *>
-                (GetChild(QString("action_%1").arg(i))));
+        MythUIButton *button = dynamic_cast<MythUIButton *>
+                (GetChild(QString("action_%1").arg(i)));
 
-        if (!m_actionButtons.at(i))
+        if (!button)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Unable to load action button action_%1").arg(i));
 
             return false;
         }
+
+        connect(button, SIGNAL(buttonPressed()),
+                this, SLOT(ActionButtonPressed()));
+
+        m_actionButtons.append(button);
     }
 
     if (!BuildFocusList())
@@ -183,6 +193,52 @@ void MythControls::ChangeButtonFocus(int direction)
     }
 }
 
+/**
+ *  \brief Slot handling a button being pressed in the left list
+ */
+void MythControls::LeftPressed(MythListButtonItem *item)
+{
+    NextPrevWidgetFocus(true);
+}
+
+/**
+ *  \brief Slot handling a button being pressed in the left list
+ */
+void MythControls::RightPressed(MythListButtonItem *item)
+{
+    if (m_currentView == kActionsByContext)
+        ChangeButtonFocus(0);
+}
+
+/**
+ *  \brief Slot handling a button being pressed in the left list
+ */
+void MythControls::ActionButtonPressed()
+{
+    QString key = GetCurrentKey();
+    if (!key.isEmpty())
+    {
+        QString label = tr("Modify Action");
+
+        MythScreenStack *mainStack =
+                                GetMythMainWindow()->GetMainStack();
+
+        m_menuPopup =
+                new MythDialogBox(label, mainStack, "actionmenu");
+
+        if (m_menuPopup->Create())
+            mainStack->AddScreen(m_menuPopup);
+
+        m_menuPopup->SetReturnEvent(this, "action");
+
+        m_menuPopup->AddButton(tr("Set Binding"));
+        m_menuPopup->AddButton(tr("Remove Binding"));
+        m_menuPopup->AddButton(tr("Cancel"));
+    }
+    else // for blank keys, no reason to ask what to do
+        AddKeyToAction();
+}
+
 /// \brief Change the view.
 void MythControls::ChangeView(void)
 {
@@ -208,72 +264,38 @@ void MythControls::ChangeView(void)
 
 bool MythControls::keyPressEvent(QKeyEvent *event)
 {
+    // Always send keypress events to the currently focused widget first
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     bool handled = false;
     bool escape = false;
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Controls", event, actions);
 
-    for (uint i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
         if (action == "MENU" || action == "INFO")
         {
-                    QString label = tr("Options");
+            QString label = tr("Options");
 
-                    MythScreenStack *mainStack =
-                                            GetMythMainWindow()->GetMainStack();
+            MythScreenStack *mainStack =
+                                    GetMythMainWindow()->GetMainStack();
 
-                    m_menuPopup =
-                            new MythDialogBox(label, mainStack, "optionmenu");
+            m_menuPopup =
+                    new MythDialogBox(label, mainStack, "optionmenu");
 
-                    if (m_menuPopup->Create())
-                        mainStack->AddScreen(m_menuPopup);
+            if (m_menuPopup->Create())
+                mainStack->AddScreen(m_menuPopup);
 
-                    m_menuPopup->SetReturnEvent(this, "option");
+            m_menuPopup->SetReturnEvent(this, "option");
 
-                    m_menuPopup->AddButton(tr("Save"));
-                    m_menuPopup->AddButton(tr("Change View"));
-                    m_menuPopup->AddButton(tr("Cancel"));
-        }
-        else if (action == "SELECT")
-        {
-            if (GetFocusWidget() == m_leftList)
-                NextPrevWidgetFocus(true);
-            else if (GetFocusWidget() == m_rightList)
-            {
-                if (m_currentView == kActionsByContext)
-                    ChangeButtonFocus(0);
-                else
-                    handled = false;
-            }
-            else
-            {
-                QString key = GetCurrentKey();
-                if (!key.isEmpty())
-                {
-                    QString label = tr("Modify Action");
-
-                    MythScreenStack *mainStack =
-                                            GetMythMainWindow()->GetMainStack();
-
-                    m_menuPopup =
-                            new MythDialogBox(label, mainStack, "actionmenu");
-
-                    if (m_menuPopup->Create())
-                        mainStack->AddScreen(m_menuPopup);
-
-                    m_menuPopup->SetReturnEvent(this, "action");
-
-                    m_menuPopup->AddButton(tr("Set Binding"));
-                    m_menuPopup->AddButton(tr("Remove Binding"));
-                    m_menuPopup->AddButton(tr("Cancel"));
-                }
-                else // for blank keys, no reason to ask what to do
-                    AddKeyToAction();
-            }
-
+            m_menuPopup->AddButton(tr("Save"));
+            m_menuPopup->AddButton(tr("Change View"));
+            m_menuPopup->AddButton(tr("Cancel"));
         }
         else if (action == "ESCAPE")
         {
@@ -312,10 +334,8 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
         {
             NextPrevWidgetFocus(true);
         }
-        else if (GetFocusWidget()->keyPressEvent(event))
-        {
+        else
             handled = false;
-        }
     }
 
     return handled;
@@ -352,7 +372,7 @@ void MythControls::SetListContents(
     uilist->Reset();
 
     // add each new string
-    for (size_t i = 0; i < contents.size(); i++)
+    for (int i = 0; i < contents.size(); i++)
     {
         MythListButtonItem *item = new MythListButtonItem(uilist, contents[i]);
         item->setDrawArrow(arrows);
@@ -452,7 +472,7 @@ QString MythControls::GetCurrentAction(void)
     if (m_leftListType == kActionList)
     {
         if (m_leftList && m_leftList->GetItemCurrent())
-            return QDeepCopy<QString>(m_leftList->GetItemCurrent()->text());
+            return Q3DeepCopy<QString>(m_leftList->GetItemCurrent()->text());
         return QString::null;
     }
 
@@ -464,7 +484,7 @@ QString MythControls::GetCurrentAction(void)
 
     QString desc = m_rightList->GetItemCurrent()->text();
     if (m_leftListType == kContextList && m_rightListType == kActionList)
-        return QDeepCopy<QString>(desc);
+        return Q3DeepCopy<QString>(desc);
 
     int loc = desc.find(" => ");
     if (loc == -1)
@@ -549,13 +569,13 @@ void MythControls::LoadData(const QString &hostname)
     m_sortedContexts.sort();
     m_sortedContexts.remove(ActionSet::kJumpContext);
     m_sortedContexts.remove(ActionSet::kGlobalContext);
-    m_sortedContexts.insert(m_sortedContexts.begin(), 1,
+    m_sortedContexts.insert(m_sortedContexts.begin(),
                             ActionSet::kGlobalContext);
-    m_sortedContexts.insert(m_sortedContexts.begin(), 1,
+    m_sortedContexts.insert(m_sortedContexts.begin(),
                             ActionSet::kJumpContext);
 
     QStringList actions;
-    for (uint i = 0; i < m_sortedContexts.size(); i++)
+    for (int i = 0; i < m_sortedContexts.size(); i++)
     {
         actions = m_bindings->GetActions(m_sortedContexts[i]);
         actions.sort();
@@ -657,9 +677,9 @@ void MythControls::AddKeyToAction(void)
     QStringList keys    = m_bindings->GetActionKeys(context, action);
 
     // Don't recreating an existing binding...
-    uint binding_index = GetCurrentButton();
-    if ((binding_index >= Action::kMaximumNumberOfBindings) ||
-        (keys[binding_index] == key))
+    int binding_index = GetCurrentButton();
+    if ((binding_index >= (int)Action::kMaximumNumberOfBindings) ||
+        ((binding_index < keys.size()) && (keys[binding_index] == key)))
     {
         return;
     }
@@ -692,7 +712,7 @@ void MythControls::AddKeyToAction(void)
     RefreshKeyInformation();
 }
 
-void MythControls::customEvent(QCustomEvent *event)
+void MythControls::customEvent(QEvent *event)
 {
 
     if (event->type() == kMythDialogBoxCompletionEventType)

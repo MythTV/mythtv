@@ -107,11 +107,11 @@ void MythUIImage::SetImage(MythImage *img)
     m_CurPos = 0;
 }
 
-void MythUIImage::SetImages(QValueVector<MythImage *> &images)
+void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
     Clear();
 
-    QValueVector<MythImage *>::iterator it;
+    QVector<MythImage *>::iterator it;
     for (it = images.begin(); it != images.end(); ++it)
     {
         MythImage *im = (*it);
@@ -187,7 +187,7 @@ void MythUIImage::Pulse(void)
         abs(m_LastDisplay.msecsTo(QTime::currentTime())) > m_Delay)
     {
         m_CurPos++;
-        if (m_CurPos >= m_Images.size())
+        if (m_CurPos >= (int)m_Images.size())
             m_CurPos = 0;
 
         SetRedraw();
@@ -202,7 +202,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 {
     if (m_Images.size() > 0)
     {
-        if (m_CurPos > m_Images.size())
+        if (m_CurPos > (int)m_Images.size())
             m_CurPos = 0;
 
         QRect area = m_Area;

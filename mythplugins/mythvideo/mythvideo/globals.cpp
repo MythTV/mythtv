@@ -1,5 +1,5 @@
-#include <qobject.h>
-#include <qdir.h>
+#include <QObject>
+#include <QDir>
 
 #include "globals.h"
 

@@ -6,8 +6,10 @@
 #include <sys/param.h>
 
 // Qt Headers
-#include <qfile.h>
-#include <qdir.h>
+#include <QDir>
+#include <QFileInfo>
+#include <QFileInfoList>
+#include <Q3TextStream>
 
 // MythTV headers
 #include "mythmedia.h"
@@ -228,24 +230,25 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
     if (!d.exists())
         return false;
 
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return false;
 
-    QFileInfoListIterator it(*list);
+    QFileInfoList list = d.entryInfoList();
 
-    for (; it.current(); ++it)
+    for( QFileInfoList::iterator it = list.begin();
+                                 it != list.end();
+                               ++it )
     {
-        if (("." == (*it)->fileName()) || (".." == (*it)->fileName()))
+        QFileInfo &fi = *it;
+
+        if (("." == fi.fileName()) || (".." == fi.fileName()))
             continue;
 
-        if ((*it)->isDir())
+        if (fi.isDir())
         {
-            ScanMediaType((*it)->absFilePath(), cnt);
+            ScanMediaType(fi.absFilePath(), cnt);
             continue;
         }
 
-        const QString ext = (*it)->extension(false);
+        const QString ext = fi.extension(false);
         if (!ext.isEmpty())
             cnt[ext.lower()]++;
     }
@@ -332,11 +335,11 @@ bool MythMediaDevice::isMounted(bool Verify)
     QFile mountFile(PATHTO_MOUNTS);
 
     // Try to open the mounts file so we can search it for our device.
-    if (!mountFile.open(IO_ReadOnly))
+    if (!mountFile.open(QIODevice::ReadOnly))
         return false;
 
     QString     debug;
-    QTextStream stream(&mountFile);
+    Q3TextStream stream(&mountFile);
 
     while (!stream.eof()) 
     {
@@ -354,7 +357,7 @@ bool MythMediaDevice::isMounted(bool Verify)
         if (!deviceName.startsWith("/dev/"))
             continue;
 
-        QStringList deviceNames = deviceName;
+        QStringList deviceNames(deviceName);
 
 
         // Get some basic info on the device name, if it looks like a path

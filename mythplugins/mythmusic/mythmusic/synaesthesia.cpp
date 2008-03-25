@@ -128,9 +128,9 @@ void Synaesthesia::setupPalette(void)
         green *= scale;
         blue *= scale;
 
-        palette[i * 3 + 0] = sBOUND(int(red));
-        palette[i * 3 + 1] = sBOUND(int(green));
-        palette[i * 3 + 2] = sBOUND(int(blue));
+        palette[i * 3 + 0] = sBOUND(int(Qt::red));
+        palette[i * 3 + 1] = sBOUND(int(Qt::green));
+        palette[i * 3 + 2] = sBOUND(int(Qt::blue));
     }
 }
 

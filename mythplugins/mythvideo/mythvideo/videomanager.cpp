@@ -1,15 +1,5 @@
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qpixmap.h>
-#include <qdir.h>
-#include <qurloperator.h>
-#include <qfileinfo.h>
-#include <qprocess.h>
-#include <qpainter.h>
-
 #include <unistd.h>
 #include <cstdlib>
-
 #include <memory>
 #include <map>
 #include <list>
@@ -18,6 +8,18 @@
 #include <cmath>
 #include <functional>
 #include <algorithm>
+
+#include <QApplication>
+#include <QStringList>
+#include <QPixmap>
+#include <QDir>
+#include <Q3UrlOperator>
+#include <QFileInfo>
+#include <Q3Process>
+#include <QPainter>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QImageReader>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -311,10 +313,10 @@ namespace mythvideo_videomanager
     // source. In other words, one day all of this container stuff
     // will be deleted and replaced by MythUI.
 
-    struct ContainerDoneEvent : public QCustomEvent
+    struct ContainerDoneEvent : public QEvent
     {
-        enum MyType { etContainerDone = 311976 };
-        ContainerDoneEvent() : QCustomEvent(etContainerDone) {}
+        enum MyType { etContainerDone = QEvent::User + 1977 };
+        ContainerDoneEvent() : QEvent(QEvent::Type(etContainerDone)) {}
     };
 
     class ContainerHandler : public QObject
@@ -1097,7 +1099,6 @@ namespace mythvideo_videomanager
 
         bool KeyPress(const QString &action)
         {
-            VERBOSE(VB_DEBUG, QString("in KeyPress mysteriously"));
             bool ret = ContainerHandler::KeyPress(action);
             return ret;
         }
@@ -1597,7 +1598,7 @@ namespace mythvideo_videomanager
       private:
         QString m_std_error;
         QString m_std_out;
-        QProcess m_process;
+        Q3Process m_process;
         QString m_purpose;
         QString m_raw_cmd;
     };
@@ -1686,7 +1687,7 @@ namespace mythvideo_videomanager
             const QString cmd = gContext->GetSetting("MovieDataCommandLine",
                                                      def_cmd);
 
-            StartRun(cmd, video_uid, "Video Data Query");
+            StartRun(cmd, QStringList(video_uid), "Video Data Query");
         }
 
       private:
@@ -1729,7 +1730,7 @@ namespace mythvideo_videomanager
                                        .arg("mythvideo/scripts/imdb.pl -P"));
             const QString cmd = gContext->GetSetting("MoviePosterCommandLine",
                                                      default_cmd);
-            StartRun(cmd, video_uid, "Poster Query");
+            StartRun(cmd, QStringList(video_uid), "Poster Query");
         }
 
       private:
@@ -1806,13 +1807,13 @@ namespace mythvideo_videomanager
         Q_OBJECT
 
       signals:
-        void SigFinished(QNetworkOperation *op, Metadata *item);
+        void SigFinished(Q3NetworkOperation *op, Metadata *item);
 
       public:
         URLOperationProxy() : m_item(0)
         {
-            connect(&m_url_op, SIGNAL(finished(QNetworkOperation *)),
-                    SLOT(OnFinished(QNetworkOperation *)));
+            connect(&m_url_op, SIGNAL(finished(Q3NetworkOperation *)),
+                    SLOT(OnFinished(Q3NetworkOperation *)));
         }
 
         void copy(const QString &uri, const QString &dest, Metadata *item)
@@ -1827,14 +1828,14 @@ namespace mythvideo_videomanager
         }
 
       private slots:
-        void OnFinished(QNetworkOperation *op)
+        void OnFinished(Q3NetworkOperation *op)
         {
             emit SigFinished(op, m_item);
         }
 
       private:
         Metadata *m_item;
-        QUrlOperator m_url_op;
+        Q3UrlOperator m_url_op;
     };
 
     class VideoManagerImp : public QObject
@@ -1970,8 +1971,8 @@ namespace mythvideo_videomanager
                     SIGNAL(SigTimeout(const QString &, Metadata *)),
                     SLOT(OnPosterDownloadTimeout(const QString &, Metadata *)));
             connect(&m_url_operator,
-                    SIGNAL(SigFinished(QNetworkOperation *, Metadata *)),
-                    SLOT(OnPosterCopyFinished(QNetworkOperation *,
+                    SIGNAL(SigFinished(Q3NetworkOperation *, Metadata *)),
+                    SLOT(OnPosterCopyFinished(Q3NetworkOperation *,
                                               Metadata *)));
         }
 
@@ -1991,7 +1992,7 @@ namespace mythvideo_videomanager
             return ret;
         }
 
-        void customEvent(QCustomEvent *e)
+        void customEvent(QEvent *e)
         {
             if (static_cast<int>(e->type()) ==
                 ContainerDoneEvent::etContainerDone)
@@ -2023,15 +2024,16 @@ namespace mythvideo_videomanager
             search_dirs += qfi.dirPath(true);
 
             const QString base_name = qfi.baseName(true);
-            QStringList image_types = QImage::inputFormatList();
+            QList<QByteArray> image_types =
+                    QImageReader::supportedImageFormats();
 
             typedef std::set<QString> image_type_list;
             image_type_list image_exts;
 
-            for (QStringList::const_iterator it = image_types.begin();
+            for (QList<QByteArray>::const_iterator it = image_types.begin();
                     it != image_types.end(); ++it)
             {
-                image_exts.insert((*it).lower());
+                image_exts.insert(QString(*it).lower());
             }
 
             if (image_exts.find("jpeg") != image_exts.end())
@@ -2138,7 +2140,7 @@ namespace mythvideo_videomanager
       private slots:
         // called during StartVideoPosterSet
         void OnPosterURL(const QString &uri, Metadata *item);
-        void OnPosterCopyFinished(QNetworkOperation *op, Metadata *item);
+        void OnPosterCopyFinished(Q3NetworkOperation *op, Metadata *item);
         void OnPosterDownloadTimeout(const QString &url, Metadata *item);
 
         // called during StartVideoSearchByTitle
@@ -2187,7 +2189,7 @@ namespace mythvideo_videomanager
             m_popup->addLabel(tr("Select action:"));
             m_popup->addLabel("");
 
-            QButton *editButton = NULL;
+            QAbstractButton *editButton = NULL;
             if (m_list_handler->GetCurrentItem())
             {
                 editButton = m_popup->addButton(tr("Edit Metadata"), this,
@@ -2209,7 +2211,7 @@ namespace mythvideo_videomanager
                                    SLOT(DoRemoveVideo()));
             }
 
-            QButton *filterButton =
+            QAbstractButton *filterButton =
                     m_popup->addButton(tr("Filter Display"), this,
                                        SLOT(DoFilter()));
             m_popup->addButton(tr("Cancel"), this, SLOT(OnVideoMenuDone()));
@@ -2437,7 +2439,7 @@ namespace mythvideo_videomanager
                 if (!dir.exists())
                     dir.mkdir(fileprefix);
 
-                QUrl url(uri);
+                Q3Url url(uri);
 
                 QString ext = QFileInfo(url.fileName()).extension(false);
                 QString dest_file = QString("%1/%2.%3").arg(fileprefix)
@@ -2467,26 +2469,26 @@ namespace mythvideo_videomanager
             OnVideoPosterSetDone(item);
     }
 
-    void VideoManagerImp::OnPosterCopyFinished(QNetworkOperation *op,
+    void VideoManagerImp::OnPosterCopyFinished(Q3NetworkOperation *op,
                                                Metadata *item)
     {
         m_url_dl_timer.stop();
         QString state, operation;
         switch(op->operation())
         {
-            case QNetworkProtocol::OpMkDir:
+            case Q3NetworkProtocol::OpMkDir:
                 operation = "MkDir";
                 break;
-            case QNetworkProtocol::OpRemove:
+            case Q3NetworkProtocol::OpRemove:
                 operation = "Remove";
                 break;
-            case QNetworkProtocol::OpRename:
+            case Q3NetworkProtocol::OpRename:
                 operation = "Rename";
                 break;
-            case QNetworkProtocol::OpGet:
+            case Q3NetworkProtocol::OpGet:
                 operation = "Get";
                 break;
-            case QNetworkProtocol::OpPut:
+            case Q3NetworkProtocol::OpPut:
                 operation = "Put";
                 break;
             default:
@@ -2496,23 +2498,23 @@ namespace mythvideo_videomanager
 
         switch(op->state())
         {
-            case QNetworkProtocol::StWaiting:
+            case Q3NetworkProtocol::StWaiting:
                 state = "The operation is in the QNetworkProtocol's queue "
                         "waiting to be prcessed.";
                 break;
-            case QNetworkProtocol::StInProgress:
+            case Q3NetworkProtocol::StInProgress:
                 state = "The operation is being processed.";
                 break;
-            case QNetworkProtocol::StDone:
+            case Q3NetworkProtocol::StDone:
                 state = "The operation has been processed succesfully.";
                 break;
-            case QNetworkProtocol::StFailed:
+            case Q3NetworkProtocol::StFailed:
                 state = "The operation has been processed but an error "
                         "occurred.";
                 if (item)
                     item->setCoverFile("");
                 break;
-            case QNetworkProtocol::StStopped:
+            case Q3NetworkProtocol::StStopped:
                 state = "The operation has been processed but has been stopped "
                         "before it finished, and is waiting to be processed.";
                 break;
@@ -2614,8 +2616,8 @@ namespace mythvideo_videomanager
             Metadata::genre_list video_genres;
             QStringList genres = QStringList::split(",", data["Genres"]);
 
-            for (QStringList::iterator p = genres.begin(); p != genres.end();
-                    ++p)
+            for (QStringList::const_iterator p = genres.begin();
+                 p != genres.end(); ++p)
             {
                 QString genre_name = (*p).stripWhiteSpace();
                 if (genre_name.length())
@@ -2630,7 +2632,7 @@ namespace mythvideo_videomanager
             // Countries
             Metadata::country_list video_countries;
             QStringList countries = QStringList::split(",", data["Countries"]);
-            for (QStringList::iterator p = countries.begin();
+            for (QStringList::const_iterator p = countries.begin();
                  p != countries.end(); ++p)
             {
                 QString country_name = (*p).stripWhiteSpace();
@@ -2910,7 +2912,7 @@ void VideoManager::keyPressEvent(QKeyEvent *event_)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Video", event_, actions);
 
-    for (QStringList::iterator p = actions.begin();
+    for (QStringList::const_iterator p = actions.begin();
             p != actions.end() && !handled; ++p)
     {
         mythvideo_videomanager::CEKeyPress kp(*p);

@@ -30,7 +30,7 @@ class MHLink;
 class MHIngredient;
 class MHEngine;
 
-#include <qpointarray.h>
+#include <q3pointarray.h>
 
 enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, EventIsRunning, EventIsStopped,
        EventUserInput, EventAnchorFired, EventTimerFired, EventAsyncStopped, EventInteractionCompleted,
@@ -169,7 +169,7 @@ public:
     virtual void DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawLine"); }
     virtual void DrawOval(int /*x1*/, int /*y1*/, int /*width*/, int /*height*/, MHEngine *) { InvalidAction("DrawOval"); }
     virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawRectangle"); }
-    virtual void DrawPoly(bool /*fIsPolygon*/, const QPointArray &/*points*/, MHEngine *) { InvalidAction("DrawPoly(gon/line)"); }
+    virtual void DrawPoly(bool /*fIsPolygon*/, const Q3PointArray &/*points*/, MHEngine *) { InvalidAction("DrawPoly(gon/line)"); }
 
     // Actions on Video streams.
     virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleVideo"); }

@@ -1,5 +1,3 @@
-#include "osdchromakey.h"
-
 /* Based on xqcam.c by Paul Chinn <loomer@svpal.org> */
 
 // C headers

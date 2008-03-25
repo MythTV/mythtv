@@ -11,14 +11,16 @@
 #ifndef __UPNPDEVICE_H__
 #define __UPNPDEVICE_H__
 
+#include <sys/time.h>
+
+#include <qdom.h>
+#include <Q3PtrList>
+#include <Q3Url>
+#include <Q3TextStream>
+
 #include "upnputil.h"
 #include "refcounted.h"
 #include "mythcontext.h"  // for MYTH_BINARY_VERSION
-
-#include <qdom.h>
-#include <qurl.h>
-#include <sys/time.h>
-
 
 extern const char *myth_source_version;
 
@@ -31,9 +33,9 @@ class UPnpIcon;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-typedef QPtrList< UPnpDevice  >  UPnpDeviceList;
-typedef QPtrList< UPnpService >  UPnpServiceList;
-typedef QPtrList< UPnpIcon    >  UPnpIconList;
+typedef Q3PtrList< UPnpDevice  >  UPnpDeviceList;
+typedef Q3PtrList< UPnpService >  UPnpServiceList;
+typedef Q3PtrList< UPnpIcon    >  UPnpIconList;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,7 +130,7 @@ class UPnpDeviceDesc
 
         UPnpDevice      m_rootDevice;
         QString         m_sHostName;
-        QUrl            m_HostUrl;
+        Q3Url            m_HostUrl;
 
     protected: 
 
@@ -138,7 +140,7 @@ class UPnpDeviceDesc
         void     ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice );
         void     ProcessDeviceList ( QDomNode oListNode, UPnpDevice *pDevice );
 
-        void     OutputDevice( QTextStream &os, 
+        void     OutputDevice( Q3TextStream &os,
                                UPnpDevice *pDevice, 
                                const QString &sUserAgent = "" );
 
@@ -158,7 +160,7 @@ class UPnpDeviceDesc
         bool     Load       ( const QString &sFileName );
         bool     Load       ( const QDomDocument &xmlDevDesc );
 
-        void     GetValidXML( const QString &sBaseAddress, int nPort, QTextStream &os, const QString &sUserAgent = "" );
+        void     GetValidXML( const QString &sBaseAddress, int nPort, Q3TextStream &os, const QString &sUserAgent = "" );
         QString  GetValidXML( const QString &sBaseAddress, int nPort );
 
         QString  FindDeviceUDN( UPnpDevice *pDevice, QString sST );

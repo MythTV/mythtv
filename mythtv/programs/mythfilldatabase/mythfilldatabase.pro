@@ -22,3 +22,6 @@ SOURCES += filldata.cpp channeldata.cpp
 SOURCES += icondata.cpp xmltvparser.cpp
 SOURCES += fillutil.cpp
 SOURCES += main.cpp
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

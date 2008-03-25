@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <qfile.h>
 #include <qfileinfo.h>
+#include <q3textstream.h>
 #include <math.h>
 
 #include "NuppelVideoPlayer.h"
@@ -605,7 +606,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
     QFile dfile(datafile);
     QFileInfo dfileinfo(dfile);
 
-    if (!dfile.open(IO_ReadOnly))
+    if (!dfile.open(QIODevice::ReadOnly))
         return false;
 
     if (!dfileinfo.size())
@@ -615,7 +616,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         return true;
     }
 
-    QTextStream stream(&dfile);
+    Q3TextStream stream(&dfile);
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
 
@@ -643,7 +644,7 @@ writeDummyTemplate(QString datafile)
     /* Leave a 0-byte file. */
     QFile dfile(datafile);
 
-    if (!dfile.open(IO_WriteOnly | IO_Truncate) && dfile.exists())
+    if (!dfile.open(QIODevice::WriteOnly | QIODevice::Truncate) && dfile.exists())
         (void)dfile.remove();
 }
 
@@ -657,10 +658,10 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
         return false;
 
     QFile dfile(datafile);
-    if (!dfile.open(IO_WriteOnly))
+    if (!dfile.open(QIODevice::WriteOnly))
         return false;
 
-    QTextStream stream(&dfile);
+    Q3TextStream stream(&dfile);
     stream << row << " " << col << "\n" << width << " " << height << "\n";
     dfile.close();
     return true;

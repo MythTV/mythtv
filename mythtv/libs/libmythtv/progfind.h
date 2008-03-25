@@ -13,13 +13,16 @@
 #define PROGFIND_H_
 
 #include <qdatetime.h>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QPaintEvent>
 
 #include "libmyth/uitypes.h"
 #include "libmyth/xmlparse.h"
 #include "libmyth/mythwidgets.h"
 #include "programinfo.h"
 
-class QListView;
+class Q3ListView;
 class ProgramInfo;
 class QWidget;
 class TV;
@@ -52,7 +55,7 @@ class ProgFinder : public MythDialog
     void upcoming();
     void details();
     void quickRecord();
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
 
   protected:
     void paintEvent(QPaintEvent *e);

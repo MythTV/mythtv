@@ -2,6 +2,7 @@
 #include <qregexp.h>
 #include <qdir.h>
 #include <qfile.h>
+#include <Q3ValueList>
 
 // C++ headers
 #include <iostream>
@@ -77,7 +78,7 @@ bool ChannelData::insert_chan(uint sourceid)
 
 QString getResponse(const QString &query, const QString &def)
 {
-    cout << query;
+    cout << (const char *)query;
 
     if (def != "")
     {
@@ -96,7 +97,7 @@ QString getResponse(const QString &query, const QString &def)
 }
 
 unsigned int ChannelData::promptForChannelUpdates(
-    QValueList<ChanInfo>::iterator chaninfo, unsigned int chanid)
+    Q3ValueList<ChanInfo>::iterator chaninfo, unsigned int chanid)
 {
     if (chanid == 0)
     {
@@ -143,7 +144,7 @@ unsigned int ChannelData::promptForChannelUpdates(
     return(chanid);
 }
 
-void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
+void ChannelData::handleChannels(int id, Q3ValueList<ChanInfo> *chanlist)
 {
     QString fileprefix = SetupIconCacheDirectory();
 
@@ -151,7 +152,7 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
     fileprefix += "/";
 
-    QValueList<ChanInfo>::iterator i = chanlist->begin();
+    Q3ValueList<ChanInfo>::iterator i = chanlist->begin();
     for (; i != chanlist->end(); i++)
     {
         QString localfile = "";
@@ -209,27 +210,27 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
             QString chanid = query.value(0).toString();
             if (interactive)
             {
-                QString name     = QString::fromUtf8(query.value(1).toString());
-                QString callsign = QString::fromUtf8(query.value(2).toString());
-                QString chanstr  = QString::fromUtf8(query.value(3).toString());
-                QString finetune = QString::fromUtf8(query.value(4).toString());
-                QString icon     = QString::fromUtf8(query.value(5).toString());
-                QString freqid   = QString::fromUtf8(query.value(6).toString());
-                QString tvformat = QString::fromUtf8(query.value(7).toString());
+                QString name     = query.value(1).toString();
+                QString callsign = query.value(2).toString();
+                QString chanstr  = query.value(3).toString();
+                QString finetune = query.value(4).toString();
+                QString icon     = query.value(5).toString();
+                QString freqid   = query.value(6).toString();
+                QString tvformat = query.value(7).toString();
 
                 cout << "### " << endl;
                 cout << "### Existing channel found" << endl;
                 cout << "### " << endl;
-                cout << "### xmltvid  = " << (*i).xmltvid.local8Bit() << endl;
-                cout << "### chanid   = " << chanid.local8Bit()       << endl;
-                cout << "### name     = " << name.local8Bit()         << endl;
-                cout << "### callsign = " << callsign.local8Bit()     << endl;
-                cout << "### channum  = " << chanstr.local8Bit()      << endl;
+                cout << "### xmltvid  = " << (const char *)(*i).xmltvid.local8Bit() << endl;
+                cout << "### chanid   = " << (const char *)chanid.local8Bit()       << endl;
+                cout << "### name     = " << (const char *)name.local8Bit()         << endl;
+                cout << "### callsign = " << (const char *)callsign.local8Bit()     << endl;
+                cout << "### channum  = " << (const char *)chanstr.local8Bit()      << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << freqid.local8Bit()   << endl;
-                cout << "### finetune = " << finetune.local8Bit()     << endl;
-                cout << "### tvformat = " << tvformat.local8Bit()     << endl;
-                cout << "### icon     = " << icon.local8Bit()         << endl;
+                    cout << "### freqid   = " << (const char *)freqid.local8Bit()   << endl;
+                cout << "### finetune = " << (const char *)finetune.local8Bit()     << endl;
+                cout << "### tvformat = " << (const char *)tvformat.local8Bit()     << endl;
+                cout << "### icon     = " << (const char *)icon.local8Bit()         << endl;
                 cout << "### " << endl;
 
                 (*i).name = name;
@@ -261,8 +262,8 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      " WHERE xmltvid = :XMLTVID "
                                      "AND sourceid = :SOURCEID;");
                     subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":NAME", (*i).name.utf8());
-                    subquery.bindValue(":CALLSIGN", (*i).callsign.utf8());
+                    subquery.bindValue(":NAME", (*i).name);
+                    subquery.bindValue(":CALLSIGN", (*i).callsign);
                     subquery.bindValue(":CHANNUM", (*i).chanstr);
                     subquery.bindValue(":FINE", (*i).finetune.toInt());
                     subquery.bindValue(":ICON", localfile);
@@ -317,14 +318,14 @@ void ChannelData::handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### " << endl;
                 cout << "### New channel found" << endl;
                 cout << "### " << endl;
-                cout << "### name     = " << (*i).name.local8Bit()     << endl;
-                cout << "### callsign = " << (*i).callsign.local8Bit() << endl;
-                cout << "### channum  = " << (*i).chanstr.local8Bit()  << endl;
+                cout << "### name     = " << (const char *)(*i).name.local8Bit()     << endl;
+                cout << "### callsign = " << (const char *)(*i).callsign.local8Bit() << endl;
+                cout << "### channum  = " << (const char *)(*i).chanstr.local8Bit()  << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << (*i).freqid.local8Bit() << endl;
-                cout << "### finetune = " << (*i).finetune.local8Bit() << endl;
-                cout << "### tvformat = " << (*i).tvformat.local8Bit() << endl;
-                cout << "### icon     = " << localfile.local8Bit()     << endl;
+                    cout << "### freqid   = " << (const char *)(*i).freqid.local8Bit() << endl;
+                cout << "### finetune = " << (const char *)(*i).finetune.local8Bit() << endl;
+                cout << "### tvformat = " << (const char *)(*i).tvformat.local8Bit() << endl;
+                cout << "### icon     = " << (const char *)localfile.local8Bit()     << endl;
                 cout << "### " << endl;
 
                 uint chanid = promptForChannelUpdates(i,0);

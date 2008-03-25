@@ -1,5 +1,7 @@
 #include <iostream>
 #include <sys/stat.h>
+//Added by qt3to4:
+#include <Q3CString>
 using namespace std;
 
 #include "metaioflacvorbiscomment.h"
@@ -321,7 +323,7 @@ void MetaIOFLACVorbisComment::setComment(FLAC__StreamMetadata* pBlock,
     QString test = getComment(pBlock, pLabel);
 
     QString thenewentry = QString(pLabel).upper() + "=" + rData;
-    QCString utf8str = thenewentry.utf8();
+    Q3CString utf8str = thenewentry.utf8().data();
     int thenewentrylen = utf8str.length();
 
     FLAC__StreamMetadata_VorbisComment_Entry entry;

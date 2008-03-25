@@ -21,6 +21,9 @@
 #include <qtimer.h>
 #include <qsqlquery.h>
 #include <qsqldatabase.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3ValueList>
 
 // myth
 #include "mythtv/mythcontext.h"
@@ -126,9 +129,8 @@ UITextType* ZMLivePlayer::getTextType(QString name)
 
     if (!type)
     {
-        cout << "ERROR: Failed to find '" << name <<  "' UI element in theme file\n"
-                << "Bailing out!" << endl;
-        exit(0);
+        VERBOSE(VB_IMPORTANT, "ERROR: Failed to find '" + name + "' UI element in theme file\n" +
+                "              Bailing out!");
     }
 
     return type;
@@ -237,7 +239,7 @@ void ZMLivePlayer::updateFrame()
     m_frameTimer->stop();
 
     // get a list of monitor id's that need updating
-    QValueList<int> monList;
+    Q3ValueList<int> monList;
     Player *p;
     vector<Player*>::iterator i = m_players->begin();
     for (; i != m_players->end(); i++)
@@ -321,7 +323,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
         {
             if (x <= (int) monList.size())
             {
-                QString s = *monList.at(x - 1);
+                QString s = monList.at(x - 1);
                 int monID = s.toInt(); 
 
                 // try to find a monitor that matches the monID

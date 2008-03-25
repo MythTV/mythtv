@@ -12,6 +12,10 @@
 #include "config.h"
 #ifdef HAVE_CDAUDIO
 #include <cdaudio.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
+#include <QEvent>
 extern "C" {
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
@@ -134,24 +138,6 @@ bool CDRipperThread::isCancelled(void)
     return m_quit;
 }
 
-void CDRipperThread::sendEvent(int eventType, const QString &value)
-{
-    StatusData *sd = new StatusData;
-    sd->type  = eventType;
-    sd->text = value;
-    sd->value = 0;
-    QApplication::postEvent(m_parent, new QCustomEvent(QEvent::User, sd));
-}
-
-void CDRipperThread::sendEvent(int eventType, int value)
-{
-    StatusData *sd = new StatusData;
-    sd->type  = eventType;
-    sd->text = "";
-    sd->value = value;
-    QApplication::postEvent(m_parent, new QCustomEvent(QEvent::User, sd));
-}
-
 void CDRipperThread::run(void)
 {
     Metadata *track = m_tracks->at(0)->metadata;
@@ -166,9 +152,12 @@ void CDRipperThread::run(void)
         tots = track->Artist() + " ~ " + track->Album();
     }
 
-    sendEvent(ST_OVERALL_TEXT, tots);
-    sendEvent(ST_OVERALL_PROGRESS, 0);
-    sendEvent(ST_TRACK_PROGRESS, 0);
+    QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_OVERALL_TEXT, tots));
+    QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_OVERALL_PROGRESS, 0));
+    QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PROGRESS, 0));
 
     QString textstatus;
     QString encodertype = gContext->GetSetting("EncoderType");
@@ -181,12 +170,13 @@ void CDRipperThread::run(void)
         m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
     }
 
-    sendEvent(ST_OVERALL_START, m_totalSectors);
+    QApplication::postEvent(m_parent,
+        new RipStatusEvent(RipStatusEvent::ST_OVERALL_START, m_totalSectors));
 
     if (class LCD * lcd = LCD::Get()) 
     {
         QString lcd_tots = QObject::tr("Importing ") + tots;
-        QPtrList<LCDTextItem> textItems;
+        Q3PtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
                                          lcd_tots, "Generic", false));
@@ -203,20 +193,25 @@ void CDRipperThread::run(void)
         if (isCancelled())
             return;
 
-        sendEvent(ST_STATUS_TEXT, QString("Track %1 of %2")
-                                  .arg(trackno + 1).arg(m_totalTracks));
+        QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_STATUS_TEXT,
+                                        QString("Track %1 of %2")
+                                        .arg(trackno + 1).arg(m_totalTracks)));
 
-        sendEvent(ST_TRACK_PROGRESS, 0);
+        QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PROGRESS, 0));
 
         track = m_tracks->at(trackno)->metadata;
 
         if (track)
         {
             textstatus = track->Title();
-            sendEvent(ST_TRACK_TEXT, textstatus);
-
-            sendEvent(ST_TRACK_PROGRESS, 0);
-            sendEvent(ST_TRACK_PERCENT, 0);
+            QApplication::postEvent(m_parent,
+                new RipStatusEvent(RipStatusEvent::ST_TRACK_TEXT, textstatus));
+            QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PROGRESS, 0));
+            QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PERCENT, 0));
 
             // do we need to start a new file?
             if (m_tracks->at(trackno)->active)
@@ -250,7 +245,9 @@ void CDRipperThread::run(void)
 
                 if (!encoder->isValid())
                 {
-                    sendEvent(ST_ENCODER_ERROR, "Encoder failed to open file for writing");
+                    QApplication::postEvent(m_parent,
+                        new RipStatusEvent(RipStatusEvent::ST_ENCODER_ERROR,
+                                    "Encoder failed to open file for writing"));
                     VERBOSE(VB_IMPORTANT,
                         QString("MythMusic: Encoder failed to open file for writing"));
 
@@ -261,7 +258,9 @@ void CDRipperThread::run(void)
             if (!encoder.get())
             {
                 // This should never happen.
-                sendEvent(ST_ENCODER_ERROR, "Failed to create encoder");
+                QApplication::postEvent(m_parent,
+                        new RipStatusEvent(RipStatusEvent::ST_ENCODER_ERROR,
+                             "Failed to create encoder"));
                 VERBOSE(VB_IMPORTANT,
                         QString("MythMusic: Error: No encoder, failing"));
                 return;
@@ -299,7 +298,8 @@ void CDRipperThread::run(void)
         }
     }
 
-    sendEvent(ST_FINISHED, "");
+    QApplication::postEvent(m_parent,
+            new RipStatusEvent(RipStatusEvent::ST_FINISHED, ""));
 }
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
@@ -338,7 +338,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     long int curpos = start;
     int16_t *buffer;
 
-    sendEvent(ST_TRACK_START, end - start + 1);
+    QApplication::postEvent(m_parent,
+        new RipStatusEvent(RipStatusEvent::ST_TRACK_START, end - start + 1));
     m_lastTrackPct = -1;
     m_lastOverallPct = -1;
 
@@ -364,8 +365,12 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
             if (newOverallPct != m_lastOverallPct)
             {
                 m_lastOverallPct = newOverallPct;
-                sendEvent(ST_OVERALL_PERCENT, newOverallPct);
-                sendEvent(ST_OVERALL_PROGRESS, m_totalSectorsDone + curpos - start);
+                QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_OVERALL_PERCENT,
+                                        newOverallPct));
+                QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_OVERALL_PROGRESS,
+                                        m_totalSectorsDone + curpos - start));
             }
 
             int newTrackPct = (int) (100.0 / (double) ((double) (end - start + 1) /
@@ -373,13 +378,18 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
             if (newTrackPct != m_lastTrackPct)
             {
                 m_lastTrackPct = newTrackPct;
-                sendEvent(ST_TRACK_PERCENT, newTrackPct);
-                sendEvent(ST_TRACK_PROGRESS, curpos - start);
+                QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PERCENT,
+                                        newTrackPct));
+                QApplication::postEvent(m_parent,
+                    new RipStatusEvent(RipStatusEvent::ST_TRACK_PROGRESS,
+                                        curpos - start));
             }
 
             if (class LCD * lcd = LCD::Get()) 
             {
-                float fProgress = (float)(m_totalSectorsDone + (curpos - start)) / m_totalSectors;
+                float fProgress = (float)(m_totalSectorsDone + (curpos - start))
+                                             / m_totalSectors;
                 lcd->setGenericProgress(fProgress);
             }
         }
@@ -557,7 +567,7 @@ void Ripper::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions, true);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -643,7 +653,7 @@ void Ripper::startScanCD(void)
     busy->start();
     scanner->start();
 
-    while (!scanner->finished())
+    while (!scanner->isFinished())
     {
         usleep(500);
         qApp->processEvents();
@@ -988,14 +998,14 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
     filename = filename.local8Bit();
 
     QStringList directoryList = QStringList::split("/", filename);
-    for (unsigned i = 0; i < (directoryList.size() - 1); i++)
+    for (int i = 0; i < (directoryList.size() - 1); i++)
     {
         musicdir += "/" + directoryList[i];
         if (createDir)
         {
             umask(022);
             directoryQD.mkdir(musicdir, true);
-            directoryQD.cd(musicdir, true);
+            directoryQD.cd(musicdir);
         }
     }
 
@@ -1212,7 +1222,7 @@ void Ripper::startEjectCD()
     busy->start();
     ejector->start();
 
-    while (!ejector->finished())
+    while (!ejector->isFinished())
     {
         usleep(500);
         qApp->processEvents();
@@ -1520,7 +1530,7 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions, false);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -1544,78 +1554,73 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void RipStatus::customEvent(QCustomEvent *e)
+void RipStatus::customEvent(QEvent *event)
 {
-    if (!e || (e->type() != QEvent::User))
-        return;
+    RipStatusEvent *rse = (RipStatusEvent *)event;
 
-    StatusData *sd = (StatusData*) (e->data());
-
-    if (!sd) return;
-
-    switch(sd->type)
+    switch ((int)rse->type())
     {
-        case ST_TRACK_TEXT:
+        case RipStatusEvent::ST_TRACK_TEXT:
         {
-            m_trackText->SetText(sd->text);
+            m_trackText->SetText(rse->text);
             break;
         }
 
-        case ST_OVERALL_TEXT:
+        case RipStatusEvent::ST_OVERALL_TEXT:
         {
-            m_overallText->SetText(sd->text);
+            m_overallText->SetText(rse->text);
             break;
         }
 
-        case ST_STATUS_TEXT:
+        case RipStatusEvent::ST_STATUS_TEXT:
         {
-            m_statusText->SetText(sd->text);
+            m_statusText->SetText(rse->text);
             break;
         }
 
-        case ST_TRACK_PROGRESS:
+        case RipStatusEvent::ST_TRACK_PROGRESS:
         {
-            m_trackProgress->SetUsed(sd->value);
+            m_trackProgress->SetUsed(rse->value);
             break;
         }
 
-        case ST_TRACK_PERCENT:
+        case RipStatusEvent::ST_TRACK_PERCENT:
         {
-            m_trackPctText->SetText(QString("%1%").arg(sd->value));
+            m_trackPctText->SetText(QString("%1%").arg(rse->value));
             break;
         }
 
-        case ST_TRACK_START:
+        case RipStatusEvent::ST_TRACK_START:
         {
-            m_trackProgress->SetTotal(sd->value);
+            m_trackProgress->SetTotal(rse->value);
             break;
         }
 
-        case ST_OVERALL_PROGRESS:
+        case RipStatusEvent::ST_OVERALL_PROGRESS:
         {
-            m_overallProgress->SetUsed(sd->value);
+            m_overallProgress->SetUsed(rse->value);
             break;
         }
 
-        case ST_OVERALL_START:
+        case RipStatusEvent::ST_OVERALL_START:
         {
-            m_overallProgress->SetTotal(sd->value);
+            m_overallProgress->SetTotal(rse->value);
             break;
         }
 
-        case ST_OVERALL_PERCENT:
+        case RipStatusEvent::ST_OVERALL_PERCENT:
         {
-            m_overallPctText->SetText(QString("%1%").arg(sd->value));
+            m_overallPctText->SetText(QString("%1%").arg(rse->value));
             break;
         }
 
-        case ST_FINISHED:
+        case RipStatusEvent::ST_FINISHED:
         {
             done(Accepted);
             break;
         }
 
-        case ST_ENCODER_ERROR:
+        case RipStatusEvent::ST_ENCODER_ERROR:
         {
             m_errorMessage = tr("The encoder failed to create the file.\n"
                                 "Do you have write permissions for the music directory?");
@@ -1627,8 +1632,6 @@ void RipStatus::customEvent(QCustomEvent *e)
             cout << "Received an unknown event type!" << endl;
             break;
     }
-
-    delete sd;
 }
 
 void RipStatus::startRip(void)

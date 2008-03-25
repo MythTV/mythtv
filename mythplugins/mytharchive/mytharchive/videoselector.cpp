@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+//Added by qt3to4:
+#include <QKeyEvent>
 
 using namespace std;
 
@@ -150,7 +152,7 @@ void VideoSelector::showMenu()
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                  "popupMenu");
 
-    QButton *button;
+    QAbstractButton *button;
     button = popupMenu->addButton(tr("Clear All"), this, SLOT(clearAll()));
     button->setFocus();
     popupMenu->addButton(tr("Select All"), this, SLOT(selectAll()));
@@ -305,7 +307,8 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
             if (file.exists())
                 v->size = (unsigned long long)file.size();
             else
-                cout << "VideoSelector: Cannot find file: " << v->filename << endl;
+                cout << "VideoSelector: Cannot find file: "
+                     << v->filename.toLocal8Bit().constData() << endl;
         }
 
         filesize_text->SetText(formatSize(v->size / 1024));
@@ -334,9 +337,9 @@ void VideoSelector::OKPressed()
                     "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
                     ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
             query.bindValue(":TYPE", "Video");
-            query.bindValue(":TITLE", v->title.utf8());
+            query.bindValue(":TITLE", v->title);
             query.bindValue(":SUBTITLE", "");
-            query.bindValue(":DESCRIPTION", v->plot.utf8());
+            query.bindValue(":DESCRIPTION", v->plot);
             query.bindValue(":STARTDATE", "");
             query.bindValue(":STARTTIME", "");
             query.bindValue(":SIZE", (long long)file.size());
@@ -425,7 +428,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
         while (query.next())
         {
             int id = query.value(0).toInt();
-            QString category = QString::fromUtf8(query.value(1).toString());
+            QString category = query.value(1).toString();
             categoryMap.insert(id, category);
         }
     }
@@ -444,11 +447,11 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
             VideoInfo *info = new VideoInfo;
 
             info->id = query.value(0).toInt();
-            info->title = QString::fromUtf8(query.value(1).toString());
-            info->plot = QString::fromUtf8(query.value(2).toString());
+            info->title = query.value(1).toString();
+            info->plot = query.value(2).toString();
             info->size = 0; //query.value(3).toInt();
-            info->filename = QString::fromUtf8(query.value(4).toString()); // Utf8 ??
-            info->coverfile = QString::fromUtf8(query.value(5).toString()); // Utf8 ??
+            info->filename = query.value(4).toString();
+            info->coverfile = query.value(5).toString();
             info->category = categoryMap[query.value(6).toInt()];
             info->parentalLevel = query.value(7).toInt();
             if (info->category == "")
@@ -527,7 +530,7 @@ void VideoSelector::updateSelectedList()
     {
         while (query.next())
         {
-            QString filename = QString::fromUtf8(query.value(0).toString()); 
+            QString filename = query.value(0).toString(); 
 
             VideoInfo *v;
             vector<VideoInfo *>::iterator i = videoList->begin();

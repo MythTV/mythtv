@@ -47,7 +47,7 @@ BackendSelect::~BackendSelect()
 void BackendSelect::Accept(void)
 {
     DeviceLocation *dev;
-    QListBoxItem   *selected = m_backends->selectedItem();
+    Q3ListBoxItem   *selected = m_backends->selectedItem();
 
     if (!selected)
         return;
@@ -185,7 +185,7 @@ void BackendSelect::CreateUI(void)
     connect(OK,         SIGNAL(clicked()),     SLOT(Accept()));
 }
 
-void BackendSelect::customEvent(QCustomEvent *e)
+void BackendSelect::customEvent(QEvent *e)
 {
     if (MythEvent::MythEventMessage != ((MythEvent::Type)(e->type())))
         return;

@@ -209,7 +209,7 @@ MediaServer::~MediaServer()
 //
 //////////////////////////////////////////////////////////////////////////////
 /*
-void MediaServer::customEvent( QCustomEvent *e )
+void MediaServer::customEvent( QEvent *e )
 {
     if (MythEvent::Type(e->type()) == MythEvent::MythEventMessage)
     {

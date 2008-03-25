@@ -15,6 +15,11 @@
 #include <mythtv/mythdialogs.h>
 
 #include "defs.h"
+//Added by qt3to4:
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
+#include <Q3PtrList>
 
 class SourceManager;
 class WeatherScreen;
@@ -108,7 +113,7 @@ class Weather : public MythDialog
     QPixmap realBackground;
     bool allowkeys;
     SourceManager *m_srcMan;
-    QPtrList<WeatherScreen> screens; //screens in correct display order
+    Q3PtrList<WeatherScreen> screens; //screens in correct display order
     /*
      * May not be necessary, but we will keep instances around, they may be
      * helpful when doing configuration. though if I split out config to

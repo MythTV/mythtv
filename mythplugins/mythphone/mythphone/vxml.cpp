@@ -103,6 +103,10 @@ a variable before you overwrite it; deletion before overwriting is automatic.
 #include <qdir.h>
 #include <qdom.h>
 #include <qimage.h>
+//Added by qt3to4:
+#include <Q3PtrList>
+#include <qwaitcondition.h>
+
 #include <pthread.h>
 #include <unistd.h>
 #include <math.h>
@@ -168,13 +172,15 @@ void *vxmlParser::vxmlThread(void *p)
 void vxmlParser::vxmlThreadWorker()
 {
     speechEngine = new tts();
+    QMutex waker_wait;
 
     while (!killVxmlThread)
     {
-        waker->wait();
+        waker_wait.lock();
+        waker->wait(&waker_wait);
         if (Rtp != 0)
         {
-            cout << "Starting VXML Session; caller=" << callerName << endl;
+            VERBOSE(VB_GENERAL, QString("Starting VXML Session; caller=%1").arg(callerName));
             runVxmlSession();
             Rtp = 0;
         }    
@@ -197,7 +203,7 @@ void vxmlParser::beginVxmlSession(rtp *r, QString cName)
         waker->wakeAll();
     }
     else
-        cerr << "VXML: Cannot process session; thread dead or busy\n";
+        VERBOSE(VB_IMPORTANT, "VXML: Cannot process session; thread dead or busy");
 }
 
 void vxmlParser::endVxmlSession()
@@ -263,7 +269,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
         return true;
     }
 
-    QUrl Url(lastUrl, strUrl, TRUE);
+    Q3Url Url(lastUrl, strUrl, TRUE);
     lastUrl = Url;
     lastUrl.setQuery("");
     QString Query = Url.query();
@@ -293,7 +299,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
                               "Content-Length: %3\r\n"
                               "\r\n%4").arg(Url.path()).arg(Query).arg(Namelist.length()).arg(Namelist);
     }
-    QSocketDevice *httpSock = new QSocketDevice(QSocketDevice::Stream);
+    Q3SocketDevice *httpSock = new Q3SocketDevice(Q3SocketDevice::Stream);
     QHostAddress hostIp;
     int port = Url.port();
     if (port == -1)
@@ -333,10 +339,10 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
             }
         }
         else
-            cerr << "Error sending VXML GET to socket\n";
+            VERBOSE(VB_IMPORTANT, "Error sending VXML GET to socket");
     }
     else
-        cout << "Could not connect to VXML host " << Url.host() << ":" << Url.port() << endl;
+        VERBOSE(VB_GENERAL, QString("Could not connect to VXML host %1:%2").arg(Url.host()).arg(Url.port()));
     httpSock->close();
     delete httpSock;
    
@@ -360,7 +366,7 @@ void vxmlParser::Parse(QDomDocument &vxmlPage)
 
     if (rootElm.tagName() != "vxml")
     {
-        cerr << "Invalid VXML script\n";
+        VERBOSE(VB_IMPORTANT, "Invalid VXML script");
         return;
     }
 
@@ -386,7 +392,7 @@ void vxmlParser::Parse(QDomDocument &vxmlPage)
                 killVxmlPage = true;
             }
             else
-                cerr << "Unsupported VXML tag \"" << e.tagName() << "\"\n";
+                VERBOSE(VB_IMPORTANT, QString("Unsupported VXML tag \"%1\"").arg(e.tagName()));
         }
         n = n.nextSibling();
     }
@@ -425,7 +431,7 @@ void vxmlParser::parsePrompt(QDomElement &prompt, bool dtmfInterrupts)
             if (e.tagName() == "break")
             {
                 QString strDuration = e.attribute("time");
-                if (strDuration) 
+                if (!strDuration.isEmpty()) 
                 {
                     PlaySilence(parseDurationType(strDuration), dtmfInterrupts);
                 }
@@ -433,10 +439,10 @@ void vxmlParser::parsePrompt(QDomElement &prompt, bool dtmfInterrupts)
             else if (e.tagName() == "audio")
             {
                 QString srcFile = e.attribute("src");
-                if (srcFile) 
+                if (!srcFile.isEmpty()) 
                     PlayWav(srcFile);
                 QString expression = e.attribute("expr");
-                if (expression) 
+                if (!expression.isEmpty()) 
                 {
                     int samples;
                     short *wav = vxmlVarList->findShortPtrVariable(expression, samples);
@@ -444,14 +450,14 @@ void vxmlParser::parsePrompt(QDomElement &prompt, bool dtmfInterrupts)
                 }
             }
             else
-                cerr << "Unsupported prompt sub-element tag \"" << e.tagName() << "\"\n";
+                VERBOSE(VB_IMPORTANT, QString("Unsupported prompt sub-element tag \"%1\"").arg(e.tagName()));
         }
         else if (!t.isNull())
         {
             PlayTTSPrompt(t.data(), dtmfInterrupts);
         }
         else
-            cerr << "Unsupported child type for \"prompt\" tag\n";
+            VERBOSE(VB_IMPORTANT, "Unsupported child type for \"prompt\" tag");
         n = n.nextSibling();
     }
 }
@@ -608,14 +614,14 @@ void vxmlParser::parseNoInput(QDomElement &noInput, bool &reprompt)
             else if (e.tagName() == "reprompt")
                 reprompt = true;
             else
-                cerr << "Unsupported prompt sub-element tag \"" << e.tagName() << "\"\n";
+                VERBOSE(VB_IMPORTANT, QString("Unsupported prompt sub-element tag \"%1\"").arg(e.tagName()));
         }
         else if (!t.isNull())
         {
             PlayTTSPrompt(t.data(), false);
         }
         else
-            cerr << "Unsupported child type for \"prompt\" tag\n";
+            VERBOSE(VB_IMPORTANT, "Unsupported child type for \"prompt\" tag");
         n = n.nextSibling();
     }
 }
@@ -633,10 +639,10 @@ void vxmlParser::parseFilled(QDomElement &filled, bool &reprompt)
             else if (e.tagName() == "if")
                 parseIfExpression(e, reprompt);
             else
-                cerr << "Unsupported prompt sub-element tag \"" << e.tagName() << "\"\n";
+                VERBOSE(VB_IMPORTANT, QString("Unsupported prompt sub-element tag \"%1\"").arg(e.tagName()));
         }
         else
-            cerr << "Unsupported child type for \"prompt\" tag\n";
+            VERBOSE(VB_IMPORTANT, "Unsupported child type for \"prompt\" tag");
         n = n.nextSibling();
     }
 }
@@ -709,7 +715,7 @@ bool vxmlParser::parseIfBlock(QDomElement &ifBlock, QString Cond, bool &reprompt
                 else if ((e.tagName() == "elseif") || (e.tagName() == "else"))
                     break; // End of this block
                 else
-                    cerr << "Unsupported prompt sub-element tag \"" << e.tagName() << "\"\n";
+                    VERBOSE(VB_IMPORTANT, QString("Unsupported prompt sub-element tag \"%1\"").arg(e.tagName()));
             }
             else if (!t.isNull())
             {
@@ -743,7 +749,7 @@ bool vxmlParser::evaluateExpression(QString Expression)
         Seperator = NotEquals;
     else
     {
-        cerr << "Invalid IF expression in VXML page\n";
+        VERBOSE(VB_IMPORTANT, "Invalid IF expression in VXML page");
         return false;
     }
 
@@ -781,7 +787,9 @@ void vxmlParser::parseForm(QDomElement &formElm)
                     filled = parseField(e);
                 else if ((e.tagName() == "filled") && (filled))
                     parseFilled(e, reprompt);
-                else if ((e.tagName() == "noinput") && (!filled) && ((e.attribute("count") == 0) || (atoi(e.attribute("count")) == loopCnt)))
+                else if ((e.tagName() == "noinput") && (!filled) &&
+                         (e.attribute("count").isEmpty() || 
+                          e.attribute("count").toInt() == loopCnt))
                     parseNoInput(e, reprompt);
             }
             n = n.nextSibling();
@@ -898,7 +906,7 @@ void vxmlParser::waitUntilFinished(bool dtmfInterrupts)
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-vxmlVarContainer::vxmlVarContainer():QPtrList<vxmlVariable>()
+vxmlVarContainer::vxmlVarContainer():Q3PtrList<vxmlVariable>()
 {
 }
 
@@ -988,9 +996,4 @@ vxmlVariable::vxmlVariable(QString N, short *wav, int S)
     spLength = S;
     Type = "SHORTPTR";
 }
-
-
-
-
-
 

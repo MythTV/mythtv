@@ -1,8 +1,8 @@
 /*
-	dvdprobe.cpp
+    dvdprobe.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
 
     implementation for dvd probing (libdvdread)
 */

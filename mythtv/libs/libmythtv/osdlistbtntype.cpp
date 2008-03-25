@@ -32,6 +32,8 @@ using namespace std;
 #include <qpainter.h>
 #include <qimage.h>
 #include <qcolor.h>
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -273,8 +275,8 @@ void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item,
     }
     list->Reset();
 
-    QPtrList<GenericTree> *itemlist = item->getAllChildren();
-    QPtrListIterator<GenericTree> it(*itemlist);
+    Q3PtrList<GenericTree> *itemlist = item->getAllChildren();
+    Q3PtrListIterator<GenericTree> it(*itemlist);
 
     OSDGenericTree     *child   = (OSDGenericTree*) it.current();
     OSDListBtnTypeItem *newitem = NULL;

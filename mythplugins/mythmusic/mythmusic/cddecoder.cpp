@@ -397,8 +397,8 @@ Metadata *CdDecoder::getMetadata()
     {
         cd_finish(cd);
         VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
-        VERBOSE(VB_MEDIA, QString("cddb_read_disc_data() said: ")
-                          + cddb_message);
+        VERBOSE(VB_MEDIA, QString("cddb_read_disc_data() said: %1")
+                .arg(cddb_message));
         return NULL;
     }
 

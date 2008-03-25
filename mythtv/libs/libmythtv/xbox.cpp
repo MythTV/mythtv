@@ -25,7 +25,7 @@ void XBox::GetSettings(void)
     BlinkBIN = gContext->GetSetting("XboxBlinkBIN");
     LEDNonLiveTV = gContext->GetNumSetting("XboxLEDNonLiveTV", 0);
 
-    if (!BlinkBIN)
+    if (BlinkBIN.isEmpty())
         return;
     
     QString timelen = gContext->GetSetting("XboxCheckRec","5");

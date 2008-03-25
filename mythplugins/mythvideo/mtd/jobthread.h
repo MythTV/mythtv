@@ -1,20 +1,22 @@
 #ifndef JOBTHREAD_H_
 #define JOBTHREAD_H_
 /*
-	jobthread.h
+    jobthread.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Headers for the mtd threads that actually do things
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+
+    Headers for the mtd threads that actually do things
 
 */
 
-#include <qthread.h>
-#include <qstringlist.h>
+#include <QThread>
+#include <QMutex>
+#include <QStringList>
 
 #include "fileobs.h"
 
+class QDir;
 class MTD;
 
 class JobThread : public QThread
@@ -130,7 +132,7 @@ class DVDISOCopyThread : public DVDThread
   public:
 
     DVDISOCopyThread(MTD *owner,
-		     QMutex *drive_mutex, 
+                     QMutex *drive_mutex,
                      const QString &dvd_device, 
                      int track, 
                      const QString &dest_file, 
@@ -139,7 +141,7 @@ class DVDISOCopyThread : public DVDThread
                      int nice_priority);
 
     ~DVDISOCopyThread();
-                     
+
     virtual void run();
 
     bool copyFullDisc(void);
@@ -212,7 +214,7 @@ class DVDTranscodeThread : public DVDThread
     int          quality;
     QDir         *working_directory;
     QStringList  tc_arguments;
-    class QProcess     *tc_process;
+    class Q3Process     *tc_process;
     bool         two_pass;
     int          audio_track;
     int          length_in_seconds;

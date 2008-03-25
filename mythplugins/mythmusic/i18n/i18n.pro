@@ -14,3 +14,5 @@ trans.files += mythmusic_nb.qm mythmusic_et.qm mythmusic_cz.qm
 INSTALLS += trans
 
 SOURCES += dummy.c
+#The following line was inserted by qt3to4
+QT += xml  sql opengl qt3support 

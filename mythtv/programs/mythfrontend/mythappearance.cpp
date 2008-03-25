@@ -362,7 +362,7 @@ void MythAppearance::anythingChanged()
     else m_changed = false;
 }
 
-void MythAppearance::customEvent(QCustomEvent *event)
+void MythAppearance::customEvent(QEvent *event)
 {
 
     if (event->type() == kMythDialogBoxCompletionEventType)

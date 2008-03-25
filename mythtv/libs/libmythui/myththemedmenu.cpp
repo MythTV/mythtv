@@ -1,6 +1,8 @@
 #include <qapplication.h>
 #include <qimage.h>
 #include <qdir.h>
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 #include <iostream>
 #include <cmath>
@@ -1170,7 +1172,7 @@ bool MythThemedMenuState::parseSettings(
     QDomDocument doc;
     QFile f(filename);
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate::parseSettings(): "
                                       "Can't open: %1").arg(filename));
@@ -1427,7 +1429,7 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     QDomDocument doc;
     QFile f(filename);
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
                                       "menu file %1").arg(menuname));
@@ -1606,7 +1608,7 @@ void MythThemedMenuPrivate::updateLCD(void)
         return;
 
     // Build a list of the menu items
-    QPtrList<LCDMenuItem> menuItems;
+    Q3PtrList<LCDMenuItem> menuItems;
     menuItems.setAutoDelete(true);
     bool selected;
 
@@ -1991,7 +1993,7 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
     int oldcolumn = currentcolumn;
     bool handled = false;
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -2147,12 +2149,12 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
     {
         if (origtype == uparrow)
         {
-            QStringList action = "PAGEUP";
+            QStringList action("PAGEUP");
             keyHandler(action, false);
         }
         else if (origtype == downarrow)
         {
-            QStringList action = "PAGEDOWN";
+            QStringList action("PAGEDOWN");
             keyHandler(action, false);
         }
         else
@@ -2187,7 +2189,7 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
 
     if (ge->gesture() == MythGestureEvent::Left)
     {
-        QStringList action = "ESCAPE";
+        QStringList action("ESCAPE");
         keyHandler(action, true);
         return true;
     }
@@ -2248,7 +2250,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     else if (action.left(7) == "EXECTV ")
     {
         QString rest = action.right(action.length() - 7).stripWhiteSpace();
-        QStringList strlist = QString("LOCK_TUNER");
+        QStringList strlist("LOCK_TUNER");
         gContext->SendReceiveStringList(strlist);
         int cardid = strlist[0].toInt();
 
@@ -2261,7 +2263,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
 
             myth_system(rest);
 
-            strlist = QString("FREE_TUNER %1").arg(cardid);
+            strlist = QStringList(QString("FREE_TUNER %1").arg(cardid));
             gContext->SendReceiveStringList(strlist);
             QString ret = strlist[0];
         }

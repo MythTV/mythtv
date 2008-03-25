@@ -8,7 +8,7 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
-#include <qtextstream.h>
+#include <q3textstream.h>
 
 #include <iostream>
 using namespace std;

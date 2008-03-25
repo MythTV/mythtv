@@ -2,7 +2,8 @@
 #define  MANAGED_LIST_H
 
 #include <vector>
-#include <qguardedptr.h>
+#include <qpointer.h>
+#include <Q3PtrList>
 
 using namespace std;
 
@@ -72,7 +73,7 @@ class MPUBLIC ManagedListItem : public QObject
         int curState;
         int listIndex;
         bool enabled;
-        QGuardedPtr<ManagedList> parentList;
+        QPointer<ManagedList> parentList;
 
         QString text;
         QString valueText;
@@ -101,7 +102,7 @@ class MPUBLIC DialogDoneListItem : public ManagedListItem
         MythDialog* getDialog() { return dialog;}
 
     protected:
-        QGuardedPtr<MythDialog> dialog;
+        QPointer<MythDialog> dialog;
         int resultValue;
 };
 
@@ -177,7 +178,7 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
         ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* parentList=NULL,
                          QObject* _parent=NULL, const char* _name=0);
 
-        const QPtrList<ManagedListItem>* getItems() const { return &itemList;}
+        const Q3PtrList<ManagedListItem>* getItems() const { return &itemList;}
         bool addItem(ManagedListItem* item, int where = -1);
 
         const int getItemCount() const { return itemCount;}
@@ -200,7 +201,7 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
 
         const QString getCurItemValue() { return getItemValue(curItem); }
         const QString getItemValue(int which) { ManagedListItem *itm = getItem(which);
-                                                return itm ? itm->getValue() : 0; }
+                                                return itm ? itm->getValue() : QString(); }
 
         const QString getCurItemText() { return getItemText(curItem); }
         const QString getItemText(int which) { ManagedListItem *itm = getItem(which);
@@ -218,11 +219,11 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
         void wentBack();
 
     protected:
-        QPtrList<ManagedListItem> itemList;
+        Q3PtrList<ManagedListItem> itemList;
         int curItem;
         int itemCount;
-        QGuardedPtr<ManagedListGroup> parentGroup;
-        QGuardedPtr<ManagedListItem> goBack;
+        QPointer<ManagedListGroup> parentGroup;
+        QPointer<ManagedListItem> goBack;
 };
 
 
@@ -435,8 +436,8 @@ class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
         Setting(this), SimpleDBStorage(this, _table, _column),
         parentList(_parentList), listItem(NULL) { }
 
-    QGuardedPtr<ManagedList> parentList;
-    QGuardedPtr<ManagedListItem> listItem;
+    QPointer<ManagedList> parentList;
+    QPointer<ManagedListItem> listItem;
 
     public slots:
         void itemChanged(ManagedListItem*) { syncDBFromItem(); }
@@ -507,7 +508,7 @@ class MPUBLIC SelectManagedListSetting : public ManagedListSetting
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
 
-        QGuardedPtr<SelectManagedListItem> selectItem;
+        QPointer<SelectManagedListItem> selectItem;
 
         virtual void constructListItem(const QString& listText, ManagedListGroup* _group,
                                                          ManagedList* _parentList, const QString& listName)
@@ -675,7 +676,7 @@ class MPUBLIC ManagedList : public QObject
         
 
     protected:
-        QGuardedPtr<ManagedListGroup> curGroup;
+        QPointer<ManagedListGroup> curGroup;
         XMLParse* theme;
         int listSize;
         QString containerName;

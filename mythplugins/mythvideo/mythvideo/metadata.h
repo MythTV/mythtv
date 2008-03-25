@@ -1,7 +1,7 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
-#include <qstring.h>
+#include <QString>
 
 #include <utility>
 #include <vector>

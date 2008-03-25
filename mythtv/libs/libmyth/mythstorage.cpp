@@ -23,7 +23,7 @@ void SimpleDBStorage::load(void)
         QString result = query.value(0).toString();
         if (!result.isNull())
         {
-            result = QString::fromUtf8(query.value(0).toString());
+            result = query.value(0).toString();
             setting->setValue(result);
             setting->setUnchanged();
         }
@@ -90,7 +90,7 @@ QString SimpleDBStorage::setClause(MSqlBindings &bindings)
     QString tagname(":SET" + column.upper());
     QString clause(column + " = " + tagname);
 
-    bindings.insert(tagname, setting->getValue().utf8());
+    bindings.insert(tagname, setting->getValue());
 
     return clause;
 }
@@ -129,7 +129,7 @@ QString HostDBStorage::setClause(MSqlBindings &bindings)
                    + ", hostname = " + hostnameTag);
 
     bindings.insert(valueTag, setting->getName());
-    bindings.insert(dataTag, setting->getValue().utf8());
+    bindings.insert(dataTag, setting->getValue());
     bindings.insert(hostnameTag, gContext->GetHostName());
 
     return clause;
@@ -161,7 +161,7 @@ QString GlobalDBStorage::setClause(MSqlBindings &bindings)
     QString clause("value = " + valueTag + ", data = " + dataTag);
 
     bindings.insert(valueTag, setting->getName());
-    bindings.insert(dataTag, setting->getValue().utf8());
+    bindings.insert(dataTag, setting->getValue());
 
     return clause;
 }

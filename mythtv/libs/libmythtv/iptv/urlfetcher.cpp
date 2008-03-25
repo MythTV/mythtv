@@ -6,20 +6,20 @@
 
 // Qt headers
 #include <qapplication.h>
-#include <qurloperator.h>
-#include <qdeepcopy.h>
+#include <q3urloperator.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "urlfetcher.h"
 
 URLFetcher::URLFetcher(const QString &url) :
-    op(new QUrlOperator(url)),
-    state(QNetworkProtocol::StInProgress)
+    op(new Q3UrlOperator(url)),
+    state(Q3NetworkProtocol::StInProgress)
 {
-    connect(op,   SIGNAL( finished(QNetworkOperation*)),
-            this, SLOT(   Finished(QNetworkOperation*)));
-    connect(op,   SIGNAL( data(const QByteArray&, QNetworkOperation*)),
-            this, SLOT(   Data(const QByteArray&, QNetworkOperation*)));
+    connect(op,   SIGNAL( finished(Q3NetworkOperation*)),
+            this, SLOT(   Finished(Q3NetworkOperation*)));
+    connect(op,   SIGNAL( data(const QByteArray&, Q3NetworkOperation*)),
+            this, SLOT(   Data(const QByteArray&, Q3NetworkOperation*)));
     op->get();
 }
 
@@ -34,12 +34,12 @@ void URLFetcher::deleteLater(void)
     }
 }
 
-void URLFetcher::Finished(QNetworkOperation *op)
+void URLFetcher::Finished(Q3NetworkOperation *op)
 {
     state = op->state();
 }
 
-void URLFetcher::Data(const QByteArray &data, QNetworkOperation *op)
+void URLFetcher::Data(const QByteArray &data, Q3NetworkOperation *op)
 {
     if (!data.isNull())
     {
@@ -54,8 +54,8 @@ QString URLFetcher::FetchData(const QString &url, bool inQtThread)
 {
     URLFetcher *instance = new URLFetcher(url);
 
-    while (instance->state == QNetworkProtocol::StWaiting ||
-           instance->state == QNetworkProtocol::StInProgress)
+    while (instance->state == Q3NetworkProtocol::StWaiting ||
+           instance->state == Q3NetworkProtocol::StInProgress)
     {
         if (inQtThread)
             qApp->processEvents();
@@ -64,9 +64,9 @@ QString URLFetcher::FetchData(const QString &url, bool inQtThread)
     }
 
     QString ret = QString::null;
-    if (instance->state == QNetworkProtocol::StDone)
+    if (instance->state == Q3NetworkProtocol::StDone)
     {
-        ret = QDeepCopy<QString>(
+        ret = Q3DeepCopy<QString>(
             QString::fromUtf8((const char*) &instance->buf[0],
                               instance->buf.size()));
     }

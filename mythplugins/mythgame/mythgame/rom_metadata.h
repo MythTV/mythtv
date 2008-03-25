@@ -2,7 +2,7 @@
 #define ROMMETADATA_H_
 
 #include <qobject.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <iostream>
 #include <qdir.h>

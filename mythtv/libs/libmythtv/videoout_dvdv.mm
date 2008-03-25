@@ -13,7 +13,7 @@ using namespace std;
 
 #include <qmutex.h>
 #include <qstring.h>
-#include <qptrqueue.h>
+#include <q3ptrqueue.h>
 #include <qmap.h>
 #include <qsize.h>
 
@@ -117,8 +117,8 @@ class DVDV_Private
     // Our buffer of frames, and the map to look
     // up frames by VideoFrame.
     FrameData             gFrames[kAccelBuffers];
-    QPtrQueue<FrameData>  freeFrames;
-    QPtrQueue<FrameData>  usedFrames;
+    Q3PtrQueue<FrameData>  freeFrames;
+    Q3PtrQueue<FrameData>  usedFrames;
     QMap<VideoFrame*, FrameData*> usedMap;
 
     /// A temporary holding area for one FrameData struct.

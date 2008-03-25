@@ -11,13 +11,15 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qpixmap.h>
 #include <unistd.h>
 #include <cstdlib>
-
 #include <cmath>
+
+#include <QApplication>
+#include <QStringList>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
@@ -57,9 +59,10 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
     QStringList actions;
 
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (QStringList::const_iterator p = actions.begin();
+         p != actions.end() && !handled; ++p)
     {
-        QString action = actions[i];
+        QString action = *p;
         handled = true;
 
         if (action == "SELECT")
@@ -103,9 +106,10 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
     {
         gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (QStringList::const_iterator p = actions.begin();
+             p != actions.end() && !handled; ++p)
         {
-            QString action = actions[i];
+            QString action = *p;
             if (action == "PLAYBACK")
             {
                 handled = true;
@@ -230,7 +234,6 @@ void VideoGallery::updateText(QPainter *p)
         pix.fill(this, pr.topLeft());
         QPainter tmp(&pix);
 
-
         Metadata *meta =
                 m_video_list->getVideoListMetadata(where_we_are->getInt());
         checkedSetText(container, "text",
@@ -312,7 +315,7 @@ void VideoGallery::updateView(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix); // redraw area
 }
 
-void VideoGallery::updateSingleIcon(QPainter *p, int lx, int ly)
+void VideoGallery::updateSingleIcon(int lx, int ly)
 {
     //
     // Draw a single video icon
@@ -337,15 +340,7 @@ void VideoGallery::updateSingleIcon(QPainter *p, int lx, int ly)
     // only redraw part of the view rectangle
     QRect pr(viewRect.left() + xpos, viewRect.top() + ypos, thumbW,
              thumbH + spaceH);
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    tmp.setPen(Qt::white);
-
-    drawIcon(&tmp, curTreePos, curPos, 0, 0);
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix); // redraw area
+    update(pr);
 }
 
 void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
@@ -443,7 +438,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         const QPixmap *icon_image = ImageCache::getImageCache().
                 load(icon_file, int(thumbW - 2 * sw),
                      int(thumbH - 2 * sh - yoffset),
-                     QImage::ScaleMin);
+                     Qt::KeepAspectRatio);
 
         if (icon_image && !icon_image->isNull())
             p->drawPixmap(xpos + sw, ypos + sh + yoffset, *icon_image,
@@ -493,7 +488,7 @@ void VideoGallery::doMenu(bool info)
 {
     if (createPopup())
     {
-        QButton *focusButton = NULL;
+        QAbstractButton *focusButton = NULL;
 
         if (info)
         {
@@ -589,7 +584,7 @@ void VideoGallery::LoadIconWindow()
         }
         *(backgrounds[i].name) = QPixmap(img->smoothScale((int)thumbW,
                                                           (int)thumbH,
-                                                          QImage::ScaleFree));
+                                                          Qt::IgnoreAspectRatio));
         delete img;
     }
 }
@@ -752,10 +747,9 @@ void VideoGallery::moveCursor(const QString& action)
     }
     else                     // partial update only
     {
-        QPainter p(this);
-        updateSingleIcon(&p,prevCol,prevRow);
-        updateSingleIcon(&p,currCol,currRow);
-        updateText(&p);
+        updateSingleIcon(prevCol, prevRow);
+        updateSingleIcon(currCol, currRow);
+        update(textRect);
     }
 }
 

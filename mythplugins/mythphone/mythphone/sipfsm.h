@@ -12,11 +12,14 @@
 #include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qthread.h>
 #include <qwidget.h>
-#include <qsocketdevice.h>
+#include <q3socketdevice.h>
 #include <qdatetime.h>
+//Added by qt3to4:
+#include <QStringList>
+#include <QEvent>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -35,20 +38,20 @@
 #endif
 
 
-class SipEvent : public QCustomEvent
+class SipEvent : public QEvent
 {
 public:
     enum Type { SipStateChange = (QEvent::User + 400), SipNotification, SipStartMedia, SipStopMedia, SipChangeMedia, 
                 SipAlertUser, SipCeaseAlertUser, SipRingbackTone, SipCeaseRingbackTone };
 
-    SipEvent(Type t) : QCustomEvent(t) {}
-    SipEvent(Type t, QString rIp, int ap, QString ac, int vp, QString vc, int dp, int rap, int rvp, QString vr) : QCustomEvent(t) 
+    SipEvent(Type t) : QEvent((QEvent::Type)t) {}
+    SipEvent(Type t, QString rIp, int ap, QString ac, int vp, QString vc, int dp, int rap, int rvp, QString vr) : QEvent((QEvent::Type)t)
     {
         audPayload=ap; vidPayload=vp; dtmfPayload=dp; remoteAudioPort=rap; remoteVideoPort=rvp;
         audCodec=ac; vidCodec=vc; vidResolution=vr;
         remoteIp=rIp;
     }
-    SipEvent(Type t, QString cUser, QString cUrl, QString cName, bool cAudio) : QCustomEvent(t) 
+    SipEvent(Type t, QString cUser, QString cUrl, QString cName, bool cAudio) : QEvent((QEvent::Type)t)
     {
         callerUser = cUser; callerName = cName; callerUrl = cUrl; callIsAudioOnly = cAudio;
     }
@@ -74,12 +77,12 @@ private:
     bool callIsAudioOnly;
 };
 
-class SipDebugEvent : public QCustomEvent
+class SipDebugEvent : public QEvent
 {
 public:
     enum Type { SipDebugEv = (QEvent::User + 430), SipErrorEv, SipTraceRxEv, SipTraceTxEv  };
 
-    SipDebugEvent(Type t, QString s) : QCustomEvent(t) { text=s;}
+    SipDebugEvent(Type t, QString s) : QEvent((QEvent::Type)t) { text=s;}
     ~SipDebugEvent() {}
     QString msg() { return text;}
 
@@ -293,7 +296,7 @@ class SipContainer
     void ModifyCall(QString audCodec, QString vidCodec="UNCHANGED");
     void UiOpened(QObject *);
     void UiClosed();
-    void UiWatch(QStrList uriList);
+    void UiWatch(QStringList uriList);
     void UiWatch(QString uri);
     void UiStopWatchAll();
     QString UiSendIMMessage(QString DestUrl, QString CallId, QString Msg);
@@ -662,8 +665,8 @@ class SipFsm : public QWidget
     QString DetermineNatAddress();
 
     int localPort;
-    QPtrList<SipFsmBase> FsmList;
-    QSocketDevice *sipSocket;
+    Q3PtrList<SipFsmBase> FsmList;
+    Q3SocketDevice *sipSocket;
     int callCount;
     int primaryCall;                   // Currently the frontend is only interested in one call at a time, and others are rejected
     int lastStatus;
@@ -703,7 +706,7 @@ class SipRegistrar : public SipFsmBase
     void remove(SipUrl *Url);
     SipRegisteredUA *find(SipUrl *Url);
 
-    QPtrList<SipRegisteredUA> RegisteredList;
+    Q3PtrList<SipRegisteredUA> RegisteredList;
     QString sipLocalIp;
     int sipLocalPort;
     QString  regDomain;
@@ -719,7 +722,7 @@ class SipNotify
     void Display(QString name, QString number);
 
   private:
-    QSocketDevice *notifySocket;
+    Q3SocketDevice *notifySocket;
 };
 
 
@@ -742,7 +745,7 @@ class aSipTimer
     void *Value;
 };
 
-class SipTimer : public QPtrList<aSipTimer>
+class SipTimer : public Q3PtrList<aSipTimer>
 {
   public:
     SipTimer();
@@ -750,7 +753,7 @@ class SipTimer : public QPtrList<aSipTimer>
     void Start(SipFsmBase *Instance, int ms, int expireEvent, void *Value=0);
     void Stop(SipFsmBase *Instance, int expireEvent, void *Value=0);
     int msLeft(SipFsmBase *Instance, int expireEvent, void *Value=0);
-    virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
+    virtual int compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2);
     void StopAll(SipFsmBase *Instance);
     SipFsmBase *Expired(int *Event, void **Value);
 

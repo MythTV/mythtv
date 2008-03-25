@@ -9,7 +9,7 @@
 // Qt headers
 #include <qdatetime.h>
 #include <qstring.h>
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "compat.h"

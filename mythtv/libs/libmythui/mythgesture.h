@@ -27,7 +27,7 @@
 #include <sys/types.h>
 
 #include <qpoint.h>
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 #include <qevent.h>
 
 const int MythGestureEventType = 24427;
@@ -36,7 +36,7 @@ const int MythGestureEventType = 24427;
  * @class MythGestureEvent
  * @brief A custom event that represents a mouse gesture.
  */
-class MythGestureEvent : public QCustomEvent
+class MythGestureEvent : public QEvent
 {
   public:
     /**
@@ -78,7 +78,7 @@ class MythGestureEvent : public QCustomEvent
      * @param type The gesture type, as per the Type enumeration.
      * @sa Type
      */
-    inline MythGestureEvent(size_t gesture):QCustomEvent(MythGestureEventType)
+    inline MythGestureEvent(size_t gesture):QEvent((QEvent::Type)MythGestureEventType)
     {
         m_position = QPoint(0,0);
         (gesture >= MaxGesture) ? _gesture = MaxGesture : _gesture = gesture;
@@ -172,7 +172,7 @@ public:
      * @brief Determine if the stroke has the minimum required points.
      * @return true if the gesture can be translated, otherwise, false.
      */
-    bool hasMinimumPoints(void) const { return points.size() >= min_points; }
+    bool hasMinimumPoints(void) const { return (uint)points.size() >= min_points; }
 
 protected:
 
@@ -204,7 +204,7 @@ private:
     int scale_ratio;
     float bin_percent;
     size_t last_gesture;    
-    QValueList <QPoint> points;
+    Q3ValueList <QPoint> points;
 
     MythGesturePrivate *p;
 };

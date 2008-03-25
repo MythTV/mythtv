@@ -6,11 +6,12 @@ using namespace std;
 
 #include <qobject.h>
 #include <qstringlist.h>
-#include <qvaluevector.h>
-#include <qsocket.h>
+#include <q3valuevector.h>
+#include <q3socket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
 #include <qmutex.h>
+#include <Q3PtrList>
 
 #include "mythsocket.h"
 #include "mythexp.h"
@@ -164,13 +165,13 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items
     // See mythmusic/databasebox.cpp for an example
-    void switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name = "",
+    void switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name = "",
                       bool popMenu = true);
 
     // Show the Generic Progress
     // QPtrList contains pointers to LCDTextItem objects which allow you to 
     // define the screen, row, and alignment of the text
-    void switchToGeneric(QPtrList<LCDTextItem> *textItems);
+    void switchToGeneric(Q3PtrList<LCDTextItem> *textItems);
 
     /** \brief Update the generic progress bar.
         \param generic_progress a value between 0 and 1.0

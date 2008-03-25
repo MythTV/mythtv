@@ -6,7 +6,10 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
-#include <qprocess.h>
+#include <q3process.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QPixmap>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -81,7 +84,7 @@ int  ThumbFinder::getChapterCount(const QString &menuTheme)
             menuTheme + "/theme.xml";
     QDomDocument doc("mydocument");
     QFile file(filename);
-    if (!file.open(IO_ReadOnly))
+    if (!file.open(QIODevice::ReadOnly))
         return 0;
 
     if (!doc.setContent(&file))
@@ -316,10 +319,10 @@ static bool copyFile(const QString &src, const QString &dst)
     char buffer[bufferSize];
     int len;
 
-    if (!s.open(IO_ReadOnly))
+    if (!s.open(QIODevice::ReadOnly))
         return false;
 
-    if (!d.open(IO_WriteOnly))
+    if (!d.open(QIODevice::WriteOnly))
     {
         s.close();
         return false;
@@ -384,7 +387,7 @@ void ThumbFinder::updateThumb(void)
     if (item->pixmap)
         delete item->pixmap;
     item->pixmap = createScaledPixmap(imageFile, size.width(), size.height(),
-                                      QImage::ScaleFree);
+                                      Qt::ScaleFree);
     int64_t pos = (int) ((m_currentPTS - m_startPTS) / m_frameTime);
     thumb->frame = pos - m_offset;
     if (itemNo != 0)
@@ -466,7 +469,7 @@ bool ThumbFinder::getThumbImages()
 
     QPixmap *pixmap = createScaledPixmap(m_frameFile,
                                          size.width(), size.height(),
-                                         QImage::ScaleFree);
+                                         Qt::ScaleFree);
 
     ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
     m_imageGrid->appendItem(item);
@@ -510,7 +513,7 @@ bool ThumbFinder::getThumbImages()
 
         QPixmap *pixmap = createScaledPixmap(m_frameFile,
                                              size.width(), size.height(),
-                                             QImage::ScaleFree);
+                                             Qt::ScaleFree);
 
         ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
         m_imageGrid->appendItem(item);
@@ -531,7 +534,7 @@ bool ThumbFinder::getThumbImages()
 }
 
 QPixmap *ThumbFinder::createScaledPixmap(QString filename,
-                      int width, int height, QImage::ScaleMode mode)
+                      int width, int height, Qt::AspectRatioMode mode)
 {
     QPixmap *pixmap = NULL;
 
@@ -883,7 +886,7 @@ void ThumbFinder::showMenu()
     m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                  "popupMenu");
 
-    QButton *button;
+    QAbstractButton *button;
     button = m_popupMenu->addButton(tr("Exit, Save Thumbnails"), this, SLOT(menuSavePressed()));
     button->setFocus();
 
@@ -920,18 +923,18 @@ void ThumbFinder::updatePositionBar(int64_t frame)
         return;
 
     QSize size = m_positionImage->GetSize();
-    QPixmap *pixmap = new QPixmap(size.width(), size.height(), -1);
+    QPixmap *pixmap = new QPixmap(size.width(), size.height());
 
     QPainter p(pixmap);
-    QBrush brush(green);
+    QBrush brush(Qt::green);
 
     p.setBrush(brush);
-    p.setPen(NoPen);
+    p.setPen(Qt::NoPen);
     p.fillRect(0, 0, size.width(), size.height(), brush);
 
     QMap<long long, int>::Iterator it;
 
-    brush.setColor(red);
+    brush.setColor(Qt::red);
     double startdelta, enddelta;
 
     for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
@@ -953,7 +956,7 @@ void ThumbFinder::updatePositionBar(int64_t frame)
 
     if (frame == 0)
         frame = 1;
-    brush.setColor(yellow);
+    brush.setColor(Qt::yellow);
     int pos = (int) (size.width() / ((m_archiveItem->duration * m_fps) / frame));
     p.fillRect(pos, 0, 3, size.height(), brush);
 

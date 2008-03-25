@@ -18,6 +18,7 @@
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>
+#include <Q3CString>
 #include <sys/time.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ UPnpSearchTask::~UPnpSearchTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket, 
+void UPnpSearchTask::SendMsg( Q3SocketDevice  *pSocket,
                               QString         sST,
                               QString         sUDN )
 {
@@ -103,7 +104,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 
 
         QString  sPacket  = sHeader + sData;
-        QCString scPacket = sPacket.utf8();
+        Q3CString scPacket = sPacket.utf8();
 
         // ------------------------------------------------------------------
         // Send Packet to UDP Socket (Send same packet twice)
@@ -122,7 +123,7 @@ void UPnpSearchTask::SendMsg( QSocketDevice  *pSocket,
 
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    QSocketDevice *pSocket = new QSocketDevice( QSocketDevice::Datagram );
+    Q3SocketDevice *pSocket = new Q3SocketDevice( Q3SocketDevice::Datagram );
 
     // ----------------------------------------------------------------------
     // Refresh IP Address List in case of changes
@@ -160,7 +161,7 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpSearchTask::ProcessDevice( QSocketDevice *pSocket, UPnpDevice *pDevice )
+void UPnpSearchTask::ProcessDevice( Q3SocketDevice *pSocket, UPnpDevice *pDevice )
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages

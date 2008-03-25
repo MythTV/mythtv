@@ -1,5 +1,6 @@
 #include <qsqldatabase.h>
 #include <qstring.h>
+#include <QSqlError>
 
 #include <iostream>
 using namespace std;
@@ -15,7 +16,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1215";
+const QString currentDatabaseVersion = "1218";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -411,8 +412,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.prepare(thequery);
-        query.exec();
+        query.exec(thequery);
 
         if (query.lastError().type() != QSqlError::None)
         {
@@ -443,9 +443,8 @@ static bool performActualUpdate(const QString updates[], QString version,
  */
 bool lockSchema(MSqlQuery &query)
 {
-    query.prepare("CREATE TABLE IF NOT EXISTS "
-                      "schemalock ( schemalock int(1));");
-    if (!query.exec())
+    if (!query.exec("CREATE TABLE IF NOT EXISTS "
+                      "schemalock ( schemalock int(1));"))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ERROR: Unable to create schemalock table: %1")
@@ -453,8 +452,7 @@ bool lockSchema(MSqlQuery &query)
         return false;
     }
 
-    query.prepare("LOCK TABLE schemalock WRITE;");
-    if (!query.exec())
+    if (!query.exec("LOCK TABLE schemalock WRITE;"))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ERROR: Unable to acquire database upgrade lock")
@@ -471,8 +469,7 @@ bool lockSchema(MSqlQuery &query)
  */
 void unlockSchema(MSqlQuery &query)
 {
-    query.prepare("UNLOCK TABLES;");
-    query.exec();
+    query.exec("UNLOCK TABLES;");
 }
 
 /** \fn CompareTVDatabaseSchemaVersion(void)
@@ -571,8 +568,7 @@ bool UpgradeTVDatabaseSchema(void)
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
-    query.exec();
+    query.exec(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;").arg(gContext->GetDatabaseParams().dbName));
 
     VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
                                   .arg(currentDatabaseVersion));
@@ -610,7 +606,9 @@ static bool doUpgradeTVDatabaseSchema(void)
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
+    {
         return true;
+    }
 
     if (dbver == "")
     {
@@ -3629,6 +3627,552 @@ thequery,
         if (!performActualUpdate(updates, "1215", dbver))
             return false;
     }
+
+    if (dbver == "1215")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE callsignnetworkmap"
+"  MODIFY callsign varbinary(20) NOT NULL default '',"
+"  MODIFY network varbinary(20) NOT NULL default '';",
+"ALTER TABLE capturecard"
+"  MODIFY videodevice varbinary(128) default NULL,"
+"  MODIFY audiodevice varbinary(128) default NULL,"
+"  MODIFY vbidevice varbinary(128) default NULL,"
+"  MODIFY cardtype varbinary(32) default 'V4L',"
+"  MODIFY defaultinput varbinary(32) default 'Television',"
+"  MODIFY hostname varbinary(64) default NULL,"
+"  MODIFY firewire_model varbinary(32) default NULL,"
+"  MODIFY dbox2_host varbinary(32) default NULL;",
+"ALTER TABLE cardinput"
+"  MODIFY inputname varbinary(32) NOT NULL default '',"
+"  MODIFY externalcommand varbinary(128) default NULL,"
+"  MODIFY shareable binary(1) default 'N',"
+"  MODIFY tunechan varbinary(10) default NULL,"
+"  MODIFY startchan varbinary(10) default NULL,"
+"  MODIFY displayname varbinary(64) NOT NULL default '';",
+"ALTER TABLE channel"
+"  MODIFY channum varbinary(10) NOT NULL default '',"
+"  MODIFY freqid varbinary(10) default NULL,"
+"  MODIFY callsign varbinary(20) NOT NULL default '',"
+"  MODIFY name varbinary(64) NOT NULL default '',"
+"  MODIFY icon varbinary(255) NOT NULL default 'none',"
+"  MODIFY videofilters varbinary(255) NOT NULL default '',"
+"  MODIFY xmltvid varbinary(64) NOT NULL default '',"
+"  MODIFY tvformat varbinary(10) NOT NULL default 'Default',"
+"  MODIFY outputfilters varbinary(255) NOT NULL default '',"
+"  MODIFY default_authority varbinary(32) NOT NULL default '';",
+"ALTER TABLE codecparams"
+"  MODIFY name varbinary(128) NOT NULL default '',"
+"  MODIFY value varbinary(128) default NULL;",
+"ALTER TABLE customexample"
+"  MODIFY rulename varbinary(64) NOT NULL,"
+"  MODIFY fromclause blob NOT NULL,"
+"  MODIFY whereclause blob NOT NULL;",
+"ALTER TABLE diseqc_config"
+"  MODIFY value varbinary(16) NOT NULL default '';",
+"ALTER TABLE diseqc_tree"
+"  MODIFY type varbinary(16) NOT NULL default '',"
+"  MODIFY subtype varbinary(16) NOT NULL default '',"
+"  MODIFY description varbinary(32) NOT NULL default '',"
+"  MODIFY rotor_positions varbinary(255) NOT NULL default '';",
+"ALTER TABLE displayprofilegroups"
+"  MODIFY name varbinary(128) NOT NULL,"
+"  MODIFY hostname varbinary(64) NOT NULL;",
+"ALTER TABLE displayprofiles"
+"  MODIFY value varbinary(128) NOT NULL,"
+"  MODIFY data varbinary(255) NOT NULL default '';",
+"ALTER TABLE dtv_multiplex"
+"  MODIFY inversion binary(1) default 'a',"
+"  MODIFY fec varbinary(10) default 'auto',"
+"  MODIFY polarity binary(1) default NULL,"
+"  MODIFY modulation varbinary(10) default 'auto',"
+"  MODIFY bandwidth binary(1) default 'a',"
+"  MODIFY lp_code_rate varbinary(10) default 'auto',"
+"  MODIFY transmission_mode binary(1) default 'a',"
+"  MODIFY guard_interval varbinary(10) default 'auto',"
+"  MODIFY constellation varbinary(10) default 'auto',"
+"  MODIFY hierarchy varbinary(10) default 'auto',"
+"  MODIFY hp_code_rate varbinary(10) default 'auto',"
+"  MODIFY sistandard varbinary(10) default 'dvb';",
+"ALTER TABLE dtv_privatetypes"
+"  MODIFY sitype varbinary(4) NOT NULL default '',"
+"  MODIFY private_type varbinary(20) NOT NULL default '',"
+"  MODIFY private_value varbinary(100) NOT NULL default '';",
+"ALTER TABLE dvdbookmark"
+"  MODIFY serialid varbinary(16) NOT NULL default '',"
+"  MODIFY name varbinary(32) default NULL;",
+"ALTER TABLE housekeeping"
+"  MODIFY tag varbinary(64) NOT NULL default '';",
+"ALTER TABLE inputgroup"
+"  MODIFY inputgroupname varbinary(32) NOT NULL;",
+"ALTER TABLE inuseprograms"
+"  MODIFY recusage varbinary(128) NOT NULL default '',"
+"  MODIFY hostname varbinary(64) NOT NULL default '',"
+"  MODIFY rechost varbinary(64) NOT NULL,"
+"  MODIFY recdir varbinary(255) NOT NULL default '';",
+"ALTER TABLE jobqueue"
+"  MODIFY hostname varbinary(64) NOT NULL default '',"
+"  MODIFY comment varbinary(128) NOT NULL default '';",
+"ALTER TABLE jumppoints"
+"  MODIFY destination varbinary(128) NOT NULL default '',"
+"  MODIFY description varbinary(255) default NULL,"
+"  MODIFY keylist varbinary(128) default NULL,"
+"  MODIFY hostname varbinary(64) NOT NULL default '';",
+"ALTER TABLE keybindings"
+"  MODIFY context varbinary(32) NOT NULL default '',"
+"  MODIFY action varbinary(32) NOT NULL default '',"
+"  MODIFY description varbinary(255) default NULL,"
+"  MODIFY keylist varbinary(128) default NULL,"
+"  MODIFY hostname varbinary(64) NOT NULL default '';",
+"ALTER TABLE keyword"
+"  MODIFY phrase varbinary(128) NOT NULL default '';",
+"ALTER TABLE mythlog"
+"  MODIFY module varbinary(32) NOT NULL default '',"
+"  MODIFY host varbinary(128) default NULL,"
+"  MODIFY message varbinary(255) NOT NULL default '',"
+"  MODIFY details blob;",
+"ALTER TABLE networkiconmap"
+"  MODIFY network varbinary(20) NOT NULL default '',"
+"  MODIFY url varbinary(255) NOT NULL default '';",
+"ALTER TABLE oldprogram"
+"  MODIFY oldtitle varbinary(128) NOT NULL default '';",
+"ALTER TABLE oldrecorded"
+"  MODIFY title varbinary(128) NOT NULL default '',"
+"  MODIFY subtitle varbinary(128) NOT NULL default '',"
+"  MODIFY description blob NOT NULL,"
+"  MODIFY category varbinary(64) NOT NULL default '',"
+"  MODIFY seriesid varbinary(40) NOT NULL default '',"
+"  MODIFY programid varbinary(40) NOT NULL default '',"
+"  MODIFY station varbinary(20) NOT NULL default '';",
+"ALTER TABLE people"
+"  MODIFY name binary(128) NOT NULL default '';",
+"ALTER TABLE playgroup"
+"  MODIFY name varbinary(32) NOT NULL default '',"
+"  MODIFY titlematch varbinary(255) NOT NULL default '';",
+"ALTER TABLE powerpriority"
+"  MODIFY priorityname varbinary(64) NOT NULL,"
+"  MODIFY selectclause blob NOT NULL;",
+"ALTER TABLE profilegroups"
+"  MODIFY name varbinary(128) default NULL,"
+"  MODIFY cardtype varbinary(32) NOT NULL default 'V4L',"
+"  MODIFY hostname varbinary(64) default NULL;",
+"ALTER TABLE program"
+"  MODIFY title varbinary(128) NOT NULL default '',"
+"  MODIFY subtitle varbinary(128) NOT NULL default '',"
+"  MODIFY description blob NOT NULL,"
+"  MODIFY category varbinary(64) NOT NULL default '',"
+"  MODIFY category_type varbinary(64) NOT NULL default '',"
+"  MODIFY title_pronounce varbinary(128) NOT NULL default '',"
+"  MODIFY seriesid varbinary(40) NOT NULL default '',"
+"  MODIFY showtype varbinary(30) NOT NULL default '',"
+"  MODIFY colorcode varbinary(20) NOT NULL default '',"
+"  MODIFY syndicatedepisodenumber varbinary(20) NOT NULL default '',"
+"  MODIFY programid varbinary(40) NOT NULL default '';",
+"ALTER TABLE programgenres"
+"  MODIFY relevance binary(1) NOT NULL default '',"
+"  MODIFY genre binary(30) default NULL;",
+"ALTER TABLE programrating"
+"  MODIFY system binary(8) NOT NULL default '',"
+"  MODIFY rating binary(16) default NULL;",
+"ALTER TABLE recgrouppassword"
+"  MODIFY recgroup varbinary(32) NOT NULL default '',"
+"  MODIFY password varbinary(10) NOT NULL default '';",
+"ALTER TABLE record"
+"  MODIFY title varbinary(128) NOT NULL default '',"
+"  MODIFY subtitle varbinary(128) NOT NULL default '',"
+"  MODIFY description blob NOT NULL,"
+"  MODIFY category varbinary(64) NOT NULL default '',"
+"  MODIFY profile varbinary(128) NOT NULL default 'Default',"
+"  MODIFY recgroup varbinary(32) NOT NULL default 'Default',"
+"  MODIFY station varbinary(20) NOT NULL default '',"
+"  MODIFY seriesid varbinary(40) NOT NULL default '',"
+"  MODIFY programid varbinary(40) NOT NULL default '',"
+"  MODIFY playgroup varbinary(32) NOT NULL default 'Default',"
+"  MODIFY storagegroup varbinary(32) NOT NULL default 'Default';",
+"ALTER TABLE recorded"
+"  MODIFY title varbinary(128) NOT NULL default '',"
+"  MODIFY subtitle varbinary(128) NOT NULL default '',"
+"  MODIFY description blob NOT NULL,"
+"  MODIFY category varbinary(64) NOT NULL default '',"
+"  MODIFY hostname varbinary(64) NOT NULL default '',"
+"  MODIFY recgroup varbinary(32) NOT NULL default 'Default',"
+"  MODIFY seriesid varbinary(40) NOT NULL default '',"
+"  MODIFY programid varbinary(40) NOT NULL default '',"
+"  MODIFY basename varbinary(255) NOT NULL,"
+"  MODIFY playgroup varbinary(32) NOT NULL default 'Default',"
+"  MODIFY profile varbinary(32) NOT NULL default '',"
+"  MODIFY storagegroup varbinary(32) NOT NULL default 'Default';",
+"ALTER TABLE recordedfile"
+"  MODIFY basename varbinary(128) NOT NULL default '',"
+"  MODIFY audio_type varbinary(255) NOT NULL default '',"
+"  MODIFY video_type varbinary(255) NOT NULL default '',"
+"  MODIFY comment varbinary(255) NOT NULL default '';",
+"ALTER TABLE recordedmarkup"
+"  MODIFY offset varbinary(32) default NULL;",
+"ALTER TABLE recordedprogram"
+"  MODIFY title varbinary(128) NOT NULL default '',"
+"  MODIFY subtitle varbinary(128) NOT NULL default '',"
+"  MODIFY description blob NOT NULL,"
+"  MODIFY category varbinary(64) NOT NULL default '',"
+"  MODIFY category_type varbinary(64) NOT NULL default '',"
+"  MODIFY title_pronounce varbinary(128) NOT NULL default '',"
+"  MODIFY seriesid varbinary(40) NOT NULL default '',"
+"  MODIFY showtype varbinary(30) NOT NULL default '',"
+"  MODIFY colorcode varbinary(20) NOT NULL default '',"
+"  MODIFY syndicatedepisodenumber varbinary(20) NOT NULL default '',"
+"  MODIFY programid varbinary(40) NOT NULL default '';",
+"ALTER TABLE recordedrating"
+"  MODIFY system binary(8) NOT NULL default '',"
+"  MODIFY rating binary(16) default NULL;",
+"ALTER TABLE recordingprofiles"
+"  MODIFY name varbinary(128) default NULL,"
+"  MODIFY videocodec varbinary(128) default NULL,"
+"  MODIFY audiocodec varbinary(128) default NULL;",
+"ALTER TABLE settings"
+"  MODIFY value varbinary(128) NOT NULL default '',"
+"  MODIFY data blob,"
+"  MODIFY hostname varbinary(64) default NULL;",
+"ALTER TABLE storagegroup"
+"  MODIFY groupname varbinary(32) NOT NULL,"
+"  MODIFY hostname varbinary(64) NOT NULL default '',"
+"  MODIFY dirname varbinary(235) NOT NULL default '';",
+"ALTER TABLE tvchain"
+"  MODIFY chainid varbinary(128) NOT NULL default '',"
+"  MODIFY hostprefix varbinary(128) NOT NULL default '',"
+"  MODIFY cardtype varbinary(32) NOT NULL default 'V4L',"
+"  MODIFY input varbinary(32) NOT NULL default '',"
+"  MODIFY channame varbinary(32) NOT NULL default '';",
+"ALTER TABLE upnpmedia"
+"  MODIFY class varbinary(64) NOT NULL default '',"
+"  MODIFY itemtype varbinary(128) NOT NULL default '',"
+"  MODIFY itemproperties varbinary(255) NOT NULL default '',"
+"  MODIFY filepath varbinary(512) NOT NULL default '',"
+"  MODIFY title varbinary(255) NOT NULL default '',"
+"  MODIFY filename varbinary(512) NOT NULL default '',"
+"  MODIFY coverart varbinary(512) NOT NULL default '';",
+"ALTER TABLE videosource"
+"  MODIFY name varbinary(128) NOT NULL default '',"
+"  MODIFY xmltvgrabber varbinary(128) default NULL,"
+"  MODIFY userid varbinary(128) NOT NULL default '',"
+"  MODIFY freqtable varbinary(16) NOT NULL default 'default',"
+"  MODIFY lineupid varbinary(64) default NULL,"
+"  MODIFY password varbinary(64) default NULL;",
+""
+        };
+
+        if (!performActualUpdate(updates, "1216", dbver))
+            return false;
+    }
+
+    if (dbver == "1216")
+    {
+        const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;").arg(gContext->GetDatabaseParams().dbName),
+"ALTER TABLE callsignnetworkmap"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY callsign varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY network varchar(20) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE capturecard"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY videodevice varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY audiodevice varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY vbidevice varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY cardtype varchar(32) CHARACTER SET utf8 default 'V4L',"
+"  MODIFY defaultinput varchar(32) CHARACTER SET utf8 default 'Television',"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL,"
+"  MODIFY firewire_model varchar(32) CHARACTER SET utf8 default NULL,"
+"  MODIFY dbox2_host varchar(32) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE cardinput"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY inputname varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY externalcommand varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY shareable char(1) CHARACTER SET utf8 default 'N',"
+"  MODIFY tunechan varchar(10) CHARACTER SET utf8 default NULL,"
+"  MODIFY startchan varchar(10) CHARACTER SET utf8 default NULL,"
+"  MODIFY displayname varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE channel"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY channum varchar(10) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY freqid varchar(10) CHARACTER SET utf8 default NULL,"
+"  MODIFY callsign varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY name varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY icon varchar(255) CHARACTER SET utf8 NOT NULL default 'none',"
+"  MODIFY videofilters varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY xmltvid varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY tvformat varchar(10) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY outputfilters varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY default_authority varchar(32) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE codecparams"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY value varchar(128) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE credits"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE customexample"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY rulename varchar(64) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY fromclause text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY whereclause text CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE diseqc_config"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY value varchar(16) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE diseqc_tree"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY type varchar(16) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtype varchar(16) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rotor_positions varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE displayprofilegroups"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE displayprofiles"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY value varchar(128) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY data varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE dtv_multiplex"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY inversion char(1) CHARACTER SET utf8 default 'a',"
+"  MODIFY fec varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY polarity char(1) CHARACTER SET utf8 default NULL,"
+"  MODIFY modulation varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY bandwidth char(1) CHARACTER SET utf8 default 'a',"
+"  MODIFY lp_code_rate varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY transmission_mode char(1) CHARACTER SET utf8 default 'a',"
+"  MODIFY guard_interval varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY constellation varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY hierarchy varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY hp_code_rate varchar(10) CHARACTER SET utf8 default 'auto',"
+"  MODIFY sistandard varchar(10) CHARACTER SET utf8 default 'dvb';",
+"ALTER TABLE dtv_privatetypes"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY sitype varchar(4) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY private_type varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY private_value varchar(100) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE dvdbookmark"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY serialid varchar(16) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY name varchar(32) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE eit_cache"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE favorites"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE housekeeping"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY tag varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE inputgroup"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY inputgroupname varchar(32) CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE inuseprograms"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY recusage varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rechost varchar(64) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY recdir varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE jobqueue"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY comment varchar(128) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE jumppoints"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY destination varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY keylist varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE keybindings"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY context varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY action varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description varchar(255) CHARACTER SET utf8 default NULL,"
+"  MODIFY keylist varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE keyword"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY phrase varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
+"ALTER TABLE mythlog"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY module varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY host varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY message varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY details text CHARACTER SET utf8;",
+"ALTER TABLE networkiconmap"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY network varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY url varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE oldfind"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE oldprogram"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY oldtitle varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
+"ALTER TABLE oldrecorded"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY seriesid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY programid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY station varchar(20) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE people"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name char(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
+"ALTER TABLE pidcache"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE playgroup"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY titlematch varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE powerpriority"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY priorityname varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,"
+"  MODIFY selectclause text CHARACTER SET utf8 NOT NULL;",
+"ALTER TABLE profilegroups"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY cardtype varchar(32) CHARACTER SET utf8 NOT NULL default 'V4L',"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE program"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY category_type varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY title_pronounce varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY seriesid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY showtype varchar(30) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY colorcode varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY syndicatedepisodenumber varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY programid varchar(40) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE programgenres"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY relevance char(1) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY genre char(30) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE programrating"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY system char(8) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rating char(16) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE recgrouppassword"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY recgroup varchar(32) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '',"
+"  MODIFY password varchar(10) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE record"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY profile varchar(128) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY recgroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY station varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY seriesid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY programid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY playgroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY storagegroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default';",
+"ALTER TABLE recorded"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY recgroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY seriesid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY programid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY basename varchar(255) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY playgroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default',"
+"  MODIFY profile varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY storagegroup varchar(32) CHARACTER SET utf8 NOT NULL default 'Default';",
+"ALTER TABLE recordedcredits"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE recordedfile"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY basename varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY audio_type varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY video_type varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY comment varchar(255) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE recordedmarkup"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY offset varchar(32) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE recordedprogram"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY title varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY subtitle varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY description text CHARACTER SET utf8 NOT NULL,"
+"  MODIFY category varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY category_type varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY title_pronounce varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY seriesid varchar(40) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY showtype varchar(30) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY colorcode varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY syndicatedepisodenumber varchar(20) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY programid varchar(40) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE recordedrating"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY system char(8) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY rating char(16) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE recordedseek"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE recordingprofiles"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY videocodec varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY audiocodec varchar(128) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE recordmatch"
+"  DEFAULT CHARACTER SET default;",
+"ALTER TABLE settings"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY value varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY data text CHARACTER SET utf8,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL;",
+"ALTER TABLE storagegroup"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY groupname varchar(32) CHARACTER SET utf8 NOT NULL,"
+"  MODIFY hostname varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY dirname varchar(235) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
+"ALTER TABLE tvchain"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY chainid varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY hostprefix varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY cardtype varchar(32) CHARACTER SET utf8 NOT NULL default 'V4L',"
+"  MODIFY input varchar(32) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY channame varchar(32) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE upnpmedia"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY class varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY itemtype varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY itemproperties varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY filepath varchar(512) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY title varchar(255) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY filename varchar(512) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY coverart varchar(512) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE videosource"
+"  DEFAULT CHARACTER SET default,"
+"  MODIFY name varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY xmltvgrabber varchar(128) CHARACTER SET utf8 default NULL,"
+"  MODIFY userid varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY freqtable varchar(16) CHARACTER SET utf8 NOT NULL default 'default',"
+"  MODIFY lineupid varchar(64) CHARACTER SET utf8 default NULL,"
+"  MODIFY password varchar(64) CHARACTER SET utf8 default NULL;",
+""
+        };
+
+        if (!performActualUpdate(updates, "1217", dbver))
+            return false;
+    }
+
+    if (dbver == "1217")
+    {
+        const QString updates[] = {
+            "DROP TABLE IF EXISTS videobookmarks;",
+            ""
+        };
+
+        if (!performActualUpdate(updates, "1218", dbver))
+            return false;
+    }
+
 
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22

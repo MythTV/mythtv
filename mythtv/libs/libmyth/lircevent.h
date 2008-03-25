@@ -1,14 +1,16 @@
 #ifndef LIRCEVENT_H_
 #define LIRCEVENT_H_
 
+#include <QEvent>
+
 const int kLircKeycodeEventType = 23423;
 const int kLircMuteEventType = 23424;
 
-class LircKeycodeEvent : public QCustomEvent 
+class LircKeycodeEvent : public QEvent
 {
   public:
     LircKeycodeEvent(const QString &lirc_text, int key_code, bool key_down) :
-            QCustomEvent(kLircKeycodeEventType), lirctext(lirc_text), 
+            QEvent((QEvent::Type)kLircKeycodeEventType), lirctext(lirc_text),
             keycode(key_code), keydown(key_down) {}
 
     QString getLircText()
@@ -32,10 +34,10 @@ class LircKeycodeEvent : public QCustomEvent
     bool keydown;
 };
 
-class LircMuteEvent : public QCustomEvent
+class LircMuteEvent : public QEvent
 {
   public:
-    LircMuteEvent(bool mute_events) : QCustomEvent(kLircMuteEventType),
+    LircMuteEvent(bool mute_events) : QEvent((QEvent::Type)kLircMuteEventType),
             mute_lirc_events(mute_events) {}
 
     bool eventsMuted()

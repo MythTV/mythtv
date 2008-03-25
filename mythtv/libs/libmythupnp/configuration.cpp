@@ -8,11 +8,11 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QDir>
+#include <QFile>
+
 #include "configuration.h"
 #include "mythcontext.h"  // for VERBOSE and GetConfDir()
-
-#include <qfile.h>
-#include <qdir.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -39,7 +39,7 @@ bool XmlConfiguration::Load( void )
     if (file.exists() && m_sFileName.length())  // Ignore empty filenames
     {
 
-        if ( !file.open( IO_ReadOnly ) )
+        if ( !file.open( QIODevice::ReadOnly ) )
             return false;
 
         QString sErrMsg;
@@ -101,7 +101,7 @@ bool XmlConfiguration::Save( void )
         }
     }
 
-    if (!file.open( IO_WriteOnly | IO_Truncate ))
+    if (!file.open( QIODevice::WriteOnly | QIODevice::Truncate ))
     {
         VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
                                       "for writing").arg( sName ));

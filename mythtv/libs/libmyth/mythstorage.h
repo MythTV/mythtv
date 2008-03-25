@@ -5,7 +5,6 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
 
 // MythTV headers
 #include "mythexp.h"
@@ -28,14 +27,14 @@ class MPUBLIC DBStorage : public Storage
 {
   public:
     DBStorage(Setting *_setting, QString _table, QString _column) :
-        setting(_setting), table(QDeepCopy<QString>(_table)),
-        column(QDeepCopy<QString>(_column)) { }
+        setting(_setting), table(_table),
+        column(_column) { }
 
     virtual ~DBStorage() { }
 
   protected:
-    QString getColumn(void) const { return QDeepCopy<QString>(column); }
-    QString getTable(void)  const { return QDeepCopy<QString>(table);  }
+    QString getColumn(void) const { return column; }
+    QString getTable(void)  const { return table;  }
 
     Setting *setting;
     QString table;

@@ -3,7 +3,7 @@
 
 #include <qstring.h>
 #include <qdatetime.h>
-#include <qvaluevector.h>
+#include <qvector.h>
 
 #include "mythuitype.h"
 #include "mythimage.h"

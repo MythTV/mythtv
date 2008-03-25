@@ -1,6 +1,13 @@
 #ifndef WELCOMEDIALOG_H_
 #define WELCOMEDIALOG_H_
 
+#include <iostream>
+
+#include <qmutex.h>
+#include <qobject.h>
+
+using namespace std;
+
 #include <qdatetime.h>
 
 #include "mythdialogs.h"
@@ -20,7 +27,7 @@ class WelcomeDialog : public MythThemedDialog
     ~WelcomeDialog();
 
     void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
     void wireUpTheme();
     DialogCode exec(void);
     
@@ -88,8 +95,8 @@ class WelcomeDialog : public MythThemedDialog
         QDateTime startTime, endTime;
     } ProgramDetail;
 
-    QPtrList<TunerStatus>    m_tunerList;
-    QPtrList<ProgramDetail>  m_scheduledList;        
+    Q3PtrList<TunerStatus>    m_tunerList;
+    Q3PtrList<ProgramDetail>  m_scheduledList;
 
     QMutex      m_RecListUpdateMuxtex;
     bool        m_pendingRecListUpdate;

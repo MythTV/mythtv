@@ -8,9 +8,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt headers
-#include <qdeepcopy.h>
-
 // MythTV headers
 #include "iptvfeederwrapper.h"
 
@@ -48,7 +45,7 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
 
     if (_feeder && _feeder->CanHandle(url))
     {
-        _url = QDeepCopy<QString>(url);
+        _url = Q3DeepCopy<QString>(url);
         VERBOSE(VB_RECORD, LOC + "Init() -- end 0");
 
         return true;
@@ -84,7 +81,7 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
 
     _feeder = tmp_feeder;
 
-    _url = QDeepCopy<QString>(url);
+    _url = Q3DeepCopy<QString>(url);
 
     VERBOSE(VB_RECORD, LOC + "Init() -- adding listeners");
 

@@ -2,14 +2,13 @@
 #define INFOSTRUCTS_H_
 
 #include <qstring.h>
+#include <QPixmap>
 
 #include "mythexp.h"
 
 #ifdef USING_MINGW
 #undef LoadIcon
 #endif
-
-class QPixmap;
 
 class MPUBLIC ChannelInfo
 {

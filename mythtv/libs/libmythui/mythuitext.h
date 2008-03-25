@@ -4,7 +4,7 @@
 #include "mythuitype.h"
 
 #include <qimage.h>
-
+#include <QColor>
 
 #include "mythuitype.h"
 

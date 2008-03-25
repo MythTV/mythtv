@@ -1,6 +1,6 @@
 #include <qapplication.h>
 #include <qfile.h>
-#include <qtextstream.h>
+#include <q3textstream.h>
 
 #include <iostream>
 #include <cstdlib>
@@ -57,7 +57,7 @@ QString getGlobalSetting(const QString &key, const QString &defaultval)
         if (query.isActive() && query.size() > 0)
         {
             query.next();
-            value = QString::fromUtf8(query.value(0).toString());
+            value = query.value(0).toString();
         }
     }
     else

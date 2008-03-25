@@ -1,4 +1,4 @@
-#include <qdir.h>
+#include <QDir>
 
 #include <map>
 #include <vector>
@@ -49,52 +49,47 @@ namespace
         if (!d.exists())
             return;
 
-        const QFileInfoList *list = d.entryInfoList();
-        if (!list)
+        QFileInfoList list = d.entryInfoList();
+        if (!list.size())
             return;
-
-        QFileInfoListIterator it(*list);
-        QFileInfo *fi;
 
         QDir dir_tester;
 
-        while ((fi = it.current()) != 0)
+        for (QFileInfoList::iterator p = list.begin(); p != list.end(); ++p)
         {
-            ++it;
-
-            if (fi->fileName() == "." ||
-                fi->fileName() == ".." ||
-                fi->fileName() == "Thumbs.db")
+            if (p->fileName() == "." ||
+                p->fileName() == ".." ||
+                p->fileName() == "Thumbs.db")
             {
                 continue;
             }
 
-            if (!fi->isDir() &&
-                ext_settings.extension_ignored(fi->extension(false))) continue;
+            if (!p->isDir() &&
+                ext_settings.extension_ignored(p->extension(false))) continue;
 
             bool add_as_file = true;
 
-            if (fi->isDir())
+            if (p->isDir())
             {
                 add_as_file = false;
 
-                dir_tester.setPath(fi->absFilePath() + "/VIDEO_TS");
+                dir_tester.setPath(p->absFilePath() + "/VIDEO_TS");
                 if (dir_tester.exists())
                 {
                     add_as_file = true;
                 }
                 else
                 {
-                    DirectoryHandler *dh = handler->newDir(fi->fileName(),
-                                                           fi->absFilePath());
-                    scan_dir(fi->absFilePath(), dh, ext_settings);
+                    DirectoryHandler *dh = handler->newDir(p->fileName(),
+                                                           p->absFilePath());
+                    scan_dir(p->absFilePath(), dh, ext_settings);
                 }
             }
 
             if (add_as_file)
             {
-                handler->handleFile(fi->fileName(), fi->absFilePath(),
-                                    fi->extension(false));
+                handler->handleFile(p->fileName(), p->absFilePath(),
+                                    p->extension(false));
             }
         }
     }

@@ -12,7 +12,6 @@
 #define SOAPCLIENT_H_
 
 #include <qdom.h>
-#include <qbuffer.h>
 
 #include "httpcomms.h"
 #include "upnputil.h"

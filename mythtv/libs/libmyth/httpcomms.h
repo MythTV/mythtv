@@ -1,11 +1,13 @@
 #ifndef HTTPCOMMS_H_
 #define HTTPCOMMS_H_
 
-#include <qhttp.h>
-#include <qfile.h>
 #include <qurl.h>
 #include <qobject.h>
-#include <qtimer.h>
+#include <QByteArray>
+#include <QString>
+#include <QTimer>
+#include <QHttp>
+
 #include "mythexp.h"
 
 class MPUBLIC HttpComms : public QObject
@@ -81,22 +83,22 @@ class MPUBLIC HttpComms : public QObject
   protected:
     struct DigestAuthInfo
     {
-        QCString nc;
-        QCString qop;
-        QCString realm;
-        QCString nonce;
-        QCString method;
-        QCString cnonce;
-        QCString username;
-        QCString password;
-        QStrList digestURI;
-        QCString algorithm;
-        QCString entityBody;
+        QByteArray nc;
+        QByteArray qop;
+        QByteArray realm;
+        QByteArray nonce;
+        QByteArray method;
+        QByteArray cnonce;
+        QByteArray username;
+        QByteArray password;
+        QStringList digestURI;
+        QByteArray algorithm;
+        QByteArray entityBody;
     };
     
     void init();
     
-    void calculateDigestResponse( DigestAuthInfo& info, QCString& Response );
+    void calculateDigestResponse( DigestAuthInfo& info, QByteArray& Response );
     bool createDigestAuth( bool isForProxy, const QString& authStr, QHttpRequestHeader* request );
     
   private slots:

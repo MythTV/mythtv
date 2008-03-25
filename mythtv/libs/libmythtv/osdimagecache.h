@@ -8,7 +8,7 @@
 #include <qrect.h>
 #include <qmutex.h>
 #include <qstring.h>
-#include <qasciicache.h>
+#include <q3asciicache.h>
 
 class OSDImageCacheValue
 {
@@ -36,7 +36,7 @@ class OSDImageCacheValue
     QString        m_cacheKey;
 };
 
-typedef QAsciiCache<OSDImageCacheValue> img_cache_t;
+typedef Q3AsciiCache<OSDImageCacheValue> img_cache_t;
 
 class OSDImageCache
 {

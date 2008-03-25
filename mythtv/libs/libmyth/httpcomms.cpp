@@ -1,4 +1,6 @@
 #include <iostream>
+
+#include <qfile.h>
 #include <qapplication.h>
 #include <qregexp.h>
 #include <unistd.h>
@@ -62,7 +64,7 @@ void HttpComms::init()
 
 void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 {
-    QHttpRequestHeader header("GET", url.encodedPathAndQuery());
+    QHttpRequestHeader header("GET", url.path() + url.encodedQuery());
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                         "Gecko/25250101 Netscape/5.432b1";
 
@@ -106,7 +108,7 @@ void HttpComms::request(QUrl               &url,
         m_timer->start(timeoutms, TRUE);
     }        
 
-    if (m_cookie)    
+    if (!m_cookie.isEmpty())
     {
         header.setValue("Cookie", m_cookie);
     }
@@ -229,9 +231,9 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
             }
             else
             {
-                QCString auth = QCodecs::base64Encode( QCString( m_webCredentials.user +
-                                                       ":" + m_webCredentials.pass ) );
-                m_curRequest.setValue( "Authorization", QString( "Basic " ).append( auth.data() ) ); 
+                QString sUser(m_webCredentials.user + ":" + m_webCredentials.pass);
+                QByteArray auth = QCodecs::base64Encode(sUser.toLocal8Bit());
+                m_curRequest.setValue( "Authorization", QString( "Basic " ).append( auth ) );
             } 
             
             if (m_timer)
@@ -242,7 +244,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
             
             // Not sure if it's possible to receive a session ID or other cookie
             // before authenticating or not.
-            if (m_cookie)    
+            if (!m_cookie.isEmpty())
             {
                 m_curRequest.setValue("Cookie", m_cookie);
             }
@@ -463,7 +465,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
                                         .arg(filename));
 
             QFile file(filename);
-            if (file.open( IO_WriteOnly ))
+            if (file.open( QIODevice::WriteOnly ))
             {
                 QDataStream stream(& file);
                 stream.writeRawBytes( (const char*) (data), data.size() );
@@ -506,7 +508,10 @@ QString HttpComms::postHttp(QUrl               &url         ,
     HttpComms *httpGrabber = NULL; 
     QString hostname = "";
 
-    QHttpRequestHeader header( "POST", url.encodedPathAndQuery());
+    QHttpRequestHeader header( "POST", url.path() + url.encodedQuery());
+
+    // Add main header values
+
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                         "Gecko/25250101 Netscape/5.432b1";
 
@@ -520,10 +525,14 @@ QString HttpComms::postHttp(QUrl               &url         ,
 
     if (pAddlHdr)
     {
-        QStringList keys = pAddlHdr->keys();
+        QList< QPair< QString, QString > > values = pAddlHdr->values();
 
-        for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it )
-            header.setValue( *it, pAddlHdr->value( *it ));
+        for (QList< QPair< QString, QString > >::iterator it  = values.begin();
+                                                          it != values.end();
+                                                        ++it )
+        {
+            header.setValue( (*it).first, (*it).second );
+        }
     }
 
     while (1) 
@@ -609,8 +618,8 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     const char *p;
     QString header;
     QString auth;
-    QCString opaque;
-    QCString Response;
+    QByteArray opaque;
+    QByteArray Response;
 
     DigestAuthInfo info;
 
@@ -668,21 +677,21 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
             p+=6;
             while ( *p == '"' ) p++;  // Go past any number of " mark(s) first
             while ( p[i] != '"' ) i++;  // Read everything until the last " mark
-            info.realm = QCString( p, i+1 );
+            info.realm = QByteArray( p, i+1 );
         }
         else if (strncasecmp(p, "algorith=", 9)==0)
         {
             p+=9;
             while ( *p == '"' ) p++;  // Go past any number of " mark(s) first
             while ( ( p[i] != '"' ) && ( p[i] != ',' ) && ( p[i] != '\0' ) ) i++;
-            info.algorithm = QCString(p, i+1);
+            info.algorithm = QByteArray(p, i+1);
         }
         else if (strncasecmp(p, "algorithm=", 10)==0)
         {
             p+=10;
             while ( *p == '"' ) p++;  // Go past any " mark(s) first
             while ( ( p[i] != '"' ) && ( p[i] != ',' ) && ( p[i] != '\0' ) ) i++;
-            info.algorithm = QCString(p,i+1);
+            info.algorithm = QByteArray(p,i+1);
         }
         else if (strncasecmp(p, "domain=", 7)==0)
         {
@@ -691,20 +700,22 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
             while ( p[i] != '"' ) i++;  // Read everything until the last " mark
             int pos;
             int idx = 0;
-            QCString uri = QCString(p,i+1);
+            QByteArray uri = QByteArray(p,i+1);
             do
             {
                 pos = uri.find( ' ', idx );
      
                 if ( pos != -1 )
                 {
-                    QUrl u (m_url, uri.mid(idx, pos-idx));
+                    QString sUrl = m_url + "//" + uri.mid(idx, pos-idx);
+                    QUrl u(sUrl);
                     if (u.isValid ())
                         info.digestURI.append( u.toString().latin1() );
                 }
                 else
                 {
-                    QUrl u (m_url, uri.mid(idx, uri.length()-idx));
+                    QString sUrl = m_url + "//" + uri.mid(idx, uri.length()-idx);
+                    QUrl u(sUrl);
                     if (u.isValid ())
                         info.digestURI.append( u.toString().latin1() );
                 }
@@ -716,21 +727,21 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
             p+=6;
             while ( *p == '"' ) p++;  // Go past any " mark(s) first
             while ( p[i] != '"' ) i++;  // Read everything until the last " mark
-            info.nonce = QCString(p,i+1);
+            info.nonce = QByteArray(p,i+1);
         }
         else if (strncasecmp(p, "opaque=", 7)==0)
         {
             p+=7;
             while ( *p == '"' ) p++;  // Go past any " mark(s) first
             while ( p[i] != '"' ) i++;  // Read everything until the last " mark
-            opaque = QCString(p,i+1);
+            opaque = QByteArray(p,i+1);
         }
         else if (strncasecmp(p, "qop=", 4)==0)
         {
             p+=4;
             while ( *p == '"' ) p++;  // Go past any " mark(s) first
             while ( p[i] != '"' ) i++;  // Read everything until the last " mark
-            info.qop = QCString(p,i+1);
+            info.qop = QByteArray(p,i+1);
         }
         p+=(i+1);
     }
@@ -738,7 +749,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     if (info.realm.isEmpty() || info.nonce.isEmpty())
         return false;
   
-    info.digestURI.append (m_url.encodedPathAndQuery());
+    info.digestURI.append (m_url.path() + m_url.encodedQuery());
   
     
 //     cerr << " RESULT OF PARSING:" << endl;
@@ -763,7 +774,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     auth += info.nonce;
 
     auth += "\", uri=\"";
-    auth += m_url.encodedPathAndQuery();
+    auth += m_url.path() + m_url.encodedQuery();
 
     auth += "\", algorithm=\"";
     auth += info.algorithm;
@@ -801,14 +812,14 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
 }
 
 
-void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QCString& Response )
+void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Response )
 {
     QMD5 md;
-    QCString HA1;
-    QCString HA2;
+    QByteArray HA1;
+    QByteArray HA2;
 
     // Calculate H(A1)
-    QCString authStr = info.username;
+    QByteArray authStr = info.username;
     authStr += ':';
     authStr += info.realm;
     authStr += ':';
@@ -830,10 +841,13 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QCString& Respons
 
     //cerr << " calculateResponse(): A1 => " << HA1 << endl;
 
+    QString sEncodedPathAndQuery = m_url.path() + m_url.encodedQuery();
+
     // Calculate H(A2)
     authStr = info.method;
     authStr += ':';
-    authStr += m_url.encodedPathAndQuery().latin1();
+    authStr += sEncodedPathAndQuery.latin1();
+
     if ( info.qop == "auth-int" )
     {
         authStr += ':';

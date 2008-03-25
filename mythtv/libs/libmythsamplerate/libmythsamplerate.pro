@@ -4,6 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythsamplerate-$$LIBVERSION
 CONFIG += thread staticlib warn_off
+CONFIG -= qt
 
 INCLUDEPATH += ../ ../../ 
 

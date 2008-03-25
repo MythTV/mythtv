@@ -14,7 +14,6 @@
 
 // Qt headers
 #include <qstring.h>
-#include <qdeepcopy.h>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -90,7 +89,7 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
     for (; !table->name.isEmpty(); table++)
     {
         if (type == table->value)
-            return QDeepCopy<QString>(table->name);
+            return Q3DeepCopy<QString>(table->name);
     }
     return QString::null;
 }

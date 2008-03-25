@@ -36,6 +36,18 @@ typedef struct {
     QString directory;
 } ThumbData;
 
+class ThumbGenEvent : public QEvent
+{
+  public:
+    enum Type
+    { ImageReady = (QEvent::User + 4000) };
+
+    ThumbGenEvent(Type t, ThumbData *td) : QEvent((QEvent::Type)t) { thumbData=td; }
+    ~ThumbGenEvent() {}
+
+    ThumbData *thumbData;
+};
+
 class ThumbGenerator : public QThread
 {
 public:

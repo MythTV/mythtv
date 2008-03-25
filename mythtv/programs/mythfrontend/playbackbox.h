@@ -10,6 +10,11 @@ using namespace std;
 #include <qdatetime.h>
 #include <qdom.h>
 #include <qmutex.h>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
 #include "mythwidgets.h"
 #include "mythdialogs.h"
@@ -19,12 +24,12 @@ using namespace std;
 #include "jobqueue.h"
 #include "tv_play.h"
 
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 #include <pthread.h>
 
-class QListViewItem;
+class Q3ListViewItem;
 class QLabel;
-class QProgressBar;
+class Q3ProgressBar;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
@@ -124,7 +129,7 @@ class PlaybackBox : public MythDialog
                 TV *player = NULL, bool showTV = false);
    ~PlaybackBox(void);
    
-    void customEvent(QCustomEvent *e);
+    void customEvent(QEvent *e);
     static ProgramInfo *RunPlaybackBox(void *player, bool);
 
   public slots:
@@ -502,7 +507,7 @@ class PlaybackBox : public MythDialog
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      ncLock;
-    QValueList<QString> networkControlCommands;
+    Q3ValueList<QString> networkControlCommands;
     bool                underNetworkControl;
     
     TV                  *m_player;

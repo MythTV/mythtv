@@ -6,6 +6,9 @@
   Directory class holding a simple contact database plus call history.
 */
 #include <iostream>
+//Added by qt3to4:
+#include <QStringList>
+#include <Q3PtrList>
 using namespace std;
 #include "directory.h"
 #include "qdatetime.h"
@@ -182,7 +185,7 @@ void DirEntry::deleteYourselfFromDB()
 //                Directory Class
 ///////////////////////////////////////////////////////
 
-Directory::Directory(QString Name):QPtrList<DirEntry>()
+Directory::Directory(QString Name):Q3PtrList<DirEntry>()
 {
     name = Name;
 }
@@ -214,7 +217,7 @@ void Directory::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
 }
 
 
-int Directory::compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2)
+int Directory::compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2)
 {
     DirEntry *d1 = (DirEntry *)s1;
     DirEntry *d2 = (DirEntry *)s2;
@@ -260,7 +263,7 @@ void Directory::deleteEntry(DirEntry *Entry)
     }
 }
 
-void Directory::AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly)
+void Directory::AddAllEntriesToList(QStringList &l, bool SpeeddialsOnly)
 {
     DirEntry *it;
     for (it=first(); it; it=next())
@@ -475,7 +478,7 @@ void CallHistory::writeTree(GenericTree *placed_tree, GenericTree *received_tree
 }
 
 
-int CallHistory::compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2)
+int CallHistory::compareItems(Q3PtrCollection::Item s1, Q3PtrCollection::Item s2)
 {
     CallRecord *d1 = (CallRecord *)s1;
     CallRecord *d2 = (CallRecord *)s2;
@@ -649,15 +652,15 @@ void DirectoryContainer::AddEntry(DirEntry *entry, QString Dir, bool addToUITree
 
 void DirectoryContainer::ChangeEntry(DirEntry *entry, QString nn, QString Url, QString fn, QString sn, QString ph, bool OnHomeLan)
 {
-    if (nn != 0)
+    if (!nn.isEmpty())
         entry->setNickName(nn);
-    if (Url != 0)
+    if (!Url.isEmpty())
         entry->setUri(Url);
-    if (fn != 0)
+    if (!fn.isEmpty())
         entry->setFirstName(fn);
-    if (sn != 0)
+    if (!sn.isEmpty())
         entry->setSurname(sn);
-    if (ph != 0)
+    if (!ph.isEmpty())
         entry->setPhotoFile(ph);
 
     entry->setOnHomeLan(OnHomeLan);
@@ -694,9 +697,9 @@ void DirectoryContainer::clearCallHistory()
 }
 
 
-QStrList DirectoryContainer::getDirectoryList(void)
+QStringList DirectoryContainer::getDirectoryList(void)
 {
-    QStrList l;
+    QStringList l;
     Directory *it;
     for (it=AllDirs.first(); it; it=AllDirs.next())
     {
@@ -760,7 +763,7 @@ GenericTree *DirectoryContainer::addToTree(QString DirName)
         return sub_node;
     }
 
-    cerr << "No directory called " << DirName << endl;
+    cerr << "No directory called " << DirName.toLocal8Bit().constData() << endl;
     return 0;
 }
 
@@ -922,23 +925,20 @@ void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
     // Fill tree from directory listing, using just the base name, which should be formatted nicely
-    const QFileInfoList *il = dir.entryInfoList();
-    if (il)
+    QFileInfoList il = dir.entryInfoList();
+
+    QFileInfoList::const_iterator it = il.begin();
+    for (int i=0; it != il.end(); ++it, i++)
     {
-        QFileInfoListIterator it(*il);
-        QFileInfo *fi;
-        for (int i=0; (fi = it.current()) != 0; ++it, i++)
-        {
-            GenericTree *sub_node = tree_to_write_to->addNode(fi->baseName(), 0, true);
-            sub_node->setAttribute(0, TA_VMAIL_ENTRY);
-            sub_node->setAttribute(1, i);
-            sub_node->setAttribute(2, i);
-        }
+        GenericTree *sub_node = tree_to_write_to->addNode(it->baseName(), 0, true);
+        sub_node->setAttribute(0, TA_VMAIL_ENTRY);
+        sub_node->setAttribute(1, i);
+        sub_node->setAttribute(2, i);
     }
 }
 
@@ -950,7 +950,7 @@ void DirectoryContainer::deleteVoicemail(QString vmailName)
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
@@ -971,7 +971,7 @@ void DirectoryContainer::clearAllVoicemail()
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
@@ -991,9 +991,9 @@ void DirectoryContainer::clearAllVoicemail()
 }
 
 
-QStrList DirectoryContainer::ListAllEntries(bool SpeeddialsOnly)
+QStringList DirectoryContainer::ListAllEntries(bool SpeeddialsOnly)
 {
-    QStrList l;
+    QStringList l;
     Directory *it;
     for (it=AllDirs.first(); it; it=AllDirs.next())
     {

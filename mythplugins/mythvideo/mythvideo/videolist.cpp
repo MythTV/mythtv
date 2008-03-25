@@ -1,4 +1,10 @@
-#include <qfileinfo.h>
+#include <memory>
+#include <algorithm>
+#include <iterator>
+#include <map>
+
+#include <QFileInfo>
+#include <Q3ValueList>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
@@ -14,11 +20,6 @@
 #include "dirscan.h"
 #include "videoutils.h"
 #include "parentalcontrols.h"
-
-#include <memory>
-#include <algorithm>
-#include <iterator>
-#include <map>
 
 namespace fake_unnamed
 {
@@ -906,8 +907,8 @@ void VideoListImp::buildFsysList()
     QStringList dirs = GetVideoDirs();
     if (dirs.size() > 1)
     {
-        for (QStringList::iterator iter = dirs.begin(); iter != dirs.end();
-             ++iter)
+        for (QStringList::const_iterator iter = dirs.begin();
+             iter != dirs.end(); ++iter)
         {
             node_paths.push_back(
                     node_to_path_list::value_type(path_to_node_name(*iter),
@@ -927,9 +928,9 @@ void VideoListImp::buildFsysList()
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
-        QValueList <MythMediaDevice*> medias = mon->GetMedias(MEDIATYPE_DATA);
+        Q3ValueList <MythMediaDevice*> medias = mon->GetMedias(MEDIATYPE_DATA);
 
-        for (QValueList <MythMediaDevice*>::Iterator itr = medias.begin();
+        for (Q3ValueList <MythMediaDevice*>::Iterator itr = medias.begin();
              itr != medias.end(); ++itr)
         {
             MythMediaDevice *pDev = *itr;

@@ -15,24 +15,28 @@ using namespace std;
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int retries) :
-    readthreadlive(true),
+    readthreadlive(true), readsLocked(false),
     rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
-    sock(remote), ateof(false), refCount(0)
+    sock(remote), ateof(false), lock(false), refLock(false), refCount(0)
 {
 }
 
-FileTransfer::FileTransfer(QString &filename, MythSocket *remote)
+FileTransfer::FileTransfer(QString &filename, MythSocket *remote) :
+    readthreadlive(true), readsLocked(false),
+    rbuffer(new RingBuffer(filename, false)),
+    sock(remote), ateof(false), lock(false), refLock(false), refCount(0)
 {
-    rbuffer = new RingBuffer(filename, false);
-    sock = remote;
-    readthreadlive = true;
-    ateof = false;
-    refCount = 0;
 }
 
 FileTransfer::~FileTransfer()
 {
-    sock->DownRef();
+    Stop();
+
+    if (rbuffer)
+    {
+        delete rbuffer;
+        rbuffer = NULL;
+    }
 }
 
 void FileTransfer::UpRef(void)
@@ -43,25 +47,16 @@ void FileTransfer::UpRef(void)
 
 bool FileTransfer::DownRef(void)
 {
-    refLock.lock();
-
-    refCount--;
-
-    if (refCount < 0)
+    int count = 0;
     {
-        Stop();
-
-        if (rbuffer)
-            delete rbuffer;
-
-        readthreadLock.unlock();
-        refLock.unlock();
-        delete this;
-        return true;
+        QMutexLocker locker(&refLock);
+        count = --refCount;
     }
+
+    if (count < 0)
+        delete this;
     
-    refLock.unlock();
-    return false;
+    return (count < 0);
 }
 
 bool FileTransfer::isOpen(void)
@@ -77,20 +72,26 @@ void FileTransfer::Stop(void)
     {
         readthreadlive = false;
         rbuffer->StopReads();
-        readthreadLock.lock();
+        QMutexLocker locker(&lock);
+        readsLocked = true;
     }
 }
 
 void FileTransfer::Pause(void)
 {
     rbuffer->StopReads();
-    readthreadLock.lock();
+    QMutexLocker locker(&lock);
+    readsLocked = true;
 }
 
 void FileTransfer::Unpause(void)
 {
     rbuffer->StartReads();
-    readthreadLock.unlock();
+    {
+        QMutexLocker locker(&lock);
+        readsLocked = false;
+    }
+    readsUnlockedCond.wakeAll();
 }
 
 int FileTransfer::RequestBlock(int size)
@@ -101,7 +102,10 @@ int FileTransfer::RequestBlock(int size)
     int tot = 0;
     int ret = 0;
 
-    readthreadLock.lock();
+    QMutexLocker locker(&lock);
+    while (readsLocked)
+        readsUnlockedCond.wait(&lock, 100 /*ms*/);
+
     requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
     char *buf = &requestBuffer[0];
     while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
@@ -123,7 +127,6 @@ int FileTransfer::RequestBlock(int size)
         if (ret < request)
             break; // we hit eof
     }
-    readthreadLock.unlock();
 
     return (ret < 0) ? -1 : tot;
 }

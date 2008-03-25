@@ -27,6 +27,9 @@
 
 // MythTV headers
 #include <mythtv/mythdialogs.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <QLabel>
 
 
 /** \class KeyGrabPopupBox
@@ -56,8 +59,8 @@ class KeyGrabPopupBox : public MythPopupBox
     bool     m_waitingForKeyRelease;
     bool     m_keyReleaseSeen;
     QString  m_capturedKey;
-    QButton *m_ok;
-    QButton *m_cancel;
+    QAbstractButton *m_ok;
+    QAbstractButton *m_cancel;
     QLabel  *m_label;
 };
 

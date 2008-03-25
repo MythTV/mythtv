@@ -2,8 +2,8 @@
 #define _COMMDETECTOR2_H_
 
 #include <qdatetime.h>
-#include <qptrlist.h>
-#include <qvaluelist.h>
+#include <q3ptrlist.h>
+#include <q3valuelist.h>
 
 #include "CommDetector.h"
 #include "CommDetectorBase.h"
@@ -54,10 +54,10 @@ private:
     bool                    finished;
 
     long long               currentFrameNumber;
-    typedef QValueList<QPtrList<FrameAnalyzer> >    frameAnalyzerList;
+    typedef Q3ValueList<Q3PtrList<FrameAnalyzer> >    frameAnalyzerList;
     frameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
     frameAnalyzerList::iterator currentPass;
-    QPtrList<FrameAnalyzer> finishedAnalyzers;
+    Q3PtrList<FrameAnalyzer> finishedAnalyzers;
 
     FrameAnalyzer::FrameMap breaks;
 

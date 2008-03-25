@@ -3,10 +3,12 @@
 
 #include <qobject.h>
 #include <qstringlist.h>
-#include <qvaluevector.h>
-#include <qsocket.h>
+#include <q3valuevector.h>
+#include <q3socket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
+#include <QEvent>
+#include <Q3PtrList>
 
 #include "remoteutil.h"
 
@@ -22,7 +24,7 @@ class LCDProcClient : public QObject
 
     LCDProcClient(LCDServer *lparent);
 
-    void customEvent(QCustomEvent  *e);
+    void customEvent(QEvent  *e);
 
    ~LCDProcClient();
 
@@ -43,9 +45,9 @@ class LCDProcClient : public QObject
     void switchToChannel(QString channum = "", QString title = "", 
                          QString subtitle = "");
     void setChannelProgress(float percentViewed);
-    void switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name = "",
+    void switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name = "",
                       bool popMenu = true);
-    void switchToGeneric(QPtrList<LCDTextItem> *textItems);
+    void switchToGeneric(Q3PtrList<LCDTextItem> *textItems);
     void setGenericProgress(bool busy, float generic_progress);
 
     void switchToVolume(QString app_name);
@@ -98,7 +100,7 @@ class LCDProcClient : public QObject
                          QString widget = "scroller", int top = 1, int bottom = 1);
 
     QStringList formatScrollerText(const QString &text);
-    void outputText(QPtrList<LCDTextItem> *textItems);
+    void outputText(Q3PtrList<LCDTextItem> *textItems);
 
     void sendToServer(const QString &someText);
 
@@ -122,15 +124,15 @@ class LCDProcClient : public QObject
     void startTime();
     void startMusic(QString artist, QString album, QString track);
     void startChannel(QString channum, QString title, QString subtitle);
-    void startGeneric(QPtrList<LCDTextItem> * textItems);
-    void startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
+    void startGeneric(Q3PtrList<LCDTextItem> * textItems);
+    void startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
                    bool popMenu);
     void startVolume(QString app_name);
     void showStartupMessage(void);
 
     QString activeScreen;
 
-    QSocket *socket;
+    Q3Socket *socket;
     QTimer *timeTimer;
     QTimer *scrollWTimer;
     QTimer *preScrollWTimer;
@@ -188,7 +190,7 @@ class LCDProcClient : public QObject
     int music_repeat;
     int music_shuffle;
 
-    QPtrList<LCDTextItem> *lcdTextItems;
+    Q3PtrList<LCDTextItem> *lcdTextItems;
     QString scrollingText;
     QString scrollScreen;
     unsigned int scrollPosition;
@@ -200,7 +202,7 @@ class LCDProcClient : public QObject
     unsigned int scrollListItem;
 
     unsigned int menuScrollPosition;
-    QPtrList<LCDMenuItem> *lcdMenuItems;
+    Q3PtrList<LCDMenuItem> *lcdMenuItems;
 
     bool connected;
     bool timeFlash;
@@ -233,7 +235,7 @@ class LCDProcClient : public QObject
     bool isTimeVisible;
     int lcdTunerNo;
 
-    QPtrList<TunerStatus> tunerList;
+    Q3PtrList<TunerStatus> tunerList;
 };
 
 #endif

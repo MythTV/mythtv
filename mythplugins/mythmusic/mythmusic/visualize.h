@@ -19,6 +19,8 @@
 #include "config.h"
 
 #include <complex>
+//Added by qt3to4:
+#include <Q3MemArray>
 extern "C" {
 #ifdef FFTW3_SUPPORT
 #include <fftw3.h>
@@ -61,8 +63,8 @@ class Spectrum : public VisualBase
     inline double clamp(double cur, double max, double min);
 
     QColor startColor, targetColor;
-    QMemArray<QRect> rects;
-    QMemArray<double> magnitudes;
+    Q3MemArray<QRect> rects;
+    Q3MemArray<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;
@@ -157,8 +159,8 @@ class Gears : public QGLWidget, public VisualBase
 		
   private:
     QColor startColor, targetColor;
-    QMemArray<QRect> rects;
-    QMemArray<double> magnitudes;
+    Q3MemArray<QRect> rects;
+    Q3MemArray<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;

@@ -4,7 +4,7 @@
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qobject.h>
-#include <qprocess.h>
+#include <q3process.h>
 
 #include <qtimer.h>
 
@@ -35,10 +35,10 @@ class WeatherSource : public QObject
 
   public:
     static ScriptInfo *probeScript(const QFileInfo &fi);
-    static QStringList probeTypes(QProcess *proc);
-    static bool probeTimeouts(QProcess *proc, uint &updateTimeout,
+    static QStringList probeTypes(Q3Process *proc);
+    static bool probeTimeouts(Q3Process *proc, uint &updateTimeout,
                               uint &scriptTimeout);
-    static bool probeInfo(QProcess *proc, QString &name, QString &version,
+    static bool probeInfo(Q3Process *proc, QString &name, QString &version,
                               QString &author, QString &email);
 
     WeatherSource(ScriptInfo *info);
@@ -92,7 +92,7 @@ class WeatherSource : public QObject
     bool m_ready;
     bool m_inuse;
     ScriptInfo *m_info;
-    QProcess *m_proc;
+    Q3Process *m_proc;
     QString m_dir;
     QString m_locale;
     QString m_buffer;

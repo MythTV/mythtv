@@ -6,6 +6,9 @@
 
 // qt
 #include <qapplication.h>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QEvent>
 
 // myth
 #include "mythcontext.h"
@@ -120,7 +123,7 @@ DialogCode WelcomeDialog::exec(void)
     return kDialogCodeAccepted;
 }
 
-void WelcomeDialog::customEvent(QCustomEvent *e)
+void WelcomeDialog::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -274,7 +277,7 @@ UITextType* WelcomeDialog::getTextType(QString name)
 
     if (!type)
     {
-        cout << "ERROR: Failed to find '" << name <<  "' UI element in theme file\n"
+        cout << "ERROR: Failed to find '" << (const char *)name <<  "' UI element in theme file\n"
              << "Bailing out!" << endl;
         exit(0);
     }
@@ -374,10 +377,10 @@ void WelcomeDialog::updateScreen(void)
             {
                 status = QObject::tr("Tuner %1 is recording:\n")
                     .arg(tuner->id);
-                status += QDeepCopy<QString>(tuner->channame);
-                status += "\n" + QDeepCopy<QString>(tuner->title);
+                status += Q3DeepCopy<QString>(tuner->channame);
+                status += "\n" + Q3DeepCopy<QString>(tuner->title);
                 if (!tuner->subtitle.isEmpty()) 
-                    status += "\n("+QDeepCopy<QString>(tuner->subtitle)+")";
+                    status += "\n("+Q3DeepCopy<QString>(tuner->subtitle)+")";
                 status += "\n" + tuner->startTime.toString("hh:mm") + 
                           " " + tr("to") + " " + tuner->endTime.toString("hh:mm");
             }
@@ -653,7 +656,7 @@ void WelcomeDialog::showPopup(void)
 
     popup = new MythPopupBox(gContext->GetMainWindow(), "Menu");
 
-    QButton *topButton;
+    QAbstractButton *topButton;
     QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 

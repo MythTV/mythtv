@@ -3,12 +3,13 @@
 
 // C++ includes
 #include <iostream>
+#include <Q3ValueList>
 
 using namespace std;
 
 // qt
 #include <qapplication.h>
-#include <qurl.h>
+#include <q3url.h>
 #include <qwidget.h>
 
 // mythtv
@@ -455,7 +456,7 @@ void MusicPlayer::nextAuto(void)
     }
 }
 
-void MusicPlayer::customEvent(QCustomEvent *event)
+void MusicPlayer::customEvent(QEvent *event)
 {
     if (m_isAutoplay)
     {
@@ -577,7 +578,7 @@ QString MusicPlayer::getFilenameFromID(int id)
         if (query.isActive() && query.size() > 0)
         {
             query.first();
-            filename = QString::fromUtf8(query.value(0).toString());
+            filename = query.value(0).toString();
             if (!filename.contains("://"))
                 filename = Metadata::GetStartdir() + filename;
         }
@@ -651,7 +652,7 @@ void MusicPlayer::savePosition(void)
 
 void MusicPlayer::restorePosition(const QString &position)
 {
-    QValueList <int> branches_to_current_node;
+    Q3ValueList <int> branches_to_current_node;
 
     if (position != "")
     {

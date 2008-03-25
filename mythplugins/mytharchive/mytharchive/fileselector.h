@@ -6,6 +6,10 @@
 // qt
 #include <qstring.h>
 #include <qstringlist.h>
+//Added by qt3to4:
+#include <QKeyEvent>
+#include <Q3PtrList>
+#include <QPixmap>
 
 // myth
 #include <mythtv/mythdialogs.h>
@@ -59,7 +63,7 @@ class FileSelector : public MythThemedDialog
     FSTYPE  m_selectorType;
     QString m_filemask;
     QString m_curDirectory;
-    QPtrList<FileData> m_fileData;
+    Q3PtrList<FileData> m_fileData;
     QStringList        m_selectedList;
 
     //

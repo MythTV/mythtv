@@ -4,6 +4,10 @@
 #include "managedlist.h"
 #include "xmlparse.h"
 
+#include <QPaintEvent>
+#include <QKeyEvent>
+#include <QPixmap>
+
 class RootSRGroup;
 class ScheduledRecording;
 class ProgramInfo;
@@ -41,7 +45,7 @@ class RecOptDialog : public MythDialog
         bool refillAll;
     
         ManagedList listMenu;
-        QGuardedPtr<RootSRGroup> rootGroup;
+        QPointer<RootSRGroup> rootGroup;
         void updateInfo(QPainter *p);
         void updateBackground(void);
         void LoadWindow(QDomElement &);

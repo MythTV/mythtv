@@ -10,13 +10,15 @@
 
 // Qt headers
 #include <qmutex.h>
-#include <qcstring.h>
+#include <q3cstring.h>
 #include <qstring.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <qwaitcondition.h>
 #include <qimage.h>
-#include <qvaluelist.h>
-#include <qptrqueue.h>
+#include <q3valuelist.h>
+#include <q3ptrqueue.h>
+#include <Q3PointArray>
+#include <Q3MemArray>
 
 // MythTV headers
 #include "../libmythfreemheg/freemheg.h"
@@ -146,10 +148,10 @@ class MHIContext : public MHContext
 
     Dsmcc           *m_dsmcc;  // Pointer to the DSMCC object carousel.
     QMutex           m_dsmccLock;
-    QPtrQueue<DSMCCPacket> m_dsmccQueue;
+    Q3PtrQueue<DSMCCPacket> m_dsmccQueue;
 
     QMutex           m_keyLock;
-    QValueList<int>  m_keyQueue;
+    Q3ValueList<int>  m_keyQueue;
     int              m_keyProfile;
 
     MHEG            *m_engine; // Pointer to the MHEG engine
@@ -163,7 +165,7 @@ class MHIContext : public MHContext
     int              m_displayHeight;
 
 
-    QPtrList<MHIImageData> m_display; // List of items to display
+    Q3PtrList<MHIImageData> m_display; // List of items to display
 
     FT_Face          m_face;
     bool             m_face_loaded;
@@ -179,7 +181,7 @@ class MHIContext : public MHContext
     int              m_tuningTo;
 
     uint             m_lastNbiVersion;
-    QMemArray<unsigned char> m_nbiData;
+    Q3MemArray<unsigned char> m_nbiData;
 };
 
 // Object for drawing text.
@@ -279,7 +281,7 @@ class MHIDLA : public MHDLADisplay
     virtual void DrawOval(int x, int y, int width, int height);
     virtual void DrawArcSector(int x, int y, int width, int height,
                                int start, int arc, bool isSector);
-    virtual void DrawPoly(bool isFilled, const QPointArray &points);
+    virtual void DrawPoly(bool isFilled, const Q3PointArray &points);
 
   protected:
     void DrawRect(int x, int y, int width, int height, MHRgba colour);

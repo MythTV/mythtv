@@ -1,13 +1,17 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <qheader.h>
+#include <q3header.h>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
 #include <iostream>
 #include <map>
@@ -151,7 +155,7 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -483,7 +487,7 @@ void ProgLister::updateKeywordInDB(const QString &text)
     {
         if (oldview >= 0)
         {
-            qphrase = viewList[oldview].utf8();
+            qphrase = viewList[oldview];
 
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("DELETE FROM keyword "
@@ -494,7 +498,7 @@ void ProgLister::updateKeywordInDB(const QString &text)
         }
         if (newview < 0)
         {
-            qphrase = text.utf8();
+            qphrase = text;
 
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -592,7 +596,7 @@ void ProgLister::addSearchRecord(void)
             return;
 
         MSqlBindings bindings;
-        genreflag = powerStringToSQL(text.utf8(), what, bindings);
+        genreflag = powerStringToSQL(text, what, bindings);
 
         if (what == "")
             return;
@@ -632,7 +636,7 @@ void ProgLister::deleteKeyword(void)
         return;
 
     QString text = viewList[view];
-    QString qphrase = text.utf8();
+    QString qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM keyword "
@@ -990,9 +994,9 @@ void ProgLister::powerEdit()
         while (query.next())
         {
             QString category = query.value(0).toString();
-            if (category <= " " || category == NULL)
+            if (category.isEmpty() || category.trimmed().isEmpty())
                 continue;
-            category = QString::fromUtf8(query.value(0).toString());
+            category = query.value(0).toString();
             powerGenre->insertItem(category);
             genreList << category;
             if (category == field[4])
@@ -1011,7 +1015,7 @@ void ProgLister::powerEdit()
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = QDeepCopy<QString>(channelFormat);
+        QString chantext = Q3DeepCopy<QString>(channelFormat);
         chantext
             .replace("<num>",  channels[i].channum)
             .replace("<sign>", channels[i].callsign)
@@ -1072,14 +1076,14 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         return ret;
     }
 
-    if (field[0])
+    if (!field[0].isEmpty())
     {
         curfield = "%" + field[0] + "%";
         output += "program.title LIKE :POWERTITLE ";
         bindings[":POWERTITLE"] = curfield;
     }
 
-    if (field[1])
+    if (!field[1].isEmpty())
     {
         if (output > "")
             output += "\nAND ";
@@ -1089,7 +1093,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         bindings[":POWERSUB"] = curfield;
     }
 
-    if (field[2])
+    if (!field[2].isEmpty())
     {
         if (output > "")
             output += "\nAND ";
@@ -1099,7 +1103,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         bindings[":POWERDESC"] = curfield;
     }
 
-    if (field[3])
+    if (!field[3].isEmpty())
     {
         if (output > "")
             output += "\nAND ";
@@ -1108,7 +1112,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         bindings[":POWERCATTYPE"] = field[3];
     }
 
-    if (field[4])
+    if (!field[4].isEmpty())
     {
         if (output > "")
             output += "\nAND ";
@@ -1118,7 +1122,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         ret = 1;
     }
 
-    if (field[5])
+    if (!field[5].isEmpty())
     {
         if (output > "")
             output += "\nAND ";
@@ -1232,7 +1236,7 @@ void ProgLister::fillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); i++)
         {
-            QString chantext = QDeepCopy<QString>(channelFormat);
+            QString chantext = Q3DeepCopy<QString>(channelFormat);
             chantext
                 .replace("<num>",  channels[i].channum)
                 .replace("<sign>", channels[i].callsign)
@@ -1268,7 +1272,7 @@ void ProgLister::fillViewList(const QString &view)
 
             while (query.next())
             {
-                QString genre1 = query.value(0).toString().utf8();
+                QString genre1 = query.value(0).toString();
                 if (genre1 <= " ")
                     continue;
 
@@ -1279,7 +1283,7 @@ void ProgLister::fillViewList(const QString &view)
                     lastGenre1 = genre1;
                 }
 
-                QString genre2 = query.value(1).toString().utf8();
+                QString genre2 = query.value(1).toString();
                 if (genre2 <= " " || genre2 == genre1)
                     continue;
 
@@ -1303,9 +1307,9 @@ void ProgLister::fillViewList(const QString &view)
                 while (query.next())
                 {
                     QString category = query.value(0).toString();
-                    if (category <= " " || category == NULL)
+                    if (category <= " " || category.isNull())
                         continue;
-                    category = QString::fromUtf8(query.value(0).toString());
+                    category = query.value(0).toString();
                     viewList << category;
                     viewTextList << category;
                 }
@@ -1333,7 +1337,7 @@ void ProgLister::fillViewList(const QString &view)
                 QString phrase = query.value(0).toString();
                 if (phrase <= " ")
                     continue;
-                phrase = QString::fromUtf8(query.value(0).toString());
+                phrase = query.value(0).toString();
                 viewList << phrase;
                 viewTextList << phrase;
             }
@@ -1344,7 +1348,7 @@ void ProgLister::fillViewList(const QString &view)
 
             if (curView < 0)
             {
-                QString qphrase = view.utf8();
+                QString qphrase = view;
 
                 MSqlQuery query(MSqlQuery::InitCon()); 
                 query.prepare("REPLACE INTO keyword (phrase, searchtype)"
@@ -1456,7 +1460,7 @@ void ProgLister::fillViewList(const QString &view)
             if (query.next())
             {
                 QString title = query.value(0).toString();
-                title = QString::fromUtf8(query.value(0).toString());
+                title = query.value(0).toString();
                 viewList << view;
                 viewTextList << title;
             }
@@ -1474,9 +1478,9 @@ void ProgLister::fillViewList(const QString &view)
             while (query.next())
             {
                 QString rulename = query.value(0).toString();
-                if (rulename <= " " || rulename == NULL)
+                if (rulename.isEmpty() || rulename.trimmed().isEmpty())
                     continue;
-                rulename = QString::fromUtf8(query.value(0).toString());
+                rulename = query.value(0).toString();
                 viewList << rulename;
                 viewTextList << rulename;
             }
@@ -1534,7 +1538,7 @@ void ProgLister::fillItemList(void)
     bool oneChanid = false;
     QString where = "";
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
-    QString qphrase = viewList[curView].utf8();
+    QString qphrase = viewList[curView];
 
     MSqlBindings bindings;
     bindings[":PGILSTART"] = startstr;
@@ -1952,7 +1956,7 @@ void ProgLister::updateInfo(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ProgLister::customEvent(QCustomEvent *e)
+void ProgLister::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;

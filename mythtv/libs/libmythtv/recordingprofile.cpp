@@ -4,7 +4,7 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythwizard.h"
 #include <qsqldatabase.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qcursor.h>
 #include <qlayout.h>
 #include <iostream>
@@ -1099,7 +1099,7 @@ class RecordingProfilePopup
 
         bool ok = (MythDialog::Accepted == popup->ExecPopup());
         if (ok)
-            text = QDeepCopy<QString>(textEdit->text());
+            text = textEdit->text();
 
         popup->hide();
         popup->deleteLater();
@@ -1130,7 +1130,7 @@ RecordingProfile::RecordingProfile(QString profName)
     tr_lossless = NULL;
     tr_resize = NULL;
 
-    if (profName != NULL)
+    if (!profName.isEmpty())
     {
         if (profName.left(11) == "Transcoders")
         {
@@ -1218,7 +1218,7 @@ void RecordingProfile::loadByID(int profileId)
         audioSettings = new AudioCompressionSettings(*this, profileName);
         addChild(audioSettings);
 
-        if (profileName && profileName.left(11) == "Transcoders")
+        if (!profileName.isEmpty() && profileName.left(11) == "Transcoders")
         {
             connect(tr_resize,   SIGNAL(valueChanged   (bool)),
                     this,        SLOT(  ResizeTranscode(bool)));

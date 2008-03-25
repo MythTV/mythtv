@@ -25,12 +25,20 @@
 #include <cstdlib>
 
 #include <qapplication.h>
-#include <qnetwork.h>
+#include <q3network.h>
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
 #include <qregexp.h>
+//Added by qt3to4:
+#include <Q3HBoxLayout>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QPixmap>
+#include <Q3VBoxLayout>
+#include <QPaintEvent>
+#include <QUrl>
 
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
@@ -72,7 +80,7 @@ void MythNewsBusyDialog::keyPressEvent(QKeyEvent *e)
 MythNews::MythNews(MythMainWindow *parent, const char *name )
     : MythDialog(parent, name)
 {
-    qInitNetworkProtocols ();
+    q3InitNetworkProtocols ();
 
     // Setup cache directory
 
@@ -138,9 +146,9 @@ void MythNews::loadSites(void)
         QString icon;
         QDateTime time;
         while ( query.next() ) {
-            name = QString::fromUtf8(query.value(0).toString());
-            url  = QString::fromUtf8(query.value(1).toString());
-            icon = QString::fromUtf8(query.value(2).toString());
+            name = query.value(0).toString();
+            url  = query.value(1).toString();
+            icon = query.value(2).toString();
             time.setTime_t(query.value(3).toUInt());
             m_NewsSites.append(new NewsSite(name,url,time));
         }
@@ -293,7 +301,7 @@ void MythNews::updateSitesView()
     p.end();
 
     bitBlt(this, m_SitesRect.left(), m_SitesRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
 }
 
 void MythNews::updateArticlesView()
@@ -317,7 +325,7 @@ void MythNews::updateArticlesView()
     p.end();
 
     bitBlt(this, m_ArticlesRect.left(), m_ArticlesRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
 }
 
 void MythNews::updateInfoView()
@@ -383,7 +391,7 @@ void MythNews::updateInfoView()
                     ttype->SetText(artText);
                 }
 
-                if (article->thumbnail())
+                if (!article->thumbnail().isEmpty())
                 {
                     QString fileprefix = MythContext::GetConfDir();
 
@@ -417,7 +425,7 @@ void MythNews::updateInfoView()
                 }
                 else
                 {
-                    if (site->imageURL())
+                    if (!site->imageURL().isEmpty())
                     {
                         QString fileprefix = MythContext::GetConfDir();
 
@@ -472,7 +480,7 @@ void MythNews::updateInfoView()
                 if (ttype)
                     ttype->SetText(site->description());
 
-                if (site->imageURL())
+                if (!site->imageURL().isEmpty())
                 {
                     QString fileprefix = MythContext::GetConfDir();
 
@@ -545,7 +553,7 @@ void MythNews::updateInfoView()
         {
             if ((article) && (m_InColumn == 1))
             {
-                if (article->enclosure())
+                if (!article->enclosure().isEmpty())
                 {
                     if (itype->isHidden())
                         itype->show();
@@ -562,7 +570,7 @@ void MythNews::updateInfoView()
         {
             if ((article) && (m_InColumn == 1))
             {
-                if (article->enclosure())
+                if (!article->enclosure().isEmpty())
                 {
                     if (dtype->isHidden())
                         dtype->show();
@@ -589,7 +597,7 @@ void MythNews::updateInfoView()
 
 
     bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
+           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
 }
 
 QString MythNews::formatSize(long long bytes, int prec)
@@ -742,7 +750,7 @@ void MythNews::slotNewsRetrieved(NewsSite* site)
     query.prepare("UPDATE newssites SET updated = :UPDATED "
                   "WHERE name = :NAME ;");
     query.bindValue(":UPDATED", updated);
-    query.bindValue(":NAME", site->name().utf8());
+    query.bindValue(":NAME", site->name());
     if (!query.exec() || !query.isActive())
         MythContext::DBError("news update time", query);
 
@@ -884,7 +892,7 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
                     if (data.size() > 0)
                     {
                         QFile file(sFilename);
-                        if (file.open( IO_WriteOnly ))
+                        if (file.open( QIODevice::WriteOnly ))
                         {
                             QDataStream stream(& file);
                             stream.writeRawBytes( (const char*) (data), data.size() );
@@ -911,7 +919,7 @@ void MythNews::slotViewArticle()
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
-            if (article->enclosure())
+            if (!article->enclosure().isEmpty())
             {
                 QString cmdURL(article->enclosure());
                 // Handle special cases for media here
@@ -920,7 +928,7 @@ void MythNews::slotViewArticle()
                 {
                     cmdURL = QString(article->mediaURL());
                     QString mediaPage = HttpComms::getHttp(cmdURL);
-                    if (mediaPage)
+                    if (!mediaPage.isEmpty())
                     {
                         // If this breaks in the future, we are building the URL to download
                         // a video.  At this time, this requires the video_id and the t argument
@@ -970,7 +978,7 @@ void MythNews::slotViewArticle()
                         .arg(gContext->GetMainWindow()->width())
                         .arg(gContext->GetMainWindow()->height());
 
-                if (!gContext->GetMainWindow()->testWFlags(Qt::WStyle_NoBorder))
+                if (gContext->GetMainWindow()->windowFlags() & Qt::WStyle_NoBorder)
                     geometry += " -g ";
 
                 QString cmd = QString("%1 %2 %3 '%4'")
@@ -990,8 +998,8 @@ bool MythNews::showEditDialog(bool edit)
 {
     MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit news site");
 
-    QVBoxLayout *vbox = new QVBoxLayout(NULL, 0, (int)(10 * hmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    Q3VBoxLayout *vbox = new Q3VBoxLayout(NULL, 0, (int)(10 * hmult));
+    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
 
     QString title;
     if (edit)
@@ -1012,7 +1020,7 @@ bool MythNews::showEditDialog(bool edit)
     label->setMaximumWidth((int)(500 * wmult));
     hbox->addWidget(label);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     label = new QLabel(tr("Name:"), popup, "nopopsize");
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -1024,7 +1032,7 @@ bool MythNews::showEditDialog(bool edit)
     titleEditor->setFocus(); 
     hbox->addWidget(titleEditor);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     label = new QLabel(tr("URL:"), popup, "nopopsize");
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -1035,7 +1043,7 @@ bool MythNews::showEditDialog(bool edit)
     MythRemoteLineEdit *urlEditor = new MythRemoteLineEdit(popup);
     hbox->addWidget(urlEditor);
 
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
     label = new QLabel(tr("Icon:"), popup, "nopopsize");
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -1087,7 +1095,8 @@ void MythNews::showMenu()
 {
     menu = new MythPopupBox(GetMythMainWindow(),"popupMenu");
 
-    QButton *temp = menu->addButton(tr("Edit News Site"), this, SLOT(editNewsSite()));
+    QAbstractButton *temp = menu->addButton(tr("Edit News Site"), this,
+                                            SLOT(editNewsSite()));
     menu->addButton(tr("Add News Site"), this, SLOT(addNewsSite()));
     menu->addButton(tr("Delete News Site"), this, SLOT(deleteNewsSite()));
     menu->addButton(tr("Cancel"), this, SLOT(cancelMenu()));
@@ -1148,7 +1157,7 @@ bool MythNews::findInDB(const QString& name)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("new find in db", query);
         return val;
@@ -1168,10 +1177,10 @@ bool MythNews::insertInDB(const QString &name, const QString &url,
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO newssites (name,category,url,ico) "
             " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
-    query.bindValue(":NAME", name.utf8());
-    query.bindValue(":CATEGORY", category.utf8());
-    query.bindValue(":URL", url.utf8());
-    query.bindValue(":ICON", icon.utf8());
+    query.bindValue(":NAME", name);
+    query.bindValue(":CATEGORY", category);
+    query.bindValue(":URL", url);
+    query.bindValue(":ICON", icon);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("news: inserting in DB", query);
         return false;
@@ -1184,7 +1193,7 @@ bool MythNews::removeFromDB(const QString &name)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("news: delete from db", query);
         return false;

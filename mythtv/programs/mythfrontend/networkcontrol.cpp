@@ -5,9 +5,10 @@ using namespace std;
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qstringlist.h>
-#include <qtextstream.h>
+#include <q3textstream.h>
 #include <qdir.h>
-#include <qdeepcopy.h>
+#include <QKeyEvent>
+#include <QEvent>
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdialogs.h"
@@ -39,7 +40,7 @@ static bool is_abbrev(QString const& command, QString const& test, unsigned minc
 }
 
 NetworkControl::NetworkControl(int port)
-          : QServerSocket(port, 1),
+          : Q3ServerSocket(port, 1),
             prompt("# "),
             gotAnswer(false), answer(""),
             client(NULL), cs(NULL)
@@ -256,7 +257,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
         result = processHelp(tokens);
     else if ((tokens[0].lower() == "exit") || (tokens[0].lower() == "quit"))
         QApplication::postEvent(this,
-                                new QCustomEvent(kNetworkControlCloseEvent));
+                                new QEvent((QEvent::Type)kNetworkControlCloseEvent));
     else if (! tokens[0].isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(tokens[0]);
@@ -264,7 +265,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
     if (result != "")
     {
         nrLock.lock();
-        networkControlReplies.push_back(QDeepCopy<QString>(result));
+        networkControlReplies.push_back(result);
         nrLock.unlock();
 
         notifyDataAvailable();
@@ -275,7 +276,7 @@ void NetworkControl::newConnection(int socket)
 {
     QString welcomeStr = "";
     bool closedOldConn = false;
-    QSocket *s = new QSocket(this);
+    Q3Socket *s = new Q3Socket(this);
     connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(s, SIGNAL(delayedCloseFinished()), this, SLOT(discardClient()));
     connect(s, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
@@ -284,8 +285,8 @@ void NetworkControl::newConnection(int socket)
     VERBOSE(VB_IMPORTANT, LOC +
             QString("New connection established. (%1)").arg(socket));
 
-    QTextStream *os = new QTextStream(s);
-    os->setEncoding(QTextStream::UnicodeUTF8);
+    Q3TextStream *os = new Q3TextStream(s);
+    os->setEncoding(Q3TextStream::UnicodeUTF8);
 
     QMutexLocker locker(&clientLock);
     if (client)
@@ -327,7 +328,7 @@ void NetworkControl::newConnection(int socket)
 
 void NetworkControl::readClient(void)
 {
-    QSocket *socket = (QSocket *)sender();
+    Q3Socket *socket = (Q3Socket *)sender();
     if (!socket)
         return;
 
@@ -346,7 +347,7 @@ void NetworkControl::readClient(void)
         tokens = QStringList::split(" ", lineIn);
 
         ncLock.lock();
-        networkControlCommands.push_back(QDeepCopy<QString>(lineIn));
+        networkControlCommands.push_back(lineIn);
         ncCond.wakeOne();
         ncLock.unlock();
     }
@@ -354,7 +355,7 @@ void NetworkControl::readClient(void)
 
 void NetworkControl::discardClient(void)
 {
-    QSocket *socket = (QSocket *)sender();
+    Q3Socket *socket = (Q3Socket *)sender();
     if (!socket)
         return;
 
@@ -427,10 +428,10 @@ QString NetworkControl::processKey(QStringList tokens)
         {
             int keyCode = keyMap[tokens[curToken]];
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, NoButton);
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, Qt::NoButton);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, NoButton);
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, Qt::NoButton);
             QApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
@@ -441,7 +442,7 @@ QString NetworkControl::processKey(QStringList tokens)
             QKeySequence a(tokens[curToken]);
             int keyCode = a[0];
             int ch = (tokens[curToken].ascii())[tokenLen - 1];
-            int buttons = NoButton;
+            int buttons = Qt::NoButton;
 
             if (tokenLen > 1)
             {
@@ -452,13 +453,13 @@ QString NetworkControl::processKey(QStringList tokens)
                 while (partNum < (tokenParts.size() - 1))
                 {
                     if (tokenParts[partNum].upper() == "CTRL")
-                        buttons |= ControlButton;
+                        buttons |= Qt::ControlButton;
                     if (tokenParts[partNum].upper() == "SHIFT")
-                        buttons |= ShiftButton;
+                        buttons |= Qt::ShiftButton;
                     if (tokenParts[partNum].upper() == "ALT")
-                        buttons |= AltButton;
+                        buttons |= Qt::AltButton;
                     if (tokenParts[partNum].upper() == "META")
-                        buttons |= MetaButton;
+                        buttons |= Qt::MetaButton;
 
                     partNum++;
                 }
@@ -466,7 +467,7 @@ QString NetworkControl::processKey(QStringList tokens)
             else
             {
                 if (tokens[curToken] == tokens[curToken].upper())
-                    buttons = ShiftButton;
+                    buttons = Qt::ShiftButton;
             }
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
@@ -826,10 +827,10 @@ QString NetworkControl::processHelp(QStringList tokens)
 void NetworkControl::notifyDataAvailable(void)
 {
     QApplication::postEvent(this,
-                            new QCustomEvent(kNetworkControlDataReadyEvent));
+                            new QEvent((QEvent::Type)kNetworkControlDataReadyEvent));
 }
 
-void NetworkControl::customEvent(QCustomEvent *e)
+void NetworkControl::customEvent(QEvent *e)
 {       
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {   
@@ -855,7 +856,7 @@ void NetworkControl::customEvent(QCustomEvent *e)
             for (unsigned int i = 3; i < tokens.size(); i++)
                 response += QString(" ") + tokens[i];
             nrLock.lock();
-            networkControlReplies.push_back(QDeepCopy<QString>(response));
+            networkControlReplies.push_back(response);
             nrLock.unlock();
 
             notifyDataAvailable();
@@ -871,7 +872,7 @@ void NetworkControl::customEvent(QCustomEvent *e)
         nrLock.lock();
         replies = networkControlReplies.size();
         while (client && cs && replies > 0 &&
-               client->state() == QSocket::Connected)
+               client->state() == Q3Socket::Connected)
         {
             reply = networkControlReplies.front();
             networkControlReplies.pop_front();
@@ -886,7 +887,7 @@ void NetworkControl::customEvent(QCustomEvent *e)
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
-        if (client && client->state() == QSocket::Connected)
+        if (client && client->state() == Q3Socket::Connected)
         {
             clientLock.lock();
             client->close();
@@ -924,8 +925,8 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     {
         while (query.next())
         {
-            QString title = QString::fromUtf8(query.value(3).toString());
-            QString subtitle = QString::fromUtf8(query.value(4).toString());
+            QString title = query.value(3).toString();
+            QString subtitle = query.value(4).toString();
 
             if (subtitle > " ")
                 title += QString(" -\"%1\"").arg(subtitle);
@@ -936,7 +937,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
                              .rightJustify(5, ' '))
                         .arg(query.value(1).toDateTime().toString(Qt::ISODate))
                         .arg(query.value(2).toDateTime().toString(Qt::ISODate))
-                        .arg(title.local8Bit());
+                        .arg(title.local8Bit().constData());
 
             if (appendCRLF)
                 result += "\r\n";
@@ -974,8 +975,8 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     {
         while (query.next())
         {
-            QString title = QString::fromUtf8(query.value(2).toString());
-            QString subtitle = QString::fromUtf8(query.value(3).toString());
+            QString title = query.value(2).toString();
+            QString subtitle = query.value(3).toString();
 
             if (subtitle > " ")
                 episode = QString("%1 -\"%2\"")

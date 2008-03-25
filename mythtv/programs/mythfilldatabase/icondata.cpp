@@ -4,8 +4,6 @@
 
 // Qt headers
 #include <qdom.h>
-#include <qstring.h>
-#include <qregexp.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 
@@ -227,7 +225,7 @@ void IconData::ImportIconMap(const QString &filename)
 
     QFile xml_file;
 
-    if (dash_open(xml_file, filename, IO_ReadOnly))
+    if (dash_open(xml_file, filename, QIODevice::ReadOnly))
     {
         QDomDocument doc;
         QString de_msg;
@@ -342,7 +340,7 @@ void IconData::ExportIconMap(const QString &filename)
                                 .arg(filename));
 
     QFile xml_file(filename);
-    if (dash_open(xml_file, filename, IO_WriteOnly))
+    if (dash_open(xml_file, filename, QIODevice::WriteOnly))
     {
         QTextStream os(&xml_file);
         os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";

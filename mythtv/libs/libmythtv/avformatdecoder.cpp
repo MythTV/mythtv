@@ -7,6 +7,8 @@
 #include <iostream>
 using namespace std;
 
+#include <q3tl.h>
+
 // MythTV headers
 #include "mythconfig.h"
 #include "avformatdecoder.h"

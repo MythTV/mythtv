@@ -21,6 +21,8 @@
 
 // Qt headers
 #include <qstringlist.h>
+#include <QKeyEvent>
+#include <Q3PtrList>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
@@ -47,7 +49,7 @@ class IconView : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QCustomEvent*);
+    void customEvent(QEvent*);
 
     QString GetError(void) { return m_errorStr; }
 
@@ -95,8 +97,8 @@ class IconView : public MythScreenType
 
     void ClearMenu(MythListButton *menu);
 
-    QPtrList<ThumbItem> m_itemList;
-    QDict<ThumbItem>    m_itemDict;
+    Q3PtrList<ThumbItem> m_itemList;
+    Q3Dict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
 

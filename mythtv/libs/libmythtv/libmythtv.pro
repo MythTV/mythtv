@@ -383,7 +383,7 @@ using_backend {
     # Support for Video4Linux devices
     using_v4l {
         HEADERS += channel.h                   analogsignalmonitor.h
-        SOURCES += channel.cpp                 analogsignalmonitor.h
+        SOURCES += channel.cpp                 analogsignalmonitor.cpp
 
         DEFINES += USING_V4L
     }
@@ -515,3 +515,6 @@ inc.path = $${PREFIX}/include/mythtv/libmythtv/
 inc.files = programinfo.h remoteutil.h recordingtypes.h
 
 INSTALLS += inc
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

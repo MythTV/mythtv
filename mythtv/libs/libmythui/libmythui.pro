@@ -20,7 +20,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
-HEADERS += mythpainter_qt.h
+HEADERS += mythpainter_qt.h mythmainwindow_internal.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
 HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
@@ -84,3 +84,6 @@ mingw {
         inc.files += mythpainter_ogl.h
     }
 }
+
+#The following line was inserted by qt3to4
+QT += network xml  sql opengl qt3support

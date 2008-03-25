@@ -1,20 +1,21 @@
 #include "unistd.h"
 #include "stdlib.h"
 
+#include <Q3ValueVector>
+#include <qsqldriver.h>
+
 #include "mythdbcon.h"
 
-#include <qsqldriver.h>
-#include <qregexp.h>
-#include <qvaluevector.h>
-
 #include "compat.h"
+
+QMutex MSqlQuery::prepareLock(false);
 
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
     m_db = QSqlDatabase::addDatabase("QMYSQL3", name);
 
-    if (!m_db)
+    if (!m_db.isValid())
     {
         VERBOSE(VB_IMPORTANT,
                "Unable to init db connection.");
@@ -25,22 +26,22 @@ MSqlDatabase::MSqlDatabase(const QString &name)
 
 MSqlDatabase::~MSqlDatabase()
 {
-    if (m_db)
+    if (m_db.isOpen())
     {
-        m_db->close();
+        m_db.close();
         QSqlDatabase::removeDatabase(m_name);
-        m_db = NULL;
+        m_db = QSqlDatabase();
     }
 }
 
 bool MSqlDatabase::isOpen()
 {
-    if (m_db)
+    if (m_db.isValid())
     {
-        if (!m_db->hostName().length())  // Bootstrapping without a database?
+        if (!m_db.hostName().length())  // Bootstrapping without a database?
             return true;                 // Pretend its open to reduce errors
 
-        if (m_db->isOpen())
+        if (m_db.isOpen())
             return true;
     }
     return false;
@@ -48,22 +49,22 @@ bool MSqlDatabase::isOpen()
 
 bool MSqlDatabase::OpenDatabase()
 {
-    if (!m_db)
+    if (!m_db.isValid())
     {
         VERBOSE(VB_IMPORTANT,
-              "MSqlDatabase::OpenDatabase(), db object is NULL!");
+              "MSqlDatabase::OpenDatabase(), db object is not valid!");
         return false;
     }
 
     bool connected = true;
     
-    if (!m_db->isOpen())
+    if (!m_db.isOpen())
     {
         DatabaseParams dbparms = gContext->GetDatabaseParams();
-        m_db->setDatabaseName(dbparms.dbName);
-        m_db->setUserName(dbparms.dbUserName);
-        m_db->setPassword(dbparms.dbPassword);
-        m_db->setHostName(dbparms.dbHostName);
+        m_db.setDatabaseName(dbparms.dbName);
+        m_db.setUserName(dbparms.dbUserName);
+        m_db.setPassword(dbparms.dbPassword);
+        m_db.setHostName(dbparms.dbHostName);
 
         if (!dbparms.dbHostName.length())  // Bootstrapping without a database?
         {
@@ -72,12 +73,12 @@ bool MSqlDatabase::OpenDatabase()
         }
 
         if (dbparms.dbPort)
-            m_db->setPort(dbparms.dbPort);
+            m_db.setPort(dbparms.dbPort);
 
         if (dbparms.dbPort && dbparms.dbHostName == "localhost")
-            m_db->setHostName("127.0.0.1");
+            m_db.setHostName("127.0.0.1");
 
-        connected = m_db->open();
+        connected = m_db.open();
 
         if (!connected && dbparms.wolEnabled)
         {
@@ -91,7 +92,7 @@ bool MSqlDatabase::OpenDatabase()
 
                 system(dbparms.wolCommand);
                 sleep(dbparms.wolReconnect);
-                connected = m_db->open();
+                connected = m_db.open();
             }
     
             if (!connected)
@@ -103,14 +104,14 @@ bool MSqlDatabase::OpenDatabase()
         {
             VERBOSE(VB_GENERAL,
                     QString("Connected to database '%1' at host: %2")
-                            .arg(m_db->databaseName()).arg(m_db->hostName()));
+                            .arg(m_db.databaseName()).arg(m_db.hostName()));
         }
     }
 
     if (!connected)
     {
         VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
-        VERBOSE(VB_IMPORTANT, MythContext::DBErrorMessage(m_db->lastError()));
+        VERBOSE(VB_IMPORTANT, MythContext::DBErrorMessage(m_db.lastError()));
     }
 
     return connected;
@@ -130,14 +131,14 @@ bool MSqlDatabase::KickDatabase()
     // mdz, 2003/08/11
 
 
-    if (!m_db->hostName().length())  // Bootstrapping without a database?
+    if (m_db.hostName().isEmpty())  // Bootstrapping without a database?
     {                                // Pretend we kicked, to reduce errors
         m_lastDBKick = QDateTime::currentDateTime();
         return true;
     }
 
     if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 && 
-        m_db->isOpen())
+        m_db.isOpen())
     {
         return true;
     }
@@ -145,7 +146,7 @@ bool MSqlDatabase::KickDatabase()
     QString query("SELECT NULL;");
     for (unsigned int i = 0 ; i < 2 ; ++i, usleep(50000))
     {
-        QSqlQuery result = m_db->exec(query); // don't convert to MSqlQuery
+        QSqlQuery result = m_db.exec(query); // don't convert to MSqlQuery
         if (result.isActive())
         {
             m_lastDBKick = QDateTime::currentDateTime();
@@ -153,8 +154,8 @@ bool MSqlDatabase::KickDatabase()
         }
         else if (i == 0)
         {
-            m_db->close();
-            m_db->open();
+            m_db.close();
+            m_db.open();
         }
         else
             MythContext::DBError("KickDatabase", result);
@@ -189,7 +190,7 @@ MDBManager::~MDBManager()
 
 MSqlDatabase *MDBManager::popConnection()
 {
-    (*m_sem)++;
+    m_sem->acquire();
     m_lock.lock();
 
     MSqlDatabase *db = m_pool.getLast();
@@ -218,7 +219,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
     }
 
     m_lock.unlock();
-    (*m_sem)--;
+    m_sem->release();
 }
 
 MSqlDatabase *MDBManager::getSchedCon()
@@ -253,14 +254,14 @@ void MDBManager::CloseDatabases()
 {
     m_lock.lock();
 
-    QPtrListIterator<MSqlDatabase> it(m_pool);
+    Q3PtrListIterator<MSqlDatabase> it(m_pool);
     MSqlDatabase                   *db;
 
     while ((db = it.current()))
     {
         VERBOSE(VB_IMPORTANT,
                 "Closing DB connection named '" + db->m_name + "'");
-        db->m_db->close();
+        db->m_db.close();
         ++it;
     }
 
@@ -273,7 +274,7 @@ void MDBManager::CloseDatabases()
 void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 {
     qi.db = NULL;
-    qi.qsqldb = NULL;
+    qi.qsqldb = QSqlDatabase();
     qi.returnConnection = true;
 }
 
@@ -285,6 +286,8 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi) : QSqlQuery(QString::null, qi.qsql
     m_returnConnection = qi.returnConnection;
 
     m_isConnected = m_db && m_db->isOpen();
+
+    m_testbindings = QRegExp("\\s(:\\w+)\\s.*\\s\\1\\b");
 }
 
 MSqlQuery::~MSqlQuery()
@@ -379,13 +382,30 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
-// This method is called from QSqlQuery::exec(void) so it gets executed
-// when we run MSqlQuery::exec(void) also.  So all SQL statements are printed
-// by this one method.
+bool MSqlQuery::exec()
+{
+    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
+        return true;                      // Pretend success, to reduce errors
+
+    bool result = QSqlQuery::exec();
+
+    if (print_verbose_messages & VB_DATABASE)
+    {
+        QString str = "";
+
+        str += "MSqlQuery: ";
+        str += executedQuery();
+
+        VERBOSE(VB_DATABASE, str);
+    }
+
+    return result;
+}
+
 bool MSqlQuery::exec(const QString &query)
 {
-    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
-        return true;                       // Pretend success, to reduce errors
+    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
+        return true;                      // Pretend success, to reduce errors
 
     bool result = QSqlQuery::exec(query);
 
@@ -393,14 +413,8 @@ bool MSqlQuery::exec(const QString &query)
     {
         QString str = "";
 
-#if QT_VERSION >= 0x030200
         str += "MSqlQuery: ";
         str += executedQuery();
-#else
-        str += "Your Qt version is too old to provide proper SQL debugging\n";
-        str += "MSqlQuery: ";
-        str += lastQuery();
-#endif
 
         VERBOSE(VB_DATABASE, str);
     }
@@ -410,11 +424,18 @@ bool MSqlQuery::exec(const QString &query)
 
 bool MSqlQuery::prepare(const QString& query)
 {
-    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
-        return true;                       // Pretend success, to reduce errors
+    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
+        return true;                      // Pretend success, to reduce errors
 
-    static QMutex prepareLock;
     QMutexLocker lock(&prepareLock);
+
+    m_last_prepared_query = Q3DeepCopy<QString>(query);
+    if (query.contains(m_testbindings))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Query contains bind value \"%1\" twice:\n")
+                .arg(m_testbindings.cap(1)) + query);
+        exit(1);
+    }
     return QSqlQuery::prepare(query); 
 }
 
@@ -422,6 +443,39 @@ bool MSqlQuery::testDBConnection()
 {
     MSqlQuery query(MSqlQuery::InitCon());
     return query.isConnected();
+}
+
+void MSqlQuery::bindValue (const QString & placeholder, const QVariant & val, QSql::ParamType paramType)
+{
+    // XXX - HACK BEGIN
+    QMutexLocker lock(&prepareLock);
+
+    // qt4 doesn't like to bind values without occurance in the prepared query
+    if (!m_last_prepared_query.contains(placeholder))
+    {
+        VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder " + placeholder +
+                " with occurance in the prepared query. Ignoring it.\nQuery was: \"" +
+                m_last_prepared_query + "\"");
+        return;
+    }
+    // XXX - HACK END
+
+    if (val.type() == QVariant::String && val.isNull())
+    {
+        QSqlQuery::bindValue(placeholder, QString(""), paramType);
+        return;
+    }
+    QSqlQuery::bindValue(placeholder, val, paramType);
+}
+
+void MSqlQuery::bindValue(int pos, const QVariant & val, QSql::ParamType paramType)
+{
+    if (val.type() == QVariant::String && val.isNull())
+    {
+        QSqlQuery::bindValue(pos, QString(""), paramType);
+        return;
+    }
+    QSqlQuery::bindValue(pos, val, paramType);
 }
 
 void MSqlQuery::bindValues(MSqlBindings &bindings)
@@ -435,18 +489,10 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
 
 QVariant MSqlQuery::lastInsertId()
 {
-    if (!m_db->m_db->hostName().length())  // Bootstrapping without a database?
+    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
         return value(0);                   // Pretend success, to reduce errors
 
-    exec("SELECT LAST_INSERT_ID();");
-    if (!isActive() || size() < 1) 
-    {
-        MythContext::DBError("selecting last insert id", *this);
-        return QVariant();
-    }
-
-    next();
-    return value(0);
+    return QSqlQuery::lastInsertId();
 }
 
 void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
@@ -473,7 +519,7 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
     QString q = query;
     QRegExp rx(QString::fromLatin1("'[^']*'|:([a-zA-Z0-9_]+)"));
 
-    QValueVector<Holder> holders;
+    Q3ValueVector<Holder> holders;
 
     int i = 0;
     while ((i = rx.search(q, i)) != -1) 

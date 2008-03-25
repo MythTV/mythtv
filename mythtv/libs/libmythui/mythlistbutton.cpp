@@ -44,8 +44,8 @@ void MythListButton::Const(void)
     m_itemList.setAutoDelete(false);
     m_topItem = 0;
     m_selItem = 0;
-    m_selIterator = new QPtrListIterator<MythListButtonItem>(m_itemList);
-    m_topIterator = new QPtrListIterator<MythListButtonItem>(m_itemList);
+    m_selIterator = new Q3PtrListIterator<MythListButtonItem>(m_itemList);
+    m_topIterator = new Q3PtrListIterator<MythListButtonItem>(m_itemList);
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
@@ -203,7 +203,7 @@ void MythListButton::SetPositionArrowStates(void)
         for (int i = 0; i < button; i++)
              m_ButtonList[i]->SetVisible(false);
 
-        QPtrListIterator<MythListButtonItem> it = (*m_topIterator);
+        Q3PtrListIterator<MythListButtonItem> it = (*m_topIterator);
         while (it.current() && button < (int)m_itemsVisible)
         {
             MythUIButton *realButton = m_ButtonList[button];
@@ -218,6 +218,7 @@ void MythListButton::SetPositionArrowStates(void)
 
         for (; button < (int)m_itemsVisible; button++)
             m_ButtonList[button]->SetVisible(false);
+
     }
 
     if (!m_showScrollArrows || !m_downArrow || !m_upArrow)
@@ -256,6 +257,7 @@ void MythListButton::InsertItem(MythListButtonItem *item)
         m_selIterator->toFirst();
         m_topIterator->toFirst();
         m_selPosition = m_topPosition = 0;
+
         emit itemSelected(item);
     }
 
@@ -402,9 +404,9 @@ bool MythListButton::IsEmpty()
         return true;
 }
 
-QPtrListIterator<MythListButtonItem> MythListButton::GetIterator(void)
+Q3PtrListIterator<MythListButtonItem> MythListButton::GetIterator(void)
 {
-    return QPtrListIterator<MythListButtonItem>(m_itemList);
+    return Q3PtrListIterator<MythListButtonItem>(m_itemList);
 }
 
 MythListButtonItem* MythListButton::GetItemAt(int pos)
@@ -772,7 +774,7 @@ bool MythListButton::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -891,7 +893,7 @@ MythUIType *MythListButton::GetChildAtPoint(const QPoint &p)
             return NULL;
 
         /* check all children */
-        QValueVector<MythUIType*>::iterator it;
+        QVector<MythUIType*>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());

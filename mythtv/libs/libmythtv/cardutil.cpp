@@ -169,22 +169,21 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
     if (rawtype.upper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::All);
-        const QFileInfoList *il = dir.entryInfoList();
-        if (!il)
+        const QFileInfoList il = dir.entryInfoList();
+        if (il.isEmpty())
             return devs;
         
         vector<uint> list;
         QMap<uint,bool> dups;
-        QFileInfoListIterator it( *il );
-        QFileInfo *fi;
+        QFileInfoList::const_iterator it = il.begin();
 
-        for (; (fi = it.current()) != 0; ++it)
+        for (; it != il.end(); ++it)
         {
-            if (fi->fileName().left(7).lower() != "adapter")
+            if (it->fileName().left(7).lower() != "adapter")
                 continue;
 
             bool ok;
-            uint num = fi->fileName().mid(7).toUInt(&ok);
+            uint num = it->fileName().mid(7).toUInt(&ok);
             if (!ok || dups[num])
                 continue;
 
@@ -820,7 +819,7 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
     else
     {
         while (query.next())
-            list = query.value(0).toString();
+            list.append( query.value(0).toString() );
     }
 
     return list;
@@ -881,7 +880,7 @@ QString CardUtil::GetDisplayName(uint inputid)
     if (!query.exec())
         MythContext::DBError("CardUtil::GetDisplayName(uint)", query);
     else if (query.next())
-        return QString::fromUtf8(query.value(0).toString());
+        return query.value(0).toString();
 
     return QString::null;
 }
@@ -899,7 +898,7 @@ QString CardUtil::GetDisplayName(uint cardid, const QString &inputname)
     if (!query.exec())
         MythContext::DBError("CardUtil::GetDisplayName(uint,QString)", query);
     else if (query.next())
-        return QString::fromUtf8(query.value(0).toString());
+        return query.value(0).toString();
 
     return QString::null;
 }
@@ -998,7 +997,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
 
     query.bindValue(":INPUTID",   0);
     query.bindValue(":GROUPID",   inputgroupid);
-    query.bindValue(":GROUPNAME", name.utf8());
+    query.bindValue(":GROUPNAME", name);
 
     if (!query.exec())
     {
@@ -1066,7 +1065,7 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
     if (!query.next())
         return false;
 
-    const QString name = QString::fromUtf8(query.value(2).toString());
+    const QString name = query.value(2).toString();
 
     query.prepare(
         "INSERT INTO inputgroup "
@@ -1075,7 +1074,7 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
 
     query.bindValue(":INPUTID",   inputid);
     query.bindValue(":GROUPID",   inputgroupid);
-    query.bindValue(":GROUPNAME", name.utf8());
+    query.bindValue(":GROUPNAME", name);
 
     if (!query.exec())
     {

@@ -27,7 +27,7 @@
  */
 
 // Qt headers
-#include <qdeepcopy.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -42,7 +42,7 @@
  *  \param hostname The host for which to create the key bindings.
  */
 KeyBindings::KeyBindings(const QString &hostname)
-    : m_hostname(QDeepCopy<QString>(hostname))
+    : m_hostname(Q3DeepCopy<QString>(hostname))
 {
     LoadMandatoryBindings();
     LoadContexts();
@@ -62,7 +62,7 @@ QStringList KeyBindings::GetKeys(void) const
 QStringList KeyBindings::GetContexts(void) const
 {
     QStringList ctxts = 
-        QDeepCopy<QStringList>(m_actionSet.GetContextStrings());
+        Q3DeepCopy<QStringList>(m_actionSet.GetContextStrings());
     ctxts.sort();
     return ctxts;
 }
@@ -76,7 +76,7 @@ QStringList KeyBindings::GetContexts(void) const
  */
 QStringList KeyBindings::GetActions(const QString &context) const
 {
-    return QDeepCopy<QStringList>(m_actionSet.GetActionStrings(context));
+    return Q3DeepCopy<QStringList>(m_actionSet.GetActionStrings(context));
 }
 
 /** \fn KeyBindings::GetKeyActions(const QString&, ActionList&) const
@@ -100,7 +100,7 @@ void KeyBindings::GetKeyActions(const QString &key, ActionList &list) const
 QStringList KeyBindings::GetActionKeys(const QString &context_name,
                                        const QString &action_name) const
 {
-    return QDeepCopy<QStringList>
+    return Q3DeepCopy<QStringList>
         (m_actionSet.GetKeys(ActionID(context_name, action_name)));
 }
 
@@ -143,7 +143,7 @@ QString KeyBindings::GetActionDescription(const QString &context_name,
                                           const QString &action_name) const
 {
     ActionID id(context_name, action_name);
-    return QDeepCopy<QString>(m_actionSet.GetDescription(id));
+    return Q3DeepCopy<QString>(m_actionSet.GetDescription(id));
 }
 
 /** \fn KeyBindings::AddActionKey(const QString&,const QString&,const QString&)

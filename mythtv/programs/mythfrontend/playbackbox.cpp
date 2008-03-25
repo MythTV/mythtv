@@ -1,22 +1,29 @@
 #include <qpushbutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
+#include <q3button.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qaccel.h>
-#include <qlistview.h>
+#include <q3accel.h>
+#include <q3listview.h>
 #include <qdatetime.h>
-#include <qprogressbar.h>
+#include <q3progressbar.h>
 #include <qlayout.h>
 #include <qapplication.h>
 #include <qtimer.h>
 #include <qimage.h>
 #include <qpainter.h>
-#include <qheader.h>
+#include <q3header.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
 #include <qwaitcondition.h>
+#include <QPixmap>
+#include <Q3GridLayout>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPaintEvent>
+#include <Q3PtrList>
 
 #include <cmath>
 #include <unistd.h>
@@ -139,7 +146,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
     if (title == "")
         return title;
 
-    QRegExp prefixes = QObject::tr("^(The |A |An )");
+    QRegExp prefixes( QObject::tr("^(The |A |An )") );
     QString sTitle = title;
 
     sTitle.remove(prefixes);
@@ -206,7 +213,13 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     pbb->Show();
 
     qApp->unlock();
-    pbbIsVisibleCond.wait();
+
+    // Qt4 requires a QMutex as a parameter...
+    // not sure if this is the best solution.  Mutex Must be locked before wait.
+    QMutex mutex;
+    mutex.lock();
+
+    pbbIsVisibleCond.wait( &mutex, -1 );
 
     if (pbb->getSelected())
         nextProgram = new ProgramInfo(*pbb->getSelected());
@@ -688,8 +701,8 @@ void PlaybackBox::updateBackground(void)
 
 void PlaybackBox::paintEvent(QPaintEvent *e)
 {
-    if (e->erased())
-        paintSkipUpdate = false;
+//    if (e->erased())
+    paintSkipUpdate = false;
 
     QRect r = e->rect();
     QPainter p(this);
@@ -1325,7 +1338,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     LCD *lcddev = LCD::Get();
     QString tstring, lcdTitle;
-    QPtrList<LCDMenuItem> lcdItems;
+    Q3PtrList<LCDMenuItem> lcdItems;
     lcdItems.setAutoDelete(true);
 
     container = theme->GetSet("selector");
@@ -2458,7 +2471,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
         if (random)
             i = (int)(1.0 * randomList.count() * rand() / (RAND_MAX + 1.0));
 
-        it = randomList.at(i);
+        it = randomList.begin() + i;
         tmpItem = findMatchingProg(*it);
         if (tmpItem)
         {
@@ -2614,7 +2627,7 @@ void PlaybackBox::showMenu()
                                   MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    QButton *topButton = popup->addButton(tr("Change Group Filter"), this,
+    QAbstractButton *topButton = popup->addButton(tr("Change Group Filter"), this,
                      SLOT(showRecGroupChooser()));
 
     popup->addButton(tr("Change Group View"), this,
@@ -2863,7 +2876,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              break;
     }
 
-    QButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
+    QAbstractButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
 
     switch (types)
     {
@@ -2877,7 +2890,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpslot = SLOT(noStop());
              break;
     }
-    QButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
+    QAbstractButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
 
     if (types == DeleteRecording ||
         types == ForceDeleteRecording)
@@ -2972,7 +2985,7 @@ void PlaybackBox::showPlaylistPopup()
     }
     tlabel->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    QButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlayList()));
+    QAbstractButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlayList()));
 
     popup->addButton(tr("Shuffle Play"), this, SLOT(doPlayListRandom()));
     popup->addButton(tr("Clear Playlist"), this, SLOT(doClearPlaylist()));
@@ -3033,7 +3046,7 @@ void PlaybackBox::showPlaylistJobPopup()
     }
     tlabel->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    QButton *jobButton;
+    QAbstractButton *jobButton;
     QString jobTitle = "";
     QString command = "";
     QStringList::Iterator it;
@@ -3150,7 +3163,7 @@ void PlaybackBox::showPlayFromPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *playButton = popup->addButton(tr("Play from bookmark"), this,
+    QAbstractButton *playButton = popup->addButton(tr("Play from bookmark"), this,
             SLOT(doPlay()));
     popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
 
@@ -3171,7 +3184,7 @@ void PlaybackBox::showStoragePopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *storageButton;
+    QAbstractButton *storageButton;
 
     MythPushButton *toggleButton;
 
@@ -3215,7 +3228,7 @@ void PlaybackBox::showRecordingPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
+    QAbstractButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
 
     popup->addButton(tr("Allow this program to re-record"), this,
@@ -3247,7 +3260,7 @@ void PlaybackBox::showJobPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *jobButton;
+    QAbstractButton *jobButton;
     QString jobTitle = "";
     QString command = "";
 
@@ -3339,7 +3352,7 @@ void PlaybackBox::showTranscodingProfiles()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *defaultButton;
+    QAbstractButton *defaultButton;
 
     defaultButton = popup->addButton(tr("Default"), this,
                                  SLOT(doBeginTranscoding()));
@@ -3375,7 +3388,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", "");
 
-    QButton *playButton = NULL;
+    QAbstractButton *playButton = NULL;
 
     if (!(m_player && m_player->IsSameProgram(curitem)))
     {
@@ -3462,7 +3475,7 @@ void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", msg);
 
-    QButton *detailsButton;
+    QAbstractButton *detailsButton;
     detailsButton = popup->addButton(tr("Show Program Details"), this,
                                      SLOT(showProgramDetails()));
 
@@ -4357,7 +4370,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-void PlaybackBox::customEvent(QCustomEvent *e)
+void PlaybackBox::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -4460,7 +4473,7 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
 
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
 {
-    QString fn = QDeepCopy<QString>(xfn.mid(max(xfn.findRev('/') + 1,0)));
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
 
     QMutexLocker locker(&previewGeneratorLock);
     vector<QString> &q = previewGeneratorQueue;
@@ -4497,7 +4510,7 @@ void PlaybackBox::UpdatePreviewGeneratorThreads(void)
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
-    QString fn = QDeepCopy<QString>(xfn.mid(max(xfn.findRev('/') + 1,0)));
+    QString fn = xfn.mid(max(xfn.findRev('/') + 1,0));
     QMutexLocker locker(&previewGeneratorLock);
 
     if (!g)
@@ -4812,7 +4825,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap((int)(blackholeBounds.width()),
                                     (int)(blackholeBounds.height()));
-        previewPixmap->fill(black);
+        previewPixmap->fill(Qt::black);
     }
 
     retpixmap = *previewPixmap;
@@ -4843,7 +4856,7 @@ void PlaybackBox::showIconHelp(void)
         gContext->GetMainWindow(), true, drawPopupFgColor,
         drawPopupBgColor, drawPopupSelColor, "icon help");
 
-    QGridLayout *grid = new QGridLayout(6, 4, (int)(5 * wmult));
+    Q3GridLayout *grid = new Q3GridLayout(6, 4, (int)(5 * wmult));
 
     QLabel *label;
     UIImageType *itype;
@@ -4934,8 +4947,8 @@ void PlaybackBox::showIconHelp(void)
 
     iconhelp->addLayout(grid);
 
-    QButton *button = iconhelp->addButton(
-        QObject::tr("OK"), iconhelp, SLOT(accept()));
+    QAbstractButton *button = iconhelp->addButton(tr("Ok"),
+                                                  iconhelp, SLOT(accept()));
     button->setFocus();
 
     iconhelp->ExecPopup();
@@ -5121,7 +5134,7 @@ void PlaybackBox::showRecGroupChooser(void)
     {
         while (query.next())
         {
-            dispGroup = QString::fromUtf8(query.value(0).toString());
+            dispGroup = query.value(0).toString();
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
 
@@ -5167,7 +5180,7 @@ void PlaybackBox::showRecGroupChooser(void)
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
 
-            dispGroup = QString::fromUtf8(query.value(0).toString());
+            dispGroup = query.value(0).toString();
             if (dispGroup == "")
             {
                 unknownCount += items;
@@ -5233,7 +5246,7 @@ void PlaybackBox::showRecGroupChooser(void)
 
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
+    connect(recGroupListBox, SIGNAL(currentChanged(Q3ListBoxItem *)), this,
             SLOT(recGroupChooserListBoxChanged()));
 
     DialogCode result = recGroupPopup->ExecPopup();
@@ -5349,7 +5362,7 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
         {
-            QString recgroup = QString::fromUtf8(query.value(0).toString());
+            QString recgroup = query.value(0).toString();
             recGroupPwCache[recgroup] =
                 query.value(1).toString();
         }
@@ -5395,7 +5408,7 @@ void PlaybackBox::showRecGroupChanger(void)
             else
                 itemStr = tr("items");
 
-            dispGroup = QString::fromUtf8(query.value(0).toString());
+            dispGroup = query.value(0).toString();
 
             if (dispGroup == "Default")
                 dispGroup = tr("Default");
@@ -5449,7 +5462,7 @@ void PlaybackBox::showRecGroupChanger(void)
 
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
+    connect(recGroupListBox, SIGNAL(currentChanged(Q3ListBoxItem *)), this,
             SLOT(recGroupChangerListBoxChanged()));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
@@ -5673,7 +5686,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     initRecGroupPopup(tr("Group Password"),
                       "showRecGroupPasswordChanger");
 
-    QGridLayout *grid = new QGridLayout(3, 2, (int)(10 * wmult));
+    Q3GridLayout *grid = new Q3GridLayout(3, 2, (int)(10 * wmult));
 
     QLabel *label = new QLabel(tr("Recording Group:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
@@ -5765,7 +5778,7 @@ void PlaybackBox::SetRecGroupPassword(const QString &oldPassword,
 
         query.prepare("DELETE FROM recgrouppassword "
                            "WHERE recgroup = :RECGROUP ;");
-        query.bindValue(":RECGROUP", recGroup.utf8());
+        query.bindValue(":RECGROUP", recGroup);
 
         query.exec();
 
@@ -5774,14 +5787,14 @@ void PlaybackBox::SetRecGroupPassword(const QString &oldPassword,
             query.prepare("INSERT INTO recgrouppassword "
                           "(recgroup, password) VALUES "
                           "( :RECGROUP , :PASSWD )");
-            query.bindValue(":RECGROUP", recGroup.utf8());
+            query.bindValue(":RECGROUP", recGroup);
             query.bindValue(":PASSWD", newPassword);
 
             query.exec();
         }
     }
 
-    recGroupPassword = QDeepCopy<QString>(newPassword);
+    recGroupPassword = newPassword;
 }
 
 bool PlaybackBox::IsRecGroupPasswordCorrect(const QString &newText) const

@@ -1,9 +1,9 @@
-#include <qfile.h>
-#include <qdir.h>
-#include <qfileinfo.h>
-#include <qregexp.h>
-
 #include <cmath>
+
+#include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QRegExp>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -319,31 +319,28 @@ bool MetadataImp::removeDir(const QString &dirName)
 {
     QDir d(dirName);
 
-    const QFileInfoList *contents = d.entryInfoList();
-    if (!contents)
+    QFileInfoList contents = d.entryInfoList();
+    if (!contents.size())
     {
         return d.rmdir(dirName);
     }
 
-    const QFileInfoListIterator it(*contents);
-    QFileInfo *fi;
-
-    while ((fi = it.current()) != 0)
+    for (QFileInfoList::iterator p = contents.begin(); p != contents.end(); ++p)
     {
-        if (fi->fileName() == "." ||
-            fi->fileName() == "..")
+        if (p->fileName() == "." ||
+            p->fileName() == "..")
         {
             continue;
         }
-        if (fi->isDir())
+        if (p->isDir())
         {
-            QString fileName = fi->fileName();
+            QString fileName = p->fileName();
             if (!removeDir(fileName))
                 return false;
         }
         else
         {
-            if (!QFile(fi->fileName()).remove())
+            if (!QFile(p->fileName()).remove())
                 return false;
         }
     }
@@ -472,9 +469,9 @@ void MetadataImp::fillCast()
 /// Sets metadata from a DB row
 void MetadataImp::fromDBRow(MSqlQuery &query)
 {
-    m_title = QString::fromUtf8(query.value(0).toString());
-    m_director = QString::fromUtf8(query.value(1).toString());
-    m_plot = QString::fromUtf8(query.value(2).toString());
+    m_title = query.value(0).toString();
+    m_director = query.value(1).toString();
+    m_plot = query.value(2).toString();
     m_rating = query.value(3).toString();
     m_year = query.value(4).toInt();
     m_userrating = (float)query.value(5).toDouble();
@@ -483,10 +480,10 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     if (m_userrating < -10.0 || m_userrating >= 10.0)
         m_userrating = 0.0;
     m_length = query.value(6).toInt();
-    m_filename = QString::fromUtf8(query.value(7).toString());
+    m_filename = query.value(7).toString();
     m_showlevel = ParentalLevel(query.value(8).toInt()).GetLevel();
-    m_coverfile = QString::fromUtf8(query.value(9).toString());
-    m_inetref = QString::fromUtf8(query.value(10).toString());
+    m_coverfile = query.value(9).toString();
+    m_inetref = query.value(10).toString();
     m_childID = query.value(11).toUInt();
     m_browse = query.value(12).toBool();
     m_playcommand = query.value(13).toString();

@@ -26,7 +26,7 @@
 
 // Qt headers
 #include <qstringlist.h>
-#include <qdict.h>
+#include <q3dict.h>
 
 /** \class Action
  *  \brief An action (for this plugin) consists of a description,
@@ -69,6 +69,6 @@ class Action
     QString     m_description; ///< The actions description.
     QStringList m_keys;        ///< The keys bound to the action.
 };
-typedef QDict<Action> Context;
+typedef Q3Dict<Action> Context;
 
 #endif /* ACTION_H */

@@ -124,7 +124,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
         hDev = open(DevName, O_RDWR);
     if ((hDev <= 0) || (WebcamName.length() <= 0))
     {
-        cerr << "Couldn't open camera " << DevName << endl;
+        cerr << "Couldn't open camera " << DevName.toLocal8Bit().constData() << endl;
         opened = false;
     }
 #endif

@@ -5,6 +5,9 @@ using namespace std;
 #include <cstdlib>
 
 #include <qapplication.h>
+#include <QPixmap>
+#include <Q3ValueList>
+#include <Q3PtrList>
 
 #include "uilistbtntype.h"
 #include "xmlparse.h"
@@ -38,8 +41,8 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
     fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
 
-    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         QString themefile = *ii + specialfile + "ui.xml";
@@ -58,7 +61,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
     QDomDocument doc;
     QFile f(themeFile);
 
-    if (!f.open(IO_ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {    
         //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
         return false;
@@ -70,9 +73,9 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << themeFile << endl;
+        cerr << "Error parsing: " << (const char *)themeFile << endl;
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        cerr << (const char *)errorMsg << endl;
         f.close();
         return false;
     }
@@ -103,7 +106,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                cerr << "Unknown element: " << (const char *)e.tagName() << endl;
                 return false;
             }
         }
@@ -168,7 +171,8 @@ void XMLParse::parseFont(QDomElement &element)
         baseFont = GetFont(base);
         if (!baseFont)
         {
-            cerr << "Specified base font '" << base << "'  does not exist for font " << face << endl;
+            cerr << "Specified base font '" << (const char *)base
+                 << "'  does not exist for font " << (const char *)face << endl;
             return;
         }
     }
@@ -248,7 +252,7 @@ void XMLParse::parseFont(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in font\n";
+                cerr << "Unknown tag " << (const char *)info.tagName() << " in font\n";
                 return;
             }
         }
@@ -257,7 +261,7 @@ void XMLParse::parseFont(QDomElement &element)
     fontProp *testFont = GetFont(name, false);
     if (testFont)
     {
-        cerr << "Error: already have a font called: " << name << endl;
+        cerr << "Error: already have a font called: " << (const char *)name << endl;
         return;
     }
     
@@ -409,7 +413,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in image\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in image\n";
                 return;
             }
         }
@@ -632,7 +636,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in repeated image\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in repeated image\n";
                 return;
             }
         }
@@ -666,17 +670,17 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
 bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
 {
     QFile f;
-    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         f.setName(*ii + "categories.xml");
-        if (f.open(IO_ReadOnly))
+        if (f.open(QIODevice::ReadOnly))
             break;
     }
     if (f.handle() == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Error: Unable to open " << f.name());
+        VERBOSE(VB_IMPORTANT, "Error: Unable to open " << (const char *)f.name());
         return false;
     }
 
@@ -687,9 +691,9 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
     
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, "Error parsing: " << f.name()
+        VERBOSE(VB_IMPORTANT, "Error parsing: " << (const char *)f.name()
                 << " line: " << errorLine << "  column: " << errorColumn
-                << ": " << errorMsg);
+                << ": " << (const char *)errorMsg);
         f.close();
         return false;
     }
@@ -862,7 +866,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
                 return;
             }
         }
@@ -870,7 +874,8 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in guidegrid: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in guidegrid: " << (const char *)name << endl;
         return;
     }
 
@@ -1084,7 +1089,7 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
                 return;
             }
         }
@@ -1092,21 +1097,24 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
     fontProp *font1 = GetFont(activeFont);
     if (!font1)
     {
-        cerr << "Unknown font: " << activeFont << " in image grid: " << name << endl;
+        cerr << "Unknown font: " << (const char *)activeFont
+             << " in image grid: " << (const char *)name << endl;
         return;
     }
 
     fontProp *font2 = GetFont(selectedFont);
     if (!font2)
     {
-        cerr << "Unknown font: " << selectedFont << " in image grid: " << name << endl;
+        cerr << "Unknown font: " << (const char *)selectedFont
+             << " in image grid: " << (const char *)name << endl;
         return;
     }
 
     fontProp *font3 = GetFont(inactiveFont);
     if (!font2)
     {
-        cerr << "Unknown font: " << inactiveFont << " in image grid: " << name << endl;
+        cerr << "Unknown font: " << (const char *)inactiveFont
+             << " in image grid: " << (const char *)name << endl;
         return;
     }
 
@@ -1242,7 +1250,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
                 return;
             }
         }
@@ -1250,7 +1258,8 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in bar: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in bar: " << (const char *)name << endl;
         return;
     }
 
@@ -1317,7 +1326,7 @@ QPoint XMLParse::parsePoint(QString text)
 {
     int x, y;
     QPoint retval(0, 0);
-    if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
+    if (sscanf((const char *)text, "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
     return retval;
 }
@@ -1326,7 +1335,7 @@ QRect XMLParse::parseRect(QString text)
 {
     int x, y, w, h;
     QRect retval(0, 0, 0, 0);
-    if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
+    if (sscanf((const char *)text, "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
 
     return retval;
@@ -1347,7 +1356,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
     LayerSet *container = GetSet(name);
     if (container)
     {
-        cerr << "Container: " << name << " already exists\n";
+        cerr << "Container: " << (const char *)name << " already exists\n";
         return;
     }
     newname = name;
@@ -1573,7 +1582,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in textarea: " << info.tagName() << endl;
+                cerr << "Unknown tag in textarea: " << (const char *)info.tagName() << endl;
                 return;
             }
         }
@@ -1582,7 +1591,8 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in textarea: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in textarea: " << (const char *)name << endl;
         return;
     }
 
@@ -1777,7 +1787,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in richtextarea: " << info.tagName() << endl;
+                cerr << "Unknown tag in richtextarea: " << (const char *)info.tagName() << endl;
                 return;
             }
         }
@@ -1786,7 +1796,8 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in richtextarea: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in richtextarea: " << (const char *)name << endl;
         return;
     }
 
@@ -1918,7 +1929,7 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown tag in multitext area: "
-                     << info.tagName()
+                     << (const char *)info.tagName()
                      << endl;
                 return;
             }
@@ -1928,7 +1939,8 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in multitextarea: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in multitextarea: " << (const char *)name << endl;
         return;
     }
 
@@ -2050,7 +2062,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
 
             else
             {
-                cerr << "Unknown tag in RemoteEdit: " << info.tagName() << endl;
+                cerr << "Unknown tag in RemoteEdit: " << (const char *)info.tagName() << endl;
                 return;
             }
         }
@@ -2059,7 +2071,8 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in RemoteEdit: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in RemoteEdit: " << (const char *)name << endl;
         return;
     }
 
@@ -2314,7 +2327,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in listarea: " << info.tagName() << endl;
+                cerr << "Unknown tag in listarea: " << (const char *)info.tagName() << endl;
                 return;
             }
         }
@@ -2522,7 +2535,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in statusbar\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in statusbar\n";
                 return;
             }
         }
@@ -2581,7 +2594,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     //
 
     typedef QMap<int, QRect> CornerMap;
-    QPtrList<TreeIcon> iconList;
+    Q3PtrList<TreeIcon> iconList;
     iconList.setAutoDelete(true);
     CornerMap bin_corners;
     bin_corners.clear();
@@ -2680,7 +2693,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     select_img = gContext->LoadScalePixmap(file);
                     if (!select_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 else if (imgname.lower() == "uparrow")
@@ -2697,7 +2710,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     uparrow_img = gContext->LoadScalePixmap(file);
                     if (!uparrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 else if (imgname.lower() == "downarrow")
@@ -2713,7 +2726,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     downarrow_img = gContext->LoadScalePixmap(file);
                     if (!downarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 else if (imgname.lower() == "leftarrow")
@@ -2729,7 +2742,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     leftarrow_img = gContext->LoadScalePixmap(file);
                     if (!leftarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 else if (imgname.lower() == "rightarrow")
@@ -2745,7 +2758,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     rightarrow_img = gContext->LoadScalePixmap(file);
                     if (!rightarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 else if ((imgname.lower() == "icon") && (imgnumber != -1))
@@ -2753,7 +2766,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     icon_img = gContext->LoadScalePixmap(file);
                     if (!icon_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                     else
                     {
@@ -2765,7 +2778,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else
                 {
-                    cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << imgname << endl;
+                    cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << (const char *)imgname << endl;
                 }
             }
             else if (info.tagName() == "bin")
@@ -2818,7 +2831,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         }
                         else
                         {
-                            cerr << "Unknown tag in bin: " << info.tagName() << endl;
+                            cerr << "Unknown tag in bin: " << (const char *)info.tagName() << endl;
                             return;
                         }
                     }
@@ -2826,7 +2839,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in ManagedTreeList\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in ManagedTreeList\n";
                 return;
             }
         }
@@ -2963,7 +2976,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_on = gContext->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "off")
@@ -2971,7 +2984,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_off = gContext->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "pushed")
@@ -2979,13 +2992,13 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_pushed = gContext->LoadScalePixmap(file);
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in PushButton\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in PushButton\n";
                 return;
             }
         }
@@ -3084,7 +3097,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                     image_on = gContext->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "off")
@@ -3092,7 +3105,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                     image_off = gContext->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "pushed")
@@ -3101,13 +3114,13 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in TextButton\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in TextButton\n";
                 return;
             }
         }
@@ -3116,7 +3129,8 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in textbutton: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font << " in textbutton: "
+             << (const char *)name << endl;
         return;
     }
 
@@ -3210,7 +3224,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_checked = gContext->LoadScalePixmap(file);
                     if (!image_checked)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "unchecked")
@@ -3218,7 +3232,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_unchecked = gContext->LoadScalePixmap(file);
                     if (!image_unchecked)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "checked_high")
@@ -3226,7 +3240,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_checked_high = gContext->LoadScalePixmap(file);
                     if (!image_checked_high)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "unchecked_high")
@@ -3234,13 +3248,13 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_unchecked_high = gContext->LoadScalePixmap(file);
                     if (!image_unchecked_high)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in CheckBox\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in CheckBox\n";
                 return;
             }
         }
@@ -3342,7 +3356,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                     image_on = gContext->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "off")
@@ -3350,7 +3364,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                     image_off = gContext->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
                 if (imgname.lower() == "pushed")
@@ -3359,13 +3373,13 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
 
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in Selector\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in Selector\n";
                 return;
             }
         }
@@ -3374,7 +3388,8 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in Selector: " << name << endl;
+        cerr << "Unknown font: " << (const char *)font
+             << " in Selector: " << (const char *)name << endl;
         return;
     }
 
@@ -3430,7 +3445,7 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in Black Hole\n";
+                cerr << "Unknown: " << (const char *)info.tagName() << " in Black Hole\n";
                 return;
             }
         }
@@ -3503,7 +3518,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                     fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for listbtn area: "
-                              << fontFcn
+                              << (const char *)fontFcn
                               << std::endl;
                     return;
                 }
@@ -3560,7 +3575,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             else
             {
                 std::cerr << "Unknown tag in listbtn area: "
-                          << info.tagName() << endl;
+                          << (const char *)info.tagName() << endl;
                 return;
             }
 
@@ -3582,16 +3597,16 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << fontActive
-             << " in listbtn area: " << name << endl;
+        cerr << "Unknown font: " << (const char *)fontActive
+             << " in listbtn area: " << (const char *)name << endl;
         return;
     }
 
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << fontInactive
-             << " in listbtn area: " << name << endl;
+        cerr << "Unknown font: " << (const char *)fontInactive
+             << " in listbtn area: " << (const char *)name << endl;
         return;
     }
 
@@ -3682,7 +3697,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                     fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for ListTreeArea: "
-                              << fontFcn
+                              << (const char *)fontFcn
                               << std::endl;
                     return;
                 }
@@ -3735,7 +3750,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
             else
             {
                 std::cerr << "Unknown tag in ListTreeArea: "
-                          << info.tagName() << endl;
+                          << (const char *)info.tagName() << endl;
                 return;
             }
 
@@ -3745,16 +3760,16 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << fontActive
-             << " in ListTreeArea: " << name << endl;
+        cerr << "Unknown font: " << (const char *)fontActive
+             << " in ListTreeArea: " << (const char *)name << endl;
         return;
     }
 
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << fontInactive
-             << " in ListTreeArea: " << name << endl;
+        cerr << "Unknown font: " << (const char *)fontInactive
+             << " in ListTreeArea: " << (const char *)name << endl;
         return;
     }
 
@@ -3863,7 +3878,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     if (!normalImage)
                     {
                         cerr << "xmparse.o: I can't find a file called " 
-                             << imgname << endl;
+                             << (const char *)imgname << endl;
                     }
                 }
                 else if (imgfunction.lower() == "focused")
@@ -3872,7 +3887,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     if (!focusedImage)
                     {
                         cerr << "xmparse.o: I can't find a file called " 
-                             << imgname << endl;
+                             << (const char *)imgname << endl;
                     }
                 }
                 else if (imgfunction.lower() == "down")
@@ -3882,7 +3897,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     if (!downImage)
                     {
                         cerr << "xmparse.o: I can't find a file called " 
-                             << imgname << endl;
+                             << (const char *)imgname << endl;
                     }
                 }
                 else if (imgfunction.lower() == "downfocused")
@@ -3892,13 +3907,13 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     if (!downFocusedImage)
                     {
                         cerr << "xmparse.o: I can't find a file called " 
-                             << imgname << endl;
+                             << (const char *)imgname << endl;
                     }
                 }
                 else
                 {
                     std::cerr << "Unknown image function in key type: "
-                              << imgfunction << endl;
+                              << (const char *)imgfunction << endl;
                     return;
                 }
             }
@@ -3918,13 +3933,13 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                 else
                 {
                     cerr << "Unknown font function in key type: "
-                         << fontFcn << endl;
+                         << (const char *)fontFcn << endl;
                     return;
                 }
             }
             else
             {
-                cerr << "Unknown: " << e.tagName() << " in key\n";
+                cerr << "Unknown: " << (const char *)e.tagName() << " in key\n";
                 return;
             }
         }
@@ -4016,7 +4031,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     normalImage = gContext->LoadScalePixmap(imgname);
                     if (!normalImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
                 else if (imgfunction.lower() == "focused")
@@ -4024,7 +4039,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     focusedImage = gContext->LoadScalePixmap(imgname);
                     if (!focusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
                 else if (imgfunction.lower() == "down")
@@ -4033,7 +4048,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 
                     if (!downImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
                 else if (imgfunction.lower() == "downfocused")
@@ -4042,13 +4057,13 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 
                     if (!downFocusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
                 else
                 {
                     std::cerr << "Unknown image function in keyboard type: "
-                              << imgfunction
+                              << (const char *)imgfunction
                               << std::endl;
                     return;
                 }
@@ -4069,14 +4084,14 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                 else 
                 {
                     std::cerr << "Unknown font function in keyboard type: "
-                              << fontFcn
+                              << (const char *)fontFcn
                               << std::endl;
                     return;
                 }
             }
             else
             {
-                cerr << "Unknown: " << e.tagName() << " in keyboard\n";
+                cerr << "Unknown: " << (const char *)e.tagName() << " in keyboard\n";
                 return;
             }
         }
@@ -4100,32 +4115,32 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
     fontProp *normalFont = GetFont(normalFontName);
     if (!normalFont)
     {
-      cerr << "Unknown font: " << normalFontName
-           << " in Keyboard: " << name << endl;
+      cerr << "Unknown font: " << (const char *)normalFontName
+           << " in Keyboard: " << (const char *)name << endl;
       return;
     }
 
     fontProp *focusedFont = GetFont(focusedFontName);
     if (!focusedFont)
     {
-        cerr << "Unknown font: " << focusedFontName
-                << " in Keyboard: " << name << endl;
+        cerr << "Unknown font: " << (const char *)focusedFontName
+                << " in Keyboard: " << (const char *)name << endl;
         return;
     }
 
     fontProp *downFont = GetFont(downFontName);
     if (!downFont)
     {
-        cerr << "Unknown font: " << downFontName
-                << " in Keyboard: " << name << endl;
+        cerr << "Unknown font: " << (const char *)downFontName
+                << " in Keyboard: " << (const char *)name << endl;
         return;
     }
 
     fontProp *downFocusedFont = GetFont(downFocusedFontName);
     if (!downFocusedFont)
     {
-        cerr << "Unknown font: " << downFocusedFontName
-                << " in Keyboard: " << name << endl;
+        cerr << "Unknown font: " << (const char *)downFocusedFontName
+                << " in Keyboard: " << (const char *)name << endl;
         return;
     }
 

@@ -6,14 +6,17 @@
 #ifndef JSMENUEVENT_H_
 #define JSMENUEVENT_H_
 
+#include <QEvent>
+#include <QString>
+
 const int kJoystickKeycodeEventType = 24425;
 const int kJoystickMuteEventType = 24426;
 
-class JoystickKeycodeEvent : public QCustomEvent 
+class JoystickKeycodeEvent : public QEvent
 {
   public:
     JoystickKeycodeEvent(const QString &jsmenuevent_text, int key_code, bool key_down) :
-            QCustomEvent(kJoystickKeycodeEventType), jsmenueventtext(jsmenuevent_text), 
+            QEvent((QEvent::Type)kJoystickKeycodeEventType), jsmenueventtext(jsmenuevent_text),
             keycode(key_code), keydown(key_down) {}
 
     QString getJoystickMenuText()
@@ -37,10 +40,10 @@ class JoystickKeycodeEvent : public QCustomEvent
     bool keydown;
 };
 
-class JoystickMenuMuteEvent : public QCustomEvent
+class JoystickMenuMuteEvent : public QEvent
 {
   public:
-    JoystickMenuMuteEvent(bool mute_events) : QCustomEvent(kJoystickMuteEventType),
+    JoystickMenuMuteEvent(bool mute_events) : QEvent((QEvent::Type)kJoystickMuteEventType),
             mute_jsmenu_events(mute_events) {}
 
     bool eventsMuted()

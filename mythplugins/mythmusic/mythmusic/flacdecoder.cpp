@@ -256,7 +256,7 @@ bool FlacDecoder::initialize()
     output_bytes = 0;
 
     if (! input()->isOpen()) {
-        if (! input()->open(IO_ReadOnly)) {
+        if (! input()->open(QIODevice::ReadOnly)) {
             error("FlacDecoder: Failed to open input. Error " +
                   QString::number(input()->status()) + ".");
             return FALSE;

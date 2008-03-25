@@ -58,12 +58,12 @@ class HttpStatus : public HttpServerExtension
 
         void    FillStatusXML     ( QDomDocument *pDoc);
     
-        void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
-        int     PrintEncoderStatus( QTextStream &os, QDomElement encoders );
-        int     PrintScheduled    ( QTextStream &os, QDomElement scheduled );
-        int     PrintJobQueue     ( QTextStream &os, QDomElement jobs );
-        int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
-        int     PrintMiscellaneousInfo ( QTextStream &os, QDomElement info );
+        void    PrintStatus       ( Q3TextStream &os, QDomDocument *pDoc );
+        int     PrintEncoderStatus( Q3TextStream &os, QDomElement encoders );
+        int     PrintScheduled    ( Q3TextStream &os, QDomElement scheduled );
+        int     PrintJobQueue     ( Q3TextStream &os, QDomElement jobs );
+        int     PrintMachineInfo  ( Q3TextStream &os, QDomElement info );
+        int     PrintMiscellaneousInfo ( Q3TextStream &os, QDomElement info );
 
     public:
                  HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );
