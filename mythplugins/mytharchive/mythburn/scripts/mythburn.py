@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080127-1"
+VERSION="0.1.20080325-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -70,7 +70,7 @@ addCutlistChapters = False
 import os, string, socket, sys, getopt, traceback, signal
 import xml.dom.minidom
 import Image, ImageDraw, ImageFont, ImageColor
-import MySQLdb, codecs
+import MySQLdb, codecs, unicodedata
 import time, datetime, tempfile
 from fcntl import ioctl
 import CDROM
@@ -861,10 +861,12 @@ def saveSetting(name, data):
     db = getDatabaseConnection()
     cursor = db.cursor()
 
-    query = "DELETE from settings WHERE value = '" + name + "' AND hostname = '" + configHostname + "'"
+    query =  "DELETE from settings "
+    query += "WHERE value = '" + name + "' AND hostname = '" + configHostname + "'"
     cursor.execute(query)
 
-    query = "INSERT INTO settings (value, data, hostname) VALUES ('" + name + "', '" + data + "', '" + configHostname + "')"
+    query =  "INSERT INTO settings (value, data, hostname) "
+    query += "VALUES ('" + name + "', '" + data + "', '" + configHostname + "')"
     cursor.execute(query)
 
     db.close()
@@ -2546,12 +2548,16 @@ def runDVDAuthor():
 def CreateDVDISO(title):
     write("Creating ISO image")
     checkCancelFlag()
-    result = os.spawnlp(os.P_WAIT, path_mkisofs[0], path_mkisofs[1], '-dvd-video', \
-        '-V',title,'-o',os.path.join(getTempPath(),'mythburn.iso'), \
-        os.path.join(getTempPath(),'dvd'))
+    command = path_mkisofs[0] + ' -dvd-video '
+    command += ' -V ' + quoteFilename(title)
+    command += ' -o ' + os.path.join(getTempPath(), 'mythburn.iso')
+    command += " " + os.path.join(getTempPath(),'dvd')
+
+    result = runCommand(command)
 
     if result<>0:
-        fatalError("Failed while running mkisofs.")
+        fatalError("Failed while running mkisofs.\n"
+                   "Command was %s" % command)
 
     write("Finished creating ISO image")
 
@@ -2954,7 +2960,8 @@ def createDVDAuthorXML(screensize, numberofitems):
             dvdauthor_element.appendChild(titleset)
 
             #Comment XML file with title of video
-            titleset.appendChild( dvddom.createComment( getText( infoDOM.getElementsByTagName("title")[0]) ) )
+            comment = getText(infoDOM.getElementsByTagName("title")[0]).replace('--', '-')
+            titleset.appendChild( dvddom.createComment(comment))
 
             menus= dvddom.createElement("menus")
             titleset.appendChild(menus)
@@ -5185,6 +5192,9 @@ def processJob(job):
             if infoDOM.documentElement.tagName != "fileinfo":
                 fatalError("The info.xml file (%s) doesn't look right" % os.path.join(folder,"info.xml"))
             title = expandItemText(infoDOM,"%title",1,0,0,0,0)
+
+            # convert to ascii and truncate to 32 chars
+            title = unicodedata.normalize('NFKD', title).encode('ASCII', 'ignore')
             title = title[:32]
 
             #Create the DVD ISO image
