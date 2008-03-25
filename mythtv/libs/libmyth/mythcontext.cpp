@@ -464,19 +464,33 @@ void MythContextPrivate::GetScreenBounds()
     }
 
     QDesktopWidget * desktop = QApplication::desktop();
+    int              numXinerama = GetNumberOfXineramaScreens();
+    int              numScreens  = desktop->numScreens();
+    int              screen;
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Total desktop dim: %1x%2, with %3 screen[s].")
-            .arg(desktop->width()).arg(desktop->height())
-            .arg(desktop->numScreens()));
+    if (numXinerama)
+        VERBOSE(VB_GENERAL,
+                QString("Total desktop dim: %1x%2, over %3 screen[s].")
+                .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
+    if (numScreens > 1)
+        for (screen = 0; screen < numScreens; ++screen)
+        {
+            QRect dim = desktop->screenGeometry(screen);
+            VERBOSE(VB_GENERAL,
+                    QString("Screen %1 dim: %1x%2.")
+                    .arg(screen).arg(dim.width()).arg(dim.height()));
+        }
 
-    int screen = parent->GetNumSetting("XineramaScreen",
-                                       desktop->primaryScreen());
+    screen = desktop->primaryScreen();
+    VERBOSE(VB_GENERAL, QString("Primary screen %1.").arg(screen));
+
+    if (numXinerama)
+        screen = parent->GetNumSetting("XineramaScreen", screen);
 
     if (screen == -1)       // Special case - span all screens
     {
         VERBOSE(VB_GENERAL, QString("Using all screens (currently %1)")
-                            .arg(desktop->numScreens()));
+                            .arg(numScreens));
         m_xbase  = 0;
         m_ybase  = 0;
         m_width  = desktop->width();
@@ -487,12 +501,12 @@ void MythContextPrivate::GetScreenBounds()
     }
     else                    // User specified a single screen
     {
-        if (screen < 0 || screen >= desktop->numScreens())
+        if (screen < 0 || screen >= numScreens)
         {
             VERBOSE(VB_IMPORTANT, QString(
                         "Xinerama screen %1 was specified,"
                         " but only %2 available, so using screen 0.")
-                    .arg(screen).arg(desktop->numScreens()));
+                    .arg(screen).arg(numScreens));
             screen = 0;
         }
 

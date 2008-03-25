@@ -2273,7 +2273,7 @@ static HostComboBox *XineramaScreen()
     for (int i=0; i<num; ++i)
         gc->addSelection(QString::number(i), QString::number(i));
     gc->addSelection(QObject::tr("All"), QString::number(-1));
-    gc->setLabel(QObject::tr("Xinerama screen"));
+    gc->setLabel(QObject::tr("Display on screen"));
     gc->setValue(0);
     gc->setHelpText(QObject::tr("Run on the specified screen or "
                     "spanning all screens."));
@@ -4913,9 +4913,7 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Screen settings"));
 
-    // These values are also used in non-Xinerama setups
-    // (e.g. Linux multi-head)
-    //if (GetNumberOfXineramaScreens() > 1)
+    if (GetNumberOfXineramaScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());
