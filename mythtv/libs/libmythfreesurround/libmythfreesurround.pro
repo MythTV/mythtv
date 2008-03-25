@@ -30,4 +30,4 @@ contains( CONFIG_LIBFFTW3, yes ) {
 }
 
 #The following line was inserted by qt3to4
-QT +=  qtcore qt3support
+QT += qtcore
