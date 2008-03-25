@@ -2997,6 +2997,7 @@ if enabled frontend; then
   echo
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
+if enabled x11 ; then
   echo "xrandr support            ${xrandr-no}"
   echo "xv support                ${xv-no}"
   echo "XvMC support              ${xvmc-no}"
@@ -3006,13 +3007,14 @@ if enabled frontend; then
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
+fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$targetos" = x"darwin" ; then
     echo "Mac acceleration          ${dvdv-no}"
   fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
   echo "DirectFB                  ${directfb-no}"
-  if test x"$mingw32" = x"yes" -o x"$targetos" = x"cygwin" ; then
+  if enabled windows ; then
     echo "DirectX                   ${directx-no}"
   fi
   if test x"$targetos" = x"mingw32" ; then
