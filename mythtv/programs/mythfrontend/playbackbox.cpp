@@ -4173,7 +4173,7 @@ void PlaybackBox::timeout(void)
     if (titleList.count() <= 1)
         return;
 
-    if (previewVideoEnabled)
+    if (previewVideoEnabled && !playingsomething)
         update(blackholeBounds);
 }
 
