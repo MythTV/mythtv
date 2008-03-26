@@ -881,7 +881,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             s->cur_st = st;
             s->cur_ptr = s->cur_pkt.data;
             s->cur_len = s->cur_pkt.size;
-            if (st && st->need_parsing && !st->parser) {
+            if (st && st->codec && st->need_parsing && !st->parser) {
                 st->parser = av_parser_init(st->codec->codec_id);
                 if (!st->parser) {
                     /* no parser available : just output the raw packets */
