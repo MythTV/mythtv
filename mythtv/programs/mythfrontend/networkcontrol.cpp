@@ -9,6 +9,7 @@ using namespace std;
 #include <qdir.h>
 #include <QKeyEvent>
 #include <QEvent>
+#include <QMap>
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdialogs.h"

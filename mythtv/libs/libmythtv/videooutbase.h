@@ -13,6 +13,7 @@ extern "C" {
 #include <QString>
 #include <QPoint>
 #include <QMap>
+#include <qwindowdefs.h>
 
 #include "videobuffers.h"
 #include "mythcodecid.h"
