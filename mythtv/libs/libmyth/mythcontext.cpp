@@ -470,7 +470,7 @@ void MythContextPrivate::GetScreenBounds()
         {
             QRect dim = desktop->screenGeometry(screen);
             VERBOSE(VB_GENERAL,
-                    QString("Screen %1 dim: %1x%2.")
+                    QString("Screen %1 dim: %2x%3.")
                     .arg(screen).arg(dim.width()).arg(dim.height()));
         }
 
