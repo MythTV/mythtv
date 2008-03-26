@@ -34,7 +34,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       lastNav(NULL),    part(0),
       title(0),         titleParts(0),
       gotStop(false),
-      cellHasStillFrame(false), dvdWaiting(false),
+      cellHasStillFrame(false), audioStreamsChanged(false),
+      dvdWaiting(false),
       titleLength(0), hl_startx(0), hl_width(0),
       hl_starty(0), hl_height(0),
       menuBuflength(0),
@@ -446,6 +447,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                             break;
                     }
                 }
+                
+                audioStreamsChanged = true;
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {
