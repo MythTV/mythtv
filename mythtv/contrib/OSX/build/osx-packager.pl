@@ -712,7 +712,7 @@ foreach my $sw (@build_depends)
   unless (-e $filename)
   {
     &Verbose("Downloading $sw");
-    unless (&Syscall([ '/usr/bin/curl', '-L', $url, '>', $filename ],
+    unless (&Syscall([ '/usr/bin/curl', '-f', '-L', $url, '>', $filename ],
                      'munge' => 1))
     {
       &Syscall([ '/bin/rm', $filename ]) if (-e $filename);
