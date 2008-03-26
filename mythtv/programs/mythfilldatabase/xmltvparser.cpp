@@ -2,7 +2,6 @@
 #include <qfile.h>
 #include <qstringlist.h>
 #include <qdatetime.h>
-#include <Q3ValueList>
 
 // C++ headers
 #include <iostream>
@@ -577,8 +576,8 @@ ProgInfo *XMLTVParser::parseProgram(
 }
                   
 bool XMLTVParser::parseFile(
-    QString filename, Q3ValueList<ChanInfo> *chanlist,
-    QMap<QString, Q3ValueList<ProgInfo> > *proglist)
+    QString filename, QList<ChanInfo> *chanlist,
+    QMap<QString, QList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
     QFile f;

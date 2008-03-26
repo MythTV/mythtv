@@ -102,15 +102,12 @@ void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     }
 }
 
-void ProgramData::fixProgramList(Q3ValueList<ProgInfo> *fixlist)
+void ProgramData::fixProgramList(QList<ProgInfo> *fixlist)
 {
-#pragma comment( "!!!!! neet to fix/re-add qSort call !!!!!" )
-// -=>TODO: Qt4 Couldn't figure out how to get qSort to compile
+    qSort(fixlist->begin(), fixlist->end());
 
-//    qSort( fixlist->begin(), fixlist->end() );
-
-    Q3ValueList<ProgInfo>::iterator i = fixlist->begin();
-    Q3ValueList<ProgInfo>::iterator cur;
+    QList<ProgInfo>::iterator i = fixlist->begin();
+    QList<ProgInfo>::iterator cur;
     while (1)    
     {
         cur = i;
@@ -144,7 +141,7 @@ void ProgramData::fixProgramList(Q3ValueList<ProgInfo> *fixlist)
         // remove overlapping programs
         if (conflict(*cur, *i))
         {
-            Q3ValueList<ProgInfo>::iterator tokeep, todelete;
+            QList<ProgInfo>::iterator tokeep, todelete;
 
             if ((*cur).end <= (*cur).start)
                 tokeep = i, todelete = cur;
@@ -184,10 +181,10 @@ void ProgramData::fixProgramList(Q3ValueList<ProgInfo> *fixlist)
 }
 
 void ProgramData::handlePrograms(
-    int id, QMap<QString, Q3ValueList<ProgInfo> > *proglist)
+    int id, QMap<QString, QList<ProgInfo> > *proglist)
 {
     int unchanged = 0, updated = 0;
-    QMap<QString, Q3ValueList<ProgInfo> >::Iterator mapiter;
+    QMap<QString, QList<ProgInfo> >::Iterator mapiter;
 
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
@@ -226,11 +223,11 @@ void ProgramData::handlePrograms(
                 continue;
             }
 
-            Q3ValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
+            QList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
             fixProgramList(sortlist);
 
-            Q3ValueList<ProgInfo>::iterator i = sortlist->begin();
+            QList<ProgInfo>::iterator i = sortlist->begin();
             for (; i != sortlist->end(); i++)
             {
                 query.prepare("SELECT * FROM program WHERE "
@@ -388,7 +385,7 @@ void ProgramData::handlePrograms(
 
                 updated++;
 
-                Q3ValueList<ProgRating>::iterator j = (*i).ratings.begin();
+                QList<ProgRating>::iterator j = (*i).ratings.begin();
                 for (; j != (*i).ratings.end(); j++)
                 {
                     query.prepare("INSERT INTO programrating (chanid,starttime,"
@@ -403,7 +400,7 @@ void ProgramData::handlePrograms(
                         MythContext::DBError("programrating insert", query);
                 }
 
-                Q3ValueList<ProgCredit>::iterator k = (*i).credits.begin();
+                QList<ProgCredit>::iterator k = (*i).credits.begin();
                 for (; k != (*i).credits.end(); k++)
                 {
                     query.prepare("SELECT person FROM people WHERE "

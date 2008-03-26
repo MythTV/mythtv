@@ -2,7 +2,6 @@
 #include <qregexp.h>
 #include <qdir.h>
 #include <qfile.h>
-#include <Q3ValueList>
 
 // C++ headers
 #include <iostream>
@@ -97,7 +96,7 @@ QString getResponse(const QString &query, const QString &def)
 }
 
 unsigned int ChannelData::promptForChannelUpdates(
-    Q3ValueList<ChanInfo>::iterator chaninfo, unsigned int chanid)
+    QList<ChanInfo>::iterator chaninfo, unsigned int chanid)
 {
     if (chanid == 0)
     {
@@ -144,7 +143,7 @@ unsigned int ChannelData::promptForChannelUpdates(
     return(chanid);
 }
 
-void ChannelData::handleChannels(int id, Q3ValueList<ChanInfo> *chanlist)
+void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 {
     QString fileprefix = SetupIconCacheDirectory();
 
@@ -152,7 +151,7 @@ void ChannelData::handleChannels(int id, Q3ValueList<ChanInfo> *chanlist)
 
     fileprefix += "/";
 
-    Q3ValueList<ChanInfo>::iterator i = chanlist->begin();
+    QList<ChanInfo>::iterator i = chanlist->begin();
     for (; i != chanlist->end(); i++)
     {
         QString localfile = "";

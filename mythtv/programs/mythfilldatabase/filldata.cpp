@@ -16,6 +16,7 @@ using namespace std;
 #include <qdir.h>
 #include <qfile.h>
 #include <q3process.h>
+#include <QList>
 #include <Q3ValueList>
 
 // libmyth headers
@@ -254,8 +255,8 @@ bool FillData::grabDDData(Source source, int poffset,
 // XMLTV stuff
 bool FillData::grabDataFromFile(int id, QString &filename)
 {
-    Q3ValueList<ChanInfo> chanlist;
-    QMap<QString, Q3ValueList<ProgInfo> > proglist;
+    QList<ChanInfo> chanlist;
+    QMap<QString, QList<ProgInfo> > proglist;
 
     if (!xmltv_parser.parseFile(filename, &chanlist, &proglist))
         return false;
@@ -983,7 +984,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
     fstream fin(xawrcfile.ascii(), ios::in);
     if (!fin.is_open()) return;
 
-    Q3ValueList<ChanInfo> chanlist;
+    QList<ChanInfo> chanlist;
 
     QString xawid;
     QString channel;
