@@ -17,6 +17,7 @@ typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
 typedef vector<XErrorEvent>       XErrorVectorType;
 #else
 #include <qapplication.h>
+#include <qdesktopwidget.h>
 #endif // USING_X11
 
 #ifdef USING_X11
