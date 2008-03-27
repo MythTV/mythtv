@@ -833,16 +833,16 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
                          "chanid %1 @ %2.").arg(chanid)
                          .arg(starttime.toString()));
 
-            while (query.next())
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Job ID %1: '%2' with status '%3' and "
-                                "comment '%4'")
-                                .arg(query.value(0).toInt())
-                                .arg(JobText(query.value(1).toInt()))
-                                .arg(StatusText(query.value(2).toInt()))
-                                .arg(query.value(3).toString()));
-            }
+        while (query.next())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Job ID %1: '%2' with status '%3' and "
+                            "comment '%4'")
+                            .arg(query.value(0).toInt())
+                            .arg(JobText(query.value(1).toInt()))
+                            .arg(StatusText(query.value(2).toInt()))
+                            .arg(query.value(3).toString()));
+        }
 
         return false;
     }
@@ -1261,84 +1261,83 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                     "found %2 total jobs")
                     .arg(findJobs).arg(query.size()));
                          
+    while (query.next())
+    {
+        bool wantThisJob = false;
 
-        while (query.next())
+        thisJob.chanid = query.value(1).toString();
+        thisJob.starttime = query.value(2).toDateTime();
+        thisJob.schedruntime = query.value(13).toDateTime();
+        thisJob.type = query.value(4).toInt();
+        thisJob.status = query.value(7).toInt();
+        thisJob.statustime = query.value(8).toDateTime();
+        thisJob.startts = thisJob.starttime.toString("yyyyMMddhhmmss");
+
+        if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
+            ((!commflagWhileRecording) ||
+             (thisJob.type != JOB_COMMFLAG)))
         {
-            bool wantThisJob = false;
-
-            thisJob.chanid = query.value(1).toString();
-            thisJob.starttime = query.value(2).toDateTime();
-            thisJob.schedruntime = query.value(13).toDateTime();
-            thisJob.type = query.value(4).toInt();
-            thisJob.status = query.value(7).toInt();
-            thisJob.statustime = query.value(8).toDateTime();
-            thisJob.startts = thisJob.starttime.toString("yyyyMMddhhmmss");
-
-            if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
-                ((!commflagWhileRecording) ||
-                 (thisJob.type != JOB_COMMFLAG)))
-            {
-                VERBOSE(VB_JOBQUEUE, LOC +
-                        QString("GetJobsInQueue: Ignoring '%1' Job "
-                                "for %2 @ %3 in %4 state.  Endtime in future.")
-                                .arg(JobText(thisJob.type))
-                                .arg(thisJob.chanid)
-                                .arg(thisJob.startts)
-                                .arg(StatusText(thisJob.status)));
-                continue;
-            }
-
-            if ((findJobs & JOB_LIST_ALL) ||
-                ((findJobs & JOB_LIST_DONE) &&
-                 (thisJob.status & JOB_DONE)) ||
-                ((findJobs & JOB_LIST_NOT_DONE) &&
-                 (!(thisJob.status & JOB_DONE))) ||
-                ((findJobs & JOB_LIST_ERROR) &&
-                 (thisJob.status == JOB_ERRORED)) ||
-                ((findJobs & JOB_LIST_RECENT) &&
-                 (thisJob.statustime > recentDate)))
-                wantThisJob = true;
-
-            if (!wantThisJob)
-            {
-                VERBOSE(VB_JOBQUEUE, LOC +
-                        QString("GetJobsInQueue: Ignore '%1' Job for "
-                                "%2 @ %3 in %4 state.")
-                                .arg(JobText(thisJob.type))
-                                .arg(thisJob.chanid)
-                                .arg(thisJob.startts)
-                                .arg(StatusText(thisJob.status)));
-                continue;
-            }
-
             VERBOSE(VB_JOBQUEUE, LOC +
-                    QString("GetJobsInQueue: Found '%1' Job for "
+                    QString("GetJobsInQueue: Ignoring '%1' Job "
+                            "for %2 @ %3 in %4 state.  Endtime in future.")
+                            .arg(JobText(thisJob.type))
+                            .arg(thisJob.chanid)
+                            .arg(thisJob.startts)
+                            .arg(StatusText(thisJob.status)));
+            continue;
+        }
+
+        if ((findJobs & JOB_LIST_ALL) ||
+            ((findJobs & JOB_LIST_DONE) &&
+             (thisJob.status & JOB_DONE)) ||
+            ((findJobs & JOB_LIST_NOT_DONE) &&
+             (!(thisJob.status & JOB_DONE))) ||
+            ((findJobs & JOB_LIST_ERROR) &&
+             (thisJob.status == JOB_ERRORED)) ||
+            ((findJobs & JOB_LIST_RECENT) &&
+             (thisJob.statustime > recentDate)))
+            wantThisJob = true;
+
+        if (!wantThisJob)
+        {
+            VERBOSE(VB_JOBQUEUE, LOC +
+                    QString("GetJobsInQueue: Ignore '%1' Job for "
                             "%2 @ %3 in %4 state.")
                             .arg(JobText(thisJob.type))
                             .arg(thisJob.chanid)
                             .arg(thisJob.startts)
                             .arg(StatusText(thisJob.status)));
-
-            thisJob.id = query.value(0).toInt();
-            thisJob.inserttime = query.value(3).toDateTime();
-            thisJob.cmds = query.value(5).toInt();
-            thisJob.flags = query.value(6).toInt();
-            thisJob.hostname = query.value(9).toString();
-            thisJob.args = query.value(10).toString();
-            thisJob.comment = query.value(11).toString();
-
-            if ((thisJob.type & JOB_USERJOB) &&
-                (UserJobTypeToIndex(thisJob.type) == 0))
-            {
-                thisJob.type = JOB_NONE;
-                VERBOSE(VB_JOBQUEUE, LOC +
-                    QString("GetJobsInQueue: Unknown Job Type: %1")
-                        .arg(thisJob.type)); 
-            }
-
-            if (thisJob.type != JOB_NONE)
-                jobs[jobCount++] = thisJob;
+            continue;
         }
+
+        VERBOSE(VB_JOBQUEUE, LOC +
+                QString("GetJobsInQueue: Found '%1' Job for "
+                        "%2 @ %3 in %4 state.")
+                        .arg(JobText(thisJob.type))
+                        .arg(thisJob.chanid)
+                        .arg(thisJob.startts)
+                        .arg(StatusText(thisJob.status)));
+
+        thisJob.id = query.value(0).toInt();
+        thisJob.inserttime = query.value(3).toDateTime();
+        thisJob.cmds = query.value(5).toInt();
+        thisJob.flags = query.value(6).toInt();
+        thisJob.hostname = query.value(9).toString();
+        thisJob.args = query.value(10).toString();
+        thisJob.comment = query.value(11).toString();
+
+        if ((thisJob.type & JOB_USERJOB) &&
+            (UserJobTypeToIndex(thisJob.type) == 0))
+        {
+            thisJob.type = JOB_NONE;
+            VERBOSE(VB_JOBQUEUE, LOC +
+                    QString("GetJobsInQueue: Unknown Job Type: %1")
+                    .arg(thisJob.type)); 
+        }
+
+        if (thisJob.type != JOB_NONE)
+            jobs[jobCount++] = thisJob;
+    }
 
     return jobCount;
 }
@@ -1421,7 +1420,7 @@ enum JobCmds JobQueue::GetJobCmd(int jobID)
 
     if (query.isActive() && query.next())
     {
-            return (enum JobCmds)query.value(0).toInt();
+        return (enum JobCmds)query.value(0).toInt();
     }
     else
     {
@@ -1443,7 +1442,7 @@ QString JobQueue::GetJobArgs(int jobID)
 
     if (query.isActive() && query.next())
     {
-            return query.value(0).toString();
+        return query.value(0).toString();
     }
     else
     {
@@ -1465,7 +1464,7 @@ enum JobFlags JobQueue::GetJobFlags(int jobID)
 
     if (query.isActive() && query.next())
     {
-            return (enum JobFlags)query.value(0).toInt();
+        return (enum JobFlags)query.value(0).toInt();
     }
     else
     {
@@ -1487,7 +1486,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobID)
 
     if (query.isActive() && query.next())
     {
-            return (enum JobStatus)query.value(0).toInt();
+        return (enum JobStatus)query.value(0).toInt();
     }
     else
     {
@@ -1512,7 +1511,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
 
     if (query.isActive() && query.next())
     {
-            return (enum JobStatus)query.value(0).toInt();
+        return (enum JobStatus)query.value(0).toInt();
     }
     else
     {
