@@ -374,6 +374,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "LEFT", "Left Arrow", "Left");
     RegisterKey("Global", "RIGHT", "Right Arrow", "Right");
     RegisterKey("Global", "SELECT", "Select", "Return,Enter,Space");
+    RegisterKey("Global", "BACKSPACE", "Backspace", "Backspace");
     RegisterKey("Global", "ESCAPE", "Escape", "Esc");
     RegisterKey("Global", "MENU", "Pop-up menu", "M");
     RegisterKey("Global", "INFO", "More information", "I");
@@ -525,7 +526,7 @@ void MythMainWindow::drawScreen(void)
     }
 
     d->painter->End();
-    
+
     d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
