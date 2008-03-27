@@ -1418,9 +1418,10 @@ enum JobCmds JobQueue::GetJobCmd(int jobID)
 
     query.exec();
 
-    if (query.isActive() && query.next())
+    if (query.isActive())
     {
-        return (enum JobCmds)query.value(0).toInt();
+        if (query.next())
+            return (enum JobCmds)query.value(0).toInt();
     }
     else
     {
@@ -1440,9 +1441,10 @@ QString JobQueue::GetJobArgs(int jobID)
 
     query.exec();
 
-    if (query.isActive() && query.next())
+    if (query.isActive())
     {
-        return query.value(0).toString();
+        if (query.next())
+            return query.value(0).toString();
     }
     else
     {
@@ -1462,9 +1464,10 @@ enum JobFlags JobQueue::GetJobFlags(int jobID)
 
     query.exec();
 
-    if (query.isActive() && query.next())
+    if (query.isActive())
     {
-        return (enum JobFlags)query.value(0).toInt();
+        if (query.next())
+            return (enum JobFlags)query.value(0).toInt();
     }
     else
     {
@@ -1484,9 +1487,10 @@ enum JobStatus JobQueue::GetJobStatus(int jobID)
 
     query.exec();
 
-    if (query.isActive() && query.next())
+    if (query.isActive())
     {
-        return (enum JobStatus)query.value(0).toInt();
+        if (query.next())
+            return (enum JobStatus)query.value(0).toInt();
     }
     else
     {
@@ -1509,9 +1513,10 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
 
     query.exec();
 
-    if (query.isActive() && query.next())
+    if (query.isActive())
     {
-        return (enum JobStatus)query.value(0).toInt();
+        if (query.next())
+            return (enum JobStatus)query.value(0).toInt();
     }
     else
     {
