@@ -765,7 +765,7 @@ int main(int argc, char *argv[])
                 updt.exec();
             }
         }
-        int found = query.numRowsAffected();
+        int found = query.size();
 
         query.exec("SELECT MIN(starttime),title,subtitle,description "
                    "FROM program WHERE programid = '' "
@@ -787,7 +787,7 @@ int main(int argc, char *argv[])
                 updt.exec();
             }
         }
-        found += query.numRowsAffected();
+        found += query.size();
         VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
 
         VERBOSE(VB_GENERAL, "Marking episode last showings.");
@@ -807,7 +807,7 @@ int main(int argc, char *argv[])
                 updt.exec();
             }
         }
-        found = query.numRowsAffected();
+        found = query.size();
 
         query.exec("SELECT MAX(starttime),title,subtitle,description "
                    "FROM program WHERE programid = '' "
@@ -829,7 +829,7 @@ int main(int argc, char *argv[])
                 updt.exec();
             }
         }
-        found += query.numRowsAffected();
+        found += query.size();
         VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
     }
 
