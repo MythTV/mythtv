@@ -138,6 +138,8 @@ void MythUIType::SetChildNeedsRedraw(MythUIType *child)
 
     childRegion.translate(m_Area.x(), m_Area.y());
 
+    childRegion = childRegion.intersect(m_Area);
+
     m_NeedsRedraw = true;
 
     if (m_DirtyRegion.isEmpty())
