@@ -521,7 +521,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     }
     else
     {
-        if ((query.size() > 0) && query.next())
+        if (query.next())
         {
             tmpStatus = query.value(0).toInt();
             jobID = query.value(1).toInt();
@@ -635,7 +635,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
     }
     else
     {
-        if ((query.size() > 0) && query.next())
+        if (query.next())
             return query.value(0).toInt();
     }
 
@@ -661,7 +661,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     }
     else
     {
-        if ((query.size() > 0) && query.next())
+        if (query.next())
         {
             jobType = query.value(0).toInt();
             chanid = query.value(1).toString();
@@ -833,8 +833,6 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
                          "chanid %1 @ %2.").arg(chanid)
                          .arg(starttime.toString()));
 
-        if (query.numRowsAffected() > 0)
-        {
             while (query.next())
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -845,7 +843,6 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
                                 .arg(StatusText(query.value(2).toInt()))
                                 .arg(query.value(3).toString()));
             }
-        }
 
         return false;
     }
@@ -1262,11 +1259,9 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     VERBOSE(VB_JOBQUEUE, LOC +
             QString("GetJobsInQueue: findJobs search bitmask %1, "
                     "found %2 total jobs")
-                    .arg(findJobs).arg(query.numRowsAffected()));
+                    .arg(findJobs).arg(query.size()));
                          
 
-    if (query.numRowsAffected() > 0)
-    {
         while (query.next())
         {
             bool wantThisJob = false;
@@ -1344,7 +1339,6 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
             if (thisJob.type != JOB_NONE)
                 jobs[jobCount++] = thisJob;
         }
-    }
 
     return jobCount;
 }
@@ -1425,9 +1419,8 @@ enum JobCmds JobQueue::GetJobCmd(int jobID)
 
     query.exec();
 
-    if (query.isActive())
+    if (query.isActive() && query.next())
     {
-        if ((query.size() > 0) && query.next())
             return (enum JobCmds)query.value(0).toInt();
     }
     else
@@ -1448,9 +1441,8 @@ QString JobQueue::GetJobArgs(int jobID)
 
     query.exec();
 
-    if (query.isActive())
+    if (query.isActive() && query.next())
     {
-        if ((query.numRowsAffected() > 0) && query.next())
             return query.value(0).toString();
     }
     else
@@ -1471,9 +1463,8 @@ enum JobFlags JobQueue::GetJobFlags(int jobID)
 
     query.exec();
 
-    if (query.isActive())
+    if (query.isActive() && query.next())
     {
-        if ((query.size() > 0) && query.next())
             return (enum JobFlags)query.value(0).toInt();
     }
     else
@@ -1494,9 +1485,8 @@ enum JobStatus JobQueue::GetJobStatus(int jobID)
 
     query.exec();
 
-    if (query.isActive())
+    if (query.isActive() && query.next())
     {
-        if ((query.size() > 0) && query.next())
             return (enum JobStatus)query.value(0).toInt();
     }
     else
@@ -1520,9 +1510,8 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
 
     query.exec();
 
-    if (query.isActive())
+    if (query.isActive() && query.next())
     {
-        if (query.size() > 0 && query.next())
             return (enum JobStatus)query.value(0).toInt();
     }
     else
@@ -1903,7 +1892,7 @@ void JobQueue::DoTranscodeThread(void)
         query.prepare("SELECT name FROM recordingprofiles WHERE id = :ID;");
         query.bindValue(":ID", transcoder);
         query.exec();
-        if (query.isActive() && query.size() > 0 && query.next())
+        if (query.isActive() && query.next())
         {
             transcoderName = query.value(0).toString();
         }
