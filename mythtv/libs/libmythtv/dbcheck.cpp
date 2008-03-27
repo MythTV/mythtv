@@ -4213,6 +4213,7 @@ bool InitializeDatabase(void)
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
     const QString updates[] = {
+QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
 "CREATE TABLE IF NOT EXISTS callsignnetworkmap ("
 "  id int(11) NOT NULL auto_increment,"
 "  callsign varchar(20) NOT NULL default '',"
