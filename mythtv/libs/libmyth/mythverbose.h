@@ -34,8 +34,8 @@
 #define VERBOSE_MAP(F) \
     F(VB_ALL,       0xffffffff, "all",                                        \
                              0, "ALL available debug output")                 \
-    F(VB_MOST,      0x7ffeffff, "most",                                       \
-                             0, "Most debug (nodatabase,notimestamp)")        \
+    F(VB_MOST,      0x3ffeffff, "most",                                       \
+                             0, "Most debug (nodatabase,notimestamp,noextra)")\
     F(VB_IMPORTANT, 0x00000001, "important",                                  \
                              0, "Errors or other very important messages")    \
     F(VB_GENERAL,   0x00000002, "general",                                    \
@@ -86,6 +86,8 @@
                              1, "Media Manager debugging messages")           \
     F(VB_IDLE,      0x01000000, "idle",                                       \
                              1, "System idle messages")                       \
+    F(VB_EXTRA,     0x40000000, "extra",                                      \
+                             1, "More detailed messages in selected levels")  \
     F(VB_TIMESTAMP, 0x80000000, "timestamp",                                  \
                              1, "Conditional data driven messages")           \
     F(VB_NONE,      0x00000000, "none",                                       \

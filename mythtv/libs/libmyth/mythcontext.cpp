@@ -462,14 +462,14 @@ void MythContextPrivate::GetScreenBounds()
     int              screen;
 
     if (hasXinerama)
-        VERBOSE(VB_GENERAL,
+        VERBOSE(VB_GENERAL+VB_EXTRA,
                 QString("Total desktop dim: %1x%2, over %3 screen[s].")
                 .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
     if (numScreens > 1)
         for (screen = 0; screen < numScreens; ++screen)
         {
             QRect dim = desktop->screenGeometry(screen);
-            VERBOSE(VB_GENERAL,
+            VERBOSE(VB_GENERAL+VB_EXTRA,
                     QString("Screen %1 dim: %2x%3.")
                     .arg(screen).arg(dim.width()).arg(dim.height()));
         }
@@ -482,7 +482,7 @@ void MythContextPrivate::GetScreenBounds()
 
     if (screen == -1)       // Special case - span all screens
     {
-        VERBOSE(VB_GENERAL, QString("Using all %1 screens.")
+        VERBOSE(VB_GENERAL+VB_EXTRA, QString("Using all %1 screens.")
                                      .arg(numScreens));
         m_xbase  = 0;
         m_ybase  = 0;
