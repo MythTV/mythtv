@@ -15,7 +15,7 @@ MythUIText::MythUIText(MythUIType *parent, const char *name)
 
     m_Font = new MythFontProperties();
 
-    m_OrigDisplayRect = m_AltDisplayRect = m_Area = QRect();
+    m_OrigDisplayRect = m_AltDisplayRect = m_Area = m_drawRect = QRect();
 
     m_Cutdown = true;
     m_CutMessage = "";
@@ -36,7 +36,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_Font = new MythFontProperties();
     *m_Font = font;
 
-    m_OrigDisplayRect = m_Area = displayRect;
+    m_OrigDisplayRect = m_Area = m_drawRect = displayRect;
     m_AltDisplayRect = altDisplayRect;
 
     m_Cutdown = true;
@@ -116,7 +116,24 @@ void MythUIText::SetCutDown(bool cut)
 void MythUIText::SetArea(const QRect &rect)
 {
     m_CutMessage = "";
+    m_drawRect = rect;
     MythUIType::SetArea(rect);
+}
+
+void MythUIText::SetStartPosition(const int x, const int y)
+{
+    int startx = m_Area.x() + x;
+    int starty = m_Area.y() + y;
+    m_drawRect.setTopLeft(QPoint(startx,starty));
+    SetRedraw();
+}
+
+void MythUIText::MoveStartPosition(const int x, const int y)
+{
+    int newx = m_drawRect.x() + x;
+    int newy = m_drawRect.y() + y;
+    m_drawRect.setTopLeft(QPoint(newx,newy));
+    SetRedraw();
 }
 
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
@@ -124,11 +141,10 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 {
     QRect area = m_Area;
     area.moveBy(xoffset, yoffset);
+    QRect drawrect = m_drawRect;
+    drawrect.moveBy(xoffset, yoffset);
 
     int alpha = CalcAlpha(alphaMod);
-
-    QRect parentRect = m_Parent->GetArea();
-    parentRect = area.intersect(parentRect);
 
     if (m_CutMessage == "")
     {
@@ -143,7 +159,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             m_CutMessage = m_Message;
     }
 
-    p->DrawText(area, m_CutMessage, m_Justification, *m_Font, alpha, parentRect);
+    p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
 }
 
 void MythUIText::Pulse(void)
@@ -213,7 +229,7 @@ void MythUIText::StopCycling(void)
 bool MythUIText::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
-        m_Area = m_OrigDisplayRect = parseRect(element);
+        m_Area = m_OrigDisplayRect = m_drawRect = parseRect(element);
     else if (element.tagName() == "altarea")
         m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")
@@ -303,6 +319,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_Justification = text->m_Justification;
     m_OrigDisplayRect = text->m_OrigDisplayRect;
     m_AltDisplayRect = text->m_AltDisplayRect;
+    m_drawRect = text->m_drawRect;
 
     m_Message = text->m_Message;
     m_CutMessage = text->m_CutMessage;

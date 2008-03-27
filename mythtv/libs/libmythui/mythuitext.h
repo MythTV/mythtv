@@ -24,6 +24,7 @@ class MythUIText : public MythUIType
     QString GetDefaultText(void);
 
     void SetFontProperties(const MythFontProperties &fontProps);
+    const MythFontProperties* GetFontProperties() { return m_Font; }
 
     void UseAlternateArea(bool useAlt);
 
@@ -32,6 +33,9 @@ class MythUIText : public MythUIType
     void SetCutDown(bool cut);
 
     void SetArea(const QRect &rect);
+    QRect GetDrawRect(void) { return m_drawRect; }
+    void SetStartPosition(const int x, const int y);
+    void MoveStartPosition(const int x, const int y);
 
     virtual void Pulse(void);
 
@@ -50,6 +54,7 @@ class MythUIText : public MythUIType
     int m_Justification;
     QRect m_OrigDisplayRect;
     QRect m_AltDisplayRect;
+    QRect m_drawRect;
 
     QString m_Message;
     QString m_CutMessage;
