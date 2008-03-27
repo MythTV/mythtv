@@ -457,11 +457,11 @@ void MythContextPrivate::GetScreenBounds()
     }
 
     QDesktopWidget * desktop = QApplication::desktop();
-    int              numXinerama = GetNumberOfXineramaScreens();
+    bool             hasXinerama = GetNumberOfXineramaScreens() > 1;
     int              numScreens  = desktop->numScreens();
     int              screen;
 
-    if (numXinerama)
+    if (hasXinerama)
         VERBOSE(VB_GENERAL,
                 QString("Total desktop dim: %1x%2, over %3 screen[s].")
                 .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
@@ -475,15 +475,15 @@ void MythContextPrivate::GetScreenBounds()
         }
 
     screen = desktop->primaryScreen();
-    VERBOSE(VB_GENERAL, QString("Primary screen %1.").arg(screen));
+    VERBOSE(VB_GENERAL, QString("Primary screen: %1.").arg(screen));
 
-    if (numXinerama)
+    if (hasXinerama)
         screen = parent->GetNumSetting("XineramaScreen", screen);
 
     if (screen == -1)       // Special case - span all screens
     {
-        VERBOSE(VB_GENERAL, QString("Using all screens (currently %1)")
-                            .arg(numScreens));
+        VERBOSE(VB_GENERAL, QString("Using all %1 screens.")
+                                     .arg(numScreens));
         m_xbase  = 0;
         m_ybase  = 0;
         m_width  = desktop->width();
@@ -491,8 +491,10 @@ void MythContextPrivate::GetScreenBounds()
 
         VERBOSE(VB_GENERAL, QString("Total width = %1, height = %2")
                             .arg(m_width).arg(m_height));
+        return;
     }
-    else                    // User specified a single screen
+
+    if (hasXinerama)        // User specified a single screen
     {
         if (screen < 0 || screen >= numScreens)
         {
@@ -502,8 +504,10 @@ void MythContextPrivate::GetScreenBounds()
                     .arg(screen).arg(numScreens));
             screen = 0;
         }
+    }
 
 
+    {
         QRect bounds;
 
         bool inWindow = parent->GetNumSetting("RunFrontendInWindow", 0);
