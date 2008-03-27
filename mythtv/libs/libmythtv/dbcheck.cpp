@@ -16,7 +16,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1218";
+const QString currentDatabaseVersion = "1219";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -4173,19 +4173,29 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             return false;
     }
 
+    if (dbver == "1218")
+    {
+        const QString updates[] = {
+"ALTER TABLE cardinput"
+"  DROP COLUMN preference,"
+"  DROP COLUMN diseqc_port,"
+"  DROP COLUMN diseqc_pos,"
+"  DROP COLUMN lnb_lof_switch,"
+"  DROP COLUMN lnb_lof_hi,"
+"  DROP COLUMN lnb_lof_lo;",
+"ALTER TABLE capturecard"
+"  DROP COLUMN firewire_port,"
+"  DROP COLUMN firewire_node;",
+"ALTER TABLE channel"
+"  DROP COLUMN atscsrcid,"
+"  DROP COLUMN commfree;",
+"ALTER TABLE recordedmarkup DROP COLUMN offset;",
+""
+};
 
-//"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
-//"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
-//"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
-//"ALTER TABLE cardinput DROP diseqc_port;" in 0.22
-//"ALTER TABLE cardinput DROP diseqc_pos;" in 0.22
-//"ALTER TABLE cardinput DROP lnb_lof_switch;" in 0.22
-//"ALTER TABLE cardinput DROP lnb_lof_hi;" in 0.22
-//"ALTER TABLE cardinput DROP lnb_lof_lo;" in 0.22
-//"ALTER TABLE capturecard DROP firewire_port;" in 0.22
-//"ALTER TABLE capturecard DROP firewire_node;" in 0.22
-//"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
-//"ALTER TABLE channel DROP COLUMN commfree;" in 0.22
+        if (!performActualUpdate(updates, "1219", dbver))
+            return false;
+    }
 
     return true;
 }
