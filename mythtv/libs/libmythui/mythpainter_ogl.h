@@ -24,7 +24,8 @@ class MythOpenGLPainter : public MythPainter
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha);
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha);
+                          const MythFontProperties &font, int alpha,
+                          const QRect &boundRect);
 
     virtual MythImage *GetFormatImage();
     virtual void DeleteFormatImage(MythImage *im);
@@ -39,7 +40,7 @@ class MythOpenGLPainter : public MythPainter
 
     void ReallyDrawText(QColor color, const QRect &r, int alpha);
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
-                                  const MythFontProperties &font);
+                                  const MythFontProperties &font, const QRect &boundRect);
 
     QMap<MythImage *, unsigned int> m_ImageIntMap;
     list<MythImage *> m_ImageExpireList;

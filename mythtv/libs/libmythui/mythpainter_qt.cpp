@@ -83,7 +83,7 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
 
 void MythQtPainter::DrawText(const QRect &r, const QString &msg,
                              int flags, const MythFontProperties &font,
-                             int alpha)
+                             int alpha, const QRect &boundRect)
 {
     assert(painter);
     (void)alpha;

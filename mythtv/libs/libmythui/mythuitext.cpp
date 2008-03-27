@@ -127,6 +127,9 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
+    QRect parentRect = m_Parent->GetArea();
+    parentRect = area.intersect(parentRect);
+
     if (m_CutMessage == "")
     {
         bool multiline = (m_Justification & Qt::WordBreak);
@@ -140,7 +143,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             m_CutMessage = m_Message;
     }
 
-    p->DrawText(area, m_CutMessage, m_Justification, *m_Font, alpha);
+    p->DrawText(area, m_CutMessage, m_Justification, *m_Font, alpha, parentRect);
 }
 
 void MythUIText::Pulse(void)

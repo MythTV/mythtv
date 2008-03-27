@@ -286,11 +286,13 @@ int MythOpenGLPainter::CalcAlpha(int alpha1, int alpha2)
 
 MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg, 
                                                  int flags, const QRect &r, 
-                                                 const MythFontProperties &font)
+                                                 const MythFontProperties &font,
+                                                 const QRect &boundRect)
 {
-    QString incoming = font.GetHash() + QString::number(r.width()) + 
+    QString incoming = font.GetHash() + QString::number(r.width()) +
                        QString::number(r.height()) + QString::number(flags) +
-                       msg;
+                       msg + QString::number(boundRect.x()) +
+                       QString::number(boundRect.y());
 
     if (m_StringToImageMap.contains(incoming))
     {
@@ -304,17 +306,21 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
     qApp->lock();
 
-    int w, h;
+    int w, h, crop_w, crop_h;
 
     if (!texture_rects)
     {
         w = NearestGLTextureSize(r.width());
         h = NearestGLTextureSize(r.height());
+        crop_w = NearestGLTextureSize(boundRect.width());
+        crop_h = NearestGLTextureSize(boundRect.height());
     }
     else
     {
         w = r.width();
         h = r.height();
+        crop_w = boundRect.width();
+        crop_h = boundRect.height();
     }
 
     QPixmap pm(QSize(w, h));
@@ -325,6 +331,13 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     tmp.setPen(Qt::black);
     tmp.drawText(0, 0, r.width(), r.height(), flags, msg);
     tmp.end();
+
+    if (!boundRect.isEmpty() || boundRect == r)
+    {
+        QPixmap newpm(QSize(crop_w, crop_h));
+        newpm = pm.copy(boundRect.x()-r.x(),boundRect.y()-r.y(),crop_w,crop_h);
+        pm = newpm;
+    }
 
     im->Assign(pm.convertToImage().convertToFormat(QImage::Format_Indexed8,
                                                    Qt::MonoOnly |
@@ -406,11 +419,11 @@ void MythOpenGLPainter::ReallyDrawText(QColor color, const QRect &r, int alpha)
 
 void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
                                  int flags, const MythFontProperties &font, 
-                                 int alpha)
+                                 int alpha, const QRect &boundRect)
 {
     glClearDepth(1.0f);
 
-    MythImage *im = GetImageFromString(msg, flags, r, font);
+    MythImage *im = GetImageFromString(msg, flags, r, font, boundRect);
 
     if (!im)
         return;
@@ -421,6 +434,8 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QRect newRect = r;
+    if (!boundRect.isEmpty())
+        newRect = boundRect;
     newRect.setWidth(im->width());
     newRect.setHeight(im->height());
 

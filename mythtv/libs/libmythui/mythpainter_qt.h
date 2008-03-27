@@ -30,7 +30,8 @@ class MythQtPainter : public MythPainter
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha);
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha);
+                          const MythFontProperties &font, int alpha,
+                          const QRect &boundRect);
 
     virtual MythImage *GetFormatImage();
     virtual void DeleteFormatImage(MythImage *im);

@@ -37,7 +37,8 @@ class MythPainter
     void DrawImage(const QPoint &topLeft, MythImage *im, int alph);
 
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
-                          const MythFontProperties &font, int alpha) = 0;
+                          const MythFontProperties &font, int alpha,
+                          const QRect &boundRect) = 0;
 
     virtual MythImage *GetFormatImage() = 0;
 
