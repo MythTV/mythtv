@@ -1124,6 +1124,12 @@ void SIScan::UpdatePMTinDB(
     {   // The service is in database, update it
         emit ServiceScanUpdateText(
             tr("Updating %1").arg(common_status_info));
+
+        bool useeit = false;
+        bool hidden = false;
+
+        ChannelUtil::GetChannelSettings(chanid, useeit, hidden);
+
         ChannelUtil::UpdateChannel(
             db_mplexid, db_source_id, chanid,
             callsign,
@@ -1131,7 +1137,7 @@ void SIScan::UpdatePMTinDB(
             chan_num,
             pmt->ProgramNumber(),
             0, 0,
-            false, false, false, QString::number(freqid));
+            useeit, hidden, false, QString::number(freqid));
     }
 }
 
@@ -1510,8 +1516,17 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         {   // The service is in database & we have good info, update it
             emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
 
+            bool useeit = false;
+            bool hidden = false;
+
+            ChannelUtil::GetChannelSettings(chanid, useeit, hidden);
+
             if (!renameChannels)
                 chan_num = ChannelUtil::GetChanNum(chanid);
+            else
+                useeit = (sdt->HasEITSchedule(i) ||
+                            sdt->HasEITPresentFollowing(i) || 
+                            force_guide_present);
 
             ChannelUtil::UpdateChannel(
                 db_mplexid,
@@ -1522,10 +1537,8 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                 chan_num,
                 sdt->ServiceID(i),
                 0, 0, 
-                sdt->HasEITSchedule(i) ||
-                sdt->HasEITPresentFollowing(i) ||
-                force_guide_present,
-                false, false, QString::null,
+                useeit,
+                hidden, false, QString::null,
                 QString::null, QString::null, QString::null,
                 default_authority);
         }

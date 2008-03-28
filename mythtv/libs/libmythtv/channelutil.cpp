@@ -1411,6 +1411,38 @@ bool ChannelUtil::GetChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
+bool ChannelUtil::GetChannelSettings(int chanid, bool &useonairguide,
+                                    bool &hidden)
+{
+    useonairguide = true;
+    hidden        = false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT useonairguide, visible "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID",  chanid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetChannelSettings", query);
+        return false;
+    }
+    else if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "GetChannelSettings() failed because it could not "
+                    "find channel id '%1'.").arg(chanid));
+        return false;
+    }
+
+    useonairguide = (query.value(0).toInt() > 0);
+    hidden        = (query.value(1).toInt() == 0);
+
+    return true;
+}
+
 DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
 {
     DBChanList list;
