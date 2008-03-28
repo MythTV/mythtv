@@ -229,6 +229,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
 
     MythUIType *uitype = NULL;
     MythUIType *base = NULL;
+    bool needInit = true;
+
 
     QString inherits = element.attribute("from", "");
     if (!inherits.isEmpty())
@@ -250,6 +252,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                                          .arg(inherits).arg(name));
             return NULL;
         }
+
+        needInit = false;
     }
 
     if (type == "imagetype")
@@ -257,14 +261,9 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     else if (type == "textarea")
         uitype = new MythUIText(parent, name);
     else if (type == "textedit")
-        uitype = new MythUITextEdit(parent, name);
+        uitype = new MythUITextEdit(parent, name, needInit);
     else if (type == "button")
-    {
-        if (base)
-            uitype = new MythUIButton(parent, name, false);
-        else
-            uitype = new MythUIButton(parent, name);
-    }
+        uitype = new MythUIButton(parent, name, needInit);
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
     else if (type == "statetype")

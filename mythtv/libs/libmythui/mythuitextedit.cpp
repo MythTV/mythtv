@@ -9,32 +9,29 @@
 
 #include "mythcontext.h"
 
-MythUITextEdit::MythUITextEdit(MythUIType *parent, const char *name)
+MythUITextEdit::MythUITextEdit(MythUIType *parent, const char *name, bool doInit)
            : MythUIType(parent, name)
 {
     m_Message = "";
+    m_Filter = FilterNone;
 
     m_Area = QRect();
 
     m_Justification = (Qt::AlignLeft | Qt::AlignTop);
 
     m_showCursor = false;
-    m_cursorVisible = false;
     m_blinkInterval = 0;
     m_cursorBlinkRate = 40;
 
-    m_position = -1;
+    m_Position = -1;
 
     m_PaddingMargin = 0;
+    m_maxLength = 0;
 
-    m_backgroundImage = new MythUIImage(this, "backgroundimage");
-    m_Text = new MythUIText(this, "TextEdit");
-    m_cursorImage = new MythUIImage(this, "cursorimage");
-    m_Text->SetCutDown(false);
+    if (doInit)
+        Init();
 
     m_CanHaveFocus = true;
-
-    m_cursorImage->SetVisible(false);
 }
 
 MythUITextEdit::~MythUITextEdit()
@@ -47,6 +44,14 @@ MythUITextEdit::~MythUITextEdit()
         delete m_Text;
 }
 
+void MythUITextEdit::Init(void)
+{
+    m_backgroundImage = new MythUIImage(this, "backgroundimage");
+    m_Text = new MythUIText(this, "textarea");
+    m_cursorImage = new MythUIImage(this, "cursorimage");
+    m_Text->SetCutDown(false);
+}
+
 void MythUITextEdit::Pulse(void)
 {
     if (m_showCursor)
@@ -54,15 +59,13 @@ void MythUITextEdit::Pulse(void)
         if (m_blinkInterval > m_cursorBlinkRate)
         {
             m_blinkInterval = 0;
-            if (m_cursorVisible)
+            if (m_cursorImage->IsVisible())
             {
                 m_cursorImage->SetVisible(false);
-                m_cursorVisible = false;
             }
             else
             {
                 m_cursorImage->SetVisible(true);
-                m_cursorVisible = true;
             }
         }
 
@@ -79,7 +82,7 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     if (element.tagName() == "area")
     {
         m_Area = parseRect(element);
-        m_Text->SetArea(m_Area);
+        SetTextRect(m_Area);
     }
     else if (element.tagName() == "font")
     {
@@ -187,7 +190,6 @@ void MythUITextEdit::SetCursorImage(MythImage *image)
         }
         m_cursorImage->SetImage(image);
 
-        m_cursorImage->SetVisible(false);
         m_showCursor = true;
     }
 }
@@ -211,13 +213,18 @@ void MythUITextEdit::SetPaddingMargin(const int margin)
 {
     m_PaddingMargin = margin;
 
-    QRect textrect;
-    textrect = QRect(   0 + margin,
-                        0 + margin,
-                        m_Area.width() - margin * 2,
-                        m_Area.height() - margin * 2);
-    m_Text->SetArea(textrect);
+    SetTextRect(m_Area);
     m_cursorImage->SetPosition(margin,margin);
+}
+
+void MythUITextEdit::SetTextRect(const QRect area)
+{
+    QRect textrect = QRect( m_PaddingMargin,
+                            m_PaddingMargin,
+                            area.width() - m_PaddingMargin * 2,
+                            area.height() - m_PaddingMargin * 2);
+
+    m_Text->SetArea(textrect);
 }
 
 void MythUITextEdit::SetText(QString text)
@@ -226,13 +233,29 @@ void MythUITextEdit::SetText(QString text)
     MoveCursor(MoveEnd);
 }
 
-void MythUITextEdit::InsertCharacter(const QString character)
+bool MythUITextEdit::InsertCharacter(const QString character)
 {
     if (m_maxLength != 0 && m_Message.length() == m_maxLength)
-        return;
+        return true;
+
+    const QChar *unichar = character.unicode();
+    if (!(unichar->isLetterOrNumber() || unichar->isPunct()
+        || unichar->isSpace() || unichar->isSymbol()))
+        return false;
+
+    if ((m_Filter & FilterAlpha) & unichar->isLetter())
+        return false;
+    if ((m_Filter & FilterNumeric) & unichar->isNumber())
+        return false;
+    if ((m_Filter & FilterSymbols) & unichar->isSymbol())
+        return false;
+    if ((m_Filter & FilterPunct) & unichar->isPunct())
+        return false;
 
     m_Message.append(character);
     SetText(m_Message);
+
+    return true;
 }
 
 void MythUITextEdit::RemoveCharacter()
@@ -259,29 +282,29 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
     switch (moveDir)
     {
         case MoveLeft:
-            if (m_position < 0)
+            if (m_Position < 0)
                 return;
 
-            size = fm.size(Qt::SingleLine, m_Message.mid(m_position,1));
+            size = fm.size(Qt::SingleLine, m_Message.mid(m_Position,1));
 
             newcursorPos = cursorPos - size.width();
 
             if (newcursorPos < 0)
             {
                 newcursorPos = m_PaddingMargin;
-                if (m_position == 0)
+                if (m_Position == 0)
                     m_Text->SetStartPosition(0, 0);
                 else
                     m_Text->MoveStartPosition(size.width(), 0);
             }
 
-            m_position--;
+            m_Position--;
             break;
         case MoveRight:
-            if (m_position == (m_Message.size() - 1))
+            if (m_Position == (m_Message.size() - 1))
                 return;
 
-            size = fm.size(Qt::SingleLine, m_Message.mid(m_position+1,1));
+            size = fm.size(Qt::SingleLine, m_Message.mid(m_Position+1,1));
 
             newcursorPos = cursorPos + size.width();
 
@@ -291,7 +314,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
                 m_Text->MoveStartPosition(-(size.width()), 0);
             }
 
-            m_position++;
+            m_Position++;
             break;
         case MoveEnd:
             size = fm.size(Qt::SingleLine, m_Message);
@@ -312,7 +335,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
                 m_Text->SetStartPosition(0,0);
             }
 
-            m_position = m_Message.size() - 1;
+            m_Position = m_Message.size() - 1;
 
             break;
     }
@@ -351,13 +374,8 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    const QChar *character = e->text().unicode();
-    if (!handled && (character->isLetterOrNumber() || character->isPunct()
-        || character->isSpace() || character->isSymbol()))
-    {
-         InsertCharacter(e->text());
+    if (!handled && InsertCharacter(e->text()))
         handled = true;
-    }
 
     return handled;
 }
@@ -373,23 +391,22 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
 
     m_blinkInterval = textedit->m_blinkInterval;
     m_cursorBlinkRate = textedit->m_cursorBlinkRate;
-    m_cursorVisible = textedit->m_cursorVisible;
     m_showCursor = textedit->m_showCursor;
-
     m_maxLength = textedit->m_maxLength;
-
     m_Justification = textedit->m_Justification;
-
+    m_PaddingMargin = textedit->m_PaddingMargin;
     m_Message = textedit->m_Message;
+    m_Position = textedit->m_Position;
+    m_Filter = textedit->m_Filter;
 
-    m_position = textedit->m_position;
+    MythUIType::CopyFrom(base);
 
     m_backgroundImage = dynamic_cast<MythUIImage *>
                     (GetChild("backgroundimage"));
+    m_Text = dynamic_cast<MythUIText *>
+                (GetChild("textarea"));
     m_cursorImage = dynamic_cast<MythUIImage *>
                     (GetChild("cursorimage"));
-
-    MythUIType::CopyFrom(base);
 }
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)
