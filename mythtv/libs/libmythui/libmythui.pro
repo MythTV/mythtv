@@ -4,7 +4,7 @@ include ( ../libs-dephack.pro )
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
-CONFIG += debug thread dll 
+CONFIG += thread dll 
 target.path = $${LIBDIR}
 INSTALLS = target
 
