@@ -42,7 +42,7 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythListButtonItem* item)
 {
-    SendEvent(buttonList->GetItemPos(item));
+    SendEvent(buttonList->GetItemPos(item), item->text(), item->getData());
     m_ScreenStack->PopScreen();
 }
 
@@ -53,9 +53,11 @@ void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
     m_id = resultid;
 }
 
-void MythDialogBox::AddButton(const QString &title)
+void MythDialogBox::AddButton(const QString &title, void *data)
 {
-    new MythListButtonItem(buttonList, title);
+    MythListButtonItem *button = new MythListButtonItem(buttonList, title);
+    if (data)
+        button->setData(data);
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
@@ -90,11 +92,11 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythDialogBox::SendEvent(int res)
+void MythDialogBox::SendEvent(int res, QString text, void *data)
 {
     if (!m_retScreen)
         return;
 
-    DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res);
+    DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
     QApplication::postEvent(m_retScreen, dce);
 }
