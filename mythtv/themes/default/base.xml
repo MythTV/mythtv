@@ -31,6 +31,10 @@
         <color>grey</color>
     </font>
 
+    <font name="basesmallblack" from="basesmall">
+        <color>black</color>
+    </font>
+
     <font name="basemediumgrey" from="basemedium">
         <color>grey</color>
     </font>
@@ -100,6 +104,15 @@
         <multiline>no</multiline>
         <align>left</align>
     </textarea>
+
+    <!-- Base definition of a textarea -->
+    <textedit name="basetextedit">
+        <area>400,350,375,50</area>
+        <font>basesmallblack</font>
+        <cursor filename="cursor.png" />
+        <margin>11</margin>
+        <background filename="textedit_background.png" />
+    </textedit>
 
     <!-- Popup Dialogue Box -->
     <window name="MythDialogBox">
