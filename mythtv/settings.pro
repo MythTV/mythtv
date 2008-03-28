@@ -46,11 +46,6 @@ contains(CONFIG_DARWIN, yes) {
     }
 }
 
-# Prevent needlessly building .app bundles everywhere.
-# Only MythFrontend, MythTV and MythTV-Setup really need to be bundles,
-# and we do that in their Makefiles if CONFIG has mac_bundle
-macx: CONFIG += console
-
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH += $$CONFIG_INCLUDEPATH
 

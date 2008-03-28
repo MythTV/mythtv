@@ -1180,6 +1180,7 @@ ivtv="yes"
 joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
+mac_bundle="no"
 opengl="yes"
 v4l="yes"
 x11="yes"
@@ -1385,6 +1386,8 @@ for opt do
   ;;
 # disabled due to abuse in Gentoo ebuild
   --disable-backend)
+  ;;
+  --enable-mac-bundle) enable mac_bundle
   ;;
   --previous|--prev)
       echo "No history of previous configure parameters."
@@ -3192,8 +3195,9 @@ if enabled darwin_da; then
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
 fi
 
-if enabled mac_bundle; then
-  append CCONFIG "mac_bundle"
+if test $targetos = darwin && disabled mac_bundle; then
+  # Qt, by default builds .app bundles everywhere. Prevent this.
+  echo "CONFIG -= app_bundle" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled mac_corevideo; then
