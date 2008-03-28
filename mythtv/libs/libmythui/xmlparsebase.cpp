@@ -11,6 +11,7 @@
 #include "mythscreentype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuitextedit.h"
 #include "mythuiclock.h"
 #include "mythlistbutton.h"
 #include "mythuibutton.h"
@@ -187,6 +188,7 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
             }
             else if (type == "imagetype" ||
                      type == "textarea" ||
+                     type == "textedit" ||
                      type == "button" ||
                      type == "buttonlist" ||
                      type == "statetype" ||
@@ -254,6 +256,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIImage(parent, name);
     else if (type == "textarea")
         uitype = new MythUIText(parent, name);
+    else if (type == "textedit")
+        uitype = new MythUITextEdit(parent, name);
     else if (type == "button")
     {
         if (base)
@@ -312,6 +316,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             }
             else if (info.tagName() == "imagetype" ||
                      info.tagName() == "textarea" ||
+                     info.tagName() == "textedit" ||
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
                      info.tagName() == "statetype" ||
@@ -415,6 +420,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
                 else if (type == "imagetype" ||
                          type == "textarea" ||
+                         type == "textedit" ||
                          type == "button" ||
                          type == "buttonlist" ||
                          type == "statetype" ||
