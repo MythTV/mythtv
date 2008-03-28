@@ -107,7 +107,7 @@
 
     <!-- Base definition of a textarea -->
     <textedit name="basetextedit">
-        <area>400,350,375,50</area>
+        <area>0,0,375,50</area>
         <font>basesmallblack</font>
         <cursor filename="cursor.png" />
         <margin>11</margin>
