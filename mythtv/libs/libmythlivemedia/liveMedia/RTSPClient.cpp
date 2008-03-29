@@ -2124,11 +2124,11 @@ unsigned RTSPClient::getResponse1(char*& responseBuffer,
   Boolean haveSeenNonCRLF = False;
   int bytesRead = 1; // because we've already read the first byte
   while (bytesRead < (int)responseBufferSize) {
-    unsigned bytesReadNow
+    int bytesReadNow
       = readSocket(envir(), fInputSocketNum,
 		   (unsigned char*)(responseBuffer+bytesRead),
 		   1, fromAddress);
-    if (bytesReadNow == 0) {
+    if (bytesReadNow <= 0) {
       envir().setResultMsg("RTSP response was truncated");
       break;
     }

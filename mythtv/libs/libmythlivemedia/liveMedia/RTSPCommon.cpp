@@ -50,7 +50,7 @@ Boolean parseRTSPRequestString(char const* reqStr,
   // Skip over the prefix of any "rtsp://" or "rtsp:/" URL that follows:
   unsigned j = i+1;
   while (j < reqStrSize && (reqStr[j] == ' ' || reqStr[j] == '\t')) ++j; // skip over any additional white space
-  for (j = i+1; j < reqStrSize-8; ++j) {
+  for (j = i+1; (int)j < (int)(reqStrSize-8); ++j) {
     if ((reqStr[j] == 'r' || reqStr[j] == 'R')
 	&& (reqStr[j+1] == 't' || reqStr[j+1] == 'T')
 	&& (reqStr[j+2] == 's' || reqStr[j+2] == 'S')
@@ -72,7 +72,7 @@ Boolean parseRTSPRequestString(char const* reqStr,
 
   // Look for the URL suffix (before the following "RTSP/"):
   parseSucceeded = False;
-  for (unsigned k = i+1; k < reqStrSize-5; ++k) {
+  for (unsigned k = i+1; (int)k < (int)(reqStrSize-5); ++k) {
     if (reqStr[k] == 'R' && reqStr[k+1] == 'T' &&
 	reqStr[k+2] == 'S' && reqStr[k+3] == 'P' && reqStr[k+4] == '/') {
       while (--k >= i && reqStr[k] == ' ') {} // go back over all spaces before "RTSP/"
@@ -107,7 +107,7 @@ Boolean parseRTSPRequestString(char const* reqStr,
   // Look for "CSeq:", skip whitespace,
   // then read everything up to the next \r or \n as 'CSeq':
   parseSucceeded = False;
-  for (j = i; j < reqStrSize-5; ++j) {
+  for (j = i; (int)j < (int)(reqStrSize-5); ++j) {
     if (reqStr[j] == 'C' && reqStr[j+1] == 'S' && reqStr[j+2] == 'e' &&
 	reqStr[j+3] == 'q' && reqStr[j+4] == ':') {
       j += 5;
