@@ -690,12 +690,17 @@ bool DVDRingBufferPriv::GoToMenu(const QString str)
     }
     else if (str.compare("menu") == 0)
     {
+        dvdnav_status_t rootMenuSupported =
+            dvdnav_menu_supported(dvdnav, DVD_MENU_Root);
         dvdnav_status_t titleMenuSupported =
             dvdnav_menu_supported(dvdnav, DVD_MENU_Title);
-        if (titleMenuSupported == DVDNAV_STATUS_OK)
+        
+        if (rootMenuSupported == DVDNAV_STATUS_OK)
+            menuid = DVD_MENU_Root;
+        else if (titleMenuSupported == DVDNAV_STATUS_OK)
             menuid = DVD_MENU_Title;
         else
-            menuid = DVD_MENU_Root;
+            return false;
     }
     else
         return false;
