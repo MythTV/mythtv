@@ -59,6 +59,7 @@ class MythMainWindow : public QWidget
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     MythScreenStack *GetMainStack();
+    MythScreenStack *GetStack(const QString &stackname);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
                            QStringList &actions, bool allowJumps = true);

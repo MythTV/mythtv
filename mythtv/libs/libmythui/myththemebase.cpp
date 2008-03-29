@@ -88,5 +88,7 @@ void MythThemeBase::Init(void)
     d->background->AddScreen(d->backgroundscreen, false);
 
     new MythScreenStack(mainWindow, "main stack", true);
+
+    new MythScreenStack(mainWindow, "popup stack");
 }
 

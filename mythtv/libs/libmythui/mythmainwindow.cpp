@@ -445,6 +445,17 @@ MythScreenStack *MythMainWindow::GetMainStack(void)
     return d->mainStack;
 }
 
+MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
+{
+    QVector<MythScreenStack *>::Iterator it;
+    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+    {
+        if ((*it)->name() == stackname)
+            return *it;
+    }
+    return NULL;
+}
+
 void MythMainWindow::animate(void)
 {
     /* FIXME: remove */
