@@ -181,8 +181,13 @@ our %depend = (
   {
     'url' 
     => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.22.tar.gz',
+    'conf-cmd'
+    # -Z in LDFLAGS is passed, via mysql_config --libs, to Qt's configure
+    # (which dies when it uses libtool)
+    =>  'LDFLAGS="" ./configure',
     'conf'
     =>  [
+          '-prefix', '"$PREFIX"',
           '--without-debug',
           '--without-docs',
           '--without-man',
@@ -193,170 +198,63 @@ our %depend = (
         ],
   },
   
-  'qt-mt'
+  'qt'
   =>
-#   {
-#     'url'
-#     =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-opensource-src-4.0.1.tar.gz',
-#     'conf-cmd'
-#     =>  'echo yes | ./configure',
-#     'conf'
-#     =>  [
-#           '-prefix', '"$PREFIX"',
-#           '-system-zlib',
-#           '-fast',
-#           '-qt-sql-mysql',
-#           '-qt-libpng',
-#           '-qt-libjpeg',
-#           '-qt-gif',
-#           '-platform macx-g++',
-#           '-no-tablet',
-#           '-I"$PREFIX/include/mysql"',
-#           '-L"$PREFIX/lib/mysql"',
-#         ],
-#     'post-conf'
-#     =>  'echo "QMAKE_LFLAGS_SHLIB += -single_module" >> src/qt.pro',
-#     'make'
-#     =>  [
-#           'sub-src',
-#           'qmake-install',
-#           'moc-install',
-#           'src-install'
-#         ],
-#   },
   {
     'url'
-    =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.8.tar.gz',
-    'pre-conf' =>
-    '/bin/echo \'' . q^
-diff -ru qt-mac-free-3.3.8.orig/config.tests/mac/mac_version.test qt-mac-free-3.3.8.new/config.tests/mac/mac_version.test
---- qt-mac-free-3.3.8.orig/config.tests/mac/mac_version.test	2004-04-24 02:40:40.000000000 +1000
-+++ qt-mac-free-3.3.8.new/config.tests/mac/mac_version.test	2008-01-01 10:33:55.000000000 +1100
-@@ -17,13 +17,17 @@
- TSTFILE=mac_version.cpp
- 
- rm -f $TSTFILE
--echo "#include <Carbon/Carbon.h>" >$TSTFILE
--echo "#include <stdio.h>" >>$TSTFILE
--echo "int main() {" >>$TSTFILE
--echo "  long gestalt_version;" >>$TSTFILE
--echo "  fprintf(stdout, \"%d\\\n\", (Gestalt(gestaltSystemVersion, &gestalt_version) == noErr) ? gestalt_version : 0);" >>$TSTFILE
--echo "  return 1;" >>$TSTFILE
--echo "}" >>$TSTFILE
-+cat << END >$TSTFILE
-+#include <Carbon/Carbon.h>
-+#include <stdio.h>
-+int main() {
-+  long gestalt_version;
-+  if (Gestalt(gestaltSystemVersion, &gestalt_version) != noErr)
-+    gestalt_version=0;
-+  fprintf(stdout, "0x%x\n", gestalt_version);
-+  return 1;
-+}
-+END
- 
- COMPILE_ERROR=yes
- if [ "$VERBOSE" = "yes" ]; then
-diff -ru qt-mac-free-3.3.8.orig/include/qglobal.h qt-mac-free-3.3.8.new/include/qglobal.h
---- qt-mac-free-3.3.8.orig/include/qglobal.h	2007-02-03 01:01:04.000000000 +1100
-+++ qt-mac-free-3.3.8.new/include/qglobal.h	2008-01-01 10:47:28.000000000 +1100
-@@ -183,7 +183,10 @@
- #  if !defined(MAC_OS_X_VERSION_10_4)
- #       define MAC_OS_X_VERSION_10_4 MAC_OS_X_VERSION_10_3 + 1
- #  endif
--#  if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4)
-+#  if !defined(MAC_OS_X_VERSION_10_5)
-+#       define MAC_OS_X_VERSION_10_5 MAC_OS_X_VERSION_10_4 + 1
-+#  endif
-+#  if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5)
- #    error "This version of Mac OS X is unsupported"
- #  endif
- #endif
-diff -ru qt-mac-free-3.3.8.orig/src/kernel/qcursor_mac.cpp qt-mac-free-3.3.8.new/src/kernel/qcursor_mac.cpp
---- qt-mac-free-3.3.8.orig/src/kernel/qcursor_mac.cpp	2007-02-03 01:01:16.000000000 +1100
-+++ qt-mac-free-3.3.8.new/src/kernel/qcursor_mac.cpp	2008-01-01 10:45:15.000000000 +1100
-@@ -177,7 +177,9 @@
- #ifdef QMAC_USE_BIG_CURSOR_API
- 	char *big_cursor_name;
- #endif
-+#ifdef QMAC_NO_FAKECURSOR
- 	CursorImageRec *ci;
-+#endif
- 	struct {
- 	    QMacAnimateCursor *anim;
- 	    ThemeCursor curs;
-@@ -258,7 +260,9 @@
- 	if(curs.cp.hcurs && curs.cp.my_cursor)
- 	    free(curs.cp.hcurs);
-     } else if(type == TYPE_CursorImage) {
-+#ifdef QMAC_NO_FAKECURSOR
- 	free(curs.ci);
-+#endif
- #ifdef QMAC_USE_BIG_CURSOR_API
-     } else if(type == TYPE_BigCursor) {
- 	QDUnregisterNamedPixMapCursur(curs.big_cursor_name);
-diff -ru qt-mac-free-3.3.8.orig/src/kernel/qt_mac.h qt-mac-free-3.3.8.new/src/kernel/qt_mac.h
---- qt-mac-free-3.3.8.orig/src/kernel/qt_mac.h	2007-02-03 01:01:13.000000000 +1100
-+++ qt-mac-free-3.3.8.new/src/kernel/qt_mac.h	2008-01-01 18:03:04.000000000 +1100
-@@ -54,7 +54,7 @@
- # define QMAC_DEFAULT_STYLE "QMacStyle" //DefaultStyle
- #endif
- 
--#if !defined(Q_WS_MACX) || QT_MACOSX_VERSION < 0x1020 || QT_MACOSX_VERSION >= 0x1030
-+#if !defined(Q_WS_MACX) || QT_MACOSX_VERSION < 0x1020 || (QT_MACOSX_VERSION >= 0x1030 && QT_MACOSX_VERSION < 0x1050)
- # define QMAC_NO_FAKECURSOR
- #endif
- 
-diff -ru qt-mac-free-3.3.8.orig/src/tools/qglobal.h qt-mac-free-3.3.8.new/src/tools/qglobal.h
---- qt-mac-free-3.3.8.orig/src/tools/qglobal.h	2007-02-03 01:01:04.000000000 +1100
-+++ qt-mac-free-3.3.8.new/src/tools/qglobal.h	2008-01-01 10:47:28.000000000 +1100
-@@ -183,7 +183,10 @@
- #  if !defined(MAC_OS_X_VERSION_10_4)
- #       define MAC_OS_X_VERSION_10_4 MAC_OS_X_VERSION_10_3 + 1
- #  endif
--#  if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4)
-+#  if !defined(MAC_OS_X_VERSION_10_5)
-+#       define MAC_OS_X_VERSION_10_5 MAC_OS_X_VERSION_10_4 + 1
-+#  endif
-+#  if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5)
- #    error "This version of Mac OS X is unsupported"
- #  endif
- #endif
-^ . '\' | patch -p1',
+    =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-opensource-src-4.3.1.tar.gz',
+    'url'
+    =>  'ftp://ftp.trolltech.com/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
+    'url'
+    =>  'http://wftp.tu-chemnitz.de/pub/Qt/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
     'conf-cmd'
-    =>  'echo yes | ./configure',
+    # some subdirs use libtool, which has problems with -Z in LDFLAGS
+    =>  'echo yes | LDFLAGS="" ./configure',
     'conf'
     =>  [
           '-prefix', '"$PREFIX"',
-          '-thread',
-          '-system-zlib',
+          '-release',
           '-fast',
-          '-qt-sql-mysql',
-          '-no-style-cde',
-          '-no-style-compact',
-          '-no-style-motif',
-          '-no-style-motifplus',
-          '-no-style-platinum',
-          '-no-style-sgi',
-          '-no-ipv6',
-          '-qt-imgfmt-png',
-          '-qt-imgfmt-jpeg',
-          '-no-imgfmt-mng',
-          '-qt-gif',
-          '-no-tablet',
+          #'-no-exceptions',
+          '-no-accessibility',
+          '-no-stl',
+          # When MythTV all ported:  '-no-qt3support',
           '-I"$PREFIX/include/mysql"',
           '-L"$PREFIX/lib/mysql"',
-        ],
-    'post-conf'
-    =>  'echo "QMAKE_LFLAGS_SHLIB += -single_module" >> src/qt.pro',
+          '-qt-sql-mysql',
+          '-no-sql-lite',
+          '-system-zlib',
+          #'-system-libtiff',
+          '-nomake examples -nomake demos',
+          '-no-nis',
+          '-no-cups',
+          '-no-qdbus',
+       ],
     'make'
     =>  [
-          'sub-src',
-          'qmake-install',
-          'moc-install',
-          # For lupdate, et c.:     'tools-install',
-          'src-install'
+          'sub-moc-install_subtargets',        #'sub-moc',
+          'sub-rcc',                           # No need to install?
+          'sub-uic',                           # No need to install?
+          'sub-corelib-install_subtargets',    #'sub-corelib',
+          'sub-xml-install_subtargets',        #'sub-xml',
+          'sub-gui-install_subtargets',        #'sub-gui',
+          'sub-sql-install_subtargets',        #'sub-sql',
+          'sub-network-install_subtargets',    #'sub-network',
+                                               #'sub-svg',
+                                               #'sub-script',
+          'sub-opengl-install_subtargets',     #'sub-opengl',
+          # When MythTV all ported, remove:
+          'sub-qt3support-install_subtargets', #'sub-qt3support',
+                                               #'sub-uic3',
+                                               #'sub-plugins',
+                                               #'sub-tools',
+          # For lupdate, et c.:
+          #'install_subtargets',
+          'install_qmake',
+          'install_mkspecs',
         ],
+    'parallel-make'
+    => 'yes'
   },
   
   'tiff'
@@ -1054,10 +952,6 @@ my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
 my @AVCfw = split / /, `ls -d $AVCfw`;
 my $AVCfw = pop @AVCfw;
 chop $AVCfw;
-
-if ( $AVCfw )
-{   print "$AVCfw\n"   }
-
 
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
