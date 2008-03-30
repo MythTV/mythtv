@@ -814,6 +814,11 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         EITFixUp::kEFixForceISO8859_15;
     // On transport 10008 only following channels need fixing:
     fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
+        fix[10008LL<<32 | 61441U << 16 | 57621] = // ProSieben
+        fix[10008LL<<32 | 61441U << 16 | 53622] = // Kabel 1
+        fix[10008LL<<32 | 61441U << 16 | 57623] = // 9Live
+        fix[10008LL<<32 | 61441U << 16 | 53626] = // Sat.1
+        fix[10008LL<<32 | 61441U << 16 | 53627] = // N24
         fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
         EITFixUp::kEFixForceISO8859_15;
 
