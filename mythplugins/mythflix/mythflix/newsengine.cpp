@@ -238,7 +238,7 @@ void NewsSite::process()
 
     QDomNode itemNode;
     QString title, description, url;
-    for (unsigned int i = 0; i < items.count(); i++) {
+    for (int i = 0; i < items.count(); i++) {
         itemNode = items.item(i);
         title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));

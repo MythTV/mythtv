@@ -147,7 +147,7 @@ void MythFlixConfig::populateSites()
 
     QDomNode catNode;
     QDomNode siteNode;
-    for (unsigned int i = 0; i < catList.count(); i++) {
+    for (int i = 0; i < catList.count(); i++) {
         catNode = catList.item(i);
 
         NewsCategory *cat = new NewsCategory();
@@ -157,7 +157,7 @@ void MythFlixConfig::populateSites()
 
         QDomNodeList siteList = catNode.childNodes();
 
-        for (unsigned int j = 0; j < siteList.count(); j++) {
+        for (int j = 0; j < siteList.count(); j++) {
             siteNode = siteList.item(j);
 
             NewsSiteItem *site = new NewsSiteItem();
@@ -349,7 +349,7 @@ bool MythFlixConfig::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("NetFlix", event, actions);
 
-    for (uint i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;

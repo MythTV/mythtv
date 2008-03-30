@@ -26,7 +26,6 @@
 #include <q3ptrlist.h>
 #include <qobject.h>
 #include <qdatetime.h>
-#include <q3cstring.h>
 
 class Q3UrlOperator;
 class Q3NetworkOperation;

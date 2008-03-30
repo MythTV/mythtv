@@ -307,7 +307,7 @@ bool MythFlix::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("NetFlix", event, actions);
 
-    for (uint i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
