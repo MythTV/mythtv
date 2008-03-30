@@ -75,8 +75,6 @@ class MythFlix : public MythScreenType
 
 private slots:
     void updateInfoView(MythListButtonItem*);
-    void slotViewArticle();
-    void slotViewArticleTop();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 

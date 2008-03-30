@@ -1,23 +1,21 @@
 #include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/mythdialogs.h>
+#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythmainwindow.h>
+
 #include "mythtv/mythdbcon.h"
 
 #include "flixutil.h"
-//Added by qt3to4:
-#include <QLabel>
 
-QString chooseQueue(QString excludedQueue)
+QString chooseQueue(MythScreenType *screen, QString excludedQueue)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString queueName = "";
 
     QString sql ="SELECT DISTINCT queue "
-                    "FROM netflix "
-                    "WHERE queue <> ''";
+                    "FROM netflix";
 
-    if (excludedQueue != "")
-        sql += QString(" AND queue <> '%1'").arg(excludedQueue);
+    if (!excludedQueue.isEmpty())
+        sql += QString(" WHERE queue <> '%1'").arg(excludedQueue);
 
     query.exec(sql);
 
@@ -28,48 +26,33 @@ QString chooseQueue(QString excludedQueue)
     }
     else
     {
-        QStringList queues;
-        while ( query.next() )
+        if (query.size() > 1)
         {
-            queues += query.value(0).toString();
-        }
+            QString label = QObject::tr("Queue Name");
 
-        if (queues.size() > 1 || excludedQueue != "")
-        {
-            MythPopupBox *queuePopup;
-            queuePopup = new MythPopupBox(gContext->GetMainWindow(),
-                                          "queuepopup");
-            QLabel *label = queuePopup->addLabel("Queue Name",
-                MythPopupBox::Large, false);
-            label->setAlignment(Qt::AlignCenter);
+            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-            MythListBox *queueList;
-            queueList = new MythListBox(queuePopup);
-            queueList->insertStringList(queues);
+            MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "queuepopup");
 
-            queuePopup->addWidget(queueList);
-            queueList->setFocus();
+            if (menuPopup->Create())
+                popupStack->AddScreen(menuPopup);
 
-            MythDialog::connect(queueList, SIGNAL(accepted(int)),
-                    queuePopup, SLOT(AcceptItem(int)));
+            menuPopup->SetReturnEvent(screen, "queues");
 
-            DialogCode result = queuePopup->ExecPopup();
-
-            if (result != MythDialog::Rejected)
+            while ( query.next() )
             {
-                queueName = queueList->currentText();
+                QString name = query.value(0).toString();
+                if (name.isEmpty())
+                    name = "default";
+                menuPopup->AddButton(name);
             }
-            else
-            {
-                queueName = "__NONE__";
-            }
-
-            queuePopup->hide();
-            queuePopup->deleteLater();
         }
-        else if (queues.size() == 1)
+        else if (query.size() == 1)
         {
-            queueName = queues[0];
+            queueName = query.value(0).toString();
+
+            if (queueName.isEmpty())
+                queueName = "default";
         }
     }
 

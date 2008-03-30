@@ -402,22 +402,6 @@ void MythFlix::slotSiteSelected(MythListButtonItem *item)
     processAndShowNews((NewsSite*) item->getData());
 }
 
-void MythFlix::slotViewArticle()
-{
-
-    QString queueName = chooseQueue();
-    if (queueName != "__NONE__")
-        InsertMovieIntoQueue(queueName, false);
-}
-
-void MythFlix::slotViewArticleTop()
-{
-
-   QString queueName = chooseQueue();
-    if (queueName != "__NONE__")
-        InsertMovieIntoQueue(queueName, true);
-}
-
 void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
 {
     MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
@@ -431,7 +415,7 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
 
     QStringList args(gContext->GetShareDir() + "mythflix/scripts/netflix.pl");
 
-    if (queueName != "")
+    if (!queueName.isEmpty())
     {
         args += "-q";
         args += queueName;
@@ -453,7 +437,7 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
         args = QStringList(gContext->GetShareDir() +
                            "mythflix/scripts/netflix.pl");
 
-        if (queueName != "")
+        if (!queueName.isEmpty())
         {
             args += "-q";
             args += queueName;
@@ -523,7 +507,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
 
                 if (proc.canReadLineStderr())
                 {
-                    if (err == "")
+                    if (err.isEmpty())
                     {
                         err = cmd + ": ";
                     }
@@ -564,7 +548,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
 
         if (proc.canReadLineStderr())
         {
-            if (err == "")
+            if (err.isEmpty())
             {
                 err = cmd + ": ";
             }
@@ -573,11 +557,11 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
         }
     }
 
-    if (err != "")
+    if (!err.isEmpty())
     {
         QString tempPurpose(purpose);
 
-        if (tempPurpose == "")
+        if (tempPurpose.isEmpty())
             tempPurpose = "Command";
 
         VERBOSE(VB_IMPORTANT, QString("%1").arg(err));
@@ -603,12 +587,20 @@ void MythFlix::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            if (buttonnum == 0)
-                slotViewArticleTop();
-            else if (buttonnum == 1)
-                slotViewArticle();
+            if (buttonnum == 0 || buttonnum == 1)
+            {
+                QString queueName = chooseQueue(this);
+                if (!queueName.isEmpty())
+                    InsertMovieIntoQueue(queueName, true);
+            }
             else if (buttonnum == 2)
                 slotShowNetFlixPage();
+        }
+        else if (resultid == "queues")
+        {
+            QString queueName = dce->GetResultText();
+            if (!queueName.isEmpty())
+                InsertMovieIntoQueue(queueName, true);
         }
 
         m_menuPopup = NULL;

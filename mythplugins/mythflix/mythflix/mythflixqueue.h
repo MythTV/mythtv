@@ -44,7 +44,7 @@ class MythFlixQueue : public MythScreenType
 
 public:
 
-    MythFlixQueue(MythScreenStack *, const char *, QString);
+    MythFlixQueue(MythScreenStack *, const char *);
     ~MythFlixQueue();
 
     bool Create(void);
@@ -53,6 +53,8 @@ public:
 
   private:
     void loadData();
+
+    void UpdateNameText();
 
     void displayOptions();
 

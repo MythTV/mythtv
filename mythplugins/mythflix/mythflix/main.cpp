@@ -29,11 +29,11 @@
 #include "mythflixconfig.h"
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
 
 #include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
 #include "flixutil.h"
 #include "dbcheck.h"
@@ -50,31 +50,21 @@ void browse(void){
 }
 
 void queue(void){
-    QString queue = chooseQueue();
-    if (queue != "__NONE__")
-    {
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixqueue",
-                                                    queue);
+    MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixqueue");
 
-        if (mythflix->Create())
-            mainStack->AddScreen(mythflix);
-    }
+    if (mythflix->Create())
+        mainStack->AddScreen(mythflix);
 }
 
 void history(void){
-    QString queue = chooseQueue();
-    if (queue != "__NONE__")
-    {
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixhistory",
-                                                    queue);
+    MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixhistory");
 
-        if (mythflix->Create())
-            mainStack->AddScreen(mythflix);
-    }
+    if (mythflix->Create())
+        mainStack->AddScreen(mythflix);
 }
 
 void NetFlixCallback(void *data, QString &selection)

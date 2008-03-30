@@ -42,8 +42,7 @@
 #include "mythflixqueue.h"
 #include "flixutil.h"
 
-MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name,
-                             QString queueName)
+MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name)
 {
     q3InitNetworkProtocols ();
@@ -66,8 +65,9 @@ MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name,
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
-    m_articlesList   = 0;
-    m_queueName = queueName;
+    m_articlesList = NULL;
+
+    m_queueName = chooseQueue(this);
 }
 
 MythFlixQueue::~MythFlixQueue()
@@ -103,14 +103,7 @@ bool MythFlixQueue::Create()
     m_boxshotImage = dynamic_cast<MythUIImage *>
                 (GetChild("boxshot"));
 
-    if (m_nameText)
-    {
-        QString myQueue = m_queueName != "" ? m_queueName : tr("Default");
-        if (QString::compare("netflix history",name())==0)
-            m_nameText->SetText(tr("History for Queue: ") + m_queueName);
-        else
-            m_nameText->SetText(tr("Items in Queue: ") + m_queueName);
-    }
+    UpdateNameText();
 
     if (!m_articlesList)
     {
@@ -126,7 +119,8 @@ bool MythFlixQueue::Create()
 
     SetFocusWidget(m_articlesList);
 
-    loadData();
+    if (!m_queueName.isEmpty())
+        loadData();
 
     return true;
 }
@@ -150,7 +144,10 @@ void MythFlixQueue::loadData()
     else
         query.bindValue(":ISQUEUE", 1);
 
-    query.bindValue(":QUEUENAME", m_queueName);
+    if (m_queueName == "default")
+        query.bindValue(":QUEUENAME", "");
+    else
+        query.bindValue(":QUEUENAME", m_queueName);
     query.exec();
 
     if (!query.isActive()) {
@@ -175,6 +172,21 @@ void MythFlixQueue::loadData()
 
     slotRetrieveNews();
 
+}
+
+void MythFlixQueue::UpdateNameText()
+{
+    if (m_nameText)
+    {
+        QString queuename = m_queueName;
+        if (queuename == "default")
+            queuename = QObject::tr("Default");
+
+        if (QString::compare("netflix history",name())==0)
+            m_nameText->SetText(tr("History for Queue: ") + queuename);
+        else
+            m_nameText->SetText(tr("Items in Queue: ") + queuename);
+    }
 }
 
 void MythFlixQueue::updateInfoView(MythListButtonItem* selected)
@@ -365,7 +377,7 @@ void MythFlixQueue::slotMoveToTop()
             int index = movieID.findRev("/");
             movieID = movieID.mid(index+1,length);
 
-            if (m_queueName != "")
+            if (!m_queueName.isEmpty())
             {
                 args += "-q";
                 args += m_queueName;
@@ -402,7 +414,7 @@ void MythFlixQueue::slotRemoveFromQueue()
             int index = movieID.findRev("/");
             movieID = movieID.mid(index+1,length);
 
-            if (m_queueName != "")
+            if (!m_queueName.isEmpty())
             {
                 args += "-q";
                 args += m_queueName;
@@ -432,9 +444,9 @@ void MythFlixQueue::slotMoveToQueue()
         if(article)
         {
 
-            QString newQueue = chooseQueue(m_queueName);
+            QString newQueue = chooseQueue(this, m_queueName);
 
-            if (newQueue == "__NONE__")
+            if (newQueue.isEmpty())
             {
 //                 MythPopupBox::showOkPopup(
 //                     gContext->GetMainWindow(), tr("Move Canceled"),
@@ -453,7 +465,7 @@ void MythFlixQueue::slotMoveToQueue()
             QStringList args = base;
             QString results;
 
-            if (newQueue != "")
+            if (!newQueue.isEmpty())
             {
                 args += "-q";
                 args += newQueue;
@@ -466,7 +478,7 @@ void MythFlixQueue::slotMoveToQueue()
 
             args = base;
 
-            if (m_queueName != "")
+            if (!m_queueName.isEmpty())
             {
                 args += "-q";
                 args += m_queueName;
@@ -520,7 +532,7 @@ void MythFlixQueue::displayOptions()
 
     m_menuPopup->AddButton(tr("Top Of Queue"));
     m_menuPopup->AddButton(tr("Remove From Queue"));
-    if (m_queueName != "")
+    if (!m_queueName.isEmpty())
         m_menuPopup->AddButton(tr("Move To Another Queue"));
     m_menuPopup->AddButton(tr("Show NetFlix Page"));
     m_menuPopup->AddButton(tr("Cancel"));
@@ -563,7 +575,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
 
                 if (proc.canReadLineStderr())
                 {
-                    if (err == "")
+                    if (err.isEmpty())
                     {
                         err = cmd + ": ";
                     }
@@ -604,7 +616,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
 
         if (proc.canReadLineStderr())
         {
-            if (err == "")
+            if (err.isEmpty())
             {
                 err = cmd + ": ";
             }
@@ -613,11 +625,11 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
         }
     }
 
-    if (err != "")
+    if (!err.isEmpty())
     {
         QString tempPurpose(purpose);
 
-        if (tempPurpose == "")
+        if (tempPurpose.isEmpty())
             tempPurpose = "Command";
 
         VERBOSE(VB_IMPORTANT, QString("%1").arg(err));
@@ -661,6 +673,16 @@ void MythFlixQueue::customEvent(QEvent *event)
                     slotShowNetFlixPage();
             }
 
+        }
+        else if (resultid == "queues")
+        {
+            QString queueName = dce->GetResultText();
+            if (!queueName.isEmpty())
+            {
+                m_queueName = queueName;
+                UpdateNameText();
+                loadData();
+            }
         }
 
         m_menuPopup = NULL;
