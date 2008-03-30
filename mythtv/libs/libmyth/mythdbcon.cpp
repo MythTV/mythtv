@@ -454,7 +454,7 @@ void MSqlQuery::bindValue (const QString & placeholder, const QVariant & val, QS
     if (!m_last_prepared_query.contains(placeholder))
     {
         VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder " + placeholder +
-                " with occurance in the prepared query. Ignoring it.\nQuery was: \"" +
+                " without occurance in the prepared query. Ignoring it.\nQuery was: \"" +
                 m_last_prepared_query + "\"");
         return;
     }

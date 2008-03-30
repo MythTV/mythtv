@@ -786,6 +786,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     p->recendts = p->endts;
 
     // Find next program starttime
+    bindings.clear();
     QDateTime nextstart = p->startts;
     querystr = "WHERE program.chanid    = :CHANID  AND "
                "      program.starttime > :STARTTS "
