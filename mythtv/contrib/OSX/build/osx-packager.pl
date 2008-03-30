@@ -80,7 +80,7 @@ our %depend_order = (
         'freetype',
         'lame',
         'mysqlclient',
-        'qt-mt',
+        'qt',
       ],
   'mythplugins'
   =>  [
@@ -229,27 +229,27 @@ our %depend = (
           '-no-nis',
           '-no-cups',
           '-no-qdbus',
+          '-no-framework',
        ],
     'make'
     =>  [
-          'sub-moc-install_subtargets',        #'sub-moc',
-          'sub-rcc',                           # No need to install?
-          'sub-uic',                           # No need to install?
-          'sub-corelib-install_subtargets',    #'sub-corelib',
-          'sub-xml-install_subtargets',        #'sub-xml',
-          'sub-gui-install_subtargets',        #'sub-gui',
-          'sub-sql-install_subtargets',        #'sub-sql',
-          'sub-network-install_subtargets',    #'sub-network',
+                                               #'sub-moc',
+                                               #'sub-rcc',
+                                               #'sub-uic',
+                                               #'sub-corelib',
+                                               #'sub-xml',
+                                               #'sub-gui',
+                                               #'sub-sql',
+                                               #'sub-network',
                                                #'sub-svg',
                                                #'sub-script',
-          'sub-opengl-install_subtargets',     #'sub-opengl',
-          # When MythTV all ported, remove:
-          'sub-qt3support-install_subtargets', #'sub-qt3support',
+                                               #'sub-opengl',
+          # When MythTV is all ported, change this to opengl?
+          'sub-qt3support-install_subtargets-ordered',
                                                #'sub-uic3',
                                                #'sub-plugins',
-                                               #'sub-tools',
           # For lupdate, et c.:
-          #'install_subtargets',
+          #'sub-tools-install_subtargets',     #'sub-tools',
           'install_qmake',
           'install_mkspecs',
         ],
@@ -946,7 +946,7 @@ if ( $OPT{'verbose'} )
 {   push @bundler, '--verbose'   }
 
 
-### Framework that has a screwed up link dep. path
+### Framework that has a screwed up link dependency path
 my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
             'Framework/AVCVideoServices.framework';
 my @AVCfw = split / /, `ls -d $AVCfw`;
