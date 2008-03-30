@@ -1314,7 +1314,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             }
 
             QVector<MythScreenStack *>::Iterator it;
-            for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+            for (it = d->stackList.end()-1; it != d->stackList.begin()-1; --it)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top)
@@ -1363,8 +1363,8 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 
                     ge->SetPosition(p);
 
-                    for (it = d->stackList.begin(); it != d->stackList.end(); 
-                         it++)
+                    for (it = d->stackList.end()-1; it != d->stackList.begin()-1;
+                         --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (screen && (clicked = screen->GetChildAt(p)) != NULL)
