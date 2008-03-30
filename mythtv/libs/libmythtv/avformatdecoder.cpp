@@ -415,8 +415,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       lastdvdtitle(-1), lastcellstart(0),
       decodeStillFrame(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
-      dvdTitleChanged(false), mpeg_seq_end_seen(false),
-      lastDVDStillFrame(NULL)
+      dvdTitleChanged(false), mpeg_seq_end_seen(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
@@ -447,9 +446,6 @@ AvFormatDecoder::~AvFormatDecoder()
         av_free_packet(pkt);
         delete pkt;
     }
-
-    if (lastDVDStillFrame)
-        av_free_packet(lastDVDStillFrame);
 
     CloseContext();
     delete ccd608;
@@ -1625,9 +1621,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 InitVideoCodec(ic->streams[i], enc,
                                selectedVideoIndex == (int) i);
-
+                
                 ScanATSCCaptionStreams(i);
-
+                
                 VERBOSE(VB_PLAYBACK, LOC + 
                         QString("Using %1 for video decoding")
                         .arg(GetCodecDecoderName()));
@@ -2005,6 +2001,7 @@ void AvFormatDecoder::RemoveAudioStreams()
         else
             i++;
     }
+    av_read_frame_flush(ic);
 }
 
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -3043,36 +3040,17 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             else
             {
                 storevideoframes = false;
-                int numVidFrames = 0;
-                if (GetNVP() && GetNVP()->getVideoOutput())
-                    numVidFrames = GetNVP()->getVideoOutput()->ValidVideoFrames();
+                
                 bool inDVDStill = ringBuffer->DVD()->InStillFrame();
 
                 if (decodeStillFrame && !inDVDStill)
-                {
                     decodeStillFrame = false;
-                }
+                
+                if (inDVDStill)
+                    ringBuffer->DVD()->RunSeekCellStart();
 
-                if (numVidFrames == 0 && inDVDStill)
-                {
-                    if (lastDVDStillFrame)
-                    {
-                        VERBOSE(VB_PLAYBACK, LOC + "DVD: in still frame but "
-                                "there is no picture. Using last stored still "
-                                "frame");
-                        storedPackets.append(lastDVDStillFrame);
-                        ringBuffer->DVD()->SeekCellStart();
-                        lastDVDStillFrame = NULL;
-                        decodeStillFrame = true;
-                    }
-                    else
-                        ringBuffer->DVD()->SeekCellStart();
-                }
-                else    
-                {   
-                    if (storedPackets.count() < 2 && !decodeStillFrame)
-                        storevideoframes = true;
-                }
+                if (storedPackets.count() < 2 && !decodeStillFrame)
+                    storevideoframes = true;
             }          
             if (GetNVP()->AtNormalSpeed() &&
                 ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
@@ -3759,9 +3737,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
-                    /* HACK remove from root of still frame display issue is fixed */
-                    if (decodeStillFrame)
-                        GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
                     if (d->HasMPEG2Dec() && mpa_pic.data[3])
                         context->release_buffer(context, &mpa_pic);
 
@@ -3769,15 +3744,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     gotvideo = 1;
                     framesPlayed++;
 
-                    if (ringBuffer->InDVDMenuOrStillFrame() && decodeStillFrame)
-                    {
-                        if (lastDVDStillFrame)
-                            av_free_packet(lastDVDStillFrame);
-                        av_dup_packet(pkt);
-                        lastDVDStillFrame = pkt;
-                        pkt = NULL;
+                    if (decodeStillFrame)
                         decodeStillFrame = false;
-                    }
 
                     lastvpts = temppts;
                     break;

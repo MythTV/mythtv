@@ -279,8 +279,6 @@ class AvFormatDecoder : public DecoderBase
     bool dvd_video_codec_changed;
     bool dvdTitleChanged;
     bool mpeg_seq_end_seen;
-    /// \brief contains last dvd still frame decoded
-    AVPacket *lastDVDStillFrame;
 };
 
 #endif
