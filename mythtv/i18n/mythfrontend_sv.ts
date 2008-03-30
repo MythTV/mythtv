@@ -66,19 +66,19 @@
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Var god välj Myth Backend Server</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Configure Manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurera Manuellt</translation>
     </message>
 </context>
 <context>
@@ -156,23 +156,23 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa Ingångsgrupp</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange nytt gruppnamn</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyvärr, detta ingångsgruppnamn kan inte vara tomt.</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyvärr, detta ingångsgruppnamn används redan.</translation>
     </message>
 </context>
 <context>
@@ -226,39 +226,43 @@
     </message>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaler</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera ALLA kanaler?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera alla otilldelade kanaler?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera kanalerna på %1?</translation>
     </message>
     <message>
         <source>Add some for channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Lägg till litet för kanaler först!</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Download all icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda ner alla ikoner..</translation>
     </message>
     <message>
         <source>Rescan for missing icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök efter saknade ikoner..</translation>
     </message>
     <message>
         <source>Download icon for </source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda ner ikon för</translation>
+    </message>
+    <message>
+        <source>Add some channels first!</source>
+        <translation>Lägg till kanaler först!</translation>
     </message>
 </context>
 <context>
@@ -460,27 +464,27 @@
     </message>
     <message>
         <source>stored search</source>
-        <translation type="unfinished"></translation>
+        <translation>lagrad sökning</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg Till</translation>
     </message>
     <message>
         <source>Match this series</source>
-        <translation type="unfinished"></translation>
+        <translation>Matcha denna serie</translation>
     </message>
     <message>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Matcha ord i undertexter</translation>
     </message>
     <message>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Visar endast markerade i bredbildsformat</translation>
     </message>
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uteslut H.264 kodade strömmar (endast EIT)</translation>
     </message>
 </context>
 <context>
@@ -862,11 +866,19 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor Läge Karta</translation>
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC Enhet Träd</translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation>Spänning</translation>
+    </message>
+    <message>
+        <source>Mini DiSEqC</source>
+        <translation>Mini DiSEqC</translation>
     </message>
 </context>
 <context>
@@ -1065,43 +1077,43 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     <name>MediaMonitor</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Select removable media to eject or insert</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj portabelt media som ska kopplas till eller bort</translation>
     </message>
     <message>
         <source>No devices to eject</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga enheter att koppla bort</translation>
     </message>
     <message>
         <source>Failed to unmount %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att avmontera %1</translation>
     </message>
     <message>
         <source>You may safely remove %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan nu avlägsna %1 säkert</translation>
     </message>
     <message>
         <source>Failed to eject %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att föra ut %1</translation>
     </message>
     <message>
         <source>Select a CD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en CD enhet</translation>
     </message>
     <message>
         <source>Select a VCD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en VCD enhet</translation>
     </message>
     <message>
         <source>Select a DVD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en DVD enhet</translation>
     </message>
     <message>
         <source>Select a DVD writer</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en DVD skrivare</translation>
     </message>
 </context>
 <context>
@@ -1123,41 +1135,43 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
     <message>
         <source>There are also other clients using this database. They should be shut down first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Andra klienter använder databasen. Dessa borde stängas av först.</translation>
     </message>
     <message>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel: MythTV kan inte uppgradera schemat för denna databas eftersom andra klienter använder den.
+
+Var god och stäng av dom andar klienterna före uppgradering.</translation>
     </message>
     <message>
         <source>Warning: MythTV wants to upgrade your database schema, from %1 to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Varning: MythTV kommer att uppgradera ditt databas schema, från %1 till %2.</translation>
     </message>
     <message>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan försöka använda det gamla schemat, men det kan orsaka problem.</translation>
     </message>
     <message>
         <source>Warning: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Varning: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
     </message>
     <message>
         <source>Error: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kunde inte säkerhetskopiera din databas.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om ditt system blir ostabilt, så finns en säkerhetskopia med namn %1 i %2.</translation>
     </message>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta kan inte ångras, så att ha en säkerhetskopia av databasen vore en god ide&apos;.</translation>
     </message>
 </context>
 <context>
@@ -1346,7 +1360,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="obsolete">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Recording List Menu</source>
@@ -1694,130 +1708,130 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>_NO_TITLE_</source>
-        <translation type="unfinished"></translation>
+        <translation>_NO_TITLE_</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Okänt</translation>
+        <translation>Okänt</translation>
     </message>
     <message>
         <source>Help (Status Icons)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjälp (Status Ikoner)</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera, och tillåt återinspelning</translation>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt detta program att återinspelas</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Ångra radering</translation>
     </message>
     <message>
         <source>Delete Forever</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera För Alltid</translation>
     </message>
     <message>
         <source>Recording is in Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelningen är i Mono</translation>
     </message>
     <message>
         <source>Recording is in Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelningen är i Surround Ljud</translation>
     </message>
     <message>
         <source>Recording is in Dolby Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelningen är i Dolby Surround Ljud</translation>
     </message>
     <message>
         <source>Recording has Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertexter finns för inspelning</translation>
     </message>
     <message>
         <source>Recording is Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelning har undertexter</translation>
     </message>
     <message>
         <source>Recording is in WideScreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelning är i bredbildsformat</translation>
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelning har tittats på</translation>
     </message>
     <message>
         <source>Show LiveTV as a Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa tv-sändning som Grupp</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Raderad</translation>
     </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
     <message>
         <source>Match Criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Matcha Kriterier</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Dekoder</translation>
     </message>
     <message>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation>Max Processorer</translation>
     </message>
     <message>
         <source>Video Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Video-återgivare</translation>
     </message>
     <message>
         <source>OSD Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD-återgivare</translation>
     </message>
     <message>
         <source>OSD Fade</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Borttoning</translation>
     </message>
     <message>
         <source>Primary Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Primär Deinterlacer</translation>
     </message>
     <message>
         <source>Fallback Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Reservdeinterlacer</translation>
     </message>
     <message>
         <source>Custom Filters</source>
-        <translation type="unfinished">Egna filter</translation>
+        <translation>Egna filter</translation>
     </message>
     <message>
         <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximalt antal processorkärnor använda för avkodning.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation> Avkodning med flera processorkärnor är avstängd-endast en processorkärna kommer användas, var god kompilera om med --enable-ffmpeg-pthreads för att ändra.</translation>
     </message>
     <message>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Då avmarkerad, kommer inte OSD tona bort, utan kommer att försvinna direkt.</translation>
     </message>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
-        <translation type="unfinished"></translation>
+        <translation>Avmarkera detta om video knycker medan OSD tonar bort.</translation>
     </message>
 </context>
 <context>
@@ -1872,11 +1886,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Tid</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
 </context>
 <context>
@@ -2089,51 +2103,51 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Stored Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagrad Sökning</translation>
     </message>
     <message>
         <source>Select a search stored from</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en lagrad sökning från</translation>
     </message>
     <message>
         <source>Custom Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Egen Inspelning</translation>
     </message>
     <message>
         <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation type="unfinished"></translation>
+        <translation>0 .. 9 flyttar till Nx10 procent i listan</translation>
     </message>
     <message>
         <source>Unrated</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocensurerad</translation>
     </message>
     <message>
         <source>At least ***/</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone ***/</translation>
     </message>
     <message>
         <source>At least ***</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone ***</translation>
     </message>
     <message>
         <source>At least **/</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone **/</translation>
     </message>
     <message>
         <source>At least **</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone **</translation>
     </message>
     <message>
         <source>At least */</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone */</translation>
     </message>
     <message>
         <source>At least *</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone *</translation>
     </message>
     <message>
         <source>At least /</source>
-        <translation type="unfinished"></translation>
+        <translation>Åtminstone /</translation>
     </message>
 </context>
 <context>
@@ -2205,6 +2219,10 @@ Returning to the previous menu.</source>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Radera &apos;%1&apos; %2 regel?</translation>
+    </message>
+    <message>
+        <source> + %1 automatic priority (%2hr)</source>
+        <translation> + %1 automatisk prioritet (%2t)</translation>
     </message>
 </context>
 <context>
@@ -2463,7 +2481,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>channel name</source>
-        <translation>kanalnamn</translation>
+        <translation type="obsolete">kanalnamn</translation>
     </message>
     <message>
         <source>Vertical over/underscan percentage</source>
@@ -2591,7 +2609,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Xinerama screen</source>
-        <translation>Xinerama-skärm</translation>
+        <translation type="obsolete">Xinerama-skärm</translation>
     </message>
     <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -3900,7 +3918,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Visible</source>
@@ -8764,1659 +8782,1732 @@ Frekvensen för denna kanal i</translation>
     </message>
     <message>
         <source>Backend Server Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppvakningsinställningar För Backend Server</translation>
     </message>
     <message>
         <source>Database Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Databasserverinställningar</translation>
     </message>
     <message>
         <source>Ping test server?</source>
-        <translation type="unfinished"></translation>
+        <translation>Pinga testserver?</translation>
     </message>
     <message>
         <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="unfinished"></translation>
+        <translation>Testa enkel värdåtkomst med pingkommandot. Stäng av om din värd eller ditt nätverk inte stöder ping (ICMP ECHO) paket</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port</translation>
     </message>
     <message>
         <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="unfinished"></translation>
+        <translation>Portnumret som databasen körs på.  Lämna tomt om standardport (3306) används.</translation>
     </message>
     <message>
         <source>Database name</source>
-        <translation type="unfinished"></translation>
+        <translation>Databasnamn</translation>
     </message>
     <message>
         <source>Enable Database Server Wakeup</source>
-        <translation type="unfinished"></translation>
+        <translation>Möjliggör Databasserver Uppvakning</translation>
     </message>
     <message>
         <source>If checked, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Då markerad, kommer MythTV frontend att använda parametrar för databas uppvakning för att skapa kontakt med databasservern.</translation>
     </message>
     <message>
         <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandot som körs på denna MythTV frontend för att väcka upp databasservern (sudo /etc/init.d/mysql restart).</translation>
     </message>
     <message>
         <source>Required fields are marked with an asterisk (*).</source>
-        <translation type="unfinished"></translation>
+        <translation>Obligatoriska fält är markerade med en asterisk (*).</translation>
     </message>
     <message>
         <source>Cannot find (ping) database host %1 on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte hitta databasvärden %1 i nätverket</translation>
     </message>
     <message>
         <source>Cannot connect to port %1 on database host %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte kontakta port %1 på databasvärd %2</translation>
     </message>
     <message>
         <source>Save database details</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara databasdetaljer</translation>
     </message>
     <message>
         <source>Save backend details</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara backend detaljer</translation>
     </message>
     <message>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara Inte</translation>
     </message>
     <message>
         <source>Save that backend or database as the default?</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara denna backend eller databas som standard?</translation>
     </message>
     <message>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppgradera</translation>
     </message>
     <message>
         <source>Use current schema</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd nuvarande schema</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation type="unfinished">Undertitel</translation>
+        <translation>Undertext</translation>
     </message>
     <message>
         <source>Could not query inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte kommunicera med ingångar.</translation>
     </message>
     <message>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>FEL, kompilera med V4L stöd för att kommunicera med ingångar</translation>
     </message>
     <message>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte öppna &apos;%1&apos; för att kommunicera med dess ingångar.</translation>
     </message>
     <message>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>FEL, kompilera med DVB stöd för att kommunicera med ingångar</translation>
     </message>
     <message>
         <source>New Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny Ingång</translation>
     </message>
     <message>
         <source>Channel Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal Alternativ</translation>
     </message>
     <message>
         <source>Icon Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon Nerladdning</translation>
     </message>
     <message>
         <source>Starts the icon downloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Startar ikonnedladdaren</translation>
     </message>
     <message>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation>som sökning</translation>
     </message>
     <message>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation>som exempel</translation>
     </message>
     <message>
         <source>Title %1 chapter %2</source>
-        <translation type="unfinished"></translation>
+        <translation>titel %1 kapitel %2</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 behind)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av %2 (%3 efter)</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 remaining)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av %2 (%3 kvar)</translation>
     </message>
     <message>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temat som du använder innehåller inte elementet %1. Var god kontakta temats upphovsmän och be dom att uppdatera det.&lt;br&gt;&lt;br&gt;Nästa bildskärm kommer att vara tom. Tryck Esc för att komma ur den och tillbaka till menyn.</translation>
     </message>
     <message>
         <source>the recorder failed to record.</source>
-        <translation type="unfinished"></translation>
+        <translation>inspelaren misslyckades att spela in.</translation>
     </message>
     <message>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>denna regel matchar inte någon förekomst i aktuell programlista.</translation>
     </message>
     <message>
         <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation>denna episod kommer att bli inspelad på en annan kanal på denna tidpunkt.</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Surround Ljud</translation>
     </message>
     <message>
         <source>Dolby Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolby Ljud</translation>
     </message>
     <message>
         <source>Audio for Hearing Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudspår för hörselskadade</translation>
     </message>
     <message>
         <source>Audio for Visually Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudspår för synskadade</translation>
     </message>
     <message>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Bredbildsformat</translation>
     </message>
     <message>
         <source>AVC/H.264</source>
-        <translation type="unfinished"></translation>
+        <translation>AVC/H.264</translation>
     </message>
     <message>
         <source>Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Det finns undertexter</translation>
     </message>
     <message>
         <source>Deaf Signing</source>
-        <translation type="unfinished"></translation>
+        <translation>Teckenspråk</translation>
     </message>
     <message>
         <source>Average Time Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>Medeltal av tidskast</translation>
     </message>
     <message>
         <source>hours</source>
-        <translation type="unfinished"></translation>
+        <translation>timmar</translation>
     </message>
     <message>
         <source>Recorded File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelat Filnamn</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt, så kommer specifierad bitrate användas för 640x480.  Om annan upplösning används, så kommer bitrate att skaleras om efter behov.</translation>
     </message>
     <message>
         <source>Frequency (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens (%1)</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens (Inget standardalternativ).
+Frekvensen för denna kanal i %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
 Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbol Rate (symboler/sekund).
+Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</translation>
     </message>
     <message>
         <source>Could not open tuner device</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte öppna mottagarenhet</translation>
     </message>
     <message>
         <source>Bad connection to backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Dålig kontakt med MythTV backend</translation>
     </message>
     <message>
         <source> offset %2</source>
-        <translation type="unfinished"></translation>
+        <translation> kompensation %2</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no tables</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout vid avsökning %1 -- inga tabeller</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no signal</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout vid avsökning %1 -- ingen signal</translation>
     </message>
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställer in till %1 mplexid(%2)</translation>
     </message>
     <message>
         <source>Record new episode first showings</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in nytt avsnitt vid premiärer</translation>
     </message>
     <message>
         <source>DVB Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB Transport</translation>
     </message>
     <message>
         <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kommer att spela in dessa program efter %d sekunder:</translation>
     </message>
     <message>
         <source>&quot;%1&quot; on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; på %2</translation>
     </message>
     <message>
         <source>Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vill du:</translation>
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV har varit oanvänt i %1 minuter och kommer att avslutas efter %2 sekunder. Tittar du på TV ännu?</translation>
     </message>
     <message>
         <source>On known multiplex...</source>
-        <translation type="unfinished"></translation>
+        <translation>På känd multiplex...</translation>
     </message>
     <message>
         <source>PVR-350 decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 dekoder</translation>
     </message>
     <message>
         <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2 kommer att använda mpeg2-rutiner; detta är snabbare på vissa 32 bitars AMD processorer.</translation>
     </message>
     <message>
         <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Notera: Avkodning av valbara undertexter fungerar inte med libmpeg2.</translation>
     </message>
     <message>
         <source>Kernel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel</translation>
     </message>
     <message>
         <source>Greedy HighMotion</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion</translation>
     </message>
     <message>
         <source>Greedy HighMotion (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion (2x)</translation>
     </message>
     <message>
         <source>Yadif</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif</translation>
     </message>
     <message>
         <source>Yadif (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (2x)</translation>
     </message>
     <message>
         <source>Bob (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x)</translation>
     </message>
     <message>
         <source>Linear blend (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (HW)</translation>
     </message>
     <message>
         <source>Kernel (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (HW)</translation>
     </message>
     <message>
         <source>Bob (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x, HW)</translation>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One field (HW)</translation>
     </message>
     <message>
         <source>One Field (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One Field (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (2x, HW)</translation>
     </message>
     <message>
         <source>Linear blend (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (2x, HW)</translation>
     </message>
     <message>
         <source>Interlaced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced (2x, Hw)</translation>
     </message>
     <message>
         <source>Video rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>Video återgivningsmetod</translation>
     </message>
     <message>
         <source>Render video offscreen. Used internally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Återge video utanför skärmen. Används internt.</translation>
     </message>
     <message>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd X11 pixel kopiering för att återge video. Detta rekommenderas inte om andra alternativ finns. Videon kommer inte att skaleras om för att passa på skärmen. Detta fungerar med alla X11 servrar, lokalt och icke lokalt.</translation>
     </message>
     <message>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd X11 delat minne pixel överföring för att återge video. Detta är bara rekommenderat framom X11 pixel kopiering. Videon kommer inte att skaleras om för att passa skärmen. Detta fungerar lokalt med dom flesta X11 servrar.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är standard video återgivaren för X11 system. Den använder XVideo hårdvaruassist för skalering, färgkonvertering. Om hårdvaran stöder bildinställningar så stöder återgivaren det också. </translation>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är standard video återgivaren för XvMC avkodare. Den använder XVideo hårdvaruassist för skalering, färgkonvertering och om tillgänglig, medger bildinställningar.</translation>
     </message>
     <message>
         <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna video återgivare för XvMC på nVidia grafikkort använder XVideo för färgkonvertering och OpenGL för skalering. Största fördelen med denna återgivare är att den tillåter OpenGL OSD återgivning, vilken frigör två XvMC buffrar för avkodning. Detta kräver ett snabbt nVidia grafikkort.</translation>
     </message>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna video återgivare använder DirectFB för skalering och färgkonvertering. Den är inte lika egenskapsrik som standard video återgivaren, men kan köras i Linux system utan X11 server.</translation>
     </message>
     <message>
         <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows video återgivare baserad på overlays. Inte kompatibel med Vista Aero Glass.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows video återgivare baserad på Direct3D. Kräver grafikkort kompatibelt med Direct3D 9. Detta är den rekommenderade återgivaren för Windows system.</translation>
     </message>
     <message>
         <source>This is the standard video render for Macintosh OS X systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är standard video återgivaren för Macintosh OS X system.</translation>
     </message>
     <message>
         <source>This is the only video renderer for the MacAccel decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är enda video återgivaren för MacAccel avkodaren.</translation>
     </message>
     <message>
         <source>This is only video renderer for the PVR-350 decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är enda video återgivaren för PVR-350 avkodaren.</translation>
     </message>
     <message>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna video återgivare använder OpenGL frö skalering och färgkonvertering och kan erbjuda begränsade bildinställningar. Detta kräver en snabbare grafikpeocessor än XVideo. Bildinställningar förbrukar också mera systemresurser.</translation>
     </message>
     <message>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna deinterlacer kräver att bildskärmen ska stöda videokällans bildfrekvens (bilder per sekund) dubbelt upp.</translation>
     </message>
     <message>
         <source>Perform no deinterlacing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utför inte deinterlacing.</translation>
     </message>
     <message>
         <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd detta med en interlaced bildskärm vars upplösning är exakt samma som videokällans upplösning. Detta är inte kompatibelt med MythTV&apos;s zoom lägen.</translation>
     </message>
     <message>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visar bara det ena av två fält i bilden. Detta ser bra ut när man visar 1080i video på en 720p bildskärm.</translation>
     </message>
     <message>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visar ett fält av bilden följt av det andra fältet förskjutet vertikalt.</translation>
     </message>
     <message>
         <source>Blends the odd and even fields linearly into one frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandar udda och jämna fält lineärt till en bild.</translation>
     </message>
     <message>
         <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta filter stänger av deinterlacing i dom fall då båda fälten är lika, och utför annars lineär deinterlacing.</translation>
     </message>
     <message>
         <source>(Hardware Accelerated)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Hårdvaruaccelererat)</translation>
     </message>
     <message>
         <source>With workaround for broken interlaced modelines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Med kringgång av problem med söndriga  interlacade modelines.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna deinterlacer använder flera fält för att minska suddighet i rörelser.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; has not been documented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; har inte blivit dokumenterat ännu.</translation>
     </message>
     <message>
         <source>OSD rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD återgivningsmetod</translation>
     </message>
     <message>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend. But it is the fastest OSD renderer; and is particularly efficient compared to the ia44blend OSD renderer for XvMC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Återge OSD med hjälp av XVideos chromakey egenskap. Denna återgivare kan inte använda alpha blend, men den är den snabbaste OSD återgivaren, och är särskillt effektiv jämfört med ia44blend OSD återgivaren för XvMC.</translation>
     </message>
     <message>
         <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Notera: nVidia hårdvara nyare än 5xxx serien har inte stöd för XVideo chromakey.</translation>
     </message>
     <message>
         <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mjukvaruåtergivning av OSD använder processorn för att göra alpha blend i OSD&apos;n.</translation>
     </message>
     <message>
         <source>Uses hardware support for 16 color alpha-blend surfaces for rendering the OSD. Because of the limited color range, MythTV renders the OSD in 16 level grayscale.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använder hårdvarustöd för 16 färgers alpha blend ytor för återgivning av OSD&apos;n. Beroende på begränsad färgskala, återger MythTV OSD&apos;n i 16 gråskalor.</translation>
     </message>
     <message>
         <source>Note: Not recommended for nVidia or Intel chipsets. This removes two of the limited XvMC buffers from decoding duty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Notera: Inte rekommenerat för nVidia eller Intel kretsuppsättningar. Detta tar bort två av dom begränsade XvMC buffrarna avkodningsprocessen. </translation>
     </message>
     <message>
         <source>Renders the OSD using the PVR-350 chromakey feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Återger OSD&apos;n genom att använda PVR-350&apos;s chromakey egenskap.</translation>
     </message>
     <message>
         <source>Uses OpenGL to alpha blend the OSD onto the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använder OpenGL för att göra alpha blend i OSD&apos;n under videovisning.</translation>
     </message>
     <message>
         <source>Max recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Max inspelningar</translation>
     </message>
     <message>
         <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximalt antal av samtidiga inspelningar som denna enhet bör göra. Vissa distributörer av digitala sändningar sänder flera program på samma multiplex. Om detta är satt till ett värde högre än 1 kan MythTV ibland dra nytta av detta.</translation>
     </message>
     <message>
         <source>Searching for installed XMLTV grabbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Söker efter installerade XMLTV hämtare</translation>
     </message>
     <message>
         <source>DVB Device Number</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB Enhet Nummer</translation>
     </message>
     <message>
         <source>Warning: already in use</source>
-        <translation type="unfinished"></translation>
+        <translation>Varning: redan i användning</translation>
     </message>
     <message>
         <source>Use DVB Card for active EIT scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd DVB kort för aktiv EIT avsökning</translation>
     </message>
     <message>
         <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta alternativ aktiverar den aktiva avsökningen av programdata (EIT). Med detta alternativ valt så är DVB kortet i konstant användning.</translation>
     </message>
     <message>
         <source>Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingång Grupp</translation>
     </message>
     <message>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lämna som &apos;Generisk&apos; om inte denna ingång är delad med en annan enhet. Endast en av ingångarna i en ingångsgrupp kommer vara tillåten att spela in på given tidpunkt.</translation>
     </message>
     <message>
         <source>Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast TV-sändning</translation>
     </message>
     <message>
         <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om detta är aktiverat så kommer MythTV att ställa in frekvens endast genom att använda MPEG programnummret. Programnummren ändrar mera ofta än DVB eller ATSC frekvensinställningsparametrar, så detta är något opålitligare. Detta kommer också att hämma insammling av EIT data under TV-mottagning och inspelning.</translation>
     </message>
     <message>
         <source>Interactions between inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Interaktivitet mellan ingångar</translation>
     </message>
     <message>
         <source>Create a New Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>skapa en ny ingångsgrupp</translation>
     </message>
     <message>
         <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingångsgrupper är bara nödvändiga då två eller flera kort delar samma resurs, som t.ex. ett firewire kort och ett analogt inmatningskort kontrollerar samma set top box.</translation>
     </message>
     <message>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorera</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished">Detektera</translation>
+        <translation>Detektera</translation>
     </message>
     <message>
         <source>Interlaced</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
-        <translation type="unfinished">Interlaced (Normal)</translation>
+        <translation>Interlaced (Normal)</translation>
     </message>
     <message>
         <source>Interlaced (Reversed)</source>
-        <translation type="unfinished">Interlaced (Omvänd)</translation>
+        <translation>Interlaced (Omvänd)</translation>
     </message>
     <message>
         <source>Progressive</source>
-        <translation type="unfinished">Progressiv</translation>
+        <translation>Progressiv</translation>
     </message>
     <message>
         <source>14:9</source>
-        <translation type="unfinished">14:9</translation>
+        <translation>14:9</translation>
     </message>
     <message>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart</translation>
     </message>
     <message>
         <source>Gray</source>
-        <translation type="unfinished"></translation>
+        <translation>Grå</translation>
     </message>
     <message>
         <source>Half</source>
-        <translation type="unfinished"></translation>
+        <translation>Halv</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Hel</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Tänj</translation>
     </message>
     <message>
         <source>[Reserved]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Reserverad]</translation>
     </message>
     <message>
         <source>SCTE mode 1</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE läge 1</translation>
     </message>
     <message>
         <source>SCTE mode 2</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE läge 2</translation>
     </message>
     <message>
         <source>ATSC 8-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 8-VSB</translation>
     </message>
     <message>
         <source>ATSC 16-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 16-VSB</translation>
     </message>
     <message>
         <source>Detective/Thriller</source>
-        <translation type="unfinished"></translation>
+        <translation>Kriminal/Thriller</translation>
     </message>
     <message>
         <source>Adventure/Western/War</source>
-        <translation type="unfinished"></translation>
+        <translation>Äventyr/Western/Krig</translation>
     </message>
     <message>
         <source>Science Fiction/Fantasy/Horror</source>
-        <translation type="unfinished"></translation>
+        <translation>Science Fiction/Fantasy/Skräck</translation>
     </message>
     <message>
         <source>Soap/melodrama/folkloric</source>
-        <translation type="unfinished"></translation>
+        <translation>Såpa/Melodrama/Folktradition</translation>
     </message>
     <message>
         <source>Serious/Classical/Religious/Historical Movie/Drama</source>
-        <translation type="unfinished"></translation>
+        <translation>Allvarlig/Klassisk/Religiös/Historisk Film/Drama</translation>
     </message>
     <message>
         <source>Adult</source>
-        <comment>Adult Movie</comment>
-        <translation type="unfinished"></translation>
+        <comment>Vuxenfilm</comment>
+        <translation type="obsolete">Vuxenfilm</translation>
     </message>
     <message>
         <source>News/weather report</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyheter/Väderrapport</translation>
     </message>
     <message>
         <source>News magazine</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyhetstidning</translation>
     </message>
     <message>
         <source>Intelligent Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Intellektuella Program</translation>
     </message>
     <message>
         <source>Game Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Tävlingsprogram</translation>
     </message>
     <message>
         <source>Variety Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Nöjesprogram</translation>
     </message>
     <message>
         <source>Talk Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Debattprogram</translation>
     </message>
     <message>
         <source>Special Events (World Cup, World Series..)</source>
-        <translation type="unfinished"></translation>
+        <translation>Speciella tilldragelser (Världsmästerskap, OS..)</translation>
     </message>
     <message>
         <source>Sports Magazines</source>
-        <translation type="unfinished"></translation>
+        <translation>Sporttidningar</translation>
     </message>
     <message>
         <source>Football (Soccer)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotboll</translation>
     </message>
     <message>
         <source>Tennis/Squash</source>
-        <translation type="unfinished"></translation>
+        <translation>Tennis/Squash</translation>
     </message>
     <message>
         <source>Misc. Team Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandad Lagsport</translation>
     </message>
     <message>
         <source>Athletics</source>
-        <translation type="unfinished"></translation>
+        <translation>Friidrott</translation>
     </message>
     <message>
         <source>Motor Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Motorsport</translation>
     </message>
     <message>
         <source>Water Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Vattensport</translation>
     </message>
     <message>
         <source>Winter Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Vintersporter</translation>
     </message>
     <message>
         <source>Equestrian</source>
-        <translation type="unfinished"></translation>
+        <translation>Hästsport</translation>
     </message>
     <message>
         <source>Martial Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Kampsporter</translation>
     </message>
     <message>
         <source>Kids</source>
-        <translation type="unfinished"></translation>
+        <translation>Barn</translation>
     </message>
     <message>
         <source>Pre-School Children&apos;s Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Förskole Barnprogram</translation>
     </message>
     <message>
         <source>Entertainment Programmes for 6 to 14</source>
-        <translation type="unfinished"></translation>
+        <translation>Underhållningsprogram för 6 till 14 år</translation>
     </message>
     <message>
         <source>Entertainment Programmes for 10 to 16</source>
-        <translation type="unfinished"></translation>
+        <translation>Underhållningsprogram för 10 till 16 år</translation>
     </message>
     <message>
         <source>Informational/Educational</source>
-        <translation type="unfinished"></translation>
+        <translation>Information/Utbildning</translation>
     </message>
     <message>
         <source>Cartoons/Puppets</source>
-        <translation type="unfinished"></translation>
+        <translation>Tecknat/Dockor</translation>
     </message>
     <message>
         <source>Music/Ballet/Dance</source>
-        <translation type="unfinished"></translation>
+        <translation>Musik/Balett/Dans</translation>
     </message>
     <message>
         <source>Rock/Pop</source>
-        <translation type="unfinished"></translation>
+        <translation>Rock/Pop</translation>
     </message>
     <message>
         <source>Classical Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Klassisk Musik</translation>
     </message>
     <message>
         <source>Folk Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Folkmusik</translation>
     </message>
     <message>
         <source>Jazz</source>
-        <translation type="unfinished"></translation>
+        <translation>Jazz</translation>
     </message>
     <message>
         <source>Musical/Opera</source>
-        <translation type="unfinished"></translation>
+        <translation>Musik/Opera</translation>
     </message>
     <message>
         <source>Ballet</source>
-        <translation type="unfinished"></translation>
+        <translation>Balett</translation>
     </message>
     <message>
         <source>Arts/Culture</source>
-        <translation type="unfinished"></translation>
+        <translation>Konst/Kultur</translation>
     </message>
     <message>
         <source>Performing Arts</source>
-        <translation type="unfinished"></translation>
+        <translation>Skådespelarkonst</translation>
     </message>
     <message>
         <source>Fine Arts</source>
-        <translation type="unfinished"></translation>
+        <translation>Konst</translation>
     </message>
     <message>
         <source>Religion</source>
-        <translation type="unfinished"></translation>
+        <translation>Religion</translation>
     </message>
     <message>
         <source>Popular Culture/Traditional Arts</source>
-        <translation type="unfinished"></translation>
+        <translation>Populärkultur/Traditionell Konst</translation>
     </message>
     <message>
         <source>Literature</source>
-        <translation type="unfinished"></translation>
+        <translation>Literatur</translation>
     </message>
     <message>
         <source>Film/Cinema</source>
-        <translation type="unfinished"></translation>
+        <translation>Film/Bio</translation>
     </message>
     <message>
         <source>Experimental Film/Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Experimentell Film/Video</translation>
     </message>
     <message>
         <source>Broadcasting/Press</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-sändning/Press</translation>
     </message>
     <message>
         <source>New Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny Media</translation>
     </message>
     <message>
         <source>Arts/Culture Magazines</source>
-        <translation type="unfinished"></translation>
+        <translation>Konst/Kulturtidningar</translation>
     </message>
     <message>
         <source>Social/Policical/Economics</source>
-        <translation type="unfinished"></translation>
+        <translation>Socialt/Politiskt/Ekonomiskt</translation>
     </message>
     <message>
         <source>Magazines/Reports/Documentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidningar/Rapporter/Dokumentärer</translation>
     </message>
     <message>
         <source>Economics/Social Advisory</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekonomi/Socialt Rådgivande</translation>
     </message>
     <message>
         <source>Remarkable People</source>
-        <translation type="unfinished"></translation>
+        <translation>Anmärkningsvärda Människor</translation>
     </message>
     <message>
         <source>Education/Science/Factual</source>
-        <translation type="unfinished"></translation>
+        <translation>utbildning/Vetenskap/Fakta</translation>
     </message>
     <message>
         <source>Nature/animals/Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Natur/Djur/Miljö</translation>
     </message>
     <message>
         <source>Technology/Natural Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation>Teknik/Naturvetenskap</translation>
     </message>
     <message>
         <source>Medicine/Physiology/Psychology</source>
-        <translation type="unfinished"></translation>
+        <translation>Medicin/Fysiologi/Psykologi</translation>
     </message>
     <message>
         <source>Foreign Countries/Expeditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Främmande Länder/Expeditioner</translation>
     </message>
     <message>
         <source>Social/Spiritual Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation>Social/Andlig Vetenskap</translation>
     </message>
     <message>
         <source>Further Education</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortbildning</translation>
     </message>
     <message>
         <source>Languages</source>
-        <translation type="unfinished"></translation>
+        <translation>Språk</translation>
     </message>
     <message>
         <source>Leisure/Hobbies</source>
-        <translation type="unfinished"></translation>
+        <translation>Fritid/Hobby</translation>
     </message>
     <message>
         <source>Tourism/Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Turism/Resa</translation>
     </message>
     <message>
         <source>Handicraft</source>
-        <translation type="unfinished"></translation>
+        <translation>Hantverk</translation>
     </message>
     <message>
         <source>Motoring</source>
-        <translation type="unfinished"></translation>
+        <translation>Motorsport</translation>
     </message>
     <message>
         <source>Fitness &amp; Health</source>
-        <translation type="unfinished"></translation>
+        <translation>Motion &amp; Hälsa</translation>
     </message>
     <message>
         <source>Cooking</source>
-        <translation type="unfinished"></translation>
+        <translation>Matlagning</translation>
     </message>
     <message>
         <source>Advertizement/Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklam/Shopping</translation>
     </message>
     <message>
         <source>Gardening</source>
-        <translation type="unfinished"></translation>
+        <translation>Trädgård</translation>
     </message>
     <message>
         <source>Original Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Originalspråk</translation>
     </message>
     <message>
         <source>Black &amp; White</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart &amp; Vit</translation>
     </message>
     <message>
         <source>&quot;Unpublished&quot; Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Opublicerade&quot; Program</translation>
     </message>
     <message>
         <source>Live Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Direktsändning</translation>
     </message>
     <message>
         <source>currently running.</source>
-        <translation type="unfinished"></translation>
+        <translation>aktuella sändningar.</translation>
     </message>
     <message>
         <source>Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Framgångsrik.</translation>
     </message>
     <message>
         <source>FAILED: xmltv ran but was interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>MISSLYCKAD: xmltv kördes men avbröts.</translation>
     </message>
     <message>
         <source>FAILED: xmltv returned error code %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>MISSLYCKAD: xmltv returnerar felkod %1.</translation>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase kördes, men satte inte in någon ny data i guiden för %1 av %2 källor. Detta kan indikera ett potentiellt sökningsproblem.</translation>
     </message>
     <message>
         <source>Max Audio Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Max Ljudkanaler</translation>
     </message>
     <message>
         <source>5.1</source>
-        <translation type="unfinished">5.1</translation>
+        <translation>5.1</translation>
     </message>
     <message>
         <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställ maximalt antal ljudkanaler som ska avkodas. Detta är för uppspelning av flerkanal/surround ljud.</translation>
     </message>
     <message>
         <source>Upmix</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppmix</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation type="unfinished"></translation>
+        <translation>Passiv</translation>
     </message>
     <message>
         <source>Active Simple</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiv Enkel</translation>
     </message>
     <message>
         <source>Active Linear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiv Linjär</translation>
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>standard gruppfilter som ska användas i Titta På Inspelningar översikten.</translation>
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Översikt</translation>
     </message>
     <message>
         <source>Show Titles only</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa endast titlar</translation>
     </message>
     <message>
         <source>Show Titles and Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa titlar och kategorier</translation>
     </message>
     <message>
         <source>Show Titles, Categories, and Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa titlar, kategorier och inspelningsgrupper</translation>
     </message>
     <message>
         <source>Show Titles and Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa titlar och inspelningsgrupper</translation>
     </message>
     <message>
         <source>Show Categories only</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa endast kategorier</translation>
     </message>
     <message>
         <source>Show Categories and Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa kategorier och inspelningsgrupper</translation>
     </message>
     <message>
         <source>Show Recording Groups only</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa endast inspelningsgrupper</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj vilken typ av gruppering som ska visas i &quot;Titta På Inspelningar&quot; översikten.</translation>
     </message>
     <message>
         <source>Run commercial flagger</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör reklam-markerare</translation>
     </message>
     <message>
         <source>Run transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör transcoder</translation>
     </message>
     <message>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppskjutande dagar för Auto-Transcode jobb</translation>
     </message>
     <message>
         <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om större än noll, så kommer Auto-Transcode jobb att schemaläggas att köras så här många dagar efter att en inspelning skutförts istället för omedelbart efter.</translation>
     </message>
     <message>
         <source>Run User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användarspecifierat jobb #%1</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är standardvärdet som används för &apos;Kör %1&apos; inställningen när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Merge short commercial breaks (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Förena korta reklamavbrott (i sekunder)</translation>
     </message>
     <message>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandla på varandra följande reklamavbrott som är kortare än så här som ett avbrott vid framspolning. Användbart om du måste spola fram några gånger under avbrott. Gäller också vid automatisk framspolning. Ange noll för att avaktivera.</translation>
     </message>
     <message>
         <source>Extra Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Skivutrymme</translation>
     </message>
     <message>
         <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra skivutrymme (i Gigabytes) som du vill behålla oanvända i filsystemet för inspelning utöver det som MythTV kräver.</translation>
     </message>
     <message>
         <source>Auto Expire Instead of Delete Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatiskt Utgående istället för Radera Inspelningar</translation>
     </message>
     <message>
         <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
-        <translation type="unfinished"></translation>
+        <translation>Istället för radering av inspelning, flytta inspelningar till &apos;Raderade Inspelningar&apos; gruppen och sätt på automatiskt utgående.</translation>
     </message>
     <message>
         <source>Deleted Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>Raderad Max Ålder</translation>
     </message>
     <message>
         <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
-        <translation type="unfinished"></translation>
+        <translation>Då satt till en siffra större än noll, så kommer Automatiskt Utgående tvinga utgående av raderade inspelningar när de är så här många dagar gamla.</translation>
     </message>
     <message>
         <source>Expire in deleted order</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt förfalla i raderad ordning</translation>
     </message>
     <message>
         <source>Expire Deleted recordings in the order which they were originally deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt raderade inspelningar gå ut i den ordning som de ursprungligen raderades i.</translation>
     </message>
     <message>
         <source>DeletedExpireOptions</source>
-        <translation type="unfinished"></translation>
+        <translation>RaderadeUtgångnaAlternativ</translation>
     </message>
     <message>
         <source>Watched before UNwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Sedda förrän osedda</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt, så kommer program som märkts som sedda att gå ut före program som inte har blivit sedda.</translation>
     </message>
     <message>
         <source>Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritet Vikt</translation>
     </message>
     <message>
         <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>När aktiverad, så kommer nya inspelnings-schemaläggningar bli märkta som valbara för Automatiskt Utgående. Existerande schemaläggningar kommer att behålla sina aktuella värden.</translation>
     </message>
     <message>
         <source>LiveTV Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Max Ålder</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatiskt utgående kommer att tvinga utgående av TV inspelningar då dom är så här många dagar gamla. TV inspelningar kan också gå ut tidigt om det blir nödvändigt att frigöra diskutrymme.</translation>
     </message>
     <message>
         <source>Re-record Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in sedda program igen</translation>
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished"></translation>
+        <translation>För en specific kategori (t.ex. &quot;Sporthändelse&quot;), begär att program blir automatiskt förlängda. Fungerar endast om programmets kategori kan bestämmas.</translation>
     </message>
     <message>
         <source>Profile Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilartikel</translation>
     </message>
     <message>
         <source>Example Custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Exempel egen filterlista: &apos;ivtc,denoise3d&apos;</translation>
     </message>
     <message>
         <source>Main deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Huvudsaklig deinterlacing funktion.</translation>
     </message>
     <message>
         <source>Fallback deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reserv deinterlacing metod.</translation>
     </message>
     <message>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;</translation>
     </message>
     <message>
         <source>if rez</source>
-        <translation type="unfinished"></translation>
+        <translation>om upplösning</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Redigera</translation>
+        <translation>Redigera</translation>
     </message>
     <message>
         <source>Add New Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till ny post</translation>
     </message>
     <message>
         <source>Playback Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppspelningsprofil</translation>
     </message>
     <message>
         <source>Current Video Playback Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvarande ideo uppspelningsprofil</translation>
     </message>
     <message>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till ny</translation>
     </message>
     <message>
         <source>Enter Playback Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange uppspelningsgruppnamn</translation>
     </message>
     <message>
         <source>Sorry, playback group
 name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyvärr, uppspelningsgrupp-
+namn kan inte vara tomt.</translation>
     </message>
     <message>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyvärr, uppspelningsgrupp-
+namnet &apos;%1&apos; är redan använt.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <source>Length of time an on-screen display window will be visible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsintervall som ett programfönster kommer vara synligt.</translation>
     </message>
     <message>
         <source>Length of time the on-screen display will display program information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsintervall under vilken programinformation kommer att visas.</translation>
     </message>
     <message>
         <source>Use this to enlarge or shrink captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd detta för att förstora eller förminska text.</translation>
     </message>
     <message>
         <source>ATSC Caption Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC textningsinställningar</translation>
     </message>
     <message>
         <source>ATSC %1 closed caption font.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC %1 teckensnitt för textning.</translation>
     </message>
     <message>
         <source>ATSC Caption Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC teckensnitt för textning</translation>
     </message>
     <message>
         <source>Monospaced Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Monospaced Serif</translation>
     </message>
     <message>
         <source>Proportional Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Proportional Serif</translation>
     </message>
     <message>
         <source>Monospaced Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Monospaced Sans Serif</translation>
     </message>
     <message>
         <source>Proportional Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Proportional Sans Serif</translation>
     </message>
     <message>
         <source>Regular Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanligt Teckensnitt</translation>
     </message>
     <message>
         <source>Italic Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursivt Teckensnitt</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursiv</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal skalering</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera detta om bilden inte fyller skärmen vertikalt. Intervall -100% till 100%</translation>
     </message>
     <message>
         <source>Horizontal scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell skalering</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera detta om bilden inte fyller skärmen horisontellt. Intervall -100% till 100%</translation>
     </message>
     <message>
         <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Föredra EIA-708 över EIA-608 textning</translation>
     </message>
     <message>
         <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>Då aktiverad så kommer den nya EIA-708 textningen föredragas över den gamla EIA-608 textningen i ATSC strömmar.</translation>
     </message>
     <message>
         <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är standard, men från och med tidigt 2008 sänder dom flesta stationer inte användbara EIA-708 textningar.</translation>
     </message>
     <message>
         <source>Enable picture controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Möjliggör bildinställningar</translation>
     </message>
     <message>
         <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat, så kommer MythTV att försöka initialisera bildinställningar (ljus, kontrast, etc.) som används under uppspelning.</translation>
     </message>
     <message>
         <source>Warn on no audio output</source>
-        <translation type="unfinished"></translation>
+        <translation>Varna om ingen ljudåtergivning</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverad, så kommer MythTV att varna dig om inte ljudkortet kan användas.</translation>
     </message>
     <message>
         <source>Always prompt (excluding Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga alltid (utom för TV sändning)</translation>
     </message>
     <message>
         <source>Always prompt (including Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga alltid (för TV sändning)</translation>
     </message>
     <message>
         <source>Prompt for Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga endast flr TV sändning</translation>
     </message>
     <message>
         <source>Continue Playback When Embedded</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsätt uppspelning då inbäddad</translation>
     </message>
     <message>
         <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta alternativ fortsätter uppspelning av TV sändning när TV fönstret är inbäddat i listan över kommande program eller listan över inspelningar. Det är standard att pausa inspelningen när TV fönstret är inbäddat.</translation>
     </message>
     <message>
         <source>Automatically mark a recording as watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Märk automatiskt en inspelning som sedd</translation>
     </message>
     <message>
         <source>Customise exit menu options</source>
-        <translation type="unfinished"></translation>
+        <translation>Anpassa avslutningsmenyalternativ</translation>
     </message>
     <message>
         <source>Show quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa avsluta</translation>
     </message>
     <message>
         <source>Show quit and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa avsluta och avstängning</translation>
     </message>
     <message>
         <source>Show quit, reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa avsluta, omstart och avstängning</translation>
     </message>
     <message>
         <source>Show shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa avstängning</translation>
     </message>
     <message>
         <source>Show reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa omstart</translation>
     </message>
     <message>
         <source>Show reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>visa omstart och avstängning</translation>
     </message>
     <message>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Som standard visas avstängningsalternativet på avslutningsmenyn endast på klienter. Här kan du tvinga specifika avstängnings- och omstartalternativ ska visas.</translation>
     </message>
     <message>
         <source>Reboot command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för omstart</translation>
     </message>
     <message>
         <source>Command or script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando eller skript som ska köras då omstart väls i avslutningsmenyn, om alternativert visas. du måste konfigurera en avslutningsknapp för att visa avslutningsmenyn.</translation>
     </message>
     <message>
         <source>Command or script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando eller skript som ska köras om du väljer avstängningsalternativet i avslutningsmenyn, om alternativet visas. Du måste konfigurera en avslutningsknapp för att visa avslutningsmenyn.</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bredd/höjdförhållandet på en Xinerama bildskärm kan inte kan inte fås från skärmen, så det måste specifieras.</translation>
     </message>
     <message>
         <source>Letterboxing Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Färg på utfyllnad över- och underkant vid brevlådeformat</translation>
     </message>
     <message>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
-        <translation type="unfinished"></translation>
+        <translation>Som standard använder MythTV svart för utfyllnad i över- och underkant vid brevlådeformat, men för plasma tv&apos;n kanske grått är att föredraga för att minska risken för inbränning.</translation>
     </message>
     <message>
         <source>Currently only works with XVideo video renderer.</source>
-        <translation type="unfinished"></translation>
+        <translation>För närvarande fungerar detta endast med XVideo video återgivaren.</translation>
     </message>
     <message>
         <source>Video Aspect Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Åsidosättande av bredd/höjdförhållande för video</translation>
     </message>
     <message>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>När aktiverade, kommer dessa åsidosätta höjd/breddförhållandet som specifierats av sändaren för alla videoströmmar.</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom</translation>
     </message>
     <message>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>När aktiverade , kommer dessa ge en fördefinierad zoom i all videouppspelning i MythTV.</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildskärmens horisontell storlek. Används för att beräkna bildskärmens faktiska höjd/breddförhållande. Detta kommer att åsidosätta systemets bildstorlek.</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildskärmens vertikala storlek. Används för att beräkna bildskärmens faktiska höjd/breddförhållande. Detta kommer åsidosätta systemets bildstorlek.</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Göm musmarkören i MythTV</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändra musmarkörens synlighet. Det mesta av MythTV&apos;s användargränssnitt reagerar inte på musklick. Använd detta alternativ för att undvika att &quot;tappa bort&quot; din muskursor.</translation>
     </message>
     <message>
         <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta väljer vad MythTV använder frö att rita.  Om du har relativt snabb hårdvara, välj OpenGL. Ändring av detta kräver omstart.</translation>
     </message>
     <message>
         <source>UI Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema för användargränssnitt</translation>
     </message>
     <message>
         <source>OSD Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema för OSD</translation>
     </message>
     <message>
         <source>Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema för menyer</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Undvik konflikter mellan TV sändningar och schemalagda program</translation>
     </message>
     <message>
         <source>Allow live TV to move scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt schemalagda program att flyttas av TV sändning</translation>
     </message>
     <message>
         <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverad, så kommer schelagda inspelningar att flyttas till andra mottagare (om möjligt), så att TV sändningar int eblir avbrutna.</translation>
     </message>
     <message>
         <source>Fine tune font size (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Finjustera teckenstorlek (%)</translation>
     </message>
     <message>
         <source>Fine tune all font sizes by this percentage. Font sizes should be the correct relative size if the X11 DPI (dots per inch) is set to 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Finjustera all teckensnitt med denna procent. Teckenstorlek borde vara korrekta relativa storleken om X11 DPI (punkter per tum) är satt till 100.</translation>
     </message>
     <message>
         <source>Display the channel icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa kanalikonerna</translation>
     </message>
     <message>
         <source>Display the icons/logos for the channels in the guide.  See section 9.5 of the Installation Guide for how to grab icons.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa ikoner/logon för kanalerna i programguiden.  Se sektion 9.5 i installationsmanualen för att se hur man hämtar ikoner.</translation>
     </message>
     <message>
         <source>Avoid back to back recordings from different channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Undvik från olika kanaler på varandra följande inspelningar</translation>
     </message>
     <message>
         <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt, så kommer shemaläggaren att undvika att tilldela program från olika kanaler till samma mottagare om deras start- och sluttid inte är samma. Detta kommer att tillåtas för att lösa konflikter.</translation>
     </message>
     <message>
         <source>The &apos;All&apos; Recording type will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Alla Inspelningar&quot; typen kommer att få denna ytterligare inspelningsprioritet.</translation>
     </message>
     <message>
         <source>Ignore LiveTV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorera TV inspelningar</translation>
     </message>
     <message>
         <source>Recording monitoring will ignore LiveTV recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelnings övervakning kommer att ignorera TV inspelningar.</translation>
     </message>
     <message>
         <source> (and other removable devices)</source>
-        <translation type="unfinished"></translation>
+        <translation> (och andra portabla enheter)</translation>
     </message>
     <message>
         <source>Use new media</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd nytt media</translation>
     </message>
     <message>
         <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta kommer att förorsaka att MythTV hoppar till ett lämpligt plugin då nytt media sätts i.</translation>
     </message>
     <message>
         <source>Ignore Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorera Enheter</translation>
     </message>
     <message>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
-        <translation type="unfinished"></translation>
+        <translation>Om det finns någon enhet som du inte vill ska övervakas så lista dom här separerade med kommatecken. Pluginsen kommer att ignorera dem</translation>
     </message>
     <message>
         <source>MythMediaMonitor</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMediaÖvervakare</translation>
     </message>
     <message>
         <source>PVR-350 Hardware Decoder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för PVr-350 hårdvarudekoder</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inställning tillåter en DataDirect guide dataleverantör att specifiera nästa nedladdningstidpunkt för att distribuera belastning på deras servrar. Om denna inställning är aktiverad så ignoreras mythfilldatabase kommandots start/stop tider.</translation>
     </message>
     <message>
         <source>File or directory to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil eller katalog för loggning av mythfilldatabase kommandots output.  Lämna tomt för att avaktivera loggning.</translation>
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse</translation>
     </message>
     <message>
         <source>Settings Access</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningsåtkomst</translation>
     </message>
     <message>
         <source>Shutdown/Reboot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för avstängning/omstart</translation>
     </message>
     <message>
         <source>General Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>allmän Uppspelning</translation>
     </message>
     <message>
         <source>Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelningsgrupper</translation>
     </message>
     <message>
         <source>UDP OSD Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD meddelanden via UDP</translation>
     </message>
     <message>
         <source>Analog Closed Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Textning för analog sändning</translation>
     </message>
     <message>
         <source>Default JobQueue settings for new scheduled recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard jobbköinställningar för nya schemalagda inspelningar</translation>
     </message>
     <message>
         <source>Yes, Exit and Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, avsluta och starta om</translation>
     </message>
     <message>
         <source>DVD contains a bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD&apos;n har ett bokmärke</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished">Spela upp från bokmärke</translation>
+        <translation>Spela upp från bokmärke</translation>
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished">Spela upp från början</translation>
+        <translation>Spela upp från början</translation>
     </message>
     <message>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inspelnings fil är tom.</translation>
     </message>
     <message>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inspelning är inte ännu tillgänglig.</translation>
     </message>
     <message>
         <source>Move to Default group</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta till standardgrupp</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Återställ raderat</translation>
     </message>
     <message>
         <source>IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>IP adress</translation>
     </message>
     <message>
         <source>Status Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Status Port</translation>
     </message>
     <message>
         <source>Security Pin (Required)</source>
-        <translation type="unfinished"></translation>
+        <translation>Säkerhets PIN (krävs)</translation>
     </message>
     <message>
         <source>Pin code required for a frontend to connect to the backend. Blank prevents all connections, 0000 allows any client to connect.</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN kod krävs för att MythTV klient ska ansluta till MythTV server. Tomt förhindrar alla anslutningar, 0000 tillåter vilken klient som helst att ansluta.</translation>
     </message>
     <message>
         <source>Disable Firewire Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Avaktivera Firewire Ställ om</translation>
     </message>
     <message>
         <source>By default MythTV will reset the firewire bus when a firewire recorder stops responding to commands. But if this causes problems you can disable this here for Linux firewire recorders.</source>
-        <translation type="unfinished"></translation>
+        <translation>Som standard kommer MythTV att ställa om firewire bussen när en firewire inspelare slutar svara på kommandon. Men om detta orsakar problem så kan du avaktivera detta för Linux firewire inspelare.</translation>
     </message>
     <message>
         <source>Miscellaneous Status Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse Status Program</translation>
     </message>
     <message>
         <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation type="unfinished"></translation>
+        <translation>Externt program eller skript som producerar extra information som ska inkluderas i MythTV servers status</translation>
     </message>
     <message>
         <source>Your Local Timezone (for XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Din lokala tidszon (för XMLTV)</translation>
     </message>
     <message>
         <source>Used if the XMLTV data comes from a different timezone than your own. This adjust the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
-        <translation type="unfinished"></translation>
+        <translation>Används om XMLTV datat kommer från en annan tidszon än din egen. Detta justerar tiderna i XMLTV EPG data för att kompensera. &apos;Auto&apos; konverterar XMLTV tid till lokal tid med hjälp av ditt systems tidszon.  &apos;Ingen&apos; gör att XMLTV tidszonerna ignoreras, och tider antas vara lokala.</translation>
     </message>
     <message>
         <source>Delay between wake attempts (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppehåll mellan uppvakningsförsök (sekunder)</translation>
     </message>
     <message>
         <source>Wake Attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppvakningsförsök</translation>
     </message>
     <message>
         <source>The command used to wake up your master backend server
 (eg. sudo /etc/init.d/mythtv-backend restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandot används för att väcka upp din MythTV server.</translation>
     </message>
     <message>
         <source>Idle shutdown timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekunder innan avstängning vid viloläge</translation>
     </message>
     <message>
         <source>Command to set Wakeup Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att ställa in uppvakningstid</translation>
     </message>
     <message>
         <source>The command used to set the wakeup time (passed as $time) for the Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandot som används för att ställa in uppvakningstid (skickad som $time) för MythTV servern</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör jobb endast på original inspelningsserver</translation>
     </message>
     <message>
         <source>User Job #%1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Eget jobb #%1 Kommando</translation>
     </message>
     <message>
         <source>User Job #%1 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Eget jobb #%1 Beskrivning</translation>
     </message>
     <message>
         <source>User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>eget jobb #%1</translation>
     </message>
     <message>
         <source>Allow %1 jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt %1 jobb</translation>
     </message>
     <message>
         <source>Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Huvudserver</translation>
     </message>
     <message>
         <source>Locale Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Landsspecifika inställningar</translation>
     </message>
     <message>
         <source>Miscellaneous Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse inställningar</translation>
     </message>
     <message>
         <source>File Management Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Filhanteringsinställningar</translation>
     </message>
     <message>
         <source>Backend Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för serveruppvakning</translation>
     </message>
     <message>
         <source>Slave Backends</source>
-        <translation type="unfinished"></translation>
+        <translation>Slavservrar</translation>
     </message>
     <message>
         <source>Job Queue (Backend-Specific)</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkö (specifik för server)</translation>
     </message>
     <message>
         <source>Tuner %1 is recording:
 </source>
-        <translation type="unfinished">TV-kort %1 spelar in:
+        <translation>Mottagare %1 spelar in:
 </translation>
     </message>
     <message>
         <source>Tuner %1 is not recording</source>
-        <translation type="unfinished">TV-kort %1 spelar inte in</translation>
+        <translation>Mottagare %1 spelar inte in</translation>
     </message>
     <message>
         <source>Date Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Datumformat</translation>
     </message>
     <message>
         <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är formatet för visning av datum. Se http://doc.trolltech.com/3.3/qdate.html#toString för giltiga format.</translation>
+    </message>
+    <message>
+        <source>CPU++</source>
+        <comment>Sample: No hardware assist</comment>
+        <translation>CPU++</translation>
+    </message>
+    <message>
+        <source>CPU+</source>
+        <comment>Sample: Hardware assist HD only</comment>
+        <translation>CPU+</translation>
+    </message>
+    <message>
+        <source>CPU--</source>
+        <comment>Sample: Hardware assist all</comment>
+        <translation>CPU--</translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <comment>Sample: high quality</comment>
+        <translation>Hög kvalité</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <comment>Sample: average quality</comment>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Slim</source>
+        <comment>Sample: low CPU usage</comment>
+        <translation>Slim</translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback. &apos;Passive&apos; is the least demanding on the CPU. &apos;Active Simple&apos; is more demanding and &apos;Active Linear&apos; is the most demanding (but highest quality).</source>
+        <translation>Ställ in ljud uppmixtyp för tvåkanals till sexkanals konvertering. Detta är för uppseplning av flerkanals/surround ljud.</translation>
+    </message>
+    <message>
+        <source>ScreenShotPath</source>
+        <translation>Sökväg till bildskärmskopior</translation>
+    </message>
+    <message>
+        <source>Path to screenshot storage location. Should be writable by the frontend</source>
+        <translation>Sökväg till katalog för bildskärmskopior. Katalogen ska kunna skrivas av användaren som kör MythTV</translation>
+    </message>
+    <message>
+        <source>Automatic Priority Range (+/-)</source>
+        <translation>automatisk Prioritetsintervall (+/-)</translation>
+    </message>
+    <message>
+        <source>Up to this number of priority points may be added for titles that are usually watched soon after recording or subtracted for titles that are often watched several days or weeks later.</source>
+        <translation>Upp till detta antal av prioritetspunkter kan läggas till för titlar som vanligtvis tittas på kort after inspelning eller borttagna för titlar som ofta tittas på flera dagar eller veckor senare.</translation>
+    </message>
+    <message>
+        <source>If other than None, override the audio sampling rate in the recording profile when this card is used.  Use this if your capture card does not support all of the standard rates.</source>
+        <translation>Om annat än tomt, åsidosätt audio sampling frekvensen i inspelningsprofilen när detta kort används.  Använd detta om ditt kort inte stöder alla standardfrekvenserna.</translation>
+    </message>
+    <message>
+        <source>Adult</source>
+        <comment>Adult Movie</comment>
+        <translation>Vuxenfilm</translation>
+    </message>
+    <message>
+        <source>Display on screen</source>
+        <translation>Visa på bildskärmen</translation>
+    </message>
+    <message>
+        <source>MythTV Frontend</source>
+        <translation>MythTV Klient</translation>
+    </message>
+    <message>
+        <source>MythTV Setup</source>
+        <translation>MythTV Setup</translation>
     </message>
 </context>
 <context>
     <name>RecOptDialog</name>
     <message>
         <source>Missing Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Saknat element</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temat du använder innehåller inte &apos;recording_options&apos; elementet.  Var god och kontakta temats upphovsmän och be dom att kan uppdatera temat.
+
+Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</translation>
     </message>
     <message>
         <source>Unknown Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänt Element</translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished">Temat som används innehåller ett okänt element (&apos;%1&apos;) som kommer att ignoreras</translation>
+        <translation>Temat som används innehåller ett okänt element (&apos;%1&apos;) som kommer att ignoreras</translation>
     </message>
 </context>
 <context>
@@ -10434,91 +10525,91 @@ name can not be blank.</source>
     <name>SIScan</name>
     <message>
         <source>Updated Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdaterad Kanal %1</translation>
     </message>
     <message>
         <source>Added Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillagd Kanal %1</translation>
     </message>
     <message>
         <source>Failed to add channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att lägga till kanal %1</translation>
     </message>
     <message>
         <source>Network %1 Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nätverk %1 Körning</translation>
     </message>
     <message>
         <source>Finished processing Transport List</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutade behandling av transportlista</translation>
     </message>
     <message>
         <source>Updating Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdaterar Tjänster</translation>
     </message>
     <message>
         <source>Finished processing Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutade behandling av tjänster</translation>
     </message>
     <message>
         <source>Frequency %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens %1</translation>
     </message>
     <message>
         <source>as</source>
-        <translation type="unfinished"></translation>
+        <translation>som</translation>
     </message>
     <message>
         <source>Skipping %1, not in imported channel map</source>
-        <translation type="unfinished"></translation>
+        <translation>skippar %1, inte i importerad kanalkarta</translation>
     </message>
     <message>
         <source>%1%2%3 on %4 (%5)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%2%3 på %4 (%5)</translation>
     </message>
     <message>
         <source>Adding %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägger till %1</translation>
     </message>
     <message>
         <source>Updating %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdaterar %1</translation>
     </message>
     <message>
         <source>Skipping %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Skippar %1</translation>
     </message>
     <message>
         <source>on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>på %1</translation>
     </message>
     <message>
         <source>Data Only Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast Datakanal (inte i sändning?)</translation>
     </message>
     <message>
         <source>Empty Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tom Kanal (inte i sändning?)</translation>
     </message>
     <message>
         <source>Audio Only Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast Ljudkanal</translation>
     </message>
     <message>
         <source>Encrypted Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Krypterad Kanal</translation>
     </message>
     <message>
         <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hittade kanal, men den matchar inte existerande tsid. Du kanske vill radera existerande kanaler och göra en omsökning av kanaler.</translation>
     </message>
     <message>
         <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skippar %1 - redan i databas, och vi har ingen bättre data.</translation>
     </message>
 </context>
 <context>
@@ -10729,94 +10820,95 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>markera som HDTV</translation>
     </message>
     <message>
         <source>from source</source>
-        <translation type="unfinished"></translation>
+        <translation>från källa</translation>
     </message>
     <message>
         <source>on input</source>
-        <translation type="unfinished"></translation>
+        <translation>på ingång</translation>
     </message>
     <message>
         <source>%1 of these are Deleted and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av dessa är raderade och använder %2</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupEditor</name>
     <message>
         <source>&apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; Kataloger för lagringsgrupper</translation>
     </message>
     <message>
         <source>Local &apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokala &apos;%1&apos; kataloger för lagringsgrupp</translation>
     </message>
     <message>
         <source>Add Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till katalog för lagringsgrupp</translation>
     </message>
     <message>
         <source>Enter directory name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange katalognamn eller tryck SELECT för att skriva med det virtuella tangentbordet</translation>
     </message>
     <message>
         <source>Edit Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera katalog för lagringsgrupp </translation>
     </message>
     <message>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos;
+Katalog Från Lagringsgrupp?</translation>
     </message>
     <message>
         <source>Yes, remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, radera katalog</translation>
     </message>
     <message>
         <source>No, Don&apos;t remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, radera inte katalog</translation>
     </message>
     <message>
         <source>(Add New Directory)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Lägg Till Ny Katalog)</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupListEditor</name>
     <message>
         <source>Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagringsgrupp (kataloger för nya inspelningar)</translation>
     </message>
     <message>
         <source>Local Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokala lagringsgrupper (kataloger för nya inspelningar)</translation>
     </message>
     <message>
         <source>Create New Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa Nya Lagringsgrupper</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Skriv in gruppnamn eller tryck SELECT för att skriva in text med det virtuella tangentbordet</translation>
+        <translation>Skriv in gruppnamn eller tryck SELECT för att skriva in text med det virtuella tangentbordet</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera &apos;%1&apos; lagringsgrupp?</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Ja, ta bort grupp</translation>
+        <translation>Ja, radera grupp</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nej, ta inte bort grupp</translation>
+        <translation>Nej, radera inte grupp</translation>
     </message>
     <message>
         <source>(Create %1 group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(skapa %1 grupp)</translation>
     </message>
 </context>
 <context>
@@ -11510,73 +11602,81 @@ Välj ett inspelat program</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Avsluta</translation>
+        <translation>Avsluta</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kommer att spela in  &quot;%1&quot; på %2 om %d seunder. Vill du:</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt dom spelas in och gå tillbaka till huvudmenyn</translation>
     </message>
     <message>
         <source>Record it later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in senare, jag vill se på TV</translation>
     </message>
     <message>
         <source>Record them later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela in dem senare, jag vill se på TV</translation>
     </message>
     <message>
         <source>Don&apos;t let them record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt dom inte spelas in, jag vill se på TV</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du borde ha fått kanallåsning vi det här laget. Du kan fortsätta att vänta på signal, byta kanal med %1 or %2, byta videokälla (%3), ingångar (%4), etc.</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>Adjust Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera Fyllningsgrad</translation>
     </message>
     <message>
         <source>Switch Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla Ingång</translation>
     </message>
     <message>
         <source>C</source>
         <comment>Card</comment>
-        <translation type="unfinished">K</translation>
+        <translation>K</translation>
     </message>
     <message>
         <source>I</source>
         <comment>Input</comment>
-        <translation type="unfinished"></translation>
+        <translation>I</translation>
     </message>
     <message>
         <source>Switch Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla Källa</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppkommande Inspelningar</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <source>You are exiting %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Du håller på att gå ut ur %1</translation>
     </message>
     <message>
         <source>Exit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta %1</translation>
+    </message>
+    <message>
+        <source>MythTV is using all inputs for Live TV?</source>
+        <translation>Använder MythTV alla ingångar för TV mottagning?</translation>
+    </message>
+    <message>
+        <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
+        <translation>MythTV har inga mottagare definierade. Var god och kör mythtv-setup programmet.</translation>
     </message>
 </context>
 <context>
@@ -11813,26 +11913,26 @@ Välj ett inspelat program</translation>
     </message>
     <message>
         <source>Multiplex Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplex Redigerare</translation>
     </message>
 </context>
 <context>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Sök</translation>
+        <translation>Sök</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished">Börjar med text</translation>
+        <translation>Börjar med text</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished">Innehåller text</translation>
+        <translation>Innehåller text</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
@@ -11954,11 +12054,11 @@ Välj ett inspelat program</translation>
     </message>
     <message>
         <source>Conflict Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt Idag</translation>
     </message>
     <message>
         <source>Conflict </source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt </translation>
     </message>
 </context>
 <context>
@@ -12075,11 +12175,11 @@ Välj ett inspelat program</translation>
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>till </translation>
     </message>
     <message>
         <source>MythTV has running or pending jobs.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV har pågående eller avvaktande jobb.</translation>
     </message>
 </context>
 <context>
