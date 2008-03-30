@@ -52,7 +52,7 @@ Action::Action(const QString &description, const QString &keys)
  */
 bool Action::HasKey(const QString &key) const
 {
-    for (size_t i = 0; i < GetKeys().count(); i++)
+    for (int i = 0; i < GetKeys().count(); i++)
     {
         if (GetKeys()[i] == key)
             return true;
@@ -96,7 +96,7 @@ bool Action::ReplaceKey(const QString &newkey, const QString &oldkey)
     if (GetKeys().contains(newkey) != 0)
         return false;
 
-    for (size_t i = 0; i < GetKeys().size(); i++)
+    for (int i = 0; i < GetKeys().size(); i++)
     {
         if (GetKeys()[i] == oldkey)
         {

@@ -428,7 +428,7 @@ void MythControls::RefreshKeyInformation(void)
     m_description->SetText(desc);
 
     QStringList keys = m_bindings->GetActionKeys(context, action);
-    for (uint i = 0; (i < keys.count()) &&
+    for (int i = 0; (i < keys.count()) &&
              (i < Action::kMaximumNumberOfBindings); i++)
     {
         m_actionButtons.at(i)->SetText(keys[i]);
@@ -537,7 +537,7 @@ QString MythControls::GetCurrentKey(void)
         uint b = GetCurrentButton();
         QStringList keys = m_bindings->GetActionKeys(context, action);
 
-        if (b < keys.count())
+        if (b < (uint)keys.count())
             return keys[b];
 
         return QString::null;

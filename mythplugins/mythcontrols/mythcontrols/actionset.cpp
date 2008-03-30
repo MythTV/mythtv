@@ -259,7 +259,7 @@ QStringList ActionSet::GetContextKeys(const QString & context_name) const
     for (;it.current(); ++it)
     {
         QStringList akeys = (*it)->GetKeys();
-        for (size_t i = 0; i < akeys.size(); i++)
+        for (int i = 0; i < akeys.size(); i++)
         {
                 keys.append(akeys[i]);
         }

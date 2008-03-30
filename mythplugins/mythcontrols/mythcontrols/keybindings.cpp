@@ -123,7 +123,7 @@ QStringList KeyBindings::GetKeyContexts(const QString &key) const
     ActionList actions = m_actionSet.GetActions(key);
     QStringList contexts;
 
-    for (size_t i = 0; i < actions.size(); i++)
+    for (int i = 0; i < actions.size(); i++)
     {
         QString context = actions[i].GetContext();
         if (!contexts.contains(context))
@@ -192,7 +192,7 @@ ActionID *KeyBindings::GetConflict(
         return new ActionID(ids[0]);
 
     // check the contexts of the other bindings
-    for (uint i = 0; i < ids.count(); i++)
+    for (int i = 0; i < ids.count(); i++)
     {
         // jump points, then global, then the same context
         if (ids[i].GetContext() == ActionSet::kJumpContext)
@@ -450,7 +450,7 @@ void KeyBindings::LoadMandatoryBindings(void)
 bool KeyBindings::HasMandatoryBindings(void) const
 {
     const ActionList &manlist = m_mandatoryBindings;
-    for (uint i = 0; i < manlist.count(); i++)
+    for (int i = 0; i < manlist.count(); i++)
     {
         if (m_actionSet.GetKeys(manlist[i]).isEmpty())
             return false;

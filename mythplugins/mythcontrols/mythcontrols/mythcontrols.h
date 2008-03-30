@@ -79,7 +79,7 @@ class MythControls : public MythScreenType
     void    UpdateRightList(void);
 
     // Gets
-    uint         GetCurrentButton(void);
+    uint    GetCurrentButton(void);
 
     // Functions
     static bool ResolveConflict(ActionID *conflict, int error_level);
@@ -93,7 +93,6 @@ class MythControls : public MythScreenType
     void LeftPressed(MythListButtonItem*);
     void RightPressed(MythListButtonItem*);
     void ActionButtonPressed();
-    bool JumpTo(QKeyEvent *event) { return false; }
     /// \brief Save the bindings to the Database.
     void Save(void) { m_bindings->CommitChanges(); }
     void RefreshKeyInformation(void);
