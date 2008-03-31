@@ -757,6 +757,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Berlin Pro7/Sat.1
     fix[  769LL << 32 | 8468 << 16 ] = EITFixUp::kEFixForceISO8859_15;
+    //DVB-T Germany RheinMain Pro7/Sat.1 
+    fix[ 8705LL << 32 | 8468 << 16 ] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Ruhrgebiet Tele 5
     fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15;
 
