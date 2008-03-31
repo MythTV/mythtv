@@ -56,7 +56,8 @@ class MythDialogBox : public MythScreenType
   private:
     void SendEvent(int res, QString text = "", void *data = 0);
 
-    MythListButton *buttonList;
+    MythUIText     *m_textarea;
+    MythListButton *m_buttonList;
     MythScreenType *m_retScreen;
     QString m_id;
 

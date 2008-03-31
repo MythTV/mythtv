@@ -15,7 +15,8 @@ MythDialogBox::MythDialogBox(const QString &text,
     m_id = "";
     m_retScreen = NULL;
     m_text = text;
-    buttonList = NULL;
+    m_textarea = NULL;
+    m_buttonList = NULL;
 }
 
 bool MythDialogBox::Create(void)
@@ -23,16 +24,16 @@ bool MythDialogBox::Create(void)
     if (!CopyWindowFromBase("MythDialogBox", this))
         return false;
 
-    MythUIText *textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
-    buttonList = dynamic_cast<MythListButton *>(GetChild("list"));
+    m_textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
+    m_buttonList = dynamic_cast<MythListButton *>(GetChild("list"));
 
-    if (!textarea || !buttonList)
+    if (!m_textarea || !m_buttonList)
         return false;
 
-    textarea->SetText(m_text);
-    buttonList->SetActive(true);
+    m_textarea->SetText(m_text);
+    m_buttonList->SetActive(true);
 
-    connect(buttonList, SIGNAL(itemClicked(MythListButtonItem*)),
+    connect(m_buttonList, SIGNAL(itemClicked(MythListButtonItem*)),
             this, SLOT(Select(MythListButtonItem*)));
 
     return true;
@@ -40,7 +41,7 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythListButtonItem* item)
 {
-    SendEvent(buttonList->GetItemPos(item), item->text(), item->getData());
+    SendEvent(m_buttonList->GetItemPos(item), item->text(), item->getData());
     m_ScreenStack->PopScreen();
 }
 
@@ -53,7 +54,7 @@ void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
 
 void MythDialogBox::AddButton(const QString &title, void *data)
 {
-    MythListButtonItem *button = new MythListButtonItem(buttonList, title);
+    MythListButtonItem *button = new MythListButtonItem(m_buttonList, title);
     if (data)
         button->setData(data);
 }
@@ -79,7 +80,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
             }
             else if (action == "RIGHT")
             {
-                MythListButtonItem *item = buttonList->GetItemCurrent();
+                MythListButtonItem *item = m_buttonList->GetItemCurrent();
                 Select(item);
             }
             else
