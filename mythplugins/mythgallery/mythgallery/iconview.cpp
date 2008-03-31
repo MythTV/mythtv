@@ -112,11 +112,7 @@ bool IconView::Create(void)
     foundtheme = LoadWindowFromXML("gallery-ui.xml", "gallery", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'gallery' from "
-                              "gallery-ui.xml");
         return false;
-    }
 
     m_menuList = dynamic_cast<MythListButton *>
                 (GetChild("menu"));

@@ -87,10 +87,6 @@ void MythControls::Teardown(void)
 /** \fn MythControls::Create(void)
  *  \brief Loads UI elements from theme
  *
- *   This method grabs all of the UI elements that are needed by
- *   mythcontrols. If this method returns false the plugin must
- *   exit, otherwise the application will crash.
- *
  *  \return true if all UI elements load successfully.
  */
 bool MythControls::Create(void)
@@ -101,11 +97,7 @@ bool MythControls::Create(void)
     foundtheme = LoadWindowFromXML("controls-ui.xml", "controls", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'controls' from "
-                              "controls-ui.xml");
         return false;
-    }
 
     m_description = dynamic_cast<MythUIText *>
                 (GetChild("description"));

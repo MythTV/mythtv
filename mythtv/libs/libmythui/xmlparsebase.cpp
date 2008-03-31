@@ -346,6 +346,9 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
         }
     }
 
+    VERBOSE(VB_IMPORTANT, QString("Unable to load window '%1' from "
+                              "%2").arg(windowname).arg(xmlfile));
+
     return false;
 }
 

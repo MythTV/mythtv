@@ -188,11 +188,7 @@ bool MythFlixConfig::Create()
     foundtheme = LoadWindowFromXML("netflix-ui.xml", "config", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'config' from "
-                              "netflix-ui.xml");
         return false;
-    }
 
     m_genresList = dynamic_cast<MythListButton *>
                 (GetChild("sites"));

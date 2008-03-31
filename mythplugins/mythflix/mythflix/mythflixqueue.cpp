@@ -82,11 +82,7 @@ bool MythFlixQueue::Create()
     foundtheme = LoadWindowFromXML("netflix-ui.xml", "queue", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'queue' from "
-                              "netflix-ui.xml");
         return false;
-    }
 
     m_articlesList = dynamic_cast<MythListButton *>
                 (GetChild("articleslist"));
