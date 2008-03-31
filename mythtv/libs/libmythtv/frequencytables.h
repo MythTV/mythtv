@@ -11,7 +11,7 @@ using namespace std;
 #include <qmap.h>
 #include <qstring.h>
 #include <qmutex.h>
-#include <Q3ValueList>
+#include <QList>
 
 // MythTV includes
 #include "dtvchannel.h"
@@ -165,7 +165,7 @@ class transport_scan_items_it_t
 {
   public:
     transport_scan_items_it_t() : _offset(0) {}
-    transport_scan_items_it_t(const Q3ValueList<TransportScanItem>::iterator it)
+    transport_scan_items_it_t(const QList<TransportScanItem>::iterator it)
     {
         _it = it;
         _offset = 0;
@@ -209,11 +209,11 @@ class transport_scan_items_it_t
     uint offset() const { return (uint) _offset; }
     transport_scan_items_it_t nextTransport() const
     {
-        Q3ValueList<TransportScanItem>::iterator tmp = _it;
+        QList<TransportScanItem>::iterator tmp = _it;
         return transport_scan_items_it_t(++tmp);
     }
   private:
-    Q3ValueList<TransportScanItem>::iterator _it;
+    QList<TransportScanItem>::iterator _it;
     int _offset;
 
     friend bool operator==(const transport_scan_items_it_t&,
@@ -222,7 +222,7 @@ class transport_scan_items_it_t
                            const transport_scan_items_it_t&);
 
     friend bool operator==(const transport_scan_items_it_t&,
-                           const Q3ValueList<TransportScanItem>::iterator&);
+                           const QList<TransportScanItem>::iterator&);
 };
 
 inline bool operator==(const transport_scan_items_it_t& A,
@@ -237,13 +237,13 @@ inline bool operator!=(const transport_scan_items_it_t &A,
     return (A._it != B._it) || (A._offset != B._offset);
 }
 
-/*
+
 inline bool operator==(const transport_scan_items_it_t& A,
-                       const Q3ValueList<TransportScanItem>::iterator& B)
+                       const QList<TransportScanItem>::iterator& B)
 {
     return (A._it == B) && (0 == A.offset());
 }
-*/
-typedef Q3ValueList<TransportScanItem> transport_scan_items_t;
+
+typedef QList<TransportScanItem> transport_scan_items_t;
 
 #endif // FREQUENCY_TABLE_H
