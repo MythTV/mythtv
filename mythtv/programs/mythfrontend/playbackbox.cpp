@@ -219,7 +219,7 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     QMutex mutex;
     mutex.lock();
 
-    pbbIsVisibleCond.wait( &mutex, -1 );
+    pbbIsVisibleCond.wait( &mutex );
 
     if (pbb->getSelected())
         nextProgram = new ProgramInfo(*pbb->getSelected());
@@ -1367,24 +1367,25 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(inTitle);
 
-            int h = titleIndex - ltype->GetItems() +
-                ltype->GetItems() * titleList.count();
-            h = h % titleList.count();
+            int h = titleIndex - ltype->GetItems();
 
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
-                if (titleList[h] == "")
-                    tstring = groupDisplayName;
+                if (h < 0)
+                    tstring = "";
                 else
+                {
                     tstring = titleList[h];
+                    if (tstring == "")
+                        tstring = groupDisplayName;
+                    tstring.remove(QRegExp("^ "));
+                }
 
-                tstring.remove(QRegExp("^ "));
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
                     lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
 
                 h++;
-                h = h % titleList.count();
              }
         }
         else if (ltype)
@@ -1425,22 +1426,24 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             ltype->SetActive(inTitle);
 
             int h = titleIndex + 1;
-            h = h % titleList.count();
 
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
-                if (titleList[h] == "")
-                    tstring = groupDisplayName;
+                if (h >= titleList.count())
+                    tstring = "";
                 else
+                {
                     tstring = titleList[h];
+                    if (tstring == "")
+                        tstring = groupDisplayName;
+                    tstring.remove(QRegExp("^ "));
+                }
 
-                tstring.remove(QRegExp("^ "));
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
                     lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
 
                 h++;
-                h = h % titleList.count();
             }
         }
         else if (ltype)
