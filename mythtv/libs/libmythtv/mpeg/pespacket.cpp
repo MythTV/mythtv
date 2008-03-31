@@ -6,10 +6,10 @@
 
 extern "C" {
 #include "mythconfig.h"
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
-#include "../libavutil/crc.h"
-#include "../libavutil/bswap.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavutil/crc.h"
+#include "libavutil/bswap.h"
 }
 
 #include <vector>
