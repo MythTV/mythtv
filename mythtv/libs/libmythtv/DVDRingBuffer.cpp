@@ -1308,10 +1308,14 @@ bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
  */
 void DVDRingBufferPriv::RunSeekCellStart(void)
 {
+    if (!runSeekCellStart)
+        return;
+    
     bool ret = true;
     if (NumMenuButtons() > 0 && !buttonExists)
         ret = false;
-    if (ret && runSeekCellStart)
+    
+    if (ret) 
     {
         ret = SeekCellStart();
         runSeekCellStart = !ret;

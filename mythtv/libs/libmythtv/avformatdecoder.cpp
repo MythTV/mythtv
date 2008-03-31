@@ -3024,6 +3024,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             int dvdpart = 0;
             ringBuffer->DVD()->GetPartAndTitle(dvdpart, dvdtitle);
             uint cellstart = ringBuffer->DVD()->GetCellStart();
+            bool inDVDStill = ringBuffer->DVD()->InStillFrame();
+            bool inDVDMenu  = ringBuffer->DVD()->IsInMenu();
             selectedVideoIndex = 0;
             if (dvdTitleChanged)
             {
@@ -3041,16 +3043,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 storevideoframes = false;
                 
-                bool inDVDStill = ringBuffer->DVD()->InStillFrame();
-
                 if (decodeStillFrame && !inDVDStill)
                     decodeStillFrame = false;
                 
-                if (inDVDStill)
-                    ringBuffer->DVD()->RunSeekCellStart();
-
                 if (storedPackets.count() < 2 && !decodeStillFrame)
                     storevideoframes = true;
+
+                if (inDVDMenu && storedPackets.count() > 0)
+                    ringBuffer->DVD()->SetRunSeekCellStart(false);
+                else if (inDVDStill)
+                    ringBuffer->DVD()->RunSeekCellStart();
             }          
             if (GetNVP()->AtNormalSpeed() &&
                 ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
