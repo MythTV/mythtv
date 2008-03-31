@@ -537,7 +537,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
     {
         query.prepare(
             "SELECT sourceid,        inputname,       externalcommand, "
-            "       preference,      tunechan,        startchan,       "
+            "       tunechan,        startchan,       "
             "       freetoaironly,   displayname,     radioservices,   "
             "       dishnet_eit,     recpriority,     quicktune        "
             "FROM cardinput "
@@ -577,18 +577,17 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "SET sourceid        = :V0, "
                 "    inputname       = :V1, "
                 "    externalcommand = :V2, "
-                "    preference      = :V3, "
-                "    tunechan        = :V4, "
-                "    startchan       = :V5, "
-                "    freetoaironly   = :V6, "
-                "    displayname     = :V7, "
-                "    radioservices   = :V8, "
-                "    dishnet_eit     = :V9, "
-                "    recpriority     = :V10, "
-                "    quicktune       = :V11  "
+                "    tunechan        = :V3, "
+                "    startchan       = :V4, "
+                "    freetoaironly   = :V5, "
+                "    displayname     = :V6, "
+                "    radioservices   = :V7, "
+                "    dishnet_eit     = :V8, "
+                "    recpriority     = :V9, "
+                "    quicktune       = :V10 "
                 "WHERE cardinputid = :INPUTID");
 
-            for (uint j = 0; j < 12; j++)
+            for (uint j = 0; j < 11; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -614,18 +613,17 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    sourceid        = :V0, "
                 "    inputname       = :V1, "
                 "    externalcommand = :V2, "
-                "    preference      = :V3, "
-                "    tunechan        = :V4, "
-                "    startchan       = :V5, "
-                "    freetoaironly   = :V6, "
-                "    displayname     = :V7, "
-                "    radioservices   = :V8, "
-                "    dishnet_eit     = :V9, "
-                "    recpriority     = :V10, "
-                "    quicktune       = :V11  ");
+                "    tunechan        = :V3, "
+                "    startchan       = :V4, "
+                "    freetoaironly   = :V5, "
+                "    displayname     = :V6, "
+                "    radioservices   = :V7, "
+                "    dishnet_eit     = :V8, "
+                "    recpriority     = :V9, "
+                "    quicktune       = :V10 ");
 
             query2.bindValue(":CARDID", dst_cardid);
-            for (uint j = 0; j < 12; j++)
+            for (uint j = 0; j < 11; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
