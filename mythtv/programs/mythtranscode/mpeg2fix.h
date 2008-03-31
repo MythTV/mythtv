@@ -13,15 +13,15 @@
 extern "C"
 {
 //AVFormat/AVCodec
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 
 //replex
 #include "replex/ringbuffer.h"
 #include "replex/multiplex.h"
 
 //libmpeg2
-#include "../libmythmpeg2/mpeg2.h"
+#include "libmythmpeg2/mpeg2.h"
 }
 
 enum MPFDisplayMask {
