@@ -336,7 +336,6 @@ sub ProcessDependencies(@)
     foreach my $file (@_)
     {
         &Verbose("Processing shared library dependencies for $file");
-        my ($filebase) = &BaseVers($file);
 
         my $cmd = "otool -L $file";
         &Verbose($cmd);
@@ -357,6 +356,9 @@ sub ProcessDependencies(@)
 
             # otool sometimes lists the framework as depending on itself
             next if ($file =~ m,/Versions/A/$dep,);
+
+            # some libs even depend on themselves
+            next if ($file =~ m,/$dep$,);
 
             # Any dependency which is already package relative can be ignored
             next if $dep =~ m/\@executable_path/;
