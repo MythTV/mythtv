@@ -23,8 +23,6 @@ bool MythDialogBox::Create(void)
     if (!CopyWindowFromBase("MythDialogBox", this))
         return false;
 
-    SetFullscreen(false);
-
     MythUIText *textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
     buttonList = dynamic_cast<MythListButton *>(GetChild("list"));
 

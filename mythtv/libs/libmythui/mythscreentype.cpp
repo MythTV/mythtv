@@ -182,7 +182,19 @@ bool MythScreenType::Create(void)
 bool MythScreenType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
+    {
         m_Area = parseRect(element);
+        QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
+        if (m_Area.width() < screenArea.width() ||
+            m_Area.height() < screenArea.height())
+        {
+            m_FullScreen = false;
+        }
+        else
+        {
+            m_FullScreen = true;
+        }
+    }
     else
         return false;
     
