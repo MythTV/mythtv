@@ -28,7 +28,7 @@ using namespace std;
 #include "exitcodes.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 #define LOC QString("Transcode: ")
