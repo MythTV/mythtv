@@ -910,7 +910,9 @@ QString createTempFile(QString name_template, bool dir)
     }
     else
     {
+        mode_t cur_umask = umask(S_IRWXO | S_IRWXG);
         ret = mkstemp(ctemplate);
+        umask(cur_umask);
     }
 
     QString tmpFileName(ctemplate);
