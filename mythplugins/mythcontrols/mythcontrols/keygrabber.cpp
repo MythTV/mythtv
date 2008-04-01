@@ -42,11 +42,12 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
     // If no capturing has occured yet, then start waiting for key release
     m_waitingForKeyRelease |= !m_keyReleaseSeen;
 
+    bool handled = false;
 
     if (!m_waitingForKeyRelease)
     {
         if (GetFocusWidget()->keyPressEvent(event))
-            return true;
+            handled = true;
     }
     else
     {
@@ -88,7 +89,9 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         }
 
         m_buttonList->SetActive(true);
+
+        handled = true;
     }
 
-    return false;
+    return handled;
 }
