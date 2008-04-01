@@ -164,6 +164,7 @@ BLOCK_QUOTE
   echo "                           directory with frontend.h [$dvb_path]"
   echo "  --disable-x11            disable X11 support"
   echo "  --x11-path=X11LOC        location of X11 include files [$x11_include_path-path]"
+#  echo "  --enable-glx-procaddrarb use glXGetProcAddressARB() instead of glXGetProcAddress()"
   echo "  --disable-xrandr         disable X11 resolution switching"
   echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
   echo "  --disable-xvmc           disable XvMC     (Linux/BSD MPEG accel.)"
@@ -905,6 +906,7 @@ MYTHTV_CONFIG_LIST='
     xvmc_vld
     dvdv
     fribidi
+    glx_proc_addr_arb
 '
 
 MYTHTV_LIST='
@@ -1192,6 +1194,7 @@ xvmc_lib=""
 xvmc_opengl="yes"
 xvmc_vld="yes"
 xvmcw="yes"
+glx_proc_addr_arb="no"
 
 # libraries
 enable zlib
@@ -1357,6 +1360,10 @@ for opt do
   --x11-path=*) x11_include_path="$optval"
   ;;
   --xvmc-lib=*) xvmc_lib="$optval"
+  ;;
+  --enable-glx-procaddrarb) glx_proc_addr_arb="yes"
+  ;;
+  --disable-glx-procaddrarb) glx_proc_addr_arb="no"
   ;;
   --enable-mac-accel) dvdv="yes"
   ;;
