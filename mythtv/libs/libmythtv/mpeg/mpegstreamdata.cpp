@@ -991,6 +991,12 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             HandleTSTables(&tspacket);
         }
     }
+    else if (!tspacket.ScramplingControl() && IsWritingPID(tspacket.PID()))
+    {
+        // PCRPID and other streams we're writing may not have payload...
+        for (uint j = 0; j < _ts_writing_listeners.size(); j++)
+            _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+    }
 
     return true;
 }
