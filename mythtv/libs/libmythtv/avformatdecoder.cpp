@@ -1518,7 +1518,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     // HACK -- end
 
                     bool force_xv = false;
-                    if (ringBuffer->isDVD())
+                    if (ringBuffer && ringBuffer->isDVD())
                     {
                         if (dec.left(4) == "xvmc")
                             dvd_xvmc_enabled = true;
@@ -1543,7 +1543,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->codec_id = (CodecID)
                         myth2av_codecid(mcid, vcd, idct, mc);
 
-                    if (ringBuffer->isDVD() && (mcid == video_codec_id) &&
+                    if (ringBuffer && ringBuffer->isDVD() && 
+                        (mcid == video_codec_id) &&
                         dvd_video_codec_changed)
                     {
                         dvd_video_codec_changed = false;
@@ -1805,7 +1806,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             ringBuffer->UpdateRawBitrate(bitrate);
     }
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer && ringBuffer->isDVD())
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
@@ -1866,7 +1867,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         GetNVP()->SetAudioParams(-1, -1, -1, false /* AC3/DTS pass-through */);
         GetNVP()->ReinitAudio();
-        if (ringBuffer->isDVD()) 
+        if (ringBuffer && ringBuffer->isDVD()) 
             audioIn = AudioInfo();
     }
 
