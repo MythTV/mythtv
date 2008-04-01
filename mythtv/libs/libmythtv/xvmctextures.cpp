@@ -1,8 +1,8 @@
 #ifdef USING_XVMC_OPENGL
 
+#include "osd.h"
 #include "XvMCSurfaceTypes.h"
 #include "xvmctextures.h"
-#include "osd.h"
 #include "osdsurface.h"
 #include "frame.h"
 
