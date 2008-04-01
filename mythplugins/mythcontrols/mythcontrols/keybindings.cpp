@@ -31,8 +31,8 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
 // MythControls headers
 #include "keybindings.h"

@@ -23,8 +23,8 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h> // for MYTH_BINARY_VERSION
-#include <mythtv/mythdialogs.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
 // MythControls headers
 #include "mythcontrols.h"

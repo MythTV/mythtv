@@ -36,7 +36,7 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
 // MythControls headers
 #include "mythcontrols.h"
@@ -585,31 +585,34 @@ void MythControls::DeleteKey(void)
     QString context = GetCurrentContext();
     QString key     = GetCurrentKey();
     QString action  = GetCurrentAction();
-    QString ptitle  = tr("Manditory Action");
-    QString pdesc   =
-        tr("This action is manditory and needs at least one key "
-           "bound to it. Instead, try rebinding with another key.");
 
     if (context.isEmpty() || key.isEmpty() || action.isEmpty())
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), ptitle, pdesc);
+        VERBOSE(VB_IMPORTANT, "Unable to delete binding, missing information");
         return;
     }
 
-    bool ok = MythPopupBox::showOkCancelPopup(
-        gContext->GetMainWindow(), "confirmdelete",
-        tr("Delete this binding?"), true);
-
-    if (!ok)
-        return;
-
-    if (!m_bindings->RemoveActionKey(context, action, key))
+    if (m_bindings->RemoveActionKey(context, action, key))
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), ptitle, pdesc);
+        RefreshKeyInformation();
         return;
     }
 
-    RefreshKeyInformation();
+    QString label = tr("This action is manditory and needs at least one key "
+                       "bound to it. Instead, try rebinding with another key.");
+
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+    m_menuPopup =
+            new MythDialogBox(label, popupStack, "mandatorydelete");
+
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "mandatorydelete");
+
+    m_menuPopup->AddButton(tr("Ok"));
 }
 
 /** \fn ResolveConflict(ActionID*, int, key)

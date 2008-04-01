@@ -31,7 +31,6 @@
 #include <mythtv/libmythui/mythdialogbox.h>
 
 #include "keybindings.h"
-#include <QKeyEvent>
 #include <Q3PtrList>
 
 
