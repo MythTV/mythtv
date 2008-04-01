@@ -755,10 +755,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     //DVB-T Germany Berlin HSE/MonA TV
     fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
-    //DVB-T Germany Berlin Pro7/Sat.1
-    fix[  769LL << 32 | 8468 << 16 ] = EITFixUp::kEFixForceISO8859_15;
-    //DVB-T Germany RheinMain Pro7/Sat.1 
-    fix[ 8705LL << 32 | 8468 << 16 ] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Ruhrgebiet Tele 5
     fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15;
 
@@ -816,18 +812,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         EITFixUp::kEFixForceISO8859_15;
     // On transport 10008 only following channels need fixing:
     fix[    10008LL<<32 | 61441U << 16 | 53002] = // Tele 5
-        fix[10008LL<<32 | 61441U << 16 | 57621] = // ProSieben
-        fix[10008LL<<32 | 61441U << 16 | 53622] = // Kabel 1
-        fix[10008LL<<32 | 61441U << 16 | 57623] = // 9Live
-        fix[10008LL<<32 | 61441U << 16 | 53626] = // Sat.1
-        fix[10008LL<<32 | 61441U << 16 | 53627] = // N24
-        fix[10008LL<<32 | 61441U << 16 | 53630] = // HSE24
         EITFixUp::kEFixForceISO8859_15;
 
     // DVB-S Astra 19.2E DMAX Germany
     fix[  1113LL << 32 | 1 << 16 | 12602] = EITFixUp::kEFixForceISO8859_15;
 
-    // Premiere and Pro7/Sat.1
+    // Premiere
     fix[133 << 16] = EITFixUp::kEFixForceISO8859_15;
 
     // DVB-T Spain
