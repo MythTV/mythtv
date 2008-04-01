@@ -49,9 +49,9 @@ class MythControls : public MythScreenType
     MythControls(MythScreenStack *parent, const char *name);
     ~MythControls();
 
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual void customEvent(QEvent*);
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent*);
 
     typedef enum
     {
@@ -78,6 +78,11 @@ class MythControls : public MythScreenType
                             bool arrows = false);
     void    UpdateRightList(void);
 
+    void GrabKey(void);
+    void AddKeyToAction(QString key);
+    void DeleteKey(void);
+    void Save(void) { m_bindings->CommitChanges(); }
+
     // Gets
     uint    GetCurrentButton(void);
 
@@ -86,15 +91,11 @@ class MythControls : public MythScreenType
     QString GetTypeDesc(ListType type) const;
 
   private slots:
-    void AddKeyToAction(void);
-    void DeleteKey(void);
     void LeftSelected(MythListButtonItem*);
     void RightSelected(MythListButtonItem*);
     void LeftPressed(MythListButtonItem*);
     void RightPressed(MythListButtonItem*);
     void ActionButtonPressed();
-    /// \brief Save the bindings to the Database.
-    void Save(void) { m_bindings->CommitChanges(); }
     void RefreshKeyInformation(void);
 
   private:
@@ -106,7 +107,7 @@ class MythControls : public MythScreenType
     MythUIText        *m_leftDescription;
     MythUIText        *m_rightDescription;
     Q3PtrList<MythUIButton> m_actionButtons;
-    MythDialogBox *m_menuPopup;
+    MythDialogBox     *m_menuPopup;
 
     KeyBindings       *m_bindings;
     QStringList        m_sortedContexts; ///< sorted list of contexts

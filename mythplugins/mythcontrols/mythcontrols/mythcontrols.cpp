@@ -36,6 +36,7 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
 
 // MythControls headers
 #include "mythcontrols.h"
@@ -228,7 +229,7 @@ void MythControls::ActionButtonPressed()
         m_menuPopup->AddButton(tr("Cancel"));
     }
     else // for blank keys, no reason to ask what to do
-        AddKeyToAction();
+        GrabKey();
 }
 
 /// \brief Change the view.
@@ -644,6 +645,20 @@ bool MythControls::ResolveConflict(ActionID *conflict, int error_level)
     return (kDialogCodeButton0 == res);
 }
 
+void MythControls::GrabKey(void)
+{
+    /* grab a key from the user */
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+    KeyGrabPopupBox *keyGrabPopup = new KeyGrabPopupBox(popupStack);
+
+    if (keyGrabPopup->Create())
+        popupStack->AddScreen(keyGrabPopup);
+
+    keyGrabPopup->SetReturnEvent(this, "keygrab");
+}
+
 /** \fn MythControls::AddKeyToAction(void)
  *  \brief Add a key to the currently selected action.
  *
@@ -652,18 +667,8 @@ bool MythControls::ResolveConflict(ActionID *conflict, int error_level)
  *  TODO FIXME This code needs work to deal with multiple
  *             binding conflicts.
  */
-void MythControls::AddKeyToAction(void)
+void MythControls::AddKeyToAction(QString key)
 {
-    /* grab a key from the user */
-    KeyGrabPopupBox *getkey = new KeyGrabPopupBox(gContext->GetMainWindow());
-    DialogCode code = getkey->ExecPopup();
-    QString    key  = getkey->GetCapturedKey();
-    getkey->deleteLater();
-    getkey = NULL;
-
-    if (kDialogCodeRejected == code)
-        return; // user hit Cancel button
-
     QString     action  = GetCurrentAction();
     QString     context = GetCurrentContext();
     QStringList keys    = m_bindings->GetActionKeys(context, action);
@@ -718,7 +723,7 @@ void MythControls::customEvent(QEvent *event)
         if (resultid == "action")
         {
             if (buttonnum == 0)
-                AddKeyToAction();
+                GrabKey();
             else if (buttonnum == 1)
                 DeleteKey();
         }
@@ -774,6 +779,14 @@ void MythControls::customEvent(QEvent *event)
 
             if (GetFocusWidget() != m_leftList)
                 SetFocusWidget(m_leftList);
+        }
+        else if (resultid == "keygrab")
+        {
+            if (buttonnum == 0)
+            {
+                QString key = *(QString *)dce->GetResultData();
+                AddKeyToAction(key);
+            }
         }
 
         m_menuPopup = NULL;
