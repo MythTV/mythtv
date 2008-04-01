@@ -27,7 +27,7 @@
 #include <sys/types.h>
 
 #include <qpoint.h>
-#include <q3valuelist.h>
+#include <qlist.h>
 #include <qevent.h>
 
 const int MythGestureEventType = 24427;
@@ -204,7 +204,7 @@ private:
     int scale_ratio;
     float bin_percent;
     size_t last_gesture;    
-    Q3ValueList <QPoint> points;
+    QList <QPoint> points;
 
     MythGesturePrivate *p;
 };
