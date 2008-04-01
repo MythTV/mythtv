@@ -138,6 +138,7 @@ class MPUBLIC GuideGrid : public MythDialog
     QRect videoRect;
 
     void fillChannelInfos(bool gotostartchannel = true);
+    int  FindChannel(uint chanid, const QString &channum) const;
 
     void fillTimeInfos();
 

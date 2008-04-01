@@ -768,6 +768,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 {
     m_channelInfos.clear();
     m_channelInfoIdx.clear();
+    m_currentStartChannel = 0;
 
     DBChanList channels = ChannelUtil::GetChannels(0, true);
     ChannelUtil::SortChannels(channels, channelOrdering, false);
@@ -789,8 +790,6 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     QMap<QString,uint_list_t> channum_to_index_map;
     QMap<QString,uint_list_t> callsign_to_index_map;
 
-    bool startingset = false;
-    m_currentStartChannel = 0;
     for (uint i = 0; i < channels.size(); i++)
     {
         uint chan=i;
@@ -806,16 +805,6 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             continue;
 
         PixmapChannel val(channels[chan]);
-
-        // set starting channel index if it hasn't been set
-        bool match = gotostartchannel && !startingset;
-        match &= (startChanID)  ? (val.chanid  == startChanID)  : true;
-        match &= (!startChanID) ? (val.channum == startChanNum) : true;
-        if (match)
-        {
-            m_currentStartChannel = GetChannelCount();
-            startingset = true;
-        }
 
         channum_to_index_map[val.channum].push_back(GetChannelCount());
         callsign_to_index_map[val.callsign].push_back(GetChannelCount());
@@ -844,12 +833,43 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         }
     }
 
+    if (gotostartchannel)
+        m_currentStartChannel = FindChannel(startChanID, startChanNum);
+    m_currentStartChannel = max(0, m_currentStartChannel);
+
     if (m_channelInfos.empty())
     {
         VERBOSE(VB_IMPORTANT, "GuideGrid: "
                 "\n\t\t\tYou don't have any channels defined in the database."
                 "\n\t\t\tGuide grid will have nothing to show you.");
     }
+}
+
+int GuideGrid::FindChannel(uint chanid, const QString &channum) const
+{
+    // first check chanid
+    uint i = (chanid) ? 0 : GetChannelCount();
+    for (; i < GetChannelCount(); i++)
+    {
+        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        {
+            if (m_channelInfos[i][j].chanid == chanid)
+                return i;
+        }
+    }
+
+    // then check channum
+    i = (channum.isEmpty()) ? GetChannelCount() : 0;
+    for (; i < GetChannelCount(); i++)
+    {
+        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        {
+            if (m_channelInfos[i][j].chanid == chanid)
+                return i;
+        }
+    }
+
+    return -1;
 }
 
 void GuideGrid::fillTimeInfos()
