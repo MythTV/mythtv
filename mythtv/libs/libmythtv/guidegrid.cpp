@@ -367,7 +367,7 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
 
     if (e->state() == Qt::ControlButton)
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -835,7 +835,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 
     if (gotostartchannel)
         m_currentStartChannel = FindChannel(startChanID, startChanNum);
-    m_currentStartChannel = max(0, m_currentStartChannel);
+    m_currentStartChannel = max((uint)0, m_currentStartChannel);
 
     if (m_channelInfos.empty())
     {
