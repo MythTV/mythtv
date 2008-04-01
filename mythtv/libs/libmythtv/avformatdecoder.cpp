@@ -92,7 +92,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 
     char str[msg_len+1];
     int bytes = vsnprintf(str, msg_len+1, fmt, vl);
-    // check for truncted messages and fix them
+    // check for truncated messages and fix them
     if (bytes > msg_len)
     {
         VERBOSE(VB_IMPORTANT, QString("Libav log output truncated %1 of %2 bytes written")
@@ -844,7 +844,7 @@ extern "C" void HandleStreamChange(void* data) {
  *
  *  \param rbuffer pointer to a valid ringuffer.
  *  \param novideo if true then no video is sought in ScanSreams.
- *  \param testbuf this paramater is not used by AvFormatDecoder.
+ *  \param testbuf this parameter is not used by AvFormatDecoder.
  */
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
                               char testbuf[kDecoderProbeBufferSize],
@@ -970,7 +970,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
         else
         {
-            // the pvr-250 seems to overreport the bitrate by * 2
+            // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
             GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
@@ -3844,7 +3844,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
         // will ignore other uses of the same stream id in DVB countries.
         has_video |= pmt.IsVideo(i, "dvb");
 
-        // MHEG may explictly select a private stream as video
+        // MHEG may explicitly select a private stream as video
         has_video |= ((i == (uint)selectedVideoIndex) &&
                       (pmt.StreamType(i) == StreamID::PrivData));
     }
@@ -3925,7 +3925,7 @@ void *AvFormatDecoder::GetVideoCodecPrivate(void)
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
 {
-    // can only disable never reenable as once
+    // can only disable never re-enable as once
     // timestretch is on its on for the session
     if (disable_passthru)
         return;
@@ -4018,7 +4018,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         GetNVP()->SetAudioParams(digInfo.bps(), digInfo.channels,
                                  digInfo.sample_rate, audioIn.do_passthru);
-        // allow the audio stuff to reencode
+        // allow the audio stuff to re-encode
         GetNVP()->SetAudioCodec(codec_ctx);
         GetNVP()->ReinitAudio();
         return true;

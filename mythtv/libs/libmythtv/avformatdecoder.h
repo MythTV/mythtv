@@ -79,7 +79,7 @@ class AudioInfo
 /// A decoder for video files.
 
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
-/// It's used a a decoder of last resort after trying the NuppelDecoder
+/// It's used as a decoder of last resort after trying the NuppelDecoder
 /// and IvtvDecoder (if "USING_IVTV" is defined).
 class AvFormatDecoder : public DecoderBase
 {
@@ -184,7 +184,7 @@ class AvFormatDecoder : public DecoderBase
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                         bool selectedStream = false);
 
-    /// Preprocess a packet, setting the video parms if nessesary.
+    /// Preprocess a packet, setting the video parms if necessary.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
     void H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
 
