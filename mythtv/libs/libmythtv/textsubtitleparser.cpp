@@ -4,8 +4,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
+#include <climits>
 #include <algorithm>
 #include <qtextcodec.h>
 

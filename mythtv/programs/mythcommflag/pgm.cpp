@@ -1,3 +1,5 @@
+#include <climits>
+
 extern "C" {
 #include "avcodec.h"
 }

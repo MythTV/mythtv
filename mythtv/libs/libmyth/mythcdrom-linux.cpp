@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdint.h>
+#include <limits.h>
 
 #include "mythconfig.h"      // for WORDS_BIGENDIAN
 #include "mythcontext.h"
