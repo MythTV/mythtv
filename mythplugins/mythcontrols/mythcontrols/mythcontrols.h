@@ -79,7 +79,7 @@ class MythControls : public MythScreenType
     void    UpdateRightList(void);
 
     void GrabKey(void);
-    void AddKeyToAction(QString key);
+    void AddKeyToAction(QString key, bool ignoreconflict = false);
     void DeleteKey(void);
     void Save(void) { m_bindings->CommitChanges(); }
 
@@ -87,7 +87,7 @@ class MythControls : public MythScreenType
     uint    GetCurrentButton(void);
 
     // Functions
-    static bool ResolveConflict(ActionID *conflict, int error_level);
+    void ResolveConflict(ActionID *conflict, int error_level, QString key);
     QString GetTypeDesc(ListType type) const;
 
   private slots:

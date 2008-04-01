@@ -213,14 +213,14 @@ void MythControls::ActionButtonPressed()
     {
         QString label = tr("Modify Action");
 
-        MythScreenStack *mainStack =
-                                GetMythMainWindow()->GetMainStack();
+        MythScreenStack *popupStack =
+                                GetMythMainWindow()->GetStack("popup stack");
 
         m_menuPopup =
-                new MythDialogBox(label, mainStack, "actionmenu");
+                new MythDialogBox(label, popupStack, "actionmenu");
 
         if (m_menuPopup->Create())
-            mainStack->AddScreen(m_menuPopup);
+            popupStack->AddScreen(m_menuPopup);
 
         m_menuPopup->SetReturnEvent(this, "action");
 
@@ -237,14 +237,14 @@ void MythControls::ChangeView(void)
 {
     QString label = tr("Change View");
 
-    MythScreenStack *mainStack =
-                            GetMythMainWindow()->GetMainStack();
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
     m_menuPopup =
-            new MythDialogBox(label, mainStack, "mcviewmenu");
+            new MythDialogBox(label, popupStack, "mcviewmenu");
 
     if (m_menuPopup->Create())
-        mainStack->AddScreen(m_menuPopup);
+        popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "view");
 
@@ -275,14 +275,14 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
         {
             QString label = tr("Options");
 
-            MythScreenStack *mainStack =
-                                    GetMythMainWindow()->GetMainStack();
+            MythScreenStack *popupStack =
+                                    GetMythMainWindow()->GetStack("popup stack");
 
             m_menuPopup =
-                    new MythDialogBox(label, mainStack, "optionmenu");
+                    new MythDialogBox(label, popupStack, "optionmenu");
 
             if (m_menuPopup->Create())
-                mainStack->AddScreen(m_menuPopup);
+                popupStack->AddScreen(m_menuPopup);
 
             m_menuPopup->SetReturnEvent(this, "option");
 
@@ -302,14 +302,14 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
                 QString label = tr("Exiting, but there are unsaved changes."
                                    "Which would you prefer?");
 
-                MythScreenStack *mainStack =
-                                        GetMythMainWindow()->GetMainStack();
+                MythScreenStack *popupStack =
+                                        GetMythMainWindow()->GetStack("popup stack");
 
                 m_menuPopup =
-                        new MythDialogBox(label, mainStack, "exitmenu");
+                        new MythDialogBox(label, popupStack, "exitmenu");
 
                 if (m_menuPopup->Create())
-                    mainStack->AddScreen(m_menuPopup);
+                    popupStack->AddScreen(m_menuPopup);
 
                 m_menuPopup->SetReturnEvent(this, "exit");
 
@@ -378,7 +378,7 @@ void MythControls::UpdateRightList(void)
     // get the selected item in the right list.
     MythListButtonItem *item = m_leftList->GetItemCurrent();
 
-    if (item != NULL)
+    if (item)
     {
         QString rtstr = item->text();
 
@@ -395,8 +395,6 @@ void MythControls::UpdateRightList(void)
             break;
         }
     }
-    else
-        VERBOSE(VB_IMPORTANT, QString("Left List Returned Null!"));
 }
 
 /** \fn MythControls::RefreshKeyInformation(void)
@@ -614,35 +612,46 @@ void MythControls::DeleteKey(void)
     RefreshKeyInformation();
 }
 
-/** \fn ResolveConflict(ActionID*, int)
+/** \fn ResolveConflict(ActionID*, int, key)
  *  \brief Resolve a potential conflict
  *  \return true if the conflict should be bound, false otherwise.
  */
-bool MythControls::ResolveConflict(ActionID *conflict, int error_level)
+void MythControls::ResolveConflict(ActionID *conflict, int error_level,
+                                    QString key)
 {
     if (!conflict)
-        return false; // programmer error
+        return;
 
-    QString msg = tr("This key binding conflicts with %1 in the %2 context.")
+    QString label = tr("This key binding conflicts with %1 in the %2 context.")
         .arg(conflict->GetAction()).arg(conflict->GetContext());
 
     if (KeyBindings::kKeyBindingError == error_level)
-    {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), tr("Conflicting Binding"), msg);
+        label.append(tr(" Unable to bind key."));
+    else
+        label.append(tr(" Do you want to bind it anyway?"));
 
-        return false;
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+    m_menuPopup =
+            new MythDialogBox(label, popupStack, "conflictmenu");
+
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "conflict");
+
+    if (KeyBindings::kKeyBindingError == error_level)
+    {
+        m_menuPopup->AddButton(tr("Ok"));
+    }
+    else
+    {
+        m_menuPopup->AddButton(tr("Cancel"));
+        m_menuPopup->AddButton(tr("Bind Key"), (void*)&key);
     }
 
-    msg = tr("This key binding may conflict with %1 in the %2 context. "
-             "Do you want to bind it anyway?")
-        .arg(conflict->GetAction()).arg(conflict->GetContext());
-
-    DialogCode res = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), tr("Conflict Warning"),
-        msg, tr("Bind Key"), QObject::tr("Cancel"), kDialogCodeButton1);
-
-    return (kDialogCodeButton0 == res);
+    delete conflict;
 }
 
 void MythControls::GrabKey(void)
@@ -667,7 +676,7 @@ void MythControls::GrabKey(void)
  *  TODO FIXME This code needs work to deal with multiple
  *             binding conflicts.
  */
-void MythControls::AddKeyToAction(QString key)
+void MythControls::AddKeyToAction(QString key, bool ignoreconflict)
 {
     QString     action  = GetCurrentAction();
     QString     context = GetCurrentContext();
@@ -681,30 +690,24 @@ void MythControls::AddKeyToAction(QString key)
         return;
     }
 
-    // Check for first of the potential conflicts.
-    int err_level;
-    ActionID *conflict = m_bindings->GetConflict(context, key, err_level);
-    if (conflict)
+    if (!ignoreconflict)
     {
-        bool ok = ResolveConflict(conflict, err_level);
+        // Check for first of the potential conflicts.
+        int err_level;
+        ActionID *conflict = m_bindings->GetConflict(context, key, err_level);
+        if (conflict)
+        {
+            ResolveConflict(conflict, err_level, key);
 
-        delete conflict;
-
-        if (!ok)
-            return; // abort on unresolved conflicts
+            return;
+        }
     }
 
     if (binding_index < keys.count())
-    {
-        VERBOSE(VB_IMPORTANT, "ReplaceActionKey");
         m_bindings->ReplaceActionKey(context, action, key,
                                      keys[binding_index]);
-    }
     else
-    {
-        VERBOSE(VB_IMPORTANT, "AddActionKey");
         m_bindings->AddActionKey(context, action, key);
-    }
 
     RefreshKeyInformation();
 }
@@ -786,6 +789,14 @@ void MythControls::customEvent(QEvent *event)
             {
                 QString key = *(QString *)dce->GetResultData();
                 AddKeyToAction(key);
+            }
+        }
+        else if (resultid == "conflict")
+        {
+            if (buttonnum == 1)
+            {
+                QString key = *(QString *)dce->GetResultData();
+                AddKeyToAction(key, true);
             }
         }
 
