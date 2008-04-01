@@ -49,6 +49,9 @@ OpenGLContext::OpenGLContext() :
 
 OpenGLContext::~OpenGLContext()
 {
+    if (!m_priv)
+        return;
+
     MakeCurrent(true);
 
     if (m_priv->m_glx_context)
@@ -62,29 +65,26 @@ OpenGLContext::~OpenGLContext()
 
     MakeCurrent(false);
 
-    if (m_priv)
+    if (m_priv->m_glx_window)
     {
-        if (m_priv->m_glx_window)
-        {
-            X11S(glXDestroyWindow(m_display, m_priv->m_glx_window));
-            m_priv->m_glx_window = 0;
-        }
-
-        if (m_priv->m_gl_window)
-        {
-            X11S(XDestroyWindow(m_display, m_priv->m_gl_window));
-            m_priv->m_gl_window = 0;
-        }
-
-        if (m_priv->m_glx_context)
-        {
-            X11S(glXDestroyContext(m_display, m_priv->m_glx_context));
-            m_priv->m_glx_context = 0;
-        }
-
-        delete m_priv;
-        m_priv = NULL;
+        X11S(glXDestroyWindow(m_display, m_priv->m_glx_window));
+        m_priv->m_glx_window = 0;
     }
+
+    if (m_priv->m_gl_window)
+    {
+        X11S(XDestroyWindow(m_display, m_priv->m_gl_window));
+        m_priv->m_gl_window = 0;
+    }
+
+    if (m_priv->m_glx_context)
+    {
+        X11S(glXDestroyContext(m_display, m_priv->m_glx_context));
+        m_priv->m_glx_context = 0;
+    }
+
+    delete m_priv;
+    m_priv = NULL;
 }
 
 void OpenGLContext::Hide(void)
