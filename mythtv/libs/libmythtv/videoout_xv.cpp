@@ -3845,10 +3845,11 @@ int VideoOutputXv::SetPictureAttribute(
     int port_min = xv_attribute_min[attribute];
     int port_max = xv_attribute_max[attribute];
     int range    = port_max - port_min;
-    
-    int tmpval = (int) roundf(range * 0.01f * newValue);
-    int value   = min(tmpval + port_min, port_max);
 
+    int tmpval2 = (newValue + valAdj) % 100; 
+    int tmpval3 = (int) roundf(range * 0.01f * tmpval2); 
+    int value   = min(tmpval3 + port_min, port_max); 
+    
     xv_set_attrib(XJ_disp, xv_port, attrName.ascii(), value);
 
 #ifdef USING_XVMC
