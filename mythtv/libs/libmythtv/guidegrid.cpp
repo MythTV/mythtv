@@ -41,6 +41,121 @@ using namespace std;
 #include "channelutil.h"
 #include "cardutil.h"
 
+JumpToChannel::JumpToChannel(
+    JumpToChannelListener *parent, const QString &start_entry,
+    int start_chan_idx, int cur_chan_idx, uint rows_disp) :
+    listener(parent),
+    entry(start_entry),
+    previous_start_channel_index(start_chan_idx),
+    previous_current_channel_index(cur_chan_idx),
+    rows_displayed(rows_disp),
+    timer(new QTimer(this))
+{
+    if (parent && timer)
+        connect(timer, SIGNAL(timeout()), SLOT(deleteLater()));
+    Update();
+}
+
+
+void JumpToChannel::deleteLater(void)
+{
+    if (listener)
+    {
+        listener->SetJumpToChannel(NULL);
+        listener = NULL;
+    }
+
+    if (timer)
+    {
+        timer->stop();
+        timer->deleteLater();
+        timer = NULL;
+    }
+
+    QObject::deleteLater();
+}
+
+
+static bool has_action(QString action, const QStringList &actions)
+{
+    QStringList::const_iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it)
+    {
+        if (action == *it)
+            return true;
+    }
+    return false;
+}
+
+bool JumpToChannel::ProcessEntry(
+    const QStringList &actions, const QKeyEvent *e)
+{
+    if (!listener)
+        return false;
+
+    if (has_action("ESCAPE", actions))
+    {
+        listener->GoTo(previous_start_channel_index,
+                       previous_current_channel_index);
+        deleteLater();
+        return true;
+    }
+
+    if (has_action("DELETE", actions))
+    {
+        if (entry.length())
+            entry = entry.left(entry.length()-1);
+        Update();
+        return true;
+    }
+
+    if (has_action("SELECT", actions))
+    {
+        Update();
+        deleteLater();
+        return true;
+    }
+
+    QString txt = e->text();
+    bool isUInt;
+    txt.toUInt(&isUInt);
+    if (isUInt)
+    {
+        entry += txt;
+        Update();
+        return true;
+    }
+
+    if (entry.length() && (txt=="_" || txt=="-" || txt=="#" || txt=="."))
+    {
+        entry += txt;
+        Update();
+        return true;
+    }
+
+    return false;
+}
+
+void JumpToChannel::Update(void)
+{
+    if (!timer || !listener)
+        return;
+
+    // setup the timeout timer for jump mode
+    timer->stop();
+    timer->start(3500, true);
+
+    // find the closest channel ...
+    int i = listener->FindChannel(0, entry, false);
+    if (i >= 0)
+    {
+        // rows_displayed to center
+        int start = i - rows_displayed/2;
+        int cur   = rows_displayed/2;
+        listener->GoTo(start, cur);
+    }
+}
+
 DBChanList GuideGrid::Run(
     uint           chanid,
     const QString &channum,
@@ -97,8 +212,12 @@ DBChanList GuideGrid::Run(
 GuideGrid::GuideGrid(MythMainWindow *parent,
                      uint chanid, QString channum,
                      TV *player, bool allowsecondaryepg,
-                     const char *name)
-         : MythDialog(parent, name)
+                     const char *name) :
+    MythDialog(parent, name),
+    jumpToChannelLock(true),
+    jumpToChannel(NULL),
+    jumpToChannelEnabled(true),
+    jumpToChannelHasRect(false)
 {
     desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
@@ -119,12 +238,9 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     curInfoRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
 
-    jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 0);
-    jumpToChannelActive = false;
-    jumpToChannelHasRect = false; // by default, we assume there is no specific region for jumpToChannel in the theme
-    jumpToChannelTimer = new QTimer(this);
-    connect(jumpToChannelTimer, SIGNAL(timeout()), SLOT(jumpToChannelTimeout()));
-    
+    jumpToChannelEnabled =
+        gContext->GetNumSetting("EPGEnableJumpToChannel", 1);
+
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
@@ -322,12 +438,6 @@ GuideGrid::~GuideGrid()
         theme = NULL;
     }
 
-    if (jumpToChannelTimer)
-    {
-        jumpToChannelTimer->deleteLater();
-        jumpToChannelTimer = NULL;
-    }
-
     if (timeCheck)
     {
         timeCheck->deleteLater();
@@ -391,17 +501,25 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
         // The reason is because the number keys could be mapped to
         // other things. If this is the case, then the jump to channel
         // will not work correctly.
-        if (jumpToChannelEnabled) 
         {
-            int digit;
-            if (jumpToChannelGetInputDigit(actions, digit)) 
+            QMutexLocker locker(&jumpToChannelLock);
+
+            if (!jumpToChannel || jumpToChannelEnabled)
             {
-                jumpToChannelDigitPress(digit);
-                // Set handled = true here so that it won't process any
-                // more actions.
-                handled = true;
+                bool isNum;
+                e->text().toInt(&isNum);
+                if (isNum && !jumpToChannel)
+                {
+                    jumpToChannel = new JumpToChannel(
+                        this, e->text(),
+                        m_currentStartChannel, m_currentRow, DISPLAY_CHANS);
+                    handled = true;
+                }
             }
-        }        
+
+            if (jumpToChannel && !handled)
+                handled = jumpToChannel->ProcessEntry(actions, e);
+        }
 	      
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -428,12 +546,6 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 dayLeft();
             else if (action == "DAYRIGHT")
                 dayRight();
-            else if (jumpToChannelEnabled && jumpToChannelActive &&
-                     (action == "ESCAPE"))
-                jumpToChannelCancel();
-            else if (jumpToChannelEnabled && jumpToChannelActive &&
-                     (action == "DELETE"))
-                jumpToChannelDeleteLastDigit();
             else if (action == "NEXTFAV" || action == "4")
                 toggleGuideListing();
             else if (action == "FINDER" || action == "6")
@@ -845,8 +957,12 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     }
 }
 
-int GuideGrid::FindChannel(uint chanid, const QString &channum) const
+int GuideGrid::FindChannel(uint chanid, const QString &channum,
+                           bool exact) const
 {
+    static QMutex chanSepRegExpLock;
+    static QRegExp chanSepRegExp(ChannelUtil::kATSCSeparators);
+
     // first check chanid
     uint i = (chanid) ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); i++)
@@ -858,13 +974,69 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum) const
         }
     }
 
-    // then check channum
+    // then check channum, first only
+    i = (channum.isEmpty()) ? GetChannelCount() : 0;
+    for (; i < GetChannelCount(); i++)
+    {
+        if (m_channelInfos[i][0].chanid == chanid)
+            return i;
+    }
+
+    // then check all channum
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); i++)
     {
         for (uint j = 0; j < m_channelInfos[i].size(); j++)
         {
             if (m_channelInfos[i][j].chanid == chanid)
+                return i;
+        }
+    }
+
+    if (exact || channum.isEmpty())
+        return -1;
+
+    // then check partial channum, first only
+    for (i = 0; i < GetChannelCount(); i++)
+    {
+        if (m_channelInfos[i][0].channum.left(channum.length()) == channum)
+            return i;
+    }
+
+    // then check all partial channum
+    for (i = 0; i < GetChannelCount(); i++)
+    {
+        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        {
+            if (m_channelInfos[i][j].channum.left(channum.length()) == channum)
+                return i;
+        }
+    }
+
+    // then check all channum with "_" for subchannels
+    QMutexLocker locker(&chanSepRegExpLock);
+    QString tmpchannum = channum;
+    if (tmpchannum.contains(chanSepRegExp))
+    {
+        tmpchannum.replace(chanSepRegExp, "_");
+    }
+    else if (channum.length() >= 2)
+    {
+        tmpchannum = channum.left(channum.length() - 1) + "_" +
+            channum.right(1);
+    }
+    else
+    {
+        return -1;
+    }
+
+    for (i = 0; i < GetChannelCount(); i++)
+    {
+        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        {
+            QString tmp = m_channelInfos[i][j].channum;
+            tmp.replace(chanSepRegExp, "_");
+            if (tmp == tmpchannum)
                 return i;
         }
     }
@@ -1215,7 +1387,8 @@ void GuideGrid::paintEvent(QPaintEvent *e)
 
     if (r.intersects(infoRect))
         paintInfo(&p);
-    if (r.intersects(dateRect) && (jumpToChannelHasRect || (!jumpToChannelHasRect && !jumpToChannelActive)))
+    if (r.intersects(dateRect) &&
+        (jumpToChannelHasRect || (!jumpToChannelHasRect && !jumpToChannel)))
         paintDate(&p);
     if (r.intersects(timeRect))
         paintTimes(&p);
@@ -1224,7 +1397,8 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     if (r.intersects(curInfoRect))
         paintCurrentInfo(&p);
 
-    // if jumpToChannel has its own rect, use that; otherwise use the date's rect
+    // if jumpToChannel has its own rect, use that;
+    // otherwise use the date's rect
     if ((jumpToChannelHasRect && r.intersects(jumpToChannelRect)) ||
         (!jumpToChannelHasRect && r.intersects(dateRect)))
         paintJumpToChannel(&p);
@@ -1271,7 +1445,14 @@ void GuideGrid::paintDate(QPainter *p)
 
 void GuideGrid::paintJumpToChannel(QPainter *p)
 {
-    if (!jumpToChannelEnabled || !jumpToChannelActive)
+    QString txt = "";
+    {
+        QMutexLocker locker(&jumpToChannelLock);
+        if (jumpToChannel)
+            txt = jumpToChannel->GetEntry();
+    }
+
+    if (txt.isEmpty())
         return;
 
     QRect jtcr;
@@ -1291,10 +1472,11 @@ void GuideGrid::paintJumpToChannel(QPainter *p)
 
     if (container)
     {
-        UITextType *type = (UITextType *)container->GetType((jumpToChannelHasRect) ? "channel" : "date");
-        if (type) {
-            type->SetText(QString::number(jumpToChannel));
-        }
+        UITextType *type = (UITextType *)container->GetType(
+            (jumpToChannelHasRect) ? "channel" : "date");
+
+        if (type)
+            type->SetText(txt);
     }
 
     if (container)
@@ -2121,131 +2303,16 @@ void GuideGrid::toggleMute(void)
         m_player->ToggleMute();
 }
 
-//
-// jumpToChannel - Jason Parekh <jasonparekh@gmail.com> - 06/23/2004
-//
-// The way this works is if you enter a digit, it will set a timer for 2.5 seconds and enter
-// jump to channel mode where as you enter digits, it will find the closest matching channel
-// and show that on the program guide.  Within the 2.5 seconds, if you press the button bound
-// to END, it will cancel channel jump mode and revert to the highlighted channel before entering
-// this mode.  If you let the timer expire, it will stay on the selected channel.
-//
-// The positioning for the channel display can be in either one of two ways.  To ensure compatibility
-// with themes, I made it so if it can't find a specific jumptochannel container, it will use the date's
-// and just overwrite the date whenever it is in channel jump mode.  However, if there is a jumptochannel
-// container, it will use that.  An example container is as follows:
-//
-//     <container name="jumptochannel">
-//     <area>20,20,115,25</area>
-//     <textarea name="channel" draworder="4" align="right">
-//         <font>info</font>
-//         <area>0,0,115,25</area>
-//         <cutdown>no</cutdown>
-//     </textarea>
-//     </container>
-//
-
-void GuideGrid::jumpToChannelDigitPress(int digit)
+void GuideGrid::GoTo(int start, int cur_row)
 {
-    // if this is the first digit press (coming from inactive mode)
-    if (jumpToChannelActive == false) {
-        jumpToChannelActive = true;
-        jumpToChannel = 0;
-        jumpToChannelPreviousStartChannel = m_currentStartChannel;
-        jumpToChannelPreviousRow = m_currentRow;
-    }
-    
-    // setup the timeout timer for jump mode
-    jumpToChannelTimer->stop();
-    jumpToChannelTimer->start(3500, true);
-
-    jumpToChannel = (jumpToChannel * 10) + digit;
-
-    // So it will move to the closest channels while they enter the digits
-    jumpToChannelShowSelection();
-}
-
-void GuideGrid::jumpToChannelDeleteLastDigit()
-{
-    jumpToChannel /= 10;
-    
-    if (jumpToChannel == 0) 
-        jumpToChannelCancel();
-    else 
-        jumpToChannelShowSelection();
-}
-
-void GuideGrid::jumpToChannelShowSelection()
-{
-    unsigned int i;
-    
-    // Not the best method, but the channel list is small and this isn't time critical
-    // Go through until the ith channel is equal to or greater than the one we're looking for
-
-    for (i=0; (i < GetChannelCount()-1) &&
-             (GetChannelInfo(i)->channum.toInt() < jumpToChannel); i++);
-    
-    if ((i > 0) &&
-        ((GetChannelInfo(i)->channum.toInt() - jumpToChannel) >
-         (jumpToChannel - GetChannelInfo(i-1)->channum.toInt())))
-    {
-        i--;
-    }
-
-    // DISPLAY_CHANS to center
-    setStartChannel(i-DISPLAY_CHANS/2);
-    m_currentRow = DISPLAY_CHANS/2;
-    
+    setStartChannel(start);
+    m_currentRow = cur_row % DISPLAY_CHANS;
     fillProgramInfos();
-
     repaint(fullRect, false);
 }
 
-void GuideGrid::jumpToChannelCommit()
+void GuideGrid::SetJumpToChannel(JumpToChannel *ptr)
 {
-    jumpToChannelResetAndHide();
-}
-
-void GuideGrid::jumpToChannelCancel()
-{
-    setStartChannel(jumpToChannelPreviousStartChannel);
-    m_currentRow = jumpToChannelPreviousRow;
-    
-    fillProgramInfos();
-    
-    repaint(fullRect, false);
-    
-    jumpToChannelResetAndHide();
-}
-
-void GuideGrid::jumpToChannelResetAndHide()
-{
-    jumpToChannelActive = false;
-
-    jumpToChannelTimer->stop();
-
-    repaint(fullRect, false);
-}
-
-void GuideGrid::jumpToChannelTimeout()
-{
-    jumpToChannelCommit();
-}
-
-// function returns true if it is able to find a mapping to a digit and false
-// otherwise.
-bool GuideGrid::jumpToChannelGetInputDigit(QStringList &actions, int &digit)
-{
-    for (int i = 0; i < actions.size(); ++i)
-    {
-        QString action = actions[i];
-        if (action[0] >= '0' && action[0] <= '9') 
-        {
-            digit = action.toInt();
-            return true;
-        }
-    }
-    
-    // There were no actions that resolved to a digit
-    return false;
+    QMutexLocker locker(&jumpToChannelLock);
+    jumpToChannel = ptr;
 }

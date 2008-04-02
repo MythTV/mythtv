@@ -33,7 +33,46 @@ class QWidget;
 typedef vector<PixmapChannel>   pix_chan_list_t;
 typedef vector<pix_chan_list_t> pix_chan_list_list_t;
 
-class MPUBLIC GuideGrid : public MythDialog
+class JumpToChannel;
+class MPUBLIC JumpToChannelListener
+{
+  public:
+    virtual void GoTo(int start, int cur_row) = 0;
+    virtual void SetJumpToChannel(JumpToChannel *ptr) = 0;
+    virtual int  FindChannel(uint chanid, const QString &channum,
+                             bool exact = true) const = 0;
+};
+
+class MPUBLIC JumpToChannel : public QObject
+{
+    Q_OBJECT
+
+  public:
+    JumpToChannel(
+        JumpToChannelListener *parent, const QString &start_entry,
+        int start_chan_idx, int cur_chan_idx, uint rows_disp);
+
+    bool ProcessEntry(const QStringList &actions, const QKeyEvent *e);
+
+    QString GetEntry(void) const { return entry; }
+
+  public slots:
+    virtual void deleteLater(void);
+
+  private:
+    ~JumpToChannel() {}
+    void Update(void);
+
+  private:
+    JumpToChannelListener *listener;
+    QString  entry;
+    int      previous_start_channel_index;
+    int      previous_current_channel_index;
+    uint     rows_displayed;
+    QTimer  *timer;
+};
+
+class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
 {
     Q_OBJECT
 
@@ -46,6 +85,9 @@ class MPUBLIC GuideGrid : public MythDialog
                           bool           allowsecondaryepg = true);
 
     DBChanList GetSelection(void) const;
+
+    virtual void GoTo(int start, int cur_row);
+    virtual void SetJumpToChannel(JumpToChannel *ptr);
 
   protected slots:
     void cursorLeft();
@@ -98,7 +140,6 @@ class MPUBLIC GuideGrid : public MythDialog
   private slots:
     void timeCheckTimeout(void);
     void repaintVideoTimeout(void);
-    void jumpToChannelTimeout(void);
 
   private:
     void keyPressEvent(QKeyEvent *e);
@@ -138,7 +179,8 @@ class MPUBLIC GuideGrid : public MythDialog
     QRect videoRect;
 
     void fillChannelInfos(bool gotostartchannel = true);
-    int  FindChannel(uint chanid, const QString &channum) const;
+    int  FindChannel(uint chanid, const QString &channum,
+                     bool exact = true) const;
 
     void fillTimeInfos();
 
@@ -201,20 +243,10 @@ class MPUBLIC GuideGrid : public MythDialog
 
     bool keyDown;
 
-    void jumpToChannelResetAndHide();
-    void jumpToChannelCancel();
-    void jumpToChannelCommit();
-    void jumpToChannelShowSelection();
-    void jumpToChannelDeleteLastDigit();
-    void jumpToChannelDigitPress(int);
-    bool jumpToChannelGetInputDigit(QStringList & actions, int & digit);
-    int jumpToChannel;
-    int jumpToChannelPreviousStartChannel;
-    int jumpToChannelPreviousRow;
-    bool jumpToChannelEnabled;
-    bool jumpToChannelActive;
-    bool jumpToChannelHasRect;
-    QTimer *jumpToChannelTimer;
+    QMutex         jumpToChannelLock;
+    JumpToChannel *jumpToChannel;
+    bool           jumpToChannelEnabled;
+    bool           jumpToChannelHasRect;
 };
 
 #endif
