@@ -231,6 +231,8 @@ class MPUBLIC ChannelUtil
                                    uint           sourceid,
                                    const QString &channum);
 
+    static const QString kATSCSeparators;
+
   private:
     static QString GetChannelStringField(int chanid, const QString &field);
     static QString GetChannelValueStr(const QString &channel_field,

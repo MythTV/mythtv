@@ -18,6 +18,8 @@ using namespace std;
 #define LOC QString("ChanUtil: ")
 #define LOC_ERR QString("ChanUtil, Error: ")
 
+const QString ChannelUtil::kATSCSeparators = "(_|-|#|\\.)";
+
 DBChannel::DBChannel(const DBChannel &other)
 {
     (*this) = other;
@@ -1513,11 +1515,11 @@ inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
-static QMutex sepExprLock;
-static const QRegExp sepExpr("(_|-|#|\\.)");
-
 inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 {
+    static QMutex sepExprLock;
+    static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
+
     int cmp = 0;
 
     bool isIntA, isIntB;
