@@ -573,6 +573,21 @@ END
 ### Third party packages
 my (@build_depends, %seen_depends);
 my @comps = ('mythtv', @components);
+
+# Deal with user-supplied skip arguments
+if ( $OPT{'mythtvskip'} )
+{   @comps = grep(!m/mythtv/,      @comps)   }
+if ( $OPT{'pluginskip'} )
+{   @comps = grep(!m/mythplugins/, @comps)   }
+if ( $OPT{'themeskip'} )
+{   @comps = grep(!m/myththemes/,  @comps)   }
+
+if ( ! @comps )
+{
+  &Complain("Nothing to build! Too many ...skip arguments?");
+  exit;
+}
+
 &Verbose("Including components:", @comps);
 
 # If no SubVersion in path, and we are checking something out, build SVN:
@@ -810,20 +825,6 @@ if (! $OPT{'nohead'})
 else
 {
   &Syscall("mkdir -p $SVNDIR/mythtv/config")
-}
-
-# Deal with user-supplied skip arguments
-if ( $OPT{'mythtvskip'} )
-{   @comps = grep(!m/mythtv/,      @comps)   }
-if ( $OPT{'pluginskip'} )
-{   @comps = grep(!m/mythplugins/, @comps)   }
-if ( $OPT{'themeskip'} )
-{   @comps = grep(!m/myththemes/,  @comps)   }
-
-if ( ! @comps )
-{
-  &Complain("Nothing to build! Too many ...skip arguments?");
-  exit;
 }
 
 # Build MythTV and any plugins
