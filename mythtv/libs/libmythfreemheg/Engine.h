@@ -33,8 +33,9 @@
 #include <qstring.h>
 #include <qrect.h>
 #include <qregion.h>
-#include <q3ptrlist.h>
-#include <q3ptrstack.h>
+#include <QList>
+#include <QStack>
+#include <QQueue>
 
 class MHDLADisplay;
 
@@ -156,25 +157,30 @@ protected:
     QRegion m_redrawRegion; // The accumulation of repaints when the screen is locked.
 
     // Application stack and functions to get the current application and scene.
-    Q3PtrStack <MHApplication> m_ApplicationStack;
-    MHApplication *CurrentApp() { if (m_ApplicationStack.isEmpty()) return NULL; else return m_ApplicationStack.top(); }
+    QStack<MHApplication*> m_ApplicationStack;
+    MHApplication *CurrentApp() {
+        if (m_ApplicationStack.isEmpty())
+            return NULL;
+        else
+            return m_ApplicationStack.top();
+    }
     MHScene *CurrentScene() { return CurrentApp() == NULL ? NULL : CurrentApp()->m_pCurrentScene; }
 
     // Action stack.  Actions may generate synchronous events which fire links and add
     // new actions.  These new actions have to be processed before we continue with other
     // actions.
-    Q3PtrStack<MHElemAction> m_ActionStack;
+    QStack<MHElemAction*> m_ActionStack;
 
     // Asynchronous event queue.  Asynchronous events are added to this queue and handled
     // once the action stack is empty.
-    Q3PtrList<MHAsynchEvent> m_EventQueue;
+    QQueue<MHAsynchEvent*> m_EventQueue;
 
     // Active Link set.  Active links are included in this table.
-    Q3PtrList <MHLink> m_LinkTable;
+    QList<MHLink*> m_LinkTable;
 
     // Pending external content.  If we have requested external content that has not yet arrived
     // we make an entry in this table.
-    Q3PtrList <MHExternContent> m_ExternContentTable;
+    QList<MHExternContent*> m_ExternContentTable;
     void CheckContentRequests();
 
     MHOwnPtrSequence <MHPSEntry> m_PersistentStore;

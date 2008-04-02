@@ -46,15 +46,17 @@ MHEG *MHCreateEngine(MHContext *context)
 MHEngine::MHEngine(MHContext *context): m_Context(context)
 {
     m_fInTransition = false;
-    m_ApplicationStack.setAutoDelete(true);
-    m_EventQueue.setAutoDelete(true);
-    m_ExternContentTable.setAutoDelete(true);
-
     m_fBooting = true;
 }
 
 MHEngine::~MHEngine()
 {
+    while (!m_ApplicationStack.isEmpty())
+       delete m_ApplicationStack.pop();
+    while (!m_EventQueue.isEmpty())
+       delete m_EventQueue.dequeue();
+    while (!m_ExternContentTable.isEmpty())
+        delete m_ExternContentTable.takeFirst();
 }
 
 // Check for external content every 2 seconds.
@@ -66,9 +68,12 @@ int MHEngine::RunAll()
     // Request to boot or reboot
     if (m_fBooting) {
         // Reset everything
-        m_ApplicationStack.clear();
-        m_EventQueue.clear();
-        m_ExternContentTable.clear();
+        while (!m_ApplicationStack.isEmpty())
+            delete m_ApplicationStack.pop();
+        while (!m_EventQueue.isEmpty())
+            delete m_EventQueue.dequeue();
+        while (!m_ExternContentTable.isEmpty())
+            delete m_ExternContentTable.takeFirst();
         m_LinkTable.clear();
 
         // UK MHEG applications boot from ~//a or ~//startup.  Actually the initial
@@ -119,12 +124,12 @@ int MHEngine::RunAll()
         }
 
         if (! m_EventQueue.isEmpty()) {
-            MHAsynchEvent *pEvent = m_EventQueue.first();
+            MHAsynchEvent *pEvent = m_EventQueue.dequeue();
             MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
                 .arg(MHLink::EventTypeToString(pEvent->eventType))
                 .arg(pEvent->pEventSource->m_ObjectReference.Printable()));
             CheckLinks(pEvent->pEventSource->m_ObjectReference, pEvent->eventType, pEvent->eventData);
-            m_EventQueue.removeFirst();
+            delete pEvent;
         }
     } while (! m_EventQueue.isEmpty() || ! m_ActionStack.isEmpty());
 
@@ -198,7 +203,8 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
             }
             if (CurrentScene()) CurrentScene()->Destruction(this);
             CurrentApp()->Destruction(this);
-            if (! fIsSpawn) m_ApplicationStack.remove(); // Pop and delete the current app.
+            if (!fIsSpawn)
+                delete m_ApplicationStack.pop(); // Pop and delete the current app.
         }
 
         MHApplication *pProgram = (MHApplication*)ParseProgram(text);
@@ -219,7 +225,8 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
 
        // This isn't in the standard as far as I can tell but we have to do this because
        // we may have events referring to the old application.
-       m_EventQueue.clear();
+       while (!m_EventQueue.isEmpty())
+           delete m_EventQueue.dequeue();
 
        // Activate the application. ....
        CurrentApp()->Activation(this);
@@ -243,9 +250,10 @@ void MHEngine::Quit()
     CurrentApp()->Destruction(this);
     // This isn't in the standard as far as I can tell but we have to do this because
     // we may have events referring to the old application.
-    m_EventQueue.clear();
+    while (!m_EventQueue.isEmpty())
+       delete m_EventQueue.dequeue();
 
-    m_ApplicationStack.remove();
+    delete m_ApplicationStack.pop();
     // If the stack is now empty we return to boot mode.
     if (m_ApplicationStack.isEmpty())
         m_fBooting = true;
@@ -297,9 +305,17 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Remove any events from the asynch event queue unless they derive from
     // the application itself or a shared ingredient.
     MHAsynchEvent *pEvent;
-    for (pEvent = m_EventQueue.first(); pEvent != 0; ) {
-        if (pEvent->pEventSource->IsShared()) pEvent = m_EventQueue.next();
-        else { m_EventQueue.remove(); pEvent = m_EventQueue.current(); }
+    QQueue<MHAsynchEvent*>::iterator it = m_EventQueue.begin();
+    while (it != m_EventQueue.end())
+    {
+        pEvent = *it;
+        if (!pEvent->pEventSource->IsShared())
+        {
+            delete pEvent;
+            it = m_EventQueue.erase(it);
+        }
+        else
+            ++it;
     }
 
     // Can now actually delete the old scene.
@@ -448,7 +464,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
             pEvent->pEventSource = pSource;
             pEvent->eventType = ev;
             pEvent->eventData = evData;
-            m_EventQueue.append(pEvent);
+            m_EventQueue.enqueue(pEvent);
         }
     }
 }
@@ -461,7 +477,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
 // Check all the links in the application and scene and fire any that match this event.
 void MHEngine::CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un)
 {
-    for (int i = 0; i < (int)m_LinkTable.count(); i++)
+    for (int i = 0; i < m_LinkTable.size(); i++)
         m_LinkTable.at(i)->MatchEvent(sourceRef, ev, un, this);
 }
 
@@ -473,7 +489,7 @@ void MHEngine::AddLink(MHLink *pLink)
 
 void MHEngine::RemoveLink(MHLink *pLink)
 {
-    (void)m_LinkTable.removeRef(pLink);
+    m_LinkTable.removeAll(pLink);
 }
 
 // Called when a link fires to add the actions to the action stack.
@@ -638,26 +654,41 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 // Remove any pending requests from the queue.
 void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 {
-    for (MHExternContent *pContent = m_ExternContentTable.first(); pContent; pContent = m_ExternContentTable.next()) {
+    QList<MHExternContent*>::iterator it = m_ExternContentTable.begin();
+    MHExternContent *pContent;
+    while (it != m_ExternContentTable.end())
+    {
+        pContent = *it;
         if (pContent->m_pRequester == pRequester) {
-            m_ExternContentTable.remove();
+            delete pContent;
+            it = m_ExternContentTable.erase(it);
             return;
         }
+        else
+            ++it;
     }
 }
 
 // See if we can satisfy any of the outstanding requests.
 void MHEngine::CheckContentRequests()
 {
-    for (MHExternContent *pContent = m_ExternContentTable.first(); pContent;) {
+    QList<MHExternContent*>::iterator it = m_ExternContentTable.begin();
+    MHExternContent *pContent;
+    while (it != m_ExternContentTable.end())
+    {
+        pContent = *it;
         QByteArray text;
-        if (m_Context->CheckCarouselObject(pContent->m_FileName) && m_Context->GetCarouselData(pContent->m_FileName, text)) {
-            pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(), text.size(), this);
+        if (m_Context->CheckCarouselObject(pContent->m_FileName) &&
+            m_Context->GetCarouselData(pContent->m_FileName, text))
+        {
+            pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(),
+                                                   text.size(), this);
             // Remove from the list.
-            m_ExternContentTable.remove();
-            pContent = m_ExternContentTable.current();
+            delete pContent;
+            it = m_ExternContentTable.erase(it);
         }
-        else pContent = m_ExternContentTable.next();
+        else
+            ++it;
     }
 }
 
