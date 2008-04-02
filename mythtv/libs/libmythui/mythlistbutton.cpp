@@ -683,12 +683,12 @@ void MythListButton::Init()
     if (m_upArrow)
     {
         m_upArrow->SetVisible(m_showScrollArrows);
-        m_upArrow->SetCanTakeFocus(true);
+        //m_upArrow->SetCanTakeFocus(true);
     }
     if (m_downArrow)
     {
         m_downArrow->SetVisible(m_showScrollArrows);
-        m_downArrow->SetCanTakeFocus(true);
+        //m_downArrow->SetCanTakeFocus(true);
     }
 
     m_contentsRect = CalculateContentsRect(arrowsRect);
