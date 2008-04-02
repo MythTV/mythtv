@@ -203,7 +203,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     QString FindThemeDir(const QString &themename);
     QString FindMenuThemeDir(const QString &menuname);
     QString GetThemeDir(void);
-    Q3ValueList<QString> GetThemeSearchPath(void);
+    QList<QString> GetThemeSearchPath(void);
 
     QString GetMenuThemeDir(void);
 

@@ -2539,9 +2539,9 @@ QString MythContext::GetThemeDir(void)
     return d->m_themepathname;
 }
 
-Q3ValueList<QString> MythContext::GetThemeSearchPath(void)
+QList<QString> MythContext::GetThemeSearchPath(void)
 {
-    Q3ValueList<QString> searchpath;
+    QList<QString> searchpath;
 
     searchpath.append(GetThemeDir());
     if (d->IsWideMode())

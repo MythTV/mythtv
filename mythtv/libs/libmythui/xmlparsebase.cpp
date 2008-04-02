@@ -334,8 +334,8 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
                                      const QString &windowname,
                                      MythUIType *parent)
 {
-    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    Q3ValueList<QString>::iterator i;
+    QList<QString> searchpath = gContext->GetThemeSearchPath();
+    QList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {
         QString themefile = *i + xmlfile;
@@ -443,8 +443,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
 bool XMLParseBase::LoadBaseTheme(void)
 {
-    Q3ValueList<QString> searchpath = gContext->GetThemeSearchPath();
-    Q3ValueList<QString>::iterator i;
+    QList<QString> searchpath = gContext->GetThemeSearchPath();
+    QList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {
         QString themefile = *i + "base.xml";
