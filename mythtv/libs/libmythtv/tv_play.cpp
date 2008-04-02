@@ -740,6 +740,9 @@ bool TV::Init(bool createWindow)
             }
         }
 
+        bool use_fixed_size = gContext->GetNumSettingOnHost(
+            "UseFixedWindowSize", gContext->GetHostName(), 1);
+
         // player window sizing
         myWindow = new MythDialog(mainWindow, "video playback window");
 
@@ -747,11 +750,20 @@ bool TV::Init(bool createWindow)
         myWindow->setNoErase();
         QRect win_bounds(0, 0, player_bounds.width(), player_bounds.height());
         myWindow->setGeometry(win_bounds);
-        myWindow->setFixedSize(win_bounds.size());
+        myWindow->setBaseSize(win_bounds.size());
+        myWindow->setMinimumSize(
+            (use_fixed_size) ? win_bounds.size() : QSize(16, 16));
+        myWindow->setMaximumSize(
+            (use_fixed_size) ? win_bounds.size() : QSize(31*1024, 31*1024));
 
         // resize main window
         mainWindow->setGeometry(player_bounds);
-        mainWindow->setFixedSize(player_bounds.size());
+        mainWindow->setBaseSize(player_bounds.size());
+        mainWindow->setMinimumSize(
+            (use_fixed_size) ? player_bounds.size() : QSize(16, 16));
+        mainWindow->setMaximumSize(
+            (use_fixed_size) ? player_bounds.size() : QSize(31*1024, 31*1024));
+        mainWindow->installEventFilter(this);
 
         // finally we put the player window on screen...
         myWindow->show();
@@ -2475,7 +2487,13 @@ void TV::RunTV(void)
 
 bool TV::eventFilter(QObject *o, QEvent *e)
 {
-    (void)o;
+    const MythMainWindow *mainWindow = gContext->GetMainWindow();
+    if (mainWindow == o)
+    {
+        if ((e->type() == QEvent::Resize) && nvp)
+            nvp->WindowResized(((const QResizeEvent*) e)->size());
+        return false;
+    }
 
     switch (e->type())
     {

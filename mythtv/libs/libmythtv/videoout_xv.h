@@ -75,6 +75,8 @@ class VideoOutputXv : public VideoOutput
 
     void ClearAfterSeek(void);
 
+    void WindowResized(const QSize &new_size);
+
     void MoveResize(void);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
@@ -218,11 +220,9 @@ class VideoOutputXv : public VideoOutput
     unsigned long        XJ_black;
     unsigned long        XJ_letterbox_colour;
     int                  XJ_depth;
-    int                  XJ_screenx;
-    int                  XJ_screeny;
-    int                  XJ_screenwidth;
-    int                  XJ_screenheight;
     bool                 XJ_started;
+    QSize                XJ_monitor_sz;
+    QSize                XJ_monitor_dim;
 
     // Used for all non-XvMC drawing
     VideoFrame           av_pause_frame;

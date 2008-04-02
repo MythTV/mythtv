@@ -63,6 +63,8 @@ class VideoOutput
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
     virtual void Show(FrameScanType) = 0;
 
+    virtual void WindowResized(const QSize &new_size) {}
+
     virtual bool InputChanged(const QSize &input_size,
                               float        aspect,
                               MythCodecID  myth_codec_id,

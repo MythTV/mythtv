@@ -23,6 +23,10 @@
 #include <iostream>
 using namespace std;
 
+// Qt headers
+#include <QApplication>
+#include <QDesktopWidget>
+
 // MythTV OSD headers
 #include "yuv2rgb.h"
 #include "osd.h"
@@ -104,8 +108,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0),
       XJ_white(0), XJ_black(0), XJ_letterbox_colour(0), XJ_depth(0),
-      XJ_screenx(0), XJ_screeny(0), XJ_screenwidth(0), XJ_screenheight(0),
-      XJ_started(false),
+      XJ_started(false), XJ_monitor_sz(640,480), XJ_monitor_dim(400,300),
 
       XJ_non_xv_image(0), non_xv_frames_shown(0), non_xv_show_frame(1),
       non_xv_fps(0), non_xv_av_format(PIX_FMT_NB), non_xv_stop_time(0),
@@ -219,6 +222,21 @@ void VideoOutputXv::MoveResize(void)
         QMutexLocker locker(&gl_context_lock);
         gl_videochain->SetVideoRect(display_video_rect, video_rect);
     }
+}
+
+void VideoOutputXv::WindowResized(const QSize &new_size)
+{
+    QMutexLocker locker(&global_lock);
+
+    display_visible_rect = QRect(QPoint(0, 0), new_size);
+
+    display_dim = QSize(
+        (XJ_monitor_dim.width()  * new_size.width()) / XJ_monitor_sz.width(),
+        (XJ_monitor_dim.height() * new_size.height())/ XJ_monitor_sz.height());
+
+    display_aspect = ((float)display_dim.width()) / display_dim.height();
+
+    MoveResize();
 }
 
 // documented in videooutbase.cpp
@@ -456,15 +474,20 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     }
     else
     {
+        // The very first Resize needs to be the maximum possible
+        // desired res, because X will mask off anything outside
+        // the initial dimensions
+        QSize sz1 = MythXGetDisplaySize(XJ_disp, XJ_screen_num);
+        QSize sz2 = qApp->desktop()->
+            availableGeometry(gContext->GetMainWindow()).size();
+        int max_w = max(sz1.width(),  sz2.width());
+        int max_h = max(sz1.height(), sz2.height());
+        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 0, 0, max_w, max_h));
+
         display_dim = MythXGetDisplayDimensions(XJ_disp, XJ_screen_num);
 
         if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
             display_dim = db_display_dim;
-
-        // Get default (possibly user selected) screen resolution from context
-        float wmult, hmult;
-        gContext->GetScreenSettings(XJ_screenx, XJ_screenwidth, wmult,
-                                    XJ_screeny, XJ_screenheight, hmult);
     }
 
     // Fetch pixel width and height of the display
@@ -518,6 +541,9 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
             QString("Estimated display dimensions: %1x%2 mm  Aspect: %3")
             .arg(display_dim.width()).arg(display_dim.height())
             .arg(((float) display_dim.width()) / display_dim.height()));
+
+    XJ_monitor_sz  = QSize(w, h);
+    XJ_monitor_dim = display_dim;
 
     // We must now scale the display measurements to our window size.
     // If we are running fullscreen this is a no-op.

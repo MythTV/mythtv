@@ -117,6 +117,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void ExposeEvent(void);
     bool IsEmbedding(void);
     void DrawUnusedRects(bool sync);
+    void WindowResized(const QSize &new_size);
 
     // Audio Sets
     void SetNoAudio(void)                     { no_audio_out = true; }

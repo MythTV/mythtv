@@ -1622,6 +1622,12 @@ void NuppelVideoPlayer::DrawUnusedRects(bool sync)
         videoOutput->DrawUnusedRects(sync);
 }
 
+void NuppelVideoPlayer::WindowResized(const QSize &new_size)
+{
+    if (videoOutput)
+        videoOutput->WindowResized(new_size);
+}
+
 void NuppelVideoPlayer::ResetCaptions(uint mode_override)
 {
     uint origMode   = textDisplayMode;
