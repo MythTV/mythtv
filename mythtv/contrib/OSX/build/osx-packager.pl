@@ -111,7 +111,7 @@ our %depend = (
     'url'
     => 'http://subversion.tigris.org/downloads/subversion-1.4.3.tar.bz2',
     'pre-conf'
-    => 'tar -xjf ../subversion-deps-1.4.3.tar.bz2',
+    => 'cd .. ; tar -xjf subversion-deps-1.4.3.tar.bz2',
     'conf'
     =>  [
            '--disable-keychain',  # Workaround a 10.3 build problem
@@ -209,7 +209,7 @@ our %depend = (
     =>  'http://wftp.tu-chemnitz.de/pub/Qt/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
     'conf-cmd'
     # some subdirs use libtool, which has problems with -Z in LDFLAGS
-    =>  'echo yes | LDFLAGS="" ./configure',
+    =>  'echo yes | LDFLAGS="" MAKEFLAGS=$parallel_make_flags ./configure',
     'conf'
     =>  [
           '-prefix', '"$PREFIX"',
@@ -706,7 +706,7 @@ foreach my $sw (@build_depends)
     my (@make);
     
     push(@make, $standard_make);
-    if ($pkg->{'parallel-make'})
+    if ($pkg->{'parallel-make'} && $parallel_make_flags)
     { push(@make, $parallel_make_flags) }
 
     if ($pkg->{'make'})
