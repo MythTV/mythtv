@@ -845,10 +845,12 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-
         QPoint position = event->GetPosition();
 
         MythUIType *type = GetChildAtPoint(position);
+
+        if (!type)
+            return;
 
         MythUIButton *button = dynamic_cast<MythUIButton *>(type);
         if (button)
@@ -896,11 +898,13 @@ MythUIType *MythListButton::GetChildAtPoint(const QPoint &p)
         QVector<MythUIType*>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
-            MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
+            MythUIType *child = NULL;
+
+            if ((*it)->GetArea().contains(p - GetArea().topLeft()))
+                child = *it;
+
             if (child != NULL)
-            {
                 return child;
-            }
         }
     }
     return NULL;
