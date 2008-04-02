@@ -1329,6 +1329,7 @@ bool MythListButtonItem::moveUpDown(bool flag)
 
 void MythListButtonItem::SetToRealButton(MythUIButton *button, bool active_on)
 {
+    button->SetCanTakeFocus(false);
     button->SetText(m_text, m_parent->m_textFlags);
     button->SetImageAlignment(m_parent->m_imageAlign);
     button->SetButtonImage(m_image);
