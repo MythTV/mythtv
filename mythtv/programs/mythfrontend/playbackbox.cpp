@@ -1328,8 +1328,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     QString tempTime;
     QString tempSize;
 
+    bool    repeatTitles = titleList.count() > 5;
     QString match;
-    QRect pr = drawListBounds;
+    QRect   pr = drawListBounds;
     QPixmap pix(pr.size());
 
     LayerSet *container = NULL;
@@ -1368,9 +1369,14 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             ltype->SetActive(inTitle);
 
             int h = titleIndex - ltype->GetItems();
+            if (repeatTitles)
+                h += titleList.count();
 
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
+                if (repeatTitles)
+                    h = h % titleList.count();
+
                 if (h < 0)
                     tstring = "";
                 else
@@ -1429,6 +1435,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
+                if (repeatTitles)
+                    h = h % titleList.count();
+
                 if (h >= titleList.count())
                     tstring = "";
                 else
