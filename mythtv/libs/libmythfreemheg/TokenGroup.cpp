@@ -218,9 +218,13 @@ MHListGroup::MHListGroup()
     m_fWrapAround = false;
     m_fMultipleSelection = false;
     m_nFirstItem = 1;
-    m_ItemList.setAutoDelete(true);
     m_nLastFirstItem = m_nFirstItem;
     m_nLastCount = 0;
+}
+MHListGroup::~MHListGroup()
+{
+    while (!m_ItemList.isEmpty())
+        delete m_ItemList.takeFirst();
 }
 
 void MHListGroup::Initialise(MHParseNode *p, MHEngine *engine)
@@ -259,11 +263,16 @@ void MHListGroup::Preparation(MHEngine *engine)
         // Find the item and add it to the list if it isn't already there.
         try {
             MHRoot *pItem = (MHRoot*)engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
-            MHListItem *p;
-            for (p = m_ItemList.first(); p != 0; p = m_ItemList.next()) {
-                if (p->m_pVisible == pItem) break;
+            MHListItem *p = 0;
+            QList<MHListItem*>::iterator it = m_ItemList.begin();
+            for (; it != m_ItemList.end(); ++it)
+            {
+                p = *it;
+                if (p->m_pVisible == pItem)
+                    break;
             }
-            if (p == 0) m_ItemList.append(new MHListItem(pItem));
+            if (!p)
+                m_ItemList.append(new MHListItem(pItem));
         }
         catch(...) { // Ignore invalid or null objects.
         }
@@ -273,7 +282,8 @@ void MHListGroup::Preparation(MHEngine *engine)
 void MHListGroup::Destruction(MHEngine *engine)
 {
     // Reset the positions of the visibles.
-    for (int j = 0; j < (int)m_ItemList.count(); j++) m_ItemList.at(j)->m_pVisible->ResetPosition();
+    for (int j = 0; j < m_ItemList.size(); j++)
+        m_ItemList.at(j)->m_pVisible->ResetPosition();
     MHTokenGroup::Destruction(engine);
 }
 
@@ -288,7 +298,8 @@ void MHListGroup::Activation(MHEngine *engine)
 void MHListGroup::Deactivation(MHEngine *engine)
 {
     // Deactivate the visibles.
-    for (int j = 0; j < (int)m_ItemList.count(); j++) m_ItemList.at(j)->m_pVisible->Deactivation(engine);
+    for (int j = 0; j < m_ItemList.size(); j++)
+        m_ItemList.at(j)->m_pVisible->Deactivation(engine);
     MHTokenGroup::Deactivation(engine);
 }
 
@@ -296,7 +307,7 @@ void MHListGroup::Deactivation(MHEngine *engine)
 // which aren't.
 void MHListGroup::Update(MHEngine *engine)
 {
-    if (m_ItemList.count() == 0) { // Special cases when the list becomes empty
+    if (!m_ItemList.size()) { // Special cases when the list becomes empty
         if (m_fFirstItemDisplayed) {
             m_fFirstItemDisplayed = false;
             engine->EventTriggered(this, EventFirstItemPresented, false);
@@ -307,7 +318,7 @@ void MHListGroup::Update(MHEngine *engine)
         }
     }
     else { // Usual case.
-        for (int i = 0; i < (int)m_ItemList.count(); i++) {
+        for (int i = 0; i < m_ItemList.size(); i++) {
             MHRoot *pVis = m_ItemList.at(i)->m_pVisible;
             int nCell = i+1 - m_nFirstItem; // Which cell does this item map onto?
             if (nCell >= 0 && nCell < m_Positions.Size()) {
@@ -315,7 +326,7 @@ void MHListGroup::Update(MHEngine *engine)
                     m_fFirstItemDisplayed = true;
                     engine->EventTriggered(this, EventFirstItemPresented, true);
                 }
-                if (i == (int)m_ItemList.count()-1 && ! m_fLastItemDisplayed) {
+                if (i == m_ItemList.size()-1 && ! m_fLastItemDisplayed) {
                     m_fLastItemDisplayed = true;
                     engine->EventTriggered(this, EventLastItemPresented, true);
                 }
@@ -329,7 +340,7 @@ void MHListGroup::Update(MHEngine *engine)
                     m_fFirstItemDisplayed = false;
                     engine->EventTriggered(this, EventFirstItemPresented, false);
                 }
-                if (i == (int)m_ItemList.count()-1 && m_fLastItemDisplayed) {
+                if (i == m_ItemList.size()-1 && m_fLastItemDisplayed) {
                     m_fLastItemDisplayed = false;
                     engine->EventTriggered(this, EventLastItemPresented, false);
                 }
@@ -342,10 +353,10 @@ void MHListGroup::Update(MHEngine *engine)
     if (m_nLastFirstItem != m_nFirstItem) {
         engine->EventTriggered(this, EventHeadItems, m_nFirstItem);
     }
-    if (m_nLastCount - m_nLastFirstItem != (int)m_ItemList.count() - m_nFirstItem) {
-        engine->EventTriggered(this, EventTailItems, (int)m_ItemList.count() - m_nFirstItem);
+    if (m_nLastCount - m_nLastFirstItem != m_ItemList.size() - m_nFirstItem) {
+        engine->EventTriggered(this, EventTailItems, m_ItemList.size() - m_nFirstItem);
     }
-    m_nLastCount = m_ItemList.count();
+    m_nLastCount = m_ItemList.size();
     m_nLastFirstItem = m_nFirstItem;
 }
 
@@ -353,14 +364,16 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    for (MHListItem *p = m_ItemList.first(); p != 0; p = m_ItemList.next()) {
-        if (p->m_pVisible == pItem) return;
+    QList<MHListItem*>::iterator it = m_ItemList.begin();
+    for (; it != m_ItemList.end(); ++it) {
+        if ((*it)->m_pVisible == pItem)
+            return;
     }
     // Ignore this if the index is out of range
-    if (nIndex < 1 || nIndex > (int)m_ItemList.count()+1) return;
+    if (nIndex < 1 || nIndex > m_ItemList.size()+1) return;
     // Insert it at the appropriate position (MHEG indexes count from 1).
     m_ItemList.insert(nIndex-1, new MHListItem(pItem));
-    if (nIndex <= m_nFirstItem && m_nFirstItem < (int)m_ItemList.count()) m_nFirstItem++;
+    if (nIndex <= m_nFirstItem && m_nFirstItem < m_ItemList.size()) m_nFirstItem++;
     Update(engine); // Apply the update behaviour
 }
 
@@ -368,9 +381,9 @@ void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 void MHListGroup::DelItem(MHRoot *pItem, MHEngine *)
 {
     // See if the item is already there and ignore this if it is.
-    for (int i = 0; i < (int)m_ItemList.count(); i++) {
+    for (int i = 0; i < m_ItemList.size(); i++) {
         if (m_ItemList.at(i)->m_pVisible == pItem) { // Found it - remove it from the list and reset the posn.
-            m_ItemList.remove(i);
+            delete m_ItemList.takeAt(i);
             pItem->ResetPosition();
             if (i+1 < m_nFirstItem && m_nFirstItem > 1) m_nFirstItem--;
             return;
@@ -385,7 +398,7 @@ void MHListGroup::Select(int nIndex, MHEngine *engine)
     if (pListItem == 0 || pListItem->m_fSelected) return; // Ignore if already selected.
     if (! m_fMultipleSelection) {
         // Deselect any existing selections.
-        for (int i = 0; i < (int)m_ItemList.count(); i++)
+        for (int i = 0; i < m_ItemList.size(); i++)
             if (m_ItemList.at(i)->m_fSelected) Deselect(i+1, engine);
     }
     pListItem->m_fSelected = true;
@@ -407,7 +420,7 @@ void MHListGroup::GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *
     if (nCell < 1) nCell = 1; // First cell
     if (nCell > m_Positions.Size()) nCell = m_Positions.Size(); // Last cell.
     int nVisIndex = nCell + m_nFirstItem - 2;
-    if (nVisIndex >= 0 && nVisIndex < (int)m_ItemList.count()) {
+    if (nVisIndex >= 0 && nVisIndex < m_ItemList.size()) {
         MHRoot *pVis = m_ItemList.at(nVisIndex)->m_pVisible;
         engine->FindObject(itemDest)->SetVariableValue(pVis->m_ObjectReference);
     }
@@ -416,7 +429,7 @@ void MHListGroup::GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *
 
 int MHListGroup::AdjustIndex(int nIndex) // Added in the MHEG corrigendum
 {
-    int nItems = m_ItemList.count();
+    int nItems = m_ItemList.size();
     if (nItems == 0) return 1;
     if (nIndex > nItems) return ((nIndex-1) % nItems) + 1;
     else if (nIndex < 0) return nItems - ((-nIndex) % nItems);
@@ -426,35 +439,35 @@ int MHListGroup::AdjustIndex(int nIndex) // Added in the MHEG corrigendum
 void MHListGroup::GetListItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return; // Ignore it if it's out of range and not wrapping
+    if (nCell < 1 || nCell > m_ItemList.size()) return; // Ignore it if it's out of range and not wrapping
     engine->FindObject(itemDest)->SetVariableValue(m_ItemList.at(nCell-1)->m_pVisible->m_ObjectReference);
 }
 
 void MHListGroup::GetItemStatus(int nCell, const MHObjectRef &itemDest, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     engine->FindObject(itemDest)->SetVariableValue(m_ItemList.at(nCell-1)->m_fSelected);
 }
 
 void MHListGroup::SelectItem(int nCell, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     Select(nCell, engine);
 }
 
 void MHListGroup::DeselectItem(int nCell, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     Deselect(nCell, engine);
 }
 
 void MHListGroup::ToggleItem(int nCell, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     if (m_ItemList.at(nCell-1)->m_fSelected) Deselect(nCell, engine); else Select(nCell, engine);
 }
 
@@ -462,7 +475,7 @@ void MHListGroup::ScrollItems(int nCell, MHEngine *engine)
 {
     nCell += m_nFirstItem;
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     m_nFirstItem = nCell;
     Update(engine);
 }
@@ -470,7 +483,7 @@ void MHListGroup::ScrollItems(int nCell, MHEngine *engine)
 void MHListGroup::SetFirstItem(int nCell, MHEngine *engine)
 {
     if (m_fWrapAround) nCell = AdjustIndex(nCell);
-    if (nCell < 1 || nCell > (int)m_ItemList.count()) return;
+    if (nCell < 1 || nCell > m_ItemList.size()) return;
     m_nFirstItem = nCell;
     Update(engine);
 }

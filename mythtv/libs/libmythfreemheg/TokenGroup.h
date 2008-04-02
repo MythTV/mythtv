@@ -32,7 +32,7 @@
 #include "Actions.h"
 
 #include <qpoint.h>
-#include <q3ptrlist.h>
+#include <QList>
 
 class MHEngine;
 
@@ -99,6 +99,7 @@ class MHListGroup : public MHTokenGroup
 {
 public:
     MHListGroup();
+    ~MHListGroup();
     virtual const char *ClassName() { return "ListGroup"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -119,7 +120,7 @@ public:
     virtual void ScrollItems(int nCell, MHEngine *engine);
     virtual void SetFirstItem(int nCell, MHEngine *engine);
     virtual void GetFirstItem(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue(m_nFirstItem); }
-    virtual void GetListSize(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue((int)(m_ItemList.count())); }
+    virtual void GetListSize(MHRoot *pResult, MHEngine *) { pResult->SetVariableValue((int)(m_ItemList.size())); }
 
 protected:
     // MHEG Internal attributes.
@@ -132,7 +133,7 @@ protected:
     MHSequence <QPoint> m_Positions;
     bool    m_fWrapAround, m_fMultipleSelection;
     //Internal attributes
-    Q3PtrList <MHListItem> m_ItemList; // Items found by looking up the object refs
+    QList<MHListItem*> m_ItemList; // Items found by looking up the object refs
     int m_nFirstItem; // First item displayed - N.B. MHEG indexes from 1.
     bool m_fFirstItemDisplayed, m_fLastItemDisplayed;
     int m_nLastCount, m_nLastFirstItem;

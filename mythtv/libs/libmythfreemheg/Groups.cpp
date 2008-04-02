@@ -40,8 +40,13 @@
 MHGroup::MHGroup()
 {
     m_nOrigGCPriority = 127; // Default.
-    m_Timers.setAutoDelete(true);
     m_nLastId = 0;
+}
+
+MHGroup::~MHGroup()
+{
+    while (!m_Timers.isEmpty())
+        delete m_Timers.takeFirst();
 }
 
 void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
@@ -205,10 +210,10 @@ MHRoot *MHGroup::FindByObjectNo(int n)
 void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *)
 {
     // First remove any existing timer with the same Id.
-    for (int i = 0; i < (int)m_Timers.count(); i++) {
+    for (int i = 0; i < m_Timers.size(); i++) {
         MHTimer *pTimer = m_Timers.at(i);
         if (pTimer->m_nTimerId == nTimerId) {
-            m_Timers.remove(i);
+            delete m_Timers.takeAt(i);
             break;
         }
     }
@@ -227,20 +232,22 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *)
 int MHGroup::CheckTimers(MHEngine *engine)
 {
     QTime currentTime = QTime::currentTime(); // Get current time
-    MHTimer *pTimer = m_Timers.first();
+    QList<MHTimer*>::iterator it = m_Timers.begin();
+    MHTimer *pTimer;
     int nMSecs = 0;
-    while (pTimer != 0) {
+    while (it != m_Timers.end()) {
+        pTimer = *it;
         if (pTimer->m_Time <= currentTime) { // Use <= rather than < here so we fire timers with zero time immediately.
             // If the time has passed trigger the event and remove the timer from the queue.
             engine->EventTriggered(this, EventTimerFired, pTimer->m_nTimerId);
-            m_Timers.remove(); // Remove the item.  This advances the "current" item.
-            pTimer = m_Timers.current();
+            delete pTimer;
+            it = m_Timers.erase(it);
         }
         else {
             // This has not yet expired.  Set "nMSecs" to the earliest time we have.
             int nMSecsToGo = currentTime.msecsTo(pTimer->m_Time);
             if (nMSecs == 0 || nMSecsToGo < nMSecs) nMSecs = nMSecsToGo;
-            pTimer = m_Timers.next();
+            ++it;
         }
     }
     return nMSecs;
