@@ -23,8 +23,6 @@
 #if !defined(PARSETEXT_H)
 #define PARSETEXT_H
 
-#include <q3cstring.h>
-
 class MHGroup;
 
 #include "ParseNode.h"

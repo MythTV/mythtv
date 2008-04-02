@@ -23,8 +23,6 @@
 #if !defined(PARSEBIN_H)
 #define PARSEBIN_H
 
-#include <q3cstring.h>
-
 class MHOctetString;
 class MHGroup;
 

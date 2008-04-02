@@ -19,7 +19,6 @@
 
 */
 
-#include <q3valuevector.h>
 #include <QStringList>
 #include <qregexp.h>
 
