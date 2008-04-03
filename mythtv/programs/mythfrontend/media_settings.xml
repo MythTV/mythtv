@@ -153,6 +153,7 @@
       <text lang="SI">Nastavitve arhiviranja</text>
       <text lang="PL">Ustaw pliki archiwum</text>
       <text lang="HE">הגדרות ארכיון קבצים</text>
+      <text lang="FI">Arkistointiasetukset</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

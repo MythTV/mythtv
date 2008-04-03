@@ -204,6 +204,7 @@
       <text>Zone Minder</text>
       <text lang="IT">Videosorveglianza</text>
       <text lang="PL">Strażnik</text>
+      <text lang="FI">ZoneMinder</text>
       <action>PLUGIN mythzoneminder</action>
       <depends>mythzoneminder</depends>
  </button>
