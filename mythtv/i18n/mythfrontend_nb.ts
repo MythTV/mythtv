@@ -151,7 +151,7 @@
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation>Bruk kanalsøkeren for å finne kanaler fro denne inndatakilden.</translation>
+        <translation>Bruk kanalsøkeren for å finne kanaler for denne inndatakilden.</translation>
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
@@ -391,7 +391,7 @@
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation>Nårr som helst på en bestemt ukedag</translation>
+        <translation>Når som helst på en bestemt ukedag</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
@@ -1165,7 +1165,7 @@ ADVARSEL: Ikke trykk på knappen hvis du bruker et «Air2PC HD-5000»-kort! Dett
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation>Tilkoblingen til hovedtjeneren har av en eller anenn grunn forsvunnet. Kjører den?</translation>
+        <translation>Tilkoblingen til hovedtjeneren har av en eller annen grunn forsvunnet. Kjører den?</translation>
     </message>
     <message>
         <source>There are also other clients using this database. They should be shut down first.</source>
@@ -1216,7 +1216,7 @@ Please shut them down before upgrading.</source>
         <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
 
 Returning to the previous menu.</source>
-        <translation>Temaet som brukes mangler elementet «file_borwsser_background». 
+        <translation>Temaet som brukes mangler elementet «file_browser_background». 
 
 Går tilbake til forrige meny.</translation>
     </message>
@@ -1224,7 +1224,7 @@ Går tilbake til forrige meny.</translation>
         <source>The theme you are using is missing the &apos;file_browser&apos; element. 
 
 Returning to the previous menu.</source>
-        <translation>Temaet som brukes mangler elementet «file_borwser». 
+        <translation>Temaet som brukes mangler elementet «file_browser». 
 
 Går tilbake til forrige meny.</translation>
     </message>
@@ -1559,7 +1559,7 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation>Reklamer blir markert</translation>
+        <translation>Reklamer er markert</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
@@ -1949,7 +1949,7 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Omvendt kronoligisk rekkefølge</translation>
+        <translation>Omvendt kronologisk rekkefølge</translation>
     </message>
     <message>
         <source>Sort by Title</source>
@@ -2388,7 +2388,7 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation>Hvis klientens vertsnavn enders ofte, kryss av denne boksen og oppgi et unikt nettverksnavn for å identifisere den. Er dette ikke avkrysset, vil klientens lokale vertsnavn bli brukt for å lagre innstillinger i databasen.</translation>
+        <translation>Hvis klientens vertsnavn endres ofte, kryss av denne boksen og oppgi et unikt nettverksnavn for å identifisere den. Er dette ikke avkrysset, vil klientens lokale vertsnavn bli brukt for å lagre innstillinger i databasen.</translation>
     </message>
     <message>
         <source>Custom identifier</source>
@@ -3163,7 +3163,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>This showing will be recorded.</source>
-        <translation>Denne sendingen vil bil tatt opp.</translation>
+        <translation>Denne sendingen vil bli tatt opp.</translation>
     </message>
     <message>
         <source>This showing is being recorded.</source>
@@ -3183,7 +3183,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>This showing was not recorded because </source>
-        <translation>Denne sendingen vil ikke bli tatt opp fordi </translation>
+        <translation>Denne sendingen ble ikke tatt opp fordi </translation>
     </message>
     <message>
         <source>it was manually set to not record.</source>
@@ -3818,7 +3818,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>Match duplicates using subtitle</source>
-        <translation>Finn duplisering ved hejlp av undertittel</translation>
+        <translation>Finn duplisering ved hjelp av undertittel</translation>
     </message>
     <message>
         <source>Match duplicates using description</source>
@@ -3850,7 +3850,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>Allow auto expire</source>
-        <translation>Tillatt automatisk utløing</translation>
+        <translation>Tillat automatisk utløping</translation>
     </message>
     <message>
         <source>Don&apos;t allow auto expire</source>
@@ -3866,11 +3866,11 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation>Slett den eldste hvis denne overstiger tillate episoder</translation>
+        <translation>Slett den eldste hvis denne overstiger antall tillatte episoder</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation>Ikke ta opp hvis denne overstiger tillate episoder</translation>
+        <translation>Ikke ta opp hvis denne overstiger antall tillatte episoder</translation>
     </message>
     <message>
         <source>No episode limit</source>
@@ -3956,7 +3956,7 @@ this program.</source>
         <source>You MUST run &apos;mythfilldatabase --manual the first time,
  instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
-        <translation>Første gangen MÅ «mythfilldatabase --manual» kjøres i stedet for bare «mythfilldatabase». Henteren tildeler ikke kanalnumbre, så disse må angis manuelt.</translation>
+        <translation>Første gangen MÅ «mythfilldatabase --manual» kjøres i stedet for bare «mythfilldatabase». Henteren tildeler ikke kanalnummer, så disse må angis manuelt.</translation>
     </message>
     <message>
         <source>Video source setup</source>
@@ -4242,7 +4242,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation>Slå på denne innstillingen hvis MythTV spiller hakkete lyd og det brukes maskinvarekoding. Innstillingen har ingen effekt på MPEG-4- eller RTJPEG-video. Hakkingen fjernes ved at MythTV beholde ekstra lyddata i dets interne hurtigminne.</translation>
+        <translation>Slå på denne innstillingen hvis MythTV spiller hakkete lyd og det brukes maskinvarekoding. Innstillingen har ingen effekt på MPEG-4- eller RTJPEG-video. Hakkingen fjernes ved at MythTV beholder ekstra lyddata i dets interne hurtigminne.</translation>
     </message>
     <message>
         <source>PIP Video Location</source>
@@ -4410,7 +4410,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation>MInimum ledig diskplass for å ta opp (i MB)</translation>
+        <translation type="unfinished">Minimum ledig diskplass for å ta opp (i MB)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
@@ -4418,7 +4418,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation>TId å ta opp før programstart (i sekunder)</translation>
+        <translation type="unfinished">Tid å ta opp før programstart (i sekunder)</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
@@ -4430,7 +4430,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation>Denne globale innstillingen tillater opptakeren å ta opp etter den planlagte sluttiden. Dette påvirker ikke planlaggeren, og ignoreres når to opptak er planlagt uten nok tid mellom dem.</translation>
+        <translation>Denne globale innstillingen tillater opptakeren å ta opp etter den planlagte sluttiden. Dette påvirker ikke planleggeren, og ignoreres når to opptak er planlagt uten nok tid mellom dem.</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
@@ -4470,7 +4470,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation>Hvis på vil et trykk på den treige spole tilbake-knappen i framoverspillingsmodues bytte til bakoverspoling, og omvendt. Hvis av vil den nevnte handlingen senke farten eller bytte til avspillingsmodues hvis farten ikke kan reduseres mer.</translation>
+        <translation>Hvis på vil et trykk på den treige spole tilbake-knappen i framoverspillingsmodus bytte til bakoverspoling, og omvendt. Hvis av vil den nevnte handlingen senke farten eller bytte til avspillingsmodus hvis farten ikke kan reduseres mer.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -4578,7 +4578,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>UDP Notify Port</source>
-        <translation>UPD-notifiseringsport</translation>
+        <translation>UDP-notifiseringsport</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -4662,7 +4662,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
-        <translation>«Fyll» er den raskeste skyggeleggingsmetoden, mens «Bilde» er treigere men ser bedre ut. Ingen skyggelegging er raskest.</translation>
+        <translation>«Fyll» er den raskeste skyggeleggingsmetoden, mens «Bilde» er treigere, men ser bedre ut. Ingen skyggelegging er raskest.</translation>
     </message>
     <message>
         <source>System Exit key</source>
@@ -4690,7 +4690,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MythTV is designed to run continuously. If you wish, you may use the ESC key or the ESC key + a modifier to exit MythTV. Do not choose a key combination that will be intercepted by your window manager.</source>
-        <translation>MythTV er laget for å kjøre kontinuerlig. Er det ønskelig kan ESC-knappen aleine eller sammen med en annen knapp brukes for å avslutte MythTV. Ikke bruke n tastekombinasjon som vil bli fanget opp av vindusbehandleren.</translation>
+        <translation type="unfinished">MythTV er laget for å kjøre kontinuerlig. Er det ønskelig kan ESC-knappen aleine eller sammen med en annen knapp brukes for å avslutte MythTV. Ikke bruk en tastekombinasjon som vil bli fanget opp av vindusbehandleren.</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
@@ -4826,7 +4826,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use GUI size for TV playback</source>
-        <translation>Bruk størrelse for grafisk grensesnitt for TV-aspilling</translation>
+        <translation>Bruk størrelse for grafisk grensesnitt for TV-avspilling</translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
@@ -4942,7 +4942,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Your preferred date format.</source>
-        <translation>Det foretrukkede datoformatet.</translation>
+        <translation>Det foretrukne datoformatet.</translation>
     </message>
     <message>
         <source>Short Date format</source>
@@ -4950,7 +4950,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Your preferred short date format.</source>
-        <translation>Det foretrukkede formate for kort datovisning.</translation>
+        <translation>Det foretrukne formatet for kort datovisning.</translation>
     </message>
     <message>
         <source>Time format</source>
@@ -5002,7 +5002,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Your preferred channel format.</source>
-        <translation>Det foretrukkede kanalformatet.</translation>
+        <translation>Det foretrukne kanalformatet.</translation>
     </message>
     <message>
         <source>Long Channel format</source>
@@ -5010,7 +5010,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Your preferred long channel format.</source>
-        <translation>Det foretrukkede formatet for lang kanalvisning.</translation>
+        <translation>Det foretrukne formatet for lang kanalvisning.</translation>
     </message>
     <message>
         <source>Time limit for ATSC signal lock (msec)</source>
@@ -5150,7 +5150,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation>Flytt programmer med høyere prioritet til andre kort og sendinger når konflikter løses. Dette kan brukes til å ta opp lavprioritersprogrammer som ellers ikke ville blitt tatt opp, men risikerer at programmer med høyere prioritet går tapt hvis planen endres.</translation>
+        <translation>Flytt programmer med høyere prioritet til andre kort og sendinger når konflikter løses. Dette kan brukes til å ta opp lavprioritetsprogrammer som ellers ikke ville blitt tatt opp, men risikerer at programmer med høyere prioritet går tapt hvis planen endres.</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -5346,7 +5346,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Maximum Number of Entries per Module</source>
-        <translation>Høyste antall oppføringer per modul</translation>
+        <translation>Høyeste antall oppføringer per modul</translation>
     </message>
     <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
@@ -5374,7 +5374,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The number of days before a log entry that has been acknowledged will be deleted by the log cleanup process.</source>
-        <translation>Antall dager før en loggoppføring som er lest slettes av loggrensinsprosessen.</translation>
+        <translation>Antall dager før en loggoppføring som er lest slettes av loggrensingsprosessen.</translation>
     </message>
     <message>
         <source>Number of days to keep unacknowledged log entries</source>
@@ -5382,7 +5382,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The number of days before a log entry that has NOT been acknowledged will be deleted by the log cleanup process.</source>
-        <translation>Antall dager før loggoppføringen som ikke er merket som lest slettes av loggrensinsprosessen.</translation>
+        <translation>Antall dager før en loggoppføring som ikke er merket som lest slettes av loggrensingsprosessen.</translation>
     </message>
     <message>
         <source>Log Print Threshold</source>
@@ -5430,7 +5430,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This controls what messages will be printed out as well as being logged to the database.</source>
-        <translation>Dette kontroller hvilke meldinger som skrives ut i tillegg til å lagres i databasen.</translation>
+        <translation>Dette kontrollerer hvilke meldinger som skrives ut i tillegg til å lagres i databasen.</translation>
     </message>
     <message>
         <source>Automatically run mythfilldatabase</source>
@@ -5566,7 +5566,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Hvis p vises video i et flytende vindu. Dette virker kun når «Bruk størrelse for grensesnitt for TV-avspilling» og «Kjør klienten i et vindu» er valgt.</translation>
+        <translation>Hvis på vises video i et flytende vindu. Dette virker kun når «Bruk størrelse for grensesnitt for TV-avspilling» og «Kjør klienten i et vindu» er valgt.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5926,7 +5926,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The TV standard to use for viewing TV.</source>
-        <translation>TV-standarden som skal brukes for vising av TV.</translation>
+        <translation>TV-standarden som skal brukes for visning av TV.</translation>
     </message>
     <message>
         <source>VBI format</source>
@@ -5946,7 +5946,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
-        <translation>Dette gjør at Myth følger symbolkse koblinger år opptak og relaterte filer slettes: i stedet for at den symbolske koblingen slettes, slettes filen den peker til.</translation>
+        <translation>Dette gjør at Myth følger symbolske koblinger når opptak og relaterte filer slettes: i stedet for at den symbolske koblingen slettes, slettes filen den peker til.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -6002,7 +6002,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The amount of time the master backend waits for a recording.  If it&apos;s idle but a recording starts within this time period, the backends won&apos;t shut down.</source>
-        <translation>Hvor lenge hovedtjeneren venter på et opptak. Hvis den er arbeidsledig men et opptak begynner innen denne tidsperioden, vil ikke tjenerne slåes av.</translation>
+        <translation>Hvor lenge hovedtjeneren venter på et opptak. Hvis den er arbeidsledig, men et opptak begynner innen denne tidsperioden, vil ikke tjenerne slåes av.</translation>
     </message>
     <message>
         <source>Startup before rec. (secs)</source>
@@ -6018,7 +6018,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
-        <translation>Formatet for tidsstrengen som gis til «setWakeuptime Command» som $time. Se QT::QDateTime.toString() for detalsjer. Angi «time_t» for sekunder siden epoke.</translation>
+        <translation>Formatet for tidsstrengen som gis til «setWakeuptime Command» som $time. Se QT::QDateTime.toString() for detaljer. Angi «time_t» for sekunder siden epoke.</translation>
     </message>
     <message>
         <source>Set wakeuptime command</source>
@@ -6098,7 +6098,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation>Denne innstillingen kontrolleren begynnelsen på jobbkøens tidsvindu, som bestemmer når nye jobber startes.</translation>
+        <translation>Denne innstillingen kontrollerer begynnelsen på jobbkøens tidsvindu, som bestemmer når nye jobber startes.</translation>
     </message>
     <message>
         <source>Job Queue End Time</source>
@@ -6537,7 +6537,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation>Endre posisjon så mange hundredels sekunder før normal avspilling startes når treige taster spol framover-/bakover-modus avsluttes. Dette kompanserer for reaksjonstiden mellom å se hvor avspillingen skal fortsette og avslutte søkingen.</translation>
+        <translation>Endre posisjon så mange hundredels sekunder før normal avspilling startes når treige taster spol framover-/bakover-modus avsluttes. Dette kompenserer for reaksjonstiden mellom å se hvor avspillingen skal fortsette og avslutte søkingen.</translation>
     </message>
     <message>
         <source>Aggressive Sound card Buffering</source>
@@ -6589,7 +6589,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
-        <translation>Bruk OpenGL vertikal synkronisering for tidsbestemmelse av video hvis maskinvaren/driverne støtter det, noe som reduserer skelving i video.</translation>
+        <translation>Bruk OpenGL vertikal synkronisering for tidsbestemmelse av video hvis maskinvaren/driverne støtter det, noe som reduserer skjelving i video.</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. </source>
@@ -6658,7 +6658,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>This recording is currently being deleted and is unavailable</source>
-        <translation>Dette opptaket er utilgjengelig fordi det er iferd med å bil slettet</translation>
+        <translation type="unfinished">Dette opptaket er utilgjengelig fordi det er iferd med å bli slettet</translation>
     </message>
     <message>
         <source>The file for this recording can not be found</source>
@@ -6780,7 +6780,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation>Denne sendingen ble tatt opp men ble avbrutt før opptaket var ferdig.</translation>
+        <translation>Denne sendingen ble tatt opp, men ble avbrutt før opptaket var ferdig.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
@@ -6900,7 +6900,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>Det er ikke sikker at det virker å endre eksisterende kortinndatakilder, slette hva som helst eller søke etter kanaler.</translation>
+        <translation>Det er ikke sikkert at det virker å endre eksisterende kortinndatakilder, slette hva som helst eller søke etter kanaler.</translation>
     </message>
     <message>
         <source>Channel Scanner</source>
@@ -6920,7 +6920,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation>Dette er sjelden nødvendig med mindre du bruker en satelittallerken og må skrive inn en startfrekvens som kanalsøkeren kan prøve.</translation>
+        <translation>Dette er sjelden nødvendig med mindre du bruker en parabol og må skrive inn en startfrekvens som kanalsøkeren kan prøve.</translation>
     </message>
     <message>
         <source>(5_1) Underscore</source>
@@ -7224,7 +7224,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
-        <translation>Kommandol for å starte en X-terminal. Kan slås av ved å la dette feltet være tomt.</translation>
+        <translation>Kommando for å starte en X-terminal. Kan slås av ved å la dette feltet være tomt.</translation>
     </message>
     <message>
         <source>Perform EIT Scan</source>
@@ -7332,7 +7332,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>This recording is currently in use by:</source>
-        <translation>Dette opptaker er for øyeblikket i bruk av:</translation>
+        <translation>Dette opptaket er for øyeblikket i bruk av:</translation>
     </message>
     <message>
         <source>The following programs will be recorded instead:</source>
@@ -7380,7 +7380,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>Hvis dette slås på spoler MythTV automatisk tilbake valgte antal sekunder etter å ha hoppet over reklame.</translation>
+        <translation>Hvis dette slås på spoler MythTV automatisk tilbake valgte antall sekunder etter å ha hoppet over reklame.</translation>
     </message>
     <message>
         <source>Title Pronounce</source>
@@ -7444,7 +7444,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
-        <translation>TIllater konvertereren å endre størrelsen på video under konvertering.</translation>
+        <translation>Tillater konvertereren å endre størrelsen på video under konvertering.</translation>
     </message>
     <message>
         <source>Lossless transcoding</source>
@@ -7684,7 +7684,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
-        <translation>Programmet som brukes for å opptage reklamer i et opptak. Hvis feltet er tomt brukes «mythcommflag».</translation>
+        <translation>Programmet som brukes for å oppdage reklamer i et opptak. Hvis feltet er tomt brukes «mythcommflag».</translation>
     </message>
     <message>
         <source>Recorder Off-Line</source>
@@ -11475,7 +11475,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation>All inndata for den valgte kanalen er allerede i bruk. Pågående opptak kan sees fra avspillingsmenyen, men for å se direkte TV må ett av de kjørende opptakene avsluttes.</translation>
+        <translation type="unfinished">Alle inndata for den valgte kanalen er allerede i bruk. Pågående opptak kan sees fra avspillingsmenyen, men for å se direkte TV må ett av de kjørende opptakene avsluttes.</translation>
     </message>
     <message>
         <source>Jump to Bookmark</source>
@@ -11544,7 +11544,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation>Bytt bilde-i-bidle/hoved</translation>
+        <translation>Bytt bilde-i-bilde/hoved</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
@@ -12144,7 +12144,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>VIrkelig slette denne videokilden?</translation>
+        <translation>Virkelig slette denne videokilden?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
@@ -12257,7 +12257,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is busy recording.</source>
-        <translation>MythTV er opptak med å ta opp.</translation>
+        <translation>MythTV er opptatt med å ta opp.</translation>
     </message>
     <message>
         <source>MythTV is busy transcoding.</source>
@@ -12265,7 +12265,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is busy flagging commercials.</source>
-        <translation>MythTV er opptakk med å merke reklamer.</translation>
+        <translation>MythTV er opptatt med å merke reklamer.</translation>
     </message>
     <message>
         <source>MythTV is busy grabbing EPG data.</source>
