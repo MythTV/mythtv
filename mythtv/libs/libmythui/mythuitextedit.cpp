@@ -229,9 +229,10 @@ void MythUITextEdit::SetTextRect(const QRect area)
     m_Text->SetArea(textrect);
 }
 
-void MythUITextEdit::SetText(QString text)
+void MythUITextEdit::SetText(const QString text)
 {
-    m_Text->SetText(text);
+    m_Message = text;
+    m_Text->SetText(m_Message);
     MoveCursor(MoveEnd);
 }
 
