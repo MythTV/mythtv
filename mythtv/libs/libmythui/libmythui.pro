@@ -41,7 +41,7 @@ inc.files += mythpainter_qt.h mythuistatetype.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
-inc.files += mythuiclock.h mythgesture.h
+inc.files += mythuiclock.h mythgesture.h mythuitextedit.h
 
 INSTALLS += inc
 
