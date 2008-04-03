@@ -7,10 +7,9 @@
 #define JSMENU_H_
 
 #include <qobject.h>
-#include <q3socket.h>
 #include <qstring.h>
 
-#include "mythdialogs.h"
+#include "mythexp.h"
 
 /*----------------------------------------------------------------------------
 ** JoystickMap related information
