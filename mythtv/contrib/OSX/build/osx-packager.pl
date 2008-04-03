@@ -122,15 +122,12 @@ our %depend = (
     #=> 'yes'
   },
 
-  'freetype'
-  =>
+  'freetype' =>
   {
-    'url'
-    =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
+    'url' =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
   },
 
-  'lame'
-  =>
+  'lame' =>
   {
     'url'
     =>  "$sourceforge/sourceforge/lame/lame-3.96.1.tar.gz",
@@ -169,15 +166,13 @@ our %depend = (
     'conf' => [ '--disable-asm-optimizations' ]
   },
 
-  'dvdcss'
-  =>
+  'dvdcss' =>
   {
     'url'
     =>  'http://download.videolan.org/pub/videolan/libdvdcss/1.2.9/libdvdcss-1.2.9.tar.bz2'
   },
 
-  'mysqlclient'
-  =>
+  'mysqlclient' =>
   {
     'url' 
     => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.22.tar.gz',
@@ -222,9 +217,11 @@ our %depend = (
           '-I"$PREFIX/include/mysql"',
           '-L"$PREFIX/lib/mysql"',
           '-qt-sql-mysql',
-          '-no-sql-lite',
+          '-no-sql-sqlite',
+          '-no-sql-odbc',
           '-system-zlib',
-          #'-system-libtiff',
+          '-no-libtiff',
+          '-no-libmng',
           '-nomake examples -nomake demos',
           '-no-nis',
           '-no-cups',
@@ -253,18 +250,27 @@ our %depend = (
           'install_qmake',
           'install_mkspecs',
         ],
-    'parallel-make'
-    => 'yes'
+    # Using configure -release saves a lot of space and time,
+    # but by default, debug builds of mythtv try to link against
+    # debug libraries of Qt. This works around that:
+    'post-conf' => 'cd $PREFIX/lib ; '.
+                   'ln -sf libQt3Support.dylib libQt3Support_debug.dylib ; '.
+                   'ln -sf libQtSql.dylib      libQtSql_debug.dylib      ; '.
+                   'ln -sf libQtXml.dylib      libQtXml_debug.dylib      ; '.
+                   'ln -sf libQtOpenGL.dylib   libQtOpenGL_debug.dylib   ; '.
+                   'ln -sf libQtGui.dylib      libQtGui_debug.dylib      ; '.
+                   'ln -sf libQtNetwork.dylib  libQtNetwork_debug.dylib  ; '.
+                   'ln -sf libQtCore.dylib     libQtCore_debug.dylib     ; ',
+                   '',
+    'parallel-make' => 'yes'
   },
   
-  'tiff'
-  =>
+  'tiff' =>
   {
     'url' => 'http://dl.maptools.org/dl/libtiff/tiff-3.8.2.tar.gz'
   },
   
-  'exif'
-  =>
+  'exif' =>
   {
     'url'  => "$sourceforge/sourceforge/libexif/libexif-0.6.13.tar.bz2",
     'conf' => [ '--disable-nls' ],
