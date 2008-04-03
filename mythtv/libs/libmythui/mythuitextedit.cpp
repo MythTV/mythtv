@@ -54,7 +54,7 @@ void MythUITextEdit::Init(void)
 
 void MythUITextEdit::Pulse(void)
 {
-    if (m_showCursor)
+    if (m_showCursor && m_HasFocus)
     {
         if (m_blinkInterval > m_cursorBlinkRate)
         {
@@ -71,6 +71,8 @@ void MythUITextEdit::Pulse(void)
 
         m_blinkInterval++;
     }
+    else
+        m_cursorImage->SetVisible(false);
 
     MythUIType::Pulse();
 }
