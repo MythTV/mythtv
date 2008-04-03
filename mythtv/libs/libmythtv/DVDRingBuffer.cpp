@@ -559,6 +559,9 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 menuBtnLock.unlock();
 
                 ClearSubtitlesOSD();
+                
+                if (parent && buttonExists)
+                    parent->HideDVDButton(false);
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {
