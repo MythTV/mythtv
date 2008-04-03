@@ -41,11 +41,8 @@ void MythListButton::Const(void)
     m_active           = false;
     m_drawFromBottom   = false;
 
-    m_itemList.setAutoDelete(false);
     m_topItem = 0;
     m_selItem = 0;
-    m_selIterator = new Q3PtrListIterator<MythListButtonItem>(m_itemList);
-    m_topIterator = new Q3PtrListIterator<MythListButtonItem>(m_itemList);
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
@@ -80,13 +77,8 @@ void MythListButton::Const(void)
 MythListButton::~MythListButton()
 {
     m_clearing = true;
-    MythListButtonItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next())
-        delete item;
-    m_itemList.clear();
-
-    delete m_topIterator;
-    delete m_selIterator;
+    while (!m_itemList.isEmpty())
+        delete m_itemList.takeFirst();
 
     if (m_fontActive)
        delete m_fontActive;
@@ -164,20 +156,16 @@ void MythListButton::Reset()
 {
     m_clearing = true;
 
-    MythListButtonItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next())
-        delete item;
+    while (!m_itemList.isEmpty())
+        delete m_itemList.takeFirst();
 
     m_clearing = false;
-    m_itemList.clear();
 
     m_topItem     = 0;
     m_selItem     = 0;
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount   = 0;
-    m_selIterator->toFirst();
-    m_topIterator->toFirst();
 
     SetPositionArrowStates();
 }
@@ -203,17 +191,17 @@ void MythListButton::SetPositionArrowStates(void)
         for (int i = 0; i < button; i++)
              m_ButtonList[i]->SetVisible(false);
 
-        Q3PtrListIterator<MythListButtonItem> it = (*m_topIterator);
-        while (it.current() && button < (int)m_itemsVisible)
+        QList<MythListButtonItem*>::iterator it = m_itemList.begin() + m_topPosition;
+        while (it != m_itemList.end() && button < (int)m_itemsVisible)
         {
             MythUIButton *realButton = m_ButtonList[button];
-            MythListButtonItem *buttonItem = it.current();
+            MythListButtonItem *buttonItem = *it;
 
             buttonItem->SetToRealButton(realButton, true);
             realButton->SetVisible(true);
 
-            button++;
             ++it;
+            button++;
         }
 
         for (; button < (int)m_itemsVisible; button++)
@@ -245,17 +233,15 @@ void MythListButton::SetPositionArrowStates(void)
 
 void MythListButton::InsertItem(MythListButtonItem *item)
 {
-    MythListButtonItem* lastItem = m_itemList.last();
+    bool wasEmpty = m_itemList.isEmpty();
     m_itemList.append(item);
 
     m_itemCount++;
 
-    if (!lastItem)
+    if (wasEmpty)
     {
         m_topItem = item;
         m_selItem = item;
-        m_selIterator->toFirst();
-        m_topIterator->toFirst();
         m_selPosition = m_topPosition = 0;
 
         emit itemSelected(item);
@@ -269,28 +255,26 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
     if (m_clearing)
         return;
 
-    if (m_itemList.findRef(item) == -1)
+    int curIndex = m_itemList.indexOf(item);
+    if (curIndex == -1)
         return;
 
     if (item == m_topItem)
     {
         if (m_topItem != m_itemList.last())
         {
-            ++(*m_topIterator);
             ++m_topPosition;
-            m_topItem = m_topIterator->current();
+            m_topItem = *(m_itemList.begin() + m_topPosition);
         }
         else if (m_topItem != m_itemList.first())
         {
-            --(*m_topIterator);
             --m_topPosition;
-            m_topItem = m_topIterator->current();
+            m_topItem = *(m_itemList.begin() + m_topPosition);
         }
         else
         {
             m_topItem = NULL;
             m_topPosition = 0;
-            m_topIterator->toFirst();
         }
     }
 
@@ -298,25 +282,22 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
     {
         if (m_selItem != m_itemList.last())
         {
-            ++(*m_selIterator);
             ++m_selPosition;
-            m_selItem = m_selIterator->current();
+            m_selItem = *(m_itemList.begin() + m_selPosition);
         }
         else if (m_selItem != m_itemList.first())
         {
-            --(*m_selIterator);
             --m_selPosition;
-            m_selItem = m_selIterator->current();
+            m_selItem = *(m_itemList.begin() + m_selPosition);
         }
         else
         {
             m_selItem = NULL;
             m_selPosition = 0;
-            m_selIterator->toFirst();
         }
     }
 
-    m_itemList.remove(item);
+    m_itemList.removeAt(curIndex);
     m_itemCount--;
 
     SetPositionArrowStates();
@@ -327,37 +308,19 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
 
 void MythListButton::SetItemCurrent(MythListButtonItem* item)
 {
-    m_selIterator->toFirst();
-    MythListButtonItem *cur;
-    bool found = false;
-    m_selPosition = 0;
-    while ((cur = m_selIterator->current()) != 0)
-    {
-        if (cur == item)
-        {
-            found = true;
-            break;
-        }
-
-        ++(*m_selIterator);
-        ++m_selPosition;
-    }
-
-    if (!found)
-    {
-        m_selIterator->toFirst();
+    m_selPosition = m_itemList.indexOf(item);
+ 
+    if (m_selPosition == -1)
         m_selPosition = 0;
-    }
 
-    m_selItem = m_selIterator->current();
+    m_selItem = m_itemList.at(m_selPosition);
 
     while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
     {
-        ++(*m_topIterator);
         ++m_topPosition;
     }
 
-    m_topItem = m_topIterator->current();
+    m_topItem = m_itemList.at(m_topPosition);
 
     SetPositionArrowStates();
 
@@ -385,10 +348,11 @@ MythListButtonItem* MythListButton::GetItemFirst()
 
 MythListButtonItem* MythListButton::GetItemNext(MythListButtonItem *item)
 {
-    if (m_itemList.findRef(item) == -1)
+    QListIterator<MythListButtonItem*> it(m_itemList);
+    if (!it.findNext(item))
         return 0;
 
-    return m_itemList.next();
+    return it.previous();
 }
 
 int MythListButton::GetCount()
@@ -404,11 +368,6 @@ bool MythListButton::IsEmpty()
         return true;
 }
 
-Q3PtrListIterator<MythListButtonItem> MythListButton::GetIterator(void)
-{
-    return Q3PtrListIterator<MythListButtonItem>(m_itemList);
-}
-
 MythListButtonItem* MythListButton::GetItemAt(int pos)
 {
     return m_itemList.at(pos);
@@ -418,7 +377,7 @@ int MythListButton::GetItemPos(MythListButtonItem* item)
 {
     if (!item)
         return -1;
-    return m_itemList.findRef(item);
+    return m_itemList.indexOf(item);
 }
 
 void MythListButton::MoveUp(MovementUnit unit)
@@ -430,16 +389,14 @@ void MythListButton::MoveUp(MovementUnit unit)
     switch (unit)
     {
         case MoveItem:
-            if (!m_selIterator->atFirst())
+            if (m_selPosition > 1)
             {
-                --(*m_selIterator);
                 --m_selPosition;
             }
             break;
         case MoveColumn:
             if ((pos+1) - (((pos+1)/m_columns)*m_columns) != 1)
             {
-                --(*m_selIterator);
                 --m_selPosition;
             }
             break;
@@ -448,7 +405,6 @@ void MythListButton::MoveUp(MovementUnit unit)
             {
                 for (int i = 0; i < m_columns; i++)
                 {
-                    --(*m_selIterator);
                     --m_selPosition;
                 }
             }
@@ -458,27 +414,24 @@ void MythListButton::MoveUp(MovementUnit unit)
             {
                 for (int i = 0; i < (int)m_itemsVisible; i++)
                 {
-                    --(*m_selIterator);
                     --m_selPosition;
                 }
                 break;
             }
             // fall through
         case MoveMax:
-            m_selIterator->toFirst();
             m_selPosition = 0;
             break;
     }
 
-    if (!m_selIterator->current())
+    if (m_selPosition >= m_itemList.size())
         return;
 
-    m_selItem = m_selIterator->current();
+    m_selItem = m_itemList.at(m_selPosition);
 
     if (m_selPosition <= m_topPosition)
     {
         m_topItem = m_selItem;
-        (*m_topIterator) = (*m_selIterator);
         m_topPosition = m_selPosition;
     }
 
@@ -496,16 +449,14 @@ void MythListButton::MoveDown(MovementUnit unit)
     switch (unit)
     {
         case MoveItem:
-            if (!m_selIterator->atLast())
+            if (m_selPosition < m_itemList.size() - 1)
             {
-                ++(*m_selIterator);
                 ++m_selPosition;
             }
             break;
         case MoveColumn:
             if ((pos+1) - (((pos+1)/m_columns)*m_columns) > 0)
             {
-                ++(*m_selIterator);
                 ++m_selPosition;
             }
             break;
@@ -514,7 +465,6 @@ void MythListButton::MoveDown(MovementUnit unit)
             {
                 for (int i = 0; i < m_columns; i++)
                 {
-                    ++(*m_selIterator);
                     ++m_selPosition;
                 }
             }
@@ -525,34 +475,31 @@ void MythListButton::MoveDown(MovementUnit unit)
             {
                 for (int i = 0; i < (int)m_itemsVisible; i++)
                 {
-                    ++(*m_selIterator);
                     ++m_selPosition;
                 }
                 break;
             }
             break;
         case MoveMax:
-            m_selIterator->toLast();
             m_selPosition = m_itemCount - 1;
             break;
     }
 
-    if (!m_selIterator->current())
+    if (m_selPosition >= m_itemList.size())
     {
-        VERBOSE(VB_IMPORTANT, "m_selIterator has left the building.");
+        VERBOSE(VB_IMPORTANT, "m_selPosition has left the building.");
         return;
     }
 
-    m_selItem = m_selIterator->current();
+    m_selItem = m_itemList.at(m_selPosition);
 
     // while (m_topPosition < m_selPosition)
     while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
     {
-        ++(*m_topIterator);
         ++m_topPosition;
     }
 
-    m_topItem = m_topIterator->current();
+    m_topItem = m_itemList.at(m_topPosition);
 
     SetPositionArrowStates();
 
@@ -566,21 +513,21 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
         return false;
     }
 
-    if (!m_selIterator->toFirst())
+    if (m_itemList.isEmpty())
     {
         return false;
     }
-    m_selPosition = 0;
 
     bool found_it = false;
-    while(m_selIterator->current())
+    QList<MythListButtonItem*>::iterator it = m_itemList.begin() + m_selPosition;
+    while(it != m_itemList.end())
     {
-        if (m_selIterator->current()->text() == position_name)
+        if ((*it)->text() == position_name)
         {
             found_it = true;
             break;
         }
-        ++(*m_selIterator);
+        ++it;
         ++m_selPosition;
     }
 
@@ -590,15 +537,14 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
         return false;
     }
 
-    m_selItem = m_selIterator->current();
+    m_selItem =  m_itemList.at(m_selPosition);
 
     while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
     {
-        ++(*m_topIterator);
         ++m_topPosition;
     }
 
-    m_topItem = m_topIterator->current();
+    m_topItem = m_itemList.at(m_topPosition);
 
     SetPositionArrowStates();
 
@@ -611,13 +557,12 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
 {
     if (item != m_selItem)
     {
-        cerr << "Can't move non-selected item\n";
         return false;
     }
 
-    if (item == m_itemList.getFirst() && flag)
+    if (item == m_itemList.first() && flag)
         return false;
-    if (item == m_itemList.getLast() && !flag)
+    if (item == m_itemList.last() && !flag)
         return false;
 
     int oldpos = m_selPosition;
@@ -627,7 +572,7 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
     if (flag)
     {
         insertat = m_selPosition - 1;
-        if (item == m_itemList.getLast())
+        if (item == m_itemList.last())
             dolast = true;
         else
             ++m_selPosition;
@@ -638,13 +583,7 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
     else
         insertat = m_selPosition + 1;
 
-    if (m_itemList.current() == item)
-    {
-        m_itemList.take();
-        //  cout << "speedy\n";
-    }
-    else
-        m_itemList.take(oldpos);
+    m_itemList.removeAt(oldpos);
 
     m_itemList.insert(insertat, item);
 
@@ -662,9 +601,9 @@ bool MythListButton::MoveItemUpDown(MythListButtonItem *item, bool flag)
 
 void MythListButton::SetAllChecked(MythListButtonItem::CheckState state)
 {
-    MythListButtonItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next())
-        item->setChecked(state);
+    QMutableListIterator<MythListButtonItem*> it(m_itemList);
+    while (it.hasNext())
+        it.next()->setChecked(state);
 }
 
 void MythListButton::Init()
