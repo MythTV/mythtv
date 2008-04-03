@@ -106,111 +106,111 @@
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGalleria Kansio &apos;%1&apos; ei ole olemassa tai on lukukelvoton.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGalleria epäonnistui teeman lataamisessa, katso konsoli.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Valittu laite ei ole enää saatavilla</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata...</translation>
     </message>
     <message>
         <source>Marking...</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkitään...</translation>
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedosto...</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Palaa</translation>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjennä Merkityt</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Kaikki</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Laitteet</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopioi tähän</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirrä tähän</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo Kansio</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Nykyinen Tiedosto tai Kansio</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaan 1 kansio, mukaanlukien kaikki alikansiot ja tiedostot.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaan 1 kuva.</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Merkityt Tiedostot</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaan %1 kuvaa ja kansiota, mukaanlukien kaikki alikansiot ja tiedostot.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusi Kansio</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo Uusi Kansio</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirretään merkitty kuva...</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopioidaan merkittyjä kuvia...</translation>
     </message>
     <message>
         <source>Failed to mount device: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saatu liitettyä laitetta: </translation>
     </message>
     <message>
         <source>Showing the default MythGallery directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytetään oletus MythGalleria kansio.</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleennimeä</translation>
     </message>
     <message>
         <source>Failed to rename directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saatu uudelleennimettyä kansiota</translation>
     </message>
     <message>
         <source>Failed to rename file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saatu uudelleennimettyä tiedostoa</translation>
     </message>
 </context>
 <context>

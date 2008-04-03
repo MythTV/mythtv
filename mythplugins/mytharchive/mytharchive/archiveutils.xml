@@ -5,6 +5,7 @@
       <text>Show Log Viewer</text>
       <text lang="SI">Pregled dnevnika</text>
       <text lang="PL">Przeglądanie logów</text>
+      <text lang="FI">Näytä Loki</text>
       <action>ARCHIVE_LAST_LOG</action>
    </button>
 
@@ -13,6 +14,7 @@
        <text>Play Created DVD</text>
        <text lang="SI">Predvajaj ustvarjen DVD</text>
        <text lang="PL">Testuj DVD</text>
+       <text lang="FI">Toista Luotu DVD</text>
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
@@ -21,6 +23,7 @@
        <text>Burn DVD</text>
        <text lang="SI">Zapeči DVD</text>
        <text lang="PL">Wypal DVD</text>
+       <text lang="FI">Polta DVD</text>
        <action>ARCHIVE_BURN_DVD</action>
    </button>
 

@@ -899,7 +899,7 @@ Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta jos h
     </message>
     <message>
         <source>No Screens defined; Entering Screen Setup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Alinäyttöjä valittuna; Siirrytään Asetuksiin.</translation>
     </message>
 </context>
 </TS>

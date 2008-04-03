@@ -11,43 +11,43 @@
     </message>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa Lähteen Yksityiskohtia</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Anna Lähteen Yksityiskohdat</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikoni:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa Uutislähdettä</translation>
     </message>
     <message>
         <source>Add News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää Uusi Uutislähde</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Uutislähde</translation>
     </message>
 </context>
 <context>
@@ -67,11 +67,11 @@ The minimum allowed value is 30 Minutes.</source>
     </message>
     <message>
         <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anna päivitysväli käyttäen nuolinäppäimiä. Pienin arvo on 30 minuuttia.</translation>
     </message>
     <message>
         <source>Press Escape or Menu to exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paina Escape tai Menu poistuaksesi.</translation>
     </message>
 </context>
 <context>
@@ -101,17 +101,18 @@ The minimum allowed value is 30 Minutes.</source>
     <name>QObject</name>
     <message>
         <source>MythNews</source>
-        <translation type="unfinished"></translation>
+        <translation>MythUutiset</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this news site
 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko varmasti tämä uutislähde
+%1</translation>
     </message>
     <message>
         <source>Downloading media...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladataan uutisia...</translation>
     </message>
 </context>
 <context>

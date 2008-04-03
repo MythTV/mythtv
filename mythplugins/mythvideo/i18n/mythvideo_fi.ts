@@ -74,19 +74,19 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei töitä eikä mitään muutakaan tekemistä.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei töitä eikä mitään muutakaan tekemistä.</translation>
     </message>
     <message>
         <source>New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusi Tuonti</translation>
     </message>
     <message>
         <source>Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta Työ</translation>
     </message>
 </context>
 <context>
@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished">Ei Kantta</translation>
+        <translation>Ei Kantta</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -339,7 +339,7 @@
     </message>
     <message>
         <source>Sorting ignores case</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestäminen ohittaa koon</translation>
     </message>
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
@@ -347,7 +347,7 @@
     </message>
     <message>
         <source>Show folders for database views</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä kansiot tietokannassa</translation>
     </message>
     <message>
         <source>If set, sub folders of your video directory will be shown in supported views.</source>
@@ -355,7 +355,7 @@
     </message>
     <message>
         <source>Image cache size</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvavälimuistin koko</translation>
     </message>
     <message>
         <source>This setting determines the number of images MythVideo will cache for views.</source>
@@ -367,39 +367,39 @@
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Kaikki</translation>
+        <translation>Kaikki</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Kyllä</translation>
+        <translation>Kyllä</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Ei</translation>
+        <translation>Ei</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimike</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Vuosi</translation>
+        <translation>Vuosi</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished">Arvostelu</translation>
+        <translation>Arvostelu</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished">Pituus</translation>
+        <translation>Pituus</translation>
     </message>
     <message>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostonimi</translation>
     </message>
     <message>
         <source>Video ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Videon ID</translation>
     </message>
     <message>
         <source>
@@ -630,23 +630,23 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus Videotoistaja</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista DVD-kirjanmerkit vanhempia kuin (päivää)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista DVD-kirjanmerkit</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Salli DVD-kirjanmerkit</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-kirjanmerkin Kysely</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
@@ -662,56 +662,57 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished">Ei Arvostelua</translation>
+        <translation>NR</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei tiedostoja</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuntematon</translation>
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>videot</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Haetaan videoita</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei kaikkiin</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä kaikkiin</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedosto Hukassa</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 näyttää olevan hukassa.
+Poistetaanko tietokannasta?</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitetään videotietokantaa</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkistetaan videotiedostoja</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Arvostelua ei saatavilla.</translation>
+        <translation>Arvostelua ei saatavilla.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuuttia</translation>
+        <translation>minuuttia</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
@@ -783,7 +784,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished">Taso %1</translation>
+        <translation>Taso %1</translation>
     </message>
     <message>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
@@ -791,62 +792,65 @@ Remove it from the database?</source>
     </message>
     <message>
         <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teemavirhe: selain/soitin saa virheellisen tiedon.</translation>
     </message>
     <message>
         <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teemavirhe: selain/video saa virheellisen tiedon.</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuaalinen Syöttö Numerolle</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuaalinen Syöttö Nimelle</translation>
     </message>
     <message>
         <source>Reset Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjennä Syöttö</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento</translation>
     </message>
     <message>
         <source>%1 failed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 epäonnistui</translation>
     </message>
     <message>
         <source>%1
 
 Check VideoManager Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1
+
+Varmista Videoasetukset</translation>
     </message>
     <message>
         <source>Fetching poster for %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Haetaan kuvakkeita %1:lle (%2)</translation>
     </message>
     <message>
         <source>A poster exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvake löytyi tälle nimikkeelle, mutta sitä ei voitu hakea aikarajoituksen puitteissa.
+</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teemavirhe: valittu/soitto saa virheellisen tiedon.</translation>
     </message>
     <message>
         <source>None defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei määritelty</translation>
     </message>
 </context>
 <context>
@@ -1069,7 +1073,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Rip/Transcode</source>
-        <translation>Kopionti/Jälkikäsittely</translation>
+        <translation>Kopiointi/Jälkikäsittely</translation>
     </message>
     <message>
         <source>Job 1 of 1</source>
@@ -1148,11 +1152,11 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Tuntematon</translation>
+        <translation>Tuntematon</translation>
     </message>
     <message>
         <source>Begin Ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita Tuonti</translation>
     </message>
 </context>
 <context>
@@ -1191,7 +1195,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Krediitit</translation>
     </message>
 </context>
 <context>
@@ -1222,7 +1226,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1280,7 +1284,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Krediitit</translation>
     </message>
 </context>
 <context>
@@ -1409,58 +1413,58 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Krediitit</translation>
     </message>
 </context>
 <context>
     <name>mythvideo_videomanager::VideoManagerImp</name>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished">Valitse toiminto:</translation>
+        <translation>Valitse toiminto:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished">Muokkaa Yksityiskohtia</translation>
+        <translation>Muokkaa Yksityiskohtia</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Haku</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Videonumeron Manuaalinen Syöttö</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Videonimikkeen Manuaalinen syöttö</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished">Tyhjää Yksityiskohdat</translation>
+        <translation>Tyhjää Yksityiskohdat</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished">Vaihda Selaustila</translation>
+        <translation>Vaihda Selaustila</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished">Poista Video</translation>
+        <translation>Poista Video</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">Suodata Näkymä</translation>
+        <translation>Suodata Näkymä</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished">Poista tämä tiedosto?</translation>
+        <translation>Poista tämä tiedosto?</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished">virhe poistossa</translation>
+        <translation>virhe poistossa</translation>
     </message>
 </context>
 </TS>

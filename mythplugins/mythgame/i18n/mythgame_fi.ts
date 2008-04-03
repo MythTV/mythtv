@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>-   By Year</source>
-        <translation>-   Vuoden Mukaisesti</translation>
+        <translation>-  Vuoden  Mukaisesti</translation>
     </message>
     <message>
         <source>-   By Genre</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-  Julkaisijan  Mukaisesti</translation>
     </message>
 </context>
 <context>
@@ -60,7 +60,7 @@
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Emulaattorit</translation>
     </message>
 </context>
 <context>
@@ -282,19 +282,19 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Updating %1(%2) ROM database</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitetään %1(%2) ROM-tietokantaa</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkistetaan %1 tiedostoa</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Selataan %1 peli(ä)...</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
-        <translation type="unfinished"></translation>
+        <translation>Hajautus tiedostonimet</translation>
     </message>
     <message>
         <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
@@ -306,7 +306,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>

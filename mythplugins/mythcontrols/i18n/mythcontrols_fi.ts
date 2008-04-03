@@ -49,11 +49,11 @@
     </message>
     <message>
         <source>Press A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Paina A-näppäintä</translation>
     </message>
     <message>
         <source>Waiting for key press</source>
-        <translation type="unfinished"></translation>
+        <translation>Odotetaan näppäinpainallusta</translation>
     </message>
 </context>
 <context>
@@ -84,83 +84,83 @@
     </message>
     <message>
         <source>Change View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda Näkymää</translation>
     </message>
     <message>
         <source>Actions By Context</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiminnot Asiayhteydessä</translation>
     </message>
     <message>
         <source>Contexts By Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Asiayhteydet Näppäimelle</translation>
     </message>
     <message>
         <source>Keys By Context</source>
-        <translation type="unfinished"></translation>
+        <translation>Näppäimet Asiayhteydessä</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished">Valinnat</translation>
+        <translation>Valinnat</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Tallenna</translation>
+        <translation>Tallenna</translation>
     </message>
     <message>
         <source>Modify Action</source>
-        <translation type="unfinished">Muokkaa Toimintoa</translation>
+        <translation>Muokkaa Toimintoa</translation>
     </message>
     <message>
         <source>Set Binding</source>
-        <translation type="unfinished">Aseta Komennot</translation>
+        <translation>Aseta Komennot</translation>
     </message>
     <message>
         <source>Remove Binding</source>
-        <translation type="unfinished">Poista Komennot</translation>
+        <translation>Poista Komennot</translation>
     </message>
     <message>
         <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistutaan, mutta on tallentamattomia muutoksia. Mitä Tehdään?</translation>
     </message>
     <message>
         <source>Save then Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna ja Poistu</translation>
     </message>
     <message>
         <source>Exit without saving changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu tallentamatta</translation>
     </message>
     <message>
         <source>Manditory Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Pakollinen Toiminto</translation>
     </message>
     <message>
         <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiminto on pakollinen ja tarvitsee ainakin yhden näppäinsidoksen.</translation>
     </message>
     <message>
         <source>This key binding conflicts with %1 in the %2 context.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näppäinsidos on ristiriitainen %1 asiayhteydessä %2.</translation>
     </message>
     <message>
         <source>Conflicting Binding</source>
-        <translation type="unfinished"></translation>
+        <translation>Ristiriitainen Näppäinsidos</translation>
     </message>
     <message>
         <source>This key binding may conflict with %1 in the %2 context. Do you want to bind it anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Näppäinsidos on ristiriitainen %1 asiayhteydessä %2. Sidotaanko kuitenkin?</translation>
     </message>
     <message>
         <source>Conflict Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ristiriidan Varoitus</translation>
     </message>
     <message>
         <source>Bind Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Sidosnäppäin</translation>
     </message>
 </context>
 <context>
@@ -182,11 +182,11 @@
     <name>QObject</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>
