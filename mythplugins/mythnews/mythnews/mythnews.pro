@@ -19,8 +19,8 @@ installimages.files = images/*.png
 INSTALLS += installfiles installimages uifiles
 
 # Input
-HEADERS += mythnews.h mythnewsconfig.h newsengine.h
-SOURCES += main.cpp mythnews.cpp mythnewsconfig.cpp newsengine.cpp
+HEADERS += mythnews.h mythnewsconfig.h mythnewseditor.h newsengine.h
+SOURCES += main.cpp mythnews.cpp mythnewsconfig.cpp mythnewseditor.cpp newsengine.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

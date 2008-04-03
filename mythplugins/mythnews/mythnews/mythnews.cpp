@@ -32,7 +32,6 @@
 #include <qregexp.h>
 //Added by qt3to4:
 #include <QUrl>
-#include <QImageReader>
 
 // MythTV headers
 #include <mythtv/libmythui/mythmainwindow.h>
@@ -43,6 +42,7 @@
 
 // MythNews headers
 #include "mythnews.h"
+#include "mythnewseditor.h"
 
 // MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
 //     : MythBusyDialog(title)
@@ -766,43 +766,25 @@ void MythNews::slotViewArticle()
 
 bool MythNews::ShowEditDialog(bool edit)
 {
-//     MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit news site");
-// 
-//     QString title;
-//     if (edit)
-//         title = tr("Edit Site Details");
-//     else
-//         title = tr("Enter Site Details");
-// 
-//     label = new QLabel(tr("Name:"), popup, "nopopsize");
-//     MythRemoteLineEdit *titleEditor = new MythRemoteLineEdit(popup);
-// 
-//     label = new QLabel(tr("URL:"), popup, "nopopsize");
-//     MythRemoteLineEdit *urlEditor = new MythRemoteLineEdit(popup);
-// 
-//     label = new QLabel(tr("Icon:"), popup, "nopopsize");
-//     MythRemoteLineEdit *iconEditor = new MythRemoteLineEdit(popup);
-// 
-//     popup->addButton(tr("OK"),     popup, SLOT(accept()));
-//     popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-// 
-//     QString siteName = "";
-//     if (edit)
-//     {
-//         MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
-// 
-//         if (siteUIItem && siteUIItem->getData())
-//         {
-//             NewsSite *site = (NewsSite*) siteUIItem->getData();
-//             if(site)
-//             {
-//                 siteName = site->name();
-//                 titleEditor->setText(site->name());
-//                 urlEditor->setText(site->url());
-//             }
-//         }
-//     }
-// 
+    NewsSite *site = NULL;
+
+    if (edit)
+    {
+        MythListButtonItem *siteListItem = m_sitesList->GetItemCurrent();
+
+        if (siteListItem && siteListItem->getData())
+            site = (NewsSite*) siteListItem->getData();
+    }
+
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNewsEditor *mythnewseditor = new MythNewsEditor(site, edit, mainStack,
+                                                        "mythnewseditor");
+
+    if (mythnewseditor->Create())
+        mainStack->AddScreen(mythnewseditor);
+
 //     if (kDialogCodeAccepted == res)
 //     {
 //         if (edit && siteName != "")
@@ -830,21 +812,6 @@ void MythNews::ShowMenu()
     m_menuPopup->AddButton(tr("Add News Site"));
     m_menuPopup->AddButton(tr("Delete News Site"));
     m_menuPopup->AddButton(tr("Cancel"));
-/*
-    m_menuPopup->addButton(tr("Edit News Site"), this,
-                                            SLOT(editNewsSite()));
-    m_menuPopup->addButton(tr("Add News Site"), this, SLOT(addNewsSite()));
-    m_menuPopup->addButton(tr("Delete News Site"), this, SLOT(deleteNewsSite()));*/
-}
-
-void MythNews::editNewsSite()
-{
-    ShowEditDialog(true);
-}
-
-void MythNews::addNewsSite()
-{
-    ShowEditDialog(false);
 }
 
 void MythNews::deleteNewsSite()
@@ -939,7 +906,34 @@ void MythNews::playVideo(const QString &filename)
     gContext->sendPlaybackEnd();
 }
 
-// void MythNews::customEvent(QEvent *event)
-// {
-// 
-// }
+void MythNews::customEvent(QEvent *event)
+{
+
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "options")
+        {
+            if (buttonnum == 0)
+            {
+                ShowEditDialog(true);
+            }
+            else if (buttonnum == 1)
+            {
+                ShowEditDialog(false);
+            }
+            else if (buttonnum == 2)
+            {
+                deleteNewsSite();
+            }
+        }
+
+        m_menuPopup = NULL;
+    }
+
+}

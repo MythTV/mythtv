@@ -52,6 +52,53 @@
 
     </window>
 
+    <window name="editor">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,800,50</area>
+            <align>center,vcenter</align>
+        </textarea>
+
+        <textarea name="namelabel" from="basetextarea">
+            <area>120,150,100,30</area>
+            <align>right,vcenter</align>
+        </textarea>
+
+        <textedit name="name" from="basetextedit">
+            <area>235,140,375,50</area>
+        </textedit>
+
+        <textarea name="urllabel" from="basetextarea">
+            <area>120,250,100,30</area>
+            <align>right,vcenter</align>
+        </textarea>
+
+        <textedit name="url" from="basetextedit">
+            <area>235,240,375,50</area>
+        </textedit>
+
+        <textarea name="iconlabel" from="basetextarea">
+            <area>120,350,100,30</area>
+            <align>right,vcenter</align>
+        </textarea>
+
+        <textedit name="icon" from="basetextedit">
+            <area>235,340,375,50</area>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <position>60,490</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>600,490</position>
+            <value>Ok</value>
+        </button>
+
+    </window>
+
     <window name="config">
 
         <buttonlist name="category" from="basebuttonlist">

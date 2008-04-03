@@ -61,7 +61,7 @@ class MythNews : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-//    void customEvent(QEvent*);
+    void customEvent(QEvent*);
 
 private:
     void updateInfoView();
@@ -77,9 +77,14 @@ private:
 
     bool getHttpFile(QString sFilename, QString cmdURL);
     void createProgress(QString title);
-    void createProgress(QString title, int total);
     QString formatSize(long long bytes, int prec);
     void playVideo(const QString &filename);
+
+    // menu stuff
+    void ShowMenu();
+    void deleteNewsSite();
+    bool ShowEditDialog(bool edit);
+
 
     NewsSite::List m_NewsSites;
 
@@ -117,14 +122,6 @@ private slots:
     void slotSiteSelected(MythListButtonItem*);
 
     void slotProgressCancelled();
-
-    // menu stuff
-    void ShowMenu();
-    void addNewsSite();
-    void editNewsSite();
-    void deleteNewsSite();
-    void cancelMenu();
-    bool ShowEditDialog(bool edit);
 };
 
 #endif /* MYTHNEWS_H */
