@@ -411,7 +411,7 @@ contains( HAVE_IWMMXT, yes ) {
 }
 
 contains( HAVE_ARMV5TE, yes ) {
-    SOURCES += armv4l/simple_idct_armv5te.S armv4l/mpegvideo_armv5te.S
+    SOURCES += armv4l/simple_idct_armv5te.S armv4l/mpegvideo_armv5te.c
 }
 
 contains( HAVE_ARMV6, yes )      { SOURCES += armv4l/simple_idct_armv6.S }
