@@ -66,7 +66,7 @@ class SingleValueImp
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(m_insert_sql);
-            query.bindValue(":NAME", name.utf8());
+            query.bindValue(":NAME", name);
             if (query.exec() && query.isActive())
             {
                 query.exec("SELECT LAST_INSERT_ID()");

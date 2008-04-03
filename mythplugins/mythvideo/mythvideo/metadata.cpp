@@ -386,7 +386,7 @@ bool MetadataImp::dropFromDB()
     }
 
     query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
-    query.bindValue(":FILENAME", m_filename.utf8());
+    query.bindValue(":FILENAME", m_filename);
     if (!query.exec())
     {
         MythContext::DBError("delete from filemarkup", query);
@@ -547,23 +547,23 @@ void MetadataImp::saveToDatabase()
                       "playcommand = :PLAYCOMMAND, childid = :CHILDID, "
                       "category = :CATEGORY WHERE intid = :INTID");
 
-        query.bindValue(":PLAYCOMMAND", m_playcommand.utf8());
+        query.bindValue(":PLAYCOMMAND", m_playcommand);
         query.bindValue(":CHILDID", m_childID);
         query.bindValue(":CATEGORY", m_categoryID);
         query.bindValue(":INTID", m_id);
     }
 
-    query.bindValue(":TITLE", m_title.utf8());
-    query.bindValue(":DIRECTOR", m_director.utf8());
-    query.bindValue(":PLOT", m_plot.utf8());
-    query.bindValue(":RATING", m_rating.utf8());
+    query.bindValue(":TITLE", m_title);
+    query.bindValue(":DIRECTOR", m_director);
+    query.bindValue(":PLOT", m_plot);
+    query.bindValue(":RATING", m_rating);
     query.bindValue(":YEAR", m_year);
     query.bindValue(":USERRATING", m_userrating);
     query.bindValue(":LENGTH", m_length);
-    query.bindValue(":FILENAME", m_filename.utf8());
+    query.bindValue(":FILENAME", m_filename);
     query.bindValue(":SHOWLEVEL", m_showlevel);
-    query.bindValue(":COVERFILE", m_coverfile.utf8());
-    query.bindValue(":INETREF", m_inetref.utf8());
+    query.bindValue(":COVERFILE", m_coverfile);
+    query.bindValue(":INETREF", m_inetref);
     query.bindValue(":BROWSE", m_browse);
 
     if (!query.exec() || !query.isActive())
