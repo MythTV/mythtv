@@ -53,7 +53,7 @@ class MythDialogBox : public MythScreenType
   signals:
     void Selected(int selection);
 
-  private:
+  protected:
     void SendEvent(int res, QString text = "", void *data = 0);
 
     MythUIText     *m_textarea;
