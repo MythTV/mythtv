@@ -2,6 +2,7 @@
 #include "stdlib.h"
 
 #include <Q3ValueVector>
+#include <Q3DeepCopy>
 #include <qsqldriver.h>
 
 #include "mythdbcon.h"

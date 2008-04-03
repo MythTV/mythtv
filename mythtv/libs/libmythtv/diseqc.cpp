@@ -14,6 +14,7 @@
 
 // Qt headers
 #include <qstring.h>
+#include <Q3DeepCopy>
 
 // MythTV headers
 #include "mythcontext.h"

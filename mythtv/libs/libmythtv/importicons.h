@@ -15,6 +15,7 @@
 
 #include <qsqldatabase.h>
 #include <qurl.h>
+#include <Q3ValueList>
 
 #include "settings.h"
 

@@ -9,7 +9,7 @@
 #include <QObject>
 #include <QString>
 #include <QMutex>
-#include <Q3ValueList>
+#include <QList>
 
 #include "mythexp.h"
 #include "mythobservable.h"
@@ -347,7 +347,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     QString app_binary_version;
 
     QMutex locationLock;
-    Q3ValueList <QString> currentLocation;
+    QList<QString> currentLocation;
 };
 
 /// This global variable contains the MythContext instance for the application

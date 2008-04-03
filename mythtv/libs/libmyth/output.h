@@ -11,6 +11,7 @@ class OutputListeners;
 class OutputEvent;
 
 #include <QMutex>
+#include <Q3PtrList>
 
 #include "mythobservable.h"
 

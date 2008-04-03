@@ -2937,8 +2937,8 @@ bool MythContext::FindThemeFile(QString &filename)
         basename = filename.mid(pathStart + 1);
 
     QString file;
-    Q3ValueList<QString> searchpath = GetThemeSearchPath();
-    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
+    QList<QString> searchpath = GetThemeSearchPath();
+    for (QList<QString>::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         if (QFile::exists((file = *ii + filename)))
@@ -3945,9 +3945,7 @@ QString MythContext::removeCurrentLocation(void)
     if (currentLocation.isEmpty())
         return QString("UNKNOWN");
 
-    QString result = currentLocation.last();
-    currentLocation.pop_back();
-    return result;
+    return currentLocation.takeLast();
 }
 
 QString MythContext::getCurrentLocation(void)

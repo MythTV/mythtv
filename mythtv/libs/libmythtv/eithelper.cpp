@@ -5,6 +5,10 @@
 
 // Std C++ headers
 #include <algorithm>
+
+// Qt headers
+#include <Q3DeepCopy>
+
 using namespace std;
 
 // MythTV includes

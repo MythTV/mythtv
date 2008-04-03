@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QStringList>
-#include <Q3DeepCopy>
 #include <QEvent>
 
 /** \class MythEvent
@@ -22,21 +21,21 @@ class MPUBLIC MythEvent : public QEvent
 
     MythEvent(const QString lmessage) : QEvent((QEvent::Type)MythEventMessage)
     {
-        message = Q3DeepCopy<QString>(lmessage);
+        message = lmessage;
         extradata.append( "empty" );
     }
 
     MythEvent(const QString lmessage, const QStringList &lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {
-        message = Q3DeepCopy<QString>(lmessage);
+        message = lmessage;
         extradata = lextradata;
     }
 
     MythEvent(const QString lmessage, const QString lextradata)
            : QEvent((QEvent::Type)MythEventMessage)
     {
-        message = Q3DeepCopy<QString>(lmessage);
+        message = lmessage;
         extradata.append( lextradata );
     }
 

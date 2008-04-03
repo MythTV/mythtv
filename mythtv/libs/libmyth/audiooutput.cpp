@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <Q3DeepCopy>
+
 using namespace std;
 
 #include "mythconfig.h"

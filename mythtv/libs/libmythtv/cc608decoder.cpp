@@ -4,6 +4,7 @@
 
 #include <qstringlist.h>
 #include <Q3CString>
+#include <Q3DeepCopy>
 
 #include "format.h"
 #include "cc608decoder.h"
