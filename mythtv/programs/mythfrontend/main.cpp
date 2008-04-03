@@ -1085,6 +1085,7 @@ int main(int argc, char **argv)
             cout << "MythTV Branch    : " << myth_source_path << endl;
             cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
             cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
+            cout << "QT Version       : " << QT_VERSION_STR << endl;
 #ifdef MYTH_BUILD_CONFIG
             cout << "Options compiled in:" <<endl;
             cout << MYTH_BUILD_CONFIG << endl;
