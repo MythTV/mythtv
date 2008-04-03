@@ -55,6 +55,7 @@
        <type>SCREENSETUPWIZARD</type>
        <text>Screen Setup Wizards</text>
        <text lang="HE">אשף הגדרות מסך</text>
+       <text lang="FI">Kuvavelho</text>
        <action>SCREENSETUPWIZARD</action>
    </button>
 
@@ -195,6 +196,7 @@
        <text lang="IT">Impostazioni Videosorveglianza</text>
        <text lang="DK">ZoneMinder</text>
        <text lang="PL">Ustaw strażnika</text>
+       <text lang="FI">Zoneminder Asetukset</text>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>

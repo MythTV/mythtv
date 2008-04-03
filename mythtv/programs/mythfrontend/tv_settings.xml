@@ -86,6 +86,7 @@
       <text>Playback OSD</text>
       <text lang="SI">OSD</text>
       <text lang="HE">תצוגה בזמן הסרטה</text>
+      <text lang="FI">OSD Asetukset</text>
       <action>SETTINGS OSD</action>
    </button>
 
@@ -106,6 +107,7 @@
       <text lang="SI">Predvajalne skupine</text>
       <text lang="PL">Grupy odtwarzania</text>
       <text lang="HE">קבוצות הסרטה</text>
+      <text lang="FI">Toistoryhmät</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 

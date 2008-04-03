@@ -74,6 +74,7 @@
       <text>Custom Priority</text>
       <text lang="IT">Personalizzate</text>
       <text lang="SI">Poljubne prioritete</text>
+      <text lang="FI">Muokatut Prioriteetit</text>
       <alttext>Custom Priority</alttext>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>

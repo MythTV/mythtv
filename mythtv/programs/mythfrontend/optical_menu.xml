@@ -84,6 +84,7 @@
    <button>
       <type>ARCHIVE</type>
       <text>Archive Files</text>
+      <text lang="FI">Arkistoi</text>
       <text lang="IT">Archivia Files</text>
       <text lang="SV">Arkivera filer</text>
       <text lang="DK">Arkivér filer</text>
@@ -139,6 +140,7 @@
       <text lang="SI">Izvrzi plošček</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="HE">הוצא מדיה</text>
+      <text lang="FI">Poista Media</text>
       <action>EJECT</action>
    </button>
 

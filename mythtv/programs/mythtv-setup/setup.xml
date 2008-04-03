@@ -103,6 +103,7 @@
      <type>SETUP_STORAGE_GROUPS</type>
      <text>6. Storage Directories</text>
      <text lang="IT">6. Cartelle</text>
+     <text lang="FI">Tallennusryhmät</text>
      <action>STORAGE GROUPS</action>
    </button>
 

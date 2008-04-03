@@ -106,6 +106,7 @@
       <text>Stored Searches</text>
       <text lang="SI">Shranjena iskanja</text>
       <text lang="HE">חיפושים שמורים</text>
+      <text lang="FI">Tallennetut Haut</text>
       <action>TV_SEARCH_STORED</action>
    </button>
 
