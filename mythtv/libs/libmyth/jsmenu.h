@@ -6,6 +6,9 @@
 #ifndef JSMENU_H_
 #define JSMENU_H_
 
+#include <vector>
+using namespace std;
+
 #include <qobject.h>
 #include <qstring.h>
 
@@ -24,12 +27,12 @@
 ** left/right), we define a range; the first time the joystick moves
 ** into that range, we send the assigned keystring.  
 **--------------------------------------------------------------------------*/
-struct button_map_type
+typedef struct
 {
     int button;
     QString keystring;
     int chord;
-};
+}  button_map_type;
 
 typedef struct
 {
