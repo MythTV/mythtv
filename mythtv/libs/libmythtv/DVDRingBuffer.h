@@ -75,6 +75,7 @@ class MPUBLIC DVDRingBufferPriv
     int GetCellID(void) { return cellid; }
     int GetVobID(void)  { return vobid; }
     bool IsSameChapter(int tmpcellid, int tmpvobid);
+    void RunSeekCellStart(void);
 
     // commands
     bool OpenFile(const QString &filename);
@@ -105,9 +106,9 @@ class MPUBLIC DVDRingBufferPriv
     int   GetTrack(uint type);
     uint8_t GetNumAudioChannels(int id);
     void JumpToTitle(bool change) { jumptotitle = change; }
-    void SeekCellStart(void);
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
+    void SetRunSeekCellStart(bool change) { runSeekCellStart = change; }
 
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
 
@@ -156,7 +157,8 @@ class MPUBLIC DVDRingBufferPriv
     int            lastvobid;
     bool           cellRepeated;
     int            buttonstreamid;
-    bool           gotoCellStart;
+    bool           runningCellStart;
+    bool           runSeekCellStart;
     long long      menupktpts;
     int            curAudioTrack;
     int8_t         curSubtitleTrack;
@@ -188,6 +190,7 @@ class MPUBLIC DVDRingBufferPriv
     uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
+    bool SeekCellStart(void);
 
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
