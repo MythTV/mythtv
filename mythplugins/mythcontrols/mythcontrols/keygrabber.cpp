@@ -13,7 +13,6 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythScreenStack *parent)
 {
     m_waitingForKeyRelease = m_keyReleaseSeen = false;
     m_capturedKey = QString::null;
-    m_okButton = NULL;
 }
 
 KeyGrabPopupBox::~KeyGrabPopupBox()
@@ -27,12 +26,9 @@ bool KeyGrabPopupBox::Create(void)
     QString label = QString("%1\n\n%2").arg(tr("Press A Key")).arg(tr("Waiting for key press"));
 
     m_textarea->SetText(label);
-    m_okButton = AddButton(tr("Ok"), (void*)&m_capturedKey);
+    AddButton(tr("Ok"), &m_capturedKey);
     AddButton(tr("Cancel"));
     m_buttonList->SetActive(false);
-
-    if (!m_okButton)
-        return false;
 
     return true;
 }

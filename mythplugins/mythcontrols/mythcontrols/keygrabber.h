@@ -24,7 +24,6 @@ class KeyGrabPopupBox : public MythDialogBox
     bool     m_waitingForKeyRelease;
     bool     m_keyReleaseSeen;
     QString  m_capturedKey;
-    MythListButtonItem *m_okButton;
 };
 
 #endif // KEYGRABBER_H_
