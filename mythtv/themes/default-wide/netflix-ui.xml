@@ -41,7 +41,7 @@
 
     <window name="queue">
 
-        <textarea name="queuename">
+        <textarea name="queuename" from="basetextarea">
             <area>20,20,670,25</area>
             <font>baselarge</font>
             <multiline>no</multiline>
