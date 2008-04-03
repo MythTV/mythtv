@@ -555,9 +555,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 ClearSubtitlesOSD();
 
-                if (parent && buttonExists)
-                    parent->HideDVDButton(false);
-
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
@@ -1318,7 +1315,7 @@ void DVDRingBufferPriv::RunSeekCellStart(void)
     if (ret) 
     {
         ret = SeekCellStart();
-        runSeekCellStart = !ret;
+        runSeekCellStart = false;
     }
 }
 
