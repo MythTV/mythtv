@@ -146,7 +146,6 @@ class MPUBLIC DVDRingBufferPriv
     uint16_t       hl_height;
     uint8_t       *menuSpuPkt;
     int            menuBuflength;
-    uint8_t       *buttonBitmap;
     AVSubtitle     dvdMenuButton;
     bool           skipstillorwait;
     long long      cellstartPos;

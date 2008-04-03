@@ -38,6 +38,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       dvdWaiting(false),
       titleLength(0), hl_startx(0), hl_width(0),
       hl_starty(0), hl_height(0),
+      menuSpuPkt(0),
       menuBuflength(0),
       skipstillorwait(true),
       cellstartPos(0), buttonSelected(false), 
@@ -57,6 +58,10 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       parent(0)
 {
     memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
+    memset(dvdBlockWriteBuf, 0, sizeof(char) * DVD_BLOCK_SIZE);
+    memset(clut, 0, sizeof(uint32_t) * 16);
+    memset(button_color, 0, sizeof(uint8_t) * 4);
+    memset(button_alpha, 0, sizeof(uint8_t) * 4);
     uint def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
     uint seekValues[8] = { 1, 2, 4, 8, 10, 15, 20, 60 };
 
