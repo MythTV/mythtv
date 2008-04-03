@@ -19,69 +19,69 @@
  *
  * ============================================================ */
 
-#include <iostream>
-#include <math.h>
+// C Headers
 #include <unistd.h>
-#include <cstdlib>
+#include <math.h>
 
+// QT headers
 #include <qapplication.h>
 #include <q3network.h>
 #include <qdatetime.h>
-#include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
 #include <qregexp.h>
 //Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QPixmap>
-#include <Q3VBoxLayout>
-#include <QPaintEvent>
 #include <QUrl>
+#include <QImageReader>
 
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-#include "mythtv/httpcomms.h"
+// MythTV headers
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/util.h>
+#include <mythtv/mythdbcon.h>
+#include <mythtv/httpcomms.h>
+#include <mythtv/mythcontext.h>
 
+// MythNews headers
 #include "mythnews.h"
 
-MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
-    : MythBusyDialog(title)
+// MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
+//     : MythBusyDialog(title)
+// {
+// }
+// 
+// MythNewsBusyDialog::~MythNewsBusyDialog()
+// {
+// }
+// 
+// void MythNewsBusyDialog::keyPressEvent(QKeyEvent *e)
+// {
+//     bool handled = false;
+//     QStringList actions;
+//     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+//     {
+//         for (unsigned int i = 0; i < actions.size() && !handled; i++)
+//         {
+//             QString action = actions[i];
+//             if (action == "ESCAPE")
+//             {
+//                 emit cancelAction();
+//                 handled = true;
+//             }
+//         }
+//     }
+// 
+//     if (!handled)
+//         MythDialog::keyPressEvent(e);
+// }
+
+
+/** \brief Creates a new MythNews Screen
+ *  \param parent Pointer to the screen stack
+ *  \param name The name of the window
+ */
+MythNews::MythNews(MythScreenStack *parent, const char *name)
+    : MythScreenType (parent, name)
 {
-}
-
-MythNewsBusyDialog::~MythNewsBusyDialog()
-{
-}
-
-void MythNewsBusyDialog::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                emit cancelAction();
-                handled = true;
-            }
-        }
-    }
-
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-
-MythNews::MythNews(MythMainWindow *parent, const char *name )
-    : MythDialog(parent, name)
-{
-    q3InitNetworkProtocols ();
-
     // Setup cache directory
 
     QString fileprefix = MythContext::GetConfDir();
@@ -98,22 +98,19 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
-    
+
     // Initialize variables
 
-    m_InColumn     = 0;
-    m_UISites      = 0;
-    m_UIArticles   = 0;
-    m_TimerTimeout = 10*60*1000; 
+    m_sitesList = m_articlesList = NULL;
+    m_updatedText = m_titleText = m_descText = NULL;
+    m_thumbnailImage = m_downloadImage = m_enclosureImage = NULL;
+    m_menuPopup = NULL;
+
+    m_TimerTimeout = 10*60*1000;
     httpGrabber = NULL;
 
     timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-
-    setNoErase();
-    loadTheme();
-
-    updateBackground();
 
     // Now do the actual work
     m_RetrieveTimer = new QTimer(this);
@@ -121,18 +118,79 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
             this, SLOT(slotRetrieveNews()));
     m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
 
-    // Load sites from database
-    loadSites();
-
     m_NewsSites.setAutoDelete(true);
 
     m_RetrieveTimer->start(m_TimerTimeout, false);
 }
 
+MythNews::~MythNews()
+{
+    m_RetrieveTimer->stop();
+}
+
+bool MythNews::Create()
+{
+
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("news-ui.xml", "news", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_sitesList = dynamic_cast<MythListButton *>
+                (GetChild("siteslist"));
+
+    m_articlesList = dynamic_cast<MythListButton *>
+                (GetChild("articleslist"));
+
+    m_updatedText = dynamic_cast<MythUIText *>
+                (GetChild("updated"));
+
+    m_titleText = dynamic_cast<MythUIText *>
+                (GetChild("title"));
+
+    m_descText = dynamic_cast<MythUIText *>
+                (GetChild("description"));
+
+    m_thumbnailImage = dynamic_cast<MythUIImage *>
+                (GetChild("thumbnail"));
+
+    m_enclosureImage = dynamic_cast<MythUIImage *>
+                (GetChild("enclosures"));
+
+    m_downloadImage = dynamic_cast<MythUIImage *>
+                (GetChild("download"));
+
+    if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
+        !m_downloadImage || !m_titleText || !m_descText)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_sitesList);
+    m_sitesList->SetActive(true);
+    m_articlesList->SetActive(false);
+
+    loadSites();
+
+    connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
+            this, SLOT(slotSiteSelected(MythListButtonItem*)));
+    connect(m_articlesList, SIGNAL(itemSelected( MythListButtonItem*)),
+            this, SLOT(  updateInfoView(MythListButtonItem*)));
+
+    return true;
+}
+
 void MythNews::loadSites(void)
 {
     m_NewsSites.clear();
-    m_UISites->Reset();
+    m_sitesList->Reset();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT name, url, ico, updated FROM newssites ORDER BY name");
@@ -156,8 +214,8 @@ void MythNews::loadSites(void)
 
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        UIListBtnTypeItem* item =
-            new UIListBtnTypeItem(m_UISites, site->name());
+        MythListButtonItem* item =
+            new MythListButtonItem(m_sitesList, site->name());
         item->setData(site);
 
         connect(site, SIGNAL(finished(NewsSite*)),
@@ -165,328 +223,110 @@ void MythNews::loadSites(void)
     }
 
     slotRetrieveNews();
-
-    slotSiteSelected((NewsSite*) m_NewsSites.first());
 }
 
-MythNews::~MythNews()
+void MythNews::updateInfoView(MythListButtonItem* selected)
 {
-    m_RetrieveTimer->stop();
-    delete m_Theme;
-}
+    if (!selected)
+        return;
 
-void MythNews::loadTheme()
-{
-    m_Theme = new XMLParse();
-    m_Theme->SetWMult(wmult);
-    m_Theme->SetHMult(hmult);
+    NewsSite *site = NULL;
+    NewsArticle *article = NULL;
 
-    QDomElement xmldata;
-    m_Theme->LoadTheme(xmldata, "news", "news-");
-
-    for (QDomNode child = xmldata.firstChild(); !child.isNull();
-         child = child.nextSibling()) {
-        
-        QDomElement e = child.toElement();
-        if (!e.isNull()) {
-
-            if (e.tagName() == "font") {
-                m_Theme->parseFont(e);
-            }
-            else if (e.tagName() == "container") {
-                QRect area;
-                QString name;
-                int context;
-                m_Theme->parseContainer(e, name, context, area);
-
-                if (name.lower() == "sites")
-                    m_SitesRect = area;
-                else if (name.lower() == "articles")
-                    m_ArticlesRect = area;
-                else if (name.lower() == "info")
-                    m_InfoRect = area;
-            }
-            else {
-                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1")
-                                              .arg(e.tagName()));
-                exit(-1);
-            }
-        }
-    }
-
-    LayerSet *container = m_Theme->GetSet("sites");
-    if (!container) {
-        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get sites container.");
-        exit(-1);
-    }
-        
-    m_UISites = (UIListBtnType*)container->GetType("siteslist");
-    if (!m_UISites) {
-        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get sites list area.");
-        exit(-1);
-    }
-        
-    connect(m_UISites, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-            SLOT(slotSiteSelected(UIListBtnTypeItem*)));
-
-    container = m_Theme->GetSet("articles");
-    if (!container) {
-        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get articles container.");
-        exit(-1);
-    }
-
-    m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
-    if (!m_UIArticles) {
-        VERBOSE(VB_IMPORTANT, "MythNews: Failed to get articles list area.");
-        exit(-1);
-    }
-    
-    connect(m_UIArticles, SIGNAL(itemSelected(UIListBtnTypeItem*)),
-            SLOT(slotArticleSelected(UIListBtnTypeItem*)));
-    
-    m_UISites->SetActive(true);
-    m_UIArticles->SetActive(false);
-}
-
-
-void MythNews::paintEvent(QPaintEvent *e)
-{
-    QRect r = e->rect();
-
-    if (r.intersects(m_SitesRect))
-        updateSitesView();
-    if (r.intersects(m_ArticlesRect))
-        updateArticlesView();
-    if (r.intersects(m_InfoRect))
-        updateInfoView();
-}
-
-void MythNews::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = m_Theme->GetSet("background");
-    if (container)
+    if (GetFocusWidget() == m_articlesList)
     {
-        container->Draw(&tmp, 0, 0);
+        article = (NewsArticle*) selected->getData();
+        if (m_sitesList->GetItemCurrent())
+            site = (NewsSite*) m_sitesList->GetItemCurrent()->getData();
     }
-
-    tmp.end();
-    m_background = bground;
-
-    setPaletteBackgroundPixmap(m_background);
-}
-
-void MythNews::updateSitesView()
-{
-    QPixmap pix(m_SitesRect.size());
-    pix.fill(this, m_SitesRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("sites");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-
-    bitBlt(this, m_SitesRect.left(), m_SitesRect.top(),
-           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
-}
-
-void MythNews::updateArticlesView()
-{
-    QPixmap pix(m_ArticlesRect.size());
-    pix.fill(this, m_ArticlesRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("articles");
-    if (container) {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-
-    bitBlt(this, m_ArticlesRect.left(), m_ArticlesRect.top(),
-           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
-}
-
-void MythNews::updateInfoView()
-{
-    QPixmap pix(m_InfoRect.size());
-    pix.fill(this, m_InfoRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("info");
-    if (container)
+    else
     {
-        NewsSite    *site     = 0;
-        NewsArticle *article  = 0;
+        site = (NewsSite*) selected->getData();
+        if (m_articlesList->GetItemCurrent())
+            article = (NewsArticle*) m_articlesList->GetItemCurrent()->getData();
+    }
 
-        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
-        if (siteUIItem && siteUIItem->getData()) 
-            site = (NewsSite*) siteUIItem->getData();
+    if (GetFocusWidget() == m_articlesList)
+    {
 
-        UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
-        if (articleUIItem && articleUIItem->getData())
-            article = (NewsArticle*) articleUIItem->getData();
-
-        if (m_InColumn == 1) 
+        if (article)
         {
-            if (article)
+
+            if (m_titleText)
+                m_titleText->SetText(article->title());
+
+            if (m_descText)
             {
-                UITextType *ttype =
-                    (UITextType *)container->GetType("title");
-                if (ttype)
-                    ttype->SetText(article->title());
-
-                ttype =
-                    (UITextType *)container->GetType("description");
-                if (ttype)
+                QString artText = article->description();
+                // Replace paragraph and break HTML with newlines
+                if( artText.find(QRegExp("</(p|P)>")) )
                 {
-                    QString artText = article->description();
-                    // Replace paragraph and break HTML with newlines
-                    if( artText.find(QRegExp("</(p|P)>")) )
-                    {
-                        artText.replace( QRegExp("<(p|P)>"), "");
-                        artText.replace( QRegExp("</(p|P)>"), "\n\n");
-                    }
-                    else
-                    {
-                        artText.replace( QRegExp("<(p|P)>"), "\n\n");
-                        artText.replace( QRegExp("</(p|P)>"), "");
-                    }                        
-                    artText.replace( QRegExp("<(br|BR|)/>"), "\n");
-                    artText.replace( QRegExp("<(br|BR|)>"), "\n");
-                    // These are done instead of simplifyWhitespace
-                    // because that function also strips out newlines
-                    // Replace tab characters with nothing
-                    artText.replace( QRegExp("\t"), "");
-                    // Replace double space with single
-                    artText.replace( QRegExp("  "), "");
-                    // Replace whitespace at beginning of lines with newline
-                    artText.replace( QRegExp("\n "), "\n");
-                    // Remove any remaining HTML tags
-                    QRegExp removeHTML(QRegExp("</?.+>"));
-                    removeHTML.setMinimal(true);
-                    artText.remove((const QRegExp&) removeHTML);
-                    artText = artText.stripWhiteSpace();
-                    ttype->SetText(artText);
-                }
-
-                if (!article->thumbnail().isEmpty())
-                {
-                    QString fileprefix = MythContext::GetConfDir();
-
-                    QDir dir(fileprefix);
-                    if (!dir.exists())
-                         dir.mkdir(fileprefix);
-
-                    fileprefix += "/MythNews/tcache";
-
-                    dir = QDir(fileprefix);
-                    if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                    QString url = article->thumbnail();
-                    QString sFilename = QString("%1/%2")
-                            .arg(fileprefix).arg(qChecksum(url,url.length()));
-
-                    bool exists = QFile::exists(sFilename);
-                    if (!exists)
-                        HttpComms::getHttpFile(sFilename, url, 20000);
-
-                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
-                    if (itype)
-                    {
-                       itype->SetImage(sFilename);
-                       itype->LoadImage();
-
-                       if (itype->isHidden())
-                           itype->show();
-                    }
+                    artText.replace( QRegExp("<(p|P)>"), "");
+                    artText.replace( QRegExp("</(p|P)>"), "\n\n");
                 }
                 else
                 {
-                    if (!site->imageURL().isEmpty())
-                    {
-                        QString fileprefix = MythContext::GetConfDir();
+                    artText.replace( QRegExp("<(p|P)>"), "\n\n");
+                    artText.replace( QRegExp("</(p|P)>"), "");
+                }
+                artText.replace( QRegExp("<(br|BR|)/>"), "\n");
+                artText.replace( QRegExp("<(br|BR|)>"), "\n");
+                // These are done instead of simplifyWhitespace
+                // because that function also strips out newlines
+                // Replace tab characters with nothing
+                artText.replace( QRegExp("\t"), "");
+                // Replace double space with single
+                artText.replace( QRegExp("  "), "");
+                // Replace whitespace at beginning of lines with newline
+                artText.replace( QRegExp("\n "), "\n");
+                // Remove any remaining HTML tags
+                QRegExp removeHTML(QRegExp("</?.+>"));
+                removeHTML.setMinimal(true);
+                artText.remove((const QRegExp&) removeHTML);
+                artText = artText.stripWhiteSpace();
+                m_descText->SetText(artText);
+            }
 
-                        QDir dir(fileprefix);
-                        if (!dir.exists())
-                            dir.mkdir(fileprefix);
+            if (!article->thumbnail().isEmpty())
+            {
+                QString fileprefix = MythContext::GetConfDir();
 
-                        fileprefix += "/MythNews/scache";
+                QDir dir(fileprefix);
+                if (!dir.exists())
+                        dir.mkdir(fileprefix);
 
-                        dir = QDir(fileprefix);
-                        if (!dir.exists())
-                            dir.mkdir(fileprefix);
+                fileprefix += "/MythNews/tcache";
 
-                        QString sitename = site->name();
-                        QString sFilename(fileprefix + "/" + sitename + ".jpg");
-                        QString url = site->imageURL();
+                dir = QDir(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
 
-                        bool exists = QFile::exists(sFilename);
-                        if (!exists)
-                            HttpComms::getHttpFile(sFilename, url, 20000);
+                QString url = article->thumbnail();
+                QString sFilename = QString("%1/%2")
+                        .arg(fileprefix).arg(qChecksum(url,url.length()));
 
-                        UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
-                        if (itype)
-                        {
-                        itype->SetImage(sFilename);
-                        itype->LoadImage();
+                bool exists = QFile::exists(sFilename);
+                if (!exists)
+                    HttpComms::getHttpFile(sFilename, url, 20000);
 
-                        if (itype->isHidden())
-                            itype->show();
-                        }
-                    }
+                if (m_thumbnailImage)
+                {
+                    m_thumbnailImage->SetFilename(sFilename);
+                    m_thumbnailImage->Load();
+
+                    if (!m_thumbnailImage->IsVisible())
+                        m_thumbnailImage->Show();
                 }
             }
-        }
-        else
-        {
-            UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
-            if (itype)
+            else
             {
-                itype->hide();
-            }
-
-            if (site)
-            {
-                UITextType *ttype =
-                    (UITextType *)container->GetType("title");
-                if (ttype)
-                    ttype->SetText(site->name());
-
-                ttype =
-                    (UITextType *)container->GetType("description");
-                if (ttype)
-                    ttype->SetText(site->description());
-
                 if (!site->imageURL().isEmpty())
                 {
                     QString fileprefix = MythContext::GetConfDir();
 
                     QDir dir(fileprefix);
                     if (!dir.exists())
-                         dir.mkdir(fileprefix);
+                        dir.mkdir(fileprefix);
 
                     fileprefix += "/MythNews/scache";
 
@@ -494,110 +334,126 @@ void MythNews::updateInfoView()
                     if (!dir.exists())
                         dir.mkdir(fileprefix);
 
-                    QString sitename = site->name();
-                    QString sFilename(fileprefix + "/" + sitename + ".jpg");
                     QString url = site->imageURL();
+                    QString extension = url.section('.', -1);
+
+                    QString sitename = site->name();
+                    QString sFilename = QString("%1/%2.%3").arg(fileprefix)
+                                                           .arg(sitename)
+                                                           .arg(extension);
 
                     bool exists = QFile::exists(sFilename);
                     if (!exists)
                         HttpComms::getHttpFile(sFilename, url, 20000);
 
-                    UIImageType *itype = (UIImageType *)container->GetType("thumbnail");
-                    if (itype)
+                    if (m_thumbnailImage)
                     {
-                       itype->SetImage(sFilename);
-                       itype->LoadImage();
+                        m_thumbnailImage->SetFilename(sFilename);
+                        m_thumbnailImage->Load();
 
-                       if (itype->isHidden())
-                           itype->show();
+                        if (!m_thumbnailImage->IsVisible())
+                            m_thumbnailImage->Show();
                     }
                 }
             }
-        }
 
-        UITextType *ttype =
-            (UITextType *)container->GetType("updated");
-        if (ttype) {
-
-            if (site)
+            if (!article->enclosure().isEmpty())
             {
-                QString text(tr("Updated") + " - ");
-                QDateTime updated(site->lastUpdated());
-                if (updated.toTime_t() != 0) {
-                    text += site->lastUpdated().toString(dateFormat) + " ";
-                    text += site->lastUpdated().toString(timeFormat);
-                }
-                else
-                    text += tr("Unknown");
-                ttype->SetText(text);
-            }
-
-            if (httpGrabber != NULL)
-            {
-                int progress = httpGrabber->getProgress();
-                int total = httpGrabber->getTotal();
-                if ((progress > 0) && (total > 0) && (progress < total))
-                {
-                    float fProgress = (float)progress/total;
-                    QString text = QString("%1 of %2 (%3 percent)")
-                            .arg(formatSize(progress, 2))
-                            .arg(formatSize(total, 2))
-                            .arg(floor(fProgress*100));
-                    ttype->SetText(text);
-                }
-            }
-        }
-
-        UIImageType *itype = (UIImageType *)container->GetType("enclosures");
-        if (itype)
-        {
-            if ((article) && (m_InColumn == 1))
-            {
-                if (!article->enclosure().isEmpty())
-                {
-                    if (itype->isHidden())
-                        itype->show();
-                } else {
-                    itype->hide();
-                }
-            } else {
-                itype->hide(); 
-            }
-        }
-
-        UIImageType *dtype = (UIImageType *)container->GetType("download");
-        if (dtype)
-        {
-            if ((article) && (m_InColumn == 1))
-            {
-                if (!article->enclosure().isEmpty())
-                {
-                    if (dtype->isHidden())
-                        dtype->show();
-                }
-                else 
-                    dtype->hide();
+                if (!m_downloadImage->IsVisible())
+                    m_downloadImage->Show();
             }
             else
-                dtype->hide();
-        }
+                m_downloadImage->Hide();
 
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
+            if (!article->enclosure().isEmpty())
+            {
+                if (m_enclosureImage->IsVisible())
+                    m_enclosureImage->Show();
+            }
+            else
+                m_enclosureImage->Hide();
+        }
+    }
+    else
+    {
+        m_downloadImage->Hide();
+        m_enclosureImage->Hide();
+
+        if (site)
+        {
+            if (m_titleText)
+                m_titleText->SetText(site->name());
+
+            if (m_descText)
+                m_descText->SetText(site->description());
+
+            if (m_thumbnailImage && m_thumbnailImage->IsVisible())
+                m_thumbnailImage->Hide();
+
+            if (!site->imageURL().isEmpty())
+            {
+                QString fileprefix = MythContext::GetConfDir();
+
+                QDir dir(fileprefix);
+                if (!dir.exists())
+                        dir.mkdir(fileprefix);
+
+                fileprefix += "/MythNews/scache";
+
+                dir = QDir(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                QString sitename = site->name();
+                QString sFilename(fileprefix + "/" + sitename + ".jpg");
+                QString url = site->imageURL();
+
+                bool exists = QFile::exists(sFilename);
+                if (!exists)
+                    HttpComms::getHttpFile(sFilename, url, 20000);
+
+                if (m_thumbnailImage)
+                {
+                    m_thumbnailImage->SetFilename(sFilename);
+                    m_thumbnailImage->Load();
+
+                    if (m_thumbnailImage->IsVisible())
+                        m_thumbnailImage->Show();
+                }
+            }
+        }
     }
 
-    p.end();
+    if (m_updatedText) {
 
+        if (site)
+        {
+            QString text(tr("Updated") + " - ");
+            QDateTime updated(site->lastUpdated());
+            if (updated.toTime_t() != 0) {
+                text += site->lastUpdated().toString(dateFormat) + " ";
+                text += site->lastUpdated().toString(timeFormat);
+            }
+            else
+                text += tr("Unknown");
+            m_updatedText->SetText(text);
+        }
 
-    bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
-           &pix, 0, 0, -1, -1, QPainter::CompositionMode_Source);
+        if (httpGrabber != NULL)
+        {
+            int progress = httpGrabber->getProgress();
+            int total = httpGrabber->getTotal();
+            if ((progress > 0) && (total > 0) && (progress < total))
+            {
+                float fProgress = (float)progress/total;
+                QString text = QString("%1 of %2 (%3 percent)")
+                        .arg(formatSize(progress, 2))
+                        .arg(formatSize(total, 2))
+                        .arg(floor(fProgress*100));
+                m_updatedText->SetText(text);
+            }
+        }
+    }
 }
 
 QString MythNews::formatSize(long long bytes, int prec)
@@ -623,105 +479,37 @@ QString MythNews::formatSize(long long bytes, int prec)
     return QString("%1 KB").arg(sizeKB);
 }
 
-void MythNews::keyPressEvent(QKeyEvent *e)
+bool MythNews::keyPressEvent(QKeyEvent *event)
 {
-    if (!e) return;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("News", e, actions);
-   
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    gContext->GetMainWindow()->TranslateKeyPress("News", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP")
-            cursorUp();
-        else if (action == "PAGEUP")
-             cursorUp(true);
-        else if (action == "DOWN")
-            cursorDown();
-        else if (action == "PAGEDOWN")
-             cursorDown(true);
-        else if (action == "LEFT")
-            cursorLeft();
+        if (action == "LEFT")
+            NextPrevWidgetFocus(false);
         else if (action == "RIGHT")
-            cursorRight();
+            NextPrevWidgetFocus(true);
         else if (action == "RETRIEVENEWS")
             slotRetrieveNews();
-        else if(action == "SELECT")
-            slotViewArticle();
         else if (action == "CANCEL")
             cancelRetrieve();
         else if (action == "MENU")
-            showMenu();
+            ShowMenu();
+        else if (action == "ESCAPE")
+            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void MythNews::cursorUp(bool page)
-{
-    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
-
-    if (m_InColumn == 0) {
-        m_UISites->MoveUp(unit);
-    }
-    else {
-        m_UIArticles->MoveUp(unit);
-    }
-}
-
-void MythNews::cursorDown(bool page)
-{
-    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
-
-    if (m_InColumn == 0) {
-        m_UISites->MoveDown(unit);
-    }
-    else {
-        m_UIArticles->MoveDown(unit);
-    }
-}
-
-void MythNews::cursorRight()
-{
-    if (m_InColumn == 1)
-    {
-        slotViewArticle();
-        return;
-    }
-
-    m_InColumn++;
-
-    m_UISites->SetActive(false);
-    m_UIArticles->SetActive(true);
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
-}
-
-void MythNews::cursorLeft()
-{
-    if (m_InColumn == 0)
-    {
-        accept();
-        return;
-    }
-
-    m_InColumn--;
-
-    m_UISites->SetActive(true);
-    m_UIArticles->SetActive(false);
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
+    return handled;
 }
 
 void MythNews::slotRetrieveNews()
@@ -773,56 +561,40 @@ void MythNews::processAndShowNews(NewsSite* site)
 
     site->process();
 
-    UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+    MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
     if (!siteUIItem || !siteUIItem->getData())
         return;
-    
+
     if (site == (NewsSite*) siteUIItem->getData()) {
 
-        m_UIArticles->Reset();
+        m_articlesList->Reset();
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next()) {
-            UIListBtnTypeItem* item =
-                new UIListBtnTypeItem(m_UIArticles, article->title());
+            MythListButtonItem* item =
+                new MythListButtonItem(m_articlesList, article->title());
             item->setData(article);
         }
-
-        update(m_ArticlesRect);
-        update(m_InfoRect);
-    } 
-}
-void MythNews::slotSiteSelected(NewsSite* site)
-{
-    if(!site)
-        return;
-        
-    m_UIArticles->Reset();
-
-    for (NewsArticle* article = site->articleList().first(); article;
-         article = site->articleList().next()) {
-        UIListBtnTypeItem* item =
-            new UIListBtnTypeItem(m_UIArticles, article->title());
-        item->setData(article);
     }
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
 }
 
-void MythNews::slotSiteSelected(UIListBtnTypeItem *item)
+void MythNews::slotSiteSelected(MythListButtonItem *item)
 {
     if (!item || !item->getData())
         return;
-    
-    slotSiteSelected((NewsSite*) item->getData());
-}
 
-void MythNews::slotArticleSelected(UIListBtnTypeItem*)
-{
-    update(m_ArticlesRect);
-    update(m_InfoRect);
+    NewsSite *site = (NewsSite*)item->getData();
+
+    m_articlesList->Reset();
+
+    for (NewsArticle* article = site->articleList().first(); article;
+         article = site->articleList().next()) {
+        MythListButtonItem* articleitem =
+            new MythListButtonItem(m_articlesList, article->title());
+        articleitem->setData(article);
+    }
+
+    updateInfoView(item);
 }
 
 void MythNews::slotProgressCancelled()
@@ -832,10 +604,10 @@ void MythNews::slotProgressCancelled()
 
 void MythNews::createProgress(QString title)
 {
-    busy = new MythNewsBusyDialog(title);
-    busy->start();
-    connect(busy, SIGNAL(cancelAction()),
-            SLOT(slotProgressCancelled()));
+//     busy = new MythNewsBusyDialog(title);
+//     busy->start();
+//     connect(busy, SIGNAL(cancelAction()),
+//             SLOT(slotProgressCancelled()));
 }
 
 bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
@@ -847,76 +619,74 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
     httpGrabber = NULL;
     QString hostname = "";
 
-                busy = NULL;
-                createProgress(QObject::tr("Downloading media..."));
-                while (1)
-                {
-                    QUrl qurl(cmdURL);
-                    if (hostname == "")
-                        hostname = qurl.host();  // hold onto original host
+//     busy = NULL;
+    createProgress(QObject::tr("Downloading media..."));
+    while (1)
+    {
+        QUrl qurl(cmdURL);
+        if (hostname == "")
+            hostname = qurl.host();  // hold onto original host
 
-                    if (!qurl.hasHost())        // can occur on redirects to partial paths
-                        qurl.setHost(hostname);
+        if (!qurl.hasHost())        // can occur on redirects to partial paths
+            qurl.setHost(hostname);
 
-                    if (httpGrabber != NULL)
-                        delete httpGrabber;
+        if (httpGrabber != NULL)
+            delete httpGrabber;
 
-                    httpGrabber = new HttpComms;
-                    abortHttp = false;
+        httpGrabber = new HttpComms;
+        abortHttp = false;
 
-                    httpGrabber->request(qurl, -1, true);
+        httpGrabber->request(qurl, -1, true);
 
-                    while ((!httpGrabber->isDone()) && (!abortHttp))
-                    {
-                        update(m_InfoRect);
-                        qApp->processEvents();
-                        usleep(100000);
-                    }
- 
-                    if (abortHttp)
-                        break;
+        while ((!httpGrabber->isDone()) && (!abortHttp))
+        {
+            qApp->processEvents();
+            usleep(100000);
+        }
 
-                    // Check for redirection
-                    if (!httpGrabber->getRedirectedURL().isEmpty())
-                    {
-                        if (redirectCount++ < 3)
-                            cmdURL = httpGrabber->getRedirectedURL();
+        if (abortHttp)
+            break;
 
-                        // Try again
-                        timeoutCount = 0;
-                        continue;
-                    }
+        // Check for redirection
+        if (!httpGrabber->getRedirectedURL().isEmpty())
+        {
+            if (redirectCount++ < 3)
+                cmdURL = httpGrabber->getRedirectedURL();
 
-                    data = httpGrabber->getRawData();
+            // Try again
+            timeoutCount = 0;
+            continue;
+        }
 
-                    if (data.size() > 0)
-                    {
-                        QFile file(sFilename);
-                        if (file.open( QIODevice::WriteOnly ))
-                        {
-                            QDataStream stream(& file);
-                            stream.writeRawBytes( (const char*) (data), data.size() );
-                            file.close();
-                            res = true;
-                        }
-                    }
-                    break;
-                }
+        data = httpGrabber->getRawData();
 
-                delete httpGrabber;
-                httpGrabber = NULL;
-                delete busy;
-                return res;
+        if (data.size() > 0)
+        {
+            QFile file(sFilename);
+            if (file.open( QIODevice::WriteOnly ))
+            {
+                QDataStream stream(& file);
+                stream.writeRawBytes( (const char*) (data), data.size() );
+                file.close();
+                res = true;
+            }
+        }
+        break;
+    }
+
+    delete httpGrabber;
+    httpGrabber = NULL;
+    return res;
 
 }
 
 void MythNews::slotViewArticle()
 {
-    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+    MythListButtonItem *articlesListItem = m_articlesList->GetItemCurrent();
 
-    if (articleUIItem && articleUIItem->getData())
+    if (articlesListItem && articlesListItem->getData())
     {
-        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        NewsArticle *article = (NewsArticle*) articlesListItem->getData();
         if(article)
         {
             if (!article->enclosure().isEmpty())
@@ -994,143 +764,92 @@ void MythNews::slotViewArticle()
     }
 }
 
-bool MythNews::showEditDialog(bool edit)
+bool MythNews::ShowEditDialog(bool edit)
 {
-    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit news site");
-
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(NULL, 0, (int)(10 * hmult));
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
-
-    QString title;
-    if (edit)
-        title = tr("Edit Site Details");
-    else
-        title = tr("Enter Site Details");
-
-    QLabel *label = new QLabel(title, popup);
-    QFont font = label->font();
-    font.setPointSize(int (font.pointSize() * 1.2));
-    font.setBold(true);
-    label->setFont(font);
-    label->setPaletteForegroundColor(QColor("yellow"));
-    label->setAlignment(Qt::AlignCenter);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred)));
-    label->setMinimumWidth((int)(500 * wmult));
-    label->setMaximumWidth((int)(500 * wmult));
-    hbox->addWidget(label);
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
-    label = new QLabel(tr("Name:"), popup, "nopopsize");
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    label->setMinimumWidth((int)(110 * wmult));
-    label->setMaximumWidth((int)(110 * wmult));
-    hbox->addWidget(label);
-
-    MythRemoteLineEdit *titleEditor = new MythRemoteLineEdit(popup);
-    titleEditor->setFocus(); 
-    hbox->addWidget(titleEditor);
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
-    label = new QLabel(tr("URL:"), popup, "nopopsize");
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    label->setMinimumWidth((int)(110 * wmult));
-    label->setMaximumWidth((int)(110 * wmult));
-    hbox->addWidget(label);
-
-    MythRemoteLineEdit *urlEditor = new MythRemoteLineEdit(popup);
-    hbox->addWidget(urlEditor);
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * hmult));
-    label = new QLabel(tr("Icon:"), popup, "nopopsize");
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    label->setMinimumWidth((int)(110 * wmult));
-    label->setMaximumWidth((int)(110 * wmult));
-    hbox->addWidget(label);
-
-    MythRemoteLineEdit *iconEditor = new MythRemoteLineEdit(popup);
-    hbox->addWidget(iconEditor);
-
-    popup->addLayout(vbox, 0);
-
-    popup->addButton(tr("OK"),     popup, SLOT(accept()));
-    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-
-    QString siteName = "";
-    if (edit)
-    {
-        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
-
-        if (siteUIItem && siteUIItem->getData())
-        {
-            NewsSite *site = (NewsSite*) siteUIItem->getData();
-            if(site)
-            {
-                siteName = site->name();
-                titleEditor->setText(site->name());
-                urlEditor->setText(site->url());
-            }
-        }
-    }
-
-    DialogCode res = popup->ExecPopup();
-
-    if (kDialogCodeAccepted == res)
-    {
-        if (edit && siteName != "")
-            removeFromDB(siteName);
-        insertInDB(titleEditor->text(), urlEditor->text(), iconEditor->text(), "custom");
-        loadSites();
-    }
-
-    popup->deleteLater();
-
-    return (kDialogCodeAccepted == res);
+//     MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit news site");
+// 
+//     QString title;
+//     if (edit)
+//         title = tr("Edit Site Details");
+//     else
+//         title = tr("Enter Site Details");
+// 
+//     label = new QLabel(tr("Name:"), popup, "nopopsize");
+//     MythRemoteLineEdit *titleEditor = new MythRemoteLineEdit(popup);
+// 
+//     label = new QLabel(tr("URL:"), popup, "nopopsize");
+//     MythRemoteLineEdit *urlEditor = new MythRemoteLineEdit(popup);
+// 
+//     label = new QLabel(tr("Icon:"), popup, "nopopsize");
+//     MythRemoteLineEdit *iconEditor = new MythRemoteLineEdit(popup);
+// 
+//     popup->addButton(tr("OK"),     popup, SLOT(accept()));
+//     popup->addButton(tr("Cancel"), popup, SLOT(reject()));
+// 
+//     QString siteName = "";
+//     if (edit)
+//     {
+//         MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
+// 
+//         if (siteUIItem && siteUIItem->getData())
+//         {
+//             NewsSite *site = (NewsSite*) siteUIItem->getData();
+//             if(site)
+//             {
+//                 siteName = site->name();
+//                 titleEditor->setText(site->name());
+//                 urlEditor->setText(site->url());
+//             }
+//         }
+//     }
+// 
+//     if (kDialogCodeAccepted == res)
+//     {
+//         if (edit && siteName != "")
+//             removeFromDB(siteName);
+//         insertInDB(titleEditor->text(), urlEditor->text(), iconEditor->text(), "custom");
+//         loadSites();
+//     }
 }
 
-void MythNews::showMenu()
+void MythNews::ShowMenu()
 {
-    menu = new MythPopupBox(GetMythMainWindow(),"popupMenu");
+    QString label = tr("Options");
 
-    QAbstractButton *temp = menu->addButton(tr("Edit News Site"), this,
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythnewsmenupopup");
+
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "options");
+
+    m_menuPopup->AddButton(tr("Edit News Site"));
+    m_menuPopup->AddButton(tr("Add News Site"));
+    m_menuPopup->AddButton(tr("Delete News Site"));
+    m_menuPopup->AddButton(tr("Cancel"));
+/*
+    m_menuPopup->addButton(tr("Edit News Site"), this,
                                             SLOT(editNewsSite()));
-    menu->addButton(tr("Add News Site"), this, SLOT(addNewsSite()));
-    menu->addButton(tr("Delete News Site"), this, SLOT(deleteNewsSite()));
-    menu->addButton(tr("Cancel"), this, SLOT(cancelMenu()));
-    temp->setFocus();
-
-    menu->ShowPopup(this, SLOT(cancelMenu()));
-}
-
-void MythNews::cancelMenu()
-{
-    if (menu) 
-    {
-        menu->deleteLater();
-        menu=NULL;
-    }
+    m_menuPopup->addButton(tr("Add News Site"), this, SLOT(addNewsSite()));
+    m_menuPopup->addButton(tr("Delete News Site"), this, SLOT(deleteNewsSite()));*/
 }
 
 void MythNews::editNewsSite()
 {
-    cancelMenu();
-    showEditDialog(true);
+    ShowEditDialog(true);
 }
 
 void MythNews::addNewsSite()
 {
-    cancelMenu();
-    showEditDialog(false);
+    ShowEditDialog(false);
 }
 
 void MythNews::deleteNewsSite()
 {
-    cancelMenu();
-
-    UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+    MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
 
     QString siteName;
     if (siteUIItem && siteUIItem->getData())
@@ -1140,13 +859,8 @@ void MythNews::deleteNewsSite()
         {
             siteName = site->name();
 
-            if (MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), QObject::tr("MythNews"),
-                                      QObject::tr("Are you sure you want to delete this news site\n\n%1")
-                                              .arg(siteName), true))
-            {
-                removeFromDB(siteName);
-                loadSites();
-            }
+            removeFromDB(siteName);
+            loadSites();
         }
     }
 }
@@ -1168,7 +882,7 @@ bool MythNews::findInDB(const QString& name)
     return val;
 }
 
-bool MythNews::insertInDB(const QString &name, const QString &url, 
+bool MythNews::insertInDB(const QString &name, const QString &url,
                           const QString &icon, const QString &category)
 {
     if (findInDB(name))
@@ -1224,3 +938,8 @@ void MythNews::playVideo(const QString &filename)
 
     gContext->sendPlaybackEnd();
 }
+
+// void MythNews::customEvent(QEvent *event)
+// {
+// 
+// }

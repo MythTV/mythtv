@@ -22,68 +22,55 @@
 #ifndef MYTHNEWS_H
 #define MYTHNEWS_H
 
-
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/httpcomms.h>
-
 #include "newsengine.h"
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QPaintEvent>
 
 class QTimer;
-class UIListBtnType;
 
-class MPUBLIC MythNewsBusyDialog : public MythBusyDialog
+// class MPUBLIC MythNewsBusyDialog : public MythBusyDialog
+// {
+//     Q_OBJECT
+//   public:
+//     MythNewsBusyDialog(const QString &title);
+//     ~MythNewsBusyDialog();
+//
+//     void keyPressEvent(QKeyEvent *);
+//
+//   signals:
+//     void cancelAction();
+//
+// };
+
+/** \class MythNews
+ *  \brief Plugin for browsing RSS news feeds.
+ */
+class MythNews : public MythScreenType
 {
     Q_OBJECT
+
   public:
-    MythNewsBusyDialog(const QString &title);
 
-    ~MythNewsBusyDialog();
-
-    void keyPressEvent(QKeyEvent *);
-
-  signals:
-    void cancelAction();
-
-};
-
-class MythNews : public MythDialog
-{
-    Q_OBJECT
-
-public:
-
-    MythNews(MythMainWindow *parent, const char *name = 0);
+    MythNews(MythScreenStack *parent, const char *name);
     ~MythNews();
 
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+//    void customEvent(QEvent*);
+
 private:
-
-    void loadTheme();
-    void loadWindow(QDomElement &element);
-    void paintEvent(QPaintEvent *e);
-
-    void updateBackground();
-    void updateSitesView();
-    void updateArticlesView();
     void updateInfoView();
-
-    void keyPressEvent(QKeyEvent *e);
-    void cursorUp(bool page=false);
-    void cursorDown(bool page=false);
-    void cursorRight();
-    void cursorLeft();
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
     void loadSites();
     bool findInDB(const QString& name);
-    bool insertInDB(const QString &name, const QString &url, 
+    bool insertInDB(const QString &name, const QString &url,
                     const QString &icon, const QString &category);
 
     bool removeFromDB(const QString &name);
@@ -93,17 +80,6 @@ private:
     void createProgress(QString title, int total);
     QString formatSize(long long bytes, int prec);
     void playVideo(const QString &filename);
-
-    XMLParse      *m_Theme;
-
-    QPixmap        m_background;
-
-    UIListBtnType *m_UISites;
-    UIListBtnType *m_UIArticles;
-    QRect          m_SitesRect;
-    QRect          m_ArticlesRect;
-    QRect          m_InfoRect;
-    unsigned int   m_InColumn;
 
     NewsSite::List m_NewsSites;
 
@@ -115,31 +91,40 @@ private:
     QString        dateFormat;
     QString        zoom;
     QString        browser;
-    MythPopupBox   *menu;
+    MythDialogBox *m_menuPopup;
 
     bool           abortHttp;
 
-    MythNewsBusyDialog *busy;
+//     MythNewsBusyDialog *busy;
     HttpComms      *httpGrabber;
 
+    MythListButton *m_sitesList;
+    MythListButton *m_articlesList;
+
+    MythUIText *m_updatedText;
+    MythUIText *m_titleText;
+    MythUIText *m_descText;
+
+    MythUIImage *m_thumbnailImage;
+    MythUIImage *m_downloadImage;
+    MythUIImage *m_enclosureImage;
+
 private slots:
+    void updateInfoView(MythListButtonItem* selected);
     void slotViewArticle();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
+    void slotSiteSelected(MythListButtonItem*);
 
-    void slotSiteSelected(UIListBtnTypeItem *item);
-    void slotSiteSelected(NewsSite*);
-    
-    void slotArticleSelected(UIListBtnTypeItem *item);
     void slotProgressCancelled();
 
     // menu stuff
-    void showMenu();
+    void ShowMenu();
     void addNewsSite();
     void editNewsSite();
     void deleteNewsSite();
     void cancelMenu();
-    bool showEditDialog(bool edit);
+    bool ShowEditDialog(bool edit);
 };
 
 #endif /* MYTHNEWS_H */

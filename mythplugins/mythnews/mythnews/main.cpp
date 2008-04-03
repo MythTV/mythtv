@@ -19,8 +19,6 @@
  *
  * ============================================================ */
 
-#include <iostream>
-
 #include <qapplication.h>
 #include <unistd.h>
 
@@ -28,7 +26,8 @@
 #include "mythnewsconfig.h"
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
+#include <mythtv/libmythui/mythmainwindow.h>
+
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
 
@@ -59,10 +58,12 @@ int mythplugin_init(const char *libversion)
 
 void runNews(void)
 {
-    gContext->addCurrentLocation("mythnews");
-    MythNews news(gContext->GetMainWindow(), "news");
-    news.exec();
-    gContext->removeCurrentLocation();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNews *mythnews = new MythNews(mainStack, "mythnews");
+
+    if (mythnews->Create())
+        mainStack->AddScreen(mythnews);
 }
 
 int mythplugin_run(void)
@@ -73,8 +74,12 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    MythNewsConfig config(gContext->GetMainWindow(), "news");
-    config.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythNewsConfig *mythnewsconfig = new MythNewsConfig(mainStack, "mythnewsconfig");
+
+    if (mythnewsconfig->Create())
+        mainStack->AddScreen(mythnewsconfig);
 
     return 0;
 }

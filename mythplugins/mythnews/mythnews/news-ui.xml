@@ -1,205 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
-  <window name="news">
+    <window name="news">
 
-    <font name="active" face="Bitstream Vera Sans">
-      <color>#ffffff</color>
-      <size>18</size>
-      <bold>yes</bold>
-    </font>
+        <buttonlist name="siteslist" from="basebuttonlist">
+            <area>20,20,200,300</area>
+            <showarrow>yes</showarrow>
+        </buttonlist>
 
-    <font name="inactive" face="Bitstream Vera Sans">
-      <color>#9999cc</color>
-      <size>18</size>
-      <bold>yes</bold>
-    </font>
+        <buttonlist name="articleslist" from="basebuttonlist">
+            <area>250,20,530,300</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
 
-    <font name="title" face="Bitstream Vera Sans">
-      <color>#ffff00</color>
-      <dropcolor>#000000</dropcolor>
-      <size>18</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
+        <textarea name="title" from="basetextarea">
+            <area>20,350,670,35</area>
+            <font>baselarge</font>
+            <multiline>yes</multiline>
+        </textarea>
 
-    <font name="desc" face="Bitstream Vera Sans">
-      <color>#ffffff</color>
-      <size>16</size>
-      <bold>no</bold>
-    </font>
+        <textarea name="description" from="basetextarea">
+            <area>20,390,610,150</area>
+            <multiline>yes</multiline>
+        </textarea>
 
-    <font name="updated" face="Bitstream Vera Sans">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>12</size>
-      <bold>no</bold>
-    </font>
+        <textarea name="updated" from="basetextarea">
+            <area>20,540,300,35</area>
+        </textarea>
 
-    <container name="sites">
+        <imagetype name="background">
+            <filename>news-info-bg.png</filename>
+            <position>0,340</position>
+        </imagetype>
 
-      <area>20,20,220,320</area>
+        <imagetype name="thumbnail">
+            <position>660,390</position>
+            <staticsize>120,90</staticsize>
+        </imagetype>
 
-      <listbtnarea name="siteslist" draworder="0">
-        <area>0,0,200,300</area>
-        <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-        </gradient>
-        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-        </gradient>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showscrollarrows>yes</showscrollarrows>
-      </listbtnarea>
+        <imagetype name="enclosures">
+            <filename>enclosures.png</filename>
+            <position>705,350</position>
+            <staticsize>32,32</staticsize>
+        </imagetype>
 
-    </container>
+        <imagetype name="download">
+            <filename>need-download.png</filename>
+            <position>740,350</position>
+            <staticsize>32,32</staticsize>
+        </imagetype>
 
-    <container name="articles"> 
+    </window>
 
-      <area>250,20,780,320</area>
+    <window name="config">
 
-      <listbtnarea name="articleslist"  draworder="0">
-        <area>0,0,530,300</area>
-        <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-        </gradient>
-        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-        </gradient>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showscrollarrows>yes</showscrollarrows>
-        <showarrow>no</showarrow>
-      </listbtnarea>
+        <buttonlist name="category" from="basebuttonlist">
+            <area>20,40,300,500</area>
+        </buttonlist>
 
-    </container>
+        <buttonlist name="sites" from="basebuttonlist">
+            <area>340,40,440,500</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
 
-    <container name="info"> 
+        <textarea name="context_switch" from="basetextarea">
+            <area>20,550,760,50</area>
+            <multiline>yes</multiline>
+        </textarea>
 
-      <area>0,340,800,260</area>
+        <textarea name="help" from="basetextarea">
+            <area>20,500,760,150</area>
+            <multiline>yes</multiline>
+        </textarea>
 
-      <textarea name="title" draworder="1">
-        <area>20,10,760,70</area>
-        <font>title</font>
-        <multiline>yes</multiline>
-      </textarea>
-
-      <textarea name="description" draworder="1">
-        <area>20,70,625,150</area>
-        <font>desc</font>
-        <multiline>yes</multiline>
-      </textarea>
-
-      <image name="background" draworder="0" fleximage="no">
-        <filename>news-info-bg.png</filename>
-        <position>0,0</position>
-      </image>
-
-      <textarea name="updated" align="right" draworder="1">
-        <area>180,220,600,30</area>
-        <font>updated</font>
-        <multiline>no</multiline>
-      </textarea>
-
-      <image name="thumbnail" draworder="2">
-        <position>660,75</position>
-        <staticsize>120,90</staticsize>
-      </image>
-
-      <image name="enclosures" draworder="1">
-        <filename>enclosures.png</filename>
-        <position>685,170</position>
-        <staticsize>32,32</staticsize>
-      </image>
-
-      <image name="download" draworder="1">
-        <filename>need-download.png</filename>
-        <position>720,170</position>
-        <staticsize>32,32</staticsize>
-      </image>
-
-    </container>
-
-  </window>
-
-  <window name="newsconfig">
-
-      <font name="active" face="Bitstream Vera Sans">
-          <color>#ffffff</color>
-          <size>18</size>
-          <bold>yes</bold>
-      </font>
-      
-      <font name="inactive" face="Bitstream Vera Sans">
-          <color>#9999cc</color>
-          <size>18</size>
-          <bold>yes</bold>
-      </font>
-
-      <font name="desc" face="Bitstream Vera Sans">
-          <color>#ffffff</color>
-          <size>16</size>
-          <bold>no</bold>
-      </font>
-      
-    <container name="config-sites">
-
-      <area>20,40,760,560</area>
-
-      <listbtnarea name="category" draworder="0">
-        <area>0,0,300,500</area>
-        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
-        </gradient>
-        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-        </gradient>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showscrollarrows>yes</showscrollarrows>
-      </listbtnarea>
-
-      <listbtnarea name="sites"  draworder="0">
-        <area>320,0,440,500</area>
-        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
-        </gradient>
-        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-        </gradient>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showarrow>no</showarrow>
-        <showscrollarrows>yes</showscrollarrows>
-      </listbtnarea>
-
-         <textarea name="context_switch" draworder="0">
-          <area>0,510,760,50</area>
-          <font>desc</font>
-          <multiline>yes</multiline>
-         </textarea>
-
-    </container>
-
-    <container name="config-freq">
-
-      <area>20,40,760,560</area>
-
-         <textarea name="help" draworder="0">
-          <area>0,50,760,150</area>
-          <font>desc</font>
-          <multiline>yes</multiline>
-         </textarea>
-
-         <blackhole name="spinbox_holder" draworder="0">
+        <!-- <blackhole name="spinbox_holder">
             <area>20,170,70,30</area>
-         </blackhole>
+        </blackhole>
 
-         <textarea name="minutes" draworder="0">
-          <area>90,170,100,30</area>
-          <font>active</font>
-          <value>Minutes</value>
-         </textarea>
+        <textarea name="minutes">
+            <area>90,170,100,30</area>
+            <font>active</font>
+            <value>Minutes</value>
+        </textarea> -->
 
-         <textarea name="context_switch" draworder="0">
-          <area>0,510,760,50</area>
-          <font>desc</font>
-          <multiline>yes</multiline>
-         </textarea>
-    </container>
-
-  </window>
+    </window>
 
 </mythuitheme>
