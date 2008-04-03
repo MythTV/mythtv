@@ -33,9 +33,9 @@ pthread_t MythSocket::m_readyread_thread = {0, 0};
 
 bool MythSocket::m_readyread_run = false;
 QMutex MythSocket::m_readyread_lock;
-Q3PtrList<MythSocket> MythSocket::m_readyread_list;
-Q3PtrList<MythSocket> MythSocket::m_readyread_dellist;
-Q3PtrList<MythSocket> MythSocket::m_readyread_addlist;
+QList<MythSocket*> MythSocket::m_readyread_list;
+QList<MythSocket*> MythSocket::m_readyread_dellist;
+QList<MythSocket*> MythSocket::m_readyread_addlist;
 
 #ifdef USING_MINGW
 HANDLE readyreadevent = NULL;
@@ -761,10 +761,10 @@ void *MythSocket::readyReadThread(void *)
     while (m_readyread_run)
     {
         m_readyread_lock.lock();
-        while (m_readyread_dellist.count() > 0)
+        while (m_readyread_dellist.size() > 0)
         {
-            sock = m_readyread_dellist.take();
-            bool del = m_readyread_list.removeRef(sock);
+            sock = m_readyread_dellist.takeFirst();
+            bool del = m_readyread_list.removeAll(sock);
 
             if (del)
             {
@@ -776,7 +776,7 @@ void *MythSocket::readyReadThread(void *)
 
         while (m_readyread_addlist.count() > 0)
         {
-            sock = m_readyread_addlist.take();
+            sock = m_readyread_addlist.takeFirst();
             //sock->UpRef();  Did upref in AddToReadyRead()
             m_readyread_list.append(sock);
         }
@@ -876,9 +876,10 @@ void *MythSocket::readyReadThread(void *)
 
         FD_SET(m_readyread_pipe[0], &rfds);
 
-        Q3PtrListIterator<MythSocket> it(m_readyread_list);
-        while ((sock = it.current()) != 0)
+        QList<MythSocket*>::const_iterator it = m_readyread_list.begin();
+        while (it != m_readyread_list.end())
         {
+            sock = *it;
             if (sock->state() == Connected &&
                 sock->m_notifyread == false &&
                 !sock->m_lock.locked())
@@ -897,9 +898,10 @@ void *MythSocket::readyReadThread(void *)
         else if (rval)
         {
             found = false;
-            Q3PtrListIterator<MythSocket> it(m_readyread_list);
-            while ((sock = it.current()) != 0)
+            QList<MythSocket*>::const_iterator it = m_readyread_list.begin();
+            while (it != m_readyread_list.end())
             {
+                sock = *it;
                 if (sock->state() == Connected &&
                     FD_ISSET(sock->socket(), &rfds) &&
                     !sock->m_lock.locked())

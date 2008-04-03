@@ -5,7 +5,7 @@
 #include <q3valuelist.h>
 #include <qdatetime.h>
 #include <qmutex.h>
-#include <q3ptrlist.h>
+#include <QList>
 
 #include "mythexp.h"
 
@@ -106,7 +106,7 @@ class MPUBLIC LiveTVChain
     int m_jumppos;
 
     QMutex m_sockLock;
-    Q3PtrList<MythSocket> m_inUseSocks;
+    QList<MythSocket*> m_inUseSocks;
 };
 
 #endif

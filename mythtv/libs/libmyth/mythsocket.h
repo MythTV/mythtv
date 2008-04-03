@@ -7,7 +7,7 @@
 #include <QString>
 #include <QStringList>
 #include <Q3SocketDevice>
-#include <Q3PtrList>
+#include <QList>
 
 #include "mythexp.h"
 
@@ -88,9 +88,9 @@ class MPUBLIC MythSocket : public Q3SocketDevice
     static pthread_t            m_readyread_thread;
     static bool                 m_readyread_run;
     static QMutex               m_readyread_lock;
-    static Q3PtrList<MythSocket> m_readyread_list;
-    static Q3PtrList<MythSocket> m_readyread_dellist;
-    static Q3PtrList<MythSocket> m_readyread_addlist;
+    static QList<MythSocket*>   m_readyread_list;
+    static QList<MythSocket*>   m_readyread_dellist;
+    static QList<MythSocket*>   m_readyread_addlist;
     static int                  m_readyread_pipe[2];
 
     static void StartReadyReadThread(void);
@@ -101,7 +101,7 @@ class MPUBLIC MythSocket : public Q3SocketDevice
     static void WakeReadyReadThread(void);
     static void ShutdownReadyReadThread(void);
 
-    friend class Q3PtrList<MythSocket>;
+    friend class QList<MythSocket*>;
 };
 
 #endif

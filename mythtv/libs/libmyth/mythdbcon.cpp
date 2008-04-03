@@ -175,7 +175,6 @@ bool MSqlDatabase::KickDatabase()
 MDBManager::MDBManager()
 {
     m_connID = 0;
-    m_pool.setAutoDelete(false);
 
     m_sem = new QSemaphore(20);
 
@@ -185,7 +184,8 @@ MDBManager::MDBManager()
 
 MDBManager::~MDBManager()
 {
-    m_pool.setAutoDelete(true);
+    while (!m_pool.isEmpty())
+        delete m_pool.takeFirst();
     delete m_sem;
 }
 
@@ -194,14 +194,15 @@ MSqlDatabase *MDBManager::popConnection()
     m_sem->acquire();
     m_lock.lock();
 
-    MSqlDatabase *db = m_pool.getLast();
-    m_pool.removeLast();
+    MSqlDatabase *db;
 
-    if (!db)
+    if (m_pool.isEmpty())
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_connID++));
         VERBOSE(VB_IMPORTANT, QString("New DB connection, total: %1").arg(m_connID));
     }
+    else
+        db = m_pool.takeLast();
 
     m_lock.unlock();
 
@@ -255,11 +256,12 @@ void MDBManager::CloseDatabases()
 {
     m_lock.lock();
 
-    Q3PtrListIterator<MSqlDatabase> it(m_pool);
-    MSqlDatabase                   *db;
+    QList<MSqlDatabase*>::const_iterator it = m_pool.begin();
+    MSqlDatabase *db;
 
-    while ((db = it.current()))
+    while (it != m_pool.end())
     {
+        db = *it;
         VERBOSE(VB_IMPORTANT,
                 "Closing DB connection named '" + db->m_name + "'");
         db->m_db.close();

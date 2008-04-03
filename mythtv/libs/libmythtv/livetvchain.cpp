@@ -1,5 +1,3 @@
-#include <Q3ValueList>
-
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -536,14 +534,14 @@ void LiveTVChain::SetHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
 
-    if (!m_inUseSocks.containsRef(sock))
+    if (!m_inUseSocks.contains(sock))
         m_inUseSocks.append(sock);
 }
 
 bool LiveTVChain::IsHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
-    return m_inUseSocks.containsRef(sock);
+    return m_inUseSocks.contains(sock);
 }
 
 int LiveTVChain::HostSocketCount(void)
@@ -554,6 +552,6 @@ int LiveTVChain::HostSocketCount(void)
 void LiveTVChain::DelHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
-    m_inUseSocks.removeRef(sock);
+    m_inUseSocks.removeAll(sock);
 }
 

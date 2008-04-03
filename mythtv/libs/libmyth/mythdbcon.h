@@ -11,6 +11,7 @@ using namespace std;
 #include <qsemaphore.h>
 #include <qsqlerror.h>
 #include <qsqlfield.h>
+#include <QList>
 
 #include "mythcontext.h"
 
@@ -53,7 +54,7 @@ class MDBManager
     MSqlDatabase *getDDCon(void);
 
   private:
-    Q3PtrList<MSqlDatabase> m_pool;
+    QList<MSqlDatabase*> m_pool;
     QMutex m_lock;
     QSemaphore *m_sem;
     int m_connID;
