@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythcontrols i18n
+SUBDIRS = mythcontrols theme i18n

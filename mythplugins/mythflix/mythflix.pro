@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythflix i18n
+SUBDIRS = mythflix theme i18n

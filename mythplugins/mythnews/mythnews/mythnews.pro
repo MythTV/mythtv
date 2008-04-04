@@ -9,14 +9,10 @@ INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = news-ui.xml
 installfiles.path = $${PREFIX}/share/mythtv/mythnews
 installfiles.files = news-sites.xml
-installimages.path = $${PREFIX}/share/mythtv/themes/default
-installimages.files = images/*.png
 
-INSTALLS += installfiles installimages uifiles
+INSTALLS += installfiles
 
 # Input
 HEADERS += mythnews.h mythnewsconfig.h mythnewseditor.h newsengine.h

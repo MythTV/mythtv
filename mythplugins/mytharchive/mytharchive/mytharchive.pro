@@ -18,14 +18,6 @@ INSTALLS += target
 ###############################################
 # shared files
 ###############################################
-menufiles.path = $${PREFIX}/share/mythtv
-menufiles.files = archivemenu.xml archiveformat.xml archiveutils.xml
-
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = mytharchive-ui.xml ../images/*.png
-
-INSTALLS += menufiles uifiles 
-
 HEADERS += archivesettings.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h
 HEADERS += archiveutil.h

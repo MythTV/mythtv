@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythzoneminder mythzmserver
+SUBDIRS = mythzoneminder mythzmserver theme
 

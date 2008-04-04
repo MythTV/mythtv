@@ -13,13 +13,6 @@ TARGET = mythmusic
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = musicmenu.xml music_settings.xml
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = music-ui.xml images/*.png
-
-INSTALLS += installfiles uifiles
-
 LIBS += -lmad -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
 
 cdaudio: LIBS += -lcdaudio

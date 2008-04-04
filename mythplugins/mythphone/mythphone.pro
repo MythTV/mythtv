@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythphone i18n
+SUBDIRS = mythphone theme i18n

@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythmovies ignyte
+SUBDIRS = mythmovies ignyte theme
 

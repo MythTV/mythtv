@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythweather i18n
+SUBDIRS = mythweather theme i18n

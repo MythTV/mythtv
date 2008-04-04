@@ -17,13 +17,6 @@ LIBS *= $$LOCAL_LIBDIR_X11
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = gallery-ui.xml
-installimages.path = $${PREFIX}/share/mythtv/themes/default
-installimages.files = images/*.png
-
-INSTALLS += installimages uifiles
-
 # Input
 HEADERS += iconview.h          singleview.h
 HEADERS += imageview.h

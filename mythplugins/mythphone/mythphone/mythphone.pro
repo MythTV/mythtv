@@ -19,11 +19,6 @@ TARGET = mythphone
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = webcam-ui.xml phone-ui.xml images/*.png
-
-INSTALLS += uifiles
-
 LIBS += 
 
 HEADERS += config.h PhoneSettings.h webcam.h phoneui.h sipfsm.h directory.h dbcheck.h rtp.h g711.h vxml.h tts.h wavfile.h h263.h tone.h sipstack.h md5digest.h gsm/proto.h gsm/unproto.h gsm/config.h gsm/private.h gsm/gsm.h gsm/k6opt.h dtmffilter.h audiodrv.h

@@ -9,18 +9,12 @@ INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = netflix-ui.xml
-installmenus.path = $${PREFIX}/share/mythtv/
-installmenus.files = netflix_menu.xml
 installfiles.path = $${PREFIX}/share/mythtv/mythflix
 installfiles.files = netflix-rss.xml
-installimages.path = $${PREFIX}/share/mythtv/themes/default
-installimages.files = images/*.png
 installscripts.path = $${PREFIX}/share/mythtv/mythflix/scripts
 installscripts.files = scripts/*.pl
 
-INSTALLS += installfiles installimages installmenus installscripts uifiles
+INSTALLS += installfiles installscripts
 
 # Input
 HEADERS += mythflixqueue.h mythflix.h mythflixconfig.h

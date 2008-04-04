@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythnews i18n
+SUBDIRS = mythnews theme i18n
