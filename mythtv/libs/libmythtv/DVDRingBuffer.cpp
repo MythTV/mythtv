@@ -1054,22 +1054,11 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
     if (dvdRet == DVDNAV_STATUS_ERR)
         return false;
 
-    bool button_is_transparent = true;
-
     for (uint i = 0 ; i < 4 ; i++)
     {
         button_alpha[i] = 0xf & (hl.palette >> (4 * i ));
-        if (button_alpha[i] > 0)
-            button_is_transparent = false;
         button_color[i] = 0xf & (hl.palette >> (16+4 *i ));
     }
-
-    if (button_is_transparent)
-    {
-        for (uint i = 0; i < 4; i++)
-            button_alpha[i] = 10;
-    }
-
 
     hl_startx = hl.sx;
     hl_width = hl.ex - hl.sx;
