@@ -2106,7 +2106,7 @@ void MythContext::ClearOldImageCache(void)
     }
 
     const size_t max_cached = GetNumSetting("ThemeCacheSize", 1);
-    while (dirtimes.size() >= max_cached)
+    while ((size_t)dirtimes.size() >= max_cached)
     {
         VERBOSE(VB_FILE, QString("Removing cache dir: %1")
                 .arg(dirtimes.begin().data()));
@@ -3447,6 +3447,23 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 MythMainWindow *MythContext::GetMainWindow(void)
 {
     return d->mainWindow;
+}
+
+/*
+ * Convenience method, so that we don't have to do:
+ *   if (gContext->GetMainWindow()->TranslateKeyPress(...))
+ */
+bool MythContext::TranslateKeyPress(const QString &context,
+                                    QKeyEvent     *e,
+                                    QStringList   &actions, bool allowJumps)
+{
+    if (!d->m_gui || !d->mainWindow)
+    {
+        VERBOSE(VB_IMPORTANT, "MC::TranslateKeyPress() called, but no window");
+        return false;
+    }
+
+    return d->mainWindow->TranslateKeyPress(context, e, actions, allowJumps);
 }
 
 /**

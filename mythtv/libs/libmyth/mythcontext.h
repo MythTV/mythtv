@@ -11,6 +11,8 @@
 #include <QMutex>
 #include <QList>
 
+#include <qevent.h>
+
 #include "mythexp.h"
 #include "mythobservable.h"
 #include "mythsocket.h"
@@ -279,6 +281,9 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
+    bool TranslateKeyPress(const QString &context, QKeyEvent *e,
+                           QStringList &actions, bool allowJumps);
+
 
     int  PromptForSchemaUpgrade(const QString &dbver, const QString &current,
                                 const QString &backupResult);
