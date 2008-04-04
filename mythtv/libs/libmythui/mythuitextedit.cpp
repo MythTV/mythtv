@@ -193,6 +193,7 @@ void MythUITextEdit::SetCursorImage(MythImage *image)
         m_cursorImage->SetImage(image);
 
         m_showCursor = true;
+        SetTextRect();
     }
 }
 
@@ -215,31 +216,45 @@ void MythUITextEdit::SetPaddingMargin(const int margin)
 {
     m_PaddingMargin = margin;
 
-    SetTextRect(m_Area);
+    SetTextRect();
     m_cursorImage->SetPosition(margin,margin);
 }
 
 void MythUITextEdit::SetTextRect(const QRect area)
 {
-    QRect textrect = QRect( m_PaddingMargin,
-                            m_PaddingMargin,
-                            area.width() - m_PaddingMargin * 2,
-                            area.height() - m_PaddingMargin * 2);
+    QRect textrect;
 
-    m_Text->SetArea(textrect);
+    if (area.isNull() || area.isEmpty())
+        textrect = m_Area;
+    else
+        textrect = area;
+
+    textrect = QRect( m_PaddingMargin,
+                      m_PaddingMargin,
+                      textrect.width() - m_PaddingMargin * 2,
+                      textrect.height() - m_PaddingMargin * 2);
+
+    if (m_cursorImage)
+        textrect.setWidth(textrect.width() - m_cursorImage->GetArea().width());
+
+    if (textrect.isValid())
+        m_Text->SetArea(textrect);
 }
 
-void MythUITextEdit::SetText(const QString text)
+void MythUITextEdit::SetText(const QString text, bool moveCursor)
 {
     m_Message = text;
     m_Text->SetText(m_Message);
-    MoveCursor(MoveEnd);
+    if (moveCursor)
+        MoveCursor(MoveEnd);
 }
 
 bool MythUITextEdit::InsertCharacter(const QString character)
 {
     if (m_maxLength != 0 && m_Message.length() == m_maxLength)
         return true;
+
+    QString newmessage = m_Message;
 
     const QChar *unichar = character.unicode();
     if (!(unichar->isLetterOrNumber() || unichar->isPunct()
@@ -255,8 +270,9 @@ bool MythUITextEdit::InsertCharacter(const QString character)
     if ((m_Filter & FilterPunct) & unichar->isPunct())
         return false;
 
-    m_Message.append(character);
-    SetText(m_Message);
+    newmessage.insert(m_Position+1, character);
+    SetText(newmessage, false);
+    MoveCursor(MoveRight);
 
     return true;
 }
@@ -266,8 +282,11 @@ void MythUITextEdit::RemoveCharacter()
     if (m_Message.isEmpty())
         return;
 
-    m_Message.remove(m_Message.length()-1, 1);
-    SetText(m_Message);
+    QString newmessage = m_Message;
+
+    newmessage.remove(m_Position, 1);
+    MoveCursor(MoveLeft);
+    SetText(newmessage, false);
 }
 
 void MythUITextEdit::MoveCursor(MoveDirection moveDir)
@@ -278,7 +297,9 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
     QFontMetrics fm(m_Text->GetFontProperties()->face());
 
     int cursorPos = m_cursorImage->GetArea().x();
+    int cursorWidth = m_cursorImage->GetArea().width();
     QRect textRect = m_Text->GetArea();
+    QRect drawRect = m_Text->GetDrawRect();
     int newcursorPos = 0;
     QSize size;
 
@@ -292,7 +313,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
 
             newcursorPos = cursorPos - size.width();
 
-            if (newcursorPos < 0)
+            if (newcursorPos < m_PaddingMargin)
             {
                 newcursorPos = m_PaddingMargin;
                 if (m_Position == 0)
@@ -313,8 +334,8 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
 
             if (newcursorPos > textRect.width())
             {
-                newcursorPos = cursorPos;
                 m_Text->MoveStartPosition(-(size.width()), 0);
+                newcursorPos = cursorPos;
             }
 
             m_Position++;
@@ -322,20 +343,23 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
         case MoveEnd:
             size = fm.size(Qt::SingleLine, m_Message);
 
-            newcursorPos = size.width() + m_cursorImage->GetArea().width();
+            int messageWidth = size.width();
 
-            if (newcursorPos <= 0)
-                newcursorPos = m_PaddingMargin;
-
-            if (newcursorPos >= textRect.width())
+            if ((messageWidth + cursorWidth)
+                >= textRect.width())
             {
-                QRect drawRect = m_Text->GetDrawRect();
-                m_Text->MoveStartPosition(drawRect.width()-newcursorPos, 0);
-                newcursorPos = textRect.width()-m_cursorImage->GetArea().width();
+                int newx = drawRect.width() -
+                           (messageWidth + cursorWidth);
+                m_Text->MoveStartPosition(newx, 0);
+                newcursorPos = messageWidth + newx + m_PaddingMargin;
             }
             else
             {
                 m_Text->SetStartPosition(0,0);
+                if (messageWidth <= 0)
+                    newcursorPos = m_PaddingMargin;
+                else
+                    newcursorPos = messageWidth + m_PaddingMargin;
             }
 
             m_Position = m_Message.size() - 1;

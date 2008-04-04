@@ -29,8 +29,8 @@ class MythUITextEdit : public MythUIType
     void SetCursorImage(MythImage *);
     void SetMaxLength(const int length);
     void SetPaddingMargin(const int margin);
-    void SetTextRect(const QRect area);
-    void SetText(const QString text);
+    void SetTextRect(const QRect area=QRect(0,0,0,0));
+    void SetText(const QString text, bool moveCursor = true);
 
     enum InputFilter
     {
