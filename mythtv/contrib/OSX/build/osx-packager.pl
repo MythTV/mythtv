@@ -203,8 +203,7 @@ our %depend = (
     'url'
     =>  'http://wftp.tu-chemnitz.de/pub/Qt/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
     'conf-cmd'
-    # some subdirs use libtool, which has problems with -Z in LDFLAGS
-    =>  'echo yes | LDFLAGS="" MAKEFLAGS=$parallel_make_flags ./configure',
+    =>  'echo yes | MAKEFLAGS=$parallel_make_flags ./configure',
     'conf'
     =>  [
           '-prefix', '"$PREFIX"',
@@ -260,7 +259,7 @@ our %depend = (
                    'ln -sf libQtOpenGL.dylib   libQtOpenGL_debug.dylib   ; '.
                    'ln -sf libQtGui.dylib      libQtGui_debug.dylib      ; '.
                    'ln -sf libQtNetwork.dylib  libQtNetwork_debug.dylib  ; '.
-                   'ln -sf libQtCore.dylib     libQtCore_debug.dylib     ; ',
+                   'ln -sf libQtCore.dylib     libQtCore_debug.dylib     ; '.
                    '',
     'parallel-make' => 'yes'
   },
