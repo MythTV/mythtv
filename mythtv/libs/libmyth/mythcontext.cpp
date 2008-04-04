@@ -3030,7 +3030,7 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         if (!tmpimage.load(filename))
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
+                    "Error loading image to scale, from file: " + filename);
 
             return NULL;
         }
@@ -3043,8 +3043,8 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         ret = new QImage(filename);
         if (ret->width() == 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
+            VERBOSE(VB_IMPORTANT, "Error loading image from file: "
+                                  + filename + " - QImage->width()=0");
 
             delete ret;
             return NULL;
@@ -3391,7 +3391,7 @@ void MythContext::connectionClosed(MythSocket *sock)
 QFont MythContext::GetBigFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->bigfontsize));
+    font.setPointSize(NormalizeFontSize(d->bigfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -3400,7 +3400,7 @@ QFont MythContext::GetBigFont(void)
 QFont MythContext::GetMediumFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->mediumfontsize));
+    font.setPointSize(NormalizeFontSize(d->mediumfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -3409,7 +3409,7 @@ QFont MythContext::GetMediumFont(void)
 QFont MythContext::GetSmallFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->smallfontsize));
+    font.setPointSize(NormalizeFontSize(d->smallfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
@@ -3451,13 +3451,28 @@ MythMainWindow *MythContext::GetMainWindow(void)
 
 /*
  * Convenience method, so that we don't have to do:
+ *   size = GetMainWindow()->NormalizeFontSize(size));
+ */
+int MythContext::NormalizeFontSize(const int pointSize)
+{
+    if (!d->mainWindow)
+    {
+        VERBOSE(VB_IMPORTANT, "MC::NormalizeFontSize() called, but no window");
+        return pointSize;
+    }
+
+    return d->mainWindow->NormalizeFontSize(pointSize);
+}
+
+/*
+ * Convenience method, so that we don't have to do:
  *   if (gContext->GetMainWindow()->TranslateKeyPress(...))
  */
 bool MythContext::TranslateKeyPress(const QString &context,
                                     QKeyEvent     *e,
                                     QStringList   &actions, bool allowJumps)
 {
-    if (!d->m_gui || !d->mainWindow)
+    if (!d->mainWindow)
     {
         VERBOSE(VB_IMPORTANT, "MC::TranslateKeyPress() called, but no window");
         return false;

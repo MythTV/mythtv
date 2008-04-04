@@ -281,6 +281,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
+    int  NormalizeFontSize(const int pointSize);
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps);
 
