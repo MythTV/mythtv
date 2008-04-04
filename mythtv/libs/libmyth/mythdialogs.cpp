@@ -214,7 +214,7 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
     bool handled = false;
     QStringList actions;
 
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -573,7 +573,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+    gContext->TranslateKeyPress("qt", e, actions);
     for ( int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -956,7 +956,7 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1774,7 +1774,7 @@ void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1836,7 +1836,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -2056,7 +2056,7 @@ void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -2441,7 +2441,7 @@ void MythScrollDialog::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
 
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {

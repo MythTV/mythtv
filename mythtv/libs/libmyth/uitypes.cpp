@@ -6026,7 +6026,7 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, false))
+    if (gContext->TranslateKeyPress("qt", e, actions, false))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {

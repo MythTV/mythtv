@@ -283,7 +283,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     MythMainWindow *GetMainWindow(void);
     int  NormalizeFontSize(const int pointSize);
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
-                           QStringList &actions, bool allowJumps);
+                           QStringList &actions, bool allowJumps = true);
 
 
     int  PromptForSchemaUpgrade(const QString &dbver, const QString &current,

@@ -83,7 +83,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     bool handled = false, updated = false;
     QStringList actions;
     if ((!popup || !popup->isShown()) &&
-        (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard)))
+        (gContext->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard)))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -207,7 +207,7 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for ( int i = 0; i < actions.size() && !handled; i++)
         {
@@ -257,7 +257,7 @@ void MythRadioButton::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -316,7 +316,7 @@ void MythSpinBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -366,7 +366,7 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -469,7 +469,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
     if ((!popup || !popup->isShown()) &&
-        gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, false))
+        gContext->TranslateKeyPress("qt", e, actions, false))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -851,7 +851,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     QStringList actions;
 
     if ((!popup || !popup->isShown()) &&
-          gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions, false))
+          gContext->TranslateKeyPress("qt", e, actions, false))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1148,8 +1148,7 @@ void MythTable::keyPressEvent(QKeyEvent *e)
     int tmpRow = currentRow();
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
-                                                     actions))
+    if (gContext->TranslateKeyPress("qt", (QKeyEvent *)e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1234,8 +1233,7 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     keyPressActions.clear();
 
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
-                                                     actions))
+    if (gContext->TranslateKeyPress("qt", (QKeyEvent *)e, actions))
     {
         keyPressActions = actions;
 
@@ -1361,7 +1359,7 @@ void MythListView::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+    gContext->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -1482,7 +1480,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
