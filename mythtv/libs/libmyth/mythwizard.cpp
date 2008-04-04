@@ -545,7 +545,7 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->TranslateKeyPress("qt", e, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
