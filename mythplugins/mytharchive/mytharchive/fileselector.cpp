@@ -207,7 +207,9 @@ void FileSelector::wireUpTheme()
     if (!m_fileList || !m_locationEdit || !m_backButton || !m_okButton 
          || !m_cancelButton || !m_homeButton)
     {
-        cout << "FileSelector: Your theme is missing some UI elements! Bailing out." << endl;
+        VERBOSE(VB_IMPORTANT, 
+                "FileSelector: Your theme is missing some UI elements! "
+                "Bailing out.");
         QTimer::singleShot(100, this, SLOT(reject()));
     }
 
@@ -442,7 +444,7 @@ void FileSelector::updateFileList()
     else
     {
         m_locationEdit->setText("/");
-        cout << "MythArchive:  current directory does not exist!" << endl;
+        VERBOSE(VB_IMPORTANT, "MythArchive:  current directory does not exist!");
     }
 
     m_fileList->refresh();

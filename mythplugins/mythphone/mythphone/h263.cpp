@@ -47,7 +47,7 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
     h263Encoder = avcodec_find_encoder(CODEC_ID_H263);
     if (!h263Encoder) 
     {
-        cerr << "Could not find H.263 Encoder\n";
+        VERBOSE(VB_IMPORTANT, "Could not find H.263 Encoder");
         return false;
     }
 
@@ -73,7 +73,7 @@ bool H263Container::H263StartEncoder(int w, int h, int fps)
     /* open it */
     if (avcodec_open(h263EncContext, h263Encoder) < 0) 
     {
-        cerr << "Could not open H.263 Encoder\n";
+        VERBOSE(VB_IMPORTANT, "Could not open H.263 Encoder");
         return false;
     }
     
@@ -96,7 +96,7 @@ bool H263Container::H263StartDecoder(int w, int h)
     h263Decoder = avcodec_find_decoder(CODEC_ID_H263);
     if (!h263Decoder)
     {
-        cerr << "Could not find H.263 decoder\n";
+        VERBOSE(VB_IMPORTANT, "Could not find H.263 decoder");
         return false;
     }
 
@@ -110,7 +110,7 @@ bool H263Container::H263StartDecoder(int w, int h)
     /* open it */
     if (avcodec_open(h263DecContext, h263Decoder) < 0) 
     {
-        cerr << "Could not open H.263 Decoder\n";
+        VERBOSE(VB_IMPORTANT, "Could not open H.263 Decoder");
         return false;
     }
     
@@ -136,7 +136,7 @@ uchar *H263Container::H263DecodeFrame(const uchar *h263Frame, int h263FrameLen, 
     int len = avcodec_decode_video(h263DecContext, pictureIn, &got_picture, (uchar *) h263Frame, h263FrameLen);
     if (len != h263FrameLen)
     {
-        cerr << "Error decoding frame; " << len << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error decoding frame: %1").arg(len));
         return 0;
     }
 
@@ -244,7 +244,9 @@ void YUV420PtoRGB32(int width, int height, int stride, const unsigned char *src,
 
   if (dstSize < (width*height*4))
   {
-    cout << "YUVtoRGB buffer (" << dstSize << ") too small for " << width << "x" << height << " pixels" << endl;
+      VERBOSE(VB_IMPORTANT, 
+              QString("YUVtoRGB buffer (%1) too small for %2x%3 pixels")
+              .arg(dstSize).arg(width).arg(height));
     return;
   }
 
@@ -291,8 +293,10 @@ void YUV420PtoRGB32(const uchar *py, const uchar *pu, const uchar *pv, int width
 
   if (dstSize < (width*height*4))
   {
-    cout << "YUVtoRGB buffer (" << dstSize << ") too small for " << width << "x" << height << " pixels" << endl;
-    return;
+      VERBOSE(VB_IMPORTANT, 
+              QString("YUVtoRGB buffer (%1) too small for %2x%3 pixels")
+              .arg(dstSize).arg(width).arg(height));
+      return;
   }
 
 	for (h=0; h<height; h++) 
@@ -339,8 +343,10 @@ void YUV422PtoRGB32(int width, int height, const unsigned char *src, unsigned ch
 
   if (dstSize < (width*height*4))
   {
-    cout << "YUVtoRGB buffer (" << dstSize << ") too small for " << width << "x" << height << " pixels" << endl;
-    return;
+      VERBOSE(VB_IMPORTANT, 
+              QString("YUVtoRGB buffer (%1) too small for %2x%3 pixels")
+              .arg(dstSize).arg(width).arg(height));
+      return;
   }
 
 	for (h=0; h<height; h++) 
@@ -399,7 +405,9 @@ void cropYuvImage(const uchar *yuvBuffer, int ow, int oh, int cx, int cy, int cw
     // Only handle even number of cropped lines so we don't have to worry about breaking up 2x2 colour blocks
     if ((cw%2) || (ch%2) || (cx%2) || (cy%2))
     {
-        cout << "YUV crop fn does not handle odd sizes; x,y=" << cx << "," << cy << "  w,h=" << cw << "," << ch << endl;
+        VERBOSE(VB_IMPORTANT, 
+          QString("YUV crop fn does not handle odd sizes; x,y=%1,%2  w,h=%3,%4")
+          .arg(cx).arg(cy).arg(cw).arg(ch));
         return;
     }
 

@@ -53,7 +53,7 @@ int gsmCodec::Encode(short *In, unsigned char *Out, int Samples, short &maxPower
 {
     (void)gain;
     if (Samples != 160)
-        cout << "GSM Encode unsupported length " << Samples << endl;
+        VERBOSE(VB_IMPORTANT, QString("GSM Encode unsupported length %1").arg(Samples));
     gsm_encode(gsmEncData, In, Out);
     maxPower = 0;
     for (int i=0;i<Samples;i++)
@@ -70,7 +70,7 @@ int gsmCodec::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
         // pass data in as a 33byte then a 32byte sample
         if (!gsmMicrosoftCompatability)
         {
-            cout << "SIP: Switching GSM decoder to Microsoft Compatability mode\n";
+            VERBOSE(VB_IMPORTANT, "SIP: Switching GSM decoder to Microsoft Compatability mode");
             gsmMicrosoftCompatability = true;
             int opt=1;
             gsm_option(gsmDecData, GSM_OPT_WAV49, &opt);
@@ -84,7 +84,7 @@ int gsmCodec::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
     }    
     
     if (Len != 33)
-        cout << "GSM Invalid receive length " << Len << endl;
+        VERBOSE(VB_IMPORTANT, QString("GSM Invalid receive length %1").arg(Len));
     gsm_decode(gsmDecData, In, Out);
     maxPower = 0;
     for (int i=0;i<160;i++)
@@ -95,7 +95,7 @@ int gsmCodec::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
 int gsmCodec::Silence(uchar *out, int ms)
 {
     if (ms != 20)
-        cout << "GSM Silence unsupported length " << ms << endl;
+        VERBOSE(VB_IMPORTANT, QString("GSM Silence unsupported length %1").arg(ms));
 
     short pcmSilence[160];
     memset(pcmSilence, 0, 160*sizeof(short));

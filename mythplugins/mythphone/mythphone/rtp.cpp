@@ -215,7 +215,7 @@ void rtp::rtpInitialise()
             Codec = new gsmCodec();
         else 
         {
-            cerr << "Unknown audio payload " << audioPayload << endl;
+            VERBOSE(VB_IMPORTANT, QString("Unknown audio payload %1").arg(audioPayload));
             audioPayload = RTP_PAYLOAD_G711U;
             Codec = new g711ulaw();
         }
@@ -314,7 +314,7 @@ void rtp::rtpAudioThreadWorker()
         delete ToneToSpk;
 
     if ((pollLoop != 0) && ((sleepMs/pollLoop)>30))
-        cout << "Mythphone: \"sleep 10000\" is sleeping for more than 30ms; please report\n";
+        VERBOSE(VB_IMPORTANT, "Mythphone: 'sleep 10000' is sleeping for more than 30ms; please report");
 }
 
 void rtp::rtpVideoThreadWorker()
@@ -373,7 +373,7 @@ void rtp::Debug(QString dbg)
     if (eventWindow)
         QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RtpDebugEv, now + " " + dbg));
 #else
-    cout << dbg.toLocal8Bit().constData();
+    VERBOSE(VB_IMPORTANT, QString("%1").arg(dbg.toLocal8Bit().constData()));
 #endif
 }
 
@@ -425,7 +425,7 @@ void rtp::OpenSocket()
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(rtpSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface " << ifName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to find network interface %1").arg(ifName.toLocal8Bit().constData()));
         delete rtpSocket;
         rtpSocket = 0;
         return;
@@ -441,7 +441,7 @@ void rtp::OpenSocket()
     int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
     if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
     {
-        cerr << "Failed to find network interface " << endl;
+        VERBOSE(VB_IMPORTANT, "Failed to find network interface");
         delete rtpSocket;
         rtpSocket = 0;
         return;
@@ -456,14 +456,14 @@ void rtp::OpenSocket()
 
     if (!rtpSocket->bind(myIP, myPort))
     {
-        cerr << "Failed to bind for RTP connection " << myIP.toString().toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to bind for RTP connection %1").arg(myIP.toString().toLocal8Bit().constData()));
         delete rtpSocket;
         rtpSocket = 0;
     }
 
     if (!rtcpSocket->bind(myIP, myRtcpPort))
     {
-        cerr << "Failed to bind for RTCP connection " << myIP.toString().toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to bind for RTCP connection %1").arg(myIP.toString().toLocal8Bit().constData()));
         delete rtcpSocket;
         rtcpSocket = 0;
     }
@@ -544,7 +544,7 @@ void rtp::Transmit(int ms)
 {
     rtpMutex.lock();
     if (txBuffer)
-       cerr << "Don't tell me to transmit something whilst I'm already busy\n";
+        VERBOSE(VB_IMPORTANT, "Don't tell me to transmit something whilst I'm already busy");
     else
     {
         int Samples = ms * PCM_SAMPLES_PER_MS;
@@ -563,7 +563,7 @@ void rtp::Transmit(short *pcmBuffer, int Samples)
     {
         rtpMutex.lock();
         if (txBuffer)
-           cerr << "Don't tell me to transmit something whilst I'm already busy\n";
+            VERBOSE(VB_IMPORTANT, "Don't tell me to transmit something whilst I'm already busy");
         else
         {
             txBuffer = new short[Samples+txPCMSamplesPerPacket]; // Increase space to multiples of full packets
@@ -581,7 +581,7 @@ void rtp::Record(short *pcmBuffer, int Samples)
 {
     rtpMutex.lock();
     if (recBuffer)
-       cerr << "Don't tell me to record something whilst I'm already busy\n";
+        VERBOSE(VB_IMPORTANT, "Don't tell me to record something whilst I'm already busy");
     else
     {
         recBuffer = pcmBuffer;
@@ -646,9 +646,9 @@ void rtp::StreamInAudio()
                     else
                     {
                         if (PAYLOAD(JBuf) != RTP_PAYLOAD_COMF_NOISE) 
-                            cerr << "Received Invalid Payload " << (int)JBuf->RtpMPT << "\n";
+                            VERBOSE(VB_IMPORTANT, QString("Received Invalid Payload %1").arg((int)JBuf->RtpMPT));
                         else
-                            cout << "Received Comfort Noise Payload\n";
+                            VERBOSE(VB_IMPORTANT, "Received Comfort Noise Payload");
                         pJitter->FreeJBuffer(JBuf);
                     }
                 }
@@ -663,7 +663,7 @@ void rtp::StreamInAudio()
                 rtpSocket->readBlock((char *)&rtpDump.RtpVPXCC, sizeof(RTPPACKET));
                 if (!oobError)
                 {
-                    cerr << "Dumping received RTP frame, no free buffers; rx-mode " << rxMode << "; tx-mode " << txMode << endl;
+                    VERBOSE(VB_IMPORTANT, QString("Dumping received RTP frame, no free buffers; rx-mode %1; tx-mode %2").arg(rxMode).arg(txMode));
                     pJitter->Debug();
                     oobError = true;
                 }
@@ -683,7 +683,7 @@ void rtp::StreamInAudio()
         {
             audio->StartSpeaker();
             if (audio->samplesOutSpaceRemaining() < PCM_SAMPLES_PER_MS * nominalPlayout)
-                cout << "RTP error, spk buffer too small for playout delay\n";
+                VERBOSE(VB_IMPORTANT, "RTP error, spk buffer too small for playout delay");
                 
             // We are going to discard all but the last received frame, but we should
             // use any discarded frames in the jitter buffer if possible, instead of just
@@ -798,7 +798,7 @@ void rtp::PlayOutAudio()
 
             case JB_REASON_SEQERR:
             default:
-//                cerr << "Something funny happened with the seq numbers, should reset them & start again\n";
+//                VERBOSE(VB_IMPORTANT, "Something funny happened with the seq numbers, should reset them & start again");
                 break;
             }
         } while (tryAgain);
@@ -915,7 +915,7 @@ void rtp::StreamInVideo()
                         }
                         if (JBuf->RtpSequenceNumber < videoFrameFirstSeqNum)
                         {
-                            cout << "Packet arrived too late to play, try increasing jitter buffer\n";
+                            VERBOSE(VB_IMPORTANT, "Packet arrived too late to play, try increasing jitter buffer");
                             pJitter->FreeJBuffer(JBuf);
                             pkLate++;
                         }
@@ -924,7 +924,7 @@ void rtp::StreamInVideo()
                     }
                     else
                     {
-                        cerr << "Received Invalid Payload " << (int)JBuf->RtpMPT << "\n";
+                        VERBOSE(VB_IMPORTANT, QString("Received Invalid Payload %1").arg((int)JBuf->RtpMPT));
                         pJitter->FreeJBuffer(JBuf);
                     }
                 }
@@ -932,7 +932,7 @@ void rtp::StreamInVideo()
                     pJitter->FreeJBuffer(JBuf);
             }
             else
-                cerr << "No free buffers, aborting network read\n";
+                VERBOSE(VB_IMPORTANT, "No free buffers, aborting network read");
         } while (tryAgain);
 
 
@@ -947,7 +947,7 @@ void rtp::StreamInVideo()
             {
                 ushort valid, missing;
                 pJitter->CountMissingPackets(rxSeqNum, valid, missing);
-                cout << "RTP Dropping video frame: Lost Packet\n";
+                VERBOSE(VB_IMPORTANT, "RTP Dropping video frame: Lost Packet");
                 rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
                 framesInDiscarded++;
                 pkMissed += missing;
@@ -991,7 +991,7 @@ void rtp::StreamInVideo()
                     // Check rxed frame was not too big
                     if (pictureIndex > (int)sizeof(picture->video))
                     {
-                        cout << "SIP: Received video frame size " << pictureIndex << "; too big for buffer\n";
+                        VERBOSE(VB_IMPORTANT, QString("SIP: Received video frame size %1; too big for buffer").arg(pictureIndex));
                         freeVideoBuffer(picture);
                         framesInDiscarded++;
                         picture = 0;
@@ -1001,7 +1001,7 @@ void rtp::StreamInVideo()
                     // then we have received a full pictures worth of packets.
                     else if (markerSetOnLastPacket)
                     {
-                        //cout << "Received frame length " << pictureIndex << " bytes\n";
+                        //VERBOSE(VB_IMPORTANT, QString("Received frame length %1 bytes").arg(pictureIndex));
                         picture->len = pictureIndex;
     
                         // Pass received picture to app
@@ -1016,7 +1016,7 @@ void rtp::StreamInVideo()
                             rtpMutex.unlock();
                             freeVideoBuffer(picture);
                             framesInDiscarded++;
-                            cout << "Discarding frame, app consuming too slowly\n";
+                            VERBOSE(VB_IMPORTANT, "Discarding frame, app consuming too slowly");
                         }
                         if (eventWindow)
                             QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RxVideoFrame));
@@ -1024,30 +1024,31 @@ void rtp::StreamInVideo()
                     }
                     else
                     {
+                        QString drop_msg = "RTP Dropping video frame: ";
                         // We didn't get the whole frame, so dump all buffered packets
-                        cout << "RTP Dropping video frame: ";
                         switch (reason)
                         {
                         case JB_REASON_DUPLICATE: 
-                            cout << "Duplicate\n";
+                            drop_msg += "Duplicate";
                             break;
                         case JB_REASON_DTMF:
+                            drop_msg += "DTMF";
                             break;
-                            cout << "DTMF\n";
                         case JB_REASON_MISSING: 
-                            cout << "Missed Packets\n";
+                            drop_msg += "Missed Packets";
                             pkMissed++;
                             break;
                         case JB_REASON_EMPTY: 
-                            cout << "Empty\n";
+                            drop_msg += "Empty";
                             break;
                         case JB_REASON_SEQERR:
-                            cout << "Sequence Error\n";
+                            drop_msg += "Sequence Error";
                             break;
                         default:
-                            cout << "Unknown\n";
+                            drop_msg += "Unknown";
                             break;
                         }
+                        VERBOSE(VB_IMPORTANT, QString("%1").arg(drop_msg));
                         rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
                         freeVideoBuffer(picture);
                         picture = 0;
@@ -1055,7 +1056,7 @@ void rtp::StreamInVideo()
                 }
                 else
                 {
-                    cout << "No buffers for video frame, dropping\n";
+                    VERBOSE(VB_IMPORTANT, "No buffers for video frame, dropping");
                     rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
                     framesInDiscarded++;
                 }
@@ -1104,7 +1105,7 @@ VIDEOBUFFER *rtp::getVideoBuffer(int len)
         rtpMutex.unlock();
         return buf;
     }
-    cerr << "Received video picture size " << len << " too big for preallocated buffer size " << MAX_VIDEO_LEN << endl;
+    VERBOSE(VB_IMPORTANT, QString("Received video picture size %1 too big for preallocated buffer size %2").arg(len).arg(MAX_VIDEO_LEN));
     return 0;
 }
 
@@ -1160,7 +1161,7 @@ void rtp::HandleRxDTMF(RTPPACKET *RTPpacket)
         lastDtmfTimestamp = RTPpacket->RtpTimeStamp;
         rtpMutex.lock();
         dtmfIn.append(DTMF2CHAR(dtmf->dtmfDigit));
-        cout << "Received DTMF digit " << dtmfIn.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Received DTMF digit %1").arg(dtmfIn.toLocal8Bit().constData()));
         rtpMutex.unlock();
     }
 }
@@ -1180,7 +1181,7 @@ void rtp::SendWaitingDtmf()
 
         if (digit != ' ')
         {
-            //cout << "Sending DTMF digit " << digit << endl;
+            //VERBOSE(VB_IMPORTANT, QString("Sending DTMF digit %1").arg(digit));
             RTPPACKET dtmfPacket;
             DTMF_RFC2833 *dtmf = (DTMF_RFC2833 *)(dtmfPacket.RtpData);
             
@@ -1222,7 +1223,7 @@ void rtp::transmitQueuedVideo()
     {
         if ((pTxShaper) && (!pTxShaper->OkToSend()))
         {
-            cout << "Dropped video frame bceause shaper says so\n";
+            VERBOSE(VB_IMPORTANT, "Dropped video frame bceause shaper says so");
             freeVideoBuffer(queuedVideo);
             return;
         }
@@ -1351,7 +1352,7 @@ void rtp::fillPacketfromBuffer(RTPPACKET &RTPpacket)
     {
         fillPacketwithSilence(RTPpacket); 
         txMode = RTP_TX_AUDIO_SILENCE;
-        cerr << "No buffer to playout, changing to playing silence\n";
+        VERBOSE(VB_IMPORTANT, "No buffer to playout, changing to playing silence");
     }
     else 
     {
@@ -1458,7 +1459,7 @@ void rtp::parseRtcpMessage(RTCPPACKET *rtcpPacket, int len)
         case RTCP_APP_DEFINED:
             break;
         default:
-            cout << "Received RTCP Unknown Message" << endl;
+            VERBOSE(VB_IMPORTANT, "Received RTCP Unknown Message");
             len = 0;
             break;
         }
@@ -1596,7 +1597,8 @@ void Jitter::InsertJBuffer(RTPPACKET *Buffer)
         else
         {
             RTPPACKET *head = first();
-            cout << "Packet misordering; got " << Buffer->RtpSequenceNumber << ", head " << head->RtpSequenceNumber << ", tail " << latest->RtpSequenceNumber << endl;
+            VERBOSE(VB_IMPORTANT, QString("Packet misordering; got %1, head %2, tail %3")
+                    .arg(Buffer->RtpSequenceNumber).arg(head->RtpSequenceNumber).arg(latest->RtpSequenceNumber));
             inSort(Buffer);
         }
     }
@@ -1659,7 +1661,7 @@ void Jitter::CountMissingPackets(ushort seq, ushort &cntValid, ushort &cntMissin
         }
         else
         {
-            cout << "Big gap in RTP sequence numbers, possibly restarted\n";
+            VERBOSE(VB_IMPORTANT, "Big gap in RTP sequence numbers, possibly restarted");
             cntMissing++; // No way to know how many were actually missed
         }
         seq = head->RtpSequenceNumber + 1;
@@ -1727,7 +1729,8 @@ int Jitter::DumpAllJBuffers(bool StopAtMarkerBit)
 
 void Jitter::Debug()
 {
-    cout << "Jitter buffers " << count() << " queued " << FreeJitterQ.count() << " free\n";
+    VERBOSE(VB_IMPORTANT, QString("Jitter buffers %1 queued %2 free")
+            .arg(count()).arg(FreeJitterQ.count()));
 }
 
 

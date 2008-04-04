@@ -172,7 +172,8 @@ void DirectoryFinder::wireUpTheme()
     if (!m_fileList || !m_locationEdit || !m_backButton || !m_okButton 
          || !m_cancelButton || !m_homeButton)
     {
-        cout << "DirectoryFinder: Your theme is missing some UI elements! Bailing out." << endl;
+        VERBOSE(VB_IMPORTANT, "DirectoryFinder: Your theme is missing"
+                " some UI elements! Bailing out.");
         QTimer::singleShot(100, this, SLOT(reject()));
     }
 
@@ -244,7 +245,8 @@ void DirectoryFinder::updateFileList()
 
     if (!d.exists())
     {
-        cout << "DirectoryFinder: current directory does not exist!" << endl;
+        VERBOSE(VB_IMPORTANT,
+                "DirectoryFinder: current directory does not exist!");
         m_locationEdit->setText("/");
         m_curDirectory = "/";
         d.setPath("/");

@@ -217,7 +217,8 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     else
     {
         result = "";
-        VERBOSE(VB_IMPORTANT, "getCriteriaSQL(): invalid operator '" + Operator->name  + "'");
+        VERBOSE(VB_IMPORTANT, QString("getCriteriaSQL(): invalid operator '%1'")
+                .arg(Operator->name));
     }
     
     return result;    
@@ -1197,7 +1198,7 @@ void SmartPlaylistEditor::saveClicked(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Failed to find ID for smartplaylist: " + name);
+            VERBOSE(VB_IMPORTANT, QString("Failed to find ID for smartplaylist: %1").arg(name));
             return;
         }
     }    
@@ -1264,7 +1265,8 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Cannot find smartplaylist: " + name);
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Cannot find smartplaylist: %1").arg(name));
             return;
         }
     }
@@ -1291,7 +1293,8 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
         if (rowCount > criteriaRows.count())
         {
             rowCount = criteriaRows.count();
-            cout << "Warning: got too many smartplaylistitems:" << rowCount << endl; 
+            VERBOSE(VB_IMPORTANT, QString("Warning:"
+                    " got too many smartplaylistitems: %1").arg(rowCount)); 
         }
         
         query.first();
@@ -1310,7 +1313,8 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     }
     else
     {
-        cout << "Warning got no smartplaylistitems for ID:" << ID << endl;
+        VERBOSE(VB_IMPORTANT, 
+                QString("Warning got no smartplaylistitems for ID: ").arg(ID));
     }
 }
 
@@ -1537,7 +1541,7 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
         }
         else
         {
-            cout << "Could not find any smartplaylist categories" << endl;
+            VERBOSE(VB_IMPORTANT, "Could not find any smartplaylist categories");
         }
     }
     else
@@ -1647,7 +1651,9 @@ int SmartPlaylistEditor::lookupCategoryID(QString category)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Failed to find smart playlist category: " + category);
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Failed to find smart playlist category: %1")
+                            .arg(category));
             ID = -1;
         }
     }

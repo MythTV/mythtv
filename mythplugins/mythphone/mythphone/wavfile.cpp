@@ -17,7 +17,7 @@
 using namespace std;
 
 #include "wavfile.h"
-
+#include <mythtv/mythverbose.h>
 
 wavfile::wavfile()
 {
@@ -36,7 +36,7 @@ bool wavfile::load(const char *Filename)
     QFile f(Filename);
     if (!f.open(QIODevice::ReadOnly))
     {
-        cerr << "Cannot open for reading file " << Filename << endl;
+        VERBOSE(VB_IMPORTANT, QString("Cannot open for reading file %1").arg(Filename));
         return false;
     }
 
@@ -107,11 +107,11 @@ static bool firstTime = true;
             if (firstTime)
             {
                 firstTime = false;
-                cout << "The TTS library is encoding as 16k PCM, you should reconfigure it to 8k PCM\n";
+                VERBOSE(VB_IMPORTANT, "The TTS library is encoding as 16k PCM, you should reconfigure it to 8k PCM");
             }
         }
         else
-            cout << "MythPhone Unsupported sample-rate " << w.SampleRate << endl;
+            VERBOSE(VB_IMPORTANT, QString("MythPhone Unsupported sample-rate %1").arg(w.SampleRate));
     }
 }
 
@@ -120,34 +120,56 @@ void wavfile::print()
     if (loaded)
     {
         if (memcmp(w.ChunkId, "RIFF", 4) == 0)
-            cout << "Filetype: RIFF\n";
+        {
+            VERBOSE(VB_IMPORTANT, "Filetype: RIFF");
+        }
         else
-            cout << "Filetype: Unsupported\n";
+        {
+            VERBOSE(VB_IMPORTANT, "Filetype: Unsupported");
+        }
 
         if (memcmp(w.Format, "WAVE", 4) == 0)
-            cout << "Format: WAVE\n";
+        {
+            VERBOSE(VB_IMPORTANT, "Format: WAVE");
+        }
         else
-            cout << "Format: Unsupported\n";
+        {
+            VERBOSE(VB_IMPORTANT, "Format: Unsupported");
+        }
 
         if (memcmp(w.subChunk1Id, "fmt ", 4) == 0)
-            cout << "SubFormat: fmt\n";
+        {
+            VERBOSE(VB_IMPORTANT, "SubFormat: fmt");
+        }
         else
-            cout << "SubFormat: Unsupported\n";
-
-        cout << "ChunkSize: " << w.subChunk1Size << endl;
-        cout << "Audio Format: " << (w.AudioFormat==1 ? "PCM" : "Unsupported") << endl;
-        cout << "Channels: " << w.NumChannels << endl;
-        cout << "Sample Rate: " << w.SampleRate << endl;
-        cout << "Byte Rate: " << w.ByteRate << endl;
-        cout << "Block Align: " << w.BlockAlign << endl;
-        cout << "Bits per Sample: " << w.BitsPerSample << endl;
+        {
+            VERBOSE(VB_IMPORTANT, QString("SubFormat: Unsupported\n"
+                            "ChunkSize: %1\n"
+                            "Audio Format: %2\n"
+                            "Channels: %3\n"
+                            "Sample Rate: %4\n"
+                            "Byte Rate: %5\n"
+                            "Block Align: %6\n"
+                            "Bits per Sample: %7")
+                            .arg(w.subChunk1Size)
+                            .arg(w.AudioFormat==1 ? "PCM" : "Unsupported")
+                            .arg(w.NumChannels)
+                            .arg(w.SampleRate)
+                            .arg(w.ByteRate)
+                            .arg(w.BlockAlign)
+                            .arg(w.BitsPerSample));
+        }
 
         if (memcmp(w.subChunk2Id, "data", 4) == 0)
-            cout << "SubFormat: data\n";
+        {
+            VERBOSE(VB_IMPORTANT, "SubFormat: data");
+        }
         else
-            cout << "SubFormat: Unsupported\n";
+        {
+            VERBOSE(VB_IMPORTANT, "SubFormat: Unsupported");
+        }
 
-        cout << "DataSize: " << w.subChunk2Size << endl;
+        VERBOSE(VB_IMPORTANT, QString("DataSize: %1").arg(w.subChunk2Size));
     }
 }
 
@@ -156,7 +178,8 @@ bool wavfile::saveToFile(const char *Filename)
     QFile f(Filename);
     if (!f.open(QIODevice::WriteOnly))
     {
-        cerr << "Cannot open for writing file " << Filename << endl;
+        VERBOSE(VB_IMPORTANT, 
+                QString("Cannot open for writing file %1").arg(Filename));
         return false;
     }
 

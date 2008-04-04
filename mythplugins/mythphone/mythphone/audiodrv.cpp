@@ -22,6 +22,7 @@
 #include <net/if.h>
 #include <linux/sockios.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythverbose.h>
 #include "config.h"
 #else
 #include <io.h>
@@ -734,14 +735,15 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     int fd = open(devName, mode, 0);
     if (fd == -1)
     {
-        cerr << "Cannot open device " << devName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Cannot open device %1")
+                .arg(devName.toLocal8Bit().constData()));
         return -1;
     }                  
 
     // Set Full Duplex operation
     /*if (ioctl(fd, SNDCTL_DSP_SETDUPLEX, 0) == -1)
     {
-        cerr << "Error setting audio driver duplex\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver duplex");
         close(fd);
         return -1;
     }*/
@@ -749,7 +751,7 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     int format = AFMT_S16_LE;//AFMT_MU_LAW;
     if (ioctl(fd, SNDCTL_DSP_SETFMT, &format) == -1)
     {
-        cerr << "Error setting audio driver format\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver format");
         close(fd);
         return -1;
     }
@@ -757,7 +759,7 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     int channels = 1;
     if (ioctl(fd, SNDCTL_DSP_CHANNELS, &channels) == -1)
     {
-        cerr << "Error setting audio driver num-channels\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver num-channels");
         close(fd);
         return -1;
     }
@@ -765,14 +767,15 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     int speed = 8000; // 8KHz
     if (ioctl(fd, SNDCTL_DSP_SPEED, &speed) == -1)
     {
-        cerr << "Error setting audio driver speed\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver speed");
         close(fd);
         return -1;
     }
 
     if ((format != AFMT_S16_LE/*AFMT_MU_LAW*/) || (channels != 1) || (speed != 8000))
     {
-        cerr << "Error setting audio driver; " << format << ", " << channels << ", " << speed << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error setting audio driver; %1, %2, %3")
+                .arg(format).arg(channels).arg(speed));
         close(fd);
         return -1;
     }
@@ -780,7 +783,7 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     uint frag_size = 0x7FFF0007; // unlimited number of fragments; fragment size=128 bytes (ok for most RTP sample sizes)
     if (ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &frag_size) == -1)
     {
-        cerr << "Error setting audio fragment size\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio fragment size");
         close(fd);
         return -1;
     }
@@ -796,7 +799,7 @@ int ossAudioDriver::OpenAudioDevice(QString devName, int mode)
     if ((ioctl(fd, SNDCTL_DSP_GETBLKSIZE, &frag_size) == -1) ||
         (ioctl(fd, SNDCTL_DSP_GETOSPACE, &info) == -1))
     {
-        cerr << "Error getting audio driver fragment info\n";
+        VERBOSE(VB_IMPORTANT, "Error getting audio driver fragment info");
         close(fd);
         return -1;
     }*/
@@ -832,7 +835,8 @@ void mythAudioDriver::Open()
 {
     // Open the audio devices
     if (spkDevice == micDevice)
-        cerr << "Cannot have matching spk and mic devices in this mode, should have chosen OSS mode\n";
+        VERBOSE(VB_IMPORTANT, "Cannot have matching spk and mic devices in "
+                "this mode, should have chosen OSS mode");
     else
     {
         mythOutput = AudioOutput::OpenAudio(spkDevice, "default", 16, 1, 8000,
@@ -920,14 +924,15 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     int fd = open(devName, mode, 0);
     if (fd == -1)
     {
-        cerr << "Cannot open device " << devName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Cannot open device %1")
+                .arg(devName.toLocal8Bit().constData()));
         return -1;
     }                  
 
     // Set Full Duplex operation
     /*if (ioctl(fd, SNDCTL_DSP_SETDUPLEX, 0) == -1)
     {
-        cerr << "Error setting audio driver duplex\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver duplex");
         close(fd);
         return -1;
     }*/
@@ -935,7 +940,7 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     int format = AFMT_S16_LE;//AFMT_MU_LAW;
     if (ioctl(fd, SNDCTL_DSP_SETFMT, &format) == -1)
     {
-        cerr << "Error setting audio driver format\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver format");
         close(fd);
         return -1;
     }
@@ -943,7 +948,7 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     int channels = 1;
     if (ioctl(fd, SNDCTL_DSP_CHANNELS, &channels) == -1)
     {
-        cerr << "Error setting audio driver num-channels\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver num-channels");
         close(fd);
         return -1;
     }
@@ -951,14 +956,15 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     int speed = 8000; // 8KHz
     if (ioctl(fd, SNDCTL_DSP_SPEED, &speed) == -1)
     {
-        cerr << "Error setting audio driver speed\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio driver speed");
         close(fd);
         return -1;
     }
 
     if ((format != AFMT_S16_LE/*AFMT_MU_LAW*/) || (channels != 1) || (speed != 8000))
     {
-        cerr << "Error setting audio driver; " << format << ", " << channels << ", " << speed << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error setting audio driver; %1, %2, %3")
+                .arg(format).arg(channels).arg(speed));
         close(fd);
         return -1;
     }
@@ -966,7 +972,7 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     uint frag_size = 0x7FFF0007; // unlimited number of fragments; fragment size=128 bytes (ok for most RTP sample sizes)
     if (ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &frag_size) == -1)
     {
-        cerr << "Error setting audio fragment size\n";
+        VERBOSE(VB_IMPORTANT, "Error setting audio fragment size");
         close(fd);
         return -1;
     }
@@ -982,7 +988,7 @@ int mythAudioDriver::OpenAudioDevice(QString devName, int mode)
     if ((ioctl(fd, SNDCTL_DSP_GETBLKSIZE, &frag_size) == -1) ||
         (ioctl(fd, SNDCTL_DSP_GETOSPACE, &info) == -1))
     {
-        cerr << "Error getting audio driver fragment info\n";
+        VERBOSE(VB_IMPORTANT, "Error getting audio driver fragment info");
         close(fd);
         return -1;
     }*/

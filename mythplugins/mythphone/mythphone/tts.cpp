@@ -60,7 +60,7 @@ void tts::setVoice(const char *voice)
         festival_eval_command(voiceCmd);
     }
     else
-        cerr << "Voice too long" << voice << endl;
+        VERBOSE(VB_IMPORTANT, QString("Voice too long %1").arg(voice));
 #endif
 }
 
@@ -78,7 +78,7 @@ void tts::toWavFile(const char *sentence, wavfile &outWave)
 #ifdef FESTIVAL_SUPPORT
     EST_Wave Wave;
     if (!festival_text_to_wave(sentence, Wave))
-        cout << "Festival TTS failed ro generate speech for: " << sentence << endl;
+        VERBOSE(VB_IMPORTANT, QString("Festival TTS failed ro generate speech for: %1").arg(sentence));
 
     outWave.load(Wave.values().memory(),
                  Wave.num_samples(),

@@ -1069,7 +1069,7 @@ void AllMusic::printTree()
 {
     //  debugging
 
-    cout << "Whole Music Tree" << endl;
+    VERBOSE(VB_IMPORTANT, "Whole Music Tree");
     m_root_node->printYourself(0);
 }
 

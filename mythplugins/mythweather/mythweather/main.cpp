@@ -164,7 +164,7 @@ int mythplugin_config()
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
     }
     else
-        cerr << "Couldn't find theme weather_settings.xml" << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't find theme weather_settings.xml");
 
     return 0;
 }

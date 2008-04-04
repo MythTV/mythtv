@@ -745,7 +745,7 @@ void PhoneUIBox::TransmitLocalWebcamImage()
                 {
                     if (encLen > (int)sizeof(vb->video))
                     {
-                        cout << "SIP: Encoded H.323 frame size is " << encLen << "; too big for buffer\n";
+                        VERBOSE(VB_IMPORTANT, QString("SIP: Encoded H.323 frame size is %1; too big for buffer").arg(encLen));
                         rtpVideo->freeVideoBuffer(vb);
                     }
                     else if (encFrame && encLen >= 0)
@@ -756,13 +756,13 @@ void PhoneUIBox::TransmitLocalWebcamImage()
                         vb->h = txHeight;
                         if (!rtpVideo->queueVideo(vb))
                         {
-                            cout << "Could not queue RTP Video frame for transmission\n";
+                            VERBOSE(VB_IMPORTANT, "Could not queue RTP Video frame for transmission");
                             rtpVideo->freeVideoBuffer(vb);
                         }
                     }
                     else
                     {
-                        cout << "H263EncodeFrame returned -1\n";
+                        VERBOSE(VB_IMPORTANT, "H263EncodeFrame returned -1");
                         rtpVideo->freeVideoBuffer(vb);
                     }
                 }
@@ -785,7 +785,9 @@ void PhoneUIBox::ProcessRxVideoFrame()
     {
         if ((rxWidth != v->w) || (rxHeight != v->h))
         {
-            cout << "SIP: Rx Image size changed from " << rxWidth << "x" << rxHeight << " to " << v->w << "x" << v->h << endl;
+            VERBOSE(VB_IMPORTANT, 
+                    QString("SIP: Rx Image size changed from %1x%2 to %3x%4")
+                    .arg(rxWidth).arg(rxHeight).arg(v->w).arg(v->h));
             rxWidth = v->w;
             rxHeight = v->h;
             ChangeVideoRxResolution();
@@ -908,8 +910,8 @@ void PhoneUIBox::ProcessSipNotification()
         }
 
         else 
-            cerr << "SIP: Unknown Notify type "
-                 << NotifyType.toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Notify type %1")
+                    .arg(NotifyType.toLocal8Bit().constData()));
     }
 }
 
@@ -1065,7 +1067,7 @@ void PhoneUIBox::doMenuPopup()
     GenericTree *Current = DirectoryList->getCurrentNode();
     if (Current == 0)
     {
-        cerr << "Mythphone: Can't get your context\n";
+        VERBOSE(VB_IMPORTANT, "Mythphone: Can't get your context");
         return;
     }
 
@@ -1144,10 +1146,10 @@ void PhoneUIBox::menuSpeedDialRemove()
             }
         }
         else
-            cerr << "mythphone: Error finding your directory entry\n";
+            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
     }
     else
-        cerr << "mythphone: Error getting info from the tree\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
     closeMenuPopup();
 }
 
@@ -1174,10 +1176,10 @@ void PhoneUIBox::menuHistorySave()
                 doAddEntryPopup(0, crEntry->getDisplayName(), crEntry->getUri());
         }
         else
-            cerr << "mythphone: Error finding your call history entry\n";
+            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your call history entry");
     }
     else
-        cerr << "mythphone: Error getting info from the tree\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
 }
 
 
@@ -1207,10 +1209,10 @@ void PhoneUIBox::menuEntryEdit()
             doAddEntryPopup(Entry);
         }
         else
-            cerr << "mythphone: Error finding your directory entry\n";
+            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
     }
     else
-        cerr << "mythphone: Error getting info from the tree\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
 }
 
 void PhoneUIBox::menuEntryMakeSpeedDial()
@@ -1228,10 +1230,10 @@ void PhoneUIBox::menuEntryMakeSpeedDial()
             }
         }
         else
-            cerr << "mythphone: Error finding your directory entry\n";
+            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
     }
     else
-        cerr << "mythphone: Error getting info from the tree\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
     closeMenuPopup();
 }
 
@@ -1248,10 +1250,10 @@ void PhoneUIBox::menuEntryDelete()
             DirectoryList->refresh();
         }
         else
-            cerr << "mythphone: Error finding your directory entry\n";
+            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
     }
     else
-        cerr << "mythphone: Error getting info from the tree\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
     closeMenuPopup();
 }
 
@@ -2188,7 +2190,7 @@ void PhoneUIBox::wireUpTheme()
     DirectoryList = getUIManagedTreeListType("directorytreelist");
     if (!DirectoryList)
     {
-        cerr << "phoneui.o: Couldn't find a Directory box in your theme\n";
+        VERBOSE(VB_IMPORTANT, "phoneui.o: Couldn't find a Directory box in your theme");
         exit(0);
     }
     connect(DirectoryList, SIGNAL(nodeSelected(int, IntVector*)),
@@ -2250,7 +2252,7 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
         if (entry)
             doCallPopup(entry, tr("Dial"), false);
         else
-            cerr << "Cannot find entry to dial\n";
+            VERBOSE(VB_IMPORTANT, "Cannot find entry to dial");
     }
 
     // SELECT on a call record --- dial this entry

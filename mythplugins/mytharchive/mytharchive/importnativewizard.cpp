@@ -260,7 +260,7 @@ void ImportNativeWizard::wireUpTheme()
     if (!m_fileList || !m_locationEdit || !m_backButton || !m_nextButton 
          || !m_prevButton || !m_cancelButton || !m_homeButton)
     {
-        cout << "ImportNativeWizard: Your theme is missing some UI elements! Bailing out." << endl;
+        VERBOSE(VB_IMPORTANT, "ImportNativeWizard: Your theme is missing some UI elements! Bailing out.");
         QTimer::singleShot(100, this, SLOT(reject()));
     }
 
@@ -459,7 +459,7 @@ void ImportNativeWizard::updateFileList()
     else
     {
         m_locationEdit->setText("/");
-        cout << "MythArchive:  current directory does not exist!" << endl;
+        VERBOSE(VB_IMPORTANT, "MythArchive:  current directory does not exist!");
     }
 
     m_fileList->refresh();
@@ -512,7 +512,7 @@ void ImportNativeWizard::loadXML(const QString &filename)
 
         if (itemNodeList.count() < 1)
         {
-            cout << "Couldn't find an 'item' element in XML file" << endl;
+            VERBOSE(VB_IMPORTANT, "Couldn't find an 'item' element in XML file");
             return;
         }
 
@@ -525,7 +525,8 @@ void ImportNativeWizard::loadXML(const QString &filename)
             QDomNodeList nodeList = e.elementsByTagName("recorded");
             if (nodeList.count() < 1)
             {
-                cout << "Couldn't find a 'recorded' element in XML file" << endl;
+                VERBOSE(VB_IMPORTANT, 
+                        "Couldn't find a 'recorded' element in XML file");
                 return;
             }
 
@@ -572,7 +573,8 @@ void ImportNativeWizard::loadXML(const QString &filename)
             nodeList = e.elementsByTagName("channel");
             if (nodeList.count() < 1)
             {
-                cout << "Couldn't find a 'channel' element in XML file" << endl;
+                VERBOSE(VB_IMPORTANT, 
+                        "Couldn't find a 'channel' element in XML file");
                 m_chanID_text->SetText("");
                 m_chanNo_text->SetText("");
                 m_chanName_text->SetText("");
@@ -596,7 +598,8 @@ void ImportNativeWizard::loadXML(const QString &filename)
             QDomNodeList nodeList = e.elementsByTagName("videometadata");
             if (nodeList.count() < 1)
             {
-                cout << "Couldn't find a 'videometadata' element in XML file" << endl;
+                VERBOSE(VB_IMPORTANT, 
+                        "Couldn't find a 'videometadata' element in XML file");
                 return;
             }
 
@@ -642,7 +645,7 @@ void ImportNativeWizard::loadXML(const QString &filename)
         m_title_text->SetText("");
         m_subtitle_text->SetText("");
         m_starttime_text->SetText("");
-        cout << "Not a native archive file" << endl;
+        VERBOSE(VB_IMPORTANT, "Not a native archive file");
     }
 }
 

@@ -39,7 +39,8 @@ extern "C" uint32_t read_callback(void *user_data, void *buffer, uint32_t length
     {
         return the_decoder_object->aacRead((char *)buffer, length);
     }
-    cerr << "read_callback called with no aacDecoder object assigned" << endl;
+    VERBOSE(VB_IMPORTANT, 
+            "read_callback called with no aacDecoder object assigned");
     return 0;
     
 }
@@ -51,7 +52,8 @@ uint32_t seek_callback(void *user_data, uint64_t position)
     {
         return the_decoder_object->aacSeek(position);
     }
-    cerr << "seek_callback called with no aacDecoder object assigned" << endl;
+    VERBOSE(VB_IMPORTANT,
+            "seek_callback called with no aacDecoder object assigned");
     return 0;
 }        
 

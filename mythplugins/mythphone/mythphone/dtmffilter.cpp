@@ -30,6 +30,7 @@ using namespace std;
 #define M_PI 3.1415926
 #endif
 
+#include <mythtv/mythverbose.h>
 
 /**********************************************************************
 DtmfFilter
@@ -155,8 +156,8 @@ QChar DtmfFilter::CheckAnyDTMF()
     Debounce[key] |= 0x01;
     if (Debounce[key] != 1) 
         return 0;
-        
-    cout << "DTMF Filter matched " << key.latin1() << endl;    
+
+    VERBOSE(VB_IMPORTANT, QString("DTMF Filter matched %1").arg(key.latin1())); 
     return key;
 }
 

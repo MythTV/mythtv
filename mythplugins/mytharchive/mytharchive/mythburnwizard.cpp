@@ -863,7 +863,7 @@ void MythburnWizard::getThemeList(void)
         setTheme(0);
     }
     else
-        cout << "MythArchive:  Theme directory does not exist!" << endl;
+        VERBOSE(VB_IMPORTANT, "MythArchive:  Theme directory does not exist!");
 }
 
 void MythburnWizard::setTheme(int item)
@@ -1268,8 +1268,9 @@ void MythburnWizard::createConfigFile(const QString &filename)
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly))
     {
-        cout << "MythburnWizard::createConfigFile: Failed to open file for writing - "
-             << filename.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythburnWizard::createConfigFile: "
+                "Failed to open file for writing - %1")
+                .arg(filename.toLocal8Bit().constData()));
         return;
     }
 

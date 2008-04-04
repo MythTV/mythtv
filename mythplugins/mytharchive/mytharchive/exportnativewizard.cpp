@@ -600,8 +600,9 @@ void ExportNativeWizard::createConfigFile(const QString &filename)
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly))
     {
-        cout << "ExportNativeWizard::createConfigFile: Failed to open file for writing - "
-                << filename.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("ExportNativeWizard::createConfigFile: "
+                "Failed to open file for writing - %1")
+                .arg(filename.toLocal8Bit().constData()));
         return;
     }
 

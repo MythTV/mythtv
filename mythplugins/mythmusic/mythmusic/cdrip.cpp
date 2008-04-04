@@ -1629,7 +1629,7 @@ void RipStatus::customEvent(QEvent *event)
         }
 
         default:
-            cout << "Received an unknown event type!" << endl;
+            VERBOSE(VB_IMPORTANT, "Received an unknown event type!");
             break;
     }
 }

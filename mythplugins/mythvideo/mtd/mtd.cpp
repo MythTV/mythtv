@@ -282,7 +282,7 @@ void MTD::cleanThreads()
                 concurrent_transcodings--;
                 if(concurrent_transcodings < 0)
                 {
-                    cerr << "mtd.o: Your number of transcode jobs ended up negative. That should be impossible." << endl;
+                    VERBOSE(VB_IMPORTANT, "mtd.o: Your number of transcode jobs ended up negative. That should be impossible.");
                     concurrent_transcodings = 0;
                 }
                 concurrent_transcodings_mutex->unlock();
@@ -420,7 +420,7 @@ void MTD::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
-    // cout << "Sending : " << message.local8Bit();
+    // VERBOSE(VB_IMPORTANT, "Sending : " << message.local8Bit());
     where->writeBlock(message.utf8(), message.utf8().length());
 }
 
@@ -774,7 +774,7 @@ void MTD::startDVD(const QStringList &tokens)
 
         if(!which_title)
         {
-            cerr << "mtd.o: title number not valid? " << endl;
+            VERBOSE(VB_IMPORTANT, "mtd.o: title number not valid? ");
             return;
         }
         
@@ -805,7 +805,7 @@ void MTD::startDVD(const QStringList &tokens)
     }
     else
     {
-        cerr << "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird." << endl;
+        VERBOSE(VB_IMPORTANT, "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird.");
     }
 }
 
@@ -996,7 +996,7 @@ void MTD::customEvent(QEvent *ce)
     }
     else
     {
-        cerr << "mtd.o: receiving events I don't understand" << endl;
+        VERBOSE(VB_IMPORTANT, "mtd.o: receiving events I don't understand");
     }
 }
 

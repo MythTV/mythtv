@@ -101,8 +101,8 @@ void MiniPlayer::wireupTheme(void)
 
     if (!container)
     {
-        cerr << "MiniPlayer: cannot find the 'player_container'"
-                " in your theme" << endl;
+        VERBOSE(VB_IMPORTANT, "MiniPlayer: cannot find the 'player_container'"
+                " in your theme");
         done(0);
         return;
     }

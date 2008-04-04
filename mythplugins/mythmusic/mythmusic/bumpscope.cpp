@@ -2,6 +2,7 @@
 #include "bumpscope.h"
 
 #include <mythtv/compat.h>
+#include <mythtv/mythverbose.h>
 
 // This was:
 // Bump Scope - Visualization Plugin for XMMS
@@ -29,7 +30,7 @@ BumpScope::BumpScope(long int winid)
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        cerr << "Unable to init SDL\n";
+        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
         return;
     }
 
@@ -84,7 +85,7 @@ void BumpScope::resize(const QSize &newsize)
 
     if (!surface)
     {
-        cerr << "Couldn't get SDL surface\n";
+        VERBOSE(VB_IMPORTANT, "Couldn't get SDL surface");
         return;
     }
 
@@ -445,7 +446,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
 
     if (!surface)
     {
-        cerr << "No sdl surface\n";
+        VERBOSE(VB_IMPORTANT, "No sdl surface");
         return false;
     }
 

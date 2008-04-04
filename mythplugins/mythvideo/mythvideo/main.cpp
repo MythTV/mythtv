@@ -423,8 +423,7 @@ namespace
                 startDVDRipper();
                 break;
             default:
-                cerr << "mythdvd main.o: handleMedia() does not know what to do"
-                     << endl;
+                VERBOSE(VB_IMPORTANT, "mythdvd main.o: handleMedia() does not know what to do");
         }
     }
 

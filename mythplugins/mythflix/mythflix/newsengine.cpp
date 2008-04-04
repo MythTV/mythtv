@@ -215,13 +215,13 @@ void NewsSite::process()
 
     if (!xmlFile.open(QIODevice::ReadOnly)) {
         new NewsArticle(this, tr("Failed to retrieve news"), "", "");
-        cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to open xmlfile");
         return;
     }
 
     if (!domDoc.setContent(&xmlFile)) {
         new NewsArticle(this, tr("Failed to retrieve news"), "", "");
-        cerr << "MythNews: NewsEngine: failed to set content from xmlfile" << endl;
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to set content from xmlfile");
         m_errorString += tr("Failed to read downloaded file");
         return;
     }

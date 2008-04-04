@@ -443,7 +443,7 @@ void DatabaseBox::BlankCDRW()
     strcat(command,scsidev.ascii());
     strcat(command," -blank=");
     strcat(command,blanktype.ascii());
-    cout << command << endl;
+    VERBOSE(VB_IMPORTANT, QString("%1").arg(command));
     system(command);
 
     record_progress->Close();

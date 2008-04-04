@@ -141,7 +141,7 @@ void DirEntry::updateYourselfInDB(QString Dir)
             changed = false;
         }
         else
-            cerr << "Mythphone: Something is up with the database\n";
+            VERBOSE(VB_IMPORTANT, "Mythphone: Something is up with the database");
     }
     else if (changed)
     {
@@ -401,7 +401,7 @@ void CallRecord::updateYourselfInDB()
             changed = false;
         }
         else
-            cerr << "Mythphone: Something is up with the database\n";
+            VERBOSE(VB_IMPORTANT, "Mythphone: Something is up with the database");
     }
     else if (changed)
     {
@@ -572,7 +572,7 @@ void DirectoryContainer::Load()
         }
     }
     else
-        cout << "mythphone: Nothing in your Directory -- ok?\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Nothing in your Directory -- ok?");
 
     // Then load the phone call history
     thequery = QString("SELECT recid, displayname,url,timestamp,"
@@ -597,7 +597,7 @@ void DirectoryContainer::Load()
         }
     }
     else
-        cout << "mythphone: Nothing in your Call History -- ok?\n";
+        VERBOSE(VB_IMPORTANT, "mythphone: Nothing in your Call History -- ok?");
 }
 
 void DirectoryContainer::createTree()
@@ -763,7 +763,8 @@ GenericTree *DirectoryContainer::addToTree(QString DirName)
         return sub_node;
     }
 
-    cerr << "No directory called " << DirName.toLocal8Bit().constData() << endl;
+    VERBOSE(VB_IMPORTANT, QString("No directory called %1")
+            .arg(DirName.toLocal8Bit().constData()));
     return 0;
 }
 
@@ -925,7 +926,9 @@ void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
+                "its meant to get created earlier so this is wrong")
+                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
         return;
     }
 
@@ -950,7 +953,9 @@ void DirectoryContainer::deleteVoicemail(QString vmailName)
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
+                "its meant to get created earlier so this is wrong")
+                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
         return;
     }
 
@@ -971,7 +976,9 @@ void DirectoryContainer::clearAllVoicemail()
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << MythContext::GetConfDir().toLocal8Bit().constData() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
+                "its meant to get created earlier so this is wrong")
+                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
         return;
     }
 

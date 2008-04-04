@@ -584,7 +584,11 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
     if (natIp.length() == 0)
         natIp = localIp;
     SipFsm::Debug(SipDebugEvent::SipDebugEv, QString("SIP listening on IP Address ") + localIp + ":" + QString::number(localPort) + " NAT address " + natIp + "\n\n");
-    cout << "SIP listening on IP Address " << localIp.toLocal8Bit().constData() << ":" << localPort << " NAT address " << natIp.toLocal8Bit().constData() << endl;
+    VERBOSE(VB_IMPORTANT, 
+            QString("SIP listening on IP Address %1:%2 NAT address %3")
+                    .arg(localIp.toLocal8Bit().constData())
+                    .arg(localPort).arg(natIp.toLocal8Bit()
+                    .constData()));
 
     // Create the timer list
     timerList = new SipTimer;
@@ -606,14 +610,14 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
             FsmList.append(sipRegistration);
         }
         else
-            cout << "SIP: Cannot register; proxy, username or password not set\n";
+            VERBOSE(VB_IMPORTANT, "SIP: Cannot register; proxy, username or password not set");
     }
 }
 
 
 SipFsm::~SipFsm()
 {
-    cout << "Destroying SipFsm object " << endl;
+    VERBOSE(VB_IMPORTANT, "Destroying SipFsm object");
     delete sipRegistrar;
     if (sipRegistration)
         delete sipRegistration;
@@ -643,7 +647,7 @@ QString SipFsm::OpenSocket(int Port)
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(sipSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface " << ifName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to find network interface %1").arg(ifName.toLocal8Bit().constData()));
         delete sipSocket;
         sipSocket = 0;
         return "";
@@ -659,7 +663,7 @@ QString SipFsm::OpenSocket(int Port)
     int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
     if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
     {
-        cerr << "Failed to find network interface " << endl;
+        VERBOSE(VB_IMPORTANT, "Failed to find network interface");
         delete sipSocket;
         sipSocket = 0;
         return "";
@@ -674,7 +678,7 @@ QString SipFsm::OpenSocket(int Port)
 
     if (!sipSocket->bind(myIP, Port))
     {
-        cerr << "Failed to bind for SIP connection " << myIP.toString().toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to bind for SIP connection %1").arg(myIP.toString().toLocal8Bit().constData()));;
         delete sipSocket;
         sipSocket = 0;
         return "";
@@ -730,7 +734,7 @@ QString SipFsm::DetermineNatAddress()
                 hostIp.setAddress(ntohl(*(long *)h->h_addr));
             else
             {
-                cout << "SIP: Failed to detect your NAT settings\n";
+                VERBOSE(VB_IMPORTANT, "SIP: Failed to detect your NAT settings");
                 return "";
             }
         }
@@ -764,16 +768,18 @@ QString SipFsm::DetermineNatAddress()
                         natIP = temp3.stripWhiteSpace();
                     }
                     else
-                        cout << "SIP: Got invalid HTML response whilst detecting your NAT settings " << endl;
+                        VERBOSE(VB_IMPORTANT, "SIP: Got invalid HTML response whilst detecting your NAT settings");
                     delete httpResponse;
                     break;
                 }
             }
             else
-                cerr << "Error sending NAT discovery packet to socket\n";
+                VERBOSE(VB_IMPORTANT, "Error sending NAT discovery packet to socket");
         }
         else
-            cout << "SIP: Could not connect to NAT discovery host " << Url.host().toLocal8Bit().constData() << ":" << Url.port() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Could not connect to NAT discovery host %1:%2")
+                    .arg(Url.host().toLocal8Bit().constData())
+                     .arg(Url.port()));
         httpSock->close();
         delete httpSock;
     }
@@ -791,7 +797,7 @@ void SipFsm::Transmit(QString Msg, QString destIP, int destPort)
         sipSocket->writeBlock((const char *)Msg, Msg.length(), dest, destPort);
     }
     else
-        cerr << "SIP: Cannot transmit SIP message to " << destIP.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP: Cannot transmit SIP message to %1").arg(destIP.toLocal8Bit().constData()));
 }
 
 bool SipFsm::Receive(SipMsg &sipMsg)
@@ -838,7 +844,7 @@ void SipFsm::NewCall(bool audioOnly, QString uri, QString DispName, QString vide
             DestroyFsm(Call);
     }
     else
-        cerr << "SIP Call attempt with call in progress\n";
+        VERBOSE(VB_IMPORTANT, "SIP Call attempt with call in progress");
 }
 
 
@@ -916,7 +922,7 @@ int SipFsm::getPrimaryCallState()
     if (call == 0)
     {
         primaryCall = -1;
-        cerr << "Seemed to lose a call here\n";
+        VERBOSE(VB_IMPORTANT, "Seemed to lose a call here");
         return SIP_IDLE;
     }
 
@@ -954,7 +960,7 @@ void SipFsm::CheckRxEvent()
                 DestroyFsm(fsm);
         }
         else if (Event != SIP_UNKNOWN)
-            cerr << "SIP: fsm should not be zero here\n";
+            VERBOSE(VB_IMPORTANT, "SIP: fsm should not be zero here");
     }
 }
 
@@ -1008,10 +1014,14 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
             if ((statusCode >= 100) && (statusCode < 200))    return SIP_INVITESTATUS_1xx;
             if ((statusCode >= 300) && (statusCode < 700))    return SIP_INVITESTATUS_3456xx;
         }
-        cerr << "SIP: Unknown STATUS method " << statusMethod.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP: Unknown STATUS method %1").arg(statusMethod.toLocal8Bit().constData()));
     }
     else
-        cerr << "SIP: Unknown method " << Method.toLocal8Bit().constData() << endl << sipMsg->string().toLocal8Bit().constData() << endl;
+    {
+        VERBOSE(VB_IMPORTANT, QString("SIP: Unknown method %1\n%2")
+                .arg(Method.toLocal8Bit().constData())
+                .arg(sipMsg->string().toLocal8Bit().constData()));
+    }
     return SIP_UNKNOWN;
 }
 
@@ -1036,7 +1046,8 @@ SipFsmBase *SipFsm::MatchCallId(SipCallId *CallId)
             if (it->callId() == CallId->string())
             {
                 if (match != 0)
-                    cerr << "SIP: Oops; we have two FSMs with the same Call Id\n";
+                    VERBOSE(VB_IMPORTANT, 
+                            "SIP: Oops; we have two FSMs with the same Call Id");
                 match = it;
             }
         }
@@ -1138,7 +1149,7 @@ void SipFsm::SendIM(QString destUrl, QString CallId, QString imMsg)
     // Matched a call-id, but it was not an IM FSM, should not happen with random call-ids
     else 
     {
-        cerr << "SIP: call-id used by non-IM FSM\n";
+        VERBOSE(VB_IMPORTANT, "SIP: call-id used by non-IM FSM");
     }
 }
 
@@ -1271,7 +1282,7 @@ void SipFsmBase::BuildSendStatus(int Code, QString Method, int statusCseq, int O
 {
     if (remoteUrl == 0)
     {
-        cerr << "URL variables not setup\n";
+        VERBOSE(VB_IMPORTANT, "URL variables not setup");
         return;
     }
 
@@ -1479,7 +1490,10 @@ void SipCall::initialise()
             CodecList[n++].Encoding = "GSM";
         }
         else
-            cout << "Unknown codec " << CodecStr.toLocal8Bit().constData() << " in Codec Priority List\n";
+        {
+            VERBOSE(VB_IMPORTANT, QString("Unknown codec %1 in Codec Priority List")
+                    .arg(CodecStr.toLocal8Bit().constData()));
+        }
         if (sep != -1)
         {
             QString tempStr = CodecListString.mid(sep+1);
@@ -1554,7 +1568,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         remoteUrl = new SipUrl(DestinationUri, "");
         if ((remoteUrl->getHostIp()).length() == 0)
         {
-            cout << "SIP: Tried to call " << DestinationUri.toLocal8Bit().constData() << " but can't get destination IP address\n";
+            VERBOSE(VB_IMPORTANT, QString("SIP: Tried to call %1 but can't get destination IP address")
+                    .arg(DestinationUri.toLocal8Bit().constData()));
             State = SIP_IDLE;
             break;
         }
@@ -1564,7 +1579,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         if ((remoteUrl->getHost() == "volkaerts") &&
             (!(parent->getRegistrar())->getRegisteredContact(remoteUrl)))
         {
-            cout << DestinationUri.toLocal8Bit().constData() << " is not registered here\n";
+            VERBOSE(VB_IMPORTANT, QString("%1  is not registered here")
+                    .arg(DestinationUri.toLocal8Bit().constData()));
             break;
         }
 #endif
@@ -1677,7 +1693,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         }
         else
         {
-            cerr << "2xx STATUS did not contain a valid Audio codec\n";
+            VERBOSE(VB_IMPORTANT, "2xx STATUS did not contain a valid Audio codec");
             BuildSendAck();  // What is the right thing to do here?
             BuildSendBye(0);
             if (eventWindow)
@@ -1877,7 +1893,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         }
         else
         {
-            cerr << "2xx STATUS on reINVITE did not contain a valid Audio codec\n";
+            VERBOSE(VB_IMPORTANT, "2xx STATUS on reINVITE did not contain a valid Audio codec");
             BuildSendAck();  
             State = SIP_CONNECTED;
         }
@@ -1970,7 +1986,7 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Invite.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1").arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -2004,7 +2020,7 @@ void SipCall::BuildSendReInvite(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Invite.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1").arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -2048,7 +2064,7 @@ void SipCall::BuildSendAck()
 {
     if ((MyUrl == 0) || (remoteUrl == 0))
     {
-        cerr << "URL variables not setup\n";
+        VERBOSE(VB_IMPORTANT, "URL variables not setup");
         return;
     }
 
@@ -2073,7 +2089,7 @@ void SipCall::BuildSendCancel(SipMsg *authMsg)
 {
     if ((MyUrl == 0) || (remoteUrl == 0))
     {
-        cerr << "URL variables not setup\n";
+        VERBOSE(VB_IMPORTANT, "URL variables not setup");
         return;
     }
 
@@ -2091,7 +2107,7 @@ void SipCall::BuildSendCancel(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Cancel.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1").arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -2116,7 +2132,7 @@ void SipCall::BuildSendBye(SipMsg *authMsg)
 {
     if (remoteUrl == 0)
     {
-        cerr << "URL variables not setup\n";
+        VERBOSE(VB_IMPORTANT, "URL variables not setup");
         return;
     }
 
@@ -2142,7 +2158,7 @@ void SipCall::BuildSendBye(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Bye.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1").arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -2193,10 +2209,10 @@ void SipCall::AlertUser(SipMsg *rxMsg)
                                                                   videoPayload == -1));
         }
         else
-            cerr << "What no from in INVITE?  It is invalid then.\n";
+            VERBOSE(VB_IMPORTANT, "What no from in INVITE?  It is invalid then.");
     }
     else
-        cerr << "What no INVITE?  How did we get here then?\n";
+        VERBOSE(VB_IMPORTANT, "What no INVITE?  How did we get here then?");
 }
 
 void SipCall::GetSDPInfo(SipMsg *sipMsg)
@@ -2374,7 +2390,8 @@ int SipRegistrar::FSM(int Event, SipMsg *sipMsg, void *Value)
             }
             else
             {
-                cout << "SIP Registration rejected for domain " << (sipMsg->getToUrl())->getHost().toLocal8Bit().constData() << endl;
+                VERBOSE(VB_IMPORTANT, QString("SIP Registration rejected for domain %1")
+                        .arg((sipMsg->getToUrl())->getHost().toLocal8Bit().constData()));
                 SendResponse(404, sipMsg, s->getHostIp(), s->getPort());
             }
         }
@@ -2384,7 +2401,9 @@ int SipRegistrar::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             SipRegisteredUA *it = (SipRegisteredUA *)Value;
             RegisteredList.remove(it);
-            cout << "SIP Registration Expired client " << it->getContactIp().toLocal8Bit().constData() << ":" << it->getContactPort() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP Registration Expired client %1:%2")
+                    .arg(it->getContactIp().toLocal8Bit().constData())
+                    .arg(it->getContactPort()));
             delete it;
         }
         break;
@@ -2404,7 +2423,9 @@ void SipRegistrar::add(SipUrl *Url, QString hostIp, int Port, int Expires)
         RegisteredList.append(entry);
         //TODO - Start expiry timer
         (parent->Timer())->Start(this, Expires*1000, SIP_REGISTRAR_TEXP, RegisteredList.current());
-        cout << "SIP Registered client " << Url->getUser().toLocal8Bit().constData() << " at " << hostIp.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP Registered client %1 at %2")
+                .arg(Url->getUser().toLocal8Bit().constData())
+                .arg(hostIp.toLocal8Bit().constData()));
     }
 
     // Entry does exist, refresh the entry expiry timer
@@ -2425,11 +2446,13 @@ void SipRegistrar::remove(SipUrl *Url)
     {
         RegisteredList.remove(it);
         (parent->Timer())->Stop(this, SIP_REGISTRAR_TEXP, it);
-        cout << "SIP Unregistered client " << Url->getUser().toLocal8Bit().constData() << " at " << Url->getHostIp().toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP Unregistered client %1 at %2")
+                .arg(Url->getUser().toLocal8Bit().constData())
+                .arg(Url->getHostIp().toLocal8Bit().constData()));
         delete it;
     }
     else
-        cerr << "SIP Registrar could not find registered client " << Url->getUser().toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP Registrar could not find registered client %1").arg(Url->getUser().toLocal8Bit().constData()));
 }
 
 bool SipRegistrar::getRegisteredContact(SipUrl *Url)
@@ -2527,7 +2550,7 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         case 200:
             if (sipMsg->getExpires() > 0)
                 Expires = sipMsg->getExpires();
-            cout << "SIP Registered to " << ProxyUrl->getHost().toLocal8Bit().constData() << " for " << Expires << "s" << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP Registered to %1 for %2 s").arg(ProxyUrl->getHost().toLocal8Bit().constData()).arg(Expires));
             State = SIP_REG_REGISTERED;
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
@@ -2541,7 +2564,8 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         default:
             if (sipMsg->getStatusCode() != 100)
             {
-                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase().toLocal8Bit().constData() << endl;
+                VERBOSE(VB_IMPORTANT, QString("SIP Registration failed; Reason %1 %2")
+                        .arg(sipMsg->getStatusCode()).arg(sipMsg->getReasonPhrase().toLocal8Bit().constData()));
                 State = SIP_REG_FAILED;
                 (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
             }
@@ -2556,14 +2580,16 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         case 200:
             if (sipMsg->getExpires() > 0)
                 Expires = sipMsg->getExpires();
-            cout << "SIP Registered to " << ProxyUrl->getHost().toLocal8Bit().constData() << " for " << Expires << "s" << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP Registered to %1 for %2 s")
+                    .arg(ProxyUrl->getHost().toLocal8Bit().constData()).arg(Expires));
             State = SIP_REG_REGISTERED;
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
         default:
             if (sipMsg->getStatusCode() != 100)
             {
-                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase().toLocal8Bit().constData() << endl;
+                VERBOSE(VB_IMPORTANT, QString("SIP Registration failed; Reason %1 %2")
+                        .arg(sipMsg->getStatusCode()).arg(sipMsg->getReasonPhrase().toLocal8Bit().constData()));
                 State = SIP_REG_FAILED;
                 (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
             }
@@ -2585,12 +2611,13 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
         else
         {
             State = SIP_REG_FAILED;
-            cout << "SIP Registration failed; no Response from Server. Are you behind a firewall?\n";
+            VERBOSE(VB_IMPORTANT, "SIP Registration failed; no Response from Server. Are you behind a firewall?");
         }
         break;
 
     default:
-        cerr << "SIP Registration: Unknown Event " << EventtoString(Event).toLocal8Bit().constData() << ", State " << State << endl;
+        VERBOSE(VB_IMPORTANT, QString("SIP Registration: Unknown Event %1, State %2")
+                .arg(EventtoString(Event).toLocal8Bit().constData()).arg(State));
         break;
     }
     return 0;
@@ -2752,7 +2779,8 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Notify.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watcherUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1")
+                    .arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -2984,7 +3012,8 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
         if (authMsg->getAuthMethod() == "Digest")
             Subscribe.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watchedUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1")
+                    .arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -3099,7 +3128,7 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
                 SendMessage(sipMsg, msgToSend); // Note - this "could" have changed if the user is typing quickly
         }
         else if (sipMsg->getStatusCode() != 200)
-            cout << "SIP: Send IM got status code " << sipMsg->getStatusCode() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Send IM got status code %1").arg(sipMsg->getStatusCode()));
         (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); // 30 min of inactivity and IM session clears
         break;
 
@@ -3107,7 +3136,7 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
         if (Retransmit(false))
             (parent->Timer())->Start(this, t1, SIP_RETX);
         else
-            cout << "SIP: Send IM failed to get a response\n";
+            VERBOSE(VB_IMPORTANT, "SIP: Send IM failed to get a response");
         break;
 
     case SIP_IM_TIMEOUT:
@@ -3138,7 +3167,7 @@ void SipIM::SendMessage(SipMsg *authMsg, QString Text)
         if (authMsg->getAuthMethod() == "Digest")
             Message.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), imUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
-            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod().toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Auth Type: %1").arg(authMsg->getAuthMethod().toLocal8Bit().constData()));
         sentAuthenticated = true;
     }
     else    
@@ -3223,7 +3252,7 @@ SipNotify::SipNotify()
     thisIP.setAddress("127.0.0.1");
     if (!notifySocket->bind(thisIP, 6951))
     {
-        cerr << "Failed to bind for CLI NOTIFY connection\n";
+        VERBOSE(VB_IMPORTANT, "Failed to bind for CLI NOTIFY connection");
         delete notifySocket;
         notifySocket = 0;
     }

@@ -1342,9 +1342,11 @@ bool DVDTranscodeThread::runTranscode(int which_run)
     }
 
     //  Debugging
-    //
-    //cout << "About to run \"" << tc_process->arguments().join(" ") << "\"" << endl;
-    //cout << "with workdir = " << tc_process->workingDirectory().path() << endl;
+    /*
+    VERBOSE(VB_IMPORTANT, QString("About to run '%1'\nwith workdir = %2")
+            .arg(tc_process->arguments().join(" "))
+            .arg(tc_process->workingDirectory().path()));
+    */
 
     if(!tc_process->start())
     {

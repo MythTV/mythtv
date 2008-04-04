@@ -143,7 +143,7 @@ void runCreateDVD(void)
     dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
-    cout << "DVD creation is not compiled in!!" << endl;
+    VERBOSE(VB_IMPORTANT, "DVD creation is not compiled in!!");
 #endif
 }
 
@@ -190,7 +190,7 @@ void runCreateArchive(void)
     dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
-    cout << "Native archive creation is not compiled in!!" << endl;
+    VERBOSE(VB_IMPORTANT, "Native archive creation is not compiled in!!");
 #endif
 }
 
@@ -238,7 +238,7 @@ void runImportVideo(void)
     dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
 #else
-    cout << "Native archive creation is not compiled in!!" << endl;
+    VERBOSE(VB_IMPORTANT, "Native archive creation is not compiled in!!");
 #endif
 }
 
@@ -436,8 +436,8 @@ void runSelectMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
+                .arg(themedir.toLocal8Bit().constData()));
     }
 }
 
@@ -469,8 +469,8 @@ void runFormatMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
+                .arg(themedir.toLocal8Bit().constData()));
     }
 }
 
@@ -511,8 +511,8 @@ void runMenu(QString which_menu)
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir.toLocal8Bit().constData()
-             << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
+                .arg(themedir.toLocal8Bit().constData()));
     }
 }
 
@@ -526,7 +526,7 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mytharchive", libversion,
                                     MYTH_BINARY_VERSION))
     {
-        cerr << "Test Popup Version Failed " << endl;
+        VERBOSE(VB_IMPORTANT, "Test Popup Version Failed ");
         return -1;
     }
 

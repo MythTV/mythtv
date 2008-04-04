@@ -59,13 +59,13 @@ int main(int argc, char **argv)
                 if(special_port < 1 ||
                    special_port > 65534)
                 {
-                    cerr << "mtd: Bad port number" << endl;
+                    VERBOSE(VB_IMPORTANT, "mtd: Bad port number");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
             } 
             else 
             {
-                cerr << "mtd: Missing argument to -p/--port option\n";
+                VERBOSE(VB_IMPORTANT, "mtd: Missing argument to -p/--port option");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }

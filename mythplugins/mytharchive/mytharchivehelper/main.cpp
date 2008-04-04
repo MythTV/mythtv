@@ -1615,8 +1615,8 @@ QString NativeArchive::findNodeText(const QDomElement &elem, const QString &node
     QDomNodeList nodeList = elem.elementsByTagName(nodeName);
     if (nodeList.count() < 1)
     {
-        cout << QString("Couldn't find a '%1' element in XML file")
-            .arg(nodeName).toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find a '%1' element in XML file")
+            .arg(nodeName).toLocal8Bit().constData());
         return "";
     }
 
@@ -2281,8 +2281,9 @@ int getDBParamters(QString outFile)
     QFile f(outFile);
     if (!f.open(QIODevice::WriteOnly))
     {
-        cout << "MythArchiveHelper: Failed to open file for writing - "
-                << outFile.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythArchiveHelper: "
+                "Failed to open file for writing - %1")
+                .arg(outFile.toLocal8Bit().constData()));
         return 1;
     }
 

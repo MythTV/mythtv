@@ -146,8 +146,8 @@ QString GetMySipIp()
     strcpy(ifreq.ifr_name, ifName);
     if (ioctl(tempSocket->socket(), SIOCGIFADDR, &ifreq) != 0)
     {
-        cerr << "Failed to find network interface "
-             << ifName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Failed to find network interface %1")
+             .arg(ifName.toLocal8Bit().constData()));
         delete tempSocket;
         tempSocket = 0;
         return "";
@@ -205,11 +205,9 @@ char myHostname[64];
             if ((query.value(1).toString() != NickName) || 
                 (query.value(2).toString() != Uri))
             {
-                cout << "SIP: Updating out-of-date autogen directory entry; "
-                     << query.value(1).toString().toLocal8Bit().constData()
-                     << ", "
-                     << query.value(2).toString().toLocal8Bit().constData()
-                     << endl;
+                VERBOSE(VB_IMPORTANT, QString("SIP: Updating out-of-date autogen directory entry; %1, %2")
+                     .arg(query.value(1).toString().toLocal8Bit().constData())
+                     .arg(query.value(2).toString().toLocal8Bit().constData()));
 
                 MSqlQuery query2(MSqlQuery::InitCon());
                 thequery = QString("UPDATE phonedirectory "
@@ -223,7 +221,7 @@ char myHostname[64];
     }
     else
     {
-        cout << "SIP: Creating autogen directory entry for this host\n";
+        VERBOSE(VB_IMPORTANT, "SIP: Creating autogen directory entry for this host");
         thequery = QString("INSERT INTO phonedirectory (nickname,firstname,surname,"
                                "url,directory,photofile,speeddial,onhomelan) VALUES "
                                "(\"%1\",\"%2\",\"%3\",\"%4\",\"%5\",\"\",1,1);")
@@ -240,7 +238,7 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mythphone", libversion,
                                     MYTH_BINARY_VERSION))
     {
-        cerr << "Test Popup Version Failed " << endl;
+        VERBOSE(VB_IMPORTANT, "Test Popup Version Failed");
         return -1;
     }
 

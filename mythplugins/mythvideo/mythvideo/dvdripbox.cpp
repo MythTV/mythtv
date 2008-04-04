@@ -273,7 +273,7 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
     }
     else
     {
-        cerr << "dvdripbox.o: Can't get a reasonable port number" << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: Can't get a reasonable port number");
         exit(0);
     }
 }
@@ -453,7 +453,7 @@ void DVDRipBox::readFromServer()
         line_from_server = line_from_server.replace( QRegExp("\n"), "" );
         line_from_server = line_from_server.replace( QRegExp("\r"), "" );
         line_from_server.simplifyWhiteSpace();
-        // cout << "Getting \"" << line_from_server.local8Bit() << "\"" << endl ;
+        // VERBOSE(VB_IMPORTANT, QString("Getting '%1'").arg(line_from_server.local8Bit()));
         QStringList tokens = QStringList::split(" ", line_from_server);
         if(tokens.count() > 0)
         {
@@ -555,7 +555,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     
     if(tokens.count() < 3)
     {
-        cerr << "dvdripbox.o: I got an mtd status update with a bad number of tokens" << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: I got an mtd status update with a bad number of tokens");
         return;
     }
 
@@ -691,7 +691,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
 
     if(tokens.count() < 6)
     {
-        cerr << "dvdripbox.o: got wrong number of tokens on a DVD job." << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: got wrong number of tokens on a DVD job.");
         return; // exit(0) ?
     }
     else if(tokens[2] == "job" && tokens[4] == "overall")
@@ -722,7 +722,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     }
     else
     {
-        cerr << "dvdripbox.o: Getting stuff I don't understand from the mtd" << endl ;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: Getting stuff I don't understand from the mtd");
     }
 
 }
@@ -735,7 +735,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
     
     if(tokens.count() < 3)
     {
-        cerr << "dvdripbox.o: I got an mtd media update with a bad number of tokens" << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: I got an mtd media update with a bad number of tokens");
         return;
     }
 
@@ -822,7 +822,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
     {
         if(tokens.count() != 10)
         {
-            cerr << "dvdripbox.o: Got wrong number of tokens in media title report." << endl;
+            VERBOSE(VB_IMPORTANT, "dvdripbox.o: Got wrong number of tokens in media title report.");
             return;
         }
         else
@@ -842,7 +842,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         DVDTitleInfo *which_title = dvd_info->getTitle(tokens[3].toUInt());
         if(!which_title)
         {
-            cerr << "dvdripbox.o: Asked to add an audio track for a title that doesn't exist" << endl;
+            VERBOSE(VB_IMPORTANT, "dvdripbox.o: Asked to add an audio track for a title that doesn't exist");
             return;
         }
         
@@ -865,7 +865,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         DVDTitleInfo *which_title = dvd_info->getTitle(tokens[3].toUInt());
         if(!which_title)
         {
-            cerr << "dvdripbox.o: Asked to add a subtitle for a title that doesn't exist" << endl;
+            VERBOSE(VB_IMPORTANT, "dvdripbox.o: Asked to add a subtitle for a title that doesn't exist");
             return;
         }
         
@@ -890,9 +890,12 @@ void DVDRipBox::setOverallJobStatus(int job_number, double status, QString title
 {
     if(job_number + 1 > (int) jobs.count())
     {
-        cerr << "dvdripbox.o: mtd job summary didn't tell us the right number of jobs" << endl;
-        cerr << "             (int) jobs.count() is " << (int) jobs.count() << endl;
-        cerr << "             requested job_number was " << job_number << endl ;
+        VERBOSE(VB_IMPORTANT, QString(
+                "dvdripbox.o: mtd job summary didn't tell us the right number of jobs\n"
+                "             (int) jobs.count() is %1\n"
+                "             requested job_number was %2")
+                .arg((int) jobs.count())
+                .arg(job_number));
     }
     else
     {
@@ -907,7 +910,7 @@ void DVDRipBox::setSubJobStatus(int job_number, double status, QString subjob_st
 {
     if(job_number + 1 > (int) jobs.count())
     {
-        cerr << "dvdripbox.o: mtd job summary didn't tell us the right number of jobs. The Bastard!" << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: mtd job summary didn't tell us the right number of jobs. The Bastard!");
     }
     else
     {
@@ -1008,7 +1011,7 @@ void DVDRipBox::wireUpTheme()
     warning_text = getUITextType("warning");
     if(!warning_text)
     {
-        cerr << "dvdripbox.o: Couldn't find a text type called warning in your theme" << endl;
+        VERBOSE(VB_IMPORTANT, "dvdripbox.o: Couldn't find a text type called warning in your theme");
         exit(0);
     }
     

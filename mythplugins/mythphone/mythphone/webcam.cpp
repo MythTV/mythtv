@@ -124,7 +124,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
         hDev = open(DevName, O_RDWR);
     if ((hDev <= 0) || (WebcamName.length() <= 0))
     {
-        cerr << "Couldn't open camera " << DevName.toLocal8Bit().constData() << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't open camera %1").arg(DevName.toLocal8Bit().constData()));
         opened = false;
     }
 #endif
@@ -136,7 +136,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
             !SetPalette(VIDEO_PALETTE_YUV422P) &&
             !SetPalette(VIDEO_PALETTE_RGB24))
         {
-            cout << "Webcam does not support YUV420P, YUV422P, or RGB24 modes; these are the only ones currently supported. Closing webcam.\n";
+            VERBOSE(VB_IMPORTANT, "Webcam does not support YUV420P, YUV422P, or RGB24 modes; these are the only ones currently supported. Closing webcam.");
             camClose();
             return false;
         }
@@ -150,13 +150,14 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
         GetCurSize(&actWidth, &actHeight);
         if ((width != actWidth) || (height != actHeight))
         {
-            cout << "Could not set webcam to " << width << "x" << height << "; got " << actWidth << "x" << actHeight << " instead.\n";
+            VERBOSE(VB_IMPORTANT, QString("Could not set webcam to %1x%2; got %3x%4 instead.")
+                    .arg(width).arg(height).arg(actWidth).arg(actHeight));
         }
 
         //Allocate picture buffer memory
         if (isGreyscale())
         {
-            cerr << "Greyscale not yet supported" << endl;
+            VERBOSE(VB_IMPORTANT, "Greyscale not yet supported");
             //picbuff1 = new unsigned char [vCaps.maxwidth * vCaps.maxheight];
             camClose();
             return false;
@@ -170,7 +171,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
             case VIDEO_PALETTE_YUV420P: frameSize = YUV420P_LEN(WCWIDTH, WCHEIGHT); break;
             case VIDEO_PALETTE_YUV422P: frameSize = YUV422P_LEN(WCWIDTH, WCHEIGHT); break;
             default:
-                cerr << "Palette mode " << GetPalette() << " not yet supported" << endl;
+                VERBOSE(VB_IMPORTANT, QString("Palette mode %1 not yet supported").arg(GetPalette()));
                 camClose();
                 return false;
                 break;
@@ -186,7 +187,7 @@ bool Webcam::camOpen(QString WebcamName, int width, int height)
         case VIDEO_PALETTE_RGB24:      wcFormat = PIX_FMT_BGR24;      break;
         case VIDEO_PALETTE_RGB32:      wcFormat = PIX_FMT_RGBA32;     break;
         default:
-            cerr << "Webcam: Unsupported palette mode " << GetPalette() << endl; // Should not get here, caught earlier
+            VERBOSE(VB_IMPORTANT, QString("Webcam: Unsupported palette mode %1").arg(GetPalette())); // Should not get here, caught earlier
             camClose();
             return false;
             break;
@@ -204,7 +205,7 @@ void Webcam::camClose()
 
 #ifndef WIN32
     if (hDev <= 0)
-        cerr << "Can't close a camera that isn't open" << endl;
+        VERBOSE(VB_IMPORTANT, "Can't close a camera that isn't open");
     else
     {
         // There must be a widget procedure called close so make
@@ -281,7 +282,7 @@ void Webcam::SetSize(int width, int height)
     vWin.height = height;
 
     if (ioctl(hDev, VIDIOCSWIN, &vWin) == -1)
-        cerr << "Webcam: Error setting capture size " << width << "x" << height << endl;
+        VERBOSE(VB_IMPORTANT, QString("Webcam: Error setting capture size %1x%2").arg(width).arg(height));
 #else
     bitmapInfo.bmiHeader.biHeight = height;
     bitmapInfo.bmiHeader.biWidth = width;
@@ -370,13 +371,13 @@ int Webcam::SetBrightness(int v)
       vPic.brightness = v;
 
       if (ioctl(hDev, VIDIOCSPICT, &vPic) == -1)
-          cerr << "Error setting brightness" << endl;
+          VERBOSE(VB_IMPORTANT, "Error setting brightness");
 
       readCaps();
     }
   }
   else
-    cerr << "Invalid Brightness parameter" << endl;
+      VERBOSE(VB_IMPORTANT, "Invalid Brightness parameter");
   return vPic.brightness;
 }
 
@@ -389,13 +390,13 @@ int Webcam::SetContrast(int v)
       vPic.contrast = v ;
 
       if (ioctl(hDev, VIDIOCSPICT, &vPic) == -1)
-          cerr << "Error setting contrast" << endl;
+          VERBOSE(VB_IMPORTANT, "Error setting contrast");
 
       readCaps();
     }
   }
   else
-    cerr << "Invalid contrast parameter" << endl;
+      VERBOSE(VB_IMPORTANT, "Invalid contrast parameter");
   return vPic.contrast;
 }
 
@@ -409,13 +410,13 @@ int Webcam::SetColour(int v)
       vPic.colour = v;
 
       if (ioctl(hDev, VIDIOCSPICT, &vPic) == -1)
-          cerr << "Error setting colour" << endl;
+          VERBOSE(VB_IMPORTANT, "Error setting colour");
 
       readCaps();
     }
   }
   else
-    cerr << "Invalid colour parameter" << endl;
+      VERBOSE(VB_IMPORTANT, "Invalid colour parameter");
   return vPic.colour;
 }
 
@@ -429,13 +430,13 @@ int Webcam::SetHue(int v)
       vPic.hue = v;
 
       if (ioctl(hDev, VIDIOCSPICT, &vPic) == -1)
-          cerr << "Error setting hue" << endl;
+          VERBOSE(VB_IMPORTANT, "Error setting hue");
 
       readCaps();
     }
   }
   else
-    cerr << "Invalid hue parameter" << endl;
+      VERBOSE(VB_IMPORTANT, "Invalid hue parameter");
   return vPic.hue;
 }
 
@@ -452,7 +453,7 @@ int Webcam::SetTargetFps(wcClient *client, int f)
     WebcamLock.unlock();
   }
   else
-    cerr << "Invalid FPS parameter" << endl;
+      VERBOSE(VB_IMPORTANT, "Invalid FPS parameter");
 
   return fps;
 }
@@ -505,7 +506,7 @@ wcClient *Webcam::RegisterClient(int format, int fps, QObject *eventWin)
     if (fps == 0)
     {
         fps = 10;
-        cerr << "Webcam requested fps of zero\n";
+        VERBOSE(VB_IMPORTANT, "Webcam requested fps of zero");
     }
 
     client->eventWindow = eventWin;
@@ -522,7 +523,7 @@ wcClient *Webcam::RegisterClient(int format, int fps, QObject *eventWin)
     case VIDEO_PALETTE_YUV420P: client->frameSize = YUV420P_LEN(WCWIDTH, WCHEIGHT); client->format = PIX_FMT_YUV420P;    break;
     case VIDEO_PALETTE_YUV422P: client->frameSize = YUV422P_LEN(WCWIDTH, WCHEIGHT); client->format = PIX_FMT_YUV422P;    break;
     default:
-        cerr << "SIP: Attempt to register unsupported Webcam format\n";
+        VERBOSE(VB_IMPORTANT, "SIP: Attempt to register unsupported Webcam format");
         delete client;
         return 0;
     }
@@ -546,7 +547,7 @@ void Webcam::ChangeClientFps(wcClient *client, int fps)
     if (fps == 0)
     {
         fps = 10;
-        cerr << "Webcam requested fps of zero\n";
+        VERBOSE(VB_IMPORTANT, "Webcam requested fps of zero");
     }
 
     WebcamLock.lock();
@@ -578,7 +579,7 @@ void Webcam::UnregisterClient(wcClient *client)
     }
 
     if (actualFps < client->fps)
-        cerr << "Client wanted a FPS of " << client->fps << " but the camera delivered " << actualFps << endl;
+        VERBOSE(VB_IMPORTANT, QString("Client wanted a FPS of %1 but the camera delivered %2").arg(client->fps).arg(actualFps));
 
     delete client;
 }
@@ -619,7 +620,7 @@ void Webcam::KillThread()
         {
             terminate();
             wait();
-            cout << "SIP Webcam thread failed to terminate gracefully and was killed\n";
+            VERBOSE(VB_IMPORTANT, "SIP Webcam thread failed to terminate gracefully and was killed");
         }
     }
 #endif
@@ -645,7 +646,7 @@ void Webcam::WebcamThreadWorker()
             ProcessFrame(picbuff1, frameSize);
         }
         else
-            cerr << "Error reading from webcam; got " << len << " bytes; expected " << frameSize << endl;
+            VERBOSE(VB_IMPORTANT, QString("Error reading from webcam; got %1 bytes; expected %2").arg(len).arg(frameSize));
     }
 #endif
 }
@@ -686,7 +687,7 @@ void Webcam::ProcessFrame(unsigned char *frame, int fSize)
             frame = tempBuffer;
             break;
         default:
-            cout << "No routine to flip this type\n";
+            VERBOSE(VB_IMPORTANT, "No routine to flip this type");
             break;
         }
     }
@@ -730,7 +731,7 @@ void Webcam::ProcessFrame(unsigned char *frame, int fSize)
                 }
             }
             else
-                cerr << "No webcam buffers\n";
+                VERBOSE(VB_IMPORTANT, "No webcam buffers");
 
             it->timeLastCapture = QTime::currentTime();
         }

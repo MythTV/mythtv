@@ -27,6 +27,7 @@
 using namespace std;
 
 #include <mythtv/compat.h>
+#include <mythtv/mythverbose.h>
 
 Synaesthesia::Synaesthesia(long int winid)
 {
@@ -54,7 +55,7 @@ Synaesthesia::Synaesthesia(long int winid)
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        cerr << "Unable to init SDL\n";
+        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
         return;
     }
 
@@ -154,7 +155,7 @@ void Synaesthesia::resize(const QSize &newsize)
 
     if (!outputImage) 
     {
-        cerr << "outputImage in Synaesthesia::resize() is NULL" << endl;
+        VERBOSE(VB_IMPORTANT, "outputImage in Synaesthesia::resize() is NULL");
         return;
     }
 
@@ -167,7 +168,7 @@ void Synaesthesia::resize(const QSize &newsize)
 
     if (!surface)
     {
-        cerr << "Couldn't get SDL surface\n";
+        VERBOSE(VB_IMPORTANT, "Couldn't get SDL surface");
         return;
     }
 
@@ -605,7 +606,7 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 #ifdef SDL_SUPPORT
     if (!surface)
     {
-        cerr << "No sdl surface\n";
+        VERBOSE(VB_IMPORTANT, "No sdl surface");
         return false;
     }
 

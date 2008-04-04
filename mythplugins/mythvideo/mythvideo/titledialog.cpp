@@ -159,7 +159,7 @@ void TitleDialog::showCurrentTitle()
     }
     else
     {
-        cerr << "titledialog.o: Hmmmm .... should not have shown you this dialog." << endl;
+        VERBOSE(VB_IMPORTANT, "titledialog.o: Hmmmm .... should not have shown you this dialog.");
     }
 }
 
@@ -313,7 +313,7 @@ void TitleDialog::viewTitle()
     QString player_string = gContext->GetSetting("TitlePlayCommand");
     if(player_string.length() < 1)
     {
-        cerr << "titledialog.o: No title player command defined" << endl;
+        VERBOSE(VB_IMPORTANT, "titledialog.o: No title player command defined");
         return;
     }
 
@@ -354,7 +354,7 @@ void TitleDialog::viewTitle()
             player_string += player_append;
         }
     }
-    // cout << "PLAYER STRING: " << player_string << endl;
+    // VERBOSE(VB_IMPORTANT, QString("PLAYER STRING: %1").arg(player_string));
 
     myth_system(player_string);
     gContext->GetMainWindow()->raise();
@@ -414,7 +414,7 @@ void TitleDialog::ripTitles()
  
             if(destination_directory.length() < 1)
             {
-                cerr << "titledialog.o: I can't rip, as I have nowhere to put finished files. MythVideo installed?" << endl;
+                VERBOSE(VB_IMPORTANT, "titledialog.o: I can't rip, as I have nowhere to put finished files. MythVideo installed?");
                 return; 
             }            
             

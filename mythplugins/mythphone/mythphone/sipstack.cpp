@@ -468,7 +468,7 @@ void SipMsg::decodeAuthenticate(QString auth)
         else if (ParamName == "qop")
         {
             if (ParamValueNoQuotes != "auth")
-                cout << "SIP: QOP value not set to AUTH in Challenge\n";
+                VERBOSE(VB_IMPORTANT, "SIP: QOP value not set to AUTH in Challenge");
         }
         else
             VERBOSE(VB_IMPORTANT, "SIP: Unknown parameter in -Authenticate; " + ParamName);

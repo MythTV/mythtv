@@ -307,8 +307,9 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
             if (file.exists())
                 v->size = (unsigned long long)file.size();
             else
-                cout << "VideoSelector: Cannot find file: "
-                     << v->filename.toLocal8Bit().constData() << endl;
+                VERBOSE(VB_IMPORTANT, 
+                        QString("VideoSelector: Cannot find file: %1")
+                                .arg(v->filename.toLocal8Bit().constData()));
         }
 
         filesize_text->SetText(formatSize(v->size / 1024));
@@ -461,7 +462,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     }
     else
     {
-        cout << "VideoSelector: Failed to get any video's" << endl;
+        VERBOSE(VB_IMPORTANT, "VideoSelector: Failed to get any video's");
         return NULL;
     }
 

@@ -27,7 +27,7 @@ LibVisualPlugin::LibVisualPlugin(MainVisual *parent, long int winid, const QStri
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
-        cerr << "Unable to init SDL\n";
+        VERBOSE(VB_IMPORTANT, "Unable to init SDL");
         return;
     }
     SDL_ShowCursor(0);
@@ -122,27 +122,31 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
                     }
                     else
                     {
-                        cerr << "Error connecting LibVisualPlugin 'Input' object to our data source object" << endl;
+                        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                                " 'Input' object to our data source object");
                     }
                 }
                 else
                 {
-                    cerr << "Error connecting LibVisualPlugin 'Plugin' object to 'Bin' object" << endl;
+                    VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                            " 'Plugin' object to 'Bin' object");
                 }
             }
             else
             {
-                cerr << "Error connecting LibVisualPlugin 'Video' object to 'Bin' object" << endl;
+                VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                        " 'Video' object to 'Bin' object");
             }
         }
         else
         {
-            cerr << "Error allocating LibVisualPlugin 'Video' object" << endl;
+            VERBOSE(VB_IMPORTANT, 
+                    "Error allocating LibVisualPlugin 'Video' object");
         }
     }
     else
     {
-        cerr << "Error allocating LibVisualPlugin 'Bin' object" << endl;
+        VERBOSE(VB_IMPORTANT, "Error allocating LibVisualPlugin 'Bin' object");
     }
 }
 
@@ -223,7 +227,7 @@ bool LibVisualPlugin::createScreen(int width, int height)
         }
         else
         {
-            cerr << "Error obtaining SDL video information" << endl;
+            VERBOSE(VB_IMPORTANT, "Error obtaining SDL video information");
         }
     }
     else
