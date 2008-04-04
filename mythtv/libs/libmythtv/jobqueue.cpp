@@ -1247,7 +1247,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                       "j.args, j.comment, r.endtime, j.schedruntime "
                   "FROM jobqueue j, recorded r "
                   "WHERE j.chanid = r.chanid AND j.starttime = r.starttime "
-                  "ORDER BY j.inserttime, j.chanid, j.id;");
+                  "ORDER BY j.schedruntime, j.id;");
 
     if (!query.exec() || !query.isActive())
     {
