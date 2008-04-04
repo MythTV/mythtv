@@ -3,23 +3,23 @@
     <name>MythFlix</name>
     <message>
         <source>Browse Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Selainasetukset</translation>
     </message>
     <message>
         <source>Add to Top of Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää Jonon Alkuun</translation>
     </message>
     <message>
         <source>Add to Bottom of Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää Jonon Loppuun</translation>
     </message>
     <message>
         <source>Show NetFlix Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä NetFlix Sivu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>
@@ -40,11 +40,11 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
     </message>
     <message>
         <source>Set update frequency by using the up/down arrows.The minimum allowed value is 30 Minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta taajuus, jonka mukaan päivitetään. Pienin arvo on 30 minuuttia.</translation>
     </message>
     <message>
         <source>Press Escape or Menu to exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paina Escape tai Menu poistuaksesi.</translation>
     </message>
 </context>
 <context>
@@ -67,31 +67,31 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus</translation>
     </message>
     <message>
         <source>History for Queue: </source>
-        <translation type="unfinished"></translation>
+        <translation>Jonon Historia: </translation>
     </message>
     <message>
         <source>Items in Queue: </source>
-        <translation type="unfinished"></translation>
+        <translation>Jonossa olevia artikkeleita: </translation>
     </message>
     <message>
         <source>Move Canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirrä Peruutetut</translation>
     </message>
     <message>
         <source>Item not moved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Artikkelia ei siirretty.</translation>
     </message>
     <message>
         <source>Move To Another Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirrä Toiseen Jonoon</translation>
     </message>
     <message>
         <source>Show NetFlix Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä NetFlix Sivu</translation>
     </message>
 </context>
 <context>

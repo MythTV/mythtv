@@ -12,6 +12,7 @@
       <text lang="RU">Создать DVD</text>
       <text lang="SI">Ustvari DVD</text>
       <text lang="PL">Utwórz DVD</text>
+      <text lang="FI">Luo DVD</text>
       <action>ARCHIVE_CREATE_DVD</action>
       <depends>themes/default/mythburn-ui.xml</depends>
    </button>
@@ -28,6 +29,7 @@
       <text lang="RU">Создать архив</text>
       <text lang="SI">Ustvari izvorni arhiv</text>
       <text lang="PL">Utwórz archiwum</text>
+      <text lang="FI">Luo Tiedosto</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
       <depends>themes/default/mythnative-ui.xml</depends>
   </button>
@@ -44,6 +46,7 @@
        <text lang="RU">Кодировать фильмы</text>
        <text lang="SI">Kodiranje videa</text>
        <text lang="PL">Zakoduj plik wideo</text>
+       <text lang="FI">Luo Video</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>
        <depends></depends>
    </button>

@@ -69,6 +69,7 @@
        <text lang="DK">Importér filer</text>
        <text lang="SI">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
+       <text lang="FI">Tuo Tiedostoja</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
@@ -101,6 +102,7 @@
       <text lang="FR">Ejecter le Média</text>
       <text lang="SI">Izvrzi medij</text>
       <text lang="PL">Wysuń tackę</text>
+      <text lang="FI">Poista Media</text>
       <action>EJECT</action>
    </button>
 

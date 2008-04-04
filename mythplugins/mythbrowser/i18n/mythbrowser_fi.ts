@@ -162,7 +162,7 @@ SPACE/Enter valitulla osoitteella poistaa sen.</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladataan...</translation>
     </message>
 </context>
 </TS>

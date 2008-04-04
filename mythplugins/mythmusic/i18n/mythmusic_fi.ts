@@ -3,43 +3,43 @@
     <name>AlbumArtImages</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Tuntematon</translation>
+        <translation>Tuntematon</translation>
     </message>
     <message>
         <source>Front Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Etukansi</translation>
     </message>
     <message>
         <source>Back Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Takakansi</translation>
     </message>
     <message>
         <source>CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>Inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisäkansi</translation>
     </message>
     <message>
         <source>front</source>
-        <translation type="unfinished"></translation>
+        <translation>etu</translation>
     </message>
     <message>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>taka</translation>
     </message>
     <message>
         <source>inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>sisä</translation>
     </message>
     <message>
         <source>cd</source>
-        <translation type="unfinished"></translation>
+        <translation>cd</translation>
     </message>
     <message>
         <source>cover</source>
-        <translation type="unfinished"></translation>
+        <translation>kansi</translation>
     </message>
 </context>
 <context>
@@ -217,23 +217,23 @@
     </message>
     <message>
         <source>Track Info.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappaleen Tiedot.</translation>
     </message>
     <message>
         <source>Album Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Albumin Taide</translation>
     </message>
     <message>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilastot</translation>
     </message>
     <message>
         <source>Save Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna Muutokset</translation>
     </message>
     <message>
         <source>Change Image Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa Kuvatyyppiä</translation>
     </message>
 </context>
 <context>
@@ -416,68 +416,69 @@
     </message>
     <message>
         <source>Visualization: </source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisoinnit: </translation>
     </message>
     <message>
         <source>Exiting Music Player
 Do you want to continue playing in the background?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistutaan Musiikkisoittimesta
+Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>No - Exit, Stop Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei - Poistu ja Lopeta Toisto</translation>
     </message>
     <message>
         <source>Yes - Exit, Continue Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä - Poistu ja Jatka Toistoa</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Tracks with same Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Samannimiset Kappaleet</translation>
     </message>
     <message>
         <source>Speed: </source>
-        <translation type="unfinished"></translation>
+        <translation>Nopeus: </translation>
     </message>
     <message>
         <source>Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>Älykäs</translation>
     </message>
     <message>
         <source>Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>Satunnais</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished">Albumi</translation>
+        <translation>Albumi</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">Esittäjä</translation>
+        <translation>Esittäjä</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjä</translation>
     </message>
     <message>
         <source>Shuffle</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekoit</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Kaikki</translation>
+        <translation>Kaikki</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappale</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista</translation>
     </message>
 </context>
 <context>
@@ -1032,7 +1033,7 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>oletus</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
@@ -1040,11 +1041,11 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuntematon Nimike</translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished">Tuodaan </translation>
+        <translation>Tuodaan </translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
@@ -1084,19 +1085,19 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>Resume mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Jatkamistapa</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Pois</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappale</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkka</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
@@ -1136,7 +1137,7 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished">Albumi</translation>
+        <translation>Albumi</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
@@ -1187,20 +1188,21 @@ Do you want to continue playing in the background?</source>
     <name>RipStatus</name>
     <message>
         <source>Stop Rip?</source>
-        <translation type="unfinished"></translation>
+        <translation>Lopeta Tuonti?</translation>
     </message>
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
-        <translation type="unfinished"></translation>
+        <translation>Lopetetaanko CD:n tuonti?</translation>
     </message>
     <message>
         <source>Cancelled by the user</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruutettu käyttäjän toimesta</translation>
     </message>
     <message>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
-        <translation type="unfinished"></translation>
+        <translation>Pakkaaja epäonnistui tiedoston luomisessa.
+Ovatko kirjoitusoikeudet musiikkikansioon kunnossa?</translation>
     </message>
 </context>
 <context>
@@ -1287,15 +1289,15 @@ Do you have write permissions for the music directory?</source>
     </message>
     <message>
         <source>Switch Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda Nimikkeitä</translation>
     </message>
     <message>
         <source>Scan CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa CD</translation>
     </message>
     <message>
         <source>Rip CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo CD</translation>
     </message>
     <message>
         <source>Artist: %1
@@ -1304,49 +1306,56 @@ Track: %3
 
 This track is already in the database. 
 Do you want to remove the existing track?</source>
-        <translation type="unfinished"></translation>
+        <translation>Artisti: %1
+Albumi: %2
+Kappale: %3
+
+Kappale on jo tietokannassa.
+Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>No tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei kappaleita</translation>
     </message>
     <message>
         <source>There are no tracks to rip?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei kappaleita tuotavaksi?</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Onnistui</translation>
     </message>
     <message>
         <source>Rip completed successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuonti onnistui täydellisesti.</translation>
     </message>
     <message>
         <source>Ejecting CD. Please Wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaan CD. Odota Hetki...</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished">Valitse Esittäjä</translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished">Valitse Albumi</translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished">Valitse Laji</translation>
+        <translation>Valitse Laji</translation>
     </message>
     <message>
         <source>Encoding Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Pakkaus Epäonnistui</translation>
     </message>
     <message>
         <source>Encoding failed with the following error:-
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakkaus epäonnistui seuraavan virheilmoituksen kanssa:-
+
+</translation>
     </message>
 </context>
 <context>
@@ -1702,39 +1711,39 @@ Do you want to remove the existing track?</source>
     <name>VisualizationsEditor</name>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished">Visualisoinnit</translation>
+        <translation>Visualisoinnit</translation>
     </message>
     <message>
         <source>Selected Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Visualisoinnit</translation>
     </message>
     <message>
         <source>Available Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarjolla Olevat Visualisoinnit</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi</translation>
     </message>
     <message>
         <source>Provider</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarjoaja</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished">Ylös</translation>
+        <translation>Ylös</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished">Alas</translation>
+        <translation>Alas</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 </TS>

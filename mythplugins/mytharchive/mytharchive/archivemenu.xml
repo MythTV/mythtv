@@ -12,6 +12,7 @@
       <text lang="RU">Экспортировать видео</text>
       <text lang="SI">Izvoz video datotek</text>
       <text lang="PL">Eksportuj pliki wideo</text>
+      <text lang="FI">Vie Video</text>
       <action>ARCHIVE_EXPORT_VIDEO</action>
    </button>
 
@@ -27,6 +28,7 @@
        <text lang="RU">Импортировать видео</text>
        <text lang="SI">Uvoz video datotek</text>
        <text lang="PL">Importuj pliki wideo</text>
+       <text lang="FI">Tuo DVD</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 
@@ -34,6 +36,7 @@
        <type>ARCHIVE_UTILITIES</type>
        <text>Archive Utilities</text>
        <text lang="SI">Pripomočki za arhiviranje</text>
+       <text lang="FI">Lisätoiminnot</text>
        <action>MENU archiveutils.xml</action>
    </button>
 
