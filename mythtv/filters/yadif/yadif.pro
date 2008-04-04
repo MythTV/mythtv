@@ -9,3 +9,5 @@ SOURCES += filter_yadif.c
 contains(ARCH_X86, yes) {
     SOURCES += aclib.c
 }
+
+macx:debug:DEFINES -= MMX
