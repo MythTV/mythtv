@@ -74,10 +74,6 @@ class TSHeader {
     bool HasAdaptationField() const { return bool(_tsdata[3] & 0x20); }
     bool HasPayload() const { return bool(_tsdata[3] & 0x10); }
 
-    unsigned int AFCOffset() const { // only works if AFC fits in TSPacket
-        return HasAdaptationField() ? _tsdata[4]+1+4 : 4;
-    }
-
     void SetTransportError(bool err) {
         if (err) _tsdata[1] |= 0x80; else _tsdata[1] &= (0xff-(0x80));
     }
@@ -139,6 +135,10 @@ class TSPacket : public TSHeader
     {
         if (payload)
             memcpy(_tspayload, payload, PAYLOAD_SIZE);
+    }
+
+    unsigned int AFCOffset() const { // only works if AFC fits in TSPacket
+        return HasAdaptationField() ? _tspayload[0]+1+4 : 4;
     }
 
     //4.0  8 bits, iff payloadStart(), points to start of field
