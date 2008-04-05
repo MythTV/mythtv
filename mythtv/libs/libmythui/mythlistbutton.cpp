@@ -329,7 +329,7 @@ void MythListButton::SetItemCurrent(MythListButtonItem* item)
 
 void MythListButton::SetItemCurrent(int current)
 {
-    if (pos >= m_itemList.size())
+    if (current >= m_itemList.size())
         return;
 
     MythListButtonItem* item = m_itemList.at(current);
