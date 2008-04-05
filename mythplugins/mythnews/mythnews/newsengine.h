@@ -132,4 +132,40 @@ private slots:
                      Q3NetworkOperation* op);
 };
 
+class NewsSiteItem
+{
+public:
+
+    typedef Q3PtrList<NewsSiteItem> List;
+
+    QString name;
+    QString category;
+    QString url;
+    QString ico;
+    bool    inDB;
+};
+
+
+class NewsCategory
+{
+public:
+
+    typedef Q3PtrList<NewsCategory> List;
+
+    QString             name;
+    NewsSiteItem::List  siteList;
+
+    NewsCategory() {
+        siteList.setAutoDelete(true);
+    }
+
+    ~NewsCategory() {
+        siteList.clear();
+    }
+
+    void clear() {
+        siteList.clear();
+    };
+};
+
 #endif /* NEWSENGINE_H */

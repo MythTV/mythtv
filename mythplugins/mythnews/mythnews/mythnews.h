@@ -68,12 +68,6 @@ private:
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
-    void loadSites();
-    bool findInDB(const QString& name);
-    bool insertInDB(const QString &name, const QString &url,
-                    const QString &icon, const QString &category);
-
-    bool removeFromDB(const QString &name);
 
     bool getHttpFile(QString sFilename, QString cmdURL);
     void createProgress(QString title);
@@ -115,10 +109,11 @@ private:
     MythUIImage *m_enclosureImage;
 
 private slots:
-    void updateInfoView(MythListButtonItem* selected);
-    void slotViewArticle();
+    void loadSites();
+    void updateInfoView(MythListButtonItem*);
+    void slotViewArticle(MythListButtonItem*);
     void slotRetrieveNews();
-    void slotNewsRetrieved(NewsSite* site);
+    void slotNewsRetrieved(NewsSite*);
     void slotSiteSelected(MythListButtonItem*);
 
     void slotProgressCancelled();

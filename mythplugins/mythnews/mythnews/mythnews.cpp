@@ -36,13 +36,14 @@
 // MythTV headers
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/util.h>
-#include <mythtv/mythdbcon.h>
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 // MythNews headers
 #include "mythnews.h"
 #include "mythnewseditor.h"
+#include "newsdbutil.h"
 
 // MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
 //     : MythBusyDialog(title)
@@ -180,9 +181,11 @@ bool MythNews::Create()
     loadSites();
 
     connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotSiteSelected(MythListButtonItem*)));
+            this, SLOT( slotSiteSelected(MythListButtonItem*)));
     connect(m_articlesList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT(  updateInfoView(MythListButtonItem*)));
+            this, SLOT( updateInfoView(MythListButtonItem*)));
+    connect(m_articlesList, SIGNAL(itemClicked( MythListButtonItem*)),
+            this, SLOT( slotViewArticle(MythListButtonItem*)));
 
     return true;
 }
@@ -680,10 +683,8 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
 }
 
-void MythNews::slotViewArticle()
+void MythNews::slotViewArticle(MythListButtonItem *articlesListItem)
 {
-    MythListButtonItem *articlesListItem = m_articlesList->GetItemCurrent();
-
     if (articlesListItem && articlesListItem->getData())
     {
         NewsArticle *article = (NewsArticle*) articlesListItem->getData();
@@ -782,16 +783,10 @@ bool MythNews::ShowEditDialog(bool edit)
     MythNewsEditor *mythnewseditor = new MythNewsEditor(site, edit, mainStack,
                                                         "mythnewseditor");
 
+    connect(mythnewseditor, SIGNAL(exiting()), this, SLOT(loadsites()));
+
     if (mythnewseditor->Create())
         mainStack->AddScreen(mythnewseditor);
-
-//     if (kDialogCodeAccepted == res)
-//     {
-//         if (edit && siteName != "")
-//             removeFromDB(siteName);
-//         insertInDB(titleEditor->text(), urlEditor->text(), iconEditor->text(), "custom");
-//         loadSites();
-//     }
 }
 
 void MythNews::ShowMenu()
@@ -830,57 +825,6 @@ void MythNews::deleteNewsSite()
             loadSites();
         }
     }
-}
-
-bool MythNews::findInDB(const QString& name)
-{
-    bool val = false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", name);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("new find in db", query);
-        return val;
-    }
-
-    val = query.numRowsAffected() > 0;
-
-    return val;
-}
-
-bool MythNews::insertInDB(const QString &name, const QString &url,
-                          const QString &icon, const QString &category)
-{
-    if (findInDB(name))
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO newssites (name,category,url,ico) "
-            " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
-    query.bindValue(":NAME", name);
-    query.bindValue(":CATEGORY", category);
-    query.bindValue(":URL", url);
-    query.bindValue(":ICON", icon);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: inserting in DB", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
-}
-
-bool MythNews::removeFromDB(const QString &name)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", name);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: delete from db", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
 }
 
 void MythNews::playVideo(const QString &filename)

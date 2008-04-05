@@ -27,8 +27,10 @@
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythlistbutton.h>
 
+// MythNews headers
+#include "newsengine.h"
+
 class MythNewsConfigPriv;
-class NewsSiteItem;
 
 class MythNewsConfig : public MythScreenType
 {
@@ -45,10 +47,6 @@ public:
 private:
     void loadData();
     void populateSites();
-
-    bool findInDB(const QString& name);
-    bool insertInDB(NewsSiteItem* site);
-    bool removeFromDB(NewsSiteItem* site);
 
     MythNewsConfigPriv *m_priv;
 

@@ -6,7 +6,10 @@
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/httpcomms.h>
+
+// MythNews headers
 #include "newsengine.h"
+#include "newsdbutil.h"
 
 /** \class MythNewsEdit
  *  \brief Site name, URL and icon edit screen.
@@ -25,8 +28,10 @@ class MythNewsEditor : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
 private:
+    void Save(void);
 
     NewsSite *m_site;
+    QString m_siteName;
     bool m_editing;
 
     MythUIText *m_titleText;

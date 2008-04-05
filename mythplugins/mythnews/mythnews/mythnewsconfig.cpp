@@ -32,47 +32,9 @@
 
 // MythNews headers
 #include "mythnewsconfig.h"
+#include "newsdbutil.h"
 
 using namespace std;
-
-// ---------------------------------------------------
-
-class NewsSiteItem
-{
-public:
-
-    typedef Q3PtrList<NewsSiteItem> List;
-
-    QString name;
-    QString category;
-    QString url;
-    QString ico;
-    bool    inDB;
-};
-
-// ---------------------------------------------------
-
-class NewsCategory
-{
-public:
-
-    typedef Q3PtrList<NewsCategory> List;
-
-    QString             name;
-    NewsSiteItem::List  siteList;
-
-    NewsCategory() {
-        siteList.setAutoDelete(true);
-    }
-
-    ~NewsCategory() {
-        siteList.clear();
-    }
-
-    void clear() {
-        siteList.clear();
-    };
-};
 
 // ---------------------------------------------------
 
@@ -286,61 +248,6 @@ void MythNewsConfig::toggleItem(MythListButtonItem *item)
         }
     }
 }
-
-bool MythNewsConfig::findInDB(const QString& name)
-{
-    bool val = false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", name);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("new find in db", query);
-        return val;
-    }
-
-    val = query.numRowsAffected() > 0;
-
-    return val;
-}
-
-bool MythNewsConfig::insertInDB(NewsSiteItem* site)
-{
-    if (!site) return false;
-
-    if (findInDB(site->name))
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO newssites (name,category,url,ico) "
-                  " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
-    query.bindValue(":NAME", site->name);
-    query.bindValue(":CATEGORY", site->category);
-    query.bindValue(":URL", site->url);
-    query.bindValue(":ICON", site->ico);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: inserting in DB", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
-}
-
-bool MythNewsConfig::removeFromDB(NewsSiteItem* site)
-{
-    if (!site) return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
-    query.bindValue(":NAME", site->name);
-    if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: delete from db", query);
-        return false;
-    }
-
-    return (query.numRowsAffected() > 0);
-}
-
 
 void MythNewsConfig::slotCategoryChanged(MythListButtonItem *item)
 {

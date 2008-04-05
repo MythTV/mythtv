@@ -2,8 +2,10 @@
 
 // MythTV headers
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 // MythNews headers
 #include "mythnewseditor.h"
@@ -21,6 +23,7 @@ MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
     m_nameEdit = m_urlEdit = m_iconEdit = NULL;
 
     m_site = site;
+    m_siteName = m_site->name();
     m_editing = edit;
 }
 
@@ -123,4 +126,15 @@ bool MythNewsEditor::keyPressEvent(QKeyEvent *event)
     }
 
     return handled;
+}
+
+void MythNewsEditor::Save()
+{
+    QDateTime time;
+
+    if (m_editing && m_siteName != "")
+        removeFromDB(m_siteName);
+
+    insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
+               m_iconEdit->GetText(), "custom");
 }
