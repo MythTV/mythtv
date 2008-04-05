@@ -11,6 +11,8 @@ class MythScreenStack;
  */
 class MythScreenType : public MythUIType
 {
+    Q_OBJECT
+
   public:
     MythScreenType(MythScreenStack *parent, const char *name, 
                    bool fullscreen = true);
@@ -34,6 +36,9 @@ class MythScreenType : public MythUIType
 
     bool IsDeleting(void);
     void SetDeleting(bool deleting);
+
+  signals:
+    void Exiting();
 
   protected:
     // for the global store..

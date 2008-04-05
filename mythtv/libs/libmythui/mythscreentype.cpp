@@ -38,6 +38,7 @@ MythScreenType::MythScreenType(MythUIType *parent, const char *name,
 
 MythScreenType::~MythScreenType()
 {
+    emit Exiting();
 }
 
 bool MythScreenType::IsFullscreen(void)
