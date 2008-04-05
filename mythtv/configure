@@ -1191,7 +1191,6 @@ xrandr="yes"
 xv="yes"
 xvmc="yes"
 xvmc_lib=""
-xvmc_opengl="yes"
 xvmc_vld="yes"
 xvmcw="yes"
 glx_proc_addr_arb="no"
@@ -2733,8 +2732,6 @@ VENDOR_XVMC_LIBS=""
 check_header X11/extensions/XvMClib.h
 has_library libXvMCW || disable xvmcw
 check_header X11/extensions/vldXvMC.h
-has_library libviaXvMC    || has_library libchromeXvMC    || disable xvmc_vld
-has_library libviaXvMCPro || has_library libchromeXvMCPro || disable xvmc_pro
 
 if test x"$xvmc_lib" != x""; then
     VENDOR_XVMC_LIBS="-l"$xvmc_lib
@@ -2746,26 +2743,34 @@ elif enabled xvmc_pro; then
         VENDOR_XVMC_LIBS="-lviaXvMCPro"
     elif has_library libchromeXvMCPro ; then
         VENDOR_XVMC_LIBS="-lchromeXvMCPro"
+    else
+        disable xvmc_pro
     fi
 elif enabled xvmc_vld; then
     if has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
     elif has_library libchromeXvMC ; then
         VENDOR_XVMC_LIBS="-lchromeXvMC"
+    else
+        disable xvmc_pro
     fi
 elif has_library libXvMCNVIDIA ; then
     VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
 elif has_library libI810XvMC ; then
     VENDOR_XVMC_LIBS="-lI810XvMC"
 else
-    disable xvmc
+    disable xvmc xvmcw
 fi
 
-test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" && disable xvmc_opengl
+if test x"$VENDOR_XVMC_LIBS" == x"-lXvMCNVIDIA" ; then
+    enable xvmc_opengl
+    disable xvmc_vld xvmc_pro
+elif enaled xvmc_opengl ; then
+    disable xvmc_opengl
+    echo "Disabling XvMC-opengl. It is only available when linking against libXvMCNIVIDIA"
+fi
 
-enabled xvmcw && enable xvmc_pro enable xvmc_vld
 enabled xvmc_pro && enable xvmc_vld
-enabled xvmc_opengl && disable xvmc_vld xvmc_pro
 
 
 # Can only do Mac accel on Mac platform
