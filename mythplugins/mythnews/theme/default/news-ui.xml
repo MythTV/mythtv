@@ -88,12 +88,12 @@
         </textedit>
 
         <button name="cancel" from="basebutton">
-            <position>60,490</position>
+            <position>60,480</position>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <position>600,490</position>
+            <position>590,480</position>
             <value>Ok</value>
         </button>
 

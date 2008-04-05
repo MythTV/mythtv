@@ -77,7 +77,7 @@ private:
     // menu stuff
     void ShowMenu();
     void deleteNewsSite();
-    bool ShowEditDialog(bool edit);
+    void ShowEditDialog(bool edit);
 
 
     NewsSite::List m_NewsSites;

@@ -21,10 +21,15 @@ MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
 
     m_titleText = m_nameLabelText = m_urlLabelText = m_iconLabelText = NULL;
     m_nameEdit = m_urlEdit = m_iconEdit = NULL;
+    m_okButton = m_cancelButton = NULL;
 
     m_site = site;
-    m_siteName = m_site->name();
     m_editing = edit;
+
+    if (m_editing)
+        m_siteName = m_site->name();
+    else
+        m_siteName = "";
 }
 
 MythNewsEditor::~MythNewsEditor()
@@ -42,8 +47,7 @@ bool MythNewsEditor::Create()
     if (!foundtheme)
         return false;
 
-    m_titleText = dynamic_cast<MythUIText *>
-                (GetChild("title"));
+    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
 
     if (m_titleText)
     {
@@ -53,38 +57,36 @@ bool MythNewsEditor::Create()
           m_titleText->SetText(tr("Enter Site Details"));
     }
 
-    m_nameLabelText = dynamic_cast<MythUIText *>
-                (GetChild("namelabel"));
+    m_nameLabelText = dynamic_cast<MythUIText *> (GetChild("namelabel"));
+    m_urlLabelText = dynamic_cast<MythUIText *> (GetChild("urllabel"));
+    m_iconLabelText = dynamic_cast<MythUIText *> (GetChild("iconlabel"));
 
-    if (m_nameLabelText)
-        m_nameLabelText->SetText(tr("Name:"));
+    m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
+    m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
+    m_iconEdit = dynamic_cast<MythUITextEdit *> (GetChild("icon"));
 
-    m_nameEdit = dynamic_cast<MythUITextEdit *>
-                (GetChild("name"));
+    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
+    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    m_urlLabelText = dynamic_cast<MythUIText *>
-                (GetChild("urllabel"));
-
-    if (m_urlLabelText)
-        m_urlLabelText->SetText(tr("URL:"));
-
-    m_urlEdit = dynamic_cast<MythUITextEdit *>
-                (GetChild("url"));
-
-    m_iconLabelText = dynamic_cast<MythUIText *>
-                (GetChild("iconlabel"));
-
-    if (m_iconLabelText)
-        m_iconLabelText->SetText(tr("Icon:"));
-
-    m_iconEdit = dynamic_cast<MythUITextEdit *>
-                (GetChild("icon"));
-
-    if (!m_nameEdit || !m_urlEdit || !m_iconEdit)
+    if (!m_nameEdit || !m_urlEdit || !m_iconEdit || !m_okButton
+        || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
     }
+
+    if (m_nameLabelText)
+        m_nameLabelText->SetText(tr("Name:"));
+    if (m_urlLabelText)
+        m_urlLabelText->SetText(tr("URL:"));
+    if (m_iconLabelText)
+        m_iconLabelText->SetText(tr("Icon:"));
+
+    m_okButton->SetText(tr("Ok"));
+    m_cancelButton->SetText(tr("Cancel"));
+
+    connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(Save()));
+    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Exit()));
 
     if (m_editing)
     {
@@ -120,12 +122,17 @@ bool MythNewsEditor::keyPressEvent(QKeyEvent *event)
         else if (action == "RIGHT")
             NextPrevWidgetFocus(true);
         else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
+            Exit();
         else
             handled = false;
     }
 
     return handled;
+}
+
+void MythNewsEditor::Exit()
+{
+    GetMythMainWindow()->GetMainStack()->PopScreen();
 }
 
 void MythNewsEditor::Save()
@@ -137,4 +144,6 @@ void MythNewsEditor::Save()
 
     insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
                m_iconEdit->GetText(), "custom");
+
+    Exit();
 }

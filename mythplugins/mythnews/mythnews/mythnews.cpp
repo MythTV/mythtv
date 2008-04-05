@@ -407,9 +407,13 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
                 if (!dir.exists())
                     dir.mkdir(fileprefix);
 
-                QString sitename = site->name();
-                QString sFilename(fileprefix + "/" + sitename + ".jpg");
                 QString url = site->imageURL();
+                QString extension = url.section('.', -1);
+
+                QString sitename = site->name();
+                QString sFilename = QString("%1/%2.%3").arg(fileprefix)
+                                                        .arg(sitename)
+                                                        .arg(extension);
 
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
@@ -765,7 +769,7 @@ void MythNews::slotViewArticle(MythListButtonItem *articlesListItem)
     }
 }
 
-bool MythNews::ShowEditDialog(bool edit)
+void MythNews::ShowEditDialog(bool edit)
 {
     NewsSite *site = NULL;
 
@@ -783,7 +787,7 @@ bool MythNews::ShowEditDialog(bool edit)
     MythNewsEditor *mythnewseditor = new MythNewsEditor(site, edit, mainStack,
                                                         "mythnewseditor");
 
-    connect(mythnewseditor, SIGNAL(exiting()), this, SLOT(loadsites()));
+    connect(mythnewseditor, SIGNAL(Exiting()), this, SLOT(loadSites()));
 
     if (mythnewseditor->Create())
         mainStack->AddScreen(mythnewseditor);

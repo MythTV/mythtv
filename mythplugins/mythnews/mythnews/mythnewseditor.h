@@ -3,6 +3,7 @@
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/httpcomms.h>
@@ -28,8 +29,6 @@ class MythNewsEditor : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
 
 private:
-    void Save(void);
-
     NewsSite *m_site;
     QString m_siteName;
     bool m_editing;
@@ -43,6 +42,12 @@ private:
     MythUITextEdit *m_urlEdit;
     MythUITextEdit *m_iconEdit;
 
+    MythUIButton *m_okButton;
+    MythUIButton *m_cancelButton;
+
+private slots:
+    void Save(void);
+    void Exit(void);
 };
 
 #endif /* MYTHNEWSEDITOR_H */
