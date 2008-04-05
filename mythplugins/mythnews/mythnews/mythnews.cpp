@@ -45,37 +45,6 @@
 #include "mythnewseditor.h"
 #include "newsdbutil.h"
 
-// MythNewsBusyDialog::MythNewsBusyDialog(const QString &title)
-//     : MythBusyDialog(title)
-// {
-// }
-// 
-// MythNewsBusyDialog::~MythNewsBusyDialog()
-// {
-// }
-// 
-// void MythNewsBusyDialog::keyPressEvent(QKeyEvent *e)
-// {
-//     bool handled = false;
-//     QStringList actions;
-//     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-//     {
-//         for (unsigned int i = 0; i < actions.size() && !handled; i++)
-//         {
-//             QString action = actions[i];
-//             if (action == "ESCAPE")
-//             {
-//                 emit cancelAction();
-//                 handled = true;
-//             }
-//         }
-//     }
-// 
-//     if (!handled)
-//         MythDialog::keyPressEvent(e);
-// }
-
-
 /** \brief Creates a new MythNews Screen
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window

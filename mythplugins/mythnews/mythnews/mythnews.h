@@ -33,20 +33,6 @@
 
 class QTimer;
 
-// class MPUBLIC MythNewsBusyDialog : public MythBusyDialog
-// {
-//     Q_OBJECT
-//   public:
-//     MythNewsBusyDialog(const QString &title);
-//     ~MythNewsBusyDialog();
-//
-//     void keyPressEvent(QKeyEvent *);
-//
-//   signals:
-//     void cancelAction();
-//
-// };
-
 /** \class MythNews
  *  \brief Plugin for browsing RSS news feeds.
  */
