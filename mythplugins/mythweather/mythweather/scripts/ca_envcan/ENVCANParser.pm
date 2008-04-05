@@ -11,7 +11,7 @@ use strict;
 use POSIX;
 use XML::Simple;
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 my %results;
 my %directions = (  N  => "North",      NNE => "North Northeast",
@@ -34,6 +34,10 @@ sub getIcon {
     }
     elsif ($condition =~ /fog/i) {
         $icon = 'fog.png';
+    }
+    elsif ($condition =~ /drizzle/i) {
+        $icon = 'lshowers.png';
+        $icon = 'rainsnow.png'  if ($condition =~ /freezing/i);
     }
     elsif ( ($condition =~ /rain/i) || ($condition =~ /showers/i) ) {
         $icon = 'showers.png';
