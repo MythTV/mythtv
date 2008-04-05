@@ -289,11 +289,8 @@ void MythUITextEdit::RemoveCharacter()
     SetText(newmessage, false);
 }
 
-void MythUITextEdit::MoveCursor(MoveDirection moveDir)
+bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 {
-    if (!m_showCursor)
-        return;
-
     QFontMetrics fm(m_Text->GetFontProperties()->face());
 
     int cursorPos = m_cursorImage->GetArea().x();
@@ -307,7 +304,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
     {
         case MoveLeft:
             if (m_Position < 0)
-                return;
+                return false;
 
             size = fm.size(Qt::SingleLine, m_Message.mid(m_Position,1));
 
@@ -326,7 +323,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
             break;
         case MoveRight:
             if (m_Position == (m_Message.size() - 1))
-                return;
+                return false;
 
             size = fm.size(Qt::SingleLine, m_Message.mid(m_Position+1,1));
 
@@ -370,6 +367,7 @@ void MythUITextEdit::MoveCursor(MoveDirection moveDir)
     m_cursorImage->SetPosition(newcursorPos, textRect.y());
 
     SetRedraw();
+    return true;
 }
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
@@ -387,11 +385,13 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT")
         {
-            MoveCursor(MoveLeft);
+            if (MoveCursor(MoveLeft))
+                handled = false;
         }
         else if (action == "RIGHT")
         {
-            MoveCursor(MoveRight);
+            if (!MoveCursor(MoveRight))
+                handled = false;
         }
         else if (action == "BACKSPACE" || action == "DELETE")
         {

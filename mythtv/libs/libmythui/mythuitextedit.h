@@ -31,6 +31,7 @@ class MythUITextEdit : public MythUIType
     void SetPaddingMargin(const int margin);
     void SetTextRect(const QRect area=QRect(0,0,0,0));
     void SetText(const QString text, bool moveCursor = true);
+    QString GetText() { return m_Message; }
 
     enum InputFilter
     {
@@ -44,7 +45,7 @@ class MythUITextEdit : public MythUIType
     void SetFilter(InputFilter filter) { m_Filter = filter; }
 
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
-    void MoveCursor(MoveDirection);
+    bool MoveCursor(MoveDirection);
 
   signals:
     void Finished();
