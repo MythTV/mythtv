@@ -3,7 +3,7 @@
 
 #include <qstring.h>
 #include <qmap.h>
-#include <Q3PtrList>
+#include <QList>
 
 #include "programinfo.h"
 #include "format.h"
@@ -231,7 +231,7 @@ class AvFormatDecoder : public DecoderBase
     bool seen_gop;
     int seq_count; ///< A counter used to determine if we need to force a call to HandleGopStart
 
-    Q3PtrList<AVPacket> storedPackets;
+    QList<AVPacket*> storedPackets;
 
     int firstgoppos;
     int prevgoppos;

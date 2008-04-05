@@ -439,10 +439,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
 AvFormatDecoder::~AvFormatDecoder()
 {
-    while (storedPackets.count() > 0)
+    while (!storedPackets.isEmpty())
     {
-        AVPacket *pkt = storedPackets.first();
-        storedPackets.removeFirst();
+        AVPacket *pkt = storedPackets.takeFirst();
         av_free_packet(pkt);
         delete pkt;
     }
@@ -672,10 +671,9 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     if (doflush)
     {
         // Free up the stored up packets
-        while (storedPackets.count() > 0)
+        while (!storedPackets.isEmpty())
         {
-            AVPacket *pkt = storedPackets.first();
-            storedPackets.removeFirst();
+            AVPacket *pkt = storedPackets.takeFirst();
             av_free_packet(pkt);
             delete pkt;
         }
@@ -3107,8 +3105,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 av_free_packet(pkt);
                 delete pkt;
             }
-            pkt = storedPackets.first();
-            storedPackets.removeFirst();
+            pkt = storedPackets.takeFirst();
         }
         else
         {
