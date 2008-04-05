@@ -329,6 +329,9 @@ void MythListButton::SetItemCurrent(MythListButtonItem* item)
 
 void MythListButton::SetItemCurrent(int current)
 {
+    if (pos >= m_itemList.size())
+        return;
+
     MythListButtonItem* item = m_itemList.at(current);
     if (!item)
         item = m_itemList.first();
@@ -796,9 +799,13 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         {
             QString buttonname = button->name();
             int pos = buttonname.section(' ',2,2).toInt();
-            SetItemCurrent(pos);
-            //MoveToNamedPosition(button->GetText());
-            emit itemClicked(GetItemCurrent());
+            if (pos < m_itemList.size())
+            {
+                SetItemCurrent(pos);
+                //MoveToNamedPosition(button->GetText());
+                emit itemClicked(GetItemCurrent());
+            }
+
             return;
         }
 
