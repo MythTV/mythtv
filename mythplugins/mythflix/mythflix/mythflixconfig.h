@@ -26,8 +26,7 @@
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythlistbutton.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+
 //Added by qt3to4:
 #include <QKeyEvent>
 
@@ -59,14 +58,9 @@ class MythFlixConfig : public MythScreenType
     MythListButton      *m_genresList;
     MythListButton      *m_siteList;
 
-    MythUIText *m_helpText;
-    MythUIText *m_contextText;
-
-    int                 m_updateFreq;
-
 private slots:
     void slotCategoryChanged(MythListButtonItem* item);
     void toggleItem(MythListButtonItem* item);
 };
 
-#endif /* MYTHNEWSCONFIG_H */
+#endif /* MYTHFLIXCONFIG_H */

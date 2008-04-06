@@ -27,7 +27,6 @@
 #include <qdir.h>
 #include <qregexp.h>
 #include <q3process.h>
-#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -47,8 +46,6 @@
 MythFlix::MythFlix(MythScreenStack *parent, const char *name)
     : MythScreenType (parent, name)
 {
-    //qInitNetworkProtocols ();
-
     // Setup cache directory
 
     QString fileprefix = MythContext::GetConfDir();
@@ -68,8 +65,10 @@ MythFlix::MythFlix(MythScreenStack *parent, const char *name)
                                    gContext->GetInstallPrefix() +
                                       "/bin/mythbrowser");
 
-    m_sitesList      = 0;
-    m_articlesList   = 0;
+    m_sitesList = m_articlesList = NULL;
+    m_statusText = m_titleText = m_descText = NULL;
+    m_boxshotImage = NULL;
+    m_menuPopup = NULL;
 }
 
 MythFlix::~MythFlix()
@@ -85,11 +84,7 @@ bool MythFlix::Create()
     foundtheme = LoadWindowFromXML("netflix-ui.xml", "browse", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window 'browse' from "
-                              "netflix-ui.xml");
         return false;
-    }
 
     m_sitesList = dynamic_cast<MythListButton *>
                 (GetChild("siteslist"));
@@ -182,7 +177,8 @@ void MythFlix::updateInfoView(MythListButtonItem* selected)
     if (!selected)
         return;
 
-    if (GetFocusWidget() == m_articlesList) {
+    if (GetFocusWidget() == m_articlesList)
+    {
 
         NewsArticle *article = (NewsArticle*) selected->getData();
 
@@ -193,9 +189,6 @@ void MythFlix::updateInfoView(MythListButtonItem* selected)
                 m_titleText->SetText(article->title());
 
             if (m_descText)
-                m_descText->SetText(article->description());
-
-            // removes html tags
             {
                 QString artText = article->description();
                 // Replace paragraph and break HTML with newlines
@@ -454,13 +447,13 @@ void MythFlix::displayOptions()
 {
     QString label = tr("Browse Options");
 
-    MythScreenStack *mainStack =
-                            GetMythMainWindow()->GetMainStack();
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    m_menuPopup = new MythDialogBox(label, mainStack, "mythflixmenupopup");
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythflixmenupopup");
 
     if (m_menuPopup->Create())
-        mainStack->AddScreen(m_menuPopup);
+        popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "options");
 

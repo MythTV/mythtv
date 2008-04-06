@@ -25,6 +25,7 @@
 #include <qdatastream.h>
 #include <qdom.h>
 #include <q3urloperator.h>
+#include <q3network.h>
 
 extern "C" {
 #include <stdlib.h>
@@ -78,6 +79,7 @@ NewsSite::NewsSite(const QString& name,
     m_articleList.clear();
 
     m_data.resize(0);
+    q3InitNetworkProtocols();
     m_urlOp = new Q3UrlOperator(m_url);
 
 }

@@ -30,7 +30,6 @@
 #include <mythtv/libmythui/mythdialogbox.h>
 
 #include "newsengine.h"
-#include <QKeyEvent>
 
 /** \class MythFlix
  *  \brief The netflix browser class.

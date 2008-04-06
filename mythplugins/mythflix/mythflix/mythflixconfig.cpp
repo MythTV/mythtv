@@ -25,8 +25,6 @@
 #include <qstring.h>
 #include <qfile.h>
 #include <qdom.h>
-//Added by qt3to4:
-#include <QKeyEvent>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -265,7 +263,7 @@ bool MythFlixConfig::findInDB(const QString& name)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM netflix WHERE name = :NAME ;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("new find in db", query);
         return val;
@@ -286,10 +284,10 @@ bool MythFlixConfig::insertInDB(NewsSiteItem* site)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO netflix (name,category,url,ico, is_queue) "
                   " VALUES( :NAME, :CATEGORY, :URL, :ICON, 0);");
-    query.bindValue(":NAME", site->name.utf8());
-    query.bindValue(":CATEGORY", site->category.utf8());
-    query.bindValue(":URL", site->url.utf8());
-    query.bindValue(":ICON", site->ico.utf8());
+    query.bindValue(":NAME", site->name);
+    query.bindValue(":CATEGORY", site->category);
+    query.bindValue(":URL", site->url);
+    query.bindValue(":ICON", site->ico);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("netlix: inserting in DB", query);
         return false;
@@ -304,7 +302,7 @@ bool MythFlixConfig::removeFromDB(NewsSiteItem* site)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM netflix WHERE name = :NAME ;");
-    query.bindValue(":NAME", site->name.utf8());
+    query.bindValue(":NAME", site->name);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("netflix: delete from db", query);
         return false;
