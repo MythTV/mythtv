@@ -1182,7 +1182,9 @@ void MythMainWindow::RegisterJump(const QString &destination,
 
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
-    if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
+    if (destination == "ScreenShot")
+	screenShot();
+    else if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
         d->popwindows = pop;
