@@ -13,7 +13,7 @@ SOURCES += version.cpp
 
 version.target = version.cpp 
 
-version.commands = sh $$SVNTREEDIR/version.sh \"$$SVNTREEDIR\" \"$$SVNREPOPATH\"
+version.commands = sh \"$$SVNTREEDIR/version.sh\" \"$$SVNTREEDIR\" \"$$SVNREPOPATH\"
 
 !mingw: version.depends = FORCE 
 

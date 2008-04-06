@@ -20,7 +20,7 @@ phony.depends = perl_build
 
 perl_install.target = install
 perl_install.depends = all
-perl_install.commands = $(MAKE) -f Makefile.perl pure_install PERL_INSTALL_ROOT="$(INSTALL_ROOT)"
+perl_install.commands = $(MAKE) -f Makefile.perl pure_install PERL_INSTALL_ROOT=\"$(INSTALL_ROOT)\"
 
 QMAKE_LINK=@-echo
 PRE_TARGETDEPS += perl_build

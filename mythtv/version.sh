@@ -19,7 +19,7 @@ SOURCE_VERSION=$(svnversion ${SVNTREEDIR} 2>/dev/null || echo Unknown)
 
 # Get a string like "0.21.20071125-1"
 BINARY_VERSION=$(grep MYTH_BINARY_VERSION \
-    ${SVNTREEDIR}/libs/libmyth/mythcontext.h \
+    "${SVNTREEDIR}/libs/libmyth/mythcontext.h" \
     | sed -e 's/.*MYTH_BINARY_VERSION //')
 
 echo "const char *myth_source_version = \"${SOURCE_VERSION}\";" > .vers.new
