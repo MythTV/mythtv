@@ -150,7 +150,7 @@ bool check_permissions(const QString &filename)
  */
 void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("OpenFile(%1, %1)")
+    VERBOSE(VB_PLAYBACK, LOC + QString("OpenFile(%1, %2)")
             .arg(lfilename).arg(retryCount));
 
     uint openAttempts = retryCount + 1;
