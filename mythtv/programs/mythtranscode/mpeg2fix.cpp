@@ -1045,7 +1045,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (! out_codec)
     {
-        VERBOSE(MPF_IMPORTANT, "Couldn't find MPEC2 encoder");
+        VERBOSE(MPF_IMPORTANT, "Couldn't find MPEG2 encoder");
         return 1;
     }
 
@@ -1057,8 +1057,8 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     c->dsp_mask = 0xffff;
 
     //NOTE: The following may seem wrong, but avcodec requires
-    //sequence->progresive == frame->progressive
-    //We fix the discrepency by dsicarding avcodec's sequence header, and
+    //sequence->progressive == frame->progressive
+    //We fix the discrepancy by discarding avcodec's sequence header, and
     //replace it with the original
     if(picture->interlaced_frame)
         c->flags |= CODEC_FLAG_INTERLACED_DCT;
@@ -1881,7 +1881,7 @@ int MPEG2fixup::Start()
             displayFrame->toFirst();
 
             // since we might reorder the frames when coming out of a cutpoint
-            // me need to save the first frame here, as it is gauranteed to
+            // me need to save the first frame here, as it is guaranteed to
             // have a sequence header.
             seqFrame = vFrame.current();
 
@@ -1948,7 +1948,7 @@ int MPEG2fixup::Start()
                                            tmpPTSdiscrep, numframes, false);
                                 if (!tmpPTSdiscrep)
                                 {
-                                    //discrepency was short-lived, continue on
+                                    //discrepancy was short-lived, continue on
                                     done = true;
                                     PTSdiscrep = 0;
                                     break;
@@ -2069,7 +2069,7 @@ int MPEG2fixup::Start()
 
                         if (deltaPTS < -2 || deltaPTS > 2)
                         {
-                            VERBOSE(MPF_PROCESS, QString("PTS discrepency: "
+                            VERBOSE(MPF_PROCESS, QString("PTS discrepancy: "
                                        "%1 != %2 on %3-Type (%4)")
                                        .arg(curFrame->pkt.pts)
                                        .arg(expectedvPTS / 300)
@@ -2108,7 +2108,7 @@ int MPEG2fixup::Start()
                             break;
                     }
 
-                    //dtsExtra is applied at the end of this block iff the current
+                    //dtsExtra is applied at the end of this block if the current
                     //tail has repeat_first_field set
                     if (ptsorder_eq_dtsorder)
                         dtsExtra = 0;
@@ -2120,7 +2120,7 @@ int MPEG2fixup::Start()
                     {
                         //if we are off by more than 1/2 frame, it is time to add a frame
                         // The frame(s) will be added right after lVpkt_tail, and
-                        // lVpkt_head will be adjusted acordingly
+                        // lVpkt_head will be adjusted accordingly
 
 
                         vFrame.at(frame_pos)->pkt.pts = lastPTS / 300;
@@ -2213,7 +2213,7 @@ int MPEG2fixup::Start()
                     break;
 
                 // The order of processing frames is critical to making
-                // everything work.  Backwards PTS discrepencies complicate
+                // everything work.  Backwards PTS discrepancies complicate
                 // the processing significantly
                 // Processing works as follows:
                 //   detect whether there is a discontinuous PTS (tmpPTS != 0)
@@ -2221,7 +2221,7 @@ int MPEG2fixup::Start()
                 //   next check if a cutpoint is active, and discard frames
                 //     as needed
                 //   next check that the current PTS < last video PTS
-                //   if we get this far, update the expected PTS, and writeout
+                //   if we get this far, update the expected PTS, and write out
                 //     the audio frame
                 int64_t nextPTS, tmpPTS;
                 int64_t incPTS =
@@ -2269,7 +2269,7 @@ int MPEG2fixup::Start()
                             {
                                 //If there are 20 consecutive frames with an
                                 //offset < 4sec, assume a mismatch and correct.
-                                //Note: if we allow too much discrepency,
+                                //Note: if we allow too much discrepancy,
                                 //we could overrun the video queue
                                 ptsinc((uint64_t *)&origaPTS[it.key()],
                                        300 * tmpPTS);
@@ -2280,7 +2280,7 @@ int MPEG2fixup::Start()
                         }
                         af->first()->pkt.pts = origaPTS[it.key()] / 300;
                 }
-                else if (tmpPTS > incPTS) //correct for small discrepencies
+                else if (tmpPTS > incPTS) //correct for small discrepancies
                 {
                     incPTS += incPTS;
                     backwardsPTS = false;
@@ -2373,7 +2373,7 @@ void usage(char *s)
     fprintf(stderr, "\t--maxframes #      -m #      : Max frames to insert at once (default=10)\n");
     fprintf(stderr, "\t--cutlist \"start - end\" -c : Apply a cutlist.  Specify on e'-c' per cut\n");
     fprintf(stderr, "\t--no3to2           -t        : Remove 3:2 pullup\n");
-    fprintf(stderr, "\t--fixup            -f        : make PTS contiuous\n");
+    fprintf(stderr, "\t--fixup            -f        : make PTS continuous\n");
     fprintf(stderr, "\t--ostream <dvd|ps> -e        : Output stream type (defaults to ps)\n");
     fprintf(stderr, "\t--showprogress     -p        : show progress\n");
     fprintf(stderr, "\t--help             -h        : This screen\n");
