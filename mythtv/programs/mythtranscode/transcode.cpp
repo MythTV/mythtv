@@ -486,7 +486,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     kfa_table = new Q3PtrList<struct kfatable_entry>;
 
-    if (!fifodir.isEmpty())
+    if (fifodir.isEmpty())
     {
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
