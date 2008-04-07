@@ -306,7 +306,7 @@ static int encode_frame(
     //uint32_t x = *(uint32_t*)payload;
     // in place swab
     swab((const char *)payload, (char *)payload, enc_len);
-    //VERBOSE(VB_AUDIO|VB_TIMESTAMP, 
+    //VERBOSE(VB_AUDIO+VB_TIMESTAMP, 
     //        QString("DigitalEncoder::Encode swab test %1 %2")
     //        .arg(x,0,16).arg(*(uint32_t*)payload,0,16));
 
@@ -375,7 +375,7 @@ size_t AudioOutputDigitalEncoder::Encode(short *buff)
         /*av_context->codec_id==CODEC_ID_DTS*/ false,
         (unsigned char*)outbuf, outsize);
 
-    VERBOSE(VB_AUDIO|VB_TIMESTAMP, 
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP, 
             QString("DigitalEncoder::Encode len1=%1 len2=%2 finallen=%3")
                 .arg(tmpsize).arg(encsize).arg(outsize));
 

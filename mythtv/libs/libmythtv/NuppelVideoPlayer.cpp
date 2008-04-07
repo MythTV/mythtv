@@ -2225,7 +2225,7 @@ float NuppelVideoPlayer::WarpFactor(void)
     warpfactor_avg = (warpfactor + (warpfactor_avg * (WARPAVLEN - 1))) /
                       WARPAVLEN;
 
-    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
+    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
             LOC + QString("A/V Divergence: %1, Rate: %2, Warpfactor: %3, "
                           "warpfactor_avg: %4")
             .arg(divergence).arg(rate).arg(warpfactor).arg(warpfactor_avg));
@@ -2396,7 +2396,7 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
     {
-        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString("A/V avsync_delay: %1, "
+        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, QString("A/V avsync_delay: %1, "
                 "avsync_avg: %2, warpfactor: %3, warpfactor_avg: %4")
                 .arg(avsync_delay / 1000).arg(avsync_avg / 1000)
                 .arg(warpfactor).arg(warpfactor_avg));
@@ -2421,7 +2421,7 @@ void NuppelVideoPlayer::AVSync(void)
     {
         long long currentaudiotime = audioOutput->GetAudiotime();
 #if 0
-        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString(
+        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, QString(
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
                     "avdel %4 avg %5 tcoffset %6")
                 .arg(currentaudiotime)

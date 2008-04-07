@@ -597,7 +597,7 @@ int AudioOutputBase::GetAudiotime(void) const
     ret = (long long)(ret * audio_stretchfactor);
 
 #if 1
-    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             QString("GetAudiotime now=%1.%2, set=%3.%4, ret=%5, audt=%6 sf=%7")
             .arg(now.tv_sec).arg(now.tv_usec)
             .arg(audiotime_updated.tv_sec).arg(audiotime_updated.tv_usec)
@@ -666,7 +666,7 @@ void AudioOutputBase::SetAudiotime(void)
 
     gettimeofday(&audiotime_updated, NULL);
 #if 1
-    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             QString("SetAudiotime set=%1.%2, audt=%3 atc=%4 "
                     "tb=%5 sb=%6 eds=%7 abps=%8 sf=%9")
             .arg(audiotime_updated.tv_sec).arg(audiotime_updated.tv_usec)
@@ -706,7 +706,7 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
 
     if (((len > afree) || ((audbuf_timecode - GetAudiotime()) > 2000)) && !blocking)
     {
-        VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
+        VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4")
                 .arg(len).arg(kAudioRingBufferSize-afree).arg(afree)
                 .arg(timecode));
@@ -775,7 +775,7 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
 
     if (((len > afree) || (audiotime && ((audbuf_timecode - GetAudiotime()) > 2000))) && !blocking)
     {
-        VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
+        VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4")
                 .arg(len).arg(kAudioRingBufferSize-afree).arg(afree)
                 .arg(timecode));
@@ -824,7 +824,7 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
     {
         if (blocking)
         {
-            VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + "Waiting for free space " +
+            VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + "Waiting for free space " +
                     QString("(need %1, available %2)").arg(len).arg(afree));
 
             // wait for more space
@@ -865,7 +865,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     int abps = (encoder) ?
         encoder->audio_bytes_per_sample : audio_bytes_per_sample;
 
-    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             LOC + QString("_AddSamples samples=%1 bytes=%2, used=%3, "
                           "free=%4, timecode=%5 needsupmix %6")
             .arg(samples)
@@ -1003,7 +1003,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                     (soundtouch::SAMPLETYPE*)encoder->GetFrameBuffer();
                 size_t frameSize = encoder->FrameSize()/abps;
 
-                VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+                VERBOSE(VB_AUDIO+VB_TIMESTAMP,
                         QString("_AddSamples Enc sfs=%1 bfs=%2 sss=%3")
                         .arg(frameSize)
                         .arg(encoder->FrameSize())
@@ -1017,7 +1017,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                         temp_buff, frameSize);
                     int amount = encoder->Encode(temp_buff);
 
-                    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+                    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
                             QString("_AddSamples Enc bytes=%1 got=%2 left=%3")
                             .arg(amount)
                             .arg(got)
@@ -1160,7 +1160,7 @@ void AudioOutputBase::OutputAudioLoop(void)
 
             if (space_on_soundcard != last_space_on_soundcard)
             {
-                VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+                VERBOSE(VB_AUDIO+VB_TIMESTAMP,
                         LOC + QString("%1 bytes free on soundcard")
                         .arg(space_on_soundcard));
 
@@ -1175,7 +1175,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                     WriteAudio(zeros, fragment_size);
                 } else {
                     // this should never happen now -dag
-                    VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC +
+                    VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC +
                             QString("waiting for space on soundcard "
                                     "to write zeros: have %1 need %2")
                             .arg(space_on_soundcard).arg(fragment_size));
@@ -1211,12 +1211,12 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (fragment_size > audiolen(true))
         {
             if (audiolen(true) > 0)  // only log if we're sending some audio
-                VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC +
+                VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC +
                         QString("audio waiting for buffer to fill: "
                                 "have %1 want %2")
                         .arg(audiolen(true)).arg(fragment_size));
 
-            //VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+            //VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             //LOC + "Broadcasting free space avail");
             pthread_mutex_lock(&audio_buflock);
             pthread_cond_broadcast(&audio_bufsig);
@@ -1231,7 +1231,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (fragment_size > space_on_soundcard)
         {
             if (space_on_soundcard != last_space_on_soundcard) {
-                VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC +
+                VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC +
                         QString("audio waiting for space on soundcard: "
                                 "have %1 need %2")
                         .arg(space_on_soundcard).arg(fragment_size));
@@ -1293,7 +1293,7 @@ int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full
 
         /* update raud */
         raud = (raud + fragment_size) % kAudioRingBufferSize;
-        VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + "Broadcasting free space avail");
+        VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + "Broadcasting free space avail");
         pthread_cond_broadcast(&audio_bufsig);
 
         written_size = fragment_size;

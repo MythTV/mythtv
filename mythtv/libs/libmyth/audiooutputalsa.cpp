@@ -153,7 +153,7 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
     
     tmpbuf = aubuf;
 
-    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+    VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             QString("WriteAudio: Preparing %1 bytes (%2 frames)")
             .arg(size).arg(frames));
     
