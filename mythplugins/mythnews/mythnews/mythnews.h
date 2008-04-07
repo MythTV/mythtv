@@ -28,6 +28,7 @@
 #include <mythtv/libmythui/mythlistbutton.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
 #include <mythtv/httpcomms.h>
 #include "newsengine.h"
 
@@ -80,7 +81,7 @@ private:
 
     bool           abortHttp;
 
-//     MythNewsBusyDialog *busy;
+    MythUIBusyDialog *m_busyPopup;
     HttpComms      *httpGrabber;
 
     MythListButton *m_sitesList;

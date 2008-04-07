@@ -75,6 +75,7 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
     m_updatedText = m_titleText = m_descText = NULL;
     m_thumbnailImage = m_downloadImage = m_enclosureImage = NULL;
     m_menuPopup = NULL;
+    m_busyPopup = NULL;
 
     m_TimerTimeout = 10*60*1000;
     httpGrabber = NULL;
@@ -95,7 +96,7 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
 
 MythNews::~MythNews()
 {
-    m_RetrieveTimer->stop();
+
 }
 
 bool MythNews::Create()
@@ -109,29 +110,16 @@ bool MythNews::Create()
     if (!foundtheme)
         return false;
 
-    m_sitesList = dynamic_cast<MythListButton *>
-                (GetChild("siteslist"));
+    m_sitesList = dynamic_cast<MythListButton *> (GetChild("siteslist"));
+    m_articlesList = dynamic_cast<MythListButton *> (GetChild("articleslist"));
 
-    m_articlesList = dynamic_cast<MythListButton *>
-                (GetChild("articleslist"));
+    m_updatedText = dynamic_cast<MythUIText *> (GetChild("updated"));
+    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
+    m_descText = dynamic_cast<MythUIText *> (GetChild("description"));
 
-    m_updatedText = dynamic_cast<MythUIText *>
-                (GetChild("updated"));
-
-    m_titleText = dynamic_cast<MythUIText *>
-                (GetChild("title"));
-
-    m_descText = dynamic_cast<MythUIText *>
-                (GetChild("description"));
-
-    m_thumbnailImage = dynamic_cast<MythUIImage *>
-                (GetChild("thumbnail"));
-
-    m_enclosureImage = dynamic_cast<MythUIImage *>
-                (GetChild("enclosures"));
-
-    m_downloadImage = dynamic_cast<MythUIImage *>
-                (GetChild("download"));
+    m_thumbnailImage = dynamic_cast<MythUIImage *> (GetChild("thumbnail"));
+    m_enclosureImage = dynamic_cast<MythUIImage *> (GetChild("enclosures"));
+    m_downloadImage = dynamic_cast<MythUIImage *> (GetChild("download"));
 
     if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
         !m_downloadImage || !m_titleText || !m_descText)
@@ -480,7 +468,20 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             ShowMenu();
         else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
+        {
+            if (m_busyPopup)
+            {
+                m_busyPopup->Close();
+                m_busyPopup = NULL;
+            }
+
+            m_RetrieveTimer->stop();
+
+            if (httpGrabber)
+                abortHttp = true;
+
+            GetScreenStack()->PopScreen();
+        }
         else
             handled = false;
     }
@@ -580,9 +581,18 @@ void MythNews::slotProgressCancelled()
 
 void MythNews::createProgress(QString title)
 {
-//     busy = new MythNewsBusyDialog(title);
-//     busy->start();
-//     connect(busy, SIGNAL(cancelAction()),
+    if (m_busyPopup)
+        return;
+
+    QString message = title;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    m_busyPopup = new MythUIBusyDialog(message, popupStack, "mythnewsbusydialog");
+
+    if (m_busyPopup->Create())
+        popupStack->AddScreen(m_busyPopup);
+//    connect(busy, SIGNAL(cancelAction()),
 //             SLOT(slotProgressCancelled()));
 }
 
@@ -595,7 +605,6 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
     httpGrabber = NULL;
     QString hostname = "";
 
-//     busy = NULL;
     createProgress(QObject::tr("Downloading media..."));
     while (1)
     {
@@ -618,6 +627,18 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         {
             qApp->processEvents();
             usleep(100000);
+
+            int progress = httpGrabber->getProgress();
+            int total = httpGrabber->getTotal();
+            if ((progress > 0) && (total > 0) && (progress < total))
+            {
+                float fProgress = (float)progress/total;
+                QString text = QString("%1 of %2 (%3 percent)")
+                        .arg(formatSize(progress, 2))
+                        .arg(formatSize(total, 2))
+                        .arg(floor(fProgress*100));
+                m_updatedText->SetText(text);
+            }
         }
 
         if (abortHttp)
@@ -648,6 +669,12 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
             }
         }
         break;
+    }
+
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
     }
 
     delete httpGrabber;
@@ -712,7 +739,8 @@ void MythNews::slotViewArticle(MythListButtonItem *articlesListItem)
                     playVideo(sFilename);
                     qApp->lock();
                 }
-            } else {
+            }
+            else {
                 QString cmdUrl(article->articleURL());
                 cmdUrl.replace('\'', "%27");
 
