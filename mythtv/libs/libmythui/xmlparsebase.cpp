@@ -462,11 +462,19 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
 {
     MythUIType *ui = GetGlobalObjectStore()->GetChild(windowname);
     if (!ui)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unable to load window '%1' from base")
+                                      .arg(windowname));
         return false;
+    }
 
     MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
     if (!st)
+    {
+        VERBOSE(VB_IMPORTANT, QString("UI Object '%1' is not a ScreenType")
+                                      .arg(windowname));
         return false;
+    }
 
     win->CopyFrom(st);
     return true;
