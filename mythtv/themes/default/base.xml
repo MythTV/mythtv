@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
     <!-- Base Font Definitions -->
@@ -110,7 +111,7 @@
         <area>0,0,375,50</area>
         <font>basesmallblack</font>
         <cursor filename="cursor.png" />
-        <margin>11</margin>
+        <margin>12</margin>
         <background filename="textedit_background.png" />
     </textedit>
 
@@ -134,6 +135,19 @@
             <showarrow>no</showarrow>
             <scrollarrows show="no"></scrollarrows>
         </buttonlist>
+    </window>
+
+    <window name="MythBusyDialog">
+        <area>305,205,191,191</area>
+        <imagetype name="backimg">
+            <filename>mythdialogbox-background.png</filename>
+            <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+            <delay>250</delay>
+        </imagetype>
+        <textarea name="message" from="basetextarea">
+            <area>0,0,191,191</area>
+            <align>center</align>
+        </textarea>
     </window>
 
 </mythuitheme>
