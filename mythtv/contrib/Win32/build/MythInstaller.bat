@@ -61,6 +61,6 @@ if ( ! -s $file ) {
     die "Cannot download $url";
 }
 
-exec "c:/perl/bin/perl/exe -w $file %ARGV";
+exec "c:/perl/bin/perl.exe -w $file %ARGV";
 __END__
 :endofperl
