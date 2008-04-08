@@ -34,11 +34,17 @@ VERBOSE=False
 URL_BASE="http://www.ofdb.de"
 DUMP_RESPONSE=False
 
-ofdb_version = "0.2"
+ofdb_version = "0.3"
 mythtv_version = "0.21"
 
 def comment_out(str):
-	print("# %s" % (str,))
+	s = str
+	try:
+		s = unicode(str, "utf8")
+	except:
+		pass
+
+	print("# %s" % (s,))
 
 def debug_out(str):
 	if VERBOSE:
@@ -46,11 +52,26 @@ def debug_out(str):
 
 def response_out(str):
 	if DUMP_RESPONSE:
-		print(str)
+		s = str
+		try:
+			s = unicode(str, "utf8")
+		except:
+			pass
+
+		print(s)
 
 def print_exception(str):
 	for line in str.splitlines():
 		comment_out(line)
+
+def _xmlprep(content):
+	"""Removes any HTML tags that just confuse the parser."""
+
+	pat = re.compile(r'<\s*meta.*?>', re.M)
+	ret = pat.sub('', content)
+	pat = re.compile(r'<\s*script.*?<\s*/script\s*>', re.M | re.S)
+	return pat.sub('', ret)
+
 
 def _myth_url_get(url, data = None, as_post = False):
 	extras = ['ofdb', ofdb_version]
@@ -102,10 +123,12 @@ def ofdb_url_get(url, data = None, as_post = False):
 	if m:
 		charset = m.group(1)
 		debug_out("Page charset reported as %s" % (charset))
-		content = unicode(content, charset)
+		# The page lies about encoding (often using two character
+		# encodings on the same page).
+		content = _xmlprep(unicode(content, charset, 'replace')).encode("utf8")
 	else:
 		# hope it is ascii
-		content = unicode(content)
+		content = _xmlprep(unicode(content, errors='replace')).encode("utf8")
 
 	response_out(content)
 	return (rc, content)
@@ -118,7 +141,7 @@ def search_title(title):
 		ret = t
 		if m:
 			ret = m.group(1)
-		return ret.strip()
+		return ret.strip().encode("utf8")
 
 	try:
 		data = {
@@ -154,7 +177,8 @@ def get_ofdb_doc(uid, context):
 	"""Returns the OFDb film page as an XML document."""
 	debug_out("Starting search for %s '%s'" % (context, uid))
 
-	(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE, "film/%s" % (uid)))
+	(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE,
+		"film/%s" % (uid.encode("utf8"),)))
 
 	reader = HtmlLib.Reader()
 	return reader.fromString(content)
@@ -275,7 +299,7 @@ def search_data(uid, rating_country):
 
 			debug_out("Looking for plot...")
 			(rc, content) = ofdb_url_get(urlparse.urljoin(URL_BASE,
-				"plot/%s" % sid))
+				"plot/%s" % sid.encode("utf8")))
 
 			reader = HtmlLib.Reader()
 			doc = reader.fromString(content)
@@ -291,7 +315,7 @@ def search_data(uid, rating_country):
 			debug_out("Looking for other info %s..." % (alturl))
 			(rc, content) = ofdb_url_get(alturl)
 			reader = HtmlLib.Reader()
-			doc = reader.fromString(content)
+			doc = reader.fromString(content, charset="utf8")
 
 			data['release_date'] = direct_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Premierendatum')]/../child::text()[2]")
 			data['runtime'] = direct_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'L\u00E4nge')]/../child::text()[2]").split()[0]
@@ -420,11 +444,14 @@ Usage: %prog [-M TITLE | -D UID [-R COUNTRY[,COUNTRY]] | -P UID]
 	DUMP_RESPONSE = options.dump_response
 
 	if options.title_search:
-		search_title(options.title_search)
+		search_title(unicode(options.title_search, "utf8"))
 	elif options.data_search:
-		search_data(options.data_search, options.ratings_from)
+		rf = options.ratings_from
+		if rf:
+			rf = unicode(rf, "utf8")
+		search_data(unicode(options.data_search, "utf8"), rf)
 	elif options.poster_search:
-		search_poster(options.poster_search)
+		search_poster(unicode(options.poster_search, "utf8"))
 	else:
 		parser.print_usage()
 		sys.exit(1)
