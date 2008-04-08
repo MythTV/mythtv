@@ -49,14 +49,9 @@ my $sourceforge = 'downloads.sourceforge.net';     # auto-redirect to a
 #my $sourceforge = 'mesh.dl.sourceforge.net';      # Germany
 
 # Set this to the empty string for no-proxy:
-# TODO - proxy code is broken for SVN actions,
-#        however downloads/etc will still work fine.
-# TODO using the proxy here WILL cause any Subversion (SVN) commands to fail,
-#      you will need to do that by hand.
-# TIP if you want to get a 'tarball' of a specific SVN version of the sourcecode, from behind a non-SVN friendly proxy, TRAC can do it for you like this: (eg.is for SVN version 16599)
-#      http://svn.mythtv.org/trac/changeset?format=zip&new=15699&old=2&new_path=trunk%2Fmythtv&old_path=trunk%2Fmythtv
 my $proxy = '';
 #my $proxy = 'http://enter.your.proxy.here:8080';
+# Subversion proxy settings are configured in %APPDATA%\Subversion\servers
 
 # Main mythtv version - used to name dlls
 my $version = 0.21;
