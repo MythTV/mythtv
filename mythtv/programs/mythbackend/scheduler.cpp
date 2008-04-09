@@ -2283,6 +2283,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                                          "(%1) for recordid %2")
                                          .arg(result.value(1).toInt())
                                          .arg(result.value(0).toString()));
+            bindings.remove(bindrecid);
             break;
         }
 
