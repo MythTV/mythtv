@@ -54,7 +54,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     virtual void SetPosition(int x, int y);
     virtual void SetPosition(const QPoint &pos);
-    virtual void GetPosition(void) const;
+    virtual QPoint GetPosition(void) const;
     virtual void SetArea(const QRect &rect);
     virtual QRect GetArea(void) const;
 
