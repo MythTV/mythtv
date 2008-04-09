@@ -2762,12 +2762,12 @@ else
     disable xvmc xvmcw
 fi
 
-if test x"$VENDOR_XVMC_LIBS" == x"-lXvMCNVIDIA" ; then
+if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
     enable xvmc_opengl
     disable xvmc_vld xvmc_pro
 elif enabled xvmc_opengl ; then
     disable xvmc_opengl
-    echo "Disabling XvMC-opengl. It is only available when linking against libXvMCNIVIDIA"
+    echo "Disabling XvMC-opengl. It is only available when linking against libXvMCNVIDIA"
 fi
 
 enabled xvmc_pro && enable xvmc_vld
