@@ -293,6 +293,11 @@ void MythUIType::SetPosition(const QPoint &pos)
     SetRedraw();
 }
 
+QPoint MythUIType::GetPosition(void) const
+{
+    return QPoint(m_Area.x(), m_Area.y());
+}
+
 void MythUIType::SetArea(const QRect &rect)
 {
     if (rect == m_Area)
