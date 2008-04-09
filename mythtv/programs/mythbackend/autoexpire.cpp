@@ -687,7 +687,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                   .arg(startts.toString(Qt::ISODate));
 
                     MythEvent me(msg);
-                    gContext->dispatchNow(me);
+                    gContext->dispatch(me);
                 }
                 else
                 {
