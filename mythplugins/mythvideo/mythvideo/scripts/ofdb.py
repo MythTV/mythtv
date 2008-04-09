@@ -156,7 +156,7 @@ def search_title(title):
 			data, True)
 
 		reader = HtmlLib.Reader()
-		doc = reader.fromString(content)
+		doc = reader.fromString(content, charset='utf8')
 
 		nodes = xpath.Evaluate("//A[starts-with(@href, 'film/')]",
 				doc.documentElement)
@@ -181,7 +181,7 @@ def get_ofdb_doc(uid, context):
 		"film/%s" % (uid.encode("utf8"),)))
 
 	reader = HtmlLib.Reader()
-	return reader.fromString(content)
+	return reader.fromString(content, charset='utf8')
 
 class NoIMDBURL(Exception):
 	pass
@@ -302,7 +302,7 @@ def search_data(uid, rating_country):
 				"plot/%s" % sid.encode("utf8")))
 
 			reader = HtmlLib.Reader()
-			doc = reader.fromString(content)
+			doc = reader.fromString(content, charset='utf8')
 
 			data['plot'] = unicode(all_text_children(doc.documentElement,
 					"//FONT[@class='Blocksatz']"))
@@ -315,7 +315,7 @@ def search_data(uid, rating_country):
 			debug_out("Looking for other info %s..." % (alturl))
 			(rc, content) = ofdb_url_get(alturl)
 			reader = HtmlLib.Reader()
-			doc = reader.fromString(content, charset="utf8")
+			doc = reader.fromString(content, charset='utf8')
 
 			data['release_date'] = direct_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Premierendatum')]/../child::text()[2]")
 			data['runtime'] = direct_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'L\u00E4nge')]/../child::text()[2]").split()[0]
@@ -374,7 +374,7 @@ def search_poster(uid):
 				"title/tt%s/posters" % (id)))
 
 			reader = HtmlLib.Reader()
-			doc = reader.fromString(content)
+			doc = reader.fromString(content, charset='utf8')
 
 			nodes = xpath.Evaluate("//TABLE[starts-with(@background, 'http://posters.imdb.com/posters/')]", doc.documentElement)
 			for i in nodes:
@@ -388,7 +388,7 @@ def search_poster(uid):
 					base = nodes[0].getAttributeNS(EMPTY_NAMESPACE, 'href')
 					(rc, content) = ofdb_url_get(base)
 					reader = HtmlLib.Reader()
-					doc = reader.fromString(content)
+					doc = reader.fromString(content, charset='utf8')
 					nodes = xpath.Evaluate(
 							"//IMG[starts-with(@SRC, 'posters/')]",
 							doc.documentElement)
