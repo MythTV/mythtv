@@ -1570,7 +1570,7 @@ sub comment {
 #------------------------------------------------------------------------------
 
 sub usage {
-    print << 'END_USAGE ";
+    print << 'END_USAGE';
 -h             This message
 -v             Verbose output
 -u all|mythtv|mythplugins|myththemes
