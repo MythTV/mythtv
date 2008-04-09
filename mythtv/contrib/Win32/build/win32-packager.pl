@@ -96,7 +96,7 @@ if (defined $opt{b}) {
     $svnlocation = "trunk";
 }
 
-$qtver = 4 if ( $SVNRELEASE > 16789 || $svnlocation eq 'trunk' );
+$qtver = 4 if ( $SVNRELEASE > 16789 && $svnlocation eq 'trunk' );
 print "using QT version: $qtver\n";
 
 # TODO -  use this list to define the components to build - only the first of these currently works well.
@@ -109,7 +109,7 @@ if ( ! exists $ENV{'HOMEPATH'} || $ENV{'HOMEPATH'} eq '\\' )
 my $doshome = $ENV{HOMEPATH};
 my $home = $doshome; 
 $home =~ s#\\#/#g;
-$home = s/ /\\ /g;
+$home =~ s/ /\\ /g;
 $home .= '/'; # all paths should end in a slash
 my $unixhome = perl2unix($home);
 
