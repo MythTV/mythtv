@@ -22,6 +22,7 @@ class MythUIImage : public MythUIType
     void SetFilename(const QString &filename);
     void SetFilepattern(const QString &filepattern, int low, int high);
 
+    void SetImageCount(int low, int high);
     void SetDelay(int delayms);
 
     // load's original

@@ -83,6 +83,12 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
     m_HighNum = high;
 }
 
+void MythUIImage::SetImageCount(int low, int high)
+{
+    m_LowNum = low;
+    m_HighNum = high;
+}
+
 void MythUIImage::SetDelay(int delayms)
 {
     m_Delay = delayms;
