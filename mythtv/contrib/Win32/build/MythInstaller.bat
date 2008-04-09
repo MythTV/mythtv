@@ -19,8 +19,11 @@ goto endofperl
 
 :WinNT
 if not exist c:\perl\bin\perl.exe goto no_perl
-if NOT exist C:\Perl\site\lib\Config\inifiles.pm call c:\perl\bin\ppm.bat install Config-inifiles
+@rem
+@rem If we needed any non-standard Perl modules, this is how to install them:
+@rem if NOT exist C:\Perl\site\lib\Config\inifiles.pm call c:\perl\bin\ppm.bat install Config-inifiles
 @rem if errorlevel 1  echo You do not have Perl in your PATH. 
+@rem
 perl -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
