@@ -1180,6 +1180,7 @@ ivtv="yes"
 joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
+mac_bundle="no"
 opengl="yes"
 v4l="yes"
 x11="yes"
@@ -1387,6 +1388,8 @@ for opt do
   ;;
 # disabled due to abuse in Gentoo ebuild
   --disable-backend)
+  ;;
+  --enable-mac-bundle) enable mac_bundle
   ;;
   --previous|--prev)
       echo "No history of previous configure parameters."
@@ -1628,9 +1631,23 @@ case $targetos in
     FFSERVERLDFLAGS=-Wl,-bind_at_load
     ;;
   mingw32*)
+    enable  backend
+    disable bindings_perl
+    disable bindings_python
+    disable dv1394
+    disable dvb
+    disable ivtv
+    enable  memalign_hack
+    disable network
+    enable opengl
+    if enabled wince; then
+        disable protocols
+    fi
+    disable v4l
+    enable  windows
+    disable x11
+    ###### Standard ffmpeg configure stuff follows:
     targetos=mingw32
-    enable backend
-    enable windows
     shlibdir="$bindir"
     VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
     VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
@@ -1638,17 +1655,7 @@ case $targetos in
         VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
         VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
     fi
-    dv1394="no"
-    ffserver="no"
-    network="no"
-    opengl="yes"
-    if enabled wince; then
-        protocols="no"
-    fi
     disable ffserver
-    disable v4l
-    disable bindings_perl
-    disable bindings_python
     SLIBPREF="lib"
     SLIBSUF=".dll"
     EXESUF=".exe"
