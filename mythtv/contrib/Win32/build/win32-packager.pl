@@ -32,6 +32,7 @@ my $SVNRELEASE = '16789'; # Latest build that has been confirmed to run,
                           # but seems to work best with some patches
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
+#my $SVNRELEASE = '16973'; # Recent 0-21-fixes
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -587,18 +588,19 @@ push @{$expect},
 [ dir => $mythtv.'mythtv', mkdirs => $mythtv.'mythtv' ],
 
 
-[ file => $mythtv.'svn_', shell => ["rm ".$unixmythtv."using_proxy_cannot_do_SVN.txt; if [ -n '$proxy' ] ; then touch ".$unixmythtv."using_proxy_cannot_do_SVN.txt; fi",'nocheck'],comment => 'disable SVN code fetching if we are using a proxy....' ],
-
-# if we dont have the sources at all, get them all from SVN!  (do a
-# checkout, but only if we don't already have the .pro file as a sign of an
-# earlier checkout)
-# this is some nasty in-line batch-script code, but it works.
+# if we dont have the sources at all, get them all from SVN!
+# (do a checkout, but only if we don't already have the .pro file
+#  as a sign of an earlier checkout)
 ;
-# mythtv,mythplugins,myththemes
+
 foreach my $comp( @components ) {
-       push @{$expect}, [ dir => $mythtv.$comp, mkdirs => $mythtv.$comp ];
-push @{$expect}, 
-[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['set PATH='.$dosmsys.'bin;%PATH% && cd '.$dosmythtv.' && IF NOT EXIST '.$dosmythtv."$comp\\$comp".".pro svn checkout  http://svn.mythtv.org/svn/$svnlocation/"."$comp $comp",'nocheck'],comment => 'Get all the mythtv sources from SVN!:'.$comp ];
+  push @{$expect}, [ dir => $mythtv.$comp, mkdirs => $mythtv.$comp ];
+  push @{$expect},
+  [ file => "$mythtv$comp/$comp.pro",
+    exec => ["$dosmsys\\bin\\svn checkout ".
+             "http://svn.mythtv.org/svn/$svnlocation/$comp $dosmythtv$comp",
+             'nocheck'],
+    comment => "Get all the mythtv sources from SVN!:$comp" ];
 }
 
 push @{$expect}, 
@@ -650,10 +652,13 @@ if ($makeclean) {
   ;	
 	
 }
-# SVN update every time, before patches, unless we are using a proxy
+# SVN update every time, before patches
 foreach my $comp( @components ) {
-push @{$expect}, 
-[ file => $mythtv.'using_proxy_cannot_do_SVN.txt', exec => ['cd '.$dosmythtv."$comp && ".$dosmsys.'bin\svn.exe -r '.$SVNRELEASE.' update','nocheck'],comment => 'getting SVN updates for:'.$comp.' on '.$svnlocation ],
+  push @{$expect}, 
+  [ file => 'always',
+    exec => ["$dosmsys\\bin\svn.exe -r $SVNRELEASE update $dosmythtv$comp",
+             'nocheck'],
+    comment => "Getting SVN updates for:$comp on $svnlocation" ];
 }
 push @{$expect}, 
 
