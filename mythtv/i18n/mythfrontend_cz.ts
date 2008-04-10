@@ -164,23 +164,23 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vytvořit skupinu vstupů</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zadat jméno nové skupiny</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chyba</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jméno skupiny nemůže být prázdné.</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto jméno skupiny již existuje.</translation>
     </message>
 </context>
 <context>
@@ -457,23 +457,23 @@
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přidat</translation>
     </message>
     <message>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hledat slova v titulku</translation>
     </message>
     <message>
         <source>Match this series</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hledat tuto sérii</translation>
     </message>
     <message>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pouze programy označené jako širokoúhlé</translation>
     </message>
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyřadit data kódovaná H.264 (pouze EIT)</translation>
     </message>
 </context>
 <context>
@@ -583,159 +583,159 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     </message>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kartézská šířka pro vaši lokaci.</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použijte záporná čísla pro jižní a západní koordináty.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kartézská délka pro Vaši lokaci.</translation>
     </message>
     <message>
         <source>Device Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ zařízení</translation>
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přepínač</translation>
     </message>
     <message>
         <source>Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rotor</translation>
     </message>
     <message>
         <source>LNB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LNB</translation>
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Volitelné jméno pro toto zařízení. Pomáhá při pozdější konfiguraci nastavení.</translation>
     </message>
     <message>
         <source>Repeat Count</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počet opakování</translation>
     </message>
     <message>
         <source>Number of times to repeat DiSEqC commands sent to this device. Larger values may help with less reliable devices.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počet opakování příkazů DiSEqC odeslaných na toto zařízení. Vyšší hodnoty mohou pomoci s méně spolehlivými zařízeními.</translation>
     </message>
     <message>
         <source>Switch Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ přepínače</translation>
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte typ přepínače ze seznamu.</translation>
     </message>
     <message>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tónový</translation>
     </message>
     <message>
         <source>DiSEqC (Uncommitted)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DiSEqC (nepropojený)</translation>
     </message>
     <message>
         <source>Legacy SW21</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tradiční SW21</translation>
     </message>
     <message>
         <source>Legacy SW42</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tradiční SW42</translation>
     </message>
     <message>
         <source>Legacy SW64</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tradiční SW64</translation>
     </message>
     <message>
         <source>Number of ports</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počet portů</translation>
     </message>
     <message>
         <source>The number of ports this switch has.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počet portů které přepínač nabízí.</translation>
     </message>
     <message>
         <source>Switch Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfigurace přepínače</translation>
     </message>
     <message>
         <source>Rotor Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ rotoru</translation>
     </message>
     <message>
         <source>Select the type of rotor from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte typ rotoru ze seznamu.</translation>
     </message>
     <message>
         <source>DiSEqC 1.2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DiSEqC 1.2</translation>
     </message>
     <message>
         <source>DiSEqC 1.3 (GotoX/USALS)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DiSEqC 1.3 (GotoX/USALS)</translation>
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nízká rychlost motoru (stupňů/sec)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pro umožnění přesného monitorování posunu motoru, zadejte nominální rychlost motoru při napájení 13V.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vysoká rychlost motoru (stupňů/sec)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pro umožnění přesného monitorování posunu motoru, zadejte nominální rychlost motoru při napájení 18V.</translation>
     </message>
     <message>
         <source>Position Index %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ukazatel pozice %1</translation>
     </message>
     <message>
         <source>Orbital Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Orbitální pozice</translation>
     </message>
     <message>
         <source>Position #%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pozice #%1 (%2)</translation>
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mapa pozice rotoru</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfigurace rotoru</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pozice</translation>
     </message>
     <message>
         <source>Rotor position setup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nastavení pozice rotoru.</translation>
     </message>
     <message>
         <source>Single (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jednoduchý (Evropa)</translation>
     </message>
     <message>
         <source>Universal (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Univerzální (Evropa)</translation>
     </message>
     <message>
         <source>Circular (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kruhový-circular (S. Amerika)</translation>
     </message>
     <message>
         <source>Linear (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární (S. Amerika)</translation>
     </message>
     <message>
         <source>C Band</source>
@@ -751,31 +751,31 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     </message>
     <message>
         <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte přednastavený LNB ze seznamu, zvolte jiný pro nastavení rozšířených možností níže.</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jiný</translation>
     </message>
     <message>
         <source>LNB Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Typ LNB</translation>
     </message>
     <message>
         <source>Select the type of LNB from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte typ LNB ze seznamu</translation>
     </message>
     <message>
         <source>Legacy (Fixed)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tradiční (pevný)</translation>
     </message>
     <message>
         <source>Standard (Voltage)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Standardní (napětí)</translation>
     </message>
     <message>
         <source>Universal (Voltage &amp; Tone)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Univerzální (napětí a tón)</translation>
     </message>
     <message>
         <source>Bandstacked</source>
@@ -807,35 +807,35 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     </message>
     <message>
         <source>LNB Reversed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obrácené LNB</translation>
     </message>
     <message>
         <source>This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto definuje zda je signál dopadající na LNB obrácený oproti standardní polarizaci. Toto vzniká při svojitém dopadu kruhového (circular) signálu na toroidní disk.</translation>
     </message>
     <message>
         <source>LNB Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfigurace LNB</translation>
     </message>
     <message>
         <source>Select Type of Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte typ zařízení</translation>
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strom zařízení DiSEqC</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zvolte který port na přepínači chcete použít.</translation>
     </message>
     <message>
         <source>Port %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Port %1</translation>
     </message>
     <message>
         <source>Choose a satellite position.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zvolte pozici satelitu.</translation>
     </message>
     <message>
         <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
@@ -843,23 +843,31 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     </message>
     <message>
         <source>Longitude (degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zeměpisná délka (stupňů)</translation>
     </message>
     <message>
         <source>Hemisphere</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polokoule</translation>
     </message>
     <message>
         <source>Eastern</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Východní</translation>
     </message>
     <message>
         <source>Western</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Západní</translation>
     </message>
     <message>
         <source>DTV Device Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konfigurace zařízení DTV</translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Napětí</translation>
+    </message>
+    <message>
+        <source>Mini DiSEqC</source>
+        <translation type="unfinished">Mini DiDEqC</translation>
     </message>
 </context>
 <context>
@@ -873,7 +881,7 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     <name>GuideGrid</name>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished">Smazat &apos;%1&apos; %2 pravidlo?</translation>
+        <translation type="unfinished">Smazat pravidlo &apos;%1&apos; %2 ?</translation>
     </message>
 </context>
 <context>
@@ -1098,7 +1106,7 @@ VAROVÁNÍ: Nemačkejte tlačítko pokud používáte kartu Air2PC HD-5000 nebo 
     </message>
     <message>
         <source>Select removable media to eject or insert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte výměnné médium pro vyjmutí nebo vložení</translation>
     </message>
 </context>
 <context>
@@ -1151,11 +1159,11 @@ Prosím, před aktualizací je vypněte.</translation>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV nebylo schopno provést zálohu databáze.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud se Váš systém stane nestabilní, soubor se zálohou databáze se jmenuje %1 a je uložen v %2.</translation>
     </message>
 </context>
 <context>
@@ -1327,11 +1335,11 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished">Volby plejlistu</translation>
+        <translation type="unfinished">Volby playlistu</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished">Přidat tuto nahrávku do plejlistu</translation>
+        <translation type="unfinished">Přidat tuto nahrávku do Playlistu</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
@@ -1363,11 +1371,11 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished">V plejlistu je %1 položek.</translation>
+        <translation type="unfinished">V playlistu je %1 položek.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished">V plejlistu je %1 položka.</translation>
+        <translation type="unfinished">V playlistu je %1 položka.</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1379,23 +1387,23 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished">Smazat plejlist</translation>
+        <translation type="unfinished">Smazat Playlist</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished">Přepnout plejlist pro tuto kategorii/název</translation>
+        <translation type="unfinished">Přepnout playlist pro tuto kategorii/název</translation>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation type="unfinished">Přepnout plejlist pro tuto nahrávací skupinu</translation>
+        <translation type="unfinished">Přepnout playlist pro tuto nahrávací skupinu</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished">Přepnout plejlist pro tuto nahrávku</translation>
+        <translation type="unfinished">Přepnout playlist pro tuto nahrávku</translation>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished">Tyto akce ovlivní všechny položky v plejlistu</translation>
+        <translation type="unfinished">Tyto akce ovlivní všechny položky v playlist</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
@@ -1463,11 +1471,11 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished">Odstranit z plejlistu</translation>
+        <translation type="unfinished">Odstranit z playlistu</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished">Přidat do plejlistu</translation>
+        <translation type="unfinished">Přidat do playlistu</translation>
     </message>
     <message>
         <source>Stop Recording</source>
@@ -1535,7 +1543,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Add this Group to Playlist</source>
-        <translation type="unfinished">Přidat tuto skupinu do plejlistu</translation>
+        <translation type="unfinished">Přidat tuto skupinu do playlistu</translation>
     </message>
     <message>
         <source>ERROR: Recorded file does not exist.</source>
@@ -1651,7 +1659,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Watch List</source>
-        <translation type="unfinished">Watch List</translation>
+        <translation type="unfinished">K přehrání</translation>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
@@ -1687,7 +1695,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Show Watch List</source>
-        <translation type="unfinished">Zobraz Watch List</translation>
+        <translation type="unfinished">Zobraz seznam &quot;K přehrání&quot;</translation>
     </message>
     <message>
         <source>Show Searches</source>
@@ -1751,19 +1759,19 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>_NO_TITLE_</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ŽÁDNÝ_NÁZEV</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Smazat a povolit nové nahrání</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Smazáno</translation>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit tento program pro znovunahrání</translation>
     </message>
 </context>
 <context>
@@ -1818,19 +1826,19 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max CPU</translation>
     </message>
     <message>
         <source>Fallback Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Záložní deinterlace</translation>
     </message>
     <message>
         <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální počet jader CPU použitých pro dekódování.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> Vícevláknové dekódování je vypnuto, bude použito pouze jedno jádro, spusťte prosím novou kompilaci s parametrem --enable-ffmpeg-pthreads pro povolení</translation>
     </message>
 </context>
 <context>
@@ -2122,7 +2130,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">0 až 9 přesune na Nx10 procent v seznamu</translation>
     </message>
 </context>
 <context>
@@ -2970,7 +2978,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Tuner Busy</source>
-        <translation type="unfinished">Ladič zaneprázdněn</translation>
+        <translation type="unfinished">Tuner zaneprázdněn</translation>
     </message>
     <message>
         <source>Inactive</source>
@@ -3042,7 +3050,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished">karta ladiče bylo už použita.</translation>
+        <translation type="unfinished">karta tuneru bylo už použita.</translation>
     </message>
     <message>
         <source>you should never see this.</source>
@@ -3827,7 +3835,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
-        <translation type="unfinished">Tento příkaz bude spuštěn pro změnu kanálu pro vsupy, které mají externí tuner jako je &quot;cable box&quot;. První argument je číslo kanálu.</translation>
+        <translation type="unfinished">Tento příkaz bude spuštěn pro změnu kanálu pro vstupy, které mají externí tuner jako je &quot;cable box&quot;. První argument je číslo kanálu.</translation>
     </message>
     <message>
         <source>Preset tuner to channel</source>
@@ -4735,7 +4743,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished">Obecné</translation>
+        <translation type="unfinished">Všeobecné nastavení</translation>
     </message>
     <message>
         <source>Program Guide</source>
@@ -5388,7 +5396,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
-        <translation type="unfinished">Seznam AutoExpirací ukazuje všechny nahrávky, které mohou expirovat jejich pořadí. Nahrávky na začátku seznamu expirují nejdříve.</translation>
+        <translation type="unfinished">Seznam AutoExpirací ukazuje všechny nahrávky, které mohou expirovat a pořadí jejich expirace. Nahrávky na začátku seznamu expirují nejdříve.</translation>
     </message>
     <message>
         <source>%1 hours left</source>
@@ -6560,7 +6568,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Musical/Opera</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Muzikál/Opera</translation>
     </message>
     <message>
         <source>Ballet</source>
@@ -6568,23 +6576,23 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Arts/Culture</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Umění/Kultura</translation>
     </message>
     <message>
         <source>Performing Arts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Herecké umění</translation>
     </message>
     <message>
         <source>Fine Arts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výtvarné umění</translation>
     </message>
     <message>
         <source>Religion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Náboženství</translation>
     </message>
     <message>
         <source>Popular Culture/Traditional Arts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Populární vzdělávání/ Tradiční umění</translation>
     </message>
     <message>
         <source>Literature</source>
@@ -6592,103 +6600,103 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Film/Cinema</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film</translation>
     </message>
     <message>
         <source>Experimental Film/Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Experimentální film</translation>
     </message>
     <message>
         <source>Broadcasting/Press</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vysílání/ Tisk</translation>
     </message>
     <message>
         <source>New Media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nová média</translation>
     </message>
     <message>
         <source>Arts/Culture Magazines</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kulturní/ umělecké magazíny</translation>
     </message>
     <message>
         <source>Social/Policical/Economics</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sociální/Politické/Ekonomické</translation>
     </message>
     <message>
         <source>Magazines/Reports/Documentary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Magazíny/Reportáže/Dokumentární</translation>
     </message>
     <message>
         <source>Economics/Social Advisory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ekonomické/ Sociální poradna</translation>
     </message>
     <message>
         <source>Remarkable People</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pozoruhodní lidé</translation>
     </message>
     <message>
         <source>Education/Science/Factual</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vzdělávání/Věda/Fakty</translation>
     </message>
     <message>
         <source>Nature/animals/Environment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Příroda/Zvířata/Prostředí</translation>
     </message>
     <message>
         <source>Technology/Natural Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Technologie/Přírodní vědy</translation>
     </message>
     <message>
         <source>Medicine/Physiology/Psychology</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lékařské/Psychologie/Fyziologie</translation>
     </message>
     <message>
         <source>Foreign Countries/Expeditions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zahraniční země/Expedice</translation>
     </message>
     <message>
         <source>Social/Spiritual Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Společenské/Duševní vědy</translation>
     </message>
     <message>
         <source>Further Education</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Další vzdělávání</translation>
     </message>
     <message>
         <source>Languages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jazyky</translation>
     </message>
     <message>
         <source>Leisure/Hobbies</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zábava/Koníčky</translation>
     </message>
     <message>
         <source>Tourism/Travel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cestování/Turistika</translation>
     </message>
     <message>
         <source>Handicraft</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Řemesla</translation>
     </message>
     <message>
         <source>Motoring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motorismus</translation>
     </message>
     <message>
         <source>Fitness &amp; Health</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zdraví &amp; Fitness</translation>
     </message>
     <message>
         <source>Cooking</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vaření</translation>
     </message>
     <message>
         <source>Advertizement/Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reklamy/TV Shopping</translation>
     </message>
     <message>
         <source>Gardening</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zahradničení</translation>
     </message>
     <message>
         <source>Original Language</source>
@@ -6700,7 +6708,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>&quot;Unpublished&quot; Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&quot;Nepublikované&quot; programy</translation>
     </message>
     <message>
         <source>Live Broadcast</source>
@@ -6713,7 +6721,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Title match (regex)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Název odpovídá</translation>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
@@ -6766,7 +6774,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ostatní představení</translation>
     </message>
     <message>
         <source>the recording failed.</source>
@@ -6806,7 +6814,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Deaf Signing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Označeno &quot;pro neslyšící&quot;</translation>
     </message>
     <message>
         <source>Last Recorded</source>
@@ -6826,7 +6834,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Watch List Score</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hodnocení seznamu &quot;K přehrání&quot;</translation>
     </message>
     <message>
         <source>Auto-expire off</source>
@@ -6846,7 +6854,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Watch List Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Status seznamu &quot;K přehrání&quot;</translation>
     </message>
     <message>
         <source>Storage Group</source>
@@ -6854,7 +6862,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>SAP/Bilingual</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Duální zvuk</translation>
     </message>
     <message>
         <source>Main Language</source>
@@ -6862,7 +6870,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>SAP Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jazyk sekundárního zvuku</translation>
     </message>
     <message>
         <source>Dual</source>
@@ -6870,7 +6878,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte jazyk pro nahrávání, pokud je vysílán duální zvuk. Pouze Vrstva II podporuje nahrávání dvou jazyků (duální). vyžaduje ivtv 0.4.0 nebo novější.</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
@@ -7034,7 +7042,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Rename to Match</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přejmenovat na odpovídající</translation>
     </message>
     <message>
         <source>Existing Channel Treatment</source>
@@ -7126,7 +7134,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Do not Transcode new recordings</source>
-        <translation type="unfinished">Nepřekodovat nové nahrávky</translation>
+        <translation type="unfinished">Nepřekódovat nové nahrávky</translation>
     </message>
     <message>
         <source>[ Select transcoder ]</source>
@@ -7154,15 +7162,15 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tato sekce obsahuje všechny transporty které MythTV zná. Zobrazují se pole zdroj, modulace, frekvence, odpovídající symbolovou rychlost, síťové ID a ID transportu.</translation>
     </message>
     <message>
         <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editor transportu může být použit pouze k úpravě transportů, které jsou připojeny ke vstupu karty.</translation>
     </message>
     <message>
         <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zjišťování zda je zachytávací karta připojena ke zdroji tohoto transportu selhalo. Ujistěte se prosím že backend neběží.</translation>
     </message>
     <message>
         <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
@@ -7174,11 +7182,11 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Guiding standard to use for making sense of the data streams after they have been demodulated, error corrected and demultiplexed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Standard pro zpracování datového toku poté, co je demodulován, jsou zkorigovány chyby a demultiplexován.</translation>
     </message>
     <message>
         <source>OpenCable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCable</translation>
     </message>
     <message>
         <source>MPEG</source>
@@ -7204,11 +7212,11 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>Adjust Playback</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přizpůsobit přehrávání</translation>
     </message>
     <message>
         <source>Adjust Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přizpůsobit nahrávání</translation>
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
@@ -7261,11 +7269,11 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poznámka: dekódování skrytých titulků nebude fungovat s libmpeg2.</translation>
     </message>
     <message>
         <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Standardní XvMC bude používat XvMC API 1.0 pro přehrávání obrazu. To je sice rychlé, ale nepracuje dobře se snímky v HDTV rozlišení.</translation>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
@@ -7281,7 +7289,7 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>Linear blend</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární míchání (blend)</translation>
     </message>
     <message>
         <source>Kernel</source>
@@ -7293,15 +7301,15 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>One field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jedno půlsnímek</translation>
     </message>
     <message>
         <source>Linear blend (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární míchání (HW)</translation>
     </message>
     <message>
         <source>Kernel (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kernel (HW)</translation>
     </message>
     <message>
         <source>Bob (2x, HW)</source>
@@ -7309,87 +7317,87 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jeden půlsnímek (HW)</translation>
     </message>
     <message>
         <source>One Field (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jeden půlsnímek (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kernel (2x, HW)</translation>
     </message>
     <message>
         <source>Linear blend (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lineární míchání (2x, HW)</translation>
     </message>
     <message>
         <source>Interlaced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prokládané (2x, HW)</translation>
     </message>
     <message>
         <source>Video rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metoda zobrazování obrazu</translation>
     </message>
     <message>
         <source>Render video offscreen. Used internally.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počítat obraz mimo obrazovku. Používá se interně.</translation>
     </message>
     <message>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Používat kopírování pixelů X11 pro zobrazení obrazu. Toto není doporučeno, pokud je k dispozici jiná možnost. Obraz nebude upraven na velikost obrazovky. Toto funguje se všemi X11 servery, lokálními i vzdálenými.</translation>
     </message>
     <message>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použít přenos pixelů sdílenou pamětí X11. Toto je doporučeno pouze oproti kopírování pixelů X11. Obraze nebude upraven na velikost obrazovky. Toto funguje s většinou lokálních X11 serverů.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je standardní zobrazovač obrazu pro X11 systémy. Využívá XVideo hardwarovou akceleraci pro úpravu velikosti a konverzi barev. Pokud hardware nabízí kontrolu obrazu, zobrazovač ji použije.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je standardní zobrazovač obrazu pro dekodéry XvMC. Používá XVideo hardwarovou akceleraci pro úpravu velikosti a konverzi barev. Pokud hardware nabízí kontrolu obrazu, zobrazovač ji použije.</translation>
     </message>
     <message>
         <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tento zobrazovač videa pro karty nVidia používá XVideo pro barevnou konverzi a OpenGL pro úpravu velikosti. Hlavní výhodou tohoto zobrazovače je umožnění zobrazování OSD s pomocí OpenGL. To uvolní dva XvMC buffery pro dekódování. Je vyžadována dostatečně rychlá karta nVidia.</translation>
     </message>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tento zobrazovač používá DirectFB pro úpravu velikosti a barevnou konverzi. Nemá tolik vlastností jako standardní zobrazovač, ale může běžet na Linuxovém hardware be X11 serveru.</translation>
     </message>
     <message>
         <source>This is the standard video render for Macintosh OS X systems.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je standardní zobrazovač pro systémy Macintosh OS X.</translation>
     </message>
     <message>
         <source>This is the only video renderer for the MacAccel decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je  zobrazovač videa pouze pro dekodér MacAccel.</translation>
     </message>
     <message>
         <source>This is only video renderer for the PVR-350 decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je zobrazovač videa pouze pro dekodér PVR-350.</translation>
     </message>
     <message>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tento zobrazovač obrazu používá OpenGl pro úpravu velikosti a barevnou konverzi a může nabídnout omezenou kontrolu obrazu. Vyžaduje rychlejší GPU než XVideo. Pokud je aktivován, kontrola obrazu spotřebuje dodatečné zdroje.</translation>
     </message>
     <message>
         <source>Perform no deinterlacing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neprovádět odstraňování prokládání.</translation>
     </message>
     <message>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazovat pouze jedno pole ze dvou ve snímku. Toto vypadá dobře, pokud zobrazujete velmi pohyblivý obraz 1080i na 720p obrazovce.</translation>
     </message>
     <message>
         <source>Blends the odd and even fields linearly into one frame.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Smíchat liché a sudé půlsnímky lineárně do jednoho snímku.</translation>
     </message>
     <message>
         <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tento filtr vypne odstraňování prokládání pokud jsou půlsnímky podobné jinak provede lineární odstranění prokládání.</translation>
     </message>
     <message>
         <source>(Hardware Accelerated)</source>
@@ -7397,7 +7405,7 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>With workaround for broken interlaced modelines.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S náhradním řešením pro poškozené prokládané řádky.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; has not been documented yet.</source>
@@ -7409,23 +7417,23 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend. But it is the fastest OSD renderer; and is particularly efficient compared to the ia44blend OSD renderer for XvMC.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazit OSD s využitím vlastnosti XVideo &quot;sytost barev&quot; (chromakey). Tentozobrazovač nepoužívá aplha míchání. Ale je to nejrychlejší zobrazovač OSD zvláště efektivní v porovnání se zobrazovačem OSD ia44blend pro XvMC. </translation>
     </message>
     <message>
         <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poznámka: karty nVidia po sérii 5xxx nemají podporu pro XVideo &quot;sytost barev&quot; (chromakey)</translation>
     </message>
     <message>
         <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Softwarové OSD zobrazování použije Vaše CPU pro alfa míchání OSD.</translation>
     </message>
     <message>
         <source>Uses hardware support for 16 color alpha-blend surfaces for rendering the OSD. Because of the limited color range, MythTV renders the OSD in 16 level grayscale.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Využívá podporu hardware pro 16-ti barevné alpha míchání pro zobrazení OSD. Z důvodu omezeného barevného rozsahu, MythTV zobrazuje OSD v 16-ti úrovních šedi. </translation>
     </message>
     <message>
         <source>Note: Not recommended for nVidia or Intel chipsets. This removes two of the limited XvMC buffers from decoding duty.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poznámka: Není doporučováno pro karty nVidia a Intel. Toto uvolňuje dvě z omezených XvMC vyrovnávacích pamětí z procesu dekódování.</translation>
     </message>
     <message>
         <source>Renders the OSD using the PVR-350 chromakey feature.</source>
@@ -7485,7 +7493,7 @@ Frekvence pro tuto stanici je</translation>
     </message>
     <message>
         <source>Perform EIT Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Provést scan programových dat</translation>
     </message>
     <message>
         <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
@@ -7553,7 +7561,7 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud změníte toto nastavení, text níže bude změněn na jméno a typ Vaší karty. Pokud karta nemůže být otevřena, bude zobrazena chybová hláška.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -7573,7 +7581,7 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tato volba zajistí otevření karty backendem pouze v případě že ji skutečně používá, v ostatních případech je karta ponechána volná pro jiné programy.</translation>
     </message>
     <message>
         <source>DVB Tuning Delay (msec)</source>
@@ -7589,15 +7597,15 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>Cable box model</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Model kabelového STB</translation>
     </message>
     <message>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obecný</translation>
     </message>
     <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte model který nejlépe odpovídá Vašemu set-top-boxu. V závislosti na revizi firmware SA4200HD může pracovat lépe než SA3250HD.</translation>
     </message>
     <message>
         <source>Connection Type</source>
@@ -7609,43 +7617,43 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vysílací port DBOX2</translation>
     </message>
     <message>
         <source>DBOX2 streaming port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Číslo vysílacího portu (streaming) na Vašem DBOX2</translation>
     </message>
     <message>
         <source>DBOX2 HTTP Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HTTP port DBOX2</translation>
     </message>
     <message>
         <source>DBOX2 http port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Číslo HTTP portu na Vašem DBOX2.</translation>
     </message>
     <message>
         <source>DBOX2 Host IP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP adresa DBOX2</translation>
     </message>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vzdálená IP adresa vašeho DBOX2</translation>
     </message>
     <message>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID zařízení</translation>
     </message>
     <message>
         <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP adresa nebo ID zařízení ze spodu HDHomeRun.  Můžete použít &quot;FFFFFFFF&quot; pokud je na Vaší síti pouze jedno takové zařízení.</translation>
     </message>
     <message>
         <source>M3U URL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">M3U URL</translation>
     </message>
     <message>
         <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">URL M3U souboru který obsahuje URL IPTV stanic.</translation>
     </message>
     <message>
         <source>Tuner</source>
@@ -7665,7 +7673,7 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>FireWire cable box</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kabelový box FireWire</translation>
     </message>
     <message>
         <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
@@ -7673,15 +7681,15 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>DBox2 TCP/IP cable box</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kabelový STB DBOX2 TCP/IP</translation>
     </message>
     <message>
         <source>HDHomeRun DTV tuner box</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DTV STB HDHomeRun</translation>
     </message>
     <message>
         <source>Network Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Síťové nahrávací zařízení</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -7689,7 +7697,7 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto jméno je zobrazeno na obrazovce při spuštění živé TV a při změně vybraného vstupu nebo karty. Pokud toto používáte, ujistěte se že informace je unikátní pro každý vstup.</translation>
     </message>
     <message>
         <source>Unencrypted channels only</source>
@@ -7725,15 +7733,15 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud priorita vstupů není stejná pro všechny vstupy, plánovač může vybrat k nahrávání pozdější čas aby mohl využít vstupu s vyšší prioritou.</translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použít dlouhodobá programová data DishNet</translation>
     </message>
     <message>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud Váš satelitní disk míří na satelity DishNet, měli by jste uvažovat o povolení této vlastnosti. Pro nejlepší výsledky, povolte taktéž obecné získávání programových informací.</translation>
     </message>
     <message>
         <source>(Delete all capture cards on %1)</source>
@@ -7749,11 +7757,11 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>Data Direct Lineup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seznam stanic Data Direct</translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Načíst seznamy stanic</translation>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
@@ -7765,7 +7773,7 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>The following programs will be recorded instead:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Následující programy budou nahrány místo:</translation>
     </message>
     <message>
         <source>currently running.</source>
@@ -7785,63 +7793,63 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">mythfilldatabase běžel, ale nevložil žádná data do programových informací pro %1 ze %2 zdrojů. Toto může indikovat potenciální selhání kolektoru (grabber).</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra vyrovnávací paměť pro audio</translation>
     </message>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolte toto nastavení pokud MythTV poškozuje při přehrávání zvuk a používáte hardwarové kódování. Toto nastavení nebude mít vliv na MPEG-4 nebo RTJPEG obraz. MythTV bude udržovat extra zvuková data v interní vyrovnávací paměti pro odstranění této chyby. </translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud zadáno, heslo musí být vloženo aby byl zobrazen kompletní seznam všech nahraných pořadů.</translation>
     </message>
     <message>
         <source>Default group filter to apply</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí skupinový filtr k aplikování</translation>
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí filtr pro aplikování na obrazovce &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vždy se zeptat na výchozí skupinový filtr</translation>
     </message>
     <message>
         <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vždy se zeptat uživatele na úvodní filtr k aplikování při vstupu na obrazovku &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Save current group filter when changed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uložit aktuální skupinový filtr když bude změněn</translation>
     </message>
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pamatovat si poslední vybraný filtr místo zobrazení výchozího filtru kdykoli vstoupíte na obrazovku &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyberte typ výchozího seskupování k zobrazení na obrazovce &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazit jméno filtru místo &quot;Všechny programy&quot;</translation>
     </message>
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použít jméno aktuálně aplikovaného filtru na místě výrazu &quot;Všechny programy&quot; na obrazovce &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazit nahrávky pořízené při běhu Živé TV při použití filtru &quot;Všechny programy&quot;</translation>
     </message>
     <message>
         <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud je toto nastavení vypnuto, Nahrávky z Živé TV budou zobrazeny pouze přes specielní nahrávací skupinu &quot;Živá TV&quot;.</translation>
     </message>
     <message>
         <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
@@ -7849,184 +7857,184 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>Show group summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazit přehled o skupině</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Když vyberete skupinu, zobrazí se přehled o skupině místo zobrzení informace o první epizodě v dané skupině.</translation>
     </message>
     <message>
         <source>Smart Fast Forwarding</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chytré rychlé přeskakování vpřed</translation>
     </message>
     <message>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, okamžitě po přeskakování vzad, přeskakovat vpřed pouze o stejný úsek jako se přeskakovalo vzad.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přeskakovat na specifický snímek</translation>
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, přeskakování je přesně na určitý snímek, ale je pomalejší.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto určuje metodu použitou při detekování začátku a konce reklam.</translation>
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Automaticky přeskakovat reklamní přestávky, pokud byly označeny během automatického označování reklam nebo s pomocí programu mythcommflag, nebo pouze upozornit že reklamy byly detekovány.</translation>
     </message>
     <message>
         <source>Run commercial flagger</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spustit označovač reklam</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je výchozí hodnota nastavení Automatického označování reklam když je naplánováno nové nahrávání.</translation>
     </message>
     <message>
         <source>Run transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spustit překódování</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je výchozí hodnota nastavení Automatického překódování když je naplánováno nové nahrávání.</translation>
     </message>
     <message>
         <source>Default Transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí program překódování</translation>
     </message>
     <message>
         <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je výchozí hodnota použitá pro nastavení překódování když je naplánováno nové nahrávání.</translation>
     </message>
     <message>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Odložení pro Automatické úlohy překódování (dnů)</translation>
     </message>
     <message>
         <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud není 0, Automatické úlohy pro překódování budou naplánovány na spuštění tolik dní poté co je nahrávání ukončeno místo okamžitého spuštění.</translation>
     </message>
     <message>
         <source>Run User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spustit Uživatelskou úlohu č.%1</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Totoje výchozí hodnota použitá pro &quot;Spustit %1&quot; když je naplánováno nové nahrávání.</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit striktnější kód detekování reklam.  ??Vypněte?? pokud některé reklamy nejsou detekovány.</translation>
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, include blank frames following commercial breaks as part of the commercial break.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Když používáte detekci prázdných snímků a automatické označování, zahrnout prázdné snímky následující po komerční přestávce jako část komerční přestávky.</translation>
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velikost automatického přeskočení zpět při vynechávání reklam</translation>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, MythTV se automaticky vrátí tolik sekund zpět po vynechání reklam.</translation>
     </message>
     <message>
         <source>Commercial Skip Notify Amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velikost přeskočení zpět při Oznámení reklam</translation>
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, MythTv se bude chovat jako by reklamy začínaly o tolik sekund dříve.  Toto může být užitečné pokud je použito upozornění na reklamy při automatické vynechávání reklam.</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální délka komerční přestávky (v sekundách)</translation>
     </message>
     <message>
         <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the user to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV zabrání využití dlouhých manuálních přeskočení.  Přeskočení která jsou delší než tento limit budou vyžadovat dvojité stisknutí klávesy Přeskočit. Automatická přeskakování nejsou ovlivněna tímto limitem.</translation>
     </message>
     <message>
         <source>Merge short commercial breaks (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spojit krátké komerční přestávky (vteřin)</translation>
     </message>
     <message>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyhodnotit po sobě následující přestávky kratší než tento limit jako jednu při přeskakování vpřed. Toto je užitečné pokud musíte přeskakovat několikrát během jedné přednášky. Aplikuje se i na automatické přeskakování. Nastavte na 0 pro vypnutí.</translation>
     </message>
     <message>
         <source>Auto Expire Instead of Delete Recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Automaticky expirovat místo mazání nahrávek</translation>
     </message>
     <message>
         <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Místo mazání nahrávek, přesunout nahrávky do nahrávací skupiny &quot;Smazané&quot; a zapnout automatickou expiraci.</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metoda použitá pro vyhodnocení které nahrávky smazat jako první.  Nahrávky z Živé TV  budou expirovat vždy dříve než normální nahrávky.</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Množství bonusových dní které program obdrží za každý bod priority. Toto je využívánou pouze pokud je použita metoda expirace Vážená čas/priorita.</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí Automatická expirace</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Požadovaná velikost prázdného místa na disku pro nová nahrávání (v MB)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV zastaví plánování nových nahrávání pokud velikost volného místa na disku backendu klesne pod tuto hodnotu.</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, programy které byly označeny jako &quot;přehrané&quot; a jsou automaticky expirované, budou znovu nahrány pokud budou znovu vysílány.</translation>
     </message>
     <message>
         <source>Category of shows to be extended</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kategorie programu pro rozšíření</translation>
     </message>
     <message>
         <source>Record past end of show (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrávat za koncem programu (v minutách)</translation>
     </message>
     <message>
         <source>For the specified category, an attempt will be made to extend the recording by the specified time.  It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pro specifické kategorie, bude proveden pokud o prodloužení nahrávání o specifikovaný čas.  Toto je ignorováno pokud jsou dva programy naplánovány bez dostatečného času mezi nimi.</translation>
     </message>
     <message>
         <source>Category record over-time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prodloužené nahrávání dle Kategorie</translation>
     </message>
     <message>
         <source>Profile Item</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Položka profilu</translation>
     </message>
     <message>
         <source>Example Custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Příklad seznamu uživatelského filtru: &quot;ivtc,denoise3d&quot;</translation>
     </message>
     <message>
         <source>Main deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hlavní metoda odstraňování prokládání.</translation>
     </message>
     <message>
         <source>Fallback deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Náhradní metoda odstraňování prokládání.</translation>
     </message>
     <message>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;</translation>
     </message>
     <message>
         <source>if rez</source>
@@ -8034,49 +8042,51 @@ Váš procesor neposkytuje čísla stanic, musíte je tak nastavit manuálně. <
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Upravit</translation>
     </message>
     <message>
         <source>Add New Entry</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přidat novou položku</translation>
     </message>
     <message>
         <source>Playback Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profily přehrávání</translation>
     </message>
     <message>
         <source>Current Video Playback Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuální přehrávací profil</translation>
     </message>
     <message>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přidat novou</translation>
     </message>
     <message>
         <source>Enter Playback Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zadejte jméno skupiny přehrávání</translation>
     </message>
     <message>
         <source>Sorry, playback group
 name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jméno přehrávací skupiny 
+nesmí být prázdné.</translation>
     </message>
     <message>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jméno přehrávací skupiny 
+&quot;%1&quot; je již použito.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chyba</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Třídit věechny titulky Vzestupně</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Descending</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Třídit věechny tituky Sestupně</translation>
     </message>
     <message>
         <source>Sort sub-titles Descending, multi-titles Ascending</source>
@@ -8096,191 +8106,191 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ovládací klávesy (Vpřed, Vzad) </translation>
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, rychlé přetáčení vpřed a vzad pokračuje pokud je klávesa uvolněna.  Opětovný stisk klávesy zvyšuje rychlost posunu. Alternativní klávesy pro přetáčení se takto chovají vždy.</translation>
     </message>
     <message>
         <source>Fast forward/rewind reposition amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velikost posunu po rychlém přetáčení vpřed/vzad</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Když se ukončuje mód rychlého posunu vpřed/vzad, provede se posun o tolika násobek setiny sekundy před pokračováním normálního přehrávání. Toto kompenzuje reakční dobu mezi okamžikem kdy chceme ukončit posun a aktuální pozicí.</translation>
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, stisknutím klávesy pro zpětný posun při posunu vpřed přepne do posunu zpět a obráceně. Pokud zakázáno, bude snížena rychlost posunu nebo přepnuto na normální přehrávání, pokud už není možno více snížit rychlost posunu.</translation>
     </message>
     <message>
         <source>Text zoom percentage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Procento zvětšení textu</translation>
     </message>
     <message>
         <source>Default Caption Font Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí typ fontu pro titulky</translation>
     </message>
     <message>
         <source>This allows you to set which font type to use when the broadcaster does not specify a font.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto vám umožní vybrat typ fontu, pokud vysílající žádný nespecifikoval.</translation>
     </message>
     <message>
         <source>Monospaced serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serif (stejná rozteč)</translation>
     </message>
     <message>
         <source>Proportional serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serif (proporcionální)</translation>
     </message>
     <message>
         <source>Monospaced sans serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sans Serif (stejná rozteč</translation>
     </message>
     <message>
         <source>Proportional sans serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sans Serif (proporcionální)</translation>
     </message>
     <message>
         <source>Casual</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naformální</translation>
     </message>
     <message>
         <source>Cursive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kurzíva</translation>
     </message>
     <message>
         <source>Capitals</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velká písmena</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vertikální škálování</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavte pokud obrázek nepasuje na Vaši obrazovku vertikálně. Možnosti -100% až 100%</translation>
     </message>
     <message>
         <source>Horizontal scaling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Horizontální škálování</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavte pokud obrázek nepasuje na Vaši obrazovku vertikálně. Možnosti -100% až 100%</translation>
     </message>
     <message>
         <source>Scan displacement (X)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zjišťovat posunutí (X)</translation>
     </message>
     <message>
         <source>Scan displacement (Y)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zjišťovat posunutí (Y)</translation>
     </message>
     <message>
         <source>Always stream recordings from the backend</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vždy vysílat nahrávky z backendu</translation>
     </message>
     <message>
         <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolte toto nastavení pokud chcete aby MythTV vždy nahrávky vysílalo ze vzdáleného backendu místo přímého načítání nahrávky pokud je dostupná lokálně. </translation>
     </message>
     <message>
         <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použít obraz jako časovou základnu a upravit zvuk aby byl synchroní. (Experimentální)</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vymazat uložené pozice při dalším přehrávání</translation>
     </message>
     <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Automaticky vymaže uložené pozice pro nahrávku pokud je znovu přehrána.  Pokud zakázáno, můžete označit začátek s přetočením a poté uložit pozici.</translation>
     </message>
     <message>
         <source>Alternate Clear Saved Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alternativní vymazání uložených pozic.</translation>
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Během přehrávání stiskněte výběrovou klávesu (Enter nebo Mezerník) s alternací mezi &quot;Pozice uložena&quot; a &quot;Pozice vymazána&quot;. Pokud zakázáno, výběrová klávesa uloží současnou pozici pro každé stisknutí klávesy. </translation>
     </message>
     <message>
         <source>Enable picture controls</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit kontrolu obrazu</translation>
     </message>
     <message>
         <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, MythTV se pokusí inicializovat kontrolu obrazu (jas, kontrast, apod.) která je aplikována při přehrávání.</translation>
     </message>
     <message>
         <source>Warn on no audio output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Varovat pokud neexistuje zvukový výstup</translation>
     </message>
     <message>
         <source>Action on playback exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Akce při ukončení přehrávání</translation>
     </message>
     <message>
         <source>Always prompt (excluding Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vždy se zeptat (vyjma Živé TV)</translation>
     </message>
     <message>
         <source>Always prompt (including Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vždy se zeptat (včetně Živé TV)</translation>
     </message>
     <message>
         <source>Prompt for Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ptát se pouze pro Živou TV</translation>
     </message>
     <message>
         <source>If set to prompt, a menu will be displayed when you exit playback mode.  The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno na &quot;zeptat se&quot;, bude zobrazeno menu pokud ukončujete přehrávání.  Možnosti kterou jsou k dispozici: uložit pozici, vymazat nahrávku nebo pokračovat v přehrávání.</translation>
     </message>
     <message>
         <source>Prompt at end of recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zeptat se na konci nahrávání</translation>
     </message>
     <message>
         <source>Jump to Program OSD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skočit do programového OSD</translation>
     </message>
     <message>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nastavuje výběr mezi zobrazením aktuální nahrávací skupiny v OSD nebo zobrazení obrazovky &quot;Nahrané pořady&quot; když se aktivuje &quot;Skočit na program&quot;. Pokud nastaveno, nahrávky jsou zobrazeny v OSD</translation>
     </message>
     <message>
         <source>If set, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, jsou nahrávky z jejichž přehrávání vyskočíte blízko konci, označeny jako &quot;přehráno&quot;. Automatická detekce není bezchybná, takže toto neaktivujte pokud nechcete aby nepřehrané nahrávky byly označeny jako přehrané.</translation>
     </message>
     <message>
         <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV bude používat tento posun pro vytvoření náhledového obrázku tolik vteřin od začátku nahrávání. Pokud toto posunutí není v bloku k odstranění nebo označeném reklamním bloku.</translation>
     </message>
     <message>
         <source>Generate preview image from a bookmark if possible</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Generovat náhledový obrázek ze záložky pokud je k dispozici</translation>
     </message>
     <message>
         <source>If enabled, MythTV will ignore the above time offset, and use the bookmark inside the recording as the offset for creating a thumbnail image. As with the above, MythTV will honour cutlists and increase this offset if necessary.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, MythTV bude ignorovat výše uvedený časový posun, a využije záložky uvnitř nahrávky jako posun pro generaci náhledového obrázku. Tak jako výše, MythTV bude ctít části k odstranění a zvětší tento posun pokud bude potřeba.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, náhled nahrávky bude přehráván v malém okně menu &quot;Nahrané pořady&quot;.</translation>
     </message>
     <message>
         <source>Use Transparent Boxes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Použít transparentní rámeček</translation>
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, obrazovky &quot;Nahrané pořady&quot; a &quot;Smazat nahrávky&quot; použijí transparentnost. Vypněte, pokud výběr nahrávky je pomalý kvůli vysokému zatížení CPU.</translation>
     </message>
     <message>
         <source>Popup Background Shading Method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metoda stínování pozadí vyskakujících oken</translation>
     </message>
     <message>
         <source>Use line edit virtual keyboards</source>
@@ -8424,19 +8434,19 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přeplánovat vyšší priority</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přesune ppořady s vyšší prioritou na jiné karty a zobrazí informaci o řešení konfliktů.  Toto může být použito pro nahrání pořadů s nižší prioritou, které by se jinak nanahrály. Riskujete ale promeškání pořadů s vyšší prioritou pokud dojde k časové změně v programu.</translation>
     </message>
     <message>
         <source>Avoid back to back recordings from different channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyhnout se navazujícím nahrávkám z různých stanic</translation>
     </message>
     <message>
         <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, plánovač se vyhne přiřazení pořadů z různých stanic na stejnou kartu pokud je jejich čas konce a žačátku stejný. Toto bude povoleno pouze v případě potřeby pro řešení konfliktů.</translation>
     </message>
     <message>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
@@ -8444,15 +8454,15 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavte na &quot;0&quot; pokud nepředpokládáte že většina pořadů nebude souhlasit s Vaším TV programem. Toto nastavuje dřívější nebo pozdější start nahrávání když jsou vytvářena pravidla. Toto může být upraveno pro každé pravidlo.</translation>
     </message>
     <message>
         <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Výchozí počet minut pro &quot;pozdější konec&quot; nahrávání pro nová pravidla nahrávání</translation>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavte na &quot;0&quot; pokud nepředpokládáte že většina pořadů nebude souhlasit s Vaším TV programem. Toto nastavuje dřívější nebo pozdější ukončení nahrávání když jsou vytvářena pravidla. Toto může být upraveno pro každé pravidlo.</translation>
     </message>
     <message>
         <source>Complex Prioritization</source>
@@ -8468,7 +8478,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dodatečná priorita když pořad souhlasí s preferovaným vstupem nastaveným v sekci &quot;možnosti plánování&quot; nahrávacího pravidla.</translation>
     </message>
     <message>
         <source>HDTV Recording Priority</source>
@@ -8476,39 +8486,39 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dodatečná priorita když je pořad označen jako HDTV vysílání v TV programu.</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorita jednotlivého nahrávání</translation>
     </message>
     <message>
         <source>Single Recordings will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jednotlivé nahrávání získá tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>Weekslot Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorita týdenního pravidelné nahrávání </translation>
     </message>
     <message>
         <source>Weekslot Recordings will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pravidelné týdenní nahrávání získá tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>Timeslot Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pravidelné časové nahrávání</translation>
     </message>
     <message>
         <source>Timeslot Recordings will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pravidelné časové nahrávání získá tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>Channel Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorita nahrávání na stanici</translation>
     </message>
     <message>
         <source>Channel Recordings will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrávání na konkrétní stanici získají tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>All Recordings Priority</source>
@@ -8516,15 +8526,15 @@ name can not be blank.</source>
     </message>
     <message>
         <source>The &apos;All&apos; Recording type will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrávka typu &quot;Vše&quot; získá tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorita nahrávání &quot;Najdi jeden&quot;</translation>
     </message>
     <message>
         <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrávky typu &quot;Najdi jeden&quot;, &quot;Najdi týdně&quot; a &quot;Najdi denně&quot; získají  tuto dodatečnou hodnotu priority nahrávání. </translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
@@ -8560,7 +8570,8 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Recording Check Frequency</source>
-        <translation type="unfinished">Frekvence kontroly nahrávání</translation>
+        <translation type="unfinished">
+Frekvence kontroly nahrávání</translation>
     </message>
     <message>
         <source>This specifies how frequently (in seconds) to check if a recording is in progress in order to update the Xbox LED.</source>
@@ -8584,43 +8595,43 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zahrnout skupinu seznamu &quot;K přehrání&quot;</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seznam &quot;K přehrání&quot; je zkrácený seznam nahrávek tříděný k zvýraznění sérií a pořadů které potřebují pozornost k udržení aktuálnosti.</translation>
     </message>
     <message>
         <source>Start from the Watch List view</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Startovat seznamem &quot;K přehrání&quot;</translation>
     </message>
     <message>
         <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, seznam &quot;K přehrání&quot; bude výchozím zobrazením pokaždé když vstoupíte na obrazovku &quot;Nahrané pořady&quot;</translation>
     </message>
     <message>
         <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyřadit nahrávky nemající nastavenu automatickou expiraci</translation>
     </message>
     <message>
         <source>Set this if you turn off auto-expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavte pokud vypínáte automatickou expiraci pro nahrávky které jste viděl a chcete je zachovat. Tato volba vyjme takové nahrávky ze seznamu &quot;K přehrání&quot;.</translation>
     </message>
     <message>
         <source>Maximum days counted in the score</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální počet dní počítaných do skóre</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skóre seznamu &quot;K přehrání je založeno na bodech odpovídajících 1 bodu za každý den od nahrávání. Tato možnost limituje maximální skóre podle věku a ovlivňuje ostatní váhové faktory.  </translation>
     </message>
     <message>
         <source>Days to exclude weekly episodes after delete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Počed dní pro vynechání epizod po smazání</translation>
     </message>
     <message>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Když je epizoda smazána nebo označena jako přehraná, ostatní epizody série jsou vynechány ze seznamu &quot;K přehrání&quot; pro tento časový interval. Denní pořady také mají menší interval založený na tomto nastavení.</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
@@ -8676,15 +8687,15 @@ name can not be blank.</source>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nastavení povolí poskytovateli služby DataDirect specifikovat příští čas stahování informací pro rozložení zátěže na jejich serverech. Pokud je toto nastavení povoleno, spouštěcí a ukončovací pro mythfilldatabase jsou ignorovány.</translation>
     </message>
     <message>
         <source>LCD Key order</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pořadí kláves LCD</translation>
     </message>
     <message>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zadejte 6 návratových kódů klávesnice pro Vaši LCD klávesnici. (funkční tlačítka) v pořadí v jakém chcete přiřadit funkce nahoru/dolů/vlevo/vpravo/ano/ne. (podívejte se na lcdproc/server/drivers/hd44780.c/keyMapMatrix[] nebo do matice Vašeho displaye.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -8740,15 +8751,15 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Video in the dock</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video v dokované ikoně</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, video bude zobrazeno v dokované ikoně aplikace. Pouze validní, pokud &quot;Použít velikost GUI pro přehrávání&quot; a &quot;Spustit frontend v okně&quot; jsou povoleny.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video v dokovací ikoně přeskočí toto množství snímků na každý zobrazený. nastavte na 0 pro zobrazení všech snímků.</translation>
     </message>
     <message>
         <source>Video on the desktop</source>
@@ -9170,7 +9181,7 @@ MythTV se nyní ukončí.</translation>
     </message>
     <message>
         <source>Backend Idle Before EIT Crawl (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Délka nečinnosti backendu před načítáním EIT (vteřin)</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
@@ -9378,7 +9389,7 @@ MythTV se nyní ukončí.</translation>
     </message>
     <message>
         <source>EIT Scanner Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Možnosti scaneru EIT (EPG)</translation>
     </message>
     <message>
         <source>Backend Wakeup settings</source>
@@ -9518,19 +9529,19 @@ MythTV se nyní ukončí.</translation>
     </message>
     <message>
         <source>Greedy HighMotion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Greedy HighMotion</translation>
     </message>
     <message>
         <source>Greedy HighMotion (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Greedy HighMotion (2x)</translation>
     </message>
     <message>
         <source>Yadif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yadif</translation>
     </message>
     <message>
         <source>Yadif (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yadif (2x)</translation>
     </message>
     <message>
         <source>Required fields are marked with an asterisk (*).</source>
@@ -9590,157 +9601,159 @@ MythTV se nyní ukončí.</translation>
     </message>
     <message>
         <source>the recorder failed to record.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrávání selhalo.</translation>
     </message>
     <message>
         <source>this recording rule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto nahrávací pravidlo je neaktivní.</translation>
     </message>
     <message>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto pravidlo neodpovídá žádným programům v současném TV programu.</translation>
     </message>
     <message>
         <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tato epizoda bude nahrána na jiném programu během tohoto časového okna.</translation>
     </message>
     <message>
         <source>Audio for Hearing Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zvuk pro sluchově postižené</translation>
     </message>
     <message>
         <source>Audio for Visually Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zvuk pro zrakově postižené</translation>
     </message>
     <message>
         <source>AVC/H.264</source>
-        <translation type="unfinished"></translation>
+        <translation>AVC/H.264</translation>
     </message>
     <message>
         <source>Recorded File Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jméno souboru nahrávky</translation>
     </message>
     <message>
         <source>Frequency (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frekvence (%1)</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frekvence (není výchozí hodnota).
+Frekvence pro tuto stanici v %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
 Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Symbolová rychlost (symbolů/sec).
+Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za sekundu.</translation>
     </message>
     <message>
         <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTv chce začít nahrávat tyto program za %d vteřin:</translation>
     </message>
     <message>
         <source>&quot;%1&quot; on %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&quot;%1&quot; na %2</translation>
     </message>
     <message>
         <source>Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chcete provést:</translation>
     </message>
     <message>
         <source>On known multiplex...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Na známém multiplexu...</translation>
     </message>
     <message>
         <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazovač pro Windows založený na překrývání. Není kompatibilní s Vista Aero Glass.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazovač pro Windows založený na Direct3D. Vyžaduje video kartu kompatibilní s Direct3D 9. Toto je preferovaný zobrazovač pro současné systémy Windows.</translation>
     </message>
     <message>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tento deinterlacer vyžaduje aby byl display schopen zobrazit dvojnásobný počet snímků než obsahuje zdroj obrazu.</translation>
     </message>
     <message>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zobrazuje jeden půlsnímek následovaný dalším vertikálně posunutým.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Při použití tohoto odstraňovače prokládání se používá několik políček pro odstranění rozmazání při pohybu. Zvyšuje to nároky na CPU.</translation>
     </message>
     <message>
         <source>Max recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální počet nahrávání</translation>
     </message>
     <message>
         <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální počet nahrávek, které je schopné zařízení zaznamenat. Některé digitální vysílače vysílají více programů na jednom multiplexu. Pokud je toto nastaveno na hodnotu větší než jedna, MythTV z toho v některých případech může profitovat.</translation>
     </message>
     <message>
         <source>DVB Device Number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Číslo zařízení DVB</translation>
     </message>
     <message>
         <source>Warning: already in use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Varování: již se používá</translation>
     </message>
     <message>
         <source>Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skupina vstupů</translation>
     </message>
     <message>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ponechte jako &quot;Generic&quot; pokud tento vstup není sdílen s dalším zařízením. Nahrávání bude povoleno v daný čas pouze jednomu vstupu ve skupině vstupů. </translation>
     </message>
     <message>
         <source>Interactions between inputs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vztah mezi vstupy</translation>
     </message>
     <message>
         <source>Create a New Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vytvořit novou skupinu vstupů</translation>
     </message>
     <message>
         <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skupiny vstupů jsou potřeba pouze pokud dvě nebo více karet sdílí stejné zdroje jako FireWire kartu a analogový vstup ovládá stejný set top box.</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vyvarovat se konfliktům mezi živou TV a naplánovanými pořady</translation>
     </message>
     <message>
         <source>Allow live TV to move scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit živé TV přesun naplánovaných pořadů</translation>
     </message>
     <message>
         <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, naplánovaná nahrávání budou přesunuta na jiné karty (pokud je to možné), takže živá TV nebude přerušena.</translation>
     </message>
     <message>
         <source>Use new media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reagovat na nové médium</translation>
     </message>
     <message>
         <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto umožní MythTv k přepnutí do příslušného pluginu, pokud je vloženo nové médium.</translation>
     </message>
     <message>
         <source>MythMediaMonitor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythMediaMonitor</translation>
     </message>
     <message>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tato nahrávka ještě není k dispozici.</translation>
     </message>
     <message>
         <source>Move to Default group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přesunout do Výchozí skupiny</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obnovit</translation>
     </message>
     <message>
         <source>Tuner %1 is recording:
@@ -9754,23 +9767,23 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Use DVB Card for active EIT scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Používat DVB kartu pro aktivní vyhledávíní EIT </translation>
     </message>
     <message>
         <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tato možnost aktivuje aktivní vyhledávání programových dat (EIT). Pokud se tato volba aktivuje, DVB karta je stále využívána.</translation>
     </message>
     <message>
         <source>Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pouze živá TV</translation>
     </message>
     <message>
         <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, MythTV bude ladit pouze s použitím programového čísla MPEG. Programová čísla se mění častěji než DVB nebo ATSC ladící parametry, takže to může být méně použitelné. Toto taktéž zabrání načítání programových dat během Živé a nahrávání.</translation>
     </message>
     <message>
         <source>Max Audio Channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max zvukových kanálů</translation>
     </message>
     <message>
         <source>5.1</source>
@@ -9778,207 +9791,241 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nastavit maximální počet kanálů k dekódování. Toto je pro přehrávání vícekanálového, prostorového zvuku.</translation>
     </message>
     <message>
         <source>Upmix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">UpMix</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pasivní</translation>
     </message>
     <message>
         <source>Active Simple</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktivní jednoduchý</translation>
     </message>
     <message>
         <source>Active Linear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktivní lineární</translation>
     </message>
     <message>
         <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Nastavit typ přepočítávání zvuku z dvoukanálového na šestikanálový. Toto je pro přehrávání vícekanálového, prostorového zvuku.</translation>
     </message>
     <message>
         <source>Extra Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rezervace diskového prostoru</translation>
     </message>
     <message>
         <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rezervované místo (v GB), které chcete zachovat volné na nahrávacím souborovém systému mimo požadavky MythTV.</translation>
     </message>
     <message>
         <source>Deleted Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maximální životnost smazaných</translation>
     </message>
     <message>
         <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno na hodnotu větší než 0, AutoExpirace vynutí expiraci Smazaných nahrávek pokud jsou v tomto stavu tolik dní.</translation>
     </message>
     <message>
         <source>Expire in deleted order</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Expirovat v smazávaném pořadí</translation>
     </message>
     <message>
         <source>Expire Deleted recordings in the order which they were originally deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nastavit expiraci Smazaných nahrávek v pořadí, v jakém byly originálně smazány.</translation>
     </message>
     <message>
         <source>DeletedExpireOptions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Možnosti expirace smazaných nahrávek</translation>
     </message>
     <message>
         <source>Watched before UNwatched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přehrané před nepřehranými</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud nastaveno, nahrávky označené jako přehrané, expirují dříve než nahrávky které přehrány nebyly.</translation>
     </message>
     <message>
         <source>Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Váha priority</translation>
     </message>
     <message>
         <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, jakákoli nová plánovaná nahrávka bude označena jako dostupná pro AutoExpiraci. Existující naplánované nahrávky si zachovají stávající hodnotu.</translation>
     </message>
     <message>
         <source>LiveTV Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Životnost živé TV</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AutoExpire si vynutí expiraci nahrávek ŽivéTV kdy jsou tolik dní staré. Nahrávky živéTV by měly expirovat brzy pokud je potřeba uvolnit místo na disku.</translation>
     </message>
     <message>
         <source>Re-record Watched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znovu nahrát přehrané</translation>
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pro specifické kategorie (např. &quot;Sportovní události&quot;), požadovat aby byl záznam automaticky prodloužen. Toto funguje pouze za předpokladu že kategorie může být zjištěna.</translation>
     </message>
     <message>
         <source>Length of time an on-screen display window will be visible.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Délka zobrazení okna OSD</translation>
     </message>
     <message>
         <source>Length of time the on-screen display will display program information.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Délka zobrazení OSD s informací o programu.</translation>
     </message>
     <message>
         <source>Use this to enlarge or shrink captions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto použijte pro zvětšení nebo zmenšení titulků.</translation>
     </message>
     <message>
         <source>ATSC Caption Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nastavení titulků ATSC</translation>
     </message>
     <message>
         <source>ATSC %1 closed caption font.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Font ATSC skrytých titulků %1.</translation>
     </message>
     <message>
         <source>ATSC Caption Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fonty titulků ATSC</translation>
     </message>
     <message>
         <source>Monospaced Serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serif (stejná rozteč)</translation>
     </message>
     <message>
         <source>Proportional Serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Serif (proporcionální)</translation>
     </message>
     <message>
         <source>Monospaced Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sans Serif (stejná rozteč)</translation>
     </message>
     <message>
         <source>Proportional Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sans Serif (proporcionální)</translation>
     </message>
     <message>
         <source>Regular Font</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obvyklý font</translation>
     </message>
     <message>
         <source>Italic Font</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Italic font</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Italic</translation>
     </message>
     <message>
         <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Preferovat titulky EIA-708 místo EIA-608</translation>
     </message>
     <message>
         <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, nové titulky EIA-708 budou preferovány oproti starším EIA-608 v ATSC datech.</translation>
     </message>
     <message>
         <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto je výchozí, ale na začátku roku 2008 většina stanic nevysílá využitelné titulky EIA-708.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokud povoleno, MythTV zobrazí varování pokud nemůže přistoupit na zvukovou kartu.</translation>
     </message>
     <message>
         <source>Continue Playback When Embedded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokračovat v přehrávání pokud je vložen</translation>
     </message>
     <message>
         <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto volba povoluje pokračovat v přehrávání když je televizní okno zařazené do seznamu následujících programů nebo seznamu nahrávek. Výchozí je pozastavit nahraný program.</translation>
     </message>
     <message>
         <source>Automatically mark a recording as watched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Automaticky označovat nahrávky jako přehrané</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poměr stran obrazovky Xinerama nemůže být zjištěn automaticky, musí se zadat manuálně.</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Horizontální velikost monitoru nebo TV. Využívá se k vypočítání poměru stran obrazovky. Toto potlačí DisplaySize načítanou ze systému.</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vertikální velikost monitoru nebo TV. Využívá se k vypočítání poměru stran obrazovky. Toto potlačí DisplaySize načítanou ze systému.</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schovat kurzor myši v MythTV</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přepíná viditelnost kurzoru myši. Většina MythTV GUI nereaguje na kliknutí myší. Použíjte tuto možnost pro zabránění &quot;ztracení&quot; kurzoru vaší myši. </translation>
     </message>
     <message>
         <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toto vybírá metodu vykreslování pro MythTV.  Pokud máte odpovídající hardware použijte OpenGL. Změna tohoto vyžaduje restart.</translation>
     </message>
     <message>
         <source>Ignore LiveTV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ignorovat nahrávky LiveTV</translation>
     </message>
     <message>
         <source>Recording monitoring will ignore LiveTV recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Monitorování nahrávání bude ignorovat nahrávky pořízené při sledování ŽivéTV. </translation>
     </message>
     <message>
         <source>UDP OSD Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Upozornění UDP OSD</translation>
     </message>
     <message>
         <source>Analog Closed Captions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skryté titulky - analog</translation>
+    </message>
+    <message>
+        <source>CPU++</source>
+        <comment>Sample: No hardware assist</comment>
+        <translation type="unfinished">CPU++ (bez HW akcelerace)</translation>
+    </message>
+    <message>
+        <source>CPU+</source>
+        <comment>Sample: Hardware assist HD only</comment>
+        <translation type="unfinished">CPU+ (Akcelerace pouze HD)</translation>
+    </message>
+    <message>
+        <source>CPU--</source>
+        <comment>Sample: Hardware assist all</comment>
+        <translation type="unfinished">CPU- (Hardware akceleruje vše)</translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <comment>Sample: high quality</comment>
+        <translation type="unfinished">Vysoká kvalita</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <comment>Sample: average quality</comment>
+        <translation type="unfinished">Průměrná kvalita</translation>
+    </message>
+    <message>
+        <source>Slim</source>
+        <comment>Sample: low CPU usage</comment>
+        <translation type="unfinished">Nízké zatížení CPU</translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback. &apos;Passive&apos; is the least demanding on the CPU. &apos;Active Simple&apos; is more demanding and &apos;Active Linear&apos; is the most demanding (but highest quality).</source>
+        <translation type="unfinished">Nastavte type přepočítávání zvuku ze dvou na šest kanálů. Toto je pro vícekanálové přehrávání zvuku.&quot;Pasivní&quot; nejméně zatěžuje CPU. &quot;Aktivní jednoduché&quot; je náročnější, &quot;Aktivní lineární&quot; je nejnáročnější ale nabízí nejvyšší kvalitu.</translation>
     </message>
 </context>
 <context>
@@ -10282,7 +10329,7 @@ No other details</source>
     </message>
     <message>
         <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="unfinished">%1 nahrávek zabírající %2 mají povolenu AutoExpiraci</translation>
+        <translation type="unfinished">%1 nahrávek zabírající %2 má povolenu AutoExpiraci</translation>
     </message>
     <message>
         <source>LiveTV</source>
@@ -10310,19 +10357,19 @@ No other details</source>
     </message>
     <message>
         <source>marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">označeno jako HDTV</translation>
     </message>
     <message>
         <source>from source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ze zdroje</translation>
     </message>
     <message>
         <source>on input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">na vstupu</translation>
     </message>
     <message>
         <source>%1 of these are Deleted and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 z těchto je smazáno a zabírají %2</translation>
     </message>
 </context>
 <context>
@@ -11056,23 +11103,23 @@ Vyber stávající nahrávání</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTv chce nahrávat &quot;%1&quot; na %2 za %d sekund. Chcete:</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Povolit nahrávání a vrátit se zpět do Hlavního menu</translation>
     </message>
     <message>
         <source>Record it later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrát později, chci se dívat na živou TV</translation>
     </message>
     <message>
         <source>Record them later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nahrát je později, chci se dívat na živou TV</translation>
     </message>
     <message>
         <source>Don&apos;t let them record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nepovolit nahrávání, chci se dívat na živou TV</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
@@ -11080,25 +11127,33 @@ Vyber stávající nahrávání</translation>
     </message>
     <message>
         <source>Switch Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přepnout vstup</translation>
     </message>
     <message>
         <source>C</source>
         <comment>Card</comment>
-        <translation type="unfinished">C</translation>
+        <translation type="unfinished">K</translation>
     </message>
     <message>
         <source>I</source>
         <comment>Input</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">V</translation>
     </message>
     <message>
         <source>Switch Source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přepnout zdroj</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aktuální nahrávání</translation>
+    </message>
+    <message>
+        <source>MythTV is using all inputs for Live TV?</source>
+        <translation type="unfinished">MythTV používá všechny vstupy pro živou TV?</translation>
+    </message>
+    <message>
+        <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
+        <translation type="unfinished">Nejsou definovány žádné zachytávací karty. Spusťte prosím program mythtv-setup.</translation>
     </message>
 </context>
 <context>
@@ -11597,7 +11652,7 @@ Vyber stávající nahrávání</translation>
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished">k</translation>
+        <translation type="unfinished">až </translation>
     </message>
 </context>
 </TS>
