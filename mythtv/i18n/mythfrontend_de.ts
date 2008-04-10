@@ -116,11 +116,11 @@
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nein, nicht</translation>
+        <translation>Nein</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation>Sind Sie sicher, dass Sie alle TV-Karten löschen wollen?</translation>
+        <translation>Sind Sie sicher, dass Sie ALLE Aufnahmekarten löschen wollen?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
@@ -136,7 +136,7 @@
     </message>
     <message>
         <source>Unable to delete capturecards for %1</source>
-        <translation>Kann TV-Karten auf %1 nicht löschen</translation>
+        <translation>Kann Aufnahmekarten auf %1 nicht löschen</translation>
     </message>
 </context>
 <context>
@@ -171,11 +171,11 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingangsgruppe anlegen</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Neuer Gruppenname</translation>
     </message>
     <message>
         <source>Error</source>
@@ -183,11 +183,11 @@
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Name darf nicht leer sein!</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Name wird bereits verwendet.</translation>
     </message>
 </context>
 <context>
@@ -201,7 +201,7 @@
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
-        <translation type="unfinished">Sender</translation>
+        <translation>Sender</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
@@ -788,7 +788,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     <name>DeviceTree</name>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation>Der kartesische Breitengrad für Ihr Standort</translation>
+        <translation>Der kartesische Breitengrad für Ihren Standort</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
@@ -828,8 +828,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
-        <translation>Select the type of switch from the list.
-Wählen sie den Switch-Typen fon dieser Liste.</translation>
+        <translation>Wählen Sie den Switch-Typen von dieser Liste.</translation>
     </message>
     <message>
         <source>Tone</source>
@@ -845,15 +844,15 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     </message>
     <message>
         <source>Legacy SW21</source>
-        <translation>Altlast SW21</translation>
+        <translation>SW21 (Veraltet)</translation>
     </message>
     <message>
         <source>Legacy SW42</source>
-        <translation>Altlast SW42</translation>
+        <translation>SW42 (Veraltet)</translation>
     </message>
     <message>
         <source>Legacy SW64</source>
-        <translation>Altlast SW64</translation>
+        <translation>SW64 (Veraltet)</translation>
     </message>
     <message>
         <source>Number of ports</source>
@@ -861,7 +860,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     </message>
     <message>
         <source>The number of ports this switch has.</source>
-        <translation>Anzahl der Ports die dieser Switch hat.</translation>
+        <translation>Anzahl der Ports, die dieser Switch hat.</translation>
     </message>
     <message>
         <source>Switch Configuration</source>
@@ -885,7 +884,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
-        <translation>Rotor niedrige Geschwindigkeit (deg/sek)</translation>
+        <translation>Rotor niedrige Geschwindigkeit (grad/sek)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
@@ -893,7 +892,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
-        <translation>Hohe Rotorgeschwindigkeit (deg/sek)</translation>
+        <translation>Hohe Rotorgeschwindigkeit (grad/sek)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
@@ -907,7 +906,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     <message>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <source>Position Index %1</source>
@@ -1251,7 +1250,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation>Datum oder Tag der Woche</translation>
+        <translation>Datum oder Wochentag</translation>
     </message>
     <message>
         <source>minute</source>
@@ -1286,7 +1285,7 @@ Wählen sie den Switch-Typen fon dieser Liste.</translation>
     <name>MediaMonitor</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Select removable media to eject or insert</source>
@@ -1370,7 +1369,7 @@ Please shut them down before upgrading.</source>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV konnte die Datenbank nicht sichern.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
@@ -1514,7 +1513,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
-        <translation type="obsolete">Wiedergabe beendet von:</translation>
+        <translation type="obsolete">Sie haben gesehen:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
@@ -1522,7 +1521,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
-        <translation>Nein. Ich habe meine Meinung geändert.</translation>
+        <translation>Nein</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
@@ -1566,7 +1565,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Status Icons</source>
-        <translation>Statusbilder</translation>
+        <translation>Statussymbole</translation>
     </message>
     <message>
         <source>Commercials are flagged</source>
@@ -1666,7 +1665,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Yes, and allow re-record</source>
-        <translation>Ja, erneutes Aufnehmen möglich</translation>
+        <translation>Ja, erneutes Aufnehmen aktivieren</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -1902,19 +1901,19 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Recording has been transcoded</source>
-        <translation>Aufnahme wurde umgewandelt</translation>
+        <translation>Umgewandelt</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation>Aufnahme hat Stereo-Ton</translation>
+        <translation>Stereo-Ton</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
-        <translation>Aufnahme ist HDTV (High Definition)</translation>
+        <translation>HDTV (High Definition)</translation>
     </message>
     <message>
         <source>Recording is Closed Captioned</source>
-        <translation>Aufnahme hat Untertitel</translation>
+        <translation>Untertitel</translation>
     </message>
     <message>
         <source>Autodetect</source>
@@ -1994,7 +1993,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Help (Status Icons)</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolerkl�rung</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
@@ -4472,7 +4471,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation>Interlaced motion estimation</translation>
+        <translation>Zeilensprungbewegungsvorhersage</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
@@ -11586,7 +11585,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Adjust Volume</source>
-        <translation>Lautstärke</translation>
+        <translation>Lautstärke anpassen</translation>
     </message>
     <message>
         <source>Mute On</source>
@@ -11746,7 +11745,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Sleep </source>
-        <translation>Schlaf</translation>
+        <translation>Abschalttimer</translation>
     </message>
     <message>
         <source>16:9 Stretch</source>
@@ -12310,23 +12309,23 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV wird &quot;%1&quot; auf %2 in %d Sekunden aufnehmen. Was m�chten Sie tun?</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnehmen und ins Hauptmen� springen</translation>
     </message>
     <message>
         <source>Record it later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Sp�ter aufnehmen, Ich m�chte fernsehen</translation>
     </message>
     <message>
         <source>Record them later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Sp�ter aufnehmen, Ich m�chte fernsehen</translation>
     </message>
     <message>
         <source>Don&apos;t let them record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Sp�ter aufnehmen, Ich m�chte fernsehen</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
@@ -12342,7 +12341,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>Switch Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingang wechseln</translation>
     </message>
     <message>
         <source>C</source>
@@ -12356,7 +12355,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>Switch Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelle wechseln</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
@@ -12578,7 +12577,7 @@ Wählen Sie eine laufende Aufnahme.
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation>Neuer Transport</translation>
+        <translation>Neuer Transponder</translation>
     </message>
 </context>
 <context>
@@ -12761,7 +12760,7 @@ Wählen Sie eine laufende Aufnahme.
     <name>WelcomeDialog</name>
     <message>
         <source>Start Frontend</source>
-        <translation>Frontend starten</translation>
+        <translation>Hauptmen� anzeigen</translation>
     </message>
     <message>
         <source>Cannot connect to server!</source>
@@ -12791,7 +12790,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>MythTV is about to start recording.</source>
-        <translation>MythTV wird bald eine Aufnahme starten.</translation>
+        <translation>MythTV wird gleich eine Aufnahme starten.</translation>
     </message>
     <message>
         <source>MythTV is busy recording.</source>
@@ -12827,15 +12826,15 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>Menu</source>
-        <translation>Menu</translation>
+        <translation>Men�</translation>
     </message>
     <message>
         <source>Unlock Shutdown</source>
-        <translation>Runterfahren erlauben</translation>
+        <translation>Ausschalten erlauben</translation>
     </message>
     <message>
         <source>Lock Shutdown</source>
-        <translation>Runterfahren verhindern</translation>
+        <translation>Ausschalten verhindern</translation>
     </message>
     <message>
         <source>Run mythfilldatabase</source>
@@ -12843,7 +12842,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>Shutdown Now</source>
-        <translation>Jetzt herunterfahren</translation>
+        <translation>Jetzt ausschalten</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -12859,7 +12858,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start recording</source>
-        <translation>Kein Herunterfahren möglich, da MythTV bald eine Aufnahme beginnt.</translation>
+        <translation>Kein Herunterfahren möglich, da MythTV gleich eine Aufnahme beginnt.</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
@@ -12871,11 +12870,11 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>bis</translation>
     </message>
     <message>
         <source>MythTV has running or pending jobs.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV hat anstehende Aufgaben.</translation>
     </message>
 </context>
 <context>
@@ -12890,3 +12889,4 @@ Wählen Sie eine laufende Aufnahme.
     </message>
 </context>
 </TS>
+
