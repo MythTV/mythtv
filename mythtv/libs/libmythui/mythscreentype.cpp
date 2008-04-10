@@ -224,4 +224,3 @@ void MythScreenType::CreateCopy(MythUIType *)
 {
     VERBOSE(VB_IMPORTANT, "CreateCopy called on screentype - bad.");
 }
-

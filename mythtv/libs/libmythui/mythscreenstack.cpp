@@ -68,7 +68,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     qApp->unlock();
 }
 
-void MythScreenStack::PopScreen(bool allowFade)
+void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
 {
     if (m_Children.isEmpty())
         return;
@@ -86,14 +86,19 @@ void MythScreenStack::PopScreen(bool allowFade)
     if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
     {
         top->SetFullscreen(false);
-        top->SetDeleting(true);
-        m_ToDelete.push_back(top);
+        if (deleteScreen)
+        {
+            top->SetDeleting(true);
+            m_ToDelete.push_back(top);
+        }
         top->AdjustAlpha(1, -kFadeVal);
     }
     else
     {
         m_Children.pop_back();
-        delete top;
+        if (deleteScreen)
+            delete top;
+
         top = NULL;
 
         mainwindow->update();

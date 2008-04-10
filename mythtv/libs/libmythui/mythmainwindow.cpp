@@ -440,6 +440,12 @@ void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
         d->mainStack = stack;
 }
 
+void MythMainWindow::PopScreenStack()
+{
+    delete d->stackList.back();
+    d->stackList.pop_back();
+}
+
 MythScreenStack *MythMainWindow::GetMainStack(void)
 {
     return d->mainStack;

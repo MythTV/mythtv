@@ -58,6 +58,7 @@ class MythMainWindow : public QWidget
     void Show(void);
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
+    void PopScreenStack();
     MythScreenStack *GetMainStack();
     MythScreenStack *GetStack(const QString &stackname);
 
