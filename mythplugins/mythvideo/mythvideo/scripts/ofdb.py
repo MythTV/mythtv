@@ -23,7 +23,13 @@ import cgi
 import traceback
 import codecs
 from optparse import OptionParser
-from xml.dom.ext.reader import HtmlLib
+
+# This is done for Ubuntu, they are removing PyXML.
+try:
+	from xml.dom.ext.reader import HtmlLib
+except ImportError:
+	sys.path.append('/usr/lib/python%s/site-packages/oldxml' % sys.version[:3])
+	from xml.dom.ext.reader import HtmlLib
 from xml.dom import EMPTY_NAMESPACE
 from xml import xpath
 
