@@ -656,7 +656,7 @@ if ($makeclean) {
 foreach my $comp( @components ) {
   push @{$expect}, 
   [ file => 'always',
-    exec => ["$dosmsys\\bin\svn.exe -r $SVNRELEASE update $dosmythtv$comp",
+    exec => ["$dosmsys\\bin\\svn.exe -r $SVNRELEASE update $dosmythtv$comp",
              'nocheck'],
     comment => "Getting SVN updates for:$comp on $svnlocation" ];
 }
