@@ -1,4 +1,5 @@
 <!DOCTYPE TS><TS>
+<defaultcodec></defaultcodec>
 <context>
     <name>@default</name>
     <message>
@@ -66,19 +67,19 @@
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een standaard Myth Backend Server</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Configure Manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Handmatig instellen</translation>
     </message>
 </context>
 <context>
@@ -171,37 +172,37 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak ingangsgroep</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer nieuwe groepsnaam in</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>fout</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorry. deze ingangsgroep mag niet leeg zijn.</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorry, deze ingangsgroep is al in gebruik.</translation>
     </message>
 </context>
 <context>
     <name>CardInputEditor</name>
     <message>
         <source>Input connections</source>
-        <translation type="unfinished">Ingang verbindingen</translation>
+        <translation>Ingang verbindingen</translation>
     </message>
 </context>
 <context>
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
-        <translation type="unfinished">Zenders</translation>
+        <translation>Zenders</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
@@ -245,35 +246,35 @@
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bent u zeker van het verwijderen van ALLE zenders?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bent u zeker van het verwijderen van ALLE niet toegewezen zenders?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bent u zeker van het verwijderen van ALLE zenders op %1?</translation>
     </message>
     <message>
         <source>Add some for channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg eerst voor zenders toe!</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Download all icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>Download alle iconen..</translation>
     </message>
     <message>
         <source>Rescan for missing icons..</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnieuw zoeken naar ontbrekende iconen..</translation>
     </message>
     <message>
         <source>Download icon for </source>
-        <translation type="unfinished"></translation>
+        <translation>Download icoon voor </translation>
     </message>
 </context>
 <context>
@@ -476,27 +477,27 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>stored search</source>
-        <translation type="unfinished"></translation>
+        <translation>Opgeslagen zoekopdracht</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg toe</translation>
     </message>
     <message>
         <source>Match this series</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek deze series</translation>
     </message>
     <message>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken naar woorden in de afleveringstitel</translation>
     </message>
     <message>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel uitzendingen in breedbeeld</translation>
     </message>
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation>H.264 gecodeerde &apos;stromen&apos; uitsluiten</translation>
     </message>
 </context>
 <context>
@@ -597,11 +598,11 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     <name>DVBUtilsImportPane</name>
     <message>
         <source>File location</source>
-        <translation type="unfinished">Bestandslocatie</translation>
+        <translation>Bestandslocatie</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation type="unfinished">Locatie van het channels.conf bestand.</translation>
+        <translation>Locatie van het channels.conf bestand.</translation>
     </message>
 </context>
 <context>
@@ -753,7 +754,7 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation type="unfinished">Rotor Positie Map</translation>
+        <translation>Rotor Positie Map</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
@@ -861,7 +862,7 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished">DiSEqC Apparaat Boom</translation>
+        <translation>DiSEqC Apparaat Boom</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
@@ -885,19 +886,19 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>Repeat Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal herhalingen</translation>
     </message>
     <message>
         <source>Number of times to repeat DiSEqC commands sent to this device. Larger values may help with less reliable devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal keren dat DiSEqC commandos naar dit apparaat verstuurd moeten worden. Een groot getal kan helpen bij minder betrouwbare apparaten.</translation>
     </message>
     <message>
         <source>LNB Reversed</source>
-        <translation type="unfinished"></translation>
+        <translation>Omgedraaid LNB signaal</translation>
     </message>
     <message>
         <source>This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit geeft aan of het signaal dat de LNB bereikt omgedraaid is ten opzichte van normale polarisatie. Dit komt voor bij circulaire signale die twee maal weerkaatsen op een toroidal schotel.</translation>
     </message>
     <message>
         <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
@@ -905,33 +906,33 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>Longitude (degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lengtegraad (graden)</translation>
     </message>
     <message>
         <source>Hemisphere</source>
-        <translation type="unfinished"></translation>
+        <translation>Halfrond</translation>
     </message>
     <message>
         <source>Eastern</source>
-        <translation type="unfinished"></translation>
+        <translation>Oost</translation>
     </message>
     <message>
         <source>Western</source>
-        <translation type="unfinished">Western</translation>
+        <translation>West</translation>
     </message>
 </context>
 <context>
     <name>FirewireDesc</name>
     <message>
         <source>Description</source>
-        <translation type="unfinished">Beschrijving</translation>
+        <translation>Beschrijving</translation>
     </message>
 </context>
 <context>
     <name>GuideGrid</name>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder regel &apos;%1&apos; %2?</translation>
     </message>
 </context>
 <context>
@@ -989,7 +990,7 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     <name>InputSelector</name>
     <message>
         <source>Input</source>
-        <translation type="unfinished">Ingang</translation>
+        <translation>Ingang</translation>
     </message>
 </context>
 <context>
@@ -1105,61 +1106,61 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>5 weekdays if daily</source>
-        <translation type="unfinished"></translation>
+        <translation>5 dagen per week indien dagelijks</translation>
     </message>
     <message>
         <source>7 days per week if daily</source>
-        <translation type="unfinished"></translation>
+        <translation>7 dagen per week indien dagelijks</translation>
     </message>
 </context>
 <context>
     <name>MediaMonitor</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Select removable media to eject or insert</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies verwijderbare media om te verwijdern of in te voeren</translation>
     </message>
     <message>
         <source>No devices to eject</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen apparaten om media te verwijderen</translation>
     </message>
     <message>
         <source>Failed to unmount %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Afkoppelen van %1 is mislukt</translation>
     </message>
     <message>
         <source>You may safely remove %1</source>
-        <translation type="unfinished"></translation>
+        <translation>U kunt %1 veilig verwijderen</translation>
     </message>
     <message>
         <source>Failed to eject %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Het verwijderen van %1 is mislukt</translation>
     </message>
     <message>
         <source>Select a CD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een CD speler</translation>
     </message>
     <message>
         <source>Select a VCD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een VCD speler</translation>
     </message>
     <message>
         <source>Select a DVD drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een DVD speler</translation>
     </message>
     <message>
         <source>Select a DVD writer</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een DVD brander</translation>
     </message>
 </context>
 <context>
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation type="unfinished">Transport</translation>
+        <translation>Transport</translation>
     </message>
 </context>
 <context>
@@ -1174,41 +1175,43 @@ WAARSCHUWING: Druk nu geen toets als u een Air2PC HD-5000 kaart gebruikt!!!! Dez
     </message>
     <message>
         <source>There are also other clients using this database. They should be shut down first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn ook andere clients die deze database gebruiken. Deze moeten eerst afgesloten worden.</translation>
     </message>
     <message>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout: MythTV kan het schema van deze database niet upgraden omdat andere clients er nog gebruik van maken.
+
+Sluit deze eerst af.</translation>
     </message>
     <message>
         <source>Warning: MythTV wants to upgrade your database schema, from %1 to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarschuwing: MythTV wil je database schema upgraden, van %1 naar %2.</translation>
     </message>
     <message>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>U kunt proberen om het oude schema te gebruiken, maar dit kan problemen veroorzaken.</translation>
     </message>
     <message>
         <source>Warning: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarschuwing: De MythTv database heeft een nieuwer schema (%1) dan verwacht (%2).</translation>
     </message>
     <message>
         <source>Error: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout: De MythTV database heeft een nieuwe schema (%1) dan verwacht (%2).</translation>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTv kon geen reservekopie van uw database maken.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er is een database reservekopie genaamd %1 geplaatst in %2 voor het geval uw systeem onstabiel wordt.</translation>
     </message>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit kan niet ongedaan gemaakt worden, dus het is een goed idee om een database reservekopie te hebben.</translation>
     </message>
 </context>
 <context>
@@ -1760,55 +1763,55 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Nog niet gezien</translation>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn geen opnames in de huidige weergave</translation>
     </message>
     <message>
         <source>There are no recordings available</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn geen opnames beschikbaar</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeer als Ongezien</translation>
     </message>
     <message>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeer als Gezien</translation>
     </message>
     <message>
         <source>Recording is preserved</source>
-        <translation type="unfinished"></translation>
+        <translation>De opname is bewaard</translation>
     </message>
     <message>
         <source>Show Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Titels weergeven</translation>
     </message>
     <message>
         <source>Show Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorieën weergeven</translation>
     </message>
     <message>
         <source>Show Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnamegroep weergeven</translation>
     </message>
     <message>
         <source>Show Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Nog niet gezien weergeven</translation>
     </message>
     <message>
         <source>Show Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoekopdrachten weergeven</translation>
     </message>
     <message>
         <source>Save Current View</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige weergave opslaan</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>_NO_TITLE_</source>
@@ -1816,126 +1819,126 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
     <message>
         <source>Help (Status Icons)</source>
-        <translation type="unfinished"></translation>
+        <translation>Help (Status iconen)</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder, en opnieuw opnemen toestaan</translation>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Het opnieuw opnemen van dit programma toestaan</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen ongedaan maken</translation>
     </message>
     <message>
         <source>Delete Forever</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorgoed verwijderen</translation>
     </message>
     <message>
         <source>Recording is in Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is in Mono</translation>
     </message>
     <message>
         <source>Recording is in Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is in Surround Sound</translation>
     </message>
     <message>
         <source>Recording is in Dolby Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is in Dolby Surround Sound</translation>
     </message>
     <message>
         <source>Recording has Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname heeft Ondertiteling beschikbaar</translation>
     </message>
     <message>
         <source>Recording is Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is ondertiteld</translation>
     </message>
     <message>
         <source>Recording is in WideScreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is in breedbeeld</translation>
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname is bekeken</translation>
     </message>
     <message>
         <source>Show LiveTV as a Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat LiveTV als een groep zien</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderd</translation>
     </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
     <message>
         <source>Match Criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Voldoe aan criterium</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>B</translation>
     </message>
     <message>
         <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation>H</translation>
     </message>
     <message>
         <source>Decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Decoder</translation>
     </message>
     <message>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation>Max CPUs</translation>
     </message>
     <message>
         <source>Video Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Video renderer</translation>
     </message>
     <message>
         <source>OSD Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD renderer</translation>
     </message>
     <message>
         <source>OSD Fade</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD fade</translation>
     </message>
     <message>
         <source>Primary Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Primaire deïnterlacer</translation>
     </message>
     <message>
         <source>Fallback Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Reserve deïnterlacer</translation>
     </message>
     <message>
         <source>Custom Filters</source>
-        <translation type="unfinished">Aangepaste filters</translation>
+        <translation>Aangepaste filters</translation>
     </message>
     <message>
         <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum aantal CPU cores dat gebruikt mag worden om de decoden.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Multithreaded decoden is niet beschikbaar-er wordt ‬maar één CPU gebruikt, hercompileer met --enable-ffmpeg-pthreads om dit beschikbaar te maken.</translation>
     </message>
     <message>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit uit staat zal het OSD niet uitfaden maar direct verdwijnen.</translation>
     </message>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zet dit uit als het beeld stotterd terwijl het OSD aan het uitfaden is.</translation>
     </message>
 </context>
 <context>
@@ -1990,11 +1993,11 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
 </context>
 <context>
@@ -2203,55 +2206,55 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder regel &apos;%1&apos; %2?</translation>
     </message>
     <message>
         <source>Stored Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Opgeslagen zoekopdracht</translation>
     </message>
     <message>
         <source>Select a search stored from</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een opgeslagen zoekopdracht van</translation>
     </message>
     <message>
         <source>Custom Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aangepaste opname</translation>
     </message>
     <message>
         <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation type="unfinished"></translation>
+        <translation>0 .. 9 verplaatst naar Nx10 percentage in de lijst</translation>
     </message>
     <message>
         <source>Unrated</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>At least ***/</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens ***/</translation>
     </message>
     <message>
         <source>At least ***</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens ***</translation>
     </message>
     <message>
         <source>At least **/</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens **/</translation>
     </message>
     <message>
         <source>At least **</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens **</translation>
     </message>
     <message>
         <source>At least */</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens */</translation>
     </message>
     <message>
         <source>At least *</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens *</translation>
     </message>
     <message>
         <source>At least /</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstens /</translation>
     </message>
 </context>
 <context>
@@ -2323,7 +2326,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder regel &apos;%1&apos; %2?</translation>
     </message>
 </context>
 <context>
@@ -2714,7 +2717,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Xinerama screen</source>
-        <translation>Xinerama scherm</translation>
+        <translation type="obsolete">Xinerama scherm</translation>
     </message>
     <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -3183,10 +3186,6 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <translation>Herhaling</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Conflicting</source>
         <translation>Conflicterende</translation>
     </message>
@@ -3444,7 +3443,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Channel Options</source>
-        <translation type="unfinished">Zender opties</translation>
+        <translation>Zender opties</translation>
     </message>
     <message>
         <source>Video Source</source>
@@ -3703,7 +3702,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Audio sampling rate limit</source>
-        <translation>Liniet audiosamplerate</translation>
+        <translation>Limiet audiosamplerate</translation>
     </message>
     <message>
         <source>Default input</source>
@@ -4865,11 +4864,11 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="unfinished">Deze instelling en de volgende bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
+        <translation>Deze instelling en de volgende bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="unfinished">Deze instelling en de vorige bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
+        <translation>Deze instelling en de vorige bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
@@ -5133,7 +5132,7 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
     </message>
     <message>
         <source>There is guide data until </source>
-        <translation>Er zijn TV-gids data voor </translation>
+        <translation>Er is TV-gids data voor </translation>
     </message>
     <message>
         <source>days</source>
@@ -6235,7 +6234,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>DVB Transport</source>
-        <translation type="unfinished">DVB transport</translation>
+        <translation>DVB transport</translation>
     </message>
     <message>
         <source>Transport Options</source>
@@ -6412,7 +6411,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="unfinished">Standaard groepsfilter om toe te passen in het &apos;Opnames bekijken&apos; scherm.</translation>
+        <translation>Standaard groepsfilter om toe te passen in het &apos;Opnames bekijken&apos; scherm.</translation>
     </message>
     <message>
         <source>Save current group filter when changed</source>
@@ -6424,39 +6423,39 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished">Standaard weergave</translation>
+        <translation>Standaard weergave</translation>
     </message>
     <message>
         <source>Show Titles only</source>
-        <translation type="unfinished">Enkel titels laten zien</translation>
+        <translation>Enkel titels laten zien</translation>
     </message>
     <message>
         <source>Show Titles and Categories</source>
-        <translation type="unfinished">Titels en categorieën laten zien</translation>
+        <translation>Titels en categorieën laten zien</translation>
     </message>
     <message>
         <source>Show Titles, Categories, and Recording Groups</source>
-        <translation type="unfinished">Titels, categorieën en opnamegroepen laten zien</translation>
+        <translation>Titels, categorieën en opnamegroepen laten zien</translation>
     </message>
     <message>
         <source>Show Titles and Recording Groups</source>
-        <translation type="unfinished">Titels en opnamegroepen laten zien</translation>
+        <translation>Titels en opnamegroepen laten zien</translation>
     </message>
     <message>
         <source>Show Categories only</source>
-        <translation type="unfinished">Enkel categorieën laten zien</translation>
+        <translation>Enkel categorieën laten zien</translation>
     </message>
     <message>
         <source>Show Categories and Recording Groups</source>
-        <translation type="unfinished">Categorieën en opnamegroepen laten zien</translation>
+        <translation>Categorieën en opnamegroepen laten zien</translation>
     </message>
     <message>
         <source>Show Recording Groups only</source>
-        <translation type="unfinished">Enkel opnamegroepen laten zien</translation>
+        <translation>Enkel opnamegroepen laten zien</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished">Standaard type groepering dat het &apos;Opnames bekijken&apos; scherm zal gebruiken.</translation>
+        <translation>Standaard type groepering dat het &apos;Opnames bekijken&apos; scherm zal gebruiken.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -8623,11 +8622,11 @@ Controleer of de video bestaat</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld, zal de MPEG4 encoder interlaced DCT encoding toepassen. Dit kan gewenst zijn tijdens het encoden van interlaced video.  Dit is echter expirimenteel en kan de video beschadigen.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld, zal de MPEG4 encoder interlaced motion estimation toepassen. Dit kan wenselijk zijn tijdens het encoden van interlaced video. Dit is echter expirimenteel en kan de video beschadigen.</translation>
     </message>
     <message>
         <source>(CH)</source>
@@ -8639,11 +8638,11 @@ Controleer of de video bestaat</translation>
     </message>
     <message>
         <source>Adjust Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeelgroep aanpassen</translation>
     </message>
     <message>
         <source>Adjust Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Recorder aanpassen</translation>
     </message>
     <message>
         <source>Colour</source>
@@ -8651,59 +8650,59 @@ Controleer of de video bestaat</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume</translation>
     </message>
     <message>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies deze optie voor budget DVT-T kaarten gebaseerd op de BT878 zoals de AverTV DVB-T welke vereisen dat het volume met rust gelaten wordt.</translation>
     </message>
     <message>
         <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat de dvb-opname paketjes van de kaart overslaan totdat een sequence start header gezien is.</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze optie laat de backend dvb-recorder de kaart alleen openen als deze werkelijk gebruikt wordt. Hierdoor blijft de kaart beschikbaar voor andere programma&apos;s op het moment dat deze niet door MythTV gebruikt wordt.</translation>
     </message>
     <message>
         <source>Experimental</source>
-        <translation type="unfinished"></translation>
+        <translation>Experimenteel</translation>
     </message>
     <message>
         <source>General (AutoExpire)</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard (Automatisch vervallen)</translation>
     </message>
     <message>
         <source>Delete files slowly</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder bestanden langzaam</translation>
     </message>
     <message>
         <source>Analog</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoog</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze sectie laat alle transporten zien die op dit moment bekend zijn bij MythTV. De scherm velden zijn videobron, modulatie, frequentie, en indien relevant, symbool snelheid, netwerk id en transport id.</translation>
     </message>
     <message>
         <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorry, de transport editor kan alleen gebruikt worden om transporten die verbonden zijn aan een TV-kaartingang te bewerken.</translation>
     </message>
     <message>
         <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het zoeken naar een TV-opnamekaart die aangesloten is aan deze transport&apos;s videobron is mislukt. Controleer of de backend niet aan staat.</translation>
     </message>
     <message>
         <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
-        <translation type="unfinished"></translation>
+        <translation>De videobronnen waar deze transport aan gekoppeld is, is niet compatibel. Maak een aparte videobron voor deze kaarten.</translation>
     </message>
     <message>
         <source>Digital TV Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Digitale TV standaard</translation>
     </message>
     <message>
         <source>Guiding standard to use for making sense of the data streams after they have been demodulated, error corrected and demultiplexed.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV gids standaard die gebruikt moet worden om de data stromen te kunnen gebruiken nadat deze gedemoduleerd zijn, fout correctie is toegepast en ze gedemultiplext zijn.</translation>
     </message>
     <message>
         <source>OpenCable</source>
@@ -8711,311 +8710,311 @@ Controleer of de video bestaat</translation>
     </message>
     <message>
         <source>MPEG</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequentie (Optie heeft geen standaard waarde)De frequentie van deze zender in</translation>
     </message>
     <message>
         <source>Modulation, aka Constellation</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulatie, oftewel constellatie</translation>
     </message>
     <message>
         <source>QAM Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>QAMAuto</translation>
     </message>
     <message>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>seconden</translation>
     </message>
     <message>
         <source>DVD Menu Not Available</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menu niet beschikbaar</translation>
     </message>
     <message>
         <source>Group</source>
         <comment>Play Group</comment>
-        <translation type="unfinished">Groep</translation>
+        <translation>Groep</translation>
     </message>
     <message>
         <source>f</source>
         <comment>RecStatusChar rsFailed</comment>
-        <translation type="unfinished"></translation>
+        <translation>f</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecStatusChar rsOtherShowing</comment>
-        <translation type="unfinished">O</translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>Recorder Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Recorder mislukt</translation>
     </message>
     <message>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Andere uitzendingen</translation>
     </message>
     <message>
         <source>Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatst opgenomen</translation>
     </message>
     <message>
         <source>Next Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Volgende opname</translation>
     </message>
     <message>
         <source>Watch List Score</source>
-        <translation type="unfinished"></translation>
+        <translation>Nog niet gezien score</translation>
     </message>
     <message>
         <source>Auto-expire off</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen uit</translation>
     </message>
     <message>
         <source>Marked as &apos;watched&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemarkeerd als &apos;Gezien&apos;</translation>
     </message>
     <message>
         <source>Not the earliest episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet de eerste aflevering</translation>
     </message>
     <message>
         <source>Recently deleted episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Recent verwijderde aflevering</translation>
     </message>
     <message>
         <source>Watch List Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Nog niet gezien status</translation>
     </message>
     <message>
         <source>Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Opslaggroep</translation>
     </message>
     <message>
         <source>SAP/Bilingual</source>
-        <translation type="unfinished"></translation>
+        <translation>SAP/Tweetalig</translation>
     </message>
     <message>
         <source>Main Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoofd taal</translation>
     </message>
     <message>
         <source>SAP Language</source>
-        <translation type="unfinished"></translation>
+        <translation>SAP taal</translation>
     </message>
     <message>
         <source>Dual</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual</translation>
     </message>
     <message>
         <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de taal of talen die opgenomen moeten worden indien er twee talen uitgezonden worden. Enkel layer II ondersteund het opnemen van twee talen (Dual). Vereist ivtv 0.4.0 of nieuwer.</translation>
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch transcoden als een opname met dit profiel gemaakt is en het opname schema zo geconfigureerd is dat transcoden toegestaan is.</translation>
     </message>
     <message>
         <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Breedte die gebruikt wordt tijdens encoden. Opmerking: PVR-x50 kaarten kunnen ghosting produceren indien dit niet op 720 ingesteld voor NTSC of 768 voor PAL.</translation>
     </message>
     <message>
         <source>Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte die gebruikt wordt tijdens encoden. Opmerking: PVR-x50 kaarten kunnen ghosting produceren indien dit niet op 480 ingesteld voor NTSC of 576 voor PAL.</translation>
     </message>
     <message>
         <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulatie, 8-VSB, QAM-256, etc.</translation>
     </message>
     <message>
         <source>ATSC Channel Separator</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Zenderscheidingsteken</translation>
     </message>
     <message>
         <source>Include in the &quot;%1&quot; recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>Toevoegen aan de &apos;%1&apos; opnamegroep</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Niet geïdentificeerde afleveringen uitsluiten</translation>
+        <translation>Niet geïdentificeerde afleveringen uitsluiten</translation>
     </message>
     <message>
         <source>Exclude old episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Oude aflevering uitsluiten</translation>
     </message>
     <message>
         <source>Select Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Opslag groep kiezen</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; storage group</source>
-        <translation type="unfinished"></translation>
+        <translation>In de &quot;%1&quot; opslaggroep bewaren</translation>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">Live TV</translation>
+        <translation>Live TV</translation>
     </message>
     <message>
         <source>Listings grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-gids grabber</translation>
     </message>
     <message>
         <source>GUID</source>
-        <translation type="unfinished"></translation>
+        <translation>GUID</translation>
     </message>
     <message>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>Generieke</translation>
     </message>
     <message>
         <source>800Mbps</source>
-        <translation type="unfinished">800Mbps</translation>
+        <translation>800Mbps</translation>
     </message>
     <message>
         <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
+        <translation>IP adres of Device ID van de onderkant van de HDHomeRun.  U kunt &apos;FFFFFFFF&apos; gebruiken als er maar één apparaat in uw netwerk heeft.</translation>
     </message>
     <message>
         <source>M3U URL</source>
-        <translation type="unfinished"></translation>
+        <translation>M3U URL</translation>
     </message>
     <message>
         <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL van de M3U die de URLs van de IPTV zenders bevat.</translation>
     </message>
     <message>
         <source>Network Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk recorder</translation>
     </message>
     <message>
         <source>Unencrypted channels only</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel vrij toegankelijke zenders</translation>
     </message>
     <message>
         <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zullen alleen vrije zenders gebruikt worden door MythTV en de MythTV zenderscanner.</translation>
     </message>
     <message>
         <source>Allow audio only channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenders die alleen geluid bevatten toestaan</translation>
     </message>
     <message>
         <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zullen kanalen die alleen geluid bevatten niet genegeerd worden door de MythTV zenderscanner.</translation>
     </message>
     <message>
         <source>Use quick tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Snel afstemmen gebruiken</translation>
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Nooit</translation>
     </message>
     <message>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zullen programma&apos;s die u al gezien heeft en die automatisch vervallen zijn opnieuw opgenomen worden als ze opnieuw uitgezonden worden.</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer alle subtitels/multititels oplopend</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer alle subtitels/multititels aflopend</translation>
     </message>
     <message>
         <source>Sort sub-titles Descending, multi-titles Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer subtitels aflopend, multititels oplopend</translation>
     </message>
     <message>
         <source>Sort sub-titles Ascending, multi-titles Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer ondertiteling oplopend, multititels aflopend</translation>
     </message>
     <message>
         <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies hoe afleveringen gesorteerd moeten worden. Subtitels zijn afleveringen die onder een specifieke titel vallen. Multititels zijn secties (b.v. &quot;Alle programma&apos;s&quot;) die meerdere titels bevatten. Secties tussen haakjes worden niet beïnvloed.</translation>
     </message>
     <message>
         <source>Episode sort orderings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteervolgorde van de afleveringen</translation>
     </message>
     <message>
         <source>Theme cache size</source>
-        <translation type="unfinished"></translation>
+        <translation>Grootte van de theme cache</translation>
     </message>
     <message>
         <source>Maximum number of prescaled themes to cache.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum aantal geschaalde themes dat in de cache opgeslagen wordt.</translation>
     </message>
     <message>
         <source>Always stream recordings from the backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnames altijd streamen vanaf de backend</translation>
     </message>
     <message>
         <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingeschakeld, zal MythTV opnames altijd streamen vanaf de backend in plaats van het bestand direct te lezen indien deze lokaal te benaderen is.</translation>
     </message>
     <message>
         <source>Jump to Program OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spring naar Programma OSD</translation>
     </message>
     <message>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak de keuze uit het bekijken van de huidige opnamegroep in het OSD, of het &apos;Opnames bekijken&apos; scherm tonen als &apos;Spring naar Programma&apos; gekozen wordt. Indien geselecteerd, dan zullen de opnames in het OSD getoond worden</translation>
     </message>
     <message>
         <source>If set, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd, zal een opname als gezien gemarkeerd worden indien u stopt met kijken terwijl deze bijna afgelopen is. De automatisch detectie is niet waterdicht, zet dit dus niet aan indien u zeker wilt zijn dat een opname nooit als gezien gemarkeerd wordt als u deze nog niet helemaal bekeken heeft.</translation>
     </message>
     <message>
         <source>Sets the Title sorting order when the view is set to Titles only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stelt de Titel sorteer volgorde in indien de weergave ingesteld is op Enkel titels.</translation>
     </message>
     <message>
         <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="unfinished"></translation>
+        <translation>De groep &apos;Nog niet gezien&apos; toevoegen</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>De groep &apos;Nog niet gezien&apos; is een lijst van opnames die zo gesorteerd is dat u ziet welke series en shows u moet kijken om up to date te blijven.</translation>
     </message>
     <message>
         <source>Start from the Watch List view</source>
-        <translation type="unfinished"></translation>
+        <translation>Start vanaf de &apos;Nog niet gezien&apos; weergave</translation>
     </message>
     <message>
         <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd, zal de groep &apos;Nog niet gezien&apos; direct getoond worden bij het openen van het &apos;Opnames Bekijken&apos; scherm</translation>
     </message>
     <message>
         <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnames die niet automatisch vervallen buitensluiten</translation>
     </message>
     <message>
         <source>Set this if you turn off auto-expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer dit indien u automatisch vervallen alleen uitzet voor opnames die u heeft gezien en wilt bewaren. Deze optie zorgt er voor dat deze opnames niet in de groep &apos;Nog te bekijken&apos; staan.</translation>
     </message>
     <message>
         <source>Maximum days counted in the score</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum aantal dagen dat geteld wordt in de score</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="unfinished"></translation>
+        <translation>De scores van de groep &apos;Nog te bekijken&apos; zijn gebaseerd op 1 punt staat gelijk aan 1 dag sinds dat de opname gemaakt is. Deze optie beperkt de maximum score door leeftijd en heeft effect op andere wegende factoren.</translation>
     </message>
     <message>
         <source>Days to exclude weekly episodes after delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal dagen dat wekelijkse opnames genegeerd worden</translation>
     </message>
     <message>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien een aflevering verwijderd is of gemarkeerd is als gezien, dan zullen andere afleveringen van deze serie voor het ingestelde aantal dagen uit de groep &apos;Nog te bekijken&apos; blijven. Voor dagelijkse opnames geld een kleiner aantal, gebaseerd op het ingestelde aantal.</translation>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
@@ -9027,151 +9026,151 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythfilldatabase programma</translation>
     </message>
     <message>
         <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik &apos;mythfilldatabase&apos; of de naam van een eigen script dat de programmagids data vult voor alle video bronnen.</translation>
     </message>
     <message>
         <source>Schedule Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnameschema status</translation>
     </message>
     <message>
         <source>Schedule Status shows current statistics from the scheduler.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname Planner Status toont de statistieken van de opname planner.</translation>
     </message>
     <message>
         <source>Total Disk Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Totale schijfruimte:</translation>
     </message>
     <message>
         <source>MythTV Drive #%1:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV Schijf #%1:</translation>
     </message>
     <message>
         <source>Directories:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappen:</translation>
     </message>
     <message>
         <source>Directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Map:</translation>
     </message>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sommige bestandssystemen gebruiken veel bronnen tijdens het verwijderen van grote opname bestanden.  Deze optie laat MythTv de bestanden langzaam verwijderen op deze backend om de impact te verkleinen.</translation>
     </message>
     <message>
         <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn geen Opslag groep mappen gedefinieerd.  Er moet minimaal één map in de standaard opslag groep gedefinieerd zijn zodat nieuwe opnames opgeslagen kunnen worden.</translation>
     </message>
     <message>
         <source>Command to Set Wakeup Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando om de Wakeup tijd in te stellen</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
-        <translation type="unfinished"></translation>
+        <translation>Het formaat van de tijd string die aan het &apos;Set Wakeup Time Command&apos; wordt doorgegeven als $time. Zie QT::QDateTime.toString() voor details. Zet op &apos;t_time&apos; voor het aantal seconden sinds epoch (1-1-1970) (gebruik &apos;time_t&apos; voor nvram_wakeup).</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle then description</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbel via afleveringstitel detecteren, daarna via beschrijving</translation>
     </message>
     <message>
         <source>Commercial Flagging Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclame Detectie methode</translation>
     </message>
     <message>
         <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veranderd reclame detectie methode die gebruikt wordt voor opnames op deze zender of slaat detectie over door de zender als commercial vrij te markeren.</translation>
     </message>
     <message>
         <source>Use Global Setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik algemene instelling</translation>
     </message>
     <message>
         <source>Channel Options - Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Zenderopties - Filters</translation>
     </message>
     <message>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beeldverhouding wanneer een video op een bepaalde resolutie wordt gekeken.</translation>
     </message>
     <message>
         <source>Backend Server Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Backend server wakeup instellingen</translation>
     </message>
     <message>
         <source>Database Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Database server instellingen</translation>
     </message>
     <message>
         <source>Ping test server?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping test server?</translation>
     </message>
     <message>
         <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="unfinished"></translation>
+        <translation>Test basis host connectiviteit door middel van het ping commando. Zet dit uit als uw host of netwerk geen ping (ICMP ECHO) pakketten ondersteund</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Poort</translation>
     </message>
     <message>
         <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="unfinished"></translation>
+        <translation>De poort waarop de database draait.  Leeg laten indien de standaard poort (3306) gebruikt wordt.</translation>
     </message>
     <message>
         <source>Database name</source>
-        <translation type="unfinished"></translation>
+        <translation>Database naam</translation>
     </message>
     <message>
         <source>Enable Database Server Wakeup</source>
-        <translation type="unfinished"></translation>
+        <translation>Database server wakeup inschakelen</translation>
     </message>
     <message>
         <source>If checked, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zal de frontend de database wakeup parameters gebruiken om opnieuw verbinding te maken met de database server.</translation>
     </message>
     <message>
         <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>Het commando dat uitgevoerd wordt op deze frontend om de database server wakker te maken (bv. sudo/etc/init.d/mysql restart).</translation>
     </message>
     <message>
         <source>Required fields are marked with an asterisk (*).</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplichte velden zijn met een sterretje (*) gemarkeerd.</translation>
     </message>
     <message>
         <source>Cannot find (ping) database host %1 on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan de database host %1 niet vinden (ping) op het netwerk</translation>
     </message>
     <message>
         <source>Cannot connect to port %1 on database host %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan niet verbinden met poort %1 op database host %2</translation>
     </message>
     <message>
         <source>Save database details</source>
-        <translation type="unfinished"></translation>
+        <translation>Database details opslaan</translation>
     </message>
     <message>
         <source>Save backend details</source>
-        <translation type="unfinished"></translation>
+        <translation>Backend details opslaan</translation>
     </message>
     <message>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet opslaan</translation>
     </message>
     <message>
         <source>Save that backend or database as the default?</source>
-        <translation type="unfinished"></translation>
+        <translation>De backend of de database als standaard opslaan?</translation>
     </message>
     <message>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Upgrade</translation>
     </message>
     <message>
         <source>Use current schema</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik het huidige schema</translation>
     </message>
     <message>
         <source>Subtitle</source>
@@ -9179,99 +9178,99 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Could not query inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan de ingangen niet aanspreken.</translation>
     </message>
     <message>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout, compileer met V4L support om ingangen aan te spreken</translation>
     </message>
     <message>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kan &apos;%1&apos; niet openen om zijn ingangen te proben.</translation>
     </message>
     <message>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout, compileer met DVB support om ingangen aan te spreken</translation>
     </message>
     <message>
         <source>New Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe ingang</translation>
     </message>
     <message>
         <source>Icon Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Icoon downloaden</translation>
     </message>
     <message>
         <source>Starts the icon downloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Start de icoon downloader</translation>
     </message>
     <message>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation>als een zoekopdracht</translation>
     </message>
     <message>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation>als een voorbeeld</translation>
     </message>
     <message>
         <source>Title %1 chapter %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel %1 hoofdstuk %2</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 behind)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2 (%3 achter)</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 remaining)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2 (resterende %3)</translation>
     </message>
     <message>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het thema dat u gebruikt heeft geen %1 element. Neem contact op met de theme makers en vraag of ze deze willen updaten. &lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn. Druk escape om terug te gaan naar het menu.</translation>
     </message>
     <message>
         <source>the recorder failed to record.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnemen mislukt.</translation>
     </message>
     <message>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze regel komt met geen enkele uitzending in de huidige programma gids overeen.</translation>
     </message>
     <message>
         <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze aflevering zal op een ander kanaal in dit tijdslot opgenomen worden.</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Surround Sound</translation>
     </message>
     <message>
         <source>Dolby Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolby Sound</translation>
     </message>
     <message>
         <source>Audio for Hearing Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio voor slechthorenden</translation>
     </message>
     <message>
         <source>Audio for Visually Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio voor slechtzienden</translation>
     </message>
     <message>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Breedbeeld</translation>
     </message>
     <message>
         <source>AVC/H.264</source>
-        <translation type="unfinished"></translation>
+        <translation>AVC/H.264</translation>
     </message>
     <message>
         <source>Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertiteling beschikbaar</translation>
     </message>
     <message>
         <source>Deaf Signing</source>
@@ -9279,57 +9278,58 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Average Time Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde tijdsverschuiving</translation>
     </message>
     <message>
         <source>hours</source>
-        <translation type="unfinished"></translation>
+        <translation>uren</translation>
     </message>
     <message>
         <source>Recorded File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam van het opgenomen bestand</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld zal de bitrate die opgegeven is gebruikt worden voor 640x480.  Indien andere resoluties gebruikt worden, zal de bitrate naar verhouding geschaald worden.</translation>
     </message>
     <message>
         <source>Frequency (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequentie (%1)</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequentie (Optie heeft geen standaard waarde)De frequentie van deze zender in %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
 Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
-        <translation type="unfinished"></translation>
+        <translation>symboolsnelheid (symbolen/seconde).
+De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</translation>
     </message>
     <message>
         <source>Could not open tuner device</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan het tuner apparaat niet openen</translation>
     </message>
     <message>
         <source>Bad connection to backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Slechte verbinding met de backend</translation>
     </message>
     <message>
         <source> offset %2</source>
-        <translation type="unfinished"></translation>
+        <translation> offset %2</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no tables</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout tijdens scannen naar %1 -- no tables</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no signal</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout tijdens scannen naar %1 -- no signal</translation>
     </message>
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Afstemmen op %1 mplexid(%2)</translation>
     </message>
     <message>
         <source>Record new episode first showings</source>
@@ -9337,291 +9337,291 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV wil deze programma&apos;s in %d seconden opnemen:</translation>
     </message>
     <message>
         <source>&quot;%1&quot; on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; op %2</translation>
     </message>
     <message>
         <source>Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wilt u:</translation>
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythtv is %1 minuten ongebruikt en zal binnen %2 seconden uitgeschakeld worden. Bent u nog steeds aan het kijken?</translation>
     </message>
     <message>
         <source>On known multiplex...</source>
-        <translation type="unfinished"></translation>
+        <translation>Op bekende multiplex...</translation>
     </message>
     <message>
         <source>PVR-350 decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 decoder</translation>
     </message>
     <message>
         <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2 zal de mpeg2 library gebruiken; dit is sneller op sommige 32bit AMD processors.</translation>
     </message>
     <message>
         <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opmerking: ondertiteling kan niet gedecodeerd worden met libmpeg2.</translation>
     </message>
     <message>
         <source>Kernel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel</translation>
     </message>
     <message>
         <source>Greedy HighMotion</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion</translation>
     </message>
     <message>
         <source>Greedy HighMotion (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion (2x)</translation>
     </message>
     <message>
         <source>Yadif</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif</translation>
     </message>
     <message>
         <source>Yadif (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (2x)</translation>
     </message>
     <message>
         <source>Bob (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x)</translation>
     </message>
     <message>
         <source>Linear blend (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (HW)</translation>
     </message>
     <message>
         <source>Kernel (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (HW)</translation>
     </message>
     <message>
         <source>Bob (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x, HW)</translation>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One field (HW)</translation>
     </message>
     <message>
         <source>One Field (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One Field (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (2x, HW)</translation>
     </message>
     <message>
         <source>Linear blend (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (2x, HW)</translation>
     </message>
     <message>
         <source>Interlaced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced (2x, Hw)</translation>
     </message>
     <message>
         <source>Video rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>Video render methode</translation>
     </message>
     <message>
         <source>Render video offscreen. Used internally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Render video offscreen. Wordt intern gebruikt.</translation>
     </message>
     <message>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik X11 pixel copy om video te renderen. Dit wordt niet aanbevolen indien er andere mogelijkheden zijn. De video zal niet geschaald worden om op het scherm te passen. Dit werkt op alle X11 server&apos;s, lokaal en remote.</translation>
     </message>
     <message>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik X11 shared memory pixel transfer om video te renderen. Dit is alleen aanbevolen als de enige andere optie X11 pixel copy renderer is. De video zal niet geschaald worden om op het scherm te passen. Dit werkt op de meeste lokale X11 server&apos;s.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de standaard video renderer voor X11 systemen. Het gebruikt XVideo hardware assist om te schalen en kleuren te converteren. Indien de hardware picture controls ondersteund gebruikt de renderer deze.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de standaard video decoder voor XvMC decoders. Het gebruikt XVideo hardware assist om te schalen, kleuren te converteren en bied indien beschikbaar XVideo picture controls.</translation>
     </message>
     <message>
         <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze video renderer voor XvMC op nVidia kaarten gebruikt XVideo voor color conversion en OpenGL om te schalen. Het grootste voordeel van deze renderer is dat het OpenGL OSD rendering toestaat. Dit maakt twee XvMC buffers vrij om te decoden. Het vereist een redelijk snelle nVidia kaart.</translation>
     </message>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze video renderer gebruikt DirectFB om te schalen en voor color conversion. Het is niet zo volledig qua features als de standaard video renderer, maar het draait wel op Linux hardware zonder een X11 server.</translation>
     </message>
     <message>
         <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows video renderer gebaseerd op overlays. Niet compatible met VistaAero Glass.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows video renderer gebaseerd op Direct3D. Vereist een videokaart die Direct3D 9 compatilbe is. Dit is de aanbevolen renderer voor Windows systemen.</translation>
     </message>
     <message>
         <source>This is the standard video render for Macintosh OS X systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de standaard video renderer voor Macintosh OS X systemen.</translation>
     </message>
     <message>
         <source>This is the only video renderer for the MacAccel decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de enige video renderer voor de MacAccel decoder.</translation>
     </message>
     <message>
         <source>This is only video renderer for the PVR-350 decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de enige video renderer voor de PVR-350 decoder.</translation>
     </message>
     <message>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze video renderer gebruikt OpenGL om te schalen en voor color conversion en bied basis picture controls. Dit vereist een snellere CPU dan XVideo. Indien ingeschakeld zal picture controls meer resources gebruiken.</translation>
     </message>
     <message>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze deïnterlacer vereist dat het scherm twee maal de frame rate van de bron video kan tonen.</translation>
     </message>
     <message>
         <source>Perform no deinterlacing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen deïnterlacing toepassen.</translation>
     </message>
     <message>
         <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik dit met een interlaced scherm waarvan de resolutie exact gelijk is aan de video grootte. Dit is incompatible met MythTV zoom modus.</translation>
     </message>
     <message>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toont maar één van de twee velden in het frame. Dit ziet er goed uit indien u een 1080i video met snelle bewegingen op een 720p scherm toont.</translation>
     </message>
     <message>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Toont één veld van het frame gevolgd door het andere veld, vertikaal weergegeven.</translation>
     </message>
     <message>
         <source>Blends the odd and even fields linearly into one frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg de even en oneven velden linear samen tot één frame.</translation>
     </message>
     <message>
         <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit filter schakeld deïnterlacing uit indien de twee velden gelijk zijn, en voert anders lineare deïnterlacing uit.</translation>
     </message>
     <message>
         <source>(Hardware Accelerated)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Hardware Accelerated)</translation>
     </message>
     <message>
         <source>With workaround for broken interlaced modelines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Met workaround voor &apos;slechte&apos; interlaced modlines.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze deïnterlacer gebruikt verschillende velden om motion blur te verminderen. Het vereist meer CPU kracht.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; has not been documented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; is nog niet gedocumenteerd.</translation>
     </message>
     <message>
         <source>OSD rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD rendering methode</translation>
     </message>
     <message>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend. But it is the fastest OSD renderer; and is particularly efficient compared to the ia44blend OSD renderer for XvMC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Render het OSD door gebruik te maken van de XVideo chromakey mogelijkheid. Deze renderer kan niet alpha blenden maar het is de snelste OSD renderen; en is specifiek efficient vergleken met de ia44blend OSD renderer voor XvMC.</translation>
     </message>
     <message>
         <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opmerking: nVidia hardware na de 5xxx serie heeft geen XVideo chromakey support.</translation>
     </message>
     <message>
         <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Software OSD rendering gebruikt de CPU om de OSD te alpha blenden.</translation>
     </message>
     <message>
         <source>Uses hardware support for 16 color alpha-blend surfaces for rendering the OSD. Because of the limited color range, MythTV renders the OSD in 16 level grayscale.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikt hardware support voor 16 kleuren alpha-blend surfaces om het OSD te renderen. Vanwege het beperkte kleurenbereik zal MythTV het OSD in 16 grijstinten renderen.</translation>
     </message>
     <message>
         <source>Note: Not recommended for nVidia or Intel chipsets. This removes two of the limited XvMC buffers from decoding duty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opmerking: Niet aanbevolen voor nVidia of Intel chipsets. Dit haalt twee van de beperkte XvMC buffers van de decoding taak af.</translation>
     </message>
     <message>
         <source>Renders the OSD using the PVR-350 chromakey feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderd het OSD door gebruik te maken van de PVR-350 chromakey mogelijkheid.</translation>
     </message>
     <message>
         <source>Uses OpenGL to alpha blend the OSD onto the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikt OpenGL om het OSD te alpha blenden op het video beeld.</translation>
     </message>
     <message>
         <source>Max recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum # opnames</translation>
     </message>
     <message>
         <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum aantal gelijktijdige opnames die dit apparaat mag maken. Sommige digitale zenders zenden meerdere programma&apos;s uit op een multiplex. mythTV kan hier in sommige gevallen gebruik van maken indien een waarde groter dan één ingevuld wordt.</translation>
     </message>
     <message>
         <source>Searching for installed XMLTV grabbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken naar geinstalleerde XMLTV grabbers</translation>
     </message>
     <message>
         <source>DVB Device Number</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB apparaat nummer</translation>
     </message>
     <message>
         <source>Warning: already in use</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarschuwing: is al in gebruik</translation>
     </message>
     <message>
         <source>Use DVB Card for active EIT scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik DVB kaart voor actieve EIT scan</translation>
     </message>
     <message>
         <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze optie activeert de active scan voor programmagids data (EIT). Door deze optie is de DVB kaart continu in gebruik.</translation>
     </message>
     <message>
         <source>Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingangsgroep</translation>
     </message>
     <message>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat op &apos;standaard&apos; staan tenzij deze ingang gedeeld wordt met een ander apparaat. Er zal maar één ingang uit een ingangsgroep tegelijkertijd mogen opnemen.</translation>
     </message>
     <message>
         <source>Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen live tv</translation>
     </message>
     <message>
         <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingeschakeld zal MythTV afstemmen door alleen gebruik te maken van het MPEG programma nummer. De programma nummers veranderen iets vaker dan DVB of ATSC tuning parameters, waardoor dit iets minder betrouwbaar is. Dit zal ook het EIT verzamelen tijdens Live tv of opnemen vertragen. </translation>
     </message>
     <message>
         <source>Interactions between inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Interactie tussen ingangen</translation>
     </message>
     <message>
         <source>Create a New Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een nieuwe ingangsgroep</translation>
     </message>
     <message>
         <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingangsgroepen zijn alleen nodig indien twee of meer kaarten dezelfde bronnen delen, zoals een firewire kaart en een analoge ingang die beide dezelfde set top box besturen.</translation>
     </message>
     <message>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation>Negeren</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished">Detecteer</translation>
+        <translation>Detecteer</translation>
     </message>
     <message>
         <source>Interlaced</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
@@ -9637,88 +9637,88 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>14:9</source>
-        <translation type="unfinished">14:9</translation>
+        <translation>14:9</translation>
     </message>
     <message>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwart</translation>
     </message>
     <message>
         <source>Gray</source>
-        <translation type="unfinished"></translation>
+        <translation>Grijs</translation>
     </message>
     <message>
         <source>Half</source>
-        <translation type="unfinished"></translation>
+        <translation>Half</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Volledig</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitgerekt</translation>
     </message>
     <message>
         <source>[Reserved]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Gereserveerd]</translation>
     </message>
     <message>
         <source>SCTE mode 1</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE mode 1</translation>
     </message>
     <message>
         <source>SCTE mode 2</source>
-        <translation type="unfinished"></translation>
+        <translation>SCTE mode 2</translation>
     </message>
     <message>
         <source>ATSC 8-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 8-VSB</translation>
     </message>
     <message>
         <source>ATSC 16-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 16-VSB</translation>
     </message>
     <message>
         <source>Detective/Thriller</source>
-        <translation type="unfinished"></translation>
+        <translation>Detective/thriller</translation>
     </message>
     <message>
         <source>Adventure/Western/War</source>
-        <translation type="unfinished"></translation>
+        <translation>Avontuur/western/oorlog</translation>
     </message>
     <message>
         <source>Science Fiction/Fantasy/Horror</source>
-        <translation type="unfinished"></translation>
+        <translation>Science fiction/Fantasie/Horror</translation>
     </message>
     <message>
         <source>Soap/melodrama/folkloric</source>
-        <translation type="unfinished"></translation>
+        <translation>Soap/melodrame/folkloristisch</translation>
     </message>
     <message>
         <source>Serious/Classical/Religious/Historical Movie/Drama</source>
-        <translation type="unfinished"></translation>
+        <translation>Serieus/klassiek/religieus/historische film/drama</translation>
     </message>
     <message>
         <source>Adult</source>
         <comment>Adult Movie</comment>
-        <translation type="unfinished"></translation>
+        <translation>Volwassen</translation>
     </message>
     <message>
         <source>News/weather report</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuws/weer</translation>
     </message>
     <message>
         <source>News magazine</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuws magazine</translation>
     </message>
     <message>
         <source>Intelligent Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligente programma&apos;s</translation>
     </message>
     <message>
         <source>Game Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelletjes programma</translation>
     </message>
     <message>
         <source>Variety Show</source>
@@ -9726,47 +9726,47 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Talk Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Talkshow</translation>
     </message>
     <message>
         <source>Special Events (World Cup, World Series..)</source>
-        <translation type="unfinished"></translation>
+        <translation>Speciale evenementen (World cup, World series..)</translation>
     </message>
     <message>
         <source>Sports Magazines</source>
-        <translation type="unfinished"></translation>
+        <translation>Sport magazine</translation>
     </message>
     <message>
         <source>Football (Soccer)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voetbal</translation>
     </message>
     <message>
         <source>Tennis/Squash</source>
-        <translation type="unfinished"></translation>
+        <translation>Tennis/squash</translation>
     </message>
     <message>
         <source>Misc. Team Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Div. teamsporten</translation>
     </message>
     <message>
         <source>Athletics</source>
-        <translation type="unfinished"></translation>
+        <translation>Atletiek</translation>
     </message>
     <message>
         <source>Motor Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Motor sport</translation>
     </message>
     <message>
         <source>Water Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Water sport</translation>
     </message>
     <message>
         <source>Winter Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>Winter sporten</translation>
     </message>
     <message>
         <source>Equestrian</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruitersport</translation>
     </message>
     <message>
         <source>Martial Sports</source>
@@ -9774,59 +9774,59 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Kids</source>
-        <translation type="unfinished"></translation>
+        <translation>Kinderen</translation>
     </message>
     <message>
         <source>Pre-School Children&apos;s Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor school kinder programma&apos;s</translation>
     </message>
     <message>
         <source>Entertainment Programmes for 6 to 14</source>
-        <translation type="unfinished"></translation>
+        <translation>Entertainment programma&apos;s voor 6 tot 14 jaar</translation>
     </message>
     <message>
         <source>Entertainment Programmes for 10 to 16</source>
-        <translation type="unfinished"></translation>
+        <translation>Entertainment programma&apos;s voor 10 tot 16 jaar</translation>
     </message>
     <message>
         <source>Informational/Educational</source>
-        <translation type="unfinished"></translation>
+        <translation>Informatief/educatief</translation>
     </message>
     <message>
         <source>Cartoons/Puppets</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekenfilm&apos;s/Poppen</translation>
     </message>
     <message>
         <source>Music/Ballet/Dance</source>
-        <translation type="unfinished"></translation>
+        <translation>Muziek/ballet/dans</translation>
     </message>
     <message>
         <source>Rock/Pop</source>
-        <translation type="unfinished"></translation>
+        <translation>Rock/pop</translation>
     </message>
     <message>
         <source>Classical Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Klassieke muziek</translation>
     </message>
     <message>
         <source>Folk Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Volksmuziek</translation>
     </message>
     <message>
         <source>Jazz</source>
-        <translation type="unfinished"></translation>
+        <translation>Jazz</translation>
     </message>
     <message>
         <source>Musical/Opera</source>
-        <translation type="unfinished"></translation>
+        <translation>Musical/opera</translation>
     </message>
     <message>
         <source>Ballet</source>
-        <translation type="unfinished"></translation>
+        <translation>Ballet</translation>
     </message>
     <message>
         <source>Arts/Culture</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunst/cultuur</translation>
     </message>
     <message>
         <source>Performing Arts</source>
@@ -9838,7 +9838,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Religion</source>
-        <translation type="unfinished"></translation>
+        <translation>Religie</translation>
     </message>
     <message>
         <source>Popular Culture/Traditional Arts</source>
@@ -9846,19 +9846,19 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Literature</source>
-        <translation type="unfinished"></translation>
+        <translation>Literatuur</translation>
     </message>
     <message>
         <source>Film/Cinema</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film</translation>
     </message>
     <message>
         <source>Experimental Film/Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Experimentele film/video</translation>
     </message>
     <message>
         <source>Broadcasting/Press</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Media</source>
@@ -9870,43 +9870,43 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Social/Policical/Economics</source>
-        <translation type="unfinished"></translation>
+        <translation>Sociaal/politiek/economie</translation>
     </message>
     <message>
         <source>Magazines/Reports/Documentary</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Economics/Social Advisory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Economie/</translation>
     </message>
     <message>
         <source>Remarkable People</source>
-        <translation type="unfinished"></translation>
+        <translation>Opmerkelijke personen</translation>
     </message>
     <message>
         <source>Education/Science/Factual</source>
-        <translation type="unfinished"></translation>
+        <translation>Educatief/wetenschap/feiten</translation>
     </message>
     <message>
         <source>Nature/animals/Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Natuur/dieren/milieu</translation>
     </message>
     <message>
         <source>Technology/Natural Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation>Technologie/natuurwetenschappen</translation>
     </message>
     <message>
         <source>Medicine/Physiology/Psychology</source>
-        <translation type="unfinished"></translation>
+        <translation>Medisch/fysiologie/psychologie</translation>
     </message>
     <message>
         <source>Foreign Countries/Expeditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Buiteland/expedities</translation>
     </message>
     <message>
         <source>Social/Spiritual Sciences</source>
-        <translation type="unfinished"></translation>
+        <translation>Sociaal/spirituele wetenschap</translation>
     </message>
     <message>
         <source>Further Education</source>
@@ -9914,15 +9914,15 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Languages</source>
-        <translation type="unfinished"></translation>
+        <translation>Talen</translation>
     </message>
     <message>
         <source>Leisure/Hobbies</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrijetijd/hobbies</translation>
     </message>
     <message>
         <source>Tourism/Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Toerisme/reizen</translation>
     </message>
     <message>
         <source>Handicraft</source>
@@ -9930,366 +9930,364 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Motoring</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>Fitness &amp; Health</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitness &amp; gezondheid</translation>
     </message>
     <message>
         <source>Cooking</source>
-        <translation type="unfinished"></translation>
+        <translation>Koken</translation>
     </message>
     <message>
         <source>Advertizement/Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclame/winkelen</translation>
     </message>
     <message>
         <source>Gardening</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuinieren</translation>
     </message>
     <message>
         <source>Original Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Originele taal</translation>
     </message>
     <message>
         <source>Black &amp; White</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwart &amp; wit</translation>
     </message>
     <message>
         <source>&quot;Unpublished&quot; Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Ongepubliceerde&quot; programma&apos;s</translation>
     </message>
     <message>
         <source>Live Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Live uitzending</translation>
     </message>
     <message>
         <source>currently running.</source>
-        <translation type="unfinished"></translation>
+        <translation>draait momenteel.</translation>
     </message>
     <message>
         <source>Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Successvol.</translation>
     </message>
     <message>
         <source>FAILED: xmltv ran but was interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>MISLUKT: xmltv is gestart maar is onderbroken.</translation>
     </message>
     <message>
         <source>FAILED: xmltv returned error code %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>MISLUKT: xmltv gaf error code %1.</translation>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase is gestart, maar heeft geen nieuwe data in de tvgids geplaatst voor %1 van %2 bronnen. Dit kan duiden op een grabber probleem.</translation>
     </message>
     <message>
         <source>Max Audio Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>MaxAudio kanalen</translation>
     </message>
     <message>
         <source>5.1</source>
-        <translation type="unfinished">5.1</translation>
+        <translation>5.1</translation>
     </message>
     <message>
         <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zet het maximum aantal audio kanalen dat gedecodeerd mag worden. Dit is voor het afspelen van multi-kanaal/surround audio.</translation>
     </message>
     <message>
         <source>Upmix</source>
-        <translation type="unfinished"></translation>
+        <translation>Upmix</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation type="unfinished"></translation>
+        <translation>passief</translation>
     </message>
     <message>
         <source>Active Simple</source>
-        <translation type="unfinished"></translation>
+        <translation>Actief simpel</translation>
     </message>
     <message>
         <source>Active Linear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Actief lineair</translation>
     </message>
     <message>
         <source>Run commercial flagger</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai het markeren van reclameblokken</translation>
     </message>
     <message>
         <source>Run transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai transcoder</translation>
     </message>
     <message>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal dagen dat auto-transcode taken uitgesteld worden</translation>
     </message>
     <message>
         <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien anders dan nul, zullen auto-transcode taken het opgegeven aantal dagen nadat de opname afgerond is gestart worden in plaast van direct hierna.</translation>
     </message>
     <message>
         <source>Run User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Start Gebruikers taak #%1</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de standaard waarde die gebrukt wordt voor de &apos;Run %1&apos; instelling wanneer een nieuwe geprogrammeerde opname gemaakt wordt.</translation>
     </message>
     <message>
         <source>Merge short commercial breaks (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg korte recleame onderbrekingen samen (in seconden)</translation>
     </message>
     <message>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandel achtereenvolgende reclame onderbrekingen korter dan de ingevoerde waarde als één onderbreking tijdens het overslaan. Dit is handig indien u tijdens onderbrekingen meerdere malen moet overslaan. Wordt ook toegepast op automatisch overslaan. Zet op 0 om uit te schakelen.</translation>
     </message>
     <message>
         <source>Extra Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra schijfruimte</translation>
     </message>
     <message>
         <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra schijfruimte (in Gigabytes) dat u vrij wilt houden op het opname bestandssysteem, naast hetgeen dat MythTV nodig heeft.</translation>
     </message>
     <message>
         <source>Auto Expire Instead of Delete Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatishc vervallen in plaats van de opname verwijderen</translation>
     </message>
     <message>
         <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats de opname naar de groep &apos;verwijderd&apos;, in plaats van de opname te verwijderen.</translation>
     </message>
     <message>
         <source>Deleted Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>Max ouderdom verwijderd</translation>
     </message>
     <message>
         <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien een nummer groter dan nul ingevuld is, zal automatisch vervallen verwijderde opnames laten vervallen indien ze het opgegeven aantal dagen oud zijn.</translation>
     </message>
     <message>
         <source>Expire in deleted order</source>
-        <translation type="unfinished"></translation>
+        <translation>Vervallen in volgorde van verwijderen</translation>
     </message>
     <message>
         <source>Expire Deleted recordings in the order which they were originally deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat verwijderde opnames vervallen in de volgorde waarin ze origineel verwijderd zijn.</translation>
     </message>
     <message>
         <source>DeletedExpireOptions</source>
-        <translation type="unfinished"></translation>
+        <translation>VerwijderVervalOpties</translation>
     </message>
     <message>
         <source>Watched before UNwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Gezien voor ONgezien</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld, zullen programma&apos;s die gemarkeerd zijn als gezien eerder vervallen dan programma&apos;s die nog niet bekeken zijn.</translation>
     </message>
     <message>
         <source>Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteit gewicht</translation>
     </message>
     <message>
         <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingeschakeld, zullen alle nieuwe geplande opnames gemarkeerd worden als geschikt voor automatisch vervallen. Bestaande schema&apos;s houden hun huidige waarde.</translation>
     </message>
     <message>
         <source>LiveTV Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>LiveTv MaxOuderdom</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen zal het vervallen van LiveTV opnames forceren indien deze het opgegeven aantal dagen oud zijn. LiveTV opnames kunnen ook eerder vervallen indien er ruimte vrij gemaakt moet worden.</translation>
     </message>
     <message>
         <source>Re-record Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Gezien heropnemen</translation>
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vraag voor een bepaalde categorie (b.v. &quot;Sport evenementen&quot;) aan dat uitzendingen automatisch verlengd worden. Dit werkt alleen indien de categorie van de uitzending bepaald kan worden.</translation>
     </message>
     <message>
         <source>Profile Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Profiel item</translation>
     </message>
     <message>
         <source>Example Custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorbeeld van een aangepaste filter lijst: &apos;ivtv,denoise3d&apos;</translation>
     </message>
     <message>
         <source>Main deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoofd deïnterlacing methode.</translation>
     </message>
     <message>
         <source>Fallback deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reserve deïnterlacing methode.</translation>
     </message>
     <message>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;</translation>
     </message>
     <message>
         <source>if rez</source>
-        <translation type="unfinished"></translation>
+        <translation>if rez</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Bewerken</translation>
+        <translation>Bewerken</translation>
     </message>
     <message>
         <source>Add New Entry</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Voeg nieuwe toe</translation>
     </message>
     <message>
         <source>Playback Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeelprofiel</translation>
     </message>
     <message>
         <source>Current Video Playback Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige video afspeelprofiel</translation>
     </message>
     <message>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg nieuwe toe</translation>
     </message>
     <message>
         <source>Enter Playback Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer afspeelgroep naam in</translation>
     </message>
     <message>
         <source>Sorry, playback group
 name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorry, afspeelgroep
+naam mag niet leeg zijn.</translation>
     </message>
     <message>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorry, afspeelgroep naam
+&apos;%1&apos; is al in gebruik.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <source>Length of time an on-screen display window will be visible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd dat een &apos;on-screen display&apos; scherm getoond wordt.</translation>
     </message>
     <message>
         <source>Length of time the on-screen display will display program information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd dat het &apos;on-screen display&apos; programma informatie toont.</translation>
     </message>
     <message>
         <source>Use this to enlarge or shrink captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik dit om ondertiteling te vergroten of te verkleinen.</translation>
     </message>
     <message>
         <source>ATSC Caption Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC ondertiteling instellingen</translation>
     </message>
     <message>
         <source>ATSC %1 closed caption font.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC %1 ondertiteling lettertype.</translation>
     </message>
     <message>
         <source>ATSC Caption Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC caption lettertype</translation>
     </message>
     <message>
         <source>Monospaced Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Monospaced serif</translation>
     </message>
     <message>
         <source>Proportional Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Proportionele serif</translation>
     </message>
     <message>
         <source>Monospaced Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Monispaced sans serif</translation>
     </message>
     <message>
         <source>Proportional Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Proportionele sans serif</translation>
     </message>
     <message>
         <source>Regular Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Normaal lettetype</translation>
     </message>
     <message>
         <source>Italic Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Cursief lettertype</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>Cursief</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikaal schalen</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Aanpassen wanneer het beeld uw scherm niet volledig vult (vertikaal). Bereik -100% tot 100%</translation>
     </message>
     <message>
         <source>Horizontal scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale schaling</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Aanpassen wanneer het beeld uw scherm niet volledig vult (horizontaal). Bereik -100% tot 100%</translation>
     </message>
     <message>
         <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef de voorkeur aan EIA-708 over EIA-608 lettertypes</translation>
     </message>
     <message>
         <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zullen de nieuwe EIA-708 lettertypes de voorkeur krijgen over de oude EIA-608 lettertypes in ATSC streams.</translation>
     </message>
     <message>
         <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is de standaard, maar vanaf begin 2008 zenden de meeste zenders geen bruikbaar EIA-708 lettertypes uit.</translation>
     </message>
     <message>
         <source>Enable picture controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Picture controls inschakelen</translation>
     </message>
     <message>
         <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld, zal MythTV proberen om picture controls (helderheid, contrast, etc.) in te schakelen tijdens het afspelen.</translation>
     </message>
     <message>
         <source>Warn on no audio output</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarschuwing bij geen geluid</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld zal MythTV een waarschuwing geven als deze de geluidskaart niet kan benaderen.</translation>
     </message>
     <message>
         <source>Always prompt (excluding Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd vragen (exclusief Live TV)</translation>
     </message>
     <message>
         <source>Always prompt (including Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd vragen (inclusief Live TV)</translation>
     </message>
     <message>
         <source>Prompt for Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Vraag alleen voor Live TV</translation>
     </message>
     <message>
         <source>Continue Playback When Embedded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Doorgaan met afspelen indien </translation>
     </message>
     <message>
         <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
@@ -10297,514 +10295,558 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Automatically mark a recording as watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnames automatishc als gezien markeren</translation>
     </message>
     <message>
         <source>Customise exit menu options</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluitmenu optes aanpassen</translation>
     </message>
     <message>
         <source>Show quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten laten zien</translation>
     </message>
     <message>
         <source>Show quit and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten en uitschakelen laten zien</translation>
     </message>
     <message>
         <source>Show quit, reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten, herstarten en uitschakelen laten zien</translation>
     </message>
     <message>
         <source>Show shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten laten zien</translation>
     </message>
     <message>
         <source>Show reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstarten laten zien</translation>
     </message>
     <message>
         <source>Show reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstarten en uitschakelen laten zien</translation>
     </message>
     <message>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard wordt de uitschakelen optie in het afsluit menu alleen op externe frontends getoond. Hier kunt u afdwingen dat bepaalde afsluit en herstart opties getoodn worden.</translation>
     </message>
     <message>
         <source>Reboot command</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstart commando</translation>
     </message>
     <message>
         <source>Command or script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando of script dat gestart moet worden indien u de herstart optie uit het afsluit menu kiest. U dient een afsluitknop te configureren om het afsluit menu te tonen.</translation>
     </message>
     <message>
         <source>Command or script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando of script dat gestart moet worden indien u de afsluiten optie uit het afsluit menu kiest. U dient een afsluitknop te configureren om het afsluit menu te tonen.</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>De beeldverhouding van een Xinerama-beeldscherm kan niet achterhaald worden, u moet het specificeren.</translation>
     </message>
     <message>
         <source>Letterboxing Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Letterboxing kleur</translation>
     </message>
     <message>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV gebruikt standaard de kleur zwart om de &apos;zwarte randen&apos; onder en boven het scherm te plaatsen, met plasma schermen kan het wenselijk zijn om grijs te kiezen om het inbranden te minimaliseren.</translation>
     </message>
     <message>
         <source>Currently only works with XVideo video renderer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werkt momenteel alleen met XVideo video renderer.</translation>
     </message>
     <message>
         <source>Video Aspect Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Video beeldverhouding aanpassen</translation>
     </message>
     <message>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld zal deze beeldverhouding voor alle uitzendingen gebruikt worden.</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom</translation>
     </message>
     <message>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld zal er standaard ingezoomt worden bij het afspelen in MythTV.</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Breedte van monitor of TV, wordt gebruikt om de beeldverhouding te berekenen. Dit gaat boven de &apos;DisplaySize&apos; van het systeem.</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte van monitor of TV, wordt gebruikt om de beeldverhouding te berekenen. Dit gaat boven de &apos;DisplaySize&apos; van het systeem.</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Muisaanwijzer verbergen in MythTV</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakelt de zichtbaarheid van de muisaanwijzer in/uit. De meeste onderdelen in MythTV reageren niet op muisklikken. Dit is enkel om het &apos;verliezen&apos; van de muisaanwijzer tegen te gaan.</translation>
     </message>
     <message>
         <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit selecteerd wat Myth gebruikt om te tekenen. Als u fatsoenlijke hardware heeft, selecteer OpenGL. Aanpassingen vereisen een herstart van Myth.</translation>
     </message>
     <message>
         <source>UI Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>UI Thema</translation>
     </message>
     <message>
         <source>OSD Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Thema</translation>
     </message>
     <message>
         <source>Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu Thema</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflicten tussen LiveTV en geprogrammeerde opnames vermijden</translation>
     </message>
     <message>
         <source>Allow live TV to move scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Sta toe dat live TV geplande opnames verplaatst</translation>
     </message>
     <message>
         <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingeschakeld zullen geplande opnames verplaatst worden naar andere kaarten (indien mogelijk), zodat live TV niet verstoord wordt.</translation>
     </message>
     <message>
         <source>Fine tune font size (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine tune lettertype grootte (%)</translation>
     </message>
     <message>
         <source>Fine tune all font sizes by this percentage. Font sizes should be the correct relative size if the X11 DPI (dots per inch) is set to 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine tune alle lettertype groottes met dit percentage. Lettertype groottes zouden de juiste relatieve grootte moeten hebben indien de X11 DPI (dots per inch) op 100 ingesteld is.</translation>
     </message>
     <message>
         <source>Display the channel icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Zender iconen tonen</translation>
     </message>
     <message>
         <source>Display the icons/logos for the channels in the guide.  See section 9.5 of the Installation Guide for how to grab icons.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toont de iconen/logo&apos;s van de kanalen in de tvgids.  Zie sectie 9.5 van de installatie handleiding voor uitleg over hoe u iconen kunt downloaden.</translation>
     </message>
     <message>
         <source>Avoid back to back recordings from different channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorkom back to back opnames van verschillende kanalen</translation>
     </message>
     <message>
         <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld zal de scheduler voorkomen dat programma&apos;s van verschillende kanalen op dezelfde kaart opgenomen worden indien de eind en begin tijd gelijk is. Dit wordt wel toegestaan indien er conflicten opgelost moeten worden.</translation>
     </message>
     <message>
         <source>The &apos;All&apos; Recording type will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>De &apos;Alle&apos; opnames soort krijgt deze waarde aan hun prioriteit toegevoegd.</translation>
     </message>
     <message>
         <source>Ignore LiveTV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Negeer LiveTV opnames</translation>
     </message>
     <message>
         <source>Recording monitoring will ignore LiveTV recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het monitoren van opnames zal LiveTV negeren.</translation>
     </message>
     <message>
         <source> (and other removable devices)</source>
-        <translation type="unfinished"></translation>
+        <translation> (en andere verwisselbare apparaten)</translation>
     </message>
     <message>
         <source>Use new media</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik nieuwe media</translation>
     </message>
     <message>
         <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit zal MythTV naar een geschikte plugin laten springen indien er nieuwe media ingevoerd wordt.</translation>
     </message>
     <message>
         <source>Ignore Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparaten negeren</translation>
     </message>
     <message>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien u wilt dat bepaalde apparaten niet gemonitord worden, geef ze dan hier komma gescheiden op. De plugins negeren deze dan</translation>
     </message>
     <message>
         <source>MythMediaMonitor</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMediaMonitor</translation>
     </message>
     <message>
         <source>PVR-350 Hardware Decoder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 Hardware decoder instellingen</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze instelling laat een DataDirect tvgids aanbieder de volgende download tijd opgeven zodat de server load verspreid wordt. Indien dit is ingeschakeld zullen de mythfilldatabase Start/Eind tijden genegeerd worden.</translation>
     </message>
     <message>
         <source>File or directory to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand of map die gebruikt wordt voor het loggen van de uitvoer van mythfilldatabase.Laat leeg om niet te loggen.</translation>
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschillende</translation>
     </message>
     <message>
         <source>Settings Access</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen toegang</translation>
     </message>
     <message>
         <source>Shutdown/Reboot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluit/herstart instellingen</translation>
     </message>
     <message>
         <source>General Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspelen Algemeen</translation>
     </message>
     <message>
         <source>Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnamegroepen</translation>
     </message>
     <message>
         <source>UDP OSD Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>UPD OSD aankondigingen</translation>
     </message>
     <message>
         <source>Analog Closed Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoge ondertiteling</translation>
     </message>
     <message>
         <source>Default JobQueue settings for new scheduled recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard JobQueue instellingen voor een nieuwe geplande opname</translation>
     </message>
     <message>
         <source>Yes, Exit and Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, afsluiten en herstarten</translation>
     </message>
     <message>
         <source>DVD contains a bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD bevat een bladwijzer</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished">Vanaf bladwijzer afspelen</translation>
+        <translation>Vanaf bladwijzer afspelen</translation>
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished">Vanaf begin afspelen</translation>
+        <translation>Vanaf het begin afspelen</translation>
     </message>
     <message>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het bestand van deze opname is leeg.</translation>
     </message>
     <message>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze opname is nog niet beschikbaar.</translation>
     </message>
     <message>
         <source>Move to Default group</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats naar standaard groep</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen ongedaan maken</translation>
     </message>
     <message>
         <source>IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-adres</translation>
     </message>
     <message>
         <source>Status Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Status poort</translation>
     </message>
     <message>
         <source>Security Pin (Required)</source>
-        <translation type="unfinished"></translation>
+        <translation>Beveiligings pin (vereist)</translation>
     </message>
     <message>
         <source>Pin code required for a frontend to connect to the backend. Blank prevents all connections, 0000 allows any client to connect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pin code is vereist om een frontend verbinding te laten maken met de backend. Indien niet gevuld, zal er geen verbinding gemaakt kunnen worden. 0000 geeft alle clients toegang.</translation>
     </message>
     <message>
         <source>Disable Firewire Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire reset uitschakelen</translation>
     </message>
     <message>
         <source>By default MythTV will reset the firewire bus when a firewire recorder stops responding to commands. But if this causes problems you can disable this here for Linux firewire recorders.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard zal MythTV de firewire bus resetten indien een firewire recorder niet meer reageerd. Indien die problemen veroorzaakt kunt u dit hier uitschakelen voor Linux firewire recorders.</translation>
     </message>
     <message>
         <source>Miscellaneous Status Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse status applicatie</translation>
     </message>
     <message>
         <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation type="unfinished"></translation>
+        <translation>Een extern programma of script dat extra informatie geeft welke in de backend status pagina getoont moet worden.  Zie contrib/misc_status_info/README</translation>
     </message>
     <message>
         <source>Your Local Timezone (for XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uw lokale tijdzone (voor XMLTV)</translation>
     </message>
     <message>
         <source>Used if the XMLTV data comes from a different timezone than your own. This adjust the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wordt gebruikt indien de XMLTV data van een andere tijdzone komt dan uw eigen tijdzone. Dit past de tijden in de XMLTV EPG data aan. &apos;Auto&apos; converterd de XMLTV tijd naar de lokale tijd door gebruik te maken van uw computer&apos;s tijdzone.  &apos;None&apos; negeert de XMLTV tijdzone en intepreteerd de tijden als lokale tijden.</translation>
     </message>
     <message>
         <source>Delay between wake attempts (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertraging tussen wake pogingen (sec)</translation>
     </message>
     <message>
         <source>Wake Attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Wake pogingen</translation>
     </message>
     <message>
         <source>The command used to wake up your master backend server
 (eg. sudo /etc/init.d/mythtv-backend restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>Het commando om de master backend server wakker te maken
+(b.v. sudo /etc/init.d/mythtv-backend restart).</translation>
     </message>
     <message>
         <source>Idle shutdown timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongebruikt afsluiten timeout (sec)</translation>
     </message>
     <message>
         <source>Command to set Wakeup Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando om de Wakeup tijd in te stellen</translation>
     </message>
     <message>
         <source>The command used to set the wakeup time (passed as $time) for the Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Het commando gebruikt om de tijd in te stellen (doorgegeven als $time) om de master backend wakker te maken</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer taken uit op de backend waarop opgenomen werd</translation>
     </message>
     <message>
         <source>User Job #%1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando voor gebruikertaak #%1</translation>
     </message>
     <message>
         <source>User Job #%1 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Omschrijving van gebruikertaak #%1</translation>
     </message>
     <message>
         <source>User Job #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikers taak #%1</translation>
     </message>
     <message>
         <source>Allow %1 jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 jobs toestaan</translation>
     </message>
     <message>
         <source>Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Master Backend</translation>
     </message>
     <message>
         <source>Locale Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Landinstellingen</translation>
     </message>
     <message>
         <source>Miscellaneous Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse instellingen</translation>
     </message>
     <message>
         <source>File Management Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsbeheer instellingen</translation>
     </message>
     <message>
         <source>Backend Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Backend wakeup instellingen</translation>
     </message>
     <message>
         <source>Slave Backends</source>
-        <translation type="unfinished"></translation>
+        <translation>Slave backends</translation>
     </message>
     <message>
         <source>Job Queue (Backend-Specific)</source>
-        <translation type="unfinished"></translation>
+        <translation>Taakrij (Backend-specifiek)</translation>
     </message>
     <message>
         <source>Tuner %1 is recording:
 </source>
-        <translation type="unfinished">Opname op tuner %1:</translation>
+        <translation>Opname op tuner %1:
+</translation>
     </message>
     <message>
         <source>Tuner %1 is not recording</source>
-        <translation type="unfinished">Tuner %1 neemt niet op</translation>
+        <translation>Tuner %1 neemt niet op</translation>
     </message>
     <message>
         <source>Date Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Weergave datum</translation>
     </message>
     <message>
         <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het formaat waarin de datum getoond wordt. Zie http://doc.trolltech.com/3.3/qdate.html#toString voor een lijst met geldige opties.</translation>
+    </message>
+    <message>
+        <source>CPU++</source>
+        <comment>Sample: No hardware assist</comment>
+        <translation>CPU++</translation>
+    </message>
+    <message>
+        <source>CPU+</source>
+        <comment>Sample: Hardware assist HD only</comment>
+        <translation>CPU+</translation>
+    </message>
+    <message>
+        <source>CPU--</source>
+        <comment>Sample: Hardware assist all</comment>
+        <translation>CPU--</translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <comment>Sample: high quality</comment>
+        <translation>Hoge Kwaliteit</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <comment>Sample: average quality</comment>
+        <translation>Normaal</translation>
+    </message>
+    <message>
+        <source>Slim</source>
+        <comment>Sample: low CPU usage</comment>
+        <translation>Minimaal</translation>
+    </message>
+    <message>
+        <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback. &apos;Passive&apos; is the least demanding on the CPU. &apos;Active Simple&apos; is more demanding and &apos;Active Linear&apos; is the most demanding (but highest quality).</source>
+        <translation>Stelt het audio upmix type voor 2 naar 6 kanaals conversie in. Dit wordt gebruikt voor multikanaal/surround audio. &apos;Passief&apos; is het minst belastend voor de CPU. &apos;Actief simpel&apos; is zwaarder en &apos;Actief linear&apos; is het meest belastend (maar bied de hoogste kwaliteit).</translation>
+    </message>
+    <message>
+        <source>Local Backend</source>
+        <translation type="obsolete">Lokale backend</translation>
+    </message>
+    <message>
+        <source>Display on screen</source>
+        <translation>Op het scherm tonen</translation>
     </message>
 </context>
 <context>
     <name>RecOptDialog</name>
     <message>
         <source>Missing Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Ontbrekend element</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het thema dat u gebruikt, bevat geen &quot;recording_options&quot; element.  Neem contact op met de maker van het thema en vraag of dit aangepast kan worden.&lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn.  Ga terug om het menu opnieuw weer te geven.</translation>
     </message>
     <message>
         <source>Unknown Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekend element</translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished">Het thema dat u gebruikt bevat een onbekend element (&apos;%1&apos;).  Het wordt genegeerd</translation>
+        <translation>Het thema dat u gebruikt bevat een onbekend element (&apos;%1&apos;).  Het wordt genegeerd</translation>
     </message>
 </context>
 <context>
     <name>RecordingProfileEditor</name>
     <message>
         <source>Add Recording Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnameprofiel toevoegen</translation>
     </message>
     <message>
         <source>Enter the name of the new profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer de naam van het nieuwe profiel in</translation>
     </message>
 </context>
 <context>
     <name>SIScan</name>
     <message>
         <source>Updated Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal %1 bijgewerkt</translation>
     </message>
     <message>
         <source>Added Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal %1 toegevoegd</translation>
     </message>
     <message>
         <source>Failed to add channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Toeveogen van kanaal %1 is mislukt</translation>
     </message>
     <message>
         <source>Network %1 Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk %1 in behandeling</translation>
     </message>
     <message>
         <source>Finished processing Transport List</source>
-        <translation type="unfinished"></translation>
+        <translation>Klaar met behandelen van transport lijst</translation>
     </message>
     <message>
         <source>Updating Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Services bijwerken</translation>
     </message>
     <message>
         <source>Finished processing Services</source>
-        <translation type="unfinished"></translation>
+        <translation>Klaar met behandelen van services</translation>
     </message>
     <message>
         <source>Frequency %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequentie %1</translation>
     </message>
     <message>
         <source>as</source>
-        <translation type="unfinished"></translation>
+        <translation>as</translation>
     </message>
     <message>
         <source>Skipping %1, not in imported channel map</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 overslaan, niet aanwezig in geimporteerde kanaal map</translation>
     </message>
     <message>
         <source>%1%2%3 on %4 (%5)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1%2%3 op %4 (%5)</translation>
     </message>
     <message>
         <source>Adding %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 toevoegen</translation>
     </message>
     <message>
         <source>Updating %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 bijwerken</translation>
     </message>
     <message>
         <source>Skipping %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 overslaan</translation>
     </message>
     <message>
         <source>on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>op %1</translation>
     </message>
     <message>
         <source>Data Only Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen data kanaal (uit de lucht?)</translation>
     </message>
     <message>
         <source>Empty Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Leeg kanaal (uit de lucht?)</translation>
     </message>
     <message>
         <source>Audio Only Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen geluidskanaal</translation>
     </message>
     <message>
         <source>Encrypted Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Gecodeerd kanaal</translation>
     </message>
     <message>
         <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2-%3 as %4 op %5 (%6)</translation>
     </message>
     <message>
         <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal gevonden maar deze correspondeerd niet met de bestaande tsid. U kunt het beste de bestaande kanalen wissen en een volledige scan doen.</translation>
     </message>
     <message>
         <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 overslaan - is al aanwezig in de DB en er is geen betere data.</translation>
     </message>
 </context>
 <context>
@@ -10884,18 +10926,18 @@ name can not be blank.</source>
     <name>ScanWizard</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>ScanWizard</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens behandelen van parameters</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardConfig</name>
     <message>
         <source>Scan Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan instellingen</translation>
     </message>
 </context>
 <context>
@@ -10909,27 +10951,27 @@ name can not be blank.</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>ScanWizard</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens afstemmen op transport</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Scannen</translation>
     </message>
     <message>
         <source>Failed to open &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Openen van &apos;%1&apos; mislukt</translation>
     </message>
     <message>
         <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandelen van &apos;%1&apos; mislukt</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens starten met scannen</translation>
     </message>
 </context>
 <context>
@@ -11010,106 +11052,107 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>standard rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>standaard regels zijn gedefinieerd</translation>
     </message>
     <message>
         <source>search rules are defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoekregels zijn gedefinieerd</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplande Run Time:</translation>
     </message>
     <message>
         <source>marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemarkeerd als HDTV</translation>
     </message>
     <message>
         <source>from source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">van bron</translation>
     </message>
     <message>
         <source>on input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">op ingang</translation>
     </message>
     <message>
         <source>%1 of these are Deleted and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 hiervan is verwijderd en gebruikt %2</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupEditor</name>
     <message>
         <source>&apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Opslag groep mappen</translation>
     </message>
     <message>
         <source>Local &apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokaal &apos;%1&apos; opslag groep mappen</translation>
     </message>
     <message>
         <source>Add Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg een Opslag groep map toe</translation>
     </message>
     <message>
         <source>Enter directory name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef de mapnaam of druk op &apos;SELECTEER&apos; om tekst via het &apos;On Screen Keyboard&apos; in te voeren</translation>
     </message>
     <message>
         <source>Edit Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk opslag groep map</translation>
     </message>
     <message>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder &apos;%1&apos;
+map uit de opslag groep?</translation>
     </message>
     <message>
         <source>Yes, remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, verwijder de map</translation>
     </message>
     <message>
         <source>No, Don&apos;t remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Nee, map niet verwijderen</translation>
     </message>
     <message>
         <source>(Add New Directory)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Voeg nieuwe map toe)</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupListEditor</name>
     <message>
         <source>Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Opslag groep (mappen voor nieuwe opnames)</translation>
     </message>
     <message>
         <source>Local Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokale opslag groepen (mappen voor nieuwe opnames)</translation>
     </message>
     <message>
         <source>Create New Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een nieuwe opslag groep</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Voer groepsnaam in of druk op &apos;SELECTEER&apos; om tekst via het &apos;On Screen Keyboard&apos; in te voeren.</translation>
+        <translation>Voer groepsnaam in of druk op &apos;SELECTEER&apos; om tekst via het &apos;On Screen Keyboard&apos; in te voeren</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder opslag groep &apos;%1&apos;?</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Ja, groep verwijderen</translation>
+        <translation>Ja, groep verwijderen</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nee, groep niet verwijderen</translation>
+        <translation>Nee, groep niet verwijderen</translation>
     </message>
     <message>
         <source>(Create %1 group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Maak groep %1)</translation>
     </message>
 </context>
 <context>
@@ -11741,130 +11784,131 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Chan %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal %1: %2</translation>
     </message>
     <message>
         <source>All Tuners are Busy.
 Select a Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle tuners zijn bezet.
+Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>End Of Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Einde van de opname</translation>
     </message>
     <message>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste programma: %1 bestaat niet</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze opname verwijderen?</translation>
     </message>
     <message>
         <source>DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished">Menu</translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Stilstaand beeld</translation>
     </message>
     <message>
         <source>Title: %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel: %1 (%2)</translation>
     </message>
     <message>
         <source>Chapter: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoofdstuk: %1%2</translation>
     </message>
     <message>
         <source>DVD Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Hoofdstuk menu</translation>
     </message>
     <message>
         <source>&apos;%1&apos; Group Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; groepswachtwoord:</translation>
     </message>
     <message>
         <source>Password Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Verkeerd wachtwoord</translation>
     </message>
     <message>
         <source>Screen Shot</source>
-        <translation type="unfinished"></translation>
+        <translation>Screen shot</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsluiten</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV wil &quot;%1&quot; op %2 in %d seconden opnemen. Wilt u:</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnemen en terug naar menu</translation>
     </message>
     <message>
         <source>Record it later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Later opnemen, ik wil TV kijken</translation>
     </message>
     <message>
         <source>Record them later, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Later opnemen, ik wil TV kijken</translation>
     </message>
     <message>
         <source>Don&apos;t let them record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet opnemen, ik wil TV kijken</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het kanaal had al vergrendeld moeten zijn. U kunt blijven wachten voor een signaal, of u kunt naar een ander kanaal overschakelen met %1 of %2, van bron wisselen (%3) of van ingang wisselen (%4).</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>Adjust Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Beeldvullend</translation>
     </message>
     <message>
         <source>Switch Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissel van ingang</translation>
     </message>
     <message>
         <source>C</source>
         <comment>Card</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>I</source>
         <comment>Input</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissen van bron</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Toekomstige opnames</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <source>You are exiting %1</source>
-        <translation type="unfinished"></translation>
+        <translation>U sluit %1 af</translation>
     </message>
     <message>
         <source>Exit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 afsluiten</translation>
     </message>
 </context>
 <context>
@@ -12067,64 +12111,64 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>(1) Channel    (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Kanaal    (2) Prioriteit</translation>
     </message>
 </context>
 <context>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe transport</translation>
     </message>
 </context>
 <context>
     <name>TransportListEditor</name>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished">Weet u zeker dat u dit transport wilt verwijderen?</translation>
+        <translation>Weet u zeker dat u dit transport wilt verwijderen?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished">Ja, het transport verwijderen</translation>
+        <translation>Ja, het transport verwijderen</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nee, niet doen</translation>
+        <translation>Nee, niet doen</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished">Transport Menu</translation>
+        <translation>Transport Menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerken..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen..</translation>
     </message>
     <message>
         <source>Multiplex Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplex bewerker</translation>
     </message>
 </context>
 <context>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Zoeken</translation>
+        <translation>Zoeken</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished">Begint met tekst</translation>
+        <translation>Begint met tekst</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished">Bevat tekst</translation>
+        <translation>Bevat tekst</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
 </context>
 <context>
@@ -12204,7 +12248,7 @@ Select a Current Recording</source>
     <name>VideoSourceSelector</name>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished">Video bron</translation>
+        <translation>Video bron</translation>
     </message>
 </context>
 <context>
@@ -12243,15 +12287,15 @@ Het volgende scherm zal leeg zijn. Keer terug naar het menu door dit scherm te v
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder regel &apos;%1&apos; %2?</translation>
     </message>
     <message>
         <source>Conflict Today</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conflict vandaag</translation>
     </message>
     <message>
         <source>Conflict </source>
-        <translation type="unfinished"></translation>
+        <translation>Conflict </translation>
     </message>
 </context>
 <context>
@@ -12367,11 +12411,11 @@ Het volgende scherm zal leeg zijn. Keer terug naar het menu door dit scherm te v
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">to</translation>
     </message>
     <message>
         <source>MythTV has running or pending jobs.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV heeft taken die draaien of wachten.</translation>
     </message>
 </context>
 <context>
