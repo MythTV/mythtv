@@ -1169,15 +1169,15 @@ if ($package == 1) {
 	 	# Create on-the-fly  files required
 	 	[ file => $mythtv.'build/isfiles/versioninfo.iss', write => [$mythtv.'build/isfiles/versioninfo.iss',
 '
-#define MyAppName "MythTv"
-#define MyAppVerName MythTv "'.$version.'(svn_'.$SVNRELEASE .')"
+#define MyAppName      "MythTv"
+#define MyAppVerName   "MythTv '.$version.'(svn_'.$SVNRELEASE .')"
 #define MyAppPublisher "Mythtv"
-#define MyAppURL "http://www.mythtv.org"
-#define MyAppExeName "Win32MythTvInstall.exe"
+#define MyAppURL       "http://www.mythtv.org"
+#define MyAppExeName   "Win32MythTvInstall.exe"
  ','nocheck' ],comment => 'write the version information for the setup'],
  [ file => $mythtv.'genfiles.sh', write => [$mythtv.'genfiles.sh','
 cd '.$unixmythtv.'build
-find . -type d -o -path "./include/*" -prune -o -path "*.svn*" -prune -o  -printf "Source: c:/mythtv/build/%h/%f; Destdir: {app}/%h\n" | sed "s/\.\///" > '.$unixmythtv.'/build/isfiles/files.iss 
+find . -type f -printf "Source: '.$mythtv.'build/%h/%f; Destdir: {app}/%h\n" | sed "s/\.\///" | grep -v ".svn" | grep -v "isfiles" | grep -v "include" > '.$unixmythtv.'/build/isfiles/files.iss
 ',], comment => 'write script to generate setup files'], 
   [ newer => [$mythtv.'build/isfiles/files.iss',$mythtv.'mythtv/last_build.txt'], shell => [$unixmythtv.'genfiles.sh'] ],
 # Run setup
