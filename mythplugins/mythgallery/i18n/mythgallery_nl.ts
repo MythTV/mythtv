@@ -1,210 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
-<defaultcodec></defaultcodec>
 <context>
     <name>IconView</name>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1336"/>
         <source>Import pictures?</source>
-        <translation>Foto&apos;s importeren?</translation>
+        <translation type="obsolete">Foto&apos;s importeren?</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1338"/>
         <source>No</source>
-        <translation>Neen</translation>
+        <translation type="obsolete">Neen</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1339"/>
         <source>Yes</source>
-        <translation>Ja</translation>
+        <translation type="obsolete">Ja</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1382"/>
         <source>Nothing found to import</source>
-        <translation>Niets gevonden om te importeren</translation>
+        <translation type="obsolete">Niets gevonden om te importeren</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1569"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="634"/>
+        <location filename="../mythgallery/iconview.cpp" line="472"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="635"/>
         <source>Sorry: OpenGL support not available</source>
-        <translation>Geen OpenGL ondersteuning aanwezig</translation>
+        <translation type="obsolete">Geen OpenGL ondersteuning aanwezig</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="887"/>
+        <location filename="../mythgallery/iconview.cpp" line="147"/>
         <source>SlideShow</source>
         <translation>Diashow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1179"/>
+        <location filename="../mythgallery/iconview.cpp" line="727"/>
         <source>Rotate CW</source>
         <translation>Draai WZ</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1182"/>
+        <location filename="../mythgallery/iconview.cpp" line="730"/>
         <source>Rotate CCW</source>
         <translation>Draai TWZ</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1218"/>
+        <location filename="../mythgallery/iconview.cpp" line="770"/>
         <source>Import</source>
         <translation>Importeren</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="897"/>
+        <location filename="../mythgallery/iconview.cpp" line="157"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="889"/>
+        <location filename="../mythgallery/iconview.cpp" line="149"/>
         <source>Random</source>
         <translation>Willekeurig</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1227"/>
+        <location filename="../mythgallery/iconview.cpp" line="779"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="99"/>
+        <location filename="../mythgallery/iconview.cpp" line="88"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>De MythGallery map &apos;%1&apos; bestaat niet, of kan niet worden gelezen.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="106"/>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation>MythGallery kon het thema niet laden, zie de console voor meer informatie.</translation>
+        <translation type="obsolete">MythGallery kon het thema niet laden, zie de console voor meer informatie.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="590"/>
+        <location filename="../mythgallery/iconview.cpp" line="473"/>
         <source>The selected device is no longer available</source>
         <translation>Het geselecteerde apparaat niet langer beschikbaar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="891"/>
+        <location filename="../mythgallery/iconview.cpp" line="151"/>
         <source>Meta Data...</source>
         <translation>Meta Data...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="893"/>
+        <location filename="../mythgallery/iconview.cpp" line="153"/>
         <source>Marking...</source>
         <translation>Markeren...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="895"/>
+        <location filename="../mythgallery/iconview.cpp" line="155"/>
         <source>File...</source>
         <translation>Bestand...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1212"/>
+        <location filename="../mythgallery/iconview.cpp" line="764"/>
         <source>Return</source>
         <translation>Terug</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1197"/>
+        <location filename="../mythgallery/iconview.cpp" line="747"/>
         <source>Clear Marked</source>
         <translation>Deselecteer Alles</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1200"/>
+        <location filename="../mythgallery/iconview.cpp" line="750"/>
         <source>Select All</source>
         <translation>Selecteer Alles</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1215"/>
+        <location filename="../mythgallery/iconview.cpp" line="767"/>
         <source>Show Devices</source>
         <translation>Toon Apparaten</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1221"/>
+        <location filename="../mythgallery/iconview.cpp" line="773"/>
         <source>Copy here</source>
         <translation>Kopieer naar hier</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1224"/>
+        <location filename="../mythgallery/iconview.cpp" line="776"/>
         <source>Move here</source>
         <translation>Verplaats naar hier</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1230"/>
+        <location filename="../mythgallery/iconview.cpp" line="782"/>
         <source>Create Dir</source>
         <translation>Maak Map</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1284"/>
+        <location filename="../mythgallery/iconview.cpp" line="838"/>
         <source>Delete Current File or Folder</source>
         <translation>Verwijder huidige bestand of map</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1286"/>
+        <location filename="../mythgallery/iconview.cpp" line="840"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Bezig met verwijderen van 1 map, inclusief alle sub-mappen en bestanden.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1287"/>
+        <location filename="../mythgallery/iconview.cpp" line="841"/>
         <source>Deleting 1 image.</source>
         <translation>Bezig met verwijderen van 1 afbeelding.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1485"/>
+        <location filename="../mythgallery/iconview.cpp" line="1034"/>
         <source>Delete Marked Files</source>
         <translation>Verwijder gemarkeerde bestanden</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1487"/>
+        <location filename="../mythgallery/iconview.cpp" line="1036"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Bezig met verwijderen van %1 afbeeldingen en mappen, inclusief alle sub-mappen en bestanden.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1526"/>
+        <location filename="../mythgallery/iconview.cpp" line="1080"/>
         <source>New Folder</source>
         <translation>Nieuwe Map</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1530"/>
+        <location filename="../mythgallery/iconview.cpp" line="1084"/>
         <source>Create New Folder</source>
         <translation>Maak een Nieuwe Map</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1637"/>
+        <location filename="../mythgallery/iconview.cpp" line="1191"/>
         <source>Moving marked images...</source>
         <translation>Bezig met verplaatsen van de gemarkeerde afbeeldingen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1637"/>
+        <location filename="../mythgallery/iconview.cpp" line="1191"/>
         <source>Copying marked images...</source>
         <translation>Bezig met kopieren van de gemarkeerde afbeeldingen</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="160"/>
         <source>Failed to mount device: </source>
-        <translation>Aankoppelen van apparaat mislukt: </translation>
+        <translation type="obsolete">Aankoppelen van apparaat mislukt: </translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="161"/>
         <source>Showing the default MythGallery directory.</source>
-        <translation>Toont de standaard MythGallery map.</translation>
+        <translation type="obsolete">Toont de standaard MythGallery map.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1553"/>
+        <location filename="../mythgallery/iconview.cpp" line="1108"/>
         <source>Rename</source>
         <translation>Hernoem</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1564"/>
+        <location filename="../mythgallery/iconview.cpp" line="1119"/>
         <source>Failed to rename directory</source>
         <translation>Hernoemen van map mislukt</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1566"/>
+        <location filename="../mythgallery/iconview.cpp" line="1121"/>
         <source>Failed to rename file</source>
         <translation>Hernoemen van bestand mislukt</translation>
     </message>
@@ -289,7 +288,7 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="31"/>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="53"/>

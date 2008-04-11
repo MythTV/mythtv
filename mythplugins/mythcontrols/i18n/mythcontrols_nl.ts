@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
-<defaultcodec></defaultcodec>
 <context>
     <name>ActionMenu</name>
     <message>
@@ -45,29 +44,34 @@
         <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="" line="134915572"/>
+        <location filename="../mythcontrols/keygrabber.cpp" line="30"/>
         <source>Cancel</source>
-        <translation type="obsolete">Annuleren</translation>
+        <translation type="unfinished">Annuleren</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/keygrabber.cpp" line="107"/>
+        <location filename="../mythcontrols/keygrabber.cpp" line="79"/>
         <source>Pressed key not recognized</source>
         <translation>Toets werd niet herkend</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/keygrabber.cpp" line="114"/>
+        <location filename="../mythcontrols/keygrabber.cpp" line="84"/>
         <source>Add key &apos;%1&apos;?</source>
         <translation>Toets &apos;%1&apos; toevoegen?</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/keygrabber.cpp" line="41"/>
+        <location filename="../mythcontrols/keygrabber.cpp" line="26"/>
         <source>Press A Key</source>
         <translation>Druk op een toets</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/keygrabber.cpp" line="42"/>
+        <location filename="../mythcontrols/keygrabber.cpp" line="26"/>
         <source>Waiting for key press</source>
         <translation>Wachten op toetsaanslag</translation>
+    </message>
+    <message>
+        <location filename="../mythcontrols/keygrabber.cpp" line="29"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -85,7 +89,7 @@
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="590"/>
         <source>Delete this binding?</source>
-        <translation>Deze verbinding verwijderen</translation>
+        <translation type="obsolete">Deze verbinding verwijderen</translation>
     </message>
     <message>
         <location filename="" line="134915572"/>
@@ -103,104 +107,119 @@
         <translation type="obsolete">Acties</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="237"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="290"/>
         <source>Change View</source>
         <translation>Wijzig weergave</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="202"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="251"/>
         <source>Actions By Context</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="203"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="252"/>
         <source>Contexts By Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="204"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="253"/>
         <source>Keys By Context</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="271"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="653"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="223"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="276"/>
         <source>Options</source>
         <translation>Opties</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="236"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="289"/>
         <source>Save</source>
         <translation>Opslaan</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="256"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="214"/>
         <source>Modify Action</source>
         <translation>Actie veranderen</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="269"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="227"/>
         <source>Set Binding</source>
         <translation type="unfinished">Verbinding instellen</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="270"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="228"/>
         <source>Remove Binding</source>
         <translation type="unfinished">Verbinding verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="288"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="303"/>
         <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
         <translation>Afsluiten, maar er zijn nog wijzigingen die niet opgeslagen zijn. Wat wilt u doen?</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="301"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="316"/>
         <source>Save then Exit</source>
         <translation>Opslaan en dan afsluiten</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="302"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="317"/>
         <source>Exit without saving changes</source>
         <translation>Afsluiten zonder de wijzigingen op te slaan</translation>
     </message>
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="577"/>
         <source>Manditory Action</source>
-        <translation>Benodigde actie</translation>
+        <translation type="obsolete">Benodigde actie</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="580"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="602"/>
         <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
         <translation>Deze actie is vereist en er moet op z&apos;n minst één toets aan verbonden zijn. Probeer deze opneiuw te verbinden met een andere toets.</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="614"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="629"/>
         <source>This key binding conflicts with %1 in the %2 context.</source>
         <translation type="unfinished">Deze toets in verbinding is in conflict met %1 in de %2 context.</translation>
     </message>
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="619"/>
         <source>Conflicting Binding</source>
-        <translation>Conflicterende verbinding</translation>
+        <translation type="obsolete">Conflicterende verbinding</translation>
     </message>
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="626"/>
         <source>This key binding may conflict with %1 in the %2 context. Do you want to bind it anyway?</source>
-        <translation>Deze toets vervinding kan een conflict geven met %1 in de %2 context. Wilt u evengoed doorgaan?</translation>
+        <translation type="obsolete">Deze toets vervinding kan een conflict geven met %1 in de %2 context. Wilt u evengoed doorgaan?</translation>
     </message>
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="629"/>
         <source>Conflict Warning</source>
-        <translation>Conflict waarschuwing</translation>
+        <translation type="obsolete">Conflict waarschuwing</translation>
     </message>
     <message>
-        <location filename="../mythcontrols/mythcontrols.cpp" line="630"/>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="654"/>
         <source>Bind Key</source>
         <translation>Verbind toets</translation>
+    </message>
+    <message>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="649"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="632"/>
+        <source> Unable to bind key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythcontrols/mythcontrols.cpp" line="634"/>
+        <source> Do you want to bind it anyway?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -226,12 +245,12 @@
     <message>
         <location filename="../mythcontrols/keygrabber.cpp" line="43"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <location filename="../mythcontrols/mythcontrols.cpp" line="630"/>
         <source>Cancel</source>
-        <translation>Annuleren</translation>
+        <translation type="obsolete">Annuleren</translation>
     </message>
 </context>
 <context>
