@@ -33,6 +33,7 @@ my $SVNRELEASE = '16789'; # Latest build that has been confirmed to run,
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '16973'; # Recent 0-21-fixes
+#my $SVNRELEASE = '17011'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -64,7 +65,7 @@ my $tickets = 0;            # Apply specific win32 tickets -
 my $dbconf = 0;             # Configure MySQL as part of the build process.
                             #  Required only for testing
 my $makeclean = 0;          # Flag to make clean
-my $svnlocation = "trunk";  # defaults to trunk unless specified
+my $svnlocation = "trunk";  # defaults to trunk unless -b specified
 my $qtver = 3;              # default to 3 until we can test otherwise below,
                             #  do not change this here.
 
@@ -97,22 +98,18 @@ if (defined $opt{b}) {
     $svnlocation = "trunk";
 }
 
-$qtver = 4 if ( $SVNRELEASE > 16789 && $svnlocation eq 'trunk' );
-print "using QT version: $qtver\n";
+# force QT4 if we are on trunk above the point where QT4 patches were merged
+if ( $svnlocation eq 'trunk' && ($SVNRELEASE eq 'HEAD' || $SVNRELEASE > 16789) )
+{   $qtver = 4   }
+
+# force us to label the DLL's as 0.21 if we are on the release 21 branch!
+$version = '0.21' if   $svnlocation eq "branches/release-0-21-fixes"; 
+
+print "Config:\n\tQT version: $qtver\n\tDLL's will be labeled as: $version\n\tSVN location is: $svnlocation\n\n";
 
 # TODO -  use this list to define the components to build - only the first of these currently works well.
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 
-# Where is the users home? 
-# Script later creates %HOMEPATH%\.mythtv\mysql.txt
-if ( ! exists $ENV{'HOMEPATH'} || $ENV{'HOMEPATH'} eq '\\' )
-{   $ENV{'HOMEPATH'} = $ENV{'USERPROFILE'}   }
-my $doshome = $ENV{HOMEPATH};
-my $home = $doshome; 
-$home =~ s#\\#/#g;
-$home =~ s/ /\\ /g;
-$home .= '/'; # all paths should end in a slash
-my $unixhome = perl2unix($home);
 
 # TODO - we should try to autodetect these paths, rather than assuming
 #        the defaults - perhaps from environment variables like this:
@@ -128,6 +125,21 @@ my $msys = 'C:/MSys/1.0/'; # must end in slash, and use forward slashes /
 my $sources = 'C:/msys/1.0/sources/'; # must end in slash, and use forward slashes /
 my $mingw = 'C:/MinGW/'; # must end in slash, and use forward slashes /
 my $mythtv = 'C:/mythtv/';  # this is where the entire SVN checkout lives so c:/mythtv/mythtv/ is the main codebase.  # must end in slash, and use forward slashes /
+
+# Where is the users home? 
+# Script later creates $home\.mythtv\mysql.txt
+my $doshome = '';
+if ( ! exists $ENV{'HOMEPATH'} || $ENV{'HOMEPATH'} eq '\\' ) {   
+	$doshome = $ENV{'USERPROFILE'};  
+} else {
+  $doshome = $ENV{HOMEDRIVE}.$ENV{HOMEPATH};
+}
+my $home = $doshome; 
+$home =~ s#\\#/#g;
+$home =~ s/ /\\ /g;
+$home .= '/'; # all paths should end in a slash
+my $unixhome = perl2unix($home);
+
 
 # DOS executable CMD.exe versions of the paths (for when we shell to DOS mode):
 my $dosmsys    = perl2dos($msys);
@@ -169,21 +181,31 @@ my $unixmythtv  = perl2unix($mythtv);
 
 
 #build expectations (causes) :
-#  missing a file (given an expected path)                                 [file]
-#  missing folder                                                          [dir]
-#  missing source archive (fancy version of 'file' to fetch from the web)  [archive]
-#  apply a perl pattern match and if it DOESNT match execute the action    [grep]  - this 'cause' actually needs two parameters in an array [ pattern, file].  If the file is absent, the pattern is assumed to not match (and emits a warning).
-#  test the file/s are totally the same (by size and mtime)                [filesame] - if first file is non-existant then that's permitted, it causes the action to trigger.
-#  test the first file is newer(mtime) than the second one                 [newer] - if given 2 existing files, not necessarily same size/content, and the first one isn't newer, execute the action!.  If the first file is ABSENT, run the action too.
+#  missing a file (given an expected path)                           [file]
+#  missing folder                                                    [dir]
+#  missing source archive (version of 'file' to fetch from the web)  [archive]
+#  apply a perl pattern match and if it DOESNT match execute action  [grep]
+#  - this 'cause' actually needs two parameters in an array
+#    [ pattern, file].  If the file is absent, the pattern
+#    is assumed to not match (and emits a warning).
+#  test the file/s are totally the same (by size and mtime)          [filesame]
+#  - if first file is non-existant then that's permitted,
+#    it causes the action to trigger.
+#  test the first file is newer(mtime) than the second one           [newer]
+#  - if given 2 existing files, not necessarily same size/content,
+#    and the first one isn't newer, execute the action!. 
+#    If the first file is ABSENT, run the action too.
 #  stop the run, useful for script debugging                         [stop]
 #  pause the run, await a enter                                      [pause]
 
 #build actions (events) are:
 #  fetch a file from the web (to a location)                         [fetch]
-#  set an environment variable (name, value pair)                    not-yet-impl
 #  execute a DOS/Win32 exe/command and wait to complete              [exec]
-#  execute a MSYS/Unix script/command in bash and wait to complete   [shell]- this 'effect' actually accepts many parameters in an array [ cmd1, cmd2, etc ]
-#  extract a .tar .tar.gz or .tar.bz2 or ,zip file ( to a location)  [extract] - (note that .gz and .bz2 are thought equivalent)
+#  execute a MSYS/Unix script/command in bash and wait to complete   [shell]
+#  - this 'effect' actually accepts many parameters in an array
+#    [ cmd1, cmd2, etc ]
+#  extract a .tar .tar.gz or .tar.bz2 or ,zip file ( to a location)  [extract]
+#  - (note that .gz and .bz2 are thought equivalent)
 #  write a small patch/config/script file directly to disk           [write]
 #  make directory tree upto the path specified                       [mkdirs]
 #  copy a new version of a file, set mtime to the original           [copy] 
@@ -480,6 +502,7 @@ push @{$expect},
 if ( $qtver == 3  ) {
 push @{$expect}, 
 
+[ pause => 'press [enter] to build QT3 next!'],
 [ archive => $sources.'qt-3.3.x-p8.tar.bz2',  fetch => 'http://'.$sourceforge.'/sourceforge/qtwin/qt-3.3.x-p8.tar.bz2'],
 [ dir => $msys.'qt-3.3.x-p8', extract => [$sources.'qt-3.3.x-p8.tar', $msys] ],
 
@@ -508,6 +531,7 @@ cd %QTDIR%
 
 
 [ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && configure.bat -thread -plugin-sql-mysql -opengl -no-sql-sqlite',comment => 'Execute qt3_env.bat  && the configure command to actually build QT now!  - ie configures qt and also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
+[ file => $mingw.'bin/sh_.exe', shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
 
 [ filesame => [$msys.'qt-3.3.x-p8/bin/libqt-mt3.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''], comment => 'is there a libqt-mt3.dll in the "lib" folder of QT? if so, copy it to the the "bin" folder for uic.exe to use!' ],
 
@@ -534,6 +558,7 @@ cd %QTDIR%
 
 #  (back to sh.exe ) now that we are done !
 [ file => $msys.'bin/sh.exe', shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],comment => 'rename msys sh_.exe back again!' ] ,
+[ file => $mingw.'bin/sh.exe', shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],comment => 'rename mingw sh_.exe back again!' ] ,
 
 #Copy libqt-mt3.dll to libqt-mt.dll  , if there is any date/size change!
 [ filesame => [$msys.'qt-3.3.x-p8/lib/libqt-mt.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''],comment => 'Copy libqt-mt3.dll to libqt-mt.dll' ] ,
@@ -548,23 +573,30 @@ cd %QTDIR%
 
 if ( $qtver == 4  ) {
 push @{$expect}, 
+[ pause => 'press [enter] to build QT4 next!'],
+
 [ archive => $sources.'qt-win-opensource-src-4.3.4.zip',  fetch => 'ftp://ftp.trolltech.com/qt/source/qt-win-opensource-src-4.3.4.zip'],
 [ dir => $msys.'qt-win-opensource-src-4.3.4', extract => [$sources.'qt-win-opensource-src-4.3.4.zip', $msys] ],
 
 [dir => $msys.'qt-win-opensource-src-4.3.4_examples', shell => 'mv '.$unixmsys.'qt-win-opensource-src-4.3.4/examples '.$unixmsys.'qt-win-opensource-src-4.3.4_examples', 
   comment => 'after extracting the qt sources, there is no need for us to build the examples, so we will just move the folder out of the way (we could just delete it but dont)! ' ] ,
 
-# write a batch script for the QT environment under DOS:
-[ file => $msys.'qt-win-opensource-src-4.3.4/qt4_env.bat', write => [$msys.'qt-win-opensource-src-4.3.4/qt4_env.bat',
+# qt recommend NOT having sh.exe in the path when building QT (yes this applies to QT4 too!)
+[ file => $msys.'bin/sh_.exe', shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
+[ file => $mingw.'bin/sh_.exe', shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
+
+# Write a batch script for the QT environment under DOS:
+# TODO - the configure script pauses until you press 'y' to continue! 
+[ file => $msys.'qt-win-opensource-src-4.3.4/qt4_env.bat_', write => [$msys.'qt-win-opensource-src-4.3.4/qt4_env.bat',
 'rem a batch script for the QT environment under DOS:
 set QTDIR='.$dosmsys.'qt-win-opensource-src-4.3.4
 set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
-configure -plugin-sql-mysql -no-sql-sqlite -release -fast -no-sql-odbc -nomake examples -nomake demos -no-nis -no-cups -noqdbus
+configure -plugin-sql-mysql -no-sql-sqlite -release -fast -no-sql-odbc -no-qdbus
 rem mingw32-make
-'
+','nocheck'
 ],comment=>'write a batch script for the QT4 environment under DOS'],
 
 # test if the core .dll is built, and build QT if it isn't! 
@@ -575,7 +607,14 @@ rem mingw32-make
 [ file => $msys.'qt-win-opensource-src-4.3.4/bin/qmake.exe', exec => '', comment => 'bin\qmake.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
 [ file => $msys.'qt-win-opensource-src-4.3.4/bin/moc.exe', exec => '', comment => 'bin\moc.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
 [ file => $msys.'qt-win-opensource-src-4.3.4/bin/uic.exe', exec => '', comment => 'bin\uic.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+
+
+#  move it (back to sh.exe ) now that we are done !
+[ file => $msys.'bin/sh.exe', shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],comment => 'rename msys sh_.exe back again!' ] ,
+[ file => $mingw.'bin/sh.exe', shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],comment => 'rename mingw sh_.exe back again!' ] ,
+
 ;
+
 }
 
 
@@ -656,7 +695,7 @@ if ($makeclean) {
 foreach my $comp( @components ) {
   push @{$expect}, 
   [ file => 'always',
-    exec => ["$dosmsys\\bin\\svn.exe -r $SVNRELEASE update $dosmythtv$comp",
+    exec => [$dosmsys."bin\\svn.exe -r $SVNRELEASE update $dosmythtv$comp",
              'nocheck'],
     comment => "Getting SVN updates for:$comp on $svnlocation" ];
 }
@@ -757,19 +796,11 @@ push @{$expect},
 [ file => $mythtv.'mythtv/config/config.pro', shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], 
 	comment => 'create an empty config.pro or the mythtv build will fail'],
 
-# do a make clean before? Yes, if the SVN revision has changed (it deleted the file for us), or the user deleted the file manually, to request it. 
-[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','make clean','find . -type f -name \*.dll | grep -v build | xargs -n1 rm','find . -type f -name \*.a | grep -v build | xargs -n1 rm','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
+# do a make clean (nd re-configure) before going any further? Yes, if the SVN revision has changed (it deleted the file for us), or the user deleted the file manually, to request it. 
+[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','make clean','find . -type f -name \*.dll | grep -v build | xargs -n1 rm','find . -type f -name \*.a | grep -v build | xargs -n1 rm','rm Makefile','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
 
-#broken Makefile, delete it
+#broken Makefile?, delete it
 [ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
-
-# fix a bug in Makefile and make COPY_DIR cp -fr instead of cp -f
-[ file => $mythtv.'mythtv/fix_makefile.sh', write => [$mythtv.'mythtv/fix_makefile.sh', 
-'cd '.$unixmythtv.'mythtv
-cat Makefile | sed  "s/\(^COPY_DIR\W*\=\W*cp\)\(\W\-f\)/\1 -fr/" > Makefile_new
-cp Makefile_new Makefile
-', 'nocheck',
-],comment => 'write a script to fix Makefile'],
 
 # configure
 [ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-xvmc --enable-directx --cpu=k8 --compile-type='.$compile_type], comment => 'do we already have a Makefile for mythtv?' ],
@@ -798,6 +829,16 @@ cp Makefile_new Makefile
             'source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythtv','make'],
   comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
+
+
+# fix a bug in Makefile and make COPY_DIR cp -fr instead of cp -f
+[ file => $mythtv.'mythtv/fix_makefile.sh', write => [$mythtv.'mythtv/fix_makefile.sh', 
+'cd '.$unixmythtv.'mythtv
+cat Makefile | sed  "s/\(^COPY_DIR\W*\=\W*cp\)\(\W\-f\)/\1 -fr/" > Makefile_new
+cp Makefile_new Makefile
+', 'nocheck',
+],comment => 'write a script to fix Makefile'],
+
 
 # re-install to msys /usr/bin folders etc, if we have a newer mythtv build
 # ready:
@@ -1148,7 +1189,7 @@ find . -type d -o -path "./include/*" -prune -o -path "*.svn*" -prune -o  -print
 }
 
 
-#----------------------------------------
+#------------------------------------------------------------------------------
 
 ; # END OF CAUSE->ACTION DEFINITIONS
 
@@ -1298,18 +1339,16 @@ foreach my $dep ( @{$expect} ) {
     } elsif ( $causetype eq 'stop' ){
         die "Stop found \n";
     } elsif ( $causetype eq 'pause' ){
+    	  comment("PAUSED! : ".$cause);
         my $temp = getc();
     } else {
         die " unknown causetype $causetype \n";
     }
 }
-
 print "\nall done\n";
-
 _end();
 
 #------------------------------------------------------------------------------
-
 # each cause has an effect, this is where we do them:
 sub effect {
     my ( $effecttype, @effectparams ) = @_;
@@ -1366,8 +1405,8 @@ sub effect {
             die " unknown effecttype $effecttype from cause 'dir'\n";
         }
 }
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
 # kinda like a directory search for blah.tar* but faster/easier.
 #  only finds .tar.gz, .tar.bz2, .zip
 sub findtar {
@@ -1384,9 +1423,8 @@ sub findtar {
     return $t if -f $t;
     die "findtar failed to match a file from:($t)\n";
 }
+
 #------------------------------------------------------------------------------
-
-
 # given a ($t) .tar.gz, .tar.bz2, .zip extract it to the directory ( $d)
 # changes current directory to $d too
 sub extracttar {
@@ -1446,9 +1484,8 @@ sub extracttar {
         print;
     }   
 }
+
 #------------------------------------------------------------------------------
-
-
 # get the $url (typically a .tar.gz or similar) , and save it to $file
 sub _fetch {
     my ( $file,$url ) = @_;
@@ -1474,9 +1511,8 @@ sub _fetch {
       die ("ERR: Unable to automatically fetch file!\nPerhaps manually downloading from the URL to the filename (both listed above) might work, or you might want to choose your own SF mirror (edit this script for instructions), or perhaps this version of the file is no longer available.");
     }
 }
+
 #------------------------------------------------------------------------------
-
-
 # execute a sequence of commands in a bash shell.
 # we explicitly add the /bin and /mingw/bin to the path
 # because at this point they aren't likely to be there
@@ -1501,6 +1537,7 @@ sub shell {
         print;
     }
 }
+
 #------------------------------------------------------------------------------
 # recursively make folders, requires perl-compatible folder separators
 # (ie forward slashes)
@@ -1518,23 +1555,26 @@ sub mkdirs {
 }
 
 #------------------------------------------------------------------------------
-
-
+# unix compatible  versions of the perl paths (for when we [shell] to unix/bash mode):
 sub perl2unix  {
     my $p = shift;
+    print "perl2unix: $p\n";
     $p =~ s#$msys#/#i;  # remove superfluous msys folders if they are there
     $p =~ s#^([CD]):#/$1#ig;  #change c:/ into /c  (or a D:)   so c:/msys becomes /c/msys etc.
     $p =~ s#//#/#ig; # reduce any double forward slashes to single ones.
     return $p;
 }
-# DOS executable CMD.exe versions of the paths (for when we shell to DOS mode):
+
+#------------------------------------------------------------------------------
+# DOS executable CMD.exe versions of the paths (for when we [exec] to DOS mode):
 sub perl2dos {
     my $p = shift;
     $p =~ s#/#\\#g; # single forward to single backward
     return $p;
 }
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+# find a pattern in a file and return if it was found or not. Absent file assumes pattern was not found.
 sub _grep {
     my ($pattern,$file) = @_;
     #$pattern = qw($pattern);
@@ -1550,7 +1590,7 @@ sub _grep {
 }
 
 #------------------------------------------------------------------------------
-
+# where is this script? 
 sub scriptpath {
   return "" if ($0 eq "");
   my @path = split /\\/, $0;
@@ -1560,7 +1600,7 @@ sub scriptpath {
 }
 
 #------------------------------------------------------------------------------
-
+# display stuff to the user in a manner that unclutters it from the other compilation messages that will be scrolling past! 
 sub comment {
     my $comment = shift;
     print "\nCOMMENTS:";
@@ -1573,7 +1613,7 @@ sub comment {
 }
 
 #------------------------------------------------------------------------------
-
+# how? what the?   oh! like that!  I get it now, I think.
 sub usage {
     print << 'END_USAGE';
 -h             This message
