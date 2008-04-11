@@ -8,6 +8,7 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name, bool doInit)
             : MythUIType(parent, name)
 {
     m_State = None;
+    m_CheckState = MythUIStateType::None;
 
     m_PaddingMargin = 0;
 
@@ -275,11 +276,19 @@ void MythUIButton::SelectState(StateType newState)
 
 void MythUIButton::SetCheckState(MythUIStateType::StateType state)
 {
+    m_CheckState = state;
     m_CheckImage->DisplayState(state);
+}
+
+MythUIStateType::StateType MythUIButton::GetCheckState()
+{
+    return m_CheckState;
 }
 
 void MythUIButton::EnableCheck(bool enable)
 {
+    if (m_CheckState == MythUIStateType::None)
+        m_CheckState = MythUIStateType::Off;
     m_CheckImage->SetVisible(enable);
     SetupPlacement();
 }

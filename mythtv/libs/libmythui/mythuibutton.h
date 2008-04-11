@@ -44,6 +44,7 @@ class MythUIButton : public MythUIType
 
     void SelectState(StateType newState);
     void SetCheckState(MythUIStateType::StateType state);
+    MythUIStateType::StateType GetCheckState();
     void EnableCheck(bool enable);
     void EnableRightArrow(bool enable);
 
@@ -75,6 +76,7 @@ class MythUIButton : public MythUIType
     QMap<int, MythFontProperties> m_FontProps;
 
     StateType m_State;
+    MythUIStateType::StateType m_CheckState;
 
     QRect m_TextRect;
     int m_PaddingMargin;
