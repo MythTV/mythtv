@@ -180,6 +180,37 @@ bool MythScreenType::Create(void)
     return true;
 }
 
+bool MythScreenType::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "LEFT")
+            NextPrevWidgetFocus(false);
+        else if (action == "RIGHT")
+            NextPrevWidgetFocus(true);
+        if (action == "UP")
+            NextPrevWidgetFocus(false);
+        else if (action == "DOWN")
+            NextPrevWidgetFocus(true);
+        else if (action == "ESCAPE")
+            GetScreenStack()->PopScreen();
+        else
+            handled = false;
+    }
+
+    return handled;
+}
+
 bool MythScreenType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
