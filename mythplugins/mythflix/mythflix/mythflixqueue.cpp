@@ -305,11 +305,12 @@ bool MythFlixQueue::keyPressEvent(QKeyEvent *event)
              slotMoveToTop();
         else if((action == "SELECT") || (action == "MENU"))
             displayOptions();
-        else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }

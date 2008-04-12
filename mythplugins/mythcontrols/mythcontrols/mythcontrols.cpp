@@ -317,19 +317,14 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Exit without saving changes"));
             }
             else
-                GetMythMainWindow()->GetMainStack()->PopScreen();
-        }
-        else if (action == "LEFT")
-        {
-            NextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            NextPrevWidgetFocus(true);
+                GetScreenStack()->PopScreen();
         }
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }

@@ -382,7 +382,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 SetFocusWidget(m_menuList);
             }
             else
-                GetMythMainWindow()->GetMainStack()->PopScreen();
+                GetScreenStack()->PopScreen();
         }
         else if (action == "ROTRIGHT")
             HandleRotateCW();
@@ -414,6 +414,9 @@ bool IconView::keyPressEvent(QKeyEvent *event)
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }

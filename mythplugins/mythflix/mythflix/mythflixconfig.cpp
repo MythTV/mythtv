@@ -333,27 +333,3 @@ void MythFlixConfig::slotCategoryChanged(MythListButtonItem *item)
         }
     }
 }
-
-bool MythFlixConfig::keyPressEvent(QKeyEvent *event)
-{
-    if (GetFocusWidget()->keyPressEvent(event))
-        return true;
-
-    bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("NetFlix", event, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
-        else
-            handled = false;
-    }
-
-    return handled;
-}
-

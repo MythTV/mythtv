@@ -43,7 +43,6 @@ class MythFlixConfig : public MythScreenType
     ~MythFlixConfig();
 
     bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
 
   private:
     void loadData();

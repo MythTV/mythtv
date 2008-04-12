@@ -21,26 +21,28 @@
 
 #include <iostream>
 
+// QT headers
 #include <qapplication.h>
 #include <unistd.h>
 
-#include "mythflix.h"
-#include "mythflixqueue.h"
-#include "mythflixconfig.h"
-
+// MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
-
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 
+// MythFlix headers
+#include "mythflix.h"
+#include "mythflixqueue.h"
+#include "mythflixconfig.h"
 #include "flixutil.h"
 #include "dbcheck.h"
 
 using namespace std;
 
-void browse(void){
+void browse(void)
+{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     MythFlix *mythflix = new MythFlix(mainStack, "flixbrowse");
@@ -49,7 +51,8 @@ void browse(void){
         mainStack->AddScreen(mythflix);
 }
 
-void queue(void){
+void queue(void)
+{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixqueue");
@@ -58,7 +61,8 @@ void queue(void){
         mainStack->AddScreen(mythflix);
 }
 
-void history(void){
+void history(void)
+{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     MythFlixQueue *mythflix = new MythFlixQueue(mainStack, "flixhistory");

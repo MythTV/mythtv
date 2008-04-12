@@ -305,21 +305,14 @@ bool MythFlix::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "LEFT")
-        {
-            NextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            NextPrevWidgetFocus(true);
-        }
-        else if((action == "SELECT") || (action == "MENU"))
+        if((action == "SELECT") || (action == "MENU"))
             displayOptions();
-        else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }

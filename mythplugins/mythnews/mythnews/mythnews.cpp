@@ -457,11 +457,7 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "LEFT")
-            NextPrevWidgetFocus(false);
-        else if (action == "RIGHT")
-            NextPrevWidgetFocus(true);
-        else if (action == "RETRIEVENEWS")
+        if (action == "RETRIEVENEWS")
             slotRetrieveNews();
         else if (action == "CANCEL")
             cancelRetrieve();
@@ -485,6 +481,9 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }
