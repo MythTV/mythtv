@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# This perl script is intended to perform movie data lookups based on 
+# This perl script is intended to perform movie data lookups based on
 # the popular www.imdb.com website
 #
 # For more information on MythVideo's external movie lookup mechanism, see
@@ -36,9 +36,9 @@ use URI::Escape;
 eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
-use Getopt::Std; 
+use Getopt::Std;
 
-$title = "IMDB Query"; 
+$title = "IMDB Query";
 $version = "v1.3.4";
 $author = "Tim Harvey, Andrei Rjeousski";
 
@@ -71,14 +71,14 @@ sub usage {
 # display 1-line of info that describes the version of the program
 sub version {
    print "$title ($version) by $author\n"
-} 
+}
 
 # display 1-line of info that can describe the type of query used
 sub info {
    print "Performs queries using the www.imdb.com website.\n";
 }
 
-# display detailed help 
+# display detailed help
 sub help {
    version();
    info();
@@ -109,7 +109,7 @@ sub parseBetween {
    return "";
 }
 
-# get Movie Data 
+# get Movie Data
 sub getMovieData {
    my ($movieid)=@_; # grab movieid parameter
    if (defined $opt_d) { printf("# looking for movie id: '%s'\n", $movieid);}
@@ -135,14 +135,14 @@ sub getMovieData {
       $title = $1;
    }
 
-   # parse director 
+   # parse director
    my $data = parseBetween($response, ">Director:</h5>", "</div>");
    if (!length($data)) {
       $data = parseBetween($response, ">Directors:</h5>", "</div>");
    }
    my $director = join(",", ($data =~ m/$name_link_pat/g));
 
-   # parse writer 
+   # parse writer
    # (Note: this takes the 'first' writer, may want to include others)
    $data = parseBetween($response, ">Writers <a href=\"/wga\">(WGA)</a>:</h5>", "</div>");
    if (!length($data)) {
@@ -209,8 +209,8 @@ sub getMovieData {
       $runtime = trim(parseBetween($rawruntime, "$country:", " min"));
    }
 
-   # parse cast 
-   #  Note: full cast would be from url: 
+   # parse cast
+   #  Note: full cast would be from url:
    #    www.imdb.com/title/<movieid>/fullcredits
    my $cast = "";
    $data = parseBetween($response, "Cast overview, first billed only",
@@ -218,29 +218,29 @@ sub getMovieData {
    if (!$data) {
        $data = parseBetween($response, "Series Cast Summary",
                                "/table>");
-   } 
+   }
 
    if (!$data) {
        $data = parseBetween($response, "Complete credited cast",
                                "/table>");
-   } 
+   }
 
    if ($data) {
       $cast = join(',', ($data =~ m/$name_link_pat/g));
       $cast = trim($cast);
    }
-   
-   
-   # parse genres 
+
+
+   # parse genres
    my $lgenres = "";
-   $data = parseBetween($response, "<h5>Genre:</h5>","</div>"); 
+   $data = parseBetween($response, "<h5>Genre:</h5>","</div>");
    if ($data) {
       my $genre_pat = qr'/Sections/Genres/(?:[a-z ]+/)*">([^<]+)<'im;
       $lgenres = join(',', ($data =~ /$genre_pat/g));
    }
-   
-   # parse countries 
-   $data = parseBetween($response, "Country:</h5>","</div>"); 
+
+   # parse countries
+   $data = parseBetween($response, "Country:</h5>","</div>");
    my $country_pat = qr'/Sections/Countries/[A-Z]+/">([^<]+)</a>'i;
    my $lcountries = join(",", ($data =~ m/$country_pat/g));
 
@@ -287,7 +287,7 @@ sub getMoviePoster {
       if (defined $opt_d) { print "# Searching for poster at: ".$impsite."\n"; }
       my $impres = get $impsite;
       if (defined $opt_d) { printf("# got %i bytes\n", length($impres)); }
-      if (defined $opt_r) { printf("%s", $impres); }      
+      if (defined $opt_r) { printf("%s", $impres); }
 
       # making sure it isnt redirect
       $uri = parseBetween($impres, "0;URL=..", "\">");
@@ -297,15 +297,20 @@ sub getMoviePoster {
          $impsite = $site . $uri;
          $impres = get $impsite;
       }
-      
+
       # do stuff normally
       $uri = parseBetween($impres, "<img SRC=\"posters/", "\" ALT");
       # uri here is relative... patch it up to make a valid uri
-      if (!($uri =~ /http:(.*)/ )) {
-         my $path = substr($impsite, 0, rindex($impsite, '/') + 1);
-         $uri = $path."posters/".$uri;
+      if ($uri =~ /\.(jpe?g|gif|png)$/) {
+          if (!($uri =~ /http:(.*)/ )) {
+             my $path = substr($impsite, 0, rindex($impsite, '/') + 1);
+             $uri = $path."posters/".$uri;
+          }
+          if (defined $opt_d) { print "# found ipmawards poster: $uri\n"; }
       }
-      if (defined $opt_d) { print "# found ipmawards poster: $uri\n"; }
+      else {
+          $uri = "";
+      }
    }
 
    # try looking on nexbase
@@ -330,10 +335,9 @@ sub getMoviePoster {
          my $cinres = get $1;
          if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
          if (defined $opt_r) { printf("%s", $cinres); }
-
-         if ($cinres =~ m/<td align=center><img src="([^"]*?)" border=1><\/td>/i) {
+        if ($cinres =~ m#<img\b[^>]+\bsrc="(/images/reviews/[^"]*?)"#i) {
             if (defined $opt_d) { print "# cinemablend url retreived\n"; }
-            $uri = "http://www.cinemablend.com/".$1;   
+            $uri = "http://www.cinemablend.com/".$1;
          }
       }
    }
@@ -356,7 +360,7 @@ sub getMoviePoster {
    my @movie_titles;
    my $found_low_res = 0;
    my $k = 0;
-   
+
    # no poster found, take lowres image from imdb
    if ($uri eq "") {
       if (defined $opt_d) { print "# looking for lowres imdb posters\n"; }
@@ -364,7 +368,7 @@ sub getMoviePoster {
       $response = get $host;
 
       # Better handling for low resolution posters
-      # 
+      #
       if ($response =~ m/<a name="poster".*<img.*src="([^"]*).*<\/a>/ig) {
          if (defined $opt_d) { print "# found low res poster at: $1\n"; }
          $uri = $1;
@@ -375,7 +379,7 @@ sub getMoviePoster {
       }
 
       if (defined $opt_d) { print "# starting to look for movie title\n"; }
-      
+
       # get main title
       if (defined $opt_d) { print "# Getting possible movie titles:\n"; }
       $movie_titles[$k++] = parseBetween($response, "<title>", "<\/title>");
@@ -386,9 +390,9 @@ sub getMoviePoster {
          $movie_titles[$k++] = trim($1);
          if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
       }
-       
+
    }
-   
+
    print "$uri\n";
 }
 
@@ -399,7 +403,7 @@ sub getMovieList {
    # If we wanted to inspect the file for any reason we can do that now
 
    #
-   # Convert filename into a query string 
+   # Convert filename into a query string
    # (use same rules that Metadata::guesTitle does)
    my $query = $filename;
    $query = uri_unescape($query);  # in case it was escaped
@@ -409,26 +413,26 @@ sub getMovieList {
    }
    # Strip off anything following '(' - people use this for general comments
    if (rindex($query, '(') != -1) {
-      $query = substr($query, 0, rindex($query, '(')); 
+      $query = substr($query, 0, rindex($query, '('));
    }
    # Strip off anything following '[' - people use this for general comments
    if (rindex($query, '[') != -1) {
-      $query = substr($query, 0, rindex($query, '[')); 
+      $query = substr($query, 0, rindex($query, '['));
    }
 
    # IMDB searches do better if any trailing ,The is left off
    $query =~ /(.*), The$/i;
    if ($1) { $query = $1; }
-   
-   # prepare the url 
+
+   # prepare the url
    $query = uri_escape($query);
    if (!$options) { $options = "" ;}
-   if (defined $opt_d) { 
+   if (defined $opt_d) {
       printf("# query: '%s', options: '%s'\n", $query, $options);
    }
-   
+
    # get the search results  page
-   #    some known IMDB options are:  
+   #    some known IMDB options are:
    #         type=[fuzy]         looser search
    #         from_year=[int]     limit matches to year (broken at imdb)
    #         to_year=[int]       limit matches to year (broken at imdb)
@@ -442,10 +446,10 @@ sub getMovieList {
       print $response;
       exit(0);
    }
-   
+
    # check to see if we got a results page or a movie page
    #    looking for 'add=<movieid>" target=' which only exists
-   #    in a movie description page 
+   #    in a movie description page
    my $movienum = parseBetween($response, "add=", "\" ");
    if (!$movienum) {
       $movienum = parseBetween($response, ";add=", "'");
@@ -459,7 +463,7 @@ sub getMovieList {
       }
 
       if (defined $opt_d) { printf("# redirected to movie page\n"); }
-      my $movietitle = parseBetween($response, "<title>", "</title>"); 
+      my $movietitle = parseBetween($response, "<title>", "</title>");
       $movietitle =~ m#(.+) \((\d+)\)#;
       $movietitle = $1;
       print "$movienum:$movietitle\n";
@@ -467,15 +471,15 @@ sub getMovieList {
    }
 
    # extract possible matches
-   #    possible matches are grouped in several catagories:  
+   #    possible matches are grouped in several catagories:
    #        exact, partial, and approximate
    my $popular_results = parseBetween($response, "<b>Popular Titles</b>",
                                               "</table>");
    my $exact_matches = parseBetween($response, "<b>Titles (Exact Matches)</b>",
                                               "</table>");
-   my $partial_matches = parseBetween($response, "<b>Titles (Partial Matches)</b>", 
+   my $partial_matches = parseBetween($response, "<b>Titles (Partial Matches)</b>",
                                               "</table>");
-#   my $approx_matches = parseBetween($response, "<b>Titles (Approx Matches)</b>", 
+#   my $approx_matches = parseBetween($response, "<b>Titles (Approx Matches)</b>",
 #                                               "</table>");
    # parse movie list from matches
    my $beg = "<tr>";
@@ -491,7 +495,7 @@ sub getMovieList {
 #   if ($data eq "") { $data = $approx_matches; }
    if ($data eq "") {
       if (defined $opt_d) { printf("# no results\n"); }
-      return; 
+      return;
    }
    my $start = index($data, $beg);
    my $finish = index($data, $end, $start);
@@ -530,27 +534,27 @@ sub getMovieList {
       if ($options =~ /tv=no/) {
          if ($type eq "TV") {
             if (defined $opt_d) {printf("# skipping TV program: %s\n", $title);}
-            $skip = 1; 
+            $skip = 1;
          }
       }
       if ($options =~ /tv=only/) {
          if ($type eq "") {
             if (defined $opt_d) {printf("# skipping Movie: %s\n", $title);}
-            $skip = 1; 
+            $skip = 1;
          }
       }
       # fix broken 'from_year=' option
       if ($options =~ /from_year=(\d+)/) {
          if ($year < $1) {
             if (defined $opt_d) {printf("# skipping b/c of yr: %s\n", $title);}
-            $skip = 1; 
+            $skip = 1;
          }
       }
       # fix broken 'to_year=' option
       if ($options =~ /to_year=(\d+)/) {
          if ($year > $1) {
             if (defined $opt_d) {printf("# skipping b/c of yr: %s\n", $title);}
-            $skip = 1; 
+            $skip = 1;
          }
       }
 
@@ -560,14 +564,14 @@ sub getMovieList {
             if (defined $opt_d) {
                 printf("# skipping Video program: %s\n", $title);
             }
-            $skip = 1; 
+            $skip = 1;
          }
       }
-   
+
       # (always) strip out video game's (why does IMDB give these anyway?)
       if ($type eq "VG") {
          if (defined $opt_d) {printf("# skipping videogame: %s\n", $title);}
-         $skip = 1; 
+         $skip = 1;
       }
 
       # add to array
@@ -590,10 +594,10 @@ sub getMovieList {
 # Main Program
 #
 
-# parse command line arguments 
+# parse command line arguments
 getopts('ohrdivDMP');
 
-# print out info 
+# print out info
 if (defined $opt_v) { version(); exit 1; }
 if (defined $opt_i) { info(); exit 1; }
 
