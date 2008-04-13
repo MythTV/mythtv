@@ -590,9 +590,7 @@ void MythNews::createProgress(QString title)
     m_busyPopup = new MythUIBusyDialog(message, popupStack, "mythnewsbusydialog");
 
     if (m_busyPopup->Create())
-        popupStack->AddScreen(m_busyPopup);
-//    connect(busy, SIGNAL(cancelAction()),
-//             SLOT(slotProgressCancelled()));
+        popupStack->AddScreen(m_busyPopup, false);
 }
 
 bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
