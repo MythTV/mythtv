@@ -623,7 +623,7 @@ void MPEG2fixup::FrameInfo(MPEG2frame *f)
 int MPEG2fixup::AddFrame(MPEG2frame *f)
 {
     index_unit iu;
-    ringbuffer *rb, *rbi;
+    ringbuffer *rb = 0, *rbi = 0;
     int id = f->pkt.stream_index;
 
     memset(&iu, 0, sizeof(index_unit));
@@ -648,6 +648,12 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         rb = &rx.extrbuf[aud_map[id]];
         rbi = &rx.index_extrbuf[aud_map[id]];
         iu.framesize = f->pkt.size;
+    }
+
+    if (! rb || ! rbi)
+    {
+        VERBOSE(MPF_IMPORTANT, "Ringbuffer pointers empty. No stream found\n");
+        return 1;
     }
 
     iu.active = 1;
