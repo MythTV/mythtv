@@ -13,7 +13,7 @@ class MythUIBusyDialog : public MythScreenType
                   MythScreenStack *parent, const char *name);
 
     bool Create(void);
-//    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event);
 
     void Close();
 
@@ -31,7 +31,7 @@ class MythUIProgressDialog : public MythScreenType
                   MythScreenStack *parent, const char *name);
 
     bool Create(void);
-//    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event);
 
     void SetTotal(uint total);
     void SetCount(uint count);

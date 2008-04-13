@@ -27,6 +27,13 @@ bool MythUIBusyDialog::Create(void)
     return true;
 }
 
+bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
+{
+    // We don't want to handle any keypresses, including Escape in the base
+    // class
+    return false;
+}
+
 void MythUIBusyDialog::Close(void)
 {
     GetScreenStack()->PopScreen();
@@ -56,6 +63,13 @@ bool MythUIProgressDialog::Create(void)
         m_messageText->SetText(m_message);
 
     return true;
+}
+
+bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
+{
+    // We don't want to handle any keypresses, including Escape in the base
+    // class
+    return false;
 }
 
 void MythUIProgressDialog::SetTotal(uint total)
