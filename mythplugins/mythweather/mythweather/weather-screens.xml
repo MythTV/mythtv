@@ -14,7 +14,7 @@
         <datum name="weather" />
         <datum name="weather_icon" />
         <datum name="observation_time" />
-        <!-- <datum name="copyright" /> -->
+        <datum name="copyright" />
     </screen>
 
     <screen name="Three Day Forecast">
@@ -33,7 +33,7 @@
         <datum name="high-2" />
         <datum name="updatetime" />
     </screen>
-    
+
     <screen name="Six Day Forecast">
         <datum name="6dlocation" />
         <datum name="date-0" />
@@ -62,33 +62,30 @@
         <datum name="low-5" />
         <datum name="updatetime" />
     </screen>
-    
+
     <!-- <screen name="Today's Forecast">
         <datum name="header" />
         <datum name="updatetime" />
         <datum name="today-desc" />
     </screen> -->
 
-    <screen name="Static Map">
-        <hasunits>no</hasunits>
+    <screen name="Static Map" hasunits="no">
         <datum name="smdesc" />
         <datum name="updatetime" />
         <datum name="map" />
     </screen>
 
-    <screen name="Animated Map">
-        <hasunits>no</hasunits>
+    <screen name="Animated Map" hasunits="no">
         <datum name="amdesc" />
         <datum name="updatetime" />
         <datum name="datum" />
     </screen>
-    
-    <screen name="Severe Weather Alerts">
-        <hasunits>no</hasunits>
+
+    <screen name="Severe Weather Alerts" hasunits="no">
         <datum name="swlocation" />
         <datum name="alerts" />
     </screen>
-    
+
     <screen name="18 Hour Forecast">
         <datum name="18hrlocation" />
         <datum name="time-0" />
@@ -111,7 +108,7 @@
         <datum name="pop-5" />
         <datum name="updatetime" />
     </screen>
-    
+
     <!-- <screen name="Tomorrow's Outlook">
         <datum name="forecastdate" />
         <datum name="tempforecast" />

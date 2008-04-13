@@ -1,335 +1,212 @@
-#include <mythtv/mythdbcon.h>
-#include <mythtv/uilistbtntype.h>
+
+// QT headers
 #include <qapplication.h>
 //Added by qt3to4:
-#include <QKeyEvent>
 #include <Q3PtrList>
 
+// MythTV headers
+#include <mythtv/mythdbcon.h>
+#include <mythtv/libmythui/mythuistatetype.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
+
+// MythWeather headers
 #include "weatherScreen.h"
 #include "weatherSource.h"
 #include "sourceManager.h"
-
-#include "defs.h"
-
 #include "weatherSetup.h"
 
 #define GLBL_SCREEN 0
 #define SCREEN_SETUP_SCREEN 1
 #define SRC_SCREEN 2
 
-GlobalSetup::GlobalSetup(MythMainWindow *parent)
-    : MythThemedDialog(parent, "global-setup", "weather-", "Global Setup")
+GlobalSetup::GlobalSetup(MythScreenStack *parent, const char *name)
+    : MythScreenType(parent, name)
 {
-    wireUI();
-    loadData();
-
-    buildFocusList();
-    assignFirstFocus();
 }
 
 GlobalSetup::~GlobalSetup()
 {
-    delete m_timeout_spinbox;
-    delete m_hold_spinbox;
 }
 
-void GlobalSetup::wireUI()
+bool GlobalSetup::Create()
 {
-    UIBlackHoleType *blckhl = getUIBlackHoleType("pgto_spinbox");
-    if (!blckhl)
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", "global-setup", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_timeoutSpinbox = dynamic_cast<MythListButton *> (GetChild("pgto_spinbox"));
+    m_holdSpinbox = dynamic_cast<MythListButton *> (GetChild("hold_spinbox"));
+
+    m_backgroundCheckbox = dynamic_cast<MythUIButton *> (GetChild("backgroundcheck"));
+    m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
+
+    if (!m_timeoutSpinbox || !m_holdSpinbox || !m_finishButton || !m_backgroundCheckbox)
     {
-        VERBOSE(VB_IMPORTANT, "error loading pgto_spinbox");
-    }
-    else
-    {
-        m_timeout_spinbox = new WeatherSpinBox(this);
-        m_timeout_spinbox->setRange(1, 1000);
-        m_timeout_spinbox->setLineStep(1);
-        m_timeout_spinbox->setFont(gContext->GetMediumFont());
-        m_timeout_spinbox->setFocusPolicy(Qt::NoFocus);
-        m_timeout_spinbox->setGeometry(blckhl->getScreenArea());
-        blckhl->allowFocus(true);
-        connect(blckhl, SIGNAL(takingFocus()), m_timeout_spinbox,
-                SLOT(setFocus()));
-        /* loosing focus? */
-        connect(blckhl, SIGNAL(loosingFocus()), m_timeout_spinbox,
-                SLOT(clearFocus()));
+        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        return false;
     }
 
-    blckhl = getUIBlackHoleType("hold_spinbox");
-    if (!blckhl)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading hold_spinbox");
-    }
-    else
-    {
-        m_hold_spinbox = new WeatherSpinBox(this);
-        m_hold_spinbox->setRange(1, 1000);
-        m_hold_spinbox->setLineStep(1);
-        m_hold_spinbox->setFont(gContext->GetMediumFont());
-        m_hold_spinbox->setFocusPolicy(Qt::NoFocus);
-        m_hold_spinbox->setGeometry(blckhl->getScreenArea());
-        blckhl->allowFocus(true);
-        connect(blckhl, SIGNAL(takingFocus()), m_hold_spinbox,
-                SLOT(setFocus()));
-        connect(blckhl, SIGNAL(loosingFocus()), m_hold_spinbox,
-                SLOT(clearFocus()));
-    }
+    BuildFocusList();
 
-    m_background_check = getUICheckBoxType("backgroundcheck");
-    if (!m_background_check)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading backgroundcheck");
-    }
-    else
-    {
-        int setting = gContext->GetNumSetting("weatherbackgroundfetch", 0);
-        m_background_check->setState((bool) setting);
-    }
+    m_finishButton->SetText(tr("Finish"));
+    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
 
-//     m_skip_check = getUICheckBoxType("skipcheck");
-//     if (!m_skip_check)
-//     {
-//         VERBOSE(VB_IMPORTANT, "error loading skipcheck");
-//     }
+    loadData();
 
-    m_finish_btn = getUITextButtonType("finishbutton");
-    if (m_finish_btn)
-    {
-        m_finish_btn->setText(tr("Finish"));
-        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
-    }
+    return true;
 }
 
 void GlobalSetup::loadData()
 {
-    m_timeout = gContext->GetNumSetting("weatherTimeout", 10);
-    m_hold_timeout = gContext->GetNumSetting("weatherHoldTimeout", 20);
+    int setting = gContext->GetNumSetting("weatherbackgroundfetch", 0);
+    if (setting == 1)
+        m_backgroundCheckbox->SetCheckState(MythUIStateType::Full);
 
-    m_timeout_spinbox->setValue(m_timeout);
-    m_hold_spinbox->setValue(m_hold_timeout);
+    m_timeout = gContext->GetNumSetting("weatherTimeout", 10);
+    m_timeoutSpinbox->MoveToNamedPosition(QString::number(m_timeout));
+
+    m_hold_timeout = gContext->GetNumSetting("weatherHoldTimeout", 20);
+    m_holdSpinbox->MoveToNamedPosition(QString::number(m_hold_timeout));
 }
 
 void GlobalSetup::saveData()
 {
-    gContext->SaveSetting("weatherTimeout", m_timeout_spinbox->value());
-    gContext->SaveSetting("weatherHoldTimeout", m_hold_spinbox->value());
-    gContext->SaveSetting("weatherbackgroundfetch",
-                          m_background_check->getState() ? 1 : 0);
-    accept();
-}
+    QString timeout = m_timeoutSpinbox->GetItemCurrent()->text();
+    gContext->SaveSetting("weatherTimeout", timeout);
+    QString holdtimeout = m_holdSpinbox->GetItemCurrent()->text();
+    gContext->SaveSetting("weatherHoldTimeout", holdtimeout);
 
-void GlobalSetup::keyPressEvent(QKeyEvent *e)
-{
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
-    UIType *curr = getCurrentFocusWidget();
-    bool handled = false;
-
-    for (uint i = 0; i < actions.size() && !handled; ++i)
-    {
-        handled = true;
-        QString action = actions[i];
-        if (action == "DOWN")
-        {
-            nextPrevWidgetFocus(true);
-        }
-        else if (action == "UP")
-        {
-            nextPrevWidgetFocus(false);
-        }
-        else if (action == "SELECT")
-        {
-            UICheckBoxType *check = dynamic_cast<UICheckBoxType *>(curr);
-            if (check)
-            {
-                check->push();
-            }
-            if (curr == m_finish_btn)
-                m_finish_btn->push();
-        }
-        else
-            handled = false;
-    }
-
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    int checkstate = 0;
+    if (m_backgroundCheckbox->GetCheckState() == MythUIStateType::Full)
+        checkstate = 1;
+    gContext->SaveSetting("weatherbackgroundfetch", checkstate);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-ScreenSetup::ScreenSetup(MythMainWindow *parent, SourceManager *srcman) :
-    MythThemedDialog(parent, "screen-setup", "weather-", "Screen Setup")
+ScreenSetup::ScreenSetup(MythScreenStack *parent, const char *name,
+                         SourceManager *srcman) : MythScreenType(parent, name)
 {
-    m_src_man = srcman;
-    wireUI();
-    loadData();
-
-    buildFocusList();
-    assignFirstFocus();
+    m_sourceManager = srcman;
 }
 
-void ScreenSetup::wireUI()
+ScreenSetup::~ScreenSetup()
 {
-    m_help_txt = getUITextType("helptxt");
-    if (!m_help_txt)
+
+    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
     {
-        VERBOSE(VB_IMPORTANT, "Missing textarea helptxt");
+        if (m_sourceManager)
+            delete m_sourceManager;
+    }
+    else
+    {
+        m_sourceManager->clearSources();
+        m_sourceManager->findScriptsDB();
+        m_sourceManager->setupSources();
     }
 
-    UITextType *activeheader = getUITextType("activehdr");
+}
+
+bool ScreenSetup::Create()
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", "screen-setup", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_helpText = dynamic_cast<MythUIText *> (GetChild("helptxt"));
+
+    m_activeList = dynamic_cast<MythListButton *> (GetChild("activelist"));
+    m_inactiveList = dynamic_cast<MythListButton *> (GetChild("inactivelist"));
+
+    m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
+
+    MythUIText *activeheader = dynamic_cast<MythUIText *> (GetChild("activehdr"));
     if (activeheader)
         activeheader->SetText(tr("Active Screens"));
 
-    UITextType *inactiveheader = getUITextType("inactivehdr");
+    MythUIText *inactiveheader = dynamic_cast<MythUIText *> (GetChild("inactivehdr"));
     if (inactiveheader)
         inactiveheader->SetText(tr("Inactive Screens"));
 
-    m_active_list = getUIListBtnType("activelist");
-    if (!m_active_list)
+    if (!m_activeList || !m_inactiveList || !m_finishButton || !m_helpText)
     {
-        VERBOSE(VB_IMPORTANT, "Missing listbtntype activelist");
-    }
-    else
-    {
-        m_active_list->calculateScreenArea();
-        connect(m_active_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(activeListItemSelected(UIListBtnTypeItem *)));
-        connect(m_active_list, SIGNAL(takingFocus()), this,
-                SLOT(updateHelpText()));
-        connect(m_active_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(updateHelpText()));
+        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        return false;
     }
 
-    m_inactive_list = getUIListBtnType("inactivelist");
-    if (!m_inactive_list)
-    {
-        VERBOSE(VB_IMPORTANT, "Missing listbtntype inactivelist");
-    }
-    else
-    {
-        m_inactive_list->calculateScreenArea();
-        connect(m_inactive_list, SIGNAL(takingFocus()), this,
-                SLOT(updateHelpText()));
-        connect(m_inactive_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(updateHelpText()));
-    }
+    BuildFocusList();
 
-//     m_type_list = getUIListBtnType("typelist");
-//     if (!m_type_list)
-//     {
-//         VERBOSE(VB_IMPORTANT, "error loading typelist");
-//     }
-//     else
-//     {
-//         m_type_list->calculateScreenArea();
-//         m_type_list->allowFocus(false);
-//         // connect(m_active_list, SIGNAL(takingFocus()), m_type_list,
-//         // SLOT(show()));
-//         connect(m_type_list, SIGNAL(takingFocus()), m_type_list, SLOT(show()));
-//         connect(m_active_list, SIGNAL(loosingFocus()), m_type_list,
-//                 SLOT(hide()));
-//         connect(m_active_list, SIGNAL(takingFocus()),
-//                 this, SLOT(activeListItemSelected()));
-//         connect(m_type_list, SIGNAL(takingFocus()), this,
-//                 SLOT(updateHelpText()));
-//         connect(m_type_list, SIGNAL(itemSelected(UIListBtnTypeItem *)), this,
-//                 SLOT(updateHelpText()));
-//     }
+    connect(m_activeList, SIGNAL(itemSelected(MythListButtonItem *)),
+            this, SLOT(updateHelpText()));
+    connect(m_activeList, SIGNAL(itemClicked(MythListButtonItem *)),
+            this, SLOT(doListSelect(MythListButtonItem *)));
+    connect(m_inactiveList, SIGNAL(itemSelected(MythListButtonItem *)),
+            this, SLOT(updateHelpText()));
+    connect(m_inactiveList, SIGNAL(itemClicked(MythListButtonItem *)),
+            this, SLOT(doListSelect(MythListButtonItem *)));
 
-//     UITextType *txt = getUITextType("typelbl");
-//     if (!txt)
-//     {
-//         VERBOSE(VB_IMPORTANT, "error loading typelbl");
-//     }
-//     else
-//     {
-//         //connect(m_active_list, SIGNAL(takingFocus()), txt, SLOT(show()));
-//         connect(m_type_list, SIGNAL(takingFocus()), txt, SLOT(show()));
-//         connect(m_active_list, SIGNAL(loosingFocus()), txt, SLOT(hide()));
-//         txt->hide();
-//         txt->SetText(tr("Data Types"));
-//     }
+    SetFocusWidget(m_inactiveList);
 
-    m_finish_btn = getUITextButtonType("finishbutton");
-    if (m_finish_btn)
-    {
-        m_finish_btn->setText(tr("Finish"));
-        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
-    }
+    m_finishButton->SetText(tr("Finish"));
+    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
 
+    loadData();
+
+    return true;
 }
 
-void ScreenSetup::keyPressEvent(QKeyEvent *e)
+bool ScreenSetup::keyPressEvent(QKeyEvent *event)
 {
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
-    UIType *curr = getCurrentFocusWidget();
-    UIListBtnType *list;
-    bool handled = false;
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    for (uint i = 0; i < actions.size() && !handled; ++i)
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Weather", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        handled = true;
         QString action = actions[i];
-        if (action == "DOWN")
-            cursorDown(curr);
-        else if (action == "UP")
-            cursorUp(curr);
-        else if (action == "SELECT")
-            cursorSelect(curr);
-        else if (action == "RIGHT")
+        handled = true;
+
+        if (action == "DELETE")
         {
-            m_active_list->allowFocus(m_active_list->GetCount() > 0);
-            nextPrevWidgetFocus(true);
-        }
-        else if (action == "LEFT")
-        {
-            m_active_list->allowFocus(m_active_list->GetCount() > 0);
-            nextPrevWidgetFocus(false);
-        }
-        else if (action == "DELETE")
-        {
-            if (curr == m_active_list)
-            {
-                UIListBtnType *list = dynamic_cast<UIListBtnType *>(curr);
-                deleteScreen(list);
-            }
-        }
-        else if (action == "SEARCH" &&
-                 (list = dynamic_cast<UIListBtnType *>(curr)))
-        {
-            list->incSearchStart();
-            updateForeground(list->getScreenArea());
-        }
-        else if (action == "NEXTSEARCH" &&
-                 (list = dynamic_cast<UIListBtnType *>(curr)))
-        {
-            list->incSearchNext();
-            updateForeground(list->getScreenArea());
+            if (GetFocusWidget() == m_activeList)
+                deleteScreen();
         }
         else
             handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void ScreenSetup::updateHelpText()
 {
-    UIType *itm = getCurrentFocusWidget();
+    MythUIType *list = GetFocusWidget();
     QString text;
-    if (!itm) return;
+    if (!list)
+        return;
 
-    if (itm == m_inactive_list)
+    if (list == m_inactiveList)
     {
 
-        UIListBtnTypeItem *lbt = m_inactive_list->GetItemCurrent();
-        if (!lbt)
+        MythListButtonItem *item = m_inactiveList->GetItemCurrent();
+        if (!item)
             return;
 
-        ScreenListInfo *si = (ScreenListInfo *) lbt->getData();
+        ScreenListInfo *si = (ScreenListInfo *) item->getData();
         if (!si)
             return;
 
@@ -337,23 +214,23 @@ void ScreenSetup::updateHelpText()
 
         text = tr("Add desired screen to the Active Screens list "
             "by pressing SELECT.") + "\n";
-        text += lbt->text() + "\n";
+        text += item->text() + "\n";
         text += QString("%1: %2").arg(tr("Sources"))
                                  .arg(sources.join(", "));
     }
-    else if (itm == m_active_list)
+    else if (list == m_activeList)
     {
-        UIListBtnTypeItem *lbt = m_active_list->GetItemCurrent();
-        if (!lbt)
+        MythListButtonItem *item = m_activeList->GetItemCurrent();
+        if (!item)
             return;
 
-        ScreenListInfo *si = (ScreenListInfo *) lbt->getData();
+        ScreenListInfo *si = (ScreenListInfo *) item->getData();
         if (!si)
             return;
 
         Q3DictIterator<TypeListInfo> it(si->types);
         TypeListInfo *ti = it.current();
-        text += lbt->text() + "\n";
+        text += item->text() + "\n";
         if (si->hasUnits)
             text += tr("Units: ") +
                     (si->units == ENG_UNITS ? tr("English Units") :
@@ -372,135 +249,57 @@ void ScreenSetup::updateHelpText()
             text += tr("change units; ");
         text += tr("move screen up or down; or remove screen.");
     }
-//     else if (itm == m_type_list)
-//     {
-//         UIListBtnTypeItem *btnitm = m_type_list->GetItemCurrent();
-//         if (btnitm)
-//         {
-//             TypeListInfo *ti = (TypeListInfo *) btnitm->getData();
-//             text = tr("%1\nLocation: %2\nSource: %3\n\nPress SELECT to change Location settings")
-//                 .arg(btnitm->text()).arg(ti->location != "" ? ti->location :
-//                                          tr("Not Defined"))
-//                 .arg(ti->src ? ti->src->name : tr("Not Defined"));
-//         }
-//     }
 
-    m_help_txt->SetText(text);
+    m_helpText->SetText(text);
 }
 
 void ScreenSetup::loadData()
 {
-    Q3IntDict<ScreenListInfo> active_screens;
     ScreenListInfo *si;
     TypeListInfo *ti;
 
-    /*
-     * Basic jist of this is taken from XMLParse, since we're doing some of the
-     * same stuff to get a list of container elements
-     */
-    QString uifile = gContext->GetThemeDir() + "/weather-ui.xml";
-    if (!QFile::exists(uifile))
-        uifile = gContext->GetShareDir() + "themes/default/weather-ui.xml";
-
-    if (!QFile::exists(uifile))
-    {
-        VERBOSE(VB_IMPORTANT, "Error locating weather-ui.xml");
-        return;
-    }
-
-    QFile xml(uifile);
-    QDomDocument doc;
-    if (!xml.open(QIODevice::ReadOnly))
-        return;
-    QString msg;
-    int line, col;
-    if (!doc.setContent(&xml, false, &msg, &line, &col))
-    {
-        VERBOSE(VB_IMPORTANT, QString("Error parsing weather-ui.xml at line %1")
-                                      .arg(line));
-        VERBOSE(VB_IMPORTANT, QString("XML error %1")
-                                      .arg(msg));
-        return;
-    }
-
-    QDomElement *win = 0;
-    QDomNode n = doc.documentElement().firstChild();
-    while (!n.isNull() && !win)
-    {
-        QDomElement e = n.toElement();
-        if (e.isNull())
-            continue;
-        if (e.tagName() == "window")
-        {
-            QString name = e.attribute("name");
-            if (!name.isNull() && name == "weather") 
-                win = &e;
-        }
-        n = n.nextSibling();
-    }
-    if (!win)
-    {
-        VERBOSE(VB_IMPORTANT, "weather window not found");
-        return;
-    }
-    n = win->firstChild();
-    QString tmpname;
-    int context;
-    QRect area;
     QStringList types;
-    while (!n.isNull())
+
+    ScreenListMap m_ScreenListMap = loadScreens();
+
+    ScreenListMap::const_iterator i = m_ScreenListMap.constBegin();
+    while (i != m_ScreenListMap.constEnd())
     {
-        QDomElement e = n.toElement();
-        if (e.tagName() == "font")
+
+        si = m_ScreenListMap[i.key()];
+        types = si->dataTypes;
+        si->units = ENG_UNITS;
+
+        QStringList type_strs;
+        for (int typei = 0; typei < types.size(); ++typei)
         {
-            m_weather_screens.parseFont(e);
+            ti = new TypeListInfo;
+            ti->name =  types[typei];
+            ti->src = 0;
+            si->types.insert(types[typei], ti);
+            type_strs << types[typei];
         }
-        else if (e.tagName() == "container")
+
+        Q3PtrList<ScriptInfo> scriptList;
+        // Only add a screen to the list if we have a source
+        // available to satisfy the requirements.
+        if (m_sourceManager->findPossibleSources(type_strs, scriptList))
         {
-            QString name = e.attribute("name");
-            if (!name.isNull() && !name.isEmpty() && name != "startup"
-                    && name != "background")
+            ScriptInfo *script;
+            for (script = scriptList.first(); script;
+                                        script = scriptList.next())
             {
-                m_weather_screens.parseContainer(e, tmpname, context, area);
-                types = WeatherScreen::getAllDynamicTypes(m_weather_screens.GetSet(name));
-                LayerSet *set = m_weather_screens.GetSet(name);
-
-                si = new ScreenListInfo;
-                si->units = ENG_UNITS;
-                si->hasUnits = !(bool) set->GetType("nounits");
-                si->multiLoc = (bool) set->GetType("multilocation");
-                si->types.setAutoDelete(true);
-
-                QStringList type_strs;
-                for (uint i = 0; i < types.size(); ++i)
-                {
-                    ti = new TypeListInfo;
-                    ti->name =  types[i];
-                    ti->src = 0;
-                    si->types.insert(types[i], ti);
-                    type_strs << types[i];
-                }
-
-                Q3PtrList<ScriptInfo> scriptList;
-                // Only add a screen to the list if we have a source
-                // available to satisfy the requirements.
-                if (m_src_man->findPossibleSources(type_strs, scriptList))
-                {
-                    ScriptInfo *script;
-                    for (script = scriptList.first(); script;
-                                                script = scriptList.next())
-                    {
-                        si->sources.append(script->name);
-                    }
-                    UIListBtnTypeItem *itm =
-                            new UIListBtnTypeItem(m_inactive_list, name);
-                    itm->setData(si);
-                }
-
+                si->sources.append(script->name);
             }
+            MythListButtonItem *item =
+                    new MythListButtonItem(m_inactiveList, i.key());
+            item->setData(si);
         }
-        n = n.nextSibling();
+
+        ++i;
     }
+
+    Q3IntDict<ScreenListInfo> active_screens;
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "SELECT weatherscreens.container, weatherscreens.units, "
@@ -527,33 +326,30 @@ void ScreenSetup::loadData()
         QString location = db.value(3).toString();
         QString src = db.value(4).toString();
         uint draworder = db.value(5).toUInt();
-        LayerSet *set = m_weather_screens.GetSet(name);
+
+        si = m_ScreenListMap[name];
+        // Clear types first as we will re-insert the values from the database
+        si->types.clear();
+        types = si->dataTypes;
 
         ti = new TypeListInfo;
         ti->name = dataitem;
         ti->location = location;
-        ti->src = m_src_man->getSourceByName(src);
-        types = WeatherScreen::getAllDynamicTypes(m_weather_screens.GetSet(name));
+        ti->src = m_sourceManager->getSourceByName(src);
 
         if (!active_screens.find(draworder))
         {
-            UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_active_list, name);
-            si = new ScreenListInfo;
+            MythListButtonItem *item = new MythListButtonItem(m_activeList, name);
             si->units = units;
-            si->types.setAutoDelete(true);
 
-            // Only insert types meant for this container
+            // Only insert types meant for this screen
             for (QStringList::Iterator type_i = types.begin(); type_i != types.end(); ++type_i )
             {
                 if(*type_i == dataitem)
-                {
                     si->types.insert(dataitem, ti);
-                }
             }
 
-            si->hasUnits = !(bool) set->GetType("nounits");
-            si->multiLoc = (bool) set->GetType("multilocation");
-            itm->setData(si);
+            item->setData(si);
             active_screens.insert(draworder, si);
         }
         else
@@ -570,91 +366,37 @@ void ScreenSetup::loadData()
     }
 }
 
-inline QString format_msg(
-    const QStringList &notDefined, uint rows, uint columns)
-{
-    const QString etc = QObject::tr("etc...");
-    uint elen = etc.length();
-    QStringList lines;
-    lines += "";
-    QStringList::iterator oit = lines.begin();
-    QStringList::const_iterator iit = notDefined.begin();
-    while (iit != notDefined.end())
-    {
-        QStringList::const_iterator nit = iit;
-        nit++;
-
-        uint olen = (*oit).length();
-        uint ilen = (*iit).length();
-
-        if (lines.size() >= rows)
-        {
-            if (((olen + 2 + ilen + 2 + elen) < columns) ||
-                (((olen + 2 + ilen) < columns) && (nit == notDefined.end())))
-            {
-                *oit += ", " + *iit;
-            }
-            else
-            {
-                *oit += ", " + etc;
-                nit = notDefined.end();
-            }
-        }
-        else
-        {
-            if ((olen + 2 + ilen) < columns)
-            {
-                *oit += ", " + *iit;
-            }
-            else
-            {
-                *oit += ",";
-                lines += "";
-                oit++;
-                *oit += *iit;
-            }
-        }
-
-        iit = nit;
-    }
-
-    return lines.join("\n").mid(2);
-}
-
 void ScreenSetup::saveData()
 {
-    // check if all active screens have sources/locations defined
-    QStringList notDefined;
-    Q3PtrListIterator<UIListBtnTypeItem> screens = m_active_list->GetIterator();
-    if (!screens)
+    if (m_activeList->GetCount() <= 0)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "No Screens",
-                tr("No Active Screens are defined.  Define atleast one "
-                    "before continuing."));
+        VERBOSE(VB_IMPORTANT, "No Active Screens are defined. Nothing Saved.");
         return;
     }
 
-    while (screens)
+    // check if all active screens have sources/locations defined
+    QStringList notDefined;
+
+    for (int i=0; i < m_activeList->GetCount(); i++)
     {
-        UIListBtnTypeItem *itm = *screens;
-        ScreenListInfo *si = (ScreenListInfo *) itm->getData();
+        MythListButtonItem *item = m_activeList->GetItemAt(i);
+        ScreenListInfo *si = (ScreenListInfo *) item->getData();
         Q3DictIterator<TypeListInfo> it(si->types);
         for (; it.current(); ++it)
         {
             TypeListInfo *ti = it.current();
             if (!ti->src)
+            {
                 notDefined << ti->name;
+                VERBOSE(VB_IMPORTANT, QString("Not defined %1").arg(ti->name));
+            }
         }
-        ++screens;
     }
 
-    if (notDefined.size())
+    if (notDefined.size() > 0)
     {
-        QString msg = tr("Can not proceed, the following data "
-                         "items do not have sources defined:\n");
-        msg += format_msg(notDefined, 1, 400);
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  "Undefined Sources", msg);
+        VERBOSE(VB_IMPORTANT, "A Selected screen has data items with no "
+                              "sources defined.");
         return;
     }
 
@@ -668,14 +410,14 @@ void ScreenSetup::saveData()
     query = "INSERT into weatherscreens (draworder, container, units, hostname) "
             "VALUES (:DRAW, :CONT, :UNITS, :HOST);";
     db.prepare(query);
-    Q3PtrListIterator<UIListBtnTypeItem> an_it = m_active_list->GetIterator();
+
     int draworder = 0;
-    while (an_it)
+    for (int i=0; i < m_activeList->GetCount(); i++)
     {
-        UIListBtnTypeItem *itm = *an_it;
-        ScreenListInfo *si = (ScreenListInfo *) itm->getData();
+        MythListButtonItem *item = m_activeList->GetItemAt(i);
+        ScreenListInfo *si = (ScreenListInfo *) item->getData();
         db.bindValue(":DRAW", draworder);
-        db.bindValue(":CONT", itm->text());
+        db.bindValue(":CONT", item->text());
         db.bindValue(":UNITS", si->units);
         db.bindValue(":HOST", gContext->GetHostName());
         if (db.exec())
@@ -724,84 +466,45 @@ void ScreenSetup::saveData()
             return;
         }
 
-        ++an_it;
         ++draworder;
     }
 
-    accept();
+    GetScreenStack()->PopScreen();
 }
 
-typedef QMap<DialogCode, QString> CommandMap;
-
-static DialogCode add_button(QStringList   &buttons,
-                             CommandMap    &commands,
-                             const QString &button_text,
-                             const QString &command)
-{
-    int idx = buttons.size();
-    buttons += button_text;
-    commands[(DialogCode)((int)kDialogCodeButton0 + idx)] = command;
-
-    return (DialogCode)((int)kDialogCodeButton0 + idx);
-}
-
-void ScreenSetup::doListSelect(UIListBtnType *list,
-                               UIListBtnTypeItem *selected)
+void ScreenSetup::doListSelect(MythListButtonItem *selected)
 {
     if (!selected)
         return;
 
     QString txt = selected->text();
-    if (list == m_active_list)
+    if (GetFocusWidget() == m_activeList)
     {
         ScreenListInfo *si = (ScreenListInfo *) selected->getData();
-        QStringList buttons;
-        CommandMap commands;
 
-        if (!si->multiLoc)
-            add_button(buttons, commands, tr("Change Location"), "change_loc");
+        QString label = tr("Manipulate Screen");
 
+        MythScreenStack *popupStack =
+                                GetMythMainWindow()->GetStack("popup stack");
+
+        MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                    "screensetupmenupopup");
+
+        if (menuPopup->Create())
+            popupStack->AddScreen(menuPopup);
+
+        menuPopup->SetReturnEvent(this, "options");
+
+        menuPopup->AddButton(tr("Move Up"), selected);
+        menuPopup->AddButton(tr("Move Down"), selected);
+        menuPopup->AddButton(tr("Remove"), selected);
+        menuPopup->AddButton(tr("Change Location"), selected);
         if (si->hasUnits)
-            add_button(buttons, commands, tr("Change Units"), "change_units");
+            menuPopup->AddButton(tr("Change Units"), selected);
+        menuPopup->AddButton(tr("Cancel"), selected);
 
-        add_button(buttons, commands, tr("Move Up"),   "move_up");
-        add_button(buttons, commands, tr("Move Down"), "move_down");
-        add_button(buttons, commands, tr("Remove"),    "remove");
-
-        DialogCode cancelbtn =
-            add_button(buttons, commands, tr("Cancel"), "cancel");
-        commands[kDialogCodeRejected] = "cancel";
-
-        DialogCode res = MythPopupBox::ShowButtonPopup(
-            gContext->GetMainWindow(), "Manipulate Screen",
-            tr("Action to take on screen ") + selected->text(),
-            buttons, cancelbtn);
-
-        QString cmd = commands[res];
-        if (cmd == "change_loc")
-        {
-            doLocationDialog(si, true);
-        }
-        else if (cmd == "change_units")
-        {
-            showUnitsPopup(selected->text(),
-                           (ScreenListInfo *) selected->getData());
-            updateHelpText();
-        }
-        else if (cmd == "move_up")
-        {
-            list->MoveItemUpDown(selected, true);
-        }
-        else if (cmd == "move_down")
-        {
-            list->MoveItemUpDown(selected, false);
-        }
-        else if (cmd == "remove")
-        {
-            deleteScreen(list);
-        }
     }
-    else if (list == m_inactive_list)
+    else if (GetFocusWidget() == m_inactiveList)
     {
         ScreenListInfo *si = (ScreenListInfo *) selected->getData();
         QStringList type_strs;
@@ -817,343 +520,216 @@ void ScreenSetup::doListSelect(UIListBtnType *list,
         bool multiLoc = si->multiLoc;
 
         Q3PtrList<ScriptInfo> tmp;
-        if (m_src_man->findPossibleSources(type_strs, tmp))
+        if (m_sourceManager->findPossibleSources(type_strs, tmp))
         {
             ScreenListInfo *newsi = new ScreenListInfo(*si);
             // FIXME: this seems bogus
             newsi->types.setAutoDelete(true);
 
-            if (!list->GetCount())
+            if (!m_inactiveList->GetCount())
             {
-                list->allowFocus(false);
-                nextPrevWidgetFocus(true);
+                m_inactiveList->SetActive(false);
+                NextPrevWidgetFocus(true);
             }
             if (hasUnits)
                 showUnitsPopup(selected->text(), newsi);
-
-            if (!doLocationDialog(newsi, true))
-                return;
-
-            UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_active_list, txt);
-            itm->setDrawArrow(multiLoc);
-            itm->setData(newsi);
-            if (m_active_list->GetCount())
-                m_active_list->allowFocus(true);
+            else
+                doLocationDialog(newsi);
         }
         else
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                "Add Screen Error",
-                tr("Screen cannot be used, not all required data "
-                   "is supplied by existing sources"));
-        }
+            VERBOSE(VB_IMPORTANT, "Screen cannot be used, not all required "
+                                  " data is supplied by existing sources");
     }
-//     else if (list == m_type_list)
-//     {
-//         doLocationDialog((ScreenListInfo *) m_active_list->GetItemCurrent()->getData(), false);
-//     }
 }
 
-bool ScreenSetup::doLocationDialog(ScreenListInfo *si,  bool alltypes)
+void ScreenSetup::doLocationDialog(ScreenListInfo *si)
 {
-    /*
-     * If its alltypes, we round up all types for this screen,
-     * if its not, just the seleted item in m_type_list
-     */
-    QStringList types;
-    Q3PtrList<TypeListInfo> infos;
-    if (alltypes)
-    {
-        Q3DictIterator<TypeListInfo> it(si->types);
-        for (; it.current(); ++it)
-        {
-            TypeListInfo *ti = it.current();
-            infos.append(ti);
-            types << ti->name;
-        }
-    }
-//     else
-//     {
-//         TypeListInfo *ti =
-//                 (TypeListInfo *) m_type_list->GetItemCurrent()->getData();
-//         infos.append(ti);
-//         types << ti->name;
-//     }
-    QString loc;
-    ScriptInfo *src = 0;
-    if (showLocationPopup(types, loc, src))
-    {
-        for (TypeListInfo *ti = infos.first(); ti; ti = infos.next())
-        {
-            ti->location = loc;
-            ti->src = src;
-        }
-        updateHelpText();
+    MythScreenStack *mainStack =
+                            GetMythMainWindow()->GetMainStack();
 
-        return true;
-    }
-    else
-        return false;
+    LocationDialog *locdialog = new LocationDialog(mainStack, "locationdialog",
+                                                   this, si, m_sourceManager);
+
+    if (locdialog->Create())
+        mainStack->AddScreen(locdialog);
 }
 
-void ScreenSetup::activeListItemSelected(UIListBtnTypeItem *itm)
+void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
 {
-    if (!itm)
-        itm = m_active_list->GetItemCurrent();
-    if (!itm)
-        return;
-
-    ScreenListInfo *si = (ScreenListInfo *) itm->getData();
     if (!si)
         return;
 
-    Q3Dict<TypeListInfo> types = si->types;
-//     m_type_list->Reset();
-//    UITextType *txt = getUITextType("typelbl");
-    if (si->multiLoc)
-    {
-//         QDictIterator<TypeListInfo> it(si->types);
-//         for (; it.current(); ++it)
-//         {
-//             UIListBtnTypeItem *item = new UIListBtnTypeItem(m_type_list,
-//                                                            it.current()->name);
-//             item->setData(it.current());
-//         }
-// 
-//         if (txt) txt->show();
-//         m_type_list->show();
-//         m_type_list->allowFocus(true);
-    }
-    else
-    {
-//         if (txt) txt->hide();
-//        m_type_list->hide();
-//        m_type_list->allowFocus(false);
-    }
-    updateForeground();
+    QString label = QString("%1 %2").arg(name).arg(tr("Change Units"));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                "weatherunitspopup");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+
+    menuPopup->SetReturnEvent(this, "units");
+
+    menuPopup->AddButton(tr("English Units"), si);
+    menuPopup->AddButton(tr("SI Units"), si);
 }
 
-bool ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
+void ScreenSetup::deleteScreen()
 {
-    if (!si) return false;
 
-    units_t *units = &si->units;
-    QStringList unitsBtns;
-    unitsBtns << tr("English Units") << tr("SI Units");
-    DialogCode ret = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(), "Change Units",
-        tr("Select units for screen ") + name, unitsBtns,
-        *units == ENG_UNITS ? kDialogCodeButton0 : kDialogCodeButton1);
+    if (m_activeList->GetItemCurrent())
+        delete m_activeList->GetItemCurrent();
 
-    switch (ret)
+    if (!m_activeList->GetCount())
     {
-        case kDialogCodeButton0:
-            *units = ENG_UNITS;
-            break;
-        case kDialogCodeButton1:
-            *units = SI_UNITS;
-            break;
-        default:
-            return false;
-    }
-    return true;
-}
-
-bool ScreenSetup::showLocationPopup(QStringList types, QString &loc,
-                                    ScriptInfo *&src)
-{
-    LocationDialog dlg(gContext->GetMainWindow(), types, m_src_man);
-    if (dlg.exec() == QDialog::Accepted)
-    {
-        loc = dlg.getLocation();
-        src = dlg.getSource();
-        return true;
+        NextPrevWidgetFocus(false);
+        m_activeList->SetActive(false);
     }
 
-    loc = QString();
-    src = NULL;
-    return false;
 }
 
-void ScreenSetup::cursorUp(UIType *curr)
+void ScreenSetup::customEvent(QEvent *event)
 {
-    UIListBtnType *list = dynamic_cast<UIListBtnType *>(curr);
-    if (list)
+    if (event->type() == kMythDialogBoxCompletionEventType)
     {
-        int index = list->GetItemPos(list->GetItemCurrent());
-        if (index > 0)
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "options")
         {
-            list->MoveUp(UIListBtnType::MoveItem);
-            updateForeground();
-        }
-        else
-            nextPrevWidgetFocus(false);
-    }
-    else
-        nextPrevWidgetFocus(false);
-}
+            MythListButtonItem *item = (MythListButtonItem *)dce->GetResultData();
+            ScreenListInfo *si = (ScreenListInfo *) item->getData();
 
-void ScreenSetup::cursorDown(UIType *curr)
-{
-    UIListBtnType *list = dynamic_cast<UIListBtnType *>(curr);
-    if (list)
-    {
-        int index = list->GetItemPos(list->GetItemCurrent());
-        if (index != list->GetCount() - 1)
+            if (buttonnum == 0)
+            {
+                m_activeList->MoveItemUpDown(item, true);
+            }
+            else if (buttonnum == 1)
+            {
+                m_activeList->MoveItemUpDown(item, false);
+            }
+            else if (buttonnum == 2)
+            {
+                deleteScreen();
+            }
+            else if (buttonnum == 3)
+            {
+                doLocationDialog(si);
+            }
+            else if (si->hasUnits && buttonnum == 4)
+            {
+                showUnitsPopup(item->text(), si);
+                updateHelpText();
+            }
+        }
+        else if (resultid == "units")
         {
-            list->MoveDown(UIListBtnType::MoveItem);
-            updateForeground();
+            ScreenListInfo *si = (ScreenListInfo *)dce->GetResultData();
+            if (buttonnum == 0)
+            {
+                si->units = ENG_UNITS;
+            }
+            else if (buttonnum == 1)
+            {
+                si->units = SI_UNITS;
+            }
+            doLocationDialog(si);
         }
-        else
-            nextPrevWidgetFocus(true);
-    }
-    else
-        nextPrevWidgetFocus(true);
-}
-
-void ScreenSetup::deleteScreen(UIListBtnType *list)
-{
-
-    if (list->GetItemCurrent())
-        delete list->GetItemCurrent();
-
-    if (!list->GetCount())
-    {
-        nextPrevWidgetFocus(false);
-        list->allowFocus(false);
-//         m_type_list->hide();
-//         m_type_list->allowFocus(false);
-//         UITextType *txt = getUITextType("typelbl");
-//         if (txt) txt->hide();
-    }
-
-}
-
-void ScreenSetup::cursorSelect(UIType *curr)
-{
-    UIListBtnType *list = dynamic_cast<UIListBtnType *>(curr);
-    if (list)
-    {
-        doListSelect(list, list->GetItemCurrent());
-        updateForeground();
-    }
-
-    if (curr == m_finish_btn)
-        m_finish_btn->push();
-}
-
-void ScreenSetup::cursorRight(UIType *curr)
-{
-    if (curr == m_active_list)
-    {
-        UIListBtnTypeItem *itm = m_active_list->GetItemCurrent();
-        if (((ScreenListInfo *) itm->getData())->multiLoc)
+        else if (resultid == "location")
         {
-            buildFocusList();
-            nextPrevWidgetFocus(true);
-        }
-    }
-}
+            ScreenListInfo *si = (ScreenListInfo *)dce->GetResultData();
+            Q3DictIterator<TypeListInfo> it(si->types);
+            for (; it.current(); ++it)
+            {
+                TypeListInfo *ti = it.current();
+                if (ti->location.isEmpty())
+                    return;
+            }
 
-void ScreenSetup::cursorLeft(UIType *curr)
-{
-//     if (curr == m_type_list)
-//     {
-//         nextPrevWidgetFocus(false);
-//     }
+            QString txt = si->name;
+
+            MythListButtonItem *item = new MythListButtonItem(m_activeList, txt);
+            item->setData(si);
+            if (m_activeList->GetCount())
+                m_activeList->SetActive(true);
+        }
+
+    }
+
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-SourceSetup::SourceSetup(MythMainWindow *parent) :
-    MythThemedDialog(parent, "source-setup", "weather-", "Source Setup")
+SourceSetup::SourceSetup(MythScreenStack *parent, const char *name)
+    : MythScreenType(parent, name)
 {
-    wireUI();
-
-    buildFocusList();
-    assignFirstFocus();
+    m_sourceList = NULL;
+    m_updateSpinbox = m_retrieveSpinbox = NULL;
+    m_finishButton = NULL;
+    m_sourceText = NULL;
 }
 
 SourceSetup::~SourceSetup()
 {
-    delete m_update_spinbox;
-    delete m_retrieve_spinbox;
-    Q3PtrListIterator<UIListBtnTypeItem> it = m_src_list->GetIterator();
-    UIListBtnTypeItem *itm;
-    while ((itm = it.current()))
+    for (int i=0; i < m_sourceList->GetCount(); i++)
     {
-        if (itm->getData())
-            delete (SourceListInfo *) itm->getData();
-        ++it;
+        MythListButtonItem *item = m_sourceList->GetItemAt(i);
+        if (item->getData())
+            delete (SourceListInfo *) item->getData();
     }
 }
 
-void SourceSetup::wireUI()
+bool SourceSetup::Create()
 {
-    m_src_list = getUIListBtnType("srclist");
-    if (!m_src_list)
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", "source-setup", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_sourceList = dynamic_cast<MythListButton *> (GetChild("srclist"));
+    m_updateSpinbox = dynamic_cast<MythListButton *> (GetChild("update_spinbox"));
+    m_retrieveSpinbox = dynamic_cast<MythListButton *> (GetChild("retrieve_spinbox"));
+    m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
+    m_sourceText = dynamic_cast<MythUIText *> (GetChild("srcinfo"));
+
+    if (!m_sourceList || !m_updateSpinbox || !m_retrieveSpinbox
+        || !m_finishButton || !m_sourceText)
     {
-        VERBOSE(VB_IMPORTANT, "error loading srclist");
-    }
-    else
-    {
-        connect(m_src_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(sourceListItemSelected(UIListBtnTypeItem *)));
-        connect(m_src_list, SIGNAL(takingFocus()),
-                this, SLOT(sourceListItemSelected()));
+        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        return false;
     }
 
-    UIBlackHoleType *blckhl = getUIBlackHoleType("update_spinbox");
-    if (!blckhl)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading update_spinbox");
-    }
-    else
-    {
-        blckhl->allowFocus(true);
-        m_update_spinbox = new WeatherSpinBox(this);
-        m_update_spinbox->setRange(10, 600);
-        m_update_spinbox->setLineStep(1);
-        m_update_spinbox->setFont(gContext->GetMediumFont());
-        m_update_spinbox->setFocusPolicy(Qt::NoFocus);
-        m_update_spinbox->setGeometry(blckhl->getScreenArea());
-        connect(blckhl, SIGNAL(takingFocus()), m_update_spinbox,
-                SLOT(setFocus()));
-        connect(blckhl, SIGNAL(loosingFocus()), m_update_spinbox,
-                SLOT(clearFocus()));
-        connect(blckhl, SIGNAL(loosingFocus()), this,
-                SLOT(updateSpinboxUpdate()));
-    }
+    BuildFocusList();
+    SetFocusWidget(m_sourceList);
 
-    blckhl = getUIBlackHoleType("retrieve_spinbox");
-    if (!blckhl)
-    {
-        VERBOSE(VB_IMPORTANT, "error loading retrieve_spinbox");
-    }
-    else
-    {
-        blckhl->allowFocus(true);
-        m_retrieve_spinbox = new WeatherSpinBox(this);
-        m_retrieve_spinbox->setRange(10, 1000);
-        m_retrieve_spinbox->setLineStep(1);
-        m_retrieve_spinbox->setFont(gContext->GetMediumFont());
-        m_retrieve_spinbox->setFocusPolicy(Qt::NoFocus);
-        m_retrieve_spinbox->setGeometry(blckhl->getScreenArea());
+    connect(m_sourceList, SIGNAL(itemSelected(MythListButtonItem *)),
+            this, SLOT(sourceListItemSelected(MythListButtonItem *)));
+    connect(m_sourceList, SIGNAL(TakingFocus()),
+            this, SLOT(sourceListItemSelected()));
 
-        connect(blckhl, SIGNAL(takingFocus()), m_retrieve_spinbox,
-                SLOT(setFocus()));
-        connect(blckhl, SIGNAL(loosingFocus()), m_retrieve_spinbox,
-                SLOT(clearFocus()));
-        connect(blckhl, SIGNAL(loosingFocus()), this,
-                SLOT(retrieveSpinboxUpdate()));
-    }
+// TODO
+//    m_updateSpinbox->setRange(10, 600);
+    connect(m_updateSpinbox, SIGNAL(loosingFocus()),
+            this,  SLOT(updateSpinboxUpdate()));
 
-    m_finish_btn = getUITextButtonType("finishbutton");
-    if (m_finish_btn)
-    {
-        m_finish_btn->setText(tr("Finish"));
-        connect(m_finish_btn, SIGNAL(pushed()), this, SLOT(saveData()));
-    }
+// TODO
+//    m_retrieveSpinbox->setRange(10, 1000);
+    connect(m_retrieveSpinbox, SIGNAL(loosingFocus()),
+            this, SLOT(retrieveSpinboxUpdate()));
+
+    m_finishButton->SetText(tr("Finish"));
+    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
+
+    loadData();
+
+    return true;
 }
 
 bool SourceSetup::loadData()
@@ -1188,12 +764,12 @@ bool SourceSetup::loadData()
         si->email = db.value(5).toString();
         si->version = db.value(6).toString();
 
-        UIListBtnTypeItem *item =
-            new UIListBtnTypeItem(m_src_list, tr(si->name));
+        MythListButtonItem *item =
+            new MythListButtonItem(m_sourceList, tr(si->name));
         item->setData(si);
     }
 
-    m_src_list->SetItemCurrent(0);
+    m_sourceList->SetItemCurrent(0);
 
     return true;
 }
@@ -1201,9 +777,9 @@ bool SourceSetup::loadData()
 void SourceSetup::saveData()
 {
     SourceListInfo *si =
-            (SourceListInfo *) m_src_list->GetItemCurrent()->getData();
-    si->retrieve_timeout = m_update_spinbox->value();
-    si->update_timeout = m_retrieve_spinbox->value();
+            (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
+    si->retrieve_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+    si->update_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "UPDATE weathersourcesettings "
@@ -1211,11 +787,10 @@ void SourceSetup::saveData()
             "WHERE sourceid = :ID;";
     db.prepare(query);
 
-    Q3PtrListIterator<UIListBtnTypeItem> an_it = m_src_list->GetIterator();
-
-    while (an_it)
+    for (int i=0; i < m_sourceList->GetCount(); i++)
     {
-        si = (SourceListInfo *) (*an_it)->getData();
+        MythListButtonItem *item = m_sourceList->GetItemAt(i);
+        si = (SourceListInfo *) item->getData();
         db.bindValue(":ID", si->id);
         db.bindValue(":UPDATE", si->update_timeout * 60);
         db.bindValue(":RETRIEVE", si->retrieve_timeout);
@@ -1224,311 +799,202 @@ void SourceSetup::saveData()
             VERBOSE(VB_IMPORTANT, db.lastError().text());
             return;
         }
-
-        ++an_it;
     }
-
-    accept();
 }
 
 void SourceSetup::updateSpinboxUpdate()
 {
     SourceListInfo *si =
-            (SourceListInfo *) m_src_list->GetItemCurrent()->getData();
-    si->retrieve_timeout = m_update_spinbox->value();
+            (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
+    si->retrieve_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
 }
 
 void SourceSetup::retrieveSpinboxUpdate()
 {
     SourceListInfo *si =
-            (SourceListInfo *) m_src_list->GetItemCurrent()->getData();
-    si->update_timeout = m_retrieve_spinbox->value();
+            (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
+    si->update_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
 }
 
-void SourceSetup::keyPressEvent(QKeyEvent *e)
+void SourceSetup::sourceListItemSelected(MythListButtonItem *item)
 {
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
-    UIType *curr = getCurrentFocusWidget();
-    bool handled = false;
+    if (!item)
+        item = m_sourceList->GetItemCurrent();
 
-    for (uint i = 0; i < actions.size() && !handled; ++i)
-    {
-        handled = true;
-        QString action = actions[i];
-        if (action == "DOWN" )
-        {
-            UIListBtnType *list;
-            if (curr && (list = dynamic_cast<UIListBtnType *>(curr)))
-            {
-                int index = list->GetItemPos(list->GetItemCurrent());
-                if (index != list->GetCount() - 1)
-                {
-                    list->MoveDown(UIListBtnType::MoveItem);
-                    updateForeground();
-                }
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "UP")
-        {
-            UIListBtnType *list;
-            if (curr && (list = dynamic_cast<UIListBtnType *>(curr)))
-            {
-                int index = list->GetItemPos(list->GetItemCurrent());
-                if (index > 0)
-                {
-                    list->MoveUp(UIListBtnType::MoveItem);
-                    updateForeground();
-                }
-            }
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "SELECT")
-        {
-            if (curr == m_finish_btn)
-                m_finish_btn->push();
-        }
-        else if (action == "RIGHT")
-        {
-            if (curr == m_src_list)
-            {
-                nextPrevWidgetFocus(true);
-            }
-        }
-        else if (action == "LEFT")
-        {
-            if (curr == m_src_list)
-            {
-                nextPrevWidgetFocus(false);
-            }
-        }
-        else
-            handled = false;
-    }
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void SourceSetup::sourceListItemSelected(UIListBtnTypeItem *itm)
-{
-    if (!itm)
-        itm = m_src_list->GetItemCurrent();
-
-    if (!itm)
+    if (!item)
         return;
 
-    SourceListInfo *si = (SourceListInfo *) itm->getData();
+    SourceListInfo *si = (SourceListInfo *) item->getData();
     if (!si)
         return;
 
-    m_update_spinbox->setValue(si->retrieve_timeout);
-    m_retrieve_spinbox->setValue(si->update_timeout);
+    m_updateSpinbox->MoveToNamedPosition(QString::number(si->retrieve_timeout));
+    m_retrieveSpinbox->MoveToNamedPosition(QString::number(si->update_timeout));
     QString txt = tr("Author: ");
     txt += si->author;
     txt += "\n" + tr("Email: ") + si->email;
     txt += "\n" + tr("Version: ") + si->version;
-    getUITextType("srcinfo")->SetText(txt);
+    m_sourceText->SetText(txt);
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-LocationDialog::LocationDialog(MythMainWindow *parent, QStringList types,
-                               SourceManager *srcman) :
-    MythThemedDialog(parent, "setup-location", "weather-", "Location Selection")
+LocationDialog::LocationDialog(MythScreenStack *parent, const char *name,
+                               MythScreenType *retScreen, ScreenListInfo *si,
+                               SourceManager *srcman)
+    : MythScreenType(parent, name)
 {
+
+    QStringList types;
+
+    Q3DictIterator<TypeListInfo> it(si->types);
+    for (; it.current(); ++it)
+    {
+        TypeListInfo *ti = it.current();
+        types << ti->name;
+    }
 
     m_types = types;
-    m_src_man = srcman;
-
-    wireUI();
-
-    assignFirstFocus();
+    m_sourceManager = srcman;
+    m_screenListInfo = si;
+    m_retScreen = retScreen;
 }
 
-void LocationDialog::wireUI()
+LocationDialog::~LocationDialog()
 {
-    m_edit = getUIRemoteEditType("loc-edit");
-    m_edit->createEdit(this);
-    m_list = getUIListBtnType("results");
-    m_list->allowFocus(true);
-    connect(m_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-            this, SLOT(itemSelected(UIListBtnTypeItem *)));
-    m_btn = getUITextButtonType("searchbtn");
-    connect(m_btn, SIGNAL(pushed()), this, SLOT(doSearch()));
-    m_btn->setText(tr("Search"));
+}
+
+bool LocationDialog::Create()
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", "setup-location", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_sourceText = dynamic_cast<MythUIText *> (GetChild("source"));
+    m_resultsText = dynamic_cast<MythUIText *> (GetChild("numresults"));
+    m_locationEdit = dynamic_cast<MythUITextEdit *> (GetChild("loc-edit"));
+    m_locationList = dynamic_cast<MythListButton *> (GetChild("results"));
+    m_searchButton = dynamic_cast<MythUIButton *> (GetChild("searchbtn"));
+
+
+    if (!m_sourceText || !m_resultsText || !m_locationEdit || !m_locationList
+        || !m_searchButton)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
+        return false;
+    }
+
+    BuildFocusList();
+    SetFocusWidget(m_locationEdit);
+
+    connect(m_searchButton, SIGNAL(buttonPressed()), this, SLOT(doSearch()));
+    m_searchButton->SetText(tr("Search"));
+    connect(m_locationList, SIGNAL(itemSelected(MythListButtonItem *)),
+            this, SLOT(itemSelected(MythListButtonItem *)));
+    connect(m_locationList, SIGNAL(itemClicked(MythListButtonItem *)),
+            this, SLOT(itemClicked(MythListButtonItem *)));
+
+    return true;
 }
 
 void LocationDialog::doSearch()
 {
+    QString busymessage = tr("Searching ...");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
+                                                       "mythweatherbusydialog");
+
+    if (busyPopup->Create())
+        popupStack->AddScreen(busyPopup, false);
+
     QMap<ScriptInfo *, QStringList> result_cache;
     int numresults = 0;
-    m_list->Reset();
-    UITextType *resultslbl = getUITextType("numresults");
+    m_locationList->Reset();
 
     QString searchingresults = tr("Searching ... Results: %1");
 
-    resultslbl->SetText(searchingresults.arg(numresults));
+    m_resultsText->SetText(searchingresults.arg(0));
     qApp->processEvents();
 
     Q3PtrList<ScriptInfo> sources;
     // if a screen makes it this far, theres at least one source for it
-    m_src_man->findPossibleSources(m_types, sources);
-    QString search = m_edit->getText();
+    m_sourceManager->findPossibleSources(m_types, sources);
+    QString search = m_locationEdit->GetText();
     ScriptInfo *si;
     for (si = sources.first(); si; si = sources.next())
     {
         if (!result_cache.contains(si))
         {
-            QStringList results = m_src_man->getLocationList(si, search);
+            QStringList results = m_sourceManager->getLocationList(si, search);
             result_cache[si] = results;
             numresults += results.size();
-            resultslbl->SetText(searchingresults.arg(numresults));
+            m_resultsText->SetText(searchingresults.arg(numresults));
             qApp->processEvents();
         }
     }
 
-    for (uint i = 0; i < result_cache.keys().size(); ++i)
+    for (int i = 0; i < result_cache.keys().size(); ++i)
     {
         si = result_cache.keys()[i];
         QStringList results = result_cache[si];
         QString name = si->name;
-        for (uint ii = 0; ii < results.size(); ++ii)
+        for (int ii = 0; ii < results.size(); ++ii)
         {
             QStringList tmp = QStringList::split("::", results[ii]);
-            UIListBtnTypeItem *itm = new UIListBtnTypeItem(m_list, tmp[1]);
+            MythListButtonItem *item = new MythListButtonItem(m_locationList, tmp[1]);
             ResultListInfo *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;
-            itm->setData(ri);
+            item->setData(ri);
+            qApp->processEvents();
         }
     }
-    resultslbl->SetText(tr("Search Complete. Results: %1").arg(numresults));
+
+    if (busyPopup)
+    {
+        busyPopup->Close();
+        busyPopup = NULL;
+    }
+
+    m_resultsText->SetText(tr("Search Complete. Results: %1").arg(numresults));
     if (numresults)
     {
-        m_list->allowFocus(true);
-        nextPrevWidgetFocus(true);
-        itemSelected(m_list->GetItemAt(0));
+        m_locationList->SetActive(true);
+        SetFocusWidget(m_locationList);
     }
-    update();
 }
 
-void LocationDialog::keyPressEvent(QKeyEvent *e)
+void LocationDialog::itemSelected(MythListButtonItem *item)
 {
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
-    UIType *curr = getCurrentFocusWidget();
-    bool handled = false;
-
-    for (uint i = 0; i < actions.size() && !handled; ++i)
-    {
-        handled = true;
-        QString action = actions[i];
-        if (action == "DOWN")
-        {
-            if (curr == m_list)
-            {
-                if (m_list->GetItemPos(m_list->GetItemCurrent()) !=
-                        m_list->GetCount() - 1)
-                    m_list->MoveDown(UIListBtnType::MoveItem);
-                else
-                    nextPrevWidgetFocus(true);
-                updateForeground(m_list->getScreenArea());
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "UP")
-        {
-            if (curr == m_list)
-            {
-                if (m_list->GetItemPos(m_list->GetItemCurrent()) > 0)
-                    m_list->MoveUp(UIListBtnType::MoveItem);
-                else nextPrevWidgetFocus(false);
-                updateForeground(m_list->getScreenArea());
-            }
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "PAGEUP" && curr == m_list)
-        {
-            m_list->MoveUp(UIListBtnType::MovePage);
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "PAGEDOWN" && curr == m_list)
-        {
-            m_list->MoveDown(UIListBtnType::MovePage);
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "PREVVIEW" && curr == m_list)
-        {
-            m_list->MoveUp(UIListBtnType::MoveMax);
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "NEXTVIEW" && curr == m_list)
-        {
-            m_list->MoveDown(UIListBtnType::MoveMax);
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "SEARCH" && curr == m_list)
-        {
-            m_list->incSearchStart();
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "NEXTSEARCH" && curr == m_list)
-        {
-            m_list->incSearchNext();
-            updateForeground(m_list->getScreenArea());
-        }
-        else if (action == "SELECT")
-        {
-            if (curr == m_btn)
-                m_btn->push();
-            else if (curr == m_list)
-                accept();
-        }
-        else
-            handled = false;
-    }
-
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void LocationDialog::itemSelected(UIListBtnTypeItem *itm)
-{
-    UITextType *txt = getUITextType("source");
-    ResultListInfo *ri = (ResultListInfo *)itm->getData();
+    ResultListInfo *ri = (ResultListInfo *)item->getData();
     if (ri)
-        txt->SetText(tr("Source: %1").arg(ri->src->name));
+        m_sourceText->SetText(tr("Source: %1").arg(ri->src->name));
 }
 
-QString LocationDialog::getLocation()
+void LocationDialog::itemClicked(MythListButtonItem *item)
 {
-    UIListBtnTypeItem *itm = m_list->GetItemCurrent();
-    if (!itm)
-        return NULL;
+    ResultListInfo *ri = (ResultListInfo *) item->getData();
 
-    ResultListInfo *ri = (ResultListInfo *) itm->getData();
+    if (ri)
+    {
+        Q3DictIterator<TypeListInfo> it(m_screenListInfo->types);
+        for (; it.current(); ++it)
+        {
+            TypeListInfo *ti = it.current();
+            ti->location = ri->idstr;
+            ti->src = ri->src;
+        }
+    }
 
-    if (!ri)
-        return NULL;
+    DialogCompletionEvent *dce =
+                new DialogCompletionEvent("location", 0, "", m_screenListInfo);
+    QApplication::postEvent(m_retScreen, dce);
 
-    return ri->idstr;
-}
-
-ScriptInfo *LocationDialog::getSource()
-{
-    UIListBtnTypeItem *itm = m_list->GetItemCurrent();
-    if (!itm)
-        return NULL;
-
-    ResultListInfo *ri = (ResultListInfo *) itm->getData();
-
-    if (!ri)
-        return NULL;
-
-    return ri->src;
+    GetScreenStack()->PopScreen();
 }

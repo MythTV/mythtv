@@ -7,6 +7,8 @@ TARGET = mythweather
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+INCLUDEPATH += $${PREFIX}/include/mythtv
+
 datafiles.path = $${PREFIX}/share/mythtv/mythweather/
 datafiles.files = weather-screens.xml
 installscripts.path = $${PREFIX}/share/mythtv/mythweather/scripts
@@ -15,10 +17,10 @@ INSTALLS += datafiles installscripts
 
 # Input
 
-HEADERS += weather.h weatherSource.h sourceManager.h defs.h weatherScreen.h dbcheck.h
-HEADERS += weatherSetup.h
+HEADERS += weather.h weatherSource.h sourceManager.h weatherScreen.h dbcheck.h
+HEADERS += weatherSetup.h weatherUtils.h
 SOURCES += main.cpp weather.cpp weatherSource.cpp sourceManager.cpp weatherScreen.cpp
-SOURCES += dbcheck.cpp weatherSetup.cpp
+SOURCES += dbcheck.cpp weatherSetup.cpp weatherUtils.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

@@ -1,149 +1,101 @@
-/*
-        MythWeather
-        Version 0.8
-        January 8th, 2003
 
-        By John Danner & Dustin Doris
-
-        Note: Portions of this code taken from MythMusic
-
-*/
-
-#include <qapplication.h>
-//Added by qt3to4:
-#include <QPaintEvent>
-#include <QPixmap>
-#include <QKeyEvent>
-
+// C headers
 #include <unistd.h>
 #include <cstdlib>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+// QT headers
+#include <qapplication.h>
 
+// MythTV headers
+#include <mythtv/mythdbcon.h>
+#include <mythtv/mythcontext.h>
+
+// MythWeather headers
 #include "weatherScreen.h"
 #include "sourceManager.h"
 #include "weatherSetup.h"
 #include "weather.h"
 
-Weather::Weather(MythMainWindow *parent, SourceManager *srcMan,
-                 const char *name) : MythDialog(parent, name)
+Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMan)
+    : MythScreenType(parent, name)
 {
-    allowkeys = true;
-    paused = false;
+    m_mainStack = parent;
+    m_weatherStack = new MythScreenStack(GetMythMainWindow(), "weather stack");
 
-    firstRun = true;
+    m_paused = false;
+
+    m_firstRun = true;
     m_srcMan = srcMan;
 
-    newlocRect = QRect(0, 0, size().width(), size().height());
-    fullRect = QRect(0, 0, size().width(), size().height());
+    m_pauseText = m_headerText = NULL;
 
-    nextpageInterval = gContext->GetNumSetting("weatherTimeout", 10);
-    nextpageIntArrow = gContext->GetNumSetting("weatherHoldTimeout", 20);
+    m_nextpageInterval = gContext->GetNumSetting("weatherTimeout", 10);
+    m_nextpageIntArrow = gContext->GetNumSetting("weatherHoldTimeout", 20);
 
-    m_startup = 0;
-    theme = new XMLParse();
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    
-    if (!theme->LoadTheme(xmldata, "weather", "weather-"))
-    {
-        VERBOSE(VB_IMPORTANT, QString("Weather: Couldn't find the theme."));
-    }
-
-    screens.setAutoDelete(true);
-
-    /*
-     * TODO this can be up to 59 seconds slow, should be a better way to do
-     * this.
-     */
-    /*
-     * TODO #2 QObject has timers built in, probably slicker to use those.
-     */
-    showtime_Timer = new QTimer(this);
-    connect(showtime_Timer, SIGNAL(timeout()), SLOT(showtime_timeout()) );
-    showtime_Timer->start((int)(60 * 1000));
-
-    nextpage_Timer = new QTimer(this);
-    connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
-    setNoErase();
-
-    // Run once before loading the background container
-    // to create a background should the window not
-    // contain it's own background - Temporary workaround
-    // until mythui port.
-    updateBackground();
-    setupScreens(xmldata);
-
-    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
-        showLayout(m_startup);
-    showtime_timeout();
+    m_nextpage_Timer = new QTimer(this);
+    connect(m_nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
+    m_allScreens = loadScreens();
 }
 
 Weather::~Weather()
 {
-    delete theme;
-    delete m_startup;
-    //for (WeatherScreen *screen = screens.first(); screen; screen = screens.next()) {
-    //    m_srcMan->disconnectScreen(screen);
-    //    delete screen;
-    //}
+    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
+    {
+        delete m_srcMan;
+    }
+
+    for (WeatherScreen *screen = m_screens.first(); screen;
+         screen = m_screens.next())
+    {
+        if (screen)
+            delete screen;
+    }
+
+    m_screens.clear();
+
+    if (m_weatherStack)
+        GetMythMainWindow()->PopScreenStack();
 }
 
-void Weather::setupScreens(QDomElement &xml)
+bool Weather::Create()
 {
-    // Deletes screen objects
-    screens.clear();
-    // it points to an element of screens, which was just deleted;
-    currScreen = 0;
-    if (m_startup)
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", "weatherbase", this);
+
+    if (!foundtheme)
     {
-        delete m_startup;
-        m_startup = 0;
+        VERBOSE(VB_IMPORTANT, "Missing required window - weatherbase.");
+        return false;
     }
 
-    QMap<QString, QDomElement> containers;
-    for (QDomNode child = xml.firstChild(); !child.isNull();
-         child = child.nextSibling())
+    m_pauseText = dynamic_cast<MythUIText *> (GetChild("pause_text"));
+    m_headerText = dynamic_cast<MythUIText *> (GetChild("header"));
+
+    if (!m_pauseText || !m_headerText)
     {
-        QDomElement e = child.toElement();
-        if (!e.isNull())
-        {
-            if (e.tagName() == "font")
-            {
-                if (!theme->GetFont(e.attribute("name"), false))
-                    theme->parseFont(e);
-            }
-            else if (e.tagName() == "container")
-            {
-                QRect area;
-                QString name;
-                int context;
-                if (e.attribute("name") == "startup")
-                {
-                    if (!theme->GetSet("startup"))
-                        theme->parseContainer(e, name, context, area);
-                    else
-                        name = e.attribute("name");
-                    WeatherScreen *ws = WeatherScreen::loadScreen(this, theme->GetSet(name));
-                    ws->setInUse(true);
-                    m_startup = ws;
-                }
-                else if (e.attribute("name") == "background")
-                {
-                    theme->parseContainer(e, name, context, area);
-                    updateBackground();
-                }
-                else
-                    containers[e.attribute("name")] = e;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Unknown element: " + e.tagName());
-                exit(0);
-            }
-        }
+        VERBOSE(VB_IMPORTANT, "Window weatherbase is missing required elements.");
+        return false;
     }
+
+    if (m_pauseText)
+    {
+        m_pauseText->SetText(tr("Paused"));
+        m_pauseText->Hide();
+    }
+
+    setupScreens();
+
+    return true;
+}
+
+void Weather::setupScreens()
+{
+    // Deletes screen objects
+    m_screens.clear();
+    // it points to an element of screens, which was just deleted;
+    m_currScreen = NULL;
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query =
@@ -159,13 +111,17 @@ void Weather::setupScreens(QDomElement &xml)
 
     if (!db.size())
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no screens",
-                tr("No Screens defined; Entering Screen Setup."));
-
         m_srcMan->clearSources();
         m_srcMan->findScripts();
-        ScreenSetup ssetup(gContext->GetMainWindow(), m_srcMan);
-        ssetup.exec();
+
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
+                                              m_srcMan);
+
+        if (ssetup->Create())
+            mainStack->AddScreen(ssetup);
+
         m_srcMan->clearSources();
         m_srcMan->findScriptsDB();
         m_srcMan->setupSources();
@@ -186,25 +142,16 @@ void Weather::setupScreens(QDomElement &xml)
         QString container = db.value(1).toString();
         units_t units = db.value(2).toUInt();
         uint draworder = db.value(3).toUInt();
-        if (!containers.contains(container))
-        {
-            VERBOSE(VB_IMPORTANT,
-                    container + " is in database, but not theme file");
+
+        ScreenListInfo *screenListInfo = m_allScreens[container];
+
+        WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, screenListInfo, id);
+        if (!ws->Create())
             continue;
-        }
-        QDomElement e = containers[container];
-        QRect area;
-        QString name;
-        int context;
-        if (!theme->GetSet(e.attribute("name")))
-            theme->parseContainer(e, name, context, area);
-        else name = e.attribute("name");
-        WeatherScreen *ws =
-                WeatherScreen::loadScreen(this, theme->GetSet(name), id);
+
         ws->setUnits(units);
         ws->setInUse(true);
-        screens.insert(draworder, ws);
-        connect(this, SIGNAL(clock_tick()), ws, SLOT(clock_tick()));
+        m_screens.insert(draworder, ws);
         connect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
                 SLOT(screenReady(WeatherScreen *)));
         m_srcMan->connectScreen(id, ws);
@@ -215,12 +162,11 @@ void Weather::screenReady(WeatherScreen *ws)
 {
     WeatherScreen *nxt = nextScreen();
 
-    if (firstRun && ws == nxt)
+    if (m_firstRun && ws == nxt)
     {
-        firstRun = false;
-        setPaletteBackgroundPixmap(realBackground);
-        showLayout(nxt);
-        nextpage_Timer->start((int)(1000 * nextpageInterval));
+        m_firstRun = false;
+        showScreen(nxt);
+        m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
     }
     disconnect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
                SLOT(screenReady(WeatherScreen *)));
@@ -228,32 +174,30 @@ void Weather::screenReady(WeatherScreen *ws)
 
 WeatherScreen *Weather::nextScreen()
 {
-    WeatherScreen *ws = screens.next();
+    WeatherScreen *ws = m_screens.next();
     if (!ws)
-        ws = screens.first();
+        ws = m_screens.first();
     return ws;
 }
 
 WeatherScreen *Weather::prevScreen()
 {
-    WeatherScreen *ws = screens.prev();
+    WeatherScreen *ws = m_screens.prev();
     if (!ws)
-        ws = screens.last();
+        ws = m_screens.last();
     return ws;
 }
 
-void Weather::keyPressEvent(QKeyEvent *e)
+bool Weather::keyPressEvent(QKeyEvent *event)
 {
-    if (currScreen && currScreen->usingKeys() && currScreen->handleKey(e))
-    {
-        return;
-    }
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Weather", event, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -262,8 +206,6 @@ void Weather::keyPressEvent(QKeyEvent *e)
             cursorLeft();
         else if (action == "RIGHT")
             cursorRight();
-        //else if (action == "SELECT")
-        //    resetLocale();
         else if (action == "PAUSE")
             holdPage();
         else if (action == "MENU")
@@ -272,116 +214,80 @@ void Weather::keyPressEvent(QKeyEvent *e)
         {
             m_srcMan->doUpdate();
         }
+        else if (action == "ESCAPE")
+        {
+            m_nextpage_Timer->stop();
+            hideScreen();
+            m_mainStack->PopScreen();
+        }
         else
             handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void Weather::updateBackground()
+void Weather::showScreen(WeatherScreen *ws)
 {
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
+    if (!ws)
+        return;
 
-    QPainter tmp(&bground);
-
-    LayerSet *container = theme->GetSet("background");
-    if (container)
-    {
-        container->Draw(&tmp, 0, 0);
-    }
-
-    tmp.end();
-    realBackground = bground;
-    setPaletteBackgroundPixmap(realBackground);
+    m_currScreen = ws;
+    m_weatherStack->AddScreen(m_currScreen, false);
+    m_headerText->SetText(m_currScreen->name());
 }
 
-void Weather::paintEvent(QPaintEvent *e)
+void Weather::hideScreen()
 {
-    QRect r = e->rect();
-    QPainter p(this);
+    if (!m_currScreen)
+        return;
 
-    if (r.intersects(fullRect))
-        updatePage(&p);
-
-    MythDialog::paintEvent(e);
-}
-
-void Weather::updatePage(QPainter *dr)
-{
-    QRect pr = fullRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-
-    if (currScreen)
-        currScreen->draw(&tmp);
-    tmp.end();
-    dr->drawPixmap(pr.topLeft(), pix);
-}
-
-void Weather::showLayout(WeatherScreen *ws)
-{
-    currScreen = ws;
-    ws->showing();
-    update();
-}
-
-void Weather::processEvents()
-{
-        qApp->processEvents();
-}
-
-void Weather::showtime_timeout()
-{
-    emit clock_tick();
-    update();
+    m_weatherStack->PopScreen(false,false);
 }
 
 void Weather::holdPage()
 {
-    if (!nextpage_Timer->isActive())
-        nextpage_Timer->start(1000 * nextpageInterval);
-    else nextpage_Timer->stop();
-    paused = !paused;
-    if (currScreen)
-        currScreen->toggle_pause(paused);
-    update(fullRect);
+    if (!m_nextpage_Timer->isActive())
+        m_nextpage_Timer->start(1000 * m_nextpageInterval);
+    else
+        m_nextpage_Timer->stop();
+
+    m_paused = !m_paused;
+
+    if (m_pauseText)
+    {
+        if (m_paused)
+            m_pauseText->Show();
+        else
+            m_pauseText->Hide();
+    }
 }
 
 void Weather::setupPage()
 {
     m_srcMan->stopTimers();
-    nextpage_Timer->stop();
+    m_nextpage_Timer->stop();
     m_srcMan->clearSources();
     m_srcMan->findScripts();
-    ScreenSetup ssetup(gContext->GetMainWindow(), m_srcMan);
-    ssetup.exec();
-    firstRun = true;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
+                                            m_srcMan);
+
+    if (ssetup->Create())
+        mainStack->AddScreen(ssetup);
+
+    m_firstRun = true;
     m_srcMan->clearSources();
     m_srcMan->findScriptsDB();
     m_srcMan->setupSources();
-    setupScreens(xmldata);
+    setupScreens();
     m_srcMan->startTimers();
     m_srcMan->doUpdate();
-    // TODO
-#if 0
-    m_srcMan->stopTimers();
-    nextpage_Timer->stop();
-    m_srcMan->clearSources();
-    m_srcMan->findScripts();
-    WeatherSetup setup(gContext->GetMainWindow(), m_srcMan);
-    setup.exec();
-    firstRun = true;
-    m_srcMan->setupSources();
-    setupScreens(xmldata);
-    nextpageInterval = gContext->GetNumSetting("weatherTimeout", 10);
-    nextpageIntArrow = gContext->GetNumSetting("weatherHoldTimeout", 20);
-    m_srcMan->startTimers();
-    m_srcMan->doUpdate();
-#endif
 }
 
 void Weather::cursorRight()
@@ -389,14 +295,9 @@ void Weather::cursorRight()
     WeatherScreen *ws = nextScreen();
     if (ws->canShowScreen())
     {
-        if (currScreen)
-            currScreen->hiding();
-        currScreen = ws;
-        currScreen->showing();
-        currScreen->toggle_pause(paused);
-        update();
-        if (!paused)
-            nextpage_Timer->start((int)(1000 * nextpageIntArrow));
+        hideScreen();
+        showScreen(ws);
+        holdPage();
     }
 }
 
@@ -405,14 +306,9 @@ void Weather::cursorLeft()
     WeatherScreen *ws = prevScreen();
     if (ws->canShowScreen())
     {
-        if (currScreen)
-            currScreen->hiding();
-        currScreen = ws;
-        currScreen->showing();
-        currScreen->toggle_pause(paused);
-        update();
-        if (!paused)
-            nextpage_Timer->start((int)(1000 * nextpageIntArrow));
+        hideScreen();
+        showScreen(ws);
+        holdPage();
     }
 }
 
@@ -422,12 +318,11 @@ void Weather::nextpage_timeout()
 
     if (nxt->canShowScreen())
     {
-        if (currScreen)
-            currScreen->hiding();
-       showLayout(nxt);
+        hideScreen();
+        showScreen(nxt);
     }
     else
         VERBOSE(VB_GENERAL, "Next screen not ready");
 
-    nextpage_Timer->changeInterval((int)(1000 * nextpageInterval));
+    m_nextpage_Timer->changeInterval((int)(1000 * m_nextpageInterval));
 }

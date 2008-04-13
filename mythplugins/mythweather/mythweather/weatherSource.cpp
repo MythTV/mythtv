@@ -1,12 +1,16 @@
 #include <unistd.h>
 
+// QT headers
 #include <qfile.h>
 #include <q3textstream.h>
+#include <qapplication.h>
 
+// MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
 
+// MythWeather headers
 #include "weatherScreen.h"
 #include "weatherSource.h"
 
@@ -21,7 +25,11 @@ QStringList WeatherSource::probeTypes(Q3Process *proc)
                 "cannot run script " + proc->arguments().join(" "));
         return QStringList();
     }
-    while (proc->isRunning());
+    while (proc->isRunning())
+    {
+        qApp->processEvents();
+        usleep(250);
+    }
 
     if (!proc->normalExit() || proc->exitStatus())
     {
@@ -61,7 +69,12 @@ bool WeatherSource::probeTimeouts(Q3Process *proc, uint &updateTimeout,
         return false;
     }
 
-    while (proc->isRunning());
+    while (proc->isRunning())
+    {
+        qApp->processEvents();
+        usleep(250);
+    }
+
     if (!proc->normalExit() || proc->exitStatus() )
     {
         VERBOSE(VB_IMPORTANT, "Error Running Script");
@@ -105,7 +118,11 @@ bool WeatherSource::probeInfo(Q3Process *proc, QString &name, QString &version,
                 "cannot run script " + proc->arguments().join(" "));
         return false;
     }
-    while (proc->isRunning());
+    while (proc->isRunning())
+    {
+        qApp->processEvents();
+        usleep(250);
+    }
 
     if (!proc->normalExit() || proc->exitStatus())
     {
@@ -412,7 +429,8 @@ QStringList WeatherSource::getLocationList(const QString &str)
         if (m_proc->canReadLineStdout())
             locs << m_proc->readLineStdout();
         else
-            usleep(100);
+            usleep(250);
+        qApp->processEvents();
     }
 
     while (m_proc->canReadLineStdout())
@@ -553,7 +571,7 @@ void WeatherSource::processData()
 {
     QStringList data = QStringList::split('\n', m_buffer);
     QStringList temp;
-    for (size_t i = 0; i < data.size(); ++i)
+    for (int i = 0; i < data.size(); ++i)
     {
         temp = QStringList::split("::", data[i]);
         if (temp.size() > 2)

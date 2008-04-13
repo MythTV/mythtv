@@ -8,7 +8,8 @@
 
 #include <qtimer.h>
 
-#include "defs.h"
+// MythWeather headers
+#include "weatherUtils.h"
 
 class QFileInfo;
 class WeatherScreen;

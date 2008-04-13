@@ -1,14 +1,15 @@
 #ifndef _SOURCEMANAGER_H_
 #define _SOURCEMANAGER_H_
 
+// QT headers
 #include <qobject.h>
 #include <q3intdict.h>
 #include <qstringlist.h>
 //Added by qt3to4:
 #include <Q3PtrList>
 
-#include "defs.h"
-
+// MythWeather headers
+#include "weatherUtils.h"
 #include "weatherSource.h"
 
 class WeatherScreen;

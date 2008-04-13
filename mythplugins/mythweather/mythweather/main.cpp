@@ -1,35 +1,25 @@
-/*
-    MythWeather
-    Version 0.8
-    January 8th, 2003
-
-    By John Danner & Dustin Doris
-
-    Note: Portions of this code taken from MythMusic
-
-*/
-
+// QT headers
 #include <qapplication.h>
 
 #include <unistd.h>
 
+// MythTV headers
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
-#include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/myththemedmenu.h>
+#include <mythtv/libmythui/mythmainwindow.h>
 
+// MythWeather headers
 #include "weather.h"
 #include "weatherSetup.h"
 #include "sourceManager.h"
 #include "dbcheck.h"
 
 SourceManager *srcMan = 0;
-XMLParse *theme = 0;
 
 void runWeather();
-void loadTheme();
 
 void setupKeys()
 {
@@ -65,23 +55,12 @@ int mythplugin_init(const char *libversion)
 
 void runWeather()
 {
-    gContext->addCurrentLocation("mythweather");
-    if (!srcMan)
-    {
-        srcMan = new SourceManager();
-        srcMan->startTimers();
-        srcMan->doUpdate();
-    }
-    Weather *weatherDat = new Weather(gContext->GetMainWindow(), srcMan,
-                                      "weather");
-    weatherDat->exec();
-    delete weatherDat;
-    gContext->removeCurrentLocation();
-    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
-    {
-        delete srcMan;
-        srcMan = 0;
-    }
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    Weather *weather = new Weather(mainStack, "mythweather", srcMan);
+
+    if (weather->Create())
+        mainStack->AddScreen(weather);
 }
 
 int mythplugin_run()
@@ -93,10 +72,15 @@ int mythplugin_run()
 void WeatherCallback(void *data, QString &selection)
 {
     (void) data;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
     if (selection == "SETTINGS_GENERAL")
     {
-        GlobalSetup gsetup(gContext->GetMainWindow());
-        gsetup.exec();
+        GlobalSetup *gsetup = new GlobalSetup(mainStack, "weatherglobalsetup");
+
+        if (gsetup->Create())
+            mainStack->AddScreen(gsetup);
     }
     else if (selection == "SETTINGS_SCREEN")
     {
@@ -106,44 +90,21 @@ void WeatherCallback(void *data, QString &selection)
         }
         srcMan->clearSources();
         srcMan->findScripts();
-        ScreenSetup ssetup(gContext->GetMainWindow(), srcMan);
-        ssetup.exec();
-        if (gContext->GetNumSetting("weatherbackgroundfetch", 0))
-        {
-            if (!srcMan)
-                srcMan = new SourceManager();
-            else
-            {
-                srcMan->clearSources();
-                srcMan->findScriptsDB();
-                srcMan->setupSources();
-            }
 
-            srcMan->startTimers();
-            srcMan->doUpdate();
-        }
-        else
-        {
-            if (srcMan)
-            {
-                delete srcMan;
-                srcMan = 0;
-            }
-        }
+        ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup", srcMan);
+
+        if (ssetup->Create())
+            mainStack->AddScreen(ssetup);
     }
     else if (selection == "SETTINGS_SOURCE")
     {
-        SourceSetup srcsetup(gContext->GetMainWindow());
-        if (srcsetup.loadData())
-        {
-            srcsetup.exec();
-        }
-        else
-        {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no sources",
-                    QObject::tr("No Sources defined, Sources are defined by"
-                                " adding screens in Screen Setup."));
-        }
+        SourceSetup *srcsetup = new SourceSetup(mainStack, "weathersourcesetup");
+
+        if (srcsetup->Create())
+            mainStack->AddScreen(srcsetup);
+//             MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no sources",
+//                     QObject::tr("No Sources defined, Sources are defined by"
+//                                 " adding screens in Screen Setup."));
     }
 }
 

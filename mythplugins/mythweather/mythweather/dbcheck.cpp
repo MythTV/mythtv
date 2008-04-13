@@ -6,7 +6,6 @@
 #include <mythtv/mythdbcon.h>
 
 #include "dbcheck.h"
-#include "defs.h"
 
 const QString currentDatabaseVersion = "1003";
 

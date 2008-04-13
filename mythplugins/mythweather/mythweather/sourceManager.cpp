@@ -1,13 +1,19 @@
+
+// QT headers
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qstring.h>
 #include <qstringlist.h>
+#include <qapplication.h>
 //Added by qt3to4:
 #include <Q3PtrList>
 
+// MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
 
+// MythWeather headers
 #include "weatherScreen.h"
 #include "weatherSource.h"
 #include "sourceManager.h"
@@ -75,15 +81,22 @@ bool SourceManager::findScripts()
     QDir dir(path);
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
 
-    MythBusyDialog *busyd = new MythBusyDialog(
-        QObject::tr("Searching for scripts"));
-
-
     if (!dir.exists())
     {
         VERBOSE(VB_IMPORTANT, "MythWeather: Scripts directory not found");
         return false;
     }
+    QString busymessage = tr("Searching for scripts");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
+                                                       "mythweatherbusydialog");
+
+    if (busyPopup->Create())
+        popupStack->AddScreen(busyPopup, false);
+
+    qApp->processEvents();
 
     recurseDirs(dir);
 
@@ -106,7 +119,7 @@ bool SourceManager::findScripts()
     }
 
     db.prepare("DELETE FROM weathersourcesettings WHERE sourceid = :ID;");
-    for (uint i = 0; i < toRemove.count(); ++i)
+    for (int i = 0; i < toRemove.count(); ++i)
     {
         db.bindValue(":ID", toRemove[i]);
         if (!db.exec())
@@ -115,8 +128,11 @@ bool SourceManager::findScripts()
         }
     }
 
-    busyd->Close();
-    busyd->deleteLater();
+    if (busyPopup)
+    {
+        busyPopup->Close();
+        busyPopup = NULL;
+    }
 
     return m_scripts.count() > 0;
 }
@@ -265,7 +281,7 @@ bool SourceManager::findPossibleSources(QStringList types,
     {
         QStringList stypes = si->types;
         handled = true;
-        uint i;
+        int i;
         for (i = 0; i < types.count() && handled; ++i)
         {
             handled = stypes.contains(types[i]);
@@ -330,7 +346,7 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
 // Recurses dir for script files
 void SourceManager::recurseDirs( QDir dir )
 {
-    if (!dir.exists()) 
+    if (!dir.exists())
         return;
 
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
@@ -339,11 +355,12 @@ void SourceManager::recurseDirs( QDir dir )
     QFileInfoList::const_iterator itr = files.begin();
     const QFileInfo *file;
 
-    while (itr != files.end()) 
+    while (itr != files.end())
     {
+        qApp->processEvents();
         file = &(*itr);
         ++itr;
-        if (file->isDir()) 
+        if (file->isDir())
         {
             if (file->fileName() == QString("..")) continue;
             if (file->fileName() == QString("."))  continue;
@@ -351,7 +368,7 @@ void SourceManager::recurseDirs( QDir dir )
             recurseDirs(recurseTo);
         }
 
-        if (file->isExecutable() && !(file->isDir())) 
+        if (file->isExecutable() && !(file->isDir()))
         {
             ScriptInfo *info = WeatherSource::probeScript(*file);
             if (info)
@@ -362,5 +379,5 @@ void SourceManager::recurseDirs( QDir dir )
         }
     }
 
-    return;    
+    return;
 }

@@ -1,70 +1,68 @@
+// QT headers
 #include <vector>
 
+// MythTV headers
 #include <mythtv/mythcontext.h>
 
+// MythWeather headers
 #include "weather.h"
 #include "weatherScreen.h"
-#include "defs.h"
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
 
-WeatherScreen *WeatherScreen::loadScreen(Weather *parent, LayerSet *container,
-                                         int id)
+WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
+                                         ScreenListInfo *screenDefn, int id)
 {
-    QString key = container->GetName();
+    QString key = screenDefn->name;
     if (key == "Current Conditions")
-        return new CurrCondScreen(parent, container, id);
+        return new CurrCondScreen(parent, "Current Conditions", screenDefn, id);
     if (key == "Three Day Forecast")
-        return new ThreeDayForecastScreen(parent, container, id);
+        return new ThreeDayForecastScreen(parent,"Three Day Forecast" , screenDefn, id);
     if (key == "Six Day Forecast")
-        return new SixDayForecastScreen(parent, container, id);
+        return new SixDayForecastScreen(parent, "Six Day Forecast", screenDefn, id);
     if (key == "Severe Weather Alerts")
-        return new SevereWeatherScreen(parent, container, id);
+        return new SevereWeatherScreen(parent, "Severe Weather Alerts", screenDefn, id);
     if (key == "Static Map")
-        return new StaticImageScreen(parent, container, id);
-   if (key == "Animated Map")
-       return new AnimatedImageScreen(parent, container, id);
+        return new StaticImageScreen(parent,"Static Map" , screenDefn, id);
+    if (key == "Animated Map")
+        return new AnimatedImageScreen(parent, "Animated Map", screenDefn, id);
 
-    return new WeatherScreen(parent, container, id);
+    return new WeatherScreen(parent, "Unknown Screen", screenDefn, id);
 }
 
-QStringList WeatherScreen::getAllDynamicTypes(LayerSet *container)
+WeatherScreen::WeatherScreen(MythScreenStack *parent, const char *name,
+                             ScreenListInfo *screenDefn, int id)
+    : MythScreenType (parent, name)
 {
-    vector<UIType *> *types = container->getAllTypes();
-    vector<UIType *>::iterator i = types->begin();
-    QStringList typesList;
-    for (; i < types->end(); ++i)
-    {
-        UIType *t = *i;
-        if (t->getName().startsWith("+"))
-            typesList << t->getName().remove(0, 1);
-    }
-    return typesList;
-}
-
-WeatherScreen::WeatherScreen(Weather *parent, LayerSet *container, int id)
-{
-    m_container = container;
-    m_parent = parent;
+    m_screenDefn = screenDefn;
+    m_name = m_screenDefn->name;
     m_id = id;
     m_prepared = false;
 
     m_inuse = false;
-    vector<UIType *> *types = m_container->getAllTypes();
-    vector<UIType *>::iterator i = types->begin();
-    for (; i < types->end(); ++i)
+
+    QStringList types = m_screenDefn->dataTypes;
+
+    for (int i = 0; i < types.size(); ++i)
     {
-        UIType *t = (UIType *) *i;
-        if (t->getName().startsWith("*") || t->getName().startsWith("+"))
-            addDataItem(t->getName().remove(0, 1),
-                        t->getName().startsWith("+"));
+        m_dataValueMap[types.at(i)] =  "";
     }
 }
 
 WeatherScreen::~WeatherScreen()
 {
-    disconnect();
+}
+
+bool WeatherScreen::Create()
+{
+
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("weather-ui.xml", m_name, this);
+
+    if (!foundtheme)
+        return false;
+
+    return true;
 }
 
 bool WeatherScreen::canShowScreen()
@@ -72,21 +70,25 @@ bool WeatherScreen::canShowScreen()
     if (!inUse())
         return false;
 
-    for (uint i = 0; i < map.size(); ++i)
-    {
-        if (map[map.keys()[i]] == "NEEDED")
+    bool ok = true;
+    QMapIterator<QString, QString> i(m_dataValueMap);
+    while (i.hasNext()) {
+        i.next();
+        if (i.key().isEmpty())
         {
-            VERBOSE(VB_GENERAL, map.keys()[i]);
+            VERBOSE(VB_GENERAL, i.key());
+            ok = false;
         }
     }
 
-    return !map.values().contains("NEEDED");
+    return ok;
 }
+
 
 void WeatherScreen::setValue(const QString &key, const QString &value)
 {
-    if (map.contains(key))
-        map[key] = prepareDataItem(key, value);
+    if (m_dataValueMap.contains(key))
+        m_dataValueMap[key] = prepareDataItem(key, value);
 }
 
 void WeatherScreen::newData(QString loc, units_t units, DataMap data)
@@ -101,40 +103,33 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
         ++itr;
     }
 
-    if (canShowScreen())
-    {
-        emit screenReady(this);
-    }
+    if (!m_prepared)
+        prepareScreen();
+
+    emit screenReady(this);
 }
 
 void WeatherScreen::prepareScreen()
 {
-    QMap<QString, QString>::iterator itr = map.begin();
-    while (itr != map.end())
+    QMap<QString, QString>::iterator itr = m_dataValueMap.begin();
+    while (itr != m_dataValueMap.end())
     {
-        UIType *widget = getType(itr.key());
+        MythUIType *widget = GetChild(itr.key());
         if (!widget)
         {
-            VERBOSE(VB_IMPORTANT, "Widget not found " + itr.key());
+            VERBOSE(VB_GENERAL, "Widget not found " + itr.key());
             ++itr;
             continue;
         }
 
-        if (dynamic_cast<UITextType *>(widget))
-            ((UITextType *) widget)->SetText(itr.data());
-        else if (dynamic_cast<UIImageType *>(widget))
+        if (dynamic_cast<MythUIText *>(widget))
         {
-            ((UIImageType *) widget)->SetImage(itr.data());
+            ((MythUIText *) widget)->SetText(itr.value());
         }
-        else if (dynamic_cast<UIAnimatedImageType *>(widget))
+        else if (dynamic_cast<MythUIImage *>(widget))
         {
-            ((UIAnimatedImageType *) widget)->SetWindow((MythDialog *) m_parent);
-            ((UIAnimatedImageType *) widget)->Pause();
-            ((UIAnimatedImageType *) widget)->SetFilename(itr.data());
-        }
-        else if (dynamic_cast<UIRichTextType *>(widget))
-        {
-            ((UIRichTextType *) widget)->SetText(itr.data());
+            ((MythUIImage *) widget)->SetFilename(itr.value());
+            ((MythUIImage *) widget)->Load();
         }
 
         prepareWidget(widget);
@@ -144,21 +139,16 @@ void WeatherScreen::prepareScreen()
     m_prepared = true;
 }
 
-void WeatherScreen::prepareWidget(UIType *widget)
+void WeatherScreen::prepareWidget(MythUIType *widget)
 {
-    UIImageType *img;
-    UIAnimatedImageType *aimg;
+    MythUIImage *img;
     /*
      * Basically so we don't do it twice since some screens (Static Map) mess
      * with image dimensions
      */
-    if ((img = dynamic_cast<UIImageType *>(widget)))
+    if ((img = dynamic_cast<MythUIImage *>(widget)))
     {
-        img->LoadImage();
-    }
-    else if ((aimg = dynamic_cast<UIAnimatedImageType *>(widget)))
-    {
-        aimg->LoadImages();
+        img->Load();
     }
 }
 
@@ -168,124 +158,17 @@ QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
     return value;
 }
 
-void WeatherScreen::addDataItem(const QString &item, bool required)
+bool WeatherScreen::keyPressEvent(QKeyEvent *event)
 {
-    if (!map.contains(item))
-        map[item] = required ? "NEEDED" : "";
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    return false;
 }
 
-void WeatherScreen::draw(QPainter *p)
-{
-    if (m_container)
-    {
-        QRect area = m_container->GetAreaRect();
-        if (area.isNull())
-        {
-            VERBOSE(VB_IMPORTANT, QString("Container %1 has NULL area, "
-                                          "bad theme.")
-                                          .arg(m_container->GetName()));
-            area.setWidth(800);
-            area.setHeight(600);
-        }
-        QPixmap pix(area.size());
-        pix.fill(m_parent, area.topLeft());
-        QPainter tmp(&pix);
-        for (int i = 0; i < 9; ++i)
-            m_container->Draw(&tmp, i, 0);
-        tmp.end();
-        p->drawPixmap(area.topLeft(), pix);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "NULL container in WeatherScreen");
-    }
-}
-
-void WeatherScreen::hiding()
-{
-    pause_animation();
-}
-
-void WeatherScreen::showing()
-{
-    if (!m_prepared)
-        prepareScreen();
-    unpause_animation();
-}
-
-void WeatherScreen::toggle_pause(bool paused)
-{
-    UITextType *txt = (UITextType *) getType("pause_text");
-    if (txt)
-    {
-        QString pausetext = QString("- %1 -").arg(tr("PAUSED"));
-        if (paused)
-            txt->SetText(pausetext);
-        else
-            txt->SetText("");
-    }
-}
-
-void WeatherScreen::pause_animation()
-{
-    vector<UIType *> *types = m_container->getAllTypes();
-    for (vector<UIType *>::iterator i = types->begin(); i < types->end(); ++i)
-    {
-        UIAnimatedImageType *t = dynamic_cast<UIAnimatedImageType *>(*i);
-        if (t) t->Pause();
-    }
-}
-
-void WeatherScreen::unpause_animation()
-{
-    vector<UIType *> *types = m_container->getAllTypes();
-    for (vector<UIType *>::iterator i = types->begin(); i < types->end(); ++i)
-    {
-        UIAnimatedImageType *t = dynamic_cast<UIAnimatedImageType *>(*i);
-        if (t)
-        {
-            t->GotoFirstImage();
-            t->UnPause();
-        }
-    }
-}
-
-UIType *WeatherScreen::getType(const QString &key)
-{
-    if (!m_container)
-        return NULL;
-
-    UIType *t = m_container->GetType(key);
-    if (t)
-        return t;
-
-    t = m_container->GetType("*" + key);
-    if (t)
-        return t;
-
-    t = m_container->GetType("+" + key);
-    if (t)
-        return t;
-
-    return NULL;
-}
-
-void WeatherScreen::clock_tick()
-{
-    QDateTime new_time(QDateTime::currentDateTime());
-    QString curDate;
-    if (QString(gContext->GetSetting("Language")) == "JA")
-        curDate = new_time.toString("M/d (ddd) h:mm ap");
-    else
-        curDate = new_time.toString("MMM d h:mm ap");
-
-    curDate = new_time.date().toString(Qt::LocalDate);
-    curDate += new_time.time().toString(" h:mm ap");
-    setValue("currentdatetime", curDate);
-}
-
-CurrCondScreen::CurrCondScreen(Weather *parent, LayerSet *container, int id)
-    : WeatherScreen(parent, container, id)
+CurrCondScreen::CurrCondScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
@@ -302,14 +185,14 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "appt")
-        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "캟" : "캜");
+        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "째F" : "째C");
 
     if (key == "temp")
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "캟" : "캜");
+          return value + (m_units == ENG_UNITS ? "째F" : "째C");
     }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
@@ -318,9 +201,10 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
     return value;
 }
 
-ThreeDayForecastScreen::ThreeDayForecastScreen(Weather *parent,
-                                               LayerSet *container, int id) :
-    WeatherScreen(parent, container, id)
+ThreeDayForecastScreen::ThreeDayForecastScreen(MythScreenStack *parent,
+                                               const char *name,
+                                               ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
@@ -332,15 +216,16 @@ QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "캟" : "캜");
+          return value + (m_units == ENG_UNITS ? "째F" : "째C");
     }
-    
+
     return value;
 }
 
-SixDayForecastScreen::SixDayForecastScreen(Weather *parent,
-                                               LayerSet *container, int id) :
-    WeatherScreen(parent, container, id)
+SixDayForecastScreen::SixDayForecastScreen(MythScreenStack *parent,
+                                            const char *name,
+                                            ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
@@ -352,49 +237,21 @@ QString SixDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "캟" : "캜");
+          return value + (m_units == ENG_UNITS ? "째F" : "째C");
     }
-    
+
     return value;
 }
 
-SevereWeatherScreen::SevereWeatherScreen(Weather *parent, LayerSet *container,
-                                         int id) :
-    WeatherScreen(parent, container, id)
+SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent, const char *name,
+                                         ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
-    m_text = (UIRichTextType *) getType("alerts");
-    m_text->SetBackground(parent->getBackground());
 }
 
-bool SevereWeatherScreen::handleKey(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
-
-    for (uint i = 0; i < actions.size() && !handled; ++i)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "UP")
-            m_text->ScrollUp();
-        else if (action == "DOWN")
-            m_text->ScrollDown();
-        else if (action == "PAGEUP")
-            m_text->ScrollPageUp();
-        else if (action == "PAGEDOWN")
-            m_text->ScrollPageDown();
-        else handled = false;
-    }
-    m_parent->update();
-
-    return handled;
-}
-
-StaticImageScreen::StaticImageScreen(Weather *parent, LayerSet *container,
-                                     int id) :
-    WeatherScreen(parent, container, id)
+StaticImageScreen::StaticImageScreen(MythScreenStack *parent, const char *name,
+                                     ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
@@ -415,45 +272,46 @@ QString StaticImageScreen::prepareDataItem(const QString &key,
             QStringList dim = QStringList::split('x',
                     value.right(value.length() - value.findRev('-') - 1));
             ret = value.left(value.findRev('-'));
-            imgsize.setWidth(dim[0].toInt());
-            imgsize.setHeight(dim[1].toInt());
+            m_imgsize.setWidth(dim[0].toInt());
+            m_imgsize.setHeight(dim[1].toInt());
         }
     }
 
     return ret;
 }
 
-void StaticImageScreen::prepareWidget(UIType *widget)
+void StaticImageScreen::prepareWidget(MythUIType *widget)
 {
-    if (widget->Name() == "+map")
+    if (widget->objectName() == "map")
     {
         /*
          * Scaling the image down and centering it
          */
-        UIImageType *img = (UIImageType *) widget;
-        QSize max = img->GetSize();
+        MythUIImage *img = (MythUIImage *) widget;
+        QRect max = img->GetArea();
 
-        if (imgsize.width() > -1 && imgsize.height() > -1)
+        if (m_imgsize.width() > -1 && m_imgsize.height() > -1)
         {
             if (max.width() > -1 && max.height() > -1)
             {
-                imgsize.scale(max, Qt::KeepAspectRatio);
+                m_imgsize.scale(QSize(max.width(),max.height()),
+                                Qt::KeepAspectRatio);
 
-                QPoint orgPos = img->DisplayPos();
+                QPoint orgPos = img->GetPosition();
 
-                int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
-                int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+                int newx = orgPos.x() + (max.width() - m_imgsize.width()) / 2;
+                int newy = orgPos.y() + (max.height() - m_imgsize.height()) / 2;
                 img->SetPosition(QPoint(newx, newy));
             }
-            img->SetSize(imgsize.width(), imgsize.height());
+            img->SetSize(m_imgsize.width(), m_imgsize.height());
         }
-        img->LoadImage();
+        img->Load();
     }
 }
 
-AnimatedImageScreen::AnimatedImageScreen(Weather *parent, LayerSet *container,
-                                         int id) :
-    WeatherScreen(parent, container, id)
+AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const char *name,
+                                         ScreenListInfo *screenDefn, int id)
+    : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
@@ -475,8 +333,8 @@ QString AnimatedImageScreen::prepareDataItem(const QString &key,
             QStringList dim = QStringList::split('x',
                     value.right(value.length() - value.findRev('-') - 1));
             ret = value.left(value.findRev('-'));
-            imgsize.setWidth(dim[0].toInt());
-            imgsize.setHeight(dim[1].toInt());
+            m_imgsize.setWidth(dim[0].toInt());
+            m_imgsize.setHeight(dim[1].toInt());
         }
 
         QString cnt = ret.right(ret.length() - ret.findRev('-') - 1);
@@ -487,34 +345,35 @@ QString AnimatedImageScreen::prepareDataItem(const QString &key,
     return ret;
 }
 
-void AnimatedImageScreen::prepareWidget(UIType *widget)
+void AnimatedImageScreen::prepareWidget(MythUIType *widget)
 {
-    if (widget->Name() == "+animatedimage")
+    if (widget->objectName() == "animatedimage")
     {
         /*
          * Scaling the image down and centering it
          */
-        UIAnimatedImageType *img = (UIAnimatedImageType *) widget;
-        QSize max = img->GetSize();
+        MythUIImage *img = (MythUIImage *) widget;
+        QRect max = img->GetArea();
 
-        if (imgsize.width() > -1 && imgsize.height() > -1)
+        if (m_imgsize.width() > -1 && m_imgsize.height() > -1)
         {
             if (max.width() > -1 && max.height() > -1)
             {
-                imgsize.scale(max, Qt::KeepAspectRatio);
+                m_imgsize.scale(QSize(max.width(),max.height()),
+                                Qt::KeepAspectRatio);
 
-                QPoint orgPos = img->DisplayPos();
+                QPoint orgPos = img->GetPosition();
 
-                int newx = orgPos.x() + (max.width() - imgsize.width()) / 2;
-                int newy = orgPos.y() + (max.height() - imgsize.height()) / 2;
+                int newx = orgPos.x() + (max.width() - m_imgsize.width()) / 2;
+                int newy = orgPos.y() + (max.height() - m_imgsize.height()) / 2;
                 img->SetPosition(QPoint(newx, newy));
             }
-            img->SetSize(imgsize.width(), imgsize.height());
+            img->SetSize(m_imgsize.width(), m_imgsize.height());
         }
 
-        img->SetImageCount(m_count);
+        img->SetImageCount(0, m_count);
         // TODO this slows things down A LOT!!
-        img->LoadImages();
+        img->Load();
     }
     return;
 }

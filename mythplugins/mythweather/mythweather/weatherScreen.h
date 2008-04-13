@@ -1,45 +1,45 @@
 #ifndef _WEATHERSCREEN_H_
 #define _WEATHERSCREEN_H_
 
-#include <qobject.h>
+// QT headers
 #include <qstringlist.h>
 #include <qstring.h>
 #include <qmap.h>
-//Added by qt3to4:
-#include <QKeyEvent>
 
-#include <mythtv/uitypes.h>
+// MythTV headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuiimage.h>
 
-#include "defs.h"
+// MythWeather headers
+#include "weatherUtils.h"
 
 class Weather;
 
-class WeatherScreen : public QObject
+/** \class WeatherScreen
+ *  \brief Weather screen
+ */
+class WeatherScreen : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    static WeatherScreen *loadScreen(Weather *parent, LayerSet *container,
-                                     int id = -1);
-    static QStringList getAllDynamicTypes(LayerSet *container);
-
-    WeatherScreen(Weather *parent, LayerSet *container, int id);
+    WeatherScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
     ~WeatherScreen();
 
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+
+    static WeatherScreen *loadScreen(MythScreenStack *parent,
+                                         ScreenListInfo *screenDefn, int id);
+
     void setValue(const QString &key, const QString &value);
-    QString getValue(const QString &key) { return map[key]; }
-    bool containsKey(const QString &key) { return map.contains(key); }
+    QString getValue(const QString &key) { return m_dataValueMap[key]; }
+    bool containsKey(const QString &key) { return m_dataValueMap.contains(key); }
     virtual bool canShowScreen();
-    void pause_animation();
-    void unpause_animation();
-    virtual void hiding();
-    virtual void showing();
-    void addDataItem(const QString &item, bool required = false);
     void setUnits(units_t units) { m_units = units; }
     units_t getUnits() { return m_units; }
-    LayerSet *getContainer() { return m_container; }
-    void draw(QPainter *p);
-    virtual void toggle_pause(bool paused);
     virtual bool usingKeys() { return false; }
     bool inUse() { return m_inuse; }
     void setInUse(bool inuse) { m_inuse = inuse; }
@@ -49,26 +49,21 @@ class WeatherScreen : public QObject
     void screenReady(WeatherScreen *);
 
   public slots:
-    virtual void clock_tick();
     virtual void newData(QString loc, units_t units, DataMap data);
-    virtual bool handleKey(QKeyEvent *e) { (void) e; return false; }
 
   protected:
     units_t m_units;
-    LayerSet *m_container;
-    Weather *m_parent;
+    ScreenListInfo *m_screenDefn;
     QString m_name;
 
   protected:
     virtual QString prepareDataItem(const QString &key, const QString &value);
-    virtual void prepareWidget(UIType *widget);
+    virtual void prepareWidget(MythUIType *widget);
     virtual void prepareScreen();
-    UIType *getType(const QString &key);
 
   private:
-    QRect fullRect;
-    QMap<QString, QString> map;
-    UIAnimatedImageType *m_ai;
+    QMap<QString, QString> m_dataValueMap;
+
     bool m_inuse;
     bool m_prepared;
     int m_id;
@@ -79,7 +74,8 @@ class CurrCondScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    CurrCondScreen(Weather *parent, LayerSet *container, int id);
+    CurrCondScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
 
   protected:
     virtual QString prepareDataItem(const QString &key, const QString &value);
@@ -90,8 +86,9 @@ class ThreeDayForecastScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    ThreeDayForecastScreen(Weather *parent, LayerSet *container, int id);
-    
+    ThreeDayForecastScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
+
   protected:
     virtual QString prepareDataItem(const QString &key, const QString &value);
 
@@ -102,8 +99,9 @@ class SixDayForecastScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    SixDayForecastScreen(Weather *parent, LayerSet *container, int id);
-    
+    SixDayForecastScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
+
   protected:
     virtual QString prepareDataItem(const QString &key, const QString &value);
 
@@ -114,14 +112,12 @@ class SevereWeatherScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    SevereWeatherScreen(Weather *parent, LayerSet *container, int id);
+    SevereWeatherScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
     bool usingKeys() { return true; }
 
-  public slots:
-    bool handleKey(QKeyEvent *e);
-
   private:
-    UIRichTextType *m_text;
+    MythUIText *m_text;
 };
 
 class StaticImageScreen : public WeatherScreen
@@ -129,14 +125,15 @@ class StaticImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    StaticImageScreen(Weather *parent, LayerSet *container, int id);
+    StaticImageScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
 
   protected:
     QString prepareDataItem(const QString &key, const QString &value);
-    void prepareWidget(UIType *widget);
+    void prepareWidget(MythUIType *widget);
 
   private:
-    QSize imgsize;
+    QSize m_imgsize;
 };
 
 class AnimatedImageScreen : public WeatherScreen
@@ -144,15 +141,16 @@ class AnimatedImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    AnimatedImageScreen(Weather *parent, LayerSet *container, int id);
+    AnimatedImageScreen(MythScreenStack *parent, const char *name,
+                               ScreenListInfo *screenDefn, int id);
 
   protected:
     QString prepareDataItem(const QString &key, const QString &value);
-    void prepareWidget(UIType *widget);
+    void prepareWidget(MythUIType *widget);
 
   private:
     int m_count;
-    QSize imgsize;
+    QSize m_imgsize;
 };
 
 #endif

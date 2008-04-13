@@ -98,6 +98,15 @@
         <align>center</align>
     </button>
 
+    <!-- Base definition of a button in a checkbox configuration -->
+    <button name="basecheckbox">
+        <position>0,0</position>
+        <showarrow>no</showarrow>
+        <check-empty filename="unchecked.png"/>
+        <check-half filename="lb-check-half.png"/>
+        <check-full filename="checked.png"/>
+    </button>
+
     <!-- Base definition of a textarea -->
     <textarea name="basetextarea">
         <area>0,0,10,10</area>
