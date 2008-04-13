@@ -272,6 +272,10 @@ static void writeout_video(multiplex_t *mx)
 					   mx->SCR, mx->muxr, outbuf, &nlength,
 					   ptsdts, mx->vrbuffer);
 
+	// something bad happened with the PES or TS write, bail
+	if (written == -1)
+		return;
+
 	length -= nlength;
 	dummy_add(&mx->vdbuf, uptsdiff( viu->dts+mx->video_delay,0)
 		  , viu->length-length);
@@ -419,6 +423,11 @@ static void writeout_ext(multiplex_t *mx, int n)
 					&mx->extrbuffer[n]);
 		break;
 	}
+
+	// something bad happened when writing TS or PES to the MPEG or AC3
+	// audio stream
+	if (written == -1)
+		return;
 
 	length -= nlength;
 	write(mx->fd_out, outbuf, written);

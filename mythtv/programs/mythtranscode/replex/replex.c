@@ -1837,11 +1837,17 @@ void init_replex(struct replex *rx)
 		avi_context *ac;
 		uint8_t buf[AVI_S];
 		int re=0;
+		ssize_t read_count = 0;
 		
 		lseek(rx->fd_in, 0, SEEK_SET);
 		ac = &rx->ac;
 		memset(ac, 0, sizeof(avi_context));
-		save_read(rx, buf, 12);
+		if ((read_count = save_read(rx, buf, 12)) != 12) {
+			fprintf(stderr,
+				"Error reading in 12 bytes from replex. Read %d bytes\n",
+				read_count);
+			exit(1);
+		}
 		
 		if (check_riff(ac, buf, 12) < 0){
 			fprintf(stderr, "Wrong RIFF header\n");
