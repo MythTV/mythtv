@@ -1387,7 +1387,8 @@ sub effect {
             print "copying file ($effectparams[0] => $effectparams[1]) \n";
             cp($effectparams[0],$effectparams[1]);
             # make destn mtime the same as the original for ease of comparison:
-            shell("touch --reference=".perl2unix($effectparams[0])." ".perl2unix($effectparams[1]));
+            shell("touch --reference='".perl2unix($effectparams[0])."' '"
+                                       .perl2unix($effectparams[1])."'");
 
         } elsif ($effecttype eq 'mkdirs') {
             mkdirs(shift @effectparams);
