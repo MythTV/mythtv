@@ -60,33 +60,16 @@ bool MythAppearance::Create()
     foundtheme = LoadWindowFromXML("appear-ui.xml", "appearance", this);
 
     if (!foundtheme)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to load window appearance from "
-                              "appear-ui.xml");
         return false;
-    }
 
-    m_topleftarrow = dynamic_cast<MythUIImage *>
-                (GetChild("topleft"));
+    m_topleftarrow = dynamic_cast<MythUIImage *> (GetChild("topleft"));
+    m_bottomrightarrow = dynamic_cast<MythUIImage *> (GetChild("bottomright"));
 
-    m_bottomrightarrow = dynamic_cast<MythUIImage *>
-                (GetChild("bottomright"));
-
-    m_size = dynamic_cast<MythUIText *>
-                (GetChild("size"));
-
-    m_offsets = dynamic_cast<MythUIText *>
-                (GetChild("offsets"));
-
-    m_changeamount = dynamic_cast<MythUIText *>
-                (GetChild("changeamount"));
-
-    m_offsets = dynamic_cast<MythUIText *>
-                (GetChild("offsets"));
-
-    m_changeamount = dynamic_cast<MythUIText *>
-                (GetChild("changeamount"));
-
+    m_size = dynamic_cast<MythUIText *> (GetChild("size"));
+    m_offsets = dynamic_cast<MythUIText *> (GetChild("offsets"));
+    m_changeamount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
+    m_offsets = dynamic_cast<MythUIText *> (GetChild("offsets"));
+    m_changeamount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
 
     m_arrowsize_x = m_topleftarrow->GetArea().width();
     m_arrowsize_y = m_topleftarrow->GetArea().height();
@@ -136,6 +119,9 @@ void MythAppearance::getScreenInfo()
 
 bool MythAppearance::keyPressEvent(QKeyEvent *event)
 {
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     QStringList actions;
     bool handled = false;
 
@@ -158,11 +144,12 @@ bool MythAppearance::keyPressEvent(QKeyEvent *event)
             moveRight();
         else if (action == "MENU")
             doMenu();
-        else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
         else
             handled = false;
     }
+
+    if (MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }
@@ -183,7 +170,6 @@ void MythAppearance::swapArrows()
 
 // now update the screen
     updateScreen();
-
 }
 
 void MythAppearance::moveUp()
@@ -285,12 +271,12 @@ void MythAppearance::doMenu()
 
     QString label = "MythAppearance Menu";
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    m_menuPopup = new MythDialogBox(label, mainStack, "menuPopup");
+    m_menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (m_menuPopup->Create())
-        mainStack->AddScreen(m_menuPopup);
+        popupStack->AddScreen(m_menuPopup);
 
     if (m_changed)
     {

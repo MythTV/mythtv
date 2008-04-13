@@ -15,12 +15,12 @@
         </imagetype>
 
         <imagetype name="bottomright">
-            <filename>bottomright.png</filename>
             <position>800,600</position>
+            <filename>bottomright.png</filename>
         </imagetype>
 
         <textarea name="part1" from="basetextarea">
-            <font>title</font>
+            <font>basemedium</font>
             <area>100,140,600,170</area>
             <value>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</value>
             <multiline>yes</multiline>
@@ -32,21 +32,15 @@
             <value>1280 x 720</value>
         </textarea>
 
-        <textarea name="offsets" from="basetextarea">
-            <font>basemedium</font>
+        <textarea name="offsets" from="size">
             <area>100,320,500,140</area>
             <value>0 x 0</value>
         </textarea>
 
-        <textarea name="changeamount" from="basetextarea">
-            <font>basemedium</font>
+        <textarea name="changeamount" from="size">
             <area>100,520,500,140</area>
             <value>1 pixel</value>
         </textarea>
-
-        <textedit name="textedit" from="basetextedit">
-            <area>300,400,375,50</area>
-        </textedit>
 
     </window>
 </mythuitheme>
