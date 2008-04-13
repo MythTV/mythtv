@@ -265,7 +265,7 @@ uint myth_system(const QString &command, int flags)
             close(fd);
 
         /* Run command */
-        execl("/bin/sh", "sh", "-c", QString(command.utf8()).ascii(), NULL);
+        execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), NULL);
         if (errno)
         {
             VERBOSE(VB_IMPORTANT,
@@ -324,17 +324,13 @@ uint myth_system(const QString &command, int flags)
     memset(&si, 0, sizeof(si));
     memset(&pi, 0, sizeof(pi));
     si.cb = sizeof(si);
-    QString cmd = QString("cmd.exe /c %1").arg(command.utf8()).ascii();
-    char* ch = new char[cmd.length() + 1];
-	strcpy(ch, cmd);
-    if (!::CreateProcessA(NULL, ch, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-        delete[] ch;
+    QString cmd = QString("cmd.exe /c %1").arg(command);
+    if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
         VERBOSE(VB_IMPORTANT,
                 QString("myth_system(): Error, CreateProcess() failed because %1")
                 .arg(::GetLastError()));
         return MYTHSYSTEM__EXIT__EXECL_ERROR;
     } else {
-        delete[] ch;
         if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
             VERBOSE(VB_IMPORTANT,
                     QString("myth_system(): Error, WaitForSingleObject() failed because %1")
