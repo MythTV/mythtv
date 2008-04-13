@@ -976,6 +976,11 @@ void MPEG2fixup::WriteFrame(const char *filename, AVPacket *pkt)
 void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
 {
     int fh = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    if (fh == -1) {
+        VERBOSE(MPF_IMPORTANT, QString("Couldn't open file %1").arg(filename));
+        return;
+    }
+
     write(fh, info->display_fbuf->buf[0],
           info->sequence->width * info->sequence->height);
     write(fh, info->display_fbuf->buf[1],
@@ -988,6 +993,11 @@ void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
 void MPEG2fixup::WriteData(const char *filename, uint8_t *data, int size)
 {
     int fh = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    if (fh == -1) {
+        VERBOSE(MPF_IMPORTANT, QString("Couldn't open file %1").arg(filename));
+        return;
+    }
+
     write(fh, data, size);
     close(fh);
 }
