@@ -1045,6 +1045,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (! out_codec)
     {
+	free(picture);
         VERBOSE(MPF_IMPORTANT, "Couldn't find MPEG2 encoder");
         return 1;
     }
@@ -1092,6 +1093,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (avcodec_open(c, out_codec) < 0)
     {
+        free(picture);
         VERBOSE(MPF_IMPORTANT, "could not open codec");
         return 1;
     }
