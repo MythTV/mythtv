@@ -702,8 +702,18 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         FrameInfo(f);
     }
 
-    ring_write(rb, f->pkt.data, f->pkt.size);
-    ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit));
+    if (ring_write(rb, f->pkt.data, f->pkt.size)<0){
+        pthread_mutex_unlock( &rx.mutex );
+        VERBOSE(MPF_IMPORTANT,
+                QString("Ring buffer overflow %1\n").arg(rb->size));
+        return 1;
+    }
+    if (ring_write(rbi, (uint8_t *)&iu, sizeof(index_unit))<0){
+        pthread_mutex_unlock( &rx.mutex );
+        VERBOSE(MPF_IMPORTANT,
+                QString("Ring buffer overflow %1\n").arg(rbi->size));
+        return 1;
+    }
     pthread_mutex_unlock(&rx.mutex);
     last_written_pos = f->pkt.pos;
     return 0;
