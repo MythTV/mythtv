@@ -200,6 +200,7 @@ class ScanCountry : public ComboBoxSetting, public TransientStorage
         UK,
         DE,
         ES,
+        NZ,
     };
 
     ScanCountry();

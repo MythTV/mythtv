@@ -439,6 +439,8 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
         country = UK;
     else if (qtcountry == QLocale::Spain)
         country = ES;
+    else if (qtcountry == QLocale::NewZealand)
+        country = NZ;
 #endif
 
     setLabel(tr("Country"));
@@ -448,6 +450,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("United Kingdom"), "uk", country == UK);
     addSelection(QObject::tr("Germany"),        "de", country == DE);
     addSelection(QObject::tr("Spain"),          "es", country == ES);
+    addSelection(QObject::tr("New Zealand"),    "nz", country == NZ);
 }
 
 AnalogPane::AnalogPane() :
