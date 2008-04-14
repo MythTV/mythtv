@@ -1092,8 +1092,10 @@ comment => 'create a mysql.txt file at: %HOMEPATH%\.mythtv\mysql.txt' ],
 
 ;
 } # end if($dbconf)
-#----------------------------------------
 
+
+if ( grep m/myththemes/, @components ) {
+#----------------------------------------
 #  build the mythplugins now:
 #----------------------------------------
 # 
@@ -1111,10 +1113,15 @@ push @{$expect},
 
 # Copy to build area
 [ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
+;
+}
 
+
+if ( grep m/myththemes/, @components ) {
 # -------------------------------
 # Make themes
 # -------------------------------
+push @{$expect},
 ## config:
 [ file => $mythtv.'myththemes/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','./configure --prefix=/usr '], comment => 'do we already have a Makefile for myththemes?' ],
 
@@ -1142,12 +1149,16 @@ push @{$expect},
 
 # Move ttf fonts to font directory
 [file => $mythtv.'qt'.$qtver.'_env.sh_', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','find '.$unixmythtv.'build/share/mythtv/themes/ -name "*.ttf" | xargs -n1 -i__ cp __ '.$unixmythtv.'build/share/mythtv', 'nocheck'], comment => 'move ttf files'],
+;
+}
+
 
 # -------------------------------
 # Prepare Readme.txt for distribution file - temporary for now
 # -------------------------------
 
 
+push @{$expect},
 [ file => $mythtv.'build/readme.txt', write => [$mythtv.'build/readme.txt',
 'README for Win32 Installation of MythTV version: '.$version.' svn '.$SVNRELEASE.'
 =============================================================
