@@ -598,8 +598,12 @@ push @{$expect},
   comment => 'after extracting the qt sources, there is no need for us to build the examples, so we will just move the folder out of the way (we could just delete it but dont)! ' ] ,
 
 # qt recommend NOT having sh.exe in the path when building QT (yes this applies to QT4 too!)
-[ file => $msys.'bin/sh_.exe', shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
-[ file => $mingw.'bin/sh_.exe', shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
+[ file => $msys.'bin/sh_.exe',
+ shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
+ comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
+[ exists => $mingw.'bin/sh.exe',
+   shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],
+ comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
 
 # Write a batch script for the QT environment under DOS:
 # TODO - the configure script pauses until you press 'y' to continue! 
@@ -626,8 +630,12 @@ rem mingw32-make
 
 
 #  move it (back to sh.exe ) now that we are done !
-[ file => $msys.'bin/sh.exe', shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],comment => 'rename msys sh_.exe back again!' ] ,
-[ file => $mingw.'bin/sh.exe', shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],comment => 'rename mingw sh_.exe back again!' ] ,
+[ file => $msys.'bin/sh.exe',
+ shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],
+ comment => 'rename msys sh_.exe back again!' ] ,
+[ exists => $mingw.'bin/sh_.exe',
+   shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],
+ comment => 'rename mingw sh_.exe back again!' ] ,
 
 ;
 
