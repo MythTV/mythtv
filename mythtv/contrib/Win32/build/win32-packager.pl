@@ -1094,7 +1094,7 @@ comment => 'create a mysql.txt file at: %HOMEPATH%\.mythtv\mysql.txt' ],
 } # end if($dbconf)
 
 
-if ( grep m/myththemes/, @components ) {
+if ( grep m/mythplugins/, @components ) {
 #----------------------------------------
 #  build the mythplugins now:
 #----------------------------------------
