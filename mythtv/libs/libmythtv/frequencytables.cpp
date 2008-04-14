@@ -320,6 +320,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 125000, 0); // UHF 21-69
 
+    // New Zealand
+    fmap["dvbt_ofdm_nz0"] = new FrequencyTable(
+        474000000, 858000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFEC_3_4,
+        DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardInterval_1_16, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAM64, 0 , 0); // UHF 21-69
+
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
     // UHF 14-69
