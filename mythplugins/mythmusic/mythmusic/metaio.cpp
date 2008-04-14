@@ -68,8 +68,13 @@ void MetaIO::readFromFilename(QString filename,
         else if ( *fmt_it == "TRACK_TITLE" ) 
         {
             QStringList tracktitle_list = QStringList::split("-", part_str);
-            tracknum = tracktitle_list[0].toInt();
-            title = tracktitle_list[1].simplifyWhiteSpace();
+            if (tracktitle_list.size() > 1)
+            {
+                tracknum = tracktitle_list[0].toInt();
+                title = tracktitle_list[1].simplifyWhiteSpace();
+            }
+            else
+                title = part_str;
         }
         else if ( *fmt_it == "ARTIST_TITLE" ) 
         {
