@@ -120,17 +120,19 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
 # TODO - Only $mingw is tested and most likely is safe to change.
 
-# perl compatible paths (single forward slashes in DOS style):
-my $msys = 'C:/MSys/1.0/'; # must end in slash, and use forward slashes /
-my $sources = 'C:/msys/1.0/sources/'; # must end in slash, and use forward slashes /
-my $mingw = 'C:/MinGW/'; # must end in slash, and use forward slashes /
-my $mythtv = 'C:/mythtv/';  # this is where the entire SVN checkout lives so c:/mythtv/mythtv/ is the main codebase.  # must end in slash, and use forward slashes /
+# Perl compatible paths. DOS style, but forward slashes, and must end in slash:
+my $msys    = 'C:/MSys/1.0/';
+my $sources = 'C:/MSys/1.0/sources/';
+my $mingw   = 'C:/MinGW/';
+my $mythtv  = 'C:/mythtv/';       # this is where the entire SVN checkout lives
+                                  # so c:/mythtv/mythtv/ is the main codebase.
+my $build   = 'C:/mythtv/build/'; # where 'make install' installs into
 
 # Where is the users home? 
 # Script later creates $home\.mythtv\mysql.txt
 my $doshome = '';
 if ( ! exists $ENV{'HOMEPATH'} || $ENV{'HOMEPATH'} eq '\\' ) {   
-	$doshome = $ENV{'USERPROFILE'};  
+  $doshome = $ENV{'USERPROFILE'};  
 } else {
   $doshome = $ENV{HOMEDRIVE}.$ENV{HOMEPATH};
 }
@@ -138,7 +140,6 @@ my $home = $doshome;
 $home =~ s#\\#/#g;
 $home =~ s/ /\\ /g;
 $home .= '/'; # all paths should end in a slash
-my $unixhome = perl2unix($home);
 
 
 # DOS executable CMD.exe versions of the paths (for when we shell to DOS mode):
@@ -147,11 +148,17 @@ my $dossources = perl2dos($sources);
 my $dosmingw   = perl2dos($mingw); 
 my $dosmythtv  = perl2dos($mythtv);
 
-# unix/msys equivalent versions of the paths (for when we shell to MSYS/UNIX mode):
-my $unixmsys = '/'; # msys root is always mounted here, irrespective of where DOS says it really is.
-my $unixmingw = '/mingw/'; # mingw is always mounted here under unix, if you setup mingw right in msys, so we will usually just say /mingw in the code, not '.$unixmingw.' or similar (see /etc/fstab)
-my $unixsources = perl2unix($sources); $unixsources =~ s#$unixmsys#/#i;  #strip leading msys path, if there, it's unnecessary as it's mounted under /
+# Unix/MSys equiv. versions of the paths (for when we shell to MSYS/UNIX mode):
+my $unixmsys  = '/';       # MSys root is always mounted here,
+                           # irrespective of where DOS says it really is.
+my $unixmingw = '/mingw/'; # MinGW is always mounted here under unix,
+                           # if you setup mingw right in msys,
+                           # so we will usually just say /mingw in the code,
+                           # not '.$unixmingw.' or similar (see /etc/fstab)
+my $unixsources = perl2unix($sources);
 my $unixmythtv  = perl2unix($mythtv);
+my $unixhome    = perl2unix($home);
+my $unixbuild   = perl2unix($build);
 
 
 #NOTE: IT'S IMPORTANT that the PATHS use the correct SLASH-ing method for
@@ -688,8 +695,7 @@ rm -f '.$mythtv.'delete_to_do_make_clean.txt']
 if ($makeclean) {
   push @{$expect},
   [ file => $mythtv.'make_clean.sh_', shell => ['source '.$unixmythtv.'make_clean.sh','nocheck'], comment => 'cleaning environment'],
-  ;	
-	
+  ;
 }
 # SVN update every time, before patches
 foreach my $comp( @components ) {
@@ -775,7 +781,7 @@ if ($tickets == 1) {
 [ filesame => [$mythtv.'mythtv/4718_playback.patch',$sources."4718_playback.patch"], copy => [''=>'',comment => 'XXXX'] ],
 [ grep  => ['gc->setValue("D:',$mythtv.'mythplugins/mythvideo/mythvideo/globalsettings.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p0 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
 [ grep  => ['\"dvd:\/\"',$mythtv.'mythplugins/mythvideo/mythvideo/main.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p1 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
-	 
+
 
 # Ticket 15831
 
@@ -785,7 +791,7 @@ if ($tickets == 1) {
 [ grep  => ['LOCALAPPDATA',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/15831_win32_fs.patch"] , comment => ' .'],
 ;
 
-}	# End if for $ticket
+} # End if for $ticket
 
 
 #----------------------------------------
@@ -793,8 +799,9 @@ if ($tickets == 1) {
 #----------------------------------------
 push @{$expect}, 
 
-[ file => $mythtv.'mythtv/config/config.pro', shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], 
-	comment => 'create an empty config.pro or the mythtv build will fail'],
+[ file => $mythtv.'mythtv/config/config.pro',
+  shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], 
+  comment => 'create an empty config.pro or the mythtv build will fail'],
 
 # do a make clean (nd re-configure) before going any further? Yes, if the SVN revision has changed (it deleted the file for us), or the user deleted the file manually, to request it. 
 [ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','make clean','find . -type f -name \*.dll | grep -v build | xargs -n1 rm','find . -type f -name \*.a | grep -v build | xargs -n1 rm','rm Makefile','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
@@ -1149,43 +1156,80 @@ MYTHTVDIR   = defaulting to %APPDATA%\mythtv
 ;
 
 if ($package == 1) {
-	push @{$expect},
-		# Create directories
-		[ dir => [$mythtv.'setup'] , mkdirs => [$mythtv.'setup'], comment => 'Create Packaging directory'],
-		[ dir => [$mythtv.'build/isfiles'] , mkdirs => [$mythtv.'build/isfiles'], comment => 'Create Packaging directory'],
-		# Move required files from inno setup to setup directory
-		[ file => $mythtv."build/isfiles/UninsHs.exe", exec => 'copy /Y "C:\Program Files\Inno Setup 5\UninsHs.exe" '.$dosmythtv.'build\isfiles\UninsHs.exe',comment => 'Copy UninsHs to setup directory' ],
-		[ file => $mythtv."build/isfiles/isxdl.dll", exec => 'copy /Y "C:\Program Files\Inno Setup 5\isxdl.dll" '.$dosmythtv.'build\isfiles\isxdl.dll',comment => 'Copy isxdl.dll to setup directory' ],
-		[ file => $mythtv."build/isfiles/WizModernSmallImage-IS.bmp", exec => 'copy /Y "C:\Program Files\Inno Setup 5\WizModernSmallImage-IS.bmp" '.$dosmythtv.'build\isfiles\WizModernSmallImage-IS.bmp',comment => 'Copy isxdl.dll to setup directory' ],
-		# Check for temporary situation, required files have all been loaded to same directory as batch file, and not svn],
-		[ file => $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss', exec => 'copy /y '.scriptpath().'\mythtvsetup.iss '.$dosmythtv.'mythtv\contrib\win32\build\mythtvsetup.iss', comment => 'Copy mythtvsetup.iss to svn ' ],
-		[ file => $mythtv.'mythtv/contrib/win32/build/configuremysql.vbs', exec => 'copy /y '.scriptpath().'\configuremysql.vbs '.$dosmythtv.'mythtv\contrib\win32\build\configuremysql.vbs', comment => 'Copy configuremysql.vbs to svn ' ],
-		[ file => $mythtv.'mythtv/contrib/win32/build/mysql.gif', exec => 'copy /y '.scriptpath().'\mysql.gif '.$dosmythtv.'mythtv\contrib\win32\build\mysql.gif', comment => 'Copy mysql.gif to svn ' ],
-		# Move required files from  contrib to setup directory
-		[ filesame => [$mythtv.'build/isfiles/mythtvsetup.iss',$mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss'],  copy => [''=>'',comment => 'mythtvsetup.iss'] ],
-		[ filesame => [$mythtv.'build//isfiles/configuremysql.vbs',$mythtv.'mythtv/contrib/win32/build/configuremysql.vbs'],  copy => [''=>'',comment => 'configuremysql.vbs'] ],
-		[ filesame => [$mythtv.'build/isfiles/mysql.gif',$mythtv.'mythtv/contrib/win32/build/mysql.gif'],  copy => [''=>'',comment => 'mysql.gif'] ],
-#		[ file => $mythtv.'build/isfiles/mythtvsetup.iss', shell => ['cp '.$unixmythtv.'/mythtv/contrib/Win32/build/mythtvsetup.iss '.$unixmythtv.'build/isfiles/mythtvsetup.iss'] ],
-	 	# Create on-the-fly  files required
-	 	[ file => $mythtv.'build/isfiles/versioninfo.iss', write => [$mythtv.'build/isfiles/versioninfo.iss',
-'
+  push @{$expect},
+    # Create directories
+    [ dir => [$mythtv.'setup'] , mkdirs => [$mythtv.'setup'],
+      comment => 'Create Packaging directory'],
+    [ dir => [$mythtv.'build/isfiles'] , mkdirs => [$mythtv.'build/isfiles'],
+      comment => 'Create Packaging directory'],
+    # Move required files from inno setup to setup directory
+    [ file => $mythtv."build/isfiles/UninsHs.exe",
+      exec => 'copy /Y "C:\Program Files\Inno Setup 5\UninsHs.exe" '.
+              $dosmythtv.'build\isfiles\UninsHs.exe',
+      comment => 'Copy UninsHs to setup directory' ],
+    [ file => $mythtv."build/isfiles/isxdl.dll",
+      exec => 'copy /Y "C:\Program Files\Inno Setup 5\isxdl.dll" '.
+              $dosmythtv.'build\isfiles\isxdl.dll',
+      comment => 'Copy isxdl.dll to setup directory' ],
+    [ file => $mythtv."build/isfiles/WizModernSmallImage-IS.bmp",
+      exec => 'copy /Y "C:\Program Files\Inno Setup 5\WizModernSmallImage-IS.bmp" '.
+              $dosmythtv.'build\isfiles\WizModernSmallImage-IS.bmp',
+      comment => 'Copy isxdl.dll to setup directory' ],
+    # Check for temporary situation, required files have all
+    # been loaded to same directory as batch file, and not svn],
+    [ file => $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss',
+      exec => 'copy /y '.scriptpath().'\mythtvsetup.iss '.
+              $dosmythtv.'mythtv\contrib\win32\build\mythtvsetup.iss',
+      comment => 'Copy mythtvsetup.iss to svn ' ],
+    [ file => $mythtv.'mythtv/contrib/win32/build/configuremysql.vbs',
+      exec => 'copy /y '.scriptpath().'\configuremysql.vbs '.
+              $dosmythtv.'mythtv\contrib\win32\build\configuremysql.vbs',
+      comment => 'Copy configuremysql.vbs to svn ' ],
+    [ file => $mythtv.'mythtv/contrib/win32/build/mysql.gif',
+      exec => 'copy /y '.scriptpath().'\mysql.gif '.
+              $dosmythtv.'mythtv\contrib\win32\build\mysql.gif',
+      comment => 'Copy mysql.gif to svn ' ],
+    # Move required files from  contrib to setup directory
+    [ filesame => [$mythtv.'build/isfiles/mythtvsetup.iss',
+                   $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss'],
+      copy => [''=>'', comment => 'mythtvsetup.iss'] ],
+    [ filesame => [$mythtv.'build//isfiles/configuremysql.vbs',
+                   $mythtv.'mythtv/contrib/win32/build/configuremysql.vbs'],
+      copy => [''=>'', comment => 'configuremysql.vbs'] ],
+    [ filesame => [$mythtv.'build/isfiles/mysql.gif',
+                   $mythtv.'mythtv/contrib/win32/build/mysql.gif'],
+      copy => [''=>'', comment => 'mysql.gif'] ],
+#    [ file => $mythtv.'build/isfiles/mythtvsetup.iss',
+#      shell => ['cp '.$unixmythtv.'/mythtv/contrib/Win32/build/mythtvsetup.iss '.
+#                      $unixmythtv.'build/isfiles/mythtvsetup.iss'] ],
+    # Create on-the-fly  files required
+    [ file => $mythtv.'build/isfiles/versioninfo.iss',
+      write => [$mythtv.'build/isfiles/versioninfo.iss', '
 #define MyAppName      "MythTv"
 #define MyAppVerName   "MythTv '.$version.'(svn_'.$SVNRELEASE .')"
 #define MyAppPublisher "Mythtv"
 #define MyAppURL       "http://www.mythtv.org"
 #define MyAppExeName   "Win32MythTvInstall.exe"
- ','nocheck' ],comment => 'write the version information for the setup'],
- [ file => $mythtv.'genfiles.sh', write => [$mythtv.'genfiles.sh','
+','nocheck' ], comment => 'write the version information for the setup'],
+    [ file => $mythtv.'genfiles.sh', write => [$mythtv.'genfiles.sh','
 cd '.$unixmythtv.'build
 find . -type f -printf "Source: '.$mythtv.'build/%h/%f; Destdir: {app}/%h\n" | sed "s/\.\///" | grep -v ".svn" | grep -v "isfiles" | grep -v "include" > '.$unixmythtv.'/build/isfiles/files.iss
 ',], comment => 'write script to generate setup files'], 
-  [ newer => [$mythtv.'build/isfiles/files.iss',$mythtv.'mythtv/last_build.txt'], shell => [$unixmythtv.'genfiles.sh'] ],
+    [ newer => [$mythtv.'build/isfiles/files.iss',
+                $mythtv.'mythtv/last_build.txt'],
+      shell => [$unixmythtv.'genfiles.sh'] ],
 # Run setup
-#  [ newer => [$mythtv.'setup/MythTvSetup.exe',$mythtv.'mythtv/last_build.txt'], exec => ['"c:\Program Files\Inno Setup 5\Compil32.exe" /cc "'.$dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
-  [ newer => [$mythtv.'setup/MythTvSetup.exe',$mythtv.'mythtv/last_build.txt'], exec => ['cd '.$dosmythtv.'build\isfiles; "c:\Program Files\Inno Setup 5\iscc.exe" "'.$dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
+#    [ newer => [$mythtv.'setup/MythTvSetup.exe',
+#                $mythtv.'mythtv/last_build.txt'],
+#      exec => ['"c:\Program Files\Inno Setup 5\Compil32.exe" /cc "'.
+#               $dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
+    [ newer => [$mythtv.'setup/MythTvSetup.exe',
+                $mythtv.'mythtv/last_build.txt'],
+      exec => ['cd '.$dosmythtv.'build\isfiles; '.
+               '"c:\Program Files\Inno Setup 5\iscc.exe" "'.
+               $dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
 
-	;
-	
+    ;
 }
 
 
@@ -1339,7 +1383,7 @@ foreach my $dep ( @{$expect} ) {
     } elsif ( $causetype eq 'stop' ){
         die "Stop found \n";
     } elsif ( $causetype eq 'pause' ){
-    	  comment("PAUSED! : ".$cause);
+        comment("PAUSED! : ".$cause);
         my $temp = getc();
     } else {
         die " unknown causetype $causetype \n";
