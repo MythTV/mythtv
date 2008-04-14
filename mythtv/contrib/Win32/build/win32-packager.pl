@@ -202,6 +202,7 @@ my $unixbuild   = perl2unix($build);
 #  - if given 2 existing files, not necessarily same size/content,
 #    and the first one isn't newer, execute the action!. 
 #    If the first file is ABSENT, run the action too.
+#  execute the action only if a file or directory exists             [exists]
 #  stop the run, useful for script debugging                         [stop]
 #  pause the run, await a enter                                      [pause]
 
@@ -523,7 +524,9 @@ push @{$expect},
 [ grep => ["\-lws2_32", $msys.'qt-3.3.x-p8/mkspecs/win32-g++/qmake.conf'], shell => ["cd ".$unixmsys."qt-3.3.x-p8/","patch -p1 < qt.patch"] ],
 
 
-[ file => $msys.'bin/sh_.exe', shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
+[ file => $msys.'bin/sh_.exe',
+ shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
+ comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
 
 # write a batch script for the QT environment under DOS:
 [ file => $msys.'qt-3.3.x-p8/qt3_env.bat', write => [$msys.'qt-3.3.x-p8/qt3_env.bat',
@@ -538,7 +541,9 @@ cd %QTDIR%
 
 
 [ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && configure.bat -thread -plugin-sql-mysql -opengl -no-sql-sqlite',comment => 'Execute qt3_env.bat  && the configure command to actually build QT now!  - ie configures qt and also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
-[ file => $mingw.'bin/sh_.exe', shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
+[ exists => $mingw.'bin/sh.exe',
+   shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],
+ comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
 
 [ filesame => [$msys.'qt-3.3.x-p8/bin/libqt-mt3.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''], comment => 'is there a libqt-mt3.dll in the "lib" folder of QT? if so, copy it to the the "bin" folder for uic.exe to use!' ],
 
@@ -564,8 +569,12 @@ cd %QTDIR%
 
 
 #  (back to sh.exe ) now that we are done !
-[ file => $msys.'bin/sh.exe', shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],comment => 'rename msys sh_.exe back again!' ] ,
-[ file => $mingw.'bin/sh.exe', shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],comment => 'rename mingw sh_.exe back again!' ] ,
+[ file => $msys.'bin/sh.exe',
+ shell => ["mv ".$unixmsys."bin/sh_.exe ".$unixmsys."bin/sh.exe"],
+ comment => 'rename msys sh_.exe back again!' ] ,
+[ exists => $mingw.'bin/sh_.exe',
+   shell => ["mv ".$unixmingw."bin/sh_.exe ".$unixmingw."bin/sh.exe"],
+ comment => 'rename mingw sh_.exe back again!' ] ,
 
 #Copy libqt-mt3.dll to libqt-mt.dll  , if there is any date/size change!
 [ filesame => [$msys.'qt-3.3.x-p8/lib/libqt-mt.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''],comment => 'Copy libqt-mt3.dll to libqt-mt.dll' ] ,
@@ -1378,6 +1387,11 @@ foreach my $dep ( @{$expect} ) {
         }
         if ( (! _grep($cause[0],$cause[1])) && $nocheck == 0 ) { 
            die "EFFECT FAILED ($causetype -> $effecttype): unable to locate regex pattern ($cause[0]) in file ($cause[1])\n";
+        }
+
+    } elsif ( $causetype eq 'exists' ) {
+        if ( -e $cause[0] ) {
+            effect($effecttype,@nocheckeffectparams);
         }
 
     } elsif ( $causetype eq 'stop' ){
