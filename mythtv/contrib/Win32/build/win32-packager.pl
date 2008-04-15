@@ -1710,6 +1710,7 @@ sub comment {
 # how? what the?   oh! like that!  I get it now, I think.
 sub usage {
     print << 'END_USAGE';
+
 -h             This message
 -v             Verbose output
 -u all|mythtv|mythplugins|myththemes
