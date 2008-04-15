@@ -394,17 +394,33 @@ push @{$expect},
 
 # if packaging is selected, get innosetup
 if ($package == 1) {
-push @{$expect},
- [ archive => $sources.'isetup-5.2.2.exe', 'fetch' => 'http://files.jrsoftware.org/ispack/ispack-5.2.2.exe',comment => 'fetch inno setup setup' ],
- [ file => "C:/Program Files/Inno Setup 5/iscc.exe", exec => $dossources.'isetup-5.2.2.exe /silent',comment => 'Install innosetup' ],
+  push @{$expect},
+ [ archive => $sources.'isetup-5.2.2.exe',
+     fetch => 'http://files.jrsoftware.org/ispack/ispack-5.2.2.exe',
+   comment => 'fetch inno setup setup' ],
+ [ file => "C:/Program Files/Inno Setup 5/iscc.exe",
+   exec => $dossources.'isetup-5.2.2.exe /silent',
+   comment => 'Install innosetup' ],
  # Get advanced uninstall
- [ archive => $sources.'UninsHs.rar', 'fetch' => 'http://www.uninshs.com/down/UninsHs.rar',comment => 'fetch uninstall for innosetup' ],
- [ archive => $sources.'unrar-3.4.3-bin.zip', 'fetch' => 'http://downloads.sourceforge.net/gnuwin32/unrar-3.4.3-bin.zip', comment => 'fetching unrar'],
- [ file => $sources.'bin/unrar.exe', shell => ["cd ".$sources, "unzip/unzip.exe unrar-3.4.3-bin.zip"]],
- [ file => 'C:/Program Files/Inno Setup 5/UninsHs.exe', shell => ['cd /c/program\ files/inno\ setup\ 5', $sources.'bin/unrar.exe e '.$sources.'UninsHs.rar'],comment => 'Install innosetup' ],
- [ archive => $sources.'istool-5.2.1.exe', 'fetch' => 'http://downloads.sourceforge.net/sourceforge/istool/istool-5.2.1.exe', comment => 'fetching istool' ],
- [ file => "c:/Program Files/Inno Setup 5/isxdl.dll", exec => $dossources.'istool-5.2.1/exe /silent', comment => 'Install istool'],
- [ file => $mythtv.'build/package_flag_', shell => ["rm ".$unixmythtv."build/package_flag",'nocheck'],comment => '' ],
+ [ archive => $sources.'UninsHs.rar',
+     fetch => 'http://www.uninshs.com/down/UninsHs.rar',
+   comment => 'fetch uninstall for innosetup' ],
+ [ archive => $sources.'unrar-3.4.3-bin.zip',
+     fetch => 'http://downloads.sourceforge.net/gnuwin32/unrar-3.4.3-bin.zip',
+   comment => 'fetching unrar'],
+ [ file => $sources.'bin/unrar.exe',
+  shell => ["cd ".$sources, "unzip/unzip.exe unrar-3.4.3-bin.zip"]],
+ [ file => 'C:/Program Files/Inno Setup 5/UninsHs.exe',
+  shell => ['cd /c/program\ files/inno\ setup\ 5',
+            $sources.'bin/unrar.exe e '.$sources.'UninsHs.rar'],
+  comment => 'Install innosetup' ],
+ [ archive => $sources.'istool-5.2.1.exe',
+     fetch => 'http://downloads.sourceforge.net/sourceforge/istool/istool-5.2.1.exe',
+   comment => 'fetching istool' ],
+ [ file => "c:/Program Files/istool/isxdl.dll",
+   exec => $dossources.'istool-5.2.1/exe /silent', comment => 'Install istool'],
+ [ exists => $mythtv.'build/package_flag',
+    shell => ["rm ".$unixmythtv."build/package_flag"],comment => '' ],
 ;
 }
 
@@ -1184,7 +1200,7 @@ MYTHTVDIR   = defaulting to %APPDATA%\mythtv
 ;
 
 if ($package == 1) {
-  push @{$expect},
+    push @{$expect},
     # Create directories
     [ dir => [$mythtv.'setup'] , mkdirs => [$mythtv.'setup'],
       comment => 'Create Packaging directory'],
@@ -1196,13 +1212,13 @@ if ($package == 1) {
               $dosmythtv.'build\isfiles\UninsHs.exe',
       comment => 'Copy UninsHs to setup directory' ],
     [ file => $mythtv."build/isfiles/isxdl.dll",
-      exec => 'copy /Y "C:\Program Files\Inno Setup 5\isxdl.dll" '.
+      exec => 'copy /Y "C:\Program Files\isfiles\isxdl.dll" '.
               $dosmythtv.'build\isfiles\isxdl.dll',
       comment => 'Copy isxdl.dll to setup directory' ],
     [ file => $mythtv."build/isfiles/WizModernSmallImage-IS.bmp",
       exec => 'copy /Y "C:\Program Files\Inno Setup 5\WizModernSmallImage-IS.bmp" '.
               $dosmythtv.'build\isfiles\WizModernSmallImage-IS.bmp',
-      comment => 'Copy isxdl.dll to setup directory' ],
+      comment => 'Copy WizModernSmallImage-IS.bmp to setup directory' ],
     # Check for temporary situation, required files have all
     # been loaded to same directory as batch file, and not svn],
     [ file => $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss',
