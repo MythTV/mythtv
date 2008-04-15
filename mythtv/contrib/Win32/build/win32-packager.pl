@@ -418,7 +418,7 @@ if ($package == 1) {
      fetch => 'http://downloads.sourceforge.net/sourceforge/istool/istool-5.2.1.exe',
    comment => 'fetching istool' ],
  [ file => "c:/Program Files/istool/isxdl.dll",
-   exec => $dossources.'istool-5.2.1/exe /silent', comment => 'Install istool'],
+   exec => $dossources.'istool-5.2.1.exe /silent', comment => 'Install istool'],
  [ exists => $mythtv.'build/package_flag',
     shell => ["rm ".$unixmythtv."build/package_flag"],comment => '' ],
 ;
