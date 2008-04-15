@@ -637,6 +637,42 @@ static HostCheckBox *JobAllowUserJob(uint job_num)
     return bc;
 }
 
+static GlobalCheckBox *UPNPShowRecordingUnderVideos()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("UPnP/RecordingsUnderVideos");
+    gc->setLabel(QObject::tr("Include Recordings in Video List"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If enabled, the master backend will include the "
+                    " list of recorded shows in the list of videos "
+                    " This is mainly to accomodate UPnP players which do not"
+                    " allow more than 1 video section." ));
+    return gc;
+};
+
+static HostSpinBox *UPNPRebuildDelay()
+{
+    HostSpinBox *gc = new HostSpinBox("UPnP/RebuildDelay", 0, 1440, 1);
+    gc->setLabel(QObject::tr("Upnp Media Update Time"));
+    gc->setHelpText(QObject::tr("The number of minutes between mythbackend checkingi "
+			   " for new videos to serve via upnp. 0 = Off. "));
+    gc->setValue(30);
+    return gc;
+};
+
+static GlobalComboBox *UPNPWmpSource()
+{
+    GlobalComboBox *gc = new GlobalComboBox("UPnP/WMPSource");
+    gc->setLabel(QObject::tr("Video content to show a WMP Client"));
+    gc->addSelection(QObject::tr("Recordings"),"0");
+    gc->addSelection(QObject::tr("Videos"),"1");
+    gc->setValue("0");
+    gc->setHelpText(QObject::tr("This lets decided to map a WMP "
+                    " client to the Recordings tree or to the Video tree when "
+                    " it requests a list of videos "));
+    return gc;
+};
+
+
 
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
@@ -771,5 +807,13 @@ BackendSettings::BackendSettings() {
     group7->addChild(UserJob(3));
     group7->addChild(UserJobDesc(4));
     group7->addChild(UserJob(4));
-    addChild(group7);    
+    addChild(group7);
+
+    VerticalConfigurationGroup* group8 = new VerticalConfigurationGroup(false);
+    group8->setLabel(QObject::tr("UPNP Server Settings"));
+    //group8->addChild(UPNPShowRecordingUnderVideos());
+    group8->addChild(UPNPWmpSource());
+    group8->addChild(UPNPRebuildDelay());
+    addChild(group8);
+
 }

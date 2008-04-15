@@ -20,10 +20,18 @@
 UPnpMedia::UPnpMedia(bool runthread, bool ismaster)
 {
 
-    if ((runthread) && (ismaster))
+    if (gContext->GetNumSetting("UPnP/RebuildDelay",30) > 0) 
     {
-        pthread_t upnpmediathread;
-        pthread_create(&upnpmediathread, NULL, doUPnpMediaThread, this);
+        VERBOSE(VB_GENERAL,"Enabling Upnpmedia rebuild thread.");
+        if ((runthread) && (ismaster))
+        {
+            pthread_t upnpmediathread;
+            pthread_create(&upnpmediathread, NULL, doUPnpMediaThread, this);
+        }
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL,"Upnpmedia rebuild disabled.");
     }
 
 }
@@ -34,12 +42,19 @@ void UPnpMedia::RunRebuildLoop(void)
     // Sleep a few seconds to wait for other stuff to settle down.
     sleep(10);
 
+    int irebuildDelay = 1800;
+
+    irebuildDelay = gContext->GetNumSetting("UPnP/RebuildDelay",30) * 60;
+
+    if (irebuildDelay < 60) 
+        irebuildDelay = 60;
+
     while (1)
     {
         //VERBOSE(VB_UPNP, "UPnpMedia::RunRebuildLoop Calling BuildMediaMap");
         BuildMediaMap();
 
-        sleep(1800 + (random()%8));
+        sleep(irebuildDelay + (random()%8));
     }
 }
 
@@ -104,7 +119,6 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
 
     int parentid;
     QDir vidDir(directory);
-    QString title;
     //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID =
     //%3").arg(directory).arg(rootID).arg(itemID));
 
@@ -247,6 +261,13 @@ void UPnpMedia::BuildMediaMap(void)
 
                 nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID,
                                                                         query);
+
+		if (!gContext->GetSetting("UPnP/RecordingsUnderVideos").isEmpty()) {
+			VERBOSE(VB_ALL, "ARMAGEDDON!");
+		 //   nextID = buildRecordingList(*it,STARTING_VIDEO_OBJECTID,
+		//		                                        nextID,query);
+	        }
+
                 filecount = (filecount - nextID) * -1;
 
                 VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap Done. Found "
