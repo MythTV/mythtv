@@ -429,8 +429,7 @@ bool PreviewGenerator::SavePreview(QString filename,
         return false;
 
     const QImage img((unsigned char*) data,
-                     width, height, 32, NULL, 65536 * 65536,
-                     QImage::LittleEndian);
+                     width, height, QImage::Format_RGB32);
 
     float ppw = max(desired_width, 0);
     float pph = max(desired_height, 0);

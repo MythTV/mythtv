@@ -1586,7 +1586,7 @@ const QImage &NuppelVideoPlayer::GetARGBFrame(QSize &size)
                   w, h, w * 4, w, w / 2, 0);
 
     argb_scaled_img = QImage(argb_buf, argb_size.width(), argb_size.height(),
-                             32, NULL, 65536 * 65536, QImage::LittleEndian);
+                             QImage::Format_RGB32);
 
     return argb_scaled_img;
 }

@@ -708,8 +708,7 @@ void OSDListBtnType::InitItem(
         *ptr = black;
 
     {
-        QImage img(data, width, height, 32, NULL, 65536 * 65536,
-                   QImage::LittleEndian);
+        QImage img(data, width, height, QImage::Format_RGB32);
         img.setAlphaBuffer(alpha<255);
         osdImg.Load(img);
     }
