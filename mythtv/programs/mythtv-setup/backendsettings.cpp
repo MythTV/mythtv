@@ -332,7 +332,7 @@ static GlobalSpinBox *WOLbackendReconnectWaitTime()
     gc->setValue(0);
     gc->setHelpText(QObject::tr("Length of time the frontend waits between "
                     "tries to wake up the master backend. This should be the "
-                    "time your masterbackend needs to startup. Set 0 to "
+                    "time your master backend needs to startup. Set 0 to "
                     "disable."));
     return gc;
 };
@@ -438,7 +438,7 @@ static GlobalLineEdit *preSDWUCheckCommand()
     gc->setHelpText(QObject::tr("A command executed before the backend would "
                     "shutdown. The return value determines if "
                     "the backend can shutdown. 0 - yes, "
-                    "1 - restart idleing, "
+                    "1 - restart idling, "
                     "2 - reset the backend to wait for a frontend."));
     return gc;
 };
@@ -644,7 +644,7 @@ static GlobalCheckBox *UPNPShowRecordingUnderVideos()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, the master backend will include the "
                     " list of recorded shows in the list of videos "
-                    " This is mainly to accomodate UPnP players which do not"
+                    " This is mainly to accommodate UPnP players which do not"
                     " allow more than 1 video section." ));
     return gc;
 };
@@ -653,7 +653,7 @@ static HostSpinBox *UPNPRebuildDelay()
 {
     HostSpinBox *gc = new HostSpinBox("UPnP/RebuildDelay", 0, 1440, 1);
     gc->setLabel(QObject::tr("Upnp Media Update Time"));
-    gc->setHelpText(QObject::tr("The number of minutes between mythbackend checkingi "
+    gc->setHelpText(QObject::tr("The number of minutes between mythbackend checking "
 			   " for new videos to serve via upnp. 0 = Off. "));
     gc->setValue(30);
     return gc;

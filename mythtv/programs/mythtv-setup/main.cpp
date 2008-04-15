@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
     bool haveProblems = false;
     do
     {
-        // Let the user select buttons, type values, scan for channels, et c.
+        // Let the user select buttons, type values, scan for channels, etc.
         SetupMenu(mainWindow);
 
         // Look for common problems
