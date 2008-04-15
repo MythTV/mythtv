@@ -1269,7 +1269,7 @@ find . -type f -printf "Source: '.$mythtv.'build/%h/%f; Destdir: {app}/%h\n" | s
 #               $dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
     [ newer => [$mythtv.'setup/MythTvSetup.exe',
                 $mythtv.'mythtv/last_build.txt'],
-      exec => ['cd '.$dosmythtv.'build\isfiles; '.
+      exec => ['cd '.$dosmythtv.'build\isfiles && '.
                '"c:\Program Files\Inno Setup 5\iscc.exe" "'.
                $dosmythtv.'build\isfiles\mythtvsetup.iss"' ]],
 
