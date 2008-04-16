@@ -10,7 +10,7 @@ MythUIButton::MythUIButton(MythUIType *parent, const char *name, bool doInit)
     m_State = None;
     m_CheckState = MythUIStateType::None;
 
-    m_PaddingMargin = 0;
+    m_PaddingMarginX = m_PaddingMarginY = 0;
 
     m_textFlags = Qt::AlignLeft | Qt::AlignVCenter;
     m_imageAlign = Qt::AlignLeft | Qt::AlignVCenter;
@@ -111,8 +111,14 @@ bool MythUIButton::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "margin")
     {
-        int paddingMargin = NormX(getFirstText(element).toInt());
-        SetPaddingMargin(paddingMargin);
+        QString paddingMargin = getFirstText(element);
+        int paddingMarginY = 0;
+        int paddingMarginX = 0;
+
+        paddingMarginX = NormX(paddingMargin.section(',',0,0).toInt());
+        if (!paddingMargin.section(',',1,1).isEmpty())
+            paddingMarginY = NormY(paddingMargin.section(',',1,1).toInt());
+        SetPaddingMargin(paddingMarginX,paddingMarginY);
     }
     else if (element.tagName() == "multiline")
     {
@@ -236,9 +242,10 @@ void MythUIButton::SetRightArrowImage(MythImage *image)
     SetupPlacement();
 }
 
-void MythUIButton::SetPaddingMargin(int margin)
+void MythUIButton::SetPaddingMargin(int marginx, int marginy)
 {
-    m_PaddingMargin = margin;
+    m_PaddingMarginX = marginx;
+    m_PaddingMarginY = marginy;
 }
 
 void MythUIButton::SetImageAlignment(int imagealign)
@@ -311,32 +318,32 @@ void MythUIButton::SetupPlacement(void)
     if (m_ButtonImage->IsVisible())
         imageRect = m_ButtonImage->GetArea();
 
-    int textx = m_PaddingMargin;
-    int imagex = m_PaddingMargin;
-    int imagey = m_PaddingMargin;
-    int textwidth = width - 2 * m_PaddingMargin;
+    int textx = m_PaddingMarginX;
+    int imagex = m_PaddingMarginX;
+    int imagey = m_PaddingMarginY;
+    int textwidth = width - 2 * m_PaddingMarginX;
 
     if (checkRect != QRect())
     {
-        int tmp = checkRect.width() + m_PaddingMargin;
+        int tmp = checkRect.width() + m_PaddingMarginX;
         textx += tmp;
         imagex += tmp;
         textwidth -= tmp;
 
-        m_CheckImage->SetPosition(m_PaddingMargin, 
+        m_CheckImage->SetPosition(m_PaddingMarginX, 
                                   (height - checkRect.height()) / 2);
     }
 
     if (arrowRect != QRect())
     {
-        textwidth -= arrowRect.width() + m_PaddingMargin;
-        m_ArrowImage->SetPosition(width - arrowRect.width() - m_PaddingMargin,
+        textwidth -= arrowRect.width() + m_PaddingMarginX;
+        m_ArrowImage->SetPosition(width - arrowRect.width() - m_PaddingMarginX,
                                   (height - arrowRect.height()) / 2);
     }
 
     if (imageRect != QRect())
     {
-        int tmp = imageRect.width() + m_PaddingMargin;
+        int tmp = imageRect.width() + m_PaddingMarginX;
         textx += tmp;
         textwidth -= tmp;
 
@@ -351,13 +358,13 @@ void MythUIButton::SetupPlacement(void)
         }
         else if (m_imageAlign & Qt::AlignRight)
         {
-            imagex = width - m_PaddingMargin - imageRect.width();
+            imagex = width - m_PaddingMarginX - imageRect.width();
         }
 
         // Vertical component
         if (m_imageAlign & Qt::AlignTop)
         {
-            imagey = m_PaddingMargin;
+            imagey = m_PaddingMarginY;
         }
         else if (m_imageAlign & Qt::AlignCenter)
         {
@@ -365,7 +372,7 @@ void MythUIButton::SetupPlacement(void)
         }
         else if (m_imageAlign & Qt::AlignBottom)
         {
-            imagey = height - m_PaddingMargin - imageRect.height();
+            imagey = height - m_PaddingMarginY - imageRect.height();
         }
 
         m_ButtonImage->SetPosition(imagex, imagey);
@@ -386,7 +393,8 @@ void MythUIButton::CopyFrom(MythUIType *base)
     m_FontProps = button->m_FontProps;
 
     m_TextRect = button->m_TextRect;
-    m_PaddingMargin = button->m_PaddingMargin;
+    m_PaddingMarginX = button->m_PaddingMarginX;
+    m_PaddingMarginY = button->m_PaddingMarginY;
     m_textFlags = button->m_textFlags;
     m_imageAlign = button->m_imageAlign;
 

@@ -36,7 +36,7 @@ class MythUIButton : public MythUIType
     void SetFont(StateType state, MythFontProperties &prop);
     void SetButtonImage(MythImage *image);
     void SetRightArrowImage(MythImage *image);
-    void SetPaddingMargin(int margin);
+    void SetPaddingMargin(int marginx, int marginy = 0);
     void SetImageAlignment(int imagealign);
 
     void SetText(const QString &msg, int textFlags = -1);
@@ -79,7 +79,8 @@ class MythUIButton : public MythUIType
     MythUIStateType::StateType m_CheckState;
 
     QRect m_TextRect;
-    int m_PaddingMargin;
+    int m_PaddingMarginX;
+    int m_PaddingMarginY;
     int m_textFlags;
     int m_imageAlign;
 };
