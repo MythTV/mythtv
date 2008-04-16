@@ -417,7 +417,7 @@ if ($package == 1) {
  [ archive => $sources.'istool-5.2.1.exe',
      fetch => 'http://downloads.sourceforge.net/sourceforge/istool/istool-5.2.1.exe',
    comment => 'fetching istool' ],
- [ file => "c:/Program Files/istool/isxdl.dll",
+ [ file => "c:/Program Files/ISTool/isxdl.dll",
    exec => $dossources.'istool-5.2.1.exe /silent', comment => 'Install istool'],
  [ exists => $mythtv.'build/package_flag',
     shell => ["rm ".$unixmythtv."build/package_flag"],comment => '' ],
@@ -1212,7 +1212,7 @@ if ($package == 1) {
               $dosmythtv.'build\isfiles\UninsHs.exe',
       comment => 'Copy UninsHs to setup directory' ],
     [ file => $mythtv."build/isfiles/isxdl.dll",
-      exec => 'copy /Y "C:\Program Files\isfiles\isxdl.dll" '.
+      exec => 'copy /Y "C:\Program Files\ISTool\isxdl.dll" '.
               $dosmythtv.'build\isfiles\isxdl.dll',
       comment => 'Copy isxdl.dll to setup directory' ],
     [ file => $mythtv."build/isfiles/WizModernSmallImage-IS.bmp",
