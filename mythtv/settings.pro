@@ -16,6 +16,9 @@ isEmpty(TARGET_OS) : win32 {
     CONFIG_OPENGL_LIBS =
     # Qt4 creates separate compile directories by default. This disables:
     CONFIG -= debug_and_release debug_and_release_target
+    # win32-packager.pl builds Qt under DOS, but MythTV is built in MinGW.
+    # This corrects the moc tool path from a DOS-style to a unix style:
+    QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
 }
 
 # if CYGWIN compile, set up flag in CONFIG 
