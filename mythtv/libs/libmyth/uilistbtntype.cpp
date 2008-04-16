@@ -1754,9 +1754,9 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
 void UIListBtnType::Init()
 {
     QFontMetrics fm(m_fontActive->face);
-    QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
+    QSize sz1 = fm.size(Qt::TextSingleLine, "XXXXX");
     fm = QFontMetrics(m_fontInactive->face);
-    QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
+    QSize sz2 = fm.size(Qt::TextSingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
 
     if (m_showScrollArrows) 

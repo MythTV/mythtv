@@ -306,7 +306,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             if (m_Position < 0)
                 return false;
 
-            size = fm.size(Qt::SingleLine, m_Message.mid(m_Position,1));
+            size = fm.size(Qt::TextSingleLine, m_Message.mid(m_Position,1));
 
             newcursorPos = cursorPos - size.width();
 
@@ -325,7 +325,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             if (m_Position == (m_Message.size() - 1))
                 return false;
 
-            size = fm.size(Qt::SingleLine, m_Message.mid(m_Position+1,1));
+            size = fm.size(Qt::TextSingleLine, m_Message.mid(m_Position+1,1));
 
             newcursorPos = cursorPos + size.width();
 
@@ -338,7 +338,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             m_Position++;
             break;
         case MoveEnd:
-            size = fm.size(Qt::SingleLine, m_Message);
+            size = fm.size(Qt::TextSingleLine, m_Message);
 
             int messageWidth = size.width();
 
