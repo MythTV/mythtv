@@ -51,7 +51,8 @@ void MythListButton::Const(void)
     m_clearing         = false;
     m_itemHorizSpacing = 0;
     m_itemVertSpacing  = 0;
-    m_itemMargin       = 0;
+    m_itemMarginX      = 0;
+    m_itemMarginY      = 0;
     m_itemHeight       = 0;
     m_itemsVisible     = 0;
     m_columns          = 0;
@@ -130,9 +131,10 @@ void MythListButton::SetSpacing(int spacing)
     m_itemVertSpacing = NormY(spacing);
 }
 
-void MythListButton::SetMargin(int margin)
+void MythListButton::SetMargin(int marginX, int marginY)
 {
-    m_itemMargin = margin;
+    m_itemMarginX = marginX;
+    m_itemMarginY = marginY;
 }
 
 void MythListButton::SetDrawFromBottom(bool draw)
@@ -634,7 +636,7 @@ void MythListButton::Init()
     QSize sz1 = fm.size(Qt::TextSingleLine, "XXXXX");
     fm = QFontMetrics(m_fontInactive->face());
     QSize sz2 = fm.size(Qt::TextSingleLine, "XXXXX");
-    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
+    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMarginY);
     m_itemWidth = m_contentsRect.width();
 
     // If we have a background image and it's not a gradient,
@@ -674,7 +676,7 @@ void MythListButton::Init()
         if (itemSelActPix)
             button->SetBackgroundImage(MythUIButton::Selected, itemSelActPix);
 
-        button->SetPaddingMargin(m_itemMargin);
+        button->SetPaddingMargin(m_itemMarginX, m_itemMarginY);
 
         if (checkNonePix)
         {
@@ -899,8 +901,8 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
     if (m_layout == LayoutHorizontal)
     {
         int x = GetArea().width() - arrowSize.width() - 1;
-        int ytop = GetArea().height() / 2 - m_itemMargin / 2 - arrowSize.height();
-        int ybottom = GetArea().height() / 2 + m_itemMargin / 2;
+        int ytop = GetArea().height() / 2 - m_itemMarginY / 2 - arrowSize.height();
+        int ybottom = GetArea().height() / 2 + m_itemMarginY / 2;
 
         m_upArrow->SetPosition(QPoint(x, ybottom));
         m_downArrow->SetPosition(QPoint(x, ytop));
@@ -913,7 +915,7 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 
     int y = m_Area.height() - arrowSize.height() - 1;
     m_upArrow->SetPosition(QPoint(0, y));
-    m_downArrow->SetPosition(QPoint(arrowSize.width() + m_itemMargin, y));
+    m_downArrow->SetPosition(QPoint(arrowSize.width() + m_itemMarginX, y));
 
     return QRect(0, y, m_Area.width(), arrowSize.height());
 }
@@ -925,13 +927,13 @@ QRect MythListButton::CalculateContentsRect(const QRect &arrowsRect) const
     if (m_layout == LayoutHorizontal)
     {
         contectRect = QRect(0, 0,
-                    GetArea().width() - arrowsRect.width() - 2 * m_itemMargin,
+                    GetArea().width() - arrowsRect.width() - 2 * m_itemMarginX,
                     GetArea().height());
     }
     else if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
     {
         contectRect = QRect(0, 0, GetArea().width(), GetArea().height() -
-                    arrowsRect.height() - 2 * m_itemMargin);
+                    arrowsRect.height() - 2 * m_itemMarginY);
     }
 
     return contectRect;
@@ -1041,7 +1043,13 @@ bool MythListButton::ParseElement(QDomElement &element)
         m_itemVertSpacing = NormY(getFirstText(element).toInt());
     }
     else if (element.tagName() == "margin")
-        m_itemMargin = NormX(getFirstText(element).toInt());
+    {
+        QString paddingMargin = getFirstText(element);
+
+        m_itemMarginX = NormX(paddingMargin.section(',',0,0).toInt());
+        if (!paddingMargin.section(',',1,1).isEmpty())
+            m_itemMarginY = NormY(paddingMargin.section(',',1,1).toInt());
+    }
     else if (element.tagName() == "drawfrombottom")
         m_drawFromBottom = parseBool(element);
     else if (element.tagName() == "multiline")
@@ -1095,7 +1103,8 @@ void MythListButton::CopyFrom(MythUIType *base)
     m_itemHeight = lb->m_itemHeight;
     m_itemHorizSpacing = lb->m_itemHorizSpacing;
     m_itemVertSpacing = lb->m_itemVertSpacing;
-    m_itemMargin = lb->m_itemMargin;
+    m_itemMarginX = lb->m_itemMarginX;
+    m_itemMarginY = lb->m_itemMarginY;
     m_itemsVisible = lb->m_itemsVisible;
     m_itemWidth = lb->m_itemWidth;
 

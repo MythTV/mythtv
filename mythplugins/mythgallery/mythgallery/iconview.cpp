@@ -210,9 +210,9 @@ void IconView::LoadDirectory(const QString &dir)
     }
 
     uint buttonwidth = m_imageList->ItemWidth() -
-                                            (2 * m_imageList->GetMargin());
+                                            (2 * m_imageList->GetMarginX());
     uint buttonheight = m_imageList->ItemHeight() -
-                                            (2 * m_imageList->GetMargin());
+                                            (2 * m_imageList->GetMarginY());
     m_thumbGen->setSize((int)buttonwidth, (int)buttonheight);
 
     if (m_thumbGen && !m_thumbGen->running())
