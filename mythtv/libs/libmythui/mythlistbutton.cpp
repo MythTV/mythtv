@@ -623,22 +623,17 @@ void MythListButton::Init()
         arrowsRect = QRect(0, 0, 0, 0);
 
     if (m_upArrow)
-    {
         m_upArrow->SetVisible(m_showScrollArrows);
-        //m_upArrow->SetCanTakeFocus(true);
-    }
+
     if (m_downArrow)
-    {
         m_downArrow->SetVisible(m_showScrollArrows);
-        //m_downArrow->SetCanTakeFocus(true);
-    }
 
     m_contentsRect = CalculateContentsRect(arrowsRect);
 
     QFontMetrics fm(m_fontActive->face());
-    QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
+    QSize sz1 = fm.size(Qt::TextSingleLine, "XXXXX");
     fm = QFontMetrics(m_fontInactive->face());
-    QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
+    QSize sz2 = fm.size(Qt::TextSingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
     m_itemWidth = m_contentsRect.width();
 
