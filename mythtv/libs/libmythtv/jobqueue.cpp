@@ -2077,8 +2077,8 @@ void JobQueue::DoFlagCommercialsThread(void)
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
     QString logDesc = QString("%1%2 recorded from channel %3 at %4")
-                          .arg((const char *)program_info->title.local8Bit())
-                          .arg((const char *)subtitle.local8Bit())
+                          .arg(program_info->title)
+                          .arg(subtitle)
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
     
@@ -2109,7 +2109,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     controlFlagsLock.unlock();
 
     QString msg = "Commercial Flagging Starting";
-    VERBOSE(VB_GENERAL, LOC + QString("%1 for %2").arg(msg).arg(logDesc));
+    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2").arg(msg).arg(logDesc)).utf8());
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;

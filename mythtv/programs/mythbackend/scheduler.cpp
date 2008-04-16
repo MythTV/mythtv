@@ -1815,7 +1815,7 @@ void Scheduler::RunScheduler(void)
             msg = is_rec ? "Started recording" : "Canceled recording (" +
                 nextRecording->RecStatusText() + ")"; 
 
-            VERBOSE(VB_GENERAL, msg << ": " << details);
+            VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details).utf8());
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
