@@ -805,8 +805,7 @@ void *MythSocket::readyReadThread(void *)
                 {
                     if (SOCKET_ERROR != ::WSAEventSelect(
                             sock->socket(), hEvent, 
-                            FD_READ | FD_CONNECT | FD_ACCEPT | 
-                            FD_OOB | FD_CLOSE))
+                            FD_READ | FD_CLOSE))
                     {
                         hEvents[n] = hEvent;
                         idx[n++] = i;
