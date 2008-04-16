@@ -100,6 +100,7 @@ class DataDirectSchedule
     bool      repeat;
     bool      isnew;
     bool      stereo;
+    bool      dolby;
     bool      subtitled;
     bool      hdtv;
     bool      closecaptioned;

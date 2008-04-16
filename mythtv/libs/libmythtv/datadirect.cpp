@@ -65,7 +65,8 @@ DataDirectSchedule::DataDirectSchedule() :
     programid(""),              stationid(""),
     time(QDateTime()),          duration(QTime()),
     repeat(false),              isnew(false),
-    stereo(false),              subtitled(false),
+    stereo(false),              dolby(false),
+    subtitled(false),
     hdtv(false),                closecaptioned(false),
     tvrating(""),
     partnumber(0),              parttotal(0)
@@ -167,6 +168,8 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.repeat = (pxmlatts.value("repeat") == "true");
         curr_schedule.isnew = (pxmlatts.value("new") == "true");
         curr_schedule.stereo = (pxmlatts.value("stereo") == "true");
+        curr_schedule.dolby = (pxmlatts.value("dolby") == "Dolby" ||
+                               pxmlatts.value("dolby") == "Dolby Digital");
         curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
         curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
         curr_schedule.closecaptioned = (pxmlatts.value("closeCaptioned") == 
@@ -272,17 +275,17 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
         query.prepare(
             "INSERT INTO dd_schedule "
-            "     ( programid,  stationid,   scheduletime,   "
-            "       duration,   isrepeat,    stereo,         "
-            "       subtitled,  hdtv,        closecaptioned, "
-            "       tvrating,   partnumber,  parttotal,      "
-            "       endtime,    isnew) "
+            "     ( programid,      stationid,   scheduletime,   "
+            "       duration,       isrepeat,    stereo,         "
+            "       dolby,          subtitled,   hdtv,           "
+            "       closecaptioned, tvrating,    partnumber,      "
+            "       parttotal,      endtime,     isnew) "
             "VALUES "
             "     (:PROGRAMID, :STATIONID,  :TIME,           "
             "      :DURATION,  :ISREPEAT,   :STEREO,         "
-            "      :SUBTITLED, :HDTV,       :CAPTIONED,      "
-            "      :TVRATING,  :PARTNUMBER, :PARTTOTAL,      "
-            "      :ENDTIME,   :ISNEW)");
+            "      :DOLBY,     :SUBTITLED,  :HDTV,           "
+            "      :CAPTIONED, :TVRATING,   :PARTNUMBER,     "
+            "      :PARTTOTAL, :ENDTIME,    :ISNEW)");
 
         query.bindValue(":PROGRAMID",   curr_schedule.programid);
         query.bindValue(":STATIONID",   curr_schedule.stationid);
@@ -290,6 +293,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":DURATION",    curr_schedule.duration);
         query.bindValue(":ISREPEAT",    curr_schedule.repeat);
         query.bindValue(":STEREO",      curr_schedule.stereo);
+        query.bindValue(":DOLBY",       curr_schedule.dolby);
         query.bindValue(":SUBTITLED",   curr_schedule.subtitled);
         query.bindValue(":HDTV",        curr_schedule.hdtv);
         query.bindValue(":CAPTIONED",   curr_schedule.closecaptioned);
@@ -602,22 +606,24 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
 
     QString qstr =
         "INSERT INTO dd_v_program "
-        "     ( chanid,         starttime,       endtime,         "
-        "       title,          subtitle,        description,     "
-        "       airdate,        stars,           previouslyshown, "
-        "       stereo,         subtitled,       hdtv,            "
-        "       closecaptioned, partnumber,      parttotal,       "
-        "       seriesid,       originalairdate, showtype,        "
-        "       category_type,  colorcode,       syndicatedepisodenumber, "
-        "       tvrating,       mpaarating,      programid )      "
-        "SELECT chanid,         scheduletime,    endtime,         "
-        "       title,          subtitle,        description,     "
-        "       year,           stars,           isrepeat,        "
-        "       stereo,         subtitled,       hdtv,            "
-        "       closecaptioned, partnumber,      parttotal,       "
-        "       seriesid,       originalairdate, showtype,        "
-        "       category_type,  colorcode,       syndicatedepisodenumber, "
-        "       tvrating,       mpaarating,      dd_program.programid "
+        "     ( chanid,                  starttime,       endtime,         "
+        "       title,                   subtitle,        description,     "
+        "       airdate,                 stars,           previouslyshown, "
+        "       stereo,                  dolby,           subtitled,       "
+        "       hdtv,                    closecaptioned,  partnumber,      "
+        "       parttotal,               seriesid,        originalairdate, "
+        "       showtype,                category_type,   colorcode,       "
+        "       syndicatedepisodenumber, tvrating,        mpaarating,      "
+        "       programid )      "
+        "SELECT chanid,                  scheduletime,    endtime,         "
+        "       title,                   subtitle,        description,     "
+        "       year,                    stars,           isrepeat,        "
+        "       stereo,                  dolby,           subtitled,       "
+        "       hdtv,                    closecaptioned,  partnumber,      "
+        "       parttotal,               seriesid,        originalairdate, "
+        "       showtype,                category_type,   colorcode,       "
+        "       syndicatedepisodenumber, tvrating,        mpaarating,      "
+        "       dd_program.programid "
         "FROM channel, dd_schedule, dd_program "
         "WHERE ((dd_schedule.programid = dd_program.programid)  AND "
         "       (channel.xmltvid       = dd_schedule.stationid) AND "
@@ -811,7 +817,8 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "title, subtitle, description, "
                     "showtype, dd_genre.class, category_type, "
                     "airdate, stars, previouslyshown, stereo, subtitled, "
-                    "(subtitled << 1 ) | closecaptioned, hdtv, stereo, "
+                    "(subtitled << 1 ) | closecaptioned, hdtv, "
+                    "(dolby << 3) | stereo, "
                     "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
                     "dd_v_program.programid FROM (dd_v_program, channel) "
@@ -1296,6 +1303,7 @@ void DataDirectProcessor::CreateTempTables()
         "( programid char(40),           stationid char(12), "
         "  scheduletime datetime,        duration time,      "
         "  isrepeat bool,                stereo bool,        "
+        "  dolby bool, "
         "  subtitled bool,               hdtv bool,          "
         "  closecaptioned bool,          tvrating char(5),   "
         "  partnumber int,               parttotal int,      "
@@ -1320,7 +1328,8 @@ void DataDirectProcessor::CreateTempTables()
         "  category varchar(64),         category_type varchar(64),   "
         "  airdate year,                 stars float unsigned,        "
         "  previouslyshown tinyint,      isrepeat bool,               "
-        "  stereo bool,                  subtitled bool,              "
+        "  stereo bool,                  dolby bool,                  "
+        "  subtitled bool,              "
         "  hdtv bool,                    closecaptioned bool,         "
         "  partnumber int,               parttotal int,               "
         "  seriesid char(12),            originalairdate date,        "
