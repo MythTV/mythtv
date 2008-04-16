@@ -419,6 +419,9 @@ if ($package == 1) {
    comment => 'fetching istool' ],
  [ file => "c:/Program Files/ISTool/isxdl.dll",
    exec => $dossources.'istool-5.2.1.exe /silent', comment => 'Install istool'],
+ [ archive => $sources.'logo_mysql_sun.gif',
+     fetch => 'http://www.mysql.com/common/logos/logo_mysql_sun.gif',
+   comment => 'Download MySQL logo for an install page in the package' ],
  [ exists => $mythtv.'build/package_flag',
     shell => ["rm ".$unixmythtv."build/package_flag"],comment => '' ],
 ;
@@ -1219,34 +1222,18 @@ if ($package == 1) {
       exec => 'copy /Y "C:\Program Files\Inno Setup 5\WizModernSmallImage-IS.bmp" '.
               $dosmythtv.'build\isfiles\WizModernSmallImage-IS.bmp',
       comment => 'Copy WizModernSmallImage-IS.bmp to setup directory' ],
-    # Check for temporary situation, required files have all
-    # been loaded to same directory as batch file, and not svn],
-    [ file => $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss',
-      exec => 'copy /y '.scriptpath().'\mythtvsetup.iss '.
-              $dosmythtv.'mythtv\contrib\win32\build\mythtvsetup.iss',
-      comment => 'Copy mythtvsetup.iss to svn ' ],
-    [ file => $mythtv.'mythtv/contrib/win32/build/configuremysql.vbs',
-      exec => 'copy /y '.scriptpath().'\configuremysql.vbs '.
-              $dosmythtv.'mythtv\contrib\win32\build\configuremysql.vbs',
-      comment => 'Copy configuremysql.vbs to svn ' ],
-    [ file => $mythtv.'mythtv/contrib/win32/build/mysql.gif',
-      exec => 'copy /y '.scriptpath().'\mysql.gif '.
-              $dosmythtv.'mythtv\contrib\win32\build\mysql.gif',
-      comment => 'Copy mysql.gif to svn ' ],
-    # Move required files from  contrib to setup directory
+    # Copy required files from sources or mythtv/contrib to setup directory:
     [ filesame => [$mythtv.'build/isfiles/mythtvsetup.iss',
                    $mythtv.'mythtv/contrib/win32/build/mythtvsetup.iss'],
       copy => [''=>'', comment => 'mythtvsetup.iss'] ],
-    [ filesame => [$mythtv.'build//isfiles/configuremysql.vbs',
-                   $mythtv.'mythtv/contrib/win32/build/configuremysql.vbs'],
-      copy => [''=>'', comment => 'configuremysql.vbs'] ],
     [ filesame => [$mythtv.'build/isfiles/mysql.gif',
-                   $mythtv.'mythtv/contrib/win32/build/mysql.gif'],
+                   $sources.'logo_mysql_sun.gif'],
       copy => [''=>'', comment => 'mysql.gif'] ],
-#    [ file => $mythtv.'build/isfiles/mythtvsetup.iss',
-#      shell => ['cp '.$unixmythtv.'/mythtv/contrib/Win32/build/mythtvsetup.iss '.
-#                      $unixmythtv.'build/isfiles/mythtvsetup.iss'] ],
     # Create on-the-fly  files required
+    [ file => $mythtv.'build/isfiles/configuremysql.vbs',
+      write => [$mythtv.'build/isfiles/configuremysql.vbs',
+'WScript.Echo "Currently Unimplemented"
+' ], comment => 'Write a VB script to configure MySQL' ],
     [ file => $mythtv.'build/isfiles/versioninfo.iss',
       write => [$mythtv.'build/isfiles/versioninfo.iss', '
 #define MyAppName      "MythTv"
