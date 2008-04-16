@@ -37,7 +37,7 @@
 
 #ifdef USING_MINGW
 #include <winsock2.h>
-#undef DialogBox
+#include <unistd.h>
 #include "compat.h"
 #endif
 
