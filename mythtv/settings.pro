@@ -14,6 +14,8 @@ isEmpty(TARGET_OS) : win32 {
     QMAKE_EXTENSION_SHLIB = dll
     VERSION =
     CONFIG_OPENGL_LIBS =
+    # Qt4 creates separate compile directories by default. This disables:
+    CONFIG -= debug_and_release debug_and_release_target
 }
 
 # if CYGWIN compile, set up flag in CONFIG 
