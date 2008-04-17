@@ -106,7 +106,7 @@ mingw {
     SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
     HEADERS += mediamonitor-windows.h   audiooutputwin.h
 
-    LIBS += -lpthread
+    LIBS += -lpthread -lwinmm -lws2_32
 
     # For easier debugging:
     target.path = $${PREFIX}/bin

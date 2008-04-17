@@ -45,6 +45,8 @@ LIBS += $$EXTRA_LIBS
 mingw {
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
+
+    LIBS += -lws2_32
 }
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
