@@ -693,7 +693,8 @@ void VideoOutputD3D::Show(FrameScanType )
 
 RenderError:
 
-        qApp->wakeUpGuiThread();
+        //-=>TODO: The following method does not exist in Qt4
+        //qApp->wakeUpGuiThread();
 
         // reset system idle timeout
         SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
