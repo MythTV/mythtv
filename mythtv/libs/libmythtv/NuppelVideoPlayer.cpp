@@ -7006,39 +7006,40 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     }
 
     OSDSet *subtitleOSD = NULL;
-    AVSubtitleRect *highlightButton = ringBuffer->DVD()->GetMenuButton();
-
-    if (highlightButton != NULL)
+    AVSubtitle *dvdSubtitle = ringBuffer->DVD()->GetMenuSubtitle();
+    AVSubtitleRect *hl_button = NULL;
+    if (dvdSubtitle != NULL)
     {
+        hl_button = &(dvdSubtitle->rects[0]);
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
         subtitleLock.lock();
-        uint h = ringBuffer->DVD()->ButtonHeight();
-        uint w = ringBuffer->DVD()->ButtonWidth();
-        uint bitmapHeight = highlightButton->h;
-        uint bitmapWidth  = highlightButton->w;
-        int linesize = highlightButton->linesize;
-        int x1 = highlightButton->x;
-        int y1 = highlightButton->y;
-        uint btnX = ringBuffer->DVD()->ButtonPosX();
-        uint btnY = ringBuffer->DVD()->ButtonPosY();
+        uint h = hl_button->h;
+        uint w  = hl_button->w;
+        int linesize = hl_button->linesize;
+        int x1 = hl_button->x;
+        int y1 = hl_button->y;
+        QRect buttonPos = ringBuffer->DVD()->GetButtonCoords();
         subtitleOSD = osd->GetSet("subtitles");
-
-        if ((w + x1) > bitmapWidth)
-            w = w - ((w + x1) - bitmapWidth);
-       
-        if ((h + y1) > bitmapHeight)
-            h = h - ((h + y1) - bitmapHeight);
-        
-        QImage hl_button(w, h, 32);
-        hl_button.setAlphaBuffer(true);
-        for (uint y = 0; y < h; y++)
+        QImage hl_image(w, h, 32);
+        hl_image.setAlphaBuffer(true);
+        uint8_t color;
+        uint32_t pixel;
+        QPoint currentPos = QPoint(0,0);
+        for (uint y = 2; y < h; y++)
         {
             for (uint x = 0; x < w; x++)
             {
-                uint8_t color = highlightButton->bitmap[(y+y1)*linesize+(x+x1)];
-                uint32_t pixel = highlightButton->rgba_palette[color];
-                hl_button.setPixel(x, y, pixel);
+                currentPos.setY(y);
+                currentPos.setX(x);
+                color = hl_button->bitmap[(y)*linesize+(x)];
+                // use rgba palette from dvd nav for drawing
+                // highlighted button
+                if (buttonPos.contains(currentPos))
+                    pixel = dvdSubtitle->rects[1].rgba_palette[color];
+                else
+                    pixel = hl_button->rgba_palette[color];
+                hl_image.setPixel(x, y, pixel);
             }
         }
 
@@ -7053,19 +7054,19 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
         if ((hmult < 0.99) || (hmult > 1.01) || (vmult < 0.99) || (vmult > 1.01)) 
         {
-            btnX = (int)    (btnX * hmult);
-            btnY = (int)    (btnY * vmult);
+            x1 = (int)    (x1 * hmult);
+            y1 = (int)    (y1 * vmult);
             w    = (int)ceil(w    * hmult);
             h    = (int)ceil(h    * vmult);
 
-            hl_button = hl_button.smoothScale(w, h);
+            hl_image = hl_image.smoothScale(w, h);
         } 
         else 
             hmult = vmult = 1.0;
 
         OSDTypeImage* image = new OSDTypeImage();
-        image->SetPosition(QPoint(btnX, btnY), hmult, vmult);
-        image->Load(hl_button);
+        image->SetPosition(QPoint(x1, y1), hmult, vmult);
+        image->Load(hl_image);
         image->SetDontRoundPosition(true);
 
         subtitleOSD->AddType(image);

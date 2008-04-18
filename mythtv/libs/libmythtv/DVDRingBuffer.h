@@ -50,14 +50,11 @@ class MPUBLIC DVDRingBufferPriv
     int  NumPartsInTitle(void) const { return titleParts; }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
 
-    AVSubtitleRect *GetMenuButton(void);
+    QRect GetButtonCoords(void);
+    AVSubtitle *GetMenuSubtitle(void);
     void ReleaseMenuButton(void);
 
     bool IgnoringStillorWait(void) { return skipstillorwait; }
-    uint ButtonPosX(void)   { return hl_startx; }
-    uint ButtonPosY(void)   { return hl_starty; }
-    uint ButtonWidth(void)  { return hl_width; }
-    uint ButtonHeight(void) { return hl_height; }
     uint GetAudioLanguage(int id);
     int  GetSubTrackNum(uint key);
     int  GetAudioTrackNum(uint key);
@@ -140,10 +137,7 @@ class MPUBLIC DVDRingBufferPriv
     uint32_t       clut[16];
     uint8_t        button_color[4];
     uint8_t        button_alpha[4];
-    uint16_t       hl_startx;
-    uint16_t       hl_width;
-    uint16_t       hl_starty;
-    uint16_t       hl_height;
+    QRect          hl_button;
     uint8_t       *menuSpuPkt;
     int            menuBuflength;
     AVSubtitle     dvdMenuButton;
@@ -182,7 +176,6 @@ class MPUBLIC DVDRingBufferPriv
     QMutex seekLock;
 
     long long Seek(long long time);
-    bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
     void ClearMenuButton(void);

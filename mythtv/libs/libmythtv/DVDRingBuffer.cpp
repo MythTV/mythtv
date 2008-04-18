@@ -36,8 +36,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       gotStop(false),
       cellHasStillFrame(false), audioStreamsChanged(false),
       dvdWaiting(false),
-      titleLength(0), hl_startx(0), hl_width(0),
-      hl_starty(0), hl_height(0),
+      titleLength(0), hl_button(0, 0, 0, 0),
       menuSpuPkt(0),
       menuBuflength(0),
       skipstillorwait(true),
@@ -549,16 +548,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         .arg(hl->pts).arg(hl->buttonN));
 
                 menuBtnLock.lock();
-
-                if (DVDButtonUpdate(false))
-                {
-                    ClearMenuButton();
-                    buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
-                }
-
-                menuBtnLock.unlock();
-
+                
+                DVDButtonUpdate(false);
                 ClearSubtitlesOSD();
+                
+                menuBtnLock.unlock();
                 
                 if (parent && buttonExists)
                     parent->HideDVDButton(false);
@@ -806,22 +800,27 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
         SelectDefaultButton();
         buttonSelected = true;
     }
+
     if (DVDButtonUpdate(false))
-        buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
+    {
+        int32_t gotbutton;
+        buttonExists = DecodeSubtitles(&dvdMenuButton, &gotbutton, 
+                                        menuSpuPkt, menuBuflength);
+    }
 }
 
-/** \brief returns dvd menu button if available.
+/** \brief returns dvd menu button information if available.
  * used by NVP::DisplayDVDButton
  */
-AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
+AVSubtitle *DVDRingBufferPriv::GetMenuSubtitle(void)
 {
     menuBtnLock.lock();
 
     if ((menuBuflength > 4) && buttonExists &&
-        (dvdMenuButton.rects[0].h >= hl_height) && 
-        (dvdMenuButton.rects[0].w >= hl_width))
+        (dvdMenuButton.rects[0].h >= hl_button.height()) && 
+        (dvdMenuButton.rects[0].w >= hl_button.width()))
     {
-        return &(dvdMenuButton.rects[0]);
+        return &(dvdMenuButton);
     }
 
     return NULL;
@@ -833,27 +832,25 @@ void DVDRingBufferPriv::ReleaseMenuButton(void)
     menuBtnLock.unlock();
 }
 
-/** \brief obtain dvd menu button bitmap, alpha and color palette
+/** \brief get coordinates of highlighted button
  */
-bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
+QRect DVDRingBufferPriv::GetButtonCoords(void)
 {
-    int gotbutton;
-    if (DecodeSubtitles(&dvdMenuButton, &gotbutton, spu_pkt, buf_size))
-    {
-        int x1, y1;
-        x1 = dvdMenuButton.rects[0].x;
-        y1 = dvdMenuButton.rects[0].y;
-        if (hl_startx > x1)
-            dvdMenuButton.rects[0].x = hl_startx - x1;
-        else
-            dvdMenuButton.rects[0].x = 0;
-        if (hl_starty > y1)
-            dvdMenuButton.rects[0].y  = hl_starty - y1;
-        else
-            dvdMenuButton.rects[0].y = 0;
-        return true;
-    }
-    return false;
+    QRect rect(0,0,0,0);
+    if (!buttonExists)
+        return rect;
+
+    int x1, y1;
+    int x = 0; int y = 0;
+    x1 = dvdMenuButton.rects[0].x;
+    y1 = dvdMenuButton.rects[0].y;
+    if (hl_button.x() > x1)
+        x = hl_button.x() - x1;
+    if (hl_button.y() > y1)
+        y  = hl_button.y() - y1;
+    rect.setRect(x, y, hl_button.width(), hl_button.height());    
+    
+    return rect;
 }
 
 /** \brief generate dvd subtitle bitmap or dvd menu bitmap. 
@@ -909,13 +906,11 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 {
                     if ((buf_size - pos) < 2)
                         goto fail;
-                    if (!IsInMenu())
-                    {
-                        palette[3] = spu_pkt[pos] >> 4;
-                        palette[2] = spu_pkt[pos] & 0x0f;
-                        palette[1] = spu_pkt[pos + 1] >> 4;
-                        palette[0] = spu_pkt[pos + 1] & 0x0f;
-                    }
+                    
+                    palette[3] = spu_pkt[pos] >> 4;
+                    palette[2] = spu_pkt[pos] & 0x0f;
+                    palette[1] = spu_pkt[pos + 1] >> 4;
+                    palette[0] = spu_pkt[pos + 1] & 0x0f;
                     pos +=2;
                 }
                 break;
@@ -923,13 +918,10 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 {
                     if ((buf_size - pos) < 2)
                         goto fail;
-                    if (!IsInMenu())
-                    {
-                        alpha[3] = spu_pkt[pos] >> 4;
-                        alpha[2] = spu_pkt[pos] & 0x0f;
-                        alpha[1] = spu_pkt[pos + 1] >> 4;
-                        alpha[0] = spu_pkt[pos + 1] & 0x0f;
-                    }
+                    alpha[3] = spu_pkt[pos] >> 4;
+                    alpha[2] = spu_pkt[pos] & 0x0f;
+                    alpha[1] = spu_pkt[pos + 1] >> 4;
+                    alpha[0] = spu_pkt[pos + 1] & 0x0f;
                     pos +=2;
                 }
                 break;
@@ -971,14 +963,6 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 h = 0;
             if (w > 0 && h > 0) 
             {
-                if (IsInMenu())
-                {
-                    for (int i = 0; i < 4 ; i++)
-                    {
-                        alpha[i]   = button_alpha[i];
-                        palette[i] = button_color[i];
-                    }
-                }
                 if (sub->rects != NULL)
                 {
                     for (i = 0; i < sub->num_rects; i++)
@@ -991,8 +975,9 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 }
 
                 bitmap = (uint8_t*) av_malloc(w * h);
-                sub->rects = (AVSubtitleRect *)av_mallocz(sizeof(AVSubtitleRect));
-                sub->num_rects = 1;
+                sub->num_rects = (IsInMenu()) ? 2 : 1;
+                sub->rects = (AVSubtitleRect *)
+                        av_mallocz(sizeof(AVSubtitleRect) * sub->num_rects);
                 sub->rects[0].rgba_palette = (uint32_t*)av_malloc(4 *4);
                 decode_rle(bitmap, w * 2, w, (h + 1) / 2,
                             spu_pkt, offset1 * 2, buf_size);
@@ -1006,7 +991,13 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].h = h;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
-                if (!IsInMenu())
+                if (IsInMenu())
+                {
+                    sub->rects[1].rgba_palette = (uint32_t*)av_malloc(4 *4);
+                    guess_palette(sub->rects[1].rgba_palette, 
+                                button_color, button_alpha);
+                }
+                else
                     find_smallest_bounding_rectangle(sub);
                 *gotSubtitles = 1;
             }
@@ -1060,10 +1051,7 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
         button_color[i] = 0xf & (hl.palette >> (16+4 *i ));
     }
 
-    hl_startx = hl.sx;
-    hl_width = hl.ex - hl.sx;
-    hl_starty = hl.sy;
-    hl_height  = hl.ey - hl.sy;
+    hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
     if (((hl.sx + hl.sy) > 0) && 
             (hl.sx < videowidth && hl.sy < videoheight))
@@ -1078,10 +1066,13 @@ void DVDRingBufferPriv::ClearMenuButton(void)
 {
     if (buttonExists || dvdMenuButton.rects)
     {
-        av_free(dvdMenuButton.rects[0].rgba_palette);
-        av_free(dvdMenuButton.rects[0].bitmap);
+        for (uint i = 0; i < dvdMenuButton.num_rects; i++)
+        {
+            AVSubtitleRect* rect =  &(dvdMenuButton.rects[i]);
+            av_free(rect->rgba_palette);
+            av_free(rect->bitmap);
+        }
         av_free(dvdMenuButton.rects);
-
         dvdMenuButton.rects = NULL;
         dvdMenuButton.num_rects = 0;
         buttonExists = false;
@@ -1102,8 +1093,7 @@ void DVDRingBufferPriv::ClearMenuSPUParameters(void)
 
     av_free(menuSpuPkt);
     menuBuflength = 0;
-    hl_startx = hl_starty = 0;
-    hl_width = hl_height = 0;
+    hl_button.setRect(0, 0, 0, 0);
 }
 
 int DVDRingBufferPriv::NumMenuButtons(void) const
