@@ -58,6 +58,8 @@ macx {
     LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION
     LIBS += -lmythupnp-$$LIBVERSION
 
+    QT += network
+
     #QMAKE_LFLAGS += -flat_namespace -undefined suppress
     QMAKE_LFLAGS += -flat_namespace -undefined error
 }
