@@ -35,6 +35,7 @@
 #include "avcodec.h"
 #include "ac3_parser.h"
 #include "bitstream.h"
+#include "crc.h"
 #include "dsputil.h"
 #include "random.h"
 
@@ -1119,6 +1120,16 @@ static int ac3_decode_frame(AVCodecContext * avctx, void *data, int *data_size, 
                 break;
         }
         return -1;
+    }
+
+    /* check for crc mismatch */
+    if(avctx->error_resilience >= FF_ER_CAREFUL) {
+        if(av_crc(av_crc8005, 0, &buf[2], ctx->frame_size-2)) {
+            av_log(avctx, AV_LOG_ERROR, "frame CRC mismatch\n");
+            *data_size = 0;
+            return ctx->frame_size;
+        }
+        /* TODO: error concealment */
     }
 
     avctx->sample_rate = ctx->sampling_rate;
