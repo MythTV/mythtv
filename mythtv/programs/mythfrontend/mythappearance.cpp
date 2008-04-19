@@ -148,7 +148,7 @@ bool MythAppearance::keyPressEvent(QKeyEvent *event)
             handled = false;
     }
 
-    if (MythScreenType::keyPressEvent(event))
+    if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 
     return handled;
