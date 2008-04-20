@@ -355,7 +355,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (uint i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -415,7 +415,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
             handled = false;
     }
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (MythScreenType::keyPressEvent(event))
         handled = true;
 
     return handled;
@@ -641,7 +641,7 @@ void IconView::customEvent(QEvent *event)
 {
     ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
-    if ((ThumbGenEvent::Type)tge->type() == ThumbGenEvent::ImageReady)
+    if (tge->type() == ThumbGenEvent::ImageReady)
     {
         ThumbData *td = tge->thumbData;
         if (!td) return;
@@ -1215,21 +1215,16 @@ void IconView::CopyMarkedFiles(bool move)
 
 void IconView::ClearMenu(MythListButton *menu)
 {
-    if (!menu || menu->IsEmpty())
+    if (!menu)
         return;
 
-    for (int i = 0; i < menu->GetCount(); i++)
+    MythListButtonItem *item = menu->GetItemFirst();
+    while (item)
     {
-        MythListButtonItem *item = menu->GetItemAt(i);
-        if (item)
-        {
-            MenuAction *act = (MenuAction*) item->getData();
-            if (act)
-            {
-                delete act;
-                item->setData(NULL);
-            }
-        }
+        MenuAction *act = (MenuAction*) item->getData();
+        if (act)
+            delete act;
+        item = menu->GetItemNext(item);
     }
 }
 
