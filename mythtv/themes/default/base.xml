@@ -81,7 +81,7 @@
         <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
         <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
         <spacing>5</spacing>
-        <margin>5</margin>
+        <margin>5,2</margin>
         <align>left,vcenter</align>
     </buttonlist>
 

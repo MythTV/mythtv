@@ -154,8 +154,7 @@ void ThumbGenerator::run()
                 td->thumb     = image.copy();
 
                 // inform parent we have thumbnail ready for it
-                QApplication::postEvent(m_parent,
-                                        new ThumbGenEvent(ThumbGenEvent::ImageReady, td));
+                QApplication::postEvent(m_parent, new ThumbGenEvent(td));
 
             }
         }

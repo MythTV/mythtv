@@ -62,8 +62,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 
     m_galleryDir = galleryDir;
 
-    m_menuList = m_submenuList = NULL,
-
     m_isGallery = false;
     m_showDevices = false;
     m_currDir = QString::null;
@@ -81,6 +79,8 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 
     m_captionText = NULL;
 
+    m_menuPopup = NULL;
+
     QDir dir(m_galleryDir);
     if (!dir.exists() || !dir.isReadable())
     {
@@ -93,9 +93,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 
 IconView::~IconView()
 {
-    ClearMenu(m_submenuList);
-    ClearMenu(m_menuList);
-
     if (m_thumbGen)
     {
         delete m_thumbGen;
@@ -114,17 +111,13 @@ bool IconView::Create(void)
     if (!foundtheme)
         return false;
 
-    m_menuList = dynamic_cast<MythListButton *>
-                (GetChild("menu"));
-    m_submenuList = dynamic_cast<MythListButton *>
-                (GetChild("submenu"));
     m_imageList = dynamic_cast<MythListButton *>
                 (GetChild("images"));
 
     m_captionText = dynamic_cast<MythUIText *>
                 (GetChild("text"));
 
-    if (!m_menuList || !m_submenuList || !m_imageList)
+    if (!m_imageList)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
@@ -134,36 +127,14 @@ bool IconView::Create(void)
             this, SLOT( HandleItemSelect(MythListButtonItem*)));
     connect(m_imageList, SIGNAL(itemSelected( MythListButtonItem*)),
             this, SLOT( UpdateText(MythListButtonItem*)));
-    connect(m_menuList, SIGNAL(itemClicked( MythListButtonItem*)),
-            this, SLOT( HandleMenuButtonPress(MythListButtonItem*)));
-    connect(m_submenuList, SIGNAL(itemClicked( MythListButtonItem*)),
-            this, SLOT( HandleMenuButtonPress(MythListButtonItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    // Set Menu Text and Handlers
-    MythListButtonItem *item;
-    item = new MythListButtonItem(m_menuList, tr("SlideShow"));
-    item->setData(new MenuAction(&IconView::HandleSlideShow));
-    item = new MythListButtonItem(m_menuList, tr("Random"));
-    item->setData(new MenuAction(&IconView::HandleRandomShow));
-    item = new MythListButtonItem(m_menuList, tr("Meta Data..."));
-    item->setData(new MenuAction(&IconView::HandleSubMenuMetadata));
-    item = new MythListButtonItem(m_menuList, tr("Marking..."));
-    item->setData(new MenuAction(&IconView::HandleSubMenuMark));
-    item = new MythListButtonItem(m_menuList, tr("File..."));
-    item->setData(new MenuAction(&IconView::HandleSubMenuFile));
-    item = new MythListButtonItem(m_menuList, tr("Settings"));
-    item->setData(new MenuAction(&IconView::HandleSettings));
 
     SetupMediaMonitor();
 
     SetFocusWidget(m_imageList);
     m_imageList->SetActive(true);
-    m_menuList->SetActive(false);
-    m_submenuList->SetActive(false);
-    m_submenuList->SetVisible(false);
 
     return true;
 }
@@ -362,27 +333,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            if (m_menuList == GetFocusWidget())
-                SetFocusWidget(m_imageList);
-            else if (m_submenuList == GetFocusWidget())
-            {
-                m_submenuList->SetVisible(false);
-                SetFocusWidget(m_menuList);
-            }
-            else
-                SetFocusWidget(m_menuList);
-        }
-        else if (action == "ESCAPE")
-        {
-            if (m_menuList == GetFocusWidget())
-                SetFocusWidget(m_imageList);
-            else if (m_submenuList == GetFocusWidget())
-            {
-                m_submenuList->SetVisible(false);
-                SetFocusWidget(m_menuList);
-            }
-            else
-                GetScreenStack()->PopScreen();
+            HandleMainMenu();
         }
         else if (action == "ROTRIGHT")
             HandleRotateCW();
@@ -415,7 +366,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
             handled = false;
     }
 
-    if (MythScreenType::keyPressEvent(event))
+    if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 
     return handled;
@@ -639,10 +590,11 @@ bool IconView::HandleEscape(void)
 
 void IconView::customEvent(QEvent *event)
 {
-    ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
-    if (tge->type() == ThumbGenEvent::ImageReady)
+    if (event->type() == kMythGalleryThumbGenEventType)
     {
+        ThumbGenEvent *tge = (ThumbGenEvent *)event;
+
         ThumbData *td = tge->thumbData;
         if (!td) return;
 
@@ -659,7 +611,6 @@ void IconView::customEvent(QEvent *event)
                 matrix.rotate(rotateAngle);
                 td->thumb = td->thumb.xForm(matrix);
             }
-
 
             int pos = m_itemList.find(thumbitem);
 
@@ -679,116 +630,184 @@ void IconView::customEvent(QEvent *event)
         }
         delete td;
     }
-
-}
-
-void IconView::HandleMenuButtonPress(MythListButtonItem *item)
-{
-    if (!item || !item->getData())
-        return;
-
-    if (GetFocusWidget() == m_submenuList)
+    else if (event->type() == kMythDialogBoxCompletionEventType)
     {
-        SetFocusWidget(m_imageList);
-        m_submenuList->SetVisible(false);
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "mainmenu")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    HandleSlideShow();
+                    break;
+                case 1:
+                    HandleRandomShow();
+                    break;
+                case 2:
+                    HandleSubMenuMetadata();
+                    break;
+                case 3:
+                    HandleSubMenuMark();
+                    break;
+                case 4:
+                    HandleSubMenuFile();
+                    break;
+                case 5:
+                    HandleSettings();
+                    break;
+            }
+        }
+        else if (resultid == "metadatamenu")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    HandleRotateCW();
+                    break;
+                case 1:
+                    HandleRotateCCW();
+                    break;
+            }
+        }
+        else if (resultid == "markingmenu")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    HandleClearMarked();
+                    break;
+                case 1:
+                    HandleSelectAll();
+                    break;
+            }
+        }
+        else if (resultid == "filemenu")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    HandleShowDevices();
+                    break;
+                case 1:
+                    HandleImport();
+                    break;
+                case 2:
+                    HandleCopyHere();
+                    break;
+                case 3:
+                    HandleMoveHere();
+                    break;
+                case 4:
+                    HandleDelete();
+                    break;
+                case 5:
+                    HandleMkDir();
+                    break;
+                case 6:
+                    HandleRename();
+                    break;
+            }
+        }
+
+        m_menuPopup = NULL;
+
     }
 
-    MenuAction *act = (MenuAction*) item->getData();
-    (this->*(*act))();
 }
 
 void IconView::HandleMainMenu(void)
 {
-    if (m_showDevices)
-    {
-        QDir d(m_currDir);
-        if (!d.exists())
-            m_currDir = m_galleryDir;
+    QString label = tr("Gallery Options");
 
-        LoadDirectory(m_currDir);
-        m_showDevices = false;
-    }
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    ClearMenu(m_submenuList);
-    m_submenuList->Reset();
-    m_submenuList->SetVisible(false);
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
 
-    SetFocusWidget(m_menuList);
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "mainmenu");
+
+    m_menuPopup->AddButton(tr("SlideShow"));
+    m_menuPopup->AddButton(tr("Random"));
+    m_menuPopup->AddButton(tr("Meta Data Menu"));
+    m_menuPopup->AddButton(tr("Marking Menu"));
+    m_menuPopup->AddButton(tr("File Menu"));
+    m_menuPopup->AddButton(tr("Settings"));
+//     if (m_showDevices)
+//     {
+//         QDir d(m_currDir);
+//         if (!d.exists())
+//             m_currDir = m_galleryDir;
+// 
+//         LoadDirectory(m_currDir);
+//         m_showDevices = false;
+//     }
 }
 
 void IconView::HandleSubMenuMetadata(void)
 {
-    ClearMenu(m_submenuList);
-    m_submenuList->Reset();
-    m_submenuList->SetVisible(true);
+    QString label = tr("Metadata Options");
 
-    MythListButtonItem *item;
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    item = new MythListButtonItem(m_submenuList, tr("Return"));
-    item->setData(new MenuAction(&IconView::HandleMainMenu));
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
 
-    item = new MythListButtonItem(m_submenuList, tr("Rotate CW"));
-    item->setData(new MenuAction(&IconView::HandleRotateCW));
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
 
-    item = new MythListButtonItem(m_submenuList, tr("Rotate CCW"));
-    item->setData(new MenuAction(&IconView::HandleRotateCCW));
+    m_menuPopup->SetReturnEvent(this, "metadatamenu");
 
-    SetFocusWidget(m_submenuList);
+    m_menuPopup->AddButton(tr("Rotate CW"));
+    m_menuPopup->AddButton(tr("Rotate CCW"));
 }
 
 void IconView::HandleSubMenuMark(void)
 {
-    ClearMenu(m_submenuList);
-    m_submenuList->Reset();
-    m_submenuList->SetVisible(true);
+    QString label = tr("Marking Options");
 
-    MythListButtonItem *item;
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    item = new MythListButtonItem(m_submenuList, tr("Return"));
-    item->setData(new MenuAction(&IconView::HandleMainMenu));
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
 
-    item = new MythListButtonItem(m_submenuList, tr("Clear Marked"));
-    item->setData(new MenuAction(&IconView::HandleClearMarked));
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
 
-    item = new MythListButtonItem(m_submenuList, tr("Select All"));
-    item->setData(new MenuAction(&IconView::HandleSelectAll));
+    m_menuPopup->SetReturnEvent(this, "markingmenu");
 
-    SetFocusWidget(m_submenuList);
+    m_menuPopup->AddButton(tr("Clear Marked"));
+    m_menuPopup->AddButton(tr("Select All"));
 }
 
 void IconView::HandleSubMenuFile(void)
 {
-    ClearMenu(m_submenuList);
-    m_submenuList->Reset();
-    m_submenuList->SetVisible(true);
+    QString label = tr("File Options");
 
-    MythListButtonItem *item;
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    item = new MythListButtonItem(m_submenuList, tr("Return"));
-    item->setData(new MenuAction(&IconView::HandleMainMenu));
+    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
 
-    item = new MythListButtonItem(m_submenuList, tr("Show Devices"));
-    item->setData(new MenuAction(&IconView::HandleShowDevices));
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
 
-    item = new MythListButtonItem(m_submenuList, tr("Import"));
-    item->setData(new MenuAction(&IconView::HandleImport));
+    m_menuPopup->SetReturnEvent(this, "filemenu");
 
-    item = new MythListButtonItem(m_submenuList, tr("Copy here"));
-    item->setData(new MenuAction(&IconView::HandleCopyHere));
-
-    item = new MythListButtonItem(m_submenuList, tr("Move here"));
-    item->setData(new MenuAction(&IconView::HandleMoveHere));
-
-    item = new MythListButtonItem(m_submenuList, tr("Delete"));
-    item->setData(new MenuAction(&IconView::HandleDelete));
-
-    item = new MythListButtonItem(m_submenuList, tr("Create Dir"));
-    item->setData(new MenuAction(&IconView::HandleMkDir));
-
-    item = new MythListButtonItem(m_submenuList, tr("Rename"));
-    item->setData(new MenuAction(&IconView::HandleRename));
-
-    SetFocusWidget(m_submenuList);
+    m_menuPopup->AddButton(tr("Show Devices"));
+    m_menuPopup->AddButton(tr("Import"));
+    m_menuPopup->AddButton(tr("Copy here"));
+    m_menuPopup->AddButton(tr("Move here"));
+    m_menuPopup->AddButton(tr("Delete"));
+    m_menuPopup->AddButton(tr("Create Dir"));
+    m_menuPopup->AddButton(tr("Rename"));
 }
 
 void IconView::HandleRotateCW(void)
@@ -1211,21 +1230,6 @@ void IconView::CopyMarkedFiles(bool move)
     progress->deleteLater();
 
     LoadDirectory(m_currDir);
-}
-
-void IconView::ClearMenu(MythListButton *menu)
-{
-    if (!menu)
-        return;
-
-    MythListButtonItem *item = menu->GetItemFirst();
-    while (item)
-    {
-        MenuAction *act = (MenuAction*) item->getData();
-        if (act)
-            delete act;
-        item = menu->GetItemNext(item);
-    }
 }
 
 void IconView::mediaStatusChanged(MediaStatus oldStatus,

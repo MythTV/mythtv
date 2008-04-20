@@ -95,18 +95,14 @@ class IconView : public MythScreenType
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
 
-    void ClearMenu(MythListButton *menu);
-
     Q3PtrList<ThumbItem> m_itemList;
     Q3Dict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
 
-    MythListButton      *m_menuList;
-    MythListButton      *m_submenuList;
-    MythListButton      *m_imageList;
-
-    MythUIText          *m_captionText;
+    MythListButton     *m_imageList;
+    MythUIText         *m_captionText;
+    MythDialogBox      *m_menuPopup;
 
     bool                m_isGallery;
     bool                m_showDevices;
@@ -122,8 +118,6 @@ class IconView : public MythScreenType
     QStringList         m_paths;
 
     QString             m_errorStr;
-
-    typedef void (IconView::*MenuAction)(void);
 
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);

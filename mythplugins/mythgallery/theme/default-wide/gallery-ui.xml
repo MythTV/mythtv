@@ -3,20 +3,8 @@
 
     <window name="gallery">
 
-        <buttonlist name="menu" from="basebuttonlist">
-            <area>20,20,140,220</area>
-            <showarrow>no</showarrow>
-            <showscrollarrows>no</showscrollarrows>
-        </buttonlist>
-
-        <buttonlist name="submenu" from="basebuttonlist">
-            <area>20,260,140,280</area>
-            <showarrow>no</showarrow>
-            <showscrollarrows>no</showscrollarrows>
-        </buttonlist>
-
         <buttonlist name="images">
-            <area>170,20,620,515</area>
+            <area>15,20,770,550</area>
             <layout>grid</layout>
             <showarrow>no</showarrow>
             <regular-background filename="gallery-back-reg.png" />
@@ -25,7 +13,7 @@
             <check-empty filename="gallery-mark-none.png" />
             <check-half filename="gallery-mark-none.png" />
             <check-full filename="gallery-mark.png" />
-            <margin>6</margin>
+            <margin>6,6</margin>
             <imagealign>hcenter,vcenter</imagealign>
             <textflags>hcenter,bottom</textflags>
         </buttonlist>
