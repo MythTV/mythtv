@@ -1603,11 +1603,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation>Ændre gruppe Visning</translation>
+        <translation>Ændre gruppevisning</translation>
     </message>
     <message>
         <source>Change Group Password</source>
-        <translation>Ændre gruppe password</translation>
+        <translation>Ændre gruppekodeord</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
@@ -1627,11 +1627,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Old Password:</source>
-        <translation>Gammelt password:</translation>
+        <translation>Gammelt kodeord:</translation>
     </message>
     <message>
         <source>New Password:</source>
-        <translation>Nyt password:</translation>
+        <translation>Nyt kodeord:</translation>
     </message>
     <message>
         <source>, %1 GB free</source>
@@ -1707,7 +1707,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Job Options</source>
-        <translation>Job muligheder</translation>
+        <translation>Jobmuligheder</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
@@ -1739,7 +1739,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation>Skift playliste for denne optage gruppe</translation>
+        <translation>Skift playliste for denne optagegruppe</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
@@ -1787,7 +1787,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Group Filter</source>
-        <translation>Ændre gruppe filtre</translation>
+        <translation>Ændre gruppefilter</translation>
     </message>
     <message>
         <source>Add this Group to Playlist</source>
@@ -1827,7 +1827,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Select Group Filter</source>
-        <translation>Vælg gruppe filter</translation>
+        <translation>Vælg gruppefilter</translation>
     </message>
     <message>
         <source>item</source>
@@ -1835,7 +1835,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>items</source>
-        <translation>punkter</translation>
+        <translation>poster</translation>
     </message>
     <message>
         <source>Groups</source>
@@ -1875,11 +1875,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Playback Group</source>
-        <translation>Ændre afspilnings gruppe</translation>
+        <translation>Ændre afspilningsgruppe</translation>
     </message>
     <message>
         <source>Group View</source>
-        <translation>Gruppe visning</translation>
+        <translation>Gruppevisning</translation>
     </message>
     <message>
         <source>Recording Group</source>
@@ -1887,7 +1887,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Playback Group</source>
-        <translation>Afspilnings gruppe</translation>
+        <translation>Afspilningsgruppe</translation>
     </message>
     <message>
         <source>Recording Title</source>
@@ -1895,7 +1895,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Group Password</source>
-        <translation>Gruppe kode</translation>
+        <translation>Gruppekodeord</translation>
     </message>
     <message>
         <source>Show Program Details</source>
@@ -1935,7 +1935,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Endnu ikke set</translation>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
@@ -1971,7 +1971,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Show Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis &apos;Endnu ikke set&apos;-liste</translation>
     </message>
     <message>
         <source>Show Searches</source>
@@ -3172,7 +3172,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Luma filter</source>
-        <translation>Luma filter</translation>
+        <translation>Luma-filter</translation>
     </message>
     <message>
         <source>Lower is better.</source>
@@ -3324,7 +3324,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Custom Filters</source>
-        <translation>Bruger filtre</translation>
+        <translation>Brugerfiltre</translation>
     </message>
     <message>
         <source>Advanced Filter configuration, format:
@@ -3614,7 +3614,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>ProfileGroup</source>
-        <translation>Profil gruppe</translation>
+        <translation>Profilgruppe</translation>
     </message>
     <message>
         <source>Transcoders</source>
@@ -3810,7 +3810,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Profile Group Name</source>
-        <translation>Profil gruppe navn</translation>
+        <translation>Navn på profilgruppe</translation>
     </message>
     <message>
         <source>Hostname</source>
@@ -4202,11 +4202,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Password required to view all recordings</source>
-        <translation>Password som skal bruges til at vise optagelser</translation>
+        <translation>Kodeord som skal bruges til at vise optagelser</translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation>Hvis der er et password, så skal det tastes for at se hele listen med optagelser.</translation>
+        <translation>Hvis der er et kodeord, så skal det indtastes for at se hele listen med optagelser.</translation>
     </message>
     <message>
         <source>View Recordings</source>
@@ -4490,7 +4490,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Password</source>
-        <translation>Kode</translation>
+        <translation>Kodeord</translation>
     </message>
     <message>
         <source>Do not adjust volume</source>
@@ -4606,11 +4606,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Playback filters</source>
-        <translation>Afspilnings filtre</translation>
+        <translation>Afspilningsfiltre</translation>
     </message>
     <message>
         <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation>Filtre som skal bruges når der vises optagelser fra denne kanal. Start med et plus for tilføje til de globale afspilnings filtre.</translation>
+        <translation>Filtre som skal bruges når der vises optagelser fra denne kanal. Start med et plus for at tilføje til de globale afspilningsfiltre.</translation>
     </message>
     <message>
         <source>Override Recording</source>
@@ -4765,7 +4765,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Create New Recording Group</source>
-        <translation>Opret ny optage gruppe</translation>
+        <translation>Opret ny optagegruppe</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -4777,11 +4777,11 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Select Recording Group</source>
-        <translation>Vælg optage gruppe</translation>
+        <translation>Vælg optagegruppe</translation>
     </message>
     <message>
         <source>Create a new recording group</source>
-        <translation>Opret ny optage gruppe</translation>
+        <translation>Opret ny optagegruppe</translation>
     </message>
     <message>
         <source>Program details</source>
@@ -4853,7 +4853,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Show group summary</source>
-        <translation>Vis gruppe total</translation>
+        <translation>Vis gruppetotal</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
@@ -4925,7 +4925,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Under afspilning vil Vælg (Enter eller mellemrum) skifte mellem &quot;Gem position&quot; og &quot;Slet position&quot;.  Hvis dette er deaktiveret, vil Vælg gemme den aktuelle position ved hvert tastetryk.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5033,7 +5033,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil Vælg-tasten ændre kanal når du bruger programoversigten i LiveTV.  Hvis dette er deaktiveret, vil Vælg vise indstillinger for optagelse.</translation>
     </message>
     <message>
         <source>If the option to use Select to change the channel is on, pressing Select on a show that is at least this many minutes into the future will schedule a recording.</source>
@@ -5073,7 +5073,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>This enables the periodic cleanup of the events stored in the Myth database (see &quot;Log MythTV events to database&quot; on the previous page).</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette aktiverer regelmæssig oprydning af hændelser gemt i MythTV-databasen (se &quot;Skriv MythTV loglinier i databasen&quot; på den foregående side).</translation>
     </message>
     <message>
         <source>The number of days between log cleanup runs.</source>
@@ -5081,7 +5081,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
-        <translation>Hvis aktiv, startes program guiden med det samme at der startes for Live TV.</translation>
+        <translation>Hvis aktiv, startes program guiden med det samme der startes for Live TV.</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -5619,7 +5619,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video i hovedvinduet vil skippe dette antal rammer for hver ramme der vises.  Sæt til 0 for at vise alle rammer.</translation>
     </message>
     <message>
         <source>Opacity</source>
@@ -5639,7 +5639,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video i det flydende vindue vil skippe dette antal rammer for hver ramme der vises.  Sæt til 0 for at vise alle rammer.</translation>
     </message>
     <message>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
@@ -5655,7 +5655,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video i dok-ikonet vil skippe dette antal rammer for hver ramme der vises.  Sæt til 0 for at vise alle rammer.</translation>
     </message>
     <message>
         <source>Video on the desktop</source>
@@ -5667,7 +5667,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video på skrivebordet vil skippe dette antal rammer for hver ramme der vises.  Sæt til 0 for at vise alle rammer.</translation>
     </message>
     <message>
         <source>Mac OS X video settings</source>
@@ -5699,7 +5699,7 @@ Din grabber kan ikke give kanalnumre, så dem skal du sætte manuelt.</translati
     </message>
     <message>
         <source>Job Queue Actions:</source>
-        <translation>Job kø muligheder:</translation>
+        <translation type="unfinished">Valg for jobkø:</translation>
     </message>
     <message>
         <source>Resume</source>
@@ -6203,7 +6203,8 @@ Frekvensen er for denne kanal er i Hz.</translation>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inversion (Standard: Auto):
+De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker.</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
@@ -6217,7 +6218,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstellation (Standard: Auto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
@@ -6241,7 +6242,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierarki (Standard: Auto)</translation>
     </message>
     <message>
         <source>CPU friendly preview of recordings</source>
@@ -6273,11 +6274,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne globale indstilling tillader optageren at begynde før den planlagte starttid.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne globale indstilling tillader optageren at optage efter den planlagte sluttid.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
@@ -6435,7 +6436,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Resolution of screen when not watching a video.</source>
-        <translation>Skærmopløsning når ikke ses video.</translation>
+        <translation>Skærmopløsning når der ikke ses video.</translation>
     </message>
     <message>
         <source>Default screen resolution when watching a video.</source>
@@ -6443,7 +6444,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Screen resolution when watching a video at a specific resolution.</source>
-        <translation>Opløsning når der vises video med en bestem opløsning.</translation>
+        <translation>Opløsning når der vises video med en bestemt opløsning.</translation>
     </message>
     <message>
         <source>Video Output</source>
@@ -6455,11 +6456,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Default refresh rate when watching a video.</source>
-        <translation>Standard opdatering frekvens når der vises video.</translation>
+        <translation>Standard opdateringsfrekvens når der vises video.</translation>
     </message>
     <message>
         <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation>Opdatering frekvens når en video vises i en bestemt opsløsning.</translation>
+        <translation>Opdateringsfrekvens når video vises i en bestemt opløsning.</translation>
     </message>
     <message>
         <source>Rate</source>
@@ -6467,7 +6468,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Aspect ratio when watching a video.</source>
-        <translation>Aspekt når der vises en video.</translation>
+        <translation>Aspektforhold når der vises en video.</translation>
     </message>
     <message>
         <source>Aspect Ratio when watching a video at a specific resolution.</source>
@@ -6613,11 +6614,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Save current group filter when changed</source>
-        <translation>Husk det aktive gruppe filter når det ændres</translation>
+        <translation>Gem det aktive gruppefilter når det ændres</translation>
     </message>
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation>Husk det sidst brugte filter i stedet for altid at starte med standard filteret.</translation>
+        <translation>Husk det sidst brugte filter i stedet for altid at starte med standardfilteret.</translation>
     </message>
     <message>
         <source>Default View</source>
@@ -6661,7 +6662,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation>Brug navnet på det aktive filteret alle steder hvor der ellers ville stå &quot;Alle programmer&quot; på afspilningsskærmen.</translation>
+        <translation>Brug navnet på det aktive filter alle steder hvor der ellers ville stå &quot;Alle programmer&quot; på afspilningsskærmen.</translation>
     </message>
     <message>
         <source>Commercial Flag New Recordings</source>
@@ -6820,7 +6821,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 Please make sure that your ui.xml is valid.
 
 Myth will now exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kunne ikke finde selector-objektet i dit tema.
+Sørg venligst for at din ui.xml er gyldig.
+
+MythTV vil nu afslutte.</translation>
     </message>
     <message>
         <source>Recording Unavailable</source>
@@ -7035,7 +7039,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
-        <translation>Spørg altid efter start gruppe filter</translation>
+        <translation>Spørg altid efter initielt gruppefilter</translation>
     </message>
     <message>
         <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
@@ -7583,7 +7587,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation>Lad automatisk nyre optagelsesregler bruge denne gruppe hvis titlen matcher dette regulære udtryk.  For eksempel ville &quot;(Nyheder|CNN)&quot; matche enhver titel hvor &quot;Nyheder&quot; eller &quot;CNN&quot; forekommer.</translation>
+        <translation>Lad automatisk nye optagelsesregler bruge denne gruppe hvis titlen matcher dette regulære udtryk.  For eksempel ville &quot;(Nyheder|CNN)&quot; matche enhver titel hvor &quot;Nyheder&quot; eller &quot;CNN&quot; forekommer.</translation>
     </message>
     <message>
         <source>Skip ahead (seconds)</source>
@@ -7603,7 +7607,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Playback Group</source>
-        <translation>Afspilnings gruppe</translation>
+        <translation>Afspilningsgruppe</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
@@ -7615,7 +7619,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Use &quot;%1&quot; playback group settings</source>
-        <translation>Brug  &quot;%1&quot; afspilningsgruppe opsætning</translation>
+        <translation>Brug  opsætning fra afspilningsgruppe &quot;%1&quot;</translation>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
@@ -8451,7 +8455,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktiv, vil MPEG4 koderen bruge &apos;high-quality&apos; kodnings-opsætning. Dette tager lang tid, men kan give bedre video kvalitet.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</translation>
     </message>
     <message>
         <source>Cable IRC</source>
@@ -8884,7 +8888,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Watch List Score</source>
-        <translation type="unfinished"></translation>
+        <translation>Score for &apos;Endnu ikke set&apos;</translation>
     </message>
     <message>
         <source>Auto-expire off</source>
@@ -8892,7 +8896,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Marked as &apos;watched&apos;</source>
-        <translation>Markeret som &quot;set&quot;</translation>
+        <translation>Markeret som &apos;set&apos;</translation>
     </message>
     <message>
         <source>Not the earliest episode</source>
@@ -8904,7 +8908,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Watch List Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Status for &apos;Endnu ikke set&apos;</translation>
     </message>
     <message>
         <source>Storage Group</source>
@@ -9036,7 +9040,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er valgt, vil programmer der er markeret som set og er auto-udløbet blive optaget igen hvis de vises igen.</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Ascending</source>
@@ -9096,27 +9100,27 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkluder &apos;Endnu ikke set&apos; gruppen</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Endnu ikke set&apos; er en kort liste af optagelser sorteret for at fremhæve serier og udsendelser som kræver opmærksomhed for at holde sig ajour.</translation>
     </message>
     <message>
         <source>Start from the Watch List view</source>
-        <translation type="unfinished"></translation>
+        <translation>Start med &apos;Endnu ikke set&apos; visning</translation>
     </message>
     <message>
         <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er aktiveret, vil &apos;Endnu ikke set&apos; visningen blive valgt hver gang du åbner Se Optagelser menuen</translation>
     </message>
     <message>
         <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ikke optagelser der ikke er sat til autoudløb</translation>
     </message>
     <message>
         <source>Set this if you turn off auto-expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Marker dette hvis du deaktiverer autoudløb for optagelser du har set og vil beholde. Dette vil ekskludere disse optagelser fra &apos;Endnu ikke set&apos; listen.</translation>
     </message>
     <message>
         <source>Maximum days counted in the score</source>
@@ -9124,23 +9128,23 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scores i &apos;Endnu ikke set&apos; er baseret på at 1 point svarer til 1 dag siden optagelse. Denne indstilling begrænser den maksimale score baseret på alder og påvirker andre vægtningsfaktorer.</translation>
     </message>
     <message>
         <source>Days to exclude weekly episodes after delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal dage ugentlige episoder skal ekskluderes efter sletning</translation>
     </message>
     <message>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Når en episode slettes eller markeres som set, bliver andre episoder af den samme serie ekskluderet fra &apos;Endnu ikke set&apos; listen for dette tidsinterval. Daglige visninger har også et mindre interval baseret på denne indstilling.</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase-program</translation>
     </message>
     <message>
         <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug &apos;mythfilldatabase&apos; eller navnet på et brugerdefineret script som vil befolke programoversigten for alle dine videokilder.</translation>
     </message>
     <message>
         <source>Schedule Status</source>
@@ -9212,7 +9216,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aspektforhold når video vises i en bestemt opløsning.</translation>
     </message>
     <message>
         <source>Backend Server Wakeup settings</source>
@@ -9308,7 +9312,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV har været ledig i %1 minutter og vil lukke ned om %2 sekunder. Ser du stadig noget?</translation>
     </message>
     <message>
         <source>Searching for installed XMLTV grabbers</source>
@@ -9541,7 +9545,7 @@ må ikke være tomt.</translation>
     </message>
     <message>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation>Som standard er det kun remote frontends der vises nedlukningsmulighederne i menuen.  Her kan du tvinge bestemte muligheder til at blive vist.</translation>
+        <translation>Som standard er det kun remote frontends der viser nedlukningsmulighederne i menuen.  Her kan du tvinge bestemte muligheder til at blive vist.</translation>
     </message>
     <message>
         <source>Reboot command</source>
@@ -10663,11 +10667,11 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Watched before UNwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Set før ikke set</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er valgt, vil programmer der er markeret som set udløbe før programmer der ikke er markeret som set.</translation>
     </message>
     <message>
         <source>Priority Weight</source>
@@ -10771,7 +10775,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Automatically mark a recording as watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Marker automatisk optagelser som set</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
@@ -11717,7 +11721,7 @@ mappen fra opbevaringsgruppen?</translation>
     </message>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation>MythTV bruger allerede alle tilgængelige inputs til at optage med.  Hvis du ønsker at se en udsendelse, der er i færd med at blive optaget, så vel et fra afspilnings menuen.  Hvis du ønsker at se direkte TV må du stoppe en af optagelserne fra sletnings menuen.</translation>
+        <translation>MythTV bruger allerede alle tilgængelige inputs til at optage med.  Hvis du ønsker at se en udsendelse, der er i færd med at blive optaget, så vælg en fra afspilningsmenuen.  Hvis du ønsker at se direkte TV, må du stoppe en af optagelserne fra slet-menuen.</translation>
     </message>
     <message>
         <source>No Lock</source>
