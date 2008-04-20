@@ -1215,16 +1215,21 @@ void IconView::CopyMarkedFiles(bool move)
 
 void IconView::ClearMenu(MythListButton *menu)
 {
-    if (!menu)
+    if (!menu || menu->IsEmpty())
         return;
 
-    MythListButtonItem *item = menu->GetItemFirst();
-    while (item)
+    for (int i = 0; i < menu->GetCount(); i++)
     {
-        MenuAction *act = (MenuAction*) item->getData();
-        if (act)
-            delete act;
-        item = menu->GetItemNext(item);
+        MythListButtonItem *item = menu->GetItemAt(i);
+        if (item)
+        {
+            MenuAction *act = (MenuAction*) item->getData();
+            if (act)
+            {
+                delete act;
+                item->setData(NULL);
+            }
+        }
     }
 }
 
