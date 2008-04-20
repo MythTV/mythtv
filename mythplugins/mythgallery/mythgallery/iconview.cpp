@@ -326,7 +326,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", event, actions);
 
-    for (uint i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -362,6 +362,11 @@ bool IconView::keyPressEvent(QKeyEvent *event)
             HandleSlideShow();
         else if (action == "RANDOMSHOW")
             HandleRandomShow();
+        else if (action == "ESCAPE")
+        {
+            if (!HandleEscape())
+                GetScreenStack()->PopScreen();
+        }
         else
             handled = false;
     }
