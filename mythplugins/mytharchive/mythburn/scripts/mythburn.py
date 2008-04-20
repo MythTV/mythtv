@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080325-1"
+VERSION="0.1.20080420-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2581,7 +2581,7 @@ def BurnDVDISO(title):
                 if drivespeed != 0:
                     command += "-speed=%d " % drivespeed
                 command += " -use-the-force-luke -Z " + dvddrivepath 
-                command += " -dvd-video -V " + title + " "
+                command += " -dvd-video -V " + quoteFilename(title) + " "
                 command += os.path.join(getTempPath(),'dvd')
             else:
                 command = path_growisofs[0] + " -dvd-compat "
