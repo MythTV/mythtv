@@ -355,7 +355,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", event, actions);
 
-    for (uint i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -641,7 +641,7 @@ void IconView::customEvent(QEvent *event)
 {
     ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
-    if (tge->type() == ThumbGenEvent::ImageReady)
+    if ((ThumbGenEvent::Type)tge->type() == ThumbGenEvent::ImageReady)
     {
         ThumbData *td = tge->thumbData;
         if (!td) return;
