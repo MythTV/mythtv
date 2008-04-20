@@ -81,7 +81,7 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Archive", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -839,22 +839,18 @@ void MythburnWizard::getThemeList(void)
     if (d.exists())
     {
         QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoList::const_iterator it = list.begin();
-        const QFileInfo *fi;
 
         int count = 0;
-        while (it != list.end())
+        for (int x = 0; x < list.size(); x++)
         {
-            fi = &(*it++);
-            // only include theme directory's with a preview image
-            if (QFile::exists(themeDir + fi->fileName() + "/preview.png"))
+            QFileInfo fi = list.at(x);
+            if (QFile::exists(themeDir + fi.fileName() + "/preview.png"))
             {
-                theme_list.append(fi->fileName());
+                theme_list.append(fi.fileName());
                 if (theme_selector)
-                    theme_selector->addItem(count, fi->fileName()); 
+                    theme_selector->addItem(count, fi.fileName());
                 ++count;
             }
-            ++it;
         }
 
         if (theme_selector)
