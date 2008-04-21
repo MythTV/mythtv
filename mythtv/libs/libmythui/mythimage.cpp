@@ -56,7 +56,7 @@ void MythImage::Resize(const QSize &newSize)
 {
     if (m_isGradient)
     {
-        *(QImage *)this = QImage(newSize, 32);
+        *(QImage *)this = QImage(newSize, QImage::Format_RGB32);
         MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha);
         SetChanged();
     }
@@ -132,7 +132,7 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin, const QColor &e
 MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
                                const QColor &end, uint alpha)
 {
-    QImage img(size.width(), size.height(), 32);
+    QImage img(size.width(), size.height(), QImage::Format_RGB32);
 
     MakeGradient(img, begin, end, alpha);
 
@@ -145,3 +145,7 @@ MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
     return ret;
 }
 
+void MythImage::Reflection()
+{
+
+}
