@@ -84,13 +84,6 @@ void WeatherCallback(void *data, QString &selection)
     }
     else if (selection == "SETTINGS_SCREEN")
     {
-        if (!srcMan)
-        {
-            srcMan = new SourceManager();
-        }
-        srcMan->clearSources();
-        srcMan->findScripts();
-
         ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup", srcMan);
 
         if (ssetup->Create())

@@ -25,8 +25,6 @@ SourceManager::SourceManager()
 {
     findScriptsDB();
     setupSources();
-    m_scripts.setAutoDelete(true);
-    m_sources.setAutoDelete(true);
 }
 
 bool SourceManager::findScriptsDB()
@@ -69,7 +67,7 @@ bool SourceManager::findScriptsDB()
         si->version = db.value(6).toString();
         si->email = db.value(7).toString();
         si->types = QStringList::split(",", db.value(8).toString());
-            m_scripts.append(si);
+        m_scripts.append(si);
     }
 
     return true;
@@ -139,7 +137,12 @@ bool SourceManager::findScripts()
 
 void SourceManager::clearSources()
 {
+    while (!m_scripts.isEmpty())
+        delete m_scripts.takeFirst();
     m_scripts.clear();
+
+    while (!m_sources.isEmpty())
+        delete m_sources.takeFirst();
     m_sources.clear();
 }
 
@@ -174,8 +177,9 @@ void SourceManager::setupSources()
 ScriptInfo *SourceManager::getSourceByName(const QString &name)
 {
     ScriptInfo *src = 0;
-    for (src = m_scripts.first(); src; src = m_scripts.next())
+    for (int x = 0; x < m_scripts.size(); x++)
     {
+        src = m_scripts.at(x);
         if (src->name == name)
         {
             return src;
@@ -213,8 +217,9 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
 {
     // matching source exists?
     WeatherSource *src;
-    for (src = m_sources.first(); src; src = m_sources.next())
+    for (int x = 0; x < m_sources.size(); x++)
     {
+        src = m_sources.at(x);
         if (src->getId() == id && src->getLocale() == loc &&
             src->getUnits() == units)
         {
@@ -224,8 +229,9 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
 
     // no matching source, make one
     ScriptInfo *si;
-    for (si = m_scripts.first(); si; si = m_scripts.next())
+    for (int x = 0; x < m_scripts.size(); x++)
     {
+        si = m_scripts.at(x);
         if (si->id == id)
         {
             WeatherSource *ws = new WeatherSource(si);
@@ -244,22 +250,29 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
 void SourceManager::startTimers()
 {
     WeatherSource *src;
-    for (src = m_sources.first(); src; src = m_sources.next())
+    for (int x = 0; x < m_sources.size(); x++)
+    {
+        src = m_sources.at(x);
         src->startUpdateTimer();
+    }
 }
 
 void SourceManager::stopTimers()
 {
     WeatherSource *src;
-    for (src = m_sources.first(); src; src = m_sources.next())
+    for (int x = 0; x < m_sources.size(); x++)
+    {
+        src = m_sources.at(x);
         src->stopUpdateTimer();
+    }
 }
 
 void SourceManager::doUpdate()
 {
     WeatherSource *src;
-    for (src = m_sources.first(); src; src = m_sources.next())
+    for (int x = 0; x < m_sources.size(); x++)
     {
+        src = m_sources.at(x);
         if (src->isRunning())
         {
             VERBOSE(VB_GENERAL, tr("Script %1 is still running when trying to do update, "
@@ -272,13 +285,13 @@ void SourceManager::doUpdate()
 }
 
 bool SourceManager::findPossibleSources(QStringList types,
-                                        Q3PtrList<ScriptInfo> &sources)
+                                        QList<ScriptInfo *> &sources)
 {
     ScriptInfo *si;
-    Q3PtrList<ScriptInfo> results;
     bool handled;
-    for (si = m_scripts.first(); si; si = m_scripts.next())
+    for (int x = 0; x < m_scripts.size(); x++)
     {
+        si = m_scripts.at(x);
         QStringList stypes = si->types;
         handled = true;
         int i;
@@ -287,16 +300,13 @@ bool SourceManager::findPossibleSources(QStringList types,
             handled = stypes.contains(types[i]);
         }
         if (handled)
-            results.append(si);
+            sources.append(si);
     }
 
-    if (results.count())
-    {
-        sources = results;
+    if (sources.count())
         return true;
-    }
-    else
-        return false;
+
+    return false;
 }
 
 bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
@@ -351,30 +361,27 @@ void SourceManager::recurseDirs( QDir dir )
 
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
     QFileInfoList files = dir.entryInfoList();
+    QFileInfo file;
 
-    QFileInfoList::const_iterator itr = files.begin();
-    const QFileInfo *file;
-
-    while (itr != files.end())
+    for (int x = 0; x < files.size(); x++)
     {
         qApp->processEvents();
-        file = &(*itr);
-        ++itr;
-        if (file->isDir())
+        file = files.at(x);
+        if (file.isDir())
         {
-            if (file->fileName() == QString("..")) continue;
-            if (file->fileName() == QString("."))  continue;
-            QDir recurseTo(file->filePath());
+            if (file.fileName() == QString("..")) continue;
+            if (file.fileName() == QString("."))  continue;
+            QDir recurseTo(file.filePath());
             recurseDirs(recurseTo);
         }
 
-        if (file->isExecutable() && !(file->isDir()))
+        if (file.isExecutable() && !(file.isDir()))
         {
-            ScriptInfo *info = WeatherSource::probeScript(*file);
+            ScriptInfo *info = WeatherSource::probeScript(file);
             if (info)
             {
                 m_scripts.append(info);
-                VERBOSE(VB_GENERAL, "found script " + file->absFilePath());
+                VERBOSE(VB_GENERAL, "found script " + file.absFilePath());
             }
         }
     }

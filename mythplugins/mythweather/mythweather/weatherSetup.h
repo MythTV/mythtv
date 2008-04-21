@@ -87,6 +87,7 @@ class ScreenSetup : public MythScreenType
 
   private:
     SourceManager *m_sourceManager;
+    bool m_createdSrcMan;
     MythUIText *m_helpText;
     MythListButton *m_activeList;
     MythListButton *m_inactiveList;

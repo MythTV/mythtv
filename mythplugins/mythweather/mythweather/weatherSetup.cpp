@@ -91,13 +91,24 @@ void GlobalSetup::saveData()
 ScreenSetup::ScreenSetup(MythScreenStack *parent, const char *name,
                          SourceManager *srcman) : MythScreenType(parent, name)
 {
-    m_sourceManager = srcman;
+    if (!srcman)
+    {
+        m_sourceManager = new SourceManager();
+        m_createdSrcMan = true;
+    }
+    else
+    {
+        m_sourceManager = srcman;
+        m_createdSrcMan = false;
+    }
+
+    m_sourceManager->clearSources();
+    m_sourceManager->findScripts();
 }
 
 ScreenSetup::~ScreenSetup()
 {
-
-    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
+    if (m_createdSrcMan)
     {
         if (m_sourceManager)
             delete m_sourceManager;
@@ -108,7 +119,6 @@ ScreenSetup::~ScreenSetup()
         m_sourceManager->findScriptsDB();
         m_sourceManager->setupSources();
     }
-
 }
 
 bool ScreenSetup::Create()
@@ -280,15 +290,15 @@ void ScreenSetup::loadData()
             type_strs << types[typei];
         }
 
-        Q3PtrList<ScriptInfo> scriptList;
+        QList<ScriptInfo *> scriptList;
         // Only add a screen to the list if we have a source
         // available to satisfy the requirements.
         if (m_sourceManager->findPossibleSources(type_strs, scriptList))
         {
             ScriptInfo *script;
-            for (script = scriptList.first(); script;
-                                        script = scriptList.next())
+            for (int x = 0; x < scriptList.size(); x++)
             {
+                script = scriptList.at(x);
                 si->sources.append(script->name);
             }
             MythListButtonItem *item =
@@ -517,9 +527,8 @@ void ScreenSetup::doListSelect(MythListButtonItem *selected)
             type_strs << it.currentKey();
         }
         bool hasUnits = si->hasUnits;
-        bool multiLoc = si->multiLoc;
 
-        Q3PtrList<ScriptInfo> tmp;
+        QList<ScriptInfo *> tmp;
         if (m_sourceManager->findPossibleSources(type_strs, tmp))
         {
             ScreenListInfo *newsi = new ScreenListInfo(*si);
@@ -922,13 +931,14 @@ void LocationDialog::doSearch()
     m_resultsText->SetText(searchingresults.arg(0));
     qApp->processEvents();
 
-    Q3PtrList<ScriptInfo> sources;
+    QList<ScriptInfo *> sources;
     // if a screen makes it this far, theres at least one source for it
     m_sourceManager->findPossibleSources(m_types, sources);
     QString search = m_locationEdit->GetText();
     ScriptInfo *si;
-    for (si = sources.first(); si; si = sources.next())
+    for (int x = 0; x < sources.size(); x++)
     {
+        si = sources.at(x);
         if (!result_cache.contains(si))
         {
             QStringList results = m_sourceManager->getLocationList(si, search);

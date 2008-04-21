@@ -26,7 +26,7 @@ class SourceManager : public QObject
     void startTimers();
     void stopTimers();
     void doUpdate();
-    bool findPossibleSources(QStringList types, Q3PtrList<ScriptInfo> &sources);
+    bool findPossibleSources(QStringList types, QList<ScriptInfo *> &sources);
     void clearSources();
     bool findScripts();
     bool findScriptsDB();
@@ -39,8 +39,8 @@ class SourceManager : public QObject
     void timeout(void) {}
 
   private:
-    Q3PtrList<ScriptInfo> m_scripts; //all scripts
-    Q3PtrList<WeatherSource> m_sources; //in-use scripts
+    QList<ScriptInfo *>      m_scripts;  //all scripts
+    QList<WeatherSource *>   m_sources;  //in-use scripts
     Q3IntDict<WeatherSource> m_sourcemap;
     units_t m_units;
     void recurseDirs(QDir dir);

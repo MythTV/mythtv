@@ -25,7 +25,19 @@ Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMa
     m_paused = false;
 
     m_firstRun = true;
-    m_srcMan = srcMan;
+
+    if (!srcMan)
+    {
+        m_srcMan = new SourceManager();
+        m_srcMan->startTimers();
+        m_srcMan->doUpdate();
+        m_createdSrcMan = true;
+    }
+    else
+    {
+        m_srcMan = srcMan;
+        m_createdSrcMan = false;
+    }
 
     m_pauseText = m_headerText = NULL;
 
@@ -39,10 +51,8 @@ Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMa
 
 Weather::~Weather()
 {
-    if (!gContext->GetNumSetting("weatherbackgroundfetch", 0))
-    {
+    if (m_createdSrcMan)
         delete m_srcMan;
-    }
 
     for (WeatherScreen *screen = m_screens.first(); screen;
          screen = m_screens.next())

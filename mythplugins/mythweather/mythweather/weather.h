@@ -61,6 +61,7 @@ class Weather : public MythScreenType
 
     bool m_gotDataHook;
 
+    bool m_createdSrcMan;
     SourceManager *m_srcMan;
     Q3PtrList<WeatherScreen> m_screens; //screens in correct display order
 
