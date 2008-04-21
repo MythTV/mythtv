@@ -50,7 +50,7 @@ void VideoSelector::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Burn", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -503,7 +503,7 @@ void VideoSelector::getVideoList(void)
         category_selector->setToItem(0);
     }
 
-    for (uint x = 1; x <= categories.count(); x++)
+    for (int x = 1; x <= categories.count(); x++)
     {
         if (category_selector)
             category_selector->addItem(x, categories[x-1]); 
