@@ -144,8 +144,3 @@ MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
     ret->m_gradAlpha = alpha;
     return ret;
 }
-
-void MythImage::Reflection()
-{
-
-}
