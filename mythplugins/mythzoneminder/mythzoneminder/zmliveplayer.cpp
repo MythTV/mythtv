@@ -144,7 +144,7 @@ void ZMLivePlayer::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -249,7 +249,7 @@ void ZMLivePlayer::updateFrame()
             monList.append(p->getMonitor()->id);
     }
 
-    for (uint x = 0; x < monList.count(); x++)
+    for (int x = 0; x < monList.count(); x++)
     {
         QString status;
         int frameSize = zm->getLiveFrame(monList[x], status, buffer, sizeof(buffer));

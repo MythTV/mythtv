@@ -89,7 +89,7 @@ void ZMEvents::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -426,7 +426,7 @@ void ZMEvents::getCameraList(void)
         m_cameraSelector->addItem(0, tr("All Cameras"));
         m_cameraSelector->setToItem(0);
 
-        for (uint x = 1; x <= cameraList.count(); x++)
+        for (int x = 1; x <= cameraList.count(); x++)
         {
             m_cameraSelector->addItem(x, cameraList[x-1]);
         }
@@ -462,7 +462,7 @@ void ZMEvents::getDateList(void)
         m_dateSelector->addItem(0, tr("All Dates"));
         m_dateSelector->setToItem(0);
 
-        for (uint x = 1; x <= m_dateList.count(); x++)
+        for (int x = 1; x <= m_dateList.count(); x++)
         {
             QDate date = QDate::fromString(m_dateList[x-1], Qt::ISODate);
             m_dateSelector->addItem(x, date.toString(dateFormat));
