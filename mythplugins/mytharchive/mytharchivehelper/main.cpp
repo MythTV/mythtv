@@ -314,7 +314,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
     QDomElement elem;
     QString type = "";
 
-    for (uint x = 0; x < nodeList.count(); x++)
+    for (int x = 0; x < nodeList.count(); x++)
     {
         node = nodeList.item(x);
         elem = node.toElement();
@@ -1209,7 +1209,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode, const QString &x
         }
         else
         {
-            for (uint x = 0; x < nodeList.count(); x++)
+            for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
@@ -1252,7 +1252,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode, const QString &x
         }
         else
         {
-            for (uint x = 0; x < nodeList.count(); x++)
+            for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
@@ -1310,7 +1310,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     QString origFilename = findNodeText(videoNode, "filename");
     QStringList dirList = QStringList::split("/", origFilename);
     QDir dir;
-    for (uint x = 0; x < dirList.count() - 1; x++)
+    for (int x = 0; x < dirList.count() - 1; x++)
     {
         path += "/" + dirList[x];
         if (!dir.exists(path))
@@ -1424,7 +1424,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         }
         else
         {
-            for (uint x = 0; x < nodeList.count(); x++)
+            for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
@@ -1495,7 +1495,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         }
         else
         {
-            for (uint x = 0; x < nodeList.count(); x++)
+            for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
