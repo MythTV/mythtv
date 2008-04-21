@@ -1,6 +1,6 @@
 include ( ../../mythconfig.mak )
 include (../../settings.pro )
-
+ 
 TEMPLATE = app
 
 CONFIG -= qt

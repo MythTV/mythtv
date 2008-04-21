@@ -23,8 +23,6 @@
 #include <map>
 #include <mysql/mysql.h>
 
-#include "config.h"
-
 using namespace std;
 
 extern void loadZMConfig(const string &configfile);
@@ -77,6 +75,7 @@ typedef struct
 
 typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
 
+// use this for ZM version 1.22.2
 typedef struct
 {
     int size;
@@ -84,11 +83,18 @@ typedef struct
     int trigger_score;
     char trigger_cause[32];
     char trigger_text[256];
-#ifdef ZMVERSION_1_22_2
     char trigger_showtext[32];
-#else
+} TriggerData_old;
+
+// use this for ZM version 1.22.3 and later
+typedef struct
+{
+    int size;
+    TriggerState trigger_state;
+    int trigger_score;
+    char trigger_cause[32];
+    char trigger_text[256];
     char trigger_showtext[256];
-#endif
 } TriggerData;
 
 typedef struct

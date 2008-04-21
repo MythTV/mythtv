@@ -1262,10 +1262,19 @@ void ZMServer::initMonitor(MONITOR *monitor)
     else
         monitor->frame_size = monitor->width * monitor->height * 3;
 
-    int shared_data_size = sizeof(SharedData) +
+    int shared_data_size;
+
+    if (g_zmversion == "1.22.2")
+        shared_data_size = sizeof(SharedData) +
+            sizeof(TriggerData_old) +
+            ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
+            ((monitor->image_buffer_count) * monitor->frame_size);
+    else
+        shared_data_size = sizeof(SharedData) +
             sizeof(TriggerData) +
             ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
             ((monitor->image_buffer_count) * monitor->frame_size);
+
     int shmid;
 
     if ((shmid = shmget((m_shmKey & 0xffffff00) | monitor->mon_id,
@@ -1299,7 +1308,13 @@ void ZMServer::initMonitor(MONITOR *monitor)
 
     monitor->shared_data = (SharedData*)shm_ptr;
 
-    monitor->shared_images = (unsigned char*) shm_ptr +
+    if (g_zmversion == "1.22.2")
+        monitor->shared_images = (unsigned char*) shm_ptr +
+            sizeof(SharedData) +
+            sizeof(TriggerData_old) +
+            ((monitor->image_buffer_count) * sizeof(struct timeval));
+    else
+        monitor->shared_images = (unsigned char*) shm_ptr +
             sizeof(SharedData) +
             sizeof(TriggerData) +
             ((monitor->image_buffer_count) * sizeof(struct timeval));

@@ -204,23 +204,6 @@ int main(int argc, char **argv)
     // load the config 
     loadZMConfig(zmconfig);
 
-    // check we are configured for the correct ZM version
-#ifdef ZMVERSION_1_22_2
-    if (g_zmversion != "1.22.2")
-    {
-        cout << "The ZM config file says it is version '" << g_zmversion << "'" << endl
-             << "but we are configured for version '1.22.2'. Bailing out." << endl;
-        return EXIT_VERSION_ERROR;
-    }
-#else
-    if (g_zmversion != "1.22.3")
-    {
-        cout << "The ZM config file says it is version '" << g_zmversion << "'" << endl
-             << "but we are configured for version '1.22.3'. Bailing out." << endl;
-        return EXIT_VERSION_ERROR;
-    }
-#endif
-
     cout << "ZM is version '" << g_zmversion << "'" << endl;
 
     // connect to the DB
