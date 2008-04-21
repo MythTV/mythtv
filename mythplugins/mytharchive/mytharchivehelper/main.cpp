@@ -2188,7 +2188,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 // change any streams identified as "liba52" to "AC3" which is what
                 // the mythburn.py script expects to get.
-                if (codec.stripWhiteSpace().toLower() == "liba52")
+                if (codec.stripWhiteSpace().lower() == "liba52")
                     stream.setAttribute("codec", "AC3");
                 else
                     stream.setAttribute("codec", codec.stripWhiteSpace());
