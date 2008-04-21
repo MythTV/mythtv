@@ -131,7 +131,7 @@ bool MythUIButton::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "textflags" || element.tagName() == "align")
     {
-        QString align = getFirstText(element).lower();
+        QString align = getFirstText(element).toLower();
 
         m_textFlags = m_textFlags & Qt::WordBreak;
 

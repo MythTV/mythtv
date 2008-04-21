@@ -1340,12 +1340,12 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
                 {
                     text = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() == 
+                else if (info.attribute("lang","").toLower() == 
                          gContext->GetLanguageAndVariant())
                 {
                     text = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() == 
+                else if (info.attribute("lang","").toLower() == 
                          gContext->GetLanguage())
                 {
                     text = getFirstText(info);
@@ -1358,12 +1358,12 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
                 {
                     alttext = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() == 
+                else if (info.attribute("lang","").toLower() == 
                          gContext->GetLanguageAndVariant())
                 {
                     alttext = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          gContext->GetLanguage())
                 {
                     alttext = getFirstText(info);

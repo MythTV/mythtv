@@ -30,7 +30,7 @@ QString XMLParseBase::getFirstText(QDomElement &element)
 
 bool XMLParseBase::parseBool(const QString &text)
 {
-    QString s = text.lower();
+    QString s = text.toLower();
     return (s == "yes" || s == "true" || s.toInt());
 }
 
@@ -115,7 +115,7 @@ int XMLParseBase::parseAlignment(const QString &text)
 
         QString align = *it;
         align = align.stripWhiteSpace();
-        align = align.lower();
+        align = align.toLower();
 
         if (align == "center" || align == "allcenter")
         {

@@ -18,7 +18,7 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    QString key = name.lower();
+    QString key = name.toLower();
     if (m_ObjectsByName.contains(key) || !image)
         return false;
 
@@ -30,7 +30,7 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 
 bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
-    QString key = name.lower();
+    QString key = name.toLower();
     if (m_ObjectsByName.contains(key) || !object)
         return false;
 
@@ -74,7 +74,7 @@ bool MythUIStateType::DisplayState(const QString &name)
 {
     MythUIType *old = m_CurrentState;
 
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.lower());
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.data();
     else
@@ -150,8 +150,8 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         m_ShowEmpty = parseBool(element);
     else if (element.tagName() == "state")
     {
-        QString name = element.attribute("name", "").lower();
-        QString type = element.attribute("type", "").lower();
+        QString name = element.attribute("name", "").toLower();
+        QString type = element.attribute("type", "").toLower();
 
         MythUIType *uitype = ParseChildren(element, this);
 

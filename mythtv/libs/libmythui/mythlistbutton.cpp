@@ -980,7 +980,7 @@ bool MythListButton::ParseElement(QDomElement &element)
         m_Area = parseRect(element);
     else if (element.tagName() == "layout")
     {
-        QString layout = getFirstText(element).lower();
+        QString layout = getFirstText(element).toLower();
 
         if (layout == "grid")
             m_layout = LayoutGrid;
@@ -1061,7 +1061,7 @@ bool MythListButton::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "textflags" || element.tagName() == "align")
     {
-        QString align = getFirstText(element).lower();
+        QString align = getFirstText(element).toLower();
 
         m_textFlags = m_textFlags & Qt::WordBreak;
 
