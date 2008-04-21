@@ -2187,7 +2187,14 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 QDomElement stream = doc.createElement("audio");
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
-                stream.setAttribute("codec", codec.stripWhiteSpace());
+
+                // change any streams identified as "liba52" to "AC3" which is what
+                // the mythburn.py script expects to get.
+                if (codec.stripWhiteSpace().toLower() == "liba52")
+                    stream.setAttribute("codec", "AC3");
+                else
+                    stream.setAttribute("codec", codec.stripWhiteSpace());
+
                 stream.setAttribute("channels", st->codec->channels);
                 if (strlen(st->language) > 0)
                     stream.setAttribute("language", st->language);
