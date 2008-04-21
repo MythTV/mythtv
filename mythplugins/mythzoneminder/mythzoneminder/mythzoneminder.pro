@@ -17,5 +17,5 @@ SOURCES += zmsettings.cpp zmclient.cpp
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
-#The following line was inserted by qt3to4
+
 QT += opengl sql xml qt3support

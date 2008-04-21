@@ -15,15 +15,17 @@
 #ifndef ZMCONSOLE_H
 #define ZMCONSOLE_H
 
+// qt
+#include <QKeyEvent>
 
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
 
+// zm
 #include "zmdefines.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 class ZMConsole : public MythThemedDialog
 {

@@ -15,7 +15,10 @@
 #ifndef ZMLIVEPLAYER_H
 #define ZMLIVEPLAYER_H
 
+// qt
+#include <QKeyEvent>
 
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
@@ -34,8 +37,6 @@
 
 // mythzoneminder
 #include "zmdefines.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 class Player
 {

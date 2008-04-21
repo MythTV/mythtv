@@ -20,8 +20,6 @@
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
-#include <q3process.h>
-//Added by qt3to4:
 #include <QKeyEvent>
 
 // myth

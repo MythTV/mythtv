@@ -21,7 +21,6 @@
 #include <qtimer.h>
 #include <qsqlquery.h>
 #include <qsqldatabase.h>
-//Added by qt3to4:
 #include <QKeyEvent>
 #include <Q3ValueList>
 

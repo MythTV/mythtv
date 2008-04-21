@@ -15,6 +15,10 @@
 #ifndef ZMEVENTS_H
 #define ZMEVENTS_H
 
+// qt
+#include <QPixmap>
+#include <QKeyEvent>
+
 // mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
@@ -23,9 +27,6 @@
 
 // zm
 #include <zmdefines.h>
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
 
 class ZMEvents : public MythThemedDialog
 {

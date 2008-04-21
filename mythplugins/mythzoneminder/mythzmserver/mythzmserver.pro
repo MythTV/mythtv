@@ -1,6 +1,6 @@
 include ( ../../mythconfig.mak )
 include (../../settings.pro )
- 
+
 TEMPLATE = app
 
 CONFIG -= qt
@@ -16,5 +16,3 @@ LIBS = $$system(mysql_config --libs)
 HEADERS += zmserver.h
 
 SOURCES += main.cpp zmserver.cpp
-#The following line was inserted by qt3to4
-QT +=  qt3support 

@@ -19,10 +19,7 @@
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
-#include <q3process.h>
 #include <qapplication.h>
-//Added by qt3to4:
-#include <Q3Frame>
 #include <QPixmap>
 #include <QLabel>
 #include <QKeyEvent>

@@ -15,6 +15,9 @@
 #ifndef ZMPLAYER_H
 #define ZMPLAYER_H
 
+// qt
+#include <QKeyEvent>
+
 // myth
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
@@ -34,8 +37,6 @@
 
 // zm
 #include "zmdefines.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 class ZMPlayer : public MythThemedDialog
 {
