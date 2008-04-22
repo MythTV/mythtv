@@ -18,7 +18,12 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
+    /// This empty constructor is needed for the QMap<> to work, it is
+    /// not intended to be used to initialize an ATSC Event.
+    /// Since we immediately initialize the value insterted into the
+    /// QMap this is safe in that use.
     ATSCEvent() {}
+    /// This is the only valid constructor for ATSCEvent.
     ATSCEvent(uint a, uint b, uint c, QString d,
               const unsigned char *e, uint f)
         : start_time(a), length(b), etm(c), desc_length(f), title(d), desc(e)
