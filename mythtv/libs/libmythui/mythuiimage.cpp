@@ -63,7 +63,7 @@ void MythUIImage::Clear(void)
 
 void MythUIImage::Init(void)
 {
-    m_Skip = QPoint(0, 0);
+    m_cropRect = QRect(0,0,0,0);
     m_ForceSize = QSize(-1, -1);
 
     m_CurPos = 0;
@@ -142,9 +142,9 @@ void MythUIImage::SetSize(int width, int height)
     m_ForceSize = QSize(width, height);
 }
 
-void MythUIImage::SetSkip(int x, int y)
+void MythUIImage::SetCropRect(int x, int y, int width, int height)
 {
-    m_Skip = QPoint(x, y);
+    m_cropRect = QRect(x, y, width, height);
 }
 
 bool MythUIImage::Load(void)
@@ -222,11 +222,14 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         QRect area = m_Area;
         area.moveBy(xoffset, yoffset);
-    
+
         int alpha = CalcAlpha(alphaMod); 
 
-        QRect srcRect = m_Images[m_CurPos]->rect();
-        srcRect.setTopLeft(m_Skip);
+        QRect srcRect;
+        if (!m_cropRect.isEmpty())
+            srcRect = m_cropRect;
+        else
+            srcRect = m_Images[m_CurPos]->rect();
 
         p->DrawImage(area, m_Images[m_CurPos], srcRect, alpha);
     }
@@ -248,8 +251,8 @@ bool MythUIImage::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "staticsize")
         m_ForceSize = parseSize(element);
-    else if (element.tagName() == "skipin")
-        m_Skip = parsePoint(element);
+    else if (element.tagName() == "crop")
+        m_cropRect = parseRect(element);
     else if (element.tagName() == "delay")
         m_Delay = getFirstText(element).toInt();
     else if (element.tagName() == "reflection")
@@ -292,7 +295,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_Filename = im->m_Filename;
     m_OrigFilename = im->m_OrigFilename;
 
-    m_Skip = im->m_Skip;
+    m_cropRect = im->m_cropRect;
     m_ForceSize = im->m_ForceSize;
 
     m_Delay = im->m_Delay;
