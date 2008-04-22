@@ -15,6 +15,7 @@
 #include "frequencytables.h"
 #include "streamlisteners.h"
 #include "dvbconfparser.h"
+#include "signalmonitorlistener.h"
 
 class MSqlQuery;
 
@@ -40,7 +41,8 @@ typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 class SIScan : public QObject,
                public MPEGStreamListener,
                public ATSCMainStreamListener,
-               public DVBMainStreamListener
+               public DVBMainStreamListener,
+               public SignalMonitorListener
 {
     Q_OBJECT
   public:
@@ -63,7 +65,7 @@ class SIScan : public QObject,
 
     bool ScanServicesSourceID(int SourceID);
 
-    void SetAnalog(bool is_analog);
+    void SetAnalog(bool is_analog)    { isAnalog                = is_analog; }
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
     void SetTVOnly(bool _tvOnly)
@@ -97,11 +99,13 @@ class SIScan : public QObject,
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
     void HandleTDT(const TimeDateTable*) {}
 
+    // SignalMonitorListener
+    virtual void AllGood(void);
+    virtual void StatusSignalLock(const SignalMonitorValue&) { }
+    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
+
   public slots:
     void deleteLater(void);
-
-  private slots:
-    void HandleAllGood(void);
 
   signals:
     // Values from 1-100 of scan completion
@@ -189,6 +193,7 @@ class SIScan : public QObject,
     QString           inputname;
 
     // Settable
+    bool              isAnalog;
     bool              ignoreAudioOnlyServices;
     bool              ignoreDataServices;
     bool              ignoreEncryptedServices;

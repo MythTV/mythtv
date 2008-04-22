@@ -35,13 +35,11 @@
  *                    is called.
  *  \param _channel HDHRChannel for card
  *  \param _flags   Flags to start with
- *  \param _name    Name for Qt signal debugging
  */
-HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
-                                     HDHRChannel* _channel,
-                                     uint64_t _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
-      dtvMonitorRunning(false)
+HDHRSignalMonitor::HDHRSignalMonitor(
+    int db_cardnum, HDHRChannel* _channel, uint64_t _flags) :
+    DTVSignalMonitor(db_cardnum, _channel, _flags),
+    dtvMonitorRunning(false)
 {
     VERBOSE(VB_CHANNEL, LOC + "ctor");
 
@@ -49,7 +47,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     signalStrength.SetThreshold(45);
 
-    AddFlags(kDTVSigMon_WaitForSig);
+    AddFlags(kSigMon_WaitForSig);
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()
@@ -59,13 +57,6 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     VERBOSE(VB_CHANNEL, LOC + "dtor");
     Stop();
-}
-
-void HDHRSignalMonitor::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    Stop();
-    DTVSignalMonitor::deleteLater();
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)
@@ -206,9 +197,9 @@ void HDHRSignalMonitor::UpdateValues(void)
 
     if (dtvMonitorRunning)
     {
-        EmitHDHRSignals();
+        EmitStatus();
         if (IsAllGood())
-            emit AllGood();
+            SendMessageAllGood();
         // TODO dtv signals...
 
         update_done = true;
@@ -242,9 +233,9 @@ void HDHRSignalMonitor::UpdateValues(void)
         isLocked = signalLock.IsGood();
     }
 
-    EmitHDHRSignals();
+    EmitStatus();
     if (IsAllGood())
-        emit AllGood();
+        SendMessageAllGood();
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
@@ -268,22 +259,3 @@ void HDHRSignalMonitor::UpdateValues(void)
 
     update_done = true;
 }
-
-#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
-    do { statusLock.lock(); \
-         SignalMonitorValue val = SIGNAL_VAL; \
-         statusLock.unlock(); \
-         emit SIGNAL_FUNC(val); } while (false)
-
-/** \fn HDHRSignalMonitor::EmitHDHRSignals(void)
- *  \brief Emits signals for lock, signal strength, etc.
- */
-void HDHRSignalMonitor::EmitHDHRSignals(void)
-{
-    // Emit signals..
-    EMIT(StatusSignalLock, signalLock); 
-    if (HasFlags(kDTVSigMon_WaitForSig))
-        EMIT(StatusSignalStrength, signalStrength);
-}
-
-#undef EMIT

@@ -15,6 +15,7 @@
 #include "mythdeque.h"
 #include "programinfo.h"
 #include "tv.h"
+#include "signalmonitorlistener.h"
 
 #include "mythconfig.h"
 
@@ -149,10 +150,10 @@ class PendingInfo
 };
 typedef QMap<uint,PendingInfo> PendingMap;
 
-class MPUBLIC TVRec : public QObject
+class MPUBLIC TVRec : public SignalMonitorListener
 {
     friend class TuningRequest;
-    Q_OBJECT
+
   public:
     TVRec(int capturecardnum);
    ~TVRec(void);
@@ -244,9 +245,9 @@ class MPUBLIC TVRec : public QObject
 
     static TVRec *GetTVRec(uint cardid);
 
-  public slots:
-    void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
-    void deleteLater(void);
+    virtual void AllGood(void) { triggerEventLoop.wakeAll(); }
+    virtual void StatusSignalLock(const SignalMonitorValue&) { }
+    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
 
   protected:
     void RunTV(void);

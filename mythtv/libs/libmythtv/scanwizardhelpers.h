@@ -67,8 +67,11 @@ class ScanProgressPopup : public ConfigurationPopupDialog
 
   public:
     ScanProgressPopup(bool lock, bool strength, bool snr);
+    virtual void deleteLater(void);
 
+    void CreateDialog(void);
     virtual DialogCode exec(void);
+    void DeleteDialog(void);
 
     void SetStatusSignalToNoise(int value);
     void SetStatusSignalStrength(int value);
@@ -79,7 +82,7 @@ class ScanProgressPopup : public ConfigurationPopupDialog
     void SetStatusTitleText(const QString &value);
 
   private slots:
-    void PopupDone(int);
+    void Done(void);
 
   private:
     ~ScanProgressPopup();
@@ -108,18 +111,25 @@ class ScannerEvent : public QEvent
         SetStatusText,
         SetStatusTitleText,
         SetPercentComplete,
+        SetStatusRotorPosition,
         SetStatusSignalToNoise,
         SetStatusSignalStrength,
         SetStatusSignalLock,
     };
 
-    ScannerEvent(TYPE t) : QEvent( (QEvent::Type)(t + QEvent::User)) { ; }
+    ScannerEvent(TYPE t) :
+        QEvent((QEvent::Type)(t + QEvent::User)),
+        str(""), intvalue(0), spp_ptr(NULL) { ; }
 
     QString strValue()              const { return str; }
     void    strValue(const QString& _str) { str = _str; }
 
     int     intValue()        const { return intvalue; }
     void    intValue(int _intvalue) { intvalue = _intvalue; }
+
+    ScanProgressPopup *ScanProgressPopupValue() const { return spp_ptr; }
+    void    ScanProgressPopupValue(ScanProgressPopup *_spp_ptr)
+        { spp_ptr = _spp_ptr; }
 
     TYPE    eventType()       const { return (TYPE)(type()-QEvent::User); }
 
@@ -129,7 +139,13 @@ class ScannerEvent : public QEvent
   private:
     QString str;
     int     intvalue;
+    ScanProgressPopup *spp_ptr;
 };
+
+void post_event(QObject *dest, ScannerEvent::TYPE type, int val);
+void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val);
+void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
+                ScanProgressPopup *spp);
 
 // ///////////////////////////////
 // Settings Below Here

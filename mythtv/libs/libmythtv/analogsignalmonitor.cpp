@@ -13,21 +13,15 @@
 #define LOC QString("AnalogSM: ").arg(channel->GetDevice())
 #define LOC_ERR QString("AnalogSM, Error: ").arg(channel->GetDevice())
 
-AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum, Channel *_channel,
-                                         uint64_t _flags, const char *_name) :
-    SignalMonitor(db_cardnum, _channel, _flags, _name),
+AnalogSignalMonitor::AnalogSignalMonitor(
+    int db_cardnum, Channel *_channel, uint64_t _flags) :
+    SignalMonitor(db_cardnum, _channel, _flags),
     usingv4l2(false)
 {
     int videofd = channel->GetFd();
     if (videofd >= 0)
         usingv4l2 = CardUtil::hasV4L2(videofd);
 }
-
-#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
-    do { statusLock.lock(); \
-         SignalMonitorValue val = SIGNAL_VAL; \
-         statusLock.unlock(); \
-         emit SIGNAL_FUNC(val); } while (false)
 
 void AnalogSignalMonitor::UpdateValues(void)
 {
@@ -76,11 +70,8 @@ void AnalogSignalMonitor::UpdateValues(void)
         signalStrength.SetValue(isLocked ? 100 : 0);
     }
 
-    EMIT(StatusSignalLock, signalLock);
-    EMIT(StatusSignalStrength, signalStrength);
-
+    EmitStatus();
     if (IsAllGood())
-        emit AllGood();
+        SendMessageAllGood();
 }
 
-#undef EMIT

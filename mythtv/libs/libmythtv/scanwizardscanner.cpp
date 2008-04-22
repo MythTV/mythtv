@@ -4,13 +4,11 @@
  * Original Project
  *      MythTV      http://www.mythtv.org
  *
- * Author(s):
- *      John Pullan  (john@pullan.org)
+ * Copyright (c) 2004, 2005 John Pullan <john@pullan.org>
+ * Copyright (c) 2005 - 2007 Daniel Kristjansson
  *
  * Description:
- *     Collection of classes to provide dvb channel scanning
- *     functionallity
- *
+ *     Collection of classes to provide channel scanning functionallity
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -86,13 +84,6 @@ static void init_statics(void)
     }
 }
 
-void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
-{
-    ScannerEvent* e = new ScannerEvent(type);
-    e->intValue(val);
-    QApplication::postEvent(dest, e);
-}
-
 ScanWizardScanner::ScanWizardScanner(void)
     : VerticalConfigurationGroup(false, true, false, false),
       log(new LogList()), channel(NULL), popupProgress(NULL),
@@ -156,6 +147,13 @@ void ScanWizardScanner::customEvent(QEvent *e)
 
         case ScannerEvent::ScanShutdown:
         {
+            if (scanEvent->ScanProgressPopupValue())
+            {
+                ScanProgressPopup *spp = scanEvent->ScanProgressPopupValue();
+                spp->DeleteDialog();
+                spp->deleteLater();
+            }
+
             Teardown();
         }
         break;
@@ -241,17 +239,17 @@ void ScanWizardScanner::updateStatusText(const QString &str)
     QApplication::postEvent(this, e);
 }
 
-void ScanWizardScanner::dvbLock(const SignalMonitorValue &val)
+void ScanWizardScanner::StatusSignalLock(const SignalMonitorValue &val)
 {
     dvbLock(val.GetValue());
 }
 
-void ScanWizardScanner::dvbSNR(const SignalMonitorValue &val)
+void ScanWizardScanner::StatusSignalToNoise(const SignalMonitorValue &val)
 {
     dvbSNR(val.GetNormalizedValue(0, 65535));
 }
 
-void ScanWizardScanner::dvbSignalStrength(const SignalMonitorValue &val)
+void ScanWizardScanner::StatusSignalStrength(const SignalMonitorValue &val)
 {
     dvbSignalStrength(val.GetNormalizedValue(0, 65535));
 }
@@ -567,28 +565,11 @@ void ScanWizardScanner::PreScanCommon(int scantype,
     // Signal Meters are connected here
     SignalMonitor *monitor = scanner->GetSignalMonitor();
     if (monitor)
-    {
-        connect(monitor,
-                SIGNAL(StatusSignalLock(const SignalMonitorValue&)),
-                this,
-                SLOT(  dvbLock(         const SignalMonitorValue&)));
-        connect(monitor,
-                SIGNAL(StatusSignalStrength(const SignalMonitorValue&)),
-                this,
-                SLOT(  dvbSignalStrength(   const SignalMonitorValue&)));
-    }
-
+        monitor->AddListener(this);
+    
     DVBSignalMonitor *dvbm = NULL;
-
 #ifdef USING_DVB
     dvbm = scanner->GetDVBSignalMonitor();
-    if (dvbm)
-    {
-        connect(dvbm,
-                SIGNAL(StatusSignalToNoise(const SignalMonitorValue&)),
-                this,
-                SLOT(  dvbSNR(const SignalMonitorValue&)));
-    }
 #endif // USING_DVB
 
     MonitorProgress(monitor, monitor, dvbm);
@@ -633,12 +614,8 @@ void ScanWizardScanner::RunPopup(void)
 {
     DialogCode ret = popupProgress->exec();
 
-    popupLock.lock();
-    popupProgress->deleteLater();
+    post_event(this, ScannerEvent::ScanShutdown, ret, popupProgress);
     popupProgress = NULL;
-    popupLock.unlock();
-
-    post_event(this, ScannerEvent::ScanShutdown, ret);
 }
 
 void ScanWizardScanner::StopPopup(void)
@@ -657,8 +634,11 @@ void ScanWizardScanner::MonitorProgress(bool lock, bool strength, bool snr)
     QMutexLocker locker(&popupLock);
     StopPopup();
     popupProgress = new ScanProgressPopup(lock, strength, snr);
+    popupProgress->CreateDialog();
     if (pthread_create(&popup_thread, NULL, spawn_popup, this) != 0)
     {
+        VERBOSE(VB_IMPORTANT, "Failed to start MonitorProgress thread");
+        popupProgress->DeleteDialog();
         popupProgress->deleteLater();
         popupProgress = NULL;
     }

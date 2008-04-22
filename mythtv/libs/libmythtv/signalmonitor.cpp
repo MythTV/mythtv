@@ -150,11 +150,10 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *         is called.
  *  \param _channel      ChannelBase class for our monitoring
  *  \param wait_for_mask SignalMonitorFlags to start with.
- *  \param name          Instance name for Qt signal/slot debugging
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
-                             uint64_t wait_for_mask,  const char *name)
-    : QObject(NULL, name),             channel(_channel),
+                             uint64_t wait_for_mask)
+    : channel(_channel),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25),                 minimum_update_rate(5),
       running(false),                  exit(false),
@@ -173,16 +172,6 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
 SignalMonitor::~SignalMonitor()
 {
     Stop();
-}
-
-/** \fn SignalMonitor::deleteLater(void)
- *  \brief Safer alternative to just deleting signal monitor directly.
- */
-void SignalMonitor::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    Stop();
-    QObject::deleteLater();
 }
 
 void SignalMonitor::AddFlags(uint64_t _flags)
@@ -278,7 +267,7 @@ QStringList SignalMonitor::GetStatusList(bool kick)
     QStringList list;
     statusLock.lock();
     list<<signalLock.GetName()<<signalLock.GetStatus();
-    if (HasFlags(kDTVSigMon_WaitForSig))
+    if (HasFlags(kSigMon_WaitForSig))
         list<<signalStrength.GetName()<<signalStrength.GetStatus();
     statusLock.unlock();
 
@@ -387,4 +376,88 @@ bool SignalMonitor::WaitForLock(int timeout)
             return WaitForLock(timeout-t.elapsed());
     }
     return false;
+}
+
+void SignalMonitor::AddListener(SignalMonitorListener *listener)
+{
+    QMutexLocker locker(&listenerLock);
+    for (uint i = 0; i < listeners.size(); i++)
+    {
+        if (listeners[i] == listener)
+            return;
+    }
+    listeners.push_back(listener);
+}
+
+void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
+{
+    QMutexLocker locker(&listenerLock);
+
+    vector<SignalMonitorListener*> new_listeners;
+    for (uint i = 0; i < listeners.size(); i++)
+    {
+        if (listeners[i] != listener)
+            new_listeners.push_back(listeners[i]);
+    }
+
+    listeners = new_listeners;
+}
+
+void SignalMonitor::SendMessage(
+    SignalMonitorMessageType type, const SignalMonitorValue &value)
+{
+    statusLock.lock();
+    SignalMonitorValue val = value;
+    statusLock.unlock();
+
+    QMutexLocker locker(&listenerLock);
+    for (uint i = 0; i < listeners.size(); i++)
+    {
+        SignalMonitorListener *listener = listeners[i];
+        DVBSignalMonitorListener *dvblistener =
+            dynamic_cast<DVBSignalMonitorListener*>(listener);
+
+        switch (type)
+        {
+        case kStatusSignalLock:
+            listener->StatusSignalLock(val);
+            break;
+        case kAllGood:
+            listener->AllGood();
+            break;
+        case kStatusSignalStrength:
+            listener->StatusSignalStrength(val);
+            break;
+        case kStatusSignalToNoise:
+            if (dvblistener)
+                dvblistener->StatusSignalToNoise(val);
+            break;
+        case kStatusBitErrorRate:
+            if (dvblistener)
+                dvblistener->StatusBitErrorRate(val);
+            break;
+        case kStatusUncorrectedBlocks:
+            if (dvblistener)
+                dvblistener->StatusUncorrectedBlocks(val);
+            break;
+        case kStatusRotorPosition:
+            if (dvblistener)
+                dvblistener->StatusRotorPosition(val);
+            break;
+        }
+    }
+}
+
+void SignalMonitor::SendMessageAllGood(void)
+{
+    QMutexLocker locker(&listenerLock);
+    for (uint i = 0; i < listeners.size(); i++)
+        listeners[i]->AllGood();
+}
+
+void SignalMonitor::EmitStatus(void)
+{
+    SendMessage(kStatusSignalLock, signalLock);
+    if (HasFlags(kSigMon_WaitForSig))
+        SendMessage(kStatusSignalStrength,    signalStrength);
 }

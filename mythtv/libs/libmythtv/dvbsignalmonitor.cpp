@@ -38,21 +38,20 @@
  *                    is called.
  *  \param _channel DVBChannel for card
  *  \param _flags   Flags to start with
- *  \param _name    Instance name for Qt signal/slot debugging
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
-                                   uint64_t _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
+                                   uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _flags),
       // This snr setup is incorrect for API 3.x but works better 
       // than int16_t range in practice, however this is correct 
       // for the 4.0 DVB API which uses a uint16_t for the snr
-      signalToNoise    (tr("Signal To Noise"),    "snr",
+      signalToNoise    (QObject::tr("Signal To Noise"),    "snr",
                         0,      true,      0, 65535, 0),
-      bitErrorRate     (tr("Bit Error Rate"),     "ber",
+      bitErrorRate     (QObject::tr("Bit Error Rate"),     "ber",
                         65535,  false,     0, 65535, 0),
-      uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
+      uncorrectedBlocks(QObject::tr("Uncorrected Blocks"), "ucb",
                         65535,  false,     0, 65535, 0),
-      rotorPosition    (tr("Rotor Progress"),     "pos",
+      rotorPosition    (QObject::tr("Rotor Progress"),     "pos",
                         100,    true,      0,   100, 0),
       streamHandlerStarted(false),
       streamHandler(NULL)
@@ -84,7 +83,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
           else { \
               VERBOSE(VB_CHANNEL, LOC + "Can " + MSG); } } } while (false)
 
-    DVB_IO(kDTVSigMon_WaitForSig, GetSignalStrength,
+    DVB_IO(kSigMon_WaitForSig, GetSignalStrength,
            "measure Signal Strength");
     DVB_IO(kDVBSigMon_WaitForSNR, GetSNR,
            "measure S/N");
@@ -114,13 +113,6 @@ DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
     DVBStreamHandler::Return(streamHandler);
-}
-
-void DVBSignalMonitor::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    Stop();
-    DTVSignalMonitor::deleteLater();
 }
 
 // documented in dtvsignalmonitor.h
@@ -210,16 +202,17 @@ void DVBSignalMonitor::UpdateValues(void)
 
     if (streamHandlerStarted)
     {
-        EmitDVBSignals();
+        EmitStatus();
         if (IsAllGood())
-            emit AllGood();
+            SendMessageAllGood();
+
         // TODO dtv signals...
 
         update_done = true;
         return;
     }
 
-    AddFlags(kDTVSigMon_WaitForSig);
+    AddFlags(kSigMon_WaitForSig);
 
     // Handle retuning after rotor has turned
     if (HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
@@ -239,7 +232,7 @@ void DVBSignalMonitor::UpdateValues(void)
 
     // Get info from card
     bool has_lock = GetDVBChannel()->HasLock();
-    if (HasFlags(kDTVSigMon_WaitForSig))
+    if (HasFlags(kSigMon_WaitForSig))
         sig = (uint) (GetDVBChannel()->GetSignalStrength() * 65535);
     if (HasFlags(kDVBSigMon_WaitForSNR))
         snr = (uint) (GetDVBChannel()->GetSNR() * 65535);
@@ -263,7 +256,7 @@ void DVBSignalMonitor::UpdateValues(void)
         signalLock.SetValue((has_lock) ? 1 : 0);
         isLocked = signalLock.IsGood();
 
-        if (HasFlags(kDTVSigMon_WaitForSig))
+        if (HasFlags(kSigMon_WaitForSig))
             signalStrength.SetValue(sig);
         if (HasFlags(kDVBSigMon_WaitForSNR))
             signalToNoise.SetValue(snr);
@@ -280,9 +273,9 @@ void DVBSignalMonitor::UpdateValues(void)
                 <<(isLocked ? "Locked" : "Lost"));
     }
 
-    EmitDVBSignals();
+    EmitStatus();
     if (IsAllGood())
-        emit AllGood();
+        SendMessageAllGood();
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
@@ -299,29 +292,19 @@ void DVBSignalMonitor::UpdateValues(void)
     update_done = true;
 }
 
-#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
-    do { statusLock.lock(); \
-         SignalMonitorValue val = SIGNAL_VAL; \
-         statusLock.unlock(); \
-         emit SIGNAL_FUNC(val); } while (false)
-
-/** \fn DVBSignalMonitor::EmitDVBSignals(void)
+/** \fn DVBSignalMonitor::EmitStatus(void)
  *  \brief Emits signals for lock, signal strength, etc.
  */
-void DVBSignalMonitor::EmitDVBSignals(void)
+void DVBSignalMonitor::EmitStatus(void)
 {
     // Emit signals..
-    EMIT(StatusSignalLock, signalLock); 
-    if (HasFlags(kDTVSigMon_WaitForSig))
-        EMIT(StatusSignalStrength, signalStrength);
+    DTVSignalMonitor::EmitStatus();
     if (HasFlags(kDVBSigMon_WaitForSNR))
-        EMIT(StatusSignalToNoise, signalToNoise);
+        SendMessage(kStatusSignalToNoise,     signalToNoise);
     if (HasFlags(kDVBSigMon_WaitForBER))
-        EMIT(StatusBitErrorRate, bitErrorRate);
+        SendMessage(kStatusBitErrorRate,      bitErrorRate);
     if (HasFlags(kDVBSigMon_WaitForUB))
-        EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
+        SendMessage(kStatusUncorrectedBlocks, uncorrectedBlocks);
     if (HasFlags(kDVBSigMon_WaitForPos))
-        EMIT(StatusRotorPosition, rotorPosition);
+        SendMessage(kStatusRotorPosition,     rotorPosition);
 }
-
-#undef EMIT

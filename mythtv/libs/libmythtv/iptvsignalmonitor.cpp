@@ -15,7 +15,7 @@
 #define LOC QString("IPTVSM(%1): ").arg(channel->GetDevice())
 #define LOC_ERR QString("IPTVSM(%1), Error: ").arg(channel->GetDevice())
 
-/** \fn IPTVSignalMonitor::IPTVSignalMonitor(int,IPTVChannel*,uint,const char*)
+/** \fn IPTVSignalMonitor::IPTVSignalMonitor(int,IPTVChannel*,uint64_t)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
@@ -28,13 +28,10 @@
  *                    is called.
  *  \param _channel IPTVChannel for card
  *  \param _flags   Flags to start with
- *  \param _name    Instance name for Qt signal/slot debugging
  */
 IPTVSignalMonitor::IPTVSignalMonitor(
-    int db_cardnum, IPTVChannel *_channel,
-    uint64_t _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
-      dtvMonitorRunning(false)
+    int db_cardnum, IPTVChannel *_channel, uint64_t _flags) :
+    DTVSignalMonitor(db_cardnum, _channel, _flags), dtvMonitorRunning(false)
 {
     bool isLocked = false;
     IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
@@ -60,14 +57,6 @@ IPTVSignalMonitor::~IPTVSignalMonitor()
 IPTVChannel *IPTVSignalMonitor::GetChannel(void)
 {
     return dynamic_cast<IPTVChannel*>(channel);
-}
-
-void IPTVSignalMonitor::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    GetChannel()->GetFeeder()->RemoveListener(this);
-    Stop();
-    DTVSignalMonitor::deleteLater();
 }
 
 /** \fn IPTVSignalMonitor::Stop(void)
@@ -130,9 +119,9 @@ void IPTVSignalMonitor::UpdateValues(void)
 
     if (dtvMonitorRunning)
     {
-        EmitIPTVSignals();
+        EmitStatus();
         if (IsAllGood())
-            emit AllGood();
+            SendMessageAllGood();
         // TODO dtv signals...
 
         update_done = true;
@@ -145,9 +134,9 @@ void IPTVSignalMonitor::UpdateValues(void)
         isLocked = signalLock.IsGood();
     }
 
-    EmitIPTVSignals();
+    EmitStatus();
     if (IsAllGood())
-        emit AllGood();
+        SendMessageAllGood();
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
@@ -166,22 +155,3 @@ void IPTVSignalMonitor::UpdateValues(void)
 
     update_done = true;
 }
-
-#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
-    do { statusLock.lock(); \
-         SignalMonitorValue val = SIGNAL_VAL; \
-         statusLock.unlock(); \
-         emit SIGNAL_FUNC(val); } while (false)
-
-/** \fn IPTVSignalMonitor::EmitIPTVSignals(void)
- *  \brief Emits signals for lock, signal strength, etc.
- */
-void IPTVSignalMonitor::EmitIPTVSignals(void)
-{
-    // Emit signals..
-    EMIT(StatusSignalLock, signalLock); 
-    if (HasFlags(kDTVSigMon_WaitForSig))
-        EMIT(StatusSignalStrength, signalStrength);
-}
-
-#undef EMIT

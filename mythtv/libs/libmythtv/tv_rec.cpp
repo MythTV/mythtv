@@ -277,12 +277,6 @@ TVRec::~TVRec()
     TeardownAll();
 }
 
-void TVRec::deleteLater(void)
-{
-    TeardownAll();
-    QObject::deleteLater();
-}
-
 void TVRec::TeardownAll(void)
 {
     if (HasFlags(kFlagRunMainLoop))
@@ -694,7 +688,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         VERBOSE(VB_IMPORTANT, LOC + msg);
     }
 
-    for (uint i = 0; i < pendingRecordings.size(); i++)
+    for (int i = 0; i < pendingRecordings.size(); i++)
         delete pendingRecordings[i].info;
     pendingRecordings.clear();
 
@@ -2016,9 +2010,7 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool notify)
             return false;
         }
 
-        connect(signalMonitor, SIGNAL(AllGood(void)),
-                this, SLOT(SignalMonitorAllGood(void)));
-
+        signalMonitor->AddListener(this);
         signalMonitor->SetUpdateRate(kSignalMonitoringRate);
         signalMonitor->SetNotifyFrontend(notify);
 
@@ -2053,7 +2045,7 @@ void TVRec::TeardownSignalMonitor()
 
     if (signalMonitor)
     {
-        signalMonitor->deleteLater();
+        delete signalMonitor;
         signalMonitor = NULL;
     }
 
@@ -3747,7 +3739,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to setup signal monitor");
             if (signalMonitor)
             {
-                signalMonitor->deleteLater();
+                delete signalMonitor;
                 signalMonitor = NULL;
             }
 

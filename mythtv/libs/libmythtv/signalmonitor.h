@@ -8,6 +8,7 @@
 #include <pthread.h>
 
 // C++ headers
+#include <vector>
 #include <algorithm>
 using namespace std;
 
@@ -17,6 +18,7 @@ using namespace std;
 
 // MythTV headers
 #include "signalmonitorvalue.h"
+#include "signalmonitorlistener.h"
 #include "channelbase.h"
 #include "cardutil.h"
 
@@ -25,9 +27,8 @@ using namespace std;
 
 inline QString sm_flags_to_string(uint64_t);
 
-class SignalMonitor : public QObject
+class SignalMonitor
 {
-    Q_OBJECT
   public:
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);
@@ -91,31 +92,18 @@ class SignalMonitor : public QObject
     void SetUpdateRate(int msec)
         { update_rate = max(msec, (int)minimum_update_rate); }
 
-  public slots:
-    virtual void deleteLater(void);
+    // // // // // // // // // // // // // // // // // // // // // // // //
+    // Listeners   // // // // // // // // // // // // // // // // // // //
+    void AddListener(SignalMonitorListener *listener);
+    void RemoveListener(SignalMonitorListener *listener);
+    void SendMessage(SignalMonitorMessageType type,
+                     const SignalMonitorValue &val);
+    void SendMessageAllGood(void);
+    virtual void EmitStatus(void);
 
-  signals:
-    /** \brief Signal to be sent as true when it is safe to begin
-     *   or continue recording, and false if it may not be safe.
-     *
-     *   Note: Signals are only sent once the monitoring thread has been started.
-     */
-    void StatusSignalLock(const SignalMonitorValue&);
-
-    /** \brief Signal to be sent with an actual signal value.
-     *
-     *   Note: Signals are only sent once the monitoring thread has been started.
-     */
-    void StatusSignalStrength(const SignalMonitorValue&);
-
-    /** \brief Signal to be sent when you have a lock on all values.
-     *
-     *   Note: Signals are only sent once the monitoring thread has been started.
-     */
-    void AllGood(void);
   protected:
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
-                  uint64_t wait_for_mask, const char *name = "SignalMonitor");
+                  uint64_t wait_for_mask);
     
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
@@ -178,7 +166,7 @@ class SignalMonitor : public QObject
     static const uint64_t kDTVSigMon_WaitForVCT = 0x0008000000ULL;
     static const uint64_t kDTVSigMon_WaitForNIT = 0x0010000000ULL;
     static const uint64_t kDTVSigMon_WaitForSDT = 0x0020000000ULL;
-    static const uint64_t kDTVSigMon_WaitForSig = 0x0040000000ULL;
+    static const uint64_t kSigMon_WaitForSig    = 0x0040000000ULL;
     static const uint64_t kFWSigMon_WaitForPower= 0x0080000000ULL;
     static const uint64_t kDTVSigMon_WaitForCrypt=0x0100000000ULL;
 
@@ -208,8 +196,11 @@ class SignalMonitor : public QObject
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
 
+    vector<SignalMonitorListener*> listeners;
+
     QMutex             startStopLock;
     mutable QMutex     statusLock;
+    mutable QMutex     listenerLock;
 };
 
 inline QString sm_flags_to_string(uint64_t flags)
@@ -271,7 +262,7 @@ inline QString sm_flags_to_string(uint64_t flags)
         str += "NIT,";
     if (SignalMonitor::kDTVSigMon_WaitForSDT & flags)
         str += "SDT,";
-    if (SignalMonitor::kDTVSigMon_WaitForSig & flags)
+    if (SignalMonitor::kSigMon_WaitForSig & flags)
         str += "Sig,";
     if (SignalMonitor::kFWSigMon_WaitForPower& flags)
         str += "STB,";

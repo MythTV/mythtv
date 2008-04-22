@@ -18,16 +18,11 @@ class DTVSignalMonitor : public SignalMonitor,
                          public ATSCAuxStreamListener,
                          public DVBMainStreamListener
 {
-    Q_OBJECT
   public:
     DTVSignalMonitor(int db_cardnum,
                      DTVChannel *_channel,
-                     uint64_t wait_for_mask,
-                     const char *name = "DTVSignalMonitor");
+                     uint64_t wait_for_mask);
     ~DTVSignalMonitor();
-
-  public slots:
-    void deleteLater(void);
 
   public:
     virtual QStringList GetStatusList(bool kick = true);

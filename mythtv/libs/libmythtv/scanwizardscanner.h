@@ -42,6 +42,7 @@
 // MythTV headers
 #include "settings.h"
 #include "dvbconfparser.h"
+#include "signalmonitorlistener.h"
 
 class ScanWizard;
 class AnalogScan;
@@ -55,7 +56,9 @@ class Channel;
 class DVBChannel;
 class SignalMonitorValue;
 
-class ScanWizardScanner : public VerticalConfigurationGroup
+class ScanWizardScanner :
+    public VerticalConfigurationGroup,
+    public DVBSignalMonitorListener
 {
     Q_OBJECT
 
@@ -84,16 +87,23 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void ImportDVBUtils(uint sourceid, int cardtype, const QString &file);
     void ImportM3U(     uint cardid, const QString &inputname, uint sourceid);
 
+    // SignalMonitorListener
+    virtual void AllGood(void) { }
+    virtual void StatusSignalLock(const SignalMonitorValue&);
+    virtual void StatusSignalStrength(const SignalMonitorValue&);
+
+    // DVBSignalMonitorListener
+    virtual void StatusSignalToNoise(const SignalMonitorValue&);
+    virtual void StatusBitErrorRate(const SignalMonitorValue&) { }
+    virtual void StatusUncorrectedBlocks(const SignalMonitorValue&) { }
+    virtual void StatusRotorPosition(const SignalMonitorValue&) { }
+
   protected slots:
     void CancelScan(void) { Teardown(); }
     void scanComplete(void);
     void transportScanComplete(void);
     void updateText(const QString& status);
     void updateStatusText(const QString& status);
-
-    void dvbLock(const SignalMonitorValue&);
-    void dvbSNR(const SignalMonitorValue&);
-    void dvbSignalStrength(const SignalMonitorValue&);
 
     void serviceScanPctComplete(int pct);
 

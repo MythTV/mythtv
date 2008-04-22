@@ -15,20 +15,14 @@ class FirewireChannel;
 
 class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 {
-    Q_OBJECT
-
   public:
     FirewireSignalMonitor(int db_cardnum, FirewireChannel *_channel,
-                          uint64_t _flags = kFWSigMon_WaitForPower,
-                          const char *_name = "FirewireSignalMonitor");
+                          uint64_t _flags = kFWSigMon_WaitForPower);
 
     virtual void HandlePAT(const ProgramAssociationTable*);
     virtual void HandlePMT(uint, const ProgramMapTable*);
 
     void Stop(void);
-
-  public slots:
-    void deleteLater(void);
 
   protected:
     FirewireSignalMonitor(void);
@@ -36,7 +30,6 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     virtual ~FirewireSignalMonitor();
 
     virtual void UpdateValues(void);
-    void EmitFirewireSignals(void);
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);

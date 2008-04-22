@@ -31,6 +31,7 @@
  */
 
 // Qt headers
+#include <qapplication.h>
 #include <qlocale.h>
 
 // MythTV headers
@@ -165,6 +166,37 @@ void ScanProgressPopup::SetStatusTitleText(const QString &value)
     setLabel(msg);
 }
 
+void ScanProgressPopup::deleteLater(void)
+{
+    disconnect();
+    if (dialog)
+    {
+        VERBOSE(VB_IMPORTANT, "Programmer Error: "
+                "ScanProgressPopup::DeleteDialog() never called.");
+    }
+    ConfigurationPopupDialog::deleteLater();
+}
+
+void ScanProgressPopup::CreateDialog(void)
+{
+    if (!dialog)
+    {
+        dialog = (ConfigPopupDialogWidget*)
+            dialogWidget(gContext->GetMainWindow(),
+                         "ConfigurationPopupDialog");
+        dialog->ShowPopup(this, SLOT(Done(void)));
+    }
+}
+
+void ScanProgressPopup::DeleteDialog(void)
+{
+    if (dialog)
+    {
+        dialog->deleteLater();
+        dialog = NULL;
+    }
+}
+
 DialogCode ScanProgressPopup::exec(void)
 {
     if (!dialog)
@@ -173,15 +205,15 @@ DialogCode ScanProgressPopup::exec(void)
             dialogWidget(gContext->GetMainWindow(),
                          "ConfigurationPopupDialog");
     }
+
     dialog->setResult(kDialogCodeRejected);
 
     done = false;
-    dialog->ShowPopup(this, SLOT(PopupDone(int)));
 
     // Qt4 requires a QMutex as a parameter...
     // not sure if this is the best solution.  Mutex Must be locked before wait.
     QMutex mutex;
-    mutex.lock();
+    QMutexLocker locker(&mutex);
 
     while (!done)
         wait.wait(&mutex, 100);
@@ -189,10 +221,33 @@ DialogCode ScanProgressPopup::exec(void)
     return dialog->result();
 }
 
-void ScanProgressPopup::PopupDone(int)
+void ScanProgressPopup::Done(void)
 {
     done = true;
     wait.wakeAll();
+}
+
+void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
+{
+    ScannerEvent *e = new ScannerEvent(type);
+    e->intValue(val);
+    QApplication::postEvent(dest, e);
+}
+
+void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
+{
+    ScannerEvent *e = new ScannerEvent(type);
+    e->strValue(Q3DeepCopy<QString>(val));
+    QApplication::postEvent(dest, e);
+}
+
+void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
+                ScanProgressPopup *spp)
+{
+    ScannerEvent *e = new ScannerEvent(type);
+    e->intValue(val);
+    e->ScanProgressPopupValue(spp);
+    QApplication::postEvent(dest, e);
 }
 
 void MultiplexSetting::load(void)

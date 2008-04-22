@@ -8,16 +8,15 @@
 
 class DVBChannel;
 class DVBStreamHandler;
+class DVBSignalMonitorListener;
 
 class DVBSignalMonitor: public DTVSignalMonitor
 {
-    Q_OBJECT
   public:
     DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                      uint64_t _flags =
-                     kDTVSigMon_WaitForSig | kDVBSigMon_WaitForSNR |
-                     kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB,
-                     const char *_name = "DVBSignalMonitor");
+                     kSigMon_WaitForSig    | kDVBSigMon_WaitForSNR |
+                     kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);
     virtual ~DVBSignalMonitor();
 
     virtual QStringList GetStatusList(bool kick);
@@ -31,6 +30,8 @@ class DVBSignalMonitor: public DTVSignalMonitor
         rotorPosition.SetValue(100);
     }
 
+    virtual void EmitStatus(void);
+
     // MPEG
     virtual void HandlePMT(uint, const ProgramMapTable*);
 
@@ -39,15 +40,6 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     // DVB Main
     virtual void HandleTDT(const TimeDateTable*);
-
-  public slots:
-    void deleteLater(void);
-
-  signals:
-    void StatusSignalToNoise(const SignalMonitorValue&);
-    void StatusBitErrorRate(const SignalMonitorValue&);
-    void StatusUncorrectedBlocks(const SignalMonitorValue&);
-    void StatusRotorPosition(const SignalMonitorValue&);
 
   protected:
     DVBSignalMonitor(void);

@@ -12,26 +12,20 @@ typedef QMap<uint,int> FilterMap;
 
 class HDHRSignalMonitor: public DTVSignalMonitor
 {
-    Q_OBJECT
   public:
     HDHRSignalMonitor(int db_cardnum, HDHRChannel* _channel,
-                      uint64_t _flags = 0,
-                      const char *_name = "HDHRSignalMonitor");
+                      uint64_t _flags = 0);
     virtual ~HDHRSignalMonitor();
 
     void Stop(void);
 
     bool UpdateFiltersFromStreamData(void);
 
-  public slots:
-    void deleteLater(void);
-
   protected:
     HDHRSignalMonitor(void);
     HDHRSignalMonitor(const HDHRSignalMonitor&);
 
     virtual void UpdateValues(void);
-    void EmitHDHRSignals(void);
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);

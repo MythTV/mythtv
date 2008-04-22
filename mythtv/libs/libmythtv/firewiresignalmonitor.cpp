@@ -24,7 +24,7 @@ const uint FirewireSignalMonitor::kBufferTimeout = 5000; /* ms */
 QMap<void*,uint> FirewireSignalMonitor::pat_keys;
 QMutex           FirewireSignalMonitor::pat_keys_lock;
 
-/** \fn FirewireSignalMonitor::FirewireSignalMonitor(int,FirewireChannel*,uint,const char*)
+/** \fn FirewireSignalMonitor::FirewireSignalMonitor(int,FirewireChannel*,uint64_t)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
@@ -37,13 +37,12 @@ QMutex           FirewireSignalMonitor::pat_keys_lock;
  *                    is called.
  *  \param _channel FirewireChannel for card
  *  \param _flags   Flags to start with
- *  \param _name    Name for Qt signal debugging
  */
 FirewireSignalMonitor::FirewireSignalMonitor(
     int db_cardnum,
     FirewireChannel *_channel,
-    uint64_t _flags, const char *_name) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
+    uint64_t _flags) :
+    DTVSignalMonitor(db_cardnum, _channel, _flags),
     dtvMonitorRunning(false),
     stb_needs_retune(true),
     stb_needs_to_wait_for_pat(false),
@@ -53,7 +52,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(
 
     signalStrength.SetThreshold(65);
 
-    AddFlags(kDTVSigMon_WaitForSig);
+    AddFlags(kSigMon_WaitForSig);
 
     stb_needs_retune =
         (FirewireDevice::kAVCPowerOff == _channel->GetPowerState());
@@ -66,13 +65,6 @@ FirewireSignalMonitor::~FirewireSignalMonitor()
 {
     VERBOSE(VB_CHANNEL, LOC + "dtor");
     Stop();
-}
-
-void FirewireSignalMonitor::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    Stop();
-    DTVSignalMonitor::deleteLater();
 }
 
 /** \fn FirewireSignalMonitor::Stop(void)
@@ -197,9 +189,9 @@ void FirewireSignalMonitor::UpdateValues(void)
 
     if (dtvMonitorRunning)
     {
-        EmitFirewireSignals();
+        EmitStatus();
         if (IsAllGood())
-            emit AllGood();
+            SendMessageAllGood();
         // TODO dtv signals...
 
         update_done = true;
@@ -265,9 +257,9 @@ void FirewireSignalMonitor::UpdateValues(void)
         signalLock.SetValue(isLocked ? 1 : 0);
     }
 
-    EmitFirewireSignals();
+    EmitStatus();
     if (IsAllGood())
-        emit AllGood();
+        SendMessageAllGood();
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
@@ -291,22 +283,3 @@ void FirewireSignalMonitor::UpdateValues(void)
 
     update_done = true;
 }
-
-#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
-    do { statusLock.lock(); \
-         SignalMonitorValue val = SIGNAL_VAL; \
-         statusLock.unlock(); \
-         emit SIGNAL_FUNC(val); } while (false)
-
-/** \fn FirewireSignalMonitor::EmitFirewireSignals(void)
- *  \brief Emits signals for lock, signal strength, etc.
- */
-void FirewireSignalMonitor::EmitFirewireSignals(void)
-{
-    // Emit signals..
-    EMIT(StatusSignalLock, signalLock); 
-    if (HasFlags(kDTVSigMon_WaitForSig))
-        EMIT(StatusSignalStrength, signalStrength);
-}
-
-#undef EMIT

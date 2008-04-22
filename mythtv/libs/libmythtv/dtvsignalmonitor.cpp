@@ -22,24 +22,23 @@
 
 DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
                                    DTVChannel *_channel,
-                                   uint64_t wait_for_mask,
-                                   const char *name)
-    : SignalMonitor(db_cardnum, _channel, wait_for_mask, name),
+                                   uint64_t wait_for_mask)
+    : SignalMonitor(db_cardnum, _channel, wait_for_mask),
       stream_data(NULL),
-      seenPAT(tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
-      seenPMT(tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
-      seenMGT(tr("Seen")+" MGT", "seen_mgt", 1, true, 0, 1, 0),
-      seenVCT(tr("Seen")+" VCT", "seen_vct", 1, true, 0, 1, 0),
-      seenNIT(tr("Seen")+" NIT", "seen_nit", 1, true, 0, 1, 0),
-      seenSDT(tr("Seen")+" SDT", "seen_sdt", 1, true, 0, 1, 0),
-      seenCrypt(tr("Seen")+" Crypt", "seen_crypt", 1, true, 0, 1, 0),
-      matchingPAT(tr("Matching")+" PAT", "matching_pat", 1, true, 0, 1, 0),
-      matchingPMT(tr("Matching")+" PMT", "matching_pmt", 1, true, 0, 1, 0),
-      matchingMGT(tr("Matching")+" MGT", "matching_mgt", 1, true, 0, 1, 0),
-      matchingVCT(tr("Matching")+" VCT", "matching_vct", 1, true, 0, 1, 0),
-      matchingNIT(tr("Matching")+" NIT", "matching_nit", 1, true, 0, 1, 0),
-      matchingSDT(tr("Matching")+" SDT", "matching_sdt", 1, true, 0, 1, 0),
-      matchingCrypt(tr("Matching")+" Crypt", "matching_crypt",
+      seenPAT(QObject::tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
+      seenPMT(QObject::tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
+      seenMGT(QObject::tr("Seen")+" MGT", "seen_mgt", 1, true, 0, 1, 0),
+      seenVCT(QObject::tr("Seen")+" VCT", "seen_vct", 1, true, 0, 1, 0),
+      seenNIT(QObject::tr("Seen")+" NIT", "seen_nit", 1, true, 0, 1, 0),
+      seenSDT(QObject::tr("Seen")+" SDT", "seen_sdt", 1, true, 0, 1, 0),
+      seenCrypt(QObject::tr("Seen")+" Crypt", "seen_crypt", 1, true, 0, 1, 0),
+      matchingPAT(QObject::tr("Matching")+" PAT", "matching_pat", 1, true, 0, 1, 0),
+      matchingPMT(QObject::tr("Matching")+" PMT", "matching_pmt", 1, true, 0, 1, 0),
+      matchingMGT(QObject::tr("Matching")+" MGT", "matching_mgt", 1, true, 0, 1, 0),
+      matchingVCT(QObject::tr("Matching")+" VCT", "matching_vct", 1, true, 0, 1, 0),
+      matchingNIT(QObject::tr("Matching")+" NIT", "matching_nit", 1, true, 0, 1, 0),
+      matchingSDT(QObject::tr("Matching")+" SDT", "matching_sdt", 1, true, 0, 1, 0),
+      matchingCrypt(QObject::tr("Matching")+" Crypt", "matching_crypt",
                     1, true, 0, 1, 0),
       majorChannel(-1), minorChannel(-1),
       networkID(0), transportID(0),
@@ -54,12 +53,6 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
 DTVSignalMonitor::~DTVSignalMonitor()
 {
     SetStreamData(NULL);
-}
-
-void DTVSignalMonitor::deleteLater(void)
-{
-    SetStreamData(NULL);
-    SignalMonitor::deleteLater();
 }
 
 DTVChannel *DTVSignalMonitor::GetDTVChannel(void)

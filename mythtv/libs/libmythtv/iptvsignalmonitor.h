@@ -9,12 +9,9 @@ class IPTVChannel;
 
 class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
 {
-    Q_OBJECT
-
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
-                      uint64_t _flags = 0,
-                      const char *_name = "IPTVSignalMonitor");
+                      uint64_t _flags = 0);
     virtual ~IPTVSignalMonitor();
 
     void Stop(void);
@@ -30,7 +27,6 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
     IPTVSignalMonitor(const IPTVSignalMonitor&);
 
     virtual void UpdateValues(void);
-    void EmitIPTVSignals(void);
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);

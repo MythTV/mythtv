@@ -94,6 +94,7 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
       channelTimeout(channel_timeout),
       inputname(Q3DeepCopy<QString>(_inputname)),
       // Settable
+      isAnalog(false),
       ignoreAudioOnlyServices(false),
       ignoreDataServices(false),
       ignoreEncryptedServices(false),
@@ -111,6 +112,8 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
     // Initialize statics
     init_freq_tables();
     current = transport_scan_items_it_t( scanTransports.end());
+
+    signalMonitor->AddListener(this);
 
     // Create a stream data for digital signal monitors
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
@@ -146,22 +149,11 @@ void SIScan::deleteLater(void)
     QObject::deleteLater();
 }
 
-void SIScan::SetAnalog(bool is_analog)
+void SIScan::AllGood(void)
 {
-    if (is_analog)
-    {
-        connect(signalMonitor, SIGNAL(AllGood(      void)),
-                this,          SLOT(  HandleAllGood(void)));
-    }
-    else
-    {
-        disconnect(signalMonitor, SIGNAL(AllGood(      void)),
-                   this,          SLOT(  HandleAllGood(void)));
-    }
-}
+    if (!isAnalog)
+        return;
 
-void SIScan::HandleAllGood(void)
-{
     QString cur_chan = (*current).FriendlyName;
     QStringList list = QStringList::split(" ", cur_chan);
     QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
@@ -778,7 +770,7 @@ void SIScan::StopScanner(void)
     if (signalMonitor)
     {
         signalMonitor->Stop();
-        signalMonitor->deleteLater();
+        delete signalMonitor;
         signalMonitor = NULL;
     }
 }

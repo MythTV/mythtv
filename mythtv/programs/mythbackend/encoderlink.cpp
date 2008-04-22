@@ -70,7 +70,10 @@ EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
 EncoderLink::~EncoderLink(void)
 {
     if (tv)
-        tv->deleteLater();
+    {
+        delete tv;
+        tv = NULL;
+    }
 }
 
 /** \fn EncoderLink::SetSocket(PlaybackSock *lsock)
