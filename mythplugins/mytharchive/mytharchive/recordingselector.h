@@ -7,12 +7,10 @@
 #ifndef RECORDINGSELECTOR_H_
 #define RECORDINGSELECTOR_H_
 
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <Q3PtrList>
 
 class ProgramInfo;
 
@@ -42,15 +40,16 @@ class RecordingSelector : public MythThemedDialog
     void titleChanged(UIListBtnTypeItem *item);
 
   private:
-    QString themeDir; 
     void updateRecordingList(void);
     void updateSelectedList(void);
     void toggleSelectedState(void);
     void getRecordingList(void);
     void wireUpTheme(void);
 
+    QString themeDir;
+
     vector<ProgramInfo *>  *recordingList;
-    Q3PtrList<ProgramInfo> selectedList;
+    QList<ProgramInfo *>    selectedList;
 
     UIListBtnType    *recording_list;
 

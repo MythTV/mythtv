@@ -7,12 +7,10 @@
 #ifndef VIDEOSELECTOR_H_
 #define VIDEOSELECTOR_H_
 
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <Q3PtrList>
 
 typedef struct
 {
@@ -62,7 +60,7 @@ class VideoSelector : public MythThemedDialog
     void setParentalLevel(int which_level);
 
     vector<VideoInfo *>  *videoList;
-    Q3PtrList<VideoInfo>  selectedList;
+    QList<VideoInfo *>    selectedList;
 
     int              currentParentalLevel;
     UITextType       *pl_text;

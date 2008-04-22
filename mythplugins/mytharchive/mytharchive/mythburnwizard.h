@@ -7,14 +7,13 @@
 #ifndef MYTHBURNWIZARD_H_
 #define MYTHBURNWIZARD_H_
 
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
 
+// mytharchive
 #include "archiveutil.h"
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
 
 class MythburnWizard : public MythThemedDialog
 {

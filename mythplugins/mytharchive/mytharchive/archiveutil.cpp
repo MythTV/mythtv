@@ -136,7 +136,7 @@ bool extractDetailsFromFilename(const QString &inFile,
     query.bindValue(":BASENAME", baseName);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         chanID = query.value(0).toString();

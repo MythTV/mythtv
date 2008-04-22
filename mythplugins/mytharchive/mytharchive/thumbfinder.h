@@ -1,17 +1,14 @@
 #ifndef THUMBFINDER_H_
 #define THUMBFINDER_H_
 
+#include <iostream>
+
+// qt
 #include <qthread.h>
 #include <qstring.h>
 #include <qstringlist.h>
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
-#include <Q3PtrList>
 
-using namespace std;
-#include <iostream>
-
+// mythtv
 #include <mythtv/mythdialogs.h>
 #include <mythtv/uitypes.h>
 extern "C" {
@@ -19,7 +16,10 @@ extern "C" {
 #include <mythtv/ffmpeg/avformat.h>
 }
 
+// mytharchive
 #include "archiveutil.h"
+
+using namespace std;
 
 typedef struct SeekAmount
 {
@@ -66,11 +66,6 @@ class ThumbFinder : public MythThemedDialog
     QString createThumbDir(void);
     QString frameToTime(int64_t frame, bool addFrame = false);
 
-    ArchiveItem    *m_archiveItem;
-    int             m_thumbCount;
-    Q3PtrList<ThumbImage> m_thumbList;
-    QString         m_thumbDir;
-
     // avcodec stuff
     bool initAVCodec(const QString &inFile);
     void closeAVCodec();
@@ -103,6 +98,11 @@ class ThumbFinder : public MythThemedDialog
     QMap<long long, int> m_deleteMap;
     int              m_finalDuration;
     int              m_offset;
+
+    ArchiveItem        *m_archiveItem;
+    int                 m_thumbCount;
+    QList<ThumbImage *> m_thumbList;
+    QString             m_thumbDir;
 
     // GUI stuff
     UITextButtonType     *m_frameButton;

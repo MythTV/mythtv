@@ -9,7 +9,7 @@
 #include <qdir.h>
 #include <qapplication.h>
 #include <QKeyEvent>
-#include <Q3TextStream>
+#include <QTextStream>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -456,7 +456,7 @@ void ExportNativeWizard::getArchiveListFromDB(void)
                   "FROM archiveitems WHERE type = 'Recording' OR type = 'Video' "
                   "ORDER BY title, subtitle");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -606,7 +606,7 @@ void ExportNativeWizard::createConfigFile(const QString &filename)
         return;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << doc.toString(4);
     f.close();
 }
@@ -773,7 +773,7 @@ void ExportNativeWizard::handleAddVideo()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title FROM videometadata");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
     }
     else

@@ -4,8 +4,6 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
-//Added by qt3to4:
-#include <QKeyEvent>
 
 // Myth
 #include <mythtv/mythcontext.h>
@@ -36,6 +34,9 @@ ImportNativeWizard::ImportNativeWizard(const QString &startDir,
 
 ImportNativeWizard::~ImportNativeWizard()
 {
+    while (!m_fileData.isEmpty())
+        delete m_fileData.takeFirst();
+    m_fileData.clear();
 }
 
 void ImportNativeWizard::keyPressEvent(QKeyEvent *e)
@@ -398,7 +399,11 @@ void ImportNativeWizard::updateFileList()
         return;
 
     m_fileList->Reset();
+
+    while (!m_fileData.isEmpty())
+        delete m_fileData.takeFirst();
     m_fileData.clear();
+
     QDir d;
 
     d.setPath(m_curDirectory);
@@ -406,18 +411,17 @@ void ImportNativeWizard::updateFileList()
     {
         // first get a list of directory's in the current directory
         QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoList::const_iterator it = list.begin();
-        const QFileInfo *fi;
+        QFileInfo fi;
 
-        while (it != list.end())
+        for (int x = 0; x < list.size(); x++)
         {
-            fi = &(*it);
-            if (fi->fileName() != ".")
+            fi = list.at(x);
+            if (fi.fileName() != ".")
             {
                 FileInfo  *data = new FileInfo; 
                 data->selected = false;
                 data->directory = true;
-                data->filename = fi->fileName();
+                data->filename = fi.fileName();
                 data->size = 0;
                 m_fileData.append(data);
 
@@ -428,21 +432,19 @@ void ImportNativeWizard::updateFileList()
                 item->setPixmap(m_directoryPixmap);
                 item->setData(data);
             }
-            ++it;
         }
 
         // second get a list of file's in the current directory
         list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
-        it = list.begin();
 
-        while (it != list.end())
+        for (int x = 0; x < list.size(); x++)
         {
-            fi = &(*it);
+            fi = list.at(x);
             FileInfo  *data = new FileInfo; 
             data->selected = false;
             data->directory = false;
-            data->filename = fi->fileName();
-            data->size = fi->size();
+            data->filename = fi.fileName();
+            data->size = fi.size();
             m_fileData.append(data);
             // add a row to the UIListBtnArea
             UIListBtnTypeItem* item = new UIListBtnTypeItem(
@@ -451,8 +453,6 @@ void ImportNativeWizard::updateFileList()
 
             item->setCheckable(false);
             item->setData(data);
-
-            ++it;
         }
         m_locationEdit->setText(m_curDirectory);
     }

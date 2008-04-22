@@ -1,13 +1,16 @@
 #ifndef EXPORTNATIVEWIZARD_H_
 #define EXPORTNATIVEWIZARD_H_
 
+// qt
+#include <QKeyEvent>
+
+// mythtv
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
 
+// mytharchive
 #include "archiveutil.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 enum NativeItemType
 {

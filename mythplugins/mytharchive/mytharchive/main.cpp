@@ -378,7 +378,7 @@ void runVideoSelector(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title FROM videometadata");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
     }
     else

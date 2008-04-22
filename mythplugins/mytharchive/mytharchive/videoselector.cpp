@@ -9,10 +9,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
-//Added by qt3to4:
-#include <QKeyEvent>
-
-using namespace std;
 
 // qt
 #include <qdir.h>
@@ -26,6 +22,8 @@ using namespace std;
 // mytharchive
 #include "videoselector.h"
 #include "archiveutil.h"
+
+using namespace std;
 
 VideoSelector::VideoSelector(MythMainWindow *parent, QString window_name,
                                  QString theme_filename, const char *name)
@@ -42,6 +40,10 @@ VideoSelector::~VideoSelector(void)
 {
     if (videoList)
         delete videoList;
+
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
+    selectedList.clear();
 }
 
 void VideoSelector::keyPressEvent(QKeyEvent *e)
@@ -175,6 +177,8 @@ void VideoSelector::selectAll()
     if (!popupMenu)
         return;
 
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
 
     VideoInfo *v;
@@ -194,6 +198,8 @@ void VideoSelector::clearAll()
     if (!popupMenu)
         return;
 
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
 
     updateVideoList();
@@ -209,13 +215,15 @@ void VideoSelector::toggleSelectedState()
 
     if (item->state() == UIListBtnTypeItem:: FullChecked)
     {
-        if (selectedList.find((VideoInfo *) item->getData()) != -1)
-            selectedList.remove((VideoInfo *) item->getData());
+        int index = selectedList.indexOf((VideoInfo *) item->getData());
+        if (index != -1)
+            delete selectedList.takeAt(index);
         item->setChecked(UIListBtnTypeItem:: NotChecked);
     }
     else
     {
-        if (selectedList.find((VideoInfo *) item->getData()) == -1)
+        int index = selectedList.indexOf((VideoInfo *) item->getData());
+        if (index == -1)
             selectedList.append((VideoInfo *) item->getData());
 
         item->setChecked(UIListBtnTypeItem:: FullChecked);
@@ -328,8 +336,9 @@ void VideoSelector::OKPressed()
     // loop though selected videos and add them to the archiveitems table
     VideoInfo *v;
 
-    for (v = selectedList.first(); v; v = selectedList.next())
+    for (int x = 0; x < selectedList.size(); x++)
     {
+        v = selectedList.at(x);
         QFile file(v->filename);
         if (file.exists())
         {
@@ -382,7 +391,7 @@ void VideoSelector::updateVideoList(void)
                     UIListBtnTypeItem* item = new UIListBtnTypeItem(
                             video_list, v->title);
                     item->setCheckable(true);
-                    if (selectedList.find((VideoInfo *) v) != -1)
+                    if (selectedList.indexOf((VideoInfo *) v) != -1)
                     {
                         item->setChecked(UIListBtnTypeItem::FullChecked);
                     }
@@ -424,7 +433,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, category FROM videocategory");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -440,7 +449,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                   "category, showlevel "
                   "FROM videometadata ORDER BY title");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         QString artist, genre;
         while (query.next())
@@ -523,11 +532,14 @@ void VideoSelector::updateSelectedList()
     if (!videoList)
         return;
 
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'Video'");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -540,7 +552,7 @@ void VideoSelector::updateSelectedList()
                 v = *i;
                 if (v->filename == filename)
                 {
-                    if (selectedList.find(v) == -1)
+                    if (selectedList.indexOf(v) == -1)
                         selectedList.append(v);
                     break;
                 }

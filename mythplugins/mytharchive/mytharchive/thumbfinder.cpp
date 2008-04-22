@@ -6,10 +6,6 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
-#include <q3process.h>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <QPixmap>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -43,13 +39,12 @@ ThumbFinder::ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
     m_archiveItem = archiveItem;
-    m_thumbList.setAutoDelete(true);
 
     m_thumbDir = createThumbDir();
 
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();
-    for (uint x = 0; x < m_archiveItem->thumbList.count(); x++)
+    for (int x = 0; x < m_archiveItem->thumbList.size(); x++)
     {
         ThumbImage *thumb = new ThumbImage;
         *thumb = *m_archiveItem->thumbList.at(x);
@@ -74,7 +69,10 @@ ThumbFinder::ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
 
 ThumbFinder::~ThumbFinder()
 {
+    while (!m_thumbList.isEmpty())
+         delete m_thumbList.takeFirst();
     m_thumbList.clear();
+
     closeAVCodec();
 }
 
@@ -116,7 +114,7 @@ void ThumbFinder::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -256,8 +254,11 @@ void ThumbFinder::wireUpTheme()
 void ThumbFinder::savePressed()
 {
     // copy the thumb details to the archiveItem
+    while (!m_archiveItem->thumbList.isEmpty())
+         delete m_archiveItem->thumbList.takeFirst();
     m_archiveItem->thumbList.clear();
-    for (uint x = 0; x < m_thumbList.count(); x++)
+
+    for (int x = 0; x < m_thumbList.size(); x++)
     {
         ThumbImage *thumb = new ThumbImage;
         *thumb = *m_thumbList.at(x);

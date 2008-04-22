@@ -4,8 +4,6 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
-//Added by qt3to4:
-#include <QKeyEvent>
 
 // Myth
 #include <mythtv/mythcontext.h>
@@ -32,6 +30,9 @@ FileSelector::FileSelector(FSTYPE type, const QString &startDir,
 
 FileSelector::~FileSelector()
 {
+    while (!m_fileData.isEmpty())
+        delete m_fileData.takeFirst();
+    m_fileData.clear();
 }
 
 QString FileSelector::getSelected(void)
@@ -341,7 +342,7 @@ void FileSelector::updateSelectedList()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'File'");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -358,7 +359,10 @@ void FileSelector::updateFileList()
         return;
 
     m_fileList->Reset();
+    while (!m_fileData.isEmpty())
+         delete m_fileData.takeFirst();
     m_fileData.clear();
+
     QDir d;
 
     d.setPath(m_curDirectory);
@@ -366,18 +370,17 @@ void FileSelector::updateFileList()
     {
         // first get a list of directory's in the current directory
         QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
-        QFileInfoList::const_iterator it = list.begin();
-        const QFileInfo *fi;
+        QFileInfo fi;
 
-        while (it != list.end())
+        for (int x = 0; x < list.size(); x++)
         {
-            fi = &(*it);
-            if (fi->fileName() != ".")
+            fi = list.at(x);
+            if (fi.fileName() != ".")
             {
                 FileData  *data = new FileData; 
                 data->selected = false;
                 data->directory = true;
-                data->filename = fi->fileName();
+                data->filename = fi.fileName();
                 data->size = 0;
                 m_fileData.append(data);
 
@@ -388,25 +391,23 @@ void FileSelector::updateFileList()
                 item->setPixmap(m_directoryPixmap);
                 item->setData(data);
             }
-            ++it;
         }
 
         if (m_selectorType != FSTYPE_DIRECTORY)
         {
             // second get a list of file's in the current directory
             list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
-            it = list.begin();
-
-            while (it != list.end())
+            for (int x = 0; x < list.size(); x++)
             {
-                fi = &(*it);
+                fi = list.at(x);
                 FileData  *data = new FileData; 
                 data->selected = false;
                 data->directory = false;
-                data->filename = fi->fileName();
-                data->size = fi->size();
+                data->filename = fi.fileName();
+                data->size = fi.size();
                 m_fileData.append(data);
-                                // add a row to the UIListBtnArea
+
+                // add a row to the UIListBtnArea
                 UIListBtnTypeItem* item = new UIListBtnTypeItem(
                         m_fileList,
                         data->filename + " (" + formatSize(data->size / 1024, 2) + ")");
@@ -436,7 +437,6 @@ void FileSelector::updateFileList()
 
                 item->setData(data);
 
-                ++it;
             }
         }
         m_locationEdit->setText(m_curDirectory);

@@ -3,13 +3,14 @@
 
 #include <iostream>
 
+// qt
+#include <QKeyEvent>
+
 // myth
 #include <mythtv/mythdialogs.h>
 
 // mytharchive
 #include "mythburnwizard.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 class EditMetadataDialog : public MythThemedDialog
 {

@@ -10,7 +10,7 @@
 #include <qdir.h>
 #include <qapplication.h>
 #include <QKeyEvent>
-#include <Q3TextStream>
+#include <QTextStream>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -936,7 +936,7 @@ QString MythburnWizard::loadFile(const QString &filename)
 
     if (file.open( QIODevice::ReadOnly ))
     {
-        Q3TextStream stream(&file);
+        QTextStream stream(&file);
 
         while ( !stream.atEnd() )
         {
@@ -1026,7 +1026,7 @@ bool MythburnWizard::isArchiveItemValid(const QString &type, const QString &file
         query.prepare("SELECT title FROM recorded WHERE basename = :FILENAME");
         query.bindValue(":FILENAME", baseName);
         query.exec();
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
             return true;
         else
         {
@@ -1040,7 +1040,7 @@ bool MythburnWizard::isArchiveItemValid(const QString &type, const QString &file
         query.prepare("SELECT title FROM videometadata WHERE filename = :FILENAME");
         query.bindValue(":FILENAME", filename);
         query.exec();
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
             return true;
         else
         {
@@ -1099,7 +1099,7 @@ void MythburnWizard::getArchiveListFromDB(void)
                   "startdate, starttime, filename, hascutlist "
                   "FROM archiveitems ORDER BY intid");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -1130,7 +1130,6 @@ void MythburnWizard::getArchiveListFromDB(void)
                 item->videoCodec = "";
                 item->videoWidth = 0;
                 item->videoHeight = 0;
-                item->thumbList.setAutoDelete(true);
                 archiveList->push_back(item);
             }
         }
@@ -1231,12 +1230,12 @@ void MythburnWizard::createConfigFile(const QString &filename)
             details.appendChild(desc);
         }
 
-        if (a->thumbList.count() > 0)
+        if (a->thumbList.size() > 0)
         {
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (uint x = 0; x < a->thumbList.count(); x++)
+            for (int x = 0; x < a->thumbList.size(); x++)
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
@@ -1270,7 +1269,7 @@ void MythburnWizard::createConfigFile(const QString &filename)
         return;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << doc.toString(4);
     f.close();
 }
@@ -1571,7 +1570,7 @@ void MythburnWizard::handleAddVideo()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title FROM videometadata");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
     }
     else

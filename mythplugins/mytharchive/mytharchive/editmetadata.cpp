@@ -5,8 +5,6 @@
 
 // mytharchive
 #include "editmetadata.h"
-//Added by qt3to4:
-#include <QKeyEvent>
 
 EditMetadataDialog::EditMetadataDialog(ArchiveItem *source_metadata,
                                  MythMainWindow *parent,

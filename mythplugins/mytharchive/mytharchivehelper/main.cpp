@@ -21,7 +21,6 @@ using namespace std;
 #include <qdir.h>
 #include <qdom.h>
 #include <qimage.h>
-#include <Q3TextStream>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -723,7 +722,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
         return 0;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -973,7 +972,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
         return 0;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -1093,7 +1092,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode, const QString &x
     query.bindValue(":STARTTIME", startTime);
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             VERBOSE(VB_JOBQUEUE, "ERROR: This recording appears to already exist!!");
             return 1;
@@ -2269,7 +2268,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
         return 1;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << doc.toString(4);
     f.close();
 
@@ -2294,7 +2293,7 @@ int getDBParamters(QString outFile)
         return 1;
     }
 
-    Q3TextStream t(&f);
+    QTextStream t(&f);
     t << params.dbHostName << endl;
     t << params.dbUserName << endl;
     t << params.dbPassword << endl;

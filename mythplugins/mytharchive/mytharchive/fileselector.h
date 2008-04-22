@@ -6,10 +6,7 @@
 // qt
 #include <qstring.h>
 #include <qstringlist.h>
-//Added by qt3to4:
 #include <QKeyEvent>
-#include <Q3PtrList>
-#include <QPixmap>
 
 // myth
 #include <mythtv/mythdialogs.h>
@@ -29,6 +26,8 @@ typedef enum
     FSTYPE_FILE = 1,
     FSTYPE_DIRECTORY = 2
 } FSTYPE;
+
+class QPixmap;
 
 class FileSelector : public MythThemedDialog
 {
@@ -60,11 +59,11 @@ class FileSelector : public MythThemedDialog
     void wireUpTheme(void);
     void updateScrollArrows(void);
 
-    FSTYPE  m_selectorType;
-    QString m_filemask;
-    QString m_curDirectory;
-    Q3PtrList<FileData> m_fileData;
-    QStringList        m_selectedList;
+    FSTYPE            m_selectorType;
+    QString           m_filemask;
+    QString           m_curDirectory;
+    QList<FileData *> m_fileData;
+    QStringList       m_selectedList;
 
     //
     //  GUI stuff

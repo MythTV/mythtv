@@ -42,6 +42,11 @@ RecordingSelector::~RecordingSelector(void)
 {
     if (recordingList)
         delete recordingList;
+
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
+    selectedList.clear();
+
 }
 
 void RecordingSelector::keyPressEvent(QKeyEvent *e)
@@ -159,6 +164,9 @@ void RecordingSelector::selectAll()
     if (!popupMenu)
         return;
 
+
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
 
     ProgramInfo *p;
@@ -178,6 +186,8 @@ void RecordingSelector::clearAll()
     if (!popupMenu)
         return;
 
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
 
     updateRecordingList();
@@ -189,13 +199,15 @@ void RecordingSelector::toggleSelectedState()
     UIListBtnTypeItem *item = recording_list->GetItemCurrent();
     if (item->state() == UIListBtnTypeItem:: FullChecked)
     {
-        if (selectedList.find((ProgramInfo *) item->getData()) != -1)
-            selectedList.remove((ProgramInfo *) item->getData());
+        int index = selectedList.indexOf((ProgramInfo *) item->getData());
+        if (index != -1)
+            delete selectedList.takeAt(index);
         item->setChecked(UIListBtnTypeItem:: NotChecked);
     }
     else
     {
-        if (selectedList.find((ProgramInfo *) item->getData()) == -1)
+        int index = selectedList.indexOf((ProgramInfo *) item->getData());
+        if (index == -1)
             selectedList.append((ProgramInfo *) item->getData());
 
         item->setChecked(UIListBtnTypeItem:: FullChecked);
@@ -320,8 +332,9 @@ void RecordingSelector::OKPressed()
     // loop though selected recordings and add them to the archiveitems table
     ProgramInfo *p;
 
-    for (p = selectedList.first(); p; p = selectedList.next())
+    for (int x = 0; x < selectedList.size(); x++)
     {
+        p = selectedList.at(x);
         query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
                 "description, startdate, starttime, size, filename, hascutlist) "
                 "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
@@ -369,7 +382,7 @@ void RecordingSelector::updateRecordingList(void)
                         p->title + " ~ " + 
                         p->startts.toString("dd MMM yy (hh:mm)"));
                 item->setCheckable(true);
-                if (selectedList.find((ProgramInfo *) p) != -1) 
+                if (selectedList.indexOf((ProgramInfo *) p) != -1)
                 {
                     item->setChecked(UIListBtnTypeItem::FullChecked);
                 }
@@ -462,11 +475,14 @@ void RecordingSelector::updateSelectedList()
     if (!recordingList)
         return;
 
+    while (!selectedList.isEmpty())
+         delete selectedList.takeFirst();
     selectedList.clear();
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'Recording'");
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -479,7 +495,7 @@ void RecordingSelector::updateSelectedList()
                 p = *i;
                 if (p->GetPlaybackURL(false, true) == filename)
                 {
-                    if (selectedList.find(p) == -1)
+                    if (selectedList.indexOf(p) == -1)
                         selectedList.append(p);
                     break;
                 }
