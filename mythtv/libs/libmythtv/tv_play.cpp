@@ -754,7 +754,8 @@ bool TV::Init(bool createWindow)
         myWindow->setMinimumSize(
             (use_fixed_size) ? win_bounds.size() : QSize(16, 16));
         myWindow->setMaximumSize(
-            (use_fixed_size) ? win_bounds.size() : QSize(31*1024, 31*1024));
+            (use_fixed_size) ? win_bounds.size() :
+            QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
 
         // resize main window
         mainWindow->setGeometry(player_bounds);
@@ -762,7 +763,8 @@ bool TV::Init(bool createWindow)
         mainWindow->setMinimumSize(
             (use_fixed_size) ? player_bounds.size() : QSize(16, 16));
         mainWindow->setMaximumSize(
-            (use_fixed_size) ? player_bounds.size() : QSize(31*1024, 31*1024));
+            (use_fixed_size) ? player_bounds.size() :
+            QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->installEventFilter(this);
 
         // finally we put the player window on screen...
