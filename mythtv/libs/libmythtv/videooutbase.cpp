@@ -128,10 +128,13 @@ VideoOutput *VideoOutput::Create(
 
     while (!renderers.empty())
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Trying video renderer: " + renderer);
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Trying video renderer: '%1'").arg(renderer));
         QStringList::iterator it = renderers.find(renderer);
         if (it != renderers.end())
             renderers.erase(it);
+        else
+            break;
 
         VideoOutput *vo = NULL;
 #ifdef USING_IVTV
