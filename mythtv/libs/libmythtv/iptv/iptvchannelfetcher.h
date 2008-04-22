@@ -1,21 +1,28 @@
 #ifndef _IPTVCHANNELFETCHER_H_
 #define _IPTVCHANNELFETCHER_H_
 
-// POSIX headers
-#include <pthread.h>
-
 // Qt headers
 #include <qobject.h>
 #include <qmutex.h>
+#include <qthread.h>
 
 // MythTV headers
 #include "iptvchannelinfo.h"
+
+class IPTVChannelFetcher;
+
+class IPTVChannelFetcherThread : public QThread
+{
+  public:
+    virtual void run();
+    IPTVChannelFetcher *iptvfetcher;
+};
 
 class IPTVChannelFetcher : public QObject
 {
     Q_OBJECT
 
-    friend void *run_scan_thunk(void *param);
+    friend class IPTVChannelFetcherThread;
 
   public:
     IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid);
@@ -37,13 +44,15 @@ class IPTVChannelFetcher : public QObject
     /// \brief Signals that the scan is complete
     void ServiceScanComplete(void);
 
+  protected:
+    void RunScan(void);
+
   private:
     ~IPTVChannelFetcher();
     void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }
     void SetNumChannelsParsed(uint);
     void SetNumChannelsInserted(uint);
     void SetMessage(const QString &status);
-    void RunScan(void);
 
   private:
     uint      _cardid;
@@ -52,7 +61,7 @@ class IPTVChannelFetcher : public QObject
     uint      _chan_cnt;
     bool      _thread_running;
     bool      _stop_now;
-    pthread_t _thread;
+    IPTVChannelFetcherThread _thread;
     QMutex    _lock;
 };
 

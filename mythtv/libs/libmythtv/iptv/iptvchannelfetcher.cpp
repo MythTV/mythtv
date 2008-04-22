@@ -15,8 +15,6 @@
 #define LOC QString("IPTVChanFetch: ")
 #define LOC_ERR QString("IPTVChanFetch, Error: ")
 
-void *run_scan_thunk(void*);
-
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,
                             QString         &channum,
@@ -25,6 +23,15 @@ static bool parse_chan_info(const QString   &rawdata,
 static bool parse_extinf(const QString &data,
                          QString       &channum,
                          QString       &name);
+
+/** \fn IPTVChannelFetcherThread::run(void)
+*   \brief Thunk that allows iptvfetcher Qthread to
+*         call IPTVChannelFetcher::RunScan().
+*/
+void IPTVChannelFetcherThread::run(void)
+{
+    iptvfetcher->RunScan();
+}
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid) :
@@ -57,7 +64,7 @@ void IPTVChannelFetcher::Stop(void)
         _stop_now = true;
         _lock.unlock();
 
-        pthread_join(_thread, NULL);
+        _thread.wait();
         return;
     }
 
@@ -76,7 +83,8 @@ bool IPTVChannelFetcher::Scan(void)
 
     _stop_now = false;
 
-    pthread_create(&_thread, NULL, run_scan_thunk, this);
+    _thread.iptvfetcher = this;
+    _thread.start(QThread::NormalPriority);
 
     while (!_thread_running && !_stop_now)
         usleep(5000);
@@ -84,14 +92,6 @@ bool IPTVChannelFetcher::Scan(void)
     _lock.unlock();
 
     return _thread_running;
-}
-
-void *run_scan_thunk(void *param)
-{
-    IPTVChannelFetcher *chanscan = (IPTVChannelFetcher*) param;
-    chanscan->RunScan();
-
-    return NULL;
 }
 
 void IPTVChannelFetcher::RunScan(void)
@@ -113,7 +113,7 @@ void IPTVChannelFetcher::RunScan(void)
     emit ServiceScanPercentComplete(5);
     emit ServiceScanUpdateText(tr("Downloading Playlist"));
 
-    QString playlist = DownloadPlaylist(url, false);
+    QString playlist = DownloadPlaylist(url, true);
 
     if (_stop_now || playlist.isEmpty())
     {
