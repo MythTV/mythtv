@@ -1,7 +1,9 @@
 #include <cassert>
 #include <stdint.h>
 
-
+// QT headers
+#include <QPainter>
+#include <QMatrix>
 
 #include "mythimage.h"
 #include "mythmainwindow.h"
@@ -56,7 +58,7 @@ void MythImage::Resize(const QSize &newSize)
 {
     if (m_isGradient)
     {
-        *(QImage *)this = QImage(newSize, QImage::Format_RGB32);
+        *(QImage *)this = QImage(newSize, QImage::Format_ARGB32);
         MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha);
         SetChanged();
     }
@@ -64,6 +66,87 @@ void MythImage::Resize(const QSize &newSize)
     {
         Assign(smoothScale(newSize));
     }
+}
+
+void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
+{
+    QImage mirrorImage;
+    FillDirection fillDirection;
+    if (axis == ReflectVertical)
+    {
+        mirrorImage = mirrored(false,true);
+        if (length < 100)
+        {
+            int height = (int)((float)mirrorImage.height() * (float)length/100);
+            mirrorImage = mirrorImage.copy(0,0,mirrorImage.width(),height);
+        }
+        fillDirection = FillTopToBottom;
+    }
+    else if (axis == ReflectHorizontal)
+    {
+        mirrorImage = mirrored(true,false);
+        if (length < 100)
+        {
+            int width = (int)((float)mirrorImage.width() * (float)length/100);
+            mirrorImage = mirrorImage.copy(0,0,width,mirrorImage.height());
+        }
+        fillDirection = FillLeftToRight;
+    }
+
+    QImage alphaChannel(mirrorImage.size(), QImage::Format_RGB32);
+    MakeGradient(alphaChannel, QColor("#AAAAAA"), QColor("#000000"), 255,
+                 false, fillDirection);
+    mirrorImage.setAlphaChannel(alphaChannel);
+
+    QMatrix shearMatrix;
+    if (axis == ReflectVertical)
+    {
+        shearMatrix.scale(1,(float)scale/100);
+        shearMatrix.shear((float)shear/100,0);
+    }
+    else if (axis == ReflectHorizontal)
+    {
+        shearMatrix.scale((float)scale/100,1);
+        shearMatrix.shear(0,(float)shear/100);
+    }
+
+    mirrorImage = mirrorImage.transformed(shearMatrix, Qt::SmoothTransformation);
+
+    QSize newsize;
+    if (axis == ReflectVertical)
+        newsize = QSize(mirrorImage.width(), height()+mirrorImage.height());
+    else if (axis == ReflectHorizontal)
+        newsize = QSize(width()+mirrorImage.width(), mirrorImage.height());
+
+    QImage temp(newsize, QImage::Format_ARGB32);
+    temp.fill(Qt::transparent);
+
+    QPainter newpainter(&temp);
+    newpainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    if (axis == ReflectVertical)
+    {
+        if (shear < 0)
+            newpainter.drawImage(mirrorImage.width()-width(), 0,
+                                 copy(0,0,width(),height()));
+        else
+            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+
+        newpainter.drawImage(0, height(), mirrorImage);
+    }
+    else if (axis == ReflectHorizontal)
+    {
+        if (shear < 0)
+            newpainter.drawImage(0, mirrorImage.height()-height(),
+                                 copy(0,0,width(),height()));
+        else
+            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+
+        newpainter.drawImage(width(), 0, mirrorImage);
+    }
+
+    newpainter.end();
+
+    Assign(temp);
 }
 
 MythImage *MythImage::FromQImage(QImage **img)
@@ -92,47 +175,53 @@ bool MythImage::Load(const QString &filename)
     return false;
 }
 
-void MythImage::MakeGradient(QImage &image, const QColor &begin, const QColor &end, int alpha)
+void MythImage::MakeGradient(QImage &image, const QColor &begin,
+                             const QColor &end, int alpha, bool drawBoundary,
+                             FillDirection direction)
 {
-    image.setAlphaBuffer(alpha < 255);
+    // Gradient fill colours
+    QColor startColor = begin;
+    QColor endColor = end;
+    startColor.setAlpha(alpha);
+    endColor.setAlpha(alpha);
 
-    // calculate how much to change the colour by at each step
-    float rstep = float(end.red() - begin.red()) /
-                  float(image.height());
-    float gstep = float(end.green() - begin.green()) / 
-                  float(image.height());
-    float bstep = float(end.blue() - begin.blue()) / 
-                  float(image.height());
-
-    uint32_t black = qRgba(0, 0, 0, alpha);
-
-    uint32_t *ptr = (uint32_t *)image.scanLine(0);
-    for (int x = 0; x < image.width(); x++, ptr++)
-         *ptr = black;
-
-    for (int y = 1; y < image.height() - 1; y++)
+    // Define Gradient
+    QPoint pointA(0,0);
+    QPoint pointB;
+    if (direction == FillTopToBottom)
     {
-        int r = (int)(begin.red()   + (y * rstep));
-        int g = (int)(begin.green() + (y * gstep));
-        int b = (int)(begin.blue()  + (y * bstep));
-        uint32_t color = qRgba(r, g, b, alpha);
-        ptr = (uint32_t *)image.scanLine(y);
-
-        *ptr = black; ptr++;
-        for (int x = 0; x < image.width() - 2; x++, ptr++)
-            *ptr = color;
-        *ptr = black;
+        pointB = QPoint(0,image.height());
+    }
+    else if (direction == FillLeftToRight)
+    {
+        pointB = QPoint(image.width(),0);
     }
 
-    ptr = (uint32_t *)image.scanLine(image.height() - 1);
-    for (int x = 0; x < image.width(); x++, ptr++)
-         *ptr = black;
+    QLinearGradient gradient(pointA, pointB);
+    gradient.setColorAt(0, startColor);
+    gradient.setColorAt(1, endColor);
+
+    // Draw Gradient
+    QPainter painter(&image);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.fillRect(0, 0, image.width(), image.height(), gradient);
+
+    if (drawBoundary)
+    {
+        // Draw boundry rect
+        QColor black(0, 0, 0, alpha);
+        painter.setPen(black);
+        QPen pen = painter.pen();
+        pen.setWidth(1);
+        painter.drawRect(image.rect());
+    }
+    painter.end();
 }
 
 MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
                                const QColor &end, uint alpha)
 {
-    QImage img(size.width(), size.height(), QImage::Format_RGB32);
+    QImage img(size.width(), size.height(), QImage::Format_ARGB32);
 
     MakeGradient(img, begin, end, alpha);
 

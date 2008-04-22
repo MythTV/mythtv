@@ -67,6 +67,12 @@ class MythUIImage : public MythUIType
     QTime m_LastDisplay;
 
     bool m_NeedLoad;
+
+    bool m_isReflected;
+    ReflectAxis m_reflectAxis;
+    int  m_reflectShear;
+    int  m_reflectScale;
+    int  m_reflectLength;
 };
 
 #endif

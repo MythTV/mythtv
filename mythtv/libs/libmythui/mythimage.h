@@ -8,6 +8,9 @@
 #include <qimage.h>
 #include <QPixmap>
 
+enum ReflectAxis {ReflectHorizontal, ReflectVertical};
+enum FillDirection {FillLeftToRight, FillTopToBottom};
+
 class MythImage : public QImage
 {
   public:
@@ -30,6 +33,7 @@ class MythImage : public QImage
     bool Load(const QString &filename);
 
     void Resize(const QSize &newSize);
+    void Reflect(ReflectAxis axis, int shear, int scale, int length);
 
     /**
      * @brief Create a gradient image.
@@ -38,10 +42,14 @@ class MythImage : public QImage
      * @param end The ending colour.
      * @return A MythImage filled with a gradient.
      */
-    static MythImage *Gradient(const QSize & size, const QColor &begin, const QColor &end, uint alpha);
+    static MythImage *Gradient(const QSize & size, const QColor &begin,
+                               const QColor &end, uint alpha);
 
   protected:
-    static void MakeGradient(QImage &image, const QColor &begin, const QColor &end, int alpha);
+    static void MakeGradient(QImage &image, const QColor &begin,
+                             const QColor &end, int alpha,
+                             bool drawBoundary=true,
+                             FillDirection direction = FillTopToBottom);
 
     virtual ~MythImage();
 

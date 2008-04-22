@@ -68,6 +68,11 @@ void MythUIImage::Init(void)
 
     m_CurPos = 0;
     m_LastDisplay = QTime::currentTime();
+
+    m_isReflected = false;
+    m_reflectShear = 0;
+    m_reflectScale = m_reflectLength = 100;
+    m_reflectAxis = ReflectVertical;
 }
 
 void MythUIImage::SetFilename(const QString &filename)
@@ -156,6 +161,10 @@ bool MythUIImage::Load(void)
         if (!image->Load(filename))
             return false;
 
+        if (m_isReflected)
+            image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                           m_reflectLength);
+
         if (!m_ForceSize.isNull())
         {
             int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
@@ -189,7 +198,7 @@ void MythUIImage::Reset(void)
 
 void MythUIImage::Pulse(void)
 {
-    if (m_Delay > 0 && 
+    if (m_Delay > 0 &&
         abs(m_LastDisplay.msecsTo(QTime::currentTime())) > m_Delay)
     {
         m_CurPos++;
@@ -243,6 +252,27 @@ bool MythUIImage::ParseElement(QDomElement &element)
         m_Skip = parsePoint(element);
     else if (element.tagName() == "delay")
         m_Delay = getFirstText(element).toInt();
+    else if (element.tagName() == "reflection")
+    {
+        m_isReflected = true;
+        QString tmp = element.attribute("axis");
+        if (!tmp.isEmpty())
+        {
+            if (tmp.toLower() == "horizontal")
+                m_reflectAxis = ReflectHorizontal;
+            else
+                m_reflectAxis = ReflectVertical;
+        }
+        tmp = element.attribute("shear");
+        if (!tmp.isEmpty())
+            m_reflectShear = tmp.toInt();
+        tmp = element.attribute("scale");
+        if (!tmp.isEmpty())
+            m_reflectScale = tmp.toInt();
+        tmp = element.attribute("length");
+        if (!tmp.isEmpty())
+            m_reflectLength = tmp.toInt();
+    }
     else
         return MythUIType::ParseElement(element);
 
@@ -271,6 +301,12 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     m_LastDisplay = QTime::currentTime();
     m_CurPos = 0;
+
+    m_isReflected = im->m_isReflected;
+    m_reflectAxis = im->m_reflectAxis;
+    m_reflectShear = im->m_reflectShear;
+    m_reflectScale = im->m_reflectScale;
+    m_reflectLength = im->m_reflectLength;
 
     SetImages(im->m_Images);
 
