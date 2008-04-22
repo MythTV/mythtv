@@ -1609,6 +1609,10 @@ bool VideoOutputXv::Init(
     XJ_disp = MythXOpenDisplay();
     XV_INIT_FATAL_ERROR_TEST(!XJ_disp, "Failed to open display.");
 
+    // HACK -- begin
+    usleep(50 * 1000);
+    // HACK -- end
+
     // Initialize X stuff
     X11L;
     XJ_screen     = DefaultScreenOfDisplay(XJ_disp);
@@ -1618,7 +1622,24 @@ bool VideoOutputXv::Init(
     XJ_curwin     = winid;
     XJ_win        = winid;
     XJ_root       = DefaultRootWindow(XJ_disp);
-    XJ_gc         = XCreateGC(XJ_disp, XJ_win, 0, 0);
+    X11U;
+
+    VERBOSE(VB_PLAYBACK, LOC + "Creating XJ_gc");
+    InstallXErrorHandler(XJ_disp);
+    X11S(XJ_gc    = XCreateGC(XJ_disp, XJ_win, 0, NULL));
+    vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
+    PrintXErrors(XJ_disp, errs);
+
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_screen:     '"<<XJ_screen<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_screen_num: '"<<XJ_screen_num<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_curwin:     '"<<XJ_curwin<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_win:        '"<<XJ_win<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_root:       '"<<XJ_root<<"'");
+    VERBOSE(VB_PLAYBACK, LOC + "XJ_gc:         '"<<XJ_gc<<"'");
+
+    XV_INIT_FATAL_ERROR_TEST(errs.size(), "Failed to create GC.");
+
+    X11L;
     XJ_depth      = DefaultDepthOfScreen(XJ_screen);
 
     // The letterbox color..
