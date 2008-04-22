@@ -715,6 +715,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
         VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
         if (!using_null_videoout)
         {
+/* TODO FIXME, not Qt4 safe
             qApp->lock();
             DialogBox *dlg = new DialogBox(
                 gContext->GetMainWindow(),
@@ -724,6 +725,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
             dlg->exec();
             dlg->deleteLater();
             qApp->unlock();
+*/
         }
         errored = true;
     }
@@ -3256,6 +3258,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if ((errMsg != QString::null) && !using_null_videoout &&
             gContext->GetNumSetting("AudioNag", 1))
         {
+/* TODO FIXME, not Qt4 safe
             DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), errMsg);
 
             QString noaudio  = QObject::tr("Continue WITHOUT AUDIO!");
@@ -3274,6 +3277,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             ret = dlg->exec();
             dlg->deleteLater();
             qApp->unlock();
+*/
         }
             
         if (kDialogCodeButton1 == ret)
@@ -3298,6 +3302,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         VERBOSE(VB_IMPORTANT, "Unable to initialize video.");
         if (!using_null_videoout)
         {
+/* TODO FIXME, not Qt4 safe
             qApp->lock();
             DialogBox *dialog = new DialogBox(
                 gContext->GetMainWindow(),
@@ -3306,6 +3311,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             dialog->exec();
             dialog->deleteLater();
             qApp->unlock();
+*/
         }
 
         if (audioOutput)
@@ -3684,6 +3690,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (IsErrored() && !using_null_videoout)
     {
+/* TODO FIXME, not Qt4 safe
         qApp->lock();
         DialogBox *dialog =
             new DialogBox(gContext->GetMainWindow(),
@@ -3693,6 +3700,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         dialog->deleteLater();
 
         qApp->unlock();
+*/
     }
 }
 
