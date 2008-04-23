@@ -30,8 +30,10 @@ MSqlDatabase::~MSqlDatabase()
     if (m_db.isOpen())
     {
         m_db.close();
+        m_db = QSqlDatabase();  // forces a destroy and must be done before
+                                // removeDatabase() so that connections
+                                // and queries are cleaned up correctly
         QSqlDatabase::removeDatabase(m_name);
-        m_db = QSqlDatabase();
     }
 }
 
