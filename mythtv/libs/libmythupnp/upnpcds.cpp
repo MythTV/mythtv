@@ -1151,21 +1151,15 @@ int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
 
     if (query.isConnected())
     {
-        // Note: Tried to use Bind, however it would not allow me to use it
-        //       for column & table names
+        QString sSQL = QString("SELECT count( %1 ) FROM %2")
+                       .arg( sColumn ).arg( GetTableName( sColumn ) );
 
-        QString sSQL;
-        
-        if (sColumn == "*")
-            sSQL = QString( "SELECT count( * ) FROM %1" ).arg( GetTableName( sColumn ) );
-        else
-            sSQL = QString( "SELECT count( %1 ) FROM %2 WHERE %3=:KEY" )
-                      .arg( sColumn )
-                      .arg( GetTableName( sColumn ) )
-                      .arg( sColumn );
+        if ( sKey.length() )
+            sSQL += " WHERE " + sColumn + " = :KEY";
 
         query.prepare( sSQL );
-        query.bindValue( ":KEY", sKey );
+        if ( sKey.length() )
+            query.bindValue( ":KEY", sKey );
         query.exec();
 
         if (query.size() > 0)
@@ -1174,7 +1168,8 @@ int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
 
             nCount = query.value(0).toInt();
         }
-
+        VERBOSE(VB_UPNP+VB_EXTRA, "UPnpCDSExtension::GetCount() - " +
+                                  sSQL + " = " + QString::number(nCount));
     }
 
     return( nCount );
@@ -1223,7 +1218,8 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
                           .arg( pRequest->m_nRequestedCount );
 
         query.prepare  ( sSQL );
-        query.bindValue(":KEY", sKey );
+        if ( sKey.length() )
+            query.bindValue(":KEY", sKey );
         query.exec();
 
         if (query.isActive() && query.size() > 0)
