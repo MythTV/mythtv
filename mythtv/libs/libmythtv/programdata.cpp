@@ -173,9 +173,10 @@ void ProgramData::fixProgramList(QList<ProgInfo> *fixlist)
                     .arg((*tokeep).channel)
                     .arg((*tokeep).title));
 
-            if (todelete == i)
-                i = cur;
-            fixlist->erase(todelete);
+            bool step_back = todelete == i;
+            i = fixlist->erase(todelete);
+            if (step_back)
+                --i;
         }
     }
 }
