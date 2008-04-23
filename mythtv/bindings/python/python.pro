@@ -6,7 +6,7 @@ python_build.commands = python setup.py build
 
 python_install.target = python_install
 python_install.CONFIG = no_path
-python_install.commands = python setup.py install --skip-build --root=\"\$${INSTALL_ROOT:-/\}\"
+python_install.commands = python setup.py install --skip-build --root=\"$(if $(INSTALL_ROOT),$(INSTALL_ROOT),/)\"
 
 # This is done so the default /usr/local prefix installs to the "normal"
 # /usr/lib/python{VER}/site-packages directory.
