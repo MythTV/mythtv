@@ -39,7 +39,7 @@ bool MSqlDatabase::isOpen()
 {
     if (m_db.isValid())
     {
-        if (!m_db.hostName().length())  // Bootstrapping without a database?
+        if (!m_db.hostName().length())   // Bootstrapping without a database?
             return true;                 // Pretend its open to reduce errors
 
         if (m_db.isOpen())
@@ -435,7 +435,8 @@ bool MSqlQuery::prepare(const QString& query)
     m_last_prepared_query = Q3DeepCopy<QString>(query);
     if (query.contains(m_testbindings))
     {
-        VERBOSE(VB_IMPORTANT, QString("Query contains bind value \"%1\" twice:\n")
+        VERBOSE(VB_IMPORTANT,
+                QString("Query contains bind value \"%1\" twice:\n")
                 .arg(m_testbindings.cap(1)) + query);
         exit(1);
     }
@@ -448,17 +449,21 @@ bool MSqlQuery::testDBConnection()
     return query.isConnected();
 }
 
-void MSqlQuery::bindValue (const QString & placeholder, const QVariant & val, QSql::ParamType paramType)
+void MSqlQuery::bindValue (const QString  & placeholder,
+                           const QVariant & val, QSql::ParamType paramType)
 {
+    if (!m_db->m_db.hostName().length())  // Bootstrapping without a database?
+        return;                           // Pretend we bound, to reduce errors
+
     // XXX - HACK BEGIN
     QMutexLocker lock(&prepareLock);
 
     // qt4 doesn't like to bind values without occurance in the prepared query
     if (!m_last_prepared_query.contains(placeholder))
     {
-        VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder " + placeholder +
-                " without occurance in the prepared query. Ignoring it.\nQuery was: \"" +
-                m_last_prepared_query + "\"");
+        VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder "
+                + placeholder + " without occurance in the prepared query."
+                " Ignoring it.\nQuery was: \"" + m_last_prepared_query + "\"");
         return;
     }
     // XXX - HACK END
@@ -471,7 +476,8 @@ void MSqlQuery::bindValue (const QString & placeholder, const QVariant & val, QS
     QSqlQuery::bindValue(placeholder, val, paramType);
 }
 
-void MSqlQuery::bindValue(int pos, const QVariant & val, QSql::ParamType paramType)
+void MSqlQuery::bindValue(int pos, const QVariant & val,
+                                   QSql::ParamType  paramType)
 {
     if (val.type() == QVariant::String && val.isNull())
     {
@@ -492,7 +498,7 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
 
 QVariant MSqlQuery::lastInsertId()
 {
-    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
+    if (m_db->m_db.hostName().isEmpty())   // Bootstrapping without a database?
         return value(0);                   // Pretend success, to reduce errors
 
     return QSqlQuery::lastInsertId();
@@ -508,9 +514,13 @@ void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
 }
 
 struct Holder {
-    Holder( const QString& hldr = QString::null, int pos = -1 ): holderName( hldr ), holderPos( pos ) {}
-    bool operator==( const Holder& h ) const { return h.holderPos == holderPos && h.holderName == holderName; }
-    bool operator!=( const Holder& h ) const { return h.holderPos != holderPos || h.holderName != holderName; }
+    Holder( const QString& hldr = QString::null, int pos = -1 )
+        : holderName( hldr ), holderPos( pos ) {}
+
+    bool operator==( const Holder& h ) const
+        { return h.holderPos == holderPos && h.holderName == holderName; }
+    bool operator!=( const Holder& h ) const
+        { return h.holderPos != holderPos || h.holderName != holderName; }
     QString holderName;
     int     holderPos;
 };
