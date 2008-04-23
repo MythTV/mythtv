@@ -2601,7 +2601,22 @@ bool MythContext::SaveSettingOnHost(const QString &key,
                                     const QString &newValue,
                                     const QString &host)
 {
+    QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
     bool success = false;
+
+
+    if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
+        return false;
+    }
+
+    if (key.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "- Illegal null key");
+        return false;
+    }
+
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
@@ -2634,15 +2649,13 @@ bool MythContext::SaveSettingOnHost(const QString &key,
             query.bindValue(":HOSTNAME", host);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("SaveSettingOnHost query failure: ", query);
+            MythContext::DBError(LOC + "- query failure: ", query);
         else
             success = true;
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-             QString("Database not open while trying to save setting: %1")
-                                .arg(key));
+        VERBOSE(VB_IMPORTANT, LOC + "- database not open");
     }
 
     ClearSettingsCache(key, newValue);
