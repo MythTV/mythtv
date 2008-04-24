@@ -108,6 +108,8 @@ mingw {
 
     LIBS += -lpthread -lwinmm -lws2_32
 
+    TARGET = lib$${TARGET}
+
     # For easier debugging:
     target.path = $${PREFIX}/bin
 
