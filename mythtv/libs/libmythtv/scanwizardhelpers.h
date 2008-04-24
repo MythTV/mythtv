@@ -33,7 +33,8 @@
 #ifndef SCANWIZARDHELPERS_H
 #define SCANWIZARDHELPERS_H
 
-#include "settings.h"
+#include "libmyth/compat.h"
+#include "libmyth/settings.h"
 
 #include <qwaitcondition.h>
 #include <qevent.h>

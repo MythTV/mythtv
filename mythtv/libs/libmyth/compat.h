@@ -35,6 +35,7 @@ typedef unsigned int uint;
 #undef LoadIcon
 #undef GetObject
 #undef DrawText
+#undef CreateDialog
 #undef CreateFont
 #endif
 
