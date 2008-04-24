@@ -501,6 +501,11 @@ use_hidesyms {
 }
 
 mingw {
+    TARGET = lib$${TARGET}
+
+    # For easier debugging:
+    target.path = $${PREFIX}/bin
+
     DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_D3D
 

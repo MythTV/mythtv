@@ -28,6 +28,7 @@ contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
 	QMAKE_CFLAGS_SHLIB =
 }
 
+mingw:TARGET      = lib$${TARGET}
 mingw:target.path = $${PREFIX}/bin
 
 !profile:QMAKE_CFLAGS_DEBUG += -O
