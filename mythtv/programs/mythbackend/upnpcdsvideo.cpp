@@ -360,7 +360,8 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
 
         query.prepare  ( sSQL );
         //VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
-        query.bindValue(":KEY", sKey );
+        if ( sKey.length() )
+            query.bindValue(":KEY", sKey );
         query.exec();
 
         if (query.isActive() && query.size() > 0)
