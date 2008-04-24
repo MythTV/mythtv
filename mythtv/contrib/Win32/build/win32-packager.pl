@@ -10,6 +10,20 @@
 ### Tool for automating frontend builds on MS Windows XP (and compatible)
 ### originally based loosely on osx-packager.pl, but now is its own beast.
 ###
+### =examples
+### win32-packager.pl -h
+### Print usage
+### win32-packager.pl -v
+### Compile mythtv based on trunk svn 16789
+### win32-packager.pl -v -r head
+### Compile mythtv based on trunk head
+### win32-packager.pl -v -b
+### Compile mythtv based on release-021-fixes svn 16468
+### win32-packager.pl -v -b -t
+### include some patches which are still not accepted and needed for Win32 
+### win32-packager.pl -v -b -t -k
+### Same but package and create setup at the end
+###
 ### =revision
 ### $Id$
 ###
@@ -87,7 +101,7 @@ $makeclean  = 1       if defined $opt{l};
 
 if (defined $opt{c}) {
     $compile_type = $opt{c} if ($opt{c} eq "release") ;
-    $compile_type = $opt{c} if ($opt{c} eq"profile") ;
+    $compile_type = $opt{c} if ($opt{c} eq "profile") ;
 }
 
 if (defined $opt{b}) {
@@ -102,8 +116,12 @@ if (defined $opt{b}) {
 if ( $svnlocation eq 'trunk' && ($SVNRELEASE eq 'HEAD' || $SVNRELEASE > 16789) )
 {   $qtver = 4   }
 
-# force us to label the DLL's as 0.21 if we are on the release 21 branch!
-$version = '0.21' if   $svnlocation eq "branches/release-0-21-fixes"; 
+# 0.22-fixes doesn't exist yet.
+if ($svnlocation eq "branches/release-0-22-fixes") {
+    $version = '0.21';
+    $svnlocation = "branches/release-0-21-fixes";
+    $qtver = 3;
+}
 
 print "Config:\n\tQT version: $qtver\n\tDLL's will be labeled as: $version\n\tSVN location is: $svnlocation\n\n";
 
@@ -694,6 +712,7 @@ push @{$expect},
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
 export PATH=$QTDIR/bin:/usr/local/bin:$PATH
+export INSTALL_ROOT='.$unixbuild.'
 ' ],comment => 'write a QT3 script that we can source later when inside msys to setup the environment variables'],
 
 
@@ -703,6 +722,7 @@ export PATH=$QTDIR/bin:/usr/local/bin:$PATH
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
 export PATH=$QTDIR/bin:/usr/local/bin:$PATH
+export INSTALL_ROOT='.$unixbuild.'
 ' ],comment => 'write a QT4 script that we can source later when inside msys to setup the environment variables'],
 
 
@@ -846,7 +866,15 @@ push @{$expect},
 [ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
 
 # configure
-[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-xvmc --enable-directx --cpu=k8 --compile-type='.$compile_type], comment => 'do we already have a Makefile for mythtv?' ],
+[ file => $mythtv.'mythtv/Makefile',
+ shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+           'cd '.$unixmythtv.'mythtv',
+           './configure --prefix=/ --disable-dbox2 --disable-hdhomerun'.
+           ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
+           ' --disable-xvmc --enable-directx --cpu=k8'.
+           ' --enable-memalign-hack --compile-type='.$compile_type],
+comment => 'do we already have a Makefile for mythtv?' ],
+
 # make
 [ newer => [$mythtv."mythtv/libs/libmyth/libmyth-$version.dll",
             $mythtv.'mythtv/last_build.txt'],
@@ -875,6 +903,8 @@ push @{$expect},
 
 
 # fix a bug in Makefile and make COPY_DIR cp -fr instead of cp -f
+# TODO Check if this is necessary. I suspect it was meant to fix #4949?
+#
 [ file => $mythtv.'mythtv/fix_makefile.sh', write => [$mythtv.'mythtv/fix_makefile.sh', 
 'cd '.$unixmythtv.'mythtv
 cat Makefile | sed  "s/\(^COPY_DIR\W*\=\W*cp\)\(\W\-f\)/\1 -fr/" > Makefile_new
@@ -882,41 +912,39 @@ cp Makefile_new Makefile
 ', 'nocheck',
 ],comment => 'write a script to fix Makefile'],
 
+# Archive old build before we create a new one with make install:
+[ exists  => $mythtv.'build_old',
+  shell   => ['rm -fr '.$unixmythtv.'build_old'],
+  comment => 'Deleting old build backup'],
+[ exists  => $build,
+  shell   => ['mv '.$unixbuild.' '.$unixmythtv.'build_old'],
+  comment => 'Renaming build to build_old for backup....'],
 
-# re-install to msys /usr/bin folders etc, if we have a newer mythtv build
+# re-install to /c/mythtv/build if we have a newer mythtv build
 # ready:
-[ newer => [$msys.'bin/mythfrontend.exe',
+[ newer => [$build.'bin/mythfrontend.exe',
             $mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythtv','make install'],
 comment => 'was the last configure successful? then install mythtv ' ],
 
-# install some themes? does a 'make install' do that adequately (no, not if
-# running outside msys)?
-# copy the basic themes somewhere that mythtv can get at it.
-# TODO this should really be independent of the msys folders, but it's not
-# at present?
-
-[ dir => $msys.'share\mythtv\themes\G.A.N.T', shell => ['mkdir /usr/share/mythtv','mkdir /usr/share/mythtv/themes','cp -r /c/mythtv/mythtv/themes/* /usr/share/mythtv/themes/'], comment => 'copy the basic themes somewhere that mythtv can get at it.' ],
+# TODO check if this is necessary. The 'make install' above should do it!
+#
+[  dir => [$msys.'share\mythtv\themes\G.A.N.T'],
+ shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+           'cd '.$unixmythtv.'mythtv','make install_themes'],
+comment => 'copy the basic themes somewhere that mythtv can get at it.' ],
 
 # setup_build creates the build area and copies results (apart from themes)
 [ file => $mythtv.'setup_build.sh_', write => [$mythtv.'setup_build.sh',
 '#!/bin/bash
 source '.$unixmythtv.'qt'.$qtver.'_env.sh
 cd '.$unixmythtv.'
-echo renaming build to build_old for backup....
-# keep around just one earlier verion in build_old:
-rm -rf build_old
-mv build build_old
-mkdir build
-echo copying exes and dlls to the build folder...
-find . -name \\*.exe  | grep -v build | xargs -n1 -i__ cp __ ./build/
-find . -name \\*.dll  | grep -v build | xargs -n1 -i__ cp __ ./build/  
 echo copying main QT dlls to build folder...
 # mythtv probably needs the qt3 dlls at runtime:
-cp '.$unixmsys.'qt-3.3.x-p8/lib/*.dll '.$unixmythtv.'build
+cp '.$unixmsys.'qt-3.3.x-p8/lib/*.dll '.$unixmythtv.'build/bin
 # mythtv probably needs the qt4 dlls at runtime:
-cp '.$unixmsys.'qt-win-opensource-4.3.4/lib/*.dll '.$unixmythtv.'build
+cp '.$unixmsys.'qt-win-opensource-4.3.4/lib/*.dll '.$unixmythtv.'build/bin
 # qt mysql connection dll has to exist in a subfolder called sqldrivers:
 echo Creating build-folder Directories...
 # Assumptions
@@ -927,44 +955,20 @@ echo Creating build-folder Directories...
 # plugins go into installlibdir/mythtv/plugins
 # filters go into installlibdir/mythtv/filters
 # translations go into <installprefix>/share/mythtv/i18n
-mkdir '.$unixmythtv.'/build/sqldrivers
-mkdir '.$unixmythtv.'/build/share
-# mkdir $unixmythtv/build/include - dont nead headers at runtime
-mkdir '.$unixmythtv.'/build/lib
-mkdir '.$unixmythtv.'/build/lib/mythtv
-mkdir '.$unixmythtv.'/build/share/mythtv
-mkdir '.$unixmythtv.'/build/share/mythtv/themes
-mkdir '.$unixmythtv.'build/share/mythtv/mythweather
-mkdir '.$unixmythtv.'build/share/mythtv/i18n
+mkdir '.$unixmythtv.'/build/bin/sqldrivers
 echo Copying QT plugin required dlls....
-cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'build/sqldrivers 
-cp '.$unixmsys.'qt-win-opensource-4.3.4/plugins/sqldrivers/qsqlmysql4.dll '.$unixmythtv.'build/sqldrivers 
+cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'build/bin/sqldrivers 
+cp '.$unixmsys.'qt-win-opensource-4.3.4/plugins/sqldrivers/qsqlmysql4.dll '.$unixmythtv.'build/bin/sqldrivers 
 echo Copying ming and msys dlls to build folder.....
 # pthread dlls and mingwm10.dll are copied from here:
-cp /mingw/bin/*.dll '.$unixmythtv.'build
+cp /mingw/bin/*.dll '.$unixmythtv.'build/bin
 # msys-1.0.dll dll is copied from here:
-cp /bin/msys-1.0.dll '.$unixmythtv.'build
-# copy exes and dlls to the build folder:
-#echo Copying exe files....
-#find . -name \\*.exe  | grep -v build | xargs -n1 -i__ cp __ ./build/
-#echo Copying dll files....
-#find . -name \\*.dll  | grep -v build | xargs -n1 -i__ cp __ ./build/  
-#echo Copying language files
-#find . -name \\*.qm | grep -v build | xargs -n -i__ cp __ ./build/share/mythtv/i18n
-echo copying share files...
-cp -r /share/mythtv ./build/share/
+cp /bin/msys-1.0.dll '.$unixmythtv.'build/bin
 echo copying lib files...
-cp -r /lib/mythtv/ ./build/lib/
-cp -r /usr/lib/mythtv/ ./build/lib/
-#echo copying include files...
-#cp -r /include/mythtv ./build/include/
-cp /usr/bin/myth*.exe ./build/
-cp /usr/bin/libmyth*.dll ./build/
-cp /usr/bin/mtd.exe ./build/
-cp /usr/bin/ignyte.exe ./build/
+mv '.$unixmythtv.'build/lib/*.dll '.$unixmythtv.'build/bin/
 touch '.$unixmythtv.'/build/package_flag
-cp '.$unixmythtv.'gdb_*.bat '.$unixmythtv.'build
-cp '.$unixmythtv.'mythtv/contrib/Win32/debug/*.cmd '.$unixmythtv.'build
+cp '.$unixmythtv.'gdb_*.bat '.$unixmythtv.'build/bin
+cp '.$unixmythtv.'mythtv/contrib/Win32/debug/*.cmd '.$unixmythtv.'build/bin
 ','nocheck' 
 ],comment => 'write a script to install mythtv to build folder'],
 
@@ -1005,7 +1009,7 @@ cp /usr/share/mythtv/i18n/* ./build/share/mythtv/i18n
 
 # Change - don't run this until mythplugins are complete - otherwise dll/exe are copied twice
 # Run setup_build.sh which creates the build area and copies executables
-[ file => [$mythtv.'build/package_flag'], shell => [$unixmythtv.'setup_build.sh'], 
+[ file => [$mythtv.'build/package_flag_'], shell => [$unixmythtv.'setup_build.sh', 'nocheck'], 
   comment => 'Copy mythtv into ./build folder' ],
 ;
 
@@ -1120,18 +1124,54 @@ if ( grep m/mythplugins/, @components ) {
 # 
 push @{$expect},
 #
+# hack location of //include/mythtv/mythconfig.mak so that configure is successful
+[ file => $msys.'include/mythtv/mythconfig.mak', 
+ shell => ['mkdir /include/mythtv',
+           'cp '.$unixmythtv.'build/include/mythtv/mythconfig.mak'.
+               ' /include/mythtv/mythconfig.mak', 'nocheck'], 
+comment => 'link mythconfig.mak'],
 ## config:
-[ file => $mythtv.'mythplugins/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythplugins','./configure --prefix=/usr --disable-mythgallery --disable-mythmusic --disable-mytharchive --disable-mythbrowser --disable-mythflix --disable-mythgame --disable-mythnews --disable-mythphone --disable-mythzoneminder --disable-mythweb --enable-aac --enable-libvisual --enable-fftw --compile-type='.$compile_type,'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'], comment => 'do we already have a Makefile for myth plugins?' ],
+[ file => $mythtv.'mythplugins/Makefile', 
+ shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+           'cd '.$unixmythtv.'mythplugins',
+           './configure --prefix= --disable-mythgallery --disable-mythmusic'.
+           ' --disable-mytharchive --disable-mythbrowser --disable-mythflix'.
+           ' --disable-mythgame --disable-mythnews --disable-mythphone'.
+           ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
+           ' --enable-libvisual --enable-fftw --compile-type='.$compile_type,
+           'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'], 
+comment => 'do we already have a Makefile for myth plugins?' ],
 
+[ grep => ['win32:DEPENDS', $mythtv.'mythplugins/settings.pro'], shell => ['echo \'win32:DEPENDS += ./\' >> '.$mythtv.'mythplugins/settings.pro','nocheck'], comment => 'fix settings.pro' ],
+
+#hack mythconfig.mak to remove /usr
+[ grep => ['LIBDIR=/lib', $mythtv.'mythplugins/mythconfig.mak'], 
+ shell => ['cd '.$unixmythtv.'mythplugins',
+           'sed -e \'s|/usr||\' mythconfig.mak > mythconfig2.mak',
+           'cp mythconfig2.mak mythconfig.mak', 'nocheck'], 
+comment => 'hack mythconfig.mak'],
 
 ## make
-[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',$mythtv.'mythtv/last_build.txt'], shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythplugins','make'], comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
+[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
+            $mythtv.'mythtv/last_build.txt'], 
+  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+            'cd '.$unixmythtv.'mythplugins','make'], 
+comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
+
+# make cleanup/cleanup.pro as install fails without it
+[ file => $mythtv.'mythplugins/cleanup/cleanup.pro', 
+ shell => ['touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro', 'nocheck'], 
+comment => 'make cleanup.pro'],
 
 ## make install
-[ newer => [$msys.'lib/mythtv/plugins/libmythmovies.dll',$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'], shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythplugins','make install'], comment => 'PLUGINS! make install' ],
+[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
+            $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
+  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+            'cd '.$unixmythtv.'mythplugins','make install'],
+comment => 'PLUGINS! make install' ],
 
 # Copy to build area
-[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
+#[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
 ;
 }
 
@@ -1142,19 +1182,24 @@ if ( grep m/myththemes/, @components ) {
 # -------------------------------
 push @{$expect},
 ## config:
-[ file => $mythtv.'myththemes/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','./configure --prefix=/usr '], comment => 'do we already have a Makefile for myththemes?' ],
+[ file => $mythtv.'myththemes/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','./configure --prefix= '], comment => 'do we already have a Makefile for myththemes?' ],
 
-# fix a bug in Makefile and make COPY_DIR cp -fr instead of cp -f
-#[ file => $mythtv.'myththemes/fix_makefile.sh', write => [$mythtv.'myththemes/fix_makefile.sh', 
-#'cd '.$unixmythtv.'myththemes
-#cat Makefile | sed  "s/\(^COPY_DIR\W*\=\W*cp\)\(\W\-f\)/\1 -fr/" > Makefile_new
-#cp Makefile_new Makefile
-#', 'nocheck',
-#],comment => 'write a script to fix Makefile'],
-#[ grep => ['COPY_DIR\W*=\W*cp -fr',$mythtv.'myththemes/Makefile'], shell => ['cd '.$unixmythtv.'myththemes','source ./fix_makefile.sh'], comment => 'fix Makefile'],
+## fix myththemes.pro
+[ grep => ['^win32:QMAKE_INSTALL_DIR', $mythtv.'myththemes/myththemes.pro'], shell => ['echo \'win32:QMAKE_INSTALL_DIR = sh ./cpsvndir\' >> '.$mythtv.'myththemes/myththemes.pro','nocheck'], comment => 'fix myththemes.pro' ],
+[ grep => ['win32:DEPENDS', $mythtv.'myththemes/myththemes.pro'], shell => ['echo \'win32:DEPENDS += ./\' >> '.$mythtv.'myththemes/myththemes.pro','nocheck'], comment => 'fix myththemes.pro' ],
+
+#hack mythconfig.mak to remove /usr
+[ grep => ['LIBDIR=/lib', $mythtv.'myththemes/mythconfig.mak'], 
+ shell => ['cd '.$unixmythtv.'myththemes',
+           'sed -e \'s|/usr||\' mythconfig.mak > mythconfig2.mak',
+           'cp mythconfig2.mak mythconfig.mak', 'nocheck'], 
+comment => 'hack mythconfig.mak'],
 
 ## make
-#[ newer => [$dosmsys.'/share/mythtv/themes/Retro/theme.xml',$mythtv.'mythtv/last_build.txt'], shell => ['rm /usr/share/mythtv/themes/Retro/base.xml','source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','make', 'make install_themes'], comment => 'THEMES! redo make if we need to (see the  last_build.txt identifier)' ],
+[ dir => [$mythtv.'/build/share/mythtv/themes/Retro'], 
+shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+          'cd '.$unixmythtv.'myththemes','make', 'make install'], 
+comment => 'THEMES! redo make if we need to (see the  last_build.txt identifier)' ],
 
 # Copy to build area
 #[ filesame => [$mythtv.'build/share/mythtv/themes/Retro/theme.xml',$dosmsys.'/share/mythtv/themes/Retro/theme.xml'], shell => ['source '.$unixmythtv.'setup_themes.sh'], comment => 'Copy new themes to a build directory' ],
