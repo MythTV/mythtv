@@ -3337,7 +3337,14 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
     socket->writeStringList(strlist);
     socket->readStringList(strlist, true);
 
-    if (strlist[0] == "REJECT")
+    if (strlist.empty())
+    {
+        VERBOSE(VB_IMPORTANT, "Protocol version check failure. The response "
+                "to MYTH_PROTO_VERSION was empty.");
+
+        return false;
+    }
+    else if (strlist[0] == "REJECT")
     {
         VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,"
                                     "backend=%2)\n")
