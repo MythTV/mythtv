@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080420-1"
+VERSION="0.1.20080427-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -258,6 +258,16 @@ def fatalError(msg):
     saveSetting("MythArchiveLastRunResult", "Failed: " + quoteString(msg));
     saveSetting("MythArchiveLastRunEnd", time.strftime("%Y-%m-%d %H:%M:%S "))
     sys.exit(0)
+
+# ###########################################################
+# Display a warning message
+
+def nonfatalError(msg):
+    """Display a warning message"""
+    write("*"*60)
+    write("WARNING: " + msg)
+    write("*"*60)
+    write("")
 
 #############################################################
 # Return the input string with single quotes escaped.
@@ -1888,7 +1898,6 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 
     # run spumux to add subtitles if they exist
     if os.path.exists(os.path.dirname(destination) + "/stream.d/spumux.xml"):
-        #FIXME is this needed??
         write("Checking integrity of subtitle pngs")
         command = os.path.join(scriptpath, "testsubtitlepngs.sh") + " %s/stream.d/spumux.xml" % (os.path.dirname(destination))
         result = runCommand(command)
@@ -1899,7 +1908,10 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
         command = path_spumux[0] + " -P %s/stream.d/spumux.xml <%s >%s" % (os.path.dirname(destination), destination, os.path.splitext(destination)[0] + "-sub.mpg")
         result = runCommand(command)
         if result<>0:
-            fatalError("Failed while running spumux - %s" % command)
+            nonfatalError("Failed while running spumux.\n"
+                          "Command was - %s.\n"
+                          "Look in the full log to see why it failed" % command)
+            os.remove(os.path.splitext(destination)[0] + "-sub.mpg")
         else:
             os.rename(os.path.splitext(destination)[0] + "-sub.mpg", destination)
 
