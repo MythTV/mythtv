@@ -76,8 +76,9 @@
 #define DCT6416_VENDOR_ID2 0x00001a66 
 #define DCT6416_MODEL_ID1  0x0000646b
 
-#define PACE550_VENDOR_ID1 0x00005094
+#define PACE_VENDOR_ID1    0x00005094 /* 550 & 779 */
 #define PACE550_MODEL_ID1  0x00010551
+#define PACE779_MODEL_ID1  0x00010755
 
 #define AVC1394_6200_OPERAND_SET 0x20      /* 6200 subunit command operand */
 
@@ -249,7 +250,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
             (dir.vendor_id == DCT6416_VENDOR_ID1) || 
             (dir.vendor_id == DCT6416_VENDOR_ID2) ||
-            (dir.vendor_id == PACE550_VENDOR_ID1)) &&
+            (dir.vendor_id == PACE_VENDOR_ID1)) &&
            ((dir.model_id == DCH3200_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT3416_MODEL_ID1) ||
@@ -260,7 +261,9 @@ int main (int argc, char *argv[])
             (dir.model_id == DCT6412_MODEL_ID1) ||
             (dir.model_id == DCT6412_MODEL_ID2) ||
             (dir.model_id == DCT6416_MODEL_ID1) ||
-            (dir.model_id == PACE550_MODEL_ID1)) ) {
+            (dir.model_id == PACE550_MODEL_ID1) ||
+            (dir.model_id == PACE779_MODEL_ID1)) )
+      {
             if (dir.unit_spec_id != DCT6200_SPEC_ID)
                fprintf(stderr, "Warning: Unit Spec ID different.\n");
             if (dir.unit_sw_version != DCT6200_SW_VERSION)
