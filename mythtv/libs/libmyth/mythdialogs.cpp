@@ -459,6 +459,7 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
         label->setAlignment(align);
     }
 
+    label->setWordWrap(true);
     addWidget(label, false);
     return label;
 }
