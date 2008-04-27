@@ -450,7 +450,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     const uint64_t pace_vendor_ids[] =
     {
-        /* PACE 550-HD */
+        /* PACE 550-HD & 779 */
         0x5094,
     };
 
@@ -459,7 +459,8 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     for (uint i = 0; i < pace_vendor_id_cnt; i++)
     {
-        id_to_model[pace_vendor_ids[i] << 32 | 0xd330] = "PACE-550";
+        id_to_model[pace_vendor_ids[i] << 32 | 0x10551] = "PACE-550";
+        id_to_model[pace_vendor_ids[i] << 32 | 0x10755] = "PACE-779";
     }
 }
 
@@ -476,6 +477,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "SA4200HD") ||
             (model == "SA4250HDC") ||
             (model == "PACE-550") ||
+            (model == "PACE-779") ||
             (model == "GENERIC"));
 }
 
