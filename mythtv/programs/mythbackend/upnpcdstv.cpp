@@ -14,7 +14,8 @@
 #include <qregexp.h>
 #include <q3url.h>
 #include <limits.h>
-#include "util.h"
+#include "mythtv/storagegroup.h"
+#include "mythtv/util.h"
 
 
 /*
@@ -144,7 +145,8 @@ QString UPnpCDSTv::GetItemListSQL( QString /* sColumn */ )
     return "SELECT chanid, starttime, endtime, title, " \
                   "subtitle, description, category, "   \
                   "hostname, recgroup, filesize, "      \
-                  "basename, progstart, progend "       \
+                  "basename, progstart, progend, "      \
+                  "storagegroup "                       \
            "FROM recorded ";
 }
 
@@ -254,6 +256,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
 
     QDateTime      dtProgStart  = query.value(11).toDateTime();
     QDateTime      dtProgEnd    = query.value(12).toDateTime();
+    QString        sStorageGrp  = query.value(13).toString();
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
@@ -325,12 +328,19 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
-    // Add Video Resource Element based on File extension (HTTP)
+    // Add Video Resource Element based on File contents/extension (HTTP)
     // ----------------------------------------------------------------------
-    
-    QFileInfo fInfo( sBaseName );
 
-    QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
+    StorageGroup sg(sStorageGrp, sHostName);
+    QString sFilePath = sg.FindRecordingFile(sBaseName);
+    QString sMimeType;
+
+    if ( QFile::exists(sFilePath) )
+        sMimeType = HTTPRequest::TestMimeType( sFilePath );
+    else
+        sMimeType = HTTPRequest::TestMimeType( sBaseName );
+
+
     // DLNA string below is temp fix for ps3 seeking.
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
