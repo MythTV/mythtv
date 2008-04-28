@@ -177,7 +177,7 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
             {
                 QRegExp r;
 
-                r.setPattern("^" + Info.extension( FALSE ) + "$");
+                r.setPattern("^" + Info.suffix() + "$");
                 r.setCaseSensitive(false);
                 QStringList result = handler->validextensions.grep(r);
                 if (result.isEmpty()) {

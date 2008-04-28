@@ -474,7 +474,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     // Add Video Resource Element based on File extension (HTTP)
     // ----------------------------------------------------------------------
 
-    QString sMimeType = HTTPRequest::GetMimeType( fInfo.extension( FALSE ));
+    QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
                                  "DLNA.ORG_FLAGS=0150000000000000000000000000"
                                  "0000" ).arg( sMimeType  );
