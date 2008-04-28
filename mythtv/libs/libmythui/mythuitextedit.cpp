@@ -385,7 +385,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT")
         {
-            if (MoveCursor(MoveLeft))
+            if (!MoveCursor(MoveLeft))
                 handled = false;
         }
         else if (action == "RIGHT")
