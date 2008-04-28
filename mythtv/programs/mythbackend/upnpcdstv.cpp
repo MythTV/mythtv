@@ -14,8 +14,8 @@
 #include <qregexp.h>
 #include <q3url.h>
 #include <limits.h>
-#include "mythtv/storagegroup.h"
-#include "mythtv/util.h"
+#include "libmyth/storagegroup.h"
+#include "libmyth/util.h"
 
 
 /*
