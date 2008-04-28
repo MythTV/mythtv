@@ -180,6 +180,7 @@ class HTTPRequest
         bool            GetKeepAlive    ();
 
         static QString  GetMimeType     ( const QString &sFileExtension );
+        static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
 
         // ------------------------------------------------------------------

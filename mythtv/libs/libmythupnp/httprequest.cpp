@@ -48,7 +48,6 @@ static MIMETypes g_MIMETypes[] =
 {
     { "gif" , "image/gif"                  },
     { "jpg" , "image/jpeg"                 },
-    { "jpeg", "image/jpeg"                 },
     { "png" , "image/png"                  },
     { "htm" , "text/html"                  },
     { "html", "text/html"                  },
@@ -68,11 +67,9 @@ static MIMETypes g_MIMETypes[] =
     { "zip" , "application/x-tar"          },
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
-    { "mpg2", "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
-    { "mpeg2","video/mpeg"                 },
     { "ts"  , "video/mpegts"               },
-    { "vob" , "video/mpeg"                 },
+    { "vob" ,  "video/mpeg"                },
     { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
     { "mov" , "video/quicktime"            },
@@ -80,7 +77,6 @@ static MIMETypes g_MIMETypes[] =
     { "mkv" , "video/x-matroska"           },
     { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             },
-    // This should be application/ogg, but most clients don't understand that.
     { "ogg" , "audio/ogg"                  },
 };
 
@@ -264,7 +260,7 @@ long HTTPRequest::SendResponse( void )
           cout << m_aBuffer.data()[i];
 
         cout << endl;
-*/       
+*/
         nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
     }
 
@@ -317,9 +313,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
     if (QFile::exists( sFileName ))
     {
-        QFileInfo info( sFileName );
 
-        m_sResponseTypeText = GetMimeType( info.extension( FALSE ).lower() );
+        m_sResponseTypeText = TestMimeType( sFileName );
 
         // ------------------------------------------------------------------
         // Get File size
@@ -653,6 +648,44 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
     }
 
     return( "text/plain" );
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::TestMimeType( const QString &sFileName )
+{
+    QFileInfo info( sFileName );
+    QString   sLOC    = "HTTPRequest::TestMimeType( " + sFileName + ") - ";
+    QString   sSuffix = info.suffix().lower();
+    QString   sMIME   = GetMimeType( sSuffix );
+
+    if ( sSuffix == "nuv"      // If a very old recording, might be an MPEG?
+       //|| sSuffix == "blah"
+       )
+    {
+        // Read the header to find out:
+
+        QFile file( sFileName );
+
+        if ( file.open(QIODevice::ReadOnly | QIODevice::Text) )
+        {
+            QByteArray head = file.read(8);
+            QString    sHex = head.toHex();
+
+            VERBOSE(VB_UPNP+VB_EXTRA, sLOC + " file starts with " + sHex);
+
+            if ( sHex == "000001ba44000400" )  // MPEG2 PS
+                sMIME = "video/mpeg";
+
+            file.close();
+        }
+        else VERBOSE(VB_IMPORTANT, sLOC + "Couldn't read file");
+    }
+
+    VERBOSE(VB_UPNP, sLOC + " type is " + sMIME);
+    return sMIME;
 }
 
 /////////////////////////////////////////////////////////////////////////////
