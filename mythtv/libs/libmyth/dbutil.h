@@ -2,6 +2,7 @@
 #define DBUTIL_H_
 
 #include <qstringlist.h>
+#include <qmap.h>
 
 #include "mythexp.h"
 
@@ -28,6 +29,7 @@ class MPUBLIC DBUtil
 
     bool BackupDB(QString &filename);
 
+    static QMap<QString,bool> GetTableMap(void);
     static bool IsBackupInProgress(void);
 
     static const int kUnknownVersionNumber;
@@ -36,7 +38,7 @@ class MPUBLIC DBUtil
     bool QueryDBMSVersion(void);
     bool ParseDBMSVersion(void);
 
-    QStringList GetTables(void);
+    static QStringList GetTables(void);
 
     QString CreateBackupFilename(QString prefix = "mythconverg",
                                  QString extension = ".sql");

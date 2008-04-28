@@ -555,16 +555,20 @@ bool UpgradeTVDatabaseSchema(void)
 
     QString backupResult = "";
 #ifndef USING_MINGW
-    dbutil.BackupDB(backupResult);
+    if (dbver != "0")
+        dbutil.BackupDB(backupResult);
 #endif
 
-    switch (gContext->PromptForSchemaUpgrade(dbver, currentDatabaseVersion,
-                                             backupResult))
+    if (dbver != "0")
     {
-        case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
-        case MYTH_SCHEMA_ERROR:
-        case MYTH_SCHEMA_EXIT:         return false;
-        case MYTH_SCHEMA_UPGRADE:      break;
+        switch (gContext->PromptForSchemaUpgrade(
+                    dbver, currentDatabaseVersion, backupResult))
+        {
+            case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
+            case MYTH_SCHEMA_ERROR:
+            case MYTH_SCHEMA_EXIT:         return false;
+            case MYTH_SCHEMA_UPGRADE:      break;
+        }
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

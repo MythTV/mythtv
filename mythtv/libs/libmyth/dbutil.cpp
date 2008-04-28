@@ -191,6 +191,15 @@ bool DBUtil::BackupDB(QString &filename)
     return result;
 }
 
+QMap<QString,bool> DBUtil::GetTableMap(void)
+{
+    QMap<QString,bool> found_table;
+    const QStringList list = GetTables();
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+        found_table[*it] = true;
+    return found_table;
+}
+
 /** \fn DBUtil::GetTables(void)
  *  \brief Retrieves a list of tables from the database.
  *
@@ -203,33 +212,24 @@ bool DBUtil::BackupDB(QString &filename)
 QStringList DBUtil::GetTables(void)
 {
     QStringList result;
+
     MSqlQuery query(MSqlQuery::InitCon());
-    if (query.isConnected())
+    if (!query.isConnected())
+        return result;
+
+    query.prepare("SHOW FULL TABLES");
+    if (!query.exec())
     {
-        QString sql;
-        // MySQL 5.0.2+ support "SHOW FULL TABLES;" to get the Table_type
-        // column to distinguish between BASE TABLEs and VIEWs
-        bool supportsTableType = (CompareDBMSVersion(5, 0, 2) >= 0);
-        if (supportsTableType)
-            sql = "SHOW FULL TABLES;";
-        else
-            sql = "SHOW TABLES;";
-
-        query.prepare(sql);
-
-        if (query.exec() && query.size() > 0)
-        {
-            while(query.next())
-            {
-                if (supportsTableType)
-                    if (query.value(1).toString() == "VIEW")
-                        continue;
-                result.append(query.value(0).toString());
-            }
-        }
-        else
-            MythContext::DBError("DBUtil Finding Tables", query);
+        MythContext::DBError("DBUtil Finding Tables", query);
+        return result;
     }
+
+    while (query.next())
+    {
+        if (query.value(1).toString() != "VIEW")
+            result.append(query.value(0).toString());
+    }
+
     return result;
 }
 

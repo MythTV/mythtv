@@ -18,6 +18,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "util.h"
+#include "dbutil.h"
 
 #define SHOW_WGET_OUTPUT 0
 
@@ -886,6 +887,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 void DataDirectProcessor::FixProgramIDs(void)
 {
     VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- begin");
+    QMap<QString,bool> found_table = DBUtil::GetTableMap();
 
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare(
@@ -894,7 +896,7 @@ void DataDirectProcessor::FixProgramIDs(void)
         "                     '00', SUBSTRING(programid, 3)) "
         "WHERE length(programid) = 12");
 
-    if (!query.exec())
+    if (found_table["recorded"] && !query.exec())
     {
         MythContext::DBError("Fixing program ids in recorded", query);
         return;
@@ -906,7 +908,7 @@ void DataDirectProcessor::FixProgramIDs(void)
         "                     '00', SUBSTRING(programid, 3)) "
         "WHERE length(programid) = 12");
 
-    if (!query.exec())
+    if (found_table["oldrecorded"] && !query.exec())
     {
         MythContext::DBError("Fixing program ids in oldrecorded", query);
         return;
@@ -918,13 +920,14 @@ void DataDirectProcessor::FixProgramIDs(void)
         "                     '00', SUBSTRING(programid, 3)) "
         "WHERE length(programid) = 12");
 
-    if (!query.exec())
+    if (found_table["program"] && !query.exec())
     {
         MythContext::DBError("Fixing program ids in program", query);
         return;
     }
 
-    gContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
+    if (found_table["settings"])
+        gContext->SaveSetting("MythFillFixProgramIDsHasRunOnce", "1");
 
     VERBOSE(VB_GENERAL, "DataDirectProcessor::FixProgramIDs() -- end");
 }
