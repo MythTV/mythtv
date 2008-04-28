@@ -48,6 +48,7 @@ static MIMETypes g_MIMETypes[] =
 {
     { "gif" , "image/gif"                  },
     { "jpg" , "image/jpeg"                 },
+    { "jpeg", "image/jpeg"                 },
     { "png" , "image/png"                  },
     { "htm" , "text/html"                  },
     { "html", "text/html"                  },
@@ -67,9 +68,11 @@ static MIMETypes g_MIMETypes[] =
     { "zip" , "application/x-tar"          },
     { "gz"  , "application/x-tar"          },
     { "mpg" , "video/mpeg"                 },
+    { "mpg2", "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
+    { "mpeg2","video/mpeg"                 },
     { "ts"  , "video/mpegts"               },
-    { "vob" ,  "video/mpeg"                },
+    { "vob" , "video/mpeg"                 },
     { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
     { "mov" , "video/quicktime"            },
@@ -77,6 +80,7 @@ static MIMETypes g_MIMETypes[] =
     { "mkv" , "video/x-matroska"           },
     { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             },
+    // This should be application/ogg, but most clients don't understand that.
     { "ogg" , "audio/ogg"                  },
 };
 
