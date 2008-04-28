@@ -1,5 +1,5 @@
-TARGET = 6200ch
-CFLAGS = -Wall -std=gnu99
+TARGET=sa3250ch
+CFLAGS = -Wall -std=gnu99 
 PREFIX = /usr/local
 BINPATH = ${PREFIX}/bin
 

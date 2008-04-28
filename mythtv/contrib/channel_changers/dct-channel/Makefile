@@ -1,4 +1,3 @@
-CC = cc
 CFLAGS = -Wall
 PREFIX = /usr/local
 MANPATH = ${PREFIX}/man/man1
@@ -23,7 +22,7 @@ serial.o: crc.h serial.h debug.h
 channel: channel.o crc.o opt.o packet.o serial.o
 
 channel.1: channel.c version.h
-	make channel
+	$(MAKE) channel
 	if ! help2man -N --output=channel.1 ./channel ; then \
 		echo "No manual page available." > channel.1 ; fi
 

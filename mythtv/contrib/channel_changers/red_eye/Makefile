@@ -1,12 +1,12 @@
-TARGET = 6200ch
-CFLAGS = -Wall -std=gnu99
+TARGET = red_eye
+CFLAGS = -Wall
 PREFIX = /usr/local
 BINPATH = ${PREFIX}/bin
 
 all: $(TARGET)
 
 $(TARGET): $(TARGET).c
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c -lavc1394 -lrom1394 -lraw1394
+	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
 
 install: $(TARGET)
 	install -m 0755 $(TARGET) ${BINPATH}
