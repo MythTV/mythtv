@@ -121,6 +121,11 @@ bool MythNewsEditor::keyPressEvent(QKeyEvent *event)
             NextPrevWidgetFocus(false);
         else if (action == "RIGHT")
             NextPrevWidgetFocus(true);
+        else if (action == "UP")
+            NextPrevWidgetFocus(false);
+        else if (action == "DOWN")
+            NextPrevWidgetFocus(true);
+
         else if (action == "ESCAPE")
             Exit();
         else
