@@ -384,6 +384,9 @@ static bool is_input_group_busy(
     QMap<uint,TunedInputInfo> &busyin,
     uint                      &mplexid_restriction)
 {
+    static QMutex        igrpLock;
+    static InputGroupMap igrp;
+
     // If none are busy, we don't need to check further
     QMap<uint,bool>::const_iterator bit = busygrp.find(groupid);
     if ((bit != busygrp.end()) && !*bit)
@@ -410,7 +413,11 @@ static bool is_input_group_busy(
         }
 
         if (*it)
-            conflicts.push_back(busyin[cardids[i]]);
+        {
+            QMutexLocker locker(&igrpLock);
+            if (igrp.GetSharedInputGroup(info.inputid, inputid))
+                conflicts.push_back(busyin[cardids[i]]);
+        }
     }
 
     // If none are busy, we don't need to check further
