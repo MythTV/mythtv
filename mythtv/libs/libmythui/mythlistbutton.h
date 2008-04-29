@@ -117,8 +117,10 @@ class MythListButton : public MythUIType
     int GetCount();
     bool IsEmpty();
 
-    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
+    enum ScrollStyle { ScrollFree, ScrollCenter };
     enum LayoutType { LayoutVertical, LayoutHorizontal, LayoutGrid };
+    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
+
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
@@ -158,6 +160,7 @@ class MythListButton : public MythUIType
     /**/
 
     LayoutType m_layout;
+    ScrollStyle m_scrollStyle;
 
     int m_order;
     QRect m_rect;

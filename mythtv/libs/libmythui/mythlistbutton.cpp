@@ -36,7 +36,8 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
 
 void MythListButton::Const(void)
 {
-    m_layout = LayoutVertical;
+    m_layout      = LayoutVertical;
+    m_scrollStyle = ScrollFree;
 
     m_active           = false;
     m_drawFromBottom   = false;
@@ -187,7 +188,11 @@ void MythListButton::SetPositionArrowStates(void)
     {
         int button = 0;
 
-        if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
+        if ((m_scrollStyle == ScrollCenter) && m_selPosition <= (m_itemsVisible/2))
+        {
+            button = (m_itemsVisible / 2) - m_selPosition;
+        }
+        else if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
             button = m_itemsVisible - m_itemCount;
 
         for (int i = 0; i < button; i++)
@@ -311,15 +316,24 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
 void MythListButton::SetItemCurrent(MythListButtonItem* item)
 {
     m_selPosition = m_itemList.indexOf(item);
- 
+
     if (m_selPosition == -1)
         m_selPosition = 0;
 
     m_selItem = m_itemList.at(m_selPosition);
 
-    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+    switch (m_scrollStyle)
     {
-        ++m_topPosition;
+        case ScrollCenter :
+            while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition + 1)
+                ++m_topPosition;
+
+            break;
+        case ScrollFree :
+            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+                ++m_topPosition;
+
+            break;
     }
 
     m_topItem = m_itemList.at(m_topPosition);
@@ -434,10 +448,25 @@ void MythListButton::MoveUp(MovementUnit unit)
 
     m_selItem = m_itemList.at(m_selPosition);
 
-    if (m_selPosition <= m_topPosition)
+    switch (m_scrollStyle)
     {
-        m_topItem = m_selItem;
-        m_topPosition = m_selPosition;
+        case ScrollCenter :
+            while (m_topPosition > 0 && m_topPosition +
+                   (int)((float)m_itemsVisible/2) > m_selPosition + 1)
+            {
+                --m_topPosition;
+                m_topItem = m_itemList.at(m_topPosition);
+                cerr << "Top: " << m_topPosition << " Sel: " << m_selPosition << endl;
+            }
+
+            break;
+        case ScrollFree :
+            if (m_selPosition <= m_topPosition)
+            {
+                m_topItem = m_selItem;
+                m_topPosition = m_selPosition;
+            }
+            break;
     }
 
     SetPositionArrowStates();
@@ -498,10 +527,20 @@ void MythListButton::MoveDown(MovementUnit unit)
 
     m_selItem = m_itemList.at(m_selPosition);
 
-    // while (m_topPosition < m_selPosition)
-    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+    switch (m_scrollStyle)
     {
-        ++m_topPosition;
+        case ScrollCenter :
+            while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
+                ++m_topPosition;
+
+            cerr << "Top: " << m_topPosition << " Sel: " << m_selPosition << endl;
+
+            break;
+        case ScrollFree :
+            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+                ++m_topPosition;
+
+            break;
     }
 
     m_topItem = m_itemList.at(m_topPosition);
@@ -544,9 +583,18 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
     m_selItem =  m_itemList.at(m_selPosition);
 
-    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+    switch (m_scrollStyle)
     {
-        ++m_topPosition;
+        case ScrollCenter :
+            while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
+                ++m_topPosition;
+
+            break;
+        case ScrollFree :
+            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+                ++m_topPosition;
+
+            break;
     }
 
     m_topItem = m_itemList.at(m_topPosition);
@@ -855,22 +903,8 @@ MythUIType *MythListButton::GetChildAtPoint(const QPoint &p)
 
 QPoint MythListButton::GetButtonPosition(int column, int row) const
 {
-    QPoint position;
-
-    if (m_layout == LayoutHorizontal)
-    {
-        position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
-                    GetArea().height() / 2 - m_itemHeight / 2);
-    }
-    else if (m_layout == LayoutVertical)
-    {
-        position = QPoint(0, (row - 1) * (m_itemHeight + m_itemVertSpacing));
-    }
-    else if (m_layout == LayoutGrid)
-    {
-        position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
-                    (row - 1) * (m_itemHeight + m_itemVertSpacing));
-    }
+    QPoint position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
+                             (row - 1) * (m_itemHeight + m_itemVertSpacing));
 
     return position;
 }
@@ -965,10 +999,10 @@ void MythListButton::CalculateVisibleItems(void)
         }
     }
 
-    if (m_rows == 0)
+    if (m_rows <= 0)
         m_rows = 1;
 
-    if (m_columns == 0)
+    if (m_columns <= 0)
         m_columns = 1;
 
     m_itemsVisible = m_columns * m_rows;
@@ -988,6 +1022,15 @@ bool MythListButton::ParseElement(QDomElement &element)
             m_layout = LayoutHorizontal;
         else
             m_layout = LayoutVertical;
+    }
+    else if (element.tagName() == "scrollstyle")
+    {
+        QString layout = getFirstText(element).toLower();
+
+        if (layout == "center")
+            m_scrollStyle = ScrollCenter;
+        else if (layout == "free")
+            m_scrollStyle = ScrollFree;
     }
     else if (element.tagName() == "inactivefont")
     {
@@ -1143,6 +1186,8 @@ void MythListButton::CopyFrom(MythUIType *base)
 
     m_textFlags = lb->m_textFlags;
     m_imageAlign = lb->m_imageAlign;
+
+    m_scrollStyle= lb->m_scrollStyle;
 
     m_clearing = false;
     m_topItem = m_selItem = NULL;
