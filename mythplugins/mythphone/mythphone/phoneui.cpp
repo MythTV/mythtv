@@ -7,7 +7,7 @@
 */
 #include <qapplication.h>
 #include <qfile.h>
-#include <qdialog.h>   
+#include <qdialog.h>
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
@@ -35,16 +35,10 @@ using namespace std;
 #include "phoneui.h"
 #include "vxml.h"
 
-
-
-
-
 PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
-                       QString theme_filename, const char *name)
-
-           : MythThemedDialog(parent, window_name, theme_filename, name)
+                       QString theme_filename, const char *name) :
+    MythThemedDialog(parent, window_name, theme_filename, name)
 {
-
     h263 = new H263Container();
 
     // Local Variables
@@ -52,22 +46,26 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     VideoOn = false;
 
     wireUpTheme();
-    phoneUIStatusBar = new PhoneUIStatusBar(getUITextType("caller_text"),
-                                            getUITextType("audio_stats_text"),
-                                            getUITextType("video_stats_text"),
-                                            getUITextType("bw_stats_text"),
-                                            getUITextType("call_time_text"),
-                                            getUITextType("status_msg_text"));
+    phoneUIStatusBar = new PhoneUIStatusBar(
+        getUITextType("caller_text"),      getUITextType("audio_stats_text"),
+        getUITextType("video_stats_text"), getUITextType("bw_stats_text"),
+        getUITextType("call_time_text"),   getUITextType("status_msg_text"));
 
     bool reg;
     QString regAs;
     QString regTo;
     sipStack->GetRegistrationStatus(reg, regTo, regAs);
+
     if (reg)
-        phoneUIStatusBar->DisplayNotification(QString(tr("Registered to ") + regTo + tr(" as ") + regAs), 5);
+    {
+        phoneUIStatusBar->DisplayNotification(
+            QString(tr("Registered to ") + regTo + tr(" as ") + regAs), 5);
+    }
     else
+    {
         phoneUIStatusBar->DisplayNotification(tr("Not Registered"), 5);
-  
+    }
+
     // Read the directory into the object structures
     DirContainer = new DirectoryContainer();
     DirContainer->Load();
@@ -97,23 +95,26 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     sipStack->UiWatch(DirContainer->ListAllEntries(true));
 
     // Possibly (user-defined) control the volume
-//    volume_control = NULL;
     volume_display_timer = new QTimer(this);
     VolumeMode = VOL_VOLUME;
-    volume_icon->SetImage(gContext->FindThemeDir("default") + "/mp_volume_icon.png");
+    volume_icon->SetImage(
+        gContext->FindThemeDir("default") + "/mp_volume_icon.png");
     volume_icon->LoadImage();
-//    volume_control = new VolumeControl(true);
-    connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
-    
+    connect(volume_display_timer, SIGNAL(timeout()),
+            this,                 SLOT(hideVolume()));
+
     rtpAudio = 0;
     rtpVideo = 0;
     loopbackMode = false;
 
     powerDispTimer = new QTimer(this);
-    connect(powerDispTimer, SIGNAL(timeout()), this, SLOT(DisplayMicSpkPower()));
+    connect(powerDispTimer, SIGNAL(timeout()),
+            this,           SLOT(DisplayMicSpkPower()));
 
     OnScreenClockTimer = new QTimer(this);
-    connect(OnScreenClockTimer, SIGNAL(timeout()), this, SLOT(OnScreenClockTick()));
+    connect(OnScreenClockTimer, SIGNAL(timeout()),
+            this,               SLOT(OnScreenClockTick()));
+
     ConnectTime.start();
 
     // Create the local webcam and start it
@@ -130,8 +131,8 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     fullScreen = false;
     rxVideoArea = receivedWebcamArea->getScreenArea();
 
-    camBrightness = 32768; 
-    camColour = 32768; 
+    camBrightness = 32768;
+    camColour = 32768;
     camContrast = 32768;
     localClient = 0;
     txClient = 0;
@@ -140,9 +141,10 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     txFps = atoi((const char *)gContext->GetSetting("TransmitFPS"));
     if (WebcamDevice.length() > 0)
     {
-        if (webcam->camOpen(WebcamDevice, wcWidth, wcHeight)) 
+        if (webcam->camOpen(WebcamDevice, wcWidth, wcHeight))
         {
-            webcam->GetCurSize(&wcWidth, &wcHeight); // See what resolution it actually opened as
+            // See what resolution it actually opened as
+            webcam->GetCurSize(&wcWidth, &wcHeight);
             camBrightness = webcam->GetBrightness();
             camContrast = webcam->GetContrast();
             camColour = webcam->GetColour();
@@ -163,7 +165,10 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     incallPopup = NULL;
     statsPopup = NULL;
     audioPkInOutLabel = audioPlayoutLabel = audioPkRtcpLabel = 0;
-    videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = videoWebcamFpsLabel = 0;
+    videoResLabel = videoPkOutLabel = 0;
+    videoPkInLabel = videoPkRtcpLabel = 0;
+    videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
+    videoWebcamFpsLabel = 0;
     currentCallEntry = 0;
 
     // Used to load voicemail messages in and play them
@@ -171,7 +176,6 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
 
     // Generate a self-event to get current SIP Stack state
     QApplication::postEvent(this, new SipEvent(SipEvent::SipStateChange));
-
 }
 
 
@@ -180,12 +184,13 @@ void PhoneUIBox::getResolution(QString setting, int &width, int &height)
     width = 352;
     height = 288;
 
-    // Gets a settings parameter of the form 640x480 and decodes into width/height
+    // Gets a settings parameter of the form 640x480 and
+    // decodes into width/height
     QString resolution = gContext->GetSetting(setting);
     if (resolution.length() > 0)
     {
         width = atoi((const char *)resolution);
-        QString heightString = resolution.mid(resolution.find('x')+1);
+        QString heightString = resolution.mid(resolution.find('x') + 1);
         height = atoi((const char *)heightString);
     }
 }
@@ -206,21 +211,25 @@ void PhoneUIBox::videoCifModeToRes(QString cifMode, int &w, int &h)
 {
     w = 176;
     h = 144;
+
     if (cifMode == "QCIF")
     {
         w = 176;
         h = 144;
     }
+
     if (cifMode == "SQCIF")
     {
         w = 128;
         h = 96;
     }
+
     if (cifMode == "CIF")
     {
         w = 352;
         h = 288;
     }
+
     if (cifMode == "4CIF")
     {
         w = 704;
@@ -238,7 +247,7 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
         handled = true;
-    
+
         if (action == "1")
             keypadPressed('1');
         else if (action == "2")
@@ -270,7 +279,7 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
         else if (action == "LOOPBACK")
             LoopbackButtonPushed();
         // Volume controls
-        else if (action == "VOLUMEDOWN") 
+        else if (action == "VOLUMEDOWN")
             changeVolume(false);
         else if (action == "VOLUMEUP")
             changeVolume(true);
@@ -302,10 +311,14 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             if (zoomFactor < 10)
             {
                 zoomFactor++;
-                zoomWidth  = ((wcWidth-128) * zoomFactor / 10) + 128;  // Zoom evenly with a minimum of 128 width
-                zoomWidth  = (zoomWidth >> 3) << 3;                    // Make boundaries easier for scaling algorithm
-                zoomHeight = ((wcHeight-96) * zoomFactor / 10) + 96;   // Zoom evenly with a minimum of 96 height
-                zoomHeight = (zoomHeight >> 3) << 3;                   // Make boundaries easier for scaling algorithm
+                // Zoom evenly with a minimum of 128 width
+                zoomWidth  = ((wcWidth-128) * zoomFactor / 10) + 128;
+                // Make boundaries easier for scaling algorithm
+                zoomWidth  = (zoomWidth >> 3) << 3;
+                // Zoom evenly with a minimum of 96 height
+                zoomHeight = ((wcHeight-96) * zoomFactor / 10) + 96;
+                // Make boundaries easier for scaling algorithm
+                zoomHeight = (zoomHeight >> 3) << 3;
             }
         }
         else if ((action == "ZOOMIN") && (VideoOn))
@@ -313,52 +326,79 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             if (zoomFactor > 0)
             {
                 zoomFactor--;
-                zoomWidth  = ((wcWidth-128) * zoomFactor / 10) + 128;  
-                zoomWidth  = (zoomWidth >> 3) << 3;                    
-                zoomHeight = ((wcHeight-96) * zoomFactor / 10) + 96;  
-                zoomHeight = (zoomHeight >> 3) << 3;                   
+                zoomWidth  = ((wcWidth-128) * zoomFactor / 10) + 128;
+                zoomWidth  = (zoomWidth >> 3) << 3;
+                zoomHeight = ((wcHeight-96) * zoomFactor / 10) + 96;
+                zoomHeight = (zoomHeight >> 3) << 3;
             }
         }
 
         // Video pan options
-        else if ((action == "LEFT") && (VideoOn) && ((!volume_status) || (volume_status->getOrder() == -1)))
+        else if ((action == "LEFT") && (VideoOn) &&
+                 ((!volume_status) || (volume_status->getOrder() == -1)))
         {
             if (wPan > -10)
                 wPan--;
         }
-        else if ((action == "RIGHT") && (VideoOn) && ((!volume_status) || (volume_status->getOrder() == -1)))
+        else if ((action == "RIGHT") && (VideoOn) &&
+                 ((!volume_status) || (volume_status->getOrder() == -1)))
         {
             if (wPan < 10)
                 wPan++;
         }
-        else if ((action == "UP") && (VideoOn) && ((!volume_status) || (volume_status->getOrder() == -1)))
+        else if ((action == "UP") && (VideoOn) &&
+                 ((!volume_status) || (volume_status->getOrder() == -1)))
         {
             if (hPan > -10)
                 hPan--;
         }
-        else if ((action == "DOWN") && (VideoOn) && ((!volume_status) || (volume_status->getOrder() == -1)))
+        else if ((action == "DOWN") && (VideoOn) &&
+                 ((!volume_status) || (volume_status->getOrder() == -1)))
         {
             if (hPan < 10)
                 hPan++;
         }
 
-        else if ((action == "DOWN") && (volume_status) && (volume_status->getOrder() != -1)) // Changing volume
+        else if ((action == "DOWN") && (volume_status) &&
+                 (volume_status->getOrder() != -1))
+        {
+            // Changing volume
             changeVolumeControl(false);
-        else if ((action == "UP") && (volume_status) && (volume_status->getOrder() != -1)) // Changing volume
+        }
+        else if ((action == "UP") && (volume_status) &&
+                 (volume_status->getOrder() != -1))
+        {
+            // Changing volume
             changeVolumeControl(true);
-        else if ((action == "RIGHT") && (volume_status) && (volume_status->getOrder() != -1)) // Changing volume
+        }
+        else if ((action == "RIGHT") && (volume_status) &&
+                 (volume_status->getOrder() != -1))
+        {
+            // Changing volume
             changeVolume(true);
-        else if ((action == "LEFT") && (volume_status) && (volume_status->getOrder() != -1)) // Changing volume
+        }
+        else if ((action == "LEFT") && (volume_status) &&
+                 (volume_status->getOrder() != -1))
+        {
+            // Changing volume
             changeVolume(false);
-
-        else if (action == "UP") 
+        }
+        else if (action == "UP")
+        {
             DirectoryList->moveUp();
+        }
         else if (action == "DOWN")
+        {
             DirectoryList->moveDown();
+        }
         else if (action == "LEFT")
+        {
             DirectoryList->popUp();
+        }
         else if (action == "RIGHT")
+        {
             DirectoryList->pushDown();
+        }
         else if ((action == "SELECT") && (State == SIP_IDLE))
         {
             SelectHit = true;
@@ -376,11 +416,15 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            HangUp(); // Just in case; to make sure we never leave a call active when we quit!
+            // Just in case; to make sure we never leave
+            // a call active when we quit!
+            HangUp();
             handled = false;
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled)
@@ -388,42 +432,43 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
 }
 void PhoneUIBox::customEvent(QEvent *event)
 {
-QString spk;
-    switch ((int)event->type()) 
+    QString spk;
+
+    switch ((int)event->type())
     {
     case WebcamEvent::FrameReady:
-        {
-            WebcamEvent *we = (WebcamEvent *)event;
-            if (we->getClient() == localClient)
-                DrawLocalWebcamImage();
-            else if (we->getClient() == txClient)
-                TransmitLocalWebcamImage();
-        }
-        break;
+    {
+        WebcamEvent *we = (WebcamEvent *)event;
+        if (we->getClient() == localClient)
+            DrawLocalWebcamImage();
+        else if (we->getClient() == txClient)
+            TransmitLocalWebcamImage();
+    }
+    break;
 
     case RtpEvent::RxVideoFrame:
         ProcessRxVideoFrame();
         break;
 
     case RtpEvent::RtpStatisticsEv:
-        {
-            RtpEvent *re = (RtpEvent *)event;
-            if (re->owner() == rtpAudio)
-                ProcessAudioRtpStatistics(re);
-            else if (re->owner() == rtpVideo)
-                ProcessVideoRtpStatistics(re);
-        }
-        break;
+    {
+        RtpEvent *re = (RtpEvent *)event;
+        if (re->owner() == rtpAudio)
+            ProcessAudioRtpStatistics(re);
+        else if (re->owner() == rtpVideo)
+            ProcessVideoRtpStatistics(re);
+    }
+    break;
 
     case RtpEvent::RtpRtcpStatsEv:
-        {
-            RtpEvent *re = (RtpEvent *)event;
-            if (re->owner() == rtpAudio)
-                ProcessAudioRtcpStatistics(re);
-            else if (re->owner() == rtpVideo)
-                ProcessVideoRtcpStatistics(re);
-        }
-        break;
+    {
+        RtpEvent *re = (RtpEvent *)event;
+        if (re->owner() == rtpAudio)
+            ProcessAudioRtcpStatistics(re);
+        else if (re->owner() == rtpVideo)
+            ProcessVideoRtcpStatistics(re);
+    }
+    break;
 
     case SipEvent::SipStateChange:
         ProcessSipStateChange();
@@ -434,56 +479,58 @@ QString spk;
         break;
 
     case SipEvent::SipStartMedia:
-        {
-            SipEvent *se = (SipEvent *)event;
-            startRTP(se->getAudioPayload(),
-                     se->getVideoPayload(),
-                     se->getDTMFPayload(),
-                     se->getAudioPort(),
-                     se->getVideoPort(),
-                     se->getRemoteIp(),
-                     se->getAudioCodec(),
-                     se->getVideoCodec(),
-                     se->getVideoRes());
-        }
-        break;
-        
+    {
+        SipEvent *se = (SipEvent *)event;
+        startRTP(se->getAudioPayload(),
+                 se->getVideoPayload(),
+                 se->getDTMFPayload(),
+                 se->getAudioPort(),
+                 se->getVideoPort(),
+                 se->getRemoteIp(),
+                 se->getAudioCodec(),
+                 se->getVideoCodec(),
+                 se->getVideoRes());
+    }
+    break;
+
     case SipEvent::SipStopMedia:
         stopRTP();
         break;
 
     case SipEvent::SipChangeMedia:
-        {
-            SipEvent *se = (SipEvent *)event;
-            stopRTP(audioCodecInUse != se->getAudioCodec(), videoCodecInUse != se->getVideoCodec());
-            startRTP(se->getAudioPayload(),
-                     se->getVideoPayload(),
-                     se->getDTMFPayload(),
-                     se->getAudioPort(),
-                     se->getVideoPort(),
-                     se->getRemoteIp(),
-                     se->getAudioCodec(),
-                     se->getVideoCodec(),
-                     se->getVideoRes());
-        }
-        break;
-    
+    {
+        SipEvent *se = (SipEvent *)event;
+        stopRTP(audioCodecInUse != se->getAudioCodec(),
+                videoCodecInUse != se->getVideoCodec());
+        startRTP(se->getAudioPayload(),
+                 se->getVideoPayload(),
+                 se->getDTMFPayload(),
+                 se->getAudioPort(),
+                 se->getVideoPort(),
+                 se->getRemoteIp(),
+                 se->getAudioCodec(),
+                 se->getVideoCodec(),
+                 se->getVideoRes());
+    }
+    break;
+
     case SipEvent::SipAlertUser:
-        {
-            SipEvent *se = (SipEvent *)event;
-            alertUser(se->getCallerUser(), se->getCallerName(), se->getCallerUrl(), se->getCallIsAudioOnly());
-        }
-        break;
-        
+    {
+        SipEvent *se = (SipEvent *)event;
+        alertUser(se->getCallerUser(), se->getCallerName(),
+                  se->getCallerUrl(), se->getCallIsAudioOnly());
+    }
+    break;
+
     case SipEvent::SipCeaseAlertUser:
         closeCallPopup();
         break;
-        
+
     case SipEvent::SipRingbackTone:
         spk = gContext->GetSetting("AudioOutputDevice");
         Tones.TTone(TelephonyTones::TONE_RINGBACK)->Play(spk, true);
         break;
-        
+
     case SipEvent::SipCeaseRingbackTone:
         if (Tones.TTone(TelephonyTones::TONE_RINGBACK)->Playing())
             Tones.TTone(TelephonyTones::TONE_RINGBACK)->Stop();
@@ -493,14 +540,18 @@ QString spk;
     QWidget::customEvent(event);
 }
 
-void PhoneUIBox::PlaceCall(QString url, QString name, QString Mode, bool onLocalLan)
+void PhoneUIBox::PlaceCall(
+    QString url, QString name, QString Mode, bool onLocalLan)
 {
     sipStack->PlaceNewCall(Mode, url, name, onLocalLan);
 
     // Add an entry into the Placed Calls dir
     if (currentCallEntry)
         delete currentCallEntry;
-    currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
+
+    currentCallEntry = new CallRecord(
+        name, url, false, (QDateTime::currentDateTime()).toString());
+
     phoneUIStatusBar->updateMidCallCaller(!name.isEmpty() ? name : url);
 }
 
@@ -511,42 +562,45 @@ void PhoneUIBox::AnswerCall(QString Mode, bool onLocalLan)
 
 void PhoneUIBox::keypadPressed(char k)
 {
-        
-
     if (rtpAudio)
     {
         rtpAudio->sendDtmf(k);
-        int id=0;
+        int id = 0;
         if (k == '*')
             id = 10;
         else if (k == '#')
             id = 11;
-        else 
+        else
             id = k - '0';
-        if (Tones.dtmf(id))
-            rtpAudio->PlayToneToSpeaker(Tones.dtmf(id)->getAudio(), Tones.dtmf(id)->getSamples());
-    }
 
+        if (Tones.dtmf(id))
+        {
+            rtpAudio->PlayToneToSpeaker(
+                Tones.dtmf(id)->getAudio(), Tones.dtmf(id)->getSamples());
+        }
+    }
     else if (State == SIP_IDLE)
     {
         doUrlPopup(k, true);
     }
 }
 
-
-void PhoneUIBox::HangUp()
+void PhoneUIBox::HangUp(void)
 {
     sipStack->HangupCall();
 }
 
-
-void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, int videoPayload, QString rxVidRes)
+void PhoneUIBox::StartVideo(
+    int lPort, QString remoteIp, int remoteVideoPort, int videoPayload,
+    QString rxVidRes)
 {
     videoCifModeToRes(rxVidRes, rxWidth, rxHeight);
 
-    rtpVideo = new rtp (this, lPort, remoteIp, remoteVideoPort, videoPayload, -1, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
+    rtpVideo = new rtp(
+        this, lPort, remoteIp, remoteVideoPort, videoPayload,
+        -1, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
 
-    if (h263->H263StartEncoder(txWidth, txHeight, txFps) && 
+    if (h263->H263StartEncoder(txWidth, txHeight, txFps) &&
         h263->H263StartDecoder(rxWidth, rxHeight))
     {
         txClient = webcam->RegisterClient(VIDEO_PALETTE_YUV420P, txFps, this);
@@ -561,7 +615,7 @@ void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, in
     }
 }
 
-void PhoneUIBox::StopVideo()
+void PhoneUIBox::StopVideo(void)
 {
     if (VideoOn)
     {
@@ -570,18 +624,21 @@ void PhoneUIBox::StopVideo()
 
         VideoOn = false;
     }
+
     if (txClient)
         webcam->UnregisterClient(txClient);
+
     txClient = 0;
 
     if (rtpVideo)
         delete rtpVideo;
+
     rtpVideo = 0;
     videoCodecInUse = "";
 }
 
 
-void PhoneUIBox::ChangeVideoTxResolution()
+void PhoneUIBox::ChangeVideoTxResolution(void)
 {
     if (VideoOn)
     {
@@ -591,7 +648,7 @@ void PhoneUIBox::ChangeVideoTxResolution()
 }
 
 
-void PhoneUIBox::ChangeVideoRxResolution()
+void PhoneUIBox::ChangeVideoRxResolution(void)
 {
     if (VideoOn)
     {
@@ -601,7 +658,7 @@ void PhoneUIBox::ChangeVideoRxResolution()
 }
 
 
-void PhoneUIBox::MenuButtonPushed()
+void PhoneUIBox::MenuButtonPushed(void)
 {
     if (rtpAudio != 0) // In a call, show the adjust parameters menu
         showVolume(true);
@@ -610,14 +667,14 @@ void PhoneUIBox::MenuButtonPushed()
 }
 
 
-void PhoneUIBox::InfoButtonPushed()
+void PhoneUIBox::InfoButtonPushed(void)
 {
     if (rtpAudio != 0) // In a call, show the adjust parameters menu
         showStatistics(rtpVideo != 0);
 }
 
 
-void PhoneUIBox::LoopbackButtonPushed()
+void PhoneUIBox::LoopbackButtonPushed(void)
 {
     if ((!loopbackMode) && (rtpAudio == 0) && (rtpVideo == 0))
     {
@@ -626,26 +683,38 @@ void PhoneUIBox::LoopbackButtonPushed()
             "AskLoopback", tr("Loopback Audio and video at ..."),
             tr("Socket on this machine"), tr("NAT Device"),
             kDialogCodeButton0);
+
         QString loopIp;
+
         switch (loop)
         {
-            default:
-            case kDialogCodeRejected:
-                return;
-            case kDialogCodeButton0:
-                loopIp = sipStack->getLocalIpAddress();
-                break;
-            case kDialogCodeButton1:
-                loopIp = sipStack->getNatIpAddress();
-                break;
+        default:
+        case kDialogCodeRejected:
+            return;
+        case kDialogCodeButton0:
+            loopIp = sipStack->getLocalIpAddress();
+            break;
+        case kDialogCodeButton1:
+            loopIp = sipStack->getNatIpAddress();
+            break;
         }
-        phoneUIStatusBar->DisplayCallState(QString(tr("Audio and Video Looped to ") + loopIp));
-        int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
-        int laPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
-        int playout = atoi((const char *)gContext->GetSetting("PlayoutVideoCall"));
-        rtpAudio = new rtp (this, laPort, loopIp, laPort, 0, playout, -1, 
-                            gContext->GetSetting("MicrophoneDevice"), 
-                            gContext->GetSetting("AudioOutputDevice"));
+
+        phoneUIStatusBar->DisplayCallState(
+            QString(tr("Audio and Video Looped to ") + loopIp));
+
+        int lvPort = atoi((const char *)
+                          gContext->GetSetting("VideoLocalPort"));
+
+        int laPort = atoi((const char *)
+                          gContext->GetSetting("AudioLocalPort"));
+
+        int playout = atoi((const char *)
+                           gContext->GetSetting("PlayoutVideoCall"));
+
+        rtpAudio = new rtp(this, laPort, loopIp, laPort, 0, playout, -1,
+                           gContext->GetSetting("MicrophoneDevice"),
+                           gContext->GetSetting("AudioOutputDevice"));
+
         powerDispTimer->start(100);
         StartVideo(lvPort, loopIp, lvPort, 34, videoResToCifMode(txWidth));
         loopbackMode = true;
@@ -664,7 +733,7 @@ void PhoneUIBox::LoopbackButtonPushed()
 }
 
 
-void PhoneUIBox::DrawLocalWebcamImage()
+void PhoneUIBox::DrawLocalWebcamImage(void)
 {
     unsigned char *rgb32Frame = webcam->GetVideoFrame(localClient);
     if (rgb32Frame != 0)
@@ -676,19 +745,29 @@ void PhoneUIBox::DrawLocalWebcamImage()
         int zy = (wcHeight-zoomHeight)/2;
         zy += (zy*hPan/10);
         zy = (zy >> 1) << 1; // Make sure its even
-    
+
         QImage ScaledImage;
-    
-        QImage Image(rgb32Frame, wcWidth, wcHeight, 32, (QRgb *)0, 0, QImage::LittleEndian);
-        
+
+        QImage Image(rgb32Frame, wcWidth, wcHeight, 32,
+                     (QRgb*)0, 0, QImage::LittleEndian);
+
         QRect puthere;
-        if (!fullScreen) // In full-screen mode local webcam gets drawn as an inset when remote pic gets drawn
-            puthere = localWebcamArea->getScreenArea();
-        else
-            puthere = QRect(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,     
-                            WC_INSET_WIDTH, WC_INSET_HEIGHT);
-        if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
+        if (!fullScreen)
         {
+            // In full-screen mode local webcam gets drawn as
+            // an inset when remote pic gets drawn
+            puthere = localWebcamArea->getScreenArea();
+        }
+        else
+        {
+            puthere = QRect(screenwidth - WC_INSET_WIDTH,
+                            screenheight - WC_INSET_HEIGHT,
+                            WC_INSET_WIDTH, WC_INSET_HEIGHT);
+        }
+
+        if (zoomFactor == 10)
+        {
+            // No Zoom; just scale the webcam image to the local window size
             ScaledImage = Image.scaled(puthere.width(), puthere.height(),
                                        Qt::KeepAspectRatio);
         }
@@ -698,198 +777,249 @@ void PhoneUIBox::DrawLocalWebcamImage()
             ScaledImage = zoomedImage.scaled(puthere.width(), puthere.height(),
                                              Qt::KeepAspectRatio);
         }
-        
-        // Draw the local webcam image if not in full-screen, else it gets drawn later
-        if (!fullScreen) 
+
+        // Draw the local webcam image if not in full-screen,
+        // else it gets drawn later
+        if (!fullScreen)
+        {
             bitBlt(this, puthere.x(), puthere.y(), &ScaledImage);
+        }
         else
+        {
             savedLocalWebcam = ScaledImage;
+        }
+
         webcam->FreeVideoBuffer(localClient, rgb32Frame);
     }
 }
 
 
 
-void PhoneUIBox::TransmitLocalWebcamImage()
+void PhoneUIBox::TransmitLocalWebcamImage(void)
 {
     unsigned char *yuvFrame = webcam->GetVideoFrame(txClient);
-    if (yuvFrame != 0)
+    if (yuvFrame)
+        return;
+
+    wcDeliveredFrames++;
+    // If we are transmitting video, process the YUV image
+    if (!(VideoOn && rtpVideo))
     {
-        wcDeliveredFrames++;
-        // If we are transmitting video, process the YUV image
-        if (VideoOn && rtpVideo)
+        webcam->FreeVideoBuffer(txClient, yuvFrame);
+        return;
+    }
+
+    if (rtpVideo->readyForVideo())
+    {
+        // Digital Zoom/pan parameters
+        int zx = (wcWidth - zoomWidth) / 2;
+        zx += (zx*wPan / 10);
+        zx = (zx >> 1) << 1; // Make sure its even
+        int zy = (wcHeight - zoomHeight) / 2;
+        zy += (zy*hPan / 10);
+        zy = (zy >> 1) << 1; // Make sure its even
+
+        int encLen;
+        if (zoomFactor == 10)
         {
-            if (rtpVideo->readyForVideo())
+            // No Zoom; just scale the webcam image to the transmit size
+            scaleYuvImage(yuvFrame, wcWidth, wcHeight,
+                          txWidth, txHeight, yuvBuffer2);
+        }
+        else
+        {
+            cropYuvImage(yuvFrame, wcWidth, wcHeight,
+                         zx, zy, zoomWidth, zoomHeight, yuvBuffer1);
+            scaleYuvImage(yuvBuffer1, zoomWidth, zoomHeight,
+                          txWidth, txHeight, yuvBuffer2);
+        }
+
+        uchar *encFrame = h263->H263EncodeFrame(yuvBuffer2, &encLen);
+        VIDEOBUFFER *vb = rtpVideo->getVideoBuffer(encLen);
+        if (vb)
+        {
+            if (encLen > (int) sizeof(vb->video))
             {
-                // Digital Zoom/pan parameters
-                int zx = (wcWidth-zoomWidth)/2;
-                zx += (zx*wPan/10);
-                zx = (zx >> 1) << 1; // Make sure its even
-                int zy = (wcHeight-zoomHeight)/2;
-                zy += (zy*hPan/10);
-                zy = (zy >> 1) << 1; // Make sure its even
-        
-                int encLen;
-                if (zoomFactor == 10) // No Zoom; just scale the webcam image to the transmit size
+                VERBOSE(VB_IMPORTANT, QString(
+                            "SIP: Encoded H.323 frame size is %1; "
+                            "too big for buffer").arg(encLen));
+                rtpVideo->freeVideoBuffer(vb);
+            }
+            else if (encFrame && encLen >= 0)
+            {
+                // Optimisation to get rid of this copy may be possible,
+                // check H.263 stack
+                memcpy(vb->video, encFrame, encLen);
+                vb->len = encLen;
+                vb->w = txWidth;
+                vb->h = txHeight;
+                if (!rtpVideo->queueVideo(vb))
                 {
-                    scaleYuvImage(yuvFrame, wcWidth, wcHeight, txWidth, txHeight, yuvBuffer2);
-                }
-                else
-                {
-                    cropYuvImage(yuvFrame, wcWidth, wcHeight, zx, zy, zoomWidth, zoomHeight, yuvBuffer1);
-                    scaleYuvImage(yuvBuffer1, zoomWidth, zoomHeight, txWidth, txHeight, yuvBuffer2);
-                }
-                uchar *encFrame = h263->H263EncodeFrame(yuvBuffer2, &encLen);
-                VIDEOBUFFER *vb = rtpVideo->getVideoBuffer(encLen);
-                if (vb)
-                {
-                    if (encLen > (int)sizeof(vb->video))
-                    {
-                        VERBOSE(VB_IMPORTANT, QString("SIP: Encoded H.323 frame size is %1; too big for buffer").arg(encLen));
-                        rtpVideo->freeVideoBuffer(vb);
-                    }
-                    else if (encFrame && encLen >= 0)
-                    {
-                        memcpy(vb->video, encFrame, encLen); // Optimisation to get rid of this copy may be possible, check H.263 stack
-                        vb->len = encLen;
-                        vb->w = txWidth;
-                        vb->h = txHeight;
-                        if (!rtpVideo->queueVideo(vb))
-                        {
-                            VERBOSE(VB_IMPORTANT, "Could not queue RTP Video frame for transmission");
-                            rtpVideo->freeVideoBuffer(vb);
-                        }
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, "H263EncodeFrame returned -1");
-                        rtpVideo->freeVideoBuffer(vb);
-                    }
+                    VERBOSE(VB_IMPORTANT,
+                            "Could not queue RTP Video frame for transmission");
+                    rtpVideo->freeVideoBuffer(vb);
                 }
             }
             else
-                wcDroppedFrames++;
+            {
+                VERBOSE(VB_IMPORTANT, "H263EncodeFrame returned -1");
+                rtpVideo->freeVideoBuffer(vb);
+            }
         }
-        webcam->FreeVideoBuffer(txClient, yuvFrame);
     }
+    else
+    {
+        wcDroppedFrames++;
+    }
+
+    webcam->FreeVideoBuffer(txClient, yuvFrame);
 }
 
 
-void PhoneUIBox::ProcessRxVideoFrame()
+void PhoneUIBox::ProcessRxVideoFrame(void)
 {
     QImage ScaledImage;
     QImage *imageToDisplay;
     VIDEOBUFFER *v;
 
-    if (VideoOn && rtpVideo && (v = rtpVideo->getRxedVideo()))
+    if (!(VideoOn && rtpVideo && (v = rtpVideo->getRxedVideo())))
+        return;
+
+    if ((rxWidth != v->w) || (rxHeight != v->h))
     {
-        if ((rxWidth != v->w) || (rxHeight != v->h))
-        {
-            VERBOSE(VB_IMPORTANT, 
-                    QString("SIP: Rx Image size changed from %1x%2 to %3x%4")
-                    .arg(rxWidth).arg(rxHeight).arg(v->w).arg(v->h));
-            rxWidth = v->w;
-            rxHeight = v->h;
-            ChangeVideoRxResolution();
-        }
-
-        uchar *decRgbFrame = h263->H263DecodeFrame(v->video, v->len, rxRgbBuffer, sizeof(rxRgbBuffer));
-        if (decRgbFrame)
-        {
-            QImage rxImage(rxRgbBuffer, v->w, v->h, 32, (QRgb *)0, 0, QImage::LittleEndian);
-
-            if ((v->w != rxVideoArea.width()) || (v->h != rxVideoArea.height()))
-            {
-                ScaledImage = rxImage.scaled(rxVideoArea.width(),
-                                             rxVideoArea.height(),
-                                             Qt::KeepAspectRatio);
-                imageToDisplay = &ScaledImage;
-            }
-            else
-                imageToDisplay = &rxImage;
-
-            // Fullscreen mode - draw on the local webcam as an inset image            
-            if ((fullScreen) && (!savedLocalWebcam.isNull())) // In full-screen mode, don't overdraw the inset local webcam 
-            {
-                QPixmap fsPixmap(screenwidth, screenheight);
-                fsPixmap.fill(Qt::black);
-                QPainter p(&fsPixmap);
-                p.drawImage((screenwidth-imageToDisplay->width())/2, 
-                            (screenheight-imageToDisplay->height())/2,
-                            *imageToDisplay);
-                p.drawImage(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,
-                            savedLocalWebcam);
-                p.setPen(Qt::white);
-                p.drawRect(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,
-                           WC_INSET_WIDTH, WC_INSET_HEIGHT);
-                bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), &fsPixmap);
-            }
-            else
-                bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), imageToDisplay);
-        }
-        rtpVideo->freeVideoBuffer(v);
+        VERBOSE(VB_IMPORTANT,
+                QString("SIP: Rx Image size changed from %1x%2 to %3x%4")
+                .arg(rxWidth).arg(rxHeight).arg(v->w).arg(v->h));
+        rxWidth = v->w;
+        rxHeight = v->h;
+        ChangeVideoRxResolution();
     }
+
+    uchar *decRgbFrame = h263->H263DecodeFrame(
+        v->video, v->len, rxRgbBuffer, sizeof(rxRgbBuffer));
+
+    if (decRgbFrame)
+    {
+        QImage rxImage(rxRgbBuffer, v->w, v->h, 32, (QRgb *)0, 0,
+                       QImage::LittleEndian);
+
+        if ((v->w != rxVideoArea.width()) || (v->h != rxVideoArea.height()))
+        {
+            ScaledImage = rxImage.scaled(rxVideoArea.width(),
+                                         rxVideoArea.height(),
+                                         Qt::KeepAspectRatio);
+            imageToDisplay = &ScaledImage;
+        }
+        else
+        {
+            imageToDisplay = &rxImage;
+        }
+
+        // Fullscreen mode - draw on the local webcam as an inset image
+        if ((fullScreen) && (!savedLocalWebcam.isNull()))
+        {
+            // In full-screen mode, don't overdraw the inset local webcam
+            QPixmap fsPixmap(screenwidth, screenheight);
+            fsPixmap.fill(Qt::black);
+            QPainter p(&fsPixmap);
+            p.drawImage((screenwidth  - imageToDisplay->width())  / 2,
+                        (screenheight - imageToDisplay->height()) / 2,
+                        *imageToDisplay);
+            p.drawImage(screenwidth  - WC_INSET_WIDTH,
+                        screenheight - WC_INSET_HEIGHT,
+                        savedLocalWebcam);
+            p.setPen(Qt::white);
+            p.drawRect(screenwidth  - WC_INSET_WIDTH,
+                       screenheight - WC_INSET_HEIGHT,
+                       WC_INSET_WIDTH, WC_INSET_HEIGHT);
+
+            bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), &fsPixmap);
+        }
+        else
+            bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), imageToDisplay);
+    }
+    rtpVideo->freeVideoBuffer(v);
 }
 
-
-void PhoneUIBox::ProcessSipStateChange()
+void PhoneUIBox::ProcessSipStateChange(void)
 {
     int OldState = State;
 
     // Poll the FSM for network events
     State = sipStack->GetSipState();
 
+    if (State == OldState)
+        return;
+
     // Handle state transitions
-    if (State != OldState)
+    // Any change of state will cancel playing of voicemails
+    if (vmail)
     {
-        // Any change of state will cancel playing of voicemails
-        if (vmail)
-            delete vmail;
-        vmail = 0;
+        delete vmail;
+        vmail = NULL;
+    }
 
-        if (State == SIP_IDLE)
+    if (State == SIP_IDLE)
+    {
+        // Returned to idle, update duration in call record
+        if (currentCallEntry)
         {
-            // Returned to idle, update duration in call record
-            if (currentCallEntry)
-            {
-                currentCallEntry->setDuration(ConnectTime.elapsed()/1000);
-                DirContainer->AddToCallHistory(currentCallEntry, true);
-                DirectoryList->refresh();
-            }
-            currentCallEntry = 0;
-            ConnectTime.restart();
+            currentCallEntry->setDuration(ConnectTime.elapsed() / 1000);
+            DirContainer->AddToCallHistory(currentCallEntry, true);
+            DirectoryList->refresh();
         }
+        currentCallEntry = 0;
+        ConnectTime.restart();
+    }
 
-        switch(State)
-        {
-        case SIP_IDLE:           phoneUIStatusBar->DisplayCallState(tr("No Active Calls"));                break;
-        case SIP_CONNECTED:      break;
-        case SIP_CONNECTED_VXML: phoneUIStatusBar->DisplayCallState(tr("Caller is Leaving Voicemail"));    break;
-        case SIP_OCONNECTING1:   phoneUIStatusBar->DisplayCallState(tr("Trying to Contact Remote Party")); break;
-        case SIP_ICONNECTING_WAITACK: phoneUIStatusBar->DisplayCallState(tr("Connecting"));                break;
-        case SIP_ICONNECTING:    phoneUIStatusBar->DisplayCallState(tr("Incoming Call"));                  break;
-        case SIP_DISCONNECTING:  phoneUIStatusBar->DisplayCallState(tr("Hanging Up"));                     break;
-        case SIP_OCONNECTING2:   // Shows notification from Sip Stack, e.g. Trying or Ringing
-        default:                 
-            break;
-        }
+    switch(State)
+    {
+    case SIP_IDLE:
+        phoneUIStatusBar->DisplayCallState(tr("No Active Calls"));
+        break;
+    case SIP_CONNECTED:
+        break;
+    case SIP_CONNECTED_VXML:
+        phoneUIStatusBar->DisplayCallState(
+            tr("Caller is Leaving Voicemail"));
+        break;
+    case SIP_OCONNECTING1:
+        phoneUIStatusBar->DisplayCallState(
+            tr("Trying to Contact Remote Party"));
+        break;
+    case SIP_ICONNECTING_WAITACK:
+        phoneUIStatusBar->DisplayCallState(tr("Connecting"));
+        break;
+    case SIP_ICONNECTING:
+        phoneUIStatusBar->DisplayCallState(tr("Incoming Call"));
+        break;
+    case SIP_DISCONNECTING:
+        phoneUIStatusBar->DisplayCallState(tr("Hanging Up"));
+        break;
+    case SIP_OCONNECTING2:
+        // Shows notification from Sip Stack, e.g. Trying or Ringing
+    default:
+        break;
     }
 }
 
 
-void PhoneUIBox::ProcessSipNotification()
+void PhoneUIBox::ProcessSipNotification(void)
 {
     // If the SIP stack has something to tell the user, then display that first
     QString NotifyType, NotifyUrl, NotifyParam1, NotifyParam2;
-    while (sipStack->GetNotification(NotifyType, NotifyUrl, NotifyParam1, NotifyParam2))
+    while (sipStack->GetNotification(
+               NotifyType, NotifyUrl, NotifyParam1, NotifyParam2))
     {
-        // See if the notification is a received STATUS messages in response to making a call
+        // See if the notification is a received STATUS messages
+        // in response to making a call
         if (NotifyType == "CALLSTATUS")
         {
             phoneUIStatusBar->DisplayCallState(NotifyParam2);
         }
 
-        // See if the notification is a change in presence status of a remote client
+        // See if the notification is a change in presence status
+        // of a remote client
         else if (NotifyType == "PRESENCE")
         {
             int newStatus = ICON_PRES_UNKNOWN;
@@ -899,7 +1029,9 @@ void PhoneUIBox::ProcessSipNotification()
                 newStatus = ICON_PRES_ONLINE;
             else if (NotifyParam1 == "inactive")
                 newStatus = ICON_PRES_AWAY;
-            DirContainer->ChangePresenceStatus(NotifyUrl, newStatus, NotifyParam2, true);
+
+            DirContainer->ChangePresenceStatus(
+                NotifyUrl, newStatus, NotifyParam2, true);
             DirectoryList->refresh();
         }
 
@@ -908,64 +1040,73 @@ void PhoneUIBox::ProcessSipNotification()
         {
             doIMPopup(NotifyUrl, NotifyParam1, NotifyParam2);
         }
-
-        else 
+        else
+        {
             VERBOSE(VB_IMPORTANT, QString("SIP: Unknown Notify type %1")
                     .arg(NotifyType.toLocal8Bit().constData()));
+        }
     }
 }
 
-
-void PhoneUIBox::OnScreenClockTick()
+void PhoneUIBox::OnScreenClockTick(void)
 {
     if (rtpAudio)
         phoneUIStatusBar->updateMidCallTime(ConnectTime.elapsed()/1000);
 }
 
-
 void PhoneUIBox::ProcessAudioRtpStatistics(RtpEvent *stats)
 {
-    phoneUIStatusBar->updateMidCallAudioStats(stats->getPkIn(), stats->getPkMissed(),
-                                              stats->getPkLate(), stats->getPkOut(),
-                                              stats->getBytesIn(), stats->getBytesOut(),
-                                              stats->getPeriod());
-    updateAudioStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
-                          stats->getPkOut(), stats->getPkInDisc(), stats->getPkOutDrop(), 
-                          stats->getBytesIn(), stats->getBytesOut(),
-                          stats->getMinPlayout(), stats->getAvgPlayout(), stats->getMaxPlayout());
-}
+    phoneUIStatusBar->updateMidCallAudioStats(
+        stats->getPkIn(), stats->getPkMissed(),
+        stats->getPkLate(), stats->getPkOut(),
+        stats->getBytesIn(), stats->getBytesOut(),
+        stats->getPeriod());
 
+    updateAudioStatistics(
+        stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(),
+        stats->getPkOut(), stats->getPkInDisc(), stats->getPkOutDrop(),
+        stats->getBytesIn(), stats->getBytesOut(),
+        stats->getMinPlayout(), stats->getAvgPlayout(), stats->getMaxPlayout());
+}
 
 void PhoneUIBox::ProcessVideoRtpStatistics(RtpEvent *stats)
 {
-    phoneUIStatusBar->updateMidCallVideoStats(stats->getPkIn(), stats->getPkMissed(),
-                                              stats->getPkLate(), stats->getPkOut(),
-                                              stats->getBytesIn(), stats->getBytesOut(),
-                                              stats->getPeriod());
-    updateVideoStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
-                          stats->getPkOut(), stats->getPkInDisc(), stats->getPkOutDrop(), 
-                          stats->getBytesIn(), stats->getBytesOut(),
-                          stats->getFramesIn(), stats->getFramesOut(), 
-                          stats->getFramesInDiscarded(), stats->getFramesOutDiscarded());
+    phoneUIStatusBar->updateMidCallVideoStats(
+        stats->getPkIn(), stats->getPkMissed(),
+        stats->getPkLate(), stats->getPkOut(),
+        stats->getBytesIn(), stats->getBytesOut(),
+        stats->getPeriod());
+
+    updateVideoStatistics(
+        stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(),
+        stats->getPkOut(), stats->getPkInDisc(), stats->getPkOutDrop(),
+        stats->getBytesIn(), stats->getBytesOut(),
+        stats->getFramesIn(), stats->getFramesOut(),
+        stats->getFramesInDiscarded(), stats->getFramesOutDiscarded());
 }
 
 
 void PhoneUIBox::ProcessAudioRtcpStatistics(RtpEvent *stats)
 {
-    updateAudioRtcpStatistics(stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
+    updateAudioRtcpStatistics(
+        stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
 }
 
 
 void PhoneUIBox::ProcessVideoRtcpStatistics(RtpEvent *stats)
 {
-    updateVideoRtcpStatistics(stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
+    updateVideoRtcpStatistics(
+        stats->getRtcpFractionLoss(), stats->getRtcpTotalLoss());
+
     if (stats->getRtcpFractionLoss() > 0)
         h263->H263ForceIFrame();
 }
 
 
-void PhoneUIBox::startRTP(int audioPayload, int videoPayload, int dtmfPayload, int audioPort, int videoPort, 
-                          QString remoteIp, QString audioCodec, QString videoCodec, QString videoRes)
+void PhoneUIBox::startRTP(
+    int audioPayload, int videoPayload, int dtmfPayload,
+    int audioPort, int videoPort,
+    QString remoteIp, QString audioCodec, QString videoCodec, QString videoRes)
 {
     if (rtpAudio == 0)
     {
@@ -973,30 +1114,42 @@ void PhoneUIBox::startRTP(int audioPayload, int videoPayload, int dtmfPayload, i
         QString spk = gContext->GetSetting("AudioOutputDevice");
         QString mic = gContext->GetSetting("MicrophoneDevice");
         int playout = (videoPayload != -1) ?
-                        atoi((const char *)gContext->GetSetting("PlayoutVideoCall")) :
-                        atoi((const char *)gContext->GetSetting("PlayoutAudioCall"));
-        rtpAudio = new rtp (this, laPort, remoteIp, audioPort, audioPayload, playout, dtmfPayload, mic, spk);
+            atoi((const char *)gContext->GetSetting("PlayoutVideoCall")) :
+            atoi((const char *)gContext->GetSetting("PlayoutAudioCall"));
+
+        rtpAudio = new rtp(
+            this, laPort, remoteIp, audioPort, audioPayload,
+            playout, dtmfPayload, mic, spk);
+
         OnScreenClockTimer->start(1000);
         phoneUIStatusBar->DisplayInCallStats(true);
         phoneUIStatusBar->updateMidCallAudioCodec(audioCodec);
         audioCodecInUse = audioCodec;
         powerDispTimer->start(100);
     }
+
     if (rtpVideo == 0)
     {
         if (videoPayload != -1)
         {
-            int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
+            int lvPort = atoi((const char *)
+                              gContext->GetSetting("VideoLocalPort"));
             StartVideo(lvPort, remoteIp, videoPort, videoPayload, videoRes);
             videoCodecInUse = videoCodec;
             phoneUIStatusBar->updateMidCallVideoCodec(videoCodec);
         }
         else
+        {
             phoneUIStatusBar->updateMidCallVideoCodec("");
+        }
     }
+
     if (rtpVideo != 0)
-        rtpVideo->setMaxBandwidth(atoi((const char *)gContext->GetSetting("TransmitBandwidth")) -
-                                  rtpAudio->getCodecBandwidth());
+    {
+        rtpVideo->setMaxBandwidth(
+            atoi((const char *)gContext->GetSetting("TransmitBandwidth")) -
+            rtpAudio->getCodecBandwidth());
+    }
 }
 
 void PhoneUIBox::stopRTP(bool stopAudio, bool stopVideo)
@@ -1011,16 +1164,18 @@ void PhoneUIBox::stopRTP(bool stopAudio, bool stopVideo)
         rtpAudio = 0;
         audioCodecInUse = "";
     }
-    
+
     if ((rtpVideo != 0) && (stopVideo))
         StopVideo();
-    
+
     OnScreenClockTimer->stop();
 }
 
-void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString callerUrl, bool inAudioOnly)
+void PhoneUIBox::alertUser(
+    QString callerUser, QString callerName, QString callerUrl, bool inAudioOnly)
 {
     QString callerDisplay;
+
     // Get a display name from directory or using best field in INVITE
     DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(callerUrl);
     if (entry)
@@ -1029,7 +1184,7 @@ void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString calle
         callerDisplay = callerName;
     else if (callerUser.length()>0)
         callerDisplay = callerUser;
-    else 
+    else
         callerDisplay = "";
 
     // Show caller on status bar once connected
@@ -1041,16 +1196,25 @@ void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString calle
     if (currentCallEntry)
         delete currentCallEntry;
     currentCallEntry = new CallRecord(callerDisplay, callerUrl, true, ts);
-    
+
     bool AutoanswerEnabled = gContext->GetNumSetting("SipAutoanswer",1);
-    if ((AutoanswerEnabled) && (entry)) // Only allow autoanswer from matched entries
+    if ((AutoanswerEnabled) && (entry))
+    {
+        // Only allow autoanswer from matched entries
         AnswerCall(txVideoMode, true);
+    }
     else
     {
         // Popup the caller's details
-        closeCallPopup(); // Check we were not displaying one (e.g. user was getting ready to dial)
+
+        // Check we were not displaying one
+        // (e.g. user was getting ready to dial)
+        closeCallPopup();
+
         if (entry)
+        {
             doCallPopup(entry, tr("Answer"), inAudioOnly);
+        }
         else
         {
             DirEntry dummyEntry(callerDisplay, callerUrl, "", "", "");
@@ -1059,7 +1223,7 @@ void PhoneUIBox::alertUser(QString callerUser, QString callerName, QString calle
     }
 }
 
-void PhoneUIBox::doMenuPopup()
+void PhoneUIBox::doMenuPopup(void)
 {
     if (menuPopup)
         return;
@@ -1082,30 +1246,46 @@ void PhoneUIBox::doMenuPopup()
     case TA_DIR:
     case TA_VMAIL:
         menuPopup->addLabel(tr("Directory"), MythPopupBox::Large);
-        b1 = menuPopup->addButton(tr("Add someone to your Directory "), this, SLOT(menuAddContact()));
+        b1 = menuPopup->addButton(
+            tr("Add someone to your Directory "),
+            this, SLOT(menuAddContact()));
         break;
+
     case TA_SPEEDDIALENTRY:
         menuPopup->addLabel(tr("Speed Dials"), MythPopupBox::Large);
-        b1 = menuPopup->addButton(tr("Edit this Entry"), this, SLOT(menuEntryEdit()));
-        menuPopup->addButton(tr("Remove from Speed Dials"), this, SLOT(menuSpeedDialRemove()));
-        menuPopup->addButton(tr("Add someone to your Directory "), this, SLOT(menuAddContact()));
+        b1 = menuPopup->addButton(
+            tr("Edit this Entry"), this, SLOT(menuEntryEdit()));
+        menuPopup->addButton(
+            tr("Remove from Speed Dials"), this, SLOT(menuSpeedDialRemove()));
+        menuPopup->addButton(
+            tr("Add someone to your Directory "), this, SLOT(menuAddContact()));
         break;
+
     case TA_CALLHISTENTRY:
         menuPopup->addLabel(tr("Call History"), MythPopupBox::Large);
-        b1 = menuPopup->addButton(tr("Save this in the Directory"), this, SLOT(menuHistorySave()));
-        menuPopup->addButton(tr("Clear the Call History"), this, SLOT(menuHistoryClear()));
+        b1 = menuPopup->addButton(
+            tr("Save this in the Directory"), this, SLOT(menuHistorySave()));
+        menuPopup->addButton(
+            tr("Clear the Call History"), this, SLOT(menuHistoryClear()));
         break;
+
     case TA_DIRENTRY:
         menuPopup->addLabel(tr("Directory"), MythPopupBox::Large);
-        b1 = menuPopup->addButton(tr("Edit this Entry"), this, SLOT(menuEntryEdit()));
-        menuPopup->addButton(tr("Make this a Speeddial"), this, SLOT(menuEntryMakeSpeedDial()));
-        menuPopup->addButton(tr("Delete this Entry"), this, SLOT(menuEntryDelete()));
-        menuPopup->addButton(tr("Add someone to your Directory "), this, SLOT(menuAddContact()));
+        b1 = menuPopup->addButton(
+            tr("Edit this Entry"), this, SLOT(menuEntryEdit()));
+        menuPopup->addButton(
+            tr("Make this a Speeddial"), this, SLOT(menuEntryMakeSpeedDial()));
+        menuPopup->addButton(
+            tr("Delete this Entry"), this, SLOT(menuEntryDelete()));
+        menuPopup->addButton(
+            tr("Add someone to your Directory "), this, SLOT(menuAddContact()));
         break;
     case TA_VMAIL_ENTRY:
         menuPopup->addLabel(tr("Voicemail"), MythPopupBox::Large);
-        b1 = menuPopup->addButton(tr("Delete this Voicemail"), this, SLOT(vmailEntryDelete()));
-        menuPopup->addButton(tr("Delete all Voicemails"), this, SLOT(vmailEntryDeleteAll()));
+        b1 = menuPopup->addButton(
+            tr("Delete this Voicemail"), this, SLOT(vmailEntryDelete()));
+        menuPopup->addButton(
+            tr("Delete all Voicemails"), this, SLOT(vmailEntryDeleteAll()));
         break;
     default:
         menuPopup->deleteLater();
@@ -1120,22 +1300,25 @@ void PhoneUIBox::doMenuPopup()
 }
 
 
-void PhoneUIBox::menuCallUrl()
+void PhoneUIBox::menuCallUrl(void)
 {
     doUrlPopup(0, true);
 }
 
-void PhoneUIBox::menuAddContact()
+void PhoneUIBox::menuAddContact(void)
 {
     doAddEntryPopup(0);
 }
 
-void PhoneUIBox::menuSpeedDialRemove()
+void PhoneUIBox::menuSpeedDialRemove(void)
 {
     GenericTree *Current = DirectoryList->getCurrentNode();
+
     if (Current != 0)
     {
-        DirEntry *Entry = DirContainer->fetchDirEntryById(Current->getAttribute(1));
+        DirEntry *Entry = DirContainer->fetchDirEntryById(
+            Current->getAttribute(1));
+
         if (Entry != 0)
         {
             if (Entry->isSpeedDial())
@@ -1146,44 +1329,66 @@ void PhoneUIBox::menuSpeedDialRemove()
             }
         }
         else
-            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "mythphone: Error finding your directory entry");
+        }
     }
     else
+    {
         VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
+    }
+
     closeMenuPopup();
 }
 
-void PhoneUIBox::menuHistorySave()
+void PhoneUIBox::menuHistorySave(void)
 {
     GenericTree *Current = DirectoryList->getCurrentNode();
+
     if (Current != 0)
     {
-        CallRecord *crEntry = DirContainer->fetchCallRecordById(Current->getAttribute(1));
-        DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(crEntry->getUri());
+        CallRecord *crEntry =
+            DirContainer->fetchCallRecordById(Current->getAttribute(1));
+
+        DirEntry *entry =
+            DirContainer->FindMatchingDirectoryEntry(crEntry->getUri());
+
         if (crEntry != 0)
         {
             if (entry != 0)
             {
                 // Tell the user one exists
-                DialogBox *NoDeviceDialog = new DialogBox(gContext->GetMainWindow(),
-                                                  "\n\n" + QObject::tr("A directory entry already exists with this URL."));
+                DialogBox *NoDeviceDialog = new DialogBox(
+                    gContext->GetMainWindow(),
+                    "\n\n" + QObject::tr(
+                        "A directory entry already exists with this URL."));
+
                 NoDeviceDialog->AddButton(QObject::tr("OK"));
                 NoDeviceDialog->exec();
                 NoDeviceDialog->deleteLater();
                 closeMenuPopup();
             }
             else
-                doAddEntryPopup(0, crEntry->getDisplayName(), crEntry->getUri());
+            {
+                doAddEntryPopup(0, crEntry->getDisplayName(),
+                                crEntry->getUri());
+            }
         }
         else
-            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your call history entry");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "mythphone: Error finding your call history entry");
+        }
     }
     else
+    {
         VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
+    }
 }
 
 
-void PhoneUIBox::menuHistoryClear()
+void PhoneUIBox::menuHistoryClear(void)
 {
     // If we are highlighting a call history entry, move up the tree
     // before we delete it
@@ -1198,29 +1403,38 @@ void PhoneUIBox::menuHistoryClear()
 }
 
 
-void PhoneUIBox::menuEntryEdit()
+void PhoneUIBox::menuEntryEdit(void)
 {
     GenericTree *Current = DirectoryList->getCurrentNode();
     if (Current != 0)
     {
-        DirEntry *Entry = DirContainer->fetchDirEntryById(Current->getAttribute(1));
+        DirEntry *Entry =
+            DirContainer->fetchDirEntryById(Current->getAttribute(1));
+
         if (Entry != 0)
         {
             doAddEntryPopup(Entry);
         }
         else
-            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "mythphone: Error finding your directory entry");
+        }
     }
     else
+    {
         VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
+    }
 }
 
-void PhoneUIBox::menuEntryMakeSpeedDial()
+void PhoneUIBox::menuEntryMakeSpeedDial(void)
 {
     GenericTree *Current = DirectoryList->getCurrentNode();
     if (Current != 0)
     {
-        DirEntry *Entry = DirContainer->fetchDirEntryById(Current->getAttribute(1));
+        DirEntry *Entry =
+            DirContainer->fetchDirEntryById(Current->getAttribute(1));
+
         if (Entry != 0)
         {
             if (!Entry->isSpeedDial())
@@ -1230,19 +1444,26 @@ void PhoneUIBox::menuEntryMakeSpeedDial()
             }
         }
         else
-            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "mythphone: Error finding your directory entry");
+        }
     }
     else
+    {
         VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
+    }
     closeMenuPopup();
 }
 
-void PhoneUIBox::menuEntryDelete()
+void PhoneUIBox::menuEntryDelete(void)
 {
     GenericTree *Current = DirectoryList->getCurrentNode();
     if (Current != 0)
     {
-        DirEntry *Entry = DirContainer->fetchDirEntryById(Current->getAttribute(1));
+        DirEntry *Entry =
+            DirContainer->fetchDirEntryById(Current->getAttribute(1));
+
         if (Entry != 0)
         {
             DirectoryList->popUp();
@@ -1250,14 +1471,19 @@ void PhoneUIBox::menuEntryDelete()
             DirectoryList->refresh();
         }
         else
-            VERBOSE(VB_IMPORTANT, "mythphone: Error finding your directory entry");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "mythphone: Error finding your directory entry");
+        }
     }
     else
+    {
         VERBOSE(VB_IMPORTANT, "mythphone: Error getting info from the tree");
+    }
     closeMenuPopup();
 }
 
-void PhoneUIBox::vmailEntryDelete()
+void PhoneUIBox::vmailEntryDelete(void)
 {
     // If we are highlighting a voicemail entry, move up the tree
     // before we delete it
@@ -1272,7 +1498,7 @@ void PhoneUIBox::vmailEntryDelete()
     closeMenuPopup();
 }
 
-void PhoneUIBox::vmailEntryDeleteAll()
+void PhoneUIBox::vmailEntryDeleteAll(void)
 {
     // If we are highlighting a voicemail entry, move up the tree
     // before we delete it
@@ -1286,7 +1512,7 @@ void PhoneUIBox::vmailEntryDeleteAll()
     closeMenuPopup();
 }
 
-void PhoneUIBox::closeMenuPopup()
+void PhoneUIBox::closeMenuPopup(void)
 {
     if (!menuPopup)
         return;
@@ -1321,17 +1547,26 @@ void PhoneUIBox::doUrlPopup(char key, bool digitsOrUrl)
         urlPopup->addWidget(urlRemoteField);
         urlRemoteField->setFocus();
     }
-    urlPopup->addButton(tr("Place Videocall Now"), this, SLOT(dialUrlVideo()));
-    urlPopup->addButton(tr("Place Voice-Only Call Now"), this, SLOT(dialUrlVoice()));
+    urlPopup->addButton(tr("Place Videocall Now"),
+                        this, SLOT(dialUrlVideo()));
+    urlPopup->addButton(tr("Place Voice-Only Call Now"),
+                        this, SLOT(dialUrlVoice()));
+
     if (digitsOrUrl)
-        urlPopup->addButton(tr("Switch from digits to URL input"), this, SLOT(dialUrlSwitchToUrl()));
+    {
+        urlPopup->addButton(tr("Switch from digits to URL input"),
+                            this, SLOT(dialUrlSwitchToUrl()));
+    }
     else
-        urlPopup->addButton(tr("Switch from URL to Digits input"), this, SLOT(dialUrlSwitchToDigits()));
+    {
+        urlPopup->addButton(tr("Switch from URL to Digits input"),
+                            this, SLOT(dialUrlSwitchToDigits()));
+    }
 
     urlPopup->ShowPopupAtXY(200, 60, this, SLOT(closeUrlPopup()));
 }
 
-void PhoneUIBox::closeUrlPopup()
+void PhoneUIBox::closeUrlPopup(void)
 {
     if (!urlPopup)
         return;
@@ -1340,21 +1575,11 @@ void PhoneUIBox::closeUrlPopup()
     urlPopup = NULL;
 }
 
-void PhoneUIBox::dialUrlVideo()
+void PhoneUIBox::dialUrlVideo(void)
 {
-    PlaceCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", txVideoMode);
-    closeUrlPopup();                           
+    PlaceCall((urlField == 0) ? urlRemoteField->text() : urlField->text(),
+              "", txVideoMode);
 
-    // If we got here via the menu popup
-    // then close that now - we're finiished with it
-    if (menuPopup)
-        closeMenuPopup();
-}
-
-
-void PhoneUIBox::dialUrlVoice()
-{
-    PlaceCall(urlField==0 ? urlRemoteField->text() : urlField->text(), "", "AUDIOONLY");
     closeUrlPopup();
 
     // If we got here via the menu popup
@@ -1363,13 +1588,27 @@ void PhoneUIBox::dialUrlVoice()
         closeMenuPopup();
 }
 
-void PhoneUIBox::dialUrlSwitchToDigits()
+
+void PhoneUIBox::dialUrlVoice(void)
+{
+    PlaceCall((urlField == 0) ? urlRemoteField->text() : urlField->text(),
+              "", "AUDIOONLY");
+
+    closeUrlPopup();
+
+    // If we got here via the menu popup
+    // then close that now - we're finiished with it
+    if (menuPopup)
+        closeMenuPopup();
+}
+
+void PhoneUIBox::dialUrlSwitchToDigits(void)
 {
     closeUrlPopup();
     doUrlPopup(0, true);
 }
 
-void PhoneUIBox::dialUrlSwitchToUrl()
+void PhoneUIBox::dialUrlSwitchToUrl(void)
 {
     closeUrlPopup();
     doUrlPopup(0, false);
@@ -1382,10 +1621,14 @@ void PhoneUIBox::doIMPopup(QString otherParty, QString callId, QString Msg)
     else
     {
         imPopup = new MythPopupBox(gContext->GetMainWindow(), "IM_popup");
-        QLabel *title = imPopup->addLabel("IM: "+otherParty, MythPopupBox::Medium);
+        QLabel *title = imPopup->addLabel(
+            "IM: "+otherParty, MythPopupBox::Medium);
+
         title->setAlignment(Qt::AlignHCenter);
+
         for (int i=0; i<MAX_DISPLAY_IM_MSGS; i++)
             imLine[i] = imPopup->addLabel("", MythPopupBox::Small, true);
+
         displayedIMMsgs = 0;
         if (callId.length() > 0)
         {
@@ -1393,43 +1636,50 @@ void PhoneUIBox::doIMPopup(QString otherParty, QString callId, QString Msg)
             scrollIMText(Msg, true);
         }
         else
+        {
             imCallid = "";
+        }
+
         imUrl = otherParty;
         imReplyField = new MythRemoteLineEdit(imPopup);
         imPopup->addWidget(imReplyField);
         imReplyField->setFocus();
         imPopup->addButton(tr("Send IM"), this, SLOT(imSendReply()));
-        
+
         imPopup->ShowPopupAtXY(200, 100, this, SLOT(closeIMPopup()));
     }
 }
 
 void PhoneUIBox::scrollIMText(QString Msg, bool msgReceived)
 {
-    if (imPopup)
+    if (!imPopup)
+        return;
+
+    // See if we need to scroll
+    if (displayedIMMsgs >= MAX_DISPLAY_IM_MSGS)
     {
-        // See if we need to scroll
-        if (displayedIMMsgs >= MAX_DISPLAY_IM_MSGS)
+        for (int i = 0; i < displayedIMMsgs - 1; i++)
         {
-            for (int i=0;i<displayedIMMsgs-1;i++)
-            {
-                imLine[i]->setPaletteForegroundColor(imLine[i+1]->paletteForegroundColor());
-                imLine[i]->setText(imLine[i+1]->text());
-            }
+            imLine[i]->setPaletteForegroundColor(
+                imLine[i+1]->paletteForegroundColor());
+            imLine[i]->setText(imLine[i+1]->text());
         }
-        else
-            displayedIMMsgs++;
-        
-        // Display latest msg 
-        if (msgReceived)
-            imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::white);
-        else
-            imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::yellow);
-        imLine[displayedIMMsgs-1]->setText(Msg);
     }
+    else
+    {
+        displayedIMMsgs++;
+    }
+
+    // Display latest msg
+    if (msgReceived)
+        imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::white);
+    else
+        imLine[displayedIMMsgs-1]->setPaletteForegroundColor(Qt::yellow);
+
+    imLine[displayedIMMsgs-1]->setText(Msg);
 }
 
-void PhoneUIBox::closeIMPopup()
+void PhoneUIBox::closeIMPopup(void)
 {
     if (!imPopup)
         return;
@@ -1438,10 +1688,11 @@ void PhoneUIBox::closeIMPopup()
     imPopup = NULL;
 }
 
-void PhoneUIBox::imSendReply()
+void PhoneUIBox::imSendReply(void)
 {
     if (!imPopup)
         return;
+
     imCallid = sipStack->UiSendIMMessage(imUrl, imCallid, imReplyField->text());
     scrollIMText(imReplyField->text(), false);
     imReplyField->setText("");
@@ -1454,10 +1705,13 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
     if (addEntryPopup)
         return;
 
-    addEntryPopup = new MythPopupBox(gContext->GetMainWindow(), "add_entry_popup");
+    addEntryPopup = new MythPopupBox(
+        gContext->GetMainWindow(), "add_entry_popup");
 
-    if (edit == 0) // If editing, currently we don't allow fields to change that will affect the displayed tree structure
+    if (edit == 0)
     {
+        // If editing, currently we don't allow fields to change
+        // that will affect the displayed tree structure
         addEntryPopup->addLabel(tr("Nickname"), MythPopupBox::Small);
         entryNickname = new MythRemoteLineEdit(addEntryPopup);
         addEntryPopup->addWidget(entryNickname);
@@ -1480,8 +1734,10 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
     entryUrl = new MythRemoteLineEdit(addEntryPopup);
     addEntryPopup->addWidget(entryUrl);
 
-    if (edit == 0) // If editing, currently we don't allow fields to change that will affect the displayed tree structure
+    if (edit == 0)
     {
+        // If editing, currently we don't allow fields to change
+        // that will affect the displayed tree structure
         entrySpeed = new MythCheckBox(addEntryPopup);
         entrySpeed->setText(tr("Speed Dial"));
         addEntryPopup->addWidget(entrySpeed);
@@ -1497,17 +1753,24 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
     addEntryPopup->addWidget(entryPhoto);
 #endif
 
-    if (edit == 0) // If editing, currently we don't allow fields to change that will affect the displayed tree structure
+    if (edit == 0)
     {
+        // If editing, currently we don't allow fields to change
+        // that will affect the displayed tree structure
         addEntryPopup->addLabel(tr("To Directory"), MythPopupBox::Small);
         entryDir = new MythComboBox(false, addEntryPopup);
         addEntryPopup->addWidget(entryDir);
     }
 
     if (edit != 0)
-        addEntryPopup->addButton(tr("Save Changes"), this, SLOT(entryAddSelected()));
+    {
+        addEntryPopup->addButton(tr("Save Changes"),
+                                 this, SLOT(entryAddSelected()));
+    }
     else
+    {
         addEntryPopup->addButton(tr("ADD"), this, SLOT(entryAddSelected()));
+    }
 
     // This shouldnt be needed but for some reason the
     // window is too short
@@ -1517,7 +1780,9 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
 
 #ifdef PHOTO
     // Fill the photos from the directory
-    QDir photos(gContext->FindThemeDir("default"), "mp_photo-*", QDir::Name, QDir::Files);
+    QDir photos(gContext->FindThemeDir("default"), "mp_photo-*",
+                QDir::Name, QDir::Files);
+
     const QFileInfoList *il = photos.entryInfoList();
     int PhotoIndex = 0;
     if (il)
@@ -1564,7 +1829,7 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
     EntrytoEdit = edit;
 }
 
-void PhoneUIBox::closeAddEntryPopup()
+void PhoneUIBox::closeAddEntryPopup(void)
 {
     if (!addEntryPopup)
         return;
@@ -1573,12 +1838,11 @@ void PhoneUIBox::closeAddEntryPopup()
     addEntryPopup = NULL;
 }
 
-
-
-void PhoneUIBox::entryAddSelected()
+void PhoneUIBox::entryAddSelected(void)
 {
-    if (EntrytoEdit == 0) // Add
+    if (EntrytoEdit == 0)
     {
+        // Add
         QString Directory = entryDir->currentText();
         if (Directory == "new")
         {
@@ -1586,24 +1850,31 @@ void PhoneUIBox::entryAddSelected()
             return;
         }
         else
-            addNewDirectoryEntry(entryNickname->text(),
-                                 entryUrl->text(),
-                                 entryDir->currentText(),
-                                 entryFirstname->text(),
-                                 entrySurname->text(),
-                                 "",
-                                 entrySpeed->isChecked(),
-                                 entryOnHomeLan->isChecked());
+        {
+            addNewDirectoryEntry(
+                entryNickname->text(),
+                entryUrl->text(),
+                entryDir->currentText(),
+                entryFirstname->text(),
+                entrySurname->text(),
+                "",
+                entrySpeed->isChecked(),
+                entryOnHomeLan->isChecked());
+        }
     }
-    else // Edit
-        addNewDirectoryEntry(0,
-                            entryUrl->text(),
-                            0,
-                            entryFirstname->text(),
-                            entrySurname->text(),
-                            "",
-                            false,
-                            entryOnHomeLan->isChecked());
+    else
+    {
+        // Edit
+        addNewDirectoryEntry(
+            0,
+            entryUrl->text(),
+            0,
+            entryFirstname->text(),
+            entrySurname->text(),
+            "",
+            false,
+            entryOnHomeLan->isChecked());
+    }
 
     closeAddEntryPopup();
     // If we got here via the menu popup
@@ -1614,9 +1885,10 @@ void PhoneUIBox::entryAddSelected()
 
 
 
-void PhoneUIBox::addNewDirectoryEntry(QString Name, QString Url, QString Dir, QString fn, QString sn, QString ph, bool isSpeed, bool OnHomeLan)
+void PhoneUIBox::addNewDirectoryEntry(
+    QString Name, QString Url, QString Dir,
+    QString fn, QString sn, QString ph, bool isSpeed, bool OnHomeLan)
 {
-
     if (EntrytoEdit == 0)
     {
         // First add to DB, which will automatically add the DIR if needed
@@ -1627,11 +1899,12 @@ void PhoneUIBox::addNewDirectoryEntry(QString Name, QString Url, QString Dir, QS
         // TODO ... before this, make sure it doesn't already
         // exist.
     }
-
-    // EDITing an existing entry
     else
     {
-        DirContainer->ChangeEntry(EntrytoEdit, Name, Url, fn, sn, ph, OnHomeLan);
+        // EDITing an existing entry
+        DirContainer->ChangeEntry(
+            EntrytoEdit, Name, Url, fn, sn, ph, OnHomeLan);
+
         DirectoryList->refresh();
     }
 
@@ -1640,22 +1913,26 @@ void PhoneUIBox::addNewDirectoryEntry(QString Name, QString Url, QString Dir, QS
 
 
 
-void PhoneUIBox::doAddDirectoryPopup()
+void PhoneUIBox::doAddDirectoryPopup(void)
 {
     if (addDirectoryPopup)
         return;
 
-    addDirectoryPopup = new MythPopupBox(gContext->GetMainWindow(), "add_directory_popup");
+    addDirectoryPopup = new MythPopupBox(
+        gContext->GetMainWindow(), "add_directory_popup");
 
     newDirName = new MythRemoteLineEdit(addDirectoryPopup);
     addDirectoryPopup->addWidget(newDirName);
-    addDirectoryPopup->addButton(tr("ADD DIRECTORY"), this, SLOT(directoryAddSelected()));
+    addDirectoryPopup->addButton(
+        tr("ADD DIRECTORY"), this, SLOT(directoryAddSelected()));
 
-    addDirectoryPopup->ShowPopupAtXY(240, 90, this, SLOT(closeAddDirectoryPopup()));
+    addDirectoryPopup->ShowPopupAtXY(
+        240, 90, this, SLOT(closeAddDirectoryPopup()));
+
     newDirName->setFocus();
 }
 
-void PhoneUIBox::closeAddDirectoryPopup()
+void PhoneUIBox::closeAddDirectoryPopup(void)
 {
     if (!addDirectoryPopup)
         return;
@@ -1666,7 +1943,7 @@ void PhoneUIBox::closeAddDirectoryPopup()
 
 
 
-void PhoneUIBox::directoryAddSelected()
+void PhoneUIBox::directoryAddSelected(void)
 {
     if (!addDirectoryPopup)
         return;
@@ -1675,30 +1952,41 @@ void PhoneUIBox::directoryAddSelected()
     // then carry on with what we were doing.
     if (addEntryPopup)
     {
-        if (EntrytoEdit == 0) // Add
-            addNewDirectoryEntry(entryNickname->text(),
-                                 entryUrl->text(),
-                                 newDirName->text(),
-                                 entryFirstname->text(),
-                                 entrySurname->text(),
-                                 "",
-                                 entrySpeed->isChecked(),
-                                 entryOnHomeLan->isChecked());
-        else // Edit
-            addNewDirectoryEntry(0,
-                                 entryUrl->text(),
-                                 0,
-                                 entryFirstname->text(),
-                                 entrySurname->text(),
-                                 "",
-                                 false,
-                                 entryOnHomeLan->isChecked());
+        if (EntrytoEdit == 0)
+        {
+            // Add
+            addNewDirectoryEntry(
+                entryNickname->text(),
+                entryUrl->text(),
+                newDirName->text(),
+                entryFirstname->text(),
+                entrySurname->text(),
+                "",
+                entrySpeed->isChecked(),
+                entryOnHomeLan->isChecked());
+        }
+        else
+        {
+            // Edit
+            addNewDirectoryEntry(
+                0,
+                entryUrl->text(),
+                0,
+                entryFirstname->text(),
+                entrySurname->text(),
+                "",
+                false,
+                entryOnHomeLan->isChecked());
+        }
+
         closeAddDirectoryPopup();
         closeAddEntryPopup();
         closeMenuPopup();
     }
     else
+    {
         closeAddDirectoryPopup();
+    }
 
     // If we got here via the URL entry popup
     // then carry close that too
@@ -1707,18 +1995,22 @@ void PhoneUIBox::directoryAddSelected()
 }
 
 
-void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOnly)
+void PhoneUIBox::doCallPopup(
+    DirEntry *entry, QString DialorAnswer, bool audioOnly)
 {
     if (!incallPopup)
     {
-        incallPopup = new MythPopupBox(gContext->GetMainWindow(), tr("Business Card"));
-    
-        callLabelName = incallPopup->addLabel(entry->getNickName(), MythPopupBox::Large);
+        incallPopup = new MythPopupBox(
+            gContext->GetMainWindow(), tr("Business Card"));
+
+        callLabelName = incallPopup->addLabel(
+            entry->getNickName(), MythPopupBox::Large);
+
         incallPopup->addLabel(entry->getFullName());
         callLabelUrl = incallPopup->addLabel(entry->getUri());
 
         entryIsOnLocalLan = entry->getOnHomeLan();
-    
+
         // Get an ordered list of calls to/from this person
         CallHistory RecentCalls;
         DirContainer->getRecentCalls(entry, RecentCalls);
@@ -1729,36 +2021,53 @@ void PhoneUIBox::doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOn
             drawCallPopupCallHistory(incallPopup, RecentCalls.prev());
             drawCallPopupCallHistory(incallPopup, RecentCalls.prev());
         }
-    
+
         QAbstractButton *button2=0;
         if (DialorAnswer == tr("Dial"))
         {
             if (!audioOnly)
             {
-                QAbstractButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(outcallDialVideoSelected()));
+                QAbstractButton *button1 = incallPopup->addButton(
+                    DialorAnswer + tr(" Videocall"),
+                    this, SLOT(outcallDialVideoSelected()));
+
                 button1->setFocus();
             }
-            button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(outcallDialVoiceSelected()));
-            incallPopup->addButton(tr("Send an Instant Message"), this, SLOT(outcallSendIMSelected()));
+
+            button2 = incallPopup->addButton(
+                DialorAnswer + tr(" Voice-Only"),
+                this, SLOT(outcallDialVoiceSelected()));
+
+            incallPopup->addButton(
+                tr("Send an Instant Message"),
+                this, SLOT(outcallSendIMSelected()));
         }
         else
         {
             if (!audioOnly)
             {
-                QAbstractButton *button1 = incallPopup->addButton(DialorAnswer + tr(" Videocall"), this, SLOT(incallDialVideoSelected()));
+                QAbstractButton *button1 =
+                    incallPopup->addButton(
+                        DialorAnswer + tr(" Videocall"),
+                        this, SLOT(incallDialVideoSelected()));
+
                 button1->setFocus();
             }
-            button2 = incallPopup->addButton(DialorAnswer + tr(" Voice-Only"), this, SLOT(incallDialVoiceSelected()));
+
+            button2 = incallPopup->addButton(
+                DialorAnswer + tr(" Voice-Only"),
+                this, SLOT(incallDialVoiceSelected()));
         }
-        
+
         if (audioOnly)
             button2->setFocus();
+
         incallPopup->ShowPopup(this, SLOT(closeCallPopup()));
     }
 }
 
 
-void PhoneUIBox::closeCallPopup()
+void PhoneUIBox::closeCallPopup(void)
 {
     if (!incallPopup)
         return;
@@ -1767,37 +2076,39 @@ void PhoneUIBox::closeCallPopup()
     incallPopup = NULL;
 }
 
-void PhoneUIBox::incallDialVideoSelected()
+void PhoneUIBox::incallDialVideoSelected(void)
 {
     AnswerCall(txVideoMode, entryIsOnLocalLan);
     closeCallPopup();
 }
- 
-void PhoneUIBox::incallDialVoiceSelected()
+
+void PhoneUIBox::incallDialVoiceSelected(void)
 {
     AnswerCall("AUDIOONLY", entryIsOnLocalLan);
     closeCallPopup();
 }
 
-void PhoneUIBox::outcallDialVideoSelected()
+void PhoneUIBox::outcallDialVideoSelected(void)
 {
-    PlaceCall(callLabelUrl->text(), callLabelName->text(), txVideoMode, entryIsOnLocalLan);
-    closeCallPopup();
-}
- 
-void PhoneUIBox::outcallDialVoiceSelected()
-{
-    PlaceCall(callLabelUrl->text(), callLabelName->text(), "AUDIOONLY", entryIsOnLocalLan);
+    PlaceCall(callLabelUrl->text(), callLabelName->text(),
+              txVideoMode, entryIsOnLocalLan);
     closeCallPopup();
 }
 
-void PhoneUIBox::outcallSendIMSelected()
+void PhoneUIBox::outcallDialVoiceSelected(void)
+{
+    PlaceCall(callLabelUrl->text(), callLabelName->text(),
+              "AUDIOONLY", entryIsOnLocalLan);
+    closeCallPopup();
+}
+
+void PhoneUIBox::outcallSendIMSelected(void)
 {
     QString OtherParty = callLabelUrl->text();
     closeCallPopup();
     doIMPopup(OtherParty, "", "");
 }
- 
+
 
 void PhoneUIBox::drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call)
 {
@@ -1821,6 +2132,7 @@ void PhoneUIBox::drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call)
             label += dt.toString("dd-MMM ");
         label += tr("at");
         label += dt.toString(" hh:mm");
+
         if (call->getDuration() > 0)
         {
             QString Duration;
@@ -1831,7 +2143,6 @@ void PhoneUIBox::drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call)
     }
 }
 
-
 void PhoneUIBox::showStatistics(bool showVideo)
 {
     if (statsPopup)
@@ -1840,35 +2151,49 @@ void PhoneUIBox::showStatistics(bool showVideo)
         return;
     }
 
-    statsPopup = new MythPopupBox(gContext->GetMainWindow(), "statistics_popup");
+    statsPopup = new MythPopupBox(
+        gContext->GetMainWindow(), "statistics_popup");
 
     statsPopup->addLabel(tr("Audio"), MythPopupBox::Medium);
-    audioPkInOutLabel    = statsPopup->addLabel(tr("Packets In/Out/Lost/Late:             "), MythPopupBox::Small);
-    audioPlayoutLabel    = statsPopup->addLabel(tr("Playout Delay Min/Avg/Max:            "), MythPopupBox::Small);
-    audioPkRtcpLabel     = statsPopup->addLabel(tr("Packets Lost by Peer:                 "), MythPopupBox::Small);
+    audioPkInOutLabel    = statsPopup->addLabel(
+        tr("Packets In/Out/Lost/Late:             "), MythPopupBox::Small);
+    audioPlayoutLabel    = statsPopup->addLabel(
+        tr("Playout Delay Min/Avg/Max:            "), MythPopupBox::Small);
+    audioPkRtcpLabel     = statsPopup->addLabel(
+        tr("Packets Lost by Peer:                 "), MythPopupBox::Small);
 
     if (showVideo)
     {
         statsPopup->addLabel(tr("Video"), MythPopupBox::Medium);
-        videoResLabel         = statsPopup->addLabel(tr("Resolution In/Out: ") + 
-                                                     QString::number(rxWidth) + "x" + QString::number(rxHeight) + " / " +  
-                                                     QString::number(txWidth) + "x" + QString::number(txHeight),
-                                                     MythPopupBox::Small);
-        videoPkInLabel        = statsPopup->addLabel(tr("Packets In/Lost/Disc/Late: "), MythPopupBox::Small);
-        videoPkOutLabel       = statsPopup->addLabel(tr("Packets Out/Dropped: "), MythPopupBox::Small);
-        videoPkRtcpLabel      = statsPopup->addLabel(tr("Packets Lost by Peer: "), MythPopupBox::Small);
-        videoFramesInOutDiscLabel = statsPopup->addLabel(tr("Video Frames In/Out/Disc: "), MythPopupBox::Small);
-        videoAvgFpsLabel      = statsPopup->addLabel(tr("Average FPS In/Out: "), MythPopupBox::Small);
-        videoWebcamFpsLabel   = statsPopup->addLabel(tr("Webcam Frames Delivered/Dropped: "), MythPopupBox::Small);
-
+        videoResLabel         = statsPopup->addLabel(
+            tr("Resolution In/Out: ") +
+            QString::number(rxWidth) + "x" + QString::number(rxHeight) + " / " +
+            QString::number(txWidth) + "x" + QString::number(txHeight),
+            MythPopupBox::Small);
+        videoPkInLabel        = statsPopup->addLabel(
+            tr("Packets In/Lost/Disc/Late: "), MythPopupBox::Small);
+        videoPkOutLabel       = statsPopup->addLabel(
+            tr("Packets Out/Dropped: "), MythPopupBox::Small);
+        videoPkRtcpLabel      = statsPopup->addLabel(
+            tr("Packets Lost by Peer: "), MythPopupBox::Small);
+        videoFramesInOutDiscLabel = statsPopup->addLabel(
+            tr("Video Frames In/Out/Disc: "), MythPopupBox::Small);
+        videoAvgFpsLabel      = statsPopup->addLabel(
+            tr("Average FPS In/Out: "), MythPopupBox::Small);
+        videoWebcamFpsLabel   = statsPopup->addLabel(
+            tr("Webcam Frames Delivered/Dropped: "), MythPopupBox::Small);
     }
 
-//    QButton *btn = statsPopup->addButton(tr("Done"), this, SLOT(closeStatisticsPopup()));
+//    QButton *btn = statsPopup->addButton(
+//        tr("Done"), this, SLOT(closeStatisticsPopup()));
 //    btn->setFocus();
+
     statsPopup->ShowPopup(this, SLOT(closeStatisticsPopup()));
 }
 
-void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int minPlayout, int avgPlayout, int maxPlayout)
+void PhoneUIBox::updateAudioStatistics(
+    int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop,
+    int bIn, int bOut, int minPlayout, int avgPlayout, int maxPlayout)
 {
     (void)pkInDisc;
     (void)pkOutDrop;
@@ -1877,53 +2202,79 @@ void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkO
     if (!statsPopup)
         return;
 
-    audioPkInOutLabel->setText(tr("Packets In/Out/Lost/Late: ") + QString::number(pkIn) + " / " + 
-                               QString::number(pkOut) + " / " + QString::number(pkLost)
-                               + " / " + QString::number(pkLate));
-    audioPlayoutLabel->setText(tr("Playout Delay Min/Avg/Max: ") + QString::number(minPlayout) + " / " + 
-                               QString::number(avgPlayout) + " / " + QString::number(maxPlayout));
-}
+    audioPkInOutLabel->setText(
+        tr("Packets In/Out/Lost/Late: ") + QString::number(pkIn) + " / " +
+        QString::number(pkOut) + " / " + QString::number(pkLost) + " / " +
+        QString::number(pkLate));
 
+    audioPlayoutLabel->setText(
+        tr("Playout Delay Min/Avg/Max: ") +
+        QString::number(minPlayout) + " / " +
+        QString::number(avgPlayout) + " / " +
+        QString::number(maxPlayout));
+}
 
 void PhoneUIBox::updateAudioRtcpStatistics(int fractionLoss, int totalLoss)
 {
     if (!statsPopup)
         return;
 
-    audioPkRtcpLabel->setText(tr("Packets Lost by Peer: ") + QString::number(fractionLoss) + " / " + QString::number(totalLoss));
+    audioPkRtcpLabel->setText(
+        tr("Packets Lost by Peer: ") +
+        QString::number(fractionLoss) + " / " + QString::number(totalLoss));
 }
 
-
-void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut)
+void PhoneUIBox::updateVideoStatistics(
+    int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop,
+    int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut)
 {
     (void)bIn;
     (void)bOut;
     if ((!statsPopup) || (videoPkInLabel == 0))
         return;
 
-    videoPkInLabel->setText(tr("Packets In/Lost/Disc/Late: ") + QString::number(pkIn) + " / " + 
-                               QString::number(pkLost) + " / " + QString::number(pkInDisc)
-                                + " / " + QString::number(pkLate));
-    videoPkOutLabel->setText(tr("Packets Out/Dropped: ") + QString::number(pkOut) + " / " + 
-                               QString::number(pkOutDrop));
-    videoFramesInOutDiscLabel->setText(tr("Video Frames In/Out/Disc: ") + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDiscIn) + " / " + QString::number(fDiscOut));
-    if (ConnectTime.elapsed()/1000 != 0)
-        videoAvgFpsLabel->setText(tr("Average FPS In/Out: ") + QString::number(fIn*1000/ConnectTime.elapsed()) + " / " + QString::number(fOut*1000/ConnectTime.elapsed()));
-    if ((ConnectTime.elapsed()/1000 != 0) && (txClient != 0))
-        videoWebcamFpsLabel->setText(tr("Webcam Frames Delivered/Dropped: ") + QString::number(wcDeliveredFrames) + " / " + QString::number(wcDroppedFrames));
-}
+    videoPkInLabel->setText(
+        tr("Packets In/Lost/Disc/Late: ") + QString::number(pkIn) + " / " +
+        QString::number(pkLost) + " / " + QString::number(pkInDisc) + " / " +
+        QString::number(pkLate));
 
+    videoPkOutLabel->setText(
+        tr("Packets Out/Dropped: ") + QString::number(pkOut) + " / " +
+        QString::number(pkOutDrop));
+
+    videoFramesInOutDiscLabel->setText(
+        tr("Video Frames In/Out/Disc: ") + QString::number(fIn) + " / " +
+        QString::number(fOut) + " / " + QString::number(fDiscIn) + " / " +
+        QString::number(fDiscOut));
+
+    if (ConnectTime.elapsed() / 1000 != 0)
+    {
+        videoAvgFpsLabel->setText(
+            tr("Average FPS In/Out: ") +
+            QString::number(fIn*1000/ConnectTime.elapsed()) + " / " +
+            QString::number(fOut*1000/ConnectTime.elapsed()));
+    }
+
+    if ((ConnectTime.elapsed() / 1000 != 0) && (txClient != 0))
+    {
+        videoWebcamFpsLabel->setText(
+            tr("Webcam Frames Delivered/Dropped: ") +
+            QString::number(wcDeliveredFrames) + " / " +
+            QString::number(wcDroppedFrames));
+    }
+}
 
 void PhoneUIBox::updateVideoRtcpStatistics(int fractionLoss, int totalLoss)
 {
     if ((!statsPopup) || (videoPkInLabel == 0))
         return;
 
-    videoPkRtcpLabel->setText(tr("Packets Lost by Peer: ") + QString::number(fractionLoss) + " / " + QString::number(totalLoss));
+    videoPkRtcpLabel->setText(
+        tr("Packets Lost by Peer: ") +
+        QString::number(fractionLoss) + " / " + QString::number(totalLoss));
 }
 
-
-void PhoneUIBox::closeStatisticsPopup()
+void PhoneUIBox::closeStatisticsPopup(void)
 {
     if (!statsPopup)
         return;
@@ -1931,9 +2282,10 @@ void PhoneUIBox::closeStatisticsPopup()
     statsPopup->deleteLater();
     statsPopup = NULL;
     audioPkInOutLabel = audioPlayoutLabel = audioPkRtcpLabel = 0;
-    videoResLabel = videoPkOutLabel = videoPkInLabel = videoPkRtcpLabel = videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
+    videoResLabel = videoPkOutLabel = 0;
+    videoPkInLabel = videoPkRtcpLabel = 0;
+    videoFramesInOutDiscLabel = videoAvgFpsLabel = 0;
 }
-
 
 void PhoneUIBox::changeVolume(bool up_or_down)
 {
@@ -1973,20 +2325,20 @@ void PhoneUIBox::changeVolume(bool up_or_down)
     case VOL_TXSIZE:
         switch (txWidth)
         {
-        case 704: 
+        case 704:
             txWidth = (up_or_down ? 704 : 352);
             txHeight = (up_or_down ? 576 : 288);
             break;
         default:
-        case 352: 
+        case 352:
             txWidth = (up_or_down ? 704 : 176);
             txHeight = (up_or_down ? 576 : 144);
             break;
-        case 176: 
+        case 176:
             txWidth = (up_or_down ? 352 : 128);
             txHeight = (up_or_down ? 288 : 96);
             break;
-        case 128: 
+        case 128:
             txWidth = (up_or_down ? 176 : 128);
             txHeight = (up_or_down ? 144 : 96);
             break;
@@ -2016,56 +2368,81 @@ void PhoneUIBox::changeVolumeControl(bool up_or_down)
 {
     if ((volume_status) && (volume_status->getOrder() != -1))
     {
-        // Currently only volume & brightness but need to add mic-volume, hue etc
+        // Currently only volume & brightness but need to add mic-volume,
+        // hue etc
         switch (VolumeMode)
         {
         default:
-        case VOL_VOLUME:     VolumeMode = (up_or_down ? VOL_MICVOLUME  : VOL_TXRATE);       break;
-        case VOL_MICVOLUME:  VolumeMode = (up_or_down ? VOL_AUDCODEC   : VOL_VOLUME);       break;
-        case VOL_AUDCODEC:   VolumeMode = (up_or_down ? VOL_BRIGHTNESS : VOL_MICVOLUME);    break; 
-        case VOL_BRIGHTNESS: VolumeMode = (up_or_down ? VOL_CONTRAST   : VOL_AUDCODEC);     break;
-        case VOL_CONTRAST:   VolumeMode = (up_or_down ? VOL_COLOUR     : VOL_BRIGHTNESS);   break;
-        case VOL_COLOUR:     VolumeMode = (up_or_down ? VOL_TXSIZE     : VOL_CONTRAST);     break;
-        case VOL_TXSIZE:     VolumeMode = (up_or_down ? VOL_TXRATE     : VOL_COLOUR);       break;
-        case VOL_TXRATE:     VolumeMode = (up_or_down ? VOL_VOLUME     : VOL_TXSIZE);       break;
+        case VOL_VOLUME:
+            VolumeMode = (up_or_down ? VOL_MICVOLUME  : VOL_TXRATE);
+            break;
+        case VOL_MICVOLUME:
+            VolumeMode = (up_or_down ? VOL_AUDCODEC   : VOL_VOLUME);
+            break;
+        case VOL_AUDCODEC:
+            VolumeMode = (up_or_down ? VOL_BRIGHTNESS : VOL_MICVOLUME);
+            break;
+        case VOL_BRIGHTNESS:
+            VolumeMode = (up_or_down ? VOL_CONTRAST   : VOL_AUDCODEC);
+            break;
+        case VOL_CONTRAST:
+            VolumeMode = (up_or_down ? VOL_COLOUR     : VOL_BRIGHTNESS);
+            break;
+        case VOL_COLOUR:
+            VolumeMode = (up_or_down ? VOL_TXSIZE     : VOL_CONTRAST);
+            break;
+        case VOL_TXSIZE:
+            VolumeMode = (up_or_down ? VOL_TXRATE     : VOL_COLOUR);
+            break;
+        case VOL_TXRATE:
+            VolumeMode = (up_or_down ? VOL_VOLUME     : VOL_TXSIZE);
+            break;
         }
 
         QString themepath = gContext->FindThemeDir("default") + "/";
         switch (VolumeMode)
         {
         default:
-        case VOL_VOLUME:     volume_icon->SetImage(themepath + "mp_volume_icon.png");     
-                             volume_setting->SetText(tr("Volume"));
-                             volume_value->SetText("");
-                             break;
-        case VOL_MICVOLUME:  volume_icon->SetImage(themepath + "mp_microphone_icon.png"); 
-                             volume_setting->SetText(tr("Mic Volume (not impl.)"));
-                             volume_value->SetText("");
-                             break;
-        case VOL_AUDCODEC:   volume_icon->SetImage(themepath + "mp_microphone_icon.png"); 
-                             volume_setting->SetText(tr("Audio Codec"));
-                             volume_value->SetText(audioCodecInUse);
-                             break;
-        case VOL_BRIGHTNESS: volume_icon->SetImage(themepath + "mp_brightness_icon.png"); 
-                             volume_setting->SetText(tr("Brightness"));
-                             volume_value->SetText("");
-                             break;
-        case VOL_CONTRAST:   volume_icon->SetImage(themepath + "mp_contrast_icon.png");   
-                             volume_setting->SetText(tr("Contrast"));
-                             volume_value->SetText("");
-                             break;
-        case VOL_COLOUR:     volume_icon->SetImage(themepath + "mp_colour_icon.png");     
-                             volume_setting->SetText(tr("Colour"));
-                             volume_value->SetText("");
-                             break;
-        case VOL_TXSIZE:     volume_icon->SetImage(themepath + "mp_framesize_icon.png");  
-                             volume_setting->SetText(tr("Transmit Video Size"));
-                             volume_value->SetText(getVideoFrameSizeText());
-                             break;
-        case VOL_TXRATE:     volume_icon->SetImage(themepath + "mp_framerate_icon.png");  
-                             volume_setting->SetText(tr("Transmit Video FPS"));
-                             volume_value->SetText(QString::number(txFps));
-                             break;
+        case VOL_VOLUME:
+            volume_icon->SetImage(themepath + "mp_volume_icon.png");
+            volume_setting->SetText(tr("Volume"));
+            volume_value->SetText("");
+            break;
+        case VOL_MICVOLUME:
+            volume_icon->SetImage(themepath + "mp_microphone_icon.png");
+            volume_setting->SetText(tr("Mic Volume (not impl.)"));
+            volume_value->SetText("");
+            break;
+        case VOL_AUDCODEC:
+            volume_icon->SetImage(themepath + "mp_microphone_icon.png");
+            volume_setting->SetText(tr("Audio Codec"));
+            volume_value->SetText(audioCodecInUse);
+            break;
+        case VOL_BRIGHTNESS:
+            volume_icon->SetImage(themepath + "mp_brightness_icon.png");
+            volume_setting->SetText(tr("Brightness"));
+            volume_value->SetText("");
+            break;
+        case VOL_CONTRAST:
+            volume_icon->SetImage(themepath + "mp_contrast_icon.png");
+            volume_setting->SetText(tr("Contrast"));
+            volume_value->SetText("");
+            break;
+        case VOL_COLOUR:
+            volume_icon->SetImage(themepath + "mp_colour_icon.png");
+            volume_setting->SetText(tr("Colour"));
+            volume_value->SetText("");
+            break;
+        case VOL_TXSIZE:
+            volume_icon->SetImage(themepath + "mp_framesize_icon.png");
+            volume_setting->SetText(tr("Transmit Video Size"));
+            volume_value->SetText(getVideoFrameSizeText());
+            break;
+        case VOL_TXRATE:
+            volume_icon->SetImage(themepath + "mp_framerate_icon.png");
+            volume_setting->SetText(tr("Transmit Video FPS"));
+            volume_value->SetText(QString::number(txFps));
+            break;
         }
 
         volume_icon->LoadImage();
@@ -2073,13 +2450,13 @@ void PhoneUIBox::changeVolumeControl(bool up_or_down)
     }
 }
 
-void PhoneUIBox::toggleMute()
+void PhoneUIBox::toggleMute(void)
 {
     if (rtpAudio)
         rtpAudio->toggleMute();
 }
 
-QString PhoneUIBox::getVideoFrameSizeText()
+QString PhoneUIBox::getVideoFrameSizeText(void)
 {
     QString fsText = QString::number(txWidth) + "x" + QString::number(txHeight);
     return fsText;
@@ -2087,92 +2464,93 @@ QString PhoneUIBox::getVideoFrameSizeText()
 
 void PhoneUIBox::showVolume(bool on_or_off)
 {
-    if (volume_status)
-    {
-        if (on_or_off)
-        {
-            switch (VolumeMode)
-            {
-            case VOL_VOLUME:
-            default:
-//                volume_status->SetUsed(volume_control->GetCurrentVolume());
-                break;
-            case VOL_MICVOLUME:
-                volume_status->SetUsed(50);
-                break;
-            case VOL_AUDCODEC:
-                if (audioCodecInUse == "GSM")
-                    volume_status->SetUsed(0);
-                else
-                    volume_status->SetUsed(100);
-                break;
-            case VOL_BRIGHTNESS:
-                volume_status->SetUsed((camBrightness * 100) / 65535);
-                break;
-            case VOL_CONTRAST:
-                volume_status->SetUsed((camContrast * 100) / 65535);
-                break;
-            case VOL_COLOUR:
-                volume_status->SetUsed((camColour * 100) / 65535);
-                break;
-            case VOL_TXSIZE:
-                switch (txWidth)
-                {
-                default:
-                case 704: volume_status->SetUsed(100); break;
-                case 352: volume_status->SetUsed(66); break;
-                case 176: volume_status->SetUsed(33); break;
-                case 128: volume_status->SetUsed(0); break;
-                }
-                volume_value->SetText(getVideoFrameSizeText());
-                break;
-            case VOL_TXRATE:
-                volume_status->SetUsed((txFps * 100) / 30);
-                volume_value->SetText(QString::number(txFps));
-                break;
-            }
-            volume_bkgnd->SetOrder(4);
-            volume_bkgnd->refresh();
-            volume_status->SetOrder(5);
-            volume_status->refresh();
-            volume_icon->SetOrder(5);
-            volume_icon->refresh();
-            volume_setting->SetOrder(6);
-            volume_setting->refresh();
-            volume_value->SetOrder(6);
-            volume_value->refresh();
-            volume_info->SetOrder(6);
-            volume_info->refresh();
+    if (!volume_status)
+        return;
 
-            volume_display_timer->start(3000, true);
-        }
-        else
+    if (on_or_off)
+    {
+        switch (VolumeMode)
         {
-            if (volume_status->getOrder() != -1)
+        case VOL_VOLUME:
+        default:
+//            volume_status->SetUsed(volume_control->GetCurrentVolume());
+            break;
+        case VOL_MICVOLUME:
+            volume_status->SetUsed(50);
+            break;
+        case VOL_AUDCODEC:
+            if (audioCodecInUse == "GSM")
+                volume_status->SetUsed(0);
+            else
+                volume_status->SetUsed(100);
+            break;
+        case VOL_BRIGHTNESS:
+            volume_status->SetUsed((camBrightness * 100) / 65535);
+            break;
+        case VOL_CONTRAST:
+            volume_status->SetUsed((camContrast * 100) / 65535);
+            break;
+        case VOL_COLOUR:
+            volume_status->SetUsed((camColour * 100) / 65535);
+            break;
+        case VOL_TXSIZE:
+            switch (txWidth)
             {
-                volume_bkgnd->SetOrder(-1);
-                volume_bkgnd->refresh();
-                volume_status->SetOrder(-1);
-                volume_status->refresh();
-                volume_icon->SetOrder(-1);
-                volume_icon->refresh();
-                volume_icon->SetImage(gContext->FindThemeDir("default") + "/mp_volume_icon.png");
-                volume_icon->LoadImage();
-                volume_setting->SetOrder(-1);
-                volume_setting->refresh();
-                volume_setting->SetText(tr("Volume"));
-                volume_value->SetOrder(-1);
-                volume_value->refresh();
-                volume_value->SetText("");
-                volume_info->SetOrder(-1);
-                volume_info->refresh();
-                VolumeMode = VOL_VOLUME;
+            default:
+            case 704: volume_status->SetUsed(100); break;
+            case 352: volume_status->SetUsed(66); break;
+            case 176: volume_status->SetUsed(33); break;
+            case 128: volume_status->SetUsed(0); break;
             }
+            volume_value->SetText(getVideoFrameSizeText());
+            break;
+        case VOL_TXRATE:
+            volume_status->SetUsed((txFps * 100) / 30);
+            volume_value->SetText(QString::number(txFps));
+            break;
+        }
+        volume_bkgnd->SetOrder(4);
+        volume_bkgnd->refresh();
+        volume_status->SetOrder(5);
+        volume_status->refresh();
+        volume_icon->SetOrder(5);
+        volume_icon->refresh();
+        volume_setting->SetOrder(6);
+        volume_setting->refresh();
+        volume_value->SetOrder(6);
+        volume_value->refresh();
+        volume_info->SetOrder(6);
+        volume_info->refresh();
+
+        volume_display_timer->start(3000, true);
+    }
+    else
+    {
+        if (volume_status->getOrder() != -1)
+        {
+            volume_bkgnd->SetOrder(-1);
+            volume_bkgnd->refresh();
+            volume_status->SetOrder(-1);
+            volume_status->refresh();
+            volume_icon->SetOrder(-1);
+            volume_icon->refresh();
+            volume_icon->SetImage(
+                gContext->FindThemeDir("default") + "/mp_volume_icon.png");
+            volume_icon->LoadImage();
+            volume_setting->SetOrder(-1);
+            volume_setting->refresh();
+            volume_setting->SetText(tr("Volume"));
+            volume_value->SetOrder(-1);
+            volume_value->refresh();
+            volume_value->SetText("");
+            volume_info->SetOrder(-1);
+            volume_info->refresh();
+            VolumeMode = VOL_VOLUME;
         }
     }
 }
 
-void PhoneUIBox::DisplayMicSpkPower()
+void PhoneUIBox::DisplayMicSpkPower(void)
 {
     if (rtpAudio != 0)
     {
@@ -2184,15 +2562,17 @@ void PhoneUIBox::DisplayMicSpkPower()
     }
 }
 
-void PhoneUIBox::wireUpTheme()
+void PhoneUIBox::wireUpTheme(void)
 {
 
     DirectoryList = getUIManagedTreeListType("directorytreelist");
     if (!DirectoryList)
     {
-        VERBOSE(VB_IMPORTANT, "phoneui.o: Couldn't find a Directory box in your theme");
+        VERBOSE(VB_IMPORTANT,
+                "phoneui.o: Couldn't find a Directory box in your theme");
         exit(0);
     }
+
     connect(DirectoryList, SIGNAL(nodeSelected(int, IntVector*)),
             this, SLOT(handleTreeListSignals(int, IntVector*)));
 
@@ -2200,9 +2580,13 @@ void PhoneUIBox::wireUpTheme()
 
     micAmplitude = getUIRepeatedImageType("mic_amplitude");
     spkAmplitude = getUIRepeatedImageType("spk_amplitude");
-    micAmplitude->setRepeat(15); // This is to work-round a bug in myththemeddialog where if the repeat
-    spkAmplitude->setRepeat(15); // has never been bigger than 0, max_repeat = 0 and it calculates the geometry as 0
-    micAmplitude->setRepeat(0);  // thus causing it to be confused
+    // This is to work-round a bug in myththemeddialog where if the repeat
+    micAmplitude->setRepeat(15);
+    // has never been bigger than 0, max_repeat = 0 and
+    // it calculates the geometry as 0
+    spkAmplitude->setRepeat(15);
+    // thus causing it to be confused
+    micAmplitude->setRepeat(0);
     spkAmplitude->setRepeat(0);
 
     volume_status = getUIStatusBarType("volume_status");
@@ -2211,28 +2595,32 @@ void PhoneUIBox::wireUpTheme()
         volume_status->SetTotal(100);
         volume_status->SetOrder(-1);
     }
+
     volume_icon = getUIImageType("volumeicon");
     if (volume_icon)
         volume_icon->SetOrder(-1);
+
     volume_bkgnd = getUIImageType("volumebkgnd");
     if (volume_bkgnd)
         volume_bkgnd->SetOrder(-1);
+
     volume_setting = getUITextType("volume_setting_text");
     if (volume_setting)
         volume_setting->SetOrder(-1);
     volume_setting->SetText("Volume");
+
     volume_value = getUITextType("volume_value_text");
     if (volume_value)
         volume_value->SetOrder(-1);
     volume_value->SetText("");
+
     volume_info = getUITextType("volume_info_text");
     if (volume_info)
         volume_info->SetOrder(-1);
     volume_info->SetText(tr("Up/Down - Change       Left/Right - Adjust"));
-    
+
     localWebcamArea = getUIBlackHoleType("local_webcam_blackhole");
     receivedWebcamArea = getUIBlackHoleType("mp_received_video_blackhole");
-
 }
 
 
@@ -2259,12 +2647,17 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
     else if (attributes->at(0) == TA_CALLHISTENTRY)
     {
         CallRecord *rec = DirContainer->fetchCallRecordById(attributes->at(1));
-        DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(rec->getUri());
+        DirEntry *entry =
+            DirContainer->FindMatchingDirectoryEntry(rec->getUri());
+
         if (entry)
+        {
             doCallPopup(entry, tr("Dial"), false);
+        }
         else
         {
-            DirEntry dummyEntry(rec->getDisplayName(), rec->getUri(), "", "", "");
+            DirEntry dummyEntry(
+                rec->getDisplayName(), rec->getUri(), "", "", "");
             doCallPopup(&dummyEntry, tr("Dial"), false);
         }
     }
@@ -2273,7 +2666,9 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
     else if (attributes->at(0) == TA_VMAIL_ENTRY)
     {
         GenericTree *node = DirectoryList->getCurrentNode();
-        QString fileName = MythContext::GetConfDir() + "/MythPhone/Voicemail/" + node->getString() + ".wav";
+        QString fileName = MythContext::GetConfDir() +
+            "/MythPhone/Voicemail/" + node->getString() + ".wav";
+
         wavfile *vmailWav = new wavfile();
         if (vmailWav->load(fileName))
         {
@@ -2292,7 +2687,7 @@ PhoneUIBox::~PhoneUIBox(void)
 {
     sipStack->UiStopWatchAll();
     sipStack->UiClosed();
-    
+
     // Just in case we are still mid-call; kill the RTP threads
     if (rtpAudio != 0)
         delete rtpAudio;
@@ -2300,16 +2695,17 @@ PhoneUIBox::~PhoneUIBox(void)
         StopVideo();
     rtpAudio = 0;
     rtpVideo = 0;
-        
+
     if (localClient != 0)
         webcam->UnregisterClient(localClient);
     if (txClient != 0)
         webcam->UnregisterClient(txClient);
     webcam->camClose();
-    
-    // Flush the events through the event queue now all the event-producing threads are closed
+
+    // Flush the events through the event queue now all the
+    // event-producing threads are closed
     QApplication::sendPostedEvents(this, 0);
-    
+
 //    if (volume_control)
 //        delete volume_control;
     delete DirContainer;
@@ -2317,7 +2713,7 @@ PhoneUIBox::~PhoneUIBox(void)
         delete vmail;
     delete h263;
     delete webcam;
-    
+
     delete phoneUIStatusBar;
     delete powerDispTimer;
     delete OnScreenClockTimer;
@@ -2329,13 +2725,16 @@ PhoneUIBox::~PhoneUIBox(void)
 /**********************************************************************
 PhoneUIStatusBar
 
-This class controls display of the one-line status bar at the foot 
+This class controls display of the one-line status bar at the foot
 of the screen
 **********************************************************************/
 
 
-PhoneUIStatusBar::PhoneUIStatusBar(UITextType *a, UITextType *b, UITextType *c, UITextType *d, UITextType *e, UITextType *f, 
-                                   QObject *parent, const char *name) : QObject(parent, name)  
+PhoneUIStatusBar::PhoneUIStatusBar(
+    UITextType *a, UITextType *b, UITextType *c, UITextType *d,
+    UITextType *e, UITextType *f,
+    QObject *parent, const char *name) :
+    QObject(parent, name)
 {
     callerText     = a;
     audioStatsText = b;
@@ -2369,14 +2768,15 @@ PhoneUIStatusBar::PhoneUIStatusBar(UITextType *a, UITextType *b, UITextType *c, 
     last_bOut = 0;
 
     notificationTimer = new QTimer(this);
-    connect(notificationTimer, SIGNAL(timeout()), this, SLOT(notificationTimeout()));
+    connect(notificationTimer, SIGNAL(timeout()),
+            this, SLOT(notificationTimeout()));
 }
-                 
-PhoneUIStatusBar::~PhoneUIStatusBar()
+
+PhoneUIStatusBar::~PhoneUIStatusBar(void)
 {
     delete notificationTimer;
 }
-                 
+
 void PhoneUIStatusBar::DisplayInCallStats(bool initialise)
 {
     if (initialise)
@@ -2435,7 +2835,7 @@ void PhoneUIStatusBar::DisplayNotification(QString s, int Seconds)
     notificationTimer->start(Seconds*1000, true);
 }
 
-void PhoneUIStatusBar::notificationTimeout()
+void PhoneUIStatusBar::notificationTimeout(void)
 {
     modeNotification = false;
     if (modeInCallStats)
@@ -2449,7 +2849,7 @@ void PhoneUIStatusBar::updateMidCallCaller(QString t)
     callerString = t;
     if (modeInCallStats && !modeNotification)
         callerText->SetText(t);
-}                
+}
 
 void PhoneUIStatusBar::updateMidCallTime(int Seconds)
 {
@@ -2462,7 +2862,8 @@ void PhoneUIStatusBar::updateMidCallTime(int Seconds)
         callTimeText->SetText(TimeString);
 }
 
-void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
+void PhoneUIStatusBar::updateMidCallAudioStats(
+    int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
 {
     audioStatsString = statsAudioCodec;
     (void)pIn;
@@ -2471,17 +2872,22 @@ void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, in
     (void)pLate;
 
     QString StatsString;
-    
-    StatsString.sprintf("; %dkbps / %dkbps", (bOut-audLast_bOut)*8*msPeriod/1000/1000,
-                                             (bIn-audLast_bIn)*8*msPeriod/1000/1000);
+
+    StatsString.sprintf(
+        "; %dkbps / %dkbps",
+        (bOut - audLast_bOut) * 8 * msPeriod / 1000 / 1000,
+        (bIn  - audLast_bIn)  * 8 * msPeriod / 1000 / 1000);
+
     audLast_bIn = bIn;
     audLast_bOut = bOut;
     audioStatsString += StatsString;
+
     if (modeInCallStats && !modeNotification)
         audioStatsText->SetText(audioStatsString);
 }
 
-void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
+void PhoneUIStatusBar::updateMidCallVideoStats(
+    int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod)
 {
     videoStatsString = statsVideoCodec;
     (void)pIn;
@@ -2490,11 +2896,15 @@ void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, in
     (void)pLate;
 
     QString StatsString;
-    StatsString.sprintf("; %dkbps / %dkbps", (bOut-vidLast_bOut)*8*msPeriod/1000/1000,
-                                             (bIn-vidLast_bIn)*8*msPeriod/1000/1000);
-    vidLast_bIn = bIn;                                           
-    vidLast_bOut = bOut;                                           
+    StatsString.sprintf(
+        "; %dkbps / %dkbps",
+        (bOut - vidLast_bOut) * 8 * msPeriod / 1000 / 1000,
+        (bIn  - vidLast_bIn)  * 8 * msPeriod / 1000 / 1000);
+
+    vidLast_bIn = bIn;
+    vidLast_bOut = bOut;
     videoStatsString += StatsString;
+
     if (modeInCallStats && !modeNotification)
         videoStatsText->SetText(videoStatsString);
 }
@@ -2503,11 +2913,9 @@ void PhoneUIStatusBar::updateMidCallVideoCodec(QString c)
 {
     statsVideoCodec = c;
 }
-                 
+
 void PhoneUIStatusBar::updateMidCallAudioCodec(QString c)
 {
     statsAudioCodec = c;
-}                                    
-                 
-
+}
 
