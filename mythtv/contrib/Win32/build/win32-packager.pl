@@ -113,7 +113,8 @@ if (defined $opt{b}) {
 }
 
 # force QT4 if we are on trunk above the point where QT4 patches were merged
-if ( $svnlocation eq 'trunk' && ($SVNRELEASE eq 'HEAD' || $SVNRELEASE > 16789) )
+if ( $svnlocation eq 'trunk' &&
+     ($SVNRELEASE =~ m/^HEAD$/i || $SVNRELEASE > 16789) )
 {   $qtver = 4   }
 
 # 0.22-fixes doesn't exist yet.
@@ -123,7 +124,8 @@ if ($svnlocation eq "branches/release-0-22-fixes") {
     $qtver = 3;
 }
 
-print "Config:\n\tQT version: $qtver\n\tDLL's will be labeled as: $version\n\tSVN location is: $svnlocation\n\n";
+print "Config:\n\tQT version: $qtver\n\tDLL's will be labeled as: $version\n";
+print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 
 # TODO -  use this list to define the components to build - only the first of these currently works well.
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
