@@ -28,6 +28,3 @@ contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -L../libavcodec -lavcodec
     INCLUDEPATH += ../libavutil
 }
-
-#The following line was inserted by qt3to4
-QT += qtcore
