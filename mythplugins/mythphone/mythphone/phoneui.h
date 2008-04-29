@@ -105,6 +105,9 @@ class PhoneUIBox : public MythThemedDialog
     void statsIncreaseAudioPlayout(void);
     void statsDecreaseAudioPlayout(void);
 
+  protected:
+    virtual void paintEvent(QPaintEvent *event);
+
   private:
     void    DrawLocalWebcamImage(void);
     void    TransmitLocalWebcamImage(void);
@@ -273,7 +276,6 @@ class PhoneUIBox : public MythThemedDialog
     QLabel                 *videoWebcamFpsLabel;
     QLabel                 *videoResLabel;
 
-
     MythPopupBox           *addEntryPopup;
     MythRemoteLineEdit     *entryNickname;
     MythRemoteLineEdit     *entryFirstname;
@@ -290,6 +292,12 @@ class PhoneUIBox : public MythThemedDialog
     MythRemoteLineEdit     *newDirName;
 
     MythPopupBox           *incallPopup;
+
+    QMutex                  nextImageLock;
+    QRect                   nextVideoArea;
+    QImage                  nextImage;
+    QRect                   nextPutHere;
+    QImage                  nextScaledImage;
 
     /// Indicates the user hit select to stop "false alarms"
     bool                    SelectHit;

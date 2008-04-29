@@ -37,7 +37,8 @@ using namespace std;
 
 PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
                        QString theme_filename, const char *name) :
-    MythThemedDialog(parent, window_name, theme_filename, name)
+    MythThemedDialog(parent, window_name, theme_filename, name),
+    nextVideoArea(0,0,0,0), nextPutHere(0,0,0,0)
 {
     h263 = new H263Container();
 
@@ -243,7 +244,7 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Phone", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -297,10 +298,7 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             else
             {
                 rxVideoArea = QRect(0, 0, screenwidth, screenheight);
-                // Paint screen black in case video image does not fill it
-                QPixmap Pixmap(screenwidth, screenheight);
-                Pixmap.fill(Qt::black);
-                bitBlt(this, 0, 0, &Pixmap);
+                update();
             }
             fullScreen = !fullScreen;
         }
@@ -782,7 +780,9 @@ void PhoneUIBox::DrawLocalWebcamImage(void)
         // else it gets drawn later
         if (!fullScreen)
         {
-            bitBlt(this, puthere.x(), puthere.y(), &ScaledImage);
+            QMutexLocker locker(&nextImageLock);
+            nextPutHere = puthere;
+            nextScaledImage = ScaledImage;
         }
         else
         {
@@ -915,30 +915,66 @@ void PhoneUIBox::ProcessRxVideoFrame(void)
             imageToDisplay = &rxImage;
         }
 
-        // Fullscreen mode - draw on the local webcam as an inset image
-        if ((fullScreen) && (!savedLocalWebcam.isNull()))
         {
-            // In full-screen mode, don't overdraw the inset local webcam
-            QPixmap fsPixmap(screenwidth, screenheight);
-            fsPixmap.fill(Qt::black);
-            QPainter p(&fsPixmap);
-            p.drawImage((screenwidth  - imageToDisplay->width())  / 2,
-                        (screenheight - imageToDisplay->height()) / 2,
-                        *imageToDisplay);
-            p.drawImage(screenwidth  - WC_INSET_WIDTH,
-                        screenheight - WC_INSET_HEIGHT,
-                        savedLocalWebcam);
-            p.setPen(Qt::white);
-            p.drawRect(screenwidth  - WC_INSET_WIDTH,
-                       screenheight - WC_INSET_HEIGHT,
-                       WC_INSET_WIDTH, WC_INSET_HEIGHT);
-
-            bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), &fsPixmap);
+            QMutexLocker locker(&nextImageLock);
+            nextVideoArea = rxVideoArea;
+            nextImage = *imageToDisplay;
         }
-        else
-            bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), imageToDisplay);
+
+        update(); // schedule a paintEvent
     }
     rtpVideo->freeVideoBuffer(v);
+}
+
+void PhoneUIBox::paintEvent(QPaintEvent *event)
+{
+    MythThemedDialog::paintEvent(event);
+
+    QMutexLocker locker(&nextImageLock);
+
+    if (nextImage.isNull())
+        return;
+
+    if (fullScreen)
+    {
+        // Paint screen black in case video image does not fill it
+        QPixmap Pixmap(screenwidth, screenheight);
+        Pixmap.fill(Qt::black);
+        bitBlt(this, 0, 0, &Pixmap);
+    }
+    else if (!nextScaledImage.isNull())
+    {
+        bitBlt(this, nextPutHere.x(), nextPutHere.y(), &nextScaledImage);
+        nextScaledImage = QImage();
+    }
+
+    if ((fullScreen) && (!savedLocalWebcam.isNull()))
+    {
+        // In full-screen mode, don't overdraw the inset local webcam
+        QPixmap fsPixmap(screenwidth, screenheight);
+        fsPixmap.fill(Qt::black);
+
+        QPainter p(&fsPixmap);
+        p.drawImage((screenwidth  - nextImage.width())  / 2,
+                    (screenheight - nextImage.height()) / 2, nextImage);
+
+        p.drawImage(screenwidth  - WC_INSET_WIDTH,
+                    screenheight - WC_INSET_HEIGHT, savedLocalWebcam);
+
+        p.setPen(Qt::white);
+
+        p.drawRect(screenwidth  - WC_INSET_WIDTH,
+                   screenheight - WC_INSET_HEIGHT,
+                   WC_INSET_WIDTH, WC_INSET_HEIGHT);
+        
+        bitBlt(this, nextVideoArea.x(), nextVideoArea.y(), &fsPixmap);
+    }
+    else
+    {
+        bitBlt(this, nextVideoArea.x(), nextVideoArea.y(), &nextImage);
+    }
+
+    nextImage = QImage();
 }
 
 void PhoneUIBox::ProcessSipStateChange(void)
@@ -2918,4 +2954,3 @@ void PhoneUIStatusBar::updateMidCallAudioCodec(QString c)
 {
     statsAudioCodec = c;
 }
-
