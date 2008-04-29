@@ -34,6 +34,7 @@ using namespace std;
 //#include "webcam_set.h"
 #include "sipfsm.h"
 #include "phoneui.h"
+#include "sipfsm.h"
 
 SipContainer *sipStack;
 
@@ -276,8 +277,9 @@ int mythplugin_init(const char *libversion)
     initKeys();
 
     addMyselfToDirectory();
- 
-    sipStack = new SipContainer();
+
+    SipFsm *sipFsm = new SipFsm();
+    sipStack = new SipContainer(sipFsm);
 
     return 0;
 }

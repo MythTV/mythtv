@@ -288,7 +288,7 @@ struct CodecNeg
 class SipContainer 
 {
   public:
-    SipContainer();
+    SipContainer(SipFsm*);
     ~SipContainer();
     void PlaceNewCall(QString Mode, QString uri, QString name, bool disableNat);
     void AnswerRingingCall(QString Mode, bool disableNat);
@@ -342,7 +342,7 @@ class SipContainer
 class SipThread : public QThread
 {
   public:
-	SipThread(SipContainer *c) { sipContainer = c;};
+    SipThread(SipContainer *c, SipFsm *s) { sipContainer = c; sipfsm = s; }
 	~SipThread() {};
 	virtual void run();
 
@@ -354,6 +354,7 @@ class SipThread : public QThread
     void ChangePrimaryCallState(SipFsm *sipFsm, int NewState);
 
 	SipContainer *sipContainer;
+        SipFsm *sipfsm;
     bool FrontEndActive;
     bool vxmlCallActive;
 #ifndef WIN32

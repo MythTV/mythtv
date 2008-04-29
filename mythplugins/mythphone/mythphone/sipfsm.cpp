@@ -67,14 +67,14 @@ of which Myth frontend has focus.
 
 **********************************************************************/
 
-SipContainer::SipContainer()
+SipContainer::SipContainer(SipFsm *sipfsm)
 {
     killSipThread = false;
     CallState = -1;
     eventWindow = 0;
 
-	sipThread = new SipThread(this);
-	sipThread->start();
+    sipThread = new SipThread(this, sipfsm);
+    sipThread->start();
 }
 
 SipContainer::~SipContainer()
@@ -294,20 +294,18 @@ void SipThread::SipThreadWorker()
     debugStream = 0;
 #endif
 
-    SipFsm *sipFsm = new SipFsm();
-
-    if (sipFsm->SocketOpenedOk())
+    if (sipfsm->SocketOpenedOk())
     {
         while(!sipContainer->killThread())
         {
             int OldCallState = CallState;
 
             // This blocks for timeout or data in Linux
-            CheckNetworkEvents(sipFsm);
-            CheckUIEvents(sipFsm);
-            CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
-            sipFsm->HandleTimerExpiries();
-            ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+            CheckNetworkEvents(sipfsm);
+            CheckUIEvents(sipfsm);
+            CheckRegistrationStatus(sipfsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
+            sipfsm->HandleTimerExpiries();
+            ChangePrimaryCallState(sipfsm, sipfsm->getPrimaryCallState());
 
         // A Ring No Answer timer runs to send calls to voicemail after x seconds
 #ifndef WIN32
@@ -317,12 +315,12 @@ void SipThread::SipThreadWorker()
                 {
                     rnaTimer = -1;
                     vxmlCallActive = true;
-                    sipFsm->Answer(true, "", false);
+                    sipfsm->Answer(true, "", false);
                 }
             }
 #endif
 
-            ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+            ChangePrimaryCallState(sipfsm, sipfsm->getPrimaryCallState());
 
             EventQLock.lock();
             if ((OldCallState != CallState) && (eventWindow))
@@ -331,7 +329,9 @@ void SipThread::SipThreadWorker()
         }
     }
 
-    delete sipFsm;
+    sipfsm->deleteLater();
+    sipfsm = NULL;
+
     if (debugStream)
         delete debugStream;
     if (debugFile)
