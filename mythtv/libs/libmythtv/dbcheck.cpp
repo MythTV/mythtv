@@ -16,7 +16,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1219";
+const QString currentDatabaseVersion = "1220";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -4201,10 +4201,84 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             return false;
     }
 
+    if (dbver == "1219")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS channelscan ("
+"  scanid       int(3)           UNSIGNED NOT NULL AUTO_INCREMENT,"
+"  cardid       int(3)           UNSIGNED NOT NULL,"
+"  sourceid     int(3)           UNSIGNED NOT NULL,"
+"  processed    tinyint(1)       UNSIGNED NOT NULL,"
+"  scandate     datetime                  NOT NULL,"
+"  PRIMARY KEY (scanid)"
+");",
+"CREATE TABLE IF NOT EXISTS channelscan_dtv_multiplex ("
+"  transportid  int(6)           UNSIGNED NOT NULL AUTO_INCREMENT,"
+"  scanid       int(3)           UNSIGNED NOT NULL,"
+"  mplexid      smallint(6)      UNSIGNED NOT NULL,"
+"  frequency    bigint(12)       UNSIGNED NOT NULL,"
+"  inversion    char(1)                   NOT NULL default 'a',"
+"  symbolrate   bigint(12)       UNSIGNED NOT NULL default '0',"
+"  fec          varchar(4)                NOT NULL default 'auto',"
+"  polarity     char(1)                   NOT NULL default ' ',"
+"  hp_code_rate varchar(4)                NOT NULL default 'auto',"
+"  lp_code_rate varchar(4)                NOT NULL default 'auto',"
+"  modulation   varchar(4)                NOT NULL default 'auto',"
+"  transmission_mode char(1)              NOT NULL default 'a',"
+"  guard_interval varchar(4)              NOT NULL default 'auto',"
+"  hierarchy    varchar(4)                NOT NULL default 'auto',"
+"  bandwidth    char(1)                   NOT NULL default 'a',"
+"  sistandard   varchar(10)               NOT NULL,"
+"  tuner_type   smallint(2)      UNSIGNED NOT NULL,"
+"  PRIMARY KEY (transportid)"
+");",
+"CREATE TABLE IF NOT EXISTS channelscan_channel ("
+"  transportid  int(6)           UNSIGNED NOT NULL,"
+"  scanid       int(3)           UNSIGNED NOT NULL,"
+"  mplex_id     smallint(6)               NOT NULL,"
+"  source_id    int(3)           UNSIGNED NOT NULL,"
+"  channel_id   int(3)           UNSIGNED NOT NULL default '0',"
+"  callsign     varchar(20)               NOT NULL default '',"
+"  service_name varchar(64)               NOT NULL default '',"
+"  chan_num     varchar(10)               NOT NULL default '',"
+"  service_id   mediumint(8)     UNSIGNED NOT NULL default '0',"
+"  atsc_major_channel int(4)     UNSIGNED NOT NULL default '0',"
+"  atsc_minor_channel int(4)     UNSIGNED NOT NULL default '0',"
+"  use_on_air_guide tinyint(1)            NOT NULL default '0',"
+"  hidden       tinyint(1)                NOT NULL default '0',"
+"  hidden_in_guide tinyint(1)             NOT NULL default '0',"
+"  freqid       varchar(10)               NOT NULL default '',"
+"  icon         varchar(255)              NOT NULL default '',"
+"  tvformat     varchar(10)               NOT NULL default 'Default',"
+"  xmltvid      varchar(64)               NOT NULL default '',"
+"  pat_tsid     int(5)           UNSIGNED NOT NULL default '0',"
+"  vct_tsid     int(5)           UNSIGNED NOT NULL default '0',"
+"  vct_chan_tsid int(5)          UNSIGNED NOT NULL default '0',"
+"  sdt_tsid     int(5)           UNSIGNED NOT NULL default '0',"
+"  orig_netid   int(5)           UNSIGNED NOT NULL default '0',"
+"  netid        int(5)           UNSIGNED NOT NULL default '0',"
+"  si_standard  varchar(10)               NOT NULL,"
+"  in_channels_conf tinyint(1)   UNSIGNED NOT NULL default '0',"
+"  in_pat       tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  in_pmt       tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  in_vct       tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  in_nit       tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  in_sdt       tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  is_encrypted tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  is_data_service tinyint(1)    UNSIGNED NOT NULL default '0',"
+"  is_audio_service tinyint(1)   UNSIGNED NOT NULL default '0',"
+"  is_opencable tinyint(1)       UNSIGNED NOT NULL default '0',"
+"  could_be_opencable tinyint(1) UNSIGNED NOT NULL default '0',"
+"  decryption_status smallint(2) UNSIGNED NOT NULL default '0'"
+");",
+""
+};
+        if (!performActualUpdate(updates, "1220", dbver))
+            return false;
+    }
+
     return true;
 }
-
-
 
 bool InitializeDatabase(void)
 {
