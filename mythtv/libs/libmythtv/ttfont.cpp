@@ -629,9 +629,15 @@ void TTFFont::Init(void)
    }
 
    loadedfontsize = (int)(fontsize * m_hmult);
-   xdpi = (int)(xdpi * m_wscale);
 
    FT_Set_Char_Size(face, 0, loadedfontsize * 64, xdpi, ydpi);
+
+   FT_Matrix tmatrix;
+   tmatrix.xx = (FT_Fixed)(m_wscale * (1<<16));
+   tmatrix.yx = (FT_Fixed)0;
+   tmatrix.xy = (FT_Fixed)0;
+   tmatrix.yy = (FT_Fixed)(1<<16);
+   FT_Set_Transform(face, &tmatrix, 0);
 
    n = face->num_charmaps;
 
