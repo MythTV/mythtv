@@ -2856,9 +2856,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
                 if (ringBuffer->InDVDMenuOrStillFrame())
                 {
-                    if (audioOutput)
-                        audioOutput->Pause(false);
-
                     if (nbframes == 0)
                     {
                         VERBOSE(VB_PLAYBACK, LOC_ERR + 
@@ -3813,7 +3810,9 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
  */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
-    if (!ringBuffer->InDVDMenuOrStillFrame())
+    if (ringBuffer->InDVDMenuOrStillFrame())
+        audioOutput->Pause(false);
+    else
         WrapTimecode(timecode, TC_AUDIO);
 
     int samplesize = (audio_channels * audio_bits) / 8; // bytes per sample
