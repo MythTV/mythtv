@@ -42,12 +42,12 @@ use Getopt::Std;
 $| = 1; # autoflush stdout;
 
 # this script was last tested to work with this version, on other versions YMMV.
-my $SVNRELEASE = '16789'; # Latest build that has been confirmed to run,
+#my $SVNRELEASE = '16789'; # Latest build that has been confirmed to run,
                           # but seems to work best with some patches
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '16973'; # Recent 0-21-fixes
-#my $SVNRELEASE = '17011'; # Recent trunk
+my $SVNRELEASE = '17131'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -633,9 +633,6 @@ push @{$expect},
 [ archive => $sources.'qt-win-opensource-src-4.3.4.zip',  fetch => 'ftp://ftp.trolltech.com/qt/source/qt-win-opensource-src-4.3.4.zip'],
 [ dir => $msys.'qt-win-opensource-src-4.3.4', extract => [$sources.'qt-win-opensource-src-4.3.4.zip', $msys] ],
 
-[dir => $msys.'qt-win-opensource-src-4.3.4_examples', shell => 'mv '.$unixmsys.'qt-win-opensource-src-4.3.4/examples '.$unixmsys.'qt-win-opensource-src-4.3.4_examples', 
-  comment => 'after extracting the qt sources, there is no need for us to build the examples, so we will just move the folder out of the way (we could just delete it but dont)! ' ] ,
-
 # qt recommend NOT having sh.exe in the path when building QT (yes this applies to QT4 too!)
 [ file => $msys.'bin/sh_.exe',
  shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
@@ -645,15 +642,15 @@ push @{$expect},
  comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
 
 # Write a batch script for the QT environment under DOS:
-# TODO - the configure script pauses until you press 'y' to continue! 
-[ file => $msys.'qt-win-opensource-src-4.3.4/qt4_env.bat_', write => [$msys.'qt-win-opensource-src-4.3.4/qt4_env.bat',
+[ file => $msys.'qt-win-opensource-src-4.3.4/qt4_env.bat_',
+ write => [$msys.'qt-win-opensource-src-4.3.4/qt4_env.bat',
 'rem a batch script for the QT environment under DOS:
 set QTDIR='.$dosmsys.'qt-win-opensource-src-4.3.4
 set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
-configure -plugin-sql-mysql -no-sql-sqlite -release -fast -no-sql-odbc -no-qdbus
+'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
 rem mingw32-make
 ','nocheck'
 ],comment=>'write a batch script for the QT4 environment under DOS'],
@@ -816,10 +813,6 @@ if ($tickets == 1) {
 [ archive => $sources.'4724_undo.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4724/win32_storeconnection.patch', comment => 'Applying Ticket 4724'],
 [ filesame => [$mythtv.'mythtv/4724_undo.patch',$sources."4724_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
 [ grep  => ['BLABLA',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth","patch -p0 < ../../".$unixmythtv."mythtv/4724_undo.patch",'nocheck'] , comment => ' .'],
-
-#4706 http://svn.mythtv.org/trac/raw-attachment/ticket/4706/mythsocket_win32_events.patch 
-[ archive => $mythtv.'mythtv/mythsocket_win32_events.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4706/mythsocket_win32_events.patch', comment => 'mythsocket_win32_events.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'], 
-[ file => $mythtv.'_', shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/mythsocket_win32_events.patch","nocheck"] , comment => 'apply above patch'], 
 
 # Ticket 4699
 [ archive => $sources.'4699_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch', comment => 'win32_fs.patch'],
