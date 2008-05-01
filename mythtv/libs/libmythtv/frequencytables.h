@@ -48,8 +48,8 @@ class FrequencyTable
                    DTVModulation           _modulation)
         : name_format(_name_format),       name_offset(_name_offset),
           frequencyStart(_frequencyStart), frequencyEnd(_frequencyEnd),
-          frequencyStep(_frequencyStep),   
-          modulation(_modulation) { ; }
+          frequencyStep(_frequencyStep),   modulation(_modulation),
+          offset1(0),                      offset2(0) { }
 
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
