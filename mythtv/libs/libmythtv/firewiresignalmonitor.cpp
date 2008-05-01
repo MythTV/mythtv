@@ -87,6 +87,9 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
     AddFlags(kDTVSigMon_PATSeen);
 
     FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    if (!fwchan)
+        return;
+
     bool crc_bogus = !fwchan->GetFirewireDevice()->IsSTBBufferCleared();
     if (crc_bogus && stb_needs_to_wait_for_pat &&
         (stb_wait_for_pat_timer.elapsed() < (int)kBufferTimeout))
@@ -206,6 +209,8 @@ void FirewireSignalMonitor::UpdateValues(void)
     stb_needs_to_wait_for_power = false;
 
     FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(channel);
+    if (!fwchan)
+        return;
 
     if (HasFlags(kFWSigMon_WaitForPower) && !HasFlags(kFWSigMon_PowerMatch))
     {
