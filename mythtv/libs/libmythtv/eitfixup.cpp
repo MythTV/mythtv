@@ -1,3 +1,7 @@
+// C++ headers
+#include <algorithm>
+
+// MythTV headers
 #include "eitfixup.h"
 #include "mythcontext.h"
 #include "dvbdescriptors.h" // for MythCategoryType
@@ -325,7 +329,8 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
              QString strTmp = event.description.mid(nPosition1+1,
                                      nLength-nPosition1);
 
-             if (QStringList::split(" ", strTmp ,TRUE).count()< kMaxDotToColon)
+             QStringList tmp = QStringList::split(" ", strTmp, true);
+             if (((uint) tmp.size()) < kMaxDotToColon)
                  fSingleDot = false;
          }
 
@@ -342,9 +347,12 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
              int i;
              for (i =0; (i<(int)strListColon.count()) && (nTitleMax==-1);i++)
              {
-                 if ((nTitle+=
-                     QStringList::split(" ",strListColon[i],TRUE).count())
-                          <kMaxToTitle)
+                 const QStringList tmp =
+                     QStringList::split(" ", strListColon[i], true);
+
+                 nTitle += tmp.size();
+
+                 if (nTitle < kMaxToTitle)
                      strListTmp.push_back(strListColon[i]);
                  else
                      nTitleMax=i;
@@ -378,14 +386,14 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
 
         strListQuestion = QStringList::split("?",event.description,TRUE);
         strListExcl = QStringList::split("!",event.description,TRUE);
-        if ((strListQuestion.count()>1) &&
-                 (strListQuestion.count()<=kMaxQuestionExclamation))
+        if ((!strListQuestion.size() > 1) &&
+            ((uint)strListQuestion.size() <= kMaxQuestionExclamation))
         {
             strListEnd = strListQuestion;
             strEnd = "?";
         }
-        else if ((strListExcl.count()>1) &&
-                 (strListExcl.count()<=kMaxQuestionExclamation))
+        else if ((strListExcl.size() > 1) &&
+                 ((uint)strListExcl.size() <= kMaxQuestionExclamation))
         {
             strListEnd = strListExcl;
             strEnd = "!";
@@ -394,14 +402,14 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
             strEnd = QString::null;
     }
 
-    if (strListEnd.count())
+    if (!strListEnd.empty())
     {
         QStringList strListSpace = QStringList::split(" ",strListEnd[0]);
-        if (fColon && (strListSpace.count() > kMaxToTitle))
+        if (fColon && ((uint)strListSpace.size() > kMaxToTitle))
              return;
-        if (strListSpace.count() > kDotToTitle)
+        if ((uint)strListSpace.size() > kDotToTitle)
              return;
-        if (strListSpace.grep(m_ukExclusionFromSubtitle).count()==0)
+        if (strListSpace.grep(m_ukExclusionFromSubtitle).empty())
         {
              event.subtitle = strListEnd[0]+strEnd;
              event.subtitle.remove(m_ukSpaceColonStart);
@@ -918,9 +926,11 @@ void EITFixUp::FixMCA(DBEvent &event) const
     tmpExp1 = m_mcaSubtitle;
     if ((position = tmpExp1.search(event.description)) != -1)
     {
-        if ((tmpExp1.cap(1).length() < SUBTITLE_MAX_LEN) &&
-            ((tmpExp1.cap(1).length()*100)/event.description.length() <
-             SUBTITLE_PCT))
+        uint tmpExp1Len = tmpExp1.cap(1).length();
+        uint evDescLen = max(event.description.length(), 1);
+
+        if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+            ((tmpExp1Len * 100 / evDescLen) < SUBTITLE_PCT))
         {
             event.subtitle    = tmpExp1.cap(1);
             event.description = tmpExp1.cap(2);
@@ -1097,9 +1107,11 @@ void EITFixUp::FixRTL(DBEvent &event) const
 
     if ((position = tmpExp1.search(event.description)) != -1)
     {
-        if ((tmpExp1.cap(1).length() < SUBTITLE_MAX_LEN) &&
-            ((tmpExp1.cap(1).length()*100)/event.description.length() <
-             SUBTITLE_PCT))
+        uint tmpExp1Len = tmpExp1.cap(1).length();
+        uint evDescLen = max(event.description.length(), 1);
+
+        if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+            (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
         {
             event.subtitle    = tmpExp1.cap(1);
             event.description = tmpExp1.cap(2);
