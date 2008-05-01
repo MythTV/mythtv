@@ -122,9 +122,9 @@ class DVBRecorder :
     bool                     _has_no_av;
 
     // TS recorder stuff
-    unsigned char   _stream_id[0x1fff];
-    unsigned char   _pid_status[0x1fff];
-    unsigned char   _continuity_counter[0x1fff];
+    unsigned char   _stream_id[0x1fff + 1];
+    unsigned char   _pid_status[0x1fff + 1];
+    unsigned char   _continuity_counter[0x1fff + 1];
 
     // Statistics
     mutable uint        _continuity_error_count;
