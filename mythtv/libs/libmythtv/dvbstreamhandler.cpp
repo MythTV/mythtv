@@ -96,6 +96,7 @@ DVBStreamHandler::DVBStreamHandler(uint dvb_device_number) :
     _dvbchannel(NULL),
 
     _pid_lock(true),
+    _open_pid_filters(0),
     _listener_lock(true)
 {
 }
