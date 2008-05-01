@@ -45,7 +45,8 @@ class PESPacket
   protected:
     // does not create it's own data
     PESPacket(const TSPacket* tspacket, bool)
-        : _pesdata(NULL), _fullbuffer(NULL), _pesdataSize(184), _allocSize(0)
+        : _pesdata(NULL),    _fullbuffer(NULL),
+          _ccLast(tspacket->ContinuityCounter()), _allocSize(0)
     {
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
@@ -55,7 +56,7 @@ class PESPacket
     PESPacket(const unsigned char *pesdata, bool)
         : _pesdata(const_cast<unsigned char*>(pesdata)),
           _fullbuffer(const_cast<unsigned char*>(pesdata)),
-          _pesdataSize(0), _allocSize(0)
+          _psiOffset(0), _ccLast(255), _allocSize(0)
     {
         _badPacket = !VerifyCRC();
         _pesdataSize = max(((int)Length())-1 + (HasCRC() ? 4 : 0), (int)0);
@@ -260,9 +261,6 @@ class PESPacket
 class SequenceHeader
 {
   public:
-    SequenceHeader() {;}
-    ~SequenceHeader() {;}
-
     uint width(void)     const { return (data[0]        <<4) | (data[1]>>4); }
     uint height(void)    const { return ((data[1] & 0xf)<<8) |  data[2];     }
     uint aspectNum(void) const { return data[3] >> 4;                        }
@@ -271,6 +269,9 @@ class SequenceHeader
     float aspect(bool mpeg1) const;
 
   private:
+    SequenceHeader() {;} // only used via reinterpret cast
+    ~SequenceHeader() {;}
+
     unsigned char data[11];
     static const float mpeg1_aspect[16];
     static const float mpeg2_aspect[16];
