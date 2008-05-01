@@ -99,7 +99,12 @@ void DeviceReadBuffer::Start(void)
         return;
     }
 
-    pthread_create(&thread, NULL, boot_ringbuffer, this);
+    if (pthread_create(&thread, NULL, boot_ringbuffer, this) != 0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                LOC_ERR + QString("Start(): pthread_create failed.") + ENO);
+        error = true;
+    }
 }
 
 void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
