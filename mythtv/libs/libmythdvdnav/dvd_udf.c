@@ -791,7 +791,7 @@ uint32_t UDFFindFile( dvd_reader_t *device, char *filename,
 
     *filesize = 0;
     tokenline[0] = '\0';
-    strcat( tokenline, filename );
+    strncat( tokenline, filename, MAX_UDF_FILE_NAME_LEN - 1 );
 
     
     if(!(GetUDFCache(device, PartitionCache, 0, &partition) &&
