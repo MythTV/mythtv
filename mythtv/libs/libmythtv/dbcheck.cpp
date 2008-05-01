@@ -1663,7 +1663,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 "UPDATE recorded SET timestretch = 1.0;",
 ""
 };
-        performActualUpdate(updates, "1088", dbver);
+        if (!performActualUpdate(updates, "1088", dbver))
+            return false;
     }
 
     if (dbver == "1088")
