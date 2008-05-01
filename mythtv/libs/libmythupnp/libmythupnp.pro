@@ -43,6 +43,9 @@ DEPENDPATH += ../libmyth
 LIBS += $$EXTRA_LIBS
 
 mingw {
+    # For easier debugging: 
+    target.path = $${PREFIX}/bin
+
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
 }

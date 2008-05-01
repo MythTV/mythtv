@@ -76,6 +76,9 @@ using_lirc {
 cygwin:DEFINES += _WIN32
 
 mingw {
+    # For easier debugging: 
+    target.path = $${PREFIX}/bin
+
     using_opengl {
         LIBS += -lopengl32
         DEFINES += USE_OPENGL_PAINTER
