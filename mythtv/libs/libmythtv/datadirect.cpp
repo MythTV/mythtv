@@ -1248,7 +1248,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 bool DataDirectProcessor::GrabLineupsOnly(void)
 {
     const QDateTime start = QDateTime(QDate::currentDate().addDays(2),
-                                      QTime::QTime(23, 59, 0));
+                                      QTime(23, 59, 0));
     const QDateTime end   = start.addSecs(1);
 
     return GrabData(start, end);

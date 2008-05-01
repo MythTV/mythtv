@@ -270,7 +270,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     if (ignore.length())
         m_IgnoreList = QStringList::split(',', ignore);
     else
-        m_IgnoreList = QStringList::QStringList();  // Force empty list
+        m_IgnoreList = QStringList();  // Force empty list
 
     if (m_StartThread)
         VERBOSE(VB_MEDIA, "Creating MediaMonitor, SendEvents="

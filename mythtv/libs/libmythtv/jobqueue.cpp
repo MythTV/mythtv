@@ -595,7 +595,7 @@ bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
             if (defer)
             {
                 schedruntime = schedruntime.addDays(defer);
-                schedruntime.setTime(QTime::QTime(0,0));
+                schedruntime.setTime(QTime(0,0));
             }
 
             QueueJob(JOB_TRANSCODE, chanid, starttime, args, comment, host,
@@ -1125,14 +1125,14 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     if (!queueStartTime.isValid())
     {
         VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowStart time, using 00:00");
-        queueStartTime = QTime::QTime(0, 0);
+        queueStartTime = QTime(0, 0);
     }
 
     queueEndTime = QTime::fromString(queueEndTimeStr);
     if (!queueEndTime.isValid())
     {
         VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowEnd time, using 23:59");
-        queueEndTime = QTime::QTime(23, 59);
+        queueEndTime = QTime(23, 59);
     }
     
     if ((queueStartTime <= curTime) && (curTime < queueEndTime))

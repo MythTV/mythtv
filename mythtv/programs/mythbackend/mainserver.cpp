@@ -1201,7 +1201,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (query.value(26).isNull() || 
                 query.value(26).toString().isEmpty())
             {
-                proginfo->originalAirDate = QDate::QDate (0, 1, 1);
+                proginfo->originalAirDate = QDate (0, 1, 1);
                 proginfo->hasAirDate      = false;
             }
             else

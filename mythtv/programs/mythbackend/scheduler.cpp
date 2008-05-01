@@ -2364,7 +2364,7 @@ void Scheduler::UpdateMatches(int recordid) {
     }
     else if (query.size())
     {
-        QDate epoch = QDate::QDate (1970, 1, 1);
+        QDate epoch(1970, 1, 1);
         int findtoday =  epoch.daysTo(QDate::currentDate()) + 719528;
         query.prepare("UPDATE record set findid = :FINDID "
                       "WHERE type = :FINDONE AND findid <= 0;");
@@ -2849,7 +2849,7 @@ void Scheduler::AddNewRecords(void)
 
         if (result.value(32).isNull())
         {
-            p->originalAirDate = QDate::QDate (0, 1, 1);
+            p->originalAirDate = QDate (0, 1, 1);
             p->hasAirDate = false;
         }
         else

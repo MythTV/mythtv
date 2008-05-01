@@ -214,7 +214,7 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
         subtitle->setValue(from);
         description->setValue(forwhat);
         findday->setValue((startDate->dateValue().dayOfWeek() + 1) % 7);
-        QDate epoch = QDate::QDate (1970, 1, 1);
+        QDate epoch(1970, 1, 1);
         findid->setValue(epoch.daysTo(startDate->dateValue()) + 719528);
     } 
 }
@@ -813,7 +813,7 @@ void ScheduledRecording::setDefault(bool haschannel)
 {
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
-    QDate epoch = QDate::QDate (1970, 1, 1);
+    QDate epoch(1970, 1, 1);
 
     id->setValue(0);
     title->setValue("");
@@ -900,7 +900,7 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
             findday->setValue((proginfo->startts.date().dayOfWeek() + 1) % 7);
             findtime->setValue(proginfo->startts.time());
 
-            QDate epoch = QDate::QDate (1970, 1, 1);
+            QDate epoch(1970, 1, 1);
             findid->setValue(epoch.daysTo(proginfo->startts.date()) + 719528);
         }
         else
@@ -909,7 +909,7 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
                 findid->setValue(proginfo->findid);
             else
             {
-                QDate epoch = QDate::QDate (1970, 1, 1);
+                QDate epoch(1970, 1, 1);
                 findid->setValue(epoch.daysTo(proginfo->startts.date()) +
                                               719528);
             }

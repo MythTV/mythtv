@@ -125,7 +125,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     QTime thisTime = m_nowDateTime.time();
     thisTime = thisTime.addSecs((30 - thisTime.minute() % 30) * 60);
     
-    if (thisTime < QTime::QTime(0,30))
+    if (thisTime < QTime(0,30))
         m_startdate->setCurrentItem(m_startdate->currentItem() + 1);
 
     message = tr("Time:");
@@ -146,8 +146,8 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     for(int m_index = -1; m_index <= 24; m_index++)
     {
-        m_starthour->insertItem(QTime::QTime((m_index + 24) % 24, 0)
-                                             .toString(hr_format));
+        m_starthour->insertItem(QTime((m_index + 24) % 24, 0)
+                                      .toString(hr_format));
         if (thisTime.hour() == m_index)
             m_starthour->setCurrentItem(m_starthour->count() - 1);
     }
@@ -157,8 +157,8 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     for(int m_index = -5; m_index <= 60; m_index += 5)
     {
-        m_startminute->insertItem(QTime::QTime(0, (m_index + 60) % 60)
-                                               .toString(":mm"));
+        m_startminute->insertItem(QTime(0, (m_index + 60) % 60)
+                                       .toString(":mm"));
         if (m_index == thisTime.minute())
             m_startminute->setCurrentItem(m_startminute->count() - 1);
     }
