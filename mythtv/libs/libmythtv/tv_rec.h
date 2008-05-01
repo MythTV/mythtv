@@ -63,7 +63,8 @@ class GeneralDBOptions
         audiodev(""),         defaultinput("Television"),
         cardtype("V4L"),
         audiosamplerate(-1),  skip_btaudio(false),
-        signal_timeout(1000), channel_timeout(3000) {;}
+        signal_timeout(1000), channel_timeout(3000),
+        wait_for_seqstart(false) {}
   
     QString videodev;
     QString vbidev;
