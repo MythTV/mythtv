@@ -26,6 +26,7 @@ extern "C" {
 #define MAX_AC3_FRAME_SIZE 6144
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
+    audio_bytes_per_sample(0),
     av_context(NULL),
     outbuf(NULL),
     outbuf_size(0),
