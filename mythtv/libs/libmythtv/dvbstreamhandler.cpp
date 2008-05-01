@@ -306,8 +306,16 @@ void DVBStreamHandler::RunTS(void)
         {
             // timeout gets reset by select, so we need to create new one
             struct timeval timeout = { 0, 50 /* ms */ * 1000 /* -> usec */ };
-            select(dvr_fd+1, &fd_select_set, NULL, NULL, &timeout);
-            len = read(dvr_fd, &(buffer[remainder]), buffer_size - remainder);
+            int ret = select(dvr_fd+1, &fd_select_set, NULL, NULL, &timeout);
+            if (ret == -1 && errno != EINTR)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "select() failed" + ENO);
+            }
+            else
+            {
+                len = read(dvr_fd, &(buffer[remainder]),
+                           buffer_size - remainder);
+            }
         }
 
         if ((0 == len) || (-1 == len))
