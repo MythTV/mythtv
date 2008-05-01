@@ -124,7 +124,10 @@ void DVBSignalMonitor::SetRotorTarget(float target)
 
 void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
 {
-    DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(channel);
+    DVBChannel *dvbchannel = GetDVBChannel();
+    if (!dvbchannel)
+        return;
+
     const DiSEqCDevRotor *rotor = dvbchannel->GetRotor();
 
     QMutexLocker locker(&statusLock);
@@ -169,19 +172,27 @@ void DVBSignalMonitor::HandlePMT(uint program_num, const ProgramMapTable *pmt)
     DTVSignalMonitor::HandlePMT(program_num, pmt);
 
     if (pmt->ProgramNumber() == (uint)programNumber)
-        GetDVBChannel()->SetPMT(pmt);
+    {
+        DVBChannel *dvbchannel = GetDVBChannel();
+        if (dvbchannel)
+            dvbchannel->SetPMT(pmt);
+    }
 }
 
 void DVBSignalMonitor::HandleSTT(const SystemTimeTable *stt)
 {
     DTVSignalMonitor::HandleSTT(stt);
-    GetDVBChannel()->SetTimeOffset(GetStreamData()->TimeOffset());
+    DVBChannel *dvbchannel = GetDVBChannel();
+    if (dvbchannel)
+        dvbchannel->SetTimeOffset(GetStreamData()->TimeOffset());
 }
 
 void DVBSignalMonitor::HandleTDT(const TimeDateTable *tdt)
 {
     DTVSignalMonitor::HandleTDT(tdt);
-    GetDVBChannel()->SetTimeOffset(GetStreamData()->TimeOffset());
+    DVBChannel *dvbchannel = GetDVBChannel();
+    if (dvbchannel)
+        dvbchannel->SetTimeOffset(GetStreamData()->TimeOffset());
 }
 
 DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
@@ -213,14 +224,18 @@ void DVBSignalMonitor::UpdateValues(void)
     }
 
     AddFlags(kSigMon_WaitForSig);
+ 
+    DVBChannel *dvbchannel = GetDVBChannel();
+    if (!dvbchannel)
+        return;
 
     // Handle retuning after rotor has turned
     if (HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
     {
-        if (GetDVBChannel()->GetRotor())
+        if (dvbchannel->GetRotor())
         {
             if (!streamHandler->IsRetuneAllowed())
-                streamHandler->SetRetuneAllowed(true, this, GetDVBChannel());
+                streamHandler->SetRetuneAllowed(true, this, dvbchannel);
             streamHandler->RetuneMonitor();
         }
         else
@@ -231,15 +246,15 @@ void DVBSignalMonitor::UpdateValues(void)
     uint sig = 0, snr = 0, ber = 0, ublocks = 0;
 
     // Get info from card
-    bool has_lock = GetDVBChannel()->HasLock();
+    bool has_lock = dvbchannel->HasLock();
     if (HasFlags(kSigMon_WaitForSig))
-        sig = (uint) (GetDVBChannel()->GetSignalStrength() * 65535);
+        sig = (uint) (dvbchannel->GetSignalStrength() * 65535);
     if (HasFlags(kDVBSigMon_WaitForSNR))
-        snr = (uint) (GetDVBChannel()->GetSNR() * 65535);
+        snr = (uint) (dvbchannel->GetSNR() * 65535);
     if (HasFlags(kDVBSigMon_WaitForBER))
-        ber = (uint) GetDVBChannel()->GetBitErrorRate();
+        ber = (uint) dvbchannel->GetBitErrorRate();
     if (HasFlags(kDVBSigMon_WaitForUB))
-        ublocks = (uint) GetDVBChannel()->GetUncorrectedBlockCount();
+        ublocks = (uint) dvbchannel->GetUncorrectedBlockCount();
 
     has_lock |= streamHandler->IsRunning();
 
