@@ -398,11 +398,13 @@ void MHScene::Initialise(MHParseNode *p, MHEngine *engine)
     MHGroup::Initialise(p, engine);
     // Event register.
     MHParseNode *pInputEventReg = p->GetNamedArg(C_INPUT_EVENT_REGISTER);
-    m_nEventReg = pInputEventReg->GetArgN(0)->GetIntValue();
+    if (pInputEventReg) m_nEventReg = pInputEventReg->GetArgN(0)->GetIntValue();
     // Co-ordinate system
     MHParseNode *pSceneCoords = p->GetNamedArg(C_SCENE_COORDINATE_SYSTEM);
-    m_nSceneCoordX = pSceneCoords->GetArgN(0)->GetIntValue();
-    m_nSceneCoordY = pSceneCoords->GetArgN(1)->GetIntValue();
+    if (pSceneCoords) {
+        m_nSceneCoordX = pSceneCoords->GetArgN(0)->GetIntValue();
+        m_nSceneCoordY = pSceneCoords->GetArgN(1)->GetIntValue();
+    }
     // Aspect ratio
     MHParseNode *pAspectRatio = p->GetNamedArg(C_ASPECT_RATIO);
     if (pAspectRatio) {

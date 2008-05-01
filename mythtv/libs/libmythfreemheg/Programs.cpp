@@ -50,7 +50,9 @@ MHProgram::MHProgram()
 void MHProgram::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHIngredient::Initialise(p, engine);
-    p->GetNamedArg(C_NAME)->GetArgN(0)->GetStringValue(m_Name); // Program name
+    MHParseNode *pCmdNode = p->GetNamedArg(C_NAME);
+    if (pCmdNode) pCmdNode->GetArgN(0)->GetStringValue(m_Name); // Program name
+
     MHParseNode *pAvail = p->GetNamedArg(C_INITIALLY_AVAILABLE);
     if (pAvail) m_fInitiallyAvailable = pAvail->GetArgN(0)->GetBoolValue();
     // The MHEG Standard says that InitiallyAvailable is mandatory and should be false.

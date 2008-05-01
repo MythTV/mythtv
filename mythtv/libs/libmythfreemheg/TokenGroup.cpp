@@ -231,10 +231,12 @@ void MHListGroup::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHTokenGroup::Initialise(p, engine);
     MHParseNode *pPositions = p->GetNamedArg(C_POSITIONS);
-    for (int i = 0; i < pPositions->GetArgCount(); i++) {
-        MHParseNode *pPos = pPositions->GetArgN(i);
-        QPoint pos(pPos->GetSeqN(0)->GetIntValue(), pPos->GetSeqN(1)->GetIntValue());
-        m_Positions.Append(pos);
+    if (pPositions) {
+        for (int i = 0; i < pPositions->GetArgCount(); i++) {
+            MHParseNode *pPos = pPositions->GetArgN(i);
+            QPoint pos(pPos->GetSeqN(0)->GetIntValue(), pPos->GetSeqN(1)->GetIntValue());
+            m_Positions.Append(pos);
+        }
     }
     MHParseNode *pWrap = p->GetNamedArg(C_WRAP_AROUND);
     if (pWrap) m_fWrapAround = pWrap->GetArgN(0)->GetBoolValue();

@@ -57,7 +57,7 @@ void MHBooleanVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be a bool.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    m_fOriginalValue = pInitial->GetArgN(0)->GetBoolValue();
+    if (pInitial) m_fOriginalValue = pInitial->GetArgN(0)->GetBoolValue();
 }
 
 void MHBooleanVar::PrintMe(FILE *fd, int nTabs) const
@@ -111,7 +111,7 @@ void MHIntegerVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be an int.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    m_nOriginalValue = pInitial->GetArgN(0)->GetIntValue();
+    if (pInitial) m_nOriginalValue = pInitial->GetArgN(0)->GetIntValue();
 }
 
 void MHIntegerVar::PrintMe(FILE *fd, int nTabs) const
@@ -185,7 +185,7 @@ void MHOctetStrVar::Initialise(MHParseNode *p, MHEngine *engine)
     MHVariable::Initialise(p, engine);
     // Original value should be a string.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
-    pInitial->GetArgN(0)->GetStringValue(m_OriginalValue);
+    if (pInitial) pInitial->GetArgN(0)->GetStringValue(m_OriginalValue);
 }
 
 void MHOctetStrVar::PrintMe(FILE *fd, int nTabs) const
@@ -258,8 +258,10 @@ void MHObjectRefVar::Initialise(MHParseNode *p, MHEngine *engine)
     // Original value should be an object reference.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
     // and this should be a ObjRef node.
-    MHParseNode *pArg = pInitial->GetNamedArg(C_OBJECT_REFERENCE);
-    m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+    if (pInitial) {
+        MHParseNode *pArg = pInitial->GetNamedArg(C_OBJECT_REFERENCE);
+        if (pArg) m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+    }
 }
 
 void MHObjectRefVar::PrintMe(FILE *fd, int nTabs) const
@@ -312,8 +314,10 @@ void MHContentRefVar::Initialise(MHParseNode *p, MHEngine *engine)
     // Original value should be a content reference.
     MHParseNode *pInitial = p->GetNamedArg(C_ORIGINAL_VALUE);
     // and this should be a ContentRef node.
-    MHParseNode *pArg = pInitial->GetNamedArg(C_CONTENT_REFERENCE);
-    m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+    if (pInitial) {
+        MHParseNode *pArg = pInitial->GetNamedArg(C_CONTENT_REFERENCE);
+        if (pArg) m_OriginalValue.Initialise(pArg->GetArgN(0), engine);
+    }
 }
 
 void MHContentRefVar::PrintMe(FILE *fd, int nTabs) const

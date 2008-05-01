@@ -40,24 +40,26 @@ void MHStream::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
     MHParseNode *pMultiplex = p->GetNamedArg(C_MULTIPLEX);
-    for (int i = 0; i < pMultiplex->GetArgCount(); i++) {
-        MHParseNode *pItem = pMultiplex->GetArgN(i);
-        if (pItem->GetTagNo() == C_AUDIO) {
-            MHAudio *pAudio = new MHAudio;
-            m_Multiplex.Append(pAudio);
-            pAudio->Initialise(pItem, engine);
+    if (pMultiplex) {
+        for (int i = 0; i < pMultiplex->GetArgCount(); i++) {
+            MHParseNode *pItem = pMultiplex->GetArgN(i);
+            if (pItem->GetTagNo() == C_AUDIO) {
+                MHAudio *pAudio = new MHAudio;
+                m_Multiplex.Append(pAudio);
+                pAudio->Initialise(pItem, engine);
+            }
+            else if (pItem->GetTagNo() == C_VIDEO) {
+                MHVideo *pVideo = new MHVideo;
+                m_Multiplex.Append(pVideo);
+                pVideo->Initialise(pItem, engine);
+            }
+            else if (pItem->GetTagNo() == C_RTGRAPHICS) {
+                MHRTGraphics *pRtGraph = new MHRTGraphics;
+                m_Multiplex.Append(pRtGraph);
+                pRtGraph->Initialise(pItem, engine);
+            }
+            // Ignore unknown items
         }
-        else if (pItem->GetTagNo() == C_VIDEO) {
-            MHVideo *pVideo = new MHVideo;
-            m_Multiplex.Append(pVideo);
-            pVideo->Initialise(pItem, engine);
-        }
-        else if (pItem->GetTagNo() == C_RTGRAPHICS) {
-            MHRTGraphics *pRtGraph = new MHRTGraphics;
-            m_Multiplex.Append(pRtGraph);
-            pRtGraph->Initialise(pItem, engine);
-        }
-        // Ignore unknown items
     }
     MHParseNode *pStorage = p->GetNamedArg(C_STORAGE);
     if (pStorage) m_nStorage = (enum Storage) pStorage->GetArgN(0)->GetEnumValue();
@@ -150,7 +152,8 @@ MHAudio::MHAudio()
 void MHAudio::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHPresentable::Initialise(p, engine);
-    m_nComponentTag = p->GetNamedArg(C_COMPONENT_TAG)->GetArgN(0)->GetIntValue();
+    MHParseNode *pComponentTagNode =  p->GetNamedArg(C_COMPONENT_TAG);
+    if (pComponentTagNode) m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
     MHParseNode *pOrigVol = p->GetNamedArg(C_ORIGINAL_VOLUME);
     if (pOrigVol) m_nOriginalVol = pOrigVol->GetIntValue();
 }
@@ -232,7 +235,8 @@ MHVideo::MHVideo()
 void MHVideo::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHVisible::Initialise(p, engine);
-    m_nComponentTag = p->GetNamedArg(C_COMPONENT_TAG)->GetArgN(0)->GetIntValue();
+    MHParseNode *pComponentTagNode = p->GetNamedArg(C_COMPONENT_TAG);
+    if (pComponentTagNode) m_nComponentTag = pComponentTagNode->GetArgN(0)->GetIntValue();
     MHParseNode *pTerm = p->GetNamedArg(C_TERMINATION);
     if (pTerm) m_Termination = (enum Termination)pTerm->GetEnumValue();
 }

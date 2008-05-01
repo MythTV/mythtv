@@ -73,7 +73,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
     }
 
     MHParseNode *pLinkEffect = p->GetNamedArg(C_LINK_EFFECT);
-    m_LinkEffect.Initialise(pLinkEffect, engine);
+    if (pLinkEffect) m_LinkEffect.Initialise(pLinkEffect, engine);
 }
 
 static const char *rchEventType[] =
