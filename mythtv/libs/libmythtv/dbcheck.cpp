@@ -3608,9 +3608,6 @@ thequery,
             profiles = VideoDisplayProfile::GetProfiles(host);
             QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
 
-            VERBOSE(VB_IMPORTANT, QString("In 1213 upg(%1): p %2")
-                    .arg(host).arg(profile));
-
             if (profiles.contains("Normal") &&
                 (profile=="CPU++" || profile=="CPU+" || profile=="CPU--"))
             {
