@@ -540,7 +540,9 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
     if (UPnPclient)
     {
         m_UPnP = UPnPclient;
+#ifndef _WIN32
         m_XML  = (XmlConfiguration *)UPnp::g_pConfig;
+#endif
     }
 
     // Creates screen saver control if we will have a GUI
