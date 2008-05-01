@@ -1062,20 +1062,31 @@ static bool wait_for_backend(int fd, int timeout_ms)
 
     // Try to wait for some output like an event, unfortunately
     // this fails on several DVB cards, so we have a timeout.
-    select(fd+1, &fd_select_set, NULL, NULL, &select_timeout);
+    int ret = 0;
+    do ret = select(fd+1, &fd_select_set, NULL, NULL, &select_timeout);
+    while ((-1 == ret) && (EINTR == errno));
+
+    if (-1 == ret)
+    {
+        VERBOSE(VB_IMPORTANT, "dvbchannel.cpp:wait_for_backend: "
+                "Failed to wait on output" + ENO);
+
+        return false;
+    }
 
     // This is supposed to work on all cards, post 2.6.12...
     fe_status_t status;
     if (ioctl(fd, FE_READ_STATUS, &status) < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("dvbchannel.cpp:wait_for_backend: "
-                                      "Failed to get status, error: %1")
-                .arg(strerror(errno)));
+        VERBOSE(VB_IMPORTANT, "dvbchannel.cpp:wait_for_backend: "
+                "Failed to get status" + ENO);
+
         return false;
     }
 
     VERBOSE(VB_CHANNEL, QString("dvbchannel.cpp:wait_for_backend: Status: %1")
             .arg(toString(status)));
+
     return true;
 }
 
