@@ -46,7 +46,7 @@ mingw {
     TARGET = lib$${TARGET}
 
     # For easier debugging:
-    target.path = lib$${TARGET}
+    target.path = $${PREFIX}/bin
 
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
