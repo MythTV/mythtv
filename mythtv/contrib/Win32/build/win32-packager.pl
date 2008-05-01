@@ -124,9 +124,10 @@ if ($svnlocation eq "branches/release-0-22-fixes") {
     $qtver = 3;
 }
 
-print "Config:\n\tQT version: $qtver\n\tDLL's will be labeled as: $version\n";
+print "Config:\n\tQT version: $qtver\n\tDLLs will be labeled as: $version\n";
 print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 print "Press [enter] to continue, or [ctrl]-c to exit now....\n";
+getc();
 
 # TODO -  use this list to define the components to build - only the first of these currently works well.
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
