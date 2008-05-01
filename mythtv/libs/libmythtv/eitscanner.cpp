@@ -40,8 +40,11 @@ QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner(uint _cardnum)
-    : channel(NULL), eitSource(NULL), eitHelper(new EITHelper()),
-      exitThread(false), rec(NULL), activeScan(false), cardnum(_cardnum)
+    : channel(NULL),              eitSource(NULL),
+      eitHelper(new EITHelper()), exitThread(false),
+      rec(NULL),                  activeScan(false),
+      activeScanTrigTime(0),      ignore_source(false),
+      cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
