@@ -22,10 +22,22 @@ using namespace std;
  */
 class TSHeader {
   public:
-    TSHeader() { _tsdata[0] = SYNC_BYTE; }
-    TSHeader(int cc) {
+    TSHeader()
+    {
+        _tsdata[0] = SYNC_BYTE;
+        /*
+          no need to init rest of header, this is only a part of a larger
+          packets which initialize the rest of the data differently.
+        */
+    }
+    TSHeader(int cc)
+    {
         _tsdata[0] = SYNC_BYTE;
         SetContinuityCounter(cc);
+        /*
+          no need to init rest of header, this is only a part of a larger
+          packets which initialize the rest of the data differently.
+        */
     }
     void InitHeader(const unsigned char* header) {
         if (header)
@@ -57,7 +69,7 @@ class TSHeader {
     //3.0  2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
     unsigned int ScramplingControl() const { return (_tsdata[3] >> 6) & 0x3; }
     //3.2  2 bit adaptation_field_control
-    //       (01-no adptation field,payload only
+    //       (01-no adaptation field,payload only
     //        10-adaptation field only,no payload
     //        11-adaptation field followed by payload
     //        00-reserved)
@@ -137,6 +149,8 @@ class TSPacket : public TSHeader
             memcpy(_tspayload, payload, PAYLOAD_SIZE);
     }
 
+    // This points outside the TSHeader data, but is declared here because
+    // it is used for the different types of packets that employ a TS Header
     unsigned int AFCOffset() const { // only works if AFC fits in TSPacket
         return HasAdaptationField() ? _tspayload[0]+1+4 : 4;
     }
