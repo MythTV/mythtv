@@ -2545,7 +2545,8 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
     prebuffering_lock.lock();
     if (prebuffering)
     {
-        if (ringBuffer->InDVDMenuOrStillFrame() && prebuffer_tries > 3)
+        if (ringBuffer->InDVDMenuOrStillFrame() && 
+            prebuffer_tries > 3)
         {
             prebuffering = false;
             prebuffer_tries = 0;
@@ -2553,7 +2554,8 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
             return true;
         }
 
-        if (!audio_paused && audioOutput)
+        if (!ringBuffer->InDVDMenuOrStillFrame() && 
+            !audio_paused && audioOutput)
         {
            if (prebuffering)
                 audioOutput->Pause(prebuffering);
@@ -3810,9 +3812,7 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
  */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
-    if (ringBuffer->InDVDMenuOrStillFrame())
-        audioOutput->Pause(false);
-    else
+    if (!ringBuffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
     int samplesize = (audio_channels * audio_bits) / 8; // bytes per sample
