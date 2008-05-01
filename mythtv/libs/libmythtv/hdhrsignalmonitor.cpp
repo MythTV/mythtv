@@ -106,6 +106,9 @@ bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
             del_pids.push_back(fit.key());
 
     HDHRChannel *hdhr = dynamic_cast<HDHRChannel*>(channel);
+    if (!hdhr)
+        return false;
+
     // Remove PIDs
     bool ok = true;
     vector<int>::iterator dit = del_pids.begin();
@@ -139,6 +142,9 @@ void HDHRSignalMonitor::RunTableMonitor(void)
     }
 
     HDHRChannel *hdrc = dynamic_cast<HDHRChannel*>(channel);
+    if (!hdrc)
+        return;
+
     uint localPort = hdhomerun_video_get_local_port(_video_socket);
     if (!hdrc->DeviceSetTarget(localPort))
     {
