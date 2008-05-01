@@ -115,7 +115,7 @@ class MPUBLIC DisplayRes {
 
   protected:
     /// \brief DisplayRes is an abstract class, instanciate with GetDisplayRes(void)
-    DisplayRes(void) : max_width(0), max_height(0) {;}
+    DisplayRes(void) : cur_mode(GUI), max_width(0), max_height(0) {;}
     virtual ~DisplayRes(void) {;}
     
     // These methods are implemented by the subclasses
