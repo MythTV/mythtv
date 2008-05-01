@@ -808,12 +808,6 @@ if ($tickets == 1) {
 [ filesame => [$mythtv.'mythtv/4984_mythcontext.patch6',$sources."4984_mythcontext.patch6"], copy => [''=>'',comment => 'XXXX'] ],
 [ grep  => ['MYTHLIBDIR',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < ".$unixmythtv."mythtv/4984_mythcontext.patch6"] , comment => ' .'],
 
-
-# Ticket 4724
-[ archive => $sources.'4724_undo.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4724/win32_storeconnection.patch', comment => 'Applying Ticket 4724'],
-[ filesame => [$mythtv.'mythtv/4724_undo.patch',$sources."4724_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['BLABLA',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth","patch -p0 < ../../".$unixmythtv."mythtv/4724_undo.patch",'nocheck'] , comment => ' .'],
-
 # Ticket 4699
 [ archive => $sources.'4699_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch', comment => 'win32_fs.patch'],
 [ filesame => [$mythtv.'mythtv/4699_win32_fs.patch',$sources."4699_win32_fs.patch"], copy => [''=>'',comment => 'XXXX'] ],
