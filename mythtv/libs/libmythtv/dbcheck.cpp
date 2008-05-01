@@ -3587,7 +3587,6 @@ thequery,
 
     if (dbver == "1213")
     {
-        VERBOSE(VB_IMPORTANT, "In 1213 upg");
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT hostname "
                       "FROM displayprofilegroups "
