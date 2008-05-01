@@ -7,14 +7,16 @@
   
 #include "jitterometer.h"
 
-Jitterometer::Jitterometer(const char *nname, int ncycles)
+Jitterometer::Jitterometer(const char *nname, int ncycles) :
+    count(0), num_cycles(ncycles), starttime_valid(0)
 {
-  times = (unsigned *)malloc(ncycles * sizeof(unsigned));
-  
-  count = 0;
-  starttime_valid = 0;
-  num_cycles = ncycles;
-  name = strdup(nname);
+    times = (unsigned*) malloc(ncycles * sizeof(unsigned));
+    memset(&starttime, 0, sizeof(struct timeval));
+
+    if (nname)
+        name = strdup(nname);
+    else
+        name = strdup("jitterometer");
 }
 
 Jitterometer::~Jitterometer()
