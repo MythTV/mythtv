@@ -465,10 +465,12 @@ class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
             }
         }
 
-        virtual const QString getValue() {
+        virtual QString getValue(void) const
+        {
             if (listItem)
             {
-                syncDBFromItem();
+                ManagedListSetting* th = const_cast<ManagedListSetting*>(this);
+                th->syncDBFromItem();
                 return listItem->getValue();
             }
             else
