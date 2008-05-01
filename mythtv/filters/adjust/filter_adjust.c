@@ -238,8 +238,8 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
                  int *width, int *height, char *options)
 {
     ThisFilter *filter;
-    int numopts, ymin, ymax, cmin, cmax;
-    float ygamma, cgamma;
+    int numopts = 0, ymin = 16, ymax = 253, cmin = 16, cmax = 240;
+    float ygamma = 1.0f, cgamma = 1.0f;
     (void) width;
     (void) height;
 
@@ -251,7 +251,6 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    numopts = 0;
     if (options)
         numopts = sscanf(options, "%d:%d:%f:%d:%d:%f", &ymin, &ymax, &ygamma,
                          &cmin, &cmax, &cgamma);
@@ -260,10 +259,10 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     {
         ymin = 16;
         ymax = 253;
-        ygamma = 1.0;
+        ygamma = 1.0f;
         cmin = 16;
         cmax = 240;
-        cgamma = 1.0;
+        cgamma = 1.0f;
     }
 
     filter = malloc (sizeof (ThisFilter));
