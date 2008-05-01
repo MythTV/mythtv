@@ -44,8 +44,8 @@ typedef Q3ValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
-typedef ProgramInfo * (*RUNPLAYBACKBOX)(void *, bool);
-typedef void (*RUNVIEWSCHEDULED) (void *, bool);
+typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
+typedef void (*EMBEDRETURNVOID) (void *, bool);
 
 class VBIMode
 {
@@ -252,8 +252,6 @@ class MPUBLIC TV : public QObject
 
   protected:
     void doEditSchedule(int editType = kScheduleProgramGuide);
-    static void *RecordedShowMenuHandler(void *param);
-    static void *ViewScheduledMenuHandler(void *param);
 
     void RunTV(void);
     static void *EventThread(void *param);
@@ -261,8 +259,8 @@ class MPUBLIC TV : public QObject
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
-    static RUNPLAYBACKBOX RunPlaybackBoxPtr;
-    static RUNVIEWSCHEDULED RunViewScheduledPtr;
+    static EMBEDRETURNPROGRAM RunPlaybackBoxPtr;
+    static EMBEDRETURNVOID RunViewScheduledPtr;
 
   private:
     bool RequestNextRecorder(bool showDialogs);
@@ -374,7 +372,6 @@ class MPUBLIC TV : public QObject
     void HandleOSDAskAllowResponse(void);
 
     void EditSchedule(int editType = kScheduleProgramGuide);
-    void EmbedWithNewThread(int editType);
 
     void SetupPlayer(bool isWatchingRecording);
     void TeardownPlayer(void);

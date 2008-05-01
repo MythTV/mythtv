@@ -78,12 +78,12 @@ QStringList TV::lastProgramStringList = QStringList();
 /**
  * \brief function pointer for RunPlaybackBox in playbackbox.cpp
  */
-RUNPLAYBACKBOX TV::RunPlaybackBoxPtr = NULL;
+EMBEDRETURNPROGRAM TV::RunPlaybackBoxPtr = NULL;
 
 /**
  * \brief function pointer for RunViewScheduled in viewscheduled.cpp
  */
-RUNVIEWSCHEDULED TV::RunViewScheduledPtr = NULL;
+EMBEDRETURNVOID TV::RunViewScheduledPtr = NULL;
 
 
 /**
@@ -294,9 +294,9 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 {
     QString name(string);
     if (name == "playbackbox")
-        RunPlaybackBoxPtr = (RUNPLAYBACKBOX)lptr;
+        RunPlaybackBoxPtr = (EMBEDRETURNPROGRAM)lptr;
     else if (name == "viewscheduled")
-        RunViewScheduledPtr = (RUNVIEWSCHEDULED)lptr;
+        RunViewScheduledPtr = (EMBEDRETURNVOID)lptr;
 }
 
 void TV::InitKeys(void)
@@ -3262,7 +3262,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
         }
         else if (action == "VIEWSCHEDULED")
-            EmbedWithNewThread(kViewSchedule);
+            EditSchedule(kViewSchedule);
         else if (action == "JUMPREC")
         {
             if (gContext->GetNumSetting("JumpToProgramOSD", 1) 
@@ -3271,7 +3271,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DisplayJumpMenuSoon();
             }
             else if (RunPlaybackBoxPtr)
-                EmbedWithNewThread(kPlaybackBox);
+                EditSchedule(kPlaybackBox);
         }
         else if (action == "SIGNALMON")
         {
@@ -5823,20 +5823,6 @@ void TV::DrawUnusedRects(bool sync)
         nvp->DrawUnusedRects(sync);
 }
 
-void *TV::ViewScheduledMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kViewSchedule);
-    return NULL;
-}
-
-void *TV::RecordedShowMenuHandler(void *param)
-{
-    TV *obj = (TV *)param;
-    obj->doEditSchedule(kPlaybackBox);
-    return NULL;
-}
-
 /**
  * \brief Used by EditSchedule(). Unpauses embedded tv based on whether theme 
     exists and/or if knob to continued playback is enabled
@@ -5989,36 +5975,6 @@ void TV::doEditSchedule(int editType)
         nvp->DiscardVideoFrames(true);
 
     menurunning = false;
-}
-
-/**
- * \brief create new thread to invoke function pointers used for
- * embedding the tv player in other containers. Example: playbackbox 
- */
-void TV::EmbedWithNewThread(int editType)
-{
-    if (menurunning != true)
-    {
-        menurunning = true;
-        pthread_t tid;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-        switch (editType)
-        {
-            case kViewSchedule:
-                pthread_create(&tid, &attr, TV::ViewScheduledMenuHandler, this);
-                break;
-            case kPlaybackBox:
-                pthread_create(&tid, &attr, TV::RecordedShowMenuHandler, this);
-                break;
-        }
-
-        pthread_attr_destroy(&attr);
-
-        return;
-    }
 }
 
 void TV::EditSchedule(int editType)
@@ -7389,7 +7345,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         }
     }
     else if (action == "VIEWSCHEDULED")
-        EmbedWithNewThread(kViewSchedule);
+        EditSchedule(kViewSchedule);
     else if (action == "JUMPREC")
     {
         if (gContext->GetNumSetting("JumpToProgramOSD", 1)
@@ -7398,7 +7354,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             DisplayJumpMenuSoon();
         }
          else if (RunPlaybackBoxPtr)
-            EmbedWithNewThread(kPlaybackBox);
+            EditSchedule(kPlaybackBox);
     }
     else if (StateIsLiveTV(GetState()))
     {

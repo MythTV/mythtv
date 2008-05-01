@@ -29,7 +29,6 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-QWaitCondition vsbIsVisibleCond;
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
@@ -38,10 +37,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
     ViewScheduled *vsb = new ViewScheduled(gContext->GetMainWindow(),
                             "view scheduled", (TV*)player, showTV);
     vsb->Show();
-    qApp->unlock();
-    QMutex vsb_lock;
-    vsb_lock.lock();
-    vsbIsVisibleCond.wait(&vsb_lock);
+    vsb->exec();
     delete vsb;
 
     return NULL;
@@ -150,10 +146,7 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
             else if (action == "DETAILS")
                 details();
             else if (action == "ESCAPE" || action == "LEFT")
-            {
-                vsbIsVisibleCond.wakeAll();
                 done(MythDialog::Accepted);
-            }
             else if (action == "UP")
                 cursorUp();
             else if (action == "DOWN")

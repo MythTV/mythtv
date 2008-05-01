@@ -60,8 +60,6 @@ using namespace std;
 
 #define USE_PREV_GEN_THREAD
 
-QWaitCondition pbbIsVisibleCond;
-
 const uint PreviewGenState::maxAttempts     = 5;
 const uint PreviewGenState::minBlockSeconds = 60;
 
@@ -206,20 +204,11 @@ static int comp_recordDate_rev(ProgramInfo *a, ProgramInfo *b)
 ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
     ProgramInfo *nextProgram = NULL;
-    qApp->lock();
 
     PlaybackBox *pbb = new PlaybackBox(PlaybackBox::Play,
             gContext->GetMainWindow(), "tvplayselect", (TV *)player, showTV);
     pbb->Show();
-
-    qApp->unlock();
-
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    pbbIsVisibleCond.wait( &mutex );
+    pbb->exec();
 
     if (pbb->getSelected())
         nextProgram = new ProgramInfo(*pbb->getSelected());
@@ -314,8 +303,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
     inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     if (!player)
+    {
         previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
-    previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
+        previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
+    }
     previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
     drawTransPixmap    = gContext->LoadScalePixmap("trans-backup.png");
     if (!drawTransPixmap)
@@ -672,7 +663,6 @@ void PlaybackBox::exitWin()
         if (curitem)
             delete curitem;
         curitem = NULL;
-        pbbIsVisibleCond.wakeAll();
     }
     else
         killPlayerSafe();
@@ -2518,7 +2508,6 @@ void PlaybackBox::playSelected()
 
     if (m_player)
     {
-        pbbIsVisibleCond.wakeAll();
         accept();
     }
 }
