@@ -203,7 +203,7 @@ uint FIRFilter::evaluate(SAMPLETYPE *dest, const SAMPLETYPE *src, uint numSample
     assert(length > 0);
     assert(lengthDiv8 * 8 == length);
     if (numSamples < length) return 0;
-    assert(resultDivFactor >= 0);
+    //assert(resultDivFactor >= 0); // Commented out in MythTV : see #4846
     if (numChannels == 2) 
     {
         return evaluateFilterStereo(dest, src, numSamples);
