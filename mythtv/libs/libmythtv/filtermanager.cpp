@@ -17,6 +17,10 @@
 #include "filtermanager.h"
 #include "mythcontext.h"
 
+#define LOC QString("FilterManager: ")
+#define LOC_WARN QString("FilterManager, Warning: ")
+#define LOC_ERR QString("FilterManager, Error: ")
+
 static const char *FmtToString(VideoFrameType ft)
 {
     switch(ft)
@@ -76,7 +80,6 @@ void FilterChain::deleteItem(Q3PtrCollection::Item d)
 FilterManager::FilterManager()
 {
     QDir FiltDir(gContext->GetFiltersDir());
-    QString Path;
 
     FiltDir.setFilter(QDir::Files | QDir::Readable);
     if (FiltDir.exists())
@@ -85,62 +88,116 @@ FilterManager::FilterManager()
         for (QStringList::iterator i = LibList.begin(); i != LibList.end();
              i++)
         {
-            Path = FiltDir.filePath(*i);
-            if (Path.length() > 1)
-                LoadFilterLib(Path);
+            QString path = FiltDir.filePath(*i);
+            if (path.length() <= 1)
+                continue;
+
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Loading filter '%1'").arg(path));
+
+            if (!LoadFilterLib(path))
+            {
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Failed to load filter library: %1").arg(path));
+            }
         }
     }
 }
 
 FilterManager::~FilterManager()
 {
-    for (Q3PtrListIterator<FilterInfo> i(Filters); i.current (); ++i)
+    filter_map_t::iterator itf = filters.begin();
+    for (; itf != filters.end(); ++itf)
     {
-        free(i.current()->symbol);
-        free(i.current()->name);
-        free(i.current()->descript);
-        free(i.current()->libname);
-        delete [] (i.current()->formats);
-        delete i.current();
+        FilterInfo *tmp = itf->second;
+        itf->second = NULL;
+
+        free(tmp->symbol);
+        free(tmp->name);
+        free(tmp->descript);
+        free(tmp->libname);
+        delete [] (tmp->formats);
+        delete tmp;
     }
+    filters.clear();
+
+    library_map_t::iterator ith = dlhandles.begin();
+    for (; ith != dlhandles.end(); ++ith)
+    {
+        void *tmp = ith->second;
+        ith->second = NULL;
+        dlclose(tmp);
+    }
+    dlhandles.clear();
 }
 
-void FilterManager::LoadFilterLib(QString Path)
+bool FilterManager::LoadFilterLib(const QString &path)
 {
-    void *handle;
-    int i;
-    FilterInfo *FiltInfo;
+    dlerror(); // clear out any pre-existing dlerrors
 
-    handle = dlopen(Path.ascii(), RTLD_LAZY);
-    if (handle)
+    void *dlhandle = NULL;
+    library_map_t::iterator it = dlhandles.find(path);
+    if (it != dlhandles.end())
+        dlhandle = it->second;
+
+    if (!dlhandle)
     {
-        FiltInfo = (FilterInfo *)dlsym(handle, "filter_table");
-        if (FiltInfo)
+        dlhandle = dlopen(path.ascii(), RTLD_LAZY);
+        if (!dlhandle)
         {
-            for (; FiltInfo->symbol != NULL; FiltInfo++)
-            {
-                if (FiltInfo->symbol == NULL || FiltInfo->name == NULL
-                    || FiltInfo->formats == NULL)
-                    break;
-
-                FilterInfo *NewFilt = new FilterInfo;
-                NewFilt->symbol = strdup(FiltInfo->symbol);
-                NewFilt->name = strdup(FiltInfo->name);
-                NewFilt->descript = strdup(FiltInfo->descript);
-
-                for (i = 0; FiltInfo->formats[i].in != FMT_NONE; i++)
-                     ;
-
-                NewFilt->formats = new FmtConv[i + 1];
-                memcpy(NewFilt->formats, FiltInfo->formats,
-                       sizeof(FmtConv) * (i + 1));
-
-                NewFilt->libname = strdup(Path.ascii());
-                FilterByName.insert(NewFilt->name, NewFilt);
-                Filters.append(NewFilt);
-            }
+            const char *errmsg = dlerror();
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load filter library: " +
+                    QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
+            return false;
         }
+        dlhandles[path] = dlhandle;
     }
+
+    FilterInfo *filtInfo = (FilterInfo*) dlsym(dlhandle, "filter_table");
+    if (!filtInfo)
+    {
+        const char *errmsg = dlerror();
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load filter symbol: " +
+                QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
+        return false;        
+    }
+
+    for (; filtInfo->symbol; filtInfo++)
+    {
+        if (!filtInfo->symbol || !filtInfo->name || !filtInfo->formats)
+            break;
+
+        FilterInfo *newFilter = new FilterInfo;
+        newFilter->symbol   = strdup(filtInfo->symbol);
+        newFilter->name     = strdup(filtInfo->name);
+        newFilter->descript = strdup(filtInfo->descript);
+
+        int i = 0;
+        for (; filtInfo->formats[i].in != FMT_NONE; i++);
+
+        newFilter->formats = new FmtConv[i + 1];
+        memcpy(newFilter->formats, filtInfo->formats,
+               sizeof(FmtConv) * (i + 1));
+
+        newFilter->libname = strdup(path.ascii());
+        filters[newFilter->name] = newFilter;
+        VERBOSE(VB_PLAYBACK, LOC + QString("filters[%1] = ")
+                .arg(newFilter->name) << newFilter);
+    }
+    return true;
+}
+
+const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
+{
+    const FilterInfo *finfo = NULL;
+    filter_map_t::const_iterator it = filters.find(name);
+    if (it != filters.end())
+        finfo = it->second;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("GetFilterInfo(%1)").arg(name) +
+            " returning: "<<finfo);
+
+    return finfo;
 }
 
 FilterChain *FilterManager::LoadFilters(QString Filters, 
@@ -148,12 +205,16 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                                         VideoFrameType &outpixfmt, int &width,
                                         int &height, int &bufsize)
 {
+    if (Filters.lower() == "none")
+        return NULL;
+
     Q3PtrList<FilterInfo> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
     Q3PtrList<FmtConv> FmtList;
-    FilterInfo *FI, *FI2;
+    const FilterInfo *FI;
+    FilterInfo *FI2;
     QString Opts;
-    FilterInfo *Convert = GetFilterInfoByName("convert");
+    const FilterInfo *Convert = GetFilterInfo("convert");
     Q3StrList OptsList (TRUE);
     QStringList FilterList = QStringList::split(",", Filters);
     VideoFilter *NewFilt = NULL;
@@ -172,7 +233,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     {
         QString FiltName = (*i).section('=', 0, 0);
         QString FiltOpts = (*i).section('=', 1);
-        FI = GetFilterInfoByName(FiltName);
+        FI = GetFilterInfo(FiltName);
 
         if (FI)
         {
@@ -181,8 +242,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
-                    "filter '%1', no such filter exists").arg(FiltName));
+            VERBOSE(VB_IMPORTANT, LOC + QString(
+                        "Failed to load filter '%1', "
+                        "no such filter exists").arg(FiltName));
             FiltInfoChain.clear();
             break;
         }
