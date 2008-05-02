@@ -46,10 +46,12 @@ class FillData
         refresh_tba(true),              dd_grab_all(false),
         dddataretrieved(false),
         need_post_grab_proc(true),      only_update_channels(false),
-        channel_update_run(false) {
-	    for( int i = 0; i < REFRESH_MAX; i++ ) refresh_request[i] = false;
-	    refresh_request[1] = true;
-	}
+        channel_update_run(false),      refresh_all(false)
+    {
+        SetRefresh(1, true);
+    }
+
+    void SetRefresh(int day, bool set);
 
     void DataDirectStationUpdate(Source source, bool update_icons = true);
     bool DataDirectUpdateChannels(Source source);
@@ -63,6 +65,12 @@ class FillData
     ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine);
     void readXawtvChannels(int id, QString xawrcfile);
 
+    enum
+    {
+        kRefreshClear = 0xFFFF0,
+        kRefreshAll   = 0xFFFF1,
+    };
+
   public:
     ProgramData         prog_data;
     ChannelData         chan_data;
@@ -74,11 +82,10 @@ class FillData
     QString lastdduserid;
     QString graboptions;
     int     raw_lineup;
-    int     maxDays;
+    uint    maxDays;
 
     bool    interrupted;
     bool    endofdata;
-    bool    refresh_request[REFRESH_MAX];
     bool    refresh_tba;
     bool    dd_grab_all;
     bool    dddataretrieved;
@@ -87,6 +94,8 @@ class FillData
     bool    channel_update_run;
 
   private:
+    QMap<uint,bool>     refresh_day;
+    bool                refresh_all;
     mutable QStringList fatalErrors;
 };
 

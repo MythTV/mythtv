@@ -35,6 +35,23 @@ using namespace std;
 #define LOC_WARN QString("FillData, Warning: ")
 #define LOC_ERR QString("FillData, Error: ")
 
+void FillData::SetRefresh(int day, bool set)
+{
+    if (kRefreshClear == day)
+    {
+        refresh_all = set;
+        refresh_day.clear();
+    }
+    else if (kRefreshAll == day)
+    {
+        refresh_all = set;
+    }
+    else
+    {
+        refresh_day[(uint)day] = set;
+    }
+}
+
 // DataDirect stuff
 void FillData::DataDirectStationUpdate(Source source, bool update_icons)
 {
@@ -701,17 +718,16 @@ bool FillData::Run(SourceList &sourcelist)
 
             // We'll keep grabbing until it returns nothing
             // Max days currently supported is 21
-            int grabdays = REFRESH_MAX;
+            int grabdays = (is_grabber_datadirect(xmltv_grabber)) ?
+                14 : REFRESH_MAX;
 
-            if (maxDays > 0) // passed with --max-days
-                grabdays = maxDays;
-            else if (is_grabber_datadirect(xmltv_grabber))
-                grabdays = 14;
+            grabdays = (maxDays > 0)          ? maxDays : grabdays;
+            grabdays = (only_update_channels) ? 1       : grabdays;
 
-            grabdays = (only_update_channels) ? 1 : grabdays;
-
-            if (grabdays == 1)
-                refresh_request[0] = true;
+            vector<bool> refresh_request;
+            refresh_request.resize(grabdays, refresh_all);
+            for (uint i = 0; i < refresh_request.size(); i++)
+                refresh_request[i] = refresh_day[i];
 
             if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)
             {

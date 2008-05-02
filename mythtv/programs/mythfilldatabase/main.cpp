@@ -205,30 +205,33 @@ int main(int argc, char *argv[])
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
-            fill_data.maxDays = QString(a.argv()[++argpos]).toInt();
+            fill_data.maxDays = QString(a.argv()[++argpos]).toUInt();
 
-            if (fill_data.maxDays < 1 || fill_data.maxDays > REFRESH_MAX)
+            if (fill_data.maxDays < 1)
             {
                 printf("ignoring invalid parameter for --max-days\n");
                 fill_data.maxDays = 0;
             }
+            else if (fill_data.maxDays == 1)
+            {
+                fill_data.SetRefresh(0, true);
+            }
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-today"))
         {
-            fill_data.refresh_request[0] = true;
+            fill_data.SetRefresh(0, true);
         }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tomorrow"))
         {
-            fill_data.refresh_request[1] = false;
+            fill_data.SetRefresh(1, false);
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-second"))
         {
-            fill_data.refresh_request[2] = true;
+            fill_data.SetRefresh(2, true);
         }
         else if (!strcmp(a.argv()[argpos], "--refresh-all"))
         {
-	  for( int i = 0; i < REFRESH_MAX; i++ )
-            fill_data.refresh_request[i] = true;
+            fill_data.SetRefresh(FillData::kRefreshAll, true);
         }
 	else if (!strcmp(a.argv()[argpos], "--refresh-day"))
         {
@@ -238,15 +241,16 @@ int main(int argc, char *argv[])
                 return FILLDB_EXIT_INVALID_CMDLINE;
             }
 
-            int day = QString(a.argv()[++argpos]).toInt();
+            bool ok = true;
+            uint day = QString(a.argv()[++argpos]).toUInt(&ok);
 
-            if (day < 0 || day > REFRESH_MAX)
+            if (!ok)
             {
                 printf("ignoring invalid parameter for --refresh-day\n");
             }
 	    else
 	    {
-	      fill_data.refresh_request[day] = true;
+                fill_data.SetRefresh(day, true);
 	    }
         }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
@@ -274,14 +278,11 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
-#if 0
         else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
         {
+            fill_data.SetRefresh(FillData::kRefreshClear, false);
             fill_data.dd_grab_all = true;
-	    for( int i = 0; i < REFRESH_MAX; i++ )
-	      fill_data.refresh_request[i] = false;
         }
-#endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
             print_verbose_messages = VB_NONE;
