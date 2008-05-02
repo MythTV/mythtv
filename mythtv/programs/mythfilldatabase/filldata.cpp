@@ -81,10 +81,11 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
 
 bool FillData::DataDirectUpdateChannels(Source source)
 {
-    if (source.xmltvgrabber == "datadirect")
-        ddprocessor.SetListingsProvider(DD_ZAP2IT);
-    else if (source.xmltvgrabber == "schedulesdirect1")
-        ddprocessor.SetListingsProvider(DD_SCHEDULES_DIRECT);
+    if (get_datadirect_provider(source.xmltvgrabber) >= 0)
+    {
+        ddprocessor.SetListingsProvider(
+            get_datadirect_provider(source.xmltvgrabber));
+    }
     else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -299,10 +300,15 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 
-    if (xmltv_grabber == "datadirect")
-        return GrabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
-    if (xmltv_grabber == "schedulesdirect1")
-        return GrabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
+    int dd_provider = get_datadirect_provider(xmltv_grabber);
+    if (dd_provider >= 0)
+    {
+        if (!GrabDDData(source, offset, *qCurrentDate, dd_provider))
+        {
+            return false;
+        }
+        return true;
+    }
 
 #ifdef USING_MINGW
     char tempfilename[MAX_PATH] = "";
