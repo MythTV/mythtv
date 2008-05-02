@@ -259,7 +259,7 @@ class MPUBLIC DataDirectProcessor
                         QString userid = "", QString password = "");
    ~DataDirectProcessor();
 
-    QString CreateTempDirectory(void);
+    QString CreateTempDirectory(bool *ok = NULL);
 
     // web service commands
     bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
@@ -332,6 +332,8 @@ class MPUBLIC DataDirectProcessor
     // static command, makes Labs and Schedules Direct ProgramIDs compatible.
     static void FixProgramIDs(void);
 
+    QStringList GetFatalErrors(void) const { return fatalErrors; }
+
   private:
     void CreateTempTables(void);
     void CreateATempTable(const QString &ptablename,
@@ -340,9 +342,12 @@ class MPUBLIC DataDirectProcessor
     bool ParseLineups(const QString &documentFile);
     bool ParseLineup(const QString &lineupid, const QString &documentFile);
 
-    QString GetPostFilename(void) const;
-    QString GetResultFilename(void) const;
-    QString GetCookieFilename(void) const;
+    void CreateTemp(const QString &templatefilename, const QString &errmsg,
+                    bool directory, QString &filename, bool &ok) const;
+
+    QString GetPostFilename  (bool &ok) const;
+    QString GetResultFilename(bool &ok) const;
+    QString GetCookieFilename(bool &ok) const;
 
     void SetAll(const QString &lineupid, bool val);
     void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
@@ -381,6 +386,8 @@ class MPUBLIC DataDirectProcessor
     mutable QString tmpResultFile;
     mutable QString cookieFile;
     QDateTime       cookieFileDT;
+
+    mutable QStringList fatalErrors;
 };
 
 #endif

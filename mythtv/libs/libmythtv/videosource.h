@@ -34,6 +34,16 @@ static inline bool is_grabber_datadirect(const QString &grabber)
     return (grabber == "datadirect") || (grabber == "schedulesdirect1");
 }
 
+static inline int get_datadirect_provider(const QString &grabber)
+{
+    if (grabber == "datadirect")
+        return DD_ZAP2IT;
+    else if (grabber == "schedulesdirect1")
+        return DD_SCHEDULES_DIRECT;
+    else
+        return -1;
+}
+
 static inline bool is_grabber_labs(const QString &grabber)
 {
     return grabber == "datadirect";

@@ -566,13 +566,6 @@ DataDirectProcessor::~DataDirectProcessor()
         rmdir(tmpDir.ascii());
 }
 
-QString DataDirectProcessor::CreateTempDirectory(void)
-{
-    if (tmpDir == "/tmp")
-        tmpDir = createTempFile("/tmp/mythtv_ddp_XXXXXX", true);
-    return Q3DeepCopy<QString>(tmpDir);
-}
-
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
@@ -1003,11 +996,27 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     QString ddurl = providers[listings_provider].webServiceURL;
 
-    QFile postfile(GetPostFilename());
+    bool ok;
+    QString postFilename = GetPostFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabNextSuggestedTime: "
+                "Creating temp post file");
+        return false;
+    }
+    QString resultFilename = GetResultFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabNextSuggestedTime: "
+                "Creating temp result file");
+        return false;
+    }
+
+    QFile postfile(postFilename);
     if (!postfile.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
-                .arg(GetPostFilename()) + ENO);
+                .arg(postFilename) + ENO);
         return false;
     }
 
@@ -1029,8 +1038,8 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' %4 --output-document='%5'")
         .arg(GetUserID().replace('\'', "'\\''"))
-        .arg(GetPassword().replace('\'', "'\\''")).arg(GetPostFilename())
-        .arg(ddurl).arg(GetResultFilename());
+        .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
+        .arg(ddurl).arg(resultFilename);
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
@@ -1042,7 +1051,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
 
-    QFile file(GetResultFilename());
+    QFile file(resultFilename);
 
     bool GotNextSuggestedTime = false;
     bool GotBlockedTime = false;
@@ -1162,8 +1171,16 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         }
     }
 
+    bool ok;
+    QString postFilename = GetPostFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabData: Creating temp post file");
+        return false;
+    }
+
     bool fp_is_pipe;
-    FILE *fp = DDPost(ddurl, GetPostFilename(), inputfile,
+    FILE *fp = DDPost(ddurl, postFilename, inputfile,
                       GetUserID(), GetPassword(),
                       pstartDate, pendDate, err, fp_is_pipe);
     if (!fp)
@@ -1208,7 +1225,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
                         LOC_ERR + "Failed to save DD cache! "
                         "redownloading data...");
                 cachedata = false;
-                fp = DDPost(ddurl, GetPostFilename(), inputfile,
+                fp = DDPost(ddurl, postFilename, inputfile,
                             GetUserID(), GetPassword(),
                             pstartDate, pendDate, err, fp_is_pipe);
             }
@@ -1222,7 +1239,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         return false;
     }
 
-    bool ok = true;
+    ok = true;
     QFile f;
     if (f.open(QIODevice::ReadOnly, fp))
     {
@@ -1370,12 +1387,28 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
     QString labsURL   = providers[listings_provider].webURL;
     QString loginPage = providers[listings_provider].loginPage;
 
-    bool ok = Post(labsURL + loginPage, list, GetResultFilename(), "",
-                   GetCookieFilename());
+    bool ok;
+    QString resultFilename = GetResultFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabLoginCookiesAndLineups: "
+                "Creating temp result file");
+        return false;
+    }
+    QString cookieFilename = GetCookieFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabLoginCookiesAndLineups: "
+                "Creating temp cookie file");
+        return false;
+    }
 
-    bool got_cookie = QFileInfo(GetCookieFilename()).size() > 100;
+    ok = Post(labsURL + loginPage, list, resultFilename, "",
+              cookieFilename);
 
-    ok &= got_cookie && (!parse_lineups || ParseLineups(GetResultFilename()));
+    bool got_cookie = QFileInfo(cookieFilename).size() > 100;
+
+    ok &= got_cookie && (!parse_lineups || ParseLineups(resultFilename));
     if (ok)
         cookieFileDT = QDateTime::currentDateTime();
 
@@ -1397,11 +1430,27 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
     list.push_back(PostItem("lineup_id", lineupid));
     list.push_back(PostItem("submit",    "Modify"));
 
-    QString labsURL = providers[listings_provider].webURL;
-    bool ok = Post(labsURL + (*it).get_action, list, GetResultFilename(),
-                   GetCookieFilename(), "");
+    bool ok;
+    QString resultFilename = GetResultFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabLoginCookiesAndLineups: "
+                "Creating temp result file");
+        return false;
+    }
+    QString cookieFilename = GetCookieFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabLoginCookiesAndLineups: "
+                "Creating temp cookie file");
+        return false;
+    }
 
-    return ok && ParseLineup(lineupid, GetResultFilename());
+    QString labsURL = providers[listings_provider].webURL;
+    ok = Post(labsURL + (*it).get_action, list, resultFilename,
+                   cookieFilename, "");
+
+    return ok && ParseLineup(lineupid, resultFilename);
 }
 
 void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
@@ -1679,9 +1728,18 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
     VERBOSE(VB_GENERAL, QString("Saving lineup %1 with %2 channels")
             .arg(lineupid).arg(list.size() - 1));
 
+    bool ok;
+    QString cookieFilename = GetCookieFilename(ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GrabLoginCookiesAndLineups: "
+                "Creating temp cookie file");
+        return false;
+    }
+
     QString labsURL = providers[listings_provider].webURL;
     return Post(labsURL + lineup.set_action, list, "",
-                GetCookieFilename(), "");
+                cookieFilename, "");
 }
 
 bool DataDirectProcessor::UpdateListings(uint sourceid)
@@ -1758,24 +1816,69 @@ RawLineup DataDirectProcessor::GetRawLineup(const QString &lineupid) const
     return (*it);
 }
 
-QString DataDirectProcessor::GetPostFilename(void) const
+void DataDirectProcessor::CreateTemp(
+    const QString &templatefilename,
+    const QString &errmsg,
+    bool           directory,
+    QString       &filename,
+    bool          &ok) const
+{
+    QString tmp = createTempFile(templatefilename, directory);
+    if (templatefilename == tmpDir)
+    {
+        fatalErrors.push_back(Q3DeepCopy<QString>(errmsg));
+        ok = false;
+    }
+    else
+    {
+        filename = Q3DeepCopy<QString>(tmp);
+        ok = true;
+    }
+}
+
+QString DataDirectProcessor::CreateTempDirectory(bool *pok)
+{
+    bool ok;
+    pok = (pok) ? pok : &ok;
+    if (tmpDir == "/tmp")
+    {
+        CreateTemp("/tmp/mythtv_ddp_XXXXXX",
+                   "Failed to create temp directory",
+                   true, tmpDir, *pok);
+    }
+    return Q3DeepCopy<QString>(tmpDir);
+}
+
+QString DataDirectProcessor::GetPostFilename(bool &ok) const
 {
     if (tmpPostFile.isEmpty())
-        tmpPostFile = createTempFile(tmpDir + "/mythtv_post_XXXXXX");
+    {
+        CreateTemp(tmpDir + "/mythtv_post_XXXXXX",
+                   "Failed to create temp post file",
+                   false, tmpPostFile, ok);
+    }
     return Q3DeepCopy<QString>(tmpPostFile);
 }
 
-QString DataDirectProcessor::GetResultFilename(void) const
+QString DataDirectProcessor::GetResultFilename(bool &ok) const
 {
     if (tmpResultFile.isEmpty())
-        tmpResultFile = createTempFile(tmpDir + "/mythtv_result_XXXXXX");
+    {
+        CreateTemp(tmpDir + "/mythtv_result_XXXXXX",
+                   "Failed to create temp result file",
+                   false, tmpResultFile, ok);
+    }
     return Q3DeepCopy<QString>(tmpResultFile);
 }
 
-QString DataDirectProcessor::GetCookieFilename(void) const
+QString DataDirectProcessor::GetCookieFilename(bool &ok) const
 {
     if (cookieFile.isEmpty())
-        cookieFile = createTempFile(tmpDir + "/mythtv_cookies_XXXXXX");
+    {
+        CreateTemp(tmpDir + "/mythtv_cookies_XXXXXX",
+                   "Failed to create temp cookie file",
+                   false, cookieFile, ok);
+    }
     return Q3DeepCopy<QString>(cookieFile);
 }
 
