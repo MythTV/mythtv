@@ -36,8 +36,6 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 #ifdef USING_OSX_FIREWIRE
     device = new DarwinFirewireDevice(guid, subunitid, fw_opts.speed);
 #endif // USING_OSX_FIREWIRE
-
-    InitializeInputs();
 }
 
 bool FirewireChannel::SetChannelByString(const QString &channum)
@@ -121,14 +119,17 @@ bool FirewireChannel::Open(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Open()");
 
-    if (inputs.find(currentInputID) == inputs.end())
-        return false;
-
     if (!device)
         return false;
 
     if (isopen)
         return true;
+
+    if (!InitializeInputs())
+        return false;
+
+    if (inputs.find(currentInputID) == inputs.end())
+        return false;
 
     InputMap::const_iterator it = inputs.find(currentInputID);
     if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
