@@ -916,11 +916,11 @@ cp Makefile_new Makefile
 
 
 # Archive old build before we create a new one with make install:
-[ exists  => $build.'_old',
-  shell   => ['rm -fr '.$unixbuild.'_old'],
+[ exists  => $mythtv.'build_old',
+  shell   => ['rm -fr '.$unixmythtv.'build_old'],
   comment => 'Deleting old build backup'],
 [ exists  => $build,
-  shell   => ['mv '.$unixbuild.' '.$unixbuild.'_old'],
+  shell   => ['mv '.$unixbuild.' '.$unixmythtv.'build_old'],
   comment => 'Renaming build to build_old for backup....'],
 
 # re-install to /c/mythtv/build if we have a newer mythtv build
