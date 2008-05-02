@@ -170,6 +170,9 @@ sub getMovieData {
    if (!$plot) {
       $plot = parseBetween($response, ">Plot Summary:</h5> ", "</div>");
    }
+   if (!$plot) {
+      $plot = parseBetween($response, ">Plot:</h5>", "</div>");
+   }
 
    if ($plot) {
       # replace name links in plot (example 0388795)
@@ -242,7 +245,7 @@ sub getMovieData {
    # parse countries
    $data = parseBetween($response, "Country:</h5>","</div>");
    my $country_pat = qr'/Sections/Countries/[A-Z]+/">([^<]+)</a>'i;
-   my $lcountries = join(",", ($data =~ m/$country_pat/g));
+   my $lcountries = trim(join(",", ($data =~ m/$country_pat/g)));
 
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
