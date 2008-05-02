@@ -85,6 +85,9 @@ class FillData
     bool    need_post_grab_proc;
     bool    only_update_channels;
     bool    channel_update_run;
+
+  private:
+    mutable QStringList fatalErrors;
 };
 
 #endif // _FILLDATA_H_

@@ -23,6 +23,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "compat.h"
+#include "util.h"
 
 // libmythtv headers
 #include "videosource.h" // for is_grabber..
@@ -305,23 +306,20 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     {
         if (!GrabDDData(source, offset, *qCurrentDate, dd_provider))
         {
+            QStringList errors = ddprocessor.GetFatalErrors();
+            for (int i = 0; i < errors.size(); i++)
+                fatalErrors.push_back(errors[i]);
             return false;
         }
         return true;
     }
 
-#ifdef USING_MINGW
-    char tempfilename[MAX_PATH] = "";
-    if (GetTempFileNameA("%TEMP%", "mth", 0, tempfilename) == 0)
-#else
-    char tempfilename[] = "/tmp/mythXXXXXX";
-    if (mkstemp(tempfilename) == -1)
-#endif
+    const QString templatename = "/tmp/mythXXXXXX";
+    const QString tempfilename = createTempFile(templatename);
+    if (templatename == tempfilename)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Error creating temporary file in /tmp, %1")
-                .arg(strerror(errno)));
-        exit(FILLDB_BUGGY_EXIT_ERR_OPEN_TMPFILE);
+        fatalErrors.push_back("Failed to create temporary file.");
+        return false;
     }
 
     QString filename = QString(tempfilename);
@@ -491,6 +489,8 @@ bool FillData::Run(SourceList &sourcelist)
 
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
     {
+        if (!fatalErrors.empty())
+            break;
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
@@ -721,6 +721,9 @@ bool FillData::Run(SourceList &sourcelist)
 
             for (int i = 0; i < grabdays; i++)
             {
+                if (!fatalErrors.empty())
+                    break;
+
                 // We need to check and see if the current date has changed 
                 // since we started in this loop.  If it has, we need to adjust
                 // the value of 'i' to compensate for this.
@@ -894,7 +897,7 @@ bool FillData::Run(SourceList &sourcelist)
                     if (!GrabData(*it, i, &qCurrentDate))
                     {
                         ++failures;
-                        if (interrupted)
+                        if (!fatalErrors.empty() || interrupted)
                         {
                             break;
                         }
@@ -914,6 +917,8 @@ bool FillData::Run(SourceList &sourcelist)
                                     ", skipping");
                 }
             }
+            if (!fatalErrors.empty())
+                break;
         }
         else
         {
@@ -946,6 +951,16 @@ bool FillData::Run(SourceList &sourcelist)
         {
             nonewdata++;
         }
+    }
+
+    if (!fatalErrors.empty())
+    {
+        for (int i = 0; i < fatalErrors.size(); i++)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Encountered Fatal Error: " +
+                    fatalErrors[i]);
+        }
+        return false;
     }
 
     if (only_update_channels && !need_post_grab_proc)

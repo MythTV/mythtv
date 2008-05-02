@@ -90,8 +90,7 @@
 #define FILLDB_EXIT_GRAB_DATA_FAILED              GENERIC_EXIT_START-3
 
 #define FILLDB_BUGGY_EXIT_SRC_IS_DD               GENERIC_EXIT_START-4
-#define FILLDB_BUGGY_EXIT_ERR_OPEN_TMPFILE        GENERIC_EXIT_START-5
-#define FILLDB_EXIT_START                         GENERIC_EXIT_START-5
+#define FILLDB_EXIT_START                         GENERIC_EXIT_START-4
 
 // mythjobqueue
 #define JOBQUEUE_EXIT_OK                          GENERIC_EXIT_OK
