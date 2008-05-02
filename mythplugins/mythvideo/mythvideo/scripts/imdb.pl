@@ -39,7 +39,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std;
 
 $title = "IMDB Query";
-$version = "v1.3.4";
+$version = "v1.3.5";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 my @countries = qw(USA UK Canada Japan);
