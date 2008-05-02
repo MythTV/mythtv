@@ -1985,8 +1985,10 @@ void TV::SetupPlayer(bool isWatchingRecording)
     int udp_port = gContext->GetNumSetting("UDPNotifyPort");
     if (udp_port > 0)
     {
+/* HACK begin -- DISABLED UNTIL THIS IS PORTED TO Qt4
         if (udpnotify == NULL)
             udpnotify = new UDPNotify(this, udp_port);
+   HACK end   -- DISABLED UNTIL THIS IS PORTED TO Qt4 */
     }
     else
         udpnotify = NULL;
