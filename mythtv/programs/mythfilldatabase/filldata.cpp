@@ -17,7 +17,6 @@ using namespace std;
 #include <qfile.h>
 #include <q3process.h>
 #include <QList>
-#include <Q3ValueList>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -30,6 +29,10 @@ using namespace std;
 
 // filldata headers
 #include "filldata.h"
+
+#define LOC QString("FillData: ")
+#define LOC_WARN QString("FillData, Warning: ")
+#define LOC_ERR QString("FillData, Error: ")
 
 // DataDirect stuff
 void FillData::DataDirectStationUpdate(Source source, bool update_icons)
@@ -84,8 +87,8 @@ bool FillData::DataDirectUpdateChannels(Source source)
         ddprocessor.SetListingsProvider(DD_SCHEDULES_DIRECT);
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                "FillData: We only support DataDirectUpdateChannels with "
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "We only support DataDirectUpdateChannels with "
                 "TMS Labs and Schedules Direct.");
         return false;
     }
@@ -112,7 +115,7 @@ bool FillData::DataDirectUpdateChannels(Source source)
     return ok;
 }
 
-bool FillData::grabDDData(Source source, int poffset,
+bool FillData::GrabDDData(Source source, int poffset,
                           QDate pdate, int ddSource) 
 {
     if (source.dd_dups.empty())
@@ -253,7 +256,7 @@ bool FillData::grabDDData(Source source, int poffset,
 }
 
 // XMLTV stuff
-bool FillData::grabDataFromFile(int id, QString &filename)
+bool FillData::GrabDataFromFile(int id, QString &filename)
 {
     QList<ChanInfo> chanlist;
     QMap<QString, QList<ProgInfo> > proglist;
@@ -292,14 +295,14 @@ time_t toTime_t(QDateTime &dt)
     return secsSince1Jan1970UTC;
 }
 
-bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
+bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 {
     QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "datadirect")
-        return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
+        return GrabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
     if (xmltv_grabber == "schedulesdirect1")
-        return grabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
+        return GrabDDData(source, offset, *qCurrentDate, DD_SCHEDULES_DIRECT);
 
 #ifdef USING_MINGW
     char tempfilename[MAX_PATH] = "";
@@ -405,7 +408,7 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
 
-    grabDataFromFile(source.id, filename);
+    succeeded &= GrabDataFromFile(source.id, filename);
 
     QFile thefile(filename);
     thefile.remove();
@@ -413,7 +416,7 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
     return succeeded;
 }
 
-void FillData::grabDataFromDDFile(
+bool FillData::GrabDataFromDDFile(
     int id, int offset, const QString &filename,
     const QString &lineupid, QDate *qCurrentDate)
 {
@@ -431,19 +434,19 @@ void FillData::grabDataFromDDFile(
     s.password = "fromfile";
     s.lineupid = lineupid;
 
-    grabData(s, offset, currentd);
+    return GrabData(s, offset, currentd);
 }
 
 
-/** \fn FillData::fillData(QValueList<Source> &sourcelist)
+/** \fn FillData::Run(SourceList &sourcelist)
  *  \brief Goes through the sourcelist and updates its channels with
  *         program info grabbed with the associated grabber.
  *  \return true if there was no failures
  */
-bool FillData::fillData(Q3ValueList<Source> &sourcelist)
+bool FillData::Run(SourceList &sourcelist)
 {
-    Q3ValueList<Source>::Iterator it;
-    Q3ValueList<Source>::Iterator it2;
+    SourceList::iterator it;
+    SourceList::iterator it2;
 
     QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -675,12 +678,13 @@ bool FillData::fillData(Q3ValueList<Source> &sourcelist)
             else
             {
                 QDate qCurrentDate = QDate::currentDate();
-                grabData(*it, 0, &qCurrentDate);
+                if (!GrabData(*it, 0, &qCurrentDate))
+                    ++failures;
             }
         }
         else if ((*it).xmltvgrabber_prefmethod == "allatonce")
         {
-            if (!grabData(*it, 0))
+            if (!GrabData(*it, 0))
                 ++failures;
         }
         else if ((*it).xmltvgrabber_baseline ||
@@ -881,7 +885,7 @@ bool FillData::fillData(Q3ValueList<Source> &sourcelist)
                 {
                     VERBOSE(VB_IMPORTANT,
                             QString("Refreshing data for ") + currDate);
-                    if (!grabData(*it, i, &qCurrentDate))
+                    if (!GrabData(*it, i, &qCurrentDate))
                     {
                         ++failures;
                         if (interrupted)

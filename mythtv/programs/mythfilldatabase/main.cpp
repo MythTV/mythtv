@@ -7,7 +7,6 @@ using namespace std;
 
 // Qt headers
 #include <qapplication.h>
-#include <Q3ValueList>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -537,7 +536,7 @@ int main(int argc, char *argv[])
                                                     Qt::ISODate);
         }
 
-        if (!fill_data.grabDataFromFile(fromfile_id, fromfile_name))
+        if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
             return FILLDB_EXIT_GRAB_DATA_FAILED;
 
         query.exec(QString("UPDATE settings SET data ='%1' "
@@ -571,12 +570,12 @@ int main(int argc, char *argv[])
     }
     else if (from_dd_file)
     {
-        fill_data.grabDataFromDDFile(
+        fill_data.GrabDataFromDDFile(
             fromfile_id, fromfile_offset, fromfile_name, fromddfile_lineupid);
     }
     else
     {
-        Q3ValueList<Source> sourcelist;
+        SourceList sourcelist;
 
         MSqlQuery sourcequery(MSqlQuery::InitCon());
         QString where = "";
@@ -615,7 +614,7 @@ int main(int argc, char *argv[])
                        newsource.xmltvgrabber_cache = false;
                        newsource.xmltvgrabber_prefmethod = "";
 
-                       sourcelist.append(newsource);
+                       sourcelist.push_back(newsource);
                        usingDataDirect |=
                            is_grabber_datadirect(newsource.xmltvgrabber);
                        usingDataDirectLabs |=
@@ -641,7 +640,7 @@ int main(int argc, char *argv[])
              return FILLDB_EXIT_DB_ERROR;
         }
 
-        if (!fill_data.fillData(sourcelist))
+        if (!fill_data.Run(sourcelist))
         {
              VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
              gContext->LogEntry("mythfilldatabase", LP_WARNING,

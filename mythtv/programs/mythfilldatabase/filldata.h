@@ -1,9 +1,12 @@
 #ifndef _FILLDATA_H_
 #define _FILLDATA_H_
 
+// C++ headers
+#include <vector>
+using namespace std;
+
 // Qt headers
 #include <qstring.h>
-#include <q3valuelist.h>
 
 // libmythtv headers
 #include "datadirect.h"
@@ -30,6 +33,7 @@ struct Source
     QString xmltvgrabber_prefmethod;
     vector<int> dd_dups;
 };
+typedef vector<Source> SourceList;
 
 class FillData
 {
@@ -49,13 +53,13 @@ class FillData
 
     void DataDirectStationUpdate(Source source, bool update_icons = true);
     bool DataDirectUpdateChannels(Source source);
-    bool grabDDData(Source source, int poffset,
+    bool GrabDDData(Source source, int poffset,
                     QDate pdate, int ddSource);
-    bool grabDataFromFile(int id, QString &filename);
-    bool grabData(Source source, int offset, QDate *qCurrentDate = 0);
-    void grabDataFromDDFile(int id, int offset, const QString &filename,
+    bool GrabDataFromFile(int id, QString &filename);
+    bool GrabData(Source source, int offset, QDate *qCurrentDate = 0);
+    bool GrabDataFromDDFile(int id, int offset, const QString &filename,
                             const QString &lineupid, QDate *qCurrentDate = 0);
-    bool fillData(Q3ValueList<Source> &sourcelist);
+    bool Run(SourceList &sourcelist);
     ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine);
     void readXawtvChannels(int id, QString xawrcfile);
 
