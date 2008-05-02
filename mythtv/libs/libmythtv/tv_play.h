@@ -244,7 +244,6 @@ class MPUBLIC TV : public QObject
     void SetPreviousChannel(void);
     void UnMute(void);
     void KeyRepeatOK(void);
-    void BrowseEndTimer(void) { BrowseEnd(false); }
     void SleepEndTimer(void);
     void IdleDialog(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
@@ -581,7 +580,7 @@ class MPUBLIC TV : public QObject
     // Channel browsing state variables
     bool browsemode;
     bool persistentbrowsemode;
-    QTimer *browseTimer;
+    MythTimer browseTimer;
     QString browsechannum;
     QString browsechanid;
     QString browsestarttime;

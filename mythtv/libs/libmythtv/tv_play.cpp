@@ -586,7 +586,6 @@ TV::TV(void)
       prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
       // channel browsing state variables
       browsemode(false), persistentbrowsemode(false),
-      browseTimer(new QTimer(this)),
       browsechannum(""), browsechanid(""), browsestarttime(""),
       // Program Info for currently playing video
       recorderPlaybackInfo(NULL),
@@ -631,7 +630,6 @@ TV::TV(void)
     gContext->addCurrentLocation("Playback");
 
     connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
-    connect(browseTimer,      SIGNAL(timeout()), SLOT(BrowseEndTimer()));
     connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
     connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
@@ -818,13 +816,6 @@ TV::~TV(void)
         prevChanTimer->disconnect();
         prevChanTimer->deleteLater();
         prevChanTimer = NULL;
-    }
-
-    if (browseTimer)
-    {
-        browseTimer->disconnect();
-        browseTimer->deleteLater();
-        browseTimer = NULL;
     }
 
     gContext->removeListener(this);
@@ -2409,6 +2400,12 @@ void TV::RunTV(void)
             }
 
             updatecheck = 0;
+        }
+
+        if (browseTimer.isRunning() &&
+            (browseTimer.elapsed() >= kBrowseTimeout))
+        {
+            BrowseEnd(false);
         }
 
         // Commit input when the OSD fades away
@@ -6531,7 +6528,7 @@ void TV::BrowseStart(void)
 
         BrowseDispInfo(BROWSE_SAME);
 
-        browseTimer->start(kBrowseTimeout, true);
+        browseTimer.start();
     }
     pbinfoLock.unlock();
 }
@@ -6545,7 +6542,7 @@ void TV::BrowseEnd(bool change)
     if (!browsemode || !GetOSD())
         return;
 
-    browseTimer->stop();
+    browseTimer.stop();
 
     GetOSD()->HideSet("browse_info");
 
@@ -6574,7 +6571,7 @@ void TV::BrowseDispInfo(int direction)
     if (paused || !GetOSD())
         return;
 
-    browseTimer->changeInterval(kBrowseTimeout);
+    browseTimer.start();
 
     if (lasttime < curtime)
         browsestarttime = curtime.toString(Qt::ISODate);
