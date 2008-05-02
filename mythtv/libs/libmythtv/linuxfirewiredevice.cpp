@@ -277,9 +277,21 @@ bool LinuxFirewireDevice::OpenPort(void)
     }
 
     VERBOSE(VB_RECORD, LOC + "Starting port handler thread");
+    int rval = pthread_create(&m_priv->port_handler_thread, NULL,
+                              linux_firewire_device_port_handler_thunk, this);
+    if (rval != 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to create port handler thread.") + ENO);
+
+        m_lock.unlock();
+        ClosePort();
+        m_lock.lock();
+
+        return false;
+    }
+
     m_priv->run_port_handler = true;
-    pthread_create(&m_priv->port_handler_thread, NULL,
-                   linux_firewire_device_port_handler_thunk, this);
 
     VERBOSE(VB_RECORD, LOC + "Waiting for port handler thread to start");
     while (!m_priv->is_port_handler_running)
