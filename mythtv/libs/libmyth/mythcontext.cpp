@@ -350,8 +350,20 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
+
+        VERBOSE(VB_IMPORTANT+VB_EXTRA,
+                "Relative PREFIX!\nappDir=" + prefixDir.canonicalPath() +
+                "\nprefix=" + m_installprefix + ", libdir=" + m_installlibdir);
         prefixDir.cd(m_installprefix);
         m_installprefix = prefixDir.canonicalPath();
+
+        // Not strictly necessary, but it tidies up the path:
+        if (QDir(m_installlibdir).isRelative())
+        {
+            prefixDir = qApp->applicationDirPath();
+            prefixDir.cd(m_installlibdir);
+            m_installlibdir = prefixDir.canonicalPath();
+        }
     }
     else if (prefixDir.path().contains(".app/Contents/MacOS"))
     {
@@ -2463,11 +2475,15 @@ QString MythContext::FindThemeDir(const QString &themename)
     QDir dir(testdir);
     if (dir.exists())
         return testdir;
+    else
+        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
     testdir = GetThemesParentDir() + themename;
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
+    else
+        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
     testdir = GetThemesParentDir() + "G.A.N.T";
     dir.setPath(testdir);
@@ -2478,6 +2494,8 @@ QString MythContext::FindThemeDir(const QString &themename)
         SaveSetting("Theme", "G.A.N.T");
         return testdir;
     }
+    else
+        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
     VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
     return "";
