@@ -1824,7 +1824,7 @@ void DataDirectProcessor::CreateTemp(
     bool          &ok) const
 {
     QString tmp = createTempFile(templatefilename, directory);
-    if (templatefilename == tmpDir)
+    if (templatefilename == tmp)
     {
         fatalErrors.push_back(Q3DeepCopy<QString>(errmsg));
         ok = false;
