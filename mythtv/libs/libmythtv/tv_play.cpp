@@ -534,6 +534,7 @@ TV::TV(void)
       baseFilters(""), 
       db_channel_format("<num> <sign>"),
       db_time_format("h:mm AP"), db_short_date_format("M/d"),
+      db_idle_timeout(0),
       fftime(0), rewtime(0),
       jumptime(0), smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
@@ -564,8 +565,6 @@ TV::TV(void)
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
-      // Idle Timer
-      idleTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
       keyRepeat(true), keyrepeatTimer(new QTimer(this)),
       // Fast forward state
@@ -615,6 +614,9 @@ TV::TV(void)
         pseudoLiveTVState[i] = kPseudoNormalLiveTV;
     }
 
+    db_idle_timeout = gContext->GetNumSetting("LiveTVIdleTimeout", 0);
+    db_idle_timeout *= 60 * 1000; // convert from minutes to ms.
+
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
     lastSignalMsgTime.start();
@@ -633,7 +635,6 @@ TV::TV(void)
     connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
     connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
-    connect(idleTimer,       SIGNAL(timeout()), SLOT(IdleDialog()));
 }
 
 /** \fn TV::Init(bool)
@@ -790,13 +791,6 @@ TV::~TV(void)
         sleepTimer = NULL;
     }
 
-    if (idleTimer)
-    {
-        idleTimer->disconnect();
-        idleTimer->deleteLater();
-        idleTimer = NULL;
-    }
-
     if (keyrepeatTimer)
     {
         keyrepeatTimer->disconnect();
@@ -928,12 +922,11 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
         GetPlayGroupSettings("Default");
 
         // Start Idle Timer
-        int idletimeout = gContext->GetNumSetting("LiveTVIdleTimeout", 0);
-        if (idletimeout > 0)
+        if (db_idle_timeout > 0)
         {
-            idleTimer->start(idletimeout * 60 * 1000, TRUE);
+            idleTimer.start();
             VERBOSE(VB_GENERAL, QString("Using Idle Timer. %1 minutes")
-                                  .arg(idletimeout));
+                    .arg(db_idle_timeout/(60*1000)));
         }
 
         if (startInGuide || gContext->GetNumSetting("WatchTVGuide", 0))
@@ -2408,6 +2401,8 @@ void TV::RunTV(void)
             BrowseEnd(false);
         }
 
+        IdleDialog();
+
         // Commit input when the OSD fades away
         if (HasQueuedChannel() && GetOSD())
         {
@@ -2619,10 +2614,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress() ignoreKeys: "<<ignoreKeys);
 #endif // DEBUG_ACTIONS
 
-    if (!GetOSD() || !GetOSD()->DialogShowing("idletimeout")
-            && StateIsLiveTV(GetState()) && idleTimer->isActive())
-        idleTimer->changeInterval(gContext->GetNumSetting("LiveTVIdleTimeout",
-                                                          0) * 60 * 1000);
+    idleTimer.start();
 
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
@@ -2958,11 +2950,19 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else if (dialogname == "idletimeout")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
-
+                    VERBOSE(VB_GENERAL, LOC + "Idle Resp: " << result);
                     if (result == 1)
-                        idleTimer->changeInterval(
-                                   gContext->GetNumSetting("LiveTVIdleTimeout",
-                                                           0) * 60 * 1000);
+                    {
+                        idleDialogTimer.stop();
+                        idleTimer.start();
+                    }
+                    else
+                    {
+                        VERBOSE(VB_GENERAL, LOC +
+                                "No longer watching LiveTV, exiting");
+                        exitPlayer = true;
+                        wantsToQuit = true;
+                    }
                 }
                 else if (dialogname == "channel_timed_out")
                 {
@@ -6182,39 +6182,44 @@ void TV::SleepEndTimer(void)
  */
 void TV::IdleDialog(void)
 {
-    if (!StateIsLiveTV(GetState()))
-       return;
-
     // Display dialogue for X seconds before exiting livetv
     int timeuntil = 45;
 
-    if (GetOSD()->DialogShowing("idletimeout"))
+    if (!StateIsLiveTV(GetState()))
+       return;
+
+    OSD *osd = GetOSD();
+    if (!osd)
+        return;
+
+    if (idleDialogTimer.isRunning() &&
+        (idleDialogTimer.elapsed() > (int) timeuntil * 1000 + 500))
     {
-        VERBOSE(VB_GENERAL, "Idle timeout reached, leaving LiveTV");
+        VERBOSE(VB_GENERAL, LOC +
+                "Idle timeout reached, leaving LiveTV");
         exitPlayer = true;
         wantsToQuit = true;
+        idleDialogTimer.start();
+        idleTimer.start();
         return;
     }
 
-    QString message = QObject::tr("Mythtv has been idle for %1 minutes and "
-        "will exit in %2 seconds. Are you still watching?")
-        .arg(gContext->GetNumSetting("LiveTVIdleTimeout", 0))
-        .arg("%d");
-
-    while (!GetOSD())
+    if (idleTimer.isRunning() && (idleTimer.elapsed() > (int)db_idle_timeout))
     {
-        qApp->unlock();
-        qApp->processEvents();
-        usleep(1000);
-        qApp->lock();
+        QString message = QObject::tr(
+            "Mythtv has been idle for %1 minutes and "
+            "will exit in %2 seconds. Are you still watching?")
+            .arg(gContext->GetNumSetting("LiveTVIdleTimeout", 0))
+            .arg("%d");
+
+        QStringList options;
+        options += tr("Yes");
+        options += tr("No");
+        dialogname = "idletimeout";
+        osd->NewDialogBox(dialogname, message, options, timeuntil, 0);
+        idleDialogTimer.start();
+        idleTimer.start();
     }
-
-    QStringList options;
-    options += tr("Yes");
-
-    dialogname = "idletimeout";
-    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, 0);
-    idleTimer->changeInterval(timeuntil * 1000);
 }
 
 void TV::ToggleAspectOverride(AspectOverrideMode aspectMode)
@@ -7860,7 +7865,7 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
         new OSDGenericTree(item, tr("Toggle On/Off"), "TOGGLE"+typeStr);
 
     uint curtrack = (uint) activenvp->GetTrack(type);
-    for (uint i = 0; i < tracks.size(); i++)
+    for (uint i = 0; i < (uint)tracks.size(); i++)
     {
         new OSDGenericTree(
             item, tracks[i], selStr + QString::number(i),

@@ -245,7 +245,6 @@ class MPUBLIC TV : public QObject
     void UnMute(void);
     void KeyRepeatOK(void);
     void SleepEndTimer(void);
-    void IdleDialog(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
@@ -426,6 +425,9 @@ class MPUBLIC TV : public QObject
     void DVDJumpBack(void);
     void DVDJumpForward(void);       
 
+    // Idle Dialog handling
+    void IdleDialog(void);
+
     static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
                                       const QString &videoFile);
 
@@ -445,6 +447,7 @@ class MPUBLIC TV : public QObject
     QString db_channel_format;
     QString db_time_format;
     QString db_short_date_format;
+    uint    db_idle_timeout;
     int     fftime;
     int     rewtime;
     int     jumptime;
@@ -518,7 +521,8 @@ class MPUBLIC TV : public QObject
     vector<SleepTimerInfo> sleep_times;
     uint    sleep_index; ///< Index into sleep_times.
     QTimer *sleepTimer;  ///< Timer for turning off playback.
-    QTimer *idleTimer; ///< Timer for turning off playback after idle period.
+    MythTimer idleTimer; ///< Timer for turning off playback after idle period.
+    MythTimer idleDialogTimer; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
     Q3PtrList<QKeyEvent> keyList;
