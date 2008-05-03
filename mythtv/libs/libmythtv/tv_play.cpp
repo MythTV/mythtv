@@ -565,7 +565,7 @@ TV::TV(void)
       // Channel Editing
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
-      sleep_index(0), sleepTimer(new QTimer(this)),
+      sleep_index(0), sleepTimerTimeout(0),
       // Fast forward state
       doing_ff_rew(0), ff_rew_index(0), speed_index(0),
       // Time Stretch state
@@ -632,7 +632,6 @@ TV::TV(void)
     gContext->addCurrentLocation("Playback");
 
     connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
-    connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
 /** \fn TV::Init(bool)
@@ -781,13 +780,6 @@ bool TV::Init(bool createWindow)
 TV::~TV(void)
 {
     QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal from continuing.
-
-    if (sleepTimer)
-    {
-        sleepTimer->disconnect();
-        sleepTimer->deleteLater();
-        sleepTimer = NULL;
-    }
 
     if (prevChanTimer)
     {
@@ -2386,6 +2378,7 @@ void TV::RunTV(void)
         }
 
         IdleDialog();
+        SleepDialog();
 
         if (unmuteTimeout && unmuteTimer.isRunning() &&
             (unmuteTimer.elapsed() > unmuteTimeout))
@@ -2946,11 +2939,26 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else if (dialogname == "idletimeout")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
-                    VERBOSE(VB_GENERAL, LOC + "Idle Resp: " << result);
                     if (result == 1)
                     {
                         idleDialogTimer.stop();
                         idleTimer.start();
+                    }
+                    else
+                    {
+                        VERBOSE(VB_GENERAL, LOC +
+                                "No longer watching LiveTV, exiting");
+                        exitPlayer = true;
+                        wantsToQuit = true;
+                    }
+                }
+                else if (dialogname == "sleeptimeout")
+                {
+                    int result = GetOSD()->GetDialogResponse(dialogname);
+                    if (result == 1)
+                    {
+                        sleepDialogTimer.stop();
+                        sleepTimer.start();
                     }
                     else
                     {
@@ -6141,17 +6149,13 @@ void TV::ToggleSleepTimer(void)
 
     // turn sleep timer off
     if (sleep_times[sleep_index].seconds == 0)
-        sleepTimer->stop();
+    {
+        sleepTimer.stop();
+    }
     else
     {
-        if (sleepTimer->isActive())
-            // sleep timer is active, adjust interval
-            sleepTimer->changeInterval(sleep_times[sleep_index].seconds *
-                                       1000);
-        else
-            // sleep timer is not active, start it
-            sleepTimer->start(sleep_times[sleep_index].seconds * 1000, 
-                              TRUE);
+        sleepTimerTimeout = sleep_times[sleep_index].seconds * 1000;
+        sleepTimer.start();
     }
 
     text = tr("Sleep ") + " " + sleep_times[sleep_index].dispString;
@@ -6161,10 +6165,47 @@ void TV::ToggleSleepTimer(void)
         GetOSD()->SetSettingsText(text, 3);
 }
 
-void TV::SleepEndTimer(void)
+void TV::SleepDialog(void)
 {
-    exitPlayer = true;
-    wantsToQuit = true;
+    // Display dialogue for X seconds before exiting livetv
+    int timeuntil = 45;
+
+    if (!StateIsLiveTV(GetState()))
+       return;
+
+    OSD *osd = GetOSD();
+    if (!osd)
+        return;
+
+    if (sleepDialogTimer.isRunning() &&
+        (sleepDialogTimer.elapsed() > (int) timeuntil * 1000 + 500))
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                "Sleep timeout reached, leaving LiveTV");
+        exitPlayer = true;
+        wantsToQuit = true;
+        sleepDialogTimer.stop();
+        sleepTimer.stop();
+        return;
+    }
+
+    if (sleepTimer.isRunning() && sleepTimer.elapsed() > sleepTimerTimeout)
+    {
+        QString message = QObject::tr(
+            "Mythtv has was set to sleep for %1 minutes and "
+            "will exit in %2 seconds.\n"
+            "Do you wish to continue watching?")
+            .arg(sleepTimerTimeout / (60 * 1000))
+            .arg("%d");
+
+        QStringList options;
+        options += tr("Yes");
+        options += tr("No");
+        dialogname = "sleeptimeout";
+        osd->NewDialogBox(dialogname, message, options, timeuntil, 0);
+        sleepDialogTimer.start();
+        sleepTimer.stop();
+    }
 }
 
 /*!
@@ -6194,8 +6235,8 @@ void TV::IdleDialog(void)
                 "Idle timeout reached, leaving LiveTV");
         exitPlayer = true;
         wantsToQuit = true;
-        idleDialogTimer.start();
-        idleTimer.start();
+        idleDialogTimer.stop();
+        idleTimer.stop();
         return;
     }
 
@@ -6204,7 +6245,7 @@ void TV::IdleDialog(void)
         QString message = QObject::tr(
             "Mythtv has been idle for %1 minutes and "
             "will exit in %2 seconds. Are you still watching?")
-            .arg(gContext->GetNumSetting("LiveTVIdleTimeout", 0))
+            .arg(db_idle_timeout / (60 * 1000))
             .arg("%d");
 
         QStringList options;
@@ -6213,7 +6254,7 @@ void TV::IdleDialog(void)
         dialogname = "idletimeout";
         osd->NewDialogBox(dialogname, message, options, timeuntil, 0);
         idleDialogTimer.start();
-        idleTimer.start();
+        idleTimer.stop();
     }
 }
 
@@ -7581,7 +7622,7 @@ void TV::BuildOSDTreeMenu(void)
     // add sleep items to menu
 
     item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
-    if (sleepTimer->isActive())
+    if (sleepTimer.isRunning())
         subitem = new OSDGenericTree(item, tr("Sleep Off"), "TOGGLESLEEPON");
     subitem = new OSDGenericTree(item, "30 " + tr("minutes"), "TOGGLESLEEP30");
     subitem = new OSDGenericTree(item, "60 " + tr("minutes"), "TOGGLESLEEP60");
@@ -7975,20 +8016,15 @@ void TV::ToggleSleepTimer(const QString time)
     const int minute = 60*1000; /* milliseconds in a minute */
     int mins = 0;
 
-    if (!sleepTimer)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No sleep timer?");
-        return;
-    }
-
     if (time == "TOGGLESLEEPON")
     {
-        if (sleepTimer->isActive())
-            sleepTimer->stop();
+        if (sleepTimer.isRunning())
+            sleepTimer.stop();
         else
         {
             mins = 60;
-            sleepTimer->start(mins *minute);
+            sleepTimerTimeout = mins * minute;
+            sleepTimer.start();
         }
     }
     else
@@ -8017,13 +8053,16 @@ void TV::ToggleSleepTimer(const QString time)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time string "<<time);
         }
 
-        if (sleepTimer->isActive())
+        if (sleepTimer.isRunning())
         {
-            sleepTimer->stop();
+            sleepTimer.stop();
         }
 
         if (mins)
-            sleepTimer->start(mins * minute);
+        {
+            sleepTimerTimeout = mins * minute;
+            sleepTimer.start();
+        }
     }
                
     // display OSD

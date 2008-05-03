@@ -243,7 +243,6 @@ class MPUBLIC TV : public QObject
   protected slots:
     void SetPreviousChannel(void);
     void UnMute(void);
-    void SleepEndTimer(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
@@ -424,7 +423,8 @@ class MPUBLIC TV : public QObject
     void DVDJumpBack(void);
     void DVDJumpForward(void);       
 
-    // Idle Dialog handling
+    // Sleep/Idle dialog handling
+    void SleepDialog(void);
     void IdleDialog(void);
 
     static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
@@ -518,8 +518,10 @@ class MPUBLIC TV : public QObject
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.
     vector<SleepTimerInfo> sleep_times;
-    uint    sleep_index; ///< Index into sleep_times.
-    QTimer *sleepTimer;  ///< Timer for turning off playback.
+    uint      sleep_index;       ///< Index into sleep_times.
+    int       sleepTimerTimeout; ///< Current sleep timeout
+    MythTimer sleepTimer;        ///< Timer for turning off playback.
+    MythTimer sleepDialogTimer;  ///< Timer for sleep dialog.
     MythTimer idleTimer; ///< Timer for turning off playback after idle period.
     MythTimer idleDialogTimer; ///< Timer for idle dialog.
 
