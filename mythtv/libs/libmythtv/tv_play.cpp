@@ -578,7 +578,7 @@ TV::TV(void)
       asInputMode(false), asInputModeExpires(QTime::currentTime()),
       // Channel changing state variables
       queuedChanNum(""),
-      muteTimer(new QTimer(this)),
+      unmuteTimeout(0),
       lockTimerOn(false),
       // previous channel functionality state variables
       prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
@@ -632,7 +632,6 @@ TV::TV(void)
     gContext->addCurrentLocation("Playback");
 
     connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
-    connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
@@ -788,13 +787,6 @@ TV::~TV(void)
         sleepTimer->disconnect();
         sleepTimer->deleteLater();
         sleepTimer = NULL;
-    }
-
-    if (muteTimer)
-    {
-        muteTimer->disconnect();
-        muteTimer->deleteLater();
-        muteTimer = NULL;
     }
 
     if (prevChanTimer)
@@ -2394,6 +2386,18 @@ void TV::RunTV(void)
         }
 
         IdleDialog();
+
+        if (unmuteTimeout && unmuteTimer.isRunning() &&
+            (unmuteTimer.elapsed() > unmuteTimeout))
+        {
+            unmuteTimer.stop();
+            if (nvp)
+            {
+                AudioOutput *aud = nvp->getAudioOutput();
+                if (aud && aud->GetMute())
+                    aud->ToggleMute();
+            }
+        }
 
         // Commit input when the OSD fades away
         if (HasQueuedChannel() && GetOSD())
@@ -6269,12 +6273,6 @@ void TV::SetMuteTimer(int timeout)
  */
 void TV::UnMute(void)
 {
-    if (!nvp)
-        return;
-
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (aud && aud->GetMute())
-        aud->ToggleMute();
 }
 
 void TV::customEvent(QEvent *e)
@@ -6440,8 +6438,8 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
-            int timeout = tokens[1].toInt();
-            muteTimer->start(timeout, true);
+            unmuteTimeout = tokens[1].toUInt();
+            unmuteTimer.start();
         }
         else if (message.left(9) == "START_EPG")
         {

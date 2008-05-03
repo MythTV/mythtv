@@ -567,7 +567,8 @@ class MPUBLIC TV : public QObject
     /// that queuedChanNumExpr can be used safely in Qt 3.2 and earlier.
     mutable QMutex  queuedInputLock;
 
-    QTimer *muteTimer;      ///< For temp. audio muting during channel changes
+    int       unmuteTimeout; ///< For temp. audio muting during channel changes
+    MythTimer unmuteTimer;   ///< For temp. audio muting during channel changes
 
     // Channel changing timeout notification variables
     QTime   lockTimer;
