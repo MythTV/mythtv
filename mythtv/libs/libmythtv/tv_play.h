@@ -243,7 +243,6 @@ class MPUBLIC TV : public QObject
   protected slots:
     void SetPreviousChannel(void);
     void UnMute(void);
-    void KeyRepeatOK(void);
     void SleepEndTimer(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
@@ -528,8 +527,7 @@ class MPUBLIC TV : public QObject
     Q3PtrList<QKeyEvent> keyList;
     /// Since keys are processed outside Qt event loop, we need a lock.
     QMutex  keyListLock;
-    bool    keyRepeat;      ///< Are repeats logical on last key?
-    QTimer *keyrepeatTimer; ///< Timeout timer for repeat key filtering
+    MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
 
     int   doing_ff_rew;  ///< If true we are doing a rewind not a fast forward
     int   ff_rew_index;  ///< Index into ff_rew_speeds for FF and Rewind speeds
@@ -689,7 +687,7 @@ class MPUBLIC TV : public QObject
     static const int kSMExitTimeout;
     static const int kInputKeysMax;  ///< When to start discarding early keys
     static const int kInputModeTimeout; ///< Timeout for entry modes in msec
-
+    static const int kKeyRepeatTimeout; ///< Seek key repeat timeout
     static const uint kNextSource;
     static const uint kPreviousSource;
 

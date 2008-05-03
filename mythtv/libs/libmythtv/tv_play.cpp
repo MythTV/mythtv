@@ -60,6 +60,7 @@ const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
 const int TV::kInputModeTimeout=5000;
+const int TV::kKeyRepeatTimeout=300;
 const uint TV::kNextSource    = 1;
 const uint TV::kPreviousSource= 2;
 
@@ -565,8 +566,6 @@ TV::TV(void)
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
-      // Key processing buffer, lock, and state
-      keyRepeat(true), keyrepeatTimer(new QTimer(this)),
       // Fast forward state
       doing_ff_rew(0), ff_rew_index(0), speed_index(0),
       // Time Stretch state
@@ -608,6 +607,7 @@ TV::TV(void)
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
+    keyRepeatTimer.start();
     for (uint i = 0; i < 2; i++)
     {
         pseudoLiveTVRec[i]   = NULL;
@@ -633,7 +633,6 @@ TV::TV(void)
 
     connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
     connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
-    connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
@@ -789,13 +788,6 @@ TV::~TV(void)
         sleepTimer->disconnect();
         sleepTimer->deleteLater();
         sleepTimer = NULL;
-    }
-
-    if (keyrepeatTimer)
-    {
-        keyrepeatTimer->disconnect();
-        keyrepeatTimer->deleteLater();
-        keyrepeatTimer = NULL;
     }
 
     if (muteTimer)
@@ -4234,18 +4226,17 @@ bool TV::DoNVPSeek(float time)
 
 void TV::DoSeek(float time, const QString &mesg)
 {
-    if (!keyRepeat)
-        return;
-
-    NormalSpeed();
-    time += StopFFRew();
-    DoNVPSeek(time);
-    UpdateOSDSeekMessage(mesg, osd_general_timeout);
-
+    bool limitkeys = false;
     if (activenvp->GetLimitKeyRepeat())
+        limitkeys = true;
+
+    if (!limitkeys || (keyRepeatTimer.elapsed() > kKeyRepeatTimeout))
     {
-        keyRepeat = false;
-        keyrepeatTimer->start(300, true);
+        keyRepeatTimer.start();
+        NormalSpeed();
+        time += StopFFRew();
+        DoNVPSeek(time);
+        UpdateOSDSeekMessage(mesg, osd_general_timeout);
     }
 }
 
@@ -6260,11 +6251,6 @@ void TV::ChangeChannel(const DBChanList &options)
             break;
         }
     }
-}
-
-void TV::KeyRepeatOK(void)
-{
-    keyRepeat = true;
 }
 
 void TV::SetMuteTimer(int timeout)
