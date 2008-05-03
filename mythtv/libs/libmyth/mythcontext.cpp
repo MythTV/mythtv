@@ -2873,7 +2873,7 @@ void MythContext::SetPalette(QWidget *widget)
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
             pal.setColor(QPalette::Active, (QColorGroup::ColorRole) i,
-                         QColor(color));
+                         createColor(color));
     }
 
     type = "Disabled";
@@ -2882,7 +2882,7 @@ void MythContext::SetPalette(QWidget *widget)
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
             pal.setColor(QPalette::Disabled, (QColorGroup::ColorRole) i,
-                         QColor(color));
+                         createColor(color));
     }
 
     type = "Inactive";
@@ -2891,7 +2891,7 @@ void MythContext::SetPalette(QWidget *widget)
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
             pal.setColor(QPalette::Inactive, (QColorGroup::ColorRole) i,
-                         QColor(color));
+                         createColor(color));
     }
 
     widget->setPalette(pal);

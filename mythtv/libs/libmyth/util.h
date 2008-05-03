@@ -57,6 +57,7 @@ MPUBLIC long long decodeLongLong(QStringList &list, uint offset);
 MPUBLIC long long decodeLongLong(QStringList &list, QStringList::const_iterator &it);
 
 MPUBLIC QRgb blendColors(QRgb source, QRgb add, int alpha);
+MPUBLIC QColor createColor(const QString &color);
 
 MPUBLIC uint myth_system(const QString &command, int flags = 0);
 

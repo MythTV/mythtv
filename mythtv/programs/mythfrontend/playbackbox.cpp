@@ -49,6 +49,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "playgroup.h"
 #include "customedit.h"
+#include "util.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -633,18 +634,18 @@ void PlaybackBox::parsePopup(QDomElement &element)
             if (info.tagName() == "solidbgcolor")
             {
                 QString col = theme->getFirstText(info);
-                drawPopupBgColor = QColor(col);
+                drawPopupBgColor = createColor(col);
                 drawPopupSolid = false;
             }
             else if (info.tagName() == "foreground")
             {
                 QString col = theme->getFirstText(info);
-                drawPopupFgColor = QColor(col);
+                drawPopupFgColor = createColor(col);
             }
             else if (info.tagName() == "highlight")
             {
                 QString col = theme->getFirstText(info);
-                drawPopupSelColor = QColor(col);
+                drawPopupSelColor = createColor(col);
             }
             else
             {

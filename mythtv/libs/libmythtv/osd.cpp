@@ -28,6 +28,7 @@ using namespace std;
 #include "libmyth/oldsettings.h"
 #include "udpnotify.h"
 #include "compat.h"
+#include "util.h"
 
 #include "osdtypeteletext.h"
 #include "osdlistbtntype.h"
@@ -1358,14 +1359,14 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
             {
                 if (info.attribute("type","").lower() == "selected") 
                 {
-                    grSelectedBeg = QColor(info.attribute("start"));
-                    grSelectedEnd = QColor(info.attribute("end"));
+                    grSelectedBeg = createColor(info.attribute("start"));
+                    grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
                 else if (info.attribute("type","").lower() == "unselected") 
                 {
-                    grUnselectedBeg = QColor(info.attribute("start"));
-                    grUnselectedEnd = QColor(info.attribute("end"));
+                    grUnselectedBeg = createColor(info.attribute("start"));
+                    grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
                 else 

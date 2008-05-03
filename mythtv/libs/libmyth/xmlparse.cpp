@@ -11,6 +11,7 @@ using namespace std;
 
 #include "uilistbtntype.h"
 #include "xmlparse.h"
+#include "util.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -2050,14 +2051,14 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                 unselected = info.attribute("unselected");
                 special = info.attribute("special");
                 
-                if (selected != "")
-                    selectedColor = QColor(selected);           
+                if (!selected.isEmpty())
+                    selectedColor = createColor(selected);       
     
-                if (unselected != "")
-                    unselectedColor = QColor(unselected);           
+                if (!unselected.isEmpty())
+                    unselectedColor = createColor(unselected);
                 
-                if (special != "")
-                    specialColor = QColor(special);         
+                if (!special.isEmpty())
+                    specialColor = createColor(special);
             }
 
             else
@@ -2226,7 +2227,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     fill_select_area = parseRect(fillarea);
                     normalizeRect(fill_select_area);
                 }
-                fill_select_color = QColor(fillcolor);
+                fill_select_color = createColor(fillcolor);
 
             }
             else if (info.tagName() == "image")
@@ -3538,13 +3539,13 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "gradient") {
 
                 if (info.attribute("type","").lower() == "selected") {
-                    grSelectedBeg = QColor(info.attribute("start"));
-                    grSelectedEnd = QColor(info.attribute("end"));
+                    grSelectedBeg = createColor(info.attribute("start"));
+                    grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
                 else if (info.attribute("type","").lower() == "unselected") {
-                    grUnselectedBeg = QColor(info.attribute("start"));
-                    grUnselectedEnd = QColor(info.attribute("end"));
+                    grUnselectedBeg = createColor(info.attribute("start"));
+                    grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
                 else {
@@ -3713,13 +3714,13 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "gradient") {
 
                 if (info.attribute("type","").lower() == "selected") {
-                    grSelectedBeg = QColor(info.attribute("start"));
-                    grSelectedEnd = QColor(info.attribute("end"));
+                    grSelectedBeg = createColor(info.attribute("start"));
+                    grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
                 else if (info.attribute("type","").lower() == "unselected") {
-                    grUnselectedBeg = QColor(info.attribute("start"));
-                    grUnselectedEnd = QColor(info.attribute("end"));
+                    grUnselectedBeg = createColor(info.attribute("start"));
+                    grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
                 else {

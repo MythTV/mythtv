@@ -18,6 +18,7 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythcontext.h"
 #include "lcddevice.h"
+#include "util.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -892,8 +893,7 @@ void UIGuideType::SetCategoryColors(const QMap<QString, QString> &catC)
     for (QMap<QString, QString>::const_iterator it = catC.begin();
          it != catC.end(); ++it)
     {
-        QColor tmp(it.data());
-        categoryColors[it.key()] = tmp;
+        categoryColors[it.key()] = createColor(it.data());
     }
 }
 
