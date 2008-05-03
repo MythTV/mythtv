@@ -580,7 +580,7 @@ class MPUBLIC TV : public QObject
     // Previous channel functionality state variables
     str_vec_t prevChan;       ///< Previous channels
     uint      prevChanKeyCnt; ///< Number of repeated channel button presses
-    QTimer   *prevChanTimer;  ///< Special (slower) repeat key filtering
+    MythTimer prevChanTimer;  ///< Special (slower) repeat key filtering
 
     // Channel browsing state variables
     bool browsemode;
@@ -691,6 +691,8 @@ class MPUBLIC TV : public QObject
     static const int kInputKeysMax;  ///< When to start discarding early keys
     static const int kInputModeTimeout; ///< Timeout for entry modes in msec
     static const int kKeyRepeatTimeout; ///< Seek key repeat timeout
+    /// How long to wait before applying all previous channel keypresses.
+    static const int kPrevChanTimeout;
     static const uint kNextSource;
     static const uint kPreviousSource;
 

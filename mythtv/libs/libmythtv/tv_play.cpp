@@ -61,6 +61,7 @@ const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
 const int TV::kInputModeTimeout=5000;
 const int TV::kKeyRepeatTimeout=300;
+const int TV::kPrevChanTimeout=750;
 const uint TV::kNextSource    = 1;
 const uint TV::kPreviousSource= 2;
 
@@ -581,7 +582,7 @@ TV::TV(void)
       unmuteTimeout(0),
       lockTimerOn(false),
       // previous channel functionality state variables
-      prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
+      prevChanKeyCnt(0),
       // channel browsing state variables
       browsemode(false), persistentbrowsemode(false),
       browsechannum(""), browsechanid(""), browsestarttime(""),
@@ -630,8 +631,6 @@ TV::TV(void)
 
     gContext->addListener(this);
     gContext->addCurrentLocation("Playback");
-
-    connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
 }
 
 /** \fn TV::Init(bool)
@@ -780,13 +779,6 @@ bool TV::Init(bool createWindow)
 TV::~TV(void)
 {
     QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal from continuing.
-
-    if (prevChanTimer)
-    {
-        prevChanTimer->disconnect();
-        prevChanTimer->deleteLater();
-        prevChanTimer = NULL;
-    }
 
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
@@ -2390,6 +2382,13 @@ void TV::RunTV(void)
                 if (aud && aud->GetMute())
                     aud->ToggleMute();
             }
+        }
+
+
+        if (prevChanTimer.isRunning() &&
+            (prevChanTimer.elapsed() >= kPrevChanTimeout))
+        {
+            SetPreviousChannel();
         }
 
         // Commit input when the OSD fades away
@@ -5176,8 +5175,7 @@ void TV::PreviousChannel(void)
     }
 
     // Reset the timer
-    prevChanTimer->stop();
-    prevChanTimer->start(750);
+    prevChanTimer.start();
 }
 
 void TV::SetPreviousChannel()
@@ -5186,7 +5184,7 @@ void TV::SetPreviousChannel()
         return;
 
     // Stop the timer
-    prevChanTimer->stop();
+    prevChanTimer.stop();
 
     // Figure out the vector the desired channel is in
     int i = (prevChan.size() - prevChanKeyCnt - 1) % prevChan.size();
