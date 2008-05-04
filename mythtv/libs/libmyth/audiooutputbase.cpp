@@ -968,8 +968,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                     if (audio_bits == 16)
                         audiobuffer[org_waud++] = mybuf[chan][itemp+1];
 
-                    if (org_waud >= (int)kAudioRingBufferSize)
-                        org_waud -= kAudioRingBufferSize;
+                    org_waud %= kAudioRingBufferSize;
                 }
             }
         }
@@ -1044,7 +1043,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                         memcpy(audiobuffer + org_waud, ob, amount);
 
                     bdiff = kAudioRingBufferSize - amount;
-                    org_waud += amount;
+                    org_waud = (org_waud + amount) % kAudioRingBufferSize;
                 }
             }
             else
@@ -1071,7 +1070,8 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                     }
                     else
                     {
-                        org_waud += nSamples * audio_bytes_per_sample;
+                        int bufsz = nSamples * audio_bytes_per_sample;
+                        org_waud = (org_waud + bufsz) % kAudioRingBufferSize;
                         nSamplesToEnd -= nSamples;
                     }
 
