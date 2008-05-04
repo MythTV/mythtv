@@ -121,7 +121,7 @@ void AudioOutputBase::SetSourceBitrate(int rate)
 void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
 {
     effdspstretched = (int)((float)effdsp / laudio_stretchfactor);
-    if (audio_stretchfactor != laudio_stretchfactor)
+    if ((audio_stretchfactor != laudio_stretchfactor) ||  !pSoundStretch)
     {
         audio_stretchfactor = laudio_stretchfactor;
         if (pSoundStretch)
@@ -374,11 +374,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (redo_stretch)
     {
-        float laudio_stretchfactor = audio_stretchfactor;
         delete pSoundStretch;
         pSoundStretch = NULL;
-        audio_stretchfactor = 0.0f;
-        SetStretchFactorLocked(laudio_stretchfactor);
+        SetStretchFactorLocked(audio_stretchfactor);
     }
     else
     {
