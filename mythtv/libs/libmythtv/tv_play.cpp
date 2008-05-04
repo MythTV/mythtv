@@ -2602,7 +2602,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
     VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress() ignoreKeys: "<<ignoreKeys);
 #endif // DEBUG_ACTIONS
 
-    idleTimer.start();
+    if (db_idle_timeout > 0)
+        idleTimer.start();
 
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
