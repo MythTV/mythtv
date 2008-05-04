@@ -683,6 +683,11 @@ void AudioOutputBase::SetAudiotime(void)
     pthread_mutex_unlock(&audio_buflock);
 }
 
+int AudioOutputBase::GetAudioBufferedTime(void) const
+{
+     return audbuf_timecode - GetAudiotime();
+}
+
 bool AudioOutputBase::AddSamples(char *buffers[], int samples,
                                  long long timecode)
 {
@@ -704,7 +709,7 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
         len += (pSoundStretch->numUnprocessedSamples() +
                 (int)(pSoundStretch->numSamples()/audio_stretchfactor))*abps;
 
-    if (((len > afree) || ((audbuf_timecode - GetAudiotime()) > 2000)) && !blocking)
+    if ((len > afree) && !blocking)
     {
         VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4")
@@ -773,7 +778,7 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
                 (int)(pSoundStretch->numSamples()/audio_stretchfactor))*abps;
     }
 
-    if (((len > afree) || (audiotime && ((audbuf_timecode - GetAudiotime()) > 2000))) && !blocking)
+    if ((len > afree) && !blocking)
     {
         VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + QString(
                 "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4")

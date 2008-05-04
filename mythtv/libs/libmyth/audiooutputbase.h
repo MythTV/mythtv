@@ -56,6 +56,7 @@ class AudioOutputBase : public AudioOutput
     virtual void Drain(void);
 
     virtual int GetAudiotime(void) const;
+    virtual int GetAudioBufferedTime(void) const;
 
     // Send output events showing current progress
     virtual void Status(void);

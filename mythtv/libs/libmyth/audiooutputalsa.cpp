@@ -80,9 +80,10 @@ bool AudioOutputALSA::OpenDevice()
     }
     else
     {
-        fragment_size = 6144; // nicely divisible by 2,4,6,8 channels @ 16-bits
-        buffer_time = 500000; // 500 ms
-        period_time = buffer_time / 4;  // 4 interrupts per buffer
+        fragment_size = 1536 * audio_channels * audio_bits / 8;
+        period_time = 25000;  // in usec, interrupt period time
+        // in usec, for driver buffer alloc (64k max)
+        buffer_time = period_time * 16;
     }
 
     if (audio_bits == 8)

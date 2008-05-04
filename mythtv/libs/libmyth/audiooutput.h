@@ -53,6 +53,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual int GetAudiotime(void) const = 0;
 
+    /// report amount of audio buffered in milliseconds.
+    virtual int GetAudioBufferedTime(void) const { return 0; }
+
     virtual void SetSourceBitrate(int ) { }
 
     QString GetError(void)   const { return lastError; }
