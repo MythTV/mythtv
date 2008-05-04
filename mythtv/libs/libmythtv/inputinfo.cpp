@@ -46,6 +46,9 @@ void InputInfo::Clear(void)
 bool InputInfo::FromStringList(QStringList::const_iterator &it,
                                QStringList::const_iterator end)
 {
+    if (it == end)
+        return false;
+
     name     = Q3DeepCopy<QString>(*it);
     name     = (name == "<EMPTY>") ? QString::null : name;
     NEXT();
