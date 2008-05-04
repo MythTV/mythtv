@@ -13,6 +13,7 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <Q3PtrList>
 
 typedef map<QString,void*>       library_map_t;
 typedef map<QString,FilterInfo*> filter_map_t;
