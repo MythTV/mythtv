@@ -1236,7 +1236,7 @@ void GLSingleView::SlideTimeout(void)
     updateGL();
     if (m_slideshow_running)
     {
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->start(max(0, m_slideshow_frame_delay_state), true);
 
         // If transitioning to/from a movie, no effect is running so
         // next timeout should trigger proper immage delay.
