@@ -419,6 +419,8 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
         found = true;
     }
 
+    (void) car; // <- we don't currently use this but may in the future.
+
     if (!found)
     {
         VERBOSE(VB_DSMCC, QString("[dsmcc] Dropping block from tag %1")

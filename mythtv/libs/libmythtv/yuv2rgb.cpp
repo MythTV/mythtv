@@ -376,10 +376,10 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
         return mmx_rgb16;
     else if ((bpp == 32) && (mode == MODE_RGB))
         return mmx_argb32;
-#endif
-
+#else
     if ((bpp == 32) && (mode == MODE_RGB))
         return yuv420_argb32_non_mmx;
+#endif
 
     return NULL;
 }

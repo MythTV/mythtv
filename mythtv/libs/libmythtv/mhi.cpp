@@ -260,7 +260,7 @@ void MHIContext::QueueDSMCCPacket(
 // A NetworkBootInfo sub-descriptor is present in the PMT.
 void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
 {
-    if (length < 2) return;
+    if (length < 2) return; // Temporary hack? -- dtk May 5th, 2008.
     QMutexLocker locker(&m_dsmccLock);
     // Save the data from the descriptor.
     m_nbiData.duplicate(data, length);

@@ -246,8 +246,6 @@ static QString mode_to_format(int mode, int v4l_version)
             return "SECAM";
         else if (mode == 3)
             return "PAL-NC";
-        else if (mode == 4)
-            return "PAL-M";
         else if (mode == 5)
             return "PAL-N";
         else if (mode == 6)

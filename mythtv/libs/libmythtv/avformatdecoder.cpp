@@ -3124,8 +3124,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 ateof = true;
                 GetNVP()->SetEof();
-                if (pkt)
-                    delete pkt;
+                delete pkt;
                 return false;
             }
 
@@ -3282,8 +3281,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (GetNVP()->IsErrored())
             {
                 av_free_packet(pkt);
-                if (pkt)
-                    delete pkt;
+                delete pkt;
                 return false;
             }
         }
@@ -3988,67 +3986,45 @@ bool AvFormatDecoder::SetupAudioStream(void)
     if (info == audioIn)
         return false; // no change
 
-    QString ptmsg = (using_passthru) ? " using passthru" : "";
     VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
             QString("audio track #%1").arg(currentTrack[kTrackTypeAudio]+1));
 
     audioOut = audioIn = info;
-    if (using_passthru)
-    {
-        // A passthru stream looks like a 48KHz 2ch (@ 16bit) to the sound card
-        AudioInfo digInfo = audioOut;
-        if (!disable_passthru)
-        {
-            digInfo.channels    = 2;
-            digInfo.sample_rate = 48000;
-            digInfo.sample_size = 4;
-        }
-        if (audioOut.channels > (int) max_channels)
-        {
-            audioOut.channels = (int) max_channels;
-            audioOut.sample_size = audioOut.channels * 2;
-            codec_ctx->channels = audioOut.channels;
-        }
-        VERBOSE(VB_AUDIO, LOC + "Audio format changed digital passthrough " +
-                QString("%1\n\t\t\tfrom %2 ; %3\n\t\t\tto   %4 ; %5")
-                .arg(digInfo.toString())
-                .arg(old_in.toString()).arg(old_out.toString())
-                .arg(audioIn.toString()).arg(audioOut.toString()));
+    AudioInfo tmpAudioOut = audioOut;
 
-        if (digInfo.sample_rate > 0)
-            GetNVP()->SetEffDsp(digInfo.sample_rate * 100);
-
-        GetNVP()->SetAudioParams(digInfo.bps(), digInfo.channels,
-                                 digInfo.sample_rate, audioIn.do_passthru);
-        // allow the audio stuff to re-encode
-        GetNVP()->SetAudioCodec(codec_ctx);
-        GetNVP()->ReinitAudio();
-        return true;
-    }
-    else
+    // A passthru stream looks like a 48KHz 2ch (@ 16bit) to the sound card
+    if (using_passthru && !disable_passthru)
     {
-        if (audioOut.channels > (int) max_channels)
-        {
-            audioOut.channels = (int) max_channels;
-            audioOut.sample_size = audioOut.channels * 2;
-            codec_ctx->channels = audioOut.channels;
-        }
+        tmpAudioOut.channels    = 2;
+        tmpAudioOut.sample_rate = 48000;
+        tmpAudioOut.sample_size = 4;
     }
+
+    if (audioOut.channels > (int) max_channels)
+    {
+        audioOut.channels    = (int) max_channels;
+        audioOut.sample_size = audioOut.channels * 2;
+        codec_ctx->channels  = audioOut.channels;
+    }
+
+    if (!using_passthru)
+        tmpAudioOut = audioOut;
 
     VERBOSE(VB_AUDIO, LOC + "Audio format changed " +
-            QString("\n\t\t\tfrom %1 ; %2\n\t\t\tto   %3 ; %4")
+            QString("%1%2\n\t\t\tfrom %3 ; %4\n\t\t\tto   %5 ; %6")
+            .arg((using_passthru) ? "digital passthrough " : "")
+            .arg((using_passthru) ? tmpAudioOut.toString() : QString(""))
             .arg(old_in.toString()).arg(old_out.toString())
             .arg(audioIn.toString()).arg(audioOut.toString()));
 
-    if (audioOut.sample_rate > 0)
-        GetNVP()->SetEffDsp(audioOut.sample_rate * 100);
+    if (tmpAudioOut.sample_rate > 0)
+        GetNVP()->SetEffDsp(tmpAudioOut.sample_rate * 100);
 
-    GetNVP()->SetAudioParams(audioOut.bps(), audioOut.channels,
-                             audioOut.sample_rate,
-                             audioIn.do_passthru);
+    GetNVP()->SetAudioParams(tmpAudioOut.bps(), tmpAudioOut.channels,
+                             tmpAudioOut.sample_rate, audioIn.do_passthru);
 
     // allow the audio stuff to reencode
-    GetNVP()->SetAudioCodec(using_passthru?codec_ctx:NULL);
+    GetNVP()->SetAudioCodec((using_passthru) ? codec_ctx : NULL);
     GetNVP()->ReinitAudio();
 
     return true;
