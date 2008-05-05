@@ -852,6 +852,13 @@ void MpegRecorder::StartRecording(void)
         if (readfd < 0)
             readfd = open(videodevice.ascii(), O_RDWR);
 
+        if (readfd < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                    QString("Failed to open device '%1'").arg(videodevice));
+            continue;
+        }
+
         tv.tv_sec = 5;
         tv.tv_usec = 0;
         FD_ZERO(&rdset);
