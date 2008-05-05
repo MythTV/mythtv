@@ -1851,6 +1851,7 @@ QString DataDirectProcessor::CreateTempDirectory(bool *pok)
 
 QString DataDirectProcessor::GetPostFilename(bool &ok) const
 {
+    ok = true;
     if (tmpPostFile.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_post_XXXXXX",
@@ -1862,6 +1863,7 @@ QString DataDirectProcessor::GetPostFilename(bool &ok) const
 
 QString DataDirectProcessor::GetResultFilename(bool &ok) const
 {
+    ok = true;
     if (tmpResultFile.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_result_XXXXXX",
@@ -1873,6 +1875,7 @@ QString DataDirectProcessor::GetResultFilename(bool &ok) const
 
 QString DataDirectProcessor::GetCookieFilename(bool &ok) const
 {
+    ok = true;
     if (cookieFile.isEmpty())
     {
         CreateTemp(tmpDir + "/mythtv_cookies_XXXXXX",
