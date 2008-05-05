@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <map>
 #include <mysql/mysql.h>
@@ -42,6 +43,17 @@ extern string  g_binPath;
 
 #define DB_CHECK_TIME 60
 extern time_t  g_lastDBKick;
+
+const string FUNCTION_MONITOR = "Monitor";
+const string FUNCTION_MODECT  = "Modect";
+const string FUNCTION_NODECT  = "Nodect";
+const string FUNCTION_RECORD  = "Record";
+const string FUNCTION_MOCORD  = "Mocord";
+const string FUNCTION_NONE    = "None";
+
+const string RESTART          = "restart";
+const string RELOAD           = "reload";
+const string RUNNING          = "running";
 
 typedef enum 
 { 
@@ -100,6 +112,10 @@ typedef struct
 typedef struct
 {
     string name;
+    string type;
+    string function;
+    int enabled;
+    string device;
     int image_buffer_count;
     int width;
     int height;
@@ -110,6 +126,23 @@ typedef struct
     string status;
     int frame_size;
     int palette;
+    int controllable;
+    int trackMotion;
+
+    string getIdStr()
+    {
+        if (id == "")
+        {
+            std::stringstream out;
+            out << mon_id;
+            id = out.str();
+        }
+        return id;
+    }
+
+  private:
+    string id;
+
 } MONITOR;
 
 class ZMServer
@@ -133,7 +166,8 @@ class ZMServer
     void handleHello(void);
     string runCommand(string command);
     void getMonitorStatus(string id, string type, string device, string channel,
-                          string function, string &zmcStatus, string &zmaStatus);
+                          string function, string &zmcStatus, string &zmaStatus,
+                          string enabled);
     void handleGetServerStatus(void);
     void handleGetMonitorStatus(void);
     void handleGetMonitorList(void);
@@ -147,6 +181,9 @@ class ZMServer
     void handleDeleteEventList(vector<string> tokens);
     void handleGetEventDates(vector<string> tokens);
     void handleRunZMAudit(void);
+    void handleSetMonitorFunction(vector<string> tokens);
+    void zmcControl(MONITOR *monitor, const string &mode);
+    void zmaControl(MONITOR *monitor, const string &mode);
 
     bool                 m_debug;
     int                  m_sock;

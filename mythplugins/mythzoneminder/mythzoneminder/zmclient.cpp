@@ -21,7 +21,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "5"
+#define ZM_PROTOCOL_VERSION "6"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -281,10 +281,13 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     for (int x = 0; x < monitorCount; x++)
     {
         Monitor *item = new Monitor;
-        item->name = strList[x * 4 + 2];
-        item->zmcStatus = strList[x * 4 + 3];
-        item->zmaStatus = strList[x * 4 + 4];
-        item->events = strList[x * 4 + 5].toInt();
+        item->id = strList[x * 7 + 2].toInt();
+        item->name = strList[x * 7 + 3];
+        item->zmcStatus = strList[x * 7 + 4];
+        item->zmaStatus = strList[x * 7 + 5];
+        item->events = strList[x * 7 + 6].toInt();
+        item->function = strList[x * 7 + 7];
+        item->enabled = strList[x * 7 + 8].toInt();
         monitorList->push_back(item);
     }
 }
@@ -654,4 +657,15 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
         VERBOSE(VB_IMPORTANT, QString("Monitor: %1 (%2) is using palette: %3")
                 .arg(item->name).arg(item->id).arg(item->palette));
     }
+}
+
+void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const int enabled)
+{
+    QStringList strList("SET_MONITOR_FUNCTION");
+    strList << QString::number(monitorID);
+    strList << function;
+    strList << QString::number(enabled);
+
+    if (!sendReceiveStringList(strList))
+        return;
 }

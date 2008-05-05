@@ -19,6 +19,13 @@
 #include <qstring.h>
 #include <qrect.h>
 
+const QString FUNCTION_MONITOR = "Monitor";
+const QString FUNCTION_MODECT  = "Modect";
+const QString FUNCTION_NODECT  = "Nodect";
+const QString FUNCTION_RECORD  = "Record";
+const QString FUNCTION_MOCORD  = "Mocord";
+const QString FUNCTION_NONE    = "None";
+
 // event details
 typedef struct
 {
@@ -48,6 +55,10 @@ typedef struct
     // used by console view
     int     id;
     QString name;
+    QString type;
+    QString function;
+    int enabled;
+    QString device;
     QString zmcStatus;
     QString zmaStatus;
     int events;
