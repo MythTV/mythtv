@@ -38,7 +38,7 @@ class DBox2Channel;
 class DTVChannel;
 class DVBChannel;
 class FirewireChannel;
-class Channel;
+class V4LChannel;
 class HDHRChannel;
 
 class MPEGStreamData;
@@ -283,7 +283,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     HDHRChannel  *GetHDHRChannel(void);
     DVBChannel   *GetDVBChannel(void);
     FirewireChannel *GetFirewireChannel(void);
-    Channel      *GetV4LChannel(void);
+    V4LChannel   *GetV4LChannel(void);
 
     bool SetupSignalMonitor(bool enable_table_monitoring, bool notify);
     bool SetupDTVSignalMonitor(void);

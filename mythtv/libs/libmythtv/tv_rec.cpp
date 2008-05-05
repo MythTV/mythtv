@@ -202,7 +202,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
     else // "V4L" or "MPEG", ie, analog TV
     {
 #ifdef USING_V4L
-        channel = new Channel(this, genOpt.videodev);
+        channel = new V4LChannel(this, genOpt.videodev);
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
@@ -1228,10 +1228,10 @@ FirewireChannel *TVRec::GetFirewireChannel(void)
 #endif // USING_FIREWIRE
 }
 
-Channel *TVRec::GetV4LChannel(void)
+V4LChannel *TVRec::GetV4LChannel(void)
 {
 #ifdef USING_V4L
-    return dynamic_cast<Channel*>(channel);
+    return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;
 #endif // USING_V4L

@@ -547,10 +547,10 @@ DVBChannel *SIScan::GetDVBChannel(void)
 #endif
 }
 
-Channel *SIScan::GetChannel(void)
+V4LChannel *SIScan::GetV4LChannel(void)
 {
 #ifdef USING_V4L
-    return dynamic_cast<Channel*>(channel);
+    return dynamic_cast<V4LChannel*>(channel);
 #else
     return NULL;
 #endif
@@ -1611,7 +1611,7 @@ uint SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 #endif // USING_DVB
 
 #ifdef USING_V4L
-    if (GetChannel())
+    if (GetV4LChannel())
     {
         // convert to visual carrier
         tuning.frequency = tuning.frequency - 1750000;

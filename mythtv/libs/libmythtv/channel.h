@@ -15,7 +15,7 @@ class TVRec;
 typedef QMap<int,int>         VidModV4L1;
 typedef QMap<int,v4l2_std_id> VidModV4L2;
 
-/** \class Channel
+/** \class V4LChannel
  *  \brief Implements tuning for TV cards using the V4L driver API,
  *         both versions 1 and 2.
  *
@@ -25,11 +25,11 @@ typedef QMap<int,v4l2_std_id> VidModV4L2;
  *   pre-encoded broadcast streams.
  *
  */
-class Channel : public DTVChannel
+class V4LChannel : public DTVChannel
 {
  public:
-    Channel(TVRec *parent, const QString &videodevice);
-    virtual ~Channel(void);
+    V4LChannel(TVRec *parent, const QString &videodevice);
+    virtual ~V4LChannel(void);
 
     bool Init(QString &inputname, QString &startchannel, bool setchan);
 

@@ -21,7 +21,7 @@ class MSqlQuery;
 
 class ChannelBase;
 class DTVChannel;
-class Channel;
+class V4LChannel;
 class DVBChannel;
 class HDHRChannel;
 
@@ -120,7 +120,7 @@ class SIScan : public QObject,
   private:
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
-    Channel          *GetChannel(void);
+    V4LChannel       *GetV4LChannel(void);
     DVBChannel       *GetDVBChannel(void);
 
     /// \brief Called by SpawnScanner to run scanning thread

@@ -7,13 +7,13 @@
 // MythTV headers
 #include "signalmonitor.h"
 
-class Channel;
+class V4LChannel;
 
 class AnalogSignalMonitor : public SignalMonitor
 {
   public:
     AnalogSignalMonitor(
-        int db_cardnum, Channel *_channel,
+        int db_cardnum, V4LChannel *_channel,
         uint64_t _flags = kSigMon_WaitForSig);
 
     virtual void UpdateValues(void);

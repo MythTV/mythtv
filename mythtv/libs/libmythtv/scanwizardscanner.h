@@ -52,7 +52,7 @@ class SIScan;
 class ScanProgressPopup;
 
 class ChannelBase;
-class Channel;
+class V4LChannel;
 class DVBChannel;
 class SignalMonitorValue;
 

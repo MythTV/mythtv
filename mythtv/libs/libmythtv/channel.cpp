@@ -38,12 +38,7 @@ using namespace std;
 static int format_to_mode(const QString& fmt, int v4l_version);
 static QString mode_to_format(int mode, int v4l_version);
 
-/** \class Channel
- *  \brief Class implementing ChannelBase interface to tuning hardware
- *         when using Video4Linux based drivers.
- */
-
-Channel::Channel(TVRec *parent, const QString &videodevice)
+V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice)
     : DTVChannel(parent),
       device(videodevice),          videofd(-1),
       device_name(QString::null),   driver_name(QString::null),
@@ -53,12 +48,12 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
 {
 }
 
-Channel::~Channel(void)
+V4LChannel::~V4LChannel(void)
 {
     Close();
 }
 
-bool Channel::Init(QString &inputname, QString &startchannel, bool setchan)
+bool V4LChannel::Init(QString &inputname, QString &startchannel, bool setchan)
 {
     if (setchan)
     {
@@ -68,7 +63,7 @@ bool Channel::Init(QString &inputname, QString &startchannel, bool setchan)
     return ChannelBase::Init(inputname, startchannel, setchan);
 }
 
-bool Channel::Open(void)
+bool V4LChannel::Open(void)
 {
 #if FAKE_VIDEO
     return true;
@@ -101,14 +96,14 @@ bool Channel::Open(void)
     return true;
 }
 
-void Channel::Close(void)
+void V4LChannel::Close(void)
 {
     if (videofd >= 0)
         close(videofd);
     videofd = -1;
 }
 
-void Channel::SetFd(int fd)
+void V4LChannel::SetFd(int fd)
 {
     if (fd != videofd)
         Close();
@@ -267,13 +262,13 @@ static QString mode_to_format(int mode, int v4l_version)
     return "Unknown";
 }
 
-/** \fn Channel::InitializeInputs(void)
+/** \fn V4LChannel::InitializeInputs(void)
  *  This enumerates the inputs, converts the format
  *  string to something the hardware understands, and
  *  if the parent pointer is valid retrieves the
  *  channels from the database.
  */
-bool Channel::InitializeInputs(void)
+bool V4LChannel::InitializeInputs(void)
 {
     // Get Inputs from DB
     if (!ChannelBase::InitializeInputs())
@@ -320,7 +315,7 @@ bool Channel::InitializeInputs(void)
     return valid_cnt;
 }
 
-/** \fn Channel::SetFormat(const QString &format)
+/** \fn V4LChannel::SetFormat(const QString &format)
  *  \brief Initializes tuner and modulator variables
  *
  *  \param format One of twelve formats:
@@ -329,7 +324,7 @@ bool Channel::InitializeInputs(void)
  *                "PAL",    "PAL-BG",  "PAL-DK",   "PAL-I",
  *                "PAL-60", "PAL-NC",  "PAL-M", or "PAL-N"
  */
-void Channel::SetFormat(const QString &format)
+void V4LChannel::SetFormat(const QString &format)
 {
     if (!Open())
         return;
@@ -356,19 +351,19 @@ void Channel::SetFormat(const QString &format)
     }
 }
 
-int Channel::SetDefaultFreqTable(const QString &name)
+int V4LChannel::SetDefaultFreqTable(const QString &name)
 {
     defaultFreqTable = SetFreqTable(name);
     return defaultFreqTable;
 }
 
-void Channel::SetFreqTable(const int index)
+void V4LChannel::SetFreqTable(const int index)
 {
     curList = chanlists[index].list;
     totalChannels = chanlists[index].count;
 }
 
-int Channel::SetFreqTable(const QString &name)
+int V4LChannel::SetFreqTable(const QString &name)
 {
     int i = 0;
     char *listname = (char *)chanlists[i].name;
@@ -392,7 +387,7 @@ int Channel::SetFreqTable(const QString &name)
     return 1;
 }
 
-int Channel::GetCurrentChannelNum(const QString &channame)
+int V4LChannel::GetCurrentChannelNum(const QString &channame)
 {
     for (int i = 0; i < totalChannels; i++)
     {
@@ -407,21 +402,21 @@ int Channel::GetCurrentChannelNum(const QString &channame)
     return -1;
 }
 
-void Channel::SaveCachedPids(const pid_cache_t &pid_cache) const
+void V4LChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
     if (chanid > 0)
         DTVChannel::SaveCachedPids(chanid, pid_cache);
 }
 
-void Channel::GetCachedPids(pid_cache_t &pid_cache) const
+void V4LChannel::GetCachedPids(pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
     if (chanid > 0)
         DTVChannel::GetCachedPids(chanid, pid_cache);
 }
 
-bool Channel::SetChannelByString(const QString &channum)
+bool V4LChannel::SetChannelByString(const QString &channum)
 {
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
     QString loc_err = loc + ", Error: ";
@@ -553,7 +548,7 @@ bool Channel::SetChannelByString(const QString &channum)
     return true;
 }
 
-bool Channel::TuneTo(const QString &channum, int finetune)
+bool V4LChannel::TuneTo(const QString &channum, int finetune)
 {
     int i = GetCurrentChannelNum(channum);
     VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): "
@@ -574,13 +569,13 @@ bool Channel::TuneTo(const QString &channum, int finetune)
     return Tune(frequency, "", "analog", "analog");
 }
 
-bool Channel::Tune(const DTVMultiplex &tuning, QString inputname)
+bool V4LChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 {
     return Tune(tuning.frequency - 1750000, // to visual carrier
                 inputname, tuning.modulation.toString(), tuning.sistandard);
 }
 
-/** \fn Channel::Tune(uint,QString,QString,QString)
+/** \fn V4LChannel::Tune(uint,QString,QString,QString)
  *  \brief Tunes to a specific frequency (Hz) on a particular input, using
  *         the specified modulation.
  *
@@ -591,7 +586,7 @@ bool Channel::Tune(const DTVMultiplex &tuning, QString inputname)
  *  \param inputname Name of the input (Television, Antenna 1, etc.)
  *  \param modulation "radio", "analog", or "digital"
  */
-bool Channel::Tune(uint frequency, QString inputname,
+bool V4LChannel::Tune(uint frequency, QString inputname,
                    QString modulation, QString si_std)
 {
     VERBOSE(VB_CHANNEL, LOC + QString("Tune(%1, %2, %3, %4)")
@@ -699,12 +694,12 @@ bool Channel::Tune(uint frequency, QString inputname,
     return true;
 }
 
-/** \fn Channel::Retune(void)
+/** \fn V4LChannel::Retune(void)
  *  \brief Retunes to last tuned frequency.
  *
  *  NOTE: This only works for V4L2 and only for analog tuning.
  */
-bool Channel::Retune(void)
+bool V4LChannel::Retune(void)
 {
     if (usingv4l2)
     {
@@ -737,7 +732,7 @@ bool Channel::Retune(void)
 }
 
 // documented in dtvchannel.h
-bool Channel::TuneMultiplex(uint mplexid, QString inputname)
+bool V4LChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
     VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
 
@@ -764,7 +759,7 @@ bool Channel::TuneMultiplex(uint mplexid, QString inputname)
     return true;
 }
 
-QString Channel::GetFormatForChannel(QString channum, QString inputname)
+QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -786,7 +781,7 @@ QString Channel::GetFormatForChannel(QString channum, QString inputname)
     return fmt;
 }
 
-bool Channel::SetInputAndFormat(int inputNum, QString newFmt)
+bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
 {
     InputMap::const_iterator it = inputs.find(inputNum);
     if (it == inputs.end() || (*it)->inputNumV4L < 0)
@@ -891,7 +886,7 @@ bool Channel::SetInputAndFormat(int inputNum, QString newFmt)
     return ok;
 }
 
-bool Channel::SwitchToInput(int inputnum, bool setstarting)
+bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
 {
     InputMap::const_iterator it = inputs.find(inputnum);
     if (it == inputs.end())
@@ -990,7 +985,7 @@ static int get_v4l2_attribute(const QString &db_col_name)
     return -1;
 }
 
-bool Channel::InitPictureAttribute(const QString db_col_name)
+bool V4LChannel::InitPictureAttribute(const QString db_col_name)
 {
     if (!pParent || is_dtv)
         return false;
@@ -1097,7 +1092,7 @@ bool Channel::InitPictureAttribute(const QString db_col_name)
     return true;
 }
 
-bool Channel::InitPictureAttributes(void)
+bool V4LChannel::InitPictureAttributes(void)
 {
     return (InitPictureAttribute("brightness") &&
             InitPictureAttribute("contrast")   &&
@@ -1105,7 +1100,7 @@ bool Channel::InitPictureAttributes(void)
             InitPictureAttribute("hue"));
 }
 
-int Channel::GetPictureAttribute(PictureAttribute attr) const
+int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
 {
     QString db_col_name = toDBString(attr);
     if (db_col_name.isEmpty())
@@ -1254,7 +1249,7 @@ static int set_attribute_value(bool usingv4l2, int videofd,
     return set_v4l1_attribute_value(videofd, v4l2_attrib, newvalue);
 }
 
-int Channel::ChangePictureAttribute(
+int V4LChannel::ChangePictureAttribute(
     PictureAdjustType type, PictureAttribute attr, bool up)
 {
     if (!pParent || is_dtv)

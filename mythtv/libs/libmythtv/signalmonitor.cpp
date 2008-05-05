@@ -95,7 +95,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     if ((cardtype.upper() == "V4L") ||
         (cardtype.upper() == "MPEG"))
     {
-        Channel *chan = dynamic_cast<Channel*>(channel);
+        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new AnalogSignalMonitor(db_cardnum, chan);
     }
