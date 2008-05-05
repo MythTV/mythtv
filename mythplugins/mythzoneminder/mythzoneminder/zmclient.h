@@ -63,6 +63,7 @@ class MPUBLIC ZMClient : public QObject
     void getMonitorList(vector<Monitor*> *monitorList);
     void getEventDates(const QString &monitorName, bool oldestFirst, 
                        QStringList &dateList);
+    void setMonitorFunction(const int monitorID, const QString &function, const int enabled);
 
   private slots:
     void restartConnection(void);  // Try to re-establish the connection to 

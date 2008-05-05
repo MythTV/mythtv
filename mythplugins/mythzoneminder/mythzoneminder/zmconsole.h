@@ -43,6 +43,7 @@ public:
     void updateStatus();
     void getDaemonStatus();
     void getMonitorStatus(void);
+    void showEditFunctionPopup();
 
   private:
     void wireUpTheme(void);
@@ -52,10 +53,14 @@ public:
     void monitorListDown(bool page);
     void monitorListUp(bool page);
 
+    void setMonitorFunction(const QString &function, const int enabled);
+
     int                m_currentMonitor;
     int                m_monitorListSize;
     vector<Monitor *> *m_monitorList;
     UIListType        *m_monitor_list;
+
+    vector<QString>  *m_functionList;
 
     UITextType        *m_status_text;
     UITextType        *m_time_text;

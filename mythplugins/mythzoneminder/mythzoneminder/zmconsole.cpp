@@ -58,6 +58,14 @@ ZMConsole::ZMConsole(MythMainWindow *parent,
             SLOT(updateStatus()));
     m_updateTimer->start(100);
 
+    m_functionList = new vector<QString>;
+    m_functionList->push_back(FUNCTION_NONE);
+    m_functionList->push_back(FUNCTION_MONITOR);
+    m_functionList->push_back(FUNCTION_MODECT);
+    m_functionList->push_back(FUNCTION_RECORD);
+    m_functionList->push_back(FUNCTION_MOCORD);
+    m_functionList->push_back(FUNCTION_MODECT);
+
     updateTime();
 }
 
@@ -67,6 +75,9 @@ ZMConsole::~ZMConsole()
 
     if (m_monitorList)
         delete m_monitorList;
+
+    if (m_functionList)
+        delete m_functionList;
 }
 
 void ZMConsole::updateTime(void)
@@ -177,12 +188,90 @@ void ZMConsole::keyPressEvent(QKeyEvent *e)
         {
             handled = false;
         }
+        else if (action == "SELECT" || action == "MENU")
+        {
+            showEditFunctionPopup();
+        }
         else
             handled = false;
     }
 
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
+}
+
+void ZMConsole::showEditFunctionPopup()
+{
+    Monitor *currentMonitor = NULL;
+
+    if (m_currentMonitor < (int) m_monitorList->size())
+        currentMonitor = m_monitorList->at(m_currentMonitor);
+
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit monitor function");
+
+    QGridLayout *grid = new QGridLayout(2, 2, (int)(10 * wmult));
+
+    QString title;
+    title = tr("Edit Function - ");
+    title += currentMonitor->name;
+
+    QLabel *label = new QLabel(title, popup);
+    QFont font = label->font();
+    font.setPointSize(int (font.pointSize() * 1.8));
+    font.setBold(true);
+    label->setFont(font);
+    label->setPaletteForegroundColor(QColor("white"));
+    label->setAlignment(Qt::AlignCenter);
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred)));
+    label->setMinimumWidth((int)(250 * wmult));
+    label->setMaximumWidth((int)(250 * wmult));
+    popup->addWidget(label);
+
+    label = new QLabel(tr("Function:"), popup);
+    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+    label->setBackgroundOrigin(ParentOrigin);
+    label->setPaletteForegroundColor(Qt::white);
+    grid->addWidget(label, 0, 0, Qt::AlignLeft);
+
+    MythComboBox *functions = new MythComboBox(false, popup);
+    grid->addWidget(functions, 0, 1, Qt::AlignLeft);
+
+    label = new QLabel(tr("Enable:"), popup);
+    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+    label->setBackgroundOrigin(ParentOrigin);
+    label->setPaletteForegroundColor(Qt::white);
+    grid->addWidget(label, 1, 0, Qt::AlignLeft);
+
+    MythCheckBox *enable = new MythCheckBox(popup);
+    grid->addWidget(enable, 1, 1, Qt::AlignLeft);
+
+    // Populate the combox box
+    int selectedFunction = 0;
+    for (int i = 0; i < (int) m_functionList->size(); i++)
+    {
+        functions->insertItem(m_functionList->at(i));
+        if (m_functionList->at(i) == currentMonitor->function)
+            selectedFunction = i;
+    }
+
+    // Set defaults
+    functions->setCurrentItem(selectedFunction);
+    enable->setChecked(currentMonitor->enabled);
+
+    functions->setFocus();
+
+    popup->addLayout(grid, 0);
+
+    popup->addButton(tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
+
+    DialogCode res = popup->ExecPopup();
+
+    if (kDialogCodeAccepted == res)
+        setMonitorFunction(functions->currentText(), enable->isChecked());
+
+    popup->deleteLater();
 }
 
 UITextType* ZMConsole::getTextType(QString name)
@@ -217,6 +306,9 @@ void ZMConsole::wireUpTheme()
         m_monitorListSize = m_monitor_list->GetItems();
         m_monitor_list->SetItemCurrent(0);
     }
+
+    buildFocusList();
+    assignFirstFocus();
 }
 
 void ZMConsole::updateMonitorList()
@@ -283,4 +375,34 @@ void ZMConsole::monitorListUp(bool page)
 
         updateMonitorList();
     }
+}
+
+void ZMConsole::setMonitorFunction(const QString &function, const int enabled)
+{
+    Monitor *currentMonitor = NULL;
+
+    if (m_currentMonitor < (int) m_monitorList->size())
+        currentMonitor = m_monitorList->at(m_currentMonitor);
+
+    if (currentMonitor == NULL)
+    {
+        VERBOSE(VB_IMPORTANT, "Monitor not found error");
+        return;
+    }
+
+    VERBOSE(VB_GENERAL, "Monitor id : " + QString::number(currentMonitor->id) +
+            " function change " + currentMonitor->function + " -> " + function +
+            ", enable value " + QString::number(currentMonitor->enabled) + " -> " +
+            QString::number(enabled));
+
+    if (currentMonitor->function == function && currentMonitor->enabled == enabled)
+    {
+        VERBOSE(VB_IMPORTANT, "Monitor Function/Enable values not changed so not updating.");
+        return;
+    }
+
+    if (class ZMClient *zm = ZMClient::get())
+        zm->setMonitorFunction(currentMonitor->id, function, enabled);
+
+    updateStatus();
 }

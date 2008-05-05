@@ -41,7 +41,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "5"
+#define ZM_PROTOCOL_VERSION "6"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -55,6 +55,8 @@
 #define ERROR_FILE_OPEN        "Cannot open event file"
 #define ERROR_INVALID_MONITOR  "Invalid Monitor"
 #define ERROR_INVALID_POINTERS "Cannot get shared memory pointers"
+#define ERROR_INVALID_MONITOR_FUNCTION  "Invalid Monitor Function"
+#define ERROR_INVALID_MONITOR_ENABLE_VALUE "Invalid Monitor Enable Value"
 
 MYSQL   g_dbConn;
 string  g_zmversion = "";
@@ -303,6 +305,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleDeleteEventList(tokens);
     else if (tokens[0] == "RUN_ZMAUDIT")
         handleRunZMAudit();
+    else if (tokens[0] == "SET_MONITOR_FUNCTION")
+        handleSetMonitorFunction(tokens);
     else
         send("UNKNOWN_COMMAND");
 }
@@ -593,7 +597,7 @@ void ZMServer::handleGetMonitorStatus(void)
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    string sql("SELECT id, name, type, device, channel, function "
+    string sql("SELECT id, name, type, device, channel, function, enabled "
                "FROM Monitors;");
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
@@ -624,12 +628,13 @@ void ZMServer::handleGetMonitorStatus(void)
             string device = row[3];
             string channel = row[4];
             string function = row[5];
+            string enabled = row[6];
             string name = row[1];
             string events = "";
             string zmcStatus = "";
             string zmaStatus = "";
             getMonitorStatus(id, type, device, channel, function,
-                             zmcStatus, zmaStatus);
+                             zmcStatus, zmaStatus, enabled);
             MYSQL_RES *res2;
             MYSQL_ROW row2;
 
@@ -658,10 +663,13 @@ void ZMServer::handleGetMonitorStatus(void)
                 }
             }
 
+            ADD_STR(outStr, id)
             ADD_STR(outStr, name)
             ADD_STR(outStr, zmcStatus)
             ADD_STR(outStr, zmaStatus)
             ADD_STR(outStr, events)
+            ADD_STR(outStr, function)
+            ADD_STR(outStr, enabled)
 
             mysql_free_result(res2);
         }
@@ -693,7 +701,8 @@ string ZMServer::runCommand(string command)
 }
 
 void ZMServer::getMonitorStatus(string id, string type, string device, string channel,
-                                string function, string &zmcStatus, string &zmaStatus)
+                                string function, string &zmcStatus, string &zmaStatus,
+                                string enabled)
 {
     zmaStatus = "";
     zmcStatus = "";
@@ -701,21 +710,27 @@ void ZMServer::getMonitorStatus(string id, string type, string device, string ch
     string command(g_binPath + "/zmdc.pl status");
     string status = runCommand(command);
 
-    if (status.find("'zma -m " + id + "' running") != string::npos)
+    if (enabled == "0")
+        zmaStatus = device + "(" + channel + ") [-]";
+    else if (status.find("'zma -m " + id + "' running") != string::npos)
         zmaStatus = device + "(" + channel + ") [R]";
     else
         zmaStatus = device + "(" + channel + ") [S]";
 
     if (type == "Local")
     {
-        if (status.find("'zmc -d "+ device + "' running") != string::npos)
+        if (enabled == "0")
+            zmcStatus = function + " [-]";
+        else if (status.find("'zmc -d "+ device + "' running") != string::npos)
             zmcStatus = function + " [R]";
         else
             zmcStatus = function + " [S]";
     }
     else
     {
-        if (status.find("'zmc -m " + id + "' running") != string::npos)
+        if (enabled == "0")
+            zmcStatus = function + " [-]";
+        else if (status.find("'zmc -m " + id + "' running") != string::npos)
             zmcStatus = function + " [R]";
         else
             zmcStatus = function + " [S]";
@@ -1206,8 +1221,9 @@ void ZMServer::getMonitorList(void)
 {
     m_monitors.clear();
 
-    string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette "
-               "FROM Monitors");
+    string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette, ");
+    sql += " Type, Function, Enabled, Device, Controllable, TrackMotion ";
+    sql += "FROM Monitors";
 
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -1236,6 +1252,12 @@ void ZMServer::getMonitorList(void)
             m->height = atoi(row[3]);
             m->image_buffer_count = atoi(row[4]);
             m->palette = atoi(row[6]);
+            m->type = row[7];
+            m->function = row[8];
+            m->enabled = atoi(row[9]);
+            m->device = row[10];
+            m->controllable = atoi(row[11]);
+            m->trackMotion = atoi(row[12]);
             m_monitors[m->mon_id] = m;
 
             initMonitor(m);
@@ -1401,4 +1423,201 @@ string ZMServer::getZMSetting(const string &setting)
     mysql_free_result(res);
 
     return result;
+}
+
+void ZMServer::handleSetMonitorFunction(vector<string> tokens)
+{
+    string outStr("");
+
+    if (tokens.size() != 4)
+    {
+        sendError(ERROR_TOKEN_COUNT);
+        return;
+    }
+
+    string monitorID(tokens[1]);
+    string function(tokens[2]);
+    string enabled(tokens[3]);
+
+    // Check validity of input passed to server. Does monitor exist && is function ok
+    if (m_monitors.find(atoi(monitorID.c_str())) == m_monitors.end())
+    {
+        sendError(ERROR_INVALID_MONITOR);
+        return;
+    }
+
+    if (function != FUNCTION_NONE && function != FUNCTION_MONITOR &&
+        function != FUNCTION_MODECT && function != FUNCTION_NODECT &&
+        function != FUNCTION_RECORD && function != FUNCTION_MOCORD)
+    {
+        sendError(ERROR_INVALID_MONITOR_FUNCTION);
+        return;
+    }
+
+    if (enabled != "0" && enabled != "1")
+    {
+        sendError(ERROR_INVALID_MONITOR_ENABLE_VALUE);
+        return;
+    }
+
+    if (m_debug)
+        cout << "User input validated OK" << endl;
+
+
+    // Now perform db update && (re)start/stop daemons as required.
+    MONITOR *monitor = m_monitors[atoi(monitorID.c_str())];
+    string oldFunction = monitor->function;
+    string newFunction = function;
+    int oldEnabled  = monitor->enabled;
+    int newEnabled  = atoi(enabled.c_str());
+    monitor->function = newFunction;
+    monitor->enabled = newEnabled;
+
+    if (m_debug)
+        cout << "SetMonitorFunction MonitorId: " << monitorID << endl << 
+                "  oldEnabled: " << oldEnabled << endl <<
+                "  newEnabled: " << newEnabled << endl <<
+                " oldFunction: " << oldFunction << endl <<
+                " newFunction: " << newFunction << endl;
+
+    if ( newFunction != oldFunction || newEnabled != oldEnabled)
+    {
+        string sql("UPDATE Monitors ");
+        sql += "SET Function = '" + function + "', ";
+        sql += "Enabled = '" + enabled + "' ";
+        sql += "WHERE Id = '" + monitorID + "'";
+
+        if (mysql_query(&g_dbConn, sql.c_str()))
+        {
+            fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+            sendError(ERROR_MYSQL_QUERY);
+            return;
+        }
+
+        if (m_debug)
+            cout << "Monitor function SQL update OK" << endl;
+
+        string status = runCommand(g_binPath + "/zmdc.pl check");
+
+        // Now refresh servers
+        if (RUNNING.compare(0, RUNNING.size(), status, 0, RUNNING.size()) == 0)
+        {
+            if (m_debug)
+                cout << "Monitor function Refreshing daemons" << endl;
+
+            bool restart = (oldFunction == FUNCTION_NONE) ||
+                           (newFunction == FUNCTION_NONE) ||
+                           (newEnabled != oldEnabled);
+
+            if (restart)
+                zmcControl(monitor, RESTART);
+            else
+                zmcControl(monitor, "");
+            zmaControl(monitor, RELOAD);
+        }
+        else
+            if (m_debug)
+                cout << "zm daemons are not running" << endl;
+    }
+    else
+        cout << "Not updating monitor function as identical to existing configuration" << endl;
+
+    ADD_STR(outStr, "OK")
+    send(outStr);
+}
+
+void ZMServer::zmcControl(MONITOR *monitor, const string &mode)
+{
+    string zmcArgs = "";
+    string sql = "";
+    sql += "SELECT count(if(Function!='None',1,NULL)) as ActiveCount ";
+    sql += "FROM Monitors ";
+
+    if (monitor->type == "Local" )
+    {
+        sql += "WHERE Device = '" + monitor->device + "'";
+        zmcArgs = "-d " + monitor->device;
+    }
+    else
+    {
+        sql += "WHERE Id = '" + monitor->getIdStr() + "'";
+        zmcArgs = "-m " + monitor->mon_id;
+    }
+
+    if (mysql_query(&g_dbConn, sql.c_str()))
+    {
+        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+        sendError(ERROR_MYSQL_QUERY);
+        return;
+    }
+
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    int activeCount;
+
+    res = mysql_store_result(&g_dbConn);
+    row = mysql_fetch_row(res);
+
+    if (row)
+        activeCount = atoi(row[0]);
+    else
+    {
+        sendError(ERROR_MYSQL_QUERY);
+        return;
+    }
+
+    if (!activeCount)
+        runCommand(g_binPath + "/zmdc.pl stop zmc " + zmcArgs);
+    else
+    {
+        if (mode == RESTART)
+            runCommand(g_binPath + "/zmdc.pl stop zmc " + zmcArgs);
+
+        runCommand(g_binPath + "/zmdc.pl start zmc " + zmcArgs);
+    }
+}
+
+void ZMServer::zmaControl(MONITOR *monitor, const string &mode)
+{
+    int zmOptControl = atoi(getZMSetting("ZM_OPT_CONTROL").c_str());
+    int zmOptFrameServer = atoi(getZMSetting("ZM_OPT_FRAME_SERVER").c_str());
+
+    if (monitor->function == FUNCTION_MODECT ||
+        monitor->function == FUNCTION_RECORD ||
+        monitor->function == FUNCTION_MOCORD ||
+        monitor->function == FUNCTION_NODECT)
+    {
+        if (mode == RESTART)
+        {
+            if (zmOptControl)
+                 runCommand(g_binPath + "/zmdc.pl stop zmtrack.pl -m " + monitor->getIdStr());
+
+            runCommand(g_binPath + "/zmdc.pl stop zma -m " + monitor->getIdStr());
+
+            if (zmOptFrameServer)
+                runCommand(g_binPath + "/zmdc.pl stop zmf -m " + monitor->getIdStr());
+        }
+
+        if (zmOptFrameServer)
+            runCommand(g_binPath + "/zmdc.pl start zmf -m " + monitor->getIdStr());
+
+        runCommand(g_binPath + "/zmdc.pl start zma -m " + monitor->getIdStr());
+
+        if (zmOptControl && monitor->controllable && monitor->trackMotion &&
+            ( monitor->function == FUNCTION_MODECT || monitor->function == FUNCTION_MOCORD) )
+            runCommand(g_binPath + "/zmdc.pl start zmtrack.pl -m " + monitor->getIdStr());
+
+        if (mode == RELOAD)
+            runCommand(g_binPath + "/zmdc.pl reload zma -m " + monitor->getIdStr());
+    }
+    else
+    {
+        if (zmOptControl)
+                 runCommand(g_binPath + "/zmdc.pl stop zmtrack.pl -m " + monitor->getIdStr());
+
+        runCommand(g_binPath + "/zmdc.pl stop zma -m " + monitor->getIdStr());
+
+        if (zmOptFrameServer)
+                runCommand(g_binPath + "/zmdc.pl stop zmf -m " + monitor->getIdStr());
+    }
 }
