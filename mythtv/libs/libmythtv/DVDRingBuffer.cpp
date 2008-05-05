@@ -86,9 +86,9 @@ void DVDRingBufferPriv::CloseDVD(void)
 
 bool DVDRingBufferPriv::IsInMenu(void) const
 {
-    return ((title == 0) || 
-            ((pgcLength/90000) < 30) ||
-            (NumMenuButtons() > 0));
+    if (dvdnav)
+        return (!dvdnav_is_domain_vts(dvdnav));
+    return true;
 }
 
 long long DVDRingBufferPriv::NormalSeek(long long time)
