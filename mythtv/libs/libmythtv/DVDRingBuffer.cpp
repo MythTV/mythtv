@@ -732,7 +732,7 @@ void DVDRingBufferPriv::GoToPreviousProgram(void)
 
 void DVDRingBufferPriv::MoveButtonLeft(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_left_button_select(dvdnav, pci);
@@ -741,7 +741,7 @@ void DVDRingBufferPriv::MoveButtonLeft(void)
 
 void DVDRingBufferPriv::MoveButtonRight(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0) )
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_right_button_select(dvdnav, pci);
@@ -750,7 +750,7 @@ void DVDRingBufferPriv::MoveButtonRight(void)
 
 void DVDRingBufferPriv::MoveButtonUp(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_upper_button_select(dvdnav, pci);
@@ -759,7 +759,7 @@ void DVDRingBufferPriv::MoveButtonUp(void)
 
 void DVDRingBufferPriv::MoveButtonDown(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_lower_button_select(dvdnav, pci);
@@ -770,7 +770,7 @@ void DVDRingBufferPriv::MoveButtonDown(void)
  */
 void DVDRingBufferPriv::ActivateButton(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 0)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_button_activate(dvdnav, pci);
