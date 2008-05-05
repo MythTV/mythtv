@@ -44,6 +44,8 @@ class MPUBLIC DVDRingBufferPriv
     uint GetTotalTimeOfTitle(void);
     uint GetChapterLength(void) const { return pgLength / 90000; }
     uint GetCellStart(void);
+    bool PGCLengthChanged(void);
+    bool CellChanged(void);
     bool InStillFrame(void) const { return cellHasStillFrame; }
     bool AudioStreamsChanged(void) const { return audioStreamsChanged; }
     bool IsWaiting(void) const { return dvdWaiting; }
@@ -121,6 +123,8 @@ class MPUBLIC DVDRingBufferPriv
     long long      pgLength;
     long long      pgcLength;
     long long      cellStart;
+    bool           cellChanged;
+    bool           pgcLengthChanged;
     long long      pgStart;
     long long      currentpos;
     dvdnav_t      *lastNav; // This really belongs in the player.

@@ -273,7 +273,6 @@ class AvFormatDecoder : public DecoderBase
 
     // DVD
     int  lastdvdtitle;
-    uint lastcellstart;
     bool decodeStillFrame;
     bool dvd_xvmc_enabled;
     bool dvd_video_codec_changed;

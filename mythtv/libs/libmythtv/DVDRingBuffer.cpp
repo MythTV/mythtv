@@ -29,7 +29,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       dvdFilename(NULL),
       dvdBlockRPos(0),  dvdBlockWPos(0),
       pgLength(0),      pgcLength(0),
-      cellStart(0),     pgStart(0),
+      cellStart(0),     cellChanged(false),
+      pgcLengthChanged(false), pgStart(0),
       currentpos(0),
       lastNav(NULL),    part(0),
       title(0),         titleParts(0),
@@ -281,9 +282,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 dvdnav_cell_change_event_t *cell_event =
                     (dvdnav_cell_change_event_t*) (blockBuf);
                 pgLength  = cell_event->pg_length;
+                if (pgcLength != cell_event->pgc_length)
+                    pgcLengthChanged = true;
                 pgcLength = cell_event->pgc_length;
                 cellStart = cell_event->cell_start;
                 pgStart   = cell_event->pg_start;
+                cellChanged = true;
 
                 if (dvdnav_get_next_still_flag(dvdnav) > 0)
                 {
@@ -661,6 +665,24 @@ uint DVDRingBufferPriv::GetTotalTimeOfTitle(void)
 uint DVDRingBufferPriv::GetCellStart(void)
 {
     return cellStart / 90000;
+}
+
+/** \brief check if dvd cell has changed
+ */
+bool DVDRingBufferPriv::CellChanged(void)
+{
+    bool ret = cellChanged;
+    cellChanged = false;
+    return ret;
+}
+
+/** \brief check if pgc length has changed
+ */
+bool DVDRingBufferPriv::PGCLengthChanged(void)
+{
+    bool ret = pgcLengthChanged;
+    pgcLengthChanged = false;
+    return ret;
 }
 
 void DVDRingBufferPriv::SkipStillFrame(void)
