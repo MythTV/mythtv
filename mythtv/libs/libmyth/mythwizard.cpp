@@ -502,6 +502,7 @@ void MythWizard::layOut()
         d->help->setBackgroundOrigin(QWidget::WindowOrigin);
 
         d->help->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+        d->help->setWordWrap(true);
 
         d->help->setMinimumWidth(screenwidth - (int)(40 * wmult));
         d->help->setMaximumHeight((int)(80 * hmult));
