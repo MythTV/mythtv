@@ -61,7 +61,7 @@ using namespace std;
 #include "firewirerecorder.h"
 
 #ifdef USING_V4L
-#include "channel.h"
+#include "v4lchannel.h"
 #endif
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */

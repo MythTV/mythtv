@@ -8,7 +8,7 @@
 #include "videodev_myth.h"
 #include "mythcontext.h"
 #include "analogsignalmonitor.h"
-#include "channel.h"
+#include "v4lchannel.h"
 
 #define LOC QString("AnalogSM: ").arg(channel->GetDevice())
 #define LOC_ERR QString("AnalogSM, Error: ").arg(channel->GetDevice())

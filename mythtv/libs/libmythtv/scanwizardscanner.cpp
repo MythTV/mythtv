@@ -45,7 +45,7 @@
 #include "dvbconfparser.h"
 
 #ifdef USING_V4L
-#include "channel.h"
+#include "v4lchannel.h"
 #include "analogsignalmonitor.h"
 #endif
 

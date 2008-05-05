@@ -23,7 +23,7 @@ extern "C" {
 
 #ifdef USING_V4L
 #   include "analogsignalmonitor.h"
-#   include "channel.h"
+#   include "v4lchannel.h"
 #endif
 
 #ifdef USING_HDHOMERUN

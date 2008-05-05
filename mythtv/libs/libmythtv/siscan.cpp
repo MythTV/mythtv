@@ -29,7 +29,7 @@
 
 #include "dvbchannel.h"
 #include "hdhrchannel.h"
-#include "channel.h"
+#include "v4lchannel.h"
 #include "compat.h"
 
 QString SIScan::loc(const SIScan *siscan)
