@@ -768,7 +768,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 
 GameHandler* GameHandler::GetHandlerByName(QString systemname)
 {
-    if (systemname.isEmpty())
+    if (systemname.isEmpty() || systemname.isNull())
         return NULL;
 
     GameHandler *handler = handlers->first();
@@ -786,7 +786,8 @@ GameHandler* GameHandler::GetHandlerByName(QString systemname)
 void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
 {
     GameHandler *handler;
-    if (systemname.isEmpty()) 
+
+    if (!systemname.isEmpty() && !systemname.isNull()) 
     {
         handler = GetHandlerByName(systemname);
     }
