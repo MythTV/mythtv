@@ -456,18 +456,22 @@ void MythListButton::MoveUp(MovementUnit unit)
             {
                 --m_topPosition;
                 m_topItem = m_itemList.at(m_topPosition);
-                cerr << "Top: " << m_topPosition << " Sel: " << m_selPosition << endl;
             }
 
             break;
         case ScrollFree :
             if (m_selPosition <= m_topPosition)
             {
-                m_topItem = m_selItem;
-                m_topPosition = m_selPosition;
+                if (unit == MoveRow)
+                    m_topPosition = ((m_selPosition/m_columns)*m_columns);
+                else
+                    m_topPosition = m_selPosition;
             }
+
             break;
     }
+
+    m_topItem = m_itemList.at(m_topPosition);
 
     SetPositionArrowStates();
 
@@ -532,14 +536,18 @@ void MythListButton::MoveDown(MovementUnit unit)
         case ScrollCenter :
             while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
                 ++m_topPosition;
-
-            cerr << "Top: " << m_topPosition << " Sel: " << m_selPosition << endl;
-
             break;
         case ScrollFree :
-            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                ++m_topPosition;
-
+            if (unit == MoveRow)
+            {
+                if (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+                    m_topPosition = m_topPosition + m_columns;
+            }
+            else
+            {
+                while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
+                    ++m_topPosition;
+            }
             break;
     }
 
@@ -1187,7 +1195,7 @@ void MythListButton::CopyFrom(MythUIType *base)
     m_textFlags = lb->m_textFlags;
     m_imageAlign = lb->m_imageAlign;
 
-    m_scrollStyle= lb->m_scrollStyle;
+    m_scrollStyle = lb->m_scrollStyle;
 
     m_clearing = false;
     m_topItem = m_selItem = NULL;
