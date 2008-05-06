@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080427-1"
+VERSION="0.1.20080506-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1760,11 +1760,10 @@ def WriteXMLToFile(myDOM, filename):
 #############################################################
 # Pre-process a single video/recording file
 
-def preProcessFile(file, folder):
+def preProcessFile(file, folder, count):
     """Pre-process a single video/recording file."""
 
-    write( "Pre-processing file '" + file.attributes["filename"].value + \
-           "' of type '"+ file.attributes["type"].value+"'")
+    write( "Pre-processing %s %d: '%s'" % (file.attributes["type"].value, count, file.attributes["filename"].value))
 
     #As part of this routine we need to pre-process the video:
     #1. check the file actually exists
@@ -4604,23 +4603,23 @@ def isFileOkayForDVD(file, folder):
 # process a single file ready for burning using either
 # mythtranscode/mythreplex or ProjectX as the cutter/demuxer
 
-def processFile(file, folder):
+def processFile(file, folder, count):
     """Process a single video/recording file ready for burning."""
 
     if useprojectx:
-        doProcessFileProjectX(file, folder)
+        doProcessFileProjectX(file, folder, count)
     else:
-        doProcessFile(file, folder)
+        doProcessFile(file, folder, count)
 
 #############################################################
 # process a single file ready for burning using mythtranscode/mythreplex
 # to cut and demux 
 
-def doProcessFile(file, folder):
+def doProcessFile(file, folder, count):
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
-    write( "Processing file " + file.attributes["filename"].value + " of type " + file.attributes["type"].value)
+    write( "Processing %s %d: '%s'" % (file.attributes["type"].value, count, file.attributes["filename"].value))
     write( "*************************************************************")
 
     #As part of this routine we need to pre-process the video this MAY mean:
@@ -4820,7 +4819,7 @@ def doProcessFile(file, folder):
             extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
 
     write( "*************************************************************")
-    write( "Finished processing file " + file.attributes["filename"].value)
+    write( "Finished processing '%s'" % file.attributes["filename"].value)
     write( "*************************************************************")
 
 
@@ -4828,11 +4827,11 @@ def doProcessFile(file, folder):
 # process a single file ready for burning using projectX to
 # cut and demux
 
-def doProcessFileProjectX(file, folder):
+def doProcessFileProjectX(file, folder, count):
     """Process a single video/recording file ready for burning."""
 
     write( "*************************************************************")
-    write( "Processing file " + file.attributes["filename"].value + " of type " + file.attributes["type"].value)
+    write( "Processing %s %d: '%s'" % (file.attributes["type"].value, count, file.attributes["filename"].value))
     write( "*************************************************************")
 
     #As part of this routine we need to pre-process the video this MAY mean:
@@ -4989,7 +4988,7 @@ def doProcessFileProjectX(file, folder):
             extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
 
     write( "*************************************************************")
-    write( "Finished processing file " + file.attributes["filename"].value)
+    write( "Finished processing file '%s'" % file.attributes["filename"].value)
     write( "*************************************************************")
 
 #############################################################
@@ -5121,7 +5120,7 @@ def processJob(job):
                         os.rmdir (folder)
                     os.makedirs(folder)
                 #Do the pre-process work
-                preProcessFile(node,folder)
+                preProcessFile(node,folder,filecount)
 
             if debug_secondrunthrough==False:
                 #Loop through all the files again but this time do more serious work!
@@ -5131,7 +5130,7 @@ def processJob(job):
                     folder=getItemTempPath(filecount)
 
                     #Process this file
-                    processFile(node,folder)
+                    processFile(node,folder,filecount)
 
             #We can only create the menus after the videos have been processed
             #and the commercials cut out so we get the correct run time length
