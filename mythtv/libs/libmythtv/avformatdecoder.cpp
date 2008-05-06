@@ -3760,7 +3760,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (ringBuffer->isDVD())
                     {
-                        if (ringBuffer->DVD()->IsInMenu())
+                        if (ringBuffer->DVD()->NumMenuButtons() > 0)
                         {
                             ringBuffer->DVD()->GetMenuSPUPkt(ptr, len,
                                                              curstream->id);
