@@ -2528,8 +2528,7 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
         return;
     }
 
-    if (ringBuffer->InDVDMenuOrStillFrame())
-        DisplayDVDButton();
+    DisplayDVDButton();
 
     videofiltersLock.lock();
     videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
@@ -2686,8 +2685,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         yuv_wait.wakeAll();
     }
 
-    if (ringBuffer->InDVDMenuOrStillFrame())
-        DisplayDVDButton();
+    DisplayDVDButton();
 
     // handle Interactive TV
     if (GetInteractiveTV() && GetDecoder())
@@ -2856,7 +2854,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     continue;
                 }
 
-                if (ringBuffer->DVD()->InStillFrame())
+                if (ringBuffer->InDVDMenuOrStillFrame())
                 {
                     if (nbframes == 0)
                     {
@@ -6999,7 +6997,7 @@ void NuppelVideoPlayer::DoChangeDVDTrack(void)
 
 void NuppelVideoPlayer::DisplayDVDButton(void)
 {
-    if (!ringBuffer->InDVDMenuOrStillFrame() || !osd)
+    if (!ringBuffer->isDVD() || !osd)
         return;
 
     VideoFrame *buffer = videoOutput->GetLastShownFrame();

@@ -997,7 +997,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 }
 
                 bitmap = (uint8_t*) av_malloc(w * h);
-                sub->num_rects = (IsInMenu()) ? 2 : 1;
+                sub->num_rects = (NumMenuButtons() > 0) ? 2 : 1;
                 sub->rects = (AVSubtitleRect *)
                         av_mallocz(sizeof(AVSubtitleRect) * sub->num_rects);
                 sub->rects[0].rgba_palette = (uint32_t*)av_malloc(4 *4);
@@ -1013,7 +1013,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].h = h;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
-                if (IsInMenu())
+                if (NumMenuButtons() > 0)
                 {
                     sub->rects[1].rgba_palette = (uint32_t*)av_malloc(4 *4);
                     guess_palette(sub->rects[1].rgba_palette, 

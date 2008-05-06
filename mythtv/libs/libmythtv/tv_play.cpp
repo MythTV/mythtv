@@ -3062,7 +3062,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
 
     if (activerbuffer &&
-        activerbuffer->isDVD() && activerbuffer->DVD()->IsInMenu())
+        activerbuffer->isDVD())
     {
         for (int i = 0; i < actions.size(); i++)
         {
