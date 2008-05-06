@@ -296,10 +296,11 @@ uint myth_system(const QString &command, int flags)
                     return GENERIC_EXIT_NOT_OK;
                 }
 
+                qApp->processEvents();
+
                 if (res > 0)
                     return WEXITSTATUS(status);
 
-                qApp->processEvents();
                 usleep(100000);
             }
         }
