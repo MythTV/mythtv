@@ -386,7 +386,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
 
         strListQuestion = QStringList::split("?",event.description,TRUE);
         strListExcl = QStringList::split("!",event.description,TRUE);
-        if ((!strListQuestion.size() > 1) &&
+        if ((strListQuestion.size() > 1) &&
             ((uint)strListQuestion.size() <= kMaxQuestionExclamation))
         {
             strListEnd = strListQuestion;
