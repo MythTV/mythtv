@@ -408,7 +408,7 @@ void MythListButton::MoveUp(MovementUnit unit)
     switch (unit)
     {
         case MoveItem:
-            if (m_selPosition > 1)
+            if (m_selPosition > 0)
             {
                 --m_selPosition;
             }
@@ -429,15 +429,8 @@ void MythListButton::MoveUp(MovementUnit unit)
             }
             break;
         case MovePage:
-            if (pos > (int)m_itemsVisible)
-            {
-                for (int i = 0; i < (int)m_itemsVisible; i++)
-                {
-                    --m_selPosition;
-                }
-                break;
-            }
-            // fall through
+            m_selPosition = max(0, m_selPosition - (int)m_itemsVisible);
+            break;
         case MoveMax:
             m_selPosition = 0;
             break;
@@ -452,7 +445,7 @@ void MythListButton::MoveUp(MovementUnit unit)
     {
         case ScrollCenter :
             while (m_topPosition > 0 && m_topPosition +
-                   (int)((float)m_itemsVisible/2) > m_selPosition + 1)
+                   (int)((float)m_itemsVisible/2) > m_selPosition)
             {
                 --m_topPosition;
                 m_topItem = m_itemList.at(m_topPosition);
@@ -460,14 +453,13 @@ void MythListButton::MoveUp(MovementUnit unit)
 
             break;
         case ScrollFree :
-            if (m_selPosition <= m_topPosition)
+            if (m_selPosition < m_topPosition)
             {
-                if (unit == MoveRow)
-                    m_topPosition = ((m_selPosition/m_columns)*m_columns);
-                else
+                if (m_layout == LayoutHorizontal)
                     m_topPosition = m_selPosition;
+                else
+                    m_topPosition = m_selPosition / m_columns * m_columns;
             }
-
             break;
     }
 
@@ -508,15 +500,7 @@ void MythListButton::MoveDown(MovementUnit unit)
             }
             break;
         case MovePage:
-            //m_selPosition = m_topPosition;
-            if ((pos + (int)m_itemsVisible) <= m_itemCount - 1)
-            {
-                for (int i = 0; i < (int)m_itemsVisible; i++)
-                {
-                    ++m_selPosition;
-                }
-                break;
-            }
+            m_selPosition = min(m_itemCount - 1, m_selPosition + (int)m_itemsVisible);
             break;
         case MoveMax:
             m_selPosition = m_itemCount - 1;
@@ -538,15 +522,15 @@ void MythListButton::MoveDown(MovementUnit unit)
                 ++m_topPosition;
             break;
         case ScrollFree :
-            if (unit == MoveRow)
+            if (m_topPosition + m_itemsVisible <= m_selPosition)
             {
-                if (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                    m_topPosition = m_topPosition + m_columns;
-            }
-            else
-            {
-                while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                    ++m_topPosition;
+                if (m_layout == LayoutHorizontal)
+                    m_topPosition = m_selPosition - m_itemsVisible + 1;
+                else
+                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
+                                        / m_columns * m_columns;
+
+                m_topPosition = max(0, m_topPosition);
             }
             break;
     }
@@ -599,9 +583,12 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
             break;
         case ScrollFree :
-            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                ++m_topPosition;
-
+            if (m_topPosition + m_itemsVisible <= m_selPosition)
+            {
+                m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
+                                    / m_columns * m_columns;
+                m_topPosition = max(0, m_topPosition);
+            }
             break;
     }
 
