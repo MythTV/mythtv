@@ -98,6 +98,11 @@ class MythListButton : public MythUIType
     void Reset();
     void Update();
 
+    void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
+    void SetValue(QString value) { MoveToNamedPosition(value); }
+    int  GetIntValue() { return GetItemCurrent()->text().toInt(); }
+    QString  GetValue() { return GetItemCurrent()->text(); }
+
     void SetItemCurrent(MythListButtonItem* item);
     void SetItemCurrent(int pos);
     MythListButtonItem* GetItemCurrent();
