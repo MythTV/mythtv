@@ -980,7 +980,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             w = x2 - x1 + 1;
             if (w < 0)
                 w = 0;
-            h = y2 - y1;
+            h = y2 - y1 + 2;
             if (h < 0)
                 h = 0;
             if (w > 0 && h > 0) 

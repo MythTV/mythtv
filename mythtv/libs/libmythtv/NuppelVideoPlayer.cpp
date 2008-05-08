@@ -4520,7 +4520,14 @@ void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
         audioOutput->Reset();
 
     if (osd)
+    {
         osd->ClearAllCCText();
+        if (ringBuffer->InDVDMenuOrStillFrame())
+        {
+            osd->HideSet("subtitles");
+            osd->ClearAll("subtitles");
+        }
+    }
 
     SetDeleteIter();
     SetCommBreakIter();
@@ -7002,10 +7009,10 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
     VideoFrame *buffer = videoOutput->GetLastShownFrame();
 
-    int numbuttons = ringBuffer->DVD()->NumMenuButtons();
+    bool numbuttons = ringBuffer->DVD()->NumMenuButtons();
     bool osdshown = osd->IsSetDisplaying("subtitles");
 
-    if ((numbuttons == 0) || 
+    if ((!numbuttons) || 
         (osdshown) ||
         (dvd_stillframe_showing && buffer->timecode > 0) ||
         ((!osdshown) && 
