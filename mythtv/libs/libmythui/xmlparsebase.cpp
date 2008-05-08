@@ -15,6 +15,7 @@
 #include "mythuiclock.h"
 #include "mythlistbutton.h"
 #include "mythuibutton.h"
+#include "mythuispinbox.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -191,6 +192,7 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
                      type == "textedit" ||
                      type == "button" ||
                      type == "buttonlist" ||
+                     type == "spinbox" ||
                      type == "statetype" ||
                      type == "clock")
             {
@@ -266,6 +268,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIButton(parent, name, needInit);
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
+    else if (type == "spinbox")
+        uitype = new MythUISpinBox(parent, name);
     else if (type == "statetype")
         uitype = new MythUIStateType(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
@@ -318,6 +322,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "textedit" ||
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
+                     info.tagName() == "spinbox" ||
                      info.tagName() == "statetype" ||
                      info.tagName() == "clock")
             {
@@ -425,6 +430,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "textedit" ||
                          type == "button" ||
                          type == "buttonlist" ||
+                         type == "spinbox" ||
                          type == "statetype" ||
                          type == "window" ||
                          type == "clock")
