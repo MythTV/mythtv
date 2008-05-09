@@ -17,6 +17,15 @@
 # @copyright MythTV
 #
 
+###############################################################################
+
+# Config
+
+    my $plugreport      = '/usr/bin/plugreport';
+    my $firewire_tester = '/usr/local/bin/firewire_tester';
+
+###############################################################################
+
 # Some helpful libraries
     use MythTV;
     use Sys::Hostname;
@@ -33,7 +42,7 @@
     my $host;
     my %guid_list;
 
-    open PLUG, 'plugreport 2>/dev/null |' or die "Can't run plugreport\n";
+    open PLUG, "$plugreport 2>/dev/null |" or die "Can't run $plugreport\n";
     while (<PLUG>) {
         if (/Host\s+Adapter\s+(\d+)/i) {
             $host = $1;
@@ -67,7 +76,7 @@
         my $overload;
         for (;;) {
             $overload++;
-            my $results = `firewire_tester -B -P $guid_list{$guid}{host} -n $guid_list{$guid}{node}`;
+            my $results = `$firewire_tester -B -P $guid_list{$guid}{host} -n $guid_list{$guid}{node}`;
             my $num =()= $results =~ /Success,\s+\d+\s+packets/g;
             if ($num >= 5) {
                 print "    success.\n";
