@@ -1041,6 +1041,13 @@ our @bundler = "$svndir/mythtv/contrib/OSX/osx-bundler.pl";
 if ( $OPT{'verbose'} )
 {   push @bundler, '--verbose'   }
 
+### Framework that has a screwed up link dependency path
+my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
+            'Framework/AVCVideoServices.framework';
+my @AVCfw = split / /, `ls -d $AVCfw`;
+my $AVCfw = pop @AVCfw;
+chop $AVCfw;
+
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
 ### because there are now multiple copies of each library.
@@ -1071,6 +1078,9 @@ foreach my $target ( @targets )
 
   # Remove copy of binary
   unlink "$SCRIPTDIR/$target" or die;
+
+  if ( $AVCfw )
+  {  &RecursiveCopy($AVCfw, "$finalTarget/Contents/Frameworks")  }
 
  if ( $target eq "MythFrontend" or $target =~ m/^MythTV/ )
  {
