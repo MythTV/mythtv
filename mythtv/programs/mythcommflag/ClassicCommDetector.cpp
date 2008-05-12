@@ -930,21 +930,23 @@ void ClassicCommDetector::BuildMasterCommList(void)
 
 
         // see if ending of recording looks like a commercial
-        QMap<long long, int>::Iterator it;
+        QMap<long long, int>::const_iterator it;
         long long max_blank = 0;
         long long max_scene = 0;
 
         it = blankCommBreakMap.begin();
-        for(unsigned int i = 0; i < blankCommBreakMap.size(); i++)
-            if ((it.data() == MARK_COMM_END) &&
-                (it.key() > max_blank))
+        for (; it != blankCommBreakMap.end(); ++it)
+        {
+            if ((it.data() == MARK_COMM_END) && (it.key() > max_blank))
                 max_blank = it.key();
+        }
 
         it = sceneCommBreakMap.begin();
-        for(unsigned int i = 0; i < sceneCommBreakMap.size(); i++)
-            if ((it.data() == MARK_COMM_END) &&
-                (it.key() > max_scene))
+        for (; it != sceneCommBreakMap.end(); ++it)
+        {
+            if ((it.data() == MARK_COMM_END) && (it.key() > max_scene))
                 max_scene = it.key();
+        }
 
         if ((max_blank < (framesProcessed - 2)) &&
             (max_scene > (framesProcessed - 2)))
