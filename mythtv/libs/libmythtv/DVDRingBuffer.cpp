@@ -29,7 +29,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       dvdFilename(NULL),
       dvdBlockRPos(0),  dvdBlockWPos(0),
       pgLength(0),      pgcLength(0),
-      cellStart(0),     pgStart(0),
+      cellStart(0),     cellChanged(false),
+      pgcLengthChanged(false), pgStart(0),
       currentpos(0),
       lastNav(NULL),    part(0),
       title(0),         titleParts(0),
@@ -86,9 +87,9 @@ void DVDRingBufferPriv::CloseDVD(void)
 
 bool DVDRingBufferPriv::IsInMenu(void) const
 {
-    return ((title == 0) || 
-            ((pgcLength/90000) < 30) ||
-            (NumMenuButtons() > 0));
+    if (dvdnav)
+        return (!dvdnav_is_domain_vts(dvdnav));
+    return true;
 }
 
 long long DVDRingBufferPriv::NormalSeek(long long time)
@@ -281,9 +282,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 dvdnav_cell_change_event_t *cell_event =
                     (dvdnav_cell_change_event_t*) (blockBuf);
                 pgLength  = cell_event->pg_length;
+                if (pgcLength != cell_event->pgc_length)
+                    pgcLengthChanged = true;
                 pgcLength = cell_event->pgc_length;
                 cellStart = cell_event->cell_start;
                 pgStart   = cell_event->pg_start;
+                cellChanged = true;
 
                 if (dvdnav_get_next_still_flag(dvdnav) > 0)
                 {
@@ -663,6 +667,24 @@ uint DVDRingBufferPriv::GetCellStart(void)
     return cellStart / 90000;
 }
 
+/** \brief check if dvd cell has changed
+ */
+bool DVDRingBufferPriv::CellChanged(void)
+{
+    bool ret = cellChanged;
+    cellChanged = false;
+    return ret;
+}
+
+/** \brief check if pgc length has changed
+ */
+bool DVDRingBufferPriv::PGCLengthChanged(void)
+{
+    bool ret = pgcLengthChanged;
+    pgcLengthChanged = false;
+    return ret;
+}
+
 void DVDRingBufferPriv::SkipStillFrame(void)
 {
     QMutexLocker locker(&seekLock);
@@ -731,7 +753,7 @@ void DVDRingBufferPriv::GoToPreviousProgram(void)
 
 void DVDRingBufferPriv::MoveButtonLeft(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_left_button_select(dvdnav, pci);
@@ -740,7 +762,7 @@ void DVDRingBufferPriv::MoveButtonLeft(void)
 
 void DVDRingBufferPriv::MoveButtonRight(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0) )
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_right_button_select(dvdnav, pci);
@@ -749,7 +771,7 @@ void DVDRingBufferPriv::MoveButtonRight(void)
 
 void DVDRingBufferPriv::MoveButtonUp(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_upper_button_select(dvdnav, pci);
@@ -758,7 +780,7 @@ void DVDRingBufferPriv::MoveButtonUp(void)
 
 void DVDRingBufferPriv::MoveButtonDown(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 1)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_lower_button_select(dvdnav, pci);
@@ -769,7 +791,7 @@ void DVDRingBufferPriv::MoveButtonDown(void)
  */
 void DVDRingBufferPriv::ActivateButton(void)
 {
-    if (IsInMenu() && (NumMenuButtons() > 0))
+    if (NumMenuButtons() > 0)
     {
         pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
         dvdnav_button_activate(dvdnav, pci);
@@ -957,7 +979,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             w = x2 - x1 + 1;
             if (w < 0)
                 w = 0;
-            h = y2 - y1;
+            h = y2 - y1 + 2;
             if (h < 0)
                 h = 0;
             if (w > 0 && h > 0) 
@@ -974,7 +996,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 }
 
                 bitmap = (uint8_t*) av_malloc(w * h);
-                sub->num_rects = (IsInMenu()) ? 2 : 1;
+                sub->num_rects = (NumMenuButtons() > 0) ? 2 : 1;
                 sub->rects = (AVSubtitleRect *)
                         av_mallocz(sizeof(AVSubtitleRect) * sub->num_rects);
                 sub->rects[0].rgba_palette = (uint32_t*)av_malloc(4 *4);
@@ -990,7 +1012,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0].h = h;
                 sub->rects[0].nb_colors = 4;
                 sub->rects[0].linesize = w;
-                if (IsInMenu())
+                if (NumMenuButtons() > 0)
                 {
                     sub->rects[1].rgba_palette = (uint32_t*)av_malloc(4 *4);
                     guess_palette(sub->rects[1].rgba_palette, 

@@ -410,7 +410,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       disable_passthru(false),      max_channels(2),
       dummy_frame(NULL),
       // DVD
-      lastdvdtitle(-1), lastcellstart(0),
+      lastdvdtitle(-1),
       decodeStillFrame(false),
       dvd_xvmc_enabled(false), dvd_video_codec_changed(false),
       dvdTitleChanged(false), mpeg_seq_end_seen(false)
@@ -3023,7 +3023,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             int dvdtitle  = 0;
             int dvdpart = 0;
             ringBuffer->DVD()->GetPartAndTitle(dvdpart, dvdtitle);
-            uint cellstart = ringBuffer->DVD()->GetCellStart();
+            bool cellChanged = ringBuffer->DVD()->CellChanged();
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
             bool inDVDMenu  = ringBuffer->DVD()->IsInMenu();
             selectedVideoIndex = 0;
@@ -3055,13 +3055,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     ringBuffer->DVD()->RunSeekCellStart();
             }          
             if (GetNVP()->AtNormalSpeed() &&
-                ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
+                ((cellChanged) || (lastdvdtitle != dvdtitle)))
             {
                 if (dvdtitle != lastdvdtitle)
                 {
-                    posmapStarted = false;
-                    m_positionMap.clear();
-                    SyncPositionMap();
                     VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
                     lastdvdtitle = dvdtitle;
                     if (lastdvdtitle != -1 )
@@ -3074,11 +3071,18 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             GetNVP()->getVideoOutput()->SetPrebuffering(true);
                     }
                 }
+                
+                if (ringBuffer->DVD()->PGCLengthChanged())
+                {
+                    posmapStarted = false;
+                    m_positionMap.clear();
+                    SyncPositionMap();
+                }
+
                 UpdateDVDFramesPlayed();
                 VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "
                                              "Update framesPlayed: %1 ")
                                              .arg(framesPlayed));
-                lastcellstart = cellstart;
             }
         }
 
@@ -3760,7 +3764,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (ringBuffer->isDVD())
                     {
-                        if (ringBuffer->DVD()->IsInMenu())
+                        if (ringBuffer->DVD()->NumMenuButtons() > 0)
                         {
                             ringBuffer->DVD()->GetMenuSPUPkt(ptr, len,
                                                              curstream->id);
