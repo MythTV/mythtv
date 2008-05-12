@@ -383,6 +383,12 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
             // found it
             upper_bound = i;
             lower_bound = i;
+
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("FindPostion(%1, search%2 adjusted)")
+                    .arg(desired_value).arg((search_adjusted) ? "" : " not") +
+                    QString(" --> [%1(%2)]").arg(i).arg(m_positionMap[i].pos));
+
             return true;
         }
         else if (value > desired_value)
@@ -414,6 +420,14 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
     upper_bound = upper;
     lower_bound = lower;
+
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("FindPostion(%1, search%3 adjusted)")
+            .arg(desired_value).arg((search_adjusted) ? "" : " not") +
+            QString(" --> [%1(%2),%3(%4)]")
+            .arg(lower_bound).arg(m_positionMap[lower_bound].pos)
+            .arg(upper_bound).arg(m_positionMap[upper_bound].pos));
+
     return false;
 }
 
