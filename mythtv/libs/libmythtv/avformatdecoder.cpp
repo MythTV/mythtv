@@ -2000,7 +2000,6 @@ void AvFormatDecoder::RemoveAudioStreams()
         else
             i++;
     }
-    av_read_frame_flush(ic);
 }
 
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)

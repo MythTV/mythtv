@@ -638,6 +638,9 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
     AVStream *st= s->streams[stream_index];
     AVPacketList *pktl= s->packet_buffer;
 
+    if (!st)
+        return;
+
     if(st->first_dts != AV_NOPTS_VALUE || dts == AV_NOPTS_VALUE)
         return;
 
@@ -2317,19 +2320,20 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
 
         /* close codec context */
         AVCodecContext *codec_ctx = s->streams[i]->codec;
-        if (codec_ctx->codec)
+        if (codec_ctx->codec) {
             avcodec_close(codec_ctx);
-
+            av_free(codec_ctx);
+        }
         /* make sure format context is not using the codec context */
         if (&s->streams[i] == s->cur_st) {
             av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st = NULL\n");
             s->cur_st = NULL;
             s->cur_ptr = NULL;
         }
-        else if (s->cur_st > &s->streams[i]) {
+     /*   else if (s->cur_st > &s->streams[i]) {
             av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st -= 1\n");
             s->cur_st -= sizeof(AVFormatContext *);
-        }
+        } */
         else {
             av_log(NULL, AV_LOG_DEBUG,
                    "av_remove_stream: no change to cur_st\n");
