@@ -1,9 +1,23 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+// POSIX headers
+#include <sys/time.h>      /* gettimeofday */
 
+// ANSI C headers
+#include <cstdlib>
+#include <cmath>
+
+// C++ headers
+#include <algorithm>
+using namespace std;
+
+// Qt headers
+#include <QFile>
+#include <QFileInfo>
+
+// MythTV headers
 #include "NuppelVideoPlayer.h"
+#include "mythcontext.h"
 
+// Commercial Flagging headers
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
 #include "pgm.h"
@@ -12,10 +26,6 @@
 #include "BlankFrameDetector.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
-
-/* Debugging */
-#include <qfile.h>
-#include <qfileinfo.h>
 
 using namespace commDetector2;
 using namespace frameAnalyzer;

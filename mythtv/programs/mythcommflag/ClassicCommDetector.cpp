@@ -1,18 +1,27 @@
-#include <cmath>
-#include <algorithm>
+// POSIX headers
 #include <unistd.h>
+#include <sys/time.h> // for gettimeofday
 
+// ANSI C headers
+#include <cmath>
+
+// C++ headers
+#include <algorithm> // for min/max
+using namespace std;
+
+// Qt headers
+#include <QString>
+
+// MythTV headers
+#include "mythcontext.h"
+#include "programinfo.h"
+#include "NuppelVideoPlayer.h"
+
+// Commercial Flagging headers
 #include "CommDetector.h"
 #include "ClassicCommDetector.h"
-#include "libmythtv/NuppelVideoPlayer.h"
 #include "ClassicLogoDetector.h"
 #include "ClassicSceneChangeDetector.h"
-
-#include "qstring.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/programinfo.h"
-
-//#include "commercial_debug.h"
 
 enum frameMaskValues {
     COMM_FRAME_SKIPPED       = 0x0001,

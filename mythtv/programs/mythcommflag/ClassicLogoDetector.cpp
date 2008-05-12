@@ -1,13 +1,16 @@
+// POSIX headers
 #include <unistd.h>
-#include <stdlib.h>
 
+// ANSI C headers
+#include <cstdlib>
+
+// MythTV headers
+#include "mythcontext.h"
+#include "NuppelVideoPlayer.h"
+
+// Commercial Flagging headers
 #include "ClassicLogoDetector.h"
 #include "ClassicCommDetector.h"
-
-#include "libmythtv/NuppelVideoPlayer.h"
-#include "libmyth/mythcontext.h"  //To be able to use VERBOSE()
-
-//#include "commercial_debug.h"
 
 typedef struct edgemaskentry
 {

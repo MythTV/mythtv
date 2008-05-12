@@ -1,37 +1,44 @@
-#include <qapplication.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qdir.h>
-#include <QEvent>
-
-#include <iostream>
-#include <fstream>
-#include <string>
+// POSIX headers
 #include <unistd.h>
+#include <sys/time.h> // for gettimeofday
+
+// ANSI C headers
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
 #include <cmath>
-#include <sys/time.h>
 
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/NuppelVideoPlayer.h"
-#include "libmythtv/programinfo.h"
-#include "libmythtv/remoteutil.h"
-#include "libmythtv/jobqueue.h"
-#include "libmythtv/remoteencoder.h"
-#include "libmyth/mythdbcon.h"
+// C++ headers
+#include <string>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
+// Qt headers
+#include <QApplication>
+#include <QString>
+#include <QRegExp>
+#include <QDir>
+#include <QEvent>
+
+// MythTV headers
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "NuppelVideoPlayer.h"
+#include "NuppelVideoPlayer.h"
+#include "programinfo.h"
+#include "remoteutil.h"
+#include "jobqueue.h"
+#include "remoteencoder.h"
+#include "RingBuffer.h"
+
+// Commercial Flagging headers
 #include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "CommDetectorFactory.h"
 #include "SlotRelayer.h"
 #include "CustomEventRelayer.h"
-
-using namespace std;
 
 bool quiet = false;
 bool force = false;

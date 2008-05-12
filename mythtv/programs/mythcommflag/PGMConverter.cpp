@@ -1,6 +1,15 @@
+// POSIX headers
+#include <sys/time.h> // for gettimeofday
+
+// Qt headers
+#include <QSize>
+
+// MythTV headers
+#include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
 #include "frame.h"          /* VideoFrame */
 
+// Commercial Flagging headers
 #include "CommDetector2.h"
 #include "pgm.h"
 #include "PGMConverter.h"

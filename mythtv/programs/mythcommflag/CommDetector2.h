@@ -1,10 +1,12 @@
 #ifndef _COMMDETECTOR2_H_
 #define _COMMDETECTOR2_H_
 
-#include <qdatetime.h>
+// Qt headers
+#include <QDateTime>
 #include <q3ptrlist.h>
 #include <q3valuelist.h>
 
+// Commercial Flagging headers
 #include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "FrameAnalyzer.h"

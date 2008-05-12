@@ -1,13 +1,22 @@
-#include <math.h>
+// POSIX headers
 #include <unistd.h>
 
-#include <qdir.h>
-#include <qfileinfo.h>
+// ANSI C headers
+#include <cmath>
+
+// Qt headers
+#include <QDir>
+#include <QFileInfo>
 #include <Q3PtrList>
 
+// MythTV headers
+#include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
+#include "mythdbcon.h"
 #include "compat.h"
+#include "programinfo.h"
 
+// Commercial Flagging headers
 #include "CommDetector.h"
 #include "CommDetector2.h"
 #include "CannyEdgeDetector.h"

@@ -1,10 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+// ANSI C headers
+#include <cstdlib>
+#include <cmath>
 
+// MythTV headers
+#include "util.h"           /* for absLongLong */
 #include "mythcontext.h"    /* gContext */
 #include "NuppelVideoPlayer.h"
 
+// Commercial Flagging headers
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
 #include "quickselect.h"

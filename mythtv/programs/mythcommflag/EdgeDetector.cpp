@@ -1,10 +1,20 @@
-#include <stdlib.h>
-#include "NuppelVideoPlayer.h"
+// ANSI C headers
+#include <cstdlib>
+
+// C++ headers
+#include <algorithm>
+using namespace std;
+
+// avlib/ffmpeg headers
 extern "C" {
 #include "avcodec.h"        // AVPicture
 }
-#include "frame.h"          // VideoFrame
 
+// MythTV headers
+#include "frame.h"          // VideoFrame
+#include "NuppelVideoPlayer.h"
+
+// Commercial Flagging headers
 #include "FrameAnalyzer.h"
 #include "EdgeDetector.h"
 

@@ -1,9 +1,14 @@
-#include <stdio.h>
-#include <math.h>
+// POSIX headers
+#include <sys/time.h> // for gettimeofday
 
-#include "mythcontext.h"    /* gContext */
+// ANSI C headers
+#include <cmath>
+
+// MythTV headers
+#include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
 
+// Commercial Flagging headers
 #include "CommDetector2.h"
 #include "FrameAnalyzer.h"
 #include "PGMConverter.h"

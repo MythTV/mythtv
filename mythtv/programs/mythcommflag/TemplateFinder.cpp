@@ -1,13 +1,22 @@
-#include <stdlib.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <q3textstream.h>
-#include <math.h>
+// POSIX headers
+#include <sys/time.h>      /* gettimeofday */
 
+// ANSI C headers
+#include <cmath>
+#include <cstdlib>
+
+// Qt headers
+#include <QFile>
+#include <QFileInfo>
+#include <q3textstream.h>
+
+// MythTV headers
 #include "NuppelVideoPlayer.h"
 #include "mythcontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
+#include "util.h"           /* myth_system */
 
+// Commercial Flagging headers
 #include "CommDetector2.h"
 #include "pgm.h"
 #include "PGMConverter.h"
