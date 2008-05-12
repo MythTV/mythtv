@@ -1,5 +1,5 @@
                                    MythTV 
-			        Release 0.21
+			        Release 0.22
 
 BUILD/CONFIGURATION INSTRUCTIONS 
 --------------------------------
@@ -19,14 +19,12 @@ The following is a list of some of the prerequisites you will need installed:
                 so get it from http://www.mp3dev.org/ (follow the using Lame
                 link).
 
-   QT - Version 3.1 or greater is strongly recommended.  You need it 
+   QT - Version 4.0 or greater is required.  You need it 
         compiled threadsafe and with the MySQL bindings.  I'm using 
         version 3.1.1.  http://www.trolltech.com
-        NOTE: MythTV is not compatible with QT v4.0 or above.
 
-   MySQL - You need this setup and working.  A recent version, I think, would
-           be best.  I don't know, though, I'm utterly new to it.  Get it from
-           your distro, or from http://www.mysql.com
+   MySQL - You need this setup and working.  Version 5.0.15 or higher is
+           required.  http://www.mysql.com
 
    XMLTV - If you are outside of North America, you will need to install the
            latest version (0.5.42 as of 2006-01-08).  This will do the work

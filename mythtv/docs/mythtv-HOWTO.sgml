@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-03-05, v0.21.00pre
+<date>2008-05-12, v0.22.00pre
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -128,7 +128,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.21
+This HOWTO is for MythTV v0.22
 
 Release notes for this version may be found in the MythTV Wiki at <url
 url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21"
@@ -899,13 +899,6 @@ to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> an
 executing <bf>apt-get build-dep mythtv</bf> should install all the
 pre-requisites required to compile MythTV.
 
-<figure loc="here">
-<eps file="warning.eps" height="1cm">
-<img src="warning.png">
-<caption><bf>NOTE</bf>:  Due to the requirement for Qt 3.3+, there are no packages for
-Debian woody/stable.
-</caption></figure>
-
 <p>The Debian packages are configured such that MythTV programs should be
 run as the <tt>mythtv</tt> user, which is automatically created during
 installation.  This user has access to write new recordings to disk in the
@@ -931,9 +924,7 @@ going to need the <bf>cdialog</bf> package in order to compile
 <bf>perl</bf>.
 
 <code>
-NOTE:  Qt v3.3 or higher is required.
-
-NOTE:  MythTV DOES NOT WORK with Qt4.
+NOTE:  Qt v4.3 or higher is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -945,48 +936,8 @@ that you've installed the -devel version of a prerequisite.
 <p> This section details the various methods for installing prerequisites
 from the command line.
 
-<sect3>Mandriva
-<p><bf>NOTE</bf>:  The following instructions should be considered out of
-date as of 2006-09-10.  If updated instructions are not submitted by the
-release of v0.21 of MythTV they will be removed.
-
-<bf>urpmi</bf> is the simplest tool for installation of packages from the
-command line, but properly configuring it can be difficult.  The
-following website <url url="http://easyurpmi.zarb.org/"
-name="http://easyurpmi.zarb.org/"> will allow you to choose
-a mirror site and then present the command-line configuration text for that
-mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
-If you add a site from the "Penguin Liberation Front", you will be able to
-load the <tt>lame</tt> library without compiling from source.
-
-Open a shell, and execute the following. You may get
-asked a number of questions regarding dependencies.  It's best to answer
-"YES".
-<tscreen><verb>
-$ su
-# urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-# urpmi XFree86-devel perl
-# urpmi libqt3-devel libMesaGLU1-devel
-</verb></tscreen>
-
-<code>
-NOTE for Mandriva 9.1+ users: execute the following command.
-
-# urpmi libqt3-mysql
-</code>
-However, you might get this when you execute the commands above:
-<tscreen><verb>
-everything already installed
-</verb></tscreen>
-
-In that case, you're ready to move to the next <ref id="Setting_up_paths"
-name="section">.  Once you have completed installing the pre-requisites,
-exit out of the shell and start a new one to ensure that any environment
-variables setup by the installation have a chance to take effect.
-
 <sect3>Gentoo. 
-<p><bf>NOTE</bf>:  MythTV does <em>not</em> run on Qt4.
-If Qt has not been installed on your system: Edit
+<p>If Qt has not been installed on your system: Edit
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <tscreen><verb>
@@ -7931,12 +7882,8 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.21.00, 2008-03-05.  Start prepping for 0.21.  Add a tip for using a
-subdirectory as the target of a storage group in case of mount failure to
-prevent root partition fillup.  Update SVN download instructions to grab the
-entire tree, so that you don't end up with versions of code / themes that
-are incompatible.  Bump XMLTV version.  bjm's recording updates.
-
+v0.22.00, 2008-05-12.  Start prepping for 0.22.  Change required minimum
+MySQL to 5.0.15.  Change Qt to 4.3.
 
 -->
 
