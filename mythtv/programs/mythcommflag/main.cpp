@@ -32,6 +32,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "remoteencoder.h"
 #include "RingBuffer.h"
+#include "mythcommandlineparser.h"
 
 // Commercial Flagging headers
 #include "CommDetector.h"
@@ -727,6 +728,11 @@ int main(int argc, char *argv[])
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
 
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings);
+
     while (argpos < a.argc())
     {
         if (!strcmp(a.argv()[argpos],"-c") ||
@@ -944,38 +950,10 @@ int main(int argc, char *argv[])
                 return COMMFLAG_EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
-            if ((a.argc() - 1) > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            { 
-                cerr << "Invalid or missing argument to -O/--override-setting "
-                        "option\n";
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
+            if (cmdline_err)
+                return COMMFLAG_EXIT_INVALID_CMDLINE;
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help"))

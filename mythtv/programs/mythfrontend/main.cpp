@@ -54,6 +54,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "dbutil.h"
+#include "mythcommandlineparser.h"
 
 #include "myththemedmenu.h"
 #include "myththemebase.h"
@@ -937,7 +938,7 @@ void CleanupMyOldInUsePrograms(void)
     query.exec();
 }
 
-void PrintHelp(void)
+void PrintHelp(const MythCommandLineParser &cmdlineparser)
 {
 
     cerr << "Valid options are: " << endl <<
@@ -948,11 +949,7 @@ void PrintHelp(void)
             "-geometry WxH+X+Y              Override window size and position\n" <<
             "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
             "-r or --reset                  Resets frontend appearance settings and language" << endl <<
-            "-w or --windowed               Run in windowed mode" << endl <<
-            "-nw or --no-windowed           Run in non-windowed mode " << endl <<
-            "-O or " << endl <<
-            "  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'" << endl <<
-            "                               This option may be repeated multiple times" << endl <<
+            cmdlineparser.GetHelpString(false).ascii() <<
             "-G or " << endl <<
             "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
             "                               Use a comma seperated list to return multiple values" << endl <<
@@ -1110,7 +1107,6 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     QString pluginname = "";
-    QMap<QString, QString> settingsOverride;
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -1120,6 +1116,13 @@ int main(int argc, char **argv)
 
     if (binname.lower() != "mythfrontend")
         pluginname = binname;
+
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPWindowed             |
+        kCLPNoWindowed);
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -1147,7 +1150,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage"))
         {
-            PrintHelp();
+            PrintHelp(cmdline);
             return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"--prompt") ||
@@ -1176,7 +1179,13 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+        }
     }
+    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
 
     if (!display.isEmpty())
     {
@@ -1225,47 +1234,6 @@ int main(int argc, char **argv)
                  !strcmp(a.argv()[argpos],"--reset"))
         {
             ResetSettings = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-w") ||
-                 !strcmp(a.argv()[argpos],"--windowed"))
-        {
-            settingsOverride["RunFrontendInWindow"] = "1";
-        }
-        else if (!strcmp(a.argv()[argpos],"-nw") ||
-                 !strcmp(a.argv()[argpos],"--no-windowed"))
-        {
-            settingsOverride["RunFrontendInWindow"] = "0";
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -O/--override-setting option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
         }
         else if (!strcmp(a.argv()[argpos],"-G") ||
                  !strcmp(a.argv()[argpos],"--get-setting"))
@@ -1330,6 +1298,11 @@ int main(int argc, char **argv)
         {
             upgradeAllowed = true;
         }
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+        }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
         {
@@ -1341,10 +1314,11 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            PrintHelp();
+            PrintHelp(cmdline);
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
+    settingsOverride = cmdline.GetSettingsOverride();
 
     if (logfile != "")
     {
