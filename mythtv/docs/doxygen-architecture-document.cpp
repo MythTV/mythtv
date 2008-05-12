@@ -458,11 +458,11 @@ remember right now that throw around lots of little bits of XML :-)
 
 The custom protocol is an ASCII encoded length and command string.
 Command sequences can be easily sent to the backend using telnet.
-<I>%e.g.</I> \verbatim telnet 127.0.0.1 5432
+<I>%e.g.</I> \verbatim telnet 127.0.0.1 6543
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.\endverbatim
-<B>\verbatim21      MYTH_PROTO_VERSION 36 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
+<B>\verbatim21      MYTH_PROTO_VERSION 40 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
 \verbatim13      ACCEPT[]:[]362       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
 The command string is prefixed by 8 characters, containing the length
 of the forthcoming command. This can be justified in any way
