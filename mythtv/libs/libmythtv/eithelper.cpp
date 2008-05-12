@@ -410,7 +410,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     }
 }
 
-// This function gets special eit data from the german provider Premiere
+// This function gets special EIT data from the German provider Premiere
 // for the option channels Premiere Sport and Premiere Direkt
 void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 {
@@ -665,7 +665,7 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
         MythContext::DBError("Looking up chanID", query);
     else if (query.next())
     {
-        // Check to see if we are interseted in this channel
+        // Check to see if we are interested in this channel
         bool useOnAirGuide = query.value(1).toBool();
         return (useOnAirGuide) ? query.value(0).toUInt() : 0;
     }
@@ -696,7 +696,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // United Kingdom
     fix[ 9018U << 16] = EITFixUp::kFixUK;
 
-    // ComHem Sweeden
+    // ComHem Sweden
     fix[40999U << 16       ] = EITFixUp::kFixComHem;
     fix[40999U << 16 | 1070] = EITFixUp::kFixSubtitle;
     fix[40999U << 16 | 1308] = EITFixUp::kFixSubtitle;
@@ -831,7 +831,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 6200LL << 32 | 8916 << 16 ] = // Madrid (TeleMadrid)
         EITFixUp::kEFixForceISO8859_15;
 
-    // DVB-S Astra 19.2E french channels
+    // DVB-S Astra 19.2E French channels
     fix[     1022LL << 32 | 1 << 16 |  6901 ] = // DIRECT 8
         fix[ 1022LL << 32 | 1 << 16 |  6905 ] = // France 24 (en Francais)
         fix[ 1022LL << 32 | 1 << 16 |  6911 ] = // DIRECT 8

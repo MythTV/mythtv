@@ -20,7 +20,7 @@ class ATSCEvent
   public:
     /// This empty constructor is needed for the QMap<> to work, it is
     /// not intended to be used to initialize an ATSC Event.
-    /// Since we immediately initialize the value insterted into the
+    /// Since we immediately initialize the value inserted into the
     /// QMap this is safe in that use.
     ATSCEvent() {}
     /// This is the only valid constructor for ATSCEvent.

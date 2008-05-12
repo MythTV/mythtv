@@ -108,7 +108,7 @@ class SignalMonitor
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
 
-    /// \brief This should be overriden to actually do signal monitoring.
+    /// \brief This should be overridden to actually do signal monitoring.
     virtual void UpdateValues() { ; }
 
   public:
@@ -172,11 +172,11 @@ class SignalMonitor
 
     static const uint64_t kDTVSigMon_WaitForAll = 0x01FF000000ULL;
 
-    /// Wait for the Signal to Noise Ratio to rise above a threshhold
+    /// Wait for the Signal to Noise Ratio to rise above a threshold
     static const uint64_t kDVBSigMon_WaitForSNR = 0x1000000000ULL;
-    /// Wait for the Bit Error Rate to fall below a threshhold
+    /// Wait for the Bit Error Rate to fall below a threshold
     static const uint64_t kDVBSigMon_WaitForBER = 0x2000000000ULL;
-    /// Wait for uncorrected FEC blocks to fall below a threshhold
+    /// Wait for uncorrected FEC blocks to fall below a threshold
     static const uint64_t kDVBSigMon_WaitForUB  = 0x4000000000ULL;
     /// Wait for rotor to complete turning the antenna
     static const uint64_t kDVBSigMon_WaitForPos = 0x8000000000ULL;

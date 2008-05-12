@@ -247,7 +247,7 @@ void SignalMonitor::Kick()
  *  \brief Returns QStringList containing all signals and their current
  *         values.
  *
- *   This searlializes the signal monitoring values so that they can
+ *   This serializes the signal monitoring values so that they can
  *   be passed from a backend to a frontend.
  *
  *   SignalMonitorValue::Parse(const QStringList&) will convert this
