@@ -385,6 +385,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  bool allow_libmpeg2)
     : DecoderBase(parent, pginfo),
       d(new AvFormatDecoderPrivate(allow_libmpeg2)),
+      is_db_ignored(gContext->IsDatabaseIgnored()),
       h264_kf_seq(new H264::KeyframeSequencer()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
@@ -1486,10 +1487,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 uint width  = max(enc->width, 16);
                 uint height = max(enc->height, 16);
-                VideoDisplayProfile vdp;
-                vdp.SetInput(QSize(width, height));
-                QString dec = vdp.GetDecoder();
-                uint thread_count = vdp.GetMaxCPUs();
+                QString dec = "ffmpeg";
+                uint thread_count = 1;
+                if (!is_db_ignored)
+                {
+                    VideoDisplayProfile vdp;
+                    vdp.SetInput(QSize(width, height));
+                    dec = vdp.GetDecoder();
+                    thread_count = vdp.GetMaxCPUs();
+                }
                 VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
                         .arg(ENABLE_THREADS ? thread_count : 1));
 

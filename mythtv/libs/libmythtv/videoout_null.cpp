@@ -103,7 +103,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     }
     CreatePauseFrame();
 
-    db_vdisp_profile->SetVideoRenderer("null");
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer("null");
 
     return true;
 }
@@ -134,7 +135,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
 
     CreatePauseFrame();
 
-    db_vdisp_profile->SetVideoRenderer("null");
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetVideoRenderer("null");
 
     MoveResize();
 

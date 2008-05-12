@@ -268,7 +268,7 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour(kLetterBoxColour_Black),
     db_deint_filtername(QString::null),
     db_use_picture_controls(false),
-    db_vdisp_profile(new VideoDisplayProfile()),
+    db_vdisp_profile(NULL),
 
     // Manual Zoom
     mz_scale_v(1.0f),                   mz_scale_h(1.0f),
@@ -340,6 +340,9 @@ VideoOutput::VideoOutput() :
         gContext->GetNumSetting("LetterboxColour",     0);
     db_use_picture_controls =
         gContext->GetNumSetting("UseOutputPictureControls", 0);
+
+    if (!gContext->IsDatabaseIgnored())
+        db_vdisp_profile = new VideoDisplayProfile();
 }
 
 /**
@@ -383,7 +386,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     video_dim            = fix_alignment(QSize(width, height));
     video_rect           = QRect(QPoint(winx, winy), video_disp_dim);
 
-    db_vdisp_profile->SetInput(video_dim);
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetInput(video_dim);
 
     aspectoverride  = db_aspectoverride;
     adjustfill      = db_adjustfill;
@@ -397,18 +401,21 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
 void VideoOutput::InitOSD(OSD *osd)
 {
-    if (!db_vdisp_profile->IsOSDFadeEnabled())
+    if (db_vdisp_profile && !db_vdisp_profile->IsOSDFadeEnabled())
         osd->DisableFade();
 }
 
 QString VideoOutput::GetFilters(void) const
 {
-    return db_vdisp_profile->GetFilters();
+    if (db_vdisp_profile)
+        return db_vdisp_profile->GetFilters();
+    return QString::null;
 }
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
-    db_vdisp_profile->SetOutput(playback_fps);
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetOutput(playback_fps);
 }
 
 /**
@@ -462,7 +469,10 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         VideoFrameType otmp = FMT_YV12;
         int btmp;
         
-        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+        if (db_vdisp_profile)
+            m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+        else
+            m_deintfiltername = "";
 
         m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
@@ -510,7 +520,8 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 void VideoOutput::FallbackDeint(void)
 {
     SetupDeinterlace(false);
-    SetupDeinterlace(true, db_vdisp_profile->GetFallbackDeinterlacer());
+    if (db_vdisp_profile)
+        SetupDeinterlace(true, db_vdisp_profile->GetFallbackDeinterlacer());
 }
 
 /** \fn VideoOutput::FallbackDeint(void)
@@ -611,7 +622,8 @@ bool VideoOutput::InputChanged(const QSize &input_size,
     video_disp_dim = fix_1080i(input_size);
     video_dim      = fix_alignment(input_size);
 
-    db_vdisp_profile->SetInput(video_dim);
+    if (db_vdisp_profile)
+        db_vdisp_profile->SetInput(video_dim);
 
     SetVideoAspectRatio(aspect);
     

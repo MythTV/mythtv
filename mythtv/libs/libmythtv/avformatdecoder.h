@@ -210,6 +210,9 @@ class AvFormatDecoder : public DecoderBase
 
   private:
     class AvFormatDecoderPrivate *d;
+
+    bool is_db_ignored;
+
     H264::KeyframeSequencer *h264_kf_seq;
 
     AVFormatContext *ic;

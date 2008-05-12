@@ -106,7 +106,7 @@ class MPUBLIC MythPrivRequest
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmyth, libmythtv and libmythui class methods
 /// used by plug-ins.
-#define MYTH_BINARY_VERSION "0.22.20080422-1"
+#define MYTH_BINARY_VERSION "0.22.20080512-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -148,7 +148,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     bool Init(const bool gui = true,
                     UPnp *UPnPclient = NULL,
               const bool promptForBackend = false,
-              const bool bypassAutoDiscovery = false);
+              const bool bypassAutoDiscovery = false,
+              const bool ignoreDB = false);
 
     QString GetMasterHostPrefix(void);
 
@@ -237,6 +238,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
                   const QString &message, const QString &details);
 
     Settings *qtconfig(void);
+
+    bool IsDatabaseIgnored(void) const;
 
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);

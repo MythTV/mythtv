@@ -178,7 +178,8 @@ class MythContextPrivate
    ~MythContextPrivate();
 
     bool Init        (const bool gui,    UPnp *UPnPclient,
-                      const bool prompt, const bool noPrompt);
+                      const bool prompt, const bool noPrompt,
+                      const bool ignoreDB);
     bool FindDatabase(const bool prompt, const bool noPrompt);
 
     bool IsWideMode() const {return (m_baseWidth == 1280);}
@@ -302,6 +303,7 @@ class MythContextPrivate
     queue<MythPrivRequest> m_priv_requests;
     QWaitCondition m_priv_queued;
 
+    bool ignoreDatabase;
     bool useSettingsCache;
     QMutex settingsCacheLock;
     QMap <QString, QString> settingsCache;      // permanent settings in the DB
@@ -337,6 +339,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       screensaverEnabled(false),
       display_res(NULL),
+      ignoreDatabase(false),
       useSettingsCache(false)
 {
     char *tmp_installprefix = getenv("MYTHTVDIR");
@@ -546,8 +549,11 @@ void MythContextPrivate::GetScreenBounds()
 }
 
 bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
-                              const bool promptForBackend, const bool noPrompt)
+                              const bool promptForBackend,
+                              const bool noPrompt,
+                              const bool ignoreDB)
 {
+    ignoreDatabase = ignoreDB;
     m_gui = gui;
     if (UPnPclient)
     {
@@ -1109,10 +1115,12 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 QString MythContextPrivate::TestDBconnection(void)
 {
     bool    doPing = m_DBparams.dbHostPing;
-    QString err;
+    QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
     int     port   = m_DBparams.dbPort;
 
+    if (ignoreDatabase)
+        return err;
 
     // 1. Check the supplied host or IP address, to prevent the app
     //    appearing to hang if we cannot route to the machine:
@@ -1529,7 +1537,8 @@ MythContext::MythContext(const QString &binversion)
 
 bool MythContext::Init(const bool gui, UPnp *UPnPclient,
                        const bool promptForBackend,
-                       const bool disableAutoDiscovery)
+                       const bool disableAutoDiscovery,
+                       const bool ignoreDB)
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
@@ -1581,8 +1590,11 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         return false;
     }
 
-    if (!d->Init(gui, UPnPclient, promptForBackend, disableAutoDiscovery))
+    if (!d->Init(gui, UPnPclient, promptForBackend,
+                 disableAutoDiscovery, ignoreDB))
+    {
         return false;
+    }
 
     ActivateSettingsCache(true);
 
@@ -2606,6 +2618,17 @@ Settings *MythContext::qtconfig(void)
     return d->m_qtThemeSettings;
 }
 
+/** /brief Returns true if database is being ignored.
+ *
+ *  This was created for some command line only programs which
+ *  still need myth libraries, such as channel scanners, channel
+ *  change programs, and the off-line commercial flagger.
+ */
+bool MythContext::IsDatabaseIgnored(void) const
+{
+    return d->ignoreDatabase;
+}
+
 void MythContext::SaveSetting(const QString &key, int newValue)
 {
     (void) SaveSettingOnHost(key,
@@ -2624,6 +2647,12 @@ bool MythContext::SaveSettingOnHost(const QString &key,
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
     bool success = false;
 
+    if (d->ignoreDatabase)
+    {
+        ClearSettingsCache(key, newValue);
+        ClearSettingsCache(host + " " + key, newValue);
+        return true;
+    }
 
     if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
     {
@@ -2706,26 +2735,16 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
         d->settingsCacheLock.unlock();
     }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (query.isConnected())
-    {
-        query.prepare("SELECT data FROM settings WHERE value "
-                      "= :KEY AND hostname = :HOSTNAME ;");
-        query.bindValue(":KEY", key);
-        query.bindValue(":HOSTNAME", d->m_localhostname);
-        query.exec();
 
-        if (query.isActive() && query.size() > 0)
+    if (!d->ignoreDatabase)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        if (query.isConnected())
         {
-            query.next();
-            value = query.value(0).toString();
-            found = true;
-        }
-        else
-        {
-            query.prepare("SELECT data FROM settings WHERE value = :KEY AND "
-                          "hostname IS NULL;");
+            query.prepare("SELECT data FROM settings WHERE value "
+                          "= :KEY AND hostname = :HOSTNAME ;");
             query.bindValue(":KEY", key);
+            query.bindValue(":HOSTNAME", d->m_localhostname);
             query.exec();
 
             if (query.isActive() && query.size() > 0)
@@ -2734,13 +2753,29 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
                 value = query.value(0).toString();
                 found = true;
             }
+            else
+            {
+                query.prepare("SELECT data FROM settings "
+                              "WHERE value = :KEY AND "
+                              "hostname IS NULL;");
+                query.bindValue(":KEY", key);
+                query.exec();
+
+                if (query.isActive() && query.size() > 0)
+                {
+                    query.next();
+                    value = query.value(0).toString();
+                    found = true;
+                }
+            }
         }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, 
-             QString("Database not open while trying to load setting: %1")
-                                .arg(key));
+        else
+        {
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Database not open while trying to "
+                            "load setting: %1")
+                    .arg(key));
+        }
     }
 
     if (!found)
@@ -2804,26 +2839,30 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
         d->settingsCacheLock.unlock();
     }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (query.isConnected())
+    if (!d->ignoreDatabase)
     {
-        query.prepare("SELECT data FROM settings WHERE value = :VALUE "
-                      "AND hostname = :HOSTNAME ;");
-        query.bindValue(":VALUE", key);
-        query.bindValue(":HOSTNAME", host);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
+        MSqlQuery query(MSqlQuery::InitCon());
+        if (query.isConnected())
         {
-            query.next();
-            value = query.value(0).toString();
-            found = true;
+            query.prepare("SELECT data FROM settings WHERE value = :VALUE "
+                          "AND hostname = :HOSTNAME ;");
+            query.bindValue(":VALUE", key);
+            query.bindValue(":HOSTNAME", host);
+
+            if (query.exec() && query.isActive() && query.size() > 0)
+            {
+                query.next();
+                value = query.value(0).toString();
+                found = true;
+            }
         }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, 
-             QString("Database not open while trying to load setting: %1")
-                                .arg(key));
+        else
+        {
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Database not open while trying to "
+                            "load setting: %1")
+                    .arg(key));
+        }
     }
 
     if (found && d->useSettingsCache)
@@ -3849,6 +3888,9 @@ void MythContext::LogEntry(const QString &module, int priority,
 {
     unsigned int logid;
     int howmany;
+
+    if (d->ignoreDatabase)
+        return;
 
     if (d->m_logenable == -1) // Haven't grabbed the settings yet
         d->LoadLogSettings();
