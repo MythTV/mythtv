@@ -41,6 +41,10 @@ using namespace std;
 #include "SlotRelayer.h"
 #include "CustomEventRelayer.h"
 
+#define LOC      QString("MythCommFlag: ")
+#define LOC_WARN QString("MythCommFlag, Warning: ")
+#define LOC_ERR  QString("MythCommFlag, Error: ")
+
 bool quiet = false;
 bool force = false;
 
@@ -94,7 +98,7 @@ QString get_filename(ProgramInfo *program_info)
     return filename;
 }
 
-int BuildVideoMarkup(ProgramInfo *program_info)
+int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 {
     QString filename = get_filename(program_info);
 
@@ -106,7 +110,7 @@ int BuildVideoMarkup(ProgramInfo *program_info)
         return COMMFLAG_EXIT_NO_RINGBUFFER;
     }
 
-    if (!MSqlQuery::testDBConnection())
+    if (useDB && !MSqlQuery::testDBConnection())
     {
         VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
@@ -408,7 +412,7 @@ void incomingCustomEvent(QEvent* e)
 int DoFlagCommercials(
     ProgramInfo *program_info,
     bool showPercentage, bool fullSpeed, bool inJobQueue,
-    NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod)
+    NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod, bool useDB)
 {
     CommDetectorFactory factory;
     commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
@@ -417,9 +421,9 @@ int DoFlagCommercials(
                                             program_info->startts,
                                             program_info->endts,
                                             program_info->recstartts,
-                                            program_info->recendts);
+                                            program_info->recendts, useDB);
 
-    if (inJobQueue)
+    if (inJobQueue && useDB)
     {
         jobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
                                    program_info->recstartts);
@@ -431,7 +435,8 @@ int DoFlagCommercials(
             VERBOSE(VB_COMMFLAG, "mythcommflag: Unable to determine jobID");
     }
 
-    program_info->SetCommFlagged(COMM_FLAG_PROCESSING);
+    if (useDB)
+        program_info->SetCommFlagged(COMM_FLAG_PROCESSING);
 
     CustomEventRelayer cer(incomingCustomEvent);
     SlotRelayer a(commDetectorBreathe);
@@ -487,11 +492,14 @@ int DoFlagCommercials(
     return comms_found;
 }
 
-int FlagCommercials(ProgramInfo *program_info)
+int FlagCommercials(ProgramInfo *program_info, bool useDB)
 {
     global_program_info = program_info;
 
     int breaksFound = 0;
+
+    if (!useDB && COMM_DETECT_UNINIT == commDetectMethod)
+        commDetectMethod = COMM_DETECT_ALL;
 
     if (commDetectMethod == COMM_DETECT_UNINIT)
     {
@@ -586,7 +594,7 @@ int FlagCommercials(ProgramInfo *program_info)
         return COMMFLAG_EXIT_NO_RINGBUFFER;
     }
 
-    if (!MSqlQuery::testDBConnection())
+    if (useDB && !MSqlQuery::testDBConnection())
     {
         VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
         delete tmprbuf;
@@ -637,7 +645,7 @@ int FlagCommercials(ProgramInfo *program_info)
     }
 
     int fakeJobID = -1;
-    if (!inJobQueue)
+    if (!inJobQueue && useDB)
     {
         JobQueue::QueueJob(JOB_COMMFLAG, program_info->chanid,
                            program_info->recstartts, "", "",
@@ -655,7 +663,7 @@ int FlagCommercials(ProgramInfo *program_info)
 
     breaksFound = DoFlagCommercials(
         program_info, showPercentage, fullSpeed, inJobQueue,
-        nvp, commDetectMethod);
+        nvp, commDetectMethod, useDB);
 
     if (fakeJobID >= 0)
     {
@@ -675,7 +683,7 @@ int FlagCommercials(ProgramInfo *program_info)
 }
 
 int FlagCommercials(
-    const QString &chanid, const QString &starttime)
+    const QString &chanid, const QString &starttime, bool useDB)
 {
     ProgramInfo *program_info =
         ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -688,7 +696,7 @@ int FlagCommercials(
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
-    int ret = FlagCommercials(program_info);
+    int ret = FlagCommercials(program_info, useDB);
 
     delete program_info;
 
@@ -712,6 +720,7 @@ int main(int argc, char *argv[])
     int jobType = JOB_NONE;
     QDir fullfile;
     time_t time_now;
+    bool useDB = true;
     bool allRecorded = false;
     bool queueJobInstead = false;
     bool copyToCutlist = false;
@@ -840,6 +849,12 @@ int main(int argc, char *argv[])
             newCutList = (a.argv()[++argpos]);
         else if (!strcmp(a.argv()[argpos], "-j"))
             jobID = QString(a.argv()[++argpos]).toInt();
+        else if (!strcmp(a.argv()[argpos], "--skipdb"))
+        {
+            useDB = false;
+            dontSubmitCommbreakListToDB = true;
+            force = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--all"))
         {
             allRecorded = true;
@@ -1011,7 +1026,9 @@ int main(int argc, char *argv[])
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    if (!gContext->Init(
+            false/*use gui*/, NULL/*upnp*/, false/*prompt for backend*/,
+            false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return COMMFLAG_EXIT_NO_MYTHCONTEXT;
@@ -1043,7 +1060,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (fullfile.path() != ".")
+    if ((fullfile.path() != ".") && useDB)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT chanid, starttime FROM recorded "
@@ -1102,7 +1119,7 @@ int main(int argc, char *argv[])
         isVideo = false;
         showPercentage = false;
 
-        int breaksFound = FlagCommercials(chanid, starttime);
+        int breaksFound = FlagCommercials(chanid, starttime, useDB);
 
         delete gContext;
 
@@ -1161,7 +1178,7 @@ int main(int argc, char *argv[])
         pginfo->pathname = filename;
         pginfo->isVideo = true;
 
-        result = BuildVideoMarkup(pginfo);
+        result = BuildVideoMarkup(pginfo, useDB);
 
         delete pginfo;
     }
@@ -1170,7 +1187,44 @@ int main(int argc, char *argv[])
         if (queueJobInstead)
             QueueCommFlagJob(chanid, starttime);
         else
-            result = FlagCommercials(chanid, starttime);
+            result = FlagCommercials(chanid, starttime, useDB);
+    }
+    else if (!useDB)
+    {
+        if (!QFile::exists(filename))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Filename: '%1' does not exist")
+                    .arg(filename));
+            return -1;
+        }
+
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
+        pginfo->pathname = filename;
+        pginfo->isVideo = true;
+        PMapDBReplacement *pmap = new PMapDBReplacement();
+        pginfo->SetPositionMapDBReplacement(pmap);
+
+        // RingBuffer doesn't like relative pathnames
+        if (filename.left(1) != "/" && !filename.startsWith("dvd://"))
+            pginfo->pathname.prepend(QDir::currentDirPath() + '/');
+
+        if ((filename.right(3).lower() == "mpg") ||
+            (filename.right(4).lower() == "mpeg"))
+        {
+            result = BuildVideoMarkup(pginfo, useDB);
+            if (COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS != result)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Failed to build video markup");
+                return result;
+            }
+        }
+
+        result = FlagCommercials(pginfo, useDB);
+
+        delete pginfo;
+        delete pmap;
     }
     else
     {
@@ -1199,7 +1253,7 @@ int main(int argc, char *argv[])
                     if (queueJobInstead)
                         QueueCommFlagJob(chanid, starttime);
                     else
-                        FlagCommercials(chanid, starttime);
+                        FlagCommercials(chanid, starttime, useDB);
                 }
                 else
                 {
@@ -1257,7 +1311,7 @@ int main(int argc, char *argv[])
                                 if (queueJobInstead)
                                     QueueCommFlagJob(chanid, starttime);
                                 else
-                                    FlagCommercials(chanid, starttime);
+                                    FlagCommercials(chanid, starttime, useDB);
                             }
                         }
                     }

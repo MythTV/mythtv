@@ -10,18 +10,20 @@ class QDateTime;
 
 class CommDetectorFactory
 {
-public:
-	CommDetectorFactory() {}
-	~CommDetectorFactory() {}
+  public:
+    CommDetectorFactory() {}
+    ~CommDetectorFactory() {}
 
-	CommDetectorBase* makeCommDetector(enum SkipTypes commDetectMethod,
-                                       bool showProgress,
-                                       bool fullSpeed, NuppelVideoPlayer* nvp,
-                                       int chanid,
-                                       const QDateTime& startedAt,
-                                       const QDateTime& stopsAt,
-                                       const QDateTime& recordingStartedAt,
-                                       const QDateTime& recordingStopsAt);
+    CommDetectorBase* makeCommDetector(
+        enum SkipTypes commDetectMethod,
+        bool showProgress,
+        bool fullSpeed, NuppelVideoPlayer* nvp,
+        int chanid,
+        const QDateTime& startedAt,
+        const QDateTime& stopsAt,
+        const QDateTime& recordingStartedAt,
+        const QDateTime& recordingStopsAt,
+        bool useDB);
 };
 
 #endif

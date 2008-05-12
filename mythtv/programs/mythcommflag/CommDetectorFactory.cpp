@@ -6,20 +6,23 @@ class NuppelVideoPlayer;
 class RemoteEncoder;
 
 CommDetectorBase*
-CommDetectorFactory::makeCommDetector(enum SkipTypes commDetectMethod,
-                                          bool showProgress, bool fullSpeed,
-                                          NuppelVideoPlayer* nvp,
-                                          int chanid,
-                                          const QDateTime& startedAt,
-                                          const QDateTime& stopsAt,
-                                          const QDateTime& recordingStartedAt,
-                                          const QDateTime& recordingStopsAt)
+CommDetectorFactory::makeCommDetector(
+    enum SkipTypes commDetectMethod,
+    bool showProgress, bool fullSpeed,
+    NuppelVideoPlayer* nvp,
+    int chanid,
+    const QDateTime& startedAt,
+    const QDateTime& stopsAt,
+    const QDateTime& recordingStartedAt,
+    const QDateTime& recordingStopsAt,
+    bool useDB)
 {
     if ((commDetectMethod & COMM_DETECT_2))
     {
-        return new CommDetector2(commDetectMethod, showProgress, fullSpeed,
-                nvp, chanid, startedAt, stopsAt,
-                recordingStartedAt, recordingStopsAt);
+        return new CommDetector2(
+            commDetectMethod, showProgress, fullSpeed,
+            nvp, chanid, startedAt, stopsAt,
+            recordingStartedAt, recordingStopsAt, useDB);
     }
 
     return new ClassicCommDetector(commDetectMethod, showProgress, fullSpeed,

@@ -311,10 +311,12 @@ QString strftimeval(const struct timeval *tv)
 
 using namespace commDetector2;
 
-CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
-        bool showProgress_in, bool fullSpeed_in, NuppelVideoPlayer* nvp_in,
-        int chanid, const QDateTime& startts_in, const QDateTime& endts_in,
-        const QDateTime& recstartts_in, const QDateTime& recendts_in)
+CommDetector2::CommDetector2(
+    enum SkipTypes commDetectMethod_in,
+    bool showProgress_in, bool fullSpeed_in, NuppelVideoPlayer* nvp_in,
+    int chanid, const QDateTime& startts_in, const QDateTime& endts_in,
+    const QDateTime& recstartts_in, const QDateTime& recendts_in,
+    bool useDB)
     : commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2))
     , showProgress(showProgress_in)
     , fullSpeed(fullSpeed_in)
@@ -338,7 +340,8 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     BorderDetector          *borderDetector = NULL;
     HistogramAnalyzer       *histogramAnalyzer = NULL;
 
-    debugdir = debugDirectory(chanid, recstartts);
+    if (useDB)
+        debugdir = debugDirectory(chanid, recstartts);
 
     /*
      * Look for blank frames to use as delimiters between commercial and

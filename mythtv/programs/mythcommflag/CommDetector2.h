@@ -30,10 +30,11 @@ QString strftimeval(const struct timeval *tv);
 class CommDetector2 : public CommDetectorBase
 {
 public:
-    CommDetector2(enum SkipTypes commDetectMethod,
-            bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
-            int chanid, const QDateTime& startts, const QDateTime& endts,
-            const QDateTime& recstartts, const QDateTime& recendts);
+    CommDetector2(
+        enum SkipTypes commDetectMethod,
+        bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
+        int chanid, const QDateTime& startts, const QDateTime& endts,
+        const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
     virtual bool go(void);
     virtual void getCommercialBreakList(QMap<long long, int> &comms);
     virtual void recordingFinished(long long totalFileSize);
