@@ -47,7 +47,7 @@ $| = 1; # autoflush stdout;
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '16973'; # Recent 0-21-fixes
-my $SVNRELEASE = '17131'; # Recent trunk
+my $SVNRELEASE = '17189'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -729,7 +729,6 @@ push @{$expect},
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
 export PATH=$QTDIR/bin:/usr/local/bin:$PATH
-export INSTALL_ROOT='.$unixbuild.'
 ' ],comment => 'write a QT3 script that we can source later when inside msys to setup the environment variables'],
 
 
@@ -739,7 +738,6 @@ export INSTALL_ROOT='.$unixbuild.'
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
 export PATH=$QTDIR/bin:/usr/local/bin:$PATH
-export INSTALL_ROOT='.$unixbuild.'
 ' ],comment => 'write a QT4 script that we can source later when inside msys to setup the environment variables'],
 
 
@@ -883,7 +881,7 @@ push @{$expect},
 [ file => $mythtv.'mythtv/Makefile',
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythtv',
-           './configure --prefix=/ --disable-dbox2 --disable-hdhomerun'.
+           './configure --prefix=.. --disable-dbox2 --disable-hdhomerun'.
            ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
            ' --disable-xvmc --enable-directx --cpu=k8'.
            ' --enable-memalign-hack --compile-type='.$compile_type],
@@ -940,7 +938,8 @@ cp Makefile_new Makefile
 [ newer => [$build.'bin/mythfrontend.exe',
             $mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythtv','make install'],
+            'cd '.$unixmythtv.'mythtv',
+            'make install INSTALL_ROOT='.$unixbuild.'/tmp'],
 comment => 'was the last configure successful? then install mythtv ' ],
 
 # TODO check if this is necessary. The 'make install' above should do it!
