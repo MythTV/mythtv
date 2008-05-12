@@ -106,7 +106,7 @@ class MPUBLIC MythPrivRequest
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmyth, libmythtv and libmythui class methods
 /// used by plug-ins.
-#define MYTH_BINARY_VERSION "0.22.20080512-1"
+#define MYTH_BINARY_VERSION "0.22.20080512-2"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *

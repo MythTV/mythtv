@@ -71,7 +71,8 @@ static QString StripHTMLTags(const QString& src)
  *  \brief Null constructor.
  */
 ProgramInfo::ProgramInfo(void) :
-    regExpLock(false), regExpSeries("0000$")
+    regExpLock(false), regExpSeries("0000$"),
+    positionMapDBReplacement(NULL)
 {
     spread = -1;
     startCol = -1;
@@ -247,6 +248,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     inUseForWhat = Q3DeepCopy<QString>(other.inUseForWhat);
     lastInUseTime = other.lastInUseTime;
     record = NULL;
+
+    positionMapDBReplacement = other.positionMapDBReplacement;
 
     return *this;
 }
@@ -2647,9 +2650,41 @@ void ProgramInfo::SetMarkupFlag(int type, bool flag) const
     }
 }
 
+static QString XtoString(MarkTypes type)
+{
+    switch (type)
+    {
+        case MARK_UNSET:        return "UNSET";
+        case MARK_UPDATED_CUT:  return "UPDATED_CUT";
+        case MARK_EDIT_MODE:    return "EDIT_MODE";
+        case MARK_CUT_END:      return "CUT_END";
+        case MARK_CUT_START:    return "CUT_START";
+        case MARK_BOOKMARK:     return "BOOKMARK";
+        case MARK_BLANK_FRAME:  return "BLANK_FRAME";
+        case MARK_COMM_START:   return "COMM_START";
+        case MARK_COMM_END:     return "COMM_END";
+        case MARK_GOP_START:    return "GOP_START";
+        case MARK_KEYFRAME:     return "KEYFRAME";
+        case MARK_SCENE_CHANGE: return "SCENE_CHANGE";
+        case MARK_GOP_BYFRAME:  return "GOP_BYFRAME";
+        default:                return "unknown";
+    }
+}
+
+#include <cassert>
 void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
                                  int type) const
 {
+    if (positionMapDBReplacement)
+    {
+        QMutexLocker locker(positionMapDBReplacement->lock);
+        VERBOSE(VB_IMPORTANT, LOC + "GetPositionMap: type: " +
+                XtoString((MarkTypes)type));
+        posMap = positionMapDBReplacement->map[(MarkTypes)type];
+
+        return;
+    }
+
     posMap.clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2680,6 +2715,17 @@ void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
 
 void ProgramInfo::ClearPositionMap(int type) const
 {
+    if (positionMapDBReplacement)
+    {
+        QMutexLocker locker(positionMapDBReplacement->lock);
+
+        VERBOSE(VB_IMPORTANT, LOC + "ClearPositionMap: type: " +
+                XtoString((MarkTypes)type));
+
+        positionMapDBReplacement->map.clear();
+        return;
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
   
     if (isVideo)
@@ -2708,6 +2754,53 @@ void ProgramInfo::ClearPositionMap(int type) const
 void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                                  long long min_frame, long long max_frame) const
 {
+    if (positionMapDBReplacement)
+    {
+        QMutexLocker locker(positionMapDBReplacement->lock);
+
+        if ((min_frame >= 0) || (max_frame >= 0))
+        {
+            frm_pos_map_t::const_iterator it, it_end;
+            it     = positionMapDBReplacement->map[(MarkTypes)type].begin();
+            it_end = positionMapDBReplacement->map[(MarkTypes)type].end();
+
+            frm_pos_map_t new_map;
+            for (; it != it_end; ++it)
+            {
+                long long frame = it.key();
+                if ((min_frame >= 0) && (frame >= min_frame))
+                    continue;
+                if ((min_frame >= 0) && (frame <= max_frame))
+                    continue;
+                new_map.insert(it.key(), it.data());
+            }
+            positionMapDBReplacement->map[(MarkTypes)type] = new_map;
+        }
+        else
+        {
+            positionMapDBReplacement->map[(MarkTypes)type].clear();
+        }
+
+        VERBOSE(VB_IMPORTANT, LOC + "SetPositionMap: type: " +
+                XtoString((MarkTypes)type));
+
+        frm_pos_map_t::const_iterator it     = posMap.begin();
+        frm_pos_map_t::const_iterator it_end = posMap.end();
+        for (; it != it_end; ++it)
+        {
+            long long frame = it.key();
+            if ((min_frame >= 0) && (frame >= min_frame))
+                continue;
+            if ((min_frame >= 0) && (frame <= max_frame))
+                continue;
+
+            positionMapDBReplacement->map[(MarkTypes)type]
+                .insert(frame, it.data());
+        }
+
+        return;
+    }
+
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
     QString comp = "";
@@ -2787,6 +2880,24 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
 void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
                                       int type) const
 {
+    if (positionMapDBReplacement)
+    {
+        QMutexLocker locker(positionMapDBReplacement->lock);
+
+        VERBOSE(VB_IMPORTANT, LOC + "SetPositionMapDelta: type: " +
+                XtoString((MarkTypes)type));
+
+        frm_pos_map_t::const_iterator it     = posMap.begin();
+        frm_pos_map_t::const_iterator it_end = posMap.end();
+        for (; it != it_end; ++it)
+        {
+            positionMapDBReplacement->map[(MarkTypes)type]
+                .insert(it.key(), it.data());
+        }
+
+        return;
+    }
+
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
 

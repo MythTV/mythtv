@@ -148,6 +148,15 @@ enum AutoExpireType {
     kLiveTVAutoExpire = 10000
 };
 
+class PMapDBReplacement
+{
+  public:
+    PMapDBReplacement() : lock(new QMutex()) { }
+   ~PMapDBReplacement() { delete lock; }
+    QMutex       *lock;
+    QMap<MarkTypes,frm_pos_map_t> map;
+};
+
 class ScheduledRecording;
 class Q3GridLayout;
 
@@ -293,7 +302,8 @@ class MPUBLIC ProgramInfo
     void SetPositionMap(frm_pos_map_t &, int type,
                         long long min_frm = -1, long long max_frm = -1) const;
     void SetPositionMapDelta(frm_pos_map_t &, int type) const;
-
+    void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
+        { positionMapDBReplacement = pmap; }
 
     // GUI stuff
     void showDetails(void) const;
@@ -404,6 +414,7 @@ class MPUBLIC ProgramInfo
     QRegExp regExpSeries;
 
     QString inUseForWhat;
+    PMapDBReplacement *positionMapDBReplacement;
 };
 
 /** \class ProgramList
