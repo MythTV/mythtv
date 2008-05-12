@@ -124,7 +124,19 @@ if ($svnlocation eq "branches/release-0-22-fixes") {
     $qtver = 3;
 }
 
+# Try to use parallel make
+my $numCPU = $ENV{'NUMBER_OF_PROCESSORS'} or 1;
+my $parallelMake = 'make';
+if ( $numCPU gt 1 ) {
+    # Pre-queue one extra job to keep the pipeline full:
+    $parallelMake = 'make -j '. ($numCPU + 1);
+}
+
+
 print "Config:\n\tQT version: $qtver\n\tDLLs will be labeled as: $version\n";
+if ( $numCPU gt 1 ) {
+    print "\tBuilding with ", $numCPU, " processors\n";
+}
 print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 print "Press [enter] to continue, or [ctrl]-c to exit now....\n";
 getc();
@@ -893,25 +905,25 @@ cp Makefile_new Makefile
             $mythtv.'mythtv/last_build.txt'],
   shell => ['rm '.$unixmythtv."mythtv/libs/libmyth/libmyth-$version.dll",
             'source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythtv','make'],
+            'cd '.$unixmythtv.'mythtv', $parallelMake],
   comment => "libs/libmyth/libmyth-$version.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier" ],
 [ newer => [$mythtv."mythtv/libs/libmythtv/libmythtv-$version.dll",
             $mythtv.'mythtv/last_build.txt'],
   shell => ['rm '.$unixmythtv."mythtv/libs/libmythtv/libmythtv-$version.dll",
             'source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythtv','make'],
+            'cd '.$unixmythtv.'mythtv', $parallelMake],
   comment => "libs/libmythtv/libmythtv-$version.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier" ],
 [ newer => [$mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',
             $mythtv.'mythtv/last_build.txt'],
   shell => ['rm '.$unixmythtv.'mythtv/programs/mythfrontend/mythfrontend.exe',
             'source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythtv','make'],
+            'cd '.$unixmythtv.'mythtv', $parallelMake],
   comment => 'programs/mythfrontend/mythfrontend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 [ newer => [$mythtv.'mythtv/programs/mythbackend/mythbackend.exe',
             $mythtv.'mythtv/last_build.txt'],
   shell => ['rm '.$unixmythtv.'mythtv/programs/mythbackend/mythbackend.exe',
             'source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythtv','make'],
+            'cd '.$unixmythtv.'mythtv', $parallelMake],
   comment => 'programs/mythbackend/mythbackend.exe - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 
 
@@ -1162,7 +1174,7 @@ comment => 'hack mythconfig.mak'],
 [ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
             $mythtv.'mythtv/last_build.txt'], 
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-            'cd '.$unixmythtv.'mythplugins','make'], 
+            'cd '.$unixmythtv.'mythplugins', $parallelMake], 
 comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
 
 # make cleanup/cleanup.pro as install fails without it
