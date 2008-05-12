@@ -61,6 +61,30 @@ bool onlyDumpDBCommercialBreakList = false;
 int jobID = -1;
 int lastCmd = -1;
 
+static QMap<QString,SkipTypes> *init_skip_types();
+QMap<QString,SkipTypes> *skipTypes = init_skip_types();
+
+static QMap<QString,SkipTypes> *init_skip_types()
+{
+    QMap<QString,SkipTypes> *tmp = new QMap<QString,SkipTypes>;
+    (*tmp)["commfree"]    = COMM_DETECT_COMMFREE;
+    (*tmp)["uninit"]      = COMM_DETECT_UNINIT;
+    (*tmp)["off"]         = COMM_DETECT_OFF;
+    (*tmp)["blank"]       = COMM_DETECT_BLANKS;
+    (*tmp)["blanks"]      = COMM_DETECT_BLANKS;
+    (*tmp)["scene"]       = COMM_DETECT_SCENE;
+    (*tmp)["blankscene"]  = COMM_DETECT_BLANK_SCENE;
+    (*tmp)["blank_scene"] = COMM_DETECT_BLANK_SCENE;
+    (*tmp)["logo"]        = COMM_DETECT_LOGO;
+    (*tmp)["all"]         = COMM_DETECT_ALL;
+    (*tmp)["d2"]          = COMM_DETECT_2;
+    (*tmp)["d2_logo"]     = COMM_DETECT_2_LOGO;
+    (*tmp)["d2_blank"]    = COMM_DETECT_2_BLANK;
+    (*tmp)["d2_scene"]    = COMM_DETECT_2_SCENE;
+    (*tmp)["d2_all"]      = COMM_DETECT_2_ALL;
+    return tmp;
+}
+
 int BuildVideoMarkup(QString& filename)
 {
     program_info = new ProgramInfo;
@@ -298,7 +322,7 @@ void commDetectorStatusUpdate(const QString& status)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,  status);
 }
 
-void commDetectorGotNewCommercialBreakList()
+void commDetectorGotNewCommercialBreakList(void)
 {
     QMap<long long, int> newCommercialMap;
     commDetector->getCommercialBreakList(newCommercialMap);
@@ -470,9 +494,12 @@ int FlagCommercials(QString chanid, QString starttime)
                         "WHERE chanid = :CHANID;");
         query.bindValue(":CHANID", chanid);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (!query.exec())
         {
-            query.next();
+            MythContext::DBError("FlagCommercials", query);
+        }
+        else if (query.next())
+        {
             commDetectMethod = (enum SkipTypes)query.value(0).toInt();
             if (commDetectMethod == COMM_DETECT_COMMFREE)
             {
@@ -707,22 +734,70 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
                  !strcmp(a.argv()[argpos],"--file"))
-            fullfile = a.argv()[++argpos];
+        {
+            if ((argpos + 1) < a.argc())
+            {
+                filename = QString::fromLocal8Bit(a.argv()[++argpos]);
+                fullfile = a.argv()[argpos];
+            }
+            else
+            {
+                cerr << "Missing argument to -f/--file option\n";
+                return -1;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"--video"))
         {
-            filename = (a.argv()[++argpos]);
-            VERBOSE(VB_GENERAL, filename);
-            isVideo = true;
-            rebuildSeekTable = true;
-            beNice = false;
+            if ((argpos + 1) < a.argc())
+            {
+                filename = (a.argv()[++argpos]);
+                isVideo = true;
+                rebuildSeekTable = true;
+                beNice = false;
+            }
+            else
+            {
+                cerr << "Missing argument to -v/--video option\n";
+                return -1;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"--method"))
         {
-            QString method = (a.argv()[++argpos]);
-            bool ok;
-            commDetectMethod = (enum SkipTypes)method.toInt(&ok);
-            if (!ok)
-                commDetectMethod = COMM_DETECT_UNINIT;
+            if ((argpos + 1) < a.argc())
+            {
+                QString method = (a.argv()[++argpos]);
+                bool ok;
+                commDetectMethod = (SkipTypes) method.toInt(&ok);
+                if (!ok)
+                {
+                    commDetectMethod = COMM_DETECT_OFF;
+                    bool off_seen = false;
+                    QMap<QString,SkipTypes>::const_iterator sit;
+                    QStringList list = QStringList::split(",", method);
+                    QStringList::const_iterator it = list.begin();
+                    for (; it != list.end(); ++it)
+                    {
+                        QString val = (*it).lower();
+                        off_seen |= val == "off";
+                        sit = skipTypes->find(val);
+                        if (sit == skipTypes->end())
+                        {
+                            cerr << "Failed to decode --method option '"
+                                 << val.ascii() << "'" << endl;
+                            return -1;
+                        }
+                        commDetectMethod = (SkipTypes)
+                            ((int)commDetectMethod | (int)sit.data());
+                    }
+                    if (COMM_DETECT_OFF == commDetectMethod)
+                        commDetectMethod = COMM_DETECT_UNINIT;
+                }
+            }
+            else
+            {
+                cerr << "Missing argument to --method option\n";
+                return -1;
+            }
         }
         else if (!strcmp(a.argv()[argpos], "--gencutlist"))
             copyToCutlist = true;
@@ -911,6 +986,9 @@ int main(int argc, char *argv[])
                     "                             before the 'allend' date (default is now).\n"
                     "--force                      Force flagging of a video even if mythcommflag\n"
                     "                             thinks it is already in use by another instance.\n"
+                    "--method                     Commercial flagging method[s] to employ\n"
+                    "                             off, blank, scene, blankscene, logo, all\n"
+                    "                             d2, d2_logo, d2_blank, d2_scene, d2_all\n"
                     "--hogcpu                     Do not nice the flagging process.\n"
                     "                             WARNING: This will consume all free CPU time.\n"
                     "-h OR --help                 This text\n\n"
@@ -971,8 +1049,7 @@ int main(int argc, char *argv[])
                       "WHERE basename = :BASENAME ;");
         query.bindValue(":BASENAME", fullfile.dirName());
 
-        if (query.exec() && query.isActive() && query.size() > 0 &&
-            query.next())
+        if (query.exec() && query.next())
         {
             chanid = query.value(0).toString();
             starttime = query.value(1).toDateTime().toString("yyyyMMddhhmmss");
