@@ -554,14 +554,16 @@ void NuppelVideoPlayer::SetPlaybackInfo(ProgramInfo *pginfo)
 {
     if (m_playbackinfo)
     {
-        m_playbackinfo->MarkAsInUse(false);
+        if (!gContext->IsDatabaseIgnored())
+            m_playbackinfo->MarkAsInUse(false);
+
         delete m_playbackinfo;
         videoFiltersForProgram = QString::null;
     }
 
     m_playbackinfo = pginfo;
 
-    if (m_playbackinfo)
+    if (m_playbackinfo && !gContext->IsDatabaseIgnored())
     {
         m_playbackinfo->MarkAsInUse(true, m_recusage);
         videoFiltersForProgram =
@@ -4025,7 +4027,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
 
 long long NuppelVideoPlayer::GetBookmark(void) const
 {
-    if (!m_playbackinfo)
+    if (!m_playbackinfo || gContext->IsDatabaseIgnored())
         return 0;
 
     if (ringBuffer->isDVD())
@@ -5351,7 +5353,7 @@ void NuppelVideoPlayer::SaveCutList(void)
 
 void NuppelVideoPlayer::LoadCutList(void)
 {
-    if (!m_playbackinfo)
+    if (!m_playbackinfo || gContext->IsDatabaseIgnored())
         return;
 
     m_playbackinfo->GetCutList(deleteMap);
