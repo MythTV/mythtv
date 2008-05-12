@@ -79,7 +79,7 @@ MPUBLIC RemoteEncoder *RemoteRequestRecorder(void);
 MPUBLIC RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
 MPUBLIC
 RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders);
-MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo);
+MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo);
 MPUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
 MPUBLIC vector<InputInfo> RemoteRequestFreeInputList(

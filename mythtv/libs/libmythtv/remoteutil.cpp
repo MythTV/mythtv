@@ -394,7 +394,7 @@ RemoteEncoder *RemoteRequestRecorder(void)
     return new RemoteEncoder(num, hostname, port);
 }
 
-RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
+RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo)
 {
     QStringList strlist( "GET_RECORDER_NUM" );
     pginfo->ToStringList(strlist);

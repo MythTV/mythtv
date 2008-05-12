@@ -1032,7 +1032,7 @@ bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
     return false;
 }
 
-bool JobQueue::IsJobRunning(int jobType, ProgramInfo *pginfo)
+bool JobQueue::IsJobRunning(int jobType, const ProgramInfo *pginfo)
 {
     return JobQueue::IsJobRunning(jobType, pginfo->chanid, pginfo->recstartts);
 }

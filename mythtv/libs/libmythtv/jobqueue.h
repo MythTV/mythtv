@@ -137,7 +137,7 @@ class MPUBLIC JobQueue : public QObject
                                      QDateTime starttime);
     static bool IsJobRunning(int jobType, QString chanid,
                              QDateTime starttime);
-    static bool IsJobRunning(int jobType, ProgramInfo *pginfo);
+    static bool IsJobRunning(int jobType, const ProgramInfo *pginfo);
     static bool IsJobQueued(int jobType, QString chanid, QDateTime starttime);
     static bool PauseJob(int jobID);
     static bool ResumeJob(int jobID);
