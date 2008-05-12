@@ -51,7 +51,7 @@ bool inJobQueue = false;
 bool watchingRecording = false;
 CommDetectorBase* commDetector = NULL;
 RemoteEncoder* recorder = NULL;
-ProgramInfo* program_info = NULL;
+ProgramInfo *global_program_info = NULL;
 enum SkipTypes commDetectMethod = COMM_DETECT_UNINIT;
 int recorderNum = -1;
 bool dontSubmitCommbreakListToDB =  false;
@@ -85,20 +85,23 @@ static QMap<QString,SkipTypes> *init_skip_types()
     return tmp;
 }
 
-int BuildVideoMarkup(QString& filename)
+QString get_filename(ProgramInfo *program_info)
 {
-    program_info = new ProgramInfo;
-    program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
-    program_info->recendts = QDateTime::currentDateTime().addSecs(-1);
-    program_info->isVideo = true;
-    program_info->pathname = filename;
+    QString filename = program_info->pathname;
+    if (!QFile::exists(filename))
+        filename = program_info->GetPlaybackURL(true);
+    return filename;
+}
+
+int BuildVideoMarkup(ProgramInfo *program_info)
+{
+    QString filename = get_filename(program_info);
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
     if (!tmprbuf)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to create RingBuffer for %1").arg(filename));
-        delete program_info;
         return COMMFLAG_EXIT_NO_RINGBUFFER;
     }
 
@@ -106,7 +109,6 @@ int BuildVideoMarkup(QString& filename)
     {
         VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
-        delete program_info;
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
@@ -120,7 +122,6 @@ int BuildVideoMarkup(QString& filename)
 
     delete nvp;
     delete tmprbuf;
-    delete program_info;
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
@@ -329,8 +330,8 @@ void commDetectorGotNewCommercialBreakList(void)
 
     QMap<long long, int>::Iterator it = newCommercialMap.begin();
     QString message = "COMMFLAG_UPDATE ";
-    message += program_info->chanid + " " +
-               program_info->recstartts.toString(Qt::ISODate);
+    message += global_program_info->chanid + " " +
+               global_program_info->recstartts.toString(Qt::ISODate);
 
     for (it = newCommercialMap.begin();
             it != newCommercialMap.end(); ++it)
@@ -392,8 +393,8 @@ void incomingCustomEvent(QEvent* e)
                               "COMMFLAG_REQUEST event for chanid %1 @ %2.  ")
                               .arg(chanid).arg(starttime);
 
-            if ((program_info->chanid == chanid) &&
-                (program_info->recstartts == startts))
+            if ((global_program_info->chanid == chanid) &&
+                (global_program_info->recstartts == startts))
             {
                 commDetector->requestCommBreakMapUpdate();
                 message += "Requested CommDetector to generate new break list.";
@@ -403,8 +404,10 @@ void incomingCustomEvent(QEvent* e)
     }
 }
 
-int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
-                      NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod)
+int DoFlagCommercials(
+    ProgramInfo *program_info,
+    bool showPercentage, bool fullSpeed, bool inJobQueue,
+    NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod)
 {
     CommDetectorFactory factory;
     commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
@@ -483,8 +486,10 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     return comms_found;
 }
 
-int FlagCommercials(QString chanid, QString starttime)
+int FlagCommercials(ProgramInfo *program_info)
 {
+    global_program_info = program_info;
+
     int breaksFound = 0;
 
     if (commDetectMethod == COMM_DETECT_UNINIT)
@@ -492,7 +497,7 @@ int FlagCommercials(QString chanid, QString starttime)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT commmethod FROM channel "
                         "WHERE chanid = :CHANID;");
-        query.bindValue(":CHANID", chanid);
+        query.bindValue(":CHANID", program_info->chanid);
 
         if (!query.exec())
         {
@@ -507,11 +512,11 @@ int FlagCommercials(QString chanid, QString starttime)
                 VERBOSE(VB_COMMFLAG,
                         QString("Chanid %1 is marked as being Commercial Free, "
                                 "we will use the default commercial detection "
-                                "method").arg(chanid));
+                                "method").arg(program_info->chanid));
             }
             else if (commDetectMethod != COMM_DETECT_UNINIT)
                 VERBOSE(VB_COMMFLAG, QString("Using method: %1 from channel %2")
-                                            .arg(commDetectMethod).arg(chanid));
+                        .arg(commDetectMethod).arg(program_info->chanid));
         }
     }
 
@@ -520,15 +525,6 @@ int FlagCommercials(QString chanid, QString starttime)
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
     QMap<long long, int> blanks;
     recorder = NULL;
-    program_info = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
-
-    if (!program_info)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
-        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
-    }
 
     if (onlyDumpDBCommercialBreakList)
     {
@@ -549,16 +545,20 @@ int FlagCommercials(QString chanid, QString starttime)
                  << (const char *)program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(cout, commBreakList);
         }
-        delete program_info;
+        global_program_info = NULL;
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
 
     if (!quiet)
     {
-        cerr << (const char *)chanid.leftJustify(6, ' ', true) << "  "
-             << (const char *)starttime.leftJustify(14, ' ', true) << "  "
-             << (const char *)program_info->title.leftJustify(41, ' ', true) << "  ";
+        QString chanid = program_info->chanid.leftJustify(6, ' ', true);
+        QString recstartts = program_info->recstartts
+            .toString("yyyyMMddhhmmss").leftJustify(14, ' ', true);
+        QString title = program_info->title.leftJustify(41, ' ', true);
+
+        cerr << chanid.ascii() << "  " << recstartts.ascii() << "  "
+             << title.ascii() << "  ";
         cerr.flush();
     }
 
@@ -570,17 +570,18 @@ int FlagCommercials(QString chanid, QString starttime)
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
         }
+        global_program_info = NULL;
         return COMMFLAG_EXIT_IN_USE;
     }
 
-    QString filename = program_info->GetPlaybackURL(true);
+    QString filename = get_filename(program_info);
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
     if (!tmprbuf)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to create RingBuffer for %1").arg(filename));
-        delete program_info;
+        global_program_info = NULL;
         return COMMFLAG_EXIT_NO_RINGBUFFER;
     }
 
@@ -588,7 +589,7 @@ int FlagCommercials(QString chanid, QString starttime)
     {
         VERBOSE(VB_IMPORTANT, "Unable to open commflag DB connection");
         delete tmprbuf;
-        delete program_info;
+        global_program_info = NULL;
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
@@ -604,7 +605,7 @@ int FlagCommercials(QString chanid, QString starttime)
 
         delete nvp;
         delete tmprbuf;
-        delete program_info;
+        global_program_info = NULL;
 
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
@@ -651,8 +652,9 @@ int FlagCommercials(QString chanid, QString starttime)
         jobID = -1;
 
 
-    breaksFound = DoFlagCommercials(showPercentage, fullSpeed, inJobQueue,
-                                    nvp, commDetectMethod);
+    breaksFound = DoFlagCommercials(
+        program_info, showPercentage, fullSpeed, inJobQueue,
+        nvp, commDetectMethod);
 
     if (fakeJobID >= 0)
     {
@@ -666,9 +668,30 @@ int FlagCommercials(QString chanid, QString starttime)
 
     delete nvp;
     delete tmprbuf;
-    delete program_info;
+    global_program_info = NULL;
 
     return breaksFound;
+}
+
+int FlagCommercials(
+    const QString &chanid, const QString &starttime)
+{
+    ProgramInfo *program_info =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!program_info)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid.ascii()).arg(starttime.ascii()));
+        return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+    }
+
+    int ret = FlagCommercials(program_info);
+
+    delete program_info;
+
+    return ret;
 }
 
 int main(int argc, char *argv[])
@@ -1154,7 +1177,15 @@ int main(int argc, char *argv[])
 
     if (isVideo)
     {
-        result = BuildVideoMarkup(filename);
+        ProgramInfo *pginfo = new ProgramInfo;
+        pginfo->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
+        pginfo->recendts = QDateTime::currentDateTime().addSecs(-1);
+        pginfo->pathname = filename;
+        pginfo->isVideo = true;
+
+        result = BuildVideoMarkup(pginfo);
+
+        delete pginfo;
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
