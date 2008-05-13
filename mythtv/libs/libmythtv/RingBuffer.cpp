@@ -884,8 +884,10 @@ void RingBuffer::ReadAheadThread(void)
             //                                                   .arg(fill_min));
         }
 
+        readsAllowedWaitMutex.lock();
         if (readsallowed || stopreads)
             readsAllowedWait.wakeAll();
+        readsAllowedWaitMutex.unlock();
 
         availWaitMutex.lock();
         if (commserror || ateof || stopreads || setswitchtonext ||
@@ -952,14 +954,11 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
     }
     else
     {
-        // Qt4 requires a QMutex as a parameter...
-        // not sure if this is the best solution.  Mutex Must be locked before wait.
-        QMutex mutex;
-        mutex.lock();
+        QMutexLocker locker(&readsAllowedWaitMutex);
 
         while (!readsallowed && !stopreads)
         {
-            if (!readsAllowedWait.wait(&mutex, 1000))
+            if (!readsAllowedWait.wait(&readsAllowedWaitMutex, 1000))
             {
                  VERBOSE(VB_IMPORTANT,
                          LOC + "Taking too long to be allowed to read..");

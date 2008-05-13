@@ -164,6 +164,7 @@ class MPUBLIC RingBuffer
     QMutex availWaitMutex;
 
     QWaitCondition readsAllowedWait;
+    QMutex readsAllowedWaitMutex;
 
     int numfailures;
 
