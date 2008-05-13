@@ -2650,7 +2650,7 @@ void ProgramInfo::SetMarkupFlag(int type, bool flag) const
     }
 }
 
-static QString XtoString(MarkTypes type)
+QString toString(MarkTypes type)
 {
     switch (type)
     {
@@ -2671,15 +2671,12 @@ static QString XtoString(MarkTypes type)
     }
 }
 
-#include <cassert>
 void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
                                  int type) const
 {
     if (positionMapDBReplacement)
     {
         QMutexLocker locker(positionMapDBReplacement->lock);
-        VERBOSE(VB_IMPORTANT, LOC + "GetPositionMap: type: " +
-                XtoString((MarkTypes)type));
         posMap = positionMapDBReplacement->map[(MarkTypes)type];
 
         return;
@@ -2718,10 +2715,6 @@ void ProgramInfo::ClearPositionMap(int type) const
     if (positionMapDBReplacement)
     {
         QMutexLocker locker(positionMapDBReplacement->lock);
-
-        VERBOSE(VB_IMPORTANT, LOC + "ClearPositionMap: type: " +
-                XtoString((MarkTypes)type));
-
         positionMapDBReplacement->map.clear();
         return;
     }
@@ -2780,9 +2773,6 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         {
             positionMapDBReplacement->map[(MarkTypes)type].clear();
         }
-
-        VERBOSE(VB_IMPORTANT, LOC + "SetPositionMap: type: " +
-                XtoString((MarkTypes)type));
 
         frm_pos_map_t::const_iterator it     = posMap.begin();
         frm_pos_map_t::const_iterator it_end = posMap.end();
@@ -2883,9 +2873,6 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     if (positionMapDBReplacement)
     {
         QMutexLocker locker(positionMapDBReplacement->lock);
-
-        VERBOSE(VB_IMPORTANT, LOC + "SetPositionMapDelta: type: " +
-                XtoString((MarkTypes)type));
 
         frm_pos_map_t::const_iterator it     = posMap.begin();
         frm_pos_map_t::const_iterator it_end = posMap.end();

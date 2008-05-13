@@ -13,6 +13,20 @@ class NuppelVideoPlayer;
 class LogoDetectorBase;
 class SceneChangeDetectorBase;
 
+class FrameInfoEntry
+{
+  public:
+    int minBrightness;
+    int maxBrightness;
+    int avgBrightness;
+    int sceneChangePercent;
+    int aspect;
+    int format;
+    int flagMask;
+    static QString GetHeader(void);
+    QString toString(uint64_t frame, bool verbose) const;
+};
+
 class ClassicCommDetector : public CommDetectorBase
 {
     Q_OBJECT
@@ -30,23 +44,13 @@ class ClassicCommDetector : public CommDetectorBase
         void recordingFinished(long long totalFileSize);
         void requestCommBreakMapUpdate(void);
 
+        void PrintFullMap(
+            ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
+
         void logoDetectorBreathe();
 
         friend class ClassicLogoDetector;
     private:
-
-        typedef struct frameinfo
-        {
-            int minBrightness;
-            int maxBrightness;
-            int avgBrightness;
-            int sceneChangePercent;
-            int aspect;
-            int format;
-            int flagMask;
-        }
-        FrameInfoEntry;
-
         typedef struct frameblock
         {
             long start;

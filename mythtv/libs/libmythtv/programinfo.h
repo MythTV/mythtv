@@ -41,6 +41,7 @@ typedef enum {
     MARK_SCENE_CHANGE = 8,
     MARK_GOP_BYFRAME = 9
 } MarkTypes;
+MPUBLIC QString toString(MarkTypes type);
 
 enum CommFlagStatuses {
     COMM_FLAG_NOT_FLAGGED = 0,

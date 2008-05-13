@@ -44,6 +44,7 @@ public:
             long long frameno, long long *pNextFrame);
     int finished(long long nframes, bool final);
     int reportTime(void) const;
+    FrameMap GetMap(unsigned int) const { return breakMap; }
 
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;

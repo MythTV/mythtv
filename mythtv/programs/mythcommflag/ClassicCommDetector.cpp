@@ -30,19 +30,100 @@ enum frameMaskValues {
     COMM_FRAME_LOGO_PRESENT  = 0x0008,
     COMM_FRAME_ASPECT_CHANGE = 0x0010,
     COMM_FRAME_RATING_SYMBOL = 0x0020
-};
+} FrameMaskValues;
 
 enum frameAspects {
     COMM_ASPECT_NORMAL = 0,
     COMM_ASPECT_WIDE
-};
+} FrameAspects;
 
 enum frameFormats {
     COMM_FORMAT_NORMAL = 0,
     COMM_FORMAT_LETTERBOX,
     COMM_FORMAT_PILLARBOX,
     COMM_FORMAT_MAX
-};
+} FrameFormats;
+
+static QString toStringFrameMaskValues(int mask, bool verbose)
+{
+    QString msg = "";
+
+    if (verbose)
+    {
+        if (COMM_FRAME_SKIPPED & mask)
+            msg += "skipped,";
+        if (COMM_FRAME_BLANK & mask)
+            msg += "blank,";
+        if (COMM_FRAME_SCENE_CHANGE & mask)
+            msg += "scene,";
+        if (COMM_FRAME_LOGO_PRESENT & mask)
+            msg += "logo,";
+        if (COMM_FRAME_ASPECT_CHANGE & mask)
+            msg += "aspect,";
+        if (COMM_FRAME_RATING_SYMBOL & mask)
+            msg += "rating,";
+
+        if (msg.length())
+            msg = msg.left(msg.length() - 1);
+        else
+            msg = "noflags";
+    }
+    else
+    {
+        msg += (COMM_FRAME_SKIPPED       & mask) ? "s" : " ";
+        msg += (COMM_FRAME_BLANK         & mask) ? "B" : " ";
+        msg += (COMM_FRAME_SCENE_CHANGE  & mask) ? "S" : " ";
+        msg += (COMM_FRAME_LOGO_PRESENT  & mask) ? "L" : " ";
+        msg += (COMM_FRAME_ASPECT_CHANGE & mask) ? "A" : " ";
+        msg += (COMM_FRAME_RATING_SYMBOL & mask) ? "R" : " ";
+    }
+
+    return msg;
+}
+
+static QString toStringFrameAspects(int aspect, bool verbose)
+{
+    if (verbose)
+        return (COMM_ASPECT_NORMAL == aspect) ? "normal" : " wide ";
+    else
+        return (COMM_ASPECT_NORMAL == aspect) ? "n" : "w";
+}
+
+static QString toStringFrameFormats(int format, bool verbose)
+{
+    switch (format)
+    {
+        case COMM_FORMAT_NORMAL:
+            return (verbose) ? "normal" : "N";
+        case COMM_FORMAT_LETTERBOX:
+            return (verbose) ? "letter" : "L";
+        case COMM_FORMAT_PILLARBOX:
+            return (verbose) ? "pillar" : "P";
+        case COMM_FORMAT_MAX:
+            return (verbose) ? " max  " : "M";
+    }
+
+    return (verbose) ? " null " : "n";
+}
+
+QString FrameInfoEntry::GetHeader(void)
+{
+    return QString("  frame     min/max/avg scene aspect format flags");
+}
+
+QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const
+{
+    return QString(
+        "%1: %2/%3/%4 %5%  %6 %7 %8")
+        .arg(frame,10)
+        .arg(minBrightness,3)
+        .arg(maxBrightness,3)
+        .arg(avgBrightness,3)
+        .arg(sceneChangePercent,3)
+        .arg(toStringFrameAspects(aspect, verbose))
+        .arg(toStringFrameFormats(format, verbose))
+        .arg(toStringFrameMaskValues(flagMask, verbose));
+}
 
 ClassicCommDetector::ClassicCommDetector(enum SkipTypes commDetectMethod_in,
                                          bool showProgress_in,
@@ -2329,6 +2410,37 @@ void ClassicCommDetector::GetLogoCommBreakMap(QMap<long long, int> &map)
 void ClassicCommDetector::logoDetectorBreathe()
 {
     emit breathe();
+}
+
+void ClassicCommDetector::PrintFullMap(
+    ostream &out, const comm_break_t *comm_breaks, bool verbose) const
+{
+    if (verbose)
+        out << FrameInfoEntry::GetHeader().ascii() << " mark" << endl;
+
+    for (long long i = 1; i < curFrameNumber; i++)
+    {
+        QMap<long long, FrameInfoEntry>::const_iterator it = frameInfo.find(i);
+        if (it == frameInfo.end())
+            continue;
+
+        out << (*it).toString(i, verbose).ascii() << " ";
+        if (comm_breaks)
+        {
+            QMap<long long, int>::const_iterator mit = comm_breaks->find(i);
+            if (mit != comm_breaks->end())
+            {
+                QString tmp = (verbose) ?
+                    toString((MarkTypes)mit.data()) :
+                    QString::number(mit.data());
+
+                out << tmp.ascii();
+            }
+        }
+        out << "\n";
+    }
+
+    out << flush;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

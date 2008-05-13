@@ -38,6 +38,10 @@ public:
         ANALYZE_FATAL,      /* Don't use this analyzer anymore. */
     };
 
+
+    /* 0-based frameno => nframes */
+    typedef QMap<long long, long long> FrameMap;
+
     virtual enum analyzeFrameResult nuppelVideoPlayerInited(
             NuppelVideoPlayer *nvp, long long nframes) {
         (void)nvp;
@@ -61,8 +65,7 @@ public:
     }
     virtual int reportTime(void) const { return 0; }
 
-    /* 0-based frameno => nframes */
-    typedef QMap<long long, long long> FrameMap;
+    virtual FrameMap GetMap(unsigned int) const = 0;
 };
 
 namespace frameAnalyzer {

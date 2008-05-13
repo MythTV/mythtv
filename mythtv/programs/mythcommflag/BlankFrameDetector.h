@@ -28,6 +28,8 @@ public:
             long long frameno, long long *pNextFrame);
     int finished(long long nframes, bool final);
     int reportTime(void) const;
+    FrameMap GetMap(unsigned int index) const
+        { return (index) ? blankMap : breakMap; }
 
     /* BlankFrameDetector interface. */
     bool getSkipCommBlanks(void) const { return skipcommblanks; }

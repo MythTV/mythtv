@@ -369,13 +369,6 @@ CommDetector2::CommDetector2(
         }
     }
 
-#ifdef LATER
-    /*
-     * "Scene Detection" doesn't seem to be too useful (in the USA); there are
-     * just too many false positives from non-commercial cut scenes. But I'll
-     * leave the code in here in case someone else finds it useful.
-     */
-
     /*
      * Look for "scene changes" to use as delimiters between commercial and
      * non-commercial segments.
@@ -401,7 +394,6 @@ CommDetector2::CommDetector2(
             pass1.append(sceneChangeDetector);
         }
     }
-#endif /* LATER */
 
     /*
      * Logo Detection requires two passes. The first pass looks for static
@@ -458,22 +450,15 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
 
     if (showProgress)
     {
+        QString tmp = "";
+
         if (nframes)
-        {
-            cerr << "\b\b\b\b\b\b\b\b\b\b\b"
-                 << (const char *)QString::number(percentage).rightJustify(3, ' ')
-                 << "%/"
-                 << (const char *)QString::number((int)fps).rightJustify(3, ' ')
-                 << "fps";
-        }
+            tmp = QString("\r%1%/ %2fps").arg(percentage,3).arg(fps,6,'f',2);
         else
-        {
-            cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                 << (const char *)QString::number(frameno).rightJustify(6, ' ')
-                 << "/"
-                 << (const char *)QString::number((int)fps).rightJustify(3, ' ')
-                 << "fps";
-        }
+            tmp = QString("\r%1/ %2fps").arg(frameno,6).arg(fps,6,'f',2);
+
+        QByteArray tmp2 = tmp.toLocal8Bit();
+        cerr << tmp2.data() << "          \r";
         cerr.flush();
     }
 
@@ -840,6 +825,62 @@ void CommDetector2::requestCommBreakMapUpdate(void)
             .arg(currentFrameNumber + 1));
     sendBreakMapUpdates = true;
     breakMapUpdateRequested = true;
+}
+
+void PrintReportMap(
+    ostream &out,
+    const FrameAnalyzer::FrameMap &frameMap)
+{
+    FrameAnalyzer::FrameMap::const_iterator it = frameMap.begin();
+    for (; it != frameMap.end(); ++it)
+    {
+        QString tmp = "";
+        long long   bb, ee, len;
+
+        /*
+         * QMap'd as 0-based index, but display as 1-based index to match "Edit
+         * Recording" OSD.
+         */
+        bb = it.key() + 1;
+        if (it.data())
+        {
+            ee = bb + it.data();
+            len = ee - bb;
+            tmp = QString("%1: %2").arg(bb, 10).arg(ee - 1, 10);
+        }
+        else
+        {
+            tmp = QString("%1: %2").arg(bb, 10).arg(0, 10);
+        }
+        out << tmp.ascii() << "\n";
+    }
+    out << flush;
+}
+
+void CommDetector2::PrintFullMap(
+    ostream &out, const comm_break_t *comm_breaks, bool verbose) const
+{
+    FrameAnalyzer::FrameMap logoMap, blankMap, blankBreakMap, sceneMap;
+    if (logoFinder)
+        logoMap = logoFinder->GetMap(0);
+
+    if (blankFrameDetector)
+    {
+        blankBreakMap = blankFrameDetector->GetMap(0);
+        blankMap      = blankFrameDetector->GetMap(1);
+    }
+
+    if (sceneChangeDetector)
+        sceneMap = sceneChangeDetector->GetMap(0);
+
+    out << "Logo Break Map" << endl;
+    PrintReportMap(out, logoMap);
+    out << "Blank Break Map" << endl;
+    PrintReportMap(out, blankBreakMap);
+    out << "Blank Map" << endl;
+    PrintReportMap(out, blankMap);
+    out << "Scene Break Map" << endl;
+    PrintReportMap(out, sceneMap);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

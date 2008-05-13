@@ -39,6 +39,8 @@ public:
     virtual void getCommercialBreakList(QMap<long long, int> &comms);
     virtual void recordingFinished(long long totalFileSize);
     virtual void requestCommBreakMapUpdate(void);
+    virtual void PrintFullMap(
+        ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
 
 private:
     void reportState(int elapsed_sec, long long frameno, long long nframes,
