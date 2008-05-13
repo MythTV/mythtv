@@ -3,6 +3,8 @@
 #include <QString>
 #include <QMap>
 
+#include <stdint.h>   // for uint64_t
+
 #include "mythexp.h"
 
 typedef enum {
