@@ -46,7 +46,7 @@ $| = 1; # autoflush stdout;
                           # but seems to work best with some patches
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
-#my $SVNRELEASE = '16973'; # Recent 0-21-fixes
+#my $SVNRELEASE = '17190'; # Recent 0-21-fixes
 my $SVNRELEASE = '17189'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
@@ -72,7 +72,7 @@ my $NOISY   = 1;            # Set to 0 for less output to the screen
 my $version = '0.22';       # Main mythtv version - used to name dlls
 my $package = 0;            # Create a Win32 Distribution package? 1 for yes
 my $update  = 0;            # Revert instead of checkout.
-                            #  Careful, will distruct local copy!
+                            #  Careful, will destruct local copy!
 my $compile_type = "debug"; # compile options: debug, profile or release
 my $tickets = 0;            # Apply specific win32 tickets -
                             #  usually those not merged into SVN
@@ -662,19 +662,25 @@ push @{$expect},
 
 # Write a batch script for the QT environment under DOS:
 [ always => [], write => [$msys.'qt-win-opensource-src-4.3.4/qt4_env.bat',
-'rem a batch script for the QT environment under DOS:
+'rem a batch script for building the QT environment under DOS:
 set QTDIR='.$dosmsys.'qt-win-opensource-src-4.3.4
 set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
-'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
+rem This would do a full build:
+rem '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
 rem mingw32-make
+rem This cuts out the examples and demos:
+'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -no-sql-odbc -no-qdbus
+mingw32-make -j '.($numCPU + 1).' sub-qt3support-make_default-ordered
 ',
 ],comment=>'write a batch script for the QT4 environment under DOS'],
 
 # test if the core .dll is built, and build QT if it isn't! 
-[ file => $msys.'qt-win-opensource-src-4.3.4/lib/QtCore4.dll', exec => $dosmsys.'qt-win-opensource-src-4.3.4\qt4_env.bat && mingw32-make ',comment => 'Execute qt4_env.bat to actually build QT now!  - ie configures qt and also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
+[ file => $msys.'qt-win-opensource-src-4.3.4/lib/QtCore4.dll',
+  exec => $dosmsys.'qt-win-opensource-src-4.3.4\qt4_env.bat',
+  comment => 'Execute qt4_env.bat to actually build QT now!  - ie configures qt and also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
 
 # For now, we will just test if it built, and abort if it didn't!
 [ file => $msys.'qt-win-opensource-src-4.3.4/plugins/sqldrivers/qsqlmysql4.dll', exec => '', comment => 'lib\libqsqlmysql4.dll - here we are just validating some basics of the the QT4 install, and if any of these components are missing, the build must have failed ( is the sql driver built properly?) '],
@@ -871,11 +877,22 @@ push @{$expect},
   shell => ['touch '.$unixmythtv.'mythtv/config/config.pro'], 
   comment => 'create an empty config.pro or the mythtv build will fail'],
 
-# do a make clean (nd re-configure) before going any further? Yes, if the SVN revision has changed (it deleted the file for us), or the user deleted the file manually, to request it. 
-[ file => $mythtv.'delete_to_do_make_clean.txt', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'mythtv','make clean','find . -type f -name \*.dll | grep -v build | xargs -n1 rm','find . -type f -name \*.a | grep -v build | xargs -n1 rm','rm Makefile','touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'], comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
+# do a make clean (nd re-configure) before going any further?
+# Yes, if the SVN revision has changed (it deleted the file for us),
+#  or the user deleted the file manually, to request it. 
+[  file => $mythtv.'delete_to_do_make_clean.txt',
+  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+            'cd '.$unixmythtv.'mythtv','make clean',
+            'find . -type f -name \*.dll | grep -v build | xargs -n1 rm',
+            'find . -type f -name \*.a | grep -v build | xargs -n1 rm',
+            'rm Makefile',
+            'touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'],
+comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
 
 #broken Makefile?, delete it
-[ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
+[  grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'],
+  shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'],
+comment => 'broken Makefile, delete it' ],
 
 # configure
 [ file => $mythtv.'mythtv/Makefile',
@@ -883,8 +900,8 @@ push @{$expect},
            'cd '.$unixmythtv.'mythtv',
            './configure --prefix=.. --disable-dbox2 --disable-hdhomerun'.
            ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
-           ' --disable-xvmc --enable-directx --cpu=k8'.
-           ' --enable-memalign-hack --compile-type='.$compile_type],
+           ' --disable-xvmc --enable-directx'.
+           ' --cpu=k8 --compile-type='.$compile_type],
 comment => 'do we already have a Makefile for mythtv?' ],
 
 # make
@@ -939,17 +956,11 @@ cp Makefile_new Makefile
             $mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythtv',
-            'make install INSTALL_ROOT='.$unixbuild.'/tmp'],
+            'make install INSTALL_ROOT='.$unixbuild.'tmp/'],
 comment => 'was the last configure successful? then install mythtv ' ],
 
-# TODO check if this is necessary. The 'make install' above should do it!
-#
-[  dir => [$msys.'share\mythtv\themes\G.A.N.T'],
- shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-           'cd '.$unixmythtv.'mythtv','make install_themes'],
-comment => 'copy the basic themes somewhere that mythtv can get at it.' ],
 
-# setup_build creates the build area and copies results (apart from themes)
+# setup_build tidies up the build area and copies extra libs in there
 [ always => [], write => [$mythtv.'setup_build.sh',
 '#!/bin/bash
 source '.$unixmythtv.'qt'.$qtver.'_env.sh
