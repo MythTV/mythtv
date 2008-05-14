@@ -665,7 +665,7 @@ void ImportNativeWizard::findChannelMatch(const QString &chanID, const QString &
     query.bindValue(":CALLSIGN", callsign);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         // got match
         query.first();
@@ -682,7 +682,7 @@ void ImportNativeWizard::findChannelMatch(const QString &chanID, const QString &
     query.bindValue(":CALLSIGN", callsign);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         // got match
         query.first();
@@ -699,7 +699,7 @@ void ImportNativeWizard::findChannelMatch(const QString &chanID, const QString &
     query.bindValue(":NAME", callsign);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         // got match
         query.first();
@@ -772,7 +772,7 @@ void ImportNativeWizard::searchChanID()
         query.bindValue(":CHANID", s);
         query.exec();
 
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             query.next();
             m_localChanID_text->SetText(query.value(0).toString());
@@ -798,7 +798,7 @@ void ImportNativeWizard::searchChanNo()
         query.bindValue(":CHANNUM", s);
         query.exec();
 
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             query.next();
             m_localChanID_text->SetText(query.value(0).toString());
@@ -824,7 +824,7 @@ void ImportNativeWizard::searchName()
         query.bindValue(":NAME", s);
         query.exec();
 
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             query.next();
             m_localChanID_text->SetText(query.value(0).toString());
@@ -850,7 +850,7 @@ void ImportNativeWizard::searchCallsign()
         query.bindValue(":CALLSIGN", s);
         query.exec();
 
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             query.next();
             m_localChanID_text->SetText(query.value(0).toString());

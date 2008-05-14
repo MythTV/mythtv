@@ -414,7 +414,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":STARTTIME", startTime);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         QDomElement elem;
@@ -603,7 +603,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":CHANID", chanID);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         QDomElement channel = doc.createElement("channel");
@@ -636,7 +636,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":STARTTIME", startTime);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         QDomElement credits = doc.createElement("credits");
         while (query.next())
@@ -658,7 +658,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":STARTTIME", startTime);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         QDomElement rating = doc.createElement("rating");
@@ -676,7 +676,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -698,7 +698,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -791,7 +791,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
     query.bindValue(":FILENAME", filename);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         QDomElement elem;
@@ -894,7 +894,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
     query.bindValue(":INTID", categoryID);
 
     query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.first();
         QDomElement category = doc.createElement("category");
@@ -921,7 +921,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
         print_verbose_messages = VB_JOBQUEUE;
     }
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -950,7 +950,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
         print_verbose_messages = VB_JOBQUEUE;
     }
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -1435,7 +1435,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                         "WHERE genre = :GENRE");
                 query.bindValue(":GENRE", genre);
                 query.exec();
-                if (query.isActive() && query.numRowsAffected())
+                if (query.isActive() && query.size())
                 {
                     query.first();
                     genreID = query.value(0).toInt();
@@ -1452,7 +1452,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                             "WHERE genre = :GENRE");
                     query.bindValue(":GENRE", genre);
                     query.exec();
-                    if (query.isActive() && query.numRowsAffected())
+                    if (query.isActive() && query.size())
                     {
                         query.first();
                         genreID = query.value(0).toInt();
@@ -1506,7 +1506,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                         "WHERE country = :COUNTRY");
                 query.bindValue(":COUNTRY", country);
                 query.exec();
-                if (query.isActive() && query.numRowsAffected())
+                if (query.isActive() && query.size())
                 {
                     query.first();
                     countryID = query.value(0).toInt();
@@ -1523,7 +1523,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                             "WHERE country = :COUNTRY");
                     query.bindValue(":COUNTRY", country);
                     query.exec();
-                    if (query.isActive() && query.numRowsAffected())
+                    if (query.isActive() && query.size())
                     {
                         query.first();
                         countryID = query.value(0).toInt();
@@ -1564,7 +1564,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                 "WHERE category = :CATEGORY");
         query.bindValue(":CATEGORY", category);
         query.exec();
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.size())
         {
             query.first();
             categoryID = query.value(0).toInt();
@@ -1581,7 +1581,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                     "WHERE category = :CATEGORY");
             query.bindValue(":CATEGORY", category);
             query.exec();
-            if (query.isActive() && query.numRowsAffected())
+            if (query.isActive() && query.size())
             {
                 query.first();
                 categoryID = query.value(0).toInt();
