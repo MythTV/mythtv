@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <cmath>
+#include <climits> // for CDSL_CURRENT which is currently INT_MAX
 
 #include "dvdprobe.h"
 
