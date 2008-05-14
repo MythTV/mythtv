@@ -258,7 +258,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
     int scrollAmt = 1;
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -424,7 +424,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
     if (visualizer_status == 2)
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE" || action == "4")
@@ -455,7 +455,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
     }
     else if (keyboard_accelerators)
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -533,7 +533,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
     }
     else
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -1548,7 +1548,7 @@ void PlaybackBoxMusic::seek(int pos)
                 QString lcd_time_string = getTimeString(pos, maxTime);
 
                 // if the string is longer than the LCD width, remove all spaces
-                if (lcd_time_string.length() > lcd->getLCDWidth())
+                if (lcd_time_string.length() > (int)lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
 
                 lcd->setMusicProgress(lcd_time_string, percent_heard);
@@ -1930,7 +1930,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
                     QString lcd_time_string = time_string; 
 
                     // if the string is longer than the LCD width, remove all spaces
-                    if (time_string.length() > lcd->getLCDWidth())
+                    if (time_string.length() > (int)lcd->getLCDWidth())
                         lcd_time_string.remove(' ');
 
                     lcd->setMusicProgress(lcd_time_string, percent_heard);

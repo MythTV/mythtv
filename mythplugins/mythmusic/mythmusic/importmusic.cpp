@@ -31,7 +31,7 @@ static QString truncateFilename(QString filename, UITextType *textType)
     QString s = filename;
     int newWidth = width + 1;
 
-    for (uint x = 0; x < filename.length(); x++)
+    for (int x = 0; x < filename.length(); x++)
     {
         if (x != 0)
             newWidth = fm.width(QString("...") + s, -1);
@@ -181,7 +181,7 @@ void ImportMusicDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -787,7 +787,7 @@ void ImportMusicDialog::setTitleInitialCap(void)
     QString title = data->Title();
     bool bFoundCap = false;
 
-    for (uint x = 0; x < title.length(); x++)
+    for (int x = 0; x < title.length(); x++)
     {
         if (title[x].isLetter())
         {
@@ -812,7 +812,7 @@ void ImportMusicDialog::setTitleWordCaps(void)
     QString title = data->Title();
     bool bInWord = false;
 
-    for (uint x = 0; x < title.length(); x++)
+    for (int x = 0; x < title.length(); x++)
     {
         if (title[x].isSpace())
             bInWord = false;
@@ -873,7 +873,7 @@ void ImportCoverArtDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;

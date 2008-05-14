@@ -157,7 +157,7 @@ class MusicFieldTreeBuilder : public MusicTreeBuilder
     
     void makeTree(MusicNode *root, const MetadataPtrList &metas) 
     {
-        if ((uint)getDepth() + 2 >= m_paths.size()) 
+        if (getDepth() + 2 >= m_paths.size()) 
         {
             root->setLeaves(metas);
             return;
@@ -302,7 +302,7 @@ protected:
 
     bool isLeafDone(Metadata *meta) 
     {
-        return(uint)getDepth() + 1 >= getPathsForMeta(meta)->size();
+        return getDepth() + 1 >= getPathsForMeta(meta)->size();
     }
 
     QString getField(Metadata *meta) 

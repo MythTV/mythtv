@@ -48,7 +48,7 @@ void StreamInput::setup()
     while (stage != -1 && stage < 4) 
     {
         qDebug("processing one event: stage %d %d %ld",
-               stage, sock->canReadLine(), sock->bytesAvailable());
+               stage, sock->canReadLine(), (long int)sock->bytesAvailable());
         qApp->processOneEvent();
     }
 

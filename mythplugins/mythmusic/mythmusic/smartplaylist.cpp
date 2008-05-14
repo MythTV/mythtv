@@ -233,7 +233,7 @@ QString getOrderBySQL(QString orderByFields)
     QString fieldName, result = "", order;
     bool bFirst = true;
     
-    for (uint x = 0; x < list.count(); x++)
+    for (int x = 0; x < list.count(); x++)
     {
         fieldName = list[x].stripWhiteSpace();
         SmartPLField *Field;
@@ -1874,7 +1874,7 @@ void SmartPlaylistDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -2221,7 +2221,7 @@ void SmartPLOrderByDialog::setFieldList(QString fieldList)
     listbox->clear();
     QStringList list = QStringList::split(",", fieldList);
     
-    for (uint x = 0; x < list.count(); x++)
+    for (int x = 0; x < list.count(); x++)
         listbox->insertItem(list[x].stripWhiteSpace());
     
     orderByChanged();
@@ -2241,7 +2241,7 @@ void SmartPLOrderByDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -2654,7 +2654,7 @@ void SmartPLDateDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")

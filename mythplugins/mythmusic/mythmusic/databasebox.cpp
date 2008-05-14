@@ -1140,7 +1140,7 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
         bool handled = false;
         QStringList actions;
         gContext->GetMainWindow()->TranslateKeyPress("Qt", e, actions);
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -1169,7 +1169,7 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
 
     UIListGenericTree *curItem = tree->GetCurrentPosition();
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;

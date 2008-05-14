@@ -65,14 +65,14 @@ void LibVisualPlugin::handleKeyPress(const QString &action)
     if (action == "SELECT")
     {
         m_currentPlugin++;
-        if (m_currentPlugin >= m_pluginList.count())
+        if (m_currentPlugin >= (uint)m_pluginList.count())
             m_currentPlugin = 0;
 
         // gstreamer causes a segfault so don't use it
         if (m_pluginList[m_currentPlugin] == "gstreamer")
         {
             m_currentPlugin++;
-            if (m_currentPlugin >= m_pluginList.count())
+            if (m_currentPlugin >= (uint)m_pluginList.count())
                 m_currentPlugin = 0;
         }
 

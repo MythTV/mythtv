@@ -827,7 +827,7 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
     visualizations.sort();
 
     item = NULL;
-    for (uint i = 0; i < currentList.size(); i++)
+    for (int i = 0; i < currentList.size(); i++)
     {
         // check the visualizer is supported
         if (visualizations.find(currentList[i]) != visualizations.end())
@@ -853,7 +853,7 @@ void VisualizationsEditor::fillWidgets(const QString &currentSelection)
     }
 
     item = NULL;
-    for (uint i = 0; i < visualizations.size(); i++)
+    for (int i = 0; i < visualizations.size(); i++)
     {
         if (currentList.find(visualizations[i]) == currentList.end())
         {
@@ -1020,7 +1020,7 @@ bool VisualizationsEditor::handleKeyPress(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
 

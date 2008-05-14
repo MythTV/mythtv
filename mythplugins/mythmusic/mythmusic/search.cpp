@@ -116,7 +116,7 @@ void SearchDialog::runQuery(QString searchText)
     {
         if (substringSearch) // alpha
         {
-             for (uint i = 0; i < list.count(); i++)
+             for (int i = 0; i < list.count(); i++)
              {
                  QString stxt = list[i];
                  whereClause += (i) ? " AND ( " : "WHERE (";
@@ -129,7 +129,7 @@ void SearchDialog::runQuery(QString searchText)
         }
         else // numeric
         {
-            for (uint i = 0; i < list.count(); i++) 
+            for (int i = 0; i < list.count(); i++) 
             {
                 QString stxt = list[i].stripWhiteSpace();
                 whereClause += (i) ? " AND ( " : "WHERE (";
@@ -172,7 +172,7 @@ void SearchDialog::runQuery(QString searchText)
         {
             if (substringSearch) // alpha
             {
-                for (uint i = 0; i < list.count(); i++) 
+                for (int i = 0; i < list.count(); i++) 
                 {
                     QString stxt = list[i];
                     stxt.replace("''", "'");
@@ -186,7 +186,7 @@ void SearchDialog::runQuery(QString searchText)
             }
             else // numeric
             {
-                for (uint i = 0; i < list.count(); i++) 
+                for (int i = 0; i < list.count(); i++) 
                 {
                     QString stxt = list[i].stripWhiteSpace();
                     int index = -1;

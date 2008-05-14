@@ -164,7 +164,7 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions, false))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             handled = true;
@@ -375,7 +375,7 @@ void MiniPlayer::customEvent(QEvent *event)
                     QString lcd_time_string = time_string; 
 
                     // if the string is longer than the LCD width, remove all spaces
-                    if (time_string.length() > lcd->getLCDWidth())
+                    if (time_string.length() > (int)lcd->getLCDWidth())
                         lcd_time_string.remove(' ');
 
                     lcd->setMusicProgress(lcd_time_string, percent_heard);
@@ -523,7 +523,7 @@ void MiniPlayer::seek(int pos)
                 QString lcd_time_string = getTimeString(pos, m_maxTime);
 
                 // if the string is longer than the LCD width, remove all spaces
-                if (lcd_time_string.length() > lcd->getLCDWidth())
+                if (lcd_time_string.length() > (int)lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
 
                 lcd->setMusicProgress(lcd_time_string, percent_heard);
