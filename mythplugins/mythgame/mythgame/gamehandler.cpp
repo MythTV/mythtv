@@ -486,7 +486,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT romname,rompath,gamename FROM gamemetadata "
-		  "WHERE system = :SYSTEM");
+        "WHERE system = :SYSTEM");
 
     query.bindValue(":SYSTEM",handler->SystemName());
 
@@ -494,7 +494,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
 
     MythProgressDialog *progressDlg = new MythProgressDialog(
         QObject::tr("Verifying %1 files").arg(handler->SystemName()),
-        query.numRowsAffected());
+        query.size());
 
     // For every file we know about, check to see if it still exists.
     if (query.isActive() && query.size() > 0)
