@@ -269,7 +269,7 @@ bool MythFlixConfig::findInDB(const QString& name)
         return val;
     }
 
-    val = query.numRowsAffected() > 0;
+    val = query.size() > 0;
 
     return val;
 }
