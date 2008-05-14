@@ -154,7 +154,7 @@ void SearchDialog::runQuery(QString searchText)
         MythContext::DBError("Search music database", query);
         has_entries = false;
     }
-    has_entries &= (query.numRowsAffected() > 0);
+    has_entries &= (query.size() > 0);
 
     uint matchCount = 0;
 
