@@ -1128,7 +1128,7 @@ void SmartPlaylistEditor::updateMatches(void)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.exec(sql))
     {
-        if (query.numRowsAffected() > 0)
+        if (query.size() > 0)
         {
             query.first();
             matchesCount = query.value(0).toInt();
@@ -1191,7 +1191,7 @@ void SmartPlaylistEditor::saveClicked(void)
     query.bindValue(":NAME", name);
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.first();
             ID = query.value(0).toInt();
@@ -1250,7 +1250,7 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     query.bindValue(":CATEGORYID", categoryid);
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.first();
             ID = query.value(0).toInt();
@@ -1287,9 +1287,9 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     if (!query.exec())
         MythContext::DBError("Load smartplaylist items", query);
     
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
-        rowCount = query.numRowsAffected();
+        rowCount = query.size();
         if (rowCount > criteriaRows.count())
         {
             rowCount = criteriaRows.count();
@@ -1534,7 +1534,7 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
 
     if (query.exec("SELECT name FROM music_smartplaylist_categories ORDER BY name;"))
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
                 categoryCombo->insertItem(query.value(0).toString());
@@ -1566,7 +1566,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
     query.bindValue(":CATEGORYID", categoryid);
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.first();
             ID = query.value(0).toInt();
@@ -1616,7 +1616,7 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
         return false;
     }
     
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -1644,7 +1644,7 @@ int SmartPlaylistEditor::lookupCategoryID(QString category)
 
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.first();
             ID = query.value(0).toInt();
@@ -2023,7 +2023,7 @@ void SmartPlaylistDialog::getSmartPlaylistCategories(void)
 
     if (query.exec("SELECT name FROM music_smartplaylist_categories ORDER BY name;"))
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
                 categoryCombo->insertItem(query.value(0).toString());
@@ -2047,7 +2047,7 @@ void SmartPlaylistDialog::getSmartPlaylists(QString category)
     query.bindValue(":CATEGORYID", categoryid);
                        if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
             {

@@ -873,7 +873,7 @@ bool Ripper::isNewTune(const QString& artist, const QString& album, const QStrin
         return true;
     }
 
-    if (query.numRowsAffected() > 0)
+    if (query.size() > 0)
     {
         return false;
     }
@@ -907,7 +907,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
         return;
     }
 
-    if (query.numRowsAffected() > 0)
+    if (query.size() > 0)
     {
         while (query.next())
         {

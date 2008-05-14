@@ -572,7 +572,7 @@ QString MusicPlayer::getFilenameFromID(int id)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(aquery);
         query.bindValue(":ID", id);
-        if (!query.exec() || query.numRowsAffected() < 1)
+        if (!query.exec() || query.size() < 1)
             MythContext::DBError("get filename", query);
 
         if (query.isActive() && query.size() > 0)

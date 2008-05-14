@@ -568,7 +568,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
 
     MythProgressDialog *file_checking;
     file_checking = new MythProgressDialog(
-        QObject::tr("Scanning music files"), query.numRowsAffected());
+        QObject::tr("Scanning music files"), query.size());
 
     QString name;
 
@@ -626,7 +626,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
 
     MythProgressDialog *file_checking;
     file_checking = new MythProgressDialog(
-        QObject::tr("Scanning Album Artwork"), query.numRowsAffected());
+        QObject::tr("Scanning Album Artwork"), query.size());
 
     if (query.isActive() && query.size() > 0)
     {
