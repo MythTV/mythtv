@@ -5,19 +5,15 @@
 
 bool findInDB(const QString& name)
 {
-    bool val = false;
-
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
     query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("new find in db", query);
-        return val;
+        return false;
     }
 
-    val = query.size() > 0;
-
-    return val;
+    return query.size() > 0;
 }
 
 bool insertInDB(NewsSiteItem* site)
