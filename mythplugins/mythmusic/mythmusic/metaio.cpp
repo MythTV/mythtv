@@ -79,8 +79,18 @@ void MetaIO::readFromFilename(QString filename,
         else if ( *fmt_it == "ARTIST_TITLE" ) 
         {
             QStringList artisttitle_list = QStringList::split("-", part_str);
-            artist = artisttitle_list[0].simplifyWhiteSpace();
-            title = artisttitle_list[1].simplifyWhiteSpace();
+            if (artisttitle_list.size() > 1)
+            {
+                artist = artisttitle_list[0].simplifyWhiteSpace();
+                title = artisttitle_list[1].simplifyWhiteSpace();
+            }
+            else
+            {
+                if (title.isEmpty())
+                    title = part_str;
+                if (artist.isEmpty())
+                    title = part_str;
+            }
         }
     }
 }
@@ -104,7 +114,7 @@ Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
 
     if (blnLength)
         length = getTrackLength(filename);
- 
+
     Metadata *retdata = new Metadata(filename, artist, "", album, title, genre,
                                      0, tracknum, length);
 
