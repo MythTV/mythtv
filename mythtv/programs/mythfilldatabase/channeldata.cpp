@@ -191,7 +191,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                             .arg((*i).xmltvid)
                             .arg((*i).old_xmltvid));
 
-                if (!query.size())
+                if (!query.numRowsAffected())
                     MythContext::DBError("xmltvid conversion",query);
             }
         }
