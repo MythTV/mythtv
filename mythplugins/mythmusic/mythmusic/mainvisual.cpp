@@ -247,9 +247,7 @@ void MainVisual::timeout()
     {
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
-        {
-            bitBlt(this, 0, 0, &pixmap);
-        }
+            update();
     }
 
     if (!playing && stop)
@@ -266,6 +264,7 @@ void MainVisual::resizeEvent( QResizeEvent *event )
     pixmap.resize(event->size());
     pixmap.fill(backgroundColor());
     QWidget::resizeEvent( event );
+
     if ( vis )
         vis->resize( size() );
 

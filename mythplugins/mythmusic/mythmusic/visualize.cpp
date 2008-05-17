@@ -410,11 +410,12 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         }
         else
         {
-            m_image = art.smoothScale(m_size, Qt::KeepAspectRatio);
+            m_image = art.scaled(m_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         }
     }
 
-    if (m_image.isNull()) {
+    if (m_image.isNull()) 
+    {
         drawWarning(p, back, m_size, QObject::tr("?"));
         return true;
     }
@@ -807,7 +808,6 @@ Gears::~Gears()
 
 void Gears::resize(const QSize &newsize)
 {
-    //cout << "Gears is resizing to width of " << newsize.width() << endl;
     size = newsize;
     scale.setMax(192, size.width() / analyzerBarWidth);
 

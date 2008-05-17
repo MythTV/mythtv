@@ -438,7 +438,6 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                     mainvisual->setGeometry(screenwidth + 10, 
                                             screenheight + 10, 
                                             160, 160);
-                setUpdatesEnabled(true);
                 mainvisual->setVisual(visual_modes[current_visual]);
                 bannerDisable();
 
@@ -1184,7 +1183,7 @@ void PlaybackBoxMusic::toggleMute()
 
 void PlaybackBoxMusic::showProgressBar()
 {
-    if (progress_bar)
+    if (progress_bar && visualizer_status != 2)
     {
         progress_bar->SetTotal(maxTime);
         progress_bar->SetUsed(currentTime);
@@ -1325,7 +1324,6 @@ void PlaybackBoxMusic::visEnable()
 {
     if (!visualizer_status != 2 && gPlayer->isPlaying())
     {
-        setUpdatesEnabled(false);
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
     }
@@ -1953,7 +1951,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
                                    oe->channels() > 1 ? "2" : "1");
             }
 
-            if (curMeta)
+            if (curMeta && visualizer_status != 2)
             {
                 if (time_text)
                     time_text->SetText(time_string);
@@ -2042,21 +2040,23 @@ void PlaybackBoxMusic::wipeTrackInfo()
 
 void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
 {
-    if (title_text)
-        title_text->SetText(mdata->FormatTitle());
-    if (artist_text)
-        artist_text->SetText(mdata->FormatArtist());
-    if (album_text)
-        album_text->SetText(mdata->Album());
-    if (albumart_image)
-        showAlbumArtImage(mdata);
-
-    if (showrating)
+    if (visualizer_status != 2)
     {
-        if (ratings_image)
-            ratings_image->setRepeat(mdata->Rating());
-    }
+        if (title_text)
+            title_text->SetText(mdata->FormatTitle());
+        if (artist_text)
+            artist_text->SetText(mdata->FormatArtist());
+        if (album_text)
+            album_text->SetText(mdata->Album());
+        if (albumart_image)
+            showAlbumArtImage(mdata);
 
+        if (showrating)
+        {
+            if (ratings_image)
+                ratings_image->setRepeat(mdata->Rating());
+        }
+    }
     setTrackOnLCD(mdata);
 }
 
@@ -2195,7 +2195,6 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
             current_visualization_text->SetText(visual_modes[current_visual]);
             current_visualization_text->refresh();
         }
-        setUpdatesEnabled(true);
     }
     else
     {
@@ -2208,7 +2207,6 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
         visual_mode_timer->stop();
-        setUpdatesEnabled(false);
         bannerDisable();
     }
 }
