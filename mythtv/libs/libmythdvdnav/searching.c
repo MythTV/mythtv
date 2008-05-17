@@ -478,15 +478,11 @@ dvdnav_status_t dvdnav_menu_supported(dvdnav_t *this, DVDMenuID_t menu)
   if (menu == DVD_MENU_Escape) menu = DVD_MENU_Root;
 
   if (vm_jump_menu(try_vm, menu) && !try_vm->stopped) {
-    vm_get_next_cell(try_vm);
-    if (!try_vm->pgcN_invalid)
-    {
-      vm_free_copy(try_vm);
-      pthread_mutex_unlock(&this->vm_lock);
-      return DVDNAV_STATUS_OK;
-    }
+    vm_free_copy(try_vm);
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_OK;
   }
-  
+
   vm_free_copy(try_vm);
   printerr("No such menu or menu not reachable.");
   pthread_mutex_unlock(&this->vm_lock);
@@ -495,7 +491,7 @@ dvdnav_status_t dvdnav_menu_supported(dvdnav_t *this, DVDMenuID_t menu)
 
 dvdnav_status_t dvdnav_menu_call(dvdnav_t *this, DVDMenuID_t menu) {
   vm_t *try_vm;
-  
+
   if(!this) {
     printerr("Passed a NULL pointer.");
     return DVDNAV_STATUS_ERR;
