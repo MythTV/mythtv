@@ -74,12 +74,42 @@ int lockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
 
-    QString value_str = getGlobalSetting("MythShutdownLock", "0");
-    bool isNumber = false;
-    ulong value = value_str.toULong(&isNumber);
-    if (!isNumber)
-        value = 0;
-    setGlobalSetting("MythShutdownLock", QString::number(++value));
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // lock setting table
+    int tries = 0;
+    while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
+    {
+        VERBOSE(VB_GENERAL, "Waiting for lock on setting table");
+        sleep(1);
+        tries++;
+    }
+
+    if (tries >= 5)
+    {
+        VERBOSE(VB_GENERAL, "Waited too long to obtain lock on setting table");
+        return 1;
+    }
+
+    // does the setting already exist?
+    query.exec("SELECT * FROM settings "
+               "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+
+    if (query.size() < 1)
+    {
+        // add the lock setting
+        query.exec("INSERT INTO settings (value, data) "
+                   "VALUES ('MythShutdownLock', '1');");
+    }
+    else
+    {
+        // update the lock setting
+        query.exec("UPDATE settings SET data = data + 1 "
+                   "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    }
+
+    // unlock settings table
+    query.exec("UNLOCK TABLES;");
 
     return 0;
 }
@@ -88,16 +118,44 @@ int unlockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
 
-    QString value_str = getGlobalSetting("MythShutdownLock", "0");
-    bool isNumber = false;
-    ulong value = value_str.toULong(&isNumber);
-    if (!isNumber)
-        value = 0;
-    // Prevent going negative
-    if (value == 0)
-        ++value;
-    setGlobalSetting("MythShutdownLock", QString::number(--value));
+    MSqlQuery query(MSqlQuery::InitCon());
 
+    // lock setting table
+    int tries = 0;
+    while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
+    {
+        VERBOSE(VB_GENERAL, "Waiting for lock on setting table");
+        sleep(1);
+        tries++;
+    }
+
+    if (tries >= 5)
+    {
+        VERBOSE(VB_GENERAL, "Waited too long to obtain lock on setting table");
+        return 1;
+    }
+
+    // does the setting exist?
+    query.exec("SELECT * FROM settings "
+               "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+
+    if (query.size() < 1)
+    {
+        // add the lock setting
+        query.exec("INSERT INTO settings (value, data) "
+                   "VALUES ('MythShutdownLock', '0');");
+    }
+    else
+    {
+        // update lock setting
+        query.exec("UPDATE settings SET data = GREATEST(0,  data - 1) "
+                   "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    }
+
+    // unlock table
+    query.exec("UNLOCK TABLES;");
+
+    // tell the master BE to reset its idle time
     RemoteSendMessage("RESET_IDLETIME");
 
     return 0;
