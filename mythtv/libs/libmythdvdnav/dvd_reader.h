@@ -229,6 +229,8 @@ int DVDDiscID( dvd_reader_t *, unsigned char * );
 int DVDUDFVolumeInfo( dvd_reader_t *, char *, unsigned int,
 		      unsigned char *, unsigned int );
 
+int DVDFileSeekForce( dvd_file_t *, int, int );
+
 /**
  * Get the ISO9660 VolumeIdentifier and VolumeSetIdentifier
  *

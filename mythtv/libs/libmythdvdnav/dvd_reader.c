@@ -1021,6 +1021,28 @@ int32_t DVDFileSeek( dvd_file_t *dvd_file, int32_t offset )
     return offset;
 }
 
+int DVDFileSeekForce( dvd_file_t *dvd_file, int offset, int force_size )
+{
+    /* Check arguments. */
+    if( dvd_file == NULL || offset < 0 )
+        return -1;
+
+    if( dvd_file->dvd->isImageFile ) {
+        if( force_size < 0 )
+            force_size = (offset - 1) / DVD_VIDEO_LB_LEN + 1;
+        if( dvd_file->filesize < force_size ) {
+            dvd_file->filesize = force_size;
+            fprintf(stderr, "libdvdread: Ignored UDF provided size of file.\n");
+        }
+    }
+
+    if( offset > dvd_file->filesize * DVD_VIDEO_LB_LEN ) {
+        return -1;
+    }
+    dvd_file->seek_pos = (uint32_t) offset;
+    return offset;
+}
+
 ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
 {
     unsigned char *secbuf_base, *secbuf;
@@ -1061,7 +1083,7 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
     memcpy( data, &(secbuf[ seek_byte ]), byte_size );
     free( secbuf_base );
 
-    dvd_file->seek_pos += byte_size;
+    DVDFileSeekForce(dvd_file, dvd_file->seek_pos + byte_size, -1);
     return byte_size;
 }
 

@@ -93,6 +93,10 @@ static inline int DVDFileSeek_( dvd_file_t *dvd_file, uint32_t offset ) {
   return (DVDFileSeek(dvd_file, (int)offset) == (int)offset);
 }
 
+static inline int DVDFileSeekForce_( dvd_file_t *dvd_file, uint32_t offset, int force_size ) {
+  return (DVDFileSeekForce(dvd_file, (int)offset, force_size) == (int)offset);
+}
+
 
 ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
   ifo_handle_t *ifofile;
@@ -1503,7 +1507,7 @@ static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
   unsigned int i;
   int info_length;
 
-  if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
+  if(!DVDFileSeekForce_(ifofile->file, sector * DVD_BLOCK_LEN, sector))
     return 0;
 
   if(!(DVDReadBytes(ifofile->file, vobu_admap, VOBU_ADMAP_SIZE)))
