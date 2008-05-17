@@ -848,7 +848,8 @@ void MythburnWizard::getThemeList(void)
             {
                 theme_list.append(fi.fileName());
                 if (theme_selector)
-                    theme_selector->addItem(count, fi.fileName());
+                    theme_selector->addItem(count, fi.fileName()
+                            .replace(QString("_"), QString(" ")));
                 ++count;
             }
         }
@@ -1278,7 +1279,8 @@ void MythburnWizard::loadConfiguration(void)
 {
     theme_selector->setToItem(
             gContext->GetSetting("MythBurnMenuTheme", ""));
-    setTheme(theme_list.findIndex(theme_selector->getCurrentString()));
+    setTheme(theme_list.findIndex(theme_selector->getCurrentString()
+            .replace(QString(" "), QString("_"))));
 
     bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
     createISO_check->setState(bCreateISO);
