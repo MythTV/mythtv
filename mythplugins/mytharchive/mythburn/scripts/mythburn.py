@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080506-1"
+VERSION="0.1.20080518-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2107,6 +2107,10 @@ def renameProjectXFiles(folder, pxbasename):
             if tokens[0] == "ok>":
                 write("found stream %s" % tokens[2], False)
                 streamIds.append(int(tokens[2], 16))
+
+    sortedstreamIds = []
+    sortedstreamIds = sorted(streamIds)
+    streamIds = sortedstreamIds
 
     # if we haven't found any PIDs look for PES-IDs
     if len(streamIds) == 0:
