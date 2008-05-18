@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080518-1"
+VERSION="0.1.20080518-2"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -93,7 +93,7 @@ dvdPALD1="%sx%s" % (dvdPAL[0],dvdPAL[1])
 dvdNTSCD1="%sx%s" % (dvdNTSC[0],dvdNTSC[1])
 
 #Single and dual layer recordable DVD free space in MBytes
-dvdrsize=(4482,8964)
+dvdrsize=(4482,8106)
 
 frameratePAL=25
 framerateNTSC=29.97
@@ -1449,7 +1449,7 @@ def getFileInformation(file, folder):
                     top_element.appendChild(node)
 
                 # find the cut list end marks if available to use as chapter marks
-                if file.attributes["usecutlist"].value == "0" and addCutlistChapters == False:
+                if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
                     sqlstatement  = """SELECT mark, type FROM recordedmarkup 
                                     WHERE chanid = '%s' AND starttime = '%s' 
                                     AND type = 0 ORDER BY mark""" % (chanid, starttime)
@@ -1962,7 +1962,7 @@ def getVideoSize(xmlFilename):
 # Run a file though the lossless encoder optionally removing commercials
 
 def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
-    """Use mythtrancode to cut commercials and/or clean up an mpeg2 file"""
+    """Use mythtranscode to cut commercials and/or clean up an mpeg2 file"""
 
     if localfile != "":
         localfile = quoteFilename(localfile)
@@ -4664,7 +4664,7 @@ def doProcessFile(file, folder, count):
                     localfile = file.attributes["localfilename"].value
                 else:
                     localfile = ""
-                write("File has a cut list - running mythtrancode to remove unwanted segments")
+                write("File has a cut list - running mythtranscode to remove unwanted segments")
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
                 if runMythtranscode(chanid, starttime, os.path.join(folder,'newfile.mpg'), True, localfile):
@@ -4687,7 +4687,7 @@ def doProcessFile(file, folder, count):
                     if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
                         mediafile = os.path.join(folder, 'newfile.mpg')
                     else:
-                        write("Failed to run mythtrancode to fix any errors")
+                        write("Failed to run mythtranscode to fix any errors")
     else:
         #does the user always want to run mpeg2 files through mythtranscode?
         #may help to fix any errors in the file 
@@ -4707,7 +4707,7 @@ def doProcessFile(file, folder, count):
             if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
                 mediafile = os.path.join(folder, 'newfile.mpg')
             else:
-                write("Failed to run mythtrancode to fix any errors")
+                write("Failed to run mythtranscode to fix any errors")
 
     #do we need to re-encode the file to make it DVD compliant?
     if not isFileOkayForDVD(file, folder):
