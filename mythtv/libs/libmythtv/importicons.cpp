@@ -419,7 +419,7 @@ QStringList ImportIconsWizard::extract_csv(const QString& strLine)
                 break;
             default:
                 pos++;
-                if (pos > str.length())
+                if (pos >= str.length())
                 {
                     strLeft = str.left(pos);
                     if (strLeft.startsWith("\"") && strLeft.endsWith("\""))
@@ -433,13 +433,9 @@ QStringList ImportIconsWizard::extract_csv(const QString& strLine)
     return ret;
 }
 
-
 QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
 {
-    QByteArray raw;
-    QTextStream rawStream(raw,IO_WriteOnly);
-    rawStream << strParam;
-
+    QByteArray raw(strParam.toAscii());
     QBuffer data(&raw);
     QHttpRequestHeader header;
 
@@ -558,36 +554,36 @@ bool ImportIconsWizard::search(const QString& strParam)
     QUrl url(ImportIconsWizard::url+"/search");
 
     QString str = wget(url,"s="+strParam1);
-
     m_listSearch.clear();
     m_listIcons->clearSelections();
 
     if (str.isEmpty() || str.startsWith("#") || str.startsWith("Error",false))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from search : %1").arg(str));
-        retVal=false;
+        retVal = false;
     }
     else
     {
         VERBOSE(VB_CHANNEL, QString("Icon Import: Working search : %1").arg(str));
-        QStringList strSplit=QStringList::split("\n",str);
+        QStringList strSplit = str.split("\n");
 
-        for (QStringList::iterator begin=strSplit.begin();
-             begin!=strSplit.end();begin++)
+        for (int x = 0; x < strSplit.size(); x++)
         {
-            if (*begin != "#" )
+            QString row = strSplit[x];
+            if (row != "#" )
             {
-                QStringList ret = extract_csv(*begin);
-                VERBOSE(VB_CHANNEL, QString("Icon Import: search : %1 %2 %3").arg(ret[0]).arg(ret[1]).arg(ret[2]));
+                QStringList ret = extract_csv(row);
+                VERBOSE(VB_CHANNEL, QString("Icon Import: search : %1 %2 %3")
+                            .arg(ret[0]).arg(ret[1]).arg(ret[2]));
                 SearchEntry entry;
-                entry.strID=ret[0];
-                entry.strName=ret[1];
-                entry.strLogo=ret[2];
+                entry.strID = ret[0];
+                entry.strName = ret[1];
+                entry.strLogo = ret[2];
                 m_listSearch.append(entry);
                 m_listIcons->addSelection(entry.strName);
             }
         }
-        retVal=true;
+        retVal = true;
     }
     enableControls(STATE_NORMAL, retVal);
     return retVal;
