@@ -31,6 +31,7 @@
 class Q3UrlOperator;
 class Q3NetworkOperation;
 class NewsSite;
+class QDomDocument;
 
 // -------------------------------------------------------
 
@@ -100,6 +101,8 @@ public:
     void retrieve();
     void stop();
     void process();
+    void parseRSS(QDomDocument domDoc);
+    void parseAtom(QDomDocument domDoc);
 
     bool     successful() const;
     QString  errorMsg() const;

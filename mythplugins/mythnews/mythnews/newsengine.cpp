@@ -226,6 +226,29 @@ void NewsSite::process()
     if (m_state == RetrieveFailed)
         m_errorString += tr("Showing Cached News");
 
+    //Check the type of the feed
+    QString rootName = domDoc.documentElement().nodeName();
+    if(rootName == QString::fromLatin1("rss") || 
+       rootName == QString::fromLatin1("rdf:RDF")) {
+        parseRSS(domDoc);
+        xmlFile.close();
+        return;
+    }
+    else if (rootName == QString::fromLatin1("feed")) {
+        parseAtom(domDoc);
+        xmlFile.close();
+        return;
+    }
+    else {
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: XML-file is not valid RSS-feed");
+        m_errorString += tr("XML-file is not valid RSS-feed");
+        return;
+    }
+
+}
+
+void NewsSite::parseRSS(QDomDocument domDoc)
+{
     QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));
 
     m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplifyWhiteSpace();
@@ -346,9 +369,40 @@ void NewsSite::process()
         }
         new NewsArticle(this, title, description, url, thumbnail, mediaurl, enclosure);
     }
+}
 
-    xmlFile.close();
+void NewsSite::parseAtom(QDomDocument domDoc)
+{
+    QDomNodeList entries = domDoc.elementsByTagName(QString::fromLatin1("entry"));
 
+    QDomNode itemNode;
+    QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
+    for (unsigned int i = 0; i < entries.count(); i++) {
+        itemNode = entries.item(i);
+        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+        if (!title.isNull())
+            ReplaceHtmlChar(title);
+
+        QDomNode summNode = itemNode.namedItem(QString::fromLatin1("summary"));
+        if (!summNode.isNull())
+        {
+            description = summNode.toElement().text().simplifyWhiteSpace();
+            ReplaceHtmlChar(description);
+        }            
+        else
+            description = QString::null;
+        
+        QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
+        if (!linkNode.isNull()){
+            QDomAttr linkHref = linkNode.toElement().attributeNode("href");
+            if(!linkHref.isNull())
+                url = linkHref.value();
+        }
+        else
+            url = QString::null;
+
+        new NewsArticle(this, title, description, url, QString::null, QString::null, QString::null);
+    }
 }
 
 void NewsSite::slotGotData(const QByteArray& data,
