@@ -652,6 +652,65 @@ push @{$expect},
 [ archive => $sources.'qt-win-opensource-src-4.3.4.zip',  fetch => 'ftp://ftp.trolltech.com/qt/source/qt-win-opensource-src-4.3.4.zip'],
 [ dir => $msys.'qt-win-opensource-src-4.3.4', extract => [$sources.'qt-win-opensource-src-4.3.4.zip', $msys] ],
 
+[ file  => $sources.'qt-4.3.4.patch',
+  write => [$sources.'qt-4.3.4.patch',
+"diff -u qt-win-opensource-src-4.3.4/qmake/option.cpp.orig qt-win-opensource-src-4.3.4/qmake/option.cpp
+--- qt-win-opensource-src-4.3.4/qmake/option.cpp.orig	Wed Feb 20 04:35:22 2008
++++ qt-win-opensource-src-4.3.4/qmake/option.cpp	Sun May 18 12:12:51 2008
+@@ -613,7 +613,10 @@
+     Q_ASSERT(!((flags & Option::FixPathToLocalSeparators) && (flags & Option::FixPathToTargetSeparators)));
+     if(flags & Option::FixPathToLocalSeparators) {
+ #if defined(Q_OS_WIN32)
+-        string = string.replace('/', '\\\\');
++        if(Option::shellPath.isEmpty())  // i.e. not running under MinGW
++            string = string.replace('/', '\\\\');
++        else
++            string = string.replace('\\\\', '/');
+ #else
+         string = string.replace('\\\\', '/');
+ #endif
+diff -ru qt-win-opensource-src-4.3.4/mkspecs/win32-g++/qmake.conf.orig qt-win-opensource-src-4.3.4/mkspecs/win32-g++/qmake.conf
+--- qt-win-opensource-src-4.3.4/mkspecs/win32-g++/qmake.conf.orig	Wed Feb 20 04:34:58 2008
++++ qt-win-opensource-src-4.3.4/mkspecs/win32-g++/qmake.conf	Sun May 18 21:10:57 2008
+@@ -75,12 +75,15 @@
+     MINGW_IN_SHELL      = 1
+ 	QMAKE_DIR_SEP		= /
+ 	QMAKE_COPY		= cp
+-	QMAKE_COPY_DIR		= xcopy /s /q /y /i
++	QMAKE_COPY_DIR		= cp -r
+ 	QMAKE_MOVE		= mv
+ 	QMAKE_DEL_FILE		= rm
+-	QMAKE_MKDIR		= mkdir
++	QMAKE_MKDIR		= mkdir -p
+ 	QMAKE_DEL_DIR		= rmdir
+     QMAKE_CHK_DIR_EXISTS = test -d
++    QMAKE_MOC		= \$\$[QT_INSTALL_BINS]/moc
++    QMAKE_UIC		= \$\$[QT_INSTALL_BINS]/uic
++    QMAKE_IDC		= \$\$[QT_INSTALL_BINS]/idc
+ } else {
+ 	QMAKE_COPY		= copy /y
+ 	QMAKE_COPY_DIR		= xcopy /s /q /y /i
+@@ -89,11 +92,10 @@
+ 	QMAKE_MKDIR		= mkdir
+ 	QMAKE_DEL_DIR		= rmdir
+     QMAKE_CHK_DIR_EXISTS	= if not exist
++    QMAKE_MOC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}moc.exe
++    QMAKE_UIC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}uic.exe
++    QMAKE_IDC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}idc.exe
+ }
+-
+-QMAKE_MOC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}moc.exe
+-QMAKE_UIC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}uic.exe
+-QMAKE_IDC		= \$\$[QT_INSTALL_BINS]\$\${DIR_SEPARATOR}idc.exe
+ 
+ QMAKE_IDL		= midl
+ QMAKE_LIB		= ar -ru
+"], comment => 'Create patch for QT4'],
+
+[ grep  => ['Option::shellPath.isEmpty',
+            $msys.'qt-win-opensource-src-4.3.4/qmake/option.cpp'], 
+  shell => ['cd '.$unixmsys, 'patch -p0 < '.$sources.'qt-4.3.4.patch'] ],
+
 # qt recommend NOT having sh.exe in the path when building QT (yes this applies to QT4 too!)
 [ file => $msys.'bin/sh_.exe',
  shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
@@ -668,12 +727,20 @@ set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
+goto SMALL
+
 rem This would do a full build:
-rem '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
-rem mingw32-make
+'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
+mingw32-make -j '.($numCPU + 1).'
+goto END
+
+:SMALL
 rem This cuts out the examples and demos:
-'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -no-sql-odbc -no-qdbus
+'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
+bin\qmake projects.pro
 mingw32-make -j '.($numCPU + 1).' sub-qt3support-make_default-ordered
+
+:END
 ',
 ],comment=>'write a batch script for the QT4 environment under DOS'],
 
@@ -898,7 +965,7 @@ comment => 'broken Makefile, delete it' ],
 [ file => $mythtv.'mythtv/Makefile',
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythtv',
-           './configure --prefix=.. --disable-dbox2 --disable-hdhomerun'.
+           './configure --prefix=/usr --disable-dbox2 --disable-hdhomerun'.
            ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
            ' --disable-xvmc --enable-directx'.
            ' --cpu=k8 --compile-type='.$compile_type],
@@ -956,7 +1023,7 @@ cp Makefile_new Makefile
             $mythtv.'mythtv/programs/mythfrontend/mythfrontend.exe'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythtv',
-            'make install INSTALL_ROOT='.$unixbuild.'tmp/'],
+            'make install'],
 comment => 'was the last configure successful? then install mythtv ' ],
 
 
@@ -1163,7 +1230,7 @@ comment => 'link mythconfig.mak'],
 [ file => $mythtv.'mythplugins/Makefile', 
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythplugins',
-           './configure --prefix= --disable-mythgallery --disable-mythmusic'.
+           './configure --prefix=/usr --disable-mythgallery --disable-mythmusic'.
            ' --disable-mytharchive --disable-mythbrowser --disable-mythflix'.
            ' --disable-mythgame --disable-mythnews --disable-mythphone'.
            ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
@@ -1211,7 +1278,10 @@ if ( grep m/myththemes/, @components ) {
 # -------------------------------
 push @{$expect},
 ## config:
-[ file => $mythtv.'myththemes/Makefile', shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh','cd '.$unixmythtv.'myththemes','./configure --prefix= '], comment => 'do we already have a Makefile for myththemes?' ],
+[ file => $mythtv.'myththemes/Makefile',
+ shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+           'cd '.$unixmythtv.'myththemes','./configure --prefix=/usr'],
+comment => 'do we already have a Makefile for myththemes?' ],
 
 ## fix myththemes.pro
 [ grep => ['^win32:QMAKE_INSTALL_DIR', $mythtv.'myththemes/myththemes.pro'], shell => ['echo \'win32:QMAKE_INSTALL_DIR = sh ./cpsvndir\' >> '.$mythtv.'myththemes/myththemes.pro','nocheck'], comment => 'fix myththemes.pro' ],
