@@ -329,6 +329,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     long long iTotal = -1, iUsed = -1, iAvail = -1; 
 
     BackendQueryDiskSpace(strlist, m_pEncoders, true, m_bIsMaster);
+    QDomElement total;
 
     QStringList::const_iterator sit = strlist.begin();
     while (sit != strlist.end())
@@ -345,18 +346,22 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         if (fsID == "-2")
             fsID = "total";
 
-        if (ids == "")
-            ids = fsID;
-        else
-            ids = ids + "," + fsID;
+        QDomElement group = pDoc->createElement("Group");
 
-        storage.setAttribute("drive_" + fsID + "_total", (int)(iTotal>>10)); 
-        storage.setAttribute("drive_" + fsID + "_used" , (int)(iUsed>>10)); 
-        storage.setAttribute("drive_" + fsID + "_free" , (int)(iAvail>>10)); 
-        storage.setAttribute("drive_" + fsID + "_dirs" , directory); 
+        group.setAttribute("id"   , fsID );
+        group.setAttribute("total", (int)(iTotal>>10) );
+        group.setAttribute("used" , (int)(iUsed>>10)  );
+        group.setAttribute("free" , (int)(iAvail>>10) );
+        group.setAttribute("dir"  , directory );
+
+        // Make sure that the total is always the last element.
+        if (fsID == "total")
+            total = group;
+        else
+            storage.appendChild(group);
     }
- 
-    storage.setAttribute("fsids", ids); 
+
+    storage.appendChild(total);
 
     // load average ---------------------
 
@@ -1081,77 +1086,71 @@ int HttpStatus::PrintMachineInfo( Q3TextStream &os, QDomElement info )
     }
 
     // local drive space   ---------------------
-    
     node = info.namedItem( "Storage" );
+    QDomElement storage = node.toElement();
+    node = storage.firstChild();
 
-    if (!node.isNull())
-    {    
-        QDomElement e = node.toElement();
+    os << "      Disk Usage:<br />\r\n";
+    os << "      <ul>\r\n";
 
-        if (!e.isNull())
+
+    while (!node.isNull())
+    {
+        QDomElement g = node.toElement();
+
+        if (!g.isNull() && g.tagName() == "Group")
         {
-            QString ids = e.attribute("fsids", "");
-            QStringList tokens = QStringList::split(",", ids);
+            int nFree    = g.attribute("free" , "0" ).toInt();
+            int nTotal   = g.attribute("total", "0" ).toInt();
+            int nUsed    = g.attribute("used" , "0" ).toInt();
+            QString nDir = g.attribute("dir"  , "" );
+            QString id   = g.attribute("id"   , "" );
 
-            os << "      Disk Usage:<br />\r\n";
-            os << "      <ul>\r\n";
+            nDir.replace(QRegExp(","), ", ");
 
-            for (unsigned int i = 0; i < tokens.size(); i++)
+
+            if (id == "total")
             {
-                // For a single-directory installation just display the totals
-                if ((tokens.size() == 2) && (i == 0) &&
-                    (tokens[i] != "total") &&
-                    (tokens[i+1] == "total"))
-                    i++;
-
-                int nFree =
-                    e.attribute("drive_" + tokens[i] + "_free" , "0" ).toInt();
-                int nTotal =
-                    e.attribute("drive_" + tokens[i] + "_total", "0" ).toInt();
-                int nUsed =
-                    e.attribute("drive_" + tokens[i] + "_used" , "0" ).toInt();
-                QString nDirs =
-                    e.attribute("drive_" + tokens[i] + "_dirs" , "" );
-
-                nDirs.replace(QRegExp(","), ", ");
-
-                if (tokens[i] == "total")
-                {
-                    os << "        <li>Total Disk Space:\r\n"
-                       << "          <ul>\r\n";
-                }
-                else
-                {
-                    os << "        <li>MythTV Drive #" << tokens[i] << ":"
-                       << "\r\n<br />\r\n";
-
-                    if (nDirs.contains(","))
-                        os << "          <ul><li>Directories: ";
-                    else
-                        os << "          <ul><li>Directory: ";
-
-                    os << nDirs << "</li>\r\n";
-                }
-
-                QLocale c(QLocale::C);
-                os << "            <li>Total Space: ";
-                sRep = c.toString(nTotal) + " MB ";
-                os << sRep << "</li>\r\n";
-
-                os << "            <li>Space Used: ";
-                sRep = c.toString(nUsed) + " MB ";
-                os << sRep << "</li>\r\n";
-
-                os << "            <li>Space Free: ";
-                sRep = c.toString(nFree) + " MB ";
-                os << sRep << "</li>\r\n";
-
-                os << "          </ul>\r\n"
-                   << "        </li>\r\n";
+                os << "        <li>Total Disk Space:</li>\r\n"
+                << "          <ul>\r\n";
             }
-            os << "      </ul>\r\n";
+            else
+            {
+                os << "        <li>MythTV Drive #" << id << ":"
+                << "</li>\r\n"
+                << "          <ul>\r\n";
+
+                if (nDir.contains(","))
+                    os << "            <li>Directories: ";
+                else
+                    os << "            <li>Directory: ";
+
+                os << nDir << "</li>\r\n";
+            }
+
+            QLocale c(QLocale::C);
+
+            os << "            <li>Total Space: ";
+            sRep = c.toString(nTotal) + " MB";
+            os << sRep << "</li>\r\n";
+
+            os << "            <li>Space Used: ";
+            sRep = c.toString(nUsed) + " MB";
+            os << sRep << "</li>\r\n";
+
+            os << "            <li>Space Free: ";
+            sRep = c.toString(nFree) + " MB";
+            os << sRep << "</li>\r\n";
+
+            os << "          </ul>\r\n"
+            << "        </li>\r\n";
+
         }
+
+        node = node.nextSibling();
     }
+
+    os << "      </ul>\r\n";
 
     // Guide Info ---------------------
 
