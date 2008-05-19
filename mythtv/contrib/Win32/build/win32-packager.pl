@@ -797,7 +797,7 @@ push @{$expect},
 # now lets write some build scripts to help with mythtv itself
 
 # Qt3
-[ file => [], write => [$mythtv.'qt3_env.sh',
+[ always => [], write => [$mythtv.'qt3_env.sh',
 'export QTDIR='.$unixmsys.'qt-3.3.x-p8
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
