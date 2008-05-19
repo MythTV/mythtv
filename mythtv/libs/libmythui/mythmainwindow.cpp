@@ -456,7 +456,7 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
     QVector<MythScreenStack *>::Iterator it;
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
     {
-        if ((*it)->name() == stackname)
+        if ((*it)->objectName() == stackname)
             return *it;
     }
     return NULL;
@@ -761,8 +761,8 @@ void MythMainWindow::attach(QWidget *child)
     // currently, it's impossible to switch to program guide from livetv
     VERBOSE(VB_IMPORTANT,
             QString("MythMainWindow::attach old: %1, new: %2, thread: %3")
-            .arg(currentWidget() ? currentWidget()->name() : "none")
-            .arg(child->name())
+            .arg(currentWidget() ? currentWidget()->objectName() : "none")
+            .arg(child->objectName())
             .arg(::GetCurrentThreadId()));
 #endif
     if (currentWidget())
@@ -820,9 +820,9 @@ void MythMainWindow::ExitToMainMenu(void)
     QWidget *current = currentWidget();
     if (current && d->exitingtomain && d->popwindows)
     {
-        if (current->name() != QString("mainmenu"))
+        if (current->objectName() != QString("mainmenu"))
         {
-            if (current->name() == QString("video playback window"))
+            if (current->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(current, me);
@@ -845,9 +845,9 @@ void MythMainWindow::ExitToMainMenu(void)
     if (toplevel && d->popwindows)
     {
         MythScreenType *screen = toplevel->GetTopScreen();
-        if (screen && screen->name() != QString("mainmenu"))
+        if (screen && screen->objectName() != QString("mainmenu"))
         {
-            if (screen->name() == QString("video playback window"))
+            if (screen->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(screen, me);

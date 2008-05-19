@@ -117,7 +117,7 @@ void MythUIClock::CopyFrom(MythUIType *base)
 
 void MythUIClock::CreateCopy(MythUIType *parent)
 {
-    MythUIClock *clock = new MythUIClock(parent, name());
+    MythUIClock *clock = new MythUIClock(parent, objectName());
     clock->CopyFrom(this);
 }
 

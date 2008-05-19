@@ -21,8 +21,7 @@ void MythUISpinBox::SetRange(int low, int high, int step)
 
     while (value <= high)
     {
-        MythListButtonItem *item = new MythListButtonItem(this,
-                                            QString::number(value));
+        new MythListButtonItem(this, QString::number(value));
         value = value + step;
     }
 

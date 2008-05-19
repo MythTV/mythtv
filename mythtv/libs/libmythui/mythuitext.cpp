@@ -253,12 +253,12 @@ bool MythUIText::ParseElement(QDomElement &element)
         {
             m_Message = qApp->translate("ThemeUI", getFirstText(element));
         }
-        else if (element.attribute("lang","").lower() ==
+        else if (element.attribute("lang","").toLower() ==
                  gContext->GetLanguageAndVariant())
         {
             m_Message = getFirstText(element);
         }
-        else if (element.attribute("lang","").lower() ==
+        else if (element.attribute("lang","").toLower() ==
                  gContext->GetLanguage())
         {
             m_Message = getFirstText(element);
@@ -277,7 +277,7 @@ bool MythUIText::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "align")
     {
-        QString align = getFirstText(element).lower();
+        QString align = getFirstText(element).toLower();
 
         // preserve the wordbreak attribute, drop everything else
         m_Justification = m_Justification & Qt::WordBreak;
@@ -352,7 +352,7 @@ void MythUIText::CopyFrom(MythUIType *base)
 
 void MythUIText::CreateCopy(MythUIType *parent)
 {
-    MythUIText *text = new MythUIText(parent, name());
+    MythUIText *text = new MythUIText(parent, objectName());
     text->CopyFrom(this);
 }
 

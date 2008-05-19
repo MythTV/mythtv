@@ -421,7 +421,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
 
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
-    MythUIButton *button = new MythUIButton(parent, name(), false);
+    MythUIButton *button = new MythUIButton(parent, objectName(), false);
     button->CopyFrom(this);
 }
 

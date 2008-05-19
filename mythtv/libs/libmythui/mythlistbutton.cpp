@@ -837,7 +837,7 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         MythUIButton *button = dynamic_cast<MythUIButton *>(type);
         if (button)
         {
-            QString buttonname = button->name();
+            QString buttonname = button->objectName();
             int pos = buttonname.section(' ',2,2).toInt();
             if (pos < m_itemList.size())
             {
@@ -852,7 +852,7 @@ void MythListButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         MythUIStateType *arrow = dynamic_cast<MythUIStateType *>(type);
         if (arrow)
         {
-            QString name = arrow->name();
+            QString name = arrow->objectName();
 
             if (name == "upscrollarrow")
             {
@@ -1117,7 +1117,7 @@ bool MythListButton::ParseElement(QDomElement &element)
 
 void MythListButton::CreateCopy(MythUIType *parent)
 {
-    MythListButton *lb = new MythListButton(parent, name());
+    MythListButton *lb = new MythListButton(parent, objectName());
     lb->CopyFrom(this);
 }
 
@@ -1129,7 +1129,7 @@ void MythListButton::CopyFrom(MythUIType *base)
         VERBOSE(VB_IMPORTANT, QString("MythListButton CopyFrom ERR: "
                                         "Copy Failed "
                                         "base '%1' is not a mythlistbutton")
-                                        .arg(base->name()));
+                                        .arg(base->objectName()));
         return;
     }
 

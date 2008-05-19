@@ -223,7 +223,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             return NULL;
 
         VERBOSE(VB_IMPORTANT, QString("duplicate name: %1 in parent %2")
-                                     .arg(name).arg(parent->name()));
+                                     .arg(name).arg(parent->objectName()));
         return NULL;
     }
 

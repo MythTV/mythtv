@@ -318,7 +318,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
 void MythUIImage::CreateCopy(MythUIType *parent)
 {
-    MythUIImage *im = new MythUIImage(parent, name());
+    MythUIImage *im = new MythUIImage(parent, objectName());
     im->CopyFrom(this);
 }
 
