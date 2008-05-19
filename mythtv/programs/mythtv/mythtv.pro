@@ -16,7 +16,7 @@ SOURCES += main.cpp
 
 macx {
     mac_bundle {
-        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythtv
+        QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythtv
     }
 }
 

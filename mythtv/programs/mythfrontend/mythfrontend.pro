@@ -40,7 +40,7 @@ macx {
     mac_bundle {
         CONFIG -= console  # Force behaviour of producing .app bundle
         RC_FILE += mythfrontend.icns
-        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythfrontend.app
+        QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythfrontend.app
     }
 
     # OS X has no ldconfig

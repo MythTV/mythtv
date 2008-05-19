@@ -22,7 +22,7 @@ SOURCES += backendsettings.cpp checksetup.cpp main.cpp
 
 macx {
     mac_bundle {
-        QMAKE_POST_LINK = ../../contrib/OSX/makebundle.sh mythtv-setup
+        QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythtv-setup
     }
 }
 
