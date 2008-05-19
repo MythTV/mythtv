@@ -797,7 +797,7 @@ push @{$expect},
 # now lets write some build scripts to help with mythtv itself
 
 # Qt3
-[ file => $mythtv.'qt3_env.sh', write => [$mythtv.'qt3_env.sh',
+[ file => [], write => [$mythtv.'qt3_env.sh',
 'export QTDIR='.$unixmsys.'qt-3.3.x-p8
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
@@ -806,7 +806,7 @@ export PATH=$QTDIR/bin:/usr/local/bin:$PATH
 
 
 # Qt4
-[ file => $mythtv.'qt4_env.sh', write => [$mythtv.'qt4_env.sh',
+[ always => [], write => [$mythtv.'qt4_env.sh',
 'export QTDIR='.$unixmsys.'qt-win-opensource-src-4.3.4
 export QMAKESPEC=$QTDIR/mkspecs/win32-g++
 export LD_LIBRARY_PATH=$QTDIR/lib:/usr/lib:/mingw/lib:/lib
@@ -965,7 +965,8 @@ comment => 'broken Makefile, delete it' ],
 [ file => $mythtv.'mythtv/Makefile',
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythtv',
-           './configure --prefix=/usr --disable-dbox2 --disable-hdhomerun'.
+           './configure --prefix='.$unixbuild.
+           ' --disable-dbox2 --disable-hdhomerun'.
            ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
            ' --disable-xvmc --enable-directx'.
            ' --cpu=k8 --compile-type='.$compile_type],
@@ -1230,7 +1231,8 @@ comment => 'link mythconfig.mak'],
 [ file => $mythtv.'mythplugins/Makefile', 
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythplugins',
-           './configure --prefix=/usr --disable-mythgallery --disable-mythmusic'.
+           './configure --prefix='.$unixbuild.
+           ' --disable-mythgallery --disable-mythmusic'.
            ' --disable-mytharchive --disable-mythbrowser --disable-mythflix'.
            ' --disable-mythgame --disable-mythnews --disable-mythphone'.
            ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
@@ -1280,7 +1282,7 @@ push @{$expect},
 ## config:
 [ file => $mythtv.'myththemes/Makefile',
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-           'cd '.$unixmythtv.'myththemes','./configure --prefix=/usr'],
+           'cd '.$unixmythtv.'myththemes','./configure --prefix='.$unixbuild],
 comment => 'do we already have a Makefile for myththemes?' ],
 
 ## fix myththemes.pro
