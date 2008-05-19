@@ -10,7 +10,7 @@ LIBS *= -L$${PREFIX}/lib
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
-    LIBS += -L/bin -lmyth-0.21 -lmythui-0.21 -lmythtv-0.21
+    LIBS += -L$${PREFIX}/bin -L/bin -lmyth-0.21 -lmythui-0.21 -lmythtv-0.21
     LIBS += -lmythavformat-0.21 -lmythavcodec-0.21 -lmythavutil-0.21
 }
 
