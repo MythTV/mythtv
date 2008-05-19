@@ -33,7 +33,7 @@ class MoviesUI : public MythThemedDialog
     void drawDisplayTree();
     GenericTree* getDisplayTreeByMovie();
     GenericTree* getDisplayTreeByTheater();
-    void populateDatabaseFromGrabber(QString ret);
+    bool populateDatabaseFromGrabber(QString ret);
     void processTheatre(QDomNode &n);
     void processMovie(QDomNode &n, int theaterId);
     TheaterVector buildTheaterDataTree();

@@ -215,8 +215,15 @@ void MoviesUI::updateMovieTimes()
     QStringList args = QStringList::split(' ', grabber);
     QString ret = executeExternal(args, "MythMovies Data Grabber");
     VERBOSE(VB_IMPORTANT, "Grabber Finished. Processing Data.");
-    populateDatabaseFromGrabber(ret);
-    gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
+    if (populateDatabaseFromGrabber(ret))
+        gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                "Error", tr("Failed to process the grabber data!"));
+        VERBOSE(VB_IMPORTANT, "Failed to process the grabber data!");
+    }
+
     gContext->ActivateSettingsCache(true);
 }
 
@@ -545,7 +552,7 @@ void MoviesUI::drawDisplayTree()
     m_currentMode = m_movieTreeUI->getCurrentNode()->getString();
 }
 
-void MoviesUI::populateDatabaseFromGrabber(QString ret)
+bool MoviesUI::populateDatabaseFromGrabber(QString ret)
 {
      //stores error returns
     QString error;
@@ -558,7 +565,7 @@ void MoviesUI::populateDatabaseFromGrabber(QString ret)
         VERBOSE(VB_IMPORTANT, QString("Error parsing data from grabber: "
                 "Error: %1 Location Line: %2 Column %3")
                 .arg(error) .arg(errorLine) .arg(errorColumn));
-        exit(-1);
+        return false;
     }
     QDomElement root = doc.documentElement();
     n = root.firstChild();
@@ -569,6 +576,8 @@ void MoviesUI::populateDatabaseFromGrabber(QString ret)
         //list.push_back(t);
         n = n.nextSibling();
     }
+
+    return true;
 }
 
 void MoviesUI::processTheatre(QDomNode &n)
