@@ -88,7 +88,7 @@ bool checkStoragePaths(QString *probs)
     {
         QString sgDir = query.value(0).toString();
         QStringList tokens = QStringList::split(",", query.value(1).toString());
-        unsigned int curToken = 0;
+        int curToken = 0;
         while (curToken < tokens.size())
         {
             checkDir.setPath(tokens[curToken]);

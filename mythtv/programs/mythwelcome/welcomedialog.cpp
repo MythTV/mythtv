@@ -196,7 +196,7 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Welcome", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -435,7 +435,7 @@ void WelcomeDialog::updateScreen(void)
         status = tr("Please Wait ...");
     else
     {
-        if (m_statusListNo >= m_statusList.count())
+        if ((int)m_statusListNo >= m_statusList.count())
             m_statusListNo = 0;
 
         status = m_statusList[m_statusListNo];
@@ -443,7 +443,7 @@ void WelcomeDialog::updateScreen(void)
             status += "...";
         m_status_text->SetText(status);
 
-        if (m_statusListNo < m_statusList.count() - 1)
+        if ((int)m_statusListNo < m_statusList.count() - 1)
             m_statusListNo++;
         else
             m_statusListNo = 0;

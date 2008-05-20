@@ -82,7 +82,7 @@ static GlobalComboBox *TVFormat()
     gc->setLabel(QObject::tr("TV format"));
 
     QStringList list = ChannelTVFormat::GetFormats();
-    for (uint i = 0; i < list.size(); i++)
+    for (int i = 0; i < list.size(); i++)
         gc->addSelection(list[i]);
 
     gc->setHelpText(QObject::tr("The TV standard to use for viewing TV."));
@@ -637,6 +637,7 @@ static HostCheckBox *JobAllowUserJob(uint job_num)
     return bc;
 }
 
+#if 0
 static GlobalCheckBox *UPNPShowRecordingUnderVideos()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("UPnP/RecordingsUnderVideos");
@@ -648,6 +649,7 @@ static GlobalCheckBox *UPNPShowRecordingUnderVideos()
                     " allow more than 1 video section." ));
     return gc;
 };
+#endif
 
 static HostSpinBox *UPNPRebuildDelay()
 {

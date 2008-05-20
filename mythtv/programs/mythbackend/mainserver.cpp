@@ -2987,7 +2987,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "GET_FREE_INPUTS")
     {
         vector<uint> excluded_cardids;
-        for (uint i = 2; i < slist.size(); i++)
+        for (int i = 2; i < slist.size(); i++)
             excluded_cardids.push_back(slist[i].toUInt());
 
         vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);
@@ -3320,7 +3320,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "GET_FREE_INPUTS")
     {
         vector<uint> excluded_cardids;
-        for (uint i = 2; i < slist.size(); i++)
+        for (int i = 2; i < slist.size(); i++)
             excluded_cardids.push_back(slist[i].toUInt());
 
         vector<InputInfo> inputs = enc->GetFreeInputs(excluded_cardids);

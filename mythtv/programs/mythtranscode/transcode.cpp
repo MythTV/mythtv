@@ -499,7 +499,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (recorderOptions != "")
         {
             QStringList options = QStringList::split(",", recorderOptions);
-            unsigned int loop = 0;
+            int loop = 0;
             while (loop < options.size())
             {
                 QStringList tokens = QStringList::split("=", options[loop]);

@@ -491,7 +491,7 @@ int main(int argc, char **argv)
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
-                for (unsigned int index = 0; index < pairs.size(); ++index)
+                for (int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
                     tokens[0].replace(QRegExp("^[\"']"), "");

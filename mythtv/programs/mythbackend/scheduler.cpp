@@ -2373,7 +2373,7 @@ void Scheduler::UpdateMatches(int recordid) {
         query.exec();
     }
 
-    unsigned clause;
+    int clause;
     QStringList fromclauses, whereclauses;
     MSqlBindings bindings;
 
