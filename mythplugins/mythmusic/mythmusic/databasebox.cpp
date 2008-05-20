@@ -878,9 +878,15 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
     if (cdwriter)
     {
+#if 0
+        /*
+         Disabled as Playlist::CreateCDAudio() is empty,
+         it is called by CreateCDAudio()
+        */
         cdaudiob = active_popup->addButton(tr("Create Audio CD from "
                                                "Playlist"), this,
                                                SLOT(CreateCDAudio()));
+#endif
 
         cdmp3b = active_popup->addButton(tr("Create MP3 CD from Playlist"),
                                          this, SLOT(CreateCDMP3()));
@@ -923,8 +929,12 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
         active_popup->addLabel(label2);
 
         cdmp3b->setEnabled((ratio_MB <= 100.0));
-        cdaudiob->setEnabled((ratio_sec <= 100.0));
-        cdaudiob->setEnabled(false);
+
+        if (cdaudiob)
+        {
+            cdaudiob->setEnabled((ratio_sec <= 100.0));
+            cdaudiob->setEnabled(false);
+        }
     }
  
     (void)item_ptr;
