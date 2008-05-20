@@ -429,6 +429,8 @@ QString NetworkControl::processKey(QStringList tokens)
         {
             int keyCode = keyMap[tokens[curToken]];
 
+            gContext->ResetScreensaver();
+
             event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, Qt::NoButton);
             QApplication::postEvent(keyDest, event);
 
@@ -470,6 +472,8 @@ QString NetworkControl::processKey(QStringList tokens)
                 if (tokens[curToken] == tokens[curToken].upper())
                     buttons = Qt::ShiftButton;
             }
+
+            gContext->ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
                                   tokens[curToken]);
