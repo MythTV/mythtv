@@ -302,7 +302,7 @@ void MoviesUI::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Movies", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         //cout << "Action: " << action << endl << flush;
@@ -498,12 +498,12 @@ GenericTree* MoviesUI::getDisplayTreeByTheater()
     theaters = &m_dataTreeByTheater;
     int tbase = 0;
     GenericTree *parent = new GenericTree("By Theater", 0, false);
-    for (unsigned int i = 0; i < theaters->size(); i++)
+    for (int i = 0; i < theaters->size(); i++)
     {
         int mbase = 0;
         Theater x = theaters->at(i);
         GenericTree *node = new GenericTree(x.name, --tbase, false);
-        for (unsigned int m =0; m < x.movies.size(); m++)
+        for (int m =0; m < x.movies.size(); m++)
         {
             Movie y = x.movies.at(m);
             node->addNode(y.name, (tbase * -100) + ++mbase, true);
@@ -519,12 +519,12 @@ GenericTree* MoviesUI::getDisplayTreeByMovie()
     movies = &m_dataTreeByMovie;
     int mbase = 0;
     GenericTree *parent = new GenericTree("By Movie", 0, false);
-    for (unsigned int i = 0; i < movies->size(); i++)
+    for (int i = 0; i < movies->size(); i++)
     {
         int tbase = 0;
         Movie x = movies->at(i);
         GenericTree *node = new GenericTree(x.name, --mbase, false);
-        for (unsigned int m = 0; m < x.theaters.size(); m++)
+        for (int m = 0; m < x.theaters.size(); m++)
         {
             Theater y = x.theaters.at(m);
             node->addNode(y.name, (mbase * -100) + ++tbase, true);
