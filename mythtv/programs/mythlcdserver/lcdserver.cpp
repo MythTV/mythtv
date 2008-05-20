@@ -144,7 +144,7 @@ QStringList LCDServer::parseCommand(QString &command)
     QChar c;
     bool bInString = false;
 
-    for (uint x = 0; x < command.length(); x++)
+    for (int x = 0; x < command.length(); x++)
     {
         c = command[x];
         if (!bInString && c == '"')
@@ -349,7 +349,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, Q3Socket *socket)
     Q3PtrList<LCDTextItem> items;
     items.setAutoDelete(true);
 
-    for (uint x = 1; x < tokens.count(); x += 5)
+    for (int x = 1; x < tokens.count(); x += 5)
     {
         bool bOK;
         int row = tokens[x].toInt(&bOK);
@@ -486,7 +486,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, Q3Socket *socket)
     Q3PtrList<LCDMenuItem> items;
     items.setAutoDelete(true);
 
-    for (uint x = 3; x < tokens.count(); x += 5)
+    for (int x = 3; x < tokens.count(); x += 5)
     {
         QString text = tokens[x];
 

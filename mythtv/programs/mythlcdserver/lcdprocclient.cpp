@@ -516,7 +516,7 @@ QString LCDProcClient::expandString(const QString &aString)
     QString bString;
 
     // if version 5 then white space seperate the list of characters
-    for (uint x = 0; x < aString.length(); x++)
+    for (int x = 0; x < aString.length(); x++)
     {
         bString += aString.at(x) + QString(" ");
     }
@@ -592,12 +592,12 @@ void LCDProcClient::showStartupMessage(void)
     QStringList list = formatScrollerText(startup_message);
 
     int startrow = 1;
-    if (list.count() < lcdHeight)
+    if (list.count() < (int)lcdHeight)
         startrow = ((lcdHeight - list.count()) / 2) + 1;
 
-    for (uint x = 0; x < list.count(); x++)
+    for (int x = 0; x < list.count(); x++)
     {
-        if (x == lcdHeight)
+        if (x == (int)lcdHeight)
             break; 
         textItems.append(new LCDTextItem(x + startrow, ALIGN_LEFT, list[x], 
                     "Generic", false));
@@ -755,7 +755,7 @@ void LCDProcClient::scrollList()
                     scrollListWidget, scrollListRow);
 
     scrollListItem++;
-    if (scrollListItem >= scrollListItems.count())
+    if ((int)scrollListItem >= scrollListItems.count())
         scrollListItem = 0;
 }
 
@@ -945,7 +945,7 @@ void LCDProcClient::formatScrollingWidgets()
     if (lcdTextItems->isEmpty())
         return; // Weird...
 
-    unsigned int max_len = 0;
+    int max_len = 0;
     Q3PtrListIterator<LCDTextItem> it(*lcdTextItems);
     LCDTextItem *curItem;
 
@@ -961,7 +961,7 @@ void LCDProcClient::formatScrollingWidgets()
     while ((curItem = it.current()) != 0)
     {
         ++it;
-        if (curItem->getText().length() > lcdWidth)
+        if (curItem->getText().length() > (int)lcdWidth)
         {
             QString temp, temp2;
             temp = temp.fill(QChar(' '), max_len - curItem->getText().length());
@@ -979,7 +979,7 @@ void LCDProcClient::formatScrollingWidgets()
         }
     }
 
-    if (max_len <= lcdWidth)
+    if (max_len <= (int)lcdWidth)
         // We're done, no scrolling
         return;
 
@@ -1257,7 +1257,7 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
             if (curItem->isSelected())
             {
                 // Set the scroll flag if necessary, otherwise set it to false
-                if (curItem->ItemName().length()  > (lcdWidth - lcdStartCol))
+                if (curItem->ItemName().length()  > (int)(lcdWidth - lcdStartCol))
                 {
                     menuPreScrollTimer->start(2000, true);
                     curItem->setScroll(true);
@@ -1398,7 +1398,7 @@ void LCDProcClient::beginScrollingMenuText()
         ++it;
         // Don't setup for smooth scrolling if the item isn't long enough
         // (It causes problems with items being scrolled when they shouldn't)
-        if (curItem->ItemName().length()  > (lcdWidth - lcdStartCol))
+        if (curItem->ItemName().length()  > (int)(lcdWidth - lcdStartCol))
         {
             temp = temp.fill(QChar(' '), lcdWidth - curItem->getIndent() - 
                              lcdStartCol);
@@ -1456,7 +1456,7 @@ void LCDProcClient::scrollMenuText()
             if (curItem->isSelected())
             {
                 curItem->incrementScrollPos();
-                if (curItem->getScrollPos() > curItem->ItemName().length())
+                if ((int)curItem->getScrollPos() > curItem->ItemName().length())
                 {
                     // Scroll slower second and subsequent times through
                     menuScrollTimer->stop();
@@ -1467,7 +1467,7 @@ void LCDProcClient::scrollMenuText()
                 // Stop the timer if this item really doesn't need to scroll.
                 // This should never have to get invoked because in theory
                 // the code in startMenu has done its job. . .
-                if (curItem->ItemName().length()  < (lcdWidth - lcdStartCol))
+                if (curItem->ItemName().length()  < (int)(lcdWidth - lcdStartCol))
                     menuScrollTimer->stop();
 
                 if (lcdHeight == 2)
@@ -1517,8 +1517,8 @@ void LCDProcClient::scrollMenuText()
     // Find the longest line, if menuScrollPosition is longer then this, then 
     // reset them all
     curItem = it.toFirst();
-    unsigned int longest_line = 0;
-    unsigned int max_scroll_pos = 0;
+    int longest_line = 0;
+    int max_scroll_pos = 0;
 
     while ((curItem = it.current()) != 0)
     {
@@ -1526,7 +1526,7 @@ void LCDProcClient::scrollMenuText()
         if (curItem->ItemName().length() > longest_line)
             longest_line = curItem->ItemName().length();
 
-        if (curItem->getScrollPos() > max_scroll_pos)
+        if ((int)curItem->getScrollPos() > max_scroll_pos)
             max_scroll_pos = curItem->getScrollPos();
     }
 
@@ -1605,7 +1605,7 @@ void LCDProcClient::scrollMenuText()
             // Increment the scroll position counter for this item
             curItem->incrementScrollPos();
 
-            if (curItem->getScrollPos() <= longest_line)
+            if ((int)curItem->getScrollPos() <= longest_line)
                 aString += curItem->ItemName().mid(curItem->getScrollPos(), 
                                                    (lcdWidth-lcdStartCol));
 
@@ -2018,13 +2018,13 @@ QStringList LCDProcClient::formatScrollerText(const QString &text)
     int lastSplit = 0;
     QString line = "";
 
-    for (uint x = 0; x < text.length(); x++)
+    for (int x = 0; x < text.length(); x++)
     {
         if (separators.contains(text[x]) > 0)
             lastSplit = line.length();
 
         line += text[x];
-        if (line.length() > lcdWidth || text[x] == '|')
+        if (line.length() > (int)lcdWidth || text[x] == '|')
         {
             QString formatedLine;
             formatedLine.fill(' ', lcdWidth);
