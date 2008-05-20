@@ -2836,7 +2836,7 @@ void Scheduler::AddNewRecords(void)
         p->recgroup = result.value(21).toString();
         p->storagegroup = result.value(42).toString();
         p->playgroup = result.value(36).toString();
-        p->chancommfree = (result.value(23).toInt() == -2);
+        p->chancommfree = COMM_DETECT_COMMFREE == result.value(23).toInt();
         p->hostname = result.value(43).toString();
         p->cardid = result.value(24).toInt();
         p->inputid = result.value(25).toInt();
@@ -3183,7 +3183,8 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
-            proginfo->chancommfree = (result.value(15).toInt() == -2);
+            proginfo->chancommfree =
+                COMM_DETECT_COMMFREE == result.value(15).toInt();
             proginfo->chanstr = result.value(16).toString();
             if (proginfo->chanstr.isNull())
                 proginfo->chanstr = "";

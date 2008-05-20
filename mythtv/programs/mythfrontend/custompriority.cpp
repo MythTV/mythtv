@@ -153,7 +153,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     m_csql << "channel.callsign LIKE 'HBO%' ";
 
     m_clause->insertItem(tr("Only channels marked as commercial free"));
-    m_csql << "channel.commmethod = -2 ";
+    m_csql << QString("channel.commmethod = %1 ").arg(COMM_DETECT_COMMFREE);
 
     m_clause->insertItem(tr("Modify priority for a station on an input"));
     m_csql << "channel.callsign = 'ESPN' AND cardinput.cardinputid = 2";

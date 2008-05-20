@@ -35,7 +35,6 @@ using namespace std;
 #include "mythcommandlineparser.h"
 
 // Commercial Flagging headers
-#include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "CommDetectorFactory.h"
 #include "SlotRelayer.h"

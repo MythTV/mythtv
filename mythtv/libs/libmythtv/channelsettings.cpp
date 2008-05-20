@@ -1,5 +1,6 @@
 #include "channelsettings.h"
 #include "cardutil.h"
+#include "channelutil.h"
 
 QString ChannelDBStorage::whereClause(MSqlBindings &bindings)
 {
@@ -250,17 +251,13 @@ class CommMethod : public ComboBoxSetting, public ChannelDBStorage
         setHelpText(QObject::tr("Changes the method of "
                "commercial detection used for recordings on this channel or "
                "skips detection by marking the channel as Commercial Free."));
-        addSelection(QObject::tr("Use Global Setting"), "-1");
 
-        // Need to keep this in sync w/ programs/mythfrontend/globalsettings.cpp
-        addSelection(QObject::tr("All Available Methods"), "255");
-        addSelection(QObject::tr("Blank Frame Detection"), "1");
-        addSelection(QObject::tr("Blank Frame + Scene Change"), "3");
-        addSelection(QObject::tr("Scene Change Detection"), "2");
-        addSelection(QObject::tr("Logo Detection"), "4");
-        addSelection(QObject::tr("Experimental"), "511");
-        addSelection(QObject::tr("Commercial Free"), "-2");
+        deque<int> tmp = GetPreferredSkipTypeCombinations();
+        tmp.push_front(COMM_DETECT_UNINIT);
+        tmp.push_back(COMM_DETECT_COMMFREE);
 
+        for (uint i = 0; i < tmp.size(); i++)
+            addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
     }
 };
 

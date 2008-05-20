@@ -23,6 +23,7 @@
 #include "mythdbcon.h"
 #include "storagegroup.h"
 #include "previewgenerator.h"
+#include "channelutil.h" // for SkipTypes
 
 #define LOC QString("ProgramInfo: ")
 #define LOC_ERR QString("ProgramInfo, Error: ")
@@ -766,7 +767,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     p->chansign           = query.value(2).toString();
     p->channame           = query.value(3).toString();
     p->repeat             = 0;
-    p->chancommfree       = (query.value(4).toInt() == -2);
+    p->chancommfree       = COMM_DETECT_COMMFREE == query.value(4).toInt();
     p->chanOutputFilters  = query.value(5).toString();
     p->seriesid           = "";
     p->programid          = "";
@@ -897,7 +898,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->chanstr = query.value(6).toString();
         proginfo->chansign = query.value(7).toString();
         proginfo->channame = query.value(8).toString();
-        proginfo->chancommfree = (query.value(9).toInt() == -2);
+        proginfo->chancommfree = COMM_DETECT_COMMFREE == query.value(9).toInt();
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
         proginfo->programid = query.value(12).toString();
@@ -4765,7 +4766,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->chansign = query.value(8).toString();
         p->channame = query.value(9).toString();
         p->repeat = query.value(10).toInt();
-        p->chancommfree = (query.value(11).toInt() == -2);
+        p->chancommfree = COMM_DETECT_COMMFREE == query.value(11).toInt();
         p->chanOutputFilters = query.value(12).toString();
         p->seriesid = query.value(13).toString();
         p->programid = query.value(14).toString();

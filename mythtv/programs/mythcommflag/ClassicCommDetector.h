@@ -1,13 +1,17 @@
 #ifndef _CLASSIC_COMMDETECTOR_H_
 #define _CLASSIC_COMMDETECTOR_H_
 
+// Qt headers
 #include <QObject>
 #include <QMap>
 #include <QDateTime>
 
-#include "CommDetector.h"
+// MythTV headers
+#include "channelutil.h"
+#include "frame.h"
+
+// Commercial Flagging headers
 #include "CommDetectorBase.h"
-#include "libmythtv/frame.h"
 
 class NuppelVideoPlayer;
 class LogoDetectorBase;
@@ -32,7 +36,7 @@ class ClassicCommDetector : public CommDetectorBase
     Q_OBJECT
 
     public:
-        ClassicCommDetector(enum SkipTypes commDetectMethod, bool showProgress,
+        ClassicCommDetector(SkipType commDetectMethod, bool showProgress,
                             bool fullSpeed, NuppelVideoPlayer* nvp,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,

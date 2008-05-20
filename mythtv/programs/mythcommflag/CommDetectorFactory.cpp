@@ -7,7 +7,7 @@ class RemoteEncoder;
 
 CommDetectorBase*
 CommDetectorFactory::makeCommDetector(
-    enum SkipTypes commDetectMethod,
+    SkipType commDetectMethod,
     bool showProgress, bool fullSpeed,
     NuppelVideoPlayer* nvp,
     int chanid,

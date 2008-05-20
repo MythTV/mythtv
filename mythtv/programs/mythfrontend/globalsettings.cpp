@@ -441,17 +441,15 @@ static HostCheckBox *ExactSeeking()
 static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
-    bc->setLabel(QObject::tr("Commercial Skip Method"));
+    bc->setLabel(QObject::tr("Commercial Flagging Method"));
+    bc->setHelpText(QObject::tr(
+                        "This determines the method used by MythTV to "
+                        "detect when commercials start and end."));
 
-    // need to keep this in sync with libs/libmythtv/channelsettings.cpp
-    bc->addSelection(QObject::tr("All Available Methods"), "255");
-    bc->addSelection(QObject::tr("Blank Frame Detection"), "1");
-    bc->addSelection(QObject::tr("Blank Frame + Scene Change"), "3");
-    bc->addSelection(QObject::tr("Scene Change Detection"), "2");
-    bc->addSelection(QObject::tr("Logo Detection"), "4");
-    bc->addSelection(QObject::tr("Experimental"), "511");
-    bc->setHelpText(QObject::tr("This determines the method used by MythTV to "
-                    "detect when commercials start and end."));
+    deque<int> tmp = GetPreferredSkipTypeCombinations();
+    for (uint i = 0; i < tmp.size(); i++)
+        bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
+
     return bc;
 }
 

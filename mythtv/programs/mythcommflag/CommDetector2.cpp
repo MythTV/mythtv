@@ -15,9 +15,9 @@
 #include "mythdbcon.h"
 #include "compat.h"
 #include "programinfo.h"
+#include "channelutil.h"
 
 // Commercial Flagging headers
-#include "CommDetector.h"
 #include "CommDetector2.h"
 #include "CannyEdgeDetector.h"
 #include "FrameAnalyzer.h"

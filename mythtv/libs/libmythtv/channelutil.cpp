@@ -20,6 +20,53 @@ using namespace std;
 
 const QString ChannelUtil::kATSCSeparators = "(_|-|#|\\.)";
 
+QString SkipTypeToString(int flags)
+{
+    if (COMM_DETECT_COMMFREE == flags)
+        return QObject::tr("Commercial Free");
+    if (COMM_DETECT_UNINIT == flags)
+        return QObject::tr("Use Global Setting");
+
+    QChar chr = '0';
+    QString ret = QString("0x%1").arg(flags,3,16,chr);
+    bool blank = COMM_DETECT_BLANK & flags;
+    bool scene = COMM_DETECT_SCENE & flags;
+    bool logo  = COMM_DETECT_LOGO  & flags;
+    bool exp   = COMM_DETECT_2     & flags;
+
+    if (blank && scene && logo)
+        ret = QObject::tr("All Available Methods");
+    else if (blank && scene && !logo)
+        ret = QObject::tr("Blank Frame + Scene Change");
+    else if (blank && !scene && logo)
+        ret = QObject::tr("Blank Frame + Logo Detection");
+    else if (!blank && scene && logo)
+        ret = QObject::tr("Scene Change + Logo Detection");
+    else if (blank && !scene && !logo)
+        ret = QObject::tr("Blank Frame Detection");
+    else if (!blank && scene && !logo)
+        ret = QObject::tr("Scene Change Detection");
+    else if (!blank && !scene && logo)
+        ret = QObject::tr("Logo Detection");
+
+    if (exp)
+        ret = QObject::tr("Experimental") + ": " + ret;
+
+    return ret;
+}
+
+deque<int> GetPreferredSkipTypeCombinations(void)
+{
+    deque<int> tmp;
+    tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE | COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_BLANK);
+    tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE);
+    tmp.push_back(COMM_DETECT_SCENE);
+    tmp.push_back(COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_2 | COMM_DETECT_BLANK | COMM_DETECT_LOGO);
+    return tmp;
+}
+
 DBChannel::DBChannel(const DBChannel &other)
 {
     (*this) = other;

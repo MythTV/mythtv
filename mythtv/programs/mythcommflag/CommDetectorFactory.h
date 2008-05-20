@@ -1,7 +1,7 @@
 #ifndef _COMMDETECTOR_FACTORY_H_
 #define _COMMDETECTOR_FACTORY_H_
 
-#include "CommDetector.h"
+#include "channelutil.h"
 
 class CommDetectorBase;
 class NuppelVideoPlayer;
@@ -15,7 +15,7 @@ class CommDetectorFactory
     ~CommDetectorFactory() {}
 
     CommDetectorBase* makeCommDetector(
-        enum SkipTypes commDetectMethod,
+        SkipType commDetectMethod,
         bool showProgress,
         bool fullSpeed, NuppelVideoPlayer* nvp,
         int chanid,

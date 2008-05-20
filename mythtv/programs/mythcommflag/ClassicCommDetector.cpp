@@ -18,7 +18,6 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 
 // Commercial Flagging headers
-#include "CommDetector.h"
 #include "ClassicCommDetector.h"
 #include "ClassicLogoDetector.h"
 #include "ClassicSceneChangeDetector.h"
@@ -125,7 +124,7 @@ QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const
         .arg(toStringFrameMaskValues(flagMask, verbose));
 }
 
-ClassicCommDetector::ClassicCommDetector(enum SkipTypes commDetectMethod_in,
+ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
                                          NuppelVideoPlayer* nvp_in,

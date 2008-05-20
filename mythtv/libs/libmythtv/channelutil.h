@@ -2,6 +2,7 @@
 #define CHANUTIL_H
 
 #include <vector>
+#include <deque>
 using namespace std;
 
 #include <stdint.h>
@@ -12,6 +13,30 @@ using namespace std;
 #include "dtvmultiplex.h"
 
 class NetworkInformationTable;
+
+// This is used as a bitmask.
+typedef enum SkipTypes {
+    COMM_DETECT_COMMFREE    = -2,
+    COMM_DETECT_UNINIT      = -1,
+    COMM_DETECT_OFF         = 0x00000000,
+    COMM_DETECT_BLANK       = 0x00000001,
+    COMM_DETECT_BLANKS      = COMM_DETECT_BLANK,
+    COMM_DETECT_SCENE       = 0x00000002,
+    COMM_DETECT_LOGO        = 0x00000004,
+    COMM_DETECT_BLANK_SCENE = (COMM_DETECT_BLANKS | COMM_DETECT_SCENE),
+    COMM_DETECT_ALL         = (COMM_DETECT_BLANKS |
+                               COMM_DETECT_SCENE |
+                               COMM_DETECT_LOGO),
+    COMM_DETECT_2           = 0x00000100,
+    COMM_DETECT_2_LOGO      = COMM_DETECT_2 | COMM_DETECT_LOGO,
+    COMM_DETECT_2_BLANK     = COMM_DETECT_2 | COMM_DETECT_BLANKS,
+    COMM_DETECT_2_SCENE     = COMM_DETECT_2 | COMM_DETECT_SCENE,
+    /* Scene detection doesn't seem to be too useful (in the USA); there *
+     * are just too many false positives from non-commercial cut scenes. */
+    COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
+} SkipType;
+QString SkipTypeToString(int);
+deque<int> GetPreferredSkipTypeCombinations(void);
 
 class DBChannel
 {

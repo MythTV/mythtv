@@ -6,8 +6,10 @@
 #include <q3ptrlist.h>
 #include <q3valuelist.h>
 
+// MythTV headers
+#include "channelutil.h"
+
 // Commercial Flagging headers
-#include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "FrameAnalyzer.h"
 
@@ -31,7 +33,7 @@ class CommDetector2 : public CommDetectorBase
 {
 public:
     CommDetector2(
-        enum SkipTypes commDetectMethod,
+        SkipType commDetectMethod,
         bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
         int chanid, const QDateTime& startts, const QDateTime& endts,
         const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
