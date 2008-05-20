@@ -188,7 +188,7 @@ void MythListButton::SetPositionArrowStates(void)
     {
         int button = 0;
 
-        if ((m_scrollStyle == ScrollCenter) && m_selPosition <= (m_itemsVisible/2))
+        if ((m_scrollStyle == ScrollCenter) && m_selPosition <= (int)(m_itemsVisible/2))
         {
             button = (m_itemsVisible / 2) - m_selPosition;
         }
@@ -522,7 +522,7 @@ void MythListButton::MoveDown(MovementUnit unit)
                 ++m_topPosition;
             break;
         case ScrollFree :
-            if (m_topPosition + m_itemsVisible <= m_selPosition)
+            if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
             {
                 if (m_layout == LayoutHorizontal)
                     m_topPosition = m_selPosition - m_itemsVisible + 1;
@@ -583,7 +583,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
             break;
         case ScrollFree :
-            if (m_topPosition + m_itemsVisible <= m_selPosition)
+            if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
             {
                 m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
                                     / m_columns * m_columns;

@@ -375,8 +375,6 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
     qApp->unlock();
 
-    int numColors = im->numColors();
-
     QVector<QRgb> colorTable = im->colorTable();
 
     for (int i = 0; i < colorTable.count(); i++)
