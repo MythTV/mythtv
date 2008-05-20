@@ -205,7 +205,7 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
     bool enc_mismatch  = counts["ENCODER"]         && counts["NOT_ENCODER"];
     bool scan_mismatch = counts["SCAN"]            && counts["NO_SCAN"];
     bool fw_mismatch   = (counts["FIREWIRE"] &&
-                          (counts["FIREWIRE"] < types.size()));
+                          ((int)counts["FIREWIRE"] < types.size()));
 
     if (tune_mismatch)
     {

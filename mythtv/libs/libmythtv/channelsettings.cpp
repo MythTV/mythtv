@@ -125,7 +125,7 @@ ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
     addSelection(QObject::tr("Default"), "Default");
 
     QStringList list = GetFormats();
-    for (uint i = 0; i < list.size(); i++)
+    for (int i = 0; i < list.size(); i++)
         addSelection(list[i]);
 }
 

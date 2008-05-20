@@ -1748,7 +1748,7 @@ bool DiSEqCDevRotor::Load(void)
         // form of "angle1=index1:angle2=index2:..."
         QString positions = query.value(1).toString();
         QStringList pos = QStringList::split(":", positions);
-        for (uint i = 0; i < pos.count(); i++)
+        for (int i = 0; i < pos.count(); i++)
         {
             QStringList eq = QStringList::split("=", pos[i]);
             if (eq.count() == 2)

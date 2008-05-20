@@ -1169,7 +1169,7 @@ void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
 
         QString str = QObject::tr("Page Not Available",
                                   "Requested Teletext page not available");
-        for (uint i = 0; (i < 30) && i < str.length(); i++)
+        for (int i = 0; (i < 30) && i < str.length(); i++)
             DrawCharacter(surface, i+10, 0, str[i], 0);
 
         return;

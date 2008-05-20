@@ -641,7 +641,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         QString dispbuf = QString::fromUtf8(tmpbuf, len);
         VERBOSE(VB_VBI, QString("%1 '").arg(timecode[mode], 10));
         QString vbuf = "";
-        unsigned int i = 0;
+        int i = 0;
         while (i < dispbuf.length()) {
             QChar cp = dispbuf.at(i);
             switch (cp.unicode())
@@ -929,7 +929,7 @@ bool is_better(const QString &newStr, const QString &oldStr)
             return true;
 
         // check if the string contains any bogus characters
-        for (uint i = 0; i < newStr.length(); i++)
+        for (int i = 0; i < newStr.length(); i++)
             if (newStr[i].toAscii() < 0x20)
                 return false;
 

@@ -422,7 +422,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 adjust = 0;
-                for (unsigned int i=0; i < m_positionMap.size(); i++) 
+                for (int i=0; i < m_positionMap.size(); i++) 
                 {
                     if (keyFrameAdjustMap.contains(m_positionMap[i].adjFrame))
                         adjust += keyFrameAdjustMap[m_positionMap[i].adjFrame];

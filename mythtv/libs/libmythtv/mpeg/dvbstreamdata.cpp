@@ -696,7 +696,7 @@ bool DVBStreamData::HasCachedAllSDTs(bool current) const
     nit_cache_t::const_iterator it = _cached_nit.begin();
     for (; it != _cached_nit.end(); ++it)
     {
-        if ((*it)->TransportStreamCount() > _cached_sdts.size())
+        if ((int)(*it)->TransportStreamCount() > _cached_sdts.size())
             return false;
 
         for (uint i = 0; i < (*it)->TransportStreamCount(); i++)

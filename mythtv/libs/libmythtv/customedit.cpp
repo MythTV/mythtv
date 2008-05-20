@@ -650,7 +650,7 @@ void CustomEdit::storeClicked(void)
         else if (nameExists)
         {
             // replace item
-            unsigned i = maxex;
+            int i = maxex;
             while (i < m_csql.count())
             {
                 if (m_csql[i] == oldwhere)
@@ -684,7 +684,7 @@ void CustomEdit::storeClicked(void)
         else
         {
             // remove item
-            unsigned i = m_clause->currentItem();
+            int i = m_clause->currentItem();
             m_clause->removeItem(i);
             i++;
             while (i < m_csql.count())

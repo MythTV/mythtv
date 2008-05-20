@@ -137,7 +137,6 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
         for (int line = 0; line < sub->lines; ++line)
         {
             const char *subLine = sub->text[line];
-            int lineLength = strlen(subLine);
 
             // check if the string contains unknown chars to UTF8,
             // if the encoding has not been detected to be non-UTF8

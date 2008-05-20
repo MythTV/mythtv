@@ -52,7 +52,7 @@ DSMCCCache::~DSMCCCache()
 QString DSMCCCacheKey::toString() const
 {
     QString result;
-    for (uint i = 0; i < 4 && i < size(); i++)
+    for (int i = 0; i < 4 && i < size(); i++)
     {
         int x = at(i);
         if (x < 16)

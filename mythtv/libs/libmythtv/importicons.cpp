@@ -382,7 +382,7 @@ QStringList ImportIconsWizard::extract_csv(const QString& strLine)
     //Clean up the line and split out the fields
     QString str = strLine;
 
-    unsigned int pos = 0;
+    int pos = 0;
     bool fFinish = false;
     while(!fFinish)
     {

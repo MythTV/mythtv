@@ -1016,7 +1016,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
                 "WHERE sourceid=%1 AND serviceID=%2 AND mplexid=%3")
         .arg(source_id).arg(program_number).arg(mplexid));
 
-    for (uint i = 0; i < qstr.size(); i++)
+    for (int i = 0; i < qstr.size(); i++)
     {
         query.prepare(qstr[i]);
         if (!query.exec())

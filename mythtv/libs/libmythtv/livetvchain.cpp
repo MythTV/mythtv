@@ -190,7 +190,7 @@ void LiveTVChain::ReloadAll(void)
 {
     QMutexLocker lock(&m_lock);
 
-    uint prev_size = m_chain.size();
+    int prev_size = m_chain.size();
     m_chain.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());

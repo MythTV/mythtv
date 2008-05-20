@@ -143,7 +143,7 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
 {
     SignalMonitorValue smv;
     SignalMonitorList monitor_list;
-    for (uint i=0; i+1<slist.size(); i+=2)
+    for (int i=0; i+1<slist.size(); i+=2)
     {
 #if DEBUG_SIGNAL_MONITOR_VALUE
         cerr<<"Parse("<<slist[i]<<", ("<<slist[i+1]<<"))"<<endl;

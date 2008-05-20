@@ -74,7 +74,7 @@ class MPUBLIC ViewScheduleDiff : public MythDialog
     bool inFill;
     bool needFill;
 
-    unsigned int listPos;
+    int listPos;
 
     ProgramInfo *CurrentProgram(void);
 

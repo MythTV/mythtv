@@ -387,7 +387,7 @@ void OSD::SetTextSubtitles(const QStringList &lines)
             QString word = words.first();
             words.pop_front();
 
-            uint totLen = newString.length() + word.length() + 1;
+            int totLen = newString.length() + word.length() + 1;
             if (totLen > MAX_CHARACTERS_PER_ROW)
             {
                 // next word won't fit anymore, create a new line

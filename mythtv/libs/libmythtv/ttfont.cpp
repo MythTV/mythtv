@@ -160,14 +160,14 @@ void TTFFont::destroy_font_raster(Raster_Map * rmap)
 Raster_Map *TTFFont::calc_size(int *width, int *height,
                                const QString &text, bool double_size)
 {
-   unsigned int i, pw, ph;
+   unsigned int pw, ph;
    Raster_Map *rtmp;
 
    pw = 0;
    ph = ((max_ascent) - max_descent) / 64;
    ph = (double_size) ? ph<<1 : ph;
 
-   for (i = 0; i < text.length(); i++)
+   for (int i = 0; i < text.length(); i++)
    {
        unsigned short j = text[i].unicode();
 
