@@ -374,17 +374,18 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                 if ((*i).callsign.isEmpty())
                 {
-                    QStringList words = QStringList::split(" ",
-                                        (*i).name.simplifyWhiteSpace().upper());
+                    QStringList words = (*i).name.simplifyWhiteSpace().upper().split(" ");
                     QString callsign = "";
-                    if (words[0].isEmpty())
+                    QString w1 = words.size() > 0 ? words[0] : QString();
+                    QString w2 = words.size() > 1 ? words[1] : QString();
+                    if (w1.isEmpty())
                         callsign = QString::number(chanid);
-                    else if (words[1].isEmpty())
+                    else if (w2.isEmpty())
                         callsign = words[0].left(5);
                     else
                     {
-                        callsign = words[0].left(words[1].length() == 1 ? 4:3);
-                        callsign += words[1].left(5 - callsign.length());
+                        callsign = w1.left(w2.length() == 1 ? 4:3);
+                        callsign += w2.left(5 - callsign.length());
                     }
                     (*i).callsign = callsign;
                 }
