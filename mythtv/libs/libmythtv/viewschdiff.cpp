@@ -243,7 +243,7 @@ void ViewScheduleDiff::cursorUp(bool page)
 {
     if (listPos > 0)
     {
-        unsigned int move = (page ? listsize : 1);
+        int move = (page ? listsize : 1);
         if (move > listPos) listPos = 0;
         else listPos -= move;
         update(fullRect);

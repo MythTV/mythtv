@@ -207,7 +207,7 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
 {
    FT_F26Dot6 x, y, xmin, ymin, xmax, ymax;
    FT_BBox bbox;
-   unsigned int i, ioff, iread;
+   unsigned int ioff, iread;
    char *off, *off2, *read, *_off, *_off2, *_read;
    int x_offset, y_offset;
    unsigned short j, previous;
@@ -225,7 +225,7 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
    rtmp = NULL;
    previous = 0;
 
-   for (i = 0; i < text.length(); i++)
+   for (int i = 0; i < text.length(); i++)
    {
        j = text[i].unicode();
 
@@ -687,11 +687,11 @@ void TTFFont::Reinit(float wscale, float hmult)
 
 void TTFFont::CalcWidth(const QString &text, int *width_return)
 {
-   unsigned int i, pw;
+   unsigned int pw;
 
    pw = 0;
 
-   for (i = 0; i < text.length(); i++)
+   for (int i = 0; i < text.length(); i++)
    {
 	unsigned short j = text[i].unicode();
 

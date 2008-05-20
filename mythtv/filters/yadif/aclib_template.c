@@ -133,7 +133,9 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 	void *retval;
 	size_t i;
 	retval = to;
-  long oldbx;
+	long oldbx;
+
+	(void) oldbx; // stop compiler warning
 #ifdef STATISTIC
   //statistic
 	{

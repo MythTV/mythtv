@@ -58,7 +58,7 @@ MHParseText::~MHParseText()
 // Get the next character.
 void MHParseText::GetNextChar()
 {
-    if (m_p >= m_data.size())
+    if ((int)m_p >= m_data.size())
         m_ch = EOF;
     else m_ch = m_data[m_p++];
 }
