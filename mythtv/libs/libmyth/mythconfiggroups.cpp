@@ -595,7 +595,7 @@ JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
     VerticalConfigurationGroup(true, false, true, true)
 {
     //setLabel(tr("Jump To Buttons"));
-    for (uint i = 0; i < labels.size(); i++)
+    for (int i = 0; i < labels.size(); i++)
     {
         TransButtonSetting *button =
             new TransButtonSetting(QString::number(i));

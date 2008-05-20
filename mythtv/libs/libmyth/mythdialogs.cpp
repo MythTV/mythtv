@@ -818,8 +818,8 @@ DialogCode MythPopupBox::ShowButtonPopup(
     popup->addLabel(message, Medium, true);
     popup->addLabel("");
 
-    const uint def = CalcItemIndex(default_button);
-    for (unsigned int i = 0; i < buttonmsgs.size(); i++ )
+    const int def = CalcItemIndex(default_button);
+    for (int i = 0; i < buttonmsgs.size(); i++ )
     {
         QAbstractButton *but = popup->addButton(buttonmsgs[i]);
         if (def == i)

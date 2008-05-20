@@ -160,7 +160,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
     if ((kDialogCodeRejected == ret) || (cancelbtn == ret))
         return (MythMediaDevice *)-1;
 
-    uint idx = MythDialog::CalcItemIndex(ret);
+    int idx = MythDialog::CalcItemIndex(ret);
     if (idx < drives.count())
         return drives[idx];
 

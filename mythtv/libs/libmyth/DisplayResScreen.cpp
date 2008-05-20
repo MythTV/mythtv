@@ -42,7 +42,7 @@ DisplayResScreen::DisplayResScreen(const QString &str)
         width_mm = slist[2].toInt();
         height_mm = slist[3].toInt();
         aspect = slist[4].toDouble();
-        for (uint i = 5; i<slist.size(); ++i)
+        for (int i = 5; i<slist.size(); ++i)
             refreshRates.push_back(slist[i].toShort());
     }
 }
@@ -75,7 +75,7 @@ QStringList DisplayResScreen::Convert(const vector<DisplayResScreen>& dsr)
 DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 {
     vector<DisplayResScreen> dsr;
-    for (uint i=0; i<slist.size(); ++i)
+    for (int i=0; i<slist.size(); ++i)
         dsr.push_back(DisplayResScreen(slist[i]));
     return dsr;
 }

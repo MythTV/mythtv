@@ -102,7 +102,7 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
 
     if (gContext->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        for (int i = 0; i < actions.size() && !handled; i++)
         {
             const QString &action = actions[i];
             handled = true;

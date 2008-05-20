@@ -148,7 +148,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
     QString result = "";
     QFile checkFile("");
 
-    unsigned int curDir = 0;
+    int curDir = 0;
     while (curDir < m_dirlist.size())
     {
         QString testFile = m_dirlist[curDir] + "/" + filename;
@@ -202,7 +202,7 @@ QString StorageGroup::FindNextDirMostFree(void)
         nextDir = m_dirlist[0];
 
     QDir checkDir("");
-    unsigned int curDir = 0;
+    int curDir = 0;
     while (curDir < m_dirlist.size())
     {
         checkDir.setPath(m_dirlist[curDir]);
@@ -668,7 +668,7 @@ void StorageGroupListEditor::load(void)
     else
         createAddDefaultButton = true;
 
-    unsigned int curGroup = 0;
+    int curGroup = 0;
     QString groupName;
     while (curGroup < StorageGroup::kSpecialGroups.size())
     {
@@ -683,7 +683,7 @@ void StorageGroupListEditor::load(void)
         curGroup++;
     }
 
-    unsigned int curName = 0;
+    int curName = 0;
     while (curName < names.size())
     {
         if ((names[curName] != "Default") &&
