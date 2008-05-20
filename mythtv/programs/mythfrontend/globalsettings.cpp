@@ -771,15 +771,29 @@ static GlobalSpinBox *RecordOverTime()
     return bs;
 }
 
-static GlobalLineEdit *OverTimeCategory()
+static GlobalComboBox *OverTimeCategory()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("OverTimeCategory");
-    ge->setLabel(QObject::tr("Category of shows to be extended"));
-    ge->setValue(QObject::tr("category name"));
-    ge->setHelpText(QObject::tr("For a specific category (e.g. "
+    GlobalComboBox *gc = new GlobalComboBox("OverTimeCategory");
+    gc->setLabel(QObject::tr("Category of shows to be extended"));
+    gc->setHelpText(QObject::tr("For a special category (e.g. "
                     "\"Sports event\"), request that shows be autoextended. "
                     "Only works if a show's category can be determined."));
-    return ge;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT category FROM program GROUP BY category;");
+
+    gc->addSelection("", "");
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString key = QString::fromUtf8(query.value(0).toString());
+            if (!key.stripWhiteSpace().isEmpty())
+                gc->addSelection(key, key);
+        }
+    }
+
+    return gc;
 }
 
 static GlobalSpinBox *CategoryOverTime()
