@@ -346,7 +346,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Status", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         QString currentItem;
@@ -1571,7 +1571,7 @@ void StatusBox::doMachineStatus()
                 contentLines[count++] +=
                     QString("   ") + QObject::tr("Directories:");
 
-                unsigned int curToken = 0;
+                int curToken = 0;
                 while (curToken < tokens.size())
                     contentLines[count++] =
                         QString("      ") + tokens[curToken++];

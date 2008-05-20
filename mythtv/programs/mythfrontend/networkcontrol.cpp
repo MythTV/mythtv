@@ -32,7 +32,7 @@ const int kNetworkControlCloseEvent     = 35672;
  * @param minchars the minimum length of test in order to declare a match
  * @return true if @p test is the initial substring of @p command
  */
-static bool is_abbrev(QString const& command, QString const& test, unsigned minchars = 1)
+static bool is_abbrev(QString const& command, QString const& test, int minchars = 1)
 {
     if (test.length() < minchars)
         return command.lower() == test.lower();
@@ -415,8 +415,8 @@ QString NetworkControl::processKey(QStringList tokens)
     if (gContext->GetMainWindow()->currentWidget())
         keyDest = gContext->GetMainWindow()->currentWidget()->focusWidget();
 
-    unsigned int curToken = 1;
-    unsigned int tokenLen = 0;
+    int curToken = 1;
+    int tokenLen = 0;
     while (curToken < tokens.size())
     {
         tokenLen = tokens[curToken].length();
@@ -450,7 +450,7 @@ QString NetworkControl::processKey(QStringList tokens)
                 QStringList tokenParts =
                     QStringList::split("+", tokens[curToken]);
 
-                unsigned int partNum = 0;
+                int partNum = 0;
                 while (partNum < (tokenParts.size() - 1))
                 {
                     if (tokenParts[partNum].upper() == "CTRL")
@@ -846,7 +846,7 @@ void NetworkControl::customEvent(QEvent *e)
             (tokens[1] == "ANSWER"))
         {
             answer = tokens[2];
-            for (unsigned int i = 3; i < tokens.size(); i++)
+            for (int i = 3; i < tokens.size(); i++)
                 answer += QString(" ") + tokens[i];
             gotAnswer = true;
         }
@@ -854,7 +854,7 @@ void NetworkControl::customEvent(QEvent *e)
                  (tokens[1] == "RESPONSE"))
         {
             QString response = tokens[2];
-            for (unsigned int i = 3; i < tokens.size(); i++)
+            for (int i = 3; i < tokens.size(); i++)
                 response += QString(" ") + tokens[i];
             nrLock.lock();
             networkControlReplies.push_back(response);

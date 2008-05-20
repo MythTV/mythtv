@@ -809,14 +809,14 @@ static VerticalConfigurationGroup *CategoryOverTimeSettings()
     return vcg;
 }
 
-static QString trunc(const QString &str, uint len)
+static QString trunc(const QString &str, int len)
 {
     if (str.length() > len)
         return str.mid(0, len - 5) + " . . . ";
     return str;
 }
 
-static QString pad(const QString &str, uint len)
+static QString pad(const QString &str, int len)
 {
     QString tmp = str;
 
