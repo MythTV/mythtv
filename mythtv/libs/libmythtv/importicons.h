@@ -146,9 +146,10 @@ private:
     /*! \brief checks and attempts to download the logo file to the appropriate
      *   place
      * \param str the string of the downloaded url
+     * \param localChanId the local ID number of the channel
      * \return true/false
      */
-    bool checkAndDownload(const QString& str);
+    bool checkAndDownload(const QString& str, const QString& localChanId);
 
     /*! \brief attempt the inital load of the TV channel information
      * \return the number of TV channels

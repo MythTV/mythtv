@@ -123,9 +123,9 @@ void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
     {
         case STATE_NORMAL:
             if (!m_editManual->getValue().isEmpty())
-                 m_buttonManual->setEnabled(true);
+                m_buttonManual->setEnabled(true);
             else
-            m_buttonManual->setEnabled(false);
+                m_buttonManual->setEnabled(false);
             if (m_missingCount < m_missingMaxCount)
             {
                 if (m_missingMaxCount < 2) //When there's only one icon, nothing to skip to!
@@ -210,7 +210,7 @@ void ImportIconsWizard::menuSelection(int nIndex)
                             arg(escape_csv(entry2.strServiceId));
 
     if ((!isBlocked(m_strMatches)) &&
-            (checkAndDownload(entry.strLogo)))
+            (checkAndDownload(entry.strLogo, entry2.strChanId)))
     {
 
         if (m_missingMaxCount > 1)
@@ -449,7 +449,7 @@ QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
     return str;
 }
 
-bool ImportIconsWizard::checkAndDownload(const QString& str)
+bool ImportIconsWizard::checkAndDownload(const QString& str, const QString& localChanId)
 {
     // Do not try and access dialog within this function
 
@@ -477,7 +477,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& str)
 
         query.prepare(qstr);
         query.bindValue(":ICON", m_strChannelDir+str2);
-        query.bindValue(":CHANID", (*m_iter).strChanId);
+        query.bindValue(":CHANID", localChanId);
 
         if (!query.exec())
         {
@@ -613,7 +613,7 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
             {
                 QStringList ret = extract_csv(*begin);
                 VERBOSE(VB_CHANNEL, QString("Icon Import: findmissing : %1 %2 %3 %4 %5").arg(ret[0]).arg(ret[1]).arg(ret[2]).arg(ret[3]).arg(ret[4]));
-                checkAndDownload(ret[4]);
+                checkAndDownload(ret[4], (*m_iter).strChanId);
             }
         }
         return true;
