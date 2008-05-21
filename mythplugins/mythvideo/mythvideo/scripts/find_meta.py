@@ -537,7 +537,6 @@ def find_metadata_for_video_path(pathName):
 			if (len(candidates) == 2) and (candidates[0][0] == candidates[1][0]):
 				imdb_id = candidates[0][0]
 			elif len(candidates) > 1:
-				import pdb; pdb.set_trace()
 				print "Got multiple candidates for title search '%s'. " % title
 				if not interactive:
 					print "Use the '-a' or '-i' switch to choose the correct one."
