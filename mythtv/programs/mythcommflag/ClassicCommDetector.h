@@ -31,6 +31,8 @@ class FrameInfoEntry
     QString toString(uint64_t frame, bool verbose) const;
 };
 
+typedef QMap<long long, int> comm_map_t;
+
 class ClassicCommDetector : public CommDetectorBase
 {
     Q_OBJECT
@@ -44,7 +46,7 @@ class ClassicCommDetector : public CommDetectorBase
                             const QDateTime& recordingStopsAt_in);
         virtual ~ClassicCommDetector();
         bool go();
-        void getCommercialBreakList(QMap<long long, int> &comms);
+        void getCommercialBreakList(comm_map_t &comms);
         void recordingFinished(long long totalFileSize);
         void requestCommBreakMapUpdate(void);
 
@@ -76,11 +78,11 @@ class ClassicCommDetector : public CommDetectorBase
         void SetVideoParams(float aspect);
         void ProcessFrame(VideoFrame *frame, long long frame_number);
         void ClearAllMaps(void);
-        void GetBlankCommMap(QMap<long long, int> &comms);
-        void GetBlankCommBreakMap(QMap<long long, int> &comms);
-        void GetSceneChangeMap(QMap<long long, int> &scenes,
+        void GetBlankCommMap(comm_map_t &comms);
+        void GetBlankCommBreakMap(comm_map_t &comms);
+        void GetSceneChangeMap(comm_map_t &scenes,
                                long long start_frame);
-        void BuildMasterCommList(void);
+        comm_map_t Combine2Maps(comm_map_t &a, comm_map_t &b) const;
         void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
                               int format, int aspect);
         void BuildAllMethodsCommList(void);
@@ -88,12 +90,12 @@ class ClassicCommDetector : public CommDetectorBase
         void BuildSceneChangeCommList(void);
         void BuildLogoCommList();
         void MergeBlankCommList(void);
-        bool FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap);
-        void DumpMap(QMap<long long, int> &map);
-        void CondenseMarkMap(QMap<long long, int>&map, int spacing, int length);
-        void ConvertShowMapToCommMap(QMap<long long, int>&map);
+        bool FrameIsInBreakMap(long long f, const comm_map_t &breakMap) const;
+        void DumpMap(comm_map_t &map);
+        void CondenseMarkMap(comm_map_t&map, int spacing, int length);
+        void ConvertShowMapToCommMap(comm_map_t&map);
         void CleanupFrameInfo(void);
-        void GetLogoCommBreakMap(QMap<long long, int> &map);
+        void GetLogoCommBreakMap(comm_map_t &map);
 
         enum SkipTypes commDetectMethod;
         bool showProgress;
@@ -152,13 +154,13 @@ class ClassicCommDetector : public CommDetectorBase
         unsigned char *framePtr;
 
         QMap<long long, FrameInfoEntry> frameInfo;
-        QMap<long long, int> blankFrameMap;
-        QMap<long long, int> blankCommMap;
-        QMap<long long, int> blankCommBreakMap;
-        QMap<long long, int> sceneMap;
-        QMap<long long, int> sceneCommBreakMap;
-        QMap<long long, int> commBreakMap;
-        QMap<long long, int> logoCommBreakMap;
+        comm_map_t blankFrameMap;
+        comm_map_t blankCommMap;
+        comm_map_t blankCommBreakMap;
+        comm_map_t sceneMap;
+        comm_map_t sceneCommBreakMap;
+        comm_map_t commBreakMap;
+        comm_map_t logoCommBreakMap;
 
         bool frameIsBlank;
         bool sceneHasChanged;

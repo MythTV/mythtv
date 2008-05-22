@@ -433,8 +433,8 @@ bool ClassicCommDetector::go()
              ((currentFrameNumber % 500) == 0)))
         {
             QMap<long long,int> commBreakMap;
-            QMap<long long, int>::Iterator it;
-            QMap<long long, int>::Iterator lastIt;
+            comm_map_t::Iterator it;
+            comm_map_t::Iterator lastIt;
             bool mapsAreIdentical = false;
 
             getCommercialBreakList(commBreakMap);
@@ -600,7 +600,7 @@ void ClassicCommDetector::sceneChangeDetectorHasNewInformation(
     frameInfo[framenum].sceneChangePercent = (int) (debugValue*100);
 }
 
-void ClassicCommDetector::getCommercialBreakList(QMap<long long, int> &marks)
+void ClassicCommDetector::getCommercialBreakList(comm_map_t &marks)
 {
 
     VERBOSE(VB_COMMFLAG, "CommDetect::GetCommBreakMap()");
@@ -609,38 +609,68 @@ void ClassicCommDetector::getCommercialBreakList(QMap<long long, int> &marks)
 
     CleanupFrameInfo();
 
-    switch (commDetectMethod)
+    bool blank = COMM_DETECT_BLANK & commDetectMethod;
+    bool scene = COMM_DETECT_SCENE & commDetectMethod;
+    bool logo  = COMM_DETECT_LOGO  & commDetectMethod;
+
+    if (COMM_DETECT_OFF == commDetectMethod)
+        return;
+
+    if (!blank && !scene && !logo)
     {
-            case COMM_DETECT_OFF:         return;
-
-            case COMM_DETECT_BLANKS:      BuildBlankFrameCommList();
-                                          marks = blankCommBreakMap;
-                                          break;
-
-            case COMM_DETECT_SCENE:       BuildSceneChangeCommList();
-                                          marks = sceneCommBreakMap;
-                                          break;
-
-            case COMM_DETECT_BLANK_SCENE: BuildBlankFrameCommList();
-                                          BuildSceneChangeCommList();
-                                          BuildMasterCommList();
-                                          marks = commBreakMap;
-                                          break;
-
-            case COMM_DETECT_LOGO:        BuildLogoCommList();
-                                          marks = logoCommBreakMap;
-                                          break;
-
-            case COMM_DETECT_ALL:         BuildAllMethodsCommList();
-                                          marks = commBreakMap;
-                                          break;
-            default: VERBOSE(VB_COMMFLAG,
-                             QString("Unexpected commDetectMethod: %1")
-                             .arg(commDetectMethod));
-                     break;
+        VERBOSE(VB_COMMFLAG,
+                QString("Unexpected commDetectMethod: 0x%1")
+                .arg(commDetectMethod,0,16));
+        return;
     }
 
-    VERBOSE(VB_COMMFLAG, "Final Commercial Break Map" );
+    if (blank && scene && logo)
+    {
+        BuildAllMethodsCommList();
+        marks = commBreakMap;
+        VERBOSE(VB_COMMFLAG, "Final Commercial Break Map");
+        return;
+    }
+
+    if (blank)
+    {
+        BuildBlankFrameCommList();
+        marks = blankCommBreakMap;
+    }
+
+    if (scene)
+    {
+        BuildSceneChangeCommList();
+        marks = sceneCommBreakMap;
+    }
+
+    if (logo)
+    {
+        BuildLogoCommList();
+        marks = logoCommBreakMap;
+    }
+
+    int cnt = ((blank) ? 1 : 0) + ((scene) ? 1 : 0) + ((logo) ? 1 : 0);
+    if (cnt == 2)
+    {
+        if (blank && scene)
+        {
+            marks = commBreakMap = Combine2Maps(
+                blankCommBreakMap, sceneCommBreakMap);
+        }
+        else if (blank && logo)
+        {
+            marks = commBreakMap = Combine2Maps(
+                blankCommBreakMap, logoCommBreakMap);
+        }
+        else if (scene && logo)
+        {
+            marks = commBreakMap = Combine2Maps(
+                sceneCommBreakMap, logoCommBreakMap);
+        }
+    }
+
+    VERBOSE(VB_COMMFLAG, "Final Commercial Break Map");
 }
 
 void ClassicCommDetector::recordingFinished(long long totalFileSize)
@@ -953,7 +983,7 @@ void ClassicCommDetector::ClearAllMaps(void)
     commBreakMap.clear();
 }
 
-void ClassicCommDetector::GetBlankCommMap(QMap<long long, int> &comms)
+void ClassicCommDetector::GetBlankCommMap(comm_map_t &comms)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetBlankCommMap()");
 
@@ -963,7 +993,7 @@ void ClassicCommDetector::GetBlankCommMap(QMap<long long, int> &comms)
     comms = blankCommMap;
 }
 
-void ClassicCommDetector::GetBlankCommBreakMap(QMap<long long, int> &comms)
+void ClassicCommDetector::GetBlankCommBreakMap(comm_map_t &comms)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetBlankCommBreakMap()");
 
@@ -973,12 +1003,12 @@ void ClassicCommDetector::GetBlankCommBreakMap(QMap<long long, int> &comms)
     comms = blankCommBreakMap;
 }
 
-void ClassicCommDetector::GetSceneChangeMap(QMap<long long, int> &scenes,
+void ClassicCommDetector::GetSceneChangeMap(comm_map_t &scenes,
         long long start_frame)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetSceneChangeMap()");
 
-    QMap<long long, int>::Iterator it;
+    comm_map_t::Iterator it;
 
     if (start_frame == -1)
         scenes.clear();
@@ -988,79 +1018,80 @@ void ClassicCommDetector::GetSceneChangeMap(QMap<long long, int> &scenes,
             scenes[it.key()] = it.data();
 }
 
-void ClassicCommDetector::BuildMasterCommList(void)
+comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildMasterCommList()");
 
-    if (blankCommBreakMap.size())
-    {
-        QMap<long long, int>::Iterator it;
+    comm_map_t newMap;
 
-        for(it = blankCommBreakMap.begin(); it != blankCommBreakMap.end(); ++it)
-            commBreakMap[it.key()] = it.data();
+    if (a.size())
+    {
+        comm_map_t::const_iterator it = a.begin();
+        for (; it != a.end(); ++it)
+            newMap[it.key()] = it.data();
     }
 
-    if ((blankCommBreakMap.size() > 1) &&
-        (sceneCommBreakMap.size() > 1))
+    if ((a.size() > 1) &&
+        (b.size() > 1))
     {
         // see if beginning of the recording looks like a commercial
-        QMap<long long, int>::Iterator it_a;
-        QMap<long long, int>::Iterator it_b;
+        comm_map_t::const_iterator it_a;
+        comm_map_t::const_iterator it_b;
 
-        it_a = blankCommBreakMap.begin();
-        it_b = sceneCommBreakMap.begin();
+        it_a = a.begin();
+        it_b = b.begin();
 
         if ((it_b.key() < 2) &&
             (it_a.key() > 2))
         {
-            commBreakMap.erase(it_a.key());
-            commBreakMap[0] = MARK_COMM_START;
+            newMap.erase(it_a.key());
+            newMap[0] = MARK_COMM_START;
         }
 
 
         // see if ending of recording looks like a commercial
-        QMap<long long, int>::const_iterator it;
-        long long max_blank = 0;
-        long long max_scene = 0;
+        comm_map_t::const_iterator it;
+        long long max_a = 0;
+        long long max_b = 0;
 
-        it = blankCommBreakMap.begin();
-        for (; it != blankCommBreakMap.end(); ++it)
+        it = a.begin();
+        for (; it != a.end(); ++it)
         {
-            if ((it.data() == MARK_COMM_END) && (it.key() > max_blank))
-                max_blank = it.key();
+            if ((it.data() == MARK_COMM_END) && (it.key() > max_a))
+                max_a = it.key();
         }
 
-        it = sceneCommBreakMap.begin();
-        for (; it != sceneCommBreakMap.end(); ++it)
+        it = b.begin();
+        for (; it != b.end(); ++it)
         {
-            if ((it.data() == MARK_COMM_END) && (it.key() > max_scene))
-                max_scene = it.key();
+            if ((it.data() == MARK_COMM_END) && (it.key() > max_b))
+                max_b = it.key();
         }
 
-        if ((max_blank < (framesProcessed - 2)) &&
-            (max_scene > (framesProcessed - 2)))
+        if ((max_a < (framesProcessed - 2)) &&
+            (max_b > (framesProcessed - 2)))
         {
-            commBreakMap.erase(max_blank);
-            commBreakMap[framesProcessed] = MARK_COMM_END;
+            newMap.erase(max_a);
+            newMap[framesProcessed] = MARK_COMM_END;
         }
     }
 
-    if ((blankCommBreakMap.size() > 3) &&
-        (sceneCommBreakMap.size() > 1))
+    if ((a.size() > 3) &&
+        (b.size() > 1))
     {
-        QMap<long long, int>::Iterator it_a;
-        QMap<long long, int>::Iterator it_b;
+        comm_map_t::const_iterator it_a;
+        comm_map_t::const_iterator it_b;
         long long b_start, b_end;
         long long s_start, s_end;
 
         b_start = b_end = -1;
         s_start = s_end = -1;
 
-        it_a = blankCommBreakMap.begin();
+        it_a = a.begin();
         it_a++;
         it_b = it_a;
         it_b++;
-        while(it_b != blankCommBreakMap.end())
+        while(it_b != a.end())
         {
             long long fdiff = it_b.key() - it_a.key();
             bool allTrue = false;
@@ -1072,21 +1103,23 @@ void ClassicCommDetector::BuildMasterCommList(void)
                 allTrue = true;
 
                 while ((f <= framesProcessed) && (f < it_b.key()) && (allTrue))
-                    allTrue = FrameIsInBreakMap(f++, sceneCommBreakMap);
+                    allTrue = FrameIsInBreakMap(f++, b);
             }
 
             if (allTrue)
             {
-                commBreakMap.erase(it_a.key());
-                commBreakMap.erase(it_b.key());
+                newMap.erase(it_a.key());
+                newMap.erase(it_b.key());
             }
 
             it_a++; it_a++;
             it_b++;
-            if (it_b != blankCommBreakMap.end())
+            if (it_b != a.end())
                 it_b++;
         }
     }
+
+    return newMap;
 }
 
 void ClassicCommDetector::UpdateFrameBlock(FrameBlock *fbp,
@@ -1139,8 +1172,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     int aspect = COMM_ASPECT_NORMAL;
     QString msg;
     long long formatCounts[COMM_FORMAT_MAX];
-    QMap<long long, int> tmpCommMap;
-    QMap<long long, int>::Iterator it;
+    comm_map_t tmpCommMap;
+    comm_map_t::Iterator it;
 
     commBreakMap.clear();
 
@@ -1816,7 +1849,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     int frames = 0;
     int commercials = 0;
     int i, x;
-    QMap<long long, int>::Iterator it;
+    comm_map_t::Iterator it;
 
     blankCommMap.clear();
 
@@ -2020,9 +2053,9 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
     if (section_start >= 0)
         sceneCommBreakMap[framesProcessed] = MARK_COMM_END;
 
-    QMap<long long, int>::Iterator it;
-    QMap<long long, int>::Iterator prev;
-    QMap<long long, int> deleteMap;
+    comm_map_t::Iterator it;
+    comm_map_t::Iterator prev;
+    comm_map_t deleteMap;
 
     it = sceneCommBreakMap.begin();
     prev = it;
@@ -2059,7 +2092,7 @@ void ClassicCommDetector::BuildLogoCommList()
     CondenseMarkMap(logoCommBreakMap, (int)(25 * fps), (int)(30 * fps));
     ConvertShowMapToCommMap(logoCommBreakMap);
 
-    QMap<long long, int>::Iterator it;
+    comm_map_t::Iterator it;
     VERBOSE(VB_COMMFLAG, "Logo Commercial Break Map" );
     for(it = logoCommBreakMap.begin(); it != logoCommBreakMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
@@ -2068,8 +2101,8 @@ void ClassicCommDetector::BuildLogoCommList()
 
 void ClassicCommDetector::MergeBlankCommList(void)
 {
-    QMap<long long, int>::Iterator it;
-    QMap<long long, int>::Iterator prev;
+    comm_map_t::Iterator it;
+    comm_map_t::Iterator prev;
     QMap<long long, long long> tmpMap;
     QMap<long long, long long>::Iterator tmpMap_it;
     QMap<long long, long long>::Iterator tmpMap_prev;
@@ -2131,8 +2164,8 @@ void ClassicCommDetector::MergeBlankCommList(void)
     }
 }
 
-bool ClassicCommDetector::FrameIsInBreakMap(long long f,
-                                            QMap<long long, int> &breakMap)
+bool ClassicCommDetector::FrameIsInBreakMap(
+    long long f, const comm_map_t &breakMap) const
 {
     for(long long i = f; i < framesProcessed; i++)
         if (breakMap.contains(i))
@@ -2157,9 +2190,9 @@ bool ClassicCommDetector::FrameIsInBreakMap(long long f,
     return false;
 }
 
-void ClassicCommDetector::DumpMap(QMap<long long, int> &map)
+void ClassicCommDetector::DumpMap(comm_map_t &map)
 {
-    QMap<long long, int>::Iterator it;
+    comm_map_t::Iterator it;
     QString msg;
 
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");
@@ -2181,12 +2214,12 @@ void ClassicCommDetector::DumpMap(QMap<long long, int> &map)
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");
 }
 
-void ClassicCommDetector::CondenseMarkMap(QMap<long long, int>&map, int spacing,
+void ClassicCommDetector::CondenseMarkMap(comm_map_t&map, int spacing,
                                           int length)
 {
-    QMap<long long, int>::Iterator it;
-    QMap<long long, int>::Iterator prev;
-    QMap<long long, int>tmpMap;
+    comm_map_t::Iterator it;
+    comm_map_t::Iterator prev;
+    comm_map_t tmpMap;
 
     if (map.size() <= 2)
         return;
@@ -2246,9 +2279,9 @@ void ClassicCommDetector::CondenseMarkMap(QMap<long long, int>&map, int spacing,
                 .arg((long int)it.key()).arg(it.data()));
 }
 
-void ClassicCommDetector::ConvertShowMapToCommMap(QMap<long long, int>&map)
+void ClassicCommDetector::ConvertShowMapToCommMap(comm_map_t&map)
 {
-    QMap<long long, int>::Iterator it;
+    comm_map_t::Iterator it;
 
     if (map.size() == 0)
         return;
@@ -2375,7 +2408,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
     }
 }
 
-void ClassicCommDetector::GetLogoCommBreakMap(QMap<long long, int> &map)
+void ClassicCommDetector::GetLogoCommBreakMap(comm_map_t &map)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetLogoCommBreakMap()");
 
@@ -2426,7 +2459,7 @@ void ClassicCommDetector::PrintFullMap(
         out << (*it).toString(i, verbose).ascii() << " ";
         if (comm_breaks)
         {
-            QMap<long long, int>::const_iterator mit = comm_breaks->find(i);
+            comm_map_t::const_iterator mit = comm_breaks->find(i);
             if (mit != comm_breaks->end())
             {
                 QString tmp = (verbose) ?
