@@ -82,7 +82,7 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
 
     qApp->lock();
 
-    removeChild(top);
+    top->setParent(0);
     if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
     {
         top->SetFullscreen(false);
