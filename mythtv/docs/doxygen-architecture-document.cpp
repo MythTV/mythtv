@@ -163,7 +163,7 @@ These tools are in the contrib directory of the source tree:
   <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
                             source, of %MythTV and all the official plugins,
                             on Mac OS 10.3 thru 10.5
-  <dt>win32-packager.pl <dd>Similar tool for Windows XP
+  <dt>win32-packager.pl <dd>Similar tool for Windows XP and Vista
 </dl>
  */
 
@@ -463,7 +463,7 @@ Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.\endverbatim
 <B>\verbatim21      MYTH_PROTO_VERSION 40 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
-\verbatim13      ACCEPT[]:[]362       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
+\verbatim13      ACCEPT[]:[]402       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
 The command string is prefixed by 8 characters, containing the length
 of the forthcoming command. This can be justified in any way
 (as the above example shows)
@@ -490,6 +490,74 @@ The following summarises some of these commands.
 For a full understanding of all the commands, either read the source code
 (programs/mythbackend/mainserver.cpp), or look on the Wiki
 (http://www.mythtv.org/wiki/index.php/Myth_Protocol_Command_List).
+
+ */
+
+/** \defgroup myth_startup Myth startup sequence
+This line is filler that is ignored by Doxygen.
+
+Most MythTV programs follow a common sequence:
+<ol>
+  <li>Process (parse) command-line arguments</li>
+  <li>Create a MythContext object, which stores paths for later location
+      of runtime assets (filters/fonts/plugins/themes/translations)</li>
+  <li>(optionally) Create a UPnP client or server</li>
+  <li>Initialise the MythContext, which:</li>
+  <ul>
+    <li>Tries to find a database on localhost,
+        or on the host specified in mysql.txt,</li>
+    <li>Tries to locate exactly one backend host via UPnP,
+        to find its database,</li>
+    <li>If possible, displays a list of all backends located via UPnP
+        for the user to choose from, or</li>
+    <li>Fails</li>
+  </ul>
+  <li>Create the main window/screen, display themed menus, <i>et c.</i></li>
+</ol>
+(examine program/*/main.cpp, and libs/libmyth/mythcontext.cpp,
+for further detail).
+
+<p>
+
+The "runtime assets" mentioned above are stored in a number of well-known
+locations. The following methods in MythContext allow programs and plugins
+to access these assets:
+<ol>
+  <li>GetInstallPrefix() returns the value of MCP's m_installprefix variable,
+      which is either the runtime env. var. $MYTHTVDIR or the compile-time var.
+      PREFIX. If these are relative paths, it is initialised relative to the
+      binary location. The value is used thus:
+  <ul>
+    <li>GetInstallPrefix() + /share/mythtv/ = GetShareDir(), GetFontsDir()</li>
+    <li>GetInstallPrefix() + /share/mythtv/themes/ = GetThemesParentDir()</li>
+    <li>GetInstallPrefix() + /share/mythtv/i18n/   = GetTranslationsDir()</li>
+    <li>GetInstallPrefix() + /share/mythtv/mytharchive</li>
+    <li>GetInstallPrefix() + /share/mythtv/mytharchive/themes</li>
+    <li>GetInstallPrefix() + /share/mythtv/mytharchive/scripts</li>
+    <li>GetInstallPrefix() + /share/mythtv/mythflix/scripts</li>
+    <li>GetInstallPrefix() + /share/mythtv/mythnews</li>
+    <li>GetInstallPrefix() + /share/mythtv/mythvideo/scripts</li>
+    <li>GetInstallPrefix() + /share/mythtv/mythweather</li>
+    <li>GetInstallPrefix() + /share/mythtv/mythweather/scripts</li>
+    <li>GetInstallPrefix() + /bin/ignyte</li>
+    <li>GetInstallPrefix() + /bin/mythfilldatabase</li>
+    <li>GetInstallPrefix() + /bin/mtd</li>
+  </ul></li>
+
+  <li>GetLibraryDir() returns the value of MCP's m_installlibdir variable,
+      which is always the LIBDIR compile-time var. Its value is only used for:
+  <ul>
+    <li>GetLibraryDir() + plugins/ = GetPluginsDir()</li>
+    <li>GetLibraryDir() + filters/ = GetFiltersDir()</li>
+  </ul></li>
+
+  <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,
+      or $HOME/.mythtv.</li>
+
+  <li>mysql.txt is loaded from GetShareDir(), GetInstallPrefix() + /etc/mythtv,
+      GetConfDir(), and the current directory. Later files override the values
+      from earlier ones.</li>
+</ol>
 
  */
 
