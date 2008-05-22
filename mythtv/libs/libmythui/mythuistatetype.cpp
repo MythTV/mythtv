@@ -209,7 +209,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
         MythUIType *other = i.data();
         QString key = i.key();
 
-        MythUIType *newtype = GetChild(other->name());
+        MythUIType *newtype = GetChild(other->objectName());
         AddObject(key, newtype);
         newtype->SetVisible(other->IsVisible());
     }
@@ -220,7 +220,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
         MythUIType *other = j.data();
         int key = j.key();
 
-        MythUIType *newtype = GetChild(other->name());
+        MythUIType *newtype = GetChild(other->objectName());
         AddObject((StateType)key, newtype);
         newtype->SetVisible(other->IsVisible());
     }
@@ -228,7 +228,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
 
 void MythUIStateType::CreateCopy(MythUIType *parent)
 {
-    MythUIStateType *st = new MythUIStateType(parent, name());
+    MythUIStateType *st = new MythUIStateType(parent, objectName());
     st->CopyFrom(this);
 }
 
