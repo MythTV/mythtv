@@ -1298,21 +1298,30 @@ static bool is_dishnet_eit(int cardid)
     return false;
 }
 
-static uint no_capturecards()
+static int no_capturecards(int cardid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT MAX(cardid) "
-        "FROM capturecard ");
 
+    QString str =
+        "SELECT COUNT(cardid) "
+        "FROM capturecard ";
+    
+    if (cardid)
+        str += "WHERE cardid < :CARDID";
+
+    query.prepare(str);
+
+    if (cardid)
+        query.bindValue(":CARDID", cardid);
+    
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("no_capturecards", query);
-        return 0;
+        return -1;
     }
     else if (query.next())
-        return query.value(0).toUInt();
-    return 0;
+        return query.value(0).toInt();
+    return -1;
 }
 
 /** \fn TVRec::RunTV(void)
@@ -1331,11 +1340,12 @@ void TVRec::RunTV(void)
     {
         scanner = new EITScanner(cardid);
         uint timeout = eitCrawlIdleStart;
-        // get the number of capture cards to distribute the the scan start
-        // evenly over eitTransportTimeout
-        uint no_cards = no_capturecards();
-        if (no_cards)
-            timeout += eitTransportTimeout * (cardid-1) / no_cards;
+        // get the number of capture cards and the position of the current card
+        // to distribute the the scan start evenly over eitTransportTimeout
+        int card_pos = no_capturecards(cardid);
+        int no_cards = no_capturecards(0);
+        if (no_cards > 0 && card_pos >= 0)
+            timeout += eitTransportTimeout * card_pos / no_cards;
         else
             timeout += random() % eitTransportTimeout;
 
