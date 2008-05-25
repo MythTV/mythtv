@@ -1298,6 +1298,23 @@ static bool is_dishnet_eit(int cardid)
     return false;
 }
 
+static uint no_capturecards()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT MAX(cardid) "
+        "FROM capturecard ");
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("no_capturecards", query);
+        return 0;
+    }
+    else if (query.next())
+        return query.value(0).toUInt();
+    return 0;
+}
+
 /** \fn TVRec::RunTV(void)
  *  \brief Event handling method, contains event loop.
  */
@@ -1313,9 +1330,15 @@ void TVRec::RunTV(void)
         (!GetDVBChannel() || GetDVBChannel()->IsMaster()))
     {
         scanner = new EITScanner(cardid);
-        // Wait at least 15 seconds between starting EIT scanning
-        // on distinct cards
-        uint timeout = eitCrawlIdleStart + cardid * 15;
+        uint timeout = eitCrawlIdleStart;
+        // get the number of capture cards to distribute the the scan start
+        // evenly over eitTransportTimeout
+        uint no_cards = no_capturecards();
+        if (no_cards)
+            timeout += eitTransportTimeout * (cardid-1) / no_cards;
+        else
+            timeout += random() % eitTransportTimeout;
+
         eitScanStartTime = eitScanStartTime.addSecs(timeout);
     }
     else
