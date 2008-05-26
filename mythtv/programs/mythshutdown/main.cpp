@@ -939,6 +939,8 @@ int main(int argc, char **argv)
     else
         showUsage();
 
+    delete gContext;
+
     return res;
 }
 
