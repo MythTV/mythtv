@@ -378,8 +378,8 @@ void WelcomeDialog::updateScreen(void)
                 status += "\n" + QDeepCopy<QString>(tuner->title);
                 if (!tuner->subtitle.isEmpty()) 
                     status += "\n("+QDeepCopy<QString>(tuner->subtitle)+")";
-                status += "\n" + tuner->startTime.toString("hh:mm") + 
-                          " " + tr("to") + " " + tuner->endTime.toString("hh:mm");
+                status += "\n" + tuner->startTime.toString(m_timeFormat) + 
+                          " " + tr("to") + " " + tuner->endTime.toString(m_timeFormat);
             }
             else
             {
@@ -414,7 +414,7 @@ void WelcomeDialog::updateScreen(void)
 
             QString dateFormat = gContext->GetSetting("DateFormat", "ddd dd MMM yyyy");
             status += "\n" + prog->startTime.toString(dateFormat + " (" + m_timeFormat) +
-                " " + tr("to") + " " +  prog->endTime.toString("hh:mm)");
+                " " + tr("to") + " " +  prog->endTime.toString(m_timeFormat + ")");
 
             if (m_screenScheduledNo < m_scheduledList.count() - 1)
                 m_screenScheduledNo++;
