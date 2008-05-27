@@ -386,6 +386,8 @@ int main(int argc, char *argv[])
     if (backendIsRunning)
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
+    delete gContext;
+
     return 0;
 }
 
