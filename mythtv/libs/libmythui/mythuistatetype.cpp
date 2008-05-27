@@ -49,7 +49,9 @@ bool MythUIStateType::AddImage(StateType type, MythImage *image)
     if (m_ObjectsByState.contains((int)type) || !image)
         return false;
 
-    MythUIImage *imType = new MythUIImage(this, "stateimage");
+    QString name = QString("stateimage%1").arg(type);
+
+    MythUIImage *imType = new MythUIImage(this, name);
     imType->SetImage(image);
 
     return AddObject(type, imType);
