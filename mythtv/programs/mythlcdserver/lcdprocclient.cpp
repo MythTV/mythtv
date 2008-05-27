@@ -1309,7 +1309,7 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
 
     // Reset things
     counter = 1;
-    curItem = it.toFirst();
+    it.toFirst();
 
     // Move the iterator to selectedItem lcdHeight/2, if > 1, -1.
     unsigned int midPoint = (lcdHeight/2) - 1;
@@ -1446,10 +1446,9 @@ void LCDProcClient::scrollMenuText()
 
     // If there is only one or two lines on the display, then just write
     // the selected item and leave
-    curItem = it.toFirst();
+    it.toFirst();
     if (lcdHeight <= 2)
     {
-        it.toFirst();
         while ((curItem = it.current()) != 0)
         {
             ++it;
@@ -1516,7 +1515,7 @@ void LCDProcClient::scrollMenuText()
 
     // Find the longest line, if menuScrollPosition is longer then this, then 
     // reset them all
-    curItem = it.toFirst();
+    it.toFirst();
     int longest_line = 0;
     int max_scroll_pos = 0;
 
@@ -1538,7 +1537,7 @@ void LCDProcClient::scrollMenuText()
         menuScrollTimer->start(500, FALSE);
         menuScrollPosition = 0;
 
-        curItem = it.toFirst();
+        it.toFirst();
         while ((curItem = it.current()) != 0)
         {
             ++it;
@@ -1548,7 +1547,7 @@ void LCDProcClient::scrollMenuText()
 
     // Reset things
     counter = 1;
-    curItem = it.toFirst();
+    it.toFirst();
 
     // Move the iterator to selectedItem -1
     if (selectedItem != 1 && it.count() >= lcdHeight)
