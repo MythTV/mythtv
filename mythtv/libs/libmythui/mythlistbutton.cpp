@@ -1328,14 +1328,17 @@ void MythListButtonItem::SetToRealButton(MythUIButton *button, bool active_on)
     button->SetImageAlignment(m_parent->m_imageAlign);
     button->SetButtonImage(m_image);
 
-    if (m_state == NotChecked)
-        button->SetCheckState(MythUIStateType::Off);
-    else if (m_state == HalfChecked)
-        button->SetCheckState(MythUIStateType::Half);
-    else
-        button->SetCheckState(MythUIStateType::Full);
-
     button->EnableCheck(m_checkable);
+
+    if (m_checkable)
+    {
+        if (m_state == NotChecked)
+            button->SetCheckState(MythUIStateType::Off);
+        else if (m_state == HalfChecked)
+            button->SetCheckState(MythUIStateType::Half);
+        else
+            button->SetCheckState(MythUIStateType::Full);
+    }
 
     if (this == m_parent->m_selItem)
     {
