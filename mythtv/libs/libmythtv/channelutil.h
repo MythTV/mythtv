@@ -35,8 +35,9 @@ typedef enum SkipTypes {
      * are just too many false positives from non-commercial cut scenes. */
     COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
 } SkipType;
-QString SkipTypeToString(int);
-deque<int> GetPreferredSkipTypeCombinations(void);
+
+MPUBLIC QString SkipTypeToString(int);
+MPUBLIC deque<int> GetPreferredSkipTypeCombinations(void);
 
 class DBChannel
 {
