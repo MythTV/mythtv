@@ -20,6 +20,10 @@ class MythUISpinBox : public MythListButton
     ~MythUISpinBox();
 
     void SetRange(int low, int high, int step);
+
+  protected:
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
 };
 
 #endif

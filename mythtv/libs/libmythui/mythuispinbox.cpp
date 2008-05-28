@@ -28,3 +28,17 @@ void MythUISpinBox::SetRange(int low, int high, int step)
     SetPositionArrowStates();
 }
 
+void MythUISpinBox::CreateCopy(MythUIType *parent)
+{
+    MythUISpinBox *spinbox = new MythUISpinBox(parent, objectName());
+    spinbox->CopyFrom(this);
+}
+
+void MythUISpinBox::CopyFrom(MythUIType *base)
+{
+    MythUISpinBox *spinbox = dynamic_cast<MythUISpinBox *>(base);
+    if (!spinbox)
+        return;
+
+    MythListButton::CopyFrom(base);
+}
