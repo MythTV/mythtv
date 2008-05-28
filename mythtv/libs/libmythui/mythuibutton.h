@@ -29,6 +29,7 @@ class MythUIButton : public MythUIType
    ~MythUIButton();
 
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual bool keyPressEvent(QKeyEvent *);
 
     void SetBackgroundImage(StateType state, MythImage *image);
     void SetCheckImage(MythUIStateType::StateType state, MythImage *image);
@@ -61,7 +62,6 @@ class MythUIButton : public MythUIType
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
-    virtual bool keyPressEvent(QKeyEvent *);
 
     void Init(void);
 
