@@ -567,6 +567,9 @@ bool ImportIconsWizard::search(const QString& strParam)
         VERBOSE(VB_CHANNEL, QString("Icon Import: Working search : %1").arg(str));
         QStringList strSplit = str.split("\n");
 
+        QString prevIconName = "";
+        int namei = 1;
+
         for (int x = 0; x < strSplit.size(); x++)
         {
             QString row = strSplit[x];
@@ -580,7 +583,19 @@ bool ImportIconsWizard::search(const QString& strParam)
                 entry.strName = ret[1];
                 entry.strLogo = ret[2];
                 m_listSearch.append(entry);
-                m_listIcons->addSelection(entry.strName);
+                if (prevIconName == entry.strName)
+                {
+                    QString newname = QString("%1 (%2)").arg(entry.strName)
+                                                        .arg(namei);
+                    m_listIcons->addSelection(newname);
+                    namei++;
+                }
+                else
+                {
+                    m_listIcons->addSelection(entry.strName);
+                    namei=1;
+                }
+                prevIconName = entry.strName;
             }
         }
         retVal = true;
