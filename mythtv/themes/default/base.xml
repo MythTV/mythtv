@@ -99,13 +99,16 @@
     </button>
 
     <!-- Base definition of a button in a checkbox configuration -->
-    <button name="basecheckbox">
+    <checkbox name="basecheckbox">
         <position>0,0</position>
-        <showarrow>no</showarrow>
-        <check-empty filename="unchecked.png"/>
+        <regular-background filename="checkbox_background_off.png" />
+        <selected-background filename="checkbox_background_selected.png" />
+        <inactive-background filename="checkbox_background_off.png" />
+        <check-empty filename="lb-check-empty.png"/>
         <check-half filename="lb-check-half.png"/>
-        <check-full filename="checked.png"/>
-    </button>
+        <check-full filename="lb-check-full.png"/>
+        <margin>5</margin>
+    </checkbox>
 
     <spinbox name="basespinbox">
         <area>0,0,100,40</area>
