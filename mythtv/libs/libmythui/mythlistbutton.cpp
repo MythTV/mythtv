@@ -545,17 +545,13 @@ void MythListButton::MoveDown(MovementUnit unit)
 bool MythListButton::MoveToNamedPosition(const QString &position_name)
 {
     if (m_selPosition < 0)
-    {
         return false;
-    }
 
     if (m_itemList.isEmpty())
-    {
         return false;
-    }
 
     bool found_it = false;
-    QList<MythListButtonItem*>::iterator it = m_itemList.begin() + m_selPosition;
+    QList<MythListButtonItem*>::iterator it = m_itemList.begin();
     while(it != m_itemList.end())
     {
         if ((*it)->text() == position_name)
