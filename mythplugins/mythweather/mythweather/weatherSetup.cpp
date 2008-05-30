@@ -6,7 +6,6 @@
 
 // MythTV headers
 #include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythuistatetype.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
 
 // MythWeather headers
@@ -38,13 +37,12 @@ bool GlobalSetup::Create()
     if (!foundtheme)
         return false;
 
-    m_timeoutSpinbox = dynamic_cast<MythListButton *> (GetChild("pgto_spinbox"));
-    m_holdSpinbox = dynamic_cast<MythListButton *> (GetChild("hold_spinbox"));
+    m_timeoutSpinbox = dynamic_cast<MythUISpinBox *> (GetChild("timeout_spinbox"));
 
-    m_backgroundCheckbox = dynamic_cast<MythUIButton *> (GetChild("backgroundcheck"));
+    m_backgroundCheckbox = dynamic_cast<MythUICheckBox *> (GetChild("backgroundcheck"));
     m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
 
-    if (!m_timeoutSpinbox || !m_holdSpinbox || !m_finishButton || !m_backgroundCheckbox)
+    if (!m_timeoutSpinbox || !m_finishButton || !m_backgroundCheckbox)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing required elements.");
         return false;
@@ -67,23 +65,20 @@ void GlobalSetup::loadData()
         m_backgroundCheckbox->SetCheckState(MythUIStateType::Full);
 
     m_timeout = gContext->GetNumSetting("weatherTimeout", 10);
-    m_timeoutSpinbox->MoveToNamedPosition(QString::number(m_timeout));
-
-    m_hold_timeout = gContext->GetNumSetting("weatherHoldTimeout", 20);
-    m_holdSpinbox->MoveToNamedPosition(QString::number(m_hold_timeout));
+    m_timeoutSpinbox->SetRange(5, 120, 5);
+    m_timeoutSpinbox->SetValue(m_timeout);
 }
 
 void GlobalSetup::saveData()
 {
-    QString timeout = m_timeoutSpinbox->GetItemCurrent()->text();
+    int timeout = m_timeoutSpinbox->GetIntValue();
     gContext->SaveSetting("weatherTimeout", timeout);
-    QString holdtimeout = m_holdSpinbox->GetItemCurrent()->text();
-    gContext->SaveSetting("weatherHoldTimeout", holdtimeout);
 
     int checkstate = 0;
     if (m_backgroundCheckbox->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
     gContext->SaveSetting("weatherbackgroundfetch", checkstate);
+    GetScreenStack()->PopScreen();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -703,8 +698,8 @@ bool SourceSetup::Create()
         return false;
 
     m_sourceList = dynamic_cast<MythListButton *> (GetChild("srclist"));
-    m_updateSpinbox = dynamic_cast<MythListButton *> (GetChild("update_spinbox"));
-    m_retrieveSpinbox = dynamic_cast<MythListButton *> (GetChild("retrieve_spinbox"));
+    m_updateSpinbox = dynamic_cast<MythUISpinBox *> (GetChild("update_spinbox"));
+    m_retrieveSpinbox = dynamic_cast<MythUISpinBox *> (GetChild("retrieve_spinbox"));
     m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
     m_sourceText = dynamic_cast<MythUIText *> (GetChild("srcinfo"));
 
@@ -720,17 +715,17 @@ bool SourceSetup::Create()
 
     connect(m_sourceList, SIGNAL(itemSelected(MythListButtonItem *)),
             this, SLOT(sourceListItemSelected(MythListButtonItem *)));
-    connect(m_sourceList, SIGNAL(TakingFocus()),
-            this, SLOT(sourceListItemSelected()));
+//     connect(m_sourceList, SIGNAL(TakingFocus()),
+//             this, SLOT(sourceListItemSelected()));
 
-// TODO
-//    m_updateSpinbox->setRange(10, 600);
-    connect(m_updateSpinbox, SIGNAL(loosingFocus()),
+    // 12 Hour max interval
+    m_updateSpinbox->SetRange(10, 720, 10);
+    connect(m_updateSpinbox, SIGNAL(LosingFocus()),
             this,  SLOT(updateSpinboxUpdate()));
 
-// TODO
-//    m_retrieveSpinbox->setRange(10, 1000);
-    connect(m_retrieveSpinbox, SIGNAL(loosingFocus()),
+    // 2 Minute retrieval timeout max
+    m_retrieveSpinbox->SetRange(10, 120, 5);
+    connect(m_retrieveSpinbox, SIGNAL(LosingFocus()),
             this, SLOT(retrieveSpinboxUpdate()));
 
     m_finishButton->SetText(tr("Finish"));
@@ -787,8 +782,8 @@ void SourceSetup::saveData()
 {
     SourceListInfo *si =
             (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
-    si->retrieve_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
-    si->update_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+    si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "UPDATE weathersourcesettings "
@@ -809,20 +804,22 @@ void SourceSetup::saveData()
             return;
         }
     }
+
+    GetScreenStack()->PopScreen();
 }
 
 void SourceSetup::updateSpinboxUpdate()
 {
     SourceListInfo *si =
             (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
-    si->retrieve_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+    si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
 }
 
 void SourceSetup::retrieveSpinboxUpdate()
 {
     SourceListInfo *si =
             (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
-    si->update_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
 }
 
 void SourceSetup::sourceListItemSelected(MythListButtonItem *item)
@@ -837,8 +834,8 @@ void SourceSetup::sourceListItemSelected(MythListButtonItem *item)
     if (!si)
         return;
 
-    m_updateSpinbox->MoveToNamedPosition(QString::number(si->retrieve_timeout));
-    m_retrieveSpinbox->MoveToNamedPosition(QString::number(si->update_timeout));
+    m_updateSpinbox->MoveToNamedPosition(QString::number(si->update_timeout));
+    m_retrieveSpinbox->MoveToNamedPosition(QString::number(si->retrieve_timeout));
     QString txt = tr("Author: ");
     txt += si->author;
     txt += "\n" + tr("Email: ") + si->email;

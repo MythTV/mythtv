@@ -13,6 +13,8 @@
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuispinbox.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 
@@ -52,9 +54,8 @@ class GlobalSetup : public MythScreenType
     void loadData(void);
 
   private:
-    MythUIButton *m_backgroundCheckbox;
-    MythListButton *m_timeoutSpinbox;
-    MythListButton *m_holdSpinbox;
+    MythUICheckBox *m_backgroundCheckbox;
+    MythUISpinBox *m_timeoutSpinbox;
     int m_timeout;
     int m_hold_timeout;
     MythUIButton *m_finishButton;
@@ -113,8 +114,8 @@ class SourceSetup : public MythScreenType
     void saveData(void);
 
   private:
-    MythListButton *m_updateSpinbox;
-    MythListButton *m_retrieveSpinbox;
+    MythUISpinBox *m_updateSpinbox;
+    MythUISpinBox *m_retrieveSpinbox;
     MythListButton *m_sourceList;
     MythUIButton *m_finishButton;
     MythUIText *m_sourceText;

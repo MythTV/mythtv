@@ -71,6 +71,7 @@ class Weather : public MythScreenType
 
     MythUIText *m_pauseText;
     MythUIText *m_headerText;
+    MythUIText *m_updatedText;
 };
 
 #endif

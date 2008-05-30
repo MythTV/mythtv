@@ -39,10 +39,9 @@ Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMa
         m_createdSrcMan = false;
     }
 
-    m_pauseText = m_headerText = NULL;
+    m_pauseText = m_headerText = m_updatedText = NULL;
 
     m_nextpageInterval = gContext->GetNumSetting("weatherTimeout", 10);
-    m_nextpageIntArrow = gContext->GetNumSetting("weatherHoldTimeout", 20);
 
     m_nextpage_Timer = new QTimer(this);
     connect(m_nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
@@ -82,8 +81,9 @@ bool Weather::Create()
 
     m_pauseText = dynamic_cast<MythUIText *> (GetChild("pause_text"));
     m_headerText = dynamic_cast<MythUIText *> (GetChild("header"));
+    m_updatedText = dynamic_cast<MythUIText *> (GetChild("update_text"));
 
-    if (!m_pauseText || !m_headerText)
+    if (!m_pauseText || !m_headerText || !m_updatedText)
     {
         VERBOSE(VB_IMPORTANT, "Window weatherbase is missing required elements.");
         return false;
@@ -248,6 +248,7 @@ void Weather::showScreen(WeatherScreen *ws)
     m_currScreen = ws;
     m_weatherStack->AddScreen(m_currScreen, false);
     m_headerText->SetText(m_currScreen->name());
+    m_updatedText->SetText(m_currScreen->getValue("updatetime"));
 }
 
 void Weather::hideScreen()
