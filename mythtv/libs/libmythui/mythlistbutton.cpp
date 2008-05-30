@@ -551,6 +551,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
         return false;
 
     bool found_it = false;
+    m_selPosition = 0;
     QList<MythListButtonItem*>::iterator it = m_itemList.begin();
     while(it != m_itemList.end())
     {
@@ -565,7 +566,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
 
     if (!found_it)
     {
-        m_selPosition = -1;
+        m_selPosition = 0;
         return false;
     }
 
