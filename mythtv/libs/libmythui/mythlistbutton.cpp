@@ -550,8 +550,10 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
     if (m_itemList.isEmpty())
         return false;
 
+    int oldPosition = m_selPosition;
+
     bool found_it = false;
-    m_selPosition = 0;
+    int selectedPosition = 0;
     QList<MythListButtonItem*>::iterator it = m_itemList.begin();
     while(it != m_itemList.end())
     {
@@ -561,29 +563,32 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
             break;
         }
         ++it;
-        ++m_selPosition;
+        ++selectedPosition;
     }
 
     if (!found_it)
-    {
-        m_selPosition = 0;
         return false;
-    }
 
+    m_selPosition = selectedPosition;
     m_selItem =  m_itemList.at(m_selPosition);
+
+    m_topPosition = 0;
 
     switch (m_scrollStyle)
     {
         case ScrollCenter :
             while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
                 ++m_topPosition;
-
             break;
         case ScrollFree :
             if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
             {
-                m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
-                                    / m_columns * m_columns;
+                if (m_layout == LayoutHorizontal)
+                    m_topPosition = m_selPosition - m_itemsVisible + 1;
+                else
+                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
+                                        / m_columns * m_columns;
+
                 m_topPosition = max(0, m_topPosition);
             }
             break;
