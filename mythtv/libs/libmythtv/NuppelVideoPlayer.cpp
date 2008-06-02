@@ -2456,7 +2456,7 @@ void NuppelVideoPlayer::AVSync(void)
 
             avsync_delay = (buffer->timecode - currentaudiotime) * 1000;//usec
             // prevents major jitter when pts resets during dvd title
-            if (avsync_delay > 200000 && ringBuffer->isDVD())
+            if (avsync_delay > 2000000 && ringBuffer->isDVD())
                 avsync_delay = 90000;
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
             if (!usevideotimebase)
