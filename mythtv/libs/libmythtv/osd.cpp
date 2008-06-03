@@ -2778,10 +2778,16 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
         return false;
 
     bool ret = runningTreeMenu->HandleKeypress(e);
+    HideTreeMenu();
+    changed = true;
+    return ret;
+}
 
+void OSD::HideTreeMenu(void)
+{
     QMutexLocker locker(&osdlock);
 
-    if (!runningTreeMenu->IsVisible())
+    if (runningTreeMenu && !runningTreeMenu->IsVisible())
     {
         OSDSet *container = GetSet(treeMenuContainer);
         if (container)
@@ -2789,10 +2795,6 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
 
         runningTreeMenu = NULL;
     }
-
-    changed = true;
-
-    return ret;
 }
 
 bool OSD::IsSetDisplaying(const QString &name)

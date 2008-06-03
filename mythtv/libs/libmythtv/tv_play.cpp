@@ -5871,6 +5871,8 @@ void TV::doEditSchedule(int editType)
 
     if (!nvp)
         return;
+    
+    ClearOSD();
 
     // Resize window to the MythTV GUI size
     if (nvp && nvp->getVideoOutput()) 
@@ -7454,6 +7456,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     {
         tree->SetVisible(false);
         tree->disconnect();
+        if (GetOSD())
+            GetOSD()->HideTreeMenu();
     }
 }
 

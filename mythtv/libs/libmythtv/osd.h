@@ -157,6 +157,7 @@ class OSD : public QObject
     OSDListTreeType *ShowTreeMenu(const QString &name, 
                                   OSDGenericTree *treeToShow);
 
+    void HideTreeMenu(void);
     void DisableFade(void);
     bool IsSetDisplaying(const QString &name);
     bool HasSet(const QString &name);
