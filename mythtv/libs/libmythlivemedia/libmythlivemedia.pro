@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythlivemedia-$$LIBVERSION
-CONFIG += thread shared warn_off
+CONFIG += thread dll warn_off
 target.path = $${LIBDIR}
 INSTALLS = target
 
