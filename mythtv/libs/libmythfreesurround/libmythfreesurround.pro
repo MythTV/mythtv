@@ -28,3 +28,5 @@ contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -L../libavcodec -lavcodec
     INCLUDEPATH += ../libavutil
 }
+
+include ( ../libs-targetfix.pro )

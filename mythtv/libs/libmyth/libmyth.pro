@@ -109,11 +109,6 @@ mingw {
 
     LIBS += -lpthread -lwinmm -lws2_32
 
-    TARGET = lib$${TARGET}
-
-    # For easier debugging:
-    target.path = $${PREFIX}/bin
-
     LIBS -= -lmythui-$$LIBVERSION  -lmythupnp-$$LIBVERSION 
     LIBS += -L. -lmythui-bootstrap -lmythupnp-bootstrap
     POST_TARGETDEPS += libmythui-bootstrap.a libmythupnp-bootstrap.a
@@ -248,3 +243,5 @@ contains( CONFIG_LIBFFTW3, yes ) {
 
 #The following line was inserted by qt3to4
 QT += network xml opengl sql qt3support
+
+include ( ../libs-targetfix.pro )

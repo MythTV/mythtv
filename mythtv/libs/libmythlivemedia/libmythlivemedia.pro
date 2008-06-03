@@ -307,3 +307,5 @@ using_live {
 
 #The following line was inserted by qt3to4
 QT += network xml  sql opengl qt3support
+
+include ( ../libs-targetfix.pro )

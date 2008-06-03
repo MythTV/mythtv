@@ -40,3 +40,5 @@ contains( ARCH_ALPHA, yes ) {
     HEADERS += alpha_asm.h
     SOURCES += motion_comp_alpha.c idct_alpha.c
 }
+
+include ( ../libs-targetfix.pro )

@@ -39,3 +39,5 @@ macx {
 }
 
 mingw:DEFINES += STDC_HEADERS
+
+include ( ../libs-targetfix.pro )

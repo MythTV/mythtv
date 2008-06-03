@@ -24,3 +24,5 @@ inc.path = $${PREFIX}/include/mythtv/
 inc.files = samplerate.h
 
 INSTALLS += inc
+
+include ( ../libs-targetfix.pro )

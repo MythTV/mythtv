@@ -28,9 +28,6 @@ contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
 	QMAKE_CFLAGS_SHLIB =
 }
 
-mingw:TARGET      = lib$${TARGET}
-mingw:target.path = $${PREFIX}/bin
-
 !profile:QMAKE_CFLAGS_DEBUG += -O
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -469,3 +466,4 @@ contains( ARCH_BFIN, yes) {
     SOURCES += bfin/vp3_idct_bfin.S
 }
 
+include ( ../libs-targetfix.pro )

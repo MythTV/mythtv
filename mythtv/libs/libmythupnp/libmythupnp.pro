@@ -43,11 +43,6 @@ DEPENDPATH += ../libmyth
 LIBS += $$EXTRA_LIBS
 
 mingw {
-    TARGET = lib$${TARGET}
-
-    # For easier debugging:
-    target.path = $${PREFIX}/bin
-
     HEADERS += darwin-sendfile.h
     SOURCES += darwin-sendfile.c
 
@@ -80,3 +75,5 @@ macx {
 
 #The following line was inserted by qt3to4
 QT += network xml  sql opengl qt3support
+
+include ( ../libs-targetfix.pro )

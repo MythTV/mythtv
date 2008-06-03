@@ -501,11 +501,6 @@ use_hidesyms {
 }
 
 mingw {
-    TARGET = lib$${TARGET}
-
-    # For easier debugging:
-    target.path = $${PREFIX}/bin
-
     DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_D3D
 
@@ -525,3 +520,5 @@ INSTALLS += inc
 
 #The following line was inserted by qt3to4
 QT += network xml  sql opengl qt3support
+
+include ( ../libs-targetfix.pro )
