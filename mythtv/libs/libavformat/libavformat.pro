@@ -13,8 +13,6 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
 LIBS += $$LOCAL_LIBDIR_X11 $$EXTRALIBS
 
-mingw:  target.path = $${PREFIX}/bin
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
@@ -198,3 +196,5 @@ macx {
 }
 
 mingw:SOURCES -= audio.c
+
+include ( ../libs-targetfix.pro )

@@ -73,3 +73,5 @@ macx {
 
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
+
+include ( ../libs-targetfix.pro )

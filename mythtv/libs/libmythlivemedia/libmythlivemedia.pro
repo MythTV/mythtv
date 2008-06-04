@@ -304,3 +304,5 @@ using_live {
     SOURCES += liveMedia/WAVAudioFileServerMediaSubsession.cpp
     SOURCES += liveMedia/WAVAudioFileSource.cpp
 }
+
+include ( ../libs-targetfix.pro )

@@ -53,4 +53,4 @@ macx {
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC2000000
 }
 
-mingw:  target.path = $${PREFIX}/bin
+include ( ../libs-targetfix.pro )

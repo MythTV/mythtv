@@ -24,4 +24,4 @@ HEADERS += DynamicLineArt.h TokenGroup.h Link.h Logging.h freemheg.h
 
 LIBS += $$EXTRA_LIBS
 
-mingw:  target.path = $${PREFIX}/bin
+include ( ../libs-targetfix.pro )

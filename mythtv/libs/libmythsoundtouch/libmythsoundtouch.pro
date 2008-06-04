@@ -27,3 +27,5 @@ SOURCES += SoundTouch.cpp
 SOURCES += TDStretch.cpp
 SOURCES += cpu_detect_x86_gcc.cpp
 SOURCES += mmx_gcc.cpp
+
+include ( ../libs-targetfix.pro )

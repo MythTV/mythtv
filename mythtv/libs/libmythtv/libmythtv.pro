@@ -520,3 +520,5 @@ inc.path = $${PREFIX}/include/mythtv/libmythtv/
 inc.files = programinfo.h remoteutil.h recordingtypes.h
 
 INSTALLS += inc
+
+include ( ../libs-targetfix.pro )

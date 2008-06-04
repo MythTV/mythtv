@@ -107,9 +107,6 @@ mingw {
 
     LIBS += -lpthread
 
-    # For easier debugging:
-    target.path = $${PREFIX}/bin
-
     LIBS -= -lmythui-$$LIBVERSION  -lmythupnp-$$LIBVERSION 
     LIBS += -L. -lmythui-bootstrap -lmythupnp-bootstrap
     POST_TARGETDEPS += libmythui-bootstrap.a libmythupnp-bootstrap.a
@@ -241,3 +238,5 @@ contains( CONFIG_LIBA52, yes ) {
 contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -lfftw3f
 }
+
+include ( ../libs-targetfix.pro )

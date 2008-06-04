@@ -8,9 +8,6 @@ mingw {
     # Worked around by building libmyth first,
     # with dlltool faking the symbols from the other two libs
     LIBS += -L../libmyth -lmyth-$$LIBVERSION
-
-    # For easier debugging, put lib in same place as mythfrontend.exe
-    target.path = $${PREFIX}/bin
 }
 
 #unix {
