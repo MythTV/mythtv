@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-06-03, v0.21.01
+<date>2008-06-04, v0.21.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -91,8 +91,8 @@ you use one of the big-name OS packages.
 See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
 like to install a custom version of Knoppix optimized for MythTV.
 
-See <url url="http://linpvr.org" name="http://linpvr.org"> if you'd like
-to install MythTV onto a VIA Epia M machine.
+See <url url="http://www.minimyth.org" name="http://www.minimyth.org"> if you'd like
+to install MythTV onto a diskless system.
 
 See <url url="http://bit.blkbk.com" name="http://bit.blkbk.com"> if you'd
 like to install MythTV on a Xbox.
@@ -7940,6 +7940,7 @@ devices.  Add note that ivtv driver is in kernel.  Add note that xbox
 mini-distribution site appears dead.  Update information on HVR-1600. 
 Update minimum MySQL version.
 v0.21.01, 2008-06-03.  Add mythbuntu.
+v0.21.02, 2008-06-04.  Update minimyth link.
 -->
 
 <!--

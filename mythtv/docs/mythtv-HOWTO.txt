@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-06-03, v0.21.01
+  2008-06-04, v0.21.02
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -445,8 +445,8 @@
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
 
-  See http://linpvr.org <http://linpvr.org> if you'd like to install
-  MythTV onto a VIA Epia M machine.
+  See http://www.minimyth.org <http://www.minimyth.org> if you'd like to
+  install MythTV onto a diskless system.
 
   See http://bit.blkbk.com <http://bit.blkbk.com> if you'd like to
   install MythTV on a Xbox.  [1mNOTE[22m:  Site appears unmaintained.
