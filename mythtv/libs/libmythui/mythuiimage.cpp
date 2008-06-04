@@ -64,7 +64,6 @@ void MythUIImage::Clear(void)
 void MythUIImage::Init(void)
 {
     m_cropRect = QRect(0,0,0,0);
-    m_ForceSize = QSize(-1, -1);
 
     m_CurPos = 0;
     m_LastDisplay = QTime::currentTime();
@@ -139,7 +138,13 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
 void MythUIImage::SetSize(int width, int height)
 {
-    m_ForceSize = QSize(width, height);
+    SetSize(QSize(width,height));
+}
+
+void MythUIImage::SetSize(const QSize &size)
+{
+    MythUIType::SetSize(size);
+    m_NeedLoad = true;
 }
 
 void MythUIImage::SetCropRect(int x, int y, int width, int height)
@@ -165,15 +170,16 @@ bool MythUIImage::Load(void)
             image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                            m_reflectLength);
 
-        if (!m_ForceSize.isNull())
+        QSize aSize = m_Area.size();
+
+        if (!aSize.isNull())
         {
-            int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
-            int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : image->height();
+            int w = (m_Area.width() != -1) ? m_Area.width() : image->width();
+            int h = (m_Area.height() != -1) ? m_Area.height() : image->height();
 
             image->Assign(image->smoothScale(w, h));
         }
 
-        QSize aSize = m_Area.size();
         aSize = aSize.expandedTo(image->size());
         m_Area.setSize(aSize);
 
@@ -250,7 +256,10 @@ bool MythUIImage::ParseElement(QDomElement &element)
             m_HighNum = tmp.toInt();
     }
     else if (element.tagName() == "staticsize")
-        m_ForceSize = parseSize(element);
+    {
+        QSize forceSize = parseSize(element);
+        SetSize(forceSize);
+    }
     else if (element.tagName() == "crop")
         m_cropRect = parseRect(element);
     else if (element.tagName() == "delay")
@@ -296,7 +305,6 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_OrigFilename = im->m_OrigFilename;
 
     m_cropRect = im->m_cropRect;
-    m_ForceSize = im->m_ForceSize;
 
     m_Delay = im->m_Delay;
     m_LowNum = im->m_LowNum;

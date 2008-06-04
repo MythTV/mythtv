@@ -32,6 +32,7 @@ class MythUIImage : public MythUIType
     void SetImages(QVector<MythImage *> &images);
 
     void SetSize(int width, int height);
+    void SetSize(const QSize &size);
     void SetCropRect(int x, int y, int width, int height);
 
     void Reset(void);
@@ -57,7 +58,6 @@ class MythUIImage : public MythUIType
     QVector<MythImage *> m_Images;
 
     QRect m_cropRect;
-    QSize  m_ForceSize;
 
     int m_Delay;
     int m_LowNum;

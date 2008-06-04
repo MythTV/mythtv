@@ -55,6 +55,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void SetPosition(int x, int y);
     virtual void SetPosition(const QPoint &pos);
     virtual QPoint GetPosition(void) const;
+    virtual void SetSize(const QSize &size);
     virtual void SetArea(const QRect &rect);
     virtual QRect GetArea(void) const;
 
@@ -149,7 +150,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     MythUIType *m_Parent;
 
-    friend class XMLParseBase;
+  friend class XMLParseBase;
 };
 
 

@@ -298,6 +298,15 @@ QPoint MythUIType::GetPosition(void) const
     return QPoint(m_Area.x(), m_Area.y());
 }
 
+void MythUIType::SetSize(const QSize &size)
+{
+    m_DirtyRegion = QRegion(m_Area);
+
+    m_Area.setSize(size);
+
+    SetRedraw();
+}
+
 void MythUIType::SetArea(const QRect &rect)
 {
     if (rect == m_Area)
