@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-03-10, v0.21.00
+<date>2008-06-03, v0.21.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -101,6 +101,9 @@ like to install MythTV on a Xbox.
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
 Fedora Core distribution.
+
+See <url url="http://www.mythbuntu.org" name="http://www.mythbuntu.org"> if
+you'd like to install a customized version of Ubuntu optimized for MythTV.
 
 There is a MythTV wiki at <url url="http://wiki.mythtv.org"
 name="http://wiki.mythtv.org">.
@@ -7936,7 +7939,7 @@ v0.21.00, 2008-03-10.  Initial version for 0.21.  Update link to ATSC
 devices.  Add note that ivtv driver is in kernel.  Add note that xbox
 mini-distribution site appears dead.  Update information on HVR-1600. 
 Update minimum MySQL version.
-
+v0.21.01, 2008-06-03.  Add mythbuntu.
 -->
 
 <!--

@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-03-10, v0.21.00
+  2008-06-03, v0.21.01
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -454,6 +454,9 @@
   See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
   instructions tailored to RedHat's Fedora Core distribution.
 
+  See http://www.mythbuntu.org <http://www.mythbuntu.org> if you'd like
+  to install a customized version of Ubuntu optimized for MythTV.
+
   There is a MythTV wiki at http://wiki.mythtv.org
   <http://wiki.mythtv.org>.
 
@@ -523,6 +526,7 @@
 
   Feature that has been added to SVN (subversion, a revision control system)
   but is not available in the current release.
+
 
 
   [1m1.7.  Mailing lists / getting help[0m
@@ -659,6 +663,7 @@
   http://pvrhw.goldfish.org/ <http://pvrhw.goldfish.org/>. The website
   will let you browse what other users have reported as their hardware
   configuration, and how happy they are with the results.
+
   If you have specific questions about the suitability of specific
   hardware choices, you can consult the archives of the mythtv-users
   mailing list at http://www.gossamer-threads.com/lists/mythtv/
@@ -724,7 +729,6 @@
   requirements are quite low.  See the ``Video Capture Device'' section
   for details.
 
-
   The price differential between a frame grabber and a card that
   implements hardware MPEG-2 encoding, such as the Hauppauge PVR-x50
   series, is now less than $30 US.  Primary development in MythTV has
@@ -787,6 +791,8 @@
   rather than one of the known-good high-performance file systems.
   There are other ramifications to using XFS and JFS - neither offer the
   opportunity to shrink a filesystem; they may only be expanded.
+
+
 
                  [1mNOTE[22m:  You [4mmust[24m [4mnot[24m use ReiserFS v3 for
   your recordings. You will get corrupted recordings if you do.
@@ -909,6 +915,7 @@
   http://www.linuxtv.org/wiki/index.php/Main_Page
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
+
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels.  See
   http://www.lyngsat.com/ <http://www.lyngsat.com/> for the types of
@@ -963,6 +970,7 @@
   The Simple Answer: Once you are in the 3.2 Ghz P4-class of CPU you
   should have no issues with viewing HDTV.
 
+
   The Complicated Answer:
 
   For 720p content (1280x720), a 2.4GHz P4 should be sufficient.
@@ -972,7 +980,6 @@
   and Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2
   hardware acceleration.  If you enable the hardware acceleration, you
   may be able to use a 1.8GHz processor.
-
 
 
   [1m3.1.5.5.  Firewire.[0m
@@ -1029,6 +1036,7 @@
      cards (no driver - this is not the PVR-250/350 series of cards
      supported by the IvyTV driver)
 
+
   +o  ATI All-in-Wonder series
 
 
@@ -1041,6 +1049,7 @@
   cards and drivers will provide better quality or compatibility than
   others.  In particular, many audio devices included on motherboards
   can be problematic.
+
   The usual practice for capturing the audio associated with the video
   is to run a cable from an audio output on the video capture card to
   the Line input on a sound card. However, some video capture cards
@@ -1100,7 +1109,6 @@
   information can be included in future versions of the HOWTO. The list
   is organized by manufacturer.
 
-
   Reports here are based on what users of the cards have posted on the
   mythtv-users mailing list, so if you need configuration details,
   please search the archives at http://www.gossamer-
@@ -1155,7 +1163,6 @@
 
   MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
   driver.
-
   The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it
   also supports audio output, but you need to connect that audio output
   to something.  There are two courses of action you may take:
@@ -1167,6 +1174,8 @@
   2. Take the audio output from the PVR-350 and connect it directly to
      your television / audio system.  You must indicate that you are
      using external audio control on the PVR-350 setup page.
+
+
   [1m3.1.9.4.  Other Options[0m
 
   Some devices with on-board TV-out capability, such as Xboxes converted
@@ -1214,6 +1223,7 @@
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.  The minimum MySQL
   version is 5.0.
+
 
 
   [1m3.2.1.  Pre-compiled packages[0m
@@ -1275,9 +1285,10 @@
   Then run:
 
 
-       # apt-get update
-       # apt-get dist-upgrade
-       # apt-get update
+
+  # apt-get update
+  # apt-get dist-upgrade
+  # apt-get update
 
 
 
@@ -1334,7 +1345,6 @@
   installation.  This user has access to write new recordings to disk in
   the default directory, read and write the database, access the audio
   and video devices, and everything else that MythTV needs to do.
-
 
   See /usr/share/doc/[4mpackagename[24m/README.Debian for more information,
   including copies of the MythTV documentation.  The mythtv-doc package
@@ -1460,9 +1470,10 @@
   to your /etc/apt/sources.list
 
 
-       # Christian Marillat's packages (mplayer, lame)
-       deb http://www.debian-multimedia.org sid main
-       deb-src http://www.debian-multimedia.org sid main
+
+  # Christian Marillat's packages (mplayer, lame)
+  deb http://www.debian-multimedia.org sid main
+  deb-src http://www.debian-multimedia.org sid main
 
 
 
@@ -1522,11 +1533,11 @@
 
 
 
-       $ su -
-       # echo /usr/local/lib >> /etc/ld.so.conf
-       # /sbin/ldconfig
-       # exit
-       $
+  $ su -
+  # echo /usr/local/lib >> /etc/ld.so.conf
+  # /sbin/ldconfig
+  # exit
+  $
 
 
 
@@ -1594,17 +1605,16 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -1705,18 +1715,19 @@
   Check that it worked:
 
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
 
-       # exit
-       $
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
+
+  # exit
+  $
 
 
 
@@ -1766,22 +1777,20 @@
 
        $ tar -xjf xmltv-0.5.51.tar.bz2
 
-
-
   Install the xmltv prerequisites.  The following prerequisites are the
   minimum required; when you actually start running the xmltv setup pro-
   gram it may alert you to other modules that are required.:
 
 
 
-  $ su
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
+       $ su
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
 
 
@@ -1835,9 +1844,9 @@
 
 
 
-  $ mkdir mythtv
-  $ svn co http://svn.mythtv.org/svn/trunk/ mythtv
-  $ cd mythtv
+       $ mkdir mythtv
+       $ svn co http://svn.mythtv.org/svn/trunk/ mythtv
+       $ cd mythtv
 
 
 
@@ -1889,8 +1898,9 @@
   blue) participating, you would do something like:
 
 
-       $ export DISTCC_HOSTS='localhost red blue'
-       $ make -j 6 CXX=distcc
+
+  $ export DISTCC_HOSTS='localhost red blue'
+  $ make -j 6 CXX=distcc
 
 
 
@@ -1946,7 +1956,6 @@
        *               -       nice       0
        @audio          -       rtprio     50
        @audio          -       nice       0
-
 
 
   [1m5.4.1.2.  realtime module[0m
@@ -2073,11 +2082,10 @@
   If this is happening to you, try running the following commands.
 
 
-
-  $ su
-  # chkconfig --level 35 mysql on
-  # /etc/rc.d/init.d/mysql start
-  # exit
+       $ su
+       # chkconfig --level 35 mysql on
+       # /etc/rc.d/init.d/mysql start
+       # exit
 
 
 
