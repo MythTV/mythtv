@@ -13,7 +13,7 @@
             <position>22,175</position>
         </imagetype>
 
-        <textarea name="header" from="baseheader">
+        <textarea name="header" from="basetextarea">
             <area>0,18,800,45</area>
             <font>baselarge</font>
             <align>allcenter</align>
