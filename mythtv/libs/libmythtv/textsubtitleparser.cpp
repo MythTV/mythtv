@@ -113,7 +113,10 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
+    {
+        fclose(sub_data.file_ptr);
         return false;
+    }
 
     target.SetFrameBasedTiming(!sub_data.uses_time);
 
