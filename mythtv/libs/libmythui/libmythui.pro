@@ -25,7 +25,7 @@ HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
 HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
-HEADERS += mythuicheckbox.h
+HEADERS += mythuicheckbox.h mythuigroup.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp myththemebase.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp
@@ -34,7 +34,7 @@ SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp
 SOURCES += mythuistatetype.cpp mythlistbutton.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
-SOURCES += mythuispinbox.cpp mythuicheckbox.cpp
+SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuigroup.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -44,7 +44,7 @@ inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
-inc.files += mythuispinbox.h mythuicheckbox.h
+inc.files += mythuispinbox.h mythuicheckbox.h mythuigroup.h
 
 INSTALLS += inc
 
