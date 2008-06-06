@@ -550,8 +550,6 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
     if (m_itemList.isEmpty())
         return false;
 
-    int oldPosition = m_selPosition;
-
     bool found_it = false;
     int selectedPosition = 0;
     QList<MythListButtonItem*>::iterator it = m_itemList.begin();
