@@ -411,7 +411,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     db_vdisp_profile->SetVideoRenderer("ivtv");
 
-    allowpreviewepg = false;
+    allowpreviewepg = true;
 
     videoDevice = gContext->GetSetting("PVR350VideoDev");
 
