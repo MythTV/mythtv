@@ -109,7 +109,7 @@ class MPUBLIC JobQueue : public QObject
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "",
                          int flags = 0, int status = JOB_QUEUED,
-                         QDateTime schedruntime = QDateTime::QDateTime());
+                         QDateTime schedruntime = QDateTime());
 
     static bool QueueJobs(int jobTypes, QString chanid,
                          QDateTime starttime, QString args = "",
