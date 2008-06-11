@@ -30,7 +30,11 @@
 #include "freemheg.h"
 
 #include <sys/timeb.h>
+#ifdef __FreeBSD__ 
+#include <sys/time.h> 
+#else
 #include <time.h>
+#endif
 
 #include "../../config.h"
 

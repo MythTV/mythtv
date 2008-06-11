@@ -27,6 +27,9 @@ using namespace std;
 #   include <sys/sysinfo.h>
 # else
 #   include <sys/param.h>
+#   ifdef __FreeBSD__ 
+#     include <sys/mount.h> 
+#   endif
 #   ifdef CONFIG_CYGWIN
 #     include <sys/statfs.h>
 #   else // if !CONFIG_CYGWIN

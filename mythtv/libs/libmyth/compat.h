@@ -279,4 +279,9 @@ inline const char *dlerror(void)
     #define lseek64(f,o,w) lseek(f,o,w)
 #endif
 
+#ifdef __FreeBSD__
+    typedef off_t off64_t;
+#endif
+
+
 #endif // __COMPAT_H__
