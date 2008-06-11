@@ -689,6 +689,22 @@ QString NetworkControl::processQuery(QStringList tokens)
         else
             return listSchedule();
     }
+    else if (is_abbrev("version", tokens[1]))
+    {
+        extern const char *myth_source_version;
+        extern const char *myth_source_path;
+
+        int dbSchema = gContext->GetNumSetting("DBSchemaVer");
+
+        return QString("VERSION: %1/%2 %3 %4 QT/%5 DBSchema/%6")
+                       .arg(myth_source_version)
+                       .arg(myth_source_path)
+                       .arg(MYTH_BINARY_VERSION)
+                       .arg(MYTH_PROTO_VERSION)
+                       .arg(QT_VERSION_STR)
+                       .arg(dbSchema);
+
+    }
     else if(is_abbrev("time", tokens[1]))
         return QDateTime::currentDateTime().toString(Qt::ISODate);
     else if ((tokens.size() == 4) &&
@@ -801,7 +817,8 @@ QString NetworkControl::processHelp(QStringList tokens)
             "                      - List info about the specified program\r\n"
             "query liveTV          - List current TV schedule\r\n"
             "query liveTV CHANID   - Query current program for specified channel\r\n"
-            "query time            - Query current time on server\r\n";
+            "query time            - Query current time on server\r\n"
+            "query version         - Query Frontend version details\r\n";
     }
     else if (command == "exit")
     {
