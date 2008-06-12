@@ -11,15 +11,16 @@
 class MythUIGroup : public MythUIType
 {
 
- public:
-   MythUIGroup(MythUIType *parent, const char *name);
-  ~MythUIGroup();
+  public:
+    MythUIGroup(MythUIType *parent, const char *name);
+   ~MythUIGroup();
 
   protected:
-    virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual bool ParseElement(QDomElement &element);
 
+    friend class MythUIStateType;
 };
 
 #endif
