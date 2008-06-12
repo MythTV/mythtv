@@ -483,6 +483,7 @@ our %conf = (
   'mythtv'
   =>  [
         '--prefix=' . $PREFIX,
+        '--runtime-prefix=../Resources',
         # To "cross compile" something for a lesser Mac:
         #'--tune=G3',
         #'--disable-altivec',

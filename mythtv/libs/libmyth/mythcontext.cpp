@@ -221,9 +221,8 @@ class MythContextPrivate
     Settings *m_settings;          ///< connection stuff, theme, button style
     Settings *m_qtThemeSettings;   ///< everything else theme-related
 
-    QString   m_installprefix;     ///< Compile-time PREFIX, or generated
+    QString   m_installprefix;     ///< Compile-time RUNPREFIX, or generated
                                    ///< from enviroment ($MYTHTVDIR or $cwd)
-    QString   m_installlibdir;     ///< Compile-time LIBDIR, or generated
 
     bool      m_gui;               ///< Should this context use GUI elements?
     bool      m_backend;           ///< Is this host any sort of backend?
@@ -314,7 +313,7 @@ class MythContextPrivate
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_settings(new Settings()), m_qtThemeSettings(new Settings()),
-      m_installprefix(PREFIX), m_installlibdir(LIBDIR),
+      m_installprefix(RUNPREFIX),
       m_gui(false), m_backend(false), m_themeloaded(false),
       m_menuthemepathname(QString::null), m_themepathname(QString::null),
       m_backgroundimage(NULL),
@@ -355,31 +354,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         // use relative PREFIX values with care.
 
         VERBOSE(VB_IMPORTANT+VB_EXTRA,
-                "Relative PREFIX!\nappDir=" + prefixDir.canonicalPath() +
-                "\nprefix=" + m_installprefix + ", libdir=" + m_installlibdir);
+                "Relative PREFIX! (" + m_installprefix +
+                ")\n\t\tappDir=" + prefixDir.canonicalPath());
         prefixDir.cd(m_installprefix);
         m_installprefix = prefixDir.canonicalPath();
-
-        // Not strictly necessary, but it tidies up the path:
-        if (QDir(m_installlibdir).isRelative())
-        {
-            prefixDir = qApp->applicationDirPath();
-            prefixDir.cd(m_installlibdir);
-            m_installlibdir = prefixDir.canonicalPath();
-        }
-    }
-    else if (prefixDir.path().contains(".app/Contents/MacOS"))
-    {
-        prefixDir.cd("../Resources");
-        if (QDir(prefixDir.canonicalPath() + "/bin").exists() ||
-            QDir(prefixDir.canonicalPath() + "/share").exists())
-            m_installprefix = prefixDir.canonicalPath();
-        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
-            m_installlibdir = prefixDir.canonicalPath() + "/lib";
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1, libdir = %2")
-                          .arg(m_installprefix).arg(m_installlibdir));
+    VERBOSE(VB_IMPORTANT, "Using runtime prefix = " + m_installprefix);
 }
 
 MythContextPrivate::~MythContextPrivate()
@@ -1945,7 +1926,7 @@ QString MythContext::GetShareDir(void)
 
 QString MythContext::GetLibraryDir(void) 
 { 
-    return d->m_installlibdir + "/mythtv/"; 
+    return d->m_installprefix + "/lib/mythtv/"; 
 }
 
 QString MythContext::GetThemesParentDir(void) 

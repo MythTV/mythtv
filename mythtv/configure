@@ -181,6 +181,8 @@ BLOCK_QUOTE
   echo ""
   echo "  --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)"
   echo ""
+  echo "  --runtime-prefix=PREFIX  prefix to be used at runtime"
+  echo "                           (e.g. .. or /myth/latest)"
   echo "  --with-bindings=LIST     install the bindings specified in the"
   echo "                           comma-separated list"
   echo "                           Supported bindings: perl, python"
@@ -1160,6 +1162,7 @@ targetos=$(tolower $(uname -s))
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
+RUNPREFIX=$PREFIX
 audio_alsa="default"
 audio_alsa_libs="-lasound"
 audio_arts="default"
@@ -1394,6 +1397,8 @@ for opt do
   --disable-backend)
   ;;
   --enable-mac-bundle) enable mac_bundle
+  ;;
+  --runtime-prefix=*) RUNPREFIX="$optval"
   ;;
   --previous|--prev)
       echo "No history of previous configure parameters."
@@ -2889,6 +2894,7 @@ echo "Compiler cache            $ccache$ccache_txt"
 echo "DistCC                    $distcc$distcc_txt"
 echo "qmake                     $(which $qmake)"
 echo "install prefix            $PREFIX"
+echo "runtime prefix            $RUNPREFIX"
 <<BLOCK_QUOTE
 echo "source path               $source_path"
 echo "C compiler                $cc"
@@ -3075,6 +3081,7 @@ echo "#ifndef FFMPEG_CONFIG_H" >> $TMPH
 echo "#define FFMPEG_CONFIG_H" >> $TMPH
 echo "#define FFMPEG_CONFIGURATION \"$FFMPEG_CONFIGURATION\"" >> $TMPH
 
+echo "RUNPREFIX=$RUNPREFIX" >> $MYTH_CONFIG_MAK
 echo "PREFIX=$PREFIX" >> $MYTH_CONFIG_MAK
 echo "LIBDIR=$libdir" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE

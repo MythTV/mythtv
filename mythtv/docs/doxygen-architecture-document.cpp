@@ -525,7 +525,7 @@ to access these assets:
 <ol>
   <li>GetInstallPrefix() returns the value of MCP's m_installprefix variable,
       which is either the runtime env. var. $MYTHTVDIR or the compile-time var.
-      PREFIX. If these are relative paths, it is initialised relative to the
+      RUNPREFIX. If these are relative paths, it is initialised relative to the
       binary location. The value is used thus:
   <ul>
     <li>GetInstallPrefix() + /share/mythtv/ = GetShareDir(), GetFontsDir()</li>
@@ -542,13 +542,9 @@ to access these assets:
     <li>GetInstallPrefix() + /bin/ignyte</li>
     <li>GetInstallPrefix() + /bin/mythfilldatabase</li>
     <li>GetInstallPrefix() + /bin/mtd</li>
-  </ul></li>
-
-  <li>GetLibraryDir() returns the value of MCP's m_installlibdir variable,
-      which is always the LIBDIR compile-time var. Its value is only used for:
-  <ul>
-    <li>GetLibraryDir() + plugins/ = GetPluginsDir()</li>
-    <li>GetLibraryDir() + filters/ = GetFiltersDir()</li>
+    <li>GetInstallPrefix() + /lib/mythtv/ = GetLibraryDir()</li>
+    <li>GetInstallPrefix() + /lib/mythtv/plugins/ = GetPluginsDir()</li>
+    <li>GetInstallPrefix() + /lib/mythtv/filters/ = GetFiltersDir()</li>
   </ul></li>
 
   <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,

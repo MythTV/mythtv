@@ -965,7 +965,7 @@ comment => 'broken Makefile, delete it' ],
 [ file => $mythtv.'mythtv/Makefile',
  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
            'cd '.$unixmythtv.'mythtv',
-           './configure --prefix='.$unixbuild.
+           './configure --prefix='.$unixbuild.' --runtime-prefix=..'.
            ' --disable-dbox2 --disable-hdhomerun'.
            ' --disable-iptv --disable-joystick-menu --disable-xvmc-vld'.
            ' --disable-xvmc --enable-directx'.

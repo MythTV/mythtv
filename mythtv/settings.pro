@@ -3,6 +3,12 @@ CONFIG += $$CCONFIG
 isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
+isEmpty( RUNPREFIX ) {
+    RUNPREFIX = $$PREFIX
+}
+isEmpty( LIBDIR ) {
+    LIBDIR = $${RUNPREFIX}/lib
+}
 
 LIBVERSION = 0.22
 VERSION = 0.22.0
@@ -89,8 +95,6 @@ release:contains( ARCH_POWERPC, yes ) {
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
-DEFINES += PREFIX=\\\"$${PREFIX}\\\"
-DEFINES += LIBDIR=\\\"$${LIBDIR}\\\"
 
 # construct linking path
 LOCAL_LIBDIR_X11 =
