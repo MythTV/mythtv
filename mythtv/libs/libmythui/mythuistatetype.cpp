@@ -1,9 +1,9 @@
+// MythUI headers
 #include "mythuistatetype.h"
 #include "mythuiimage.h"
+#include "mythuigroup.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
-
-#include "mythcontext.h"
 
 MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
                 : MythUIType(parent, name)
@@ -155,7 +155,16 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         QString name = element.attribute("name", "").toLower();
         QString type = element.attribute("type", "").toLower();
 
-        MythUIType *uitype = ParseChildren(element, this);
+        QString statename = "";
+
+        if (!type.isEmpty())
+            statename = type;
+        else
+            statename = name;
+
+        MythUIGroup *uitype = new MythUIGroup(this, statename);
+        uitype->ParseElement(element);
+        ParseChildren(element, uitype);
 
         if (!type.isEmpty())
         {
@@ -194,10 +203,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
 {
     MythUIStateType *st = dynamic_cast<MythUIStateType *>(base);
     if (!st)
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
         return;
-    }
 
     ClearMaps();
 

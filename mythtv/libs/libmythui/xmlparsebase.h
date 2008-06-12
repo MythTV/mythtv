@@ -27,8 +27,7 @@ class XMLParseBase
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);
 
-    // if more than one, returns last one parsed.
-    static MythUIType *ParseChildren(QDomElement &element, MythUIType *parent);
+    static void ParseChildren(QDomElement &element, MythUIType *parent);
 
     // parse one and return it.
     static MythUIType *ParseUIType(QDomElement &element, const QString &type,

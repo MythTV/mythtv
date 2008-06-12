@@ -163,9 +163,12 @@ void XMLParseBase::ClearGlobalObjectStore(void)
     GetGlobalObjectStore();
 }
 
-MythUIType *XMLParseBase::ParseChildren(QDomElement &element, 
+void XMLParseBase::ParseChildren(QDomElement &element,
                                         MythUIType *parent)
 {
+    if (!parent)
+        VERBOSE(VB_IMPORTANT, "Parent is NULL");
+
     MythUIType *ret = NULL;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -198,12 +201,10 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
                      type == "statetype" ||
                      type == "clock")
             {
-                ret = ParseUIType(info, type, parent);
+                ParseUIType(info, type, parent);
             }
         }
     }
-
-    return ret;
 }
 
 MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
@@ -217,6 +218,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         return NULL;
     }
 
+    // check for name in immediate parent as siblings cannot share names
     if (parent && parent->GetChild(name))
     {
         // if we're the global object store, assume it's just a theme overriding
@@ -228,8 +230,6 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                                      .arg(name).arg(parent->objectName()));
         return NULL;
     }
-
-    // check for name in parent
 
     MythUIType *uitype = NULL;
     MythUIType *base = NULL;

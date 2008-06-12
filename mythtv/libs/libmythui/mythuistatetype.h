@@ -29,6 +29,8 @@ class MythUIStateType : public MythUIType
     bool DisplayState(const QString &name);
     bool DisplayState(StateType type);
 
+    MythUIType* GetCurrentState() { return m_CurrentState; }
+
     void ClearImages();
 
   protected:
