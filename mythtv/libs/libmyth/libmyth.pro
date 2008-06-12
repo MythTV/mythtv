@@ -83,7 +83,7 @@ inc2.path  = $${PREFIX}/include/mythtv/libmyth
 inc2.files = $${inc.files}
 
 
-DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
+DEFINES += RUNPREFIX=\"$${RUNPREFIX}\"
 
 using_oss {
     DEFINES += USING_OSS
