@@ -68,11 +68,13 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
 # TODO - Only $mingw is tested and most likely is safe to change.
 
-# perl compatible paths (single forward slashes in DOS style):
-my $msys = 'C:/MSys/1.0/'; # must end in slash, and use forward slashes /
-my $sources = 'C:/msys/1.0/sources/'; # must end in slash, and use forward slashes /
-my $mingw = 'C:/MinGW/'; # must end in slash, and use forward slashes /
-my $mythtv = 'C:/mythtv/';  # this is where the entire SVN checkout lives so c:/mythtv/mythtv/ is the main codebase.  # must end in slash, and use forward slashes /
+# Perl compatible paths. DOS style, but forward slashes, and must end in slash:
+my $msys    = 'C:/MSys/1.0/';
+my $sources = 'C:/msys/1.0/sources/';
+my $mingw   = 'C:/MinGW/';
+my $mythtv  = 'C:/mythtv/';       # this is where the entire SVN checkout lives
+                                  # so c:/mythtv/mythtv/ is the main codebase.
+my $build   = 'C:/mythtv/build/'; # where 'make install' installs into
 
 # DOS executable CMD.exe versions of the paths (for when we shell to DOS mode):
 my $dosmsys    = perl2dos($msys);
@@ -80,11 +82,17 @@ my $dossources = perl2dos($sources);
 my $dosmingw   = perl2dos($mingw); 
 my $dosmythtv  = perl2dos($mythtv);
 
-# unix/msys equivalent versions of the paths (for when we shell to MSYS/UNIX mode):
-my $unixmsys = '/'; # msys root is always mounted here, irrespective of where DOS says it really is.
-my $unixmingw = '/mingw/'; # mingw is always mounted here under unix, if you setup mingw right in msys, so we will usually just say /mingw in the code, not '.$unixmingw.' or similar (see /etc/fstab)
-my $unixsources = perl2unix($sources); $unixsources =~ s#$unixmsys#/#i;  #strip leading msys path, if there, it's unnecessary as it's mounted under /
+# Unix/MSys equiv. versions of the paths (for when we shell to MSYS/UNIX mode):
+my $unixmsys  = '/';       # MSys root is always mounted here,
+                           # irrespective of where DOS says it really is.
+my $unixmingw = '/mingw/'; # MinGW is always mounted here under unix,
+                           # if you setup mingw right in msys,
+                           # so we will usually just say /mingw in the code,
+                           # not '.$unixmingw.' or similar (see /etc/fstab)
+my $unixsources = perl2unix($sources);
+$unixsources =~ s#$unixmsys#/#i;  #strip leading msys path, if there, it's unnecessary as it's mounted under /
 my $unixmythtv  = perl2unix($mythtv);
+my $unixbuild   = perl2unix($build);
 
 
 #NOTE: ITS IMPORTANT that the PATHS use the correct SLASH-ing method for the type of action:
@@ -520,7 +528,16 @@ push @{$expect},
 [ grep => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'], shell => ['rm '.$unixmythtv.'mythtv/Makefile','nocheck'], comment => 'broken Makefile, delete it' ],
 
 # configure
-[ file => $mythtv.'mythtv/Makefile', shell => ['source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','./configure --prefix=/usr --disable-dbox2 --disable-hdhomerun --disable-dvb --disable-ivtv --disable-iptv --disable-joystick-menu --disable-xvmc-vld --disable-x11 --disable-xvmc --enable-directx --enable-memalign-hack --cpu=k8 --compile-type=debug'], comment => 'do we already have a Makefile for mythtv?' ],
+[ file => $mythtv.'mythtv/Makefile',
+ shell => ['source '.$unixmythtv.'qt_env.sh',
+           'cd '.$unixmythtv.'mythtv',
+           './configure --prefix='.$unixbuild.' --runtime-prefix=..'.
+           ' --disable-dbox2 --disable-hdhomerun'.
+           ' --disable-dvb --disable-ivtv --disable-iptv'.
+           ' --disable-joystick-menu --disable-xvmc-vld --disable-x11'.
+           ' --disable-xvmc --enable-directx'.
+           ' --enable-memalign-hack --cpu=k8 --compile-type=debug'],
+comment => 'do we already have a Makefile for mythtv?' ],
 # make
 [ newer => [$mythtv.'mythtv/libs/libmyth/libmyth-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmyth/libmyth-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmyth/libmyth-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
 [ newer => [$mythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll',$mythtv.'mythtv/last_build.txt'], shell => ['rm '.$unixmythtv.'mythtv/libs/libmythtv/libmythtv-0.21.dll','source '.$unixmythtv.'qt_env.sh','cd '.$unixmythtv.'mythtv','make'], comment => 'libs/libmythtv/libmythtv-0.21.dll - redo make unless all these files exist, and are newer than the last_build.txt identifier' ],
