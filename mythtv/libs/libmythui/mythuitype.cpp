@@ -8,8 +8,6 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythcontext.h"
-
 MythUIType::MythUIType(QObject *parent, const char *name)
           : QObject(parent, name)
 {
@@ -52,9 +50,10 @@ void MythUIType::AddChild(MythUIType *child)
     m_ChildrenList.push_back(child);
 }
 
-MythUIType *MythUIType::GetChild(const char *name, const char *inherits)
+MythUIType *MythUIType::GetChild(const char *name, const char *inherits,
+                                 const bool recurse)
 {
-    QObject *ret = child(name, inherits);
+    QObject *ret = child(name, inherits, recurse);
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
     return NULL;
@@ -552,13 +551,13 @@ void MythUIType::CopyFrom(MythUIType *base)
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end(); 
          ++it)
     {
-         (*it)->CreateCopy(this);
+        (*it)->CreateCopy(this);
     }
 }
 
 void MythUIType::CreateCopy(MythUIType *)
 {
-    VERBOSE(VB_IMPORTANT, "Copy called on base type?");
+    // Calling CreateCopy on base type is not valid
 }
 
 //FIXME add alpha/movement/etc.
@@ -566,6 +565,8 @@ bool MythUIType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));
+    else if (element.tagName() == "area")
+        SetArea(parseRect(element));
     else if (element.tagName() == "alpha")
     {
         m_Alpha = getFirstText(element).toInt();
