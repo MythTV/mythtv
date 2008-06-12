@@ -59,10 +59,12 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     cellHeight = 1;
     lcdStartCol = LCD_START_COL;
     if (lcdWidth < 12)
+    {
         if (lcdHeight == 1)
            lcdStartCol = 0;
         else
            lcdStartCol = 1;
+    }
 
     hostname = "";
     port = 13666;
