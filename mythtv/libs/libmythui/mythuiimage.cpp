@@ -113,7 +113,7 @@ void MythUIImage::SetImage(MythImage *img)
 
     img->UpRef();
     m_Images.push_back(img);
-    m_Area.setSize(img->size());
+    SetSize(img->size());
     m_CurPos = 0;
 }
 
@@ -130,7 +130,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
         QSize aSize = m_Area.size();
         aSize = aSize.expandedTo(im->size());
-        m_Area.setSize(aSize);
+        SetSize(aSize);
     }
 
     m_CurPos = 0;
@@ -181,7 +181,7 @@ bool MythUIImage::Load(void)
         }
 
         aSize = aSize.expandedTo(image->size());
-        m_Area.setSize(aSize);
+        SetSize(aSize);
 
         image->SetChanged();
 

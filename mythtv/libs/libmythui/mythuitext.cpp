@@ -235,7 +235,11 @@ void MythUIText::StopCycling(void)
 bool MythUIText::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
-        m_Area = m_OrigDisplayRect = m_drawRect = parseRect(element);
+    {
+        QRect area = parseRect(element);
+        m_OrigDisplayRect = area;
+        SetArea(area);
+    }
     else if (element.tagName() == "altarea")
         m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")

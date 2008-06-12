@@ -299,9 +299,15 @@ QPoint MythUIType::GetPosition(void) const
 
 void MythUIType::SetSize(const QSize &size)
 {
+    if (size == m_Area.size())
+        return;
+
     m_DirtyRegion = QRegion(m_Area);
 
     m_Area.setSize(size);
+
+    if (m_Parent)
+        m_Parent->ExpandArea(m_Area);
 
     SetRedraw();
 }
@@ -313,8 +319,22 @@ void MythUIType::SetArea(const QRect &rect)
 
     m_DirtyRegion = QRegion(m_Area);
 
+    if (m_Parent)
+        m_Parent->ExpandArea(rect);
+
     m_Area = rect;
     SetRedraw();
+}
+
+void MythUIType::ExpandArea(const QRect &rect)
+{
+    QSize childSize = rect.size();
+    QSize size = m_Area.size();
+
+    if (childSize == size)
+        return;
+
+    SetSize(size.expandedTo(childSize));
 }
 
 QRect MythUIType::GetArea(void) const
@@ -536,7 +556,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_Visible = base->m_Visible;
     m_CanHaveFocus = base->m_CanHaveFocus;
 
-    m_Area = base->m_Area;
+    SetArea(base->m_Area);
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
     m_AlphaChange = base->m_AlphaChange;
