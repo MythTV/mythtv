@@ -358,7 +358,9 @@ push @{$expect},
 # primary server site is:
 # http://dev.mysql.com/get/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi/from/http://mysql.mirrors.ilisys.com.au/
 [ archive => $sources.'mysql-essential-5.0.45-win32.msi', 'fetch' => 'http://mirror.services.wisc.edu/mysql/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi',comment => 'fetch mysql binaries - this is a big download(23MB) so it might take a while' ],
-[ file => "c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll", exec => $dossources.'mysql-essential-5.0.45-win32.msi /quiet INSTALLLEVEL=2',comment => 'Install mysql - be sure to choose to do a "COMPLETE" install. You should also choose NOT to "configure the server now" ' ],
+[ file => "c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll",
+  exec => $dossources.'mysql-essential-5.0.45-win32.msi INSTALLLEVEL=2',
+comment => 'Install mysql - be sure to choose to do a "COMPLETE" install. You should also choose NOT to "configure the server now" ' ],
 
 # after mysql install 
 [ filesame => [$mingw.'bin/libmySQL.dll','c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll'],  copy => [''=>'',comment => 'post-mysql-install'] ],
