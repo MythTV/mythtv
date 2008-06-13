@@ -19,8 +19,6 @@ class MythUIGroup : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual bool ParseElement(QDomElement &element);
-
-    friend class MythUIStateType;
 };
 
 #endif

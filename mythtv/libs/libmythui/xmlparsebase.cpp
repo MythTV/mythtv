@@ -17,6 +17,7 @@
 #include "mythuibutton.h"
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"
+#include "mythuigroup.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -169,7 +170,6 @@ void XMLParseBase::ParseChildren(QDomElement &element,
     if (!parent)
         VERBOSE(VB_IMPORTANT, "Parent is NULL");
 
-    MythUIType *ret = NULL;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -193,6 +193,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
             }
             else if (type == "imagetype" ||
                      type == "textarea" ||
+                     type == "group" ||
                      type == "textedit" ||
                      type == "button" ||
                      type == "buttonlist" ||
@@ -264,6 +265,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIImage(parent, name);
     else if (type == "textarea")
         uitype = new MythUIText(parent, name);
+    else if (type == "group")
+        uitype = new MythUIGroup(parent, name);
     else if (type == "textedit")
         uitype = new MythUITextEdit(parent, name, needInit);
     else if (type == "button")
@@ -323,6 +326,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             }
             else if (info.tagName() == "imagetype" ||
                      info.tagName() == "textarea" ||
+                     info.tagName() == "group" ||
                      info.tagName() == "textedit" ||
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
@@ -432,6 +436,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
                 else if (type == "imagetype" ||
                          type == "textarea" ||
+                         type == "group" ||
                          type == "textedit" ||
                          type == "button" ||
                          type == "buttonlist" ||

@@ -162,9 +162,10 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         else
             statename = name;
 
-        MythUIGroup *uitype = new MythUIGroup(this, statename);
-        uitype->ParseElement(element);
-        ParseChildren(element, uitype);
+        element.setAttribute("name",statename);
+
+        MythUIGroup *uitype = dynamic_cast<MythUIGroup *>
+                                (ParseUIType(element, "group", this));
 
         if (!type.isEmpty())
         {
