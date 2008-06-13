@@ -2346,7 +2346,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
         memset(avgHistogram, 0, sizeof(avgHistogram));
 
         for (long i = 1; i <= framesProcessed; i++)
-            avgHistogram[frameInfo[i].avgBrightness] += 1;
+            avgHistogram[clamp(frameInfo[i].avgBrightness, 0, 255)] += 1;
 
         for (int i = 1; i <= 255 && minAvg == -1; i++)
             if (avgHistogram[i] > (framesProcessed * 0.0004))

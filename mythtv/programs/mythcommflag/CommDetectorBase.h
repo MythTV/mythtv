@@ -46,6 +46,7 @@ signals:
     void breathe();
 
 protected:    
+    ~CommDetectorBase() {}
     bool m_bPaused;
     bool m_bStop;    
     

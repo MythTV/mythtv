@@ -715,10 +715,6 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
     visible = GetVisibleOSDBounds(visible_aspect, font_scaling, themeaspect);
 }
 
-static float sq(float a) { return a*a; }
-//static float lerp(float r, float a, float b)
-//    { return ((1.0f - r) * a) + (r * b); }
-
 /**
  * \fn VideoOutput::GetVisibleOSDBounds(float&,float&,float) const
  * \brief Returns visible portions of total OSD bounds

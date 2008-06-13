@@ -13,6 +13,7 @@ using namespace std;
 #include "osdsurface.h"
 #include "osdlistbtntype.h"
 #include "osdtypeteletext.h"
+#include "util.h"
 
 #include "mythcontext.h"
 #include "mythdialogs.h"
@@ -1263,11 +1264,6 @@ void OSDTypeText::DrawString(OSDSurface *surface, QRect rect,
         }
     }
 } 
-
-int clamp(int val, int minimum, int maximum)
-{
-    return min(max(val, minimum), maximum);
-}
 
 bool OSDTypeText::MoveCursor(int dir)
 {

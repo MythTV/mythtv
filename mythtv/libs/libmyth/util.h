@@ -1,6 +1,9 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <algorithm>
+using namespace std;
+
 #include <qstringlist.h>
 #include <qdatetime.h>
 #include <qcolor.h>
@@ -88,6 +91,25 @@ MPUBLIC unsigned long long myth_get_approximate_large_file_size(
     const QString &fname);
 
 MPUBLIC double MythGetPixelAspectRatio(void);
+
+inline float clamp(float val, float minimum, float maximum)
+{
+    return min(max(val, minimum), maximum);
+}
+inline int   clamp(int val, int minimum, int maximum)
+{
+    return min(max(val, minimum), maximum);
+}
+inline float lerp(float r, float a, float b)
+{
+    return ((1.0f - r) * a) + (r * b);
+}
+inline int   lerp(float r, int a, int b)
+{
+    return (int) lerp(r, (float) a, (float) b);
+}
+inline float sq(float a) { return a*a; }
+inline int   sq(int   a) { return a*a; }
 
 // CPU Tick timing function
 #ifdef MMX

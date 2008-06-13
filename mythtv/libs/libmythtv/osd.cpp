@@ -38,8 +38,6 @@ static bool   cc708_defaults_initialized = false;
 static QMutex cc708_init_lock;
 static void initialize_osd_fonts(void);
 
-static float sq(float a) { return a*a; }
-
 #define LOC QString("OSD: ")
 #define LOC_ERR QString("OSD, Error: ")
 

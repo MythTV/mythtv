@@ -553,7 +553,10 @@ int DoFlagCommercials(
             program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
     }
 
-    delete commDetector;
+    CommDetectorBase *tmp = commDetector;
+    commDetector = NULL;
+    sleep(1);
+    tmp->deleteLater();
 
     return comms_found;
 }
