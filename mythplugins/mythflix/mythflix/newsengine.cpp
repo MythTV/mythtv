@@ -234,7 +234,8 @@ void NewsSite::process()
 
     QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));
 
-    m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplifyWhiteSpace();
+    m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text();
+    StripHtml(m_desc);
 
     QDomNodeList items = domDoc.elementsByTagName(QString::fromLatin1("item"));
 
@@ -242,22 +243,22 @@ void NewsSite::process()
     QString title, description, url;
     for (int i = 0; i < items.count(); i++) {
         itemNode = items.item(i);
-        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplified();
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
         if (!descNode.isNull())
         {
-            description = descNode.toElement().text().simplifyWhiteSpace();
+            description = descNode.toElement().text().simplified();
             ReplaceHtmlChar(description);
-        }            
+            StripHtml(description);
+        }
         else
             description = QString::null;
         QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
         if (!linkNode.isNull())
-            url = linkNode.toElement().text().simplifyWhiteSpace();
+            url = linkNode.toElement().text().simplified();
         else
             url = QString::null;
 
-            
         new NewsArticle(this, title, description, url);
     }
 
@@ -290,3 +291,33 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&#233;",QChar(233));
 }
 
+void NewsSite::StripHtml(QString &text)
+{
+    text = text.simplified();
+    // Replace paragraph and break HTML with newlines
+    if( text.find(QRegExp("</(p|P)>")) )
+    {
+        text.replace( QRegExp("<(p|P)>"), "");
+        text.replace( QRegExp("</(p|P)>"), "\n\n");
+    }
+    else
+    {
+        text.replace( QRegExp("<(p|P)>"), "\n\n");
+        text.replace( QRegExp("</(p|P)>"), "");
+    }
+    text.replace( QRegExp("<(br|BR|)/>"), "\n");
+    text.replace( QRegExp("<(br|BR|)>"), "\n");
+    // These are done instead of simplified
+    // because that function also strips out newlines
+    // Replace tab characters with nothing
+//     text.replace( QRegExp("\t"), "");
+//     // Replace double space with single
+//     text.replace( QRegExp("  "), "");
+//     // Replace whitespace at beginning of lines with newline
+//     text.replace( QRegExp("\n "), "\n");
+    // Remove any remaining HTML tags
+    QRegExp removeHTML(QRegExp("</?.+>"));
+    removeHTML.setMinimal(true);
+    text.remove((const QRegExp&) removeHTML);
+    text = text.trimmed();
+}

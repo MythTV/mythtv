@@ -108,6 +108,7 @@ private:
     Q3UrlOperator*     m_urlOp;
 
     void ReplaceHtmlChar( QString &s);
+    void StripHtml(QString &text);
 
 signals:
 

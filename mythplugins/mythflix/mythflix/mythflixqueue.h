@@ -53,6 +53,7 @@ public:
 
   private:
     void loadData();
+    MythImage* LoadPosterImage(QString location);
 
     void UpdateNameText();
 

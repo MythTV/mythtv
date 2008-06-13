@@ -189,36 +189,7 @@ void MythFlix::updateInfoView(MythListButtonItem* selected)
                 m_titleText->SetText(article->title());
 
             if (m_descText)
-            {
-                QString artText = article->description();
-                // Replace paragraph and break HTML with newlines
-                if( artText.find(QRegExp("</(p|P)>")) )
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "");
-                    artText.replace( QRegExp("</(p|P)>"), "\n\n");
-                }
-                else
-                {
-                    artText.replace( QRegExp("<(p|P)>"), "\n\n");
-                    artText.replace( QRegExp("</(p|P)>"), "");
-                }
-                artText.replace( QRegExp("<(br|BR|)/>"), "\n");
-                artText.replace( QRegExp("<(br|BR|)>"), "\n");
-                // These are done instead of simplifyWhitespace
-                // because that function also strips out newlines
-                // Replace tab characters with nothing
-                artText.replace( QRegExp("\t"), "");
-                // Replace double space with single
-                artText.replace( QRegExp("  "), "");
-                // Replace whitespace at beginning of lines with newline
-                artText.replace( QRegExp("\n "), "\n");
-                // Remove any remaining HTML tags
-                QRegExp removeHTML(QRegExp("</?.+>"));
-                removeHTML.setMinimal(true);
-                artText.remove((const QRegExp&) removeHTML);
-                artText = artText.stripWhiteSpace();
-                m_descText->SetText(artText);
-            }
+                m_descText->SetText(article->description());
 
             QString imageLoc = article->articleURL();
             int length = imageLoc.length();
