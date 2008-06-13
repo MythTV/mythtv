@@ -64,6 +64,7 @@ void MythUIImage::Clear(void)
 void MythUIImage::Init(void)
 {
     m_cropRect = QRect(0,0,0,0);
+    m_ForceSize = QSize(0,0);
 
     m_CurPos = 0;
     m_LastDisplay = QTime::currentTime();
@@ -112,6 +113,15 @@ void MythUIImage::SetImage(MythImage *img)
     m_Delay = -1;
 
     img->UpRef();
+
+    if (!m_ForceSize.isNull())
+    {
+        int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : img->width();
+        int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : img->height();
+
+        img->Assign(img->smoothScale(w, h));
+    }
+
     m_Images.push_back(img);
     SetSize(img->size());
     m_CurPos = 0;
@@ -126,6 +136,15 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
     {
         MythImage *im = (*it);
         im->UpRef();
+
+        if (!m_ForceSize.isNull())
+        {
+            int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : im->width();
+            int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : im->height();
+
+            im->Assign(im->smoothScale(w, h));
+        }
+
         m_Images.push_back(im);
 
         QSize aSize = m_Area.size();
@@ -170,16 +189,15 @@ bool MythUIImage::Load(void)
             image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                            m_reflectLength);
 
-        QSize aSize = m_Area.size();
-
-        if (!aSize.isNull())
+        if (!m_ForceSize.isNull())
         {
-            int w = (m_Area.width() != -1) ? m_Area.width() : image->width();
-            int h = (m_Area.height() != -1) ? m_Area.height() : image->height();
+            int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
+            int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : image->height();
 
             image->Assign(image->smoothScale(w, h));
         }
 
+        QSize aSize = m_Area.size();
         aSize = aSize.expandedTo(image->size());
         SetSize(aSize);
 
@@ -255,6 +273,12 @@ bool MythUIImage::ParseElement(QDomElement &element)
         if (!tmp.isEmpty())
             m_HighNum = tmp.toInt();
     }
+    else if (element.tagName() == "area")
+    {
+        QRect area = parseRect(element);
+        SetArea(area);
+        m_ForceSize = area.size();
+    }
     else if (element.tagName() == "staticsize")
     {
         QSize forceSize = parseSize(element);
@@ -305,6 +329,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_OrigFilename = im->m_OrigFilename;
 
     m_cropRect = im->m_cropRect;
+    m_ForceSize = im->m_ForceSize;
 
     m_Delay = im->m_Delay;
     m_LowNum = im->m_LowNum;

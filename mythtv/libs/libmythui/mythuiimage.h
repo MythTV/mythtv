@@ -58,6 +58,7 @@ class MythUIImage : public MythUIType
     QVector<MythImage *> m_Images;
 
     QRect m_cropRect;
+    QSize  m_ForceSize;
 
     int m_Delay;
     int m_LowNum;
